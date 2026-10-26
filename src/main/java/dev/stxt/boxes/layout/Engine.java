@@ -30,6 +30,10 @@ public final class Engine {
     private final GridLayout grid;
     private final AbsoluteLayout absolute;
 
+    /**
+     * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
+     * calculables a mano. El PDF se maqueta con {@code new Engine(new PdfMetrics())}.
+     */
     public Engine() {
         this(new FixedMetrics());
     }

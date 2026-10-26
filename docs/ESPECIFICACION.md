@@ -370,7 +370,10 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
 - **Altura.** Cada línea mide `Line height`. La altura del contenido es el número de líneas
   por `Line height`.
 - **Alineación.** `left`, `right` y `center` desplazan cada línea; `justify` reparte
-  el sobrante entre los espacios, salvo en la última línea de cada párrafo.
+  el sobrante a partes iguales entre los espacios de la línea. No se justifican la última
+  línea de cada párrafo, las líneas de una sola palabra ni las que desbordan (los espacios no
+  se comprimen). La última línea de una página no es la última de su párrafo si este continúa
+  en la página siguiente, así que se justifica.
 - **Tamaños intrínsecos.** min-content = la palabra más ancha; max-content = el párrafo más
   largo en una sola línea.
 - **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
@@ -382,6 +385,8 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
 `Offset`. Su hueco original se conserva y sus hermanos no se mueven. Si se declaran
 arriba y abajo, gana arriba; si se declaran izquierda y derecha, gana izquierda. Una caja
 `relative` sin desplazamiento sirve como containing block de sus descendientes `absolute`.
+Los porcentajes del `Offset` se resuelven contra el ancho o el alto del containing block; uno
+vertical con el alto del containing block indefinido cuenta como `auto` (no desplaza).
 
 **`absolute`.** La caja sale del flujo: no ocupa espacio ni contribuye a la altura `auto` de su
 padre. En cada eje se cumple:
@@ -407,13 +412,19 @@ términos sean `auto`:
 
 En los casos con algún término `auto`, los márgenes `auto` valen 0. El **tamaño automático** es
 el ajuste al contenido (`fit-content`) en horizontal y la altura del contenido en vertical. La
-**posición estática** es donde habría quedado la caja si fuera `static`.
+**posición estática** es donde habría quedado la caja si fuera `static`:
+
+- en flujo de bloque, el cursor vertical más los márgenes colapsados de las cajas anteriores,
+  sin colapsar con el margen superior de la propia caja, que se suma después según la ecuación;
+- dentro de un contenedor flex o grid, la esquina superior izquierda de su caja de contenido.
 
 **`fixed`.** Como `absolute`, pero su containing block es el área útil. En modo paginado **se
 pinta en todas las páginas** (cabeceras, pies, marcas de agua). En modo continuo no hay ventana,
 y se comporta como `absolute` respecto al área útil del documento. Las cajas `fixed` no reservan
 espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlas en el margen de
-la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`).
+la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si una caja `fixed`
+depende de su posición estática (desplazamientos `auto`), se toma la de la primera página en la
+que aparece y se repite igual en todas.
 
 **Orden de cálculo.** Las cajas posicionadas fuera de flujo se resuelven cuando su containing
 block ya conoce su tamaño, después del layout en flujo. En modo continuo, cuando el containing
@@ -456,7 +467,9 @@ el **eje cruzado**.
    redistribuye con el ancho final). La línea mide lo que el ítem más alto; sin `Wrap` y con
    tamaño cruzado definido en el contenedor, la única línea mide lo que el contenedor.
 7. **Estirar:** los ítems con `stretch` y sin tamaño cruzado declarado pasan a medir lo que la
-   línea, y se repite su layout.
+   línea, y se repite su layout. En `column`, si el contenedor tiene una sola línea, estos
+   ítems se miden desde el principio con el ancho del contenedor; con `Wrap`, se miden con su
+   ajuste al contenido y después se estiran al ancho de su línea sin recalcular su alto.
 8. **Alinear** en el eje principal, en el cruzado y las líneas en el contenedor.
 
 Con tamaño cruzado `auto`, el contenedor mide la suma de sus líneas más los huecos.
@@ -480,6 +493,9 @@ Con tamaño cruzado `auto`, el contenedor mide la suma de sus líneas más los h
 | `between` | 0 | hueco + L/(n−1) | 0 |
 | `around` | L/2n | hueco + L/n | L/2n |
 | `evenly` | L/(n+1) | hueco + L/(n+1) | L/(n+1) |
+
+Si el sobrante es negativo (los ítems desbordan), `between` se alinea como `start` y `around` y
+`evenly`, como `center`. Lo mismo vale para las líneas con `Lines`.
 
 **Comportamientos a tener en cuenta:**
 
@@ -524,6 +540,8 @@ ambas; `auto` equivale a `minmax(min-content, max-content)`; `1fr` equivale a
    reparto.
 5. **Estirar:** si no hay fracciones y sobra espacio, se reparte entre las pistas `auto`.
 
+Una pista `fit-content` se trata como `auto`.
+
 Las **columnas** se dimensionan primero, con los anchos min-content y max-content de los
 ítems. Las **filas** después, con la altura de cada ítem maquetado al ancho de sus columnas.
 Con `Height: auto` en el contenedor, las filas en fracción no tienen espacio que repartir y
@@ -532,6 +550,8 @@ miden en proporción a su contenido: todas las filas `1fr` miden lo que la más 
 **Alineación en la celda.** Cada ítem ocupa un área formada por sus pistas y los huecos
 internos. Con `stretch` (por defecto) y sin `Width`/`Height` declarado, ocupa toda el área y se
 repite su layout. Con `start`, `end` o `center`, conserva su tamaño de contenido y se desplaza.
+Los porcentajes de alto de un ítem se resuelven contra el alto de su área en el layout final;
+al dimensionar las filas, todavía sin área, cuentan como `auto`.
 
 ### 5.9 Dimensionado
 
@@ -544,10 +564,12 @@ repite su layout. Con `start`, `end` o `center`, conserva su tamaño de contenid
 | `flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
 | `flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
 | `flex` en `column` | máximo de los ítems | máximo de los ítems |
-| `grid` | suma de pistas dimensionadas con restricción min-content | ídem con max-content |
+| `grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
 
 Una caja con `Width` fijo tiene ese valor como min-content y max-content. Las cajas `absolute`
-y `fixed` no aportan nada a sus ancestros.
+y `fixed` no aportan nada a sus ancestros. En flex se usan los tamaños intrínsecos de cada ítem
+tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En grid, el max-content hace que
+las fracciones lleguen al max-content de su contenido.
 
 **Definido e indefinido.** Un tamaño es **definido** si se conoce sin hacer el layout del
 contenido: un número, el área útil, un porcentaje de algo definido o un ítem estirado por flex
@@ -585,33 +607,58 @@ regla. Si no hay ninguno, relaja las reglas en este orden:
 
 Si sigue sin haber corte posible, corta donde se acaba el espacio.
 
+Un párrafo que no puede respetar `Widows` y `Orphans` y no tiene nada antes en la página ofrece
+igualmente un corte que las incumple, para que su padre pueda preferirlo a otro que incumpla
+`avoid`. En ese corte se respetan las viudas si se puede y, si no, se llena el espacio.
+
+Solo se vuelve atrás a cortes entre hijos: si el mejor corte es anterior al hijo que no cabe,
+se descarta lo colocado después, pero nunca se repite el layout de un hijo anterior con menos
+espacio para partirlo por dentro.
+
 **Garantía de progreso.** Al principio de una página siempre se coloca algo, aunque desborde o
 haya que cortarlo a la fuerza. Una caja monolítica más alta que una página no provoca un bucle
 infinito.
 
 **Cortes forzados.** `Break before: page` y `Break after: page` fuerzan un salto. Solo se
-aplican a cajas en flujo.
+aplican a cajas en flujo. El `Break before: page` del primer hijo de un bloque y el
+`Break after: page` del último se propagan al bloque. Un corte forzado al principio de una
+página se ignora (no deja páginas en blanco), igual que el `Break after: page` de la última
+caja del documento.
 
 **Márgenes en los cortes.** En un corte no forzado, los márgenes que tocan el corte se truncan
-a cero. En un corte forzado, se trunca el margen anterior al corte y se conserva el posterior.
+a cero: tras el corte, el margen superior del primer hijo de la página y los que salen de él
+por arriba; un fragmento de continuación no deja salir márgenes por arriba. En un corte forzado,
+se trunca el margen anterior al corte y se conserva el posterior.
 
 **Bordes y relleno en los cortes.** Con `Decoration: slice`, el primer fragmento no tiene
 borde ni relleno inferiores y los siguientes no tienen los superiores. Con `Decoration: clone`,
 cada fragmento se pinta como una caja completa: el contenido de cada página cabe entre su borde
 y relleno superiores e inferiores. Un `Height` fijo es el total de todos los fragmentos, no el
 de cada uno; con `clone`, el total del contenido es ese alto menos un borde y un relleno, y
-cada fragmento les suma los suyos.
+cada fragmento les suma los suyos. `Min height` y `Max height` también se aplican al total (con
+`clone`, al contenido total más un borde y un relleno).
+
+Una caja con `Height` definido se parte como cualquier otra, aunque no tenga contenido: lo que
+no cabe de su alto pasa a la página siguiente. Para evitarlo se declara `Break inside: avoid`,
+que no impide partirla si no cabe en una página entera. Un fragmento cortado de una caja con
+alto `auto` mide hasta el corte; con alto definido, llega hasta el final de la página sin pasar
+del alto que le queda.
 
 **Flex y grid.** En `column`, el corte se hace entre ítems. En `row` y en grid, entre líneas
 o filas. Una línea, fila o ítem que no cabe en lo que queda de página pasa entero a la
 siguiente. Si tampoco cabe al principio de una página, sus ítems se fragmentan **en
 paralelo**: cada uno se parte por su cuenta y la fila continúa en la página siguiente con los
 ítems que no han terminado, todos desde arriba, y con la altura del más largo de ellos; las
-filas siguientes van detrás. Las filas que ocupa un mismo ítem se parten juntas. Un contenedor
-`column` con `Wrap` no se parte.
+filas siguientes van detrás, con el hueco que las separaba. Las filas que ocupa un mismo ítem
+se parten juntas, cada ítem desde su posición. Un ítem estirado reparte entre las páginas el
+alto que le impone su línea o su área, así que puede terminar antes o después que el texto de
+sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte y desborda. Al elegir el
+corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un contenedor `column`
+con `Wrap` no se parte.
 
 **Posicionadas.** Una caja `absolute` se coloca en la página donde cae su posición y no se
-parte. Una caja `fixed` se repite en todas las páginas.
+parte. Si su containing block está partido, se resuelve contra el fragmento de esa página: su
+alto es el de ese fragmento, no el total. Una caja `fixed` se repite en todas las páginas.
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
 ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores reales.
@@ -693,8 +740,11 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
 | `z-index` | Propiedad `z-index` | `Layer` |
 | `box-decoration-break` | `slice`, `clone` | `Decoration: slice`, `clone` |
+| Elección del corte de página | Puede volver a maquetar un hijo ya colocado con menos espacio para partirlo por dentro | Solo vuelve atrás a cortes entre hijos |
 | `text-wrap` | `wrap`, `balance`, `pretty`… (`pretty` según el navegador) | `Text wrap: auto` (voraz) o `pretty` (Knuth-Plass en todo el párrafo) |
-| Márgenes `auto` en ítems flex | Absorben espacio | Valen 0 |
+| Márgenes `auto` en ítems flex y grid | Absorben espacio (en grid, alinean el ítem en su área) | Valen 0 |
+| Posición estática de una `absolute` en flex o grid | Como si fuera el único ítem, con la alineación del contenedor | Esquina de la caja de contenido del contenedor |
+| Pista `fit-content` en grid | Función `fit-content(límite)`: como `auto`, sin pasar del límite | Palabra clave `fit-content`, que equivale a `auto` |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |
