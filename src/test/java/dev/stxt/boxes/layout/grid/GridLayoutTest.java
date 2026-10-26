@@ -136,6 +136,26 @@ class GridLayoutTest {
     }
 
     @Test
+    void itemCrossingFractionsFitsItsArea() {
+        // W (palabra de 300) ocupa las dos columnas 1fr de un grid de 200: cada una mide 150.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tLayout: grid", "\t\tWidth: 200", "\t\tGrid:", "\t\t\tColumns: 1fr 1fr",
+                "\t\tBox:", "\t\t\tId: W", "\t\t\tText: " + "a".repeat(60), "\t\t\tItem:", "\t\t\t\tCell: 1 1 1 2",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 10", "\t\t\tItem:", "\t\t\t\tCell: 2 2");
+        assertRect(40, 40, 300, 12, l.rect("W"));
+        assertRect(190, 52, 150, 10, l.rect("B"));
+    }
+
+    @Test
+    void itemCrossingFractionsInIntrinsicWidths() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tWidth: min-content",
+                "\t\tGrid:", "\t\t\tColumns: 1fr 1fr",
+                "\t\tBox:", "\t\t\tText: " + "a".repeat(60), "\t\t\tItem:", "\t\t\t\tCell: 1 1 1 2");
+        assertEquals(300, l.rect("G").width(), 1e-9);
+    }
+
+    @Test
     void intrinsicWidths() {
         // A: min 10, max 25. B: min y max 15. Hueco 10.
         String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";

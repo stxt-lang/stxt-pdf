@@ -11,14 +11,14 @@ import java.util.List;
  *
  * <ol>
  *   <li>Inicializar base (mínimo) y límite (máximo) de cada pista.</li>
- *   <li>Aportaciones intrínsecas: primero ítems de una pista, después los que ocupan varias.</li>
+ *   <li>Aportaciones intrínsecas: primero ítems de una pista, después los que ocupan varias sin
+ *       cruzar ninguna fracción y, al final, los que cruzan alguna (solo crecen las fracciones).</li>
  *   <li>Maximizar: repartir el espacio libre hasta el límite de cada pista no flexible.</li>
  *   <li>Expandir fracciones, con bucle de congelación por min-content.</li>
  *   <li>Si no hay fracciones, estirar las pistas {@code auto} con el sobrante.</li>
  * </ol>
  *
- * <p>Simplificaciones: un ítem que ocupa varias pistas y alguna es flexible no aporta a las
- * pistas flexibles; {@code fit-content} se trata como {@code auto}.</p>
+ * <p>Simplificación: {@code fit-content} se trata como {@code auto}.</p>
  */
 public final class TrackSizing {
 
@@ -87,6 +87,9 @@ public final class TrackSizing {
                 .filter(it -> it.span() > 1)
                 .sorted(Comparator.comparingInt(ItemContribution::span))
                 .forEach(it -> distributeExcess(tracks, base, limit, it, gap));
+
+        // 2c. Ítems que cruzan alguna fracción, todos juntos.
+        distributeToFlexible(tracks, base, items, gap);
 
         for (int i = 0; i < n; i++) {
             if (!tracks.get(i).flexible() && limit[i] < base[i]) {
@@ -231,6 +234,49 @@ public final class TrackSizing {
                 }
             }
         }
+    }
+
+    /**
+     * Ítems de varias pistas que cruzan alguna fracción (Grid §12.5, paso 4): lo que les falta
+     * hasta su min-content se reparte solo entre las fracciones con mínimo intrínseco que ocupan,
+     * en proporción a su {@code fr} (si los {@code fr} suman menos de 1, esa parte en proporción y
+     * el resto a partes iguales). Se calcula con las bases de antes del paso, y cada pista crece
+     * lo que pida el ítem que más le pida.
+     */
+    private static void distributeToFlexible(List<Track> tracks, double[] base, List<ItemContribution> items,
+                                             double gap) {
+        double[] planned = base.clone();
+        for (ItemContribution it : items) {
+            int from = it.track();
+            int to = Math.min(tracks.size(), from + it.span());
+            if (it.span() < 2 || tracks.subList(from, to).stream().noneMatch(Track::flexible)) {
+                continue;
+            }
+            double excess = it.minContent() - gap * (it.span() - 1);
+            double frSum = 0;
+            int count = 0;
+            for (int i = from; i < to; i++) {
+                excess -= base[i];
+                Track t = tracks.get(i);
+                if (t.flexible() && t.minIntrinsic()) {
+                    frSum += t.fraction();
+                    count++;
+                }
+            }
+            if (excess <= EPS || count == 0) {
+                continue;
+            }
+            for (int i = from; i < to; i++) {
+                Track t = tracks.get(i);
+                if (t.flexible() && t.minIntrinsic()) {
+                    double share = frSum >= 1
+                            ? excess * t.fraction() / frSum
+                            : excess * t.fraction() + excess * (1 - frSum) / count;
+                    planned[i] = Math.max(planned[i], base[i] + share);
+                }
+            }
+        }
+        System.arraycopy(planned, 0, base, 0, base.length);
     }
 
     private static double sum(double[] v) {

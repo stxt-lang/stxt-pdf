@@ -29,18 +29,9 @@ Resueltas en el código después del repaso:
   que su `Width` (o `Height`) declarado, como en CSS (§5.7). Los algoritmos dan ahora los
   intrínsecos del contenido (`contentIntrinsic`), y `ConstraintSpace.measuringContentHeight()`
   mide el alto del contenido sin el `Height` de la caja.
-
-## Cambiar el código
-
-Pendientes de implementar, una a una. Al resolver cada una, actualiza la especificación y
-quítala de aquí.
-
-15. **Un ítem que ocupa varias pistas y alguna es flexible no aporta nada a su tamaño**
-    (simplificación que ya traía `TrackSizing`). Un ítem largo que cruza una columna `1fr`
-    puede desbordar su área.
-    *Dónde:* `layout/grid/TrackSizing.distributeExcess`.
-    *Propuesta (CSS):* repartir su exceso entre las pistas flexibles que ocupa, en proporción a
-    su fracción.
+- **15:** lo que le falta a un ítem que cruza alguna fracción se reparte entre las fracciones
+  que ocupa, en proporción a su `fr`, como en CSS (§5.8; `TrackSizing.distributeToFlexible`).
+  Solo crecen las fracciones con mínimo intrínseco, y se usa el min-content del ítem.
 
 ## Aplazadas al hito de fuentes
 

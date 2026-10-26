@@ -61,6 +61,36 @@ class TrackSizingTest {
         assertArrayEquals(new double[]{257.5, 257.5}, columns("50% 50%", 515), 1e-9);
     }
 
+    private static double[] spanning(String tracks, double available, ItemContribution... items) {
+        List<Track> t = ValueParser.list(tracks).stream().map(Track::of).toList();
+        return TrackSizing.size(t, List.of(items), available, 0);
+    }
+
+    @Test
+    void itemCrossingFractionsGrowsThem() {
+        // El ítem necesita 300 en dos fracciones: 150 cada una, aunque solo haya 200.
+        assertArrayEquals(new double[]{150, 150},
+                spanning("1fr 1fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+        assertArrayEquals(new double[]{150, 150},
+                spanning("1fr 1fr", Double.POSITIVE_INFINITY, new ItemContribution(0, 2, 300, 300)), 1e-9);
+    }
+
+    @Test
+    void itemCrossingFractionsInProportionToFr() {
+        assertArrayEquals(new double[]{200, 100},
+                spanning("2fr 1fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+        // Con fr que suman 0.75: 0.75 del exceso en proporción y el resto a partes iguales.
+        assertArrayEquals(new double[]{187.5, 112.5},
+                spanning("0.5fr 0.25fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+    }
+
+    @Test
+    void itemCrossingFractionsOnlyGrowsTheFractions() {
+        // La auto se queda con su ítem (50); la fracción toma los 250 que faltan.
+        assertArrayEquals(new double[]{50, 250}, spanning("auto 1fr", 200,
+                new ItemContribution(0, 1, 50, 50), new ItemContribution(0, 2, 300, 300)), 1e-9);
+    }
+
     @Test
     void module6Exercise() {
         List<Track> t = ValueParser.list("auto 1fr 1fr").stream().map(Track::of).toList();
