@@ -3,9 +3,11 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,9 +25,11 @@ import java.util.List;
  * </ol>
  *
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
- * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.
- * Además, el "orden del árbol" es el de los fragmentos: las cajas {@code absolute} cuelgan del
- * fragmento de su containing block, detrás de sus hijos en flujo.</p>
+ * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
+ *
+ * <p>El "orden del árbol" es el del documento, no el de los fragmentos: las cajas
+ * {@code absolute} cuelgan del fragmento de su containing block, detrás de sus hijos en flujo, y
+ * las {@code fixed} se añaden al final, así que los contextos se ordenan por su caja.</p>
  */
 public final class StackingContext {
 
@@ -91,6 +95,7 @@ public final class StackingContext {
             } else if (s.isPositioned()) {
                 StackingContext pseudo = new StackingContext(p, 0);
                 pseudo.walkChildren(p);
+                pseudo.sort();
                 positionedZero.add(pseudo);
             } else {
                 inFlow.add(p);
@@ -113,9 +118,40 @@ public final class StackingContext {
     }
 
     private void sort() {
-        // Orden estable: a igual Layer, se conserva el orden del árbol.
-        negative.sort(Comparator.comparingInt(s -> s.layer));
-        positive.sort(Comparator.comparingInt(s -> s.layer));
+        // A igual Layer, en orden del documento.
+        Comparator<StackingContext> byLayer =
+                Comparator.<StackingContext>comparingInt(s -> s.layer).thenComparing(TREE_ORDER);
+        negative.sort(byLayer);
+        positionedZero.sort(TREE_ORDER);
+        positive.sort(byLayer);
+    }
+
+    private static final Comparator<StackingContext> TREE_ORDER =
+            (a, b) -> compareTreeOrder(a.root.f().box(), b.root.f().box());
+
+    /** Orden del documento (recorrido en preorden del árbol de cajas): un ancestro va antes. */
+    static int compareTreeOrder(Box a, Box b) {
+        List<Box> pathA = ancestry(a);
+        List<Box> pathB = ancestry(b);
+        int i = 0;
+        while (i < pathA.size() && i < pathB.size() && pathA.get(i) == pathB.get(i)) {
+            i++;
+        }
+        if (i == pathA.size() || i == pathB.size()) {
+            return Integer.compare(pathA.size(), pathB.size());
+        }
+        List<Box> siblings = pathA.get(i - 1).children;
+        return Integer.compare(siblings.indexOf(pathA.get(i)), siblings.indexOf(pathB.get(i)));
+    }
+
+    /** La caja y sus ancestros, desde la raíz. */
+    private static List<Box> ancestry(Box box) {
+        List<Box> path = new ArrayList<>();
+        for (Box b = box; b != null; b = b.parent) {
+            path.add(b);
+        }
+        Collections.reverse(path);
+        return path;
     }
 
     public void paint(Canvas canvas) {

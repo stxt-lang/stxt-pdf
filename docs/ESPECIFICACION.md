@@ -444,7 +444,9 @@ Dentro de cada contexto, el orden de pintado de abajo arriba es:
 4. Cajas posicionadas sin `Layer` o con `Layer: 0`, en orden del árbol.
 5. Contextos hijos con `Layer` positiva, de menor a mayor.
 
-A igual `Layer`, se pinta en orden del árbol. **`Layer` solo compara dentro del mismo contexto:**
+A igual `Layer`, se pinta en orden del árbol. El orden del árbol es el del documento: una caja
+`absolute` se pinta en su sitio entre sus hermanas aunque su containing block esté más arriba.
+**`Layer` solo compara dentro del mismo contexto:**
 el contenido de un contexto se pinta como un bloque al nivel de ese contexto, aunque sus hijos
 tengan `Layer` mayores.
 
@@ -715,6 +717,8 @@ Result:
 ```
 
 Por defecto solo se vuelcan las cajas con `Id`; las descendientes con `Id` se anidan dentro.
+Una caja `absolute` se anida dentro de su containing block, detrás de sus hijos en flujo, y no
+dentro de su padre.
 Las cajas sin `Id` pueden incluirse para depurar.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`

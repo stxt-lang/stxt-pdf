@@ -14,19 +14,13 @@ son diferencias con CSS, §8) y se han quitado de aquí; la 31 (`new Engine()` u
 `FixedMetrics`) es del API, no del modelo, y está en el javadoc de `Engine`. Quedan las
 abiertas, con su número original. Las decisiones nuevas siguen desde la 41.
 
+Resueltas en el código después del repaso: la 2 (las posicionadas se pintan en orden del
+documento, §5.6).
+
 ## Cambiar el código
 
 Pendientes de implementar, una a una. Al resolver cada una, actualiza la especificación y
 quítala de aquí.
-
-2. **Las `absolute` cuelgan del fragmento de su containing block**, detrás de sus hijos en
-   flujo, y no del de su padre en el árbol de cajas. Afecta al anidamiento del volcado (§7) y al
-   "orden del árbol" del pintado (§5.6): una `absolute` se pinta después de una hermana
-   `relative` posterior en el documento si su containing block está más arriba. Incumple el
-   §5.6.
-   *Dónde:* `layout/position/AbsoluteLayout.resolvePending`, `paint/StackingContext`.
-   *Propuesta:* pintar las posicionadas en el orden del documento; el volcado sigue anidándolas
-   bajo su containing block.
 
 6. **Un ítem con `Width` fijo no encoge por debajo de ese ancho.** Con `Min width: auto` el
    mínimo es el min-content del ítem (§5.7), y una caja con `Width` fijo tiene ese valor como
