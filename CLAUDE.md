@@ -44,7 +44,7 @@ referencia; al terminar un hito, actualízala.
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
 | 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho; falta `justify`) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
-| 4 | `intrinsic()` en todos los algoritmos; flex (caso 02) | `layout/flex/FlexLayout` sobre `FlexResolver` |
+| 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho; los intrínsecos de grid, en el hito 5) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | Grid | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | `BreakToken` en los algoritmos, PDF con PDFBox, métricas reales | `PdfCanvas` (no existe aún), `TextMeasurer` |
 | 7 | `{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass | — |

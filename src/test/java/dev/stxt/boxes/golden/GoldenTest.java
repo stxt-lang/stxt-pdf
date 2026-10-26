@@ -39,8 +39,7 @@ class GoldenTest {
     private static final Path SVG_DIR = Path.of("target", "golden-svg");
 
     /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
-    private static final Map<String, String> PENDING = Map.of(
-            "02-flex-grow", "pendiente del hito 4 (FlexLayout)");
+    private static final Map<String, String> PENDING = Map.of();
 
     private final DocumentReader reader = new DocumentReader();
 

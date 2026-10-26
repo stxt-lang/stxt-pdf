@@ -36,7 +36,7 @@ public final class Engine {
     public Engine(TextMeasurer measurer) {
         this.block = new BlockLayout(this);
         this.inline = new InlineLayout(measurer);
-        this.flex = new FlexLayout();
+        this.flex = new FlexLayout(this);
         this.grid = new GridLayout();
         this.absolute = new AbsoluteLayout(this);
     }

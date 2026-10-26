@@ -448,7 +448,8 @@ el **eje cruzado**.
    sus tamaños hipotéticos y los huecos quepan.
 5. **Tamaños flexibles** (por línea), ver abajo.
 6. **Tamaño cruzado:** layout de cada ítem con su tamaño principal final (en `row`, el texto se
-   redistribuye con el ancho final). La línea mide lo que el ítem más alto.
+   redistribuye con el ancho final). La línea mide lo que el ítem más alto; sin `Wrap` y con
+   tamaño cruzado definido en el contenedor, la única línea mide lo que el contenedor.
 7. **Estirar:** los ítems con `stretch` y sin tamaño cruzado declarado pasan a medir lo que la
    línea, y se repite su layout.
 8. **Alinear** en el eje principal, en el cruzado y las líneas en el contenedor.

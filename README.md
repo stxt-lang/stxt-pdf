@@ -41,11 +41,11 @@ de ruta.
 | `BlockLayout`, `InlineLayout` en modo continuo (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Text align: justify` se coloca como `left`) | Pendiente |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
-| `FlexLayout` | Pendiente (hito 4) |
+| `FlexLayout` e intrínsecos de flex en modo continuo | Hecho y probado |
 | `GridLayout` | Pendiente (hito 5) |
 | Fragmentación en los algoritmos, PDF con PDFBox | Pendiente (hito 6) |
 
-Los tests de referencia (`GoldenTest`) están activos; el caso 02 se salta hasta el hito 4. Cada
+Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/`.
 
 ## Hoja de ruta
@@ -53,7 +53,7 @@ caso deja un SVG de depuración en `target/golden-svg/`.
 1. ~~**Árbol de cajas.** Conectar `DocumentReader` con `dev.stxt:stxt-core` y validar contra el template.~~ Hecho.
 2. ~~**Bloque y texto.** `BlockLayout` e `InlineLayout` con `FixedMetrics`; salida SVG de depuración. Activar `GoldenTest` (caso 01).~~ Hecho.
 3. ~~**Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator` (caso 03).~~ Hecho.
-4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).
+4. ~~**Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).~~ Hecho (los intrínsecos de grid van con el hito 5).
 5. **Grid.** `GridLayout` sobre `Placement` y `TrackSizing`.
 6. **Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales.
 7. **Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass.
