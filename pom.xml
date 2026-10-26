@@ -19,7 +19,7 @@
     </properties>
 
     <dependencies>
-        <!-- Parser y validador oficial de STXT. Se usa desde stxt.StxtCoreReader.
+        <!-- Parser y validador oficial de STXT. Lo usa stxt.DocumentReader, y el motor trabaja con sus nodos.
              Comprueba la última versión en https://central.sonatype.com/artifact/dev.stxt/stxt-core -->
         <dependency>
             <groupId>dev.stxt</groupId>

@@ -29,7 +29,6 @@ de ruta.
 | Pieza | Estado |
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
-| Lector STXT mínimo (`MinimalStxtReader`) | Hecho y probado |
 | Árbol de cajas: herencia, cajas anónimas, validaciones | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
@@ -38,7 +37,7 @@ de ruta.
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
-| Adaptador a la librería oficial `stxt-core` 1.0.3, con validación del template | Hecho y probado |
+| Lectura con la librería oficial `stxt-core` 1.0.3 y validación del template | Hecho y probado |
 | `BlockLayout`, `InlineLayout` | Pendiente (hito 2) |
 | Cajas `absolute` y `fixed` en el layout | Pendiente (hito 3) |
 | `FlexLayout` | Pendiente (hito 4) |
@@ -49,7 +48,7 @@ Los tests de referencia (`GoldenTest`) están desactivados hasta completar los h
 
 ## Hoja de ruta
 
-1. ~~**Árbol de cajas.** Conectar `StxtCoreReader` con `dev.stxt:stxt-core` y validar contra el template.~~ Hecho.
+1. ~~**Árbol de cajas.** Conectar `DocumentReader` con `dev.stxt:stxt-core` y validar contra el template.~~ Hecho.
 2. **Bloque y texto.** `BlockLayout` e `InlineLayout` con `FixedMetrics`; salida SVG de depuración. Activar `GoldenTest` (caso 01).
 3. **Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator`.
 4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).
@@ -62,7 +61,7 @@ Los tests de referencia (`GoldenTest`) están desactivados hasta completar los h
 ```
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect
-  stxt/         StxtNode, DocumentReader, MinimalStxtReader, StxtCoreReader, StxtSyntaxException
+  stxt/         DocumentReader (stxt-core + template)
   tree/         Box, Style, Media, BoxTreeBuilder, InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, MarginStrut, Sizing, PendingAbsolute

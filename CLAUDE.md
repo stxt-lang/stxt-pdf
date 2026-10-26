@@ -41,7 +41,7 @@ referencia; al terminar un hito, actualízala.
 
 | Hito | Trabajo | Dónde |
 |---|---|---|
-| 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/StxtCoreReader` |
+| 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
 | 2 | Flujo de bloque y texto; activar `GoldenTest` (caso 01) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | `relative`, `absolute`, `fixed` (esta en el `Paginator`) | `layout/position`, `fragment/Paginator` |
 | 4 | `intrinsic()` en todos los algoritmos; flex (caso 02) | `layout/flex/FlexLayout` sobre `FlexResolver` |
@@ -58,7 +58,7 @@ describe el algoritmo a implementar (por ejemplo, el pseudocódigo de `BlockLayo
 Flujo de datos:
 
 ```
-texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ Box (árbol) + Media
+texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media
    ──Engine.layOutDocument──▶ Paginator ──▶ List<Page> (árbol de Fragment por página)
    ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PDF)
 ```
@@ -66,7 +66,7 @@ texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ 
 | Package | Contenido |
 |---|---|
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect` |
-| `stxt` | `StxtNode` (nodo neutral), `DocumentReader`, `MinimalStxtReader` (sin validación de template), `StxtCoreReader` (`stxt-core` + template; exige el namespace `dev.stxt.boxes` en la raíz), `StxtSyntaxException` (con el código de error de la librería) |
+| `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el template y exige una única raíz con el namespace `dev.stxt.boxes` |
 | `tree` | `Box`, `Style` (propiedades y enums), `Media`, `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `MarginStrut`, `Sizing`, `PendingAbsolute` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
@@ -76,9 +76,11 @@ texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ 
 
 ### Piezas clave
 
-- **`StxtNode`** aísla al motor de la librería de parseo: nada fuera de `stxt` debe depender de
-  `stxt-core`. Los nombres se comparan con `is(...)` (forma canónica: espacios compactados y
-  minúsculas).
+- **Nodos de `stxt-core`:** el motor trabaja directamente con `dev.stxt.Node`, `InlineNode`
+  (valor inline e hijos) y `TextNode` (bloque `>>`); `getText()` da el contenido en los dos
+  casos. Los nombres se comparan por `getCanonicalName()`: minúsculas y los espacios convertidos
+  en guiones (`Box sizing` → `box-sizing`). Los errores de sintaxis y del template son
+  `ParseException` de la librería, con código (`INVALID_VALUE`, `TOO_FEW_CHILDREN`…) y línea.
 - **`BoxTreeBuilder`** interpreta valores, aplica la herencia, crea las cajas anónimas (§5.1) y
   comprueba las reglas del §6 que el template no puede expresar. Los errores son
   `InvalidModelException` con la **línea del documento**; los mensajes siguen la tabla del §6.
@@ -133,9 +135,11 @@ texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ 
 
 - JUnit 5. Un test por pieza pura, en el mismo package que la clase (`src/test/java/dev/stxt/boxes/...`).
   Los nombres de los métodos de test están en inglés y en camelCase (`autoMarginsCenter`).
-- Los documentos de test se leen con `MinimalStxtReader` (no valida el template).
-  `StxtCoreReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
-  contra el template y dan el mismo árbol con los dos lectores: añade ahí los documentos nuevos.
+- Los documentos de test se leen con `DocumentReader`, que valida contra el template: un test
+  de una regla del §6 comprueba así que el template no la detecta antes. Los volcados de §7
+  (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
+  `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan:
+  añade ahí los documentos nuevos.
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
   `src/test/resources/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.

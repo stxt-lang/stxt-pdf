@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.InlineNode;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.Paginator;
@@ -9,7 +10,6 @@ import dev.stxt.boxes.layout.grid.GridLayout;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.InlineLayout;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
-import dev.stxt.boxes.stxt.StxtNode;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 
@@ -38,8 +38,11 @@ public final class Engine {
         this.grid = new GridLayout();
     }
 
-    /** Documento STXT → páginas. En modo continuo devuelve una sola página. */
-    public List<Page> layOutDocument(StxtNode document) {
+    /**
+     * Documento STXT ya validado ({@link dev.stxt.boxes.stxt.DocumentReader}) → páginas. En modo
+     * continuo devuelve una sola página.
+     */
+    public List<Page> layOutDocument(InlineNode document) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
         cache.clear();
         return new Paginator(this).paginate(tree.root(), tree.media());

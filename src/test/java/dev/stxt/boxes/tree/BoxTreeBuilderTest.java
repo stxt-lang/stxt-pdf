@@ -1,9 +1,9 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.InlineNode;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.stxt.MinimalStxtReader;
-import dev.stxt.boxes.stxt.StxtNode;
+import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BoxTreeBuilderTest {
 
     private static BoxTreeBuilder.Result build(String doc) {
-        StxtNode root = new MinimalStxtReader().read(doc, "test");
+        InlineNode root = new DocumentReader().read(doc);
         return new BoxTreeBuilder().build(root);
     }
 
@@ -69,7 +69,7 @@ class BoxTreeBuilderTest {
     @Test
     void rulesTheTemplateCannotExpress() {
         assertThrows(InvalidModelException.class, () -> build(
-                "Document:\n\tMedia:\n\t\tType: paged\n\t\tWidth: 595\n\tBox:\n\t\tHeight: 10"));
+                "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 595\n\tBox:\n\t\tHeight: 10"));
         assertThrows(InvalidModelException.class, () -> build(document(
                 "\tBox:", "\t\tFlex:", "\t\t\tGap: 10")));
         assertThrows(InvalidModelException.class, () -> build(document(

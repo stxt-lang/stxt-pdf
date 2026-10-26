@@ -1,5 +1,7 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
 import dev.stxt.boxes.layout.grid.Area;
 import dev.stxt.boxes.layout.grid.Cell;
 import dev.stxt.boxes.layout.grid.GridAreas;
@@ -7,11 +9,11 @@ import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
-import dev.stxt.boxes.stxt.StxtNode;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,10 @@ import java.util.regex.Pattern;
  * Construye el árbol de cajas a partir del documento (módulos 0 y 1, ESPECIFICACION.md §5.1):
  * interpreta los valores, aplica la herencia, crea las cajas anónimas y comprueba las reglas
  * que el template no puede expresar (§6).
+ *
+ * <p>Trabaja sobre los nodos de {@code stxt-core}. Los nombres se comparan por su nombre
+ * canónico ({@link Node#getCanonicalName()}: minúsculas y los espacios convertidos en guiones,
+ * de modo que {@code Box sizing} es {@code box-sizing}).</p>
  */
 public final class BoxTreeBuilder {
 
@@ -28,15 +34,16 @@ public final class BoxTreeBuilder {
     public record Result(Media media, Box root) {
     }
 
-    public Result build(StxtNode document) {
-        if (!document.is("Document")) {
+    public Result build(InlineNode document) {
+        if (!is(document, "document")) {
             throw error(document, "La raíz del documento debe ser Document");
         }
-        StxtNode mediaNode = document.child("Media")
+        InlineNode mediaNode = child(document, "media")
+                .map(BoxTreeBuilder::inline)
                 .orElseThrow(() -> error(document, "Falta el nodo Media"));
         Media media = media(mediaNode);
 
-        Box root = new Box(null, new Style(), true, document.line());
+        Box root = new Box(null, new Style(), true, document.getLine());
         buildContent(document, root);
         if (root.children.isEmpty()) {
             throw error(document, "El documento necesita al menos una Box");
@@ -48,13 +55,13 @@ public final class BoxTreeBuilder {
     // Media
     // ------------------------------------------------------------------------------------------
 
-    private Media media(StxtNode n) {
+    private Media media(InlineNode n) {
         Media.Type type = enumValue(Media.Type.class, required(n, "Type"), n);
         double width = points(required(n, "Width"), n, "Width");
-        OptionalDouble height = n.contentOf("Height")
+        OptionalDouble height = contentOf(n, "height")
                 .map(v -> OptionalDouble.of(points(v, n, "Height")))
                 .orElse(OptionalDouble.empty());
-        Insets margin = n.contentOf("Margin")
+        Insets margin = contentOf(n, "margin")
                 .map(v -> mediaMargin(v, n))
                 .orElse(Insets.ZERO);
         if (type == Media.Type.PAGED && height.isEmpty()) {
@@ -67,7 +74,7 @@ public final class BoxTreeBuilder {
         return media;
     }
 
-    private Insets mediaMargin(String text, StxtNode n) {
+    private Insets mediaMargin(String text, Node n) {
         List<Double> v = ValueParser.list(text).stream().map(x -> {
             if (!(x instanceof Value.Points p)) {
                 throw error(n, "El margen del medio solo admite puntos: " + text);
@@ -83,11 +90,11 @@ public final class BoxTreeBuilder {
     // ------------------------------------------------------------------------------------------
 
     /** Hijos {@code Box} y {@code Text} en orden; crea cajas anónimas si hace falta. */
-    private void buildContent(StxtNode node, Box box) {
-        List<StxtNode> content = node.children().stream()
-                .filter(h -> h.is("Box") || h.is("Text"))
+    private void buildContent(InlineNode node, Box box) {
+        List<Node> content = node.getChildren().stream()
+                .filter(h -> is(h, "box") || is(h, "text"))
                 .toList();
-        boolean hasBoxes = content.stream().anyMatch(h -> h.is("Box"));
+        boolean hasBoxes = content.stream().anyMatch(h -> is(h, "box"));
         Style.Layout layout = box.style.layout;
 
         if (layout == Style.Layout.INLINE && hasBoxes) {
@@ -95,18 +102,18 @@ public final class BoxTreeBuilder {
         }
         boolean textInAnonymous = hasBoxes || layout == Style.Layout.FLEX || layout == Style.Layout.GRID;
 
-        for (StxtNode h : content) {
-            if (h.is("Box")) {
-                box.addChild(box(h, box));
+        for (Node h : content) {
+            if (is(h, "box")) {
+                box.addChild(box(inline(h), box));
             } else if (textInAnonymous) {
                 // Texto mezclado con cajas, o dentro de flex/grid: caja anónima (módulo 1, §6).
                 Style s = Style.inheriting(box.style);
                 s.layout = Style.Layout.INLINE;
-                Box anonymous = new Box(null, s, true, h.line());
-                anonymous.text = h.content();
+                Box anonymous = new Box(null, s, true, h.getLine());
+                anonymous.text = h.getText();
                 box.addChild(anonymous);
             } else {
-                box.text = h.content();
+                box.text = h.getText();
                 if (layout == Style.Layout.BLOCK) {
                     // Un bloque que solo contiene texto se maqueta con el algoritmo de línea.
                     box.style.layout = Style.Layout.INLINE;
@@ -115,13 +122,13 @@ public final class BoxTreeBuilder {
         }
     }
 
-    private Box box(StxtNode n, Box parent) {
+    private Box box(InlineNode n, Box parent) {
         Style s = Style.inheriting(parent.style);
         String id = null;
-        for (StxtNode p : n.children()) {
-            String v = p.content();
+        for (Node p : n.getChildren()) {
+            String v = p.getText();
             try {
-                switch (StxtNode.canonical(p.name())) {
+                switch (p.getCanonicalName()) {
                     case "box", "text" -> {
                         // se procesan en buildContent
                     }
@@ -131,34 +138,34 @@ public final class BoxTreeBuilder {
                     case "offset" -> s.offset = Sides.shorthand(ValueParser.list(v));
                     case "layer" -> s.layer = integer(v, p);
                     case "isolate" -> s.isolate = bool(v, p);
-                    case "box sizing" -> s.boxSizing = enumValue(Style.BoxSizing.class, v, p);
+                    case "box-sizing" -> s.boxSizing = enumValue(Style.BoxSizing.class, v, p);
                     case "width" -> s.width = ValueParser.value(v);
                     case "height" -> s.height = ValueParser.value(v);
-                    case "min width" -> s.minWidth = ValueParser.value(v);
-                    case "max width" -> s.maxWidth = ValueParser.value(v);
-                    case "min height" -> s.minHeight = ValueParser.value(v);
-                    case "max height" -> s.maxHeight = ValueParser.value(v);
-                    case "aspect ratio" -> s.aspectRatio = aspectRatio(v, p);
+                    case "min-width" -> s.minWidth = ValueParser.value(v);
+                    case "max-width" -> s.maxWidth = ValueParser.value(v);
+                    case "min-height" -> s.minHeight = ValueParser.value(v);
+                    case "max-height" -> s.maxHeight = ValueParser.value(v);
+                    case "aspect-ratio" -> s.aspectRatio = aspectRatio(v, p);
                     case "margin" -> s.margin = Sides.shorthand(ValueParser.list(v));
                     case "padding" -> s.padding = nonNegativeSides(Sides.shorthand(ValueParser.list(v)), p, "Padding", true);
                     case "border" -> s.border = nonNegativeSides(Sides.shorthand(ValueParser.list(v)), p, "Border", false);
                     case "background" -> s.background = color(v, p);
                     case "color" -> s.color = color(v, p);
-                    case "border color" -> s.borderColor = color(v, p);
+                    case "border-color" -> s.borderColor = color(v, p);
                     case "font" -> s.font = v.trim();
-                    case "font size" -> s.fontSize = positive(v, p);
-                    case "line height" -> s.lineHeight = ValueParser.value(v);
-                    case "text align" -> s.textAlign = enumValue(Style.TextAlign.class, v, p);
-                    case "flex" -> flex(p, s);
-                    case "grid" -> grid(p, s);
-                    case "item" -> item(p, s);
-                    case "break before" -> s.breakBefore = enumValue(Style.Break.class, v, p);
-                    case "break after" -> s.breakAfter = enumValue(Style.Break.class, v, p);
-                    case "break inside" -> s.avoidBreakInside = breakInside(v, p);
+                    case "font-size" -> s.fontSize = positive(v, p);
+                    case "line-height" -> s.lineHeight = ValueParser.value(v);
+                    case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, v, p);
+                    case "flex" -> flex(inline(p), s);
+                    case "grid" -> grid(inline(p), s);
+                    case "item" -> item(inline(p), s);
+                    case "break-before" -> s.breakBefore = enumValue(Style.Break.class, v, p);
+                    case "break-after" -> s.breakAfter = enumValue(Style.Break.class, v, p);
+                    case "break-inside" -> s.avoidBreakInside = breakInside(v, p);
                     case "widows" -> s.widows = positiveInteger(v, p);
                     case "orphans" -> s.orphans = positiveInteger(v, p);
                     case "decoration" -> s.decoration = enumValue(Style.Decoration.class, v, p);
-                    default -> throw error(p, "Propiedad desconocida en Box: " + p.name());
+                    default -> throw error(p, "Propiedad desconocida en Box: " + p.getName());
                 }
             } catch (IllegalArgumentException ex) {
                 throw error(p, ex.getMessage());
@@ -166,22 +173,22 @@ public final class BoxTreeBuilder {
         }
         validateBox(n, s, parent);
 
-        Box box = new Box(id, s, false, n.line());
+        Box box = new Box(id, s, false, n.getLine());
         buildContent(n, box);
         return box;
     }
 
-    private void flex(StxtNode n, Style s) {
-        for (StxtNode p : n.children()) {
-            String v = p.content();
-            switch (StxtNode.canonical(p.name())) {
+    private void flex(InlineNode n, Style s) {
+        for (Node p : n.getChildren()) {
+            String v = p.getText();
+            switch (p.getCanonicalName()) {
                 case "direction" -> s.flexDirection = enumValue(Style.Direction.class, v, p);
                 case "wrap" -> s.flexWrap = bool(v, p);
                 case "gap" -> gap(v, s);
-                case "main axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, v, p);
-                case "cross axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, v, p);
+                case "main-axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, v, p);
+                case "cross-axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, v, p);
                 case "lines" -> s.flexLines = enumValue(Style.Distribution.class, v, p);
-                default -> throw error(p, "Propiedad desconocida en Flex: " + p.name());
+                default -> throw error(p, "Propiedad desconocida en Flex: " + p.getName());
             }
         }
         if (s.flexMainAxis == Style.Distribution.STRETCH) {
@@ -189,10 +196,10 @@ public final class BoxTreeBuilder {
         }
     }
 
-    private void grid(StxtNode n, Style s) {
-        for (StxtNode p : n.children()) {
-            String v = p.content();
-            switch (StxtNode.canonical(p.name())) {
+    private void grid(InlineNode n, Style s) {
+        for (Node p : n.getChildren()) {
+            String v = p.getText();
+            switch (p.getCanonicalName()) {
                 case "columns" -> s.gridColumns = ValueParser.list(v);
                 case "rows" -> s.gridRows = ValueParser.list(v);
                 case "gap" -> gap(v, s);
@@ -203,38 +210,38 @@ public final class BoxTreeBuilder {
                 case "flow" -> s.gridFlow = enumValue(Style.Direction.class, v, p);
                 case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, v, p);
                 case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, v, p);
-                default -> throw error(p, "Propiedad desconocida en Grid: " + p.name());
+                default -> throw error(p, "Propiedad desconocida en Grid: " + p.getName());
             }
         }
     }
 
-    private void item(StxtNode n, Style s) {
-        for (StxtNode p : n.children()) {
-            String v = p.content();
-            switch (StxtNode.canonical(p.name())) {
+    private void item(InlineNode n, Style s) {
+        for (Node p : n.getChildren()) {
+            String v = p.getText();
+            switch (p.getCanonicalName()) {
                 case "grow" -> s.itemGrow = nonNegative(v, p);
                 case "shrink" -> s.itemShrink = nonNegative(v, p);
                 case "basis" -> s.itemBasis = ValueParser.value(v);
-                case "cross axis" -> s.itemCrossAxis = enumValue(Style.Alignment.class, v, p);
+                case "cross-axis" -> s.itemCrossAxis = enumValue(Style.Alignment.class, v, p);
                 case "cell" -> s.itemCell = v.trim();
                 case "horizontal" -> s.itemHorizontal = enumValue(Style.Alignment.class, v, p);
                 case "vertical" -> s.itemVertical = enumValue(Style.Alignment.class, v, p);
-                default -> throw error(p, "Propiedad desconocida en Item: " + p.name());
+                default -> throw error(p, "Propiedad desconocida en Item: " + p.getName());
             }
         }
     }
 
     /** Reglas que el template no puede expresar (ESPECIFICACION.md §6). */
-    private void validateBox(StxtNode n, Style s, Box parent) {
-        if (n.child("Flex").isPresent() && s.layout != Style.Layout.FLEX) {
+    private void validateBox(InlineNode n, Style s, Box parent) {
+        if (child(n, "flex").isPresent() && s.layout != Style.Layout.FLEX) {
             throw error(n, "Flex solo se aplica con Layout: flex");
         }
-        if (n.child("Grid").isPresent() && s.layout != Style.Layout.GRID) {
+        if (child(n, "grid").isPresent() && s.layout != Style.Layout.GRID) {
             throw error(n, "Grid solo se aplica con Layout: grid");
         }
         Style.Layout parentLayout = parent.style.layout;
         boolean parentFlexOrGrid = parentLayout == Style.Layout.FLEX || parentLayout == Style.Layout.GRID;
-        if (n.child("Item").isPresent() && (!parentFlexOrGrid || s.isOutOfFlow())) {
+        if (child(n, "item").isPresent() && (!parentFlexOrGrid || s.isOutOfFlow())) {
             throw error(n, "Item solo tiene efecto en hijos en flujo de un contenedor flex o grid");
         }
         if (s.itemCell != null) {
@@ -257,6 +264,32 @@ public final class BoxTreeBuilder {
     }
 
     // ------------------------------------------------------------------------------------------
+    // Acceso a los nodos
+    // ------------------------------------------------------------------------------------------
+
+    /** Compara con un nombre ya canónico ({@code "box-sizing"}). */
+    private static boolean is(Node n, String canonicalName) {
+        return n.getCanonicalName().equals(canonicalName);
+    }
+
+    /** Primer hijo con ese nombre canónico. */
+    private static Optional<Node> child(InlineNode n, String canonicalName) {
+        return n.getChildren().stream().filter(h -> is(h, canonicalName)).findFirst();
+    }
+
+    private static Optional<String> contentOf(InlineNode n, String canonicalName) {
+        return child(n, canonicalName).map(Node::getText);
+    }
+
+    /** Los nodos con hijos no pueden ser bloques de texto ({@code >>}). */
+    private static InlineNode inline(Node n) {
+        if (n instanceof InlineNode i) {
+            return i;
+        }
+        throw error(n, n.getName() + " no puede ser un bloque de texto (>>)");
+    }
+
+    // ------------------------------------------------------------------------------------------
     // Utilidades de interpretación
     // ------------------------------------------------------------------------------------------
 
@@ -269,15 +302,15 @@ public final class BoxTreeBuilder {
         s.columnGap = v.size() == 2 ? v.get(1) : v.get(0);
     }
 
-    private static <E extends Enum<E>> E enumValue(Class<E> type, String text, StxtNode n) {
+    private static <E extends Enum<E>> E enumValue(Class<E> type, String text, Node n) {
         try {
             return Enum.valueOf(type, text.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            throw error(n, "Valor no permitido en " + n.name() + ": " + text.trim());
+            throw error(n, "Valor no permitido en " + n.getName() + ": " + text.trim());
         }
     }
 
-    private static boolean breakInside(String text, StxtNode n) {
+    private static boolean breakInside(String text, Node n) {
         Style.Break b = enumValue(Style.Break.class, text, n);
         if (b == Style.Break.PAGE) {
             throw error(n, "Break inside solo admite auto o avoid");
@@ -285,7 +318,7 @@ public final class BoxTreeBuilder {
         return b == Style.Break.AVOID;
     }
 
-    private static boolean bool(String text, StxtNode n) {
+    private static boolean bool(String text, Node n) {
         return switch (text.trim().toLowerCase(Locale.ROOT)) {
             case "true", "yes" -> true;
             case "false", "no" -> false;
@@ -293,7 +326,7 @@ public final class BoxTreeBuilder {
         };
     }
 
-    private static int integer(String text, StxtNode n) {
+    private static int integer(String text, Node n) {
         try {
             return Integer.parseInt(text.trim());
         } catch (NumberFormatException ex) {
@@ -301,15 +334,15 @@ public final class BoxTreeBuilder {
         }
     }
 
-    private static int positiveInteger(String text, StxtNode n) {
+    private static int positiveInteger(String text, Node n) {
         int v = integer(text, n);
         if (v < 1) {
-            throw error(n, n.name() + " debe ser al menos 1");
+            throw error(n, n.getName() + " debe ser al menos 1");
         }
         return v;
     }
 
-    private static double points(String text, StxtNode n, String property) {
+    private static double points(String text, Node n, String property) {
         Value v = ValueParser.value(text);
         if (!(v instanceof Value.Points p) || p.pt() <= 0) {
             throw error(n, property + " del medio debe ser un número de puntos positivo: " + text);
@@ -317,23 +350,23 @@ public final class BoxTreeBuilder {
         return p.pt();
     }
 
-    private static double positive(String text, StxtNode n) {
+    private static double positive(String text, Node n) {
         double v = nonNegative(text, n);
         if (v == 0) {
-            throw error(n, n.name() + " debe ser mayor que 0");
+            throw error(n, n.getName() + " debe ser mayor que 0");
         }
         return v;
     }
 
-    private static double nonNegative(String text, StxtNode n) {
+    private static double nonNegative(String text, Node n) {
         Value v = ValueParser.value(text);
         if (!(v instanceof Value.Points p) || p.pt() < 0) {
-            throw error(n, n.name() + " debe ser un número no negativo: " + text.trim());
+            throw error(n, n.getName() + " debe ser un número no negativo: " + text.trim());
         }
         return p.pt();
     }
 
-    private static Sides<Value> nonNegativeSides(Sides<Value> sides, StxtNode n, String property, boolean allowsPercentage) {
+    private static Sides<Value> nonNegativeSides(Sides<Value> sides, Node n, String property, boolean allowsPercentage) {
         for (Value v : sides.asList()) {
             boolean valid = (v instanceof Value.Points p && p.pt() >= 0)
                     || (allowsPercentage && v instanceof Value.Percentage q && q.percent() >= 0);
@@ -346,7 +379,7 @@ public final class BoxTreeBuilder {
         return sides;
     }
 
-    private static Double aspectRatio(String text, StxtNode n) {
+    private static Double aspectRatio(String text, Node n) {
         String t = text.trim();
         try {
             if (t.contains("/")) {
@@ -367,7 +400,7 @@ public final class BoxTreeBuilder {
         throw error(n, "Aspect ratio espera 'ancho/alto' o un número positivo: " + t);
     }
 
-    private static String color(String text, StxtNode n) {
+    private static String color(String text, Node n) {
         String t = text.trim();
         if (!COLOR.matcher(t).matches()) {
             throw error(n, "Color no válido (usa #RGB o #RRGGBB): " + t);
@@ -375,11 +408,12 @@ public final class BoxTreeBuilder {
         return t;
     }
 
-    private static String required(StxtNode n, String child) {
-        return n.contentOf(child).orElseThrow(() -> error(n, n.name() + " necesita " + child));
+    /** Hijo obligatorio de una sola palabra ({@code "Type"}), para los mensajes de error. */
+    private static String required(InlineNode n, String child) {
+        return contentOf(n, child.toLowerCase(Locale.ROOT)).orElseThrow(() -> error(n, n.getName() + " necesita " + child));
     }
 
-    private static InvalidModelException error(StxtNode n, String message) {
-        return new InvalidModelException(n.line(), message);
+    private static InvalidModelException error(Node n, String message) {
+        return new InvalidModelException(n.getLine(), message);
     }
 }
