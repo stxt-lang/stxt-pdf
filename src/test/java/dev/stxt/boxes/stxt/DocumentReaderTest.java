@@ -4,10 +4,17 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.exceptions.ParseException;
+import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.inline.PdfMetrics;
+import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -43,6 +50,19 @@ class DocumentReaderTest {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }
+    }
+
+    /** Los documentos de ejemplo de la especificación son válidos y se maquetan sin errores. */
+    @Test
+    void specificationExamplesAreValid() throws IOException {
+        String spec = Files.readString(Path.of("docs/ESPECIFICACION.md"));
+        Matcher m = Pattern.compile("```\n(Document \\(dev\\.stxt\\.boxes\\):\n.*?)```", Pattern.DOTALL).matcher(spec);
+        int examples = 0;
+        while (m.find()) {
+            new Engine(new PdfMetrics(new Resources())).layOutDocument(reader.read(m.group(1)));
+            examples++;
+        }
+        assertEquals(2, examples);
     }
 
     @Test

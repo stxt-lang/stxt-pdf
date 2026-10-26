@@ -60,7 +60,7 @@ Flujo de datos:
 
 ```
 texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media
-   ──Engine.layOutDocument──▶ Paginator ──▶ List<Page> (árbol de Fragment por página)
+   ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ List<Page> (árbol de Fragment por página)
    ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PdfCanvas)
 ```
 
@@ -91,7 +91,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
-  `BoxTreeBuilder.definiteHeight`). No generalices una regla nueva sin comentarlo con el usuario.
+  `BoxTreeBuilder.definiteHeight`). Los desbordamientos (§5.12) son errores: `Overflow` los
+  busca en el resultado ya paginado y señala al culpable más interior. `Font` y `Font size` no
+  tienen valor por defecto y se suelen declarar en `Document`. No generalices una regla nueva
+  sin comentarlo con el usuario.
 - **Enums de `Style`:** los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas, así que **cada constante debe llamarse igual que su valor en el documento**
   (`Position.ABSOLUTE` ↔ `absolute`). Si cambias un valor, cambia la constante y el template.
@@ -195,8 +198,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - Los documentos de test se leen con `DocumentReader`, que valida contra el template: un test
   de una regla del §6 comprueba así que el template no la detecta antes. Los volcados de §7
   (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
-  `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan:
-  añade ahí los documentos nuevos.
+  `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
+  (añade ahí los documentos nuevos) y que los ejemplos de la especificación se maquetan sin
+  errores.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `src/test/resources/errors/errors.stxt`
   tiene un `Case` por regla, con `Code`, `Line` (contada desde la primera línea del documento
   incrustado) y el documento en un bloque `Document >>`. Se maqueta con las métricas reales.
@@ -213,8 +217,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   ha cambiado; míralo antes de dar el cambio por bueno.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
   515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
-  añade `Font: IBM Plex Sans` a cada `\tBox:` de primer nivel; los demás documentos de test con
-  texto deben declarar `Font` ellos mismos. Con
+  declara en `Document` `Font: IBM Plex Sans` y `Font size: 10`; los demás documentos de test
+  con texto deben declararlos ellos mismos. Un test de layout no puede desbordar: los
+  desbordamientos van al catálogo de errores. Con
   `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
   una página concreta; los tests `*FragmentationTest` lo usan.

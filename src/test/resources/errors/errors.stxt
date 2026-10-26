@@ -157,6 +157,17 @@ Errors:
 				Box:
 					Font size: 12
 					Text: hola
+	Case: Texto sin Font size
+		Code: TEXT_WITHOUT_FONT_SIZE
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Box:
+					Text: hola
 	Case: Texto en caja anónima sin Font
 		Code: TEXT_WITHOUT_FONT
 		Line: 7
@@ -520,8 +531,51 @@ Errors:
 						Height: 10
 						Item:
 							Cell: c
-	Case: Fuente desconocida, declarada en la antecesora
+	Case: Fuente desconocida, declarada en Document
 		Code: FONT_UNKNOWN
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: Helvetica
+				Font size: 10
+				Box:
+					Box:
+						Text: hola
+	Case: Carácter que la fuente no tiene
+		Code: GLYPH_MISSING
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Font size: 10
+				Box:
+					Text >>
+						Primera línea
+
+						Kanji 漢
+	Case: Palabra más ancha que su línea
+		Code: TEXT_OVERFLOW
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Font size: 10
+				Box:
+					Width: 100
+					Text >>
+						Una palabra muy
+						supercalifragilisticoespialidosa
+	Case: Caja más ancha que el área útil
+		Code: BOX_OVERFLOW
 		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
@@ -529,20 +583,92 @@ Errors:
 					Type: continuous
 					Width: 595
 				Box:
-					Font: Helvetica
-					Box:
-						Text: hola
-	Case: Carácter que la fuente no tiene
-		Code: GLYPH_MISSING
-		Line: 10
+					Width: 600
+					Height: 10
+	Case: Hija más ancha que su contenedor
+		Code: BOX_OVERFLOW
+		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
 				Box:
-					Font: IBM Plex Sans
-					Text >>
-						Primera línea
-
-						Kanji 漢
+					Width: 100
+					Box:
+						Width: 150
+						Height: 10
+	Case: Columnas que no caben en el grid
+		Code: BOX_OVERFLOW
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Font size: 10
+				Box:
+					Layout: grid
+					Width: 200
+					Grid:
+						Columns: 1fr 1fr
+					Box:
+						Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+						Item:
+							Cell: 1 1 1 2
+	Case: Texto más alto que su Height
+		Code: BOX_OVERFLOW
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Font size: 10
+				Box:
+					Width: 100
+					Height: 20
+					Text: uno dos tres cuatro cinco seis siete ocho nueve diez
+	Case: Hija más alta que el Height del padre
+		Code: BOX_OVERFLOW
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Box:
+					Height: 50
+					Box:
+						Height: 80
+	Case: Absolute fuera de la página
+		Code: BOX_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: paged
+					Width: 595
+					Height: 842
+				Box:
+					Position: absolute
+					Offset: -100 auto auto 0
+					Width: 50
+					Height: 10
+	Case: Línea más alta que la página
+		Code: PAGE_OVERFLOW
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: paged
+					Width: 595
+					Height: 842
+					Margin: 40
+				Font: IBM Plex Sans
+				Font size: 10
+				Box:
+					Line height: 900
+					Text: a

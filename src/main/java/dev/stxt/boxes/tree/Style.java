@@ -84,7 +84,8 @@ public final class Style {
     public String font;
     public FontWeight fontWeight = FontWeight.NORMAL;
     public FontStyle fontStyle = FontStyle.NORMAL;
-    public double fontSize = 10;
+    /** {@code NaN} = sin declarar, que es un error en una caja con texto (§6). */
+    public double fontSize = Double.NaN;
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     public Value lineHeight;
     public TextAlign textAlign = TextAlign.LEFT;
@@ -140,6 +141,9 @@ public final class Style {
      */
     private final Map<String, Integer> lines = new HashMap<>();
 
+    /** Propiedades de la fuente: se heredan con su línea y se pueden declarar en {@code Document}. */
+    public static final List<String> FONT_PROPERTIES = List.of("font", "font-weight", "font-style", "font-size");
+
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
     public static Style inheriting(Style parent) {
         Style s = new Style();
@@ -148,7 +152,7 @@ public final class Style {
             s.font = parent.font;
             s.fontWeight = parent.fontWeight;
             s.fontStyle = parent.fontStyle;
-            for (String p : List.of("font", "font-weight", "font-style")) {
+            for (String p : FONT_PROPERTIES) {
                 if (parent.lines.containsKey(p)) {
                     s.lines.put(p, parent.lines.get(p));
                 }

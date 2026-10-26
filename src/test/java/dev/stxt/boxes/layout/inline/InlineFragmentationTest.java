@@ -83,13 +83,5 @@ class InlineFragmentationTest {
         assertRect(40, 40, 30, 60, l.rect(2, "P"));
     }
 
-    @Test
-    void lineTallerThanThePageOverflows() {
-        LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: X", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: P", "\t\tLine height: 150", "\t\tText: a");
-        assertEquals(2, l.pages());
-        assertFalse(l.has(1, "P"));
-        assertRect(40, 40, 515, 150, l.rect(2, "P"));
-    }
+    // Una línea más alta que la página no se puede partir: es un error (catálogo de errores).
 }

@@ -125,27 +125,17 @@ class GridLayoutTest {
 
     @Test
     void percentageColumnsInIntrinsicWidthsAreAuto() {
-        // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto.
+        // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto. Con
+        // min-content (25) cada columna mediría 12.5 y B desbordaría: es un error.
         String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
                 "\tBox:", "\t\tId: max", "\t\tLayout: grid", "\t\tWidth: max-content",
-                "\t\tGrid:", "\t\t\tColumns: 50% 50%", items,
-                "\tBox:", "\t\tId: min", "\t\tLayout: grid", "\t\tWidth: min-content",
                 "\t\tGrid:", "\t\t\tColumns: 50% 50%", items);
         assertEquals(40, l.rect("max").width(), 1e-9);
-        assertEquals(25, l.rect("min").width(), 1e-9);
     }
 
-    @Test
-    void itemCrossingFractionsFitsItsArea() {
-        // W (palabra de 300) ocupa las dos columnas 1fr de un grid de 200: cada una mide 150.
-        LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tWidth: 200", "\t\tGrid:", "\t\t\tColumns: 1fr 1fr",
-                "\t\tBox:", "\t\t\tId: W", "\t\t\tText: " + "a".repeat(60), "\t\t\tItem:", "\t\t\t\tCell: 1 1 1 2",
-                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 10", "\t\t\tItem:", "\t\t\t\tCell: 2 2");
-        assertRect(40, 40, 300, 12, l.rect("W"));
-        assertRect(190, 52, 150, 10, l.rect("B"));
-    }
+    // Un ítem que cruza fracciones y no cabe en el contenedor (las columnas no bajan de su
+    // min-content) es un desbordamiento: está en el catálogo de errores.
 
     @Test
     void itemCrossingFractionsInIntrinsicWidths() {

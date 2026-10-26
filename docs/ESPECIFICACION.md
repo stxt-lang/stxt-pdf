@@ -57,7 +57,9 @@ resumen en el [§8](#8-diferencias-con-css).
 
 ## 2. Estructura de un documento
 
-Un documento tiene un nodo raíz `Document` con exactamente un `Media` y una o más `Box`.
+Un documento tiene un nodo raíz `Document` con exactamente un `Media`, las propiedades de la
+fuente que heredan todas las cajas (`Font`, `Font weight`, `Font style` y `Font size`,
+opcionales) y una o más `Box`.
 Cada `Box` puede contener propiedades, `Text` y otras `Box`.
 
 ```
@@ -67,14 +69,14 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
+	Font: IBM Plex Sans
+	Font size: 10
 	Box:
 		Id: title
-		Font: IBM Plex Sans
 		Font size: 20
 		Text: Un título
 	Box:
 		Id: body
-		Font: IBM Plex Sans
 		Padding: 10
 		Box:
 			Text >>
@@ -159,7 +161,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Offset` izquierda/derecha | el ancho del containing block |
 | `Basis` (ítem flex) | el tamaño del contenedor flex en el eje principal (en `column`, su alto, que debe ser definido) |
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
-| Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda); las filas, su alto, que debe ser definido |
+| Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
 | `Line height` | el `Font size` de la propia caja |
 
 `Border` no admite porcentajes.
@@ -240,12 +242,16 @@ No afectan al layout.
 
 ### 4.6 Texto
 
+`Font`, `Font weight`, `Font style` y `Font size` se pueden declarar también en `Document`, y
+entonces las heredan todas las cajas. Es lo habitual para la fuente del documento: cada caja
+declara solo lo que cambia.
+
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
-| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en toda caja con texto, propia o heredada. Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
+| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en toda caja con texto, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
 | `Font weight` | `normal`, `bold` | `normal` | **Sí** | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
 | `Font style` | `normal`, `italic` | `normal` | **Sí** | |
-| `Font size` | número > 0 | `10` | **Sí** | Cuerpo de la fuente. |
+| `Font size` | número > 0 | — | **Sí** | Cuerpo de la fuente. **Obligatorio** en toda caja con texto, propio o heredado (también de `Document`). |
 | `Line height` | número o % | `120%` | **Sí** | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
 | `Text align` | `left`, `right`, `center`, `justify` | `left` | **Sí** | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Text wrap` | `auto`, `pretty` | `auto` | **Sí** | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
@@ -388,8 +394,8 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
   mientras quepan. Con `Text wrap: pretty`, **Knuth-Plass**: se eligen los saltos del párrafo
   que minimizan la suma de los deméritos de sus líneas, de modo que las líneas quedan más
   parejas (sin guiones; los espacios se estiran hasta la mitad de su ancho y no se encogen; la
-  última línea no cuenta). En los dos casos, una palabra más ancha que la línea ocupa una línea
-  propia y **desborda**.
+  última línea no cuenta). En los dos casos, una palabra más ancha que la línea es un error
+  ([§5.12](#512-desbordamiento)).
 - **Altura.** Cada línea mide `Line height`. La altura del contenido es el número de líneas
   por `Line height`.
 - **Línea base.** La caja de la fuente (su ascendente más su descendente, de la tabla `hhea`
@@ -527,8 +533,8 @@ Con tamaño cruzado `auto`, el contenedor mide la suma de sus líneas más los h
 | `around` | L/2n | hueco + L/n | L/2n |
 | `evenly` | L/(n+1) | hueco + L/(n+1) | L/(n+1) |
 
-Si el sobrante es negativo (los ítems desbordan), `between` se alinea como `start` y `around` y
-`evenly`, como `center`. Lo mismo vale para las líneas con `Lines`. Los márgenes `auto` de un
+Un sobrante negativo después de encoger significa que los ítems no caben: es un error
+([§5.12](#512-desbordamiento)). Los márgenes `auto` de un
 ítem son un error: la alineación se hace con `Main axis` y `Cross axis`.
 
 **Comportamientos a tener en cuenta:**
@@ -661,9 +667,10 @@ Solo se vuelve atrás a cortes entre hijos: si el mejor corte es anterior al hij
 se descarta lo colocado después, pero nunca se repite el layout de un hijo anterior con menos
 espacio para partirlo por dentro.
 
-**Garantía de progreso.** Al principio de una página siempre se coloca algo, aunque desborde o
-haya que cortarlo a la fuerza. Una caja monolítica más alta que una página no provoca un bucle
-infinito.
+**Garantía de progreso.** Al principio de una página siempre se coloca algo, aunque haya que
+cortarlo a la fuerza. Lo que no se puede partir y no cabe en una página entera (una línea más
+alta que el área útil, una fila con un ítem que no puede colocar nada) es un error
+([§5.12](#512-desbordamiento)).
 
 **Cortes forzados.** `Break before: page` y `Break after: page` fuerzan un salto. Solo se
 aplican a cajas en flujo. El `Break before: page` del primer hijo de un bloque y el
@@ -703,7 +710,8 @@ paralelo**: cada uno se parte por su cuenta y la fila continúa en la página si
 filas siguientes van detrás, con el hueco que las separaba. Las filas que ocupa un mismo ítem
 se parten juntas, cada ítem desde su posición. Un ítem estirado reparte entre las páginas el
 alto que le impone su línea o su área, así que puede terminar antes o después que el texto de
-sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte y desborda. Al elegir el
+sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte, y si no cabe es un error.
+Al elegir el
 corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un contenedor `column`
 con `Wrap` no se parte.
 
@@ -764,6 +772,28 @@ tiene son errores con la línea de la caja ([§6](#6-validación)). También son
 porque no son del documento, que no exista `fonts/`, un fichero que no se puede leer, una fuente
 variable o dos ficheros con la misma familia, peso y estilo.
 
+### 5.12 Desbordamiento
+
+**Nada puede desbordar.** Después de maquetar y paginar, el motor comprueba el resultado y da
+un error con la primera de estas situaciones:
+
+- **una palabra más ancha que su línea** (`TEXT_OVERFLOW`), en la línea del documento donde
+  está la palabra;
+- **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus
+  márgenes horizontales (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo
+  declara;
+- **contenido que pasa del alto de su caja**: líneas o hijos que no caben en un `Height` o un
+  `Max height` (`BOX_OVERFLOW`), en la línea de esa propiedad;
+- en modo paginado, **algo del flujo que no cabe en el área útil de una página y no se puede
+  partir** (`PAGE_OVERFLOW`), en la línea de su `Height` o su `Line height` si los declara;
+- **una caja `absolute` o `fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
+  línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página.
+
+El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro,
+se nombra lo de dentro. Las cajas `relative` se comprueban en su sitio, sin el desplazamiento de
+`Offset`, y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino
+decisiones del autor. Tampoco cuentan los márgenes verticales, que colapsan.
+
 ---
 
 ## 6. Validación
@@ -780,7 +810,7 @@ el resultado del layout es predecible: lo que se lee en el documento es lo que s
   otra.
 - **Se para en el primer error.**
 
-La validación se hace en tres niveles:
+La validación se hace en cuatro niveles:
 
 1. **Sintaxis STXT y template** ([§9](#9-template-completo)): estructura, cardinalidades, tipos
    `ENUM`, `INTEGER`, `BOOLEAN` y `TEXT`. La realiza la librería STXT con sus propios códigos
@@ -788,6 +818,8 @@ La validación se hace en tres niveles:
 2. **Modelo:** las reglas que el template no puede expresar, al construir el árbol de cajas.
 3. **Fuentes** ([§5.11](#511-recursos-y-fuentes)): con las métricas reales (la salida PDF),
    antes de maquetar, porque necesitan la carpeta de fuentes.
+4. **Desbordamientos** ([§5.12](#512-desbordamiento)): sobre el resultado, después de maquetar
+   y paginar.
 
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
@@ -800,7 +832,8 @@ La validación se hace en tres niveles:
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `INLINE_WITH_BOXES` | `Layout: inline` solo contiene `Text` | `Una caja con Layout: inline solo puede contener Text…` |
-| `TEXT_WITHOUT_FONT` | El texto necesita `Font`, propia o heredada | `El texto necesita Font: declárala en la caja o en una antecesora` |
+| `TEXT_WITHOUT_FONT` | El texto necesita `Font`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en la caja, en una antecesora o en Document` |
+| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Font size`, propio o heredado (también de `Document`) | `El texto necesita Font size: decláralo en la caja, en una antecesora o en Document` |
 | `CONTAINER_MISMATCH` | `Flex` solo con `Layout: flex`; `Grid` solo con `Layout: grid` | `Flex solo se aplica con Layout: flex` |
 | `ITEM_MISMATCH` | `Item` solo en hijos en flujo de flex o grid, y con las propiedades de ese contenedor | `Grow de Item solo tiene efecto en ítems de flex, y el padre es grid` |
 | `OFFSET_ON_STATIC` | `Offset` no se admite con `Position: static` | `Offset no tiene efecto con Position: static` |
@@ -818,6 +851,9 @@ La validación se hace en tres niveles:
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Font weight` y `Font style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
+| `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y las `absolute` y `fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 | `DOCUMENT_STRUCTURE` | Lo que el template ya rechaza (falta `Media`, un bloque `>>` mal puesto…), si se construye el árbol sin validar el documento | `Falta el nodo Media` |
 
 Las propiedades de fragmentación (`Break before`, `Widows`…) no son errores en modo continuo:
@@ -870,7 +906,8 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
 | `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Font weight: normal` o `bold` y `Font style: normal` o `italic`, sin síntesis: el fichero debe existir |
 | Kerning y ligaduras | Sí | No |
-| Palabras largas | Desbordan (configurable) | Desbordan |
+| Palabras largas | Desbordan (configurable) | Error |
+| Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
 | `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
 | `position: fixed` en pantalla | Relativo a la ventana | En continuo, relativo al documento |
 | `position: fixed` en impresión | Repetido en cada página | Igual: repetido, relativo al área útil |
@@ -909,6 +946,10 @@ Template (@stxt.template): dev.stxt.boxes
 				Width: (1)
 				Height: (?)
 				Margin: (?)
+			Font: (?)
+			Font weight: (?) ENUM [normal, bold]
+			Font style: (?) ENUM [normal, italic]
+			Font size: (?)
 			Box: (+)
 				Id: (?)
 				Layout: (?) ENUM [block, inline, flex, grid]
@@ -930,10 +971,10 @@ Template (@stxt.template): dev.stxt.boxes
 				Background: (?)
 				Color: (?)
 				Border color: (?)
-				Font: (?)
-				Font weight: (?) ENUM [normal, bold]
-				Font style: (?) ENUM [normal, italic]
-				Font size: (?)
+				Font: (?) @Font
+				Font weight: (?) @Font weight
+				Font style: (?) @Font style
+				Font size: (?) @Font size
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
 				Text wrap: (?) ENUM [auto, pretty]
@@ -988,9 +1029,10 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
+	Font: IBM Plex Sans
+	Font size: 10
 	Box:
 		Id: header
-		Font: IBM Plex Sans
 		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
@@ -999,7 +1041,6 @@ Document (dev.stxt.boxes):
 		Text: Informe trimestral
 	Box:
 		Id: footer
-		Font: IBM Plex Sans
 		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
@@ -1008,7 +1049,6 @@ Document (dev.stxt.boxes):
 		Text: Página {page} de {pages}
 	Box:
 		Id: title
-		Font: IBM Plex Sans
 		Font weight: bold
 		Font size: 20
 		Line height: 24
@@ -1017,7 +1057,6 @@ Document (dev.stxt.boxes):
 		Text: Resultados del trimestre
 	Box:
 		Id: body
-		Font: IBM Plex Sans
 		Layout: grid
 		Grid:
 			Columns: 150 1fr
@@ -1040,7 +1079,6 @@ Document (dev.stxt.boxes):
 				Una línea en blanco empieza un párrafo nuevo.
 	Box:
 		Id: stamp
-		Font: IBM Plex Sans
 		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80
@@ -1056,8 +1094,8 @@ Document (dev.stxt.boxes):
 
 - **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
-- **Fuentes:** las cajas de primer nivel no tienen un antecesor común que declare `Font`, así
-  que cada una con texto la declara; sus hijas la heredan. El título va en negrita.
+- **Fuentes:** `Document` declara `Font` y `Font size`, que heredan todas las cajas. El título
+  cambia el tamaño y va en negrita.
 - **`header`** (`fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.

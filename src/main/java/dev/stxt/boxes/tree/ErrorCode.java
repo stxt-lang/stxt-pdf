@@ -38,6 +38,8 @@ public enum ErrorCode {
     INLINE_WITH_BOXES,
     /** Texto sin {@code Font}, propia o heredada. */
     TEXT_WITHOUT_FONT,
+    /** Texto sin {@code Font size}, propio o heredado. */
+    TEXT_WITHOUT_FONT_SIZE,
 
     // --- Combinaciones sin efecto o contradictorias --------------------------------------------
     /** {@code Flex} sin {@code Layout: flex} o {@code Grid} sin {@code Layout: grid}. */
@@ -68,6 +70,14 @@ public enum ErrorCode {
     BREAK_NOT_ALLOWED,
     /** {@code Areas} no rectangulares o {@code Cell} no válida. */
     GRID_PLACEMENT,
+
+    // --- Desbordamientos (al maquetar) -------------------------------------------------------
+    /** Una palabra más ancha que su línea. */
+    TEXT_OVERFLOW,
+    /** Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o una absolute que sale de la página. */
+    BOX_OVERFLOW,
+    /** Algo del flujo más alto que la página que no se puede partir. */
+    PAGE_OVERFLOW,
 
     // --- Fuentes ------------------------------------------------------------------------------
     /** {@code Font} no está en la carpeta de fuentes. */

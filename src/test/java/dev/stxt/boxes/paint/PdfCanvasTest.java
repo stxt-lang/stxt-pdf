@@ -83,8 +83,8 @@ class PdfCanvasTest {
     @Test
     void onePdfPagePerPage() throws Exception {
         InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 300\n"
-                + "\t\tHeight: 200\n\t\tMargin: 20\n\tBox:\n\t\tFont: IBM Plex Sans\n\t\tText: Uno\n"
-                + "\tBox:\n\t\tFont: IBM Plex Sans\n\t\tBreak before: page\n\t\tText: Dos\n");
+                + "\t\tHeight: 200\n\t\tMargin: 20\n\tFont: IBM Plex Sans\n\tFont size: 10\n"
+                + "\tBox:\n\t\tText: Uno\n\tBox:\n\t\tBreak before: page\n\t\tText: Dos\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "two-pages"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDFTextStripper stripper = new PDFTextStripper();

@@ -55,13 +55,16 @@ public final class Engine {
     /**
      * Documento STXT ya validado ({@link dev.stxt.boxes.stxt.DocumentReader}) → páginas. En modo
      * continuo devuelve una sola página. Antes de maquetar comprueba con el {@link TextMeasurer}
-     * que se puede medir todo el texto (las fuentes, en la salida PDF).
+     * que se puede medir todo el texto (las fuentes, en la salida PDF), y después que nada
+     * desborda ({@link Overflow}).
      */
     public List<Page> layOutDocument(InlineNode document) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
         measurer.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
-        return new Paginator(this).paginate(tree.root(), tree.media());
+        List<Page> pages = new Paginator(this).paginate(tree.root(), tree.media());
+        Overflow.check(pages, tree.media());
+        return pages;
     }
 
     /**

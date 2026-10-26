@@ -6,6 +6,10 @@ Template (@stxt.template): dev.stxt.boxes
 				Width: (1)
 				Height: (?)
 				Margin: (?)
+			Font: (?)
+			Font weight: (?) ENUM [normal, bold]
+			Font style: (?) ENUM [normal, italic]
+			Font size: (?)
 			Box: (+)
 				Id: (?)
 				Layout: (?) ENUM [block, inline, flex, grid]
@@ -27,10 +31,10 @@ Template (@stxt.template): dev.stxt.boxes
 				Background: (?)
 				Color: (?)
 				Border color: (?)
-				Font: (?)
-				Font weight: (?) ENUM [normal, bold]
-				Font style: (?) ENUM [normal, italic]
-				Font size: (?)
+				Font: (?) @Font
+				Font weight: (?) @Font weight
+				Font style: (?) @Font style
+				Font size: (?) @Font size
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
 				Text wrap: (?) ENUM [auto, pretty]
@@ -68,13 +72,14 @@ Template (@stxt.template): dev.stxt.boxes
 	Description >>
 		Document: Documento de cajas. Referencia completa en docs/ESPECIFICACION.md.
 		Media: Medio de salida. Define el área útil, que es el containing block inicial.
+		Font size: Cuerpo de la fuente, en puntos. Obligatorio en las cajas con texto, propio o heredado (también de Document). Se hereda.
 		Box: Una caja del árbol. Puede contener Text y otras Box, en orden.
 		Layout: Cómo coloca la caja a sus hijos. Por defecto, block.
 		Position: Cómo participa la caja en el flujo de su padre. Por defecto, static.
 		Offset: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Position distinta de static.
 		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 		Box sizing: Qué miden Width y Height: la caja de borde (border, por defecto) o el contenido (content).
-		Font: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en las cajas con texto, propia o heredada. Se hereda.
+		Font: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en las cajas con texto, propia o heredada (también de Document). Se hereda.
 		Font weight: Peso: normal (por defecto) o bold. Se hereda.
 		Font style: Estilo: normal (por defecto) o italic. Se hereda.
 		Line height: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size.

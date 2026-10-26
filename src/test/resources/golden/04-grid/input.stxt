@@ -5,9 +5,10 @@ Document (dev.stxt.boxes):
 		Type: continuous
 		Width: 595
 		Margin: 40
+	Font: IBM Plex Sans
+	Font size: 10
 	Box:
 		Id: page
-		Font: IBM Plex Sans
 		Layout: grid
 		Grid:
 			Columns: 150 1fr

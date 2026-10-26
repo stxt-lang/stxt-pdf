@@ -43,14 +43,9 @@ Resueltas por el hito:
 
 Decisiones nuevas:
 
-42. **`Font` obligatoria y sin valor por defecto:** el texto sin `Font` (propia o heredada) es
-    un error del modelo, también con `FixedMetrics`. Como solo se hereda de antecesoras y las
-    cajas de primer nivel no tienen ninguna declarada, cada caja de primer nivel con texto
-    declara la suya (el ejemplo del §10 la repite cinco veces).
-    *Dónde:* `tree/BoxTreeBuilder.buildContent`.
-    *Alternativa:* admitir propiedades de texto heredables en `Document` para todo el
-    documento. Sigue abierta tras la conversación sobre errores, igual que si `Font size`
-    (hoy 10 por defecto) debe ser obligatoria.
+42. ~~**`Font` obligatoria y sin valor por defecto**~~, resuelta tras la conversación sobre
+    errores: `Font` y `Font size` son obligatorias en el texto y se pueden declarar en
+    `Document` (§4.6), así que ya no hay que repetirlas en cada caja de primer nivel.
 
 43. **Un carácter que la fuente no tiene es un error**, con la línea de la caja; no se pinta el
     glifo `.notdef` ni se busca otra fuente. Los espacios en blanco se comprueban como espacio y
@@ -157,3 +152,27 @@ tiene un caso por código.
 59. **Sin código propio lo que ya rechaza el template:** `Main axis: stretch` y
     `Break inside: page` son `VALUE_NOT_ALLOWED`, y un bloque `>>` donde van hijos,
     `DOCUMENT_STRUCTURE`; con `DocumentReader` salen antes los códigos de `stxt-core`.
+
+60. **Solo las propiedades de la fuente en `Document`** (`Font`, `Font weight`, `Font style` y
+    `Font size`): es lo que se decidió para no repetirlas. `Color`, `Line height`,
+    `Text align`… se heredan igual, pero hay que declararlas en una caja.
+    *Dónde:* template, `tree/BoxTreeBuilder.build`, `Style.FONT_PROPERTIES`.
+    *Alternativa:* admitir en `Document` todas las propiedades que se heredan.
+
+61. **Los desbordamientos se comprueban sobre el resultado final**, una vez paginado, y no
+    durante el layout: así no cuentan las pasadas de medida. Cuentan las líneas y los hijos en
+    flujo que no caben en la caja de contenido de su padre (a lo ancho con sus márgenes
+    horizontales; a lo alto, el borde inferior), el flujo que no cabe en la página y las
+    `absolute` y `fixed` que salen de la página física. No cuentan el desplazamiento de las
+    `relative`, los márgenes negativos (espacio que gana el autor) ni el borde superior (los
+    márgenes verticales colapsan).
+    *Dónde:* `layout/Overflow`, llamado desde `Engine.layOutDocument`.
+    *Alternativa:* detectarlo en cada algoritmo al colocar, con el riesgo de confundir medidas
+    provisionales con el resultado.
+
+62. **El culpable de un desbordamiento:** se baja hasta lo más interior que se sale. A lo ancho
+    se señala su `Width` (o `Min width`, o la caja); si es una palabra, la línea del documento
+    de esa palabra (la primera vez que aparece en el texto de la caja). A lo alto, el `Height`
+    (o `Max height`) del contenedor que se queda corto. Si no cabe en la página, el `Height` o
+    el `Line height` de lo más interior que pasa del final.
+    *Dónde:* `layout/Overflow.tooWide`, `tooTall`, `pageOverflow`, `textOverflow`.

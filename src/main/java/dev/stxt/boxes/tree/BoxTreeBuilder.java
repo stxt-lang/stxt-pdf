@@ -67,7 +67,15 @@ public final class BoxTreeBuilder {
                 .orElseThrow(() -> error(document, ErrorCode.DOCUMENT_STRUCTURE, "Falta el nodo Media"));
         Media media = media(mediaNode);
 
-        Box root = new Box(null, new Style(), true, document.getLine());
+        // Las propiedades de la fuente de Document las heredan todas las cajas.
+        Style rootStyle = new Style();
+        for (Node p : document.getChildren()) {
+            if (Style.FONT_PROPERTIES.contains(p.getCanonicalName())) {
+                rootStyle.declared(p.getCanonicalName(), p.getLine());
+                font(p, rootStyle);
+            }
+        }
+        Box root = new Box(null, rootStyle, true, document.getLine());
         // El área útil: definida en modo paginado; infinita en continuo.
         definiteHeight.put(root, media.paged());
         buildContent(document, root);
@@ -138,7 +146,11 @@ public final class BoxTreeBuilder {
             }
             if (box.style.font == null) {
                 throw error(h, ErrorCode.TEXT_WITHOUT_FONT,
-                        "El texto necesita Font: declárala en la caja o en una antecesora");
+                        "El texto necesita Font: declárala en la caja, en una antecesora o en Document");
+            }
+            if (!box.style.isDeclared("font-size")) {
+                throw error(h, ErrorCode.TEXT_WITHOUT_FONT_SIZE,
+                        "El texto necesita Font size: decláralo en la caja, en una antecesora o en Document");
             }
             Box target = box;
             if (textInAnonymous) {
@@ -189,10 +201,7 @@ public final class BoxTreeBuilder {
                 case "background" -> s.background = color(p);
                 case "color" -> s.color = color(p);
                 case "border-color" -> s.borderColor = color(p);
-                case "font" -> s.font = fontFamily(p);
-                case "font-weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
-                case "font-style" -> s.fontStyle = enumValue(Style.FontStyle.class, p);
-                case "font-size" -> s.fontSize = positive(p);
+                case "font", "font-weight", "font-style", "font-size" -> font(p, s);
                 case "line-height" -> s.lineHeight = value(p, LENGTH, false);
                 case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
                 case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
@@ -779,6 +788,16 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (usa #RGB o #RRGGBB): " + t);
         }
         return t;
+    }
+
+    /** {@code Font}, {@code Font weight}, {@code Font style} o {@code Font size}, en una caja o en {@code Document}. */
+    private static void font(Node p, Style s) {
+        switch (p.getCanonicalName()) {
+            case "font" -> s.font = fontFamily(p);
+            case "font-weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
+            case "font-style" -> s.fontStyle = enumValue(Style.FontStyle.class, p);
+            default -> s.fontSize = positive(p);
+        }
     }
 
     private static String fontFamily(Node n) {

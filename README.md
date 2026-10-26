@@ -37,10 +37,11 @@ directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
-por la familia, el peso y el estilo que declara. `Font` es obligatoria en toda caja con texto
-y no tiene valor por defecto. El repositorio incluye
+por la familia, el peso y el estilo que declara. `Font` y `Font size` son obligatorias en el
+texto y no tienen valor por defecto. El repositorio incluye
 [IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/) (normal, negrita, cursiva y negrita
-cursiva), con licencia SIL Open Font License. Los detalles están en el §5.11 de la
+cursiva), con licencia SIL Open Font License. `Font` y `Font size` se suelen declarar en
+`Document`, de donde las heredan todas las cajas. Los detalles están en el §5.11 de la
 especificación.
 
 ## Estado
@@ -54,6 +55,7 @@ terminados.
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
 | Árbol de cajas: herencia, cajas anónimas, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
+| Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |
