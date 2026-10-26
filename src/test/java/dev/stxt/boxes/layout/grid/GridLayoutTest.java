@@ -112,6 +112,30 @@ class GridLayoutTest {
     }
 
     @Test
+    void percentageRowsWithAutoHeightAreAuto() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tRows: 50% 50%",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 30");
+        assertRect(40, 40, 515, 40, l.rect("G"));
+        assertRect(40, 40, 515, 10, l.rect("A"));
+        assertRect(40, 50, 515, 30, l.rect("B"));
+    }
+
+    @Test
+    void percentageColumnsInIntrinsicWidthsAreAuto() {
+        // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto.
+        String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: max", "\t\tLayout: grid", "\t\tWidth: max-content",
+                "\t\tGrid:", "\t\t\tColumns: 50% 50%", items,
+                "\tBox:", "\t\tId: min", "\t\tLayout: grid", "\t\tWidth: min-content",
+                "\t\tGrid:", "\t\t\tColumns: 50% 50%", items);
+        assertEquals(40, l.rect("max").width(), 1e-9);
+        assertEquals(25, l.rect("min").width(), 1e-9);
+    }
+
+    @Test
     void intrinsicWidths() {
         // A: min 10, max 25. B: min y max 15. Hueco 10.
         String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";

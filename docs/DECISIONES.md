@@ -15,7 +15,17 @@ son diferencias con CSS, §8) y se han quitado de aquí; la 31 (`new Engine()` u
 abiertas, con su número original. Las decisiones nuevas siguen desde la 41.
 
 Resueltas en el código después del repaso: la 2 (las posicionadas se pintan en orden del
-documento, §5.6).
+documento, §5.6) y la 14 (una pista en porcentaje sobre un tamaño indefinido es `auto`, §5.8).
+
+## Por aclarar
+
+41. **Base de los porcentajes de las pistas de grid.** El §3.6 dice que es la caja de
+    contenido del contenedor, como en CSS, pero `TrackSizing` los resuelve contra la caja de
+    contenido menos los huecos: `Columns: 50% 50%` con `Gap: 10` cabe justo, cuando en CSS
+    desborda 10 pt. Encontrada al resolver la 14.
+    *Dónde:* `layout/grid/TrackSizing.size` (`reference`).
+    *Alternativas:* corregir el código para seguir el §3.6 (y CSS), o cambiar el §3.6 y
+    apuntarlo en el §8 como diferencia con CSS.
 
 ## Cambiar el código
 
@@ -34,12 +44,6 @@ quítala de aquí.
    alto de su contenido como en CSS.
    *Dónde:* `layout/flex/FlexLayout.columnItem`.
    *Propuesta (CSS):* mínimo automático = min(alto declarado, alto del contenido).
-
-14. **Pista en porcentaje sobre un tamaño indefinido** (filas con el contenedor en
-    `Height: auto`, o al calcular intrínsecos): vale 0. Contradice el §3.1 ("un valor que
-    depende de una base indefinida se comporta como `auto`").
-    *Dónde:* `layout/grid/TrackSizing`.
-    *Propuesta (CSS):* tratarla como `auto`.
 
 15. **Un ítem que ocupa varias pistas y alguna es flexible no aporta nada a su tamaño**
     (simplificación que ya traía `TrackSizing`). Un ítem largo que cruza una columna `1fr`

@@ -99,8 +99,10 @@ public final class GridLayout implements LayoutAlgorithm {
             maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.maxContent(), is.maxContent()));
         }
         double gaps = gap * Math.max(0, g.columns().size() - 1);
-        double min = sum(TrackSizing.size(g.columns(), minContributions, gaps, gap)) + gaps;
-        double max = sum(TrackSizing.size(g.columns(), maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
+        // Sin containing block, las columnas en porcentaje cuentan como auto (§3.1).
+        List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
+        double min = sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
+        double max = sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
         return BoxModel.intrinsic(box, new IntrinsicSizes(min, Math.max(min, max)));
     }
 

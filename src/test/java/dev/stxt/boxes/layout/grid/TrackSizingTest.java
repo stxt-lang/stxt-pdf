@@ -41,6 +41,27 @@ class TrackSizingTest {
     }
 
     @Test
+    void percentagesWithoutBaseAreAuto() {
+        // Sin base, 50% y min(300, 50%) son auto (max-content 140 y 90); minmax(100, 50%)
+        // pasa a minmax(100, auto) (max-content 220); 120 es fija.
+        assertArrayEquals(new double[]{140, 90, 220, 120},
+                columns("50% min(300, 50%) minmax(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
+    }
+
+    @Test
+    void percentagesWithBase() {
+        // 50% de 515 = 257.5 (los huecos no se descuentan); de los 495 para pistas, el resto
+        // para la auto (estirada).
+        assertArrayEquals(new double[]{257.5, 237.5}, columns("50% auto", 515), 1e-9);
+    }
+
+    @Test
+    void percentagesIgnoreGaps() {
+        // Como en CSS, 50% 50% con hueco desborda el hueco.
+        assertArrayEquals(new double[]{257.5, 257.5}, columns("50% 50%", 515), 1e-9);
+    }
+
+    @Test
     void module6Exercise() {
         List<Track> t = ValueParser.list("auto 1fr 1fr").stream().map(Track::of).toList();
         List<ItemContribution> items = List.of(

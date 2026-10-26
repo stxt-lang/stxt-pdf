@@ -542,7 +542,9 @@ ambas; `auto` equivale a `minmax(min-content, max-content)`; `1fr` equivale a
    reparto.
 5. **Estirar:** si no hay fracciones y sobra espacio, se reparte entre las pistas `auto`.
 
-Una pista `fit-content` se trata como `auto`.
+Una pista `fit-content` se trata como `auto`. Una pista en porcentaje sobre un tamaño
+indefinido (las filas de un contenedor con `Height: auto`, o las columnas al calcular sus
+tamaños intrínsecos) también se comporta como `auto` ([§3.1](#31-tipos-de-valor)).
 
 Las **columnas** se dimensionan primero, con los anchos min-content y max-content de los
 ítems. Las **filas** después, con la altura de cada ítem maquetado al ancho de sus columnas.

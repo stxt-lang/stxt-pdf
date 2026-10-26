@@ -28,21 +28,24 @@ public final class TrackSizing {
     }
 
     /**
-     * @param tracks    definiciones de las pistas (explícitas e implícitas)
+     * @param declared  definiciones de las pistas (explícitas e implícitas)
      * @param items     aportaciones de los ítems colocados
      * @param available tamaño de la caja de contenido del contenedor en este eje;
-     *                  {@link Double#POSITIVE_INFINITY} si es indefinido
+     *                  {@link Double#POSITIVE_INFINITY} si es indefinido (los porcentajes de las
+     *                  pistas se comportan entonces como {@code auto})
      * @param gap       separación entre pistas
      * @return tamaño de cada pista
      */
-    public static double[] size(List<Track> tracks, List<ItemContribution> items,
+    public static double[] size(List<Track> declared, List<ItemContribution> items,
                                 double available, double gap) {
+        boolean finite = Double.isFinite(available);
+        List<Track> tracks = finite ? declared : declared.stream().map(Track::withoutPercentBase).toList();
         int n = tracks.size();
         double[] base = new double[n];
         double[] limit = new double[n];
-        boolean finite = Double.isFinite(available);
         double space = finite ? available - gap * Math.max(0, n - 1) : Double.POSITIVE_INFINITY;
-        double reference = finite ? space : 0;
+        // Los porcentajes se refieren a la caja de contenido entera, huecos incluidos (§3.6).
+        double reference = finite ? available : 0;
 
         // 1. Inicializar.
         for (int i = 0; i < n; i++) {
