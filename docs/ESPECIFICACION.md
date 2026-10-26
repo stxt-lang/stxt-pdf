@@ -642,6 +642,11 @@ de cada uno; con `clone`, el total del contenido es ese alto menos un borde y un
 cada fragmento les suma los suyos. `Min height` y `Max height` también se aplican al total (con
 `clone`, al contenido total más un borde y un relleno).
 
+Con `slice`, el borde y el relleno inferiores solo se reservan cuando hacen falta: si la caja
+terminaría en la página pero ellos no caben, se maqueta de nuevo con ese espacio reservado, de
+modo que se corta antes (o pasa entera a la página siguiente) y termina allí con su borde y su
+relleno. Si la caja se corta de todos modos, su fragmento llega hasta el final de la página.
+
 Una caja con `Height` definido se parte como cualquier otra, aunque no tenga contenido: lo que
 no cabe de su alto pasa a la página siguiente. Para evitarlo se declara `Break inside: avoid`,
 que no impide partirla si no cabe en una página entera. Un fragmento cortado de una caja con

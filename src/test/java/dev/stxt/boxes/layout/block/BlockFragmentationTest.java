@@ -79,6 +79,43 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void sliceReservesBottomDecorationWhenTheBoxEnds() {
+        // El contenido (40 + 55) cabe en 100, pero el relleno inferior (10) no: con 90 para el
+        // contenido, C2 (avoid) pasa a la página 2 y Q termina allí con su relleno.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBox:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
+                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 40",
+                "\t\tBox:", "\t\t\tId: C2", "\t\t\tHeight: 55", "\t\t\tBreak inside: avoid");
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 40, l.rect(1, "Q"));
+        assertRect(40, 40, 515, 65, l.rect(2, "Q"));
+        assertRect(40, 40, 515, 55, l.rect(2, "C2"));
+    }
+
+    @Test
+    void sliceReservesBottomDecorationForText() {
+        // Cinco líneas de 20 caben en 100, pero el relleno inferior no. Con 90 caben cuatro, que
+        // dejarían una viuda: se cortan tres y las dos últimas pasan con el relleno.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBox:", "\t\tId: Q", "\t\tWidth: 50", "\t\tPadding: 0 0 10 0", "\t\tLine height: 20",
+                "\t\tText: aaaaaaaa bbbbbbbb cccccccc dddddddd eeeeeeee");
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 50, 60, l.rect(1, "Q"));
+        assertRect(40, 40, 50, 50, l.rect(2, "Q"));
+    }
+
+    @Test
+    void sliceDoesNotReserveWhenTheBoxContinues() {
+        // Q se parte de todos modos: el primer fragmento llega al final de la página, sin hueco.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBox:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
+                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 150");
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "Q"));
+        assertRect(40, 40, 515, 60, l.rect(2, "Q"));
+    }
+
+    @Test
     void cloneDecorationRepeatsBorderInEveryFragment() {
         // Como el anterior, con clone: el contenido de cada página cabe entre 5 arriba y 5 abajo
         // (90 pt). Página 1: C1 (40) + 50 de C2. Página 2: 5 + los 30 que faltan de C2 + 5.

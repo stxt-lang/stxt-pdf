@@ -23,6 +23,8 @@ import java.util.List;
  */
 public final class Engine {
 
+    private static final double EPSILON = 1e-9;
+
     private final LayoutCache cache = new LayoutCache();
     private final BlockLayout block;
     private final InlineLayout inline;
@@ -63,8 +65,26 @@ public final class Engine {
     /**
      * Layout de una caja con su algoritmo. Si la caja es el containing block de cajas
      * {@code absolute} de su interior, las resuelve al terminar (ESPECIFICACION.md §5.5).
+     *
+     * <p>Si la caja termina en esta página y solo se salen de ella su borde y su relleno
+     * inferiores, se repite el layout con ese espacio reservado (§5.10): la caja termina dentro
+     * de la página o se corta antes, y el final pasa a la siguiente con el borde y el relleno.</p>
      */
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        LayoutResult r = layoutOnce(box, space, from);
+        if (!space.fragmenting() || r.breakToken() != null) {
+            return r;
+        }
+        Fragment f = r.fragment();
+        double bottom = f.border().bottom() + f.padding().bottom();
+        double remaining = space.fragmentainerRemaining().getAsDouble();
+        if (bottom > 0 && f.height() > remaining + EPSILON && f.height() - bottom <= remaining + EPSILON) {
+            return layoutOnce(box, space.withRemaining(remaining - bottom, space.atFragmentainerStart()), from);
+        }
+        return r;
+    }
+
+    private LayoutResult layoutOnce(Box box, ConstraintSpace space, BreakToken from) {
         return cache.layout(box, space, from,
                 () -> absolute.resolvePending(box, algorithm(box).layout(box, space, from)));
     }

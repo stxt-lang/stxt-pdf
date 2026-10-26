@@ -39,7 +39,8 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
     /**
      * Lo que queda de página para el contenido del fragmento: sin el borde y el relleno
      * superiores y, con {@code clone}, tampoco los inferiores. Con {@code slice}, los inferiores
-     * no se reservan.
+     * no se reservan aquí: solo hacen falta si la caja termina en esta página, y de eso se
+     * encarga {@link Engine#layout}.
      */
     public static double contentRemaining(BoxModel model, boolean first, ConstraintSpace space) {
         double bottom = model.clones() ? model.border().bottom() + model.padding().bottom() : 0;

@@ -17,7 +17,10 @@ abiertas, con su número original. Las decisiones nuevas siguen desde la 41.
 Resueltas en el código después del repaso: la 2 (las posicionadas se pintan en orden del
 documento, §5.6), la 14 (una pista en porcentaje sobre un tamaño indefinido es `auto`, §5.8) y la 41,
 encontrada al resolver la 14 (los porcentajes de las pistas se resolvían contra la caja de
-contenido menos los huecos; ahora, contra la caja de contenido, como dice el §3.6).
+contenido menos los huecos; ahora, contra la caja de contenido, como dice el §3.6) y la 21
+(con `slice`, si solo el borde y el relleno inferiores no caben, `Engine.layout` repite el
+layout reservándolos, §5.10; no se reservan siempre, como con `clone`, para no dejar un hueco al
+final de cada página cuando la caja se corta de todos modos).
 
 ## Cambiar el código
 
@@ -43,13 +46,6 @@ quítala de aquí.
     *Dónde:* `layout/grid/TrackSizing.distributeExcess`.
     *Propuesta (CSS):* repartir su exceso entre las pistas flexibles que ocupa, en proporción a
     su fracción.
-
-21. **Con `Decoration: slice` no se reservan el borde y el relleno inferiores:** si el
-    contenido cabe y solo el borde o el relleno inferiores se salen de la página, la caja
-    termina igualmente y desborda (se pintan en el margen de la página).
-    *Dónde:* `layout/Slice`.
-    *Propuesta:* reservarlos también con `slice`, como ya se hace con `clone`
-    (`Slice.contentRemaining`). Puede cambiar algún caso golden.
 
 38. **Numeración en dos fases:** en la primera, `{page}` y `{pages}` se miden como `00`
     (reservan dos cifras); en la segunda, solo se rehacen las líneas que los contienen. Los
