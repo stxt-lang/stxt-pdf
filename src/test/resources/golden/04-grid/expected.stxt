@@ -1,0 +1,25 @@
+# page: columnas 150 y 515 - 20 - 150 = 345; filas 30, 60 (main) y 20, con huecos de 10.
+# side se estira a su fila (60). cards: tres fracciones de (515 - 20) / 3 = 165 y una fila
+# implícita para c4; empieza en y = 40 + 130 + 20.
+Result:
+	Page: 1
+		Fragment: page
+			Rect: 40 40 515 130
+			Fragment: head
+				Rect: 40 40 515 30
+			Fragment: side
+				Rect: 40 80 150 60
+			Fragment: main
+				Rect: 210 80 345 60
+			Fragment: foot
+				Rect: 40 150 515 20
+		Fragment: cards
+			Rect: 40 190 515 80
+			Fragment: c1
+				Rect: 40 190 165 40
+			Fragment: c2
+				Rect: 215 190 165 50
+			Fragment: c3
+				Rect: 390 190 165 30
+			Fragment: c4
+				Rect: 40 250 165 20

@@ -1,0 +1,65 @@
+# Copia de examples/report.stxt (ESPECIFICACION.md §10). Si cambia el ejemplo, cambia esta copia.
+# Informe de ejemplo (ESPECIFICACION.md §10): A4 paginado con cabecera y pie repetidos,
+# título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto.
+Document (dev.stxt.boxes):
+	Media:
+		Type: paged
+		Width: 595
+		Height: 842
+		Margin: 40
+	Box:
+		Id: header
+		Position: fixed
+		Offset: -30 0 auto 0
+		Height: 20
+		Font size: 8
+		Color: #5F5E5A
+		Text: Informe trimestral
+	Box:
+		Id: footer
+		Position: fixed
+		Offset: auto 0 -30 0
+		Height: 20
+		Font size: 8
+		Text align: right
+		Text: Página {page} de {pages}
+	Box:
+		Id: title
+		Font size: 20
+		Line height: 24
+		Margin: 0 0 16 0
+		Break after: avoid
+		Text: Resultados del trimestre
+	Box:
+		Id: body
+		Layout: grid
+		Grid:
+			Columns: 150 1fr
+			Gap: 20
+		Box:
+			Id: side
+			Background: #F1EFE8
+			Padding: 10
+			Break inside: avoid
+			Text >>
+				Resumen de las cifras clave
+				del trimestre.
+		Box:
+			Id: main
+			Text align: justify
+			Text >>
+				Primer párrafo del informe. Los saltos de línea simples
+				dentro del bloque equivalen a espacios.
+
+				Una línea en blanco empieza un párrafo nuevo.
+	Box:
+		Id: stamp
+		Position: absolute
+		Offset: 0 0 auto auto
+		Width: 80
+		Height: 30
+		Border: 1
+		Border color: #A32D2D
+		Text align: center
+		Layer: 1
+		Text: BORRADOR

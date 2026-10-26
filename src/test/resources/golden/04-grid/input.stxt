@@ -1,0 +1,56 @@
+# Grid (ESPECIFICACION.md §5.8): áreas con nombre, pistas fijas y en fracción, y colocación
+# automática con filas implícitas.
+Document (dev.stxt.boxes):
+	Media:
+		Type: continuous
+		Width: 595
+		Margin: 40
+	Box:
+		Id: page
+		Layout: grid
+		Grid:
+			Columns: 150 1fr
+			Gap: 10 20
+			Areas >>
+				head head
+				side main
+				foot foot
+		Box:
+			Id: head
+			Height: 30
+			Item:
+				Cell: head
+		Box:
+			Id: side
+			Text: Resumen
+			Item:
+				Cell: side
+		Box:
+			Id: main
+			Height: 60
+			Item:
+				Cell: main
+		Box:
+			Id: foot
+			Height: 20
+			Item:
+				Cell: foot
+	Box:
+		Id: cards
+		Layout: grid
+		Margin: 20 0 0 0
+		Grid:
+			Columns: repeat(3, 1fr)
+			Gap: 10
+		Box:
+			Id: c1
+			Height: 40
+		Box:
+			Id: c2
+			Height: 50
+		Box:
+			Id: c3
+			Height: 30
+		Box:
+			Id: c4
+			Height: 20

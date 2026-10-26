@@ -37,7 +37,7 @@ public final class Engine {
         this.block = new BlockLayout(this);
         this.inline = new InlineLayout(measurer);
         this.flex = new FlexLayout(this);
-        this.grid = new GridLayout();
+        this.grid = new GridLayout(this);
         this.absolute = new AbsoluteLayout(this);
     }
 

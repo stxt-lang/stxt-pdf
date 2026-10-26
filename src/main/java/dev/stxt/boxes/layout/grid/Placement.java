@@ -1,10 +1,12 @@
 package dev.stxt.boxes.layout.grid;
 
+import dev.stxt.boxes.tree.Style;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Colocación de ítems en la rejilla (módulo 6, ESPECIFICACION.md §5.8), con {@code Flow: row}.
+ * Colocación de ítems en la rejilla (módulo 6, ESPECIFICACION.md §5.8).
  *
  * <ol>
  *   <li>Los ítems con fila y columna explícitas se colocan primero.</li>
@@ -13,11 +15,31 @@ import java.util.List;
  *   <li>Si un ítem no cabe en las filas existentes, se crean filas implícitas.</li>
  * </ol>
  *
- * <p>Pendiente: {@code Flow: column} (es el mismo algoritmo con los ejes intercambiados).</p>
+ * <p>{@code Flow: column} es el mismo algoritmo con los ejes intercambiados: se trasponen la
+ * rejilla y las celdas, se coloca por filas y se deshace la trasposición.</p>
  */
 public final class Placement {
 
     private Placement() {
+    }
+
+    /**
+     * @param cells   celdas pedidas, en orden del árbol
+     * @param columns columnas de la rejilla explícita
+     * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: column})
+     * @param flow    dirección de la colocación automática
+     * @return el área asignada a cada ítem, en el mismo orden
+     */
+    public static List<Area> place(List<Cell> cells, int columns, int rows, Style.Direction flow) {
+        if (flow == Style.Direction.ROW) {
+            return place(cells, columns);
+        }
+        List<Cell> transposed = cells.stream()
+                .map(c -> new Cell(c.column(), c.row(), c.columns(), c.rows()))
+                .toList();
+        return place(transposed, rows).stream()
+                .map(a -> new Area(a.column(), a.row(), a.columns(), a.rows()))
+                .toList();
     }
 
     /**

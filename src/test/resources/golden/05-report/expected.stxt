@@ -1,0 +1,18 @@
+# Los valores de la explicación del §10 de la especificación. Las alturas de side y main salen
+# de FixedMetrics: side, dos líneas en 130 pt más el relleno (44); main se estira a la fila.
+Result:
+	Page: 1
+		Fragment: title
+			Rect: 40 40 515 24
+		Fragment: body
+			Rect: 40 80 515 44
+			Fragment: side
+				Rect: 40 80 150 44
+			Fragment: main
+				Rect: 210 80 345 44
+		Fragment: stamp
+			Rect: 475 40 80 30
+		Fragment: header
+			Rect: 40 10 515 20
+		Fragment: footer
+			Rect: 40 812 515 20

@@ -44,8 +44,8 @@ referencia; al terminar un hito, actualízala.
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
 | 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho; falta `justify`) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
-| 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho; los intrínsecos de grid, en el hito 5) | `layout/flex/FlexLayout` sobre `FlexResolver` |
-| 5 | Grid | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
+| 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho) | `layout/flex/FlexLayout` sobre `FlexResolver` |
+| 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | `BreakToken` en los algoritmos, PDF con PDFBox, métricas reales | `PdfCanvas` (no existe aún), `TextMeasurer` |
 | 7 | `{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass | — |
 
@@ -177,3 +177,6 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
    la tabla del §4, `Style` y `BoxTreeBuilder` (y la validación del §6 si aplica).
 3. Al completar un hito, actualiza la tabla de estado y la hoja de ruta del README y elimina sus
    `TODO(hito N)`.
+4. Cada decisión de interpretación (hueco de la especificación, diferencia con CSS,
+   simplificación) se apunta en [`docs/DECISIONES.md`](docs/DECISIONES.md) con el hito, dónde
+   está y la alternativa. Se repasan todas juntas al terminar los hitos.
