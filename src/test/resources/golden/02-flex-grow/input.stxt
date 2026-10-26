@@ -1,0 +1,27 @@
+# Módulo 5: reparto del espacio libre con Grow.
+Document (dev.stxt.boxes):
+	Media:
+		Type: continuous
+		Width: 595
+		Margin: 40
+	Box:
+		Id: row
+		Layout: flex
+		Flex:
+			Gap: 20
+		Box:
+			Id: A
+			Height: 50
+			Item:
+				Basis: 100
+				Grow: 1
+		Box:
+			Id: B
+			Height: 50
+			Item:
+				Basis: 150
+				Grow: 3
+		Box:
+			Id: C
+			Width: 65
+			Height: 50

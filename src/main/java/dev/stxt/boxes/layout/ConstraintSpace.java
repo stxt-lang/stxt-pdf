@@ -1,6 +1,6 @@
 package dev.stxt.boxes.layout;
 
-import dev.stxt.boxes.arbol.Medio;
+import dev.stxt.boxes.tree.Media;
 
 import java.util.OptionalDouble;
 
@@ -28,19 +28,19 @@ public record ConstraintSpace(
         boolean atFragmentainerStart) {
 
     /** Espacio de la caja raíz al empezar una página (o el documento, en modo continuo). */
-    public static ConstraintSpace paraPagina(Medio medio) {
-        double ancho = medio.areaUtil().ancho();
-        OptionalDouble alto = medio.alturaFragmentainer();
-        return new ConstraintSpace(ancho, alto, true, alto.isPresent(), ancho, alto, alto, true);
+    public static ConstraintSpace forPage(Media media) {
+        double width = media.pageArea().width();
+        OptionalDouble height = media.fragmentainerHeight();
+        return new ConstraintSpace(width, height, true, height.isPresent(), width, height, height, true);
     }
 
-    public boolean fragmentando() {
+    public boolean fragmenting() {
         return fragmentainerRemaining.isPresent();
     }
 
-    public ConstraintSpace conRestante(double restante, boolean alInicio) {
+    public ConstraintSpace withRemaining(double remaining, boolean atStart) {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
                 percentBaseWidth, percentBaseHeight,
-                fragmentando() ? OptionalDouble.of(restante) : OptionalDouble.empty(), alInicio);
+                fragmenting() ? OptionalDouble.of(remaining) : OptionalDouble.empty(), atStart);
     }
 }

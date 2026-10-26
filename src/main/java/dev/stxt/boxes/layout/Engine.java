@@ -1,0 +1,73 @@
+package dev.stxt.boxes.layout;
+
+import dev.stxt.boxes.fragment.BreakToken;
+import dev.stxt.boxes.fragment.Page;
+import dev.stxt.boxes.fragment.Paginator;
+import dev.stxt.boxes.layout.block.BlockLayout;
+import dev.stxt.boxes.layout.flex.FlexLayout;
+import dev.stxt.boxes.layout.grid.GridLayout;
+import dev.stxt.boxes.layout.inline.FixedMetrics;
+import dev.stxt.boxes.layout.inline.InlineLayout;
+import dev.stxt.boxes.layout.inline.TextMeasurer;
+import dev.stxt.boxes.stxt.StxtNode;
+import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.BoxTreeBuilder;
+
+import java.util.List;
+
+/**
+ * Punto de entrada del motor y despachador de algoritmos por {@code Layout} (módulo 9).
+ * Todas las llamadas recursivas de layout pasan por aquí para usar la caché.
+ */
+public final class Engine {
+
+    private final LayoutCache cache = new LayoutCache();
+    private final BlockLayout block;
+    private final InlineLayout inline;
+    private final FlexLayout flex;
+    private final GridLayout grid;
+
+    public Engine() {
+        this(new FixedMetrics());
+    }
+
+    public Engine(TextMeasurer measurer) {
+        this.block = new BlockLayout(this);
+        this.inline = new InlineLayout(measurer);
+        this.flex = new FlexLayout();
+        this.grid = new GridLayout();
+    }
+
+    /** Documento STXT → páginas. En modo continuo devuelve una sola página. */
+    public List<Page> layOutDocument(StxtNode document) {
+        BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
+        cache.clear();
+        return new Paginator(this).paginate(tree.root(), tree.media());
+    }
+
+    public IntrinsicSizes intrinsic(Box box) {
+        return cache.intrinsic(box, () -> algorithm(box).intrinsic(box));
+    }
+
+    public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        return cache.layout(box, space, from, () -> algorithm(box).layout(box, space, from));
+    }
+
+    public LayoutCache cache() {
+        return cache;
+    }
+
+    private LayoutAlgorithm algorithm(Box box) {
+        return switch (box.style.layout) {
+            case BLOCK -> block;
+            case INLINE -> inline;
+            case FLEX -> flex;
+            case GRID -> grid;
+        };
+    }
+
+    @Override
+    public String toString() {
+        return "Engine[" + cache.stats() + "]";
+    }
+}

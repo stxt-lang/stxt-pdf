@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout;
 
-import dev.stxt.boxes.arbol.Box;
-import dev.stxt.boxes.fragmentos.BreakToken;
+import dev.stxt.boxes.fragment.BreakToken;
+import dev.stxt.boxes.tree.Box;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -17,44 +17,44 @@ import java.util.function.Supplier;
  */
 public final class LayoutCache {
 
-    private record Clave(Box caja, ConstraintSpace espacio, BreakToken desde) {
+    private record Key(Box box, ConstraintSpace space, BreakToken from) {
     }
 
-    private final Map<Box, IntrinsicSizes> intrinsecos = new IdentityHashMap<>();
-    private final Map<Clave, LayoutResult> layouts = new HashMap<>();
-    private int aciertos;
-    private int fallos;
+    private final Map<Box, IntrinsicSizes> intrinsics = new IdentityHashMap<>();
+    private final Map<Key, LayoutResult> layouts = new HashMap<>();
+    private int hits;
+    private int misses;
 
-    public IntrinsicSizes intrinsic(Box caja, Supplier<IntrinsicSizes> calculo) {
-        IntrinsicSizes r = intrinsecos.get(caja);
+    public IntrinsicSizes intrinsic(Box box, Supplier<IntrinsicSizes> computation) {
+        IntrinsicSizes r = intrinsics.get(box);
         if (r == null) {
-            r = calculo.get();
-            intrinsecos.put(caja, r);
+            r = computation.get();
+            intrinsics.put(box, r);
         }
         return r;
     }
 
-    public LayoutResult layout(Box caja, ConstraintSpace espacio, BreakToken desde,
-                               Supplier<LayoutResult> calculo) {
-        Clave clave = new Clave(caja, espacio, desde);
-        LayoutResult r = layouts.get(clave);
+    public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from,
+                               Supplier<LayoutResult> computation) {
+        Key key = new Key(box, space, from);
+        LayoutResult r = layouts.get(key);
         if (r != null) {
-            aciertos++;
+            hits++;
             return r;
         }
-        fallos++;
-        r = calculo.get();
-        layouts.put(clave, r);
+        misses++;
+        r = computation.get();
+        layouts.put(key, r);
         return r;
     }
 
-    public void vaciar() {
-        intrinsecos.clear();
+    public void clear() {
+        intrinsics.clear();
         layouts.clear();
     }
 
     /** Para diagnosticar la eficacia de la caché en los tests de anidamiento profundo. */
-    public String estadisticas() {
-        return "aciertos=" + aciertos + " fallos=" + fallos;
+    public String stats() {
+        return "hits=" + hits + " misses=" + misses;
     }
 }

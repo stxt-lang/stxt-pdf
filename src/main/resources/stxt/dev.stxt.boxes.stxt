@@ -1,80 +1,80 @@
 Template (@stxt.template): dev.stxt.boxes
 	Structure >>
-		Documento (dev.stxt.boxes):
-			Medio: (1)
-				Tipo: (1) ENUM [continuo, paginado]
-				Ancho: (1)
-				Alto: (?)
-				Margen: (?)
-			Caja: (+)
+		Document (dev.stxt.boxes):
+			Media: (1)
+				Type: (1) ENUM [continuous, paged]
+				Width: (1)
+				Height: (?)
+				Margin: (?)
+			Box: (+)
 				Id: (?)
-				Layout: (?) ENUM [bloque, linea, flex, grid]
-				Posicion: (?) ENUM [flujo, relativa, absoluta, fija]
-				Desplazamiento: (?)
-				Capa: (?) INTEGER
-				Aislar: (?) BOOLEAN
-				Medida: (?) ENUM [borde, contenido]
-				Ancho: (?) @Ancho
-				Alto: (?) @Alto
-				Min ancho: (?)
-				Max ancho: (?)
-				Min alto: (?)
-				Max alto: (?)
-				Proporcion: (?)
-				Margen: (?) @Margen
-				Relleno: (?)
-				Borde: (?)
-				Fondo: (?)
+				Layout: (?) ENUM [block, inline, flex, grid]
+				Position: (?) ENUM [static, relative, absolute, fixed]
+				Offset: (?)
+				Layer: (?) INTEGER
+				Isolate: (?) BOOLEAN
+				Box sizing: (?) ENUM [border, content]
+				Width: (?) @Width
+				Height: (?) @Height
+				Min width: (?)
+				Max width: (?)
+				Min height: (?)
+				Max height: (?)
+				Aspect ratio: (?)
+				Margin: (?) @Margin
+				Padding: (?)
+				Border: (?)
+				Background: (?)
 				Color: (?)
-				Color borde: (?)
-				Fuente: (?)
-				Tamano: (?)
-				Interlineado: (?)
-				Alinear: (?) ENUM [izquierda, derecha, centro, justificado]
+				Border color: (?)
+				Font: (?)
+				Font size: (?)
+				Line height: (?)
+				Text align: (?) ENUM [left, right, center, justify]
 				Flex: (?)
-					Direccion: (?) ENUM [fila, columna]
-					Envolver: (?) BOOLEAN
-					Hueco: (?)
-					Eje principal: (?) ENUM [inicio, fin, centro, entre, alrededor, uniforme]
-					Eje cruzado: (?) ENUM [inicio, fin, centro, estirar]
-					Lineas: (?) ENUM [inicio, fin, centro, entre, alrededor, estirar]
+					Direction: (?) ENUM [row, column]
+					Wrap: (?) BOOLEAN
+					Gap: (?)
+					Main axis: (?) ENUM [start, end, center, between, around, evenly]
+					Cross axis: (?) ENUM [start, end, center, stretch]
+					Lines: (?) ENUM [start, end, center, between, around, stretch]
 				Grid: (?)
-					Columnas: (?)
-					Filas: (?)
-					Hueco: (?) @Hueco
+					Columns: (?)
+					Rows: (?)
+					Gap: (?) @Gap
 					Areas: (?) TEXT
-					Flujo: (?) ENUM [fila, columna]
-					Horizontal: (?) ENUM [inicio, fin, centro, estirar]
-					Vertical: (?) ENUM [inicio, fin, centro, estirar]
+					Flow: (?) ENUM [row, column]
+					Horizontal: (?) ENUM [start, end, center, stretch]
+					Vertical: (?) ENUM [start, end, center, stretch]
 				Item: (?)
-					Crecer: (?)
-					Encoger: (?)
-					Base: (?)
-					Eje cruzado: (?) @Eje cruzado
-					Celda: (?)
+					Grow: (?)
+					Shrink: (?)
+					Basis: (?)
+					Cross axis: (?) @Cross axis
+					Cell: (?)
 					Horizontal: (?) @Horizontal
 					Vertical: (?) @Vertical
-				Corte antes: (?) ENUM [auto, pagina, evitar]
-				Corte despues: (?) ENUM [auto, pagina, evitar]
-				Corte dentro: (?) ENUM [auto, evitar]
-				Viudas: (?) INTEGER
-				Huerfanas: (?) INTEGER
-				Decoracion: (?) ENUM [cortar, repetir]
-				Texto: (?) TEXT
-				Caja: (*) @Caja
+				Break before: (?) ENUM [auto, page, avoid]
+				Break after: (?) ENUM [auto, page, avoid]
+				Break inside: (?) ENUM [auto, avoid]
+				Widows: (?) INTEGER
+				Orphans: (?) INTEGER
+				Decoration: (?) ENUM [slice, clone]
+				Text: (?) TEXT
+				Box: (*) @Box
 	Description >>
-		Documento: Documento de cajas. Referencia completa en docs/ESPECIFICACION.md.
-		Medio: Medio de salida. Define el área útil, que es el containing block inicial.
-		Caja: Una caja del árbol. Puede contener Texto y otras Cajas, en orden.
-		Layout: Cómo coloca la caja a sus hijos. Por defecto, bloque.
-		Posicion: Cómo participa la caja en el flujo de su padre. Por defecto, flujo.
-		Desplazamiento: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Posicion distinta de flujo.
-		Capa: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
-		Medida: Qué miden Ancho y Alto: la caja de borde (por defecto) o el contenido.
-		Interlineado: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Tamano.
-		Hueco: Separación entre ítems: un valor, o dos (filas columnas).
+		Document: Documento de cajas. Referencia completa en docs/ESPECIFICACION.md.
+		Media: Medio de salida. Define el área útil, que es el containing block inicial.
+		Box: Una caja del árbol. Puede contener Text y otras Box, en orden.
+		Layout: Cómo coloca la caja a sus hijos. Por defecto, block.
+		Position: Cómo participa la caja en el flujo de su padre. Por defecto, static.
+		Offset: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Position distinta de static.
+		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
+		Box sizing: Qué miden Width y Height: la caja de borde (border, por defecto) o el contenido (content).
+		Line height: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size.
+		Gap: Separación entre ítems: un valor, o dos (filas columnas).
 		Areas: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
-		Celda: Nombre de área, o "fila columna [filas columnas]" contando desde 1; auto para colocar automáticamente.
-		Viudas: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2. Se hereda.
-		Huerfanas: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2. Se hereda.
-		Texto: Contenido. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+		Cell: Nombre de área, o "fila columna [filas columnas]" contando desde 1; auto para colocar automáticamente.
+		Widows: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2. Se hereda.
+		Orphans: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2. Se hereda.
+		Text: Contenido. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.

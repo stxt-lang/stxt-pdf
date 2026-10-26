@@ -7,22 +7,22 @@ package dev.stxt.boxes.layout;
  */
 public final class MarginStrut {
 
-    private double positivo;
-    private double negativo;
-    private boolean vacio = true;
+    private double positive;
+    private double negative;
+    private boolean empty = true;
 
-    public void add(double margen) {
-        if (margen > 0) {
-            positivo = Math.max(positivo, margen);
+    public void add(double margin) {
+        if (margin > 0) {
+            positive = Math.max(positive, margin);
         } else {
-            negativo = Math.min(negativo, margen);
+            negative = Math.min(negative, margin);
         }
-        vacio = false;
+        empty = false;
     }
 
     /** Mayor positivo más el más negativo. */
     public double resolve() {
-        return positivo + negativo;
+        return positive + negative;
     }
 
     public double resolveAndReset() {
@@ -32,19 +32,19 @@ public final class MarginStrut {
     }
 
     public void reset() {
-        positivo = 0;
-        negativo = 0;
-        vacio = true;
+        positive = 0;
+        negative = 0;
+        empty = true;
     }
 
-    public boolean vacio() {
-        return vacio;
+    public boolean isEmpty() {
+        return empty;
     }
 
     /** Colapsa una serie de márgenes adyacentes. */
-    public static double colapsar(double... margenes) {
+    public static double collapse(double... margins) {
         MarginStrut s = new MarginStrut();
-        for (double m : margenes) {
+        for (double m : margins) {
             s.add(m);
         }
         return s.resolve();

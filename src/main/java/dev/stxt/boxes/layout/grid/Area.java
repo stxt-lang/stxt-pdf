@@ -1,19 +1,19 @@
 package dev.stxt.boxes.layout.grid;
 
 /** Rectángulo de celdas en la rejilla. Filas y columnas empiezan en 1, como las líneas de CSS. */
-public record Area(int fila, int columna, int filas, int columnas) {
+public record Area(int row, int column, int rows, int columns) {
 
     public Area {
-        if (fila < 1 || columna < 1 || filas < 1 || columnas < 1) {
-            throw new IllegalArgumentException("Área no válida: " + fila + " " + columna + " " + filas + " " + columnas);
+        if (row < 1 || column < 1 || rows < 1 || columns < 1) {
+            throw new IllegalArgumentException("Área no válida: " + row + " " + column + " " + rows + " " + columns);
         }
     }
 
-    public int filaFin() {
-        return fila + filas - 1;
+    public int rowEnd() {
+        return row + rows - 1;
     }
 
-    public int columnaFin() {
-        return columna + columnas - 1;
+    public int columnEnd() {
+        return column + columns - 1;
     }
 }

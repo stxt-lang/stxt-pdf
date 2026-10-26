@@ -7,7 +7,10 @@ están en **puntos tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Template STXT del modelo:** [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
-- **Documento de ejemplo:** [`src/test/resources/ejemplos/informe.stxt`](src/test/resources/ejemplos/informe.stxt)
+- **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
+
+Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
+inglés; la documentación y los comentarios, en castellano.
 
 ## Requisitos y uso
 
@@ -25,8 +28,8 @@ de ruta.
 
 | Pieza | Estado |
 |---|---|
-| Valores, abreviados, `minmax`, `clamp`, `repetir` | Hecho y probado |
-| Lector STXT mínimo (`LectorStxtMinimo`) | Hecho y probado |
+| Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
+| Lector STXT mínimo (`MinimalStxtReader`) | Hecho y probado |
 | Árbol de cajas: herencia, cajas anónimas, validaciones | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
@@ -37,7 +40,7 @@ de ruta.
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Adaptador a la librería oficial `stxt-core` | Pendiente (hito 1) |
 | `BlockLayout`, `InlineLayout` | Pendiente (hito 2) |
-| Cajas `absoluta` y `fija` en el layout | Pendiente (hito 3) |
+| Cajas `absolute` y `fixed` en el layout | Pendiente (hito 3) |
 | `FlexLayout` | Pendiente (hito 4) |
 | `GridLayout` | Pendiente (hito 5) |
 | Fragmentación en los algoritmos, PDF con PDFBox | Pendiente (hito 6) |
@@ -46,31 +49,31 @@ Los tests de referencia (`GoldenTest`) están desactivados hasta completar los h
 
 ## Hoja de ruta
 
-1. **Árbol de cajas.** Conectar `LectorStxtCore` con `dev.stxt:stxt-core` y validar contra el template.
-2. **Bloque y texto.** `BlockLayout` e `InlineLayout` con `MetricaFija`; salida SVG de depuración. Activar `GoldenTest` (caso 01).
-3. **Posicionamiento y capas.** `relativa`, `absoluta` con `EcuacionAbsoluta`, `fija` en el `Paginator`.
-4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `ResolutorFlex` (caso 02).
-5. **Grid.** `GridLayout` sobre `Colocacion` y `TrackSizing`.
+1. **Árbol de cajas.** Conectar `StxtCoreReader` con `dev.stxt:stxt-core` y validar contra el template.
+2. **Bloque y texto.** `BlockLayout` e `InlineLayout` con `FixedMetrics`; salida SVG de depuración. Activar `GoldenTest` (caso 01).
+3. **Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator`.
+4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).
+5. **Grid.** `GridLayout` sobre `Placement` y `TrackSizing`.
 6. **Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales.
-7. **Pulido.** `{pagina}`/`{paginas}`, `Decoracion: repetir`, fragmentación en paralelo, Knuth-Plass.
+7. **Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass.
 
 ## Estructura
 
 ```
 src/main/java/dev/stxt/boxes/
-  modelo/       Valor, ValorParser, Lados, Insets, Rect
-  stxt/         NodoStxt, LectorDocumento, LectorStxtMinimo, LectorStxtCore
-  arbol/        Box, Estilo, Medio, BoxTreeBuilder
-  layout/       Motor, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
-                IntrinsicSizes, MarginStrut, Dimensiones
-    bloque/     BlockLayout
-    linea/      InlineLayout, LineBreaker, TextMeasurer, MetricaFija
-    flex/       FlexLayout, ResolutorFlex, ItemFlex
-    grid/       GridLayout, TrackSizing, Pista, Colocacion, Celda, AreasGrid
-    posicion/   EcuacionAbsoluta
-  fragmentos/   Fragment, BreakToken, Paginator, Pagina, ReglasCorte
-  pintado/      Canvas, StackingContext, SvgCanvas
-  salida/       VolcadoStxt
+  model/        Value, ValueParser, Sides, Insets, Rect
+  stxt/         StxtNode, DocumentReader, MinimalStxtReader, StxtCoreReader, StxtSyntaxException
+  tree/         Box, Style, Media, BoxTreeBuilder, InvalidModelException
+  layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
+                IntrinsicSizes, MarginStrut, Sizing, PendingAbsolute
+    block/      BlockLayout
+    inline/     InlineLayout, LineBreaker, TextMeasurer, FixedMetrics
+    flex/       FlexLayout, FlexResolver, FlexItem
+    grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
+    position/   AbsoluteEquation
+  fragment/     Fragment, BreakToken, Paginator, Page, BreakRules, TextLine
+  paint/        Canvas, StackingContext, SvgCanvas
+  output/       StxtDump
 ```
 
 ## Validación en el editor

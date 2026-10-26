@@ -1,0 +1,9 @@
+# max(20, 30) = 30 entre A y B; C centrada: 40 + (515 - 200) / 2 = 197.5
+Result:
+	Page: 1
+		Fragment: A
+			Rect: 40 40 515 60
+		Fragment: B
+			Rect: 40 130 515 65
+		Fragment: C
+			Rect: 197.5 205 200 40

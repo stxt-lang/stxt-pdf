@@ -1,11 +1,11 @@
 package dev.stxt.boxes.golden;
 
-import dev.stxt.boxes.arbol.BoxTreeBuilder;
-import dev.stxt.boxes.fragmentos.Pagina;
-import dev.stxt.boxes.layout.Motor;
-import dev.stxt.boxes.salida.VolcadoStxt;
-import dev.stxt.boxes.stxt.LectorStxtMinimo;
-import dev.stxt.boxes.stxt.NodoStxt;
+import dev.stxt.boxes.fragment.Page;
+import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.output.StxtDump;
+import dev.stxt.boxes.stxt.MinimalStxtReader;
+import dev.stxt.boxes.stxt.StxtNode;
+import dev.stxt.boxes.tree.BoxTreeBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -21,51 +21,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests de referencia (ESPECIFICACION.md §7): cada carpeta de {@code golden/} contiene
- * {@code entrada.stxt} y {@code esperado.stxt}. Se comparan nombres y valores; los números de
+ * {@code input.stxt} y {@code expected.stxt}. Se comparan nombres y valores; los números de
  * {@code Rect} con una tolerancia de 0.01 pt.
  */
 @Disabled("Activar al completar el hito 2 (BlockLayout) y el hito 4 (FlexLayout)")
 class GoldenTest {
 
-    private static final double TOLERANCIA = 0.01;
-    private final LectorStxtMinimo lector = new LectorStxtMinimo();
+    private static final double TOLERANCE = 0.01;
+    private final MinimalStxtReader reader = new MinimalStxtReader();
 
     @TestFactory
-    Stream<DynamicTest> casos() throws IOException, URISyntaxException {
-        Path raiz = Path.of(getClass().getResource("/golden").toURI());
-        try (Stream<Path> dirs = Files.list(raiz)) {
-            List<Path> casos = dirs.filter(Files::isDirectory).sorted().toList();
-            return casos.stream().map(dir -> DynamicTest.dynamicTest(dir.getFileName().toString(), () -> {
-                NodoStxt entrada = lector.leer(dir.resolve("entrada.stxt"));
-                NodoStxt esperado = lector.leer(dir.resolve("esperado.stxt"));
-                List<Pagina> paginas = new Motor().maquetar(entrada);
-                var medio = new BoxTreeBuilder().construir(entrada).medio();
-                String volcado = VolcadoStxt.volcar(paginas, medio.areaUtil(), false);
-                comparar(esperado, lector.leer(volcado, "volcado"), dir.getFileName() + "/");
+    Stream<DynamicTest> cases() throws IOException, URISyntaxException {
+        Path root = Path.of(getClass().getResource("/golden").toURI());
+        try (Stream<Path> dirs = Files.list(root)) {
+            List<Path> cases = dirs.filter(Files::isDirectory).sorted().toList();
+            return cases.stream().map(dir -> DynamicTest.dynamicTest(dir.getFileName().toString(), () -> {
+                StxtNode input = reader.read(dir.resolve("input.stxt"));
+                StxtNode expected = reader.read(dir.resolve("expected.stxt"));
+                List<Page> pages = new Engine().layOutDocument(input);
+                var media = new BoxTreeBuilder().build(input).media();
+                String dump = StxtDump.dump(pages, media.pageArea(), false);
+                compare(expected, reader.read(dump, "dump"), dir.getFileName() + "/");
             }));
         }
     }
 
-    private static void comparar(NodoStxt esperado, NodoStxt obtenido, String ruta) {
-        String aqui = ruta + esperado.nombre();
-        assertEquals(NodoStxt.canonico(esperado.nombre()), NodoStxt.canonico(obtenido.nombre()), aqui);
-        if (esperado.es("Rect")) {
-            double[] e = numeros(esperado.contenido());
-            double[] o = numeros(obtenido.contenido());
-            assertEquals(4, o.length, aqui);
+    private static void compare(StxtNode expected, StxtNode actual, String path) {
+        String here = path + expected.name();
+        assertEquals(StxtNode.canonical(expected.name()), StxtNode.canonical(actual.name()), here);
+        if (expected.is("Rect")) {
+            double[] e = numbers(expected.content());
+            double[] a = numbers(actual.content());
+            assertEquals(4, a.length, here);
             for (int i = 0; i < 4; i++) {
-                assertEquals(e[i], o[i], TOLERANCIA, aqui + " (componente " + i + ")");
+                assertEquals(e[i], a[i], TOLERANCE, here + " (componente " + i + ")");
             }
         } else {
-            assertEquals(esperado.contenido().trim(), obtenido.contenido().trim(), aqui);
+            assertEquals(expected.content().trim(), actual.content().trim(), here);
         }
-        assertEquals(esperado.hijos().size(), obtenido.hijos().size(), aqui + ": número de hijos");
-        for (int i = 0; i < esperado.hijos().size(); i++) {
-            comparar(esperado.hijos().get(i), obtenido.hijos().get(i), aqui + "/");
+        assertEquals(expected.children().size(), actual.children().size(), here + ": número de hijos");
+        for (int i = 0; i < expected.children().size(); i++) {
+            compare(expected.children().get(i), actual.children().get(i), here + "/");
         }
     }
 
-    private static double[] numeros(String s) {
+    private static double[] numbers(String s) {
         return Stream.of(s.trim().split("\\s+")).mapToDouble(Double::parseDouble).toArray();
     }
 }

@@ -1,6 +1,6 @@
 package dev.stxt.boxes.layout.grid;
 
-import dev.stxt.boxes.modelo.Valor;
+import dev.stxt.boxes.model.Value;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,141 +28,141 @@ public final class TrackSizing {
     }
 
     /**
-     * @param pistas     definiciones de las pistas (explícitas e implícitas)
-     * @param items      aportaciones de los ítems colocados
-     * @param disponible tamaño de la caja de contenido del contenedor en este eje;
-     *                   {@link Double#POSITIVE_INFINITY} si es indefinido
-     * @param hueco      separación entre pistas
+     * @param tracks    definiciones de las pistas (explícitas e implícitas)
+     * @param items     aportaciones de los ítems colocados
+     * @param available tamaño de la caja de contenido del contenedor en este eje;
+     *                  {@link Double#POSITIVE_INFINITY} si es indefinido
+     * @param gap       separación entre pistas
      * @return tamaño de cada pista
      */
-    public static double[] dimensionar(List<Pista> pistas, List<AportacionItem> items,
-                                       double disponible, double hueco) {
-        int n = pistas.size();
+    public static double[] size(List<Track> tracks, List<ItemContribution> items,
+                                double available, double gap) {
+        int n = tracks.size();
         double[] base = new double[n];
-        double[] limite = new double[n];
-        boolean finito = Double.isFinite(disponible);
-        double espacio = finito ? disponible - hueco * Math.max(0, n - 1) : Double.POSITIVE_INFINITY;
-        double referencia = finito ? espacio : 0;
+        double[] limit = new double[n];
+        boolean finite = Double.isFinite(available);
+        double space = finite ? available - gap * Math.max(0, n - 1) : Double.POSITIVE_INFINITY;
+        double reference = finite ? space : 0;
 
         // 1. Inicializar.
         for (int i = 0; i < n; i++) {
-            Pista p = pistas.get(i);
-            base[i] = p.minIntrinseco() ? 0 : p.min().resolver(referencia).orElse(0);
-            if (p.flexible()) {
-                limite[i] = Double.POSITIVE_INFINITY;
-            } else if (p.maxIntrinseco()) {
-                limite[i] = 0;
+            Track t = tracks.get(i);
+            base[i] = t.minIntrinsic() ? 0 : t.min().resolve(reference).orElse(0);
+            if (t.flexible()) {
+                limit[i] = Double.POSITIVE_INFINITY;
+            } else if (t.maxIntrinsic()) {
+                limit[i] = 0;
             } else {
-                limite[i] = p.max().resolver(referencia).orElse(0);
+                limit[i] = t.max().resolve(reference).orElse(0);
             }
         }
 
         // 2a. Ítems de una sola pista.
-        for (AportacionItem it : items) {
-            if (it.extension() != 1) {
+        for (ItemContribution it : items) {
+            if (it.span() != 1) {
                 continue;
             }
-            int i = it.pista();
-            Pista p = pistas.get(i);
-            if (p.min().esAuto() || p.min() == Valor.Palabra.MIN_CONTENT || p.min() == Valor.Palabra.FIT_CONTENT) {
+            int i = it.track();
+            Track t = tracks.get(i);
+            if (t.min().isAuto() || t.min() == Value.Keyword.MIN_CONTENT || t.min() == Value.Keyword.FIT_CONTENT) {
                 base[i] = Math.max(base[i], it.minContent());
-            } else if (p.min() == Valor.Palabra.MAX_CONTENT) {
+            } else if (t.min() == Value.Keyword.MAX_CONTENT) {
                 base[i] = Math.max(base[i], it.maxContent());
             }
-            if (!p.flexible()) {
-                if (p.max() == Valor.Palabra.MIN_CONTENT) {
-                    limite[i] = Math.max(limite[i], it.minContent());
-                } else if (p.max().esAuto() || p.max() == Valor.Palabra.MAX_CONTENT
-                        || p.max() == Valor.Palabra.FIT_CONTENT) {
-                    limite[i] = Math.max(limite[i], it.maxContent());
+            if (!t.flexible()) {
+                if (t.max() == Value.Keyword.MIN_CONTENT) {
+                    limit[i] = Math.max(limit[i], it.minContent());
+                } else if (t.max().isAuto() || t.max() == Value.Keyword.MAX_CONTENT
+                        || t.max() == Value.Keyword.FIT_CONTENT) {
+                    limit[i] = Math.max(limit[i], it.maxContent());
                 }
             }
         }
 
         // 2b. Ítems de varias pistas, de menor a mayor extensión.
         items.stream()
-                .filter(it -> it.extension() > 1)
-                .sorted(Comparator.comparingInt(AportacionItem::extension))
-                .forEach(it -> repartirExceso(pistas, base, limite, it, hueco));
+                .filter(it -> it.span() > 1)
+                .sorted(Comparator.comparingInt(ItemContribution::span))
+                .forEach(it -> distributeExcess(tracks, base, limit, it, gap));
 
         for (int i = 0; i < n; i++) {
-            if (!pistas.get(i).flexible() && limite[i] < base[i]) {
-                limite[i] = base[i];
+            if (!tracks.get(i).flexible() && limit[i] < base[i]) {
+                limit[i] = base[i];
             }
         }
 
-        if (!finito) {
+        if (!finite) {
             // Tamaño indefinido: las pistas no flexibles llegan a su límite y las fracciones
             // toman el mayor base/fr (simplificación de "find the size of an fr").
-            double tamanoFr = 0;
+            double frSize = 0;
             for (int i = 0; i < n; i++) {
-                Pista p = pistas.get(i);
-                if (p.flexible()) {
-                    tamanoFr = Math.max(tamanoFr, base[i] / Math.max(p.fraccion(), 1));
+                Track t = tracks.get(i);
+                if (t.flexible()) {
+                    frSize = Math.max(frSize, base[i] / Math.max(t.fraction(), 1));
                 } else {
-                    base[i] = limite[i];
+                    base[i] = limit[i];
                 }
             }
             for (int i = 0; i < n; i++) {
-                Pista p = pistas.get(i);
-                if (p.flexible()) {
-                    base[i] = Math.max(base[i], tamanoFr * p.fraccion());
+                Track t = tracks.get(i);
+                if (t.flexible()) {
+                    base[i] = Math.max(base[i], frSize * t.fraction());
                 }
             }
             return base;
         }
 
         // 3. Maximizar.
-        double libre = espacio - suma(base);
-        boolean[] activo = new boolean[n];
+        double free = space - sum(base);
+        boolean[] active = new boolean[n];
         for (int i = 0; i < n; i++) {
-            activo[i] = !pistas.get(i).flexible() && base[i] < limite[i];
+            active[i] = !tracks.get(i).flexible() && base[i] < limit[i];
         }
-        while (libre > EPS && contar(activo) > 0) {
-            double parte = libre / contar(activo);
+        while (free > EPS && count(active) > 0) {
+            double share = free / count(active);
             for (int i = 0; i < n; i++) {
-                if (activo[i]) {
-                    double d = Math.min(parte, limite[i] - base[i]);
+                if (active[i]) {
+                    double d = Math.min(share, limit[i] - base[i]);
                     base[i] += d;
-                    libre -= d;
-                    if (base[i] >= limite[i] - EPS) {
-                        activo[i] = false;
+                    free -= d;
+                    if (base[i] >= limit[i] - EPS) {
+                        active[i] = false;
                     }
                 }
             }
         }
 
         // 4. Expandir fracciones.
-        boolean hayFlexibles = pistas.stream().anyMatch(Pista::flexible);
-        if (hayFlexibles) {
+        boolean anyFlexible = tracks.stream().anyMatch(Track::flexible);
+        if (anyFlexible) {
             boolean[] inflexible = new boolean[n];
-            for (int vuelta = 0; vuelta <= n; vuelta++) {
-                double fijo = 0;
-                double sumaFr = 0;
+            for (int round = 0; round <= n; round++) {
+                double fixed = 0;
+                double frSum = 0;
                 for (int i = 0; i < n; i++) {
-                    if (!pistas.get(i).flexible() || inflexible[i]) {
-                        fijo += base[i];
+                    if (!tracks.get(i).flexible() || inflexible[i]) {
+                        fixed += base[i];
                     } else {
-                        sumaFr += pistas.get(i).fraccion();
+                        frSum += tracks.get(i).fraction();
                     }
                 }
-                if (sumaFr == 0) {
+                if (frSum == 0) {
                     break;
                 }
-                double tamanoFr = Math.max(0, espacio - fijo) / Math.max(sumaFr, 1);
-                boolean recalcular = false;
+                double frSize = Math.max(0, space - fixed) / Math.max(frSum, 1);
+                boolean recompute = false;
                 for (int i = 0; i < n; i++) {
-                    Pista p = pistas.get(i);
-                    if (p.flexible() && !inflexible[i] && base[i] > tamanoFr * p.fraccion() + EPS) {
+                    Track t = tracks.get(i);
+                    if (t.flexible() && !inflexible[i] && base[i] > frSize * t.fraction() + EPS) {
                         inflexible[i] = true;
-                        recalcular = true;
+                        recompute = true;
                     }
                 }
-                if (!recalcular) {
+                if (!recompute) {
                     for (int i = 0; i < n; i++) {
-                        Pista p = pistas.get(i);
-                        if (p.flexible() && !inflexible[i]) {
-                            base[i] = tamanoFr * p.fraccion();
+                        Track t = tracks.get(i);
+                        if (t.flexible() && !inflexible[i]) {
+                            base[i] = frSize * t.fraction();
                         }
                     }
                     break;
@@ -170,17 +170,17 @@ public final class TrackSizing {
             }
         } else {
             // 5. Estirar pistas auto.
-            libre = espacio - suma(base);
-            int auto = 0;
-            for (Pista p : pistas) {
-                if (p.max().esAuto()) {
-                    auto++;
+            free = space - sum(base);
+            int autoTracks = 0;
+            for (Track t : tracks) {
+                if (t.max().isAuto()) {
+                    autoTracks++;
                 }
             }
-            if (libre > EPS && auto > 0) {
+            if (free > EPS && autoTracks > 0) {
                 for (int i = 0; i < n; i++) {
-                    if (pistas.get(i).max().esAuto()) {
-                        base[i] += libre / auto;
+                    if (tracks.get(i).max().isAuto()) {
+                        base[i] += free / autoTracks;
                     }
                 }
             }
@@ -188,49 +188,49 @@ public final class TrackSizing {
         return base;
     }
 
-    private static void repartirExceso(List<Pista> pistas, double[] base, double[] limite,
-                                       AportacionItem it, double hueco) {
-        int desde = it.pista();
-        int hasta = Math.min(pistas.size(), desde + it.extension());
-        double huecos = hueco * (it.extension() - 1);
-        for (int i = desde; i < hasta; i++) {
-            if (pistas.get(i).flexible()) {
+    private static void distributeExcess(List<Track> tracks, double[] base, double[] limit,
+                                         ItemContribution it, double gap) {
+        int from = it.track();
+        int to = Math.min(tracks.size(), from + it.span());
+        double gaps = gap * (it.span() - 1);
+        for (int i = from; i < to; i++) {
+            if (tracks.get(i).flexible()) {
                 return;
             }
         }
-        double sumaBase = huecos;
-        double sumaLimite = huecos;
-        int intrinsecasMin = 0;
-        int intrinsecasMax = 0;
-        for (int i = desde; i < hasta; i++) {
-            sumaBase += base[i];
-            sumaLimite += Math.max(limite[i], base[i]);
-            if (pistas.get(i).minIntrinseco()) {
-                intrinsecasMin++;
+        double baseSum = gaps;
+        double limitSum = gaps;
+        int intrinsicMin = 0;
+        int intrinsicMax = 0;
+        for (int i = from; i < to; i++) {
+            baseSum += base[i];
+            limitSum += Math.max(limit[i], base[i]);
+            if (tracks.get(i).minIntrinsic()) {
+                intrinsicMin++;
             }
-            if (pistas.get(i).maxIntrinseco()) {
-                intrinsecasMax++;
+            if (tracks.get(i).maxIntrinsic()) {
+                intrinsicMax++;
             }
         }
-        double exceso = it.minContent() - sumaBase;
-        if (exceso > 0 && intrinsecasMin > 0) {
-            for (int i = desde; i < hasta; i++) {
-                if (pistas.get(i).minIntrinseco()) {
-                    base[i] += exceso / intrinsecasMin;
+        double excess = it.minContent() - baseSum;
+        if (excess > 0 && intrinsicMin > 0) {
+            for (int i = from; i < to; i++) {
+                if (tracks.get(i).minIntrinsic()) {
+                    base[i] += excess / intrinsicMin;
                 }
             }
         }
-        double excesoLimite = it.maxContent() - sumaLimite;
-        if (excesoLimite > 0 && intrinsecasMax > 0) {
-            for (int i = desde; i < hasta; i++) {
-                if (pistas.get(i).maxIntrinseco()) {
-                    limite[i] = Math.max(limite[i], base[i]) + excesoLimite / intrinsecasMax;
+        double limitExcess = it.maxContent() - limitSum;
+        if (limitExcess > 0 && intrinsicMax > 0) {
+            for (int i = from; i < to; i++) {
+                if (tracks.get(i).maxIntrinsic()) {
+                    limit[i] = Math.max(limit[i], base[i]) + limitExcess / intrinsicMax;
                 }
             }
         }
     }
 
-    private static double suma(double[] v) {
+    private static double sum(double[] v) {
         double s = 0;
         for (double x : v) {
             s += x;
@@ -238,7 +238,7 @@ public final class TrackSizing {
         return s;
     }
 
-    private static int contar(boolean[] v) {
+    private static int count(boolean[] v) {
         int c = 0;
         for (boolean b : v) {
             if (b) {
