@@ -152,7 +152,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Offset` izquierda/derecha | el ancho del containing block |
 | `Basis` (ítem flex) | el tamaño del contenedor flex en el eje principal |
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje |
-| Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje |
+| Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda) |
 | `Line height` | el `Font size` de la propia caja |
 
 `Border` no admite porcentajes.

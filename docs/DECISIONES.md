@@ -15,17 +15,9 @@ son diferencias con CSS, §8) y se han quitado de aquí; la 31 (`new Engine()` u
 abiertas, con su número original. Las decisiones nuevas siguen desde la 41.
 
 Resueltas en el código después del repaso: la 2 (las posicionadas se pintan en orden del
-documento, §5.6) y la 14 (una pista en porcentaje sobre un tamaño indefinido es `auto`, §5.8).
-
-## Por aclarar
-
-41. **Base de los porcentajes de las pistas de grid.** El §3.6 dice que es la caja de
-    contenido del contenedor, como en CSS, pero `TrackSizing` los resuelve contra la caja de
-    contenido menos los huecos: `Columns: 50% 50%` con `Gap: 10` cabe justo, cuando en CSS
-    desborda 10 pt. Encontrada al resolver la 14.
-    *Dónde:* `layout/grid/TrackSizing.size` (`reference`).
-    *Alternativas:* corregir el código para seguir el §3.6 (y CSS), o cambiar el §3.6 y
-    apuntarlo en el §8 como diferencia con CSS.
+documento, §5.6), la 14 (una pista en porcentaje sobre un tamaño indefinido es `auto`, §5.8) y la 41,
+encontrada al resolver la 14 (los porcentajes de las pistas se resolvían contra la caja de
+contenido menos los huecos; ahora, contra la caja de contenido, como dice el §3.6).
 
 ## Cambiar el código
 
