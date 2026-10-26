@@ -1,23 +1,26 @@
 package dev.stxt.boxes.layout;
 
 /**
- * Acumulador de márgenes verticales pendientes de colapsar (módulo 2, ESPECIFICACION.md §5.3).
- * Cada margen encontrado se añade; se resuelve cuando aparece algo que corta el colapso
- * (borde, relleno, contenido o el final de un contexto).
+ * Márgenes verticales adyacentes pendientes de colapsar (ESPECIFICACION.md §5.3). Guarda por
+ * separado el mayor positivo y el más negativo, porque el colapso de varios márgenes es su suma
+ * y no se puede calcular a partir de resultados parciales: {@code 20} y {@code −5} dan 15, pero
+ * añadir {@code −10} da 10, no 5.
+ *
+ * <p>Es inmutable: forma parte de {@link AdjoiningMargins}, que viaja en {@link LayoutResult}.</p>
+ *
+ * @param positive el mayor margen positivo, o 0
+ * @param negative el margen más negativo, o 0
  */
-public final class MarginStrut {
+public record MarginStrut(double positive, double negative) {
 
-    private double positive;
-    private double negative;
-    private boolean empty = true;
+    public static final MarginStrut EMPTY = new MarginStrut(0, 0);
 
-    public void add(double margin) {
-        if (margin > 0) {
-            positive = Math.max(positive, margin);
-        } else {
-            negative = Math.min(negative, margin);
-        }
-        empty = false;
+    public MarginStrut add(double margin) {
+        return new MarginStrut(Math.max(positive, margin), Math.min(negative, margin));
+    }
+
+    public MarginStrut add(MarginStrut other) {
+        return new MarginStrut(Math.max(positive, other.positive), Math.min(negative, other.negative));
     }
 
     /** Mayor positivo más el más negativo. */
@@ -25,27 +28,11 @@ public final class MarginStrut {
         return positive + negative;
     }
 
-    public double resolveAndReset() {
-        double r = resolve();
-        reset();
-        return r;
-    }
-
-    public void reset() {
-        positive = 0;
-        negative = 0;
-        empty = true;
-    }
-
-    public boolean isEmpty() {
-        return empty;
-    }
-
     /** Colapsa una serie de márgenes adyacentes. */
     public static double collapse(double... margins) {
-        MarginStrut s = new MarginStrut();
+        MarginStrut s = EMPTY;
         for (double m : margins) {
-            s.add(m);
+            s = s.add(m);
         }
         return s.resolve();
     }

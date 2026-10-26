@@ -42,7 +42,7 @@ referencia; al terminar un hito, actualízala.
 | Hito | Trabajo | Dónde |
 |---|---|---|
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
-| 2 | Flujo de bloque y texto; activar `GoldenTest` (caso 01) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
+| 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho; falta `justify`) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | `relative`, `absolute`, `fixed` (esta en el `Paginator`) | `layout/position`, `fragment/Paginator` |
 | 4 | `intrinsic()` en todos los algoritmos; flex (caso 02) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | Grid | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
@@ -68,7 +68,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el template y exige una única raíz con el namespace `dev.stxt.boxes` |
 | `tree` | `Box`, `Style` (propiedades y enums), `Media`, `BoxTreeBuilder`, `InvalidModelException` |
-| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `MarginStrut`, `Sizing`, `PendingAbsolute` |
+| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
 | `paint` | `Canvas`, `StackingContext`, `SvgCanvas` |
@@ -98,8 +98,19 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   ancho disponible, alto (vacío = indefinido), tamaños impuestos por el padre, bases de
   porcentajes y espacio restante en la página (vacío = modo continuo).
 - **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad
-  del corte (`PERFECT_BREAK` … `FORCED`) y las `PendingAbsolute` que suben hasta su
-  containing block.
+  del corte (`PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su
+  containing block (con la posición estática relativa a la caja de contenido de quien devuelve
+  el resultado) y los `AdjoiningMargins`.
+- **`BoxModel`**: margen, borde, relleno, ancho de la caja de borde y alto si es definido, a
+  partir del `ConstraintSpace`. Es la parte común de todos los algoritmos; `childSpace()` da el
+  espacio de los hijos en flujo y `BoxModel.intrinsic(...)` pasa de tamaños intrínsecos del
+  contenido a los de la caja de margen. Los márgenes `auto` valen 0: el centrado lo hace el
+  padre, que es quien coloca al hijo.
+- **Colapso de márgenes:** cada caja devuelve en `AdjoiningMargins` los márgenes de sus
+  descendientes que salen por arriba o por abajo (y si está vacía y deja pasar los suyos); el
+  padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es
+  inmutable y guarda el mayor positivo y el más negativo por separado.
+  `Box.establishesBlockFormattingContext()` dice qué cajas lo cortan.
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`. El
   `Paginator` detecta la falta de progreso comparando tokens; el mismo bucle sirve para los dos
   modos (en continuo da una sola vuelta).
@@ -143,8 +154,12 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
   `src/test/resources/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
-  Está `@Disabled` hasta completar los hitos 2 y 4: al terminar el 2, actívalo (o filtra al
-  caso 01).
+  Los casos que necesitan un hito pendiente están en `GoldenTest.PENDING` y se saltan con el
+  motivo: al completar el hito, quítalos de ahí. Cada caso escribe un SVG de depuración en
+  `target/golden-svg/`.
+- Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
+  515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). Con
+  `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`.
 - Para un caso nuevo, calcula el resultado esperado a mano siguiendo la especificación (como en
   el "Cómo se maqueta" del §10) y añade una carpeta numerada.
 

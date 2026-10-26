@@ -5,32 +5,43 @@ import dev.stxt.Node;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.output.StxtDump;
+import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
+import dev.stxt.boxes.tree.Media;
 import dev.stxt.runtime.STXT;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Tests de referencia (ESPECIFICACION.md §7): cada carpeta de {@code golden/} contiene
  * {@code input.stxt} y {@code expected.stxt}. Se comparan nombres y valores; los números de
  * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el template; el
  * volcado no tiene namespace y se lee sin validación.
+ *
+ * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/}.</p>
  */
-@Disabled("Activar al completar el hito 2 (BlockLayout) y el hito 4 (FlexLayout)")
 class GoldenTest {
 
     private static final double TOLERANCE = 0.01;
+    private static final Path SVG_DIR = Path.of("target", "golden-svg");
+
+    /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
+    private static final Map<String, String> PENDING = Map.of(
+            "02-flex-grow", "pendiente del hito 4 (FlexLayout)");
+
     private final DocumentReader reader = new DocumentReader();
 
     @TestFactory
@@ -39,13 +50,24 @@ class GoldenTest {
         try (Stream<Path> dirs = Files.list(root)) {
             List<Path> cases = dirs.filter(Files::isDirectory).sorted().toList();
             return cases.stream().map(dir -> DynamicTest.dynamicTest(dir.getFileName().toString(), () -> {
+                String name = dir.getFileName().toString();
+                assumeTrue(!PENDING.containsKey(name), () -> name + ": " + PENDING.get(name));
                 InlineNode input = reader.read(dir.resolve("input.stxt"));
                 Node expected = STXT.rawParser().parseFile(dir.resolve("expected.stxt").toFile()).get(0);
                 List<Page> pages = new Engine().layOutDocument(input);
-                var media = new BoxTreeBuilder().build(input).media();
+                Media media = new BoxTreeBuilder().build(input).media();
+                writeSvg(name, pages, media);
                 String dump = StxtDump.dump(pages, media.pageArea(), false);
-                compare(expected, STXT.rawParser().parse(dump).get(0), dir.getFileName() + "/");
+                compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
             }));
+        }
+    }
+
+    private static void writeSvg(String name, List<Page> pages, Media media) throws IOException {
+        Files.createDirectories(SVG_DIR);
+        for (Page p : pages) {
+            String svg = SvgCanvas.page(p, media, p.content().height(), true);
+            Files.writeString(SVG_DIR.resolve(name + "-" + p.number() + ".svg"), svg, StandardCharsets.UTF_8);
         }
     }
 

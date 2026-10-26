@@ -11,10 +11,12 @@ import java.util.List;
  * @param fragment    el fragmento producido en este fragmentainer
  * @param breakToken  dónde se cortó; {@code null} si la caja ha terminado
  * @param breakAppeal calidad del corte elegido (mayor es mejor; ver {@link #PERFECT_BREAK})
- * @param pending     cajas absolutas cuyo containing block es un ancestro de esta caja
+ * @param pending     cajas absolutas cuyo containing block es un ancestro de esta caja, con la
+ *                    posición estática relativa a la caja de contenido de esta caja
+ * @param adjoining   márgenes de los descendientes que colapsan fuera de la caja (§5.3)
  */
 public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAppeal,
-                           List<PendingAbsolute> pending) {
+                           List<PendingAbsolute> pending, AdjoiningMargins adjoining) {
 
     /** Corte que no incumple ninguna regla. */
     public static final int PERFECT_BREAK = 3;
@@ -30,7 +32,11 @@ public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAp
     }
 
     public static LayoutResult finished(Fragment fragment) {
-        return new LayoutResult(fragment, null, PERFECT_BREAK, List.of());
+        return finished(fragment, List.of(), AdjoiningMargins.NONE);
+    }
+
+    public static LayoutResult finished(Fragment fragment, List<PendingAbsolute> pending, AdjoiningMargins adjoining) {
+        return new LayoutResult(fragment, null, PERFECT_BREAK, pending, adjoining);
     }
 
     public boolean isFinished() {

@@ -54,6 +54,19 @@ public final class Box {
         return children.stream().filter(h -> !h.style.isOutOfFlow()).toList();
     }
 
+    /**
+     * Crea un contexto de formato de bloque, que aísla el colapso de márgenes
+     * (ESPECIFICACION.md §5.3): el área útil (la raíz), las cajas {@code absolute} y
+     * {@code fixed}, los ítems de flex y grid y las cajas con {@code Isolate: true}.
+     */
+    public boolean establishesBlockFormattingContext() {
+        if (parent == null || style.isolate || style.isOutOfFlow()) {
+            return true;
+        }
+        Style.Layout l = parent.style.layout;
+        return l == Style.Layout.FLEX || l == Style.Layout.GRID;
+    }
+
     public boolean hasText() {
         return text != null && !text.isBlank();
     }
