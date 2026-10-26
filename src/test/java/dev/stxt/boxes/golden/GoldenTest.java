@@ -7,6 +7,7 @@ import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.output.StxtDump;
 import dev.stxt.boxes.paint.PdfCanvas;
 import dev.stxt.boxes.paint.SvgCanvas;
+import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Media;
@@ -93,15 +94,15 @@ class GoldenTest {
      * y un {@code page-N.png} por página (versionados): así un cambio en el resultado se ve en el
      * diff. Un PNG solo se reescribe si cambian sus píxeles, y se borran los de páginas que ya no
      * existen. El PDF lleva los contornos de depuración de las cajas y se maqueta con las métricas
-     * reales ({@link PdfCanvas#write(InlineNode,
-     * java.io.OutputStream, boolean)}), no con las de la comparación.
+     * reales de las fuentes de {@code resources/fonts}, que se incrustan ({@link PdfCanvas#write(InlineNode,
+     * Resources, java.io.OutputStream, boolean)}), no con las de la comparación.
      */
     private static void writePdfAndImages(Path dir, InlineNode input) throws IOException {
         if (!Files.isDirectory(dir)) {
             return;
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(input, out, true);
+        PdfCanvas.write(input, new Resources(), out, true);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         int pages;
         try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {

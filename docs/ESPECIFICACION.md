@@ -69,10 +69,12 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Box:
 		Id: title
+		Font: IBM Plex Sans
 		Font size: 20
 		Text: Un título
 	Box:
 		Id: body
+		Font: IBM Plex Sans
 		Padding: 10
 		Box:
 			Text >>
@@ -222,7 +224,9 @@ No afectan al layout.
 
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
-| `Font` | nombre | `Helvetica` | **Sí** | En la salida PDF, una de las 14 fuentes estándar o una fuente registrada. |
+| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en toda caja con texto, propia o heredada. Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
+| `Font weight` | `normal`, `bold` | `normal` | **Sí** | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
+| `Font style` | `normal`, `italic` | `normal` | **Sí** | |
 | `Font size` | número > 0 | `10` | **Sí** | Cuerpo de la fuente. |
 | `Line height` | número o % | `120%` | **Sí** | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
 | `Text align` | `left`, `right`, `center`, `justify` | `left` | **Sí** | La última línea de un párrafo justificado se alinea a la izquierda. |
@@ -369,6 +373,10 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
   propia y **desborda**.
 - **Altura.** Cada línea mide `Line height`. La altura del contenido es el número de líneas
   por `Line height`.
+- **Línea base.** La caja de la fuente (su ascendente más su descendente, de la tabla `hhea`
+  del fichero TTF) se centra en la línea, como el *half-leading* de CSS:
+  `línea base = arriba + (Line height − (ascendente + descendente) · Font size) / 2 + ascendente · Font size`.
+  No afecta al layout, solo al pintado.
 - **Alineación.** `left`, `right` y `center` desplazan cada línea; `justify` reparte
   el sobrante a partes iguales entre los espacios de la línea. No se justifican la última
   línea de cada párrafo, las líneas de una sola palabra ni las que desbordan (los espacios no
@@ -684,6 +692,51 @@ Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas con
 saltos y se vuelven a medir y alinear. Como las cajas `fixed` no ocupan espacio, el flujo
 principal no cambia.
 
+### 5.11 Recursos y fuentes
+
+**Carpeta de recursos.** Los ficheros que usa un documento están en una única carpeta, por
+defecto `resources/` (relativa al directorio de trabajo del motor), que la aplicación puede
+cambiar. Dentro hay dos subcarpetas fijas, que pueden organizarse a su vez en subcarpetas:
+
+```
+resources/
+	fonts/      fuentes TTF
+	images/     imágenes (reservada)
+```
+
+Los recursos se buscan **siempre hacia abajo**, desde la raíz de la carpeta. Una ruta de
+recurso es relativa a esa raíz (`images/logo.png`), admite `/` y `\` como separadores y no
+puede:
+
+- ser absoluta (`/…`, `\…`, `C:…`) ni empezar por `~`;
+- contener un segmento `..`, aunque al normalizarla volviera a quedar dentro;
+- llegar, a través de un enlace simbólico, a un fichero fuera de la carpeta.
+
+**Fuentes.** Solo se usan las fuentes TTF de `fonts/`; no hay fuentes del sistema, ni las 14
+estándar de PDF, ni fuentes de sustitución. La salida PDF las incrusta (solo los glifos usados),
+de modo que el documento se ve igual en cualquier máquina; por eso deben tener una licencia que
+permita incrustarlas, como la SIL Open Font License. El repositorio incluye IBM Plex Sans.
+
+Cada fichero se identifica por lo que declara su interior, no por su nombre:
+
+- **familia:** la familia tipográfica de la tabla `name` (`nameID` 16) o, si no la tiene, la
+  familia (`nameID` 1). Se compara exactamente, con mayúsculas y espacios;
+- **peso:** `usWeightClass` de la tabla `OS/2`: 400 es `normal` y 700 es `bold`. Los ficheros
+  de otros pesos (300, 500…) se ignoran;
+- **estilo:** el bit de cursiva de `fsSelection` (`OS/2`).
+
+Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El
+kerning y las ligaduras no se aplican: el ancho de un texto es la suma de los avances de sus
+glifos.
+
+**Comprobaciones.** Con las métricas reales, antes de maquetar se comprueba que cada caja con
+texto tiene su fuente (familia, peso y estilo) en `fonts/` y que la fuente tiene todos los
+caracteres de su texto (los espacios en blanco se pintan como espacios; `{page}` y `{pages}`,
+como cifras). Una fuente desconocida, una variante que falta o un carácter que la fuente no
+tiene son errores con la línea de la caja ([§6](#6-validación)). También son errores, sin línea
+porque no son del documento, que no exista `fonts/`, un fichero que no se puede leer, una fuente
+variable o dos ficheros con la misma familia, peso y estilo.
+
 ---
 
 ## 6. Validación
@@ -693,6 +746,8 @@ La validación se hace en dos niveles:
 1. **Template STXT** ([§9](#9-template-completo)): estructura, cardinalidades, tipos `ENUM`,
    `INTEGER`, `BOOLEAN` y `TEXT`. La realiza la librería STXT con sus códigos de error.
 2. **Motor:** reglas que el template no puede expresar. Se informan con la línea del documento.
+   Las de las fuentes ([§5.11](#511-recursos-y-fuentes)) solo se comprueban con las métricas
+   reales (la salida PDF), porque necesitan la carpeta de fuentes.
 
 | Regla | Mensaje (ejemplo) |
 |---|---|
@@ -712,6 +767,10 @@ La validación se hace en dos niveles:
 | `Font size` > 0; `Grow` y `Shrink` ≥ 0 | `Font size debe ser mayor que 0` |
 | Colores `#RGB` o `#RRGGBB` | `Color no válido (usa #RGB o #RRGGBB)` |
 | `Gap` admite 1 o 2 valores | `Gap admite 1 o 2 valores` |
+| El texto necesita `Font`, propia o heredada | `El texto necesita Font: declárala en la caja o en una antecesora` |
+| `Font` existe en la carpeta de fuentes | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
+| La familia tiene la variante de `Font weight` y `Font style` | `La fuente IBM Plex Sans no tiene la variante bold italic. Variantes en …: bold, normal` |
+| La fuente tiene todos los caracteres del texto | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 
 ---
 
@@ -747,12 +806,15 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Tema | CSS | Este modelo |
 |---|---|---|
 | Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT; cada caja declara sus propiedades |
-| Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
+| Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
 | `display` | Combina tipo exterior e interior | `Layout` (interior); el exterior lo decide el padre. No hay `inline-block`. |
 | `box-sizing` | `content-box` por defecto | `Box sizing: border` por defecto |
 | Unidades | px, em, rem, vw… | pt, %, fr |
 | `line-height` sin unidad | Multiplicador | **Un número son puntos**; el relativo se escribe con % |
-| Altura de línea | Calculada por fuente, *half-leading* y *baseline* | Cada línea mide `Line height` |
+| Altura de línea | Calculada por fuente, *half-leading* y *baseline* | Cada línea mide `Line height`; la línea base se coloca con el *half-leading* de su fuente |
+| Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
+| `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Font weight: normal` o `bold` y `Font style: normal` o `italic`, sin síntesis: el fichero debe existir |
+| Kerning y ligaduras | Sí | No |
 | Palabras largas | Desbordan (configurable) | Desbordan |
 | `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
 | `position: fixed` en pantalla | Relativo a la ventana | En continuo, relativo al documento |
@@ -807,6 +869,8 @@ Template (@stxt.template): dev.stxt.boxes
 				Color: (?)
 				Border color: (?)
 				Font: (?)
+				Font weight: (?) ENUM [normal, bold]
+				Font style: (?) ENUM [normal, italic]
 				Font size: (?)
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
@@ -864,6 +928,7 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Box:
 		Id: header
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
@@ -872,6 +937,7 @@ Document (dev.stxt.boxes):
 		Text: Informe trimestral
 	Box:
 		Id: footer
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
@@ -880,6 +946,8 @@ Document (dev.stxt.boxes):
 		Text: Página {page} de {pages}
 	Box:
 		Id: title
+		Font: IBM Plex Sans
+		Font weight: bold
 		Font size: 20
 		Line height: 24
 		Margin: 0 0 16 0
@@ -887,6 +955,7 @@ Document (dev.stxt.boxes):
 		Text: Resultados del trimestre
 	Box:
 		Id: body
+		Font: IBM Plex Sans
 		Layout: grid
 		Grid:
 			Columns: 150 1fr
@@ -909,6 +978,7 @@ Document (dev.stxt.boxes):
 				Una línea en blanco empieza un párrafo nuevo.
 	Box:
 		Id: stamp
+		Font: IBM Plex Sans
 		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80
@@ -924,6 +994,8 @@ Document (dev.stxt.boxes):
 
 - **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
+- **Fuentes:** las cajas de primer nivel no tienen un antecesor común que declare `Font`, así
+  que cada una con texto la declara; sus hijas la heredan. El título va en negrita.
 - **`header`** (`fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.
@@ -948,6 +1020,7 @@ Document (dev.stxt.boxes):
 | Término | Definición |
 |---|---|
 | **Área útil** | Rectángulo del medio menos sus márgenes; containing block inicial. |
+| **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([§5.11](#511-recursos-y-fuentes)). |
 | **Caja anónima** | Caja que crea el motor para envolver texto mezclado con cajas. |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([§5.2](#52-modelo-de-caja-y-containing-block)). |
 | **Containing block** | Rectángulo de referencia para porcentajes, `auto` y desplazamientos. |

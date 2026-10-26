@@ -75,7 +75,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             }
             changed = true;
             String text = PageNumbers.apply(l.text(), page, pages);
-            double width = real.width(text, s.font, s.fontSize);
+            double width = real.width(text, s.fontFace(), s.fontSize);
             double spacing = l.wordSpacing() > 0
                     ? LineBreaker.wordSpacing(text, width, available, s.textAlign, false) : 0;
             double x = LineBreaker.offset(width, available, s.textAlign);
@@ -92,7 +92,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
-                ? LineBreaker.intrinsics(box.text, measurer, box.style.font, box.style.fontSize)
+                ? LineBreaker.intrinsics(box.text, measurer, box.style.fontFace(), box.style.fontSize)
                 : IntrinsicSizes.ZERO;
         return content;
     }
@@ -108,7 +108,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
         List<List<String>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.font, s.fontSize, s.textWrap)
+                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.fontFace(), s.fontSize, s.textWrap)
                 : List.of();
         List<String> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
@@ -138,7 +138,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             while (paragraphEnds[paragraph] <= j) {
                 paragraph++;
             }
-            double width = measurer.width(text, s.font, s.fontSize);
+            double width = measurer.width(text, s.fontFace(), s.fontSize);
             double x = LineBreaker.offset(width, available, s.textAlign);
             double spacing = LineBreaker.wordSpacing(text, width, available, s.textAlign,
                     j == paragraphEnds[paragraph] - 1);

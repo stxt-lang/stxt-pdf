@@ -16,6 +16,7 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Box:
 		Id: footer
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: auto 0 -15 0
 		Height: 10

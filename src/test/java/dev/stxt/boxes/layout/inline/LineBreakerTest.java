@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.layout.IntrinsicSizes;
+import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
@@ -12,10 +13,11 @@ class LineBreakerTest {
 
     // Factor 1 y tamaño 1: cada carácter mide 1 pt; un espacio también.
     private final TextMeasurer measurer = new FixedMetrics(1);
+    private static final FontFace F = new FontFace("F", Style.FontWeight.NORMAL, Style.FontStyle.NORMAL);
 
     @Test
     void greedyFirstFit() {
-        List<String> l = LineBreaker.breakLines("uno dos tres cuatro", 8, measurer, "F", 1);
+        List<String> l = LineBreaker.breakLines("uno dos tres cuatro", 8, measurer, F, 1);
         assertEquals(List.of("uno dos", "tres", "cuatro"), l);
     }
 
@@ -26,33 +28,33 @@ class LineBreakerTest {
         // Knuth-Plass prefiere una línea con la máxima y otra con 100 × (1/1)³ = 100.
         String text = "a bbb c ddddd e fff";
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, "F", 1, Style.TextWrap.AUTO).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, Style.TextWrap.AUTO).get(0));
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, "F", 1, Style.TextWrap.PRETTY).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, Style.TextWrap.PRETTY).get(0));
     }
 
     @Test
     void prettyKeepsParagraphsAndOverflowingWords() {
         assertEquals(List.of(List.of("a", "larguísima", "b"), List.of("uno", "dos")),
-                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, "F", 1, Style.TextWrap.PRETTY));
+                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, F, 1, Style.TextWrap.PRETTY));
         assertEquals(List.of(List.of("uno dos tres")),
-                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, "F", 1, Style.TextWrap.PRETTY));
+                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, F, 1, Style.TextWrap.PRETTY));
     }
 
     @Test
     void singleBreaksAreSpacesAndBlankLineSeparatesParagraphs() {
-        List<String> l = LineBreaker.breakLines("uno\ndos\n\ntres", 100, measurer, "F", 1);
+        List<String> l = LineBreaker.breakLines("uno\ndos\n\ntres", 100, measurer, F, 1);
         assertEquals(List.of("uno dos", "tres"), l);
     }
 
     @Test
     void wordWiderThanLineOverflows() {
-        assertEquals(List.of("a", "larguísima", "b"), LineBreaker.breakLines("a larguísima b", 4, measurer, "F", 1));
+        assertEquals(List.of("a", "larguísima", "b"), LineBreaker.breakLines("a larguísima b", 4, measurer, F, 1));
     }
 
     @Test
     void intrinsics() {
-        IntrinsicSizes s = LineBreaker.intrinsics("uno dos tres", measurer, "F", 1);
+        IntrinsicSizes s = LineBreaker.intrinsics("uno dos tres", measurer, F, 1);
         assertEquals(4, s.minContent(), 1e-9);
         assertEquals(12, s.maxContent(), 1e-9);
         assertEquals(8, s.fitContent(8), 1e-9);

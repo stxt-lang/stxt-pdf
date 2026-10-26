@@ -28,6 +28,8 @@ Template (@stxt.template): dev.stxt.boxes
 				Color: (?)
 				Border color: (?)
 				Font: (?)
+				Font weight: (?) ENUM [normal, bold]
+				Font style: (?) ENUM [normal, italic]
 				Font size: (?)
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
@@ -72,6 +74,9 @@ Template (@stxt.template): dev.stxt.boxes
 		Offset: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Position distinta de static.
 		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 		Box sizing: Qué miden Width y Height: la caja de borde (border, por defecto) o el contenido (content).
+		Font: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en las cajas con texto, propia o heredada. Se hereda.
+		Font weight: Peso: normal (por defecto) o bold. Se hereda.
+		Font style: Estilo: normal (por defecto) o italic. Se hereda.
 		Line height: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size.
 		Text wrap: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo). Se hereda.
 		Gap: Separación entre ítems: un valor, o dos (filas columnas).

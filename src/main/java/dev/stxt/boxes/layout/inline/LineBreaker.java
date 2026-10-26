@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.layout.IntrinsicSizes;
+import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -30,21 +31,21 @@ public final class LineBreaker {
 
     /** Líneas del texto para un ancho disponible, con el algoritmo voraz. */
     public static List<String> breakLines(String text, double available, TextMeasurer measurer,
-                                          String font, double fontSize) {
+                                          FontFace font, double fontSize) {
         List<String> lines = new ArrayList<>();
         breakParagraphs(text, available, measurer, font, fontSize).forEach(lines::addAll);
         return lines;
     }
 
-    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(String, double, TextMeasurer, String, double, Style.TextWrap)}). */
+    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(String, double, TextMeasurer, FontFace, double, Style.TextWrap)}). */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     String font, double fontSize) {
+                                                     FontFace font, double fontSize) {
         return breakParagraphs(text, available, measurer, font, fontSize, Style.TextWrap.AUTO);
     }
 
     /** Líneas de cada párrafo del texto para un ancho disponible (las viudas y huérfanas son por párrafo). */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     String font, double fontSize, Style.TextWrap wrap) {
+                                                     FontFace font, double fontSize, Style.TextWrap wrap) {
         List<List<String>> result = new ArrayList<>();
         for (List<String> paragraph : paragraphs(text)) {
             if (wrap == Style.TextWrap.PRETTY) {
@@ -88,7 +89,7 @@ public final class LineBreaker {
      * <p>El ancho de una línea es la suma de los de sus palabras y espacios.</p>
      */
     static List<String> optimal(List<String> words, double available, TextMeasurer measurer,
-                                String font, double fontSize) {
+                                FontFace font, double fontSize) {
         int n = words.size();
         double space = measurer.width(" ", font, fontSize);
         double[] prefix = new double[n + 1];
@@ -139,7 +140,7 @@ public final class LineBreaker {
     }
 
     /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
-    public static IntrinsicSizes intrinsics(String text, TextMeasurer measurer, String font, double fontSize) {
+    public static IntrinsicSizes intrinsics(String text, TextMeasurer measurer, FontFace font, double fontSize) {
         double min = 0;
         double max = 0;
         for (List<String> paragraph : paragraphs(text)) {

@@ -1,8 +1,10 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.tree.FontFace;
+
 /**
  * Métrica aproximada para enseñar y para tests deterministas: cada carácter mide
- * {@code factor × tamaño}. Con el factor 0.5 se aproxima el ancho medio de Helvetica.
+ * {@code factor × tamaño}, sea cual sea la fuente. No necesita la carpeta de fuentes.
  *
  * <p>Es la métrica por defecto de {@link dev.stxt.boxes.layout.Engine} y la de todos los tests
  * de layout. Para la salida PDF se usan las métricas reales de {@link PdfMetrics}.</p>
@@ -20,7 +22,7 @@ public final class FixedMetrics implements TextMeasurer {
     }
 
     @Override
-    public double width(String text, String font, double fontSize) {
+    public double width(String text, FontFace font, double fontSize) {
         return text.codePointCount(0, text.length()) * factor * fontSize;
     }
 }

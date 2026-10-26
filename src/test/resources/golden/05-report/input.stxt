@@ -9,6 +9,7 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Box:
 		Id: header
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
@@ -17,6 +18,7 @@ Document (dev.stxt.boxes):
 		Text: Informe trimestral
 	Box:
 		Id: footer
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
@@ -25,6 +27,8 @@ Document (dev.stxt.boxes):
 		Text: Página {page} de {pages}
 	Box:
 		Id: title
+		Font: IBM Plex Sans
+		Font weight: bold
 		Font size: 20
 		Line height: 24
 		Margin: 0 0 16 0
@@ -32,6 +36,7 @@ Document (dev.stxt.boxes):
 		Text: Resultados del trimestre
 	Box:
 		Id: body
+		Font: IBM Plex Sans
 		Layout: grid
 		Grid:
 			Columns: 150 1fr
@@ -54,6 +59,7 @@ Document (dev.stxt.boxes):
 				Una línea en blanco empieza un párrafo nuevo.
 	Box:
 		Id: stamp
+		Font: IBM Plex Sans
 		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80

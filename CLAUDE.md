@@ -35,7 +35,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los siete
+Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los ocho
 hitos están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
@@ -48,6 +48,7 @@ actualízala.
 | 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
 | 7 | ~~`{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass~~ (hecho; caso 07) | `layout/Slice`, `layout/UnitBreaker`, `layout/inline/PageNumbers`, `layout/inline/LineBreaker` |
+| 8 | ~~Carpeta de recursos, fuentes TTF incrustadas, `Font weight`/`Font style`, línea base real~~ (hecho) | `resources`, `layout/inline/PdfMetrics`, `paint/PdfCanvas` |
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
@@ -65,9 +66,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect` |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el template y exige una única raíz con el namespace `dev.stxt.boxes` |
-| `tree` | `Box`, `Style` (propiedades y enums), `Media`, `BoxTreeBuilder`, `InvalidModelException` |
+| `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
+| `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
@@ -144,8 +146,19 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
 - **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
-  el de todos los tests de layout; `PdfMetrics` da las métricas reales de las 14 fuentes
-  estándar y es el que usa `PdfCanvas.write(document, out)`.
+  el de todos los tests de layout, y no necesita fuentes; `PdfMetrics` da las métricas reales de
+  las fuentes TTF de `Resources` y es el que usa `PdfCanvas.write(document, out)`.
+  `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics` comprueba que
+  existen las fuentes y tienen todos los caracteres (errores con línea).
+- **Recursos (§5.11):** carpeta fija, por defecto `resources/` del directorio de trabajo, con
+  `fonts/` e `images/`; `Resources` solo sirve para cambiarla. Toda ruta pasa por
+  `Resources.resolve`, que **nunca va hacia atrás** (rechaza absolutas, `..` y enlaces que
+  salen). Las fuentes se identifican por familia, peso (400/700) y estilo leídos del TTF
+  (`FontLibrary`); no hay fuente por defecto ni de sustitución: `Font` es obligatoria en el
+  texto. El repositorio incluye IBM Plex Sans (OFL).
+- **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
+  `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
+  SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.
 
 ## Convenciones
 
@@ -189,7 +202,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   Un PNG solo se reescribe si cambian sus píxeles: si aparece modificado en git, el resultado
   ha cambiado; míralo antes de dar el cambio por bueno.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
-  515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). Con
+  515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
+  añade `Font: IBM Plex Sans` a cada `\tBox:` de primer nivel; los demás documentos de test con
+  texto deben declarar `Font` ellos mismos. Con
   `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
   una página concreta; los tests `*FragmentationTest` lo usan.

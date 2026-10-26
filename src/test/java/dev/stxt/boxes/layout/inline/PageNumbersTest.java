@@ -2,6 +2,8 @@ package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PageNumbersTest {
 
     private static final double PAGE = 180;
+    private static final FontFace F = new FontFace("F", Style.FontWeight.NORMAL, Style.FontStyle.NORMAL);
 
     private static final String[] FOOTER = {"\tBox:", "\t\tId: footer", "\t\tPosition: fixed",
             "\t\tOffset: auto 0 -30 0", "\t\tHeight: 20", "\t\tText align: right",
@@ -35,9 +38,9 @@ class PageNumbersTest {
     @Test
     void probeReservesTheDigits() {
         assertEquals("Página 00".length(),
-                PageNumbers.probing(new FixedMetrics(1), 2).width("Página {page}", "F", 1), 1e-9);
+                PageNumbers.probing(new FixedMetrics(1), 2).width("Página {page}", F, 1), 1e-9);
         assertEquals("Página 000".length(),
-                PageNumbers.probing(new FixedMetrics(1), 3).width("Página {page}", "F", 1), 1e-9);
+                PageNumbers.probing(new FixedMetrics(1), 3).width("Página {page}", F, 1), 1e-9);
         assertEquals(2, PageNumbers.digits(99));
         assertEquals(3, PageNumbers.digits(100));
     }

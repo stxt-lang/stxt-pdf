@@ -14,10 +14,14 @@ import java.util.Map;
  * Maqueta un documento de 595 pt de ancho con márgenes de 40 (área útil de 515 pt desde
  * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página,
  * incluidos los de las cajas {@code fixed}. Sin número de página, se refiere a la primera.
+ *
+ * <p>Declara {@code Font} en cada caja de primer nivel, porque el texto la necesita (§6); con
+ * {@link dev.stxt.boxes.layout.inline.FixedMetrics} la familia no influye en las medidas.</p>
  */
 public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
+    private static final String FONT = "\t\tFont: IBM Plex Sans";
 
     private final List<Page> pages;
     private final List<Map<String, Fragment>> fragments = new ArrayList<>();
@@ -46,7 +50,14 @@ public final class LayoutFixture {
     }
 
     private static LayoutFixture layOut(String media, String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n" + media + String.join("\n", boxLines);
+        List<String> lines = new ArrayList<>();
+        for (String line : boxLines) {
+            lines.add(line);
+            if (line.equals("\tBox:")) {
+                lines.add(FONT);
+            }
+        }
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n" + media + String.join("\n", lines);
         return new LayoutFixture(new Engine().layOutDocument(READER.read(doc)));
     }
 

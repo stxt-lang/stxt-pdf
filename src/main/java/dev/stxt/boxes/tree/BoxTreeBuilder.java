@@ -105,7 +105,12 @@ public final class BoxTreeBuilder {
         for (Node h : content) {
             if (is(h, "box")) {
                 box.addChild(box(inline(h), box));
-            } else if (textInAnonymous) {
+                continue;
+            }
+            if (box.style.font == null) {
+                throw error(h, "El texto necesita Font: declárala en la caja o en una antecesora");
+            }
+            if (textInAnonymous) {
                 // Texto mezclado con cajas, o dentro de flex/grid: caja anónima (módulo 1, §6).
                 Style s = Style.inheriting(box.style);
                 s.layout = Style.Layout.INLINE;
@@ -152,7 +157,9 @@ public final class BoxTreeBuilder {
                     case "background" -> s.background = color(v, p);
                     case "color" -> s.color = color(v, p);
                     case "border-color" -> s.borderColor = color(v, p);
-                    case "font" -> s.font = v.trim();
+                    case "font" -> s.font = fontFamily(v, p);
+                    case "font-weight" -> s.fontWeight = enumValue(Style.FontWeight.class, v, p);
+                    case "font-style" -> s.fontStyle = enumValue(Style.FontStyle.class, v, p);
                     case "font-size" -> s.fontSize = positive(v, p);
                     case "line-height" -> s.lineHeight = ValueParser.value(v);
                     case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, v, p);
@@ -309,6 +316,14 @@ public final class BoxTreeBuilder {
         } catch (IllegalArgumentException ex) {
             throw error(n, "Valor no permitido en " + n.getName() + ": " + text.trim());
         }
+    }
+
+    private static String fontFamily(String text, Node n) {
+        String family = text.trim();
+        if (family.isEmpty()) {
+            throw error(n, "Font necesita el nombre de una familia");
+        }
+        return family;
     }
 
     private static boolean breakInside(String text, Node n) {

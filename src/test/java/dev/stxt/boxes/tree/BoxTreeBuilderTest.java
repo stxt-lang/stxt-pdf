@@ -32,6 +32,7 @@ class BoxTreeBuilderTest {
         BoxTreeBuilder.Result r = build(document(
                 "\tBox:",
                 "\t\tId: parent",
+                "\t\tFont: IBM Plex Sans",
                 "\t\tText: antes",
                 "\t\tBox:",
                 "\t\t\tId: child"));
@@ -45,7 +46,7 @@ class BoxTreeBuilderTest {
 
     @Test
     void blockWithOnlyTextUsesInlineLayout() {
-        Box b = build(document("\tBox:", "\t\tText: hola")).root().children.get(0);
+        Box b = build(document("\tBox:", "\t\tFont: IBM Plex Sans", "\t\tText: hola")).root().children.get(0);
         assertEquals(Style.Layout.INLINE, b.style.layout);
         assertFalse(b.anonymous);
         assertEquals("hola", b.text);
@@ -55,11 +56,16 @@ class BoxTreeBuilderTest {
     void onlyTextAndFragmentationPropertiesAreInherited() {
         Box child = build(document(
                 "\tBox:",
+                "\t\tFont: IBM Plex Sans",
+                "\t\tFont weight: bold",
+                "\t\tFont style: italic",
                 "\t\tFont size: 14",
                 "\t\tWidows: 3",
                 "\t\tPadding: 10",
                 "\t\tBox:",
                 "\t\t\tText: x")).root().children.get(0).children.get(0);
+        assertEquals(new FontFace("IBM Plex Sans", Style.FontWeight.BOLD, Style.FontStyle.ITALIC),
+                child.style.fontFace());
         assertEquals(14, child.style.fontSize, 1e-9);
         assertEquals(3, child.style.widows);
         assertEquals(16.8, child.style.usedLineHeight(), 1e-9);
@@ -81,6 +87,21 @@ class BoxTreeBuilderTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tBox:", "\t\tWidth: 12,5")));
         assertEquals(7, e.line());
+    }
+
+    @Test
+    void textNeedsAFont() {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
+                "\tBox:", "\t\tFont size: 12", "\t\tText: hola")));
+        assertEquals(8, e.line());
+        assertEquals("línea 8: El texto necesita Font: declárala en la caja o en una antecesora", e.getMessage());
+        // También el texto que va a una caja anónima, y sin importar que una hermana la declare.
+        InvalidModelException anonymous = assertThrows(InvalidModelException.class, () -> build(document(
+                "\tBox:", "\t\tFont: IBM Plex Sans", "\t\tText: a",
+                "\tBox:", "\t\tLayout: flex", "\t\tText: b")));
+        assertEquals(11, anonymous.line());
+        // Una caja sin texto no la necesita.
+        build(document("\tBox:", "\t\tHeight: 10"));
     }
 
     @Test

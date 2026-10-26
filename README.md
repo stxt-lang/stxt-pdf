@@ -29,10 +29,25 @@ try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
 }
 ```
 
+## Recursos y fuentes
+
+Las fuentes y las imágenes están en una carpeta de recursos, por defecto `resources/` en el
+directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
+`PdfCanvas.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
+hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
+
+Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
+por la familia, el peso y el estilo que declara. `Font` es obligatoria en toda caja con texto
+y no tiene valor por defecto. El repositorio incluye
+[IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/) (normal, negrita, cursiva y negrita
+cursiva), con licencia SIL Open Font License. Los detalles están en el §5.11 de la
+especificación.
+
 ## Estado
 
 Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
-depuración y PDF. Los siete hitos de la hoja de ruta están terminados.
+depuración y PDF con las fuentes incrustadas. Los ocho hitos de la hoja de ruta están
+terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -53,18 +68,18 @@ depuración y PDF. Los siete hitos de la hoja de ruta están terminados.
 | `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
 | Fragmentación de bloque y texto: elección del corte, viudas y huérfanas, `avoid`, cortes forzados, truncado de márgenes, `Decoration: slice`, `Height` repartido entre fragmentos | Hecho y probado |
 | Fragmentación de flex (entre líneas o ítems) y grid (entre filas), con los ítems de una fila más alta que la página partidos en paralelo | Hecho y probado |
-| Salida PDF con PDFBox (`PdfCanvas`) y métricas reales de las 14 fuentes estándar (`PdfMetrics`) | Hecho y probado |
+| Salida PDF con PDFBox (`PdfCanvas`) y métricas reales de las fuentes (`PdfMetrics`) | Hecho y probado |
 | Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
 | Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
-| Fuentes registradas (TrueType) en la salida PDF | Pendiente |
+| Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
 `src/test/resources/golden/`, el PDF (`output.pdf`, ignorado por git) y una imagen por página
 (`page-N.png`, versionada): si un cambio altera el resultado, la imagen aparece modificada en
-git. Las imágenes dependen de las fuentes del sistema con que PDFBox pinta las 14 estándar, así
-que en otro sistema operativo pueden salir distintas. `PdfCanvasTest` deja sus PDF en
-`target/pdf/`.
+git. Como las fuentes van incrustadas, las imágenes no dependen de las fuentes del sistema;
+aún pueden variar detalles del suavizado con otra versión de Java. `PdfCanvasTest` deja sus PDF
+en `target/pdf/`.
 
 ## Hoja de ruta
 
@@ -75,14 +90,16 @@ que en otro sistema operativo pueden salir distintas. `PdfCanvasTest` deja sus P
 5. ~~**Grid.** `GridLayout` sobre `Placement` y `TrackSizing` (casos 04 y 05, el ejemplo del §10).~~ Hecho.
 6. ~~**Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales (caso 06).~~ Hecho.
 7. ~~**Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass (caso 07).~~ Hecho.
+8. ~~**Fuentes.** Carpeta de recursos, fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real.~~ Hecho.
 
 ## Estructura
 
 ```
 src/main/java/dev/stxt/boxes/
-  model/        Value, ValueParser, Sides, Insets, Rect
+  model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics
   stxt/         DocumentReader (stxt-core + template)
-  tree/         Box, Style, Media, BoxTreeBuilder, InvalidModelException
+  resources/    Resources, FontLibrary, FontFile, ResourceException
+  tree/         Box, Style, FontFace, Media, BoxTreeBuilder, InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
                 Slice, UnitBreaker

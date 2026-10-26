@@ -24,6 +24,10 @@ public final class Style {
 
     public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }
 
+    public enum FontWeight { NORMAL, BOLD }
+
+    public enum FontStyle { NORMAL, ITALIC }
+
     /** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
     public enum TextWrap { AUTO, PRETTY }
 
@@ -74,7 +78,10 @@ public final class Style {
     public String borderColor;
 
     // --- Texto (heredables) ---------------------------------------------------------------------
-    public String font = "Helvetica";
+    /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (§6). */
+    public String font;
+    public FontWeight fontWeight = FontWeight.NORMAL;
+    public FontStyle fontStyle = FontStyle.NORMAL;
     public double fontSize = 10;
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     public Value lineHeight;
@@ -130,6 +137,8 @@ public final class Style {
         if (parent != null) {
             s.color = parent.color;
             s.font = parent.font;
+            s.fontWeight = parent.fontWeight;
+            s.fontStyle = parent.fontStyle;
             s.fontSize = parent.fontSize;
             s.lineHeight = parent.lineHeight;
             s.textAlign = parent.textAlign;
@@ -138,6 +147,11 @@ public final class Style {
             s.orphans = parent.orphans;
         }
         return s;
+    }
+
+    /** Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (§6). */
+    public FontFace fontFace() {
+        return new FontFace(font, fontWeight, fontStyle);
     }
 
     /** Altura de línea usada, en puntos. */

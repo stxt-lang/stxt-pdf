@@ -1,64 +1,87 @@
 package dev.stxt.boxes.layout.inline;
 
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import dev.stxt.boxes.resources.FontFile;
+import dev.stxt.boxes.resources.FontLibrary;
+import dev.stxt.boxes.resources.ResourceException;
+import dev.stxt.boxes.resources.Resources;
+import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.tree.InvalidModelException;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Locale;
 
 /**
- * Métricas reales de las 14 fuentes estándar de PDF, con PDFBox:
- * {@code ancho = font.getStringWidth(texto) / 1000 × tamaño}. Es la métrica que corresponde a
- * la salida de {@link dev.stxt.boxes.paint.PdfCanvas}: {@code new Engine(new PdfMetrics())}.
+ * Métricas reales de las fuentes TTF de la carpeta de recursos (ESPECIFICACION.md §5.11): es la
+ * métrica que corresponde a la salida de {@link dev.stxt.boxes.paint.PdfCanvas}, que incrusta
+ * esas mismas fuentes: {@code new Engine(new PdfMetrics(resources))}.
  *
- * <p>{@code Font} admite los nombres de las fuentes estándar ({@code Helvetica},
- * {@code Helvetica-Bold}, {@code Times-Roman}, {@code Courier}…) y los alias que reconoce
- * PDFBox ({@code Arial}, {@code TimesNewRoman}, {@code CourierNew}…). Los caracteres que la
- * fuente no puede codificar (WinAnsi) se sustituyen por {@code ?}, aquí y al pintar.</p>
+ * <p>{@link #validate(Box)} comprueba antes de maquetar que cada texto tiene su fuente (familia,
+ * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
-    private final Map<String, PDFont> fonts = new ConcurrentHashMap<>();
+    /** Lo que pueden pintar {@code {page}} y {@code {pages}}. */
+    private static final String DIGITS = "0123456789";
+
+    private final Resources resources;
+
+    /** Métricas de las fuentes de la carpeta de recursos por defecto. */
+    public PdfMetrics() {
+        this(new Resources());
+    }
+
+    public PdfMetrics(Resources resources) {
+        this.resources = resources;
+    }
 
     @Override
-    public double width(String text, String font, double fontSize) {
-        PDFont f = fonts.computeIfAbsent(font, PdfMetrics::standardFont);
-        try {
-            return f.getStringWidth(encodable(f, text)) / 1000 * fontSize;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    public double width(String text, FontFace font, double fontSize) {
+        return resources.fonts().find(font).width(text, fontSize);
     }
 
     /**
-     * Una de las 14 fuentes estándar, por su nombre o un alias.
+     * {@inheritDoc}
      *
-     * @throws IllegalArgumentException si no es una fuente estándar
+     * <p>Los errores de la propia carpeta (que no exista, un fichero ilegible…) no son del
+     * documento: son {@link ResourceException}, sin línea.</p>
      */
-    public static PDFont standardFont(String name) {
-        Standard14Fonts.FontName standard = Standard14Fonts.getMappedFontName(name);
-        if (standard == null) {
-            throw new IllegalArgumentException("Fuente desconocida: " + name
-                    + " (en la salida PDF se admiten las 14 fuentes estándar: Helvetica, Times-Roman, Courier…)");
-        }
-        return new PDType1Font(standard);
+    @Override
+    public void validate(Box root) {
+        validate(root, resources.fonts());
     }
 
-    /** El texto con {@code ?} en lugar de los caracteres que la fuente no puede codificar. */
-    public static String encodable(PDFont font, String text) {
-        StringBuilder sb = new StringBuilder(text.length());
-        text.codePoints().forEach(cp -> {
-            String c = new String(Character.toChars(cp));
-            try {
-                font.encode(c);
-                sb.append(c);
-            } catch (IllegalArgumentException | IOException e) {
-                sb.append('?');
+    private static void validate(Box box, FontLibrary fonts) {
+        if (box.hasText()) {
+            check(box, fonts);
+        }
+        box.children.forEach(child -> validate(child, fonts));
+    }
+
+    private static void check(Box box, FontLibrary fonts) {
+        try {
+            FontFile font = fonts.find(box.style.fontFace());
+            String text = box.text;
+            if (PageNumbers.contains(text)) {
+                text = text.replace(PageNumbers.PAGES, "").replace(PageNumbers.PAGE, "") + DIGITS;
             }
-        });
-        return sb.toString();
+            for (int i = 0; i < text.length(); ) {
+                int cp = text.codePointAt(i);
+                // Los espacios en blanco del documento se pintan como espacios (§5.4).
+                int painted = Character.isWhitespace(cp) ? ' ' : cp;
+                if (!font.has(painted)) {
+                    throw new ResourceException("La fuente " + font.face() + " no tiene el carácter "
+                            + describe(painted));
+                }
+                i += Character.charCount(cp);
+            }
+        } catch (ResourceException e) {
+            throw new InvalidModelException(box.line, e.getMessage());
+        }
+    }
+
+    /** {@code '→' (U+2192)}; los caracteres de control, solo con su código. */
+    private static String describe(int cp) {
+        String code = String.format(Locale.ROOT, "U+%04X", cp);
+        return Character.isISOControl(cp) ? code : "'" + new String(Character.toChars(cp)) + "' (" + code + ")";
     }
 }

@@ -27,6 +27,7 @@ public final class Engine {
     private static final double EPSILON = 1e-9;
 
     private final LayoutCache cache = new LayoutCache();
+    private final TextMeasurer measurer;
     private final BlockLayout block;
     private final InlineLayout inline;
     private final FlexLayout flex;
@@ -35,13 +36,15 @@ public final class Engine {
 
     /**
      * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
-     * calculables a mano. El PDF se maqueta con {@code new Engine(new PdfMetrics())}.
+     * calculables a mano. No necesita la carpeta de fuentes. El PDF se maqueta con
+     * {@code new Engine(new PdfMetrics(resources))}.
      */
     public Engine() {
         this(new FixedMetrics());
     }
 
     public Engine(TextMeasurer measurer) {
+        this.measurer = measurer;
         this.block = new BlockLayout(this);
         this.inline = new InlineLayout(measurer);
         this.flex = new FlexLayout(this);
@@ -51,10 +54,12 @@ public final class Engine {
 
     /**
      * Documento STXT ya validado ({@link dev.stxt.boxes.stxt.DocumentReader}) → páginas. En modo
-     * continuo devuelve una sola página.
+     * continuo devuelve una sola página. Antes de maquetar comprueba con el {@link TextMeasurer}
+     * que se puede medir todo el texto (las fuentes, en la salida PDF).
      */
     public List<Page> layOutDocument(InlineNode document) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
+        measurer.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
         return new Paginator(this).paginate(tree.root(), tree.media());
     }

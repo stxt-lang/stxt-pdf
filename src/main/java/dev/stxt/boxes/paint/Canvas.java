@@ -2,6 +2,8 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.VerticalMetrics;
+import dev.stxt.boxes.tree.FontFace;
 
 /** Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. */
 public interface Canvas {
@@ -17,5 +19,13 @@ public interface Canvas {
      *
      * @param wordSpacing espacio que se añade a cada espacio entre palabras ({@code justify})
      */
-    void text(double x, double baselineY, String text, String font, double fontSize, String color, double wordSpacing);
+    void text(double x, double baselineY, String text, FontFace font, double fontSize, String color, double wordSpacing);
+
+    /**
+     * Ascendente y descendente con que se pinta la fuente, para colocar la línea base
+     * (ESPECIFICACION.md §5.4). Por defecto, la aproximación sin fuente.
+     */
+    default VerticalMetrics vertical(FontFace font) {
+        return VerticalMetrics.APPROXIMATE;
+    }
 }

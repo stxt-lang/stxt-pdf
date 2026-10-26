@@ -5,6 +5,7 @@ import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.FontFace;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ class StackingContextTest {
         }
 
         @Override
-        public void text(double x, double baselineY, String text, String font, double fontSize, String color,
+        public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                          double wordSpacing) {
         }
     }

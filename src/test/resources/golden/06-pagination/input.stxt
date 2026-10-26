@@ -15,6 +15,7 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Box:
 		Id: header
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: -15 0 auto 0
 		Height: 10
@@ -22,6 +23,7 @@ Document (dev.stxt.boxes):
 		Text: Cabecera
 	Box:
 		Id: footer
+		Font: IBM Plex Sans
 		Position: fixed
 		Offset: auto 0 -15 0
 		Height: 10
@@ -33,12 +35,14 @@ Document (dev.stxt.boxes):
 		Height: 100
 	Box:
 		Id: title
+		Font: IBM Plex Sans
 		Height: 20
 		Margin: 10 0 10 0
 		Break after: avoid
 		Text: Título
 	Box:
 		Id: text
+		Font: IBM Plex Sans
 		Width: 30
 		Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
 	Box:

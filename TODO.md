@@ -1,6 +1,7 @@
 # Ideas varias
 
 - Fuentes truetype incrustadas en carpeta de recursos
+- Eliminar box-sizing, no hace falta y simplificamos código
 - Mover src/test/resources a test/, con una carpeta por documento, y muchos casos de prueba con documentos completos
 - Que pasa con tablas? Que tengan header y footer, etc.
 - Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...

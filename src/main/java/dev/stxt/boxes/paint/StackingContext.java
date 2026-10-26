@@ -3,7 +3,9 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -178,11 +180,12 @@ public final class StackingContext {
             return;
         }
         Style s = p.f().box().style;
+        FontFace font = s.fontFace();
+        VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         for (TextLine l : p.f().lines()) {
-            // Línea base aproximada: centrada en la line box con el 80 % del tamaño por encima.
-            double baseline = content.y() + l.y() + (l.height() - s.fontSize) / 2 + s.fontSize * 0.8;
-            canvas.text(content.x() + l.x(), baseline, l.text(), s.font, s.fontSize, s.color, l.wordSpacing());
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
+            canvas.text(content.x() + l.x(), baseline, l.text(), font, s.fontSize, s.color, l.wordSpacing());
         }
     }
 }

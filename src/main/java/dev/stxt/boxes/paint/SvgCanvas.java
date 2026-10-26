@@ -3,13 +3,18 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
+import dev.stxt.boxes.tree.Style;
 
 import java.util.Locale;
 
 /**
  * Salida SVG para depurar (hito 2): una página por fichero, en pt. Si {@code debug} está
  * activo, dibuja además el contorno de cada caja de borde.
+ *
+ * <p>No incrusta las fuentes: el visor usa las suyas, y la línea base es la aproximada
+ * ({@link dev.stxt.boxes.model.VerticalMetrics#APPROXIMATE}).</p>
  */
 public final class SvgCanvas implements Canvas {
 
@@ -60,12 +65,14 @@ public final class SvgCanvas implements Canvas {
     }
 
     @Override
-    public void text(double x, double baselineY, String text, String font, double fontSize, String color,
+    public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                      double wordSpacing) {
         String spacing = wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing);
+        String weight = font.weight() == Style.FontWeight.BOLD ? " font-weight=\"bold\"" : "";
+        String style = font.style() == Style.FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,
-                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\" font-size=\"%.2f\" fill=\"%s\"%s>%s</text>%n",
-                x, baselineY, escape(font), fontSize, color, spacing, escape(text)));
+                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\" fill=\"%s\"%s>%s</text>%n",
+                x, baselineY, escape(font.family()), weight, style, fontSize, color, spacing, escape(text)));
     }
 
     private static String escape(String s) {
