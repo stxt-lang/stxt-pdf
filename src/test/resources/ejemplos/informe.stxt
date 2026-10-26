@@ -1,0 +1,64 @@
+# Informe de ejemplo (ESPECIFICACION.md §10): A4 paginado con cabecera y pie repetidos,
+# título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto.
+Documento (dev.stxt.boxes):
+	Medio:
+		Tipo: paginado
+		Ancho: 595
+		Alto: 842
+		Margen: 40
+	Caja:
+		Id: cabecera
+		Posicion: fija
+		Desplazamiento: -30 0 auto 0
+		Alto: 20
+		Tamano: 8
+		Color: #5F5E5A
+		Texto: Informe trimestral
+	Caja:
+		Id: pie
+		Posicion: fija
+		Desplazamiento: auto 0 -30 0
+		Alto: 20
+		Tamano: 8
+		Alinear: derecha
+		Texto: Página {pagina} de {paginas}
+	Caja:
+		Id: titulo
+		Tamano: 20
+		Interlineado: 24
+		Margen: 0 0 16 0
+		Corte despues: evitar
+		Texto: Resultados del trimestre
+	Caja:
+		Id: cuerpo
+		Layout: grid
+		Grid:
+			Columnas: 150 1fr
+			Hueco: 20
+		Caja:
+			Id: lateral
+			Fondo: #F1EFE8
+			Relleno: 10
+			Corte dentro: evitar
+			Texto >>
+				Resumen de las cifras clave
+				del trimestre.
+		Caja:
+			Id: principal
+			Alinear: justificado
+			Texto >>
+				Primer párrafo del informe. Los saltos de línea simples
+				dentro del bloque equivalen a espacios.
+
+				Una línea en blanco empieza un párrafo nuevo.
+	Caja:
+		Id: sello
+		Posicion: absoluta
+		Desplazamiento: 0 0 auto auto
+		Ancho: 80
+		Alto: 30
+		Borde: 1
+		Color borde: #A32D2D
+		Alinear: centro
+		Capa: 1
+		Texto: BORRADOR

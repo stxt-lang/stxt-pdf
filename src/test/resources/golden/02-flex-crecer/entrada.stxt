@@ -1,0 +1,27 @@
+# Módulo 5: reparto del espacio libre con Crecer.
+Documento (dev.stxt.boxes):
+	Medio:
+		Tipo: continuo
+		Ancho: 595
+		Margen: 40
+	Caja:
+		Id: fila
+		Layout: flex
+		Flex:
+			Hueco: 20
+		Caja:
+			Id: A
+			Alto: 50
+			Item:
+				Base: 100
+				Crecer: 1
+		Caja:
+			Id: B
+			Alto: 50
+			Item:
+				Base: 150
+				Crecer: 3
+		Caja:
+			Id: C
+			Ancho: 65
+			Alto: 50
