@@ -140,10 +140,10 @@ Cada entrada indica el hito, dónde está en el código, qué se hace y la alter
     deja salir márgenes por arriba.
     *Dónde:* `layout/block/BlockLayout`.
 
-26. **Flex y grid no parten sus ítems:** se corta entre líneas (`row`), entre ítems (`column`)
-    o entre filas; una línea o fila más alta que la página desborda. Un contenedor `column` con
-    `Wrap` no se parte. La fragmentación en paralelo de los ítems de una fila es del hito 7.
-    No se corta entre dos filas que ocupa un mismo ítem.
+26. **Flex y grid cortan entre unidades:** entre líneas (`row`), entre ítems (`column`) o entre
+    filas. Un contenedor `column` con `Wrap` no se parte. No se corta entre dos filas que ocupa
+    un mismo ítem. Desde el hito 7, una unidad más alta que la página parte sus ítems en
+    paralelo (decisiones 35 a 37).
     *Dónde:* `layout/UnitBreaker`, `layout/flex/FlexLayout`, `layout/grid/GridLayout`.
 
 27. **Cajas `absolute` con el containing block partido:** se resuelven con el fragmento de su
@@ -151,8 +151,8 @@ Cada entrada indica el hito, dónde está en el código, qué se hace y la alter
     fragmento, no el total.
     *Dónde:* `layout/position/AbsoluteLayout.resolvePending`.
 
-28. **`Decoration: clone` se trata como `slice`** hasta el hito 7.
-    *Dónde:* `layout/Slice`.
+28. ~~**`Decoration: clone` se trata como `slice`** hasta el hito 7.~~ Resuelta en el hito 7:
+    ver decisiones 33 y 34.
 
 29. **Fuentes en PDF:** solo las 14 estándar y los alias que reconoce PDFBox (`Arial`,
     `TimesNewRoman`…); una fuente desconocida es un error al maquetar con `PdfMetrics`, no una
@@ -181,3 +181,61 @@ Cada entrada indica el hito, dónde está en el código, qué se hace y la alter
     *Dónde:* `layout/inline/LineBreaker.wordSpacing`, `layout/inline/InlineLayout`.
     *Alternativa:* repartir también entre letras, o dejar sin justificar la última línea de
     cada fragmento.
+
+## Pulido (hito 7)
+
+33. **`Decoration: clone` con `Height` definido:** el alto declarado es el de una caja
+    completa, así que el total del contenido es ese alto menos un borde y un relleno, y cada
+    fragmento les suma los suyos (`Height: 250` con borde 5 en páginas de 100 da 100 + 100 + 70).
+    `Min height` y `Max height` se aplican igual: al contenido total más un borde y un relleno.
+    El alto consumido del `BreakToken` cuenta solo la caja de contenido.
+    *Dónde:* `layout/Slice.cloned`.
+    *Alternativa:* que el alto declarado sea la suma de los fragmentos con su decoración (como
+    con `slice`).
+
+34. **Con `clone` se reservan el borde y el relleno inferiores** en cada página: el contenido
+    corta antes para que quepan. Con `slice` no se reservan (decisión 21).
+    *Dónde:* `layout/Slice.contentRemaining`.
+
+35. **"Una fila que no cabe en una página" es una que no cabe ni al principio de una página.**
+    Una fila que no cabe en lo que queda de página pasa entera a la siguiente, como hasta el
+    hito 6; solo si tampoco cabe ahí se parten sus ítems en paralelo. Mantiene el caso golden 06.
+    *Dónde:* `layout/UnitBreaker`.
+    *Alternativa (CSS):* partir la fila en cuanto no cabe en lo que queda de página, comparando
+    la calidad de ese corte con la de cortar antes de la fila.
+
+36. **El corte en paralelo también parte los ítems de flex `column`** que no caben en una
+    página (la especificación solo habla de filas). Un contenedor `column` con `Wrap` sigue sin
+    partirse.
+    *Dónde:* `layout/flex/FlexLayout` (`Units.splittable`).
+    *Alternativa:* dejar que esos ítems desborden.
+
+37. **Continuación de una fila partida en paralelo:** los ítems que no han terminado siguen
+    desde arriba de la página siguiente, sin su margen superior; los que han terminado no
+    tienen más fragmentos. Un ítem estirado (alto impuesto por la línea o el área) reparte ese
+    alto entre las páginas, así que puede acabar antes o después que el texto de sus hermanos.
+    La fila continúa con el alto del ítem más largo y las filas siguientes van detrás, con el
+    hueco que las separaba. Las filas entre las que no se puede cortar se parten juntas, cada
+    ítem desde su posición. Si algún ítem no puede colocar nada, la fila no se parte y desborda
+    como antes. La calidad del corte es la peor de los ítems que se parten
+    (`Break inside: avoid` la deja en `FORCED`).
+    *Dónde:* `layout/UnitBreaker.split`.
+    *Alternativa:* alinear la continuación de cada ítem con su posición en la fila.
+
+38. **Numeración en dos fases:** en la primera, `{page}` y `{pages}` se miden como `00`
+    (reservan dos cifras); en la segunda, solo se rehacen las líneas que los contienen: texto,
+    ancho, alineación y espaciado de `justify` (solo si la línea ya estaba justificada). Los
+    saltos de línea y los altos de la primera fase no cambian, así que con 100 páginas o más el
+    número puede desbordar su línea. En modo continuo valen 1 y 1.
+    *Dónde:* `layout/inline/PageNumbers`, `InlineLayout.number`, `fragment/Paginator`.
+    *Alternativa:* volver a maquetar la caja entera (puede cambiar su alto) o reservar tantas
+    cifras como tenga el total de la primera fase y paginar otra vez si no bastan.
+
+39. **Knuth-Plass simplificado (`Text wrap: pretty`):** sin guiones, sin encogimiento de los
+    espacios (las líneas justificadas no se comprimen, decisión 32) y sin clases de ajuste
+    (*fitness classes*). Cada espacio se estira hasta la mitad de su ancho; `badness = 100 × r³`
+    hasta 10 000; deméritos = (10 + badness)²; la última línea del párrafo no tiene badness. El
+    nombre sigue a CSS (`text-wrap: pretty`), aunque en los navegadores `pretty` solo retoca
+    las últimas líneas.
+    *Dónde:* `layout/inline/LineBreaker.optimal`.
+    *Alternativa:* guiones con un diccionario, encogimiento y clases de ajuste, como en TeX.

@@ -20,6 +20,26 @@ class LineBreakerTest {
     }
 
     @Test
+    void prettyMinimizesTheDemerits() {
+        // Ancho 10, espacios de 1 que se estiran hasta 0.5. El voraz deja 3 de sobrante en las
+        // dos primeras líneas: badness 100 × (3/1)³ = 2700 y la máxima (3 / 0.5 = 6).
+        // Knuth-Plass prefiere una línea con la máxima y otra con 100 × (1/1)³ = 100.
+        String text = "a bbb c ddddd e fff";
+        assertEquals(List.of("a bbb c", "ddddd e", "fff"),
+                LineBreaker.breakParagraphs(text, 10, measurer, "F", 1, Style.TextWrap.AUTO).get(0));
+        assertEquals(List.of("a bbb", "c ddddd e", "fff"),
+                LineBreaker.breakParagraphs(text, 10, measurer, "F", 1, Style.TextWrap.PRETTY).get(0));
+    }
+
+    @Test
+    void prettyKeepsParagraphsAndOverflowingWords() {
+        assertEquals(List.of(List.of("a", "larguísima", "b"), List.of("uno", "dos")),
+                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, "F", 1, Style.TextWrap.PRETTY));
+        assertEquals(List.of(List.of("uno dos tres")),
+                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, "F", 1, Style.TextWrap.PRETTY));
+    }
+
+    @Test
     void singleBreaksAreSpacesAndBlankLineSeparatesParagraphs() {
         List<String> l = LineBreaker.breakLines("uno\ndos\n\ntres", 100, measurer, "F", 1);
         assertEquals(List.of("uno dos", "tres"), l);

@@ -48,8 +48,8 @@ import java.util.OptionalDouble;
  * declarado es ese alto, no el de su contenido.</p>
  *
  * <p>En modo paginado (§5.10) se corta entre líneas en {@code row} y entre ítems en
- * {@code column}, con {@link UnitBreaker}; los ítems no se parten. Un contenedor {@code column}
- * con {@code Wrap} no se parte.</p>
+ * {@code column}, con {@link UnitBreaker}; una línea (en {@code column}, un ítem) que no cabe en
+ * una página se parte en paralelo. Un contenedor {@code column} con {@code Wrap} no se parte.</p>
  */
 public final class FlexLayout implements LayoutAlgorithm {
 
@@ -109,6 +109,8 @@ public final class FlexLayout implements LayoutAlgorithm {
         /** Tamaño cruzado, de caja de margen. */
         double cross;
         LayoutResult result;
+        /** Espacio de {@link #result}. */
+        ConstraintSpace space;
 
         Item(Box box, Insets margin, Style.Alignment align) {
             this.box = box;
@@ -257,9 +259,10 @@ public final class FlexLayout implements LayoutAlgorithm {
                 appeal[u] = BreakRules.between(groups.get(u - 1), groups.get(u));
                 forced[u] = BreakRules.forcedBetween(groups.get(u - 1), groups.get(u));
             }
-            return UnitBreaker.fragment(box, model, space, from, placed, pending, new UnitBreaker.Units(
+            return UnitBreaker.fragment(engine, box, model, space, from, placed, pending, new UnitBreaker.Units(
                     starts.stream().mapToDouble(Double::doubleValue).toArray(),
-                    ends.stream().mapToDouble(Double::doubleValue).toArray(), appeal, forced, extent));
+                    ends.stream().mapToDouble(Double::doubleValue).toArray(), appeal, forced, extent,
+                    row || !multiLine));
         }
 
         // --- Pasos 2 y 3: base, mínimo y máximo de cada ítem ------------------------------------
@@ -385,12 +388,14 @@ public final class FlexLayout implements LayoutAlgorithm {
         void layOutItem(Item it, OptionalDouble cross) {
             if (row) {
                 double width = Math.max(0, it.main - it.margin.horizontal());
-                it.result = engine.layout(it.box, itemSpace(width, true, cross), null);
+                it.space = itemSpace(width, true, cross);
+                it.result = engine.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().height() + it.margin.vertical();
             } else {
                 double height = Math.max(0, it.main - it.margin.vertical());
                 double width = cross.orElse(it.crossWidth);
-                it.result = engine.layout(it.box, itemSpace(width, true, OptionalDouble.of(height)), null);
+                it.space = itemSpace(width, true, OptionalDouble.of(height));
+                it.result = engine.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().width() + it.margin.horizontal();
             }
         }
@@ -428,7 +433,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
             RelativeOffset offset = RelativeOffset.of(it.box.style, contentWidth, contentHeight);
-            return new UnitBreaker.Placed(it.box, it.result, x + offset.dx(), y + offset.dy(), unit);
+            return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit);
         }
 
         /** Los porcentajes de los ítems se resuelven contra la caja de contenido del contenedor. */

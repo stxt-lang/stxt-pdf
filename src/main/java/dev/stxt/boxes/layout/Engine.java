@@ -2,6 +2,7 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.fragment.BreakToken;
+import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.Paginator;
 import dev.stxt.boxes.layout.block.BlockLayout;
@@ -66,6 +67,14 @@ public final class Engine {
 
     public LayoutCache cache() {
         return cache;
+    }
+
+    /**
+     * Sustituye {@code {page}} y {@code {pages}} en las líneas de un fragmento ya maquetado y en
+     * las de sus descendientes; el {@link Paginator} lo usa al terminar de paginar.
+     */
+    public Fragment number(Fragment fragment, int page, int pages) {
+        return inline.number(fragment, page, pages);
     }
 
     /** Layout de las cajas fuera de flujo; el {@link Paginator} lo usa para las {@code fixed}. */

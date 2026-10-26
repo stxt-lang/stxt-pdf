@@ -35,6 +35,19 @@ class InlineLayoutTest {
     }
 
     @Test
+    void textWrapPrettyIsInheritedAndUsesKnuthPlass() {
+        // El ejemplo de LineBreakerTest.prettyMinimizesTheDemerits a escala 5: ancho 50.
+        String text = "a bbb c ddddd e fff";
+        LayoutFixture l = layOut("\tBox:", "\t\tText wrap: pretty",
+                "\t\tBox:", "\t\t\tId: P", "\t\t\tWidth: 50", "\t\t\tText: " + text,
+                "\t\tBox:", "\t\t\tId: G", "\t\t\tWidth: 50", "\t\t\tText wrap: auto", "\t\t\tText: " + text);
+        assertEquals(List.of("a bbb", "c ddddd e", "fff"),
+                l.fragment("P").lines().stream().map(TextLine::text).toList());
+        assertEquals(List.of("a bbb c", "ddddd e", "fff"),
+                l.fragment("G").lines().stream().map(TextLine::text).toList());
+    }
+
+    @Test
     void justifyFillsAllLinesButTheLastOfEachParagraph() {
         // Primera línea: 95 pt y 3 espacios, el sobrante (5) se reparte entre ellos.
         LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tText align: justify",

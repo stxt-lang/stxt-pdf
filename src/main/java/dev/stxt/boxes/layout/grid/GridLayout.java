@@ -40,8 +40,8 @@ import java.util.OptionalDouble;
  * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
  *
- * <p>En modo paginado (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems no se
- * parten y una fila que no cabe en una página desborda.</p>
+ * <p>En modo paginado (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems de una
+ * fila que no cabe en una página se parten en paralelo.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
 
@@ -131,6 +131,7 @@ public final class GridLayout implements LayoutAlgorithm {
         Insets[] margins = new Insets[n];
         double[] itemWidths = new double[n];
         double[] areaWidths = new double[n];
+        ConstraintSpace[] spaces = new ConstraintSpace[n];
         LayoutResult[] results = new LayoutResult[n];
         List<ItemContribution> heights = new ArrayList<>();
         for (int i = 0; i < n; i++) {
@@ -139,8 +140,8 @@ public final class GridLayout implements LayoutAlgorithm {
             areaWidths[i] = span(columns, a.column() - 1, a.columns(), columnGap);
             margins[i] = Insets.resolve(item.style.margin, areaWidths[i]);
             itemWidths[i] = itemWidth(item, areaWidths[i], margins[i], horizontal(item, s), atStart);
-            results[i] = engine.layout(item, itemSpace(itemWidths[i], OptionalDouble.empty(),
-                    areaWidths[i], OptionalDouble.empty(), atStart), null);
+            spaces[i] = itemSpace(itemWidths[i], OptionalDouble.empty(), areaWidths[i], OptionalDouble.empty(), atStart);
+            results[i] = engine.layout(item, spaces[i], null);
             double h = results[i].fragment().height() + margins[i].vertical();
             heights.add(new ItemContribution(a.row() - 1, a.rows(), h, h));
         }
@@ -163,19 +164,20 @@ public final class GridLayout implements LayoutAlgorithm {
             Insets margin = margins[i];
             double areaHeight = span(rows, a.row() - 1, a.rows(), rowGap);
             Style.Alignment vertical = vertical(item, s);
-            LayoutResult r = finalLayout(item, results[i], itemWidths[i], areaWidths[i], areaHeight,
-                    margin, vertical, atStart);
+            ConstraintSpace finalSpace = finalSpace(item, spaces[i], results[i], itemWidths[i], areaWidths[i],
+                    areaHeight, margin, vertical, atStart);
+            LayoutResult r = engine.layout(item, finalSpace, null);
             Fragment f = r.fragment();
             double px = x[a.column() - 1] + margin.left()
                     + offset(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
             double py = y[a.row() - 1] + margin.top()
                     + offset(vertical, areaHeight, f.height() + margin.vertical());
             RelativeOffset relative = RelativeOffset.of(item.style, contentWidth, contentHeight);
-            placed.add(new UnitBreaker.Placed(item, r, px + relative.dx(), py + relative.dy(), a.row() - 1));
+            placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1));
         }
 
         double extent = sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        return UnitBreaker.fragment(box, model, space, from, placed, pending, rowUnits(g, rows, y, extent));
+        return UnitBreaker.fragment(engine, box, model, space, from, placed, pending, rowUnits(g, rows, y, extent));
     }
 
     /**
@@ -210,7 +212,7 @@ public final class GridLayout implements LayoutAlgorithm {
             appeal[r] = spanned ? -1 : BreakRules.between(before, after);
             forced[r] = !spanned && BreakRules.forcedBetween(before, after);
         }
-        return new UnitBreaker.Units(y, ends, appeal, forced, extent);
+        return new UnitBreaker.Units(y, ends, appeal, forced, extent, true);
     }
 
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */
@@ -230,12 +232,13 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Layout definitivo del ítem: con el alto del área como base de sus porcentajes y, con
-     * {@code stretch} y alto {@code auto}, estirado al área. Reutiliza el de la medida si no
+     * Espacio del layout definitivo del ítem: con el alto del área como base de sus porcentajes
+     * y, con {@code stretch} y alto {@code auto}, estirado al área. Es el de la medida si no
      * cambia nada.
      */
-    private LayoutResult finalLayout(Box item, LayoutResult measured, double width, double areaWidth,
-                                     double areaHeight, Insets margin, Style.Alignment vertical, boolean atStart) {
+    private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, LayoutResult measured, double width,
+                                       double areaWidth, double areaHeight, Insets margin, Style.Alignment vertical,
+                                       boolean atStart) {
         Style is = item.style;
         OptionalDouble base = OptionalDouble.of(areaHeight);
         OptionalDouble fixedHeight = OptionalDouble.empty();
@@ -250,9 +253,9 @@ public final class GridLayout implements LayoutAlgorithm {
         boolean stretched = fixedHeight.isPresent()
                 && Math.abs(fixedHeight.getAsDouble() - measured.fragment().height()) > 1e-9;
         if (!stretched && !dependsOnHeightBase(is)) {
-            return measured;
+            return measureSpace;
         }
-        return engine.layout(item, itemSpace(width, fixedHeight, areaWidth, base, atStart), null);
+        return itemSpace(width, fixedHeight, areaWidth, base, atStart);
     }
 
     /** El alto del ítem se declara con un porcentaje (o una función que lo contiene). */

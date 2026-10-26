@@ -226,6 +226,7 @@ No afectan al layout.
 | `Font size` | número > 0 | `10` | **Sí** | Cuerpo de la fuente. |
 | `Line height` | número o % | `120%` | **Sí** | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
 | `Text align` | `left`, `right`, `center`, `justify` | `left` | **Sí** | La última línea de un párrafo justificado se alinea a la izquierda. |
+| `Text wrap` | `auto`, `pretty` | `auto` | **Sí** | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
 | `Text` | texto inline o bloque | — | — | Contenido. Ver [§5.4](#54-texto). |
 
 ### 4.7 `Flex`
@@ -360,16 +361,20 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
 
 - **Espacios.** Las secuencias de espacios y los saltos de línea simples equivalen a un espacio.
   Una **línea en blanco** separa párrafos y fuerza un salto.
-- **Reparto.** Algoritmo voraz: las palabras se añaden a la línea mientras quepan. Una palabra
-  más ancha que la línea ocupa una línea propia y **desborda**.
+- **Reparto.** Con `Text wrap: auto`, algoritmo voraz: las palabras se añaden a la línea
+  mientras quepan. Con `Text wrap: pretty`, **Knuth-Plass**: se eligen los saltos del párrafo
+  que minimizan la suma de los deméritos de sus líneas, de modo que las líneas quedan más
+  parejas (sin guiones; los espacios se estiran hasta la mitad de su ancho y no se encogen; la
+  última línea no cuenta). En los dos casos, una palabra más ancha que la línea ocupa una línea
+  propia y **desborda**.
 - **Altura.** Cada línea mide `Line height`. La altura del contenido es el número de líneas
   por `Line height`.
 - **Alineación.** `left`, `right` y `center` desplazan cada línea; `justify` reparte
   el sobrante entre los espacios, salvo en la última línea de cada párrafo.
 - **Tamaños intrínsecos.** min-content = la palabra más ancha; max-content = el párrafo más
   largo en una sola línea.
-- **Numeración de páginas.** En modo paginado, `{page}` y `{pages}` en el texto se
-  sustituyen por el número de página y el total de páginas. Ver [§5.10](#510-fragmentación).
+- **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
+  página y el total de páginas; en modo continuo, por 1 y 1. Ver [§5.10](#510-fragmentación).
 
 ### 5.5 Posicionamiento
 
@@ -592,19 +597,26 @@ a cero. En un corte forzado, se trunca el margen anterior al corte y se conserva
 
 **Bordes y relleno en los cortes.** Con `Decoration: slice`, el primer fragmento no tiene
 borde ni relleno inferiores y los siguientes no tienen los superiores. Con `Decoration: clone`,
-cada fragmento se pinta como una caja completa. Un `Height` fijo es el total de todos los
-fragmentos, no el de cada uno.
+cada fragmento se pinta como una caja completa: el contenido de cada página cabe entre su borde
+y relleno superiores e inferiores. Un `Height` fijo es el total de todos los fragmentos, no el
+de cada uno; con `clone`, el total del contenido es ese alto menos un borde y un relleno, y
+cada fragmento les suma los suyos.
 
 **Flex y grid.** En `column`, el corte se hace entre ítems. En `row` y en grid, entre líneas
-o filas; si una fila no cabe en una página, sus ítems se fragmentan **en paralelo** y la fila
-continúa en la página siguiente con la altura del ítem más largo.
+o filas. Una línea, fila o ítem que no cabe en lo que queda de página pasa entero a la
+siguiente. Si tampoco cabe al principio de una página, sus ítems se fragmentan **en
+paralelo**: cada uno se parte por su cuenta y la fila continúa en la página siguiente con los
+ítems que no han terminado, todos desde arriba, y con la altura del más largo de ellos; las
+filas siguientes van detrás. Las filas que ocupa un mismo ítem se parten juntas. Un contenedor
+`column` con `Wrap` no se parte.
 
 **Posicionadas.** Una caja `absolute` se coloca en la página donde cae su posición y no se
 parte. Una caja `fixed` se repite en todas las páginas.
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
-ancho de un número de prueba y después se sustituyen los valores reales. Si el texto cambia de
-ancho, solo se vuelve a maquetar esa caja; como las cajas `fixed` no ocupan espacio, el flujo
+ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores reales.
+Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas conservan los
+saltos y se vuelven a medir y alinear. Como las cajas `fixed` no ocupan espacio, el flujo
 principal no cambia.
 
 ---
@@ -668,7 +680,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Tema | CSS | Este modelo |
 |---|---|---|
 | Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT; cada caja declara sus propiedades |
-| Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font size`, `Line height`, `Text align`) y `Widows`/`Orphans` |
+| Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
 | `display` | Combina tipo exterior e interior | `Layout` (interior); el exterior lo decide el padre. No hay `inline-block`. |
 | `box-sizing` | `content-box` por defecto | `Box sizing: border` por defecto |
 | Unidades | px, em, rem, vw… | pt, %, fr |
@@ -681,6 +693,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
 | `z-index` | Propiedad `z-index` | `Layer` |
 | `box-decoration-break` | `slice`, `clone` | `Decoration: slice`, `clone` |
+| `text-wrap` | `wrap`, `balance`, `pretty`… (`pretty` según el navegador) | `Text wrap: auto` (voraz) o `pretty` (Knuth-Plass en todo el párrafo) |
 | Márgenes `auto` en ítems flex | Absorben espacio | Valen 0 |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
@@ -727,6 +740,7 @@ Template (@stxt.template): dev.stxt.boxes
 				Font size: (?)
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
+				Text wrap: (?) ENUM [auto, pretty]
 				Flex: (?)
 					Direction: (?) ENUM [row, column]
 					Wrap: (?) BOOLEAN

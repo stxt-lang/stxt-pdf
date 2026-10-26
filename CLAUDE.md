@@ -35,8 +35,9 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; queda el
-hito 7. La tabla de estado del README es la referencia; al terminar un hito, actualízala.
+Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los siete
+hitos están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+actualízala.
 
 | Hito | Trabajo | Dónde |
 |---|---|---|
@@ -46,11 +47,11 @@ hito 7. La tabla de estado del README es la referencia; al terminar un hito, act
 | 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
-| 7 | `{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass | `Slice`, `UnitBreaker` (marcados con `TODO(hito 7)`) |
+| 7 | ~~`{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass~~ (hecho; caso 07) | `layout/Slice`, `layout/UnitBreaker`, `layout/inline/PageNumbers`, `layout/inline/LineBreaker` |
 
-Lo pendiente está marcado con `// TODO(hito N)` y lanza `UnsupportedOperationException` con el
-hito en el mensaje. Busca `TODO(hito` para ver qué falta. El javadoc de cada clase pendiente
-describe el algoritmo a implementar (por ejemplo, el pseudocódigo de `BlockLayout`).
+No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
+así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
+pendiente describe el algoritmo a implementar (por ejemplo, el pseudocódigo de `BlockLayout`).
 
 ## Arquitectura
 
@@ -127,9 +128,15 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   queda con el **último de mayor calidad** (`BreakRules.best`). Relajar las reglas en el orden
   de la especificación sale solo de esa comparación: por eso un hijo que no puede respetar
   viudas y huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`.
-  `Slice` calcula alto, borde y relleno de cada fragmento (`Decoration: slice`); flex y grid
-  cortan entre unidades que no se parten con `UnitBreaker`. Con `atFragmentainerStart` hay que
-  colocar algo aunque desborde (garantía de progreso).
+  `Slice` calcula alto, borde y relleno de cada fragmento (`Decoration: slice` y `clone`; usa
+  `Slice.contentRemaining` para lo que queda al contenido). Flex y grid cortan entre unidades
+  (líneas, ítems o filas) con `UnitBreaker`; una unidad que no cabe ni al principio de página
+  parte sus ítems en paralelo, repitiendo su layout con `ConstraintSpace.fragmented` y el
+  espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de cada
+  ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso).
+- **Numeración (`{page}`/`{pages}`):** `InlineLayout` mide los marcadores como `00` y las
+  líneas los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que
+  rehace solo esas líneas con los valores de cada página (`PageNumbers`).
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.

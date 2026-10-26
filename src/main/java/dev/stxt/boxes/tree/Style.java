@@ -24,6 +24,9 @@ public final class Style {
 
     public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }
 
+    /** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
+    public enum TextWrap { AUTO, PRETTY }
+
     public enum Direction { ROW, COLUMN }
 
     /** Reparto en un eje: {@code Main axis} y {@code Lines}. */
@@ -76,6 +79,7 @@ public final class Style {
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     public Value lineHeight;
     public TextAlign textAlign = TextAlign.LEFT;
+    public TextWrap textWrap = TextWrap.AUTO;
 
     // --- Flex ------------------------------------------------------------------------------------
     public Direction flexDirection = Direction.ROW;
@@ -129,6 +133,7 @@ public final class Style {
             s.fontSize = parent.fontSize;
             s.lineHeight = parent.lineHeight;
             s.textAlign = parent.textAlign;
+            s.textWrap = parent.textWrap;
             s.widows = parent.widows;
             s.orphans = parent.orphans;
         }

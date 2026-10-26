@@ -4,6 +4,7 @@ import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
+import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
@@ -22,6 +23,9 @@ import java.util.Map;
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
  * y se repiten en todas las páginas (ESPECIFICACION.md §5.5). Su containing block es el área
  * útil; en modo continuo, que no tiene alto, se toma el alto del flujo del documento.</p>
+ *
+ * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
+ * líneas de cada página ({@link PageNumbers}). En modo continuo hay una página de una.</p>
  */
 public final class Paginator {
 
@@ -55,8 +59,12 @@ public final class Paginator {
             }
         } while (token != null);
 
+        // Segunda fase de la numeración: ya se sabe cuántas páginas hay (en continuo, una).
+        boolean numbered = hasPageNumbers(root);
+        int total = results.size();
         List<Page> pages = new ArrayList<>();
         for (LayoutResult r : results) {
+            int number = pages.size() + 1;
             Rect area = media.pageArea();
             double height = media.paged() ? area.height() : r.fragment().height();
             List<Fragment> fixedFragments = new ArrayList<>();
@@ -64,12 +72,18 @@ public final class Paginator {
             List<PendingAbsolute> queue = new ArrayList<>(fixed.values());
             for (int i = 0; i < queue.size(); i++) {
                 LayoutResult f = engine.absolute().layOut(queue.get(i), area.width(), height, Insets.ZERO);
-                fixedFragments.add(f.fragment());
+                fixedFragments.add(numbered ? engine.number(f.fragment(), number, total) : f.fragment());
                 queue.addAll(f.pending());
             }
-            pages.add(new Page(pages.size() + 1, r.fragment(), fixedFragments));
+            Fragment content = numbered ? engine.number(r.fragment(), number, total) : r.fragment();
+            pages.add(new Page(number, content, fixedFragments));
         }
         return pages;
+    }
+
+    /** Algún texto del documento contiene {@code {page}} o {@code {pages}}. */
+    private static boolean hasPageNumbers(Box box) {
+        return PageNumbers.contains(box.text) || box.children.stream().anyMatch(Paginator::hasPageNumbers);
     }
 
     /**

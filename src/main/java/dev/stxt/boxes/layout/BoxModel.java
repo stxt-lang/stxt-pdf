@@ -25,9 +25,11 @@ import java.util.function.Supplier;
  *                  si depende del contenido
  * @param minHeight alto mínimo de la caja de borde
  * @param maxHeight alto máximo de la caja de borde; vacío = sin máximo
+ * @param decoration borde y relleno en los cortes ({@link Slice})
  */
 public record BoxModel(Insets margin, Insets border, Insets padding, double width,
-                       OptionalDouble height, double minHeight, OptionalDouble maxHeight) {
+                       OptionalDouble height, double minHeight, OptionalDouble maxHeight,
+                       Style.Decoration decoration) {
 
     /**
      * Resuelve el modelo de caja de una caja en flujo de bloque.
@@ -68,7 +70,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 height = OptionalDouble.of(Sizing.constrain(height.getAsDouble(), minHeight, maxHeight));
             }
         }
-        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight);
+        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.decoration);
     }
 
     /**
@@ -150,6 +152,11 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return Sizing.constrain(contentHeight + border.vertical() + padding.vertical(), minHeight, maxHeight);
     }
 
+    /** Cada fragmento lleva borde y relleno completos ({@code Decoration: clone}). */
+    public boolean clones() {
+        return decoration == Style.Decoration.CLONE;
+    }
+
     /** Nada separa el borde superior de la caja de su contenido: ni borde ni relleno. */
     public boolean openAtTop() {
         return border.top() == 0 && padding.top() == 0;
@@ -170,16 +177,17 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
 
     /**
      * Espacio para los hijos en flujo: la caja de contenido es su containing block. En modo
-     * paginado, lo que queda de página se mide desde el principio de la caja de contenido.
+     * paginado, lo que queda de página se mide desde el principio de la caja de contenido (y,
+     * con {@code Decoration: clone}, sin el borde y el relleno inferiores).
      *
-     * @param first es el primer fragmento de la caja (los siguientes no llevan borde ni relleno
-     *              superiores, ver {@link Slice})
+     * @param first es el primer fragmento de la caja (con {@code slice}, los siguientes no llevan
+     *              borde ni relleno superiores, ver {@link Slice})
      */
     public ConstraintSpace childSpace(ConstraintSpace space, boolean first) {
         double w = contentWidth();
         OptionalDouble h = contentHeight();
         OptionalDouble remaining = space.fragmenting()
-                ? OptionalDouble.of(space.fragmentainerRemaining().getAsDouble() - Slice.top(this, first))
+                ? OptionalDouble.of(Slice.contentRemaining(this, first, space))
                 : OptionalDouble.empty();
         return new ConstraintSpace(w, h, false, false, w, h, remaining, space.atFragmentainerStart());
     }

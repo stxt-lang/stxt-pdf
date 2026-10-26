@@ -32,7 +32,7 @@ try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
 ## Estado
 
 Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
-depuración y PDF. Queda el pulido de la hoja de ruta (hito 7).
+depuración y PDF. Los siete hitos de la hoja de ruta están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -52,9 +52,10 @@ depuración y PDF. Queda el pulido de la hoja de ruta (hito 7).
 | `FlexLayout` e intrínsecos de flex | Hecho y probado |
 | `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
 | Fragmentación de bloque y texto: elección del corte, viudas y huérfanas, `avoid`, cortes forzados, truncado de márgenes, `Decoration: slice`, `Height` repartido entre fragmentos | Hecho y probado |
-| Fragmentación de flex (entre líneas o ítems) y grid (entre filas), sin partir los ítems | Hecho y probado |
+| Fragmentación de flex (entre líneas o ítems) y grid (entre filas), con los ítems de una fila más alta que la página partidos en paralelo | Hecho y probado |
 | Salida PDF con PDFBox (`PdfCanvas`) y métricas reales de las 14 fuentes estándar (`PdfMetrics`) | Hecho y probado |
-| `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo de los ítems (hito 7) | Pendiente |
+| Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
+| Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
 | Fuentes registradas (TrueType) en la salida PDF | Pendiente |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
@@ -73,7 +74,7 @@ que en otro sistema operativo pueden salir distintas. `PdfCanvasTest` deja sus P
 4. ~~**Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).~~ Hecho.
 5. ~~**Grid.** `GridLayout` sobre `Placement` y `TrackSizing` (casos 04 y 05, el ejemplo del §10).~~ Hecho.
 6. ~~**Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales (caso 06).~~ Hecho.
-7. **Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass.
+7. ~~**Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass (caso 07).~~ Hecho.
 
 ## Estructura
 
@@ -86,7 +87,7 @@ src/main/java/dev/stxt/boxes/
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
                 Slice, UnitBreaker
     block/      BlockLayout
-    inline/     InlineLayout, LineBreaker, TextMeasurer, FixedMetrics, PdfMetrics
+    inline/     InlineLayout, LineBreaker, PageNumbers, TextMeasurer, FixedMetrics, PdfMetrics
     flex/       FlexLayout, FlexResolver, FlexItem
     grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset

@@ -1,0 +1,51 @@
+# Hito 7 (ESPECIFICACION.md §5.10). Área útil de 260 × 160 desde (20, 20).
+#
+# Página 1: card (Decoration: clone, borde 2 y relleno 3) deja 160 − 10 = 150 al contenido:
+#   caben 150 de los 200 de c1.
+# Página 2: card vuelve a tener borde y relleno arriba; los 50 que faltan de c1 (card mide 60).
+#   La fila de grid (200) no cabe en los 100 que quedan: grid pasa a la página siguiente.
+# Página 3: la fila tampoco cabe al principio de página: sus ítems se parten en paralelo.
+#   g1 coloca 160 y g2 cabe entero (50).
+# Página 4: sigue g1 desde arriba (40) y end va detrás.
+# El pie muestra "{page}/{pages}" con los valores de cada página.
+Document (dev.stxt.boxes):
+	Media:
+		Type: paged
+		Width: 300
+		Height: 200
+		Margin: 20
+	Box:
+		Id: footer
+		Position: fixed
+		Offset: auto 0 -15 0
+		Height: 10
+		Font size: 8
+		Text align: right
+		Text: {page}/{pages}
+	Box:
+		Id: card
+		Border: 2
+		Padding: 3
+		Border color: #A32D2D
+		Decoration: clone
+		Box:
+			Id: c1
+			Height: 200
+			Background: #F1EFE8
+	Box:
+		Id: grid
+		Layout: grid
+		Grid:
+			Columns: 1fr 1fr
+			Gap: 10
+		Box:
+			Id: g1
+			Height: 200
+			Background: #E1F0E8
+		Box:
+			Id: g2
+			Height: 50
+			Background: #E1E8F0
+	Box:
+		Id: end
+		Height: 10

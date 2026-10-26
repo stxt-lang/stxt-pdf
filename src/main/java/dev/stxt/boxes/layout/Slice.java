@@ -9,10 +9,13 @@ import dev.stxt.boxes.model.Insets;
  * <ul>
  *   <li>Con {@code Decoration: slice}, el primer fragmento no tiene borde ni relleno inferiores
  *       y los siguientes no tienen los superiores.</li>
+ *   <li>Con {@code Decoration: clone}, cada fragmento tiene borde y relleno completos: el
+ *       contenido de cada página cabe entre ellos.</li>
  *   <li>Un {@code Height} definido es el total de todos los fragmentos: si el contenido termina
  *       y el alto propio de la caja no cabe en la página, lo que falta pasa al fragmento
  *       siguiente. Un fragmento cortado dentro del contenido llega hasta el final de la página,
- *       sin pasar del alto que le queda a la caja.</li>
+ *       sin pasar del alto que le queda a la caja. Con {@code clone}, el total es el del
+ *       contenido: el alto menos un borde y un relleno.</li>
  *   <li>Con alto {@code auto}, el fragmento mide lo que su contenido; {@code Min height} y
  *       {@code Max height} se aplican al total.</li>
  * </ul>
@@ -21,24 +24,33 @@ import dev.stxt.boxes.model.Insets;
  * @param border   bordes de este fragmento
  * @param padding  relleno de este fragmento
  * @param finished la caja termina en este fragmento
- * @param consumed alto de caja de borde de este fragmento y de los anteriores
+ * @param consumed alto de caja de borde de este fragmento y de los anteriores; con
+ *                 {@code clone}, alto de su caja de contenido
  */
 public record Slice(double height, Insets border, Insets padding, boolean finished, double consumed) {
 
     private static final double EPSILON = 1e-9;
 
-    // TODO(hito 7): Decoration: clone, con borde y relleno completos en cada fragmento.
-
-    /** Borde y relleno superiores del fragmento: solo los tiene el primero. */
+    /** Borde y relleno superiores del fragmento: con {@code slice}, solo los tiene el primero. */
     public static double top(BoxModel model, boolean first) {
-        return first ? model.border().top() + model.padding().top() : 0;
+        return first || model.clones() ? model.border().top() + model.padding().top() : 0;
+    }
+
+    /**
+     * Lo que queda de página para el contenido del fragmento: sin el borde y el relleno
+     * superiores y, con {@code clone}, tampoco los inferiores. Con {@code slice}, los inferiores
+     * no se reservan.
+     */
+    public static double contentRemaining(BoxModel model, boolean first, ConstraintSpace space) {
+        double bottom = model.clones() ? model.border().bottom() + model.padding().bottom() : 0;
+        return space.fragmentainerRemaining().getAsDouble() - top(model, first) - bottom;
     }
 
     /**
      * Alto, borde y relleno de un fragmento.
      *
      * @param first           es el primer fragmento de la caja
-     * @param consumed        alto de caja de borde de los fragmentos anteriores
+     * @param consumed        alto consumido por los fragmentos anteriores (ver {@link #consumed()})
      * @param content         alto del contenido colocado en este fragmento
      * @param contentFinished el contenido termina en este fragmento
      * @param space           espacio de la caja; sin fragmentación no hay límite
@@ -47,6 +59,9 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
                            boolean contentFinished, ConstraintSpace space) {
         if (!space.fragmenting()) {
             return new Slice(model.usedHeight(content), model.border(), model.padding(), true, 0);
+        }
+        if (model.clones()) {
+            return cloned(model, consumed, content, contentFinished, space);
         }
         double remaining = space.fragmentainerRemaining().getAsDouble();
         double top = top(model, first);
@@ -72,6 +87,34 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             h = Math.max(h, Math.min(remaining, model.height().getAsDouble() - consumed));
         }
         return open(model, first, h, consumed);
+    }
+
+    /**
+     * {@code Decoration: clone}: el reparto se hace con el alto de la caja de contenido, y cada
+     * fragmento le suma el borde y el relleno completos.
+     */
+    private static Slice cloned(BoxModel model, double consumed, double content, boolean contentFinished,
+                                ConstraintSpace space) {
+        double decoration = model.border().vertical() + model.padding().vertical();
+        double available = space.fragmentainerRemaining().getAsDouble() - decoration;
+        double h = content;
+        boolean finished = contentFinished;
+        if (contentFinished) {
+            double total = Math.max(0, model.usedHeight(consumed + content) - decoration);
+            h = Math.max(0, total - consumed);
+            if (h > available + EPSILON && h > content + EPSILON) {
+                // El contenido cabe, pero el alto propio de la caja no: el resto, a la página siguiente.
+                double fits = Math.max(available, content);
+                if (fits < h - EPSILON) {
+                    h = fits;
+                    finished = false;
+                }
+            }
+        } else if (model.height().isPresent()) {
+            double total = Math.max(0, model.height().getAsDouble() - decoration);
+            h = Math.max(h, Math.min(available, total - consumed));
+        }
+        return new Slice(decoration + h, model.border(), model.padding(), finished, consumed + h);
     }
 
     /** Fragmento que no es el último: sin borde ni relleno inferiores. */

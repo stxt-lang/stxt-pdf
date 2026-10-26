@@ -28,13 +28,57 @@ import java.util.List;
  * <p>En modo paginado (§5.10) se colocan las líneas que caben desde la del {@link BreakToken.Line}
  * respetando viudas y huérfanas en cada párrafo ({@link BreakRules#cutLines}); si no cabe
  * ninguna, se devuelve {@link BreakToken#BEFORE} para que el padre corte antes de la caja.</p>
+ *
+ * <p>{@code {page}} y {@code {pages}} se miden como un número de prueba y se sustituyen al
+ * terminar la paginación con {@link #number} ({@link PageNumbers}).</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
+    /** Mide {@code {page}} y {@code {pages}} como el número de prueba ({@link PageNumbers}). */
     private final TextMeasurer measurer;
+    private final TextMeasurer real;
 
     public InlineLayout(TextMeasurer measurer) {
-        this.measurer = measurer;
+        this.measurer = PageNumbers.probing(measurer);
+        this.real = measurer;
+    }
+
+    /**
+     * Segunda fase de la numeración ({@link PageNumbers}): el fragmento y sus descendientes con
+     * los valores reales de {@code {page}} y {@code {pages}} en sus líneas. Cada línea con un
+     * marcador vuelve a medirse y a alinearse; con {@code justify}, solo se justifica si ya lo
+     * estaba. Devuelve el mismo fragmento si no cambia nada.
+     */
+    public Fragment number(Fragment f, int page, int pages) {
+        List<Fragment> children = new ArrayList<>();
+        boolean changed = false;
+        for (Fragment child : f.children()) {
+            Fragment numbered = number(child, page, pages);
+            changed |= numbered != child;
+            children.add(numbered);
+        }
+        List<TextLine> lines = new ArrayList<>();
+        Style s = f.box().style;
+        double available = f.width() - f.border().horizontal() - f.padding().horizontal();
+        for (TextLine l : f.lines()) {
+            if (!PageNumbers.contains(l.text())) {
+                lines.add(l);
+                continue;
+            }
+            changed = true;
+            String text = PageNumbers.apply(l.text(), page, pages);
+            double width = real.width(text, s.font, s.fontSize);
+            double spacing = l.wordSpacing() > 0
+                    ? LineBreaker.wordSpacing(text, width, available, s.textAlign, false) : 0;
+            double x = LineBreaker.offset(width, available, s.textAlign);
+            width += spacing * text.chars().filter(c -> c == ' ').count();
+            lines.add(new TextLine(x, l.y(), width, l.height(), text, spacing));
+        }
+        if (!changed) {
+            return f;
+        }
+        return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.border(), f.padding(), children, lines,
+                f.first(), f.last());
     }
 
     @Override
@@ -56,7 +100,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
         List<List<String>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.font, s.fontSize)
+                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.font, s.fontSize, s.textWrap)
                 : List.of();
         List<String> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
@@ -68,7 +112,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         int end = texts.size();
         int appeal = LayoutResult.PERFECT_BREAK;
         if (space.fragmenting()) {
-            double remaining = space.fragmentainerRemaining().getAsDouble() - Slice.top(model, first);
+            double remaining = Slice.contentRemaining(model, first, space);
             BreakRules.Cut cut = BreakRules.cutLines(paragraphEnds, start, BreakRules.capacity(remaining, lineHeight),
                     s.widows, s.orphans, space.atFragmentainerStart());
             if (cut.end() == start && start < texts.size()) {

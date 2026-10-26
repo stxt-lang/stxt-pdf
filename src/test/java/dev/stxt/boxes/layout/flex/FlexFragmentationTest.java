@@ -76,6 +76,37 @@ class FlexFragmentationTest {
     }
 
     @Test
+    void rowLineTallerThanAPageBreaksItsItemsInParallel() {
+        // A: 20 líneas de 12 (240). B se estira a la línea (240) y reparte ese alto entre las
+        // páginas. Líneas de A: 8 + 8 + 4; B: 100 + 100 + 40. La página 3 mide lo que A.
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBox:", "\t\tId: F", "\t\tLayout: flex",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tWidth: 30", "\t\t\tText: " + text,
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tWidth: 100");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 30, 96, l.rect(1, "A"));
+        assertRect(70, 40, 100, 100, l.rect(1, "B"));
+        assertRect(40, 40, 515, 100, l.rect(2, "F"));
+        assertRect(70, 40, 100, 100, l.rect(2, "B"));
+        assertRect(40, 40, 30, 48, l.rect(3, "A"));
+        assertRect(70, 40, 100, 40, l.rect(3, "B"));
+        assertRect(40, 40, 515, 48, l.rect(3, "F"));
+    }
+
+    @Test
+    void columnItemTallerThanAPageIsBroken() {
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tBox:", "\t\tId: F", "\t\tLayout: flex", "\t\tFlex:", "\t\t\tDirection: column"},
+                new String[]{"\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 150"}, item("B")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "A"));
+        assertRect(40, 40, 515, 50, l.rect(2, "A"));
+        assertRect(40, 90, 515, 40, l.rect(2, "B"));
+        assertRect(40, 40, 515, 90, l.rect(2, "F"));
+    }
+
+    @Test
     void containerThatDoesNotFitMovesToTheNextPage() {
         // Tras X (70) no cabe ni la primera línea: el contenedor entero pasa a la página 2.
         LayoutFixture l = layOutPaged(PAGE, concat(

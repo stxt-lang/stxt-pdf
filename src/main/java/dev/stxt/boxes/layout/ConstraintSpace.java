@@ -46,4 +46,10 @@ public record ConstraintSpace(
                 percentBaseWidth, percentBaseHeight,
                 fragmenting() ? OptionalDouble.of(remaining) : OptionalDouble.empty(), atStart);
     }
+
+    /** El mismo espacio, con fragmentación aunque no la tuviera (los ítems que se parten en paralelo). */
+    public ConstraintSpace fragmented(double remaining, boolean atStart) {
+        return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
+                percentBaseWidth, percentBaseHeight, OptionalDouble.of(remaining), atStart);
+    }
 }

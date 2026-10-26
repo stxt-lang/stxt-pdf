@@ -1,0 +1,35 @@
+# Columnas de grid: (260 − 10) / 2 = 125. c1, dentro de card: x = 20 + 5 = 25, ancho 260 − 10 = 250.
+# footer: arriba = 160 + 15 − 10 = 165, y = 20 + 165 = 185; se repite en todas las páginas.
+Result:
+	Page: 1
+		Fragment: card
+			Rect: 20 20 260 160
+			Fragment: c1
+				Rect: 25 25 250 150
+		Fragment: footer
+			Rect: 20 185 260 10
+	Page: 2
+		Fragment: card
+			Rect: 20 20 260 60
+			Fragment: c1
+				Rect: 25 25 250 50
+		Fragment: footer
+			Rect: 20 185 260 10
+	Page: 3
+		Fragment: grid
+			Rect: 20 20 260 160
+			Fragment: g1
+				Rect: 20 20 125 160
+			Fragment: g2
+				Rect: 155 20 125 50
+		Fragment: footer
+			Rect: 20 185 260 10
+	Page: 4
+		Fragment: grid
+			Rect: 20 20 260 40
+			Fragment: g1
+				Rect: 20 20 125 40
+		Fragment: end
+			Rect: 20 60 260 10
+		Fragment: footer
+			Rect: 20 185 260 10

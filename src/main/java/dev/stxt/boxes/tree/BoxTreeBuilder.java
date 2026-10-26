@@ -156,6 +156,7 @@ public final class BoxTreeBuilder {
                     case "font-size" -> s.fontSize = positive(v, p);
                     case "line-height" -> s.lineHeight = ValueParser.value(v);
                     case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, v, p);
+                    case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, v, p);
                     case "flex" -> flex(inline(p), s);
                     case "grid" -> grid(inline(p), s);
                     case "item" -> item(inline(p), s);

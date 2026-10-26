@@ -31,6 +31,7 @@ Template (@stxt.template): dev.stxt.boxes
 				Font size: (?)
 				Line height: (?)
 				Text align: (?) ENUM [left, right, center, justify]
+				Text wrap: (?) ENUM [auto, pretty]
 				Flex: (?)
 					Direction: (?) ENUM [row, column]
 					Wrap: (?) BOOLEAN
@@ -72,6 +73,7 @@ Template (@stxt.template): dev.stxt.boxes
 		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 		Box sizing: Qué miden Width y Height: la caja de borde (border, por defecto) o el contenido (content).
 		Line height: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size.
+		Text wrap: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo). Se hereda.
 		Gap: Separación entre ítems: un valor, o dos (filas columnas).
 		Areas: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
 		Cell: Nombre de área, o "fila columna [filas columnas]" contando desde 1; auto para colocar automáticamente.

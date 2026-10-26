@@ -1,5 +1,7 @@
 package dev.stxt.boxes.fragment;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +28,8 @@ public sealed interface BreakToken {
     /**
      * Bloque: siguiente hijo a colocar y, si el corte fue dentro de él, su propio token.
      *
-     * @param consumedHeight alto de caja de borde de los fragmentos anteriores de la caja; un
+     * @param consumedHeight alto de caja de borde de los fragmentos anteriores de la caja (con
+     *                       {@code Decoration: clone}, de su caja de contenido); un
      *                       {@code Height} definido es el total de todos los fragmentos
      */
     record Block(int nextChild, BreakToken childToken, double consumedHeight) implements BreakToken {
@@ -38,12 +41,17 @@ public sealed interface BreakToken {
 
     /**
      * Flex o grid: siguiente línea o fila (en flex {@code column}, siguiente ítem) y alto de los
-     * fragmentos anteriores. {@code itemTokens} queda para el corte en paralelo de los ítems de
-     * una fila que no cabe en una página (hito 7); de momento está siempre vacía.
+     * fragmentos anteriores.
+     *
+     * @param itemTokens vacía si el corte es antes de {@code nextLine}. Si es dentro (una fila que
+     *                   no cabe en una página y cuyos ítems se parten en paralelo), el token de
+     *                   cada ítem de la fila en orden del árbol, con {@code null} en los que ya
+     *                   han terminado
      */
     record Container(int nextLine, List<BreakToken> itemTokens, double consumedHeight) implements BreakToken {
         public Container {
-            itemTokens = List.copyOf(itemTokens);
+            // List.copyOf no admite null.
+            itemTokens = Collections.unmodifiableList(new ArrayList<>(itemTokens));
         }
     }
 
