@@ -38,7 +38,7 @@ de ruta.
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
-| Adaptador a la librería oficial `stxt-core` | Pendiente (hito 1) |
+| Adaptador a la librería oficial `stxt-core` 1.0.3, con validación del template | Hecho y probado |
 | `BlockLayout`, `InlineLayout` | Pendiente (hito 2) |
 | Cajas `absolute` y `fixed` en el layout | Pendiente (hito 3) |
 | `FlexLayout` | Pendiente (hito 4) |
@@ -49,7 +49,7 @@ Los tests de referencia (`GoldenTest`) están desactivados hasta completar los h
 
 ## Hoja de ruta
 
-1. **Árbol de cajas.** Conectar `StxtCoreReader` con `dev.stxt:stxt-core` y validar contra el template.
+1. ~~**Árbol de cajas.** Conectar `StxtCoreReader` con `dev.stxt:stxt-core` y validar contra el template.~~ Hecho.
 2. **Bloque y texto.** `BlockLayout` e `InlineLayout` con `FixedMetrics`; salida SVG de depuración. Activar `GoldenTest` (caso 01).
 3. **Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator`.
 4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).

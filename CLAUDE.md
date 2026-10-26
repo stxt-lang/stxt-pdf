@@ -41,7 +41,7 @@ referencia; al terminar un hito, actualízala.
 
 | Hito | Trabajo | Dónde |
 |---|---|---|
-| 1 | Conectar con `dev.stxt:stxt-core` y validar contra el template | `stxt/StxtCoreReader` |
+| 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/StxtCoreReader` |
 | 2 | Flujo de bloque y texto; activar `GoldenTest` (caso 01) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | `relative`, `absolute`, `fixed` (esta en el `Paginator`) | `layout/position`, `fragment/Paginator` |
 | 4 | `intrinsic()` en todos los algoritmos; flex (caso 02) | `layout/flex/FlexLayout` sobre `FlexResolver` |
@@ -66,7 +66,7 @@ texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ 
 | Package | Contenido |
 |---|---|
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect` |
-| `stxt` | `StxtNode` (nodo neutral), `DocumentReader`, `MinimalStxtReader` (sin validación de template), `StxtCoreReader` (pendiente), `StxtSyntaxException` |
+| `stxt` | `StxtNode` (nodo neutral), `DocumentReader`, `MinimalStxtReader` (sin validación de template), `StxtCoreReader` (`stxt-core` + template; exige el namespace `dev.stxt.boxes` en la raíz), `StxtSyntaxException` (con el código de error de la librería) |
 | `tree` | `Box`, `Style` (propiedades y enums), `Media`, `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `MarginStrut`, `Sizing`, `PendingAbsolute` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
@@ -134,6 +134,8 @@ texto STXT ──DocumentReader──▶ StxtNode ──BoxTreeBuilder──▶ 
 - JUnit 5. Un test por pieza pura, en el mismo package que la clase (`src/test/java/dev/stxt/boxes/...`).
   Los nombres de los métodos de test están en inglés y en camelCase (`autoMarginsCenter`).
 - Los documentos de test se leen con `MinimalStxtReader` (no valida el template).
+  `StxtCoreReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
+  contra el template y dan el mismo árbol con los dos lectores: añade ahí los documentos nuevos.
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
   `src/test/resources/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
