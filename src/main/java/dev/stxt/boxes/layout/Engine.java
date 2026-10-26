@@ -10,6 +10,7 @@ import dev.stxt.boxes.layout.flex.FlexLayout;
 import dev.stxt.boxes.layout.grid.GridLayout;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.InlineLayout;
+import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.tree.Box;
@@ -54,8 +55,17 @@ public final class Engine {
      */
     public List<Page> layOutDocument(InlineNode document) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
-        cache.clear();
+        reservePageDigits(PageNumbers.DIGITS);
         return new Paginator(this).paginate(tree.root(), tree.media());
+    }
+
+    /**
+     * Cifras que reservan {@code {page}} y {@code {pages}} al maquetar ({@link PageNumbers}).
+     * Vacía la caché, porque cambian las medidas del texto.
+     */
+    public void reservePageDigits(int digits) {
+        inline.reservePageDigits(digits);
+        cache.clear();
     }
 
     public IntrinsicSizes intrinsic(Box box) {

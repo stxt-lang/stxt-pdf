@@ -671,6 +671,8 @@ alto es el de ese fragmento, no el total. Una caja `fixed` se repite en todas la
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
 ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores reales.
+Si el total de páginas tiene más cifras (100 páginas o más), antes se vuelve a paginar
+reservando tantas cifras como tenga el total, y así hasta que basten.
 Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas conservan los
 saltos y se vuelven a medir y alinear. Como las cajas `fixed` no ocupan espacio, el flujo
 principal no cambia.

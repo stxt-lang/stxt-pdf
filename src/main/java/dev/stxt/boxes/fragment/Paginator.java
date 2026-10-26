@@ -25,7 +25,8 @@ import java.util.Map;
  * útil; en modo continuo, que no tiene alto, se toma el alto del flujo del documento.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
- * líneas de cada página ({@link PageNumbers}). En modo continuo hay una página de una.</p>
+ * líneas de cada página ({@link PageNumbers}). En modo continuo hay una página de una. Si el
+ * total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
  */
 public final class Paginator {
 
@@ -39,28 +40,21 @@ public final class Paginator {
     }
 
     public List<Page> paginate(Box root, Media media) {
-        List<LayoutResult> results = new ArrayList<>();
         // Cada caja fixed una sola vez, con la posición estática de la página donde aparece.
         Map<Box, PendingAbsolute> fixed = new LinkedHashMap<>();
-        BreakToken token = null;
-        do {
-            ConstraintSpace space = ConstraintSpace.forPage(media);
-            LayoutResult r = engine.layout(root, space, token);
-            BreakToken next = perPage(r.breakToken());
-            if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
-                throw new IllegalStateException("Sin progreso en la página " + (results.size() + 1)
-                        + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
-            }
-            results.add(r);
-            r.pending().forEach(p -> fixed.putIfAbsent(p.box(), p));
-            token = next;
-            if (results.size() > MAX_PAGES) {
-                throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
-            }
-        } while (token != null);
+        List<LayoutResult> results = flow(root, media, fixed);
+        boolean numbered = hasPageNumbers(root);
+        // Si el total no cabe en las cifras reservadas, se vuelve a paginar reservando las suyas.
+        // Las cifras solo crecen, así que el bucle termina.
+        int digits = PageNumbers.DIGITS;
+        while (numbered && PageNumbers.digits(results.size()) > digits) {
+            digits = PageNumbers.digits(results.size());
+            engine.reservePageDigits(digits);
+            fixed.clear();
+            results = flow(root, media, fixed);
+        }
 
         // Segunda fase de la numeración: ya se sabe cuántas páginas hay (en continuo, una).
-        boolean numbered = hasPageNumbers(root);
         int total = results.size();
         List<Page> pages = new ArrayList<>();
         for (LayoutResult r : results) {
@@ -79,6 +73,28 @@ public final class Paginator {
             pages.add(new Page(number, content, fixedFragments));
         }
         return pages;
+    }
+
+    /** Pagina el flujo: un resultado por página. Apunta en {@code fixed} las cajas {@code fixed}. */
+    private List<LayoutResult> flow(Box root, Media media, Map<Box, PendingAbsolute> fixed) {
+        List<LayoutResult> results = new ArrayList<>();
+        BreakToken token = null;
+        do {
+            ConstraintSpace space = ConstraintSpace.forPage(media);
+            LayoutResult r = engine.layout(root, space, token);
+            BreakToken next = perPage(r.breakToken());
+            if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
+                throw new IllegalStateException("Sin progreso en la página " + (results.size() + 1)
+                        + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
+            }
+            results.add(r);
+            r.pending().forEach(p -> fixed.putIfAbsent(p.box(), p));
+            token = next;
+            if (results.size() > MAX_PAGES) {
+                throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
+            }
+        } while (token != null);
+        return results;
     }
 
     /** Algún texto del documento contiene {@code {page}} o {@code {pages}}. */

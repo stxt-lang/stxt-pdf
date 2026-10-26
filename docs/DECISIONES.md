@@ -14,13 +14,17 @@ son diferencias con CSS, §8) y se han quitado de aquí; la 31 (`new Engine()` u
 `FixedMetrics`) es del API, no del modelo, y está en el javadoc de `Engine`. Quedan las
 abiertas, con su número original. Las decisiones nuevas siguen desde la 41.
 
-Resueltas en el código después del repaso: la 2 (las posicionadas se pintan en orden del
-documento, §5.6), la 14 (una pista en porcentaje sobre un tamaño indefinido es `auto`, §5.8) y la 41,
-encontrada al resolver la 14 (los porcentajes de las pistas se resolvían contra la caja de
-contenido menos los huecos; ahora, contra la caja de contenido, como dice el §3.6) y la 21
-(con `slice`, si solo el borde y el relleno inferiores no caben, `Engine.layout` repite el
-layout reservándolos, §5.10; no se reservan siempre, como con `clone`, para no dejar un hueco al
-final de cada página cuando la caja se corta de todos modos).
+Resueltas en el código después del repaso:
+
+- **2:** las posicionadas se pintan en orden del documento (§5.6).
+- **14:** una pista en porcentaje sobre un tamaño indefinido es `auto` (§5.8).
+- **41** (encontrada al resolver la 14): los porcentajes de las pistas se resolvían contra la
+  caja de contenido menos los huecos; ahora, contra la caja de contenido, como dice el §3.6.
+- **21:** con `slice`, si solo el borde y el relleno inferiores no caben, `Engine.layout` repite
+  el layout reservándolos (§5.10). No se reservan siempre, como con `clone`, para no dejar un
+  hueco al final de cada página cuando la caja se corta de todos modos.
+- **38:** con 100 páginas o más, el `Paginator` vuelve a paginar reservando las cifras del total
+  (§5.10).
 
 ## Cambiar el código
 
@@ -46,14 +50,6 @@ quítala de aquí.
     *Dónde:* `layout/grid/TrackSizing.distributeExcess`.
     *Propuesta (CSS):* repartir su exceso entre las pistas flexibles que ocupa, en proporción a
     su fracción.
-
-38. **Numeración en dos fases:** en la primera, `{page}` y `{pages}` se miden como `00`
-    (reservan dos cifras); en la segunda, solo se rehacen las líneas que los contienen. Los
-    saltos de línea y los altos de la primera fase no cambian, así que con 100 páginas o más el
-    número puede desbordar su línea.
-    *Dónde:* `layout/inline/PageNumbers`, `InlineLayout.number`, `fragment/Paginator`.
-    *Propuesta:* si el total tiene más de dos cifras, volver a paginar midiendo con esas cifras
-    hasta que el total no cambie.
 
 ## Aplazadas al hito de fuentes
 

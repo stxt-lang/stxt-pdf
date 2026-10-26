@@ -35,12 +35,20 @@ import java.util.List;
 public final class InlineLayout implements LayoutAlgorithm {
 
     /** Mide {@code {page}} y {@code {pages}} como el número de prueba ({@link PageNumbers}). */
-    private final TextMeasurer measurer;
+    private TextMeasurer measurer;
     private final TextMeasurer real;
 
     public InlineLayout(TextMeasurer measurer) {
-        this.measurer = PageNumbers.probing(measurer);
         this.real = measurer;
+        reservePageDigits(PageNumbers.DIGITS);
+    }
+
+    /**
+     * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia las medidas: hay
+     * que vaciar la caché antes de volver a maquetar ({@link dev.stxt.boxes.layout.Engine}).
+     */
+    public void reservePageDigits(int digits) {
+        this.measurer = PageNumbers.probing(real, digits);
     }
 
     /**
