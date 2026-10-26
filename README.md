@@ -53,6 +53,7 @@ terminados.
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
 | Árbol de cajas: herencia, cajas anónimas, validaciones | Hecho y probado |
+| Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |

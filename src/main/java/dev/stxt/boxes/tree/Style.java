@@ -3,7 +3,9 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Propiedades especificadas de una caja, con los valores por defecto de ESPECIFICACION.md §4.
@@ -131,6 +133,13 @@ public final class Style {
     public int orphans = 2;
     public Decoration decoration = Decoration.SLICE;
 
+    /**
+     * Línea del documento de cada propiedad declarada, por su nombre canónico ({@code "height"};
+     * las de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.rows"}). Las
+     * de la fuente se heredan con su valor, para señalar dónde se declaró.
+     */
+    private final Map<String, Integer> lines = new HashMap<>();
+
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
     public static Style inheriting(Style parent) {
         Style s = new Style();
@@ -139,6 +148,11 @@ public final class Style {
             s.font = parent.font;
             s.fontWeight = parent.fontWeight;
             s.fontStyle = parent.fontStyle;
+            for (String p : List.of("font", "font-weight", "font-style")) {
+                if (parent.lines.containsKey(p)) {
+                    s.lines.put(p, parent.lines.get(p));
+                }
+            }
             s.fontSize = parent.fontSize;
             s.lineHeight = parent.lineHeight;
             s.textAlign = parent.textAlign;
@@ -147,6 +161,29 @@ public final class Style {
             s.orphans = parent.orphans;
         }
         return s;
+    }
+
+    /** Apunta la línea donde se declara una propiedad. */
+    public void declared(String property, int line) {
+        lines.put(property, line);
+    }
+
+    /** Si la propiedad se declaró (en esta caja o, las de la fuente, en una antecesora). */
+    public boolean isDeclared(String property) {
+        return lines.containsKey(property);
+    }
+
+    /**
+     * Línea donde se declaró la propiedad.
+     *
+     * @throws IllegalStateException si no se declaró
+     */
+    public int line(String property) {
+        Integer line = lines.get(property);
+        if (line == null) {
+            throw new IllegalStateException("Propiedad no declarada: " + property);
+        }
+        return line;
     }
 
     /** Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (§6). */

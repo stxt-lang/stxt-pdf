@@ -166,7 +166,7 @@ public final class GridLayout implements LayoutAlgorithm {
             Insets margin = margins[i];
             double areaHeight = span(rows, a.row() - 1, a.rows(), rowGap);
             Style.Alignment vertical = vertical(item, s);
-            ConstraintSpace finalSpace = finalSpace(item, spaces[i], results[i], itemWidths[i], areaWidths[i],
+            ConstraintSpace finalSpace = finalSpace(item, spaces[i], itemWidths[i], areaWidths[i],
                     areaHeight, margin, vertical, atStart);
             LayoutResult r = engine.layout(item, finalSpace, null);
             Fragment f = r.fragment();
@@ -235,10 +235,10 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /**
      * Espacio del layout definitivo del ítem: con el alto del área como base de sus porcentajes
-     * y, con {@code stretch} y alto {@code auto}, estirado al área. Es el de la medida si no
-     * cambia nada.
+     * y, con {@code stretch} y alto {@code auto}, estirado al área. Es el de la medida si el ítem
+     * no se estira ni declara su alto en porcentaje.
      */
-    private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, LayoutResult measured, double width,
+    private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, double width,
                                        double areaWidth, double areaHeight, Insets margin, Style.Alignment vertical,
                                        boolean atStart) {
         Style is = item.style;
@@ -252,9 +252,9 @@ public final class GridLayout implements LayoutAlgorithm {
                         Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));
             }
         }
-        boolean stretched = fixedHeight.isPresent()
-                && Math.abs(fixedHeight.getAsDouble() - measured.fragment().height()) > 1e-9;
-        if (!stretched && !dependsOnHeightBase(is)) {
+        // Un ítem estirado se maqueta siempre con su alto fijado, aunque mida lo mismo: es la base
+        // definida de los porcentajes de sus hijos (§3.6).
+        if (fixedHeight.isEmpty() && !dependsOnHeightBase(is)) {
             return measureSpace;
         }
         return itemSpace(width, fixedHeight, areaWidth, base, atStart);

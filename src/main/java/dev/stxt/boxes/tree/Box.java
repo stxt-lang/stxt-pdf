@@ -27,6 +27,10 @@ public final class Box {
     public Box parent;
     /** Contenido en línea, si la caja contiene texto directamente. */
     public String text;
+    /** Línea del nodo {@code Text}. */
+    public int textLine;
+    /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
+    public boolean textBlock;
 
     // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
     // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.
@@ -80,6 +84,20 @@ public final class Box {
             b = b.parent;
         }
         return b;
+    }
+
+    /** Línea del documento donde está el carácter {@code index} del texto. */
+    public int textLineAt(int index) {
+        if (!textBlock) {
+            return textLine;
+        }
+        int line = textLine + 1;
+        for (int i = 0; i < index; i++) {
+            if (text.charAt(i) == '\n') {
+                line++;
+            }
+        }
+        return line;
     }
 
     public boolean hasText() {

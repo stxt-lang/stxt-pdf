@@ -85,8 +85,13 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   `ParseException` de la librería, con código (`INVALID_VALUE`, `TOO_FEW_CHILDREN`…) y línea.
 - **`BoxTreeBuilder`** interpreta valores, aplica la herencia, crea las cajas anónimas (§5.1) y
   comprueba las reglas del §6 que el template no puede expresar. Los errores son
-  `InvalidModelException` con la **línea del documento**; los mensajes siguen la tabla del §6.
-  La raíz que devuelve es una `Box` anónima que representa el área útil.
+  `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo culpable**: la
+  de la propiedad (`Style.line("height")`, `"grid.rows"`…), no la de su caja. La raíz que
+  devuelve es una `Box` anónima que representa el área útil.
+- **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
+  es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
+  porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
+  `BoxTreeBuilder.definiteHeight`). No generalices una regla nueva sin comentarlo con el usuario.
 - **Enums de `Style`:** los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas, así que **cada constante debe llamarse igual que su valor en el documento**
   (`Position.ABSOLUTE` ↔ `absolute`). Si cambias un valor, cambia la constante y el template.
@@ -192,6 +197,11 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
   `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan:
   añade ahí los documentos nuevos.
+- **Catálogo de errores** (`errors/ErrorCatalogTest`): `src/test/resources/errors/errors.stxt`
+  tiene un `Case` por regla, con `Code`, `Line` (contada desde la primera línea del documento
+  incrustado) y el documento en un bloque `Document >>`. Se maqueta con las métricas reales.
+  `everyCodeHasACase` exige un caso por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de
+  layout prueban los casos válidos; los inválidos van al catálogo.
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
   `src/test/resources/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
@@ -217,6 +227,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
    correcto antes de cambiar ninguno de los dos.
 2. Si añades o cambias una propiedad, actualiza a la vez: el template `.stxt`, la copia del §9,
    la tabla del §4, `Style` y `BoxTreeBuilder` (y la validación del §6 si aplica).
+   Una regla de validación nueva lleva su `ErrorCode`, su fila en la tabla del §6 y un caso en
+   el catálogo de errores.
 3. Al completar un hito, actualiza la tabla de estado y la hoja de ruta del README y elimina sus
    `TODO(hito N)`.
 4. Cada decisión de interpretación (hueco de la especificación, diferencia con CSS,

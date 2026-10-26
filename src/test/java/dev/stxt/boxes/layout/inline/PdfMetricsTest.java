@@ -3,10 +3,16 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
+import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,20 +53,36 @@ class PdfMetricsTest {
     }
 
     @Test
-    void unknownFamilyWithLineAndSuggestion() {
+    void unknownFamilyAtTheFontLineWithSuggestion() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> validate("\tBox:", "\t\tFont: ibm plex sans", "\t\tText: Hola"));
-        assertEquals(5, e.line());
+                () -> validate("\tBox:", "\t\tFont: ibm plex sans", "\t\tBox:", "\t\t\tText: Hola"));
+        assertEquals(ErrorCode.FONT_UNKNOWN, e.code());
+        assertEquals(6, e.line());
         assertTrue(e.getMessage().contains("Fuente desconocida: ibm plex sans. ¿Querías decir 'IBM Plex Sans'?"),
                 e.getMessage());
     }
 
     @Test
-    void missingCharacter() {
+    void missingVariantAtTheTextLine(@TempDir Path dir) throws IOException {
+        Path fonts = Files.createDirectories(dir.resolve("fonts"));
+        Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("r.ttf"));
+        PdfMetrics regularOnly = new PdfMetrics(new Resources(dir));
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n"
+                + "\tBox:\n\t\tFont: IBM Plex Sans\n\t\tFont weight: bold\n\t\tBox:\n\t\t\tText: Hola";
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> regularOnly.validate(new BoxTreeBuilder().build(new DocumentReader().read(doc)).root()));
+        assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.code());
+        assertEquals(9, e.line());
+        assertTrue(e.getMessage().endsWith("(Font en la línea 6, Font weight en la línea 7)"), e.getMessage());
+    }
+
+    @Test
+    void missingCharacterAtItsLineInsideTheBlock() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> validate("\tBox:", "\t\tFont: IBM Plex Sans", "\t\tBox:", "\t\t\tFont weight: bold",
-                        "\t\t\tText: Kanji 漢"));
-        assertEquals(7, e.line());
-        assertEquals("línea 7: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
+                        "\t\t\tText >>", "\t\t\t\tPrimera línea", "", "\t\t\t\tKanji 漢"));
+        assertEquals(ErrorCode.GLYPH_MISSING, e.code());
+        assertEquals(12, e.line());
+        assertEquals("línea 12: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
 }

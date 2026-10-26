@@ -112,14 +112,15 @@ class GridLayoutTest {
     }
 
     @Test
-    void percentageRowsWithAutoHeightAreAuto() {
+    void percentageRowsOfADefiniteHeight() {
+        // Con Height: auto en el contenedor, las filas en porcentaje son un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tRows: 50% 50%",
+                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tHeight: 100", "\t\tGrid:", "\t\t\tRows: 50% 50%",
                 "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10",
                 "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 30");
-        assertRect(40, 40, 515, 40, l.rect("G"));
+        assertRect(40, 40, 515, 100, l.rect("G"));
         assertRect(40, 40, 515, 10, l.rect("A"));
-        assertRect(40, 50, 515, 30, l.rect("B"));
+        assertRect(40, 90, 515, 30, l.rect("B"));
     }
 
     @Test

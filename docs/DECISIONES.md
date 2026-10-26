@@ -49,7 +49,8 @@ Decisiones nuevas:
     declara la suya (el ejemplo del §10 la repite cinco veces).
     *Dónde:* `tree/BoxTreeBuilder.buildContent`.
     *Alternativa:* admitir propiedades de texto heredables en `Document` para todo el
-    documento. Pendiente de la conversación sobre la política de errores.
+    documento. Sigue abierta tras la conversación sobre errores, igual que si `Font size`
+    (hoy 10 por defecto) debe ser obligatoria.
 
 43. **Un carácter que la fuente no tiene es un error**, con la línea de la caja; no se pinta el
     glifo `.notdef` ni se busca otra fuente. Los espacios en blanco se comprueban como espacio y
@@ -101,3 +102,58 @@ Decisiones nuevas:
     `fonts/`.
     *Dónde:* `resources/Resources.checkInside`.
     *Alternativa:* rechazar cualquier enlace.
+
+## Política de errores
+
+Errores con código estable (`ErrorCode`) y la línea del nodo culpable; las combinaciones sin
+efecto o contradictorias son errores (§6). El catálogo `src/test/resources/errors/errors.stxt`
+tiene un caso por código.
+
+51. **El alto definido se decide al leer el documento**, con una regla fija (§3.6), no al
+    maquetar. Es más estricta que el motor y que CSS: un ítem de flex estirado no da un alto
+    definido a sus hijos, aunque el motor sí lo conoce al maquetarlos.
+    *Dónde:* `tree/BoxTreeBuilder.definiteHeight` y `validatePercentages`.
+    *Alternativa:* detectar los porcentajes sin base durante el layout final, distinguiéndolo de
+    las pasadas de medida (grid mide sus ítems sin base y luego los maqueta con el alto del área).
+
+52. **Un ítem de grid estirado se maqueta siempre con su alto fijado**, aunque mida lo mismo
+    que al medirlo, para que sus hijos tengan la base definida que promete la regla 51. Cuesta
+    un layout más por ítem estirado.
+    *Dónde:* `layout/grid/GridLayout.finalSpace`.
+    *Alternativa:* repetirlo solo si algún descendiente usa porcentajes verticales.
+
+53. **`Margin: auto` horizontal en flujo de bloque necesita `Width` o `Max width`**: con ancho
+    `auto` la caja ocupa toda la línea y los márgenes valdrían 0. También son error los
+    verticales en flujo de bloque y los de las `absolute` sin inicio, tamaño y fin. Amplían la
+    regla acordada (márgenes `auto` en ítems de flex y grid) con el mismo criterio.
+    *Dónde:* `tree/BoxTreeBuilder.validateMargins`.
+
+54. **Mínimos y máximos solo se comparan en las mismas unidades** (puntos con puntos,
+    porcentaje con porcentaje). Si no se pueden comparar al leer, al maquetar sigue ganando el
+    mínimo.
+    *Dónde:* `tree/BoxTreeBuilder.validateMinMax`, `layout/Sizing.constrain`.
+    *Alternativa:* comparar también al maquetar y dar un error de layout.
+
+55. **Formas de valor por propiedad:** `Width: 1fr`, `Max width: max-content`, `Gap: auto`,
+    un `minmax()` fuera de las pistas o un número negativo fuera de `Margin` y `Offset` son
+    errores (`VALUE_NOT_ALLOWED`); antes se comportaban como `auto` o se aceptaban. Sigue la
+    columna *Valores* del §4.
+    *Dónde:* `tree/BoxTreeBuilder.value`, `sides`, `tracks`.
+
+56. **Se para en el primer error.** Acumularlos tiene el problema de los errores en cascada
+    (una caja mal definida provoca otros en sus hijos).
+    *Alternativa:* devolver la lista de errores independientes.
+
+57. **Líneas de los errores de fuentes:** una familia desconocida señala la línea de su `Font`,
+    aunque esté en una antecesora; una variante que falta, la del texto, y el mensaje nombra
+    dónde se declaran `Font`, `Font weight` y `Font style`; un carácter que falta, la suya
+    dentro del bloque `Text >>`.
+    *Dónde:* `layout/inline/PdfMetrics.check`, `tree/Box.textLineAt`.
+
+58. **El hueco entre filas de un flex `row` sin `Wrap` no se comprueba**: no se usa, así que
+    `Gap: 5%` en un flex de una línea sin alto definido no es un error.
+    *Dónde:* `tree/BoxTreeBuilder.validateContainer`.
+
+59. **Sin código propio lo que ya rechaza el template:** `Main axis: stretch` y
+    `Break inside: page` son `VALUE_NOT_ALLOWED`, y un bloque `>>` donde van hijos,
+    `DOCUMENT_STRUCTURE`; con `DocumentReader` salen antes los códigos de `stxt-core`.

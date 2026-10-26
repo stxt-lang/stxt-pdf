@@ -6,8 +6,12 @@ import dev.stxt.boxes.resources.ResourceException;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
+import dev.stxt.boxes.tree.Style;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -58,25 +62,54 @@ public final class PdfMetrics implements TextMeasurer {
     }
 
     private static void check(Box box, FontLibrary fonts) {
+        Style s = box.style;
+        FontFile font;
         try {
-            FontFile font = fonts.find(box.style.fontFace());
-            String text = box.text;
-            if (PageNumbers.contains(text)) {
-                text = text.replace(PageNumbers.PAGES, "").replace(PageNumbers.PAGE, "") + DIGITS;
-            }
-            for (int i = 0; i < text.length(); ) {
-                int cp = text.codePointAt(i);
-                // Los espacios en blanco del documento se pintan como espacios (§5.4).
-                int painted = Character.isWhitespace(cp) ? ' ' : cp;
-                if (!font.has(painted)) {
-                    throw new ResourceException("La fuente " + font.face() + " no tiene el carácter "
-                            + describe(painted));
-                }
-                i += Character.charCount(cp);
-            }
+            font = fonts.find(s.fontFace());
         } catch (ResourceException e) {
-            throw new InvalidModelException(box.line, e.getMessage());
+            if (!fonts.families().contains(s.font)) {
+                // El culpable es la declaración de Font, aunque esté en una antecesora.
+                throw new InvalidModelException(s.line("font"), ErrorCode.FONT_UNKNOWN, e.getMessage());
+            }
+            throw new InvalidModelException(box.textLine, ErrorCode.FONT_VARIANT_MISSING,
+                    e.getMessage() + " (" + declarations(s) + ")");
         }
+        String text = box.text;
+        for (int i = 0; i < text.length(); ) {
+            String marker = text.startsWith(PageNumbers.PAGES, i) ? PageNumbers.PAGES
+                    : text.startsWith(PageNumbers.PAGE, i) ? PageNumbers.PAGE : null;
+            if (marker != null) {
+                // Se pinta como cifras.
+                for (char d : DIGITS.toCharArray()) {
+                    requireGlyph(box, font, d, i);
+                }
+                i += marker.length();
+                continue;
+            }
+            int cp = text.codePointAt(i);
+            // Los espacios en blanco del documento se pintan como espacios (§5.4).
+            requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, i);
+            i += Character.charCount(cp);
+        }
+    }
+
+    private static void requireGlyph(Box box, FontFile font, int cp, int index) {
+        if (!font.has(cp)) {
+            throw new InvalidModelException(box.textLineAt(index), ErrorCode.GLYPH_MISSING,
+                    "La fuente " + font.face() + " no tiene el carácter " + describe(cp));
+        }
+    }
+
+    /** Dónde se declaran la familia, el peso y el estilo, para los mensajes. */
+    private static String declarations(Style s) {
+        List<String> parts = new ArrayList<>();
+        for (String p : List.of("font", "font-weight", "font-style")) {
+            if (s.isDeclared(p)) {
+                String name = p.equals("font") ? "Font" : p.equals("font-weight") ? "Font weight" : "Font style";
+                parts.add(name + " en la línea " + s.line(p));
+            }
+        }
+        return String.join(", ", parts);
     }
 
     /** {@code '→' (U+2192)}; los caracteres de control, solo con su código. */

@@ -29,19 +29,21 @@ class PositioningTest {
     }
 
     @Test
-    void relativeTopAndLeftWin() {
+    void relativeOffsets() {
+        // Arriba y abajo, o izquierda y derecha, a la vez son un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: all", "\t\tPosition: relative", "\t\tOffset: 5 7 9 11", "\t\tHeight: 20",
+                "\tBox:", "\t\tId: start", "\t\tPosition: relative", "\t\tOffset: 5 auto auto 11", "\t\tHeight: 20",
                 "\tBox:", "\t\tId: endOnly", "\t\tPosition: relative", "\t\tOffset: auto 7 9 auto", "\t\tHeight: 20");
-        assertRect(51, 45, 515, 20, l.rect("all"));
+        assertRect(51, 45, 515, 20, l.rect("start"));
         assertRect(33, 51, 515, 20, l.rect("endOnly"));
     }
 
     @Test
     void relativePercentages() {
-        // Izquierda: 10 % de 515. Arriba: 10 % del alto del padre, que solo es definido en P.
+        // Izquierda: 10 % de 515. Arriba: 10 % del alto del padre (200). Un porcentaje vertical
+        // con el alto del padre indefinido es un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: top", "\t\tPosition: relative", "\t\tOffset: 50% auto auto 10%", "\t\tHeight: 20",
+                "\tBox:", "\t\tId: top", "\t\tPosition: relative", "\t\tOffset: auto auto auto 10%", "\t\tHeight: 20",
                 "\tBox:", "\t\tHeight: 200",
                 "\t\tBox:", "\t\t\tId: inner", "\t\t\tPosition: relative", "\t\t\tOffset: 10% auto auto auto", "\t\t\tHeight: 10");
         assertRect(91.5, 40, 515, 20, l.rect("top"));

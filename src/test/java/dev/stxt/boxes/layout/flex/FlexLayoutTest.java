@@ -207,16 +207,13 @@ class FlexLayoutTest {
     }
 
     @Test
-    void columnGrowsOnlyWithADefiniteHeight() {
+    void columnGrowsWithADefiniteHeight() {
+        // Sin Height en el contenedor, Grow es un error (catálogo de errores).
         LayoutFixture l = layOut(
                 "\tBox:", "\t\tLayout: flex", "\t\tHeight: 100", "\t\tFlex:", "\t\t\tDirection: column",
                 "\t\tBox:", "\t\t\tHeight: 20",
-                "\t\tBox:", "\t\t\tId: G", "\t\t\tItem:", "\t\t\t\tGrow: 1",
-                "\tBox:", "\t\tLayout: flex", "\t\tFlex:", "\t\t\tDirection: column",
-                "\t\tBox:", "\t\t\tHeight: 20",
-                "\t\tBox:", "\t\t\tId: N", "\t\t\tItem:", "\t\t\t\tGrow: 1");
+                "\t\tBox:", "\t\t\tId: G", "\t\t\tItem:", "\t\t\t\tGrow: 1");
         assertRect(40, 60, 515, 80, l.rect("G"));
-        assertRect(40, 160, 515, 0, l.rect("N"));
     }
 
     @Test

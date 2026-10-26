@@ -5,6 +5,7 @@ import dev.stxt.boxes.model.Rect;
 import org.junit.jupiter.api.Test;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
+import static dev.stxt.boxes.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BlockLayoutTest {
@@ -101,27 +102,31 @@ class BlockLayoutTest {
                 "\tBox:", "\t\tId: half", "\t\tWidth: 50%", "\t\tHeight: 10",
                 "\tBox:", "\t\tId: content", "\t\tBox sizing: content", "\t\tWidth: 100",
                 "\t\tPadding: 10", "\t\tBorder: 2", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: minWins", "\t\tMax width: 100", "\t\tMin width: 150", "\t\tHeight: 10",
                 "\tBox:", "\t\tId: right", "\t\tWidth: 200", "\t\tMargin: 0 0 0 auto", "\t\tHeight: 10",
                 "\tBox:", "\t\tId: margins", "\t\tMargin: 0 15 0 25", "\t\tHeight: 10");
         assertEquals(257.5, l.rect("half").width(), 1e-9);
         // Box sizing: content también suma relleno y borde al alto: 10 + 24.
         assertRect(40, 50, 124, 34, l.rect("content"));
-        assertEquals(150, l.rect("minWins").width(), 1e-9);
-        assertRect(355, 94, 200, 10, l.rect("right"));
-        assertRect(65, 104, 475, 10, l.rect("margins"));
+        assertRect(355, 84, 200, 10, l.rect("right"));
+        assertRect(65, 94, 475, 10, l.rect("margins"));
     }
 
     @Test
-    void percentHeightNeedsADefiniteContainingBlock() {
-        // En modo continuo el área útil no tiene alto: 50 % se comporta como auto.
+    void minWinsWhenItCannotBeComparedBeforeLayout() {
+        // 150 frente al 20 % de 515 (103): si se pudieran comparar al leer, sería un error.
+        LayoutFixture l = layOut("\tBox:", "\t\tId: minWins", "\t\tMax width: 20%", "\t\tMin width: 150",
+                "\t\tHeight: 10");
+        assertEquals(150, l.rect("minWins").width(), 1e-9);
+    }
+
+    @Test
+    void percentHeightOfADefiniteContainingBlock() {
+        // Sin alto definido (el área útil en modo continuo), es un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: auto", "\t\tHeight: 50%",
-                "\t\tBox:", "\t\t\tHeight: 20",
                 "\tBox:", "\t\tHeight: 200",
                 "\t\tBox:", "\t\t\tId: half", "\t\t\tHeight: 50%");
-        assertEquals(20, l.rect("auto").height(), 1e-9);
         assertEquals(100, l.rect("half").height(), 1e-9);
+        assertEquals(100, layOutPaged(180, "\tBox:", "\t\tId: page", "\t\tHeight: 100%").rect("page").height(), 1e-9);
     }
 
     @Test

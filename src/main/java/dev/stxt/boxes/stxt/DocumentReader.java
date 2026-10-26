@@ -5,6 +5,7 @@ import dev.stxt.Node;
 import dev.stxt.Parser;
 import dev.stxt.schema.SchemaValidator;
 import dev.stxt.template.TemplateSchemaProviderMemory;
+import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 
 import java.io.IOException;
@@ -60,11 +61,12 @@ public final class DocumentReader {
     private static InlineNode root(List<Node> roots) {
         if (roots.size() != 1) {
             int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
-            throw new InvalidModelException(line, "El documento debe tener exactamente un nodo raíz y tiene " + roots.size());
+            throw new InvalidModelException(line, ErrorCode.DOCUMENT_ROOT,
+                    "El documento debe tener exactamente un nodo raíz y tiene " + roots.size());
         }
         Node root = roots.get(0);
         if (!NAMESPACE.equals(root.getNamespace()) || !(root instanceof InlineNode document)) {
-            throw new InvalidModelException(root.getLine(),
+            throw new InvalidModelException(root.getLine(), ErrorCode.DOCUMENT_ROOT,
                     "El nodo raíz debe ser " + root.getName() + " (" + NAMESPACE + "):");
         }
         return document;
