@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  *
  * <p>Trabaja sobre los nodos de {@code stxt-core}. Los nombres se comparan por su nombre
  * canónico ({@link Node#getCanonicalName()}: minúsculas y los espacios convertidos en guiones,
- * de modo que {@code Box sizing} es {@code box-sizing}). No es reentrante: cada llamada a
+ * de modo que {@code Min width} es {@code min-width}). No es reentrante: cada llamada a
  * {@link #build} usa su propio estado.</p>
  */
 public final class BoxTreeBuilder {
@@ -187,7 +187,6 @@ public final class BoxTreeBuilder {
                 case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                 case "layer" -> s.layer = integer(p);
                 case "isolate" -> s.isolate = bool(p);
-                case "box-sizing" -> s.boxSizing = enumValue(Style.BoxSizing.class, p);
                 case "width" -> s.width = value(p, SIZE, false);
                 case "height" -> s.height = value(p, SIZE, false);
                 case "min-width" -> s.minWidth = value(p, LENGTH_OR_AUTO, false);
@@ -524,7 +523,7 @@ public final class BoxTreeBuilder {
     // Acceso a los nodos
     // ------------------------------------------------------------------------------------------
 
-    /** Compara con un nombre ya canónico ({@code "box-sizing"}). */
+    /** Compara con un nombre ya canónico ({@code "min-width"}). */
     private static boolean is(Node n, String canonicalName) {
         return n.getCanonicalName().equals(canonicalName);
     }

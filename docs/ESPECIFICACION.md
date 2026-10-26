@@ -215,7 +215,6 @@ cajas de primer nivel y de las cajas `fixed`. En modo continuo su altura es infi
 
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
-| `Box sizing` | `border`, `content` | `border` | No | Qué miden `Width` y `Height`: la caja de borde o la de contenido. |
 | `Width` | número, %, `auto`, intrínsecos, funciones | `auto` | No | |
 | `Height` | número, %, `auto`, intrínsecos, funciones | `auto` | No | |
 | `Min width`, `Min height` | número, %, `auto` | `auto` | No | `auto` = min-content en ítems de flex y grid; 0 en el resto. |
@@ -342,9 +341,8 @@ salen del flujo del padre.
 Cada caja tiene cuatro rectángulos concéntricos: **contenido**, **relleno** (contenido +
 `Padding`), **borde** (relleno + `Border`) y **margen** (borde + `Margin`).
 
-Con `Box sizing: border` (por defecto), `Width` y `Height` miden la caja de borde: una caja con
-`Width: 200` ocupa 200 pt antes de los márgenes. Con `Box sizing: content`, miden solo el
-contenido.
+`Width` y `Height` (y sus mínimos y máximos, y `Basis`) miden siempre la **caja de borde**: una
+caja con `Width: 200` ocupa 200 pt antes de los márgenes, con el relleno y el borde dentro.
 
 El **containing block** de una caja es el rectángulo de referencia para porcentajes, `auto` y
 `Offset`:
@@ -899,7 +897,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
 | `display` | Combina tipo exterior e interior | `Layout` (interior); el exterior lo decide el padre. No hay `inline-block`. |
-| `box-sizing` | `content-box` por defecto | `Box sizing: border` por defecto |
+| `box-sizing` | `content-box` por defecto; configurable | No existe: `Width` y `Height` miden siempre la caja de borde |
 | Unidades | px, em, rem, vw… | pt, %, fr |
 | `line-height` sin unidad | Multiplicador | **Un número son puntos**; el relativo se escribe con % |
 | Altura de línea | Calculada por fuente, *half-leading* y *baseline* | Cada línea mide `Line height`; la línea base se coloca con el *half-leading* de su fuente |
@@ -957,7 +955,6 @@ Template (@stxt.template): dev.stxt.boxes
 				Offset: (?)
 				Layer: (?) INTEGER
 				Isolate: (?) BOOLEAN
-				Box sizing: (?) ENUM [border, content]
 				Width: (?) @Width
 				Height: (?) @Height
 				Min width: (?)

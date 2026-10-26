@@ -22,8 +22,6 @@ public final class Style {
 
     public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
 
-    public enum BoxSizing { BORDER, CONTENT }
-
     public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }
 
     public enum FontWeight { NORMAL, BOLD }
@@ -52,7 +50,6 @@ public final class Style {
     /** {@code null} = auto. */
     public Integer layer;
     public boolean isolate;
-    public BoxSizing boxSizing = BoxSizing.BORDER;
 
     // --- Dimensiones ---------------------------------------------------------------------------
     public Value width = Value.AUTO;

@@ -100,15 +100,14 @@ class BlockLayoutTest {
     void widths() {
         LayoutFixture l = layOut(
                 "\tBox:", "\t\tId: half", "\t\tWidth: 50%", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: content", "\t\tBox sizing: content", "\t\tWidth: 100",
-                "\t\tPadding: 10", "\t\tBorder: 2", "\t\tHeight: 10",
+                "\tBox:", "\t\tId: sized", "\t\tWidth: 100", "\t\tPadding: 10", "\t\tBorder: 2", "\t\tHeight: 40",
                 "\tBox:", "\t\tId: right", "\t\tWidth: 200", "\t\tMargin: 0 0 0 auto", "\t\tHeight: 10",
                 "\tBox:", "\t\tId: margins", "\t\tMargin: 0 15 0 25", "\t\tHeight: 10");
         assertEquals(257.5, l.rect("half").width(), 1e-9);
-        // Box sizing: content también suma relleno y borde al alto: 10 + 24.
-        assertRect(40, 50, 124, 34, l.rect("content"));
-        assertRect(355, 84, 200, 10, l.rect("right"));
-        assertRect(65, 94, 475, 10, l.rect("margins"));
+        // Width y Height miden siempre la caja de borde, con el relleno y el borde dentro.
+        assertRect(40, 50, 100, 40, l.rect("sized"));
+        assertRect(355, 90, 200, 10, l.rect("right"));
+        assertRect(65, 100, 475, 10, l.rect("margins"));
     }
 
     @Test

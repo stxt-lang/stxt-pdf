@@ -17,7 +17,6 @@ Template (@stxt.template): dev.stxt.boxes
 				Offset: (?)
 				Layer: (?) INTEGER
 				Isolate: (?) BOOLEAN
-				Box sizing: (?) ENUM [border, content]
 				Width: (?) @Width
 				Height: (?) @Height
 				Min width: (?)
@@ -78,7 +77,6 @@ Template (@stxt.template): dev.stxt.boxes
 		Position: Cómo participa la caja en el flujo de su padre. Por defecto, static.
 		Offset: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Position distinta de static.
 		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
-		Box sizing: Qué miden Width y Height: la caja de borde (border, por defecto) o el contenido (content).
 		Font: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en las cajas con texto, propia o heredada (también de Document). Se hereda.
 		Font weight: Peso: normal (por defecto) o bold. Se hereda.
 		Font style: Estilo: normal (por defecto) o italic. Se hereda.

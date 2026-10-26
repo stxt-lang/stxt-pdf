@@ -115,8 +115,7 @@ public final class AbsoluteLayout {
         AbsoluteEquation.Solution h = AbsoluteEquation.horizontal(left, width, right, marginLeft, marginRight,
                 cbWidth, staticX, content);
         if (width.isEmpty()) {
-            double extraWidth = model.border().horizontal() + model.padding().horizontal();
-            double constrained = BoxModel.constrainWidth(s, h.size(), cbWidth, extraWidth);
+            double constrained = BoxModel.constrainWidth(s, h.size(), cbWidth);
             if (constrained != h.size()) {
                 h = AbsoluteEquation.horizontal(left, OptionalDouble.of(constrained), right, marginLeft, marginRight,
                         cbWidth, staticX, content);

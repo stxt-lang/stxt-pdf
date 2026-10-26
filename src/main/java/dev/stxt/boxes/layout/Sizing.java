@@ -2,7 +2,6 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.OptionalDouble;
 
@@ -18,15 +17,6 @@ public final class Sizing {
     public static double constrain(double provisional, double min, OptionalDouble max) {
         double v = max.isPresent() ? Math.min(provisional, max.getAsDouble()) : provisional;
         return Math.max(v, min);
-    }
-
-    /**
-     * Convierte un ancho o alto especificado en tamaño de caja de borde, según {@code Box sizing}.
-     * Con {@code Box sizing: content}, el valor declarado es el del contenido y se le suman
-     * relleno y borde.
-     */
-    public static double toBorderBox(double declared, Style.BoxSizing boxSizing, double paddingAndBorder) {
-        return boxSizing == Style.BoxSizing.CONTENT ? declared + paddingAndBorder : declared;
     }
 
     /**

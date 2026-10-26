@@ -229,8 +229,7 @@ public final class GridLayout implements LayoutAlgorithm {
         double width = horizontal == Style.Alignment.STRETCH
                 ? areaWidth - margin.horizontal()
                 : engine.intrinsic(item).fitContent(areaWidth) - margin.horizontal();
-        double extra = probe.border().horizontal() + probe.padding().horizontal();
-        return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth, extra);
+        return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth);
     }
 
     /**

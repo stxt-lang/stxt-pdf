@@ -81,7 +81,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Nodos de `stxt-core`:** el motor trabaja directamente con `dev.stxt.Node`, `InlineNode`
   (valor inline e hijos) y `TextNode` (bloque `>>`); `getText()` da el contenido en los dos
   casos. Los nombres se comparan por `getCanonicalName()`: minúsculas y los espacios convertidos
-  en guiones (`Box sizing` → `box-sizing`). Los errores de sintaxis y del template son
+  en guiones (`Min width` → `min-width`). Los errores de sintaxis y del template son
   `ParseException` de la librería, con código (`INVALID_VALUE`, `TOO_FEW_CHILDREN`…) y línea.
 - **`BoxTreeBuilder`** interpreta valores, aplica la herencia, crea las cajas anónimas (§5.1) y
   comprueba las reglas del §6 que el template no puede expresar. Los errores son
@@ -180,8 +180,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   grid necesitan saber si era `auto`); se convierte a puntos con `resolve(...)` durante el
   layout.
 - **Geometría:** posiciones y tamaños se refieren a la **caja de borde** salvo que se diga otra
-  cosa; `Box sizing: border` es el valor por defecto. El ancho baja de padres a hijos y el alto
-  sube de hijos a padres.
+  cosa; `Width` y `Height` la miden siempre (no hay `Box sizing`). El ancho baja de padres a
+  hijos y el alto sube de hijos a padres.
 - **Inmutabilidad:** las entradas y salidas del layout son `record` con listas copiadas
   (`List.copyOf`). `Box` es mutable y su igualdad es por identidad (clave de la caché).
 - **Min y max:** primero se aplica el máximo y luego el mínimo; si chocan, gana el mínimo

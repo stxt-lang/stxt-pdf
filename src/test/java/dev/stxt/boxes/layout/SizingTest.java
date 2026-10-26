@@ -2,7 +2,6 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
@@ -32,7 +31,6 @@ class SizingTest {
         // Width 50 % (border-box), relleno 10 20, borde 1 → contenido 215.5.
         double border = new Value.Percentage(50).resolve(515).getAsDouble();
         assertEquals(215.5, border - 2 - 40, 1e-9);
-        assertEquals(257.5 + 42, Sizing.toBorderBox(257.5, Style.BoxSizing.CONTENT, 42), 1e-9);
     }
 
     @Test
