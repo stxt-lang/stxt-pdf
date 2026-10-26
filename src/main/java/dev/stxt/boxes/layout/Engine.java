@@ -68,8 +68,17 @@ public final class Engine {
         cache.clear();
     }
 
+    /** min-content y max-content de la caja de margen (§5.9). */
     public IntrinsicSizes intrinsic(Box box) {
-        return cache.intrinsic(box, () -> algorithm(box).intrinsic(box));
+        return cache.intrinsic(box, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
+    }
+
+    /**
+     * min-content y max-content del contenido de la caja, sin su {@code Width}: el mínimo
+     * automático de un ítem flex depende de ellos (§5.7).
+     */
+    public IntrinsicSizes contentIntrinsic(Box box) {
+        return cache.contentIntrinsic(box, () -> algorithm(box).contentIntrinsic(box));
     }
 
     /**

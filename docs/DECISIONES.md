@@ -25,24 +25,15 @@ Resueltas en el código después del repaso:
   hueco al final de cada página cuando la caja se corta de todos modos.
 - **38:** con 100 páginas o más, el `Paginator` vuelve a paginar reservando las cifras del total
   (§5.10).
+- **6 y 7:** el mínimo automático de un ítem flex es el tamaño de su contenido, nunca mayor
+  que su `Width` (o `Height`) declarado, como en CSS (§5.7). Los algoritmos dan ahora los
+  intrínsecos del contenido (`contentIntrinsic`), y `ConstraintSpace.measuringContentHeight()`
+  mide el alto del contenido sin el `Height` de la caja.
 
 ## Cambiar el código
 
 Pendientes de implementar, una a una. Al resolver cada una, actualiza la especificación y
 quítala de aquí.
-
-6. **Un ítem con `Width` fijo no encoge por debajo de ese ancho.** Con `Min width: auto` el
-   mínimo es el min-content del ítem (§5.7), y una caja con `Width` fijo tiene ese valor como
-   min-content (§5.9). En CSS, un ítem con `width: 400px` sí encoge hasta el min-content de su
-   contenido, así que `Shrink` solo afecta aquí a ítems sin ancho declarado.
-   *Dónde:* `layout/flex/FlexLayout.rowItem`.
-   *Propuesta (CSS):* mínimo automático = min(ancho declarado, min-content del contenido);
-   necesita los intrínsecos del contenido sin el `Width` de la caja. Se resuelve junto con la 7.
-
-7. **En `column`, el mínimo automático de un ítem con `Height` declarado es ese alto**, no el
-   alto de su contenido como en CSS.
-   *Dónde:* `layout/flex/FlexLayout.columnItem`.
-   *Propuesta (CSS):* mínimo automático = min(alto declarado, alto del contenido).
 
 15. **Un ítem que ocupa varias pistas y alguna es flexible no aporta nada a su tamaño**
     (simplificación que ya traía `TrackSizing`). Un ítem largo que cruza una columna `1fr`

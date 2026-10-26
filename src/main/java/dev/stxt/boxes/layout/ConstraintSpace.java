@@ -19,6 +19,9 @@ import java.util.OptionalDouble;
  *                                continuo, o una caja que no se parte, como un ítem de flex)
  * @param atFragmentainerStart    no hay nada antes de la caja en esta página: debe colocar algo
  *                                aunque no quepa (garantía de progreso)
+ * @param contentHeight           se mide el alto del contenido: la caja ignora su {@code Height}
+ *                                y su {@code Aspect ratio} (el mínimo automático de un ítem flex
+ *                                en {@code column}, §5.7); no pasa a sus hijos
  */
 public record ConstraintSpace(
         double availableWidth,
@@ -28,7 +31,15 @@ public record ConstraintSpace(
         double percentBaseWidth,
         OptionalDouble percentBaseHeight,
         OptionalDouble fragmentainerRemaining,
-        boolean atFragmentainerStart) {
+        boolean atFragmentainerStart,
+        boolean contentHeight) {
+
+    public ConstraintSpace(double availableWidth, OptionalDouble availableHeight, boolean fixedWidth,
+                           boolean fixedHeight, double percentBaseWidth, OptionalDouble percentBaseHeight,
+                           OptionalDouble fragmentainerRemaining, boolean atFragmentainerStart) {
+        this(availableWidth, availableHeight, fixedWidth, fixedHeight, percentBaseWidth, percentBaseHeight,
+                fragmentainerRemaining, atFragmentainerStart, false);
+    }
 
     /** Espacio de la caja raíz al empezar una página (o el documento, en modo continuo). */
     public static ConstraintSpace forPage(Media media) {
@@ -45,6 +56,12 @@ public record ConstraintSpace(
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
                 percentBaseWidth, percentBaseHeight,
                 fragmenting() ? OptionalDouble.of(remaining) : OptionalDouble.empty(), atStart);
+    }
+
+    /** El mismo espacio, para medir el alto del contenido sin el {@code Height} de la caja. */
+    public ConstraintSpace measuringContentHeight() {
+        return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
+                percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, true);
     }
 
     /** El mismo espacio, con fragmentación aunque no la tuviera (los ítems que se parten en paralelo). */

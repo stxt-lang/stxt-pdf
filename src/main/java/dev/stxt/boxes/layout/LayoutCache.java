@@ -21,15 +21,26 @@ public final class LayoutCache {
     }
 
     private final Map<Box, IntrinsicSizes> intrinsics = new IdentityHashMap<>();
+    private final Map<Box, IntrinsicSizes> contents = new IdentityHashMap<>();
     private final Map<Key, LayoutResult> layouts = new HashMap<>();
     private int hits;
     private int misses;
 
+    /** Tamaños intrínsecos de la caja de margen. */
     public IntrinsicSizes intrinsic(Box box, Supplier<IntrinsicSizes> computation) {
-        IntrinsicSizes r = intrinsics.get(box);
+        return cached(intrinsics, box, computation);
+    }
+
+    /** Tamaños intrínsecos del contenido. */
+    public IntrinsicSizes contentIntrinsic(Box box, Supplier<IntrinsicSizes> computation) {
+        return cached(contents, box, computation);
+    }
+
+    private static IntrinsicSizes cached(Map<Box, IntrinsicSizes> map, Box box, Supplier<IntrinsicSizes> computation) {
+        IntrinsicSizes r = map.get(box);
         if (r == null) {
             r = computation.get();
-            intrinsics.put(box, r);
+            map.put(box, r);
         }
         return r;
     }
@@ -50,6 +61,7 @@ public final class LayoutCache {
 
     public void clear() {
         intrinsics.clear();
+        contents.clear();
         layouts.clear();
     }
 

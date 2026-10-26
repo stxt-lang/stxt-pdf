@@ -86,7 +86,7 @@ public final class GridLayout implements LayoutAlgorithm {
      * restricción max-content (espacio infinito y los ítems aportando su max-content), §5.9.
      */
     @Override
-    public IntrinsicSizes intrinsic(Box box) {
+    public IntrinsicSizes contentIntrinsic(Box box) {
         Grid g = grid(box);
         // Sin containing block, un hueco en porcentaje cuenta como 0.
         double gap = box.style.columnGap.resolve(OptionalDouble.empty()).orElse(0);
@@ -103,7 +103,7 @@ public final class GridLayout implements LayoutAlgorithm {
         List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
         double min = sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
         double max = sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
-        return BoxModel.intrinsic(box, new IntrinsicSizes(min, Math.max(min, max)));
+        return new IntrinsicSizes(min, Math.max(min, max));
     }
 
     @Override

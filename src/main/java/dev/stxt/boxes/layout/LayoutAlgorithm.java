@@ -8,8 +8,12 @@ import dev.stxt.boxes.tree.Box;
  */
 public interface LayoutAlgorithm {
 
-    /** min-content y max-content de la caja de margen. No depende del espacio disponible. */
-    IntrinsicSizes intrinsic(Box box);
+    /**
+     * min-content y max-content del contenido de la caja, sin su borde, su relleno, su margen ni
+     * su {@code Width}. No depende del espacio disponible. Los de la caja de margen los da
+     * {@link Engine#intrinsic} con {@link BoxModel#intrinsic}.
+     */
+    IntrinsicSizes contentIntrinsic(Box box);
 
     /**
      * Calcula la geometría de la caja y de sus descendientes.

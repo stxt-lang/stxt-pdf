@@ -92,12 +92,15 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   recursiva de layout o de tamaños intrínsecos pasa por `engine.layout(...)` /
   `engine.intrinsic(...)`**, nunca directamente al algoritmo, para usar la `LayoutCache` (sin
   ella, flex y grid anidados crecen de forma exponencial).
-- **`LayoutAlgorithm`**: `intrinsic(box)` (min/max-content de la caja de margen, independiente
-  del espacio) y `layout(box, space, from)`.
+- **`LayoutAlgorithm`**: `contentIntrinsic(box)` (min/max-content del contenido, sin borde,
+  relleno, margen ni `Width`; independiente del espacio) y `layout(box, space, from)`. Los de la
+  caja de margen los da `engine.intrinsic(box)` con `BoxModel.intrinsic`; los del contenido,
+  `engine.contentIntrinsic(box)` (el mínimo automático de un ítem flex).
 - **`ConstraintSpace`** es la entrada inmutable del layout y parte de la clave de la caché:
   ancho disponible, alto (vacío = indefinido), tamaños impuestos por el padre, bases de
   porcentajes, espacio restante en la página desde el borde superior de la caja (vacío = sin
-  fragmentación) y si la caja empieza la página.
+  fragmentación), si la caja empieza la página y si se mide el alto de su contenido ignorando
+  su `Height` (`measuringContentHeight()`).
 - **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad
   del corte (`PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su
   containing block (con la posición estática relativa a la caja de contenido de quien devuelve

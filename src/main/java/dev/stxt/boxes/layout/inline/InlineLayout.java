@@ -90,16 +90,16 @@ public final class InlineLayout implements LayoutAlgorithm {
     }
 
     @Override
-    public IntrinsicSizes intrinsic(Box box) {
+    public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
                 ? LineBreaker.intrinsics(box.text, measurer, box.style.font, box.style.fontSize)
                 : IntrinsicSizes.ZERO;
-        return BoxModel.intrinsic(box, content);
+        return content;
     }
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, () -> intrinsic(box));
+        BoxModel model = BoxModel.resolve(box, space, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
         model.applyTo(box);
         Style s = box.style;
         double available = model.contentWidth();

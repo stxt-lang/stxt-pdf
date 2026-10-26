@@ -54,6 +54,50 @@ class FlexLayoutTest {
     }
 
     @Test
+    void itemWithWidthShrinksToItsContent() {
+        // Faltan 285: los dos ceden 142.5. Su contenido mide 10, así que Width no los frena.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tLayout: flex",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tWidth: 400", "\t\t\tText: aa",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tWidth: 400", "\t\t\tText: bb");
+        assertRect(40, 40, 257.5, 12, l.rect("A"));
+        assertRect(297.5, 40, 257.5, 12, l.rect("B"));
+    }
+
+    @Test
+    void itemWithWidthDoesNotShrinkBelowItsContent() {
+        // A cedería 142.5, pero su palabra mide 300: se congela ahí y B cede el resto.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tLayout: flex",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tWidth: 400", "\t\t\tText: " + "a".repeat(60),
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tWidth: 400", "\t\t\tText: b");
+        assertEquals(300, l.rect("A").width(), 1e-9);
+        assertRect(340, 40, 215, 12, l.rect("B"));
+    }
+
+    @Test
+    void columnItemWithHeightShrinksToItsContent() {
+        // En 100 de alto faltan 60: los dos ceden 30. Su contenido mide 12 (una línea).
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tLayout: flex", "\t\tHeight: 100", "\t\tFlex:", "\t\t\tDirection: column",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 80", "\t\t\tText: a",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 80", "\t\t\tText: b");
+        assertRect(40, 40, 515, 50, l.rect("A"));
+        assertRect(40, 90, 515, 50, l.rect("B"));
+    }
+
+    @Test
+    void columnItemWithHeightDoesNotShrinkBelowItsContent() {
+        // A cedería 30, pero sus tres líneas miden 36 (con 10 de ancho, una palabra por línea).
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tLayout: flex", "\t\tHeight: 50", "\t\tFlex:", "\t\t\tDirection: column",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 40", "\t\t\tWidth: 10", "\t\t\tText: aa bb cc",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 40", "\t\t\tText: d");
+        assertRect(40, 40, 10, 36, l.rect("A"));
+        assertRect(40, 76, 515, 14, l.rect("B"));
+    }
+
+    @Test
     void itemMarginsAreOutsideTheMainSize() {
         LayoutFixture l = layOut(
                 "\tBox:", "\t\tLayout: flex",

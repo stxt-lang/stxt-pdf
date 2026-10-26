@@ -6,7 +6,8 @@ package dev.stxt.boxes.layout.flex;
  * @param basis  tamaño base ({@code Basis}, el tamaño declarado o el max-content)
  * @param grow   factor {@code Grow}
  * @param shrink factor {@code Shrink}
- * @param min    mínimo; con {@code Min width: auto} es el min-content del ítem
+ * @param min    mínimo; con {@code Min width: auto} es el tamaño de su contenido, sin pasar del
+ *               tamaño declarado (§5.7)
  * @param max    máximo; {@link Double#POSITIVE_INFINITY} si no hay
  */
 public record FlexItem(double basis, double grow, double shrink, double min, double max) {

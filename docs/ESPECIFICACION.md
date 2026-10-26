@@ -461,7 +461,9 @@ el **eje cruzado**.
 2. **Base** de cada ítem: `Basis` si tiene valor; si es `auto`, el tamaño declarado en el eje
    principal; si tampoco lo hay, su max-content.
 3. **Tamaño hipotético:** la base limitada por el mínimo y el máximo del ítem. Con
-   `Min width: auto`, el mínimo es el **min-content** del ítem.
+   `Min width: auto` (`Min height: auto` en `column`), el mínimo es el **tamaño de su
+   contenido**: el min-content en `row` y el alto del contenido en `column`, sin pasar del
+   máximo del ítem y nunca mayor que su `Width` (o `Height`) declarado.
 4. **Líneas:** sin `Wrap`, una sola. Con `Wrap`, los ítems se añaden a la línea mientras
    sus tamaños hipotéticos y los huecos quepan.
 5. **Tamaños flexibles** (por línea), ver abajo.
@@ -504,7 +506,9 @@ Si el sobrante es negativo (los ítems desbordan), `between` se alinea como `sta
 - En `column` con `Height: auto` no hay espacio libre: `Grow` no tiene efecto.
 - `Basis: 0` con `Grow: 1` reparte todo el espacio (columnas iguales); `Basis: auto` con
   `Grow: 1` solo reparte el sobrante sobre el tamaño del contenido.
-- Un ítem no encoge por debajo de su min-content salvo que declare `Min width: 0`.
+- Un ítem no encoge por debajo del min-content de su contenido salvo que declare
+  `Min width: 0`. Un `Width` declarado no lo frena: un ítem con `Width: 400` y poco contenido
+  encoge si no cabe.
 
 ### 5.8 Grid
 
@@ -570,7 +574,8 @@ al dimensionar las filas, todavía sin área, cuentan como `auto`.
 | `flex` en `column` | máximo de los ítems | máximo de los ítems |
 | `grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
 
-Una caja con `Width` fijo tiene ese valor como min-content y max-content. Las cajas `absolute`
+Una caja con `Width` fijo tiene ese valor como min-content y max-content (el mínimo
+automático de un ítem flex mira en cambio su contenido, [§5.7](#57-flex)). Las cajas `absolute`
 y `fixed` no aportan nada a sus ancestros. En flex se usan los tamaños intrínsecos de cada ítem
 tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En grid, el max-content hace que
 las fracciones lleguen al max-content de su contenido.

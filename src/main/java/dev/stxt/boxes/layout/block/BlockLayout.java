@@ -63,7 +63,7 @@ public final class BlockLayout implements LayoutAlgorithm {
     }
 
     @Override
-    public IntrinsicSizes intrinsic(Box box) {
+    public IntrinsicSizes contentIntrinsic(Box box) {
         double min = 0;
         double max = 0;
         for (Box child : box.inFlowChildren()) {
@@ -71,7 +71,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             min = Math.max(min, i.minContent());
             max = Math.max(max, i.maxContent());
         }
-        return BoxModel.intrinsic(box, new IntrinsicSizes(min, max));
+        return new IntrinsicSizes(min, max);
     }
 
     @Override

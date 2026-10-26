@@ -26,7 +26,8 @@ import java.util.OptionalDouble;
  * <ol>
  *   <li>Espacio disponible en el eje principal.</li>
  *   <li>Base de cada ítem: {@code Basis}, el tamaño declarado o el max-content.</li>
- *   <li>Tamaño hipotético: base limitada por el mínimo (min-content si {@code Min width: auto}).</li>
+ *   <li>Tamaño hipotético: base limitada por el mínimo (con {@code Min width: auto}, el tamaño
+ *       del contenido, sin pasar del declarado).</li>
  *   <li>Repartir en líneas si {@code Wrap}.</li>
  *   <li>Resolver tamaños flexibles con {@link FlexResolver}.</li>
  *   <li>Tamaño cruzado: layout de cada ítem con su tamaño principal; la línea mide el mayor.</li>
@@ -61,7 +62,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     /** Tabla de ESPECIFICACION.md §5.9. */
     @Override
-    public IntrinsicSizes intrinsic(Box box) {
+    public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style;
         // Sin containing block, un hueco en porcentaje cuenta como 0.
         double gap = s.columnGap.resolve(OptionalDouble.empty()).orElse(0);
@@ -86,7 +87,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         } else {
             content = new IntrinsicSizes(sumMin + gaps, sumMax + gaps);
         }
-        return BoxModel.intrinsic(box, content);
+        return content;
     }
 
     @Override
@@ -281,17 +282,17 @@ public final class FlexLayout implements LayoutAlgorithm {
             double base = basis.isPresent() ? basis.getAsDouble() + margins
                     : declared.isPresent() ? declared.getAsDouble() + margins
                     : intrinsic.maxContent();
+            double max = is.maxWidth == null ? Double.POSITIVE_INFINITY
+                    : borderBox(is.maxWidth.resolve(contentWidth), is, extra).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.minWidth.isAuto()) {
-                // Un ítem no encoge por debajo de su min-content (ni de su ancho declarado, si es menor).
-                min = declared.isPresent()
-                        ? Math.min(intrinsic.minContent(), declared.getAsDouble() + margins)
-                        : intrinsic.minContent();
+                // Mínimo automático (§5.7): el min-content de su contenido, sin pasar de Max width,
+                // y nunca más que el ancho declarado.
+                double content = Math.min(engine.contentIntrinsic(b).minContent() + extra + margins, max);
+                min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
                 min = borderBox(is.minWidth.resolve(contentWidth), is, extra).orElse(0) + margins;
             }
-            double max = is.maxWidth == null ? Double.POSITIVE_INFINITY
-                    : borderBox(is.maxWidth.resolve(contentWidth), is, extra).orElse(Double.POSITIVE_INFINITY) + margins;
             it.flex = new FlexItem(base, is.itemGrow, is.itemShrink, min, max);
             return it;
         }
@@ -322,8 +323,17 @@ public final class FlexLayout implements LayoutAlgorithm {
 
             OptionalDouble basis = declaredBasis(is, extra);
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
-            double min = is.minHeight.isAuto() ? contentSize + margins
-                    : borderBox(is.minHeight.resolve(contentHeight), is, extra).orElse(0) + margins;
+            double min;
+            if (is.minHeight.isAuto()) {
+                // Mínimo automático (§5.7): el alto de su contenido, sin pasar de Max height, y
+                // nunca más que el alto declarado.
+                double content = sized.height().isPresent()
+                        ? engine.layout(b, measure.measuringContentHeight(), null).fragment().height()
+                        : contentSize;
+                min = Math.min(contentSize, content) + margins;
+            } else {
+                min = borderBox(is.minHeight.resolve(contentHeight), is, extra).orElse(0) + margins;
+            }
             double max = is.maxHeight == null ? Double.POSITIVE_INFINITY
                     : borderBox(is.maxHeight.resolve(contentHeight), is, extra).orElse(Double.POSITIVE_INFINITY) + margins;
             it.flex = new FlexItem(base, is.itemGrow, is.itemShrink, min, max);

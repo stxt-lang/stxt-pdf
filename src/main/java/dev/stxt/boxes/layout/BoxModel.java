@@ -60,6 +60,8 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         OptionalDouble height;
         if (space.fixedHeight()) {
             height = space.availableHeight();
+        } else if (space.contentHeight()) {
+            height = OptionalDouble.empty();
         } else {
             height = borderBox(s.height.resolve(baseHeight), s, extraHeight);
             if (height.isEmpty() && s.aspectRatio != null) {
