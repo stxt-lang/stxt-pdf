@@ -11,7 +11,8 @@ import java.util.Map;
 
 /**
  * Maqueta un documento continuo de 595 pt con márgenes de 40 (área útil de 515 pt desde
- * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página.
+ * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página,
+ * incluidos los de las cajas {@code fixed}.
  */
 public final class LayoutFixture {
 
@@ -21,7 +22,8 @@ public final class LayoutFixture {
     private final Map<String, Rect> rects = new HashMap<>();
 
     private LayoutFixture(Page page) {
-        walk(page.content(), 40, 40);
+        walk(page.content().children(), 40, 40);
+        walk(page.fixed(), 40, 40);
     }
 
     /** Líneas de las cajas de primer nivel, con tabuladores como en el documento. */
@@ -45,16 +47,16 @@ public final class LayoutFixture {
         return fragments.get(id);
     }
 
-    /** Recorre los hijos de un fragmento cuya caja de contenido empieza en (x, y). */
-    private void walk(Fragment parent, double x, double y) {
-        for (Fragment f : parent.children()) {
+    /** Recorre fragmentos relativos a una caja de contenido que empieza en (x, y). */
+    private void walk(List<Fragment> children, double x, double y) {
+        for (Fragment f : children) {
             Rect border = new Rect(x + f.x(), y + f.y(), f.width(), f.height());
             if (f.box().id != null) {
                 fragments.put(f.box().id, f);
                 rects.put(f.box().id, border);
             }
             Rect content = border.shrink(f.border()).shrink(f.box().padding);
-            walk(f, content.x(), content.y());
+            walk(f.children(), content.x(), content.y());
         }
     }
 }

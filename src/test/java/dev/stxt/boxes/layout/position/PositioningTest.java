@@ -1,0 +1,172 @@
+package dev.stxt.boxes.layout.position;
+
+import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.model.Rect;
+import org.junit.jupiter.api.Test;
+
+import static dev.stxt.boxes.layout.LayoutFixture.layOut;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class PositioningTest {
+
+    private static void assertRect(double x, double y, double w, double h, Rect r) {
+        assertEquals(new Rect(x, y, w, h).toString(), new Rect(round(r.x()), round(r.y()), round(r.width()), round(r.height())).toString());
+    }
+
+    private static double round(double v) {
+        return Math.round(v * 100) / 100.0;
+    }
+
+    @Test
+    void relativeShiftsWithoutMovingSiblings() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: A", "\t\tHeight: 10",
+                "\tBox:", "\t\tId: R", "\t\tPosition: relative", "\t\tOffset: 5 auto auto 10", "\t\tHeight: 20",
+                "\tBox:", "\t\tId: B", "\t\tHeight: 10");
+        assertRect(40, 40, 515, 10, l.rect("A"));
+        assertRect(50, 55, 515, 20, l.rect("R"));
+        assertRect(40, 70, 515, 10, l.rect("B"));
+    }
+
+    @Test
+    void relativeTopAndLeftWin() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: all", "\t\tPosition: relative", "\t\tOffset: 5 7 9 11", "\t\tHeight: 20",
+                "\tBox:", "\t\tId: endOnly", "\t\tPosition: relative", "\t\tOffset: auto 7 9 auto", "\t\tHeight: 20");
+        assertRect(51, 45, 515, 20, l.rect("all"));
+        assertRect(33, 51, 515, 20, l.rect("endOnly"));
+    }
+
+    @Test
+    void relativePercentages() {
+        // Izquierda: 10 % de 515. Arriba: 10 % del alto del padre, que solo es definido en P.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: top", "\t\tPosition: relative", "\t\tOffset: 50% auto auto 10%", "\t\tHeight: 20",
+                "\tBox:", "\t\tHeight: 200",
+                "\t\tBox:", "\t\t\tId: inner", "\t\t\tPosition: relative", "\t\t\tOffset: 10% auto auto auto", "\t\t\tHeight: 10");
+        assertRect(91.5, 40, 515, 20, l.rect("top"));
+        assertRect(40, 80, 515, 10, l.rect("inner"));
+    }
+
+    @Test
+    void absoluteWithoutPositionedAncestorUsesThePageArea() {
+        // En modo continuo, el alto del área útil es el del flujo: 100.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tHeight: 100",
+                "\tBox:", "\t\tId: S", "\t\tPosition: absolute", "\t\tOffset: 0 0 auto auto", "\t\tWidth: 80", "\t\tHeight: 30",
+                "\tBox:", "\t\tId: F", "\t\tPosition: absolute", "\t\tOffset: auto 0 0 auto", "\t\tWidth: 80", "\t\tHeight: 30");
+        assertRect(475, 40, 80, 30, l.rect("S"));
+        assertRect(475, 110, 80, 30, l.rect("F"));
+    }
+
+    @Test
+    void containingBlockIsThePaddingBoxOfThePositionedAncestor() {
+        // Caja de relleno de R: (42, 42), 511 × 96.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: R", "\t\tPosition: relative", "\t\tHeight: 100", "\t\tBorder: 2", "\t\tPadding: 10",
+                "\t\tBox:", "\t\t\tId: TL", "\t\t\tPosition: absolute", "\t\t\tOffset: 0 auto auto 0", "\t\t\tWidth: 50", "\t\t\tHeight: 20",
+                "\t\tBox:", "\t\t\tId: BR", "\t\t\tPosition: absolute", "\t\t\tOffset: auto 0 0 auto", "\t\t\tWidth: 50", "\t\t\tHeight: 20");
+        assertRect(40, 40, 515, 100, l.rect("R"));
+        assertRect(42, 42, 50, 20, l.rect("TL"));
+        assertRect(503, 118, 50, 20, l.rect("BR"));
+    }
+
+    @Test
+    void absoluteBoxesDoNotContributeToTheParentHeight() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: R", "\t\tPosition: relative",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tPosition: absolute", "\t\t\tWidth: 10", "\t\t\tHeight: 50");
+        assertRect(40, 40, 515, 0, l.rect("R"));
+        assertRect(40, 40, 10, 50, l.rect("A"));
+    }
+
+    @Test
+    void staticPositionAndShrinkToFit() {
+        // A estaría en la caja de contenido de M: (40 + 5, 40 + 10 + 5). Su texto mide 30.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: R", "\t\tPosition: relative",
+                "\t\tBox:", "\t\t\tHeight: 10",
+                "\t\tBox:", "\t\t\tPadding: 5",
+                "\t\t\tBox:", "\t\t\t\tId: A", "\t\t\t\tPosition: absolute", "\t\t\t\tText: aaa bb");
+        assertRect(40, 40, 515, 20, l.rect("R"));
+        assertRect(45, 55, 30, 12, l.rect("A"));
+    }
+
+    @Test
+    void autoSizeStretchesBetweenOffsets() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 100",
+                "\t\tBox:", "\t\t\tId: S", "\t\t\tPosition: absolute", "\t\t\tOffset: 10 20 30 15");
+        assertRect(55, 50, 480, 60, l.rect("S"));
+    }
+
+    @Test
+    void autoMarginsCenter() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 200",
+                "\t\tBox:", "\t\t\tId: C", "\t\t\tPosition: absolute", "\t\t\tOffset: 0",
+                "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tMargin: auto");
+        assertRect(247.5, 115, 100, 50, l.rect("C"));
+    }
+
+    @Test
+    void minAndMaxWidthLimitTheAutomaticWidth() {
+        // El máximo convierte el estiramiento en un ancho fijo: sobre-restringida, se ignora la derecha.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tId: min", "\t\tPosition: absolute", "\t\tMin width: 100", "\t\tText: aaa",
+                "\tBox:", "\t\tId: max", "\t\tPosition: absolute", "\t\tOffset: 0 0 auto 0", "\t\tMax width: 200", "\t\tHeight: 10");
+        assertRect(40, 40, 100, 12, l.rect("min"));
+        assertRect(40, 40, 200, 10, l.rect("max"));
+    }
+
+    @Test
+    void percentagesUseTheContainingBlock() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tPosition: relative", "\t\tWidth: 200", "\t\tHeight: 100",
+                "\t\tBox:", "\t\t\tId: P", "\t\t\tPosition: absolute", "\t\t\tOffset: 50% auto auto 25%",
+                "\t\t\tWidth: 50%", "\t\t\tHeight: 10%");
+        assertRect(90, 90, 100, 10, l.rect("P"));
+    }
+
+    @Test
+    void absoluteMovesWithItsRelativeContainingBlock() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tPosition: relative", "\t\tOffset: 10 auto auto 20", "\t\tHeight: 50",
+                "\t\tBox:", "\t\t\tId: A", "\t\t\tPosition: absolute", "\t\t\tOffset: 0 auto auto 0",
+                "\t\t\tWidth: 10", "\t\t\tHeight: 10");
+        assertRect(60, 50, 10, 10, l.rect("A"));
+    }
+
+    @Test
+    void nestedAbsoluteUsesTheNearestPositionedAncestor() {
+        // B es absolute y por tanto containing block de C, aunque esté dentro de R.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 100",
+                "\t\tBox:", "\t\t\tId: B", "\t\t\tPosition: absolute", "\t\t\tOffset: 10 auto auto 10",
+                "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tBorder: 1",
+                "\t\t\tBox:", "\t\t\t\tId: C", "\t\t\t\tPosition: absolute", "\t\t\t\tOffset: auto 0 0 auto",
+                "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
+        assertRect(50, 50, 100, 50, l.rect("B"));
+        assertRect(139, 89, 10, 10, l.rect("C"));
+    }
+
+    @Test
+    void fixedInContinuousModeUsesTheDocumentHeight() {
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tHeight: 100",
+                "\tBox:", "\t\tId: F", "\t\tPosition: fixed", "\t\tOffset: auto 0 0 0", "\t\tHeight: 20");
+        assertRect(40, 120, 515, 20, l.rect("F"));
+    }
+
+    @Test
+    void fixedIgnoresPositionedAncestors() {
+        // G no tiene desplazamientos: queda en su posición estática, en la caja de contenido de R.
+        LayoutFixture l = layOut(
+                "\tBox:", "\t\tHeight: 30",
+                "\tBox:", "\t\tPosition: relative", "\t\tPadding: 10", "\t\tHeight: 100",
+                "\t\tBox:", "\t\t\tId: F", "\t\t\tPosition: fixed", "\t\t\tOffset: 0 auto auto 0", "\t\t\tWidth: 10", "\t\t\tHeight: 10",
+                "\t\tBox:", "\t\t\tId: G", "\t\t\tPosition: fixed", "\t\t\tWidth: 10", "\t\t\tHeight: 10");
+        assertRect(40, 40, 10, 10, l.rect("F"));
+        assertRect(50, 80, 10, 10, l.rect("G"));
+    }
+}

@@ -40,7 +40,7 @@ de ruta.
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del template | Hecho y probado |
 | `BlockLayout`, `InlineLayout` en modo continuo (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Text align: justify` se coloca como `left`) | Pendiente |
-| Cajas `absolute` y `fixed` en el layout | Pendiente (hito 3) |
+| Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
 | `FlexLayout` | Pendiente (hito 4) |
 | `GridLayout` | Pendiente (hito 5) |
 | Fragmentación en los algoritmos, PDF con PDFBox | Pendiente (hito 6) |
@@ -52,7 +52,7 @@ caso deja un SVG de depuración en `target/golden-svg/`.
 
 1. ~~**Árbol de cajas.** Conectar `DocumentReader` con `dev.stxt:stxt-core` y validar contra el template.~~ Hecho.
 2. ~~**Bloque y texto.** `BlockLayout` e `InlineLayout` con `FixedMetrics`; salida SVG de depuración. Activar `GoldenTest` (caso 01).~~ Hecho.
-3. **Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator`.
+3. ~~**Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator` (caso 03).~~ Hecho.
 4. **Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).
 5. **Grid.** `GridLayout` sobre `Placement` y `TrackSizing`.
 6. **Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales.
@@ -71,7 +71,7 @@ src/main/java/dev/stxt/boxes/
     inline/     InlineLayout, LineBreaker, TextMeasurer, FixedMetrics
     flex/       FlexLayout, FlexResolver, FlexItem
     grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
-    position/   AbsoluteEquation
+    position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
   fragment/     Fragment, BreakToken, Paginator, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas
   output/       StxtDump

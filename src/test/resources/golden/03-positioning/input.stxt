@@ -1,0 +1,44 @@
+# Posicionamiento (ESPECIFICACION.md §5.5): relative, absolute en su containing block y
+# fixed en el margen de la página.
+Document (dev.stxt.boxes):
+	Media:
+		Type: paged
+		Width: 595
+		Height: 842
+		Margin: 40
+	Box:
+		Id: header
+		Position: fixed
+		Offset: -30 0 auto 0
+		Height: 20
+	Box:
+		Id: footer
+		Position: fixed
+		Offset: auto 0 -30 0
+		Height: 20
+	Box:
+		Id: title
+		Height: 24
+		Margin: 0 0 16 0
+	Box:
+		Id: card
+		Position: relative
+		Offset: 5 auto auto 10
+		Height: 100
+		Padding: 10
+		Border: 2
+		Box:
+			Id: badge
+			Position: absolute
+			Offset: 0 0 auto auto
+			Width: 50
+			Height: 20
+	Box:
+		Id: next
+		Height: 30
+	Box:
+		Id: stamp
+		Position: absolute
+		Offset: 0 0 auto auto
+		Width: 80
+		Height: 30

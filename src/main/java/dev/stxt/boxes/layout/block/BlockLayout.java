@@ -12,6 +12,7 @@ import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.MarginStrut;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
+import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
 
@@ -30,6 +31,7 @@ import java.util.List;
  *     si aún no hay nada entre el borde superior de la caja y el hijo: el strut sale de la caja
  *     si no: cursor += strut                                           // colapso
  *     colocar el fragmento en (margen izquierdo, cursor)               // márgenes auto = centrar
+ *     si es relative: desplazar el fragmento según Offset
  *     cursor += alto; strut = margen inferior del hijo + los que salen de él por abajo
  * Height auto = cursor (+ strut si no sale por abajo) + relleno + borde
  * </pre>
@@ -80,11 +82,11 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         for (Box child : box.children) {
             if (child.style.isOutOfFlow()) {
-                // Posición estática: donde empezaría si estuviera en flujo (§5.5). La resuelve el hito 3.
+                // Posición estática: donde empezaría si estuviera en flujo (§5.5). La caja se
+                // resuelve en su containing block (AbsoluteLayout).
                 pending.add(new PendingAbsolute(child, 0, atTop ? 0 : cursor + strut.resolve()));
                 continue;
             }
-            // TODO(hito 3): desplazar las cajas relative según Offset.
             LayoutResult r = engine.layout(child, childSpace, null);
             Fragment f = r.fragment();
             AdjoiningMargins adjoining = r.adjoining();
@@ -111,6 +113,10 @@ public final class BlockLayout implements LayoutAlgorithm {
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style.margin.left(), child.style.margin.right())[0];
+            // Una caja relative se desplaza después de colocarla; el cursor no se entera (§5.5).
+            RelativeOffset offset = RelativeOffset.of(child.style, contentWidth, childSpace.percentBaseHeight());
+            x += offset.dx();
+            y += offset.dy();
             child.x = x;
             child.y = y;
             fragments.add(f.moved(x, y));

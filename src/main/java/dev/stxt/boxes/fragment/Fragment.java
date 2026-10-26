@@ -3,6 +3,7 @@ package dev.stxt.boxes.fragment;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,5 +39,12 @@ public record Fragment(Box box, double x, double y, double width, double height,
 
     public Fragment moved(double newX, double newY) {
         return new Fragment(box, newX, newY, width, height, border, children, lines, first, last);
+    }
+
+    /** El mismo fragmento con más hijos al final (las cajas absolutas que resuelve esta caja). */
+    public Fragment withMoreChildren(List<Fragment> more) {
+        List<Fragment> all = new ArrayList<>(children);
+        all.addAll(more);
+        return new Fragment(box, x, y, width, height, border, all, lines, first, last);
     }
 }

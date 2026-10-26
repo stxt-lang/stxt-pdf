@@ -43,7 +43,7 @@ referencia; al terminar un hito, actualízala.
 |---|---|---|
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
 | 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho; falta `justify`) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
-| 3 | `relative`, `absolute`, `fixed` (esta en el `Paginator`) | `layout/position`, `fragment/Paginator` |
+| 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
 | 4 | `intrinsic()` en todos los algoritmos; flex (caso 02) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | Grid | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | `BreakToken` en los algoritmos, PDF con PDFBox, métricas reales | `PdfCanvas` (no existe aún), `TextMeasurer` |
@@ -111,6 +111,12 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es
   inmutable y guarda el mayor positivo y el más negativo por separado.
   `Box.establishesBlockFormattingContext()` dice qué cajas lo cortan.
+- **Cajas posicionadas:** los algoritmos no maquetan los hijos `absolute`/`fixed`; los
+  devuelven como `PendingAbsolute` con su posición estática, y los hijos `relative` se
+  desplazan con `RelativeOffset` después de colocarlos. `Engine.layout` resuelve con
+  `AbsoluteLayout` las `absolute` cuyo containing block es la caja recién maquetada (sus
+  fragmentos cuelgan del de esa caja); las `fixed` suben hasta la raíz y el `Paginator` las
+  coloca en `Page.fixed` de cada página.
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`. El
   `Paginator` detecta la falta de progreso comparando tokens; el mismo bucle sirve para los dos
   modos (en continuo da una sola vuelta).

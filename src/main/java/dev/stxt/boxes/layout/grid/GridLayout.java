@@ -15,6 +15,10 @@ import dev.stxt.boxes.tree.Box;
  *   <li>Filas: {@link TrackSizing} con la altura de cada ítem al ancho de sus columnas.</li>
  *   <li>Alinear cada ítem en su área ({@code Horizontal}, {@code Vertical}); estirar = re-layout.</li>
  * </ol>
+ *
+ * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
+ * {@link dev.stxt.boxes.layout.PendingAbsolute}. Los ítems {@code relative} se desplazan con
+ * {@link dev.stxt.boxes.layout.position.RelativeOffset} después de alinearlos.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
 

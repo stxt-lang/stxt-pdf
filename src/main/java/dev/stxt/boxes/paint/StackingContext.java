@@ -23,7 +23,9 @@ import java.util.List;
  * </ol>
  *
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
- * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
+ * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.
+ * Además, el "orden del árbol" es el de los fragmentos: las cajas {@code absolute} cuelgan del
+ * fragmento de su containing block, detrás de sus hijos en flujo.</p>
  */
 public final class StackingContext {
 
@@ -48,10 +50,35 @@ public final class StackingContext {
 
     /** Contexto raíz de una página; {@code originX/Y} es la esquina del área útil. */
     public static StackingContext build(Fragment root, double originX, double originY) {
+        return build(root, List.of(), originX, originY);
+    }
+
+    /**
+     * Contexto raíz de una página con sus cajas {@code fixed}, que crean contextos hijos del
+     * raíz; sus posiciones son relativas al área útil.
+     */
+    public static StackingContext build(Fragment root, List<Fragment> fixed, double originX, double originY) {
         StackingContext sc = new StackingContext(new Piece(root, originX, originY), 0);
         sc.walkChildren(sc.root);
+        for (Fragment f : fixed) {
+            sc.addContext(new Piece(f, originX + f.x(), originY + f.y()));
+        }
         sc.sort();
         return sc;
+    }
+
+    private void addContext(Piece p) {
+        Style s = p.f().box().style;
+        StackingContext child = new StackingContext(p, s.layer != null ? s.layer : 0);
+        child.walkChildren(p);
+        child.sort();
+        if (child.layer < 0) {
+            negative.add(child);
+        } else if (child.layer > 0) {
+            positive.add(child);
+        } else {
+            positionedZero.add(child);
+        }
     }
 
     private void walkChildren(Piece parent) {
@@ -60,16 +87,7 @@ public final class StackingContext {
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y());
             Style s = h.box().style;
             if (createsContext(h)) {
-                StackingContext child = new StackingContext(p, s.layer != null ? s.layer : 0);
-                child.walkChildren(p);
-                child.sort();
-                if (child.layer < 0) {
-                    negative.add(child);
-                } else if (child.layer > 0) {
-                    positive.add(child);
-                } else {
-                    positionedZero.add(child);
-                }
+                addContext(p);
             } else if (s.isPositioned()) {
                 StackingContext pseudo = new StackingContext(p, 0);
                 pseudo.walkChildren(p);

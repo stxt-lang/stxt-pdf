@@ -28,7 +28,8 @@ public final class Box {
     /** Contenido en línea, si la caja contiene texto directamente. */
     public String text;
 
-    // Geometría usada (caja de borde), relativa a la caja de contenido del padre.
+    // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
+    // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.
     public double x;
     public double y;
     public double width;
@@ -65,6 +66,20 @@ public final class Box {
         }
         Style.Layout l = parent.style.layout;
         return l == Style.Layout.FLEX || l == Style.Layout.GRID;
+    }
+
+    /**
+     * Containing block de una caja fuera de flujo (ESPECIFICACION.md §5.2): para {@code absolute},
+     * el ancestro más cercano con {@code Position} distinta de {@code static}; si no hay ninguno,
+     * o si la caja es {@code fixed}, la raíz, que representa el área útil.
+     */
+    public Box outOfFlowContainingBlock() {
+        Box b = parent;
+        boolean fixed = style.position == Style.Position.FIXED;
+        while (b.parent != null && (fixed || !b.style.isPositioned())) {
+            b = b.parent;
+        }
+        return b;
     }
 
     public boolean hasText() {

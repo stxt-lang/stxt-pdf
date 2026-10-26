@@ -34,7 +34,8 @@ class DocumentReaderTest {
         for (String file : new String[] {
                 "src/test/resources/examples/report.stxt",
                 "src/test/resources/golden/01-block-flow/input.stxt",
-                "src/test/resources/golden/02-flex-grow/input.stxt"}) {
+                "src/test/resources/golden/02-flex-grow/input.stxt",
+                "src/test/resources/golden/03-positioning/input.stxt"}) {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }

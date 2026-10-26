@@ -19,6 +19,10 @@ import dev.stxt.boxes.tree.Box;
  *   <li>Estirar los ítems con {@code stretch} y repetir su layout.</li>
  *   <li>Alinear en el eje principal, en el cruzado y las líneas.</li>
  * </ol>
+ *
+ * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
+ * {@link dev.stxt.boxes.layout.PendingAbsolute}. Los ítems {@code relative} se desplazan con
+ * {@link dev.stxt.boxes.layout.position.RelativeOffset} después de alinearlos.</p>
  */
 public final class FlexLayout implements LayoutAlgorithm {
 

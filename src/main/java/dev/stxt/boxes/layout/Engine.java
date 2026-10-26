@@ -10,6 +10,7 @@ import dev.stxt.boxes.layout.grid.GridLayout;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.InlineLayout;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
+import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 
@@ -26,6 +27,7 @@ public final class Engine {
     private final InlineLayout inline;
     private final FlexLayout flex;
     private final GridLayout grid;
+    private final AbsoluteLayout absolute;
 
     public Engine() {
         this(new FixedMetrics());
@@ -36,6 +38,7 @@ public final class Engine {
         this.inline = new InlineLayout(measurer);
         this.flex = new FlexLayout();
         this.grid = new GridLayout();
+        this.absolute = new AbsoluteLayout(this);
     }
 
     /**
@@ -52,12 +55,22 @@ public final class Engine {
         return cache.intrinsic(box, () -> algorithm(box).intrinsic(box));
     }
 
+    /**
+     * Layout de una caja con su algoritmo. Si la caja es el containing block de cajas
+     * {@code absolute} de su interior, las resuelve al terminar (ESPECIFICACION.md §5.5).
+     */
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        return cache.layout(box, space, from, () -> algorithm(box).layout(box, space, from));
+        return cache.layout(box, space, from,
+                () -> absolute.resolvePending(box, algorithm(box).layout(box, space, from)));
     }
 
     public LayoutCache cache() {
         return cache;
+    }
+
+    /** Layout de las cajas fuera de flujo; el {@link Paginator} lo usa para las {@code fixed}. */
+    public AbsoluteLayout absolute() {
+        return absolute;
     }
 
     private LayoutAlgorithm algorithm(Box box) {

@@ -411,7 +411,8 @@ espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlas en
 la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`).
 
 **Orden de cálculo.** Las cajas posicionadas fuera de flujo se resuelven cuando su containing
-block ya conoce su tamaño, después del layout en flujo.
+block ya conoce su tamaño, después del layout en flujo. En modo continuo, cuando el containing
+block es el área útil, su alto es el del flujo del documento (el área útil no tiene alto).
 
 ### 5.6 Apilamiento y orden de pintado
 

@@ -49,10 +49,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         if (space.fixedWidth()) {
             width = space.availableWidth();
         } else {
-            width = Sizing.constrain(
-                    specifiedWidth(s, space, margin, extraWidth, intrinsic),
-                    borderBox(s.minWidth.resolve(baseWidth), s, extraWidth).orElse(0),
-                    s.maxWidth == null ? OptionalDouble.empty() : borderBox(s.maxWidth.resolve(baseWidth), s, extraWidth));
+            width = constrainWidth(s, specifiedWidth(s, space, margin, extraWidth, intrinsic), baseWidth, extraWidth);
         }
 
         double minHeight = borderBox(s.minHeight.resolve(baseHeight), s, extraHeight).orElse(0);
@@ -72,6 +69,18 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             }
         }
         return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight);
+    }
+
+    /**
+     * Limita un ancho de caja de borde por {@code Min width} y {@code Max width} (§5.9).
+     *
+     * @param baseWidth  base de los porcentajes
+     * @param extraWidth borde y relleno horizontales, para {@code Box sizing: content}
+     */
+    public static double constrainWidth(Style s, double width, double baseWidth, double extraWidth) {
+        return Sizing.constrain(width,
+                borderBox(s.minWidth.resolve(baseWidth), s, extraWidth).orElse(0),
+                s.maxWidth == null ? OptionalDouble.empty() : borderBox(s.maxWidth.resolve(baseWidth), s, extraWidth));
     }
 
     /** Ancho de caja de borde antes de mínimo y máximo. */
