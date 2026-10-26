@@ -42,7 +42,7 @@ public final class StxtDump {
     private static void dumpChildren(StringBuilder sb, Fragment parent, double absX, double absY,
                                      int level, boolean includeWithoutId) {
         Rect content = new Rect(absX, absY, parent.width(), parent.height())
-                .shrink(parent.border()).shrink(parent.box().padding);
+                .shrink(parent.border()).shrink(parent.padding());
         for (Fragment h : parent.children()) {
             dumpFragment(sb, h, content.x(), content.y(), level, includeWithoutId);
         }

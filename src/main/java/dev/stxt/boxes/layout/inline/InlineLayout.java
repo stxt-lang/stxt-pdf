@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
@@ -9,6 +10,7 @@ import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
+import dev.stxt.boxes.layout.Slice;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
 
@@ -20,6 +22,10 @@ import java.util.List;
  *
  * <p>Pasos: resolver el ancho de contenido, partir con {@link LineBreaker}, alinear cada línea,
  * altura = número de líneas × {@code Line height}.</p>
+ *
+ * <p>En modo paginado (§5.10) se colocan las líneas que caben desde la del {@link BreakToken.Line}
+ * respetando viudas y huérfanas en cada párrafo ({@link BreakRules#cutLines}); si no cabe
+ * ninguna, se devuelve {@link BreakToken#BEFORE} para que el padre corte antes de la caja.</p>
  *
  * <p>Pendiente: {@code justify} se coloca como {@code left}; repartir el sobrante entre los
  * espacios necesita que {@link TextLine} y el {@code Canvas} sepan del espaciado entre
@@ -43,29 +49,57 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        // TODO(hito 6): en modo paginado, colocar solo las líneas que indique
-        //   BreakRules.linesThatFit y devolver un BreakToken.Line con la siguiente.
         BoxModel model = BoxModel.resolve(box, space, () -> intrinsic(box));
         model.applyTo(box);
         Style s = box.style;
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();
+        boolean first = from == null;
+        int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
-        List<String> texts = box.hasText()
-                ? LineBreaker.breakLines(box.text, available, measurer, s.font, s.fontSize)
+        List<List<String>> paragraphs = box.hasText()
+                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.font, s.fontSize)
                 : List.of();
+        List<String> texts = new ArrayList<>();
+        int[] paragraphEnds = new int[paragraphs.size()];
+        for (int p = 0; p < paragraphs.size(); p++) {
+            texts.addAll(paragraphs.get(p));
+            paragraphEnds[p] = texts.size();
+        }
+
+        int end = texts.size();
+        int appeal = LayoutResult.PERFECT_BREAK;
+        if (space.fragmenting()) {
+            double remaining = space.fragmentainerRemaining().getAsDouble() - Slice.top(model, first);
+            BreakRules.Cut cut = BreakRules.cutLines(paragraphEnds, start, BreakRules.capacity(remaining, lineHeight),
+                    s.widows, s.orphans, space.atFragmentainerStart());
+            if (cut.end() == start && start < texts.size()) {
+                return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, LayoutResult.PERFECT_BREAK,
+                        List.of(), AdjoiningMargins.NONE);
+            }
+            end = cut.end();
+            appeal = cut.appeal();
+        }
+
         List<TextLine> lines = new ArrayList<>();
-        for (String text : texts) {
+        for (String text : texts.subList(start, end)) {
             double width = measurer.width(text, s.font, s.fontSize);
             double x = LineBreaker.offset(width, available, s.textAlign);
             lines.add(new TextLine(x, lines.size() * lineHeight, width, lineHeight, text));
         }
 
-        double height = model.usedHeight(lines.size() * lineHeight);
-        box.height = height;
-        Fragment fragment = Fragment.complete(box, 0, 0, model.width(), height, List.of(), lines);
+        Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,
+                end == texts.size(), space);
+        box.height = slice.height();
+        Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(), slice.padding(),
+                List.of(), lines, first, slice.finished());
+        if (!slice.finished()) {
+            // Faltan líneas o, si han terminado, el alto propio de la caja.
+            return new LayoutResult(fragment, new BreakToken.Line(end, slice.consumed()),
+                    end == texts.size() ? LayoutResult.PERFECT_BREAK : appeal, List.of(), AdjoiningMargins.NONE);
+        }
         // Una caja sin líneas, borde, relleno ni alto deja colapsar sus márgenes (§5.3).
-        boolean empty = lines.isEmpty() && height == 0 && model.openAtTop() && model.openAtBottom()
+        boolean empty = first && lines.isEmpty() && slice.height() == 0 && model.openAtTop() && model.openAtBottom()
                 && !box.establishesBlockFormattingContext();
         return LayoutResult.finished(fragment, List.of(), empty ? AdjoiningMargins.EMPTY_BOX : AdjoiningMargins.NONE);
     }

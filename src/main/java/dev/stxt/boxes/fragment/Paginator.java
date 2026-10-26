@@ -42,13 +42,14 @@ public final class Paginator {
         do {
             ConstraintSpace space = ConstraintSpace.forPage(media);
             LayoutResult r = engine.layout(root, space, token);
-            if (r.breakToken() != null && r.breakToken().equals(token)) {
+            BreakToken next = perPage(r.breakToken());
+            if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
                 throw new IllegalStateException("Sin progreso en la página " + (results.size() + 1)
                         + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
             }
             results.add(r);
             r.pending().forEach(p -> fixed.putIfAbsent(p.box(), p));
-            token = r.breakToken();
+            token = next;
             if (results.size() > MAX_PAGES) {
                 throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
             }
@@ -69,5 +70,13 @@ public final class Paginator {
             pages.add(new Page(pages.size() + 1, r.fragment(), fixedFragments));
         }
         return pages;
+    }
+
+    /**
+     * La raíz representa el área útil, y su alto es el de cada página, no el total de todas: su
+     * token no acumula alto consumido. Así cada página vuelve a tener el área útil completa.
+     */
+    private static BreakToken perPage(BreakToken token) {
+        return token instanceof BreakToken.Block b ? new BreakToken.Block(b.nextChild(), b.childToken(), 0) : token;
     }
 }

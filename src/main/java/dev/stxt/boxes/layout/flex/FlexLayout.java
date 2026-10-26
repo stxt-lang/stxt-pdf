@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout.flex;
 
+import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
-import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.Engine;
@@ -11,6 +11,7 @@ import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
+import dev.stxt.boxes.layout.UnitBreaker;
 import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
@@ -45,6 +46,10 @@ import java.util.OptionalDouble;
  *
  * <p>Simplificación: en {@code column}, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
+ *
+ * <p>En modo paginado (§5.10) se corta entre líneas en {@code row} y entre ítems en
+ * {@code column}, con {@link UnitBreaker}; los ítems no se parten. Un contenedor {@code column}
+ * con {@code Wrap} no se parte.</p>
  */
 public final class FlexLayout implements LayoutAlgorithm {
 
@@ -86,11 +91,9 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        // TODO(hito 6): reanudar desde from (BreakToken.Container) y cortar entre líneas en row
-        //   o entre ítems en column (§5.10).
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
         model.applyTo(box);
-        return new Run(box, model, space).layOut();
+        return new Run(box, model, space).layOut(from);
     }
 
     /** Un ítem y su estado durante el layout. */
@@ -128,6 +131,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         final double mainGap;
         final double crossGap;
         final boolean atStart;
+        final ConstraintSpace space;
 
         Run(Box box, BoxModel model, ConstraintSpace space) {
             this.box = box;
@@ -145,9 +149,10 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.mainGap = row ? columnGap : rowGap;
             this.crossGap = row ? rowGap : columnGap;
             this.atStart = space.atFragmentainerStart();
+            this.space = space;
         }
 
-        LayoutResult layOut() {
+        LayoutResult layOut(BreakToken from) {
             List<PendingAbsolute> pending = new ArrayList<>();
             List<Item> items = new ArrayList<>();
             for (Box child : box.children) {
@@ -196,8 +201,12 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
             }
 
-            // Paso 8: alinear.
-            List<Fragment> fragments = new ArrayList<>();
+            // Paso 8: alinear. Las unidades de la fragmentación son las líneas en row y los ítems
+            // en column (con Wrap, el contenedor entero).
+            List<UnitBreaker.Placed> placed = new ArrayList<>();
+            List<Double> starts = new ArrayList<>();
+            List<Double> ends = new ArrayList<>();
+            List<List<Box>> groups = new ArrayList<>();
             double[] lineDistribution = distribute(multiLine ? s.flexLines : Style.Distribution.START, crossFree, n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
@@ -211,24 +220,46 @@ public final class FlexLayout implements LayoutAlgorithm {
                 double free = mainSize.isPresent() ? mainSize.getAsDouble() - used : 0;
                 double[] d = distribute(s.flexMainAxis, free, line.size());
                 double mainPos = d[0];
+                if (row) {
+                    starts.add(crossPos);
+                    ends.add(crossPos + lineCross[l]);
+                    groups.add(line.stream().map(it -> it.box).toList());
+                }
                 for (Item it : line) {
                     double offset = switch (it.align) {
                         case START, STRETCH -> 0;
                         case END -> lineCross[l] - it.cross;
                         case CENTER -> (lineCross[l] - it.cross) / 2;
                     };
-                    place(it, mainPos, crossPos + offset, fragments, pending);
+                    int unit = row ? l : multiLine ? 0 : groups.size();
+                    if (!row && !multiLine) {
+                        starts.add(mainPos);
+                        ends.add(mainPos + it.main);
+                        groups.add(List.of(it.box));
+                    }
+                    placed.add(place(it, mainPos, crossPos + offset, unit));
                     mainPos += it.main + mainGap + d[1];
                 }
                 crossPos += lineCross[l] + crossGap + lineDistribution[1];
             }
 
             double crossExtent = sum(lineCross) + crossGap * Math.max(0, n - 1);
-            double height = model.usedHeight(row ? crossExtent : mainExtent);
-            box.height = height;
-            Fragment fragment = Fragment.complete(box, 0, 0, model.width(), height, fragments, List.of());
-            // Los márgenes de los ítems nunca colapsan con los del contenedor (§5.3).
-            return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
+            double extent = row ? crossExtent : mainExtent;
+            if (!row && multiLine && n > 0) {
+                starts.add(0.0);
+                ends.add(extent);
+                groups.add(List.of());
+            }
+            int units = starts.size();
+            int[] appeal = new int[units];
+            boolean[] forced = new boolean[units];
+            for (int u = 1; u < units; u++) {
+                appeal[u] = BreakRules.between(groups.get(u - 1), groups.get(u));
+                forced[u] = BreakRules.forcedBetween(groups.get(u - 1), groups.get(u));
+            }
+            return UnitBreaker.fragment(box, model, space, from, placed, pending, new UnitBreaker.Units(
+                    starts.stream().mapToDouble(Double::doubleValue).toArray(),
+                    ends.stream().mapToDouble(Double::doubleValue).toArray(), appeal, forced, extent));
         }
 
         // --- Pasos 2 y 3: base, mínimo y máximo de cada ítem ------------------------------------
@@ -393,20 +424,11 @@ public final class FlexLayout implements LayoutAlgorithm {
         // --- Paso 8 ----------------------------------------------------------------------------------
 
         /** Coloca el ítem; {@code mainPos} y {@code crossPos} son de su caja de margen. */
-        void place(Item it, double mainPos, double crossPos, List<Fragment> fragments, List<PendingAbsolute> pending) {
-            Fragment f = it.result.fragment();
+        UnitBreaker.Placed place(Item it, double mainPos, double crossPos, int unit) {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
             RelativeOffset offset = RelativeOffset.of(it.box.style, contentWidth, contentHeight);
-            x += offset.dx();
-            y += offset.dy();
-            it.box.x = x;
-            it.box.y = y;
-            fragments.add(f.moved(x, y));
-            Insets padding = Insets.resolve(it.box.style.padding, contentWidth);
-            double dx = x + f.border().left() + padding.left();
-            double dy = y + f.border().top() + padding.top();
-            it.result.pending().forEach(p -> pending.add(p.translated(dx, dy)));
+            return new UnitBreaker.Placed(it.box, it.result, x + offset.dx(), y + offset.dy(), unit);
         }
 
         /** Los porcentajes de los ítems se resuelven contra la caja de contenido del contenedor. */

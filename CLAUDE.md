@@ -35,9 +35,8 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Es un **esqueleto**: la arquitectura, las interfaces y las piezas puras están hechas y probadas;
-los algoritmos de layout completos están pendientes. La tabla de estado del README es la
-referencia; al terminar un hito, actualízala.
+Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; queda el
+hito 7. La tabla de estado del README es la referencia; al terminar un hito, actualízala.
 
 | Hito | Trabajo | Dónde |
 |---|---|---|
@@ -46,8 +45,8 @@ referencia; al terminar un hito, actualízala.
 | 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
 | 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
-| 6 | `BreakToken` en los algoritmos, PDF con PDFBox, métricas reales | `PdfCanvas` (no existe aún), `TextMeasurer` |
-| 7 | `{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass | — |
+| 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
+| 7 | `{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass | `Slice`, `UnitBreaker` (marcados con `TODO(hito 7)`) |
 
 Lo pendiente está marcado con `// TODO(hito N)` y lanza `UnsupportedOperationException` con el
 hito en el mensaje. Busca `TODO(hito` para ver qué falta. El javadoc de cada clase pendiente
@@ -60,7 +59,7 @@ Flujo de datos:
 ```
 texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media
    ──Engine.layOutDocument──▶ Paginator ──▶ List<Page> (árbol de Fragment por página)
-   ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PDF)
+   ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PdfCanvas)
 ```
 
 | Package | Contenido |
@@ -68,10 +67,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el template y exige una única raíz con el namespace `dev.stxt.boxes` |
 | `tree` | `Box`, `Style` (propiedades y enums), `Media`, `BoxTreeBuilder`, `InvalidModelException` |
-| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute` |
+| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas` |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 ### Piezas clave
@@ -96,7 +95,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   del espacio) y `layout(box, space, from)`.
 - **`ConstraintSpace`** es la entrada inmutable del layout y parte de la clave de la caché:
   ancho disponible, alto (vacío = indefinido), tamaños impuestos por el padre, bases de
-  porcentajes y espacio restante en la página (vacío = modo continuo).
+  porcentajes, espacio restante en la página desde el borde superior de la caja (vacío = sin
+  fragmentación) y si la caja empieza la página.
 - **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad
   del corte (`PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su
   containing block (con la posición estática relativa a la caja de contenido de quien devuelve
@@ -117,13 +117,25 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   `AbsoluteLayout` las `absolute` cuyo containing block es la caja recién maquetada (sus
   fragmentos cuelgan del de esa caja); las `fixed` suben hasta la raíz y el `Paginator` las
   coloca en `Page.fixed` de cada página.
-- **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`. El
-  `Paginator` detecta la falta de progreso comparando tokens; el mismo bucle sirve para los dos
-  modos (en continuo da una sola vuelta).
+- **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya
+  consumido por la caja (un `Height` definido es el total de todos los fragmentos), y `BEFORE`:
+  "no cabe nada, corta antes de mí", que nunca se pasa como `from`. El `Paginator` detecta la
+  falta de progreso comparando tokens; el mismo bucle sirve para los dos modos (en continuo da
+  una sola vuelta). El token de la raíz no acumula alto: cada página tiene el área útil entera.
+- **Fragmentación (§5.10):** cada algoritmo coloca lo que cabe en `fragmentainerRemaining` y
+  devuelve el corte con su calidad; el padre lo compara con los cortes entre sus hijos y se
+  queda con el **último de mayor calidad** (`BreakRules.best`). Relajar las reglas en el orden
+  de la especificación sale solo de esa comparación: por eso un hijo que no puede respetar
+  viudas y huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`.
+  `Slice` calcula alto, borde y relleno de cada fragmento (`Decoration: slice`); flex y grid
+  cortan entre unidades que no se parten con `UnitBreaker`. Con `atFragmentainerStart` hay que
+  colocar algo aunque desborde (garantía de progreso).
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
-  a coordenadas absolutas de página.
-- **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) para tests deterministas;
-  en el hito 6 se sustituye por métricas de PDFBox.
+  a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
+  partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
+- **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
+  el de todos los tests de layout; `PdfMetrics` da las métricas reales de las 14 fuentes
+  estándar y es el que usa `PdfCanvas.write(document, out)`.
 
 ## Convenciones
 
@@ -165,7 +177,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   `target/golden-svg/`.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
   515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). Con
-  `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`.
+  `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`. `layOutPaged(alto, …)` pagina
+  (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
+  una página concreta; los tests `*FragmentationTest` lo usan.
 - Para un caso nuevo, calcula el resultado esperado a mano siguiendo la especificación (como en
   el "Cómo se maqueta" del §10) y añade una carpeta numerada.
 

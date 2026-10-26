@@ -3,7 +3,7 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 
-/** Destino de pintado: SVG de depuración o PDF (hito 6). Coordenadas absolutas en pt. */
+/** Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. */
 public interface Canvas {
 
     /** Fondo de la caja de relleno (puede ser {@code null}). */

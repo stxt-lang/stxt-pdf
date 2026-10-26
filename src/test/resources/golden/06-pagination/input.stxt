@@ -1,0 +1,68 @@
+# Paginación (ESPECIFICACION.md §5.10). Área útil de 260 × 160 desde (20, 20).
+#
+# Página 1: intro ocupa 0..100. title iría en 110..130 y text en 140, donde solo cabe una de sus
+#   6 líneas: partirlo deja huérfanas (calidad 2) y cortar antes de text incumple el avoid de
+#   title (calidad 1). Cortar antes de title no incumple nada (calidad 3): gana.
+# Página 2: title arriba, sin su margen superior (corte no forzado), y text entero en 30.
+#   grid tiene Break before: page.
+# Página 3: filas de grid en 0..50, 60..110 y 120..170; caben las dos primeras.
+# Página 4: la tercera fila, sin el hueco que la separaba de la segunda, y end.
+Document (dev.stxt.boxes):
+	Media:
+		Type: paged
+		Width: 300
+		Height: 200
+		Margin: 20
+	Box:
+		Id: header
+		Position: fixed
+		Offset: -15 0 auto 0
+		Height: 10
+		Font size: 8
+		Text: Cabecera
+	Box:
+		Id: footer
+		Position: fixed
+		Offset: auto 0 -15 0
+		Height: 10
+		Font size: 8
+		Text align: right
+		Text: Pie
+	Box:
+		Id: intro
+		Height: 100
+	Box:
+		Id: title
+		Height: 20
+		Margin: 10 0 10 0
+		Break after: avoid
+		Text: Título
+	Box:
+		Id: text
+		Width: 30
+		Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
+	Box:
+		Id: grid
+		Layout: grid
+		Break before: page
+		Grid:
+			Columns: 1fr 1fr
+			Gap: 10
+		Box:
+			Id: g1
+			Height: 50
+		Box:
+			Id: g2
+			Height: 50
+		Box:
+			Id: g3
+			Height: 50
+		Box:
+			Id: g4
+			Height: 50
+		Box:
+			Id: g5
+			Height: 50
+	Box:
+		Id: end
+		Height: 10

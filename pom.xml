@@ -27,13 +27,12 @@
             <version>1.0.3</version>
         </dependency>
 
-        <!-- Hito 6: salida PDF y métricas reales de fuentes.
+        <!-- Salida PDF (paint.PdfCanvas) y métricas reales de fuentes (layout.inline.PdfMetrics). -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>3.x.x</version>
+            <version>3.0.8</version>
         </dependency>
-        -->
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

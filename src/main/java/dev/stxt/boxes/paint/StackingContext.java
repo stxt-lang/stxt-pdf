@@ -82,7 +82,7 @@ public final class StackingContext {
     }
 
     private void walkChildren(Piece parent) {
-        Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().box().padding);
+        Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
         for (Fragment h : parent.f().children()) {
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y());
             Style s = h.box().style;
@@ -142,7 +142,7 @@ public final class StackingContext {
             return;
         }
         Style s = p.f().box().style;
-        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().box().padding);
+        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         for (TextLine l : p.f().lines()) {
             // Línea base aproximada: centrada en la line box con el 80 % del tamaño por encima.
             double baseline = content.y() + l.y() + (l.height() - s.fontSize) / 2 + s.fontSize * 0.8;

@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout.grid;
 
+import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
-import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.Engine;
@@ -11,6 +11,7 @@ import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
+import dev.stxt.boxes.layout.UnitBreaker;
 import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
@@ -38,6 +39,9 @@ import java.util.OptionalDouble;
  * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
  * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
+ *
+ * <p>En modo paginado (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems no se
+ * parten y una fila que no cabe en una página desborda.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
 
@@ -102,8 +106,6 @@ public final class GridLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        // TODO(hito 6): reanudar desde from (BreakToken.Container) y cortar entre filas; una
-        //   fila que no cabe se fragmenta en paralelo (§5.10).
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
         model.applyTo(box);
         Style s = box.style;
@@ -148,7 +150,7 @@ public final class GridLayout implements LayoutAlgorithm {
         double[] y = offsets(rows, rowGap);
 
         // Alinear cada ítem en su área.
-        List<Fragment> fragments = new ArrayList<>();
+        List<UnitBreaker.Placed> placed = new ArrayList<>();
         List<PendingAbsolute> pending = new ArrayList<>();
         for (Box child : box.children) {
             if (child.style.isOutOfFlow()) {
@@ -169,22 +171,46 @@ public final class GridLayout implements LayoutAlgorithm {
             double py = y[a.row() - 1] + margin.top()
                     + offset(vertical, areaHeight, f.height() + margin.vertical());
             RelativeOffset relative = RelativeOffset.of(item.style, contentWidth, contentHeight);
-            px += relative.dx();
-            py += relative.dy();
-            item.x = px;
-            item.y = py;
-            fragments.add(f.moved(px, py));
-            Insets padding = Insets.resolve(item.style.padding, areaWidths[i]);
-            double dx = px + f.border().left() + padding.left();
-            double dy = py + f.border().top() + padding.top();
-            r.pending().forEach(p -> pending.add(p.translated(dx, dy)));
+            placed.add(new UnitBreaker.Placed(item, r, px + relative.dx(), py + relative.dy(), a.row() - 1));
         }
 
-        double height = model.usedHeight(sum(rows) + rowGap * Math.max(0, rows.length - 1));
-        box.height = height;
-        Fragment fragment = Fragment.complete(box, 0, 0, model.width(), height, fragments, List.of());
-        // Los márgenes de los ítems nunca colapsan con los del contenedor (§5.3).
-        return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
+        double extent = sum(rows) + rowGap * Math.max(0, rows.length - 1);
+        return UnitBreaker.fragment(box, model, space, from, placed, pending, rowUnits(g, rows, y, extent));
+    }
+
+    /**
+     * Las filas como unidades de la fragmentación (§5.10). No se puede cortar entre dos filas que
+     * ocupa un mismo ítem; entre las demás, la calidad del corte sale de los ítems que acaban
+     * antes y de los que empiezan después.
+     */
+    private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
+        int n = rows.length;
+        double[] ends = new double[n];
+        int[] appeal = new int[n];
+        boolean[] forced = new boolean[n];
+        for (int r = 0; r < n; r++) {
+            ends[r] = y[r] + rows[r];
+            if (r == 0) {
+                continue;
+            }
+            List<Box> before = new ArrayList<>();
+            List<Box> after = new ArrayList<>();
+            boolean spanned = false;
+            for (int i = 0; i < g.items().size(); i++) {
+                Area a = g.areas().get(i);
+                int from = a.row() - 1;
+                int to = from + a.rows();
+                spanned |= from < r && to > r;
+                if (to == r) {
+                    before.add(g.items().get(i));
+                } else if (from == r) {
+                    after.add(g.items().get(i));
+                }
+            }
+            appeal[r] = spanned ? -1 : BreakRules.between(before, after);
+            forced[r] = !spanned && BreakRules.forcedBetween(before, after);
+        }
+        return new UnitBreaker.Units(y, ends, appeal, forced, extent);
     }
 
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */

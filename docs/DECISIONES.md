@@ -99,3 +99,74 @@ Cada entrada indica el hito, dónde está en el código, qué se hace y la alter
 18. **Posición estática de un hijo `absolute` de un contenedor grid:** la esquina de su caja
     de contenido (como en flex, decisión 10).
     *Dónde:* `layout/grid/GridLayout`.
+
+## Fragmentación y PDF (hito 6)
+
+19. **Una caja con `Height` definido se parte como cualquier otra**, aunque no tenga contenido:
+    lo que no cabe de su alto pasa a la página siguiente (como en CSS). Para que no se parta
+    hay que declarar `Break inside: avoid`, y aun así se parte si no cabe en una página entera.
+    *Dónde:* `layout/Slice`.
+    *Alternativa:* tratar como monolíticas las cajas sin contenido.
+
+20. **Alto de un fragmento cortado:** con alto `auto` mide hasta el corte (el fondo no llega al
+    final de la página); con alto definido llega hasta el final de la página, sin pasar del alto
+    que le queda. `Min height` y `Max height` se aplican al total de los fragmentos.
+    *Dónde:* `layout/Slice`.
+    *Alternativa:* estirar siempre hasta el final de la página, como hace Chromium.
+
+21. **El borde y el relleno inferiores no se reservan:** si el contenido cabe y solo el borde o
+    el relleno inferiores se salen de la página, la caja termina igualmente y desborda.
+    *Dónde:* `layout/Slice`.
+
+22. **Solo se vuelve atrás a cortes entre hijos.** Si el mejor corte es anterior al hijo que no
+    cabe, se descarta lo colocado después; nunca se repite el layout de un hijo anterior con
+    menos espacio para partirlo por dentro.
+    *Dónde:* `layout/block/BlockLayout`.
+
+23. **Relajar viudas y huérfanas:** un párrafo que no puede respetarlas y no tiene nada antes
+    en la página ofrece igualmente un corte (calidad `VIOLATES_WIDOWS`), para que el padre
+    pueda preferirlo a un corte que incumpla `avoid`. Se respetan las viudas si se puede y, si
+    no, se llena el espacio.
+    *Dónde:* `fragment/BreakRules.cutLines`, `relaxedLines`.
+
+24. **Cortes forzados:** el `Break before: page` del primer hijo de un bloque (y el
+    `Break after: page` del último) se propaga a su padre, como en CSS. Un corte forzado al
+    principio de una página se ignora (no deja páginas vacías), y también el
+    `Break after: page` de la última caja del documento.
+    *Dónde:* `fragment/BreakRules.forcedBefore`, `forcedAfter`; `layout/block/BlockLayout`.
+
+25. **Márgenes en los cortes:** tras un corte no forzado se truncan el margen superior del
+    primer hijo de la página y los que salen de él por arriba. Un fragmento de continuación no
+    deja salir márgenes por arriba.
+    *Dónde:* `layout/block/BlockLayout`.
+
+26. **Flex y grid no parten sus ítems:** se corta entre líneas (`row`), entre ítems (`column`)
+    o entre filas; una línea o fila más alta que la página desborda. Un contenedor `column` con
+    `Wrap` no se parte. La fragmentación en paralelo de los ítems de una fila es del hito 7.
+    No se corta entre dos filas que ocupa un mismo ítem.
+    *Dónde:* `layout/UnitBreaker`, `layout/flex/FlexLayout`, `layout/grid/GridLayout`.
+
+27. **Cajas `absolute` con el containing block partido:** se resuelven con el fragmento de su
+    containing block de la página donde cae su posición estática; su alto es el de ese
+    fragmento, no el total.
+    *Dónde:* `layout/position/AbsoluteLayout.resolvePending`.
+
+28. **`Decoration: clone` se trata como `slice`** hasta el hito 7.
+    *Dónde:* `layout/Slice`.
+
+29. **Fuentes en PDF:** solo las 14 estándar y los alias que reconoce PDFBox (`Arial`,
+    `TimesNewRoman`…); una fuente desconocida es un error al maquetar con `PdfMetrics`, no una
+    validación del árbol (el SVG admite cualquiera). La especificación (§4.6) habla también de
+    fuentes registradas, que quedan pendientes. Los caracteres fuera de WinAnsi se pintan y se
+    miden como `?`.
+    *Dónde:* `layout/inline/PdfMetrics`, `paint/PdfCanvas`.
+
+30. **Línea base aproximada:** la de `StackingContext` (línea centrada con el 80 % del cuerpo
+    por encima), también en PDF; no se usan el ascendente ni el descendente reales de la fuente.
+    *Dónde:* `paint/StackingContext`.
+    *Alternativa:* calcularla con las métricas de la fuente.
+
+31. **`new Engine()` sigue usando `FixedMetrics`**, para que los tests y los casos golden sean
+    deterministas y calculables a mano; el PDF se maqueta con `new Engine(new PdfMetrics())`
+    (`PdfCanvas.write(document, out)` lo hace).
+    *Dónde:* `layout/Engine`.

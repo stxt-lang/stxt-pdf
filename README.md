@@ -20,11 +20,19 @@ Java 17 o superior y Maven.
 mvn test
 ```
 
+Para obtener un PDF, el layout debe usar las métricas reales de las fuentes:
+
+```java
+InlineNode doc = new DocumentReader().read(Path.of("report.stxt"));
+try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
+    PdfCanvas.write(doc, out);   // maqueta con new Engine(new PdfMetrics()) y pinta
+}
+```
+
 ## Estado
 
-Es un **esqueleto**: la arquitectura, las interfaces y las piezas puras del motor están
-implementadas y probadas; los algoritmos de layout completos están por hacer, siguiendo la hoja
-de ruta.
+Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
+depuración y PDF. Queda el pulido de la hoja de ruta (hito 7).
 
 | Pieza | Estado |
 |---|---|
@@ -38,15 +46,20 @@ de ruta.
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del template | Hecho y probado |
-| `BlockLayout`, `InlineLayout` en modo continuo (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
+| `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Text align: justify` se coloca como `left`) | Pendiente |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
-| `FlexLayout` e intrínsecos de flex en modo continuo | Hecho y probado |
-| `GridLayout` (con `Flow: column`) e intrínsecos de grid en modo continuo | Hecho y probado |
-| Fragmentación en los algoritmos, PDF con PDFBox | Pendiente (hito 6) |
+| `FlexLayout` e intrínsecos de flex | Hecho y probado |
+| `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
+| Fragmentación de bloque y texto: elección del corte, viudas y huérfanas, `avoid`, cortes forzados, truncado de márgenes, `Decoration: slice`, `Height` repartido entre fragmentos | Hecho y probado |
+| Fragmentación de flex (entre líneas o ítems) y grid (entre filas), sin partir los ítems | Hecho y probado |
+| Salida PDF con PDFBox (`PdfCanvas`) y métricas reales de las 14 fuentes estándar (`PdfMetrics`) | Hecho y probado |
+| `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo de los ítems (hito 7) | Pendiente |
+| Fuentes registradas (TrueType) en la salida PDF | Pendiente |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
-caso deja un SVG de depuración en `target/golden-svg/`.
+caso deja un SVG de depuración en `target/golden-svg/`, y `PdfCanvasTest` deja sus PDF en
+`target/pdf/`.
 
 ## Hoja de ruta
 
@@ -55,7 +68,7 @@ caso deja un SVG de depuración en `target/golden-svg/`.
 3. ~~**Posicionamiento y capas.** `relative`, `absolute` con `AbsoluteEquation`, `fixed` en el `Paginator` (caso 03).~~ Hecho.
 4. ~~**Intrínsecos y flex.** `intrinsic()` en todos los algoritmos; `FlexLayout` sobre `FlexResolver` (caso 02).~~ Hecho.
 5. ~~**Grid.** `GridLayout` sobre `Placement` y `TrackSizing` (casos 04 y 05, el ejemplo del §10).~~ Hecho.
-6. **Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales.
+6. ~~**Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales (caso 06).~~ Hecho.
 7. **Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass.
 
 ## Estructura
@@ -66,14 +79,15 @@ src/main/java/dev/stxt/boxes/
   stxt/         DocumentReader (stxt-core + template)
   tree/         Box, Style, Media, BoxTreeBuilder, InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
-                IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute
+                IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
+                Slice, UnitBreaker
     block/      BlockLayout
-    inline/     InlineLayout, LineBreaker, TextMeasurer, FixedMetrics
+    inline/     InlineLayout, LineBreaker, TextMeasurer, FixedMetrics, PdfMetrics
     flex/       FlexLayout, FlexResolver, FlexItem
     grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
   fragment/     Fragment, BreakToken, Paginator, Page, BreakRules, TextLine
-  paint/        Canvas, StackingContext, SvgCanvas
+  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas
   output/       StxtDump
 ```
 

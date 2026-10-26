@@ -9,7 +9,8 @@ import java.util.List;
  * Salida inmutable del layout de una caja (módulos 7 y 8).
  *
  * @param fragment    el fragmento producido en este fragmentainer
- * @param breakToken  dónde se cortó; {@code null} si la caja ha terminado
+ * @param breakToken  dónde se cortó; {@code null} si la caja ha terminado y
+ *                    {@link BreakToken#BEFORE} si no cabe nada de ella (el padre corta antes)
  * @param breakAppeal calidad del corte elegido (mayor es mejor; ver {@link #PERFECT_BREAK})
  * @param pending     cajas absolutas cuyo containing block es un ancestro de esta caja, con la
  *                    posición estática relativa a la caja de contenido de esta caja

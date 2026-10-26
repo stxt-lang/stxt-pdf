@@ -168,11 +168,19 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         box.width = width;
     }
 
-    /** Espacio para los hijos en flujo: la caja de contenido es su containing block. */
-    public ConstraintSpace childSpace(ConstraintSpace space) {
+    /**
+     * Espacio para los hijos en flujo: la caja de contenido es su containing block. En modo
+     * paginado, lo que queda de página se mide desde el principio de la caja de contenido.
+     *
+     * @param first es el primer fragmento de la caja (los siguientes no llevan borde ni relleno
+     *              superiores, ver {@link Slice})
+     */
+    public ConstraintSpace childSpace(ConstraintSpace space, boolean first) {
         double w = contentWidth();
         OptionalDouble h = contentHeight();
-        // TODO(hito 6): pasar el espacio que queda en la página para fragmentar.
-        return new ConstraintSpace(w, h, false, false, w, h, OptionalDouble.empty(), space.atFragmentainerStart());
+        OptionalDouble remaining = space.fragmenting()
+                ? OptionalDouble.of(space.fragmentainerRemaining().getAsDouble() - Slice.top(this, first))
+                : OptionalDouble.empty();
+        return new ConstraintSpace(w, h, false, false, w, h, remaining, space.atFragmentainerStart());
     }
 }

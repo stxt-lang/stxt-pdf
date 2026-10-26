@@ -64,7 +64,7 @@ public final class AbsoluteLayout {
         List<PendingAbsolute> rest = new ArrayList<>();
         for (PendingAbsolute p : r.pending()) {
             if (resolvesHere(p, box)) {
-                LayoutResult a = layOut(p, cbWidth, cbHeight, box.padding);
+                LayoutResult a = layOut(p, cbWidth, cbHeight, f.padding());
                 placed.add(a.fragment());
                 rest.addAll(a.pending());
             } else {

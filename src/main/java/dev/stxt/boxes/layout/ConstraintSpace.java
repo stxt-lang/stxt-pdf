@@ -14,8 +14,11 @@ import java.util.OptionalDouble;
  * @param fixedHeight             el padre impone el alto exacto (por ejemplo, al estirar)
  * @param percentBaseWidth        base para porcentajes horizontales
  * @param percentBaseHeight       base para porcentajes verticales; vacío = indefinida
- * @param fragmentainerRemaining  espacio que queda en la página actual; vacío = modo continuo
- * @param atFragmentainerStart    la caja empieza al principio de una página (garantía de progreso)
+ * @param fragmentainerRemaining  espacio que queda en la página actual desde el borde superior de
+ *                                la caja (puede ser negativo); vacío = sin fragmentación (modo
+ *                                continuo, o una caja que no se parte, como un ítem de flex)
+ * @param atFragmentainerStart    no hay nada antes de la caja en esta página: debe colocar algo
+ *                                aunque no quepa (garantía de progreso)
  */
 public record ConstraintSpace(
         double availableWidth,

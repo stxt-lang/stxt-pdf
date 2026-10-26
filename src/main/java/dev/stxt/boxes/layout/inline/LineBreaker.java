@@ -23,7 +23,17 @@ public final class LineBreaker {
     public static List<String> breakLines(String text, double available, TextMeasurer measurer,
                                           String font, double fontSize) {
         List<String> lines = new ArrayList<>();
+        breakParagraphs(text, available, measurer, font, fontSize).forEach(lines::addAll);
+        return lines;
+    }
+
+    /** Líneas de cada párrafo del texto para un ancho disponible (las viudas y huérfanas son por párrafo). */
+    public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
+                                                     String font, double fontSize) {
+        List<List<String>> result = new ArrayList<>();
         for (List<String> paragraph : paragraphs(text)) {
+            List<String> lines = new ArrayList<>();
+            result.add(lines);
             StringBuilder current = new StringBuilder();
             for (String word : paragraph) {
                 String candidate = current.length() == 0 ? word : current + " " + word;
@@ -40,7 +50,7 @@ public final class LineBreaker {
                 lines.add(current.toString());
             }
         }
-        return lines;
+        return result;
     }
 
     /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
