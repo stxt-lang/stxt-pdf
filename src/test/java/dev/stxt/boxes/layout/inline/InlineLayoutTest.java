@@ -35,6 +35,19 @@ class InlineLayoutTest {
     }
 
     @Test
+    void justifyFillsAllLinesButTheLastOfEachParagraph() {
+        // Primera línea: 95 pt y 3 espacios, el sobrante (5) se reparte entre ellos.
+        LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tText align: justify",
+                "\t\tText >>", "\t\t\t" + TEXT, "", "\t\t\t" + TEXT);
+        List<TextLine> lines = l.fragment("T").lines();
+        assertEquals(4, lines.size());
+        assertEquals(new TextLine(0, 0, 100, 12, "aaaa bbbb cccc dddd", 5.0 / 3), lines.get(0));
+        assertEquals(new TextLine(0, 12, 20, 12, "eeee", 0), lines.get(1));
+        assertEquals(5.0 / 3, lines.get(2).wordSpacing(), 1e-9);
+        assertEquals(0, lines.get(3).wordSpacing(), 1e-9);
+    }
+
+    @Test
     void paddingReducesTheLineWidth() {
         LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tPadding: 10", "\t\tText: " + TEXT);
         Fragment f = l.fragment("T");

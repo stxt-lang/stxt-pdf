@@ -29,6 +29,9 @@ import java.util.Map;
  * para que las líneas midan lo mismo que al maquetar, el layout debe usar las mismas métricas:
  * {@code new Engine(new PdfMetrics())}. PDF tiene el origen abajo a la izquierda: las
  * coordenadas verticales se invierten al pintar.</p>
+ *
+ * <p>Con {@code debug}, como {@link SvgCanvas}, dibuja además el contorno de cada caja de borde
+ * (lo usan las imágenes de los tests de referencia).</p>
  */
 public final class PdfCanvas implements Canvas {
 
@@ -36,11 +39,13 @@ public final class PdfCanvas implements Canvas {
     private final double pageHeight;
     /** Fuentes del documento, compartidas por todas sus páginas. */
     private final Map<String, PDFont> fonts;
+    private final boolean debug;
 
-    private PdfCanvas(PDPageContentStream out, double pageHeight, Map<String, PDFont> fonts) {
+    private PdfCanvas(PDPageContentStream out, double pageHeight, Map<String, PDFont> fonts, boolean debug) {
         this.out = out;
         this.pageHeight = pageHeight;
         this.fonts = fonts;
+        this.debug = debug;
     }
 
     /**
@@ -48,12 +53,17 @@ public final class PdfCanvas implements Canvas {
      * métricas de PDF y escribe el PDF en {@code target}, que no se cierra.
      */
     public static void write(InlineNode document, OutputStream target) throws IOException {
+        write(document, target, false);
+    }
+
+    /** Como {@link #write(InlineNode, OutputStream)}, con los contornos de depuración si {@code debug}. */
+    public static void write(InlineNode document, OutputStream target, boolean debug) throws IOException {
         List<Page> pages = new Engine(new PdfMetrics()).layOutDocument(document);
-        write(pages, new BoxTreeBuilder().build(document).media(), target);
+        write(pages, new BoxTreeBuilder().build(document).media(), target, debug);
     }
 
     /** Pinta las páginas y escribe el PDF en {@code target}, que no se cierra. */
-    public static void write(List<Page> pages, Media media, OutputStream target) throws IOException {
+    public static void write(List<Page> pages, Media media, OutputStream target, boolean debug) throws IOException {
         try (PDDocument doc = new PDDocument()) {
             Map<String, PDFont> fonts = new HashMap<>();
             Rect area = media.pageArea();
@@ -65,7 +75,7 @@ public final class PdfCanvas implements Canvas {
                 doc.addPage(page);
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                     StackingContext.build(p.content(), p.fixed(), area.x(), area.y())
-                            .paint(new PdfCanvas(cs, height, fonts));
+                            .paint(new PdfCanvas(cs, height, fonts, debug));
                 }
             }
             doc.save(target);
@@ -100,14 +110,28 @@ public final class PdfCanvas implements Canvas {
         if (w.right() > 0) {
             background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
         }
+        if (debug) {
+            try {
+                out.setStrokingColor(0xDD / 255f, 0x33 / 255f, 0x33 / 255f);
+                out.setLineWidth(0.3f);
+                out.setLineDashPattern(new float[]{2, 2}, 0);
+                out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
+                out.stroke();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
     }
 
     @Override
-    public void text(double x, double baselineY, String text, String font, double fontSize, String color) {
+    public void text(double x, double baselineY, String text, String font, double fontSize, String color,
+                     double wordSpacing) {
         PDFont f = fonts.computeIfAbsent(font, PdfMetrics::standardFont);
         try {
             out.beginText();
             out.setFont(f, (float) fontSize);
+            // Tw: se suma a cada byte 32 del texto, que en las fuentes estándar (WinAnsi) es el espacio.
+            out.setWordSpacing((float) wordSpacing);
             setColor(color);
             out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
             out.showText(PdfMetrics.encodable(f, text));

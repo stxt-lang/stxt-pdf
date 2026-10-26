@@ -12,6 +12,10 @@ public interface Canvas {
     /** Borde alrededor de la caja de borde. */
     void border(Rect borderBox, Insets widths, String color);
 
-    /** Texto con la línea base en {@code baselineY}. */
-    void text(double x, double baselineY, String text, String font, double fontSize, String color);
+    /**
+     * Texto con la línea base en {@code baselineY}.
+     *
+     * @param wordSpacing espacio que se añade a cada espacio entre palabras ({@code justify})
+     */
+    void text(double x, double baselineY, String text, String font, double fontSize, String color, double wordSpacing);
 }

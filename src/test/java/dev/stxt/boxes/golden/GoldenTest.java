@@ -5,21 +5,32 @@ import dev.stxt.Node;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.output.StxtDump;
+import dev.stxt.boxes.paint.PdfCanvas;
 import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Media;
 import dev.stxt.runtime.STXT;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,12 +42,18 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el template; el
  * volcado no tiene namespace y se lee sin validación.
  *
- * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/}.</p>
+ * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/} y, en su propia
+ * carpeta de {@code src/test/resources/golden/}, el PDF y una imagen por página (ver
+ * {@link #writePdfAndImages}).</p>
  */
 class GoldenTest {
 
     private static final double TOLERANCE = 0.01;
     private static final Path SVG_DIR = Path.of("target", "golden-svg");
+    /** Carpeta de los casos en el código fuente, donde se escriben el PDF y sus imágenes. */
+    private static final Path SOURCE_DIR = Path.of("src", "test", "resources", "golden");
+    private static final float IMAGE_DPI = 100;
+    private static final Pattern PAGE_IMAGE = Pattern.compile("page-(\\d+)\\.png");
 
     /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
     private static final Map<String, String> PENDING = Map.of();
@@ -56,6 +73,7 @@ class GoldenTest {
                 List<Page> pages = new Engine().layOutDocument(input);
                 Media media = new BoxTreeBuilder().build(input).media();
                 writeSvg(name, pages, media);
+                writePdfAndImages(SOURCE_DIR.resolve(name), input);
                 String dump = StxtDump.dump(pages, media.pageArea(), false);
                 compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
             }));
@@ -68,6 +86,59 @@ class GoldenTest {
             String svg = SvgCanvas.page(p, media, p.content().height(), true);
             Files.writeString(SVG_DIR.resolve(name + "-" + p.number() + ".svg"), svg, StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * Escribe en la carpeta del caso, en el código fuente, {@code output.pdf} (ignorado por git)
+     * y un {@code page-N.png} por página (versionados): así un cambio en el resultado se ve en el
+     * diff. Un PNG solo se reescribe si cambian sus píxeles, y se borran los de páginas que ya no
+     * existen. El PDF lleva los contornos de depuración de las cajas y se maqueta con las métricas
+     * reales ({@link PdfCanvas#write(InlineNode,
+     * java.io.OutputStream, boolean)}), no con las de la comparación.
+     */
+    private static void writePdfAndImages(Path dir, InlineNode input) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfCanvas.write(input, out, true);
+        Files.write(dir.resolve("output.pdf"), out.toByteArray());
+        int pages;
+        try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
+            PDFRenderer renderer = new PDFRenderer(pdf);
+            pages = pdf.getNumberOfPages();
+            for (int i = 0; i < pages; i++) {
+                writeIfChanged(renderer.renderImageWithDPI(i, IMAGE_DPI, ImageType.RGB),
+                        dir.resolve("page-" + (i + 1) + ".png"));
+            }
+        }
+        try (Stream<Path> files = Files.list(dir)) {
+            for (Path f : files.toList()) {
+                Matcher m = PAGE_IMAGE.matcher(f.getFileName().toString());
+                if (m.matches() && Integer.parseInt(m.group(1)) > pages) {
+                    Files.delete(f);
+                }
+            }
+        }
+    }
+
+    private static void writeIfChanged(BufferedImage image, Path file) throws IOException {
+        if (Files.exists(file)) {
+            BufferedImage old = ImageIO.read(file.toFile());
+            if (old != null && samePixels(old, image)) {
+                return;
+            }
+        }
+        ImageIO.write(image, "png", file.toFile());
+    }
+
+    private static boolean samePixels(BufferedImage a, BufferedImage b) {
+        if (a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
+            return false;
+        }
+        int w = a.getWidth();
+        int h = a.getHeight();
+        return Arrays.equals(a.getRGB(0, 0, w, h, null, 0, w), b.getRGB(0, 0, w, h, null, 0, w));
     }
 
     private static void compare(Node expected, Node actual, String path) {

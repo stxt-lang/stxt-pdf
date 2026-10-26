@@ -170,3 +170,14 @@ Cada entrada indica el hito, dónde está en el código, qué se hace y la alter
     deterministas y calculables a mano; el PDF se maqueta con `new Engine(new PdfMetrics())`
     (`PdfCanvas.write(document, out)` lo hace).
     *Dónde:* `layout/Engine`.
+
+## Texto justificado (hito 2, terminado después del 6)
+
+32. **`justify`:** el sobrante de la línea se reparte a partes iguales entre sus espacios (en
+    PDF, con el espaciado de palabras `Tw`; en SVG, con `word-spacing`). No se justifican la
+    última línea de cada párrafo, las líneas de una sola palabra ni las que desbordan (no se
+    comprimen). Una línea cortada por un salto de página no es la última de su párrafo, así que
+    se justifica.
+    *Dónde:* `layout/inline/LineBreaker.wordSpacing`, `layout/inline/InlineLayout`.
+    *Alternativa:* repartir también entre letras, o dejar sin justificar la última línea de
+    cada fragmento.

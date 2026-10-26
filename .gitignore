@@ -4,3 +4,6 @@ target/
 *.iml
 .vscode/
 salida/
+
+# PDF de los casos golden: se regeneran en cada ejecución; las imágenes page-N.png sí se versionan.
+src/test/resources/golden/**/*.pdf

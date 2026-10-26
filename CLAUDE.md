@@ -41,7 +41,7 @@ hito 7. La tabla de estado del README es la referencia; al terminar un hito, act
 | Hito | Trabajo | Dónde |
 |---|---|---|
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
-| 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho; falta `justify`) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
+| 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
 | 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
 | 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
@@ -174,7 +174,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
   Los casos que necesitan un hito pendiente están en `GoldenTest.PENDING` y se saltan con el
   motivo: al completar el hito, quítalos de ahí. Cada caso escribe un SVG de depuración en
-  `target/golden-svg/`.
+  `target/golden-svg/` y, en su carpeta del código fuente, `output.pdf` (ignorado por git) y
+  `page-N.png` por página (versionados, con los contornos de las cajas y las métricas reales).
+  Un PNG solo se reescribe si cambian sus píxeles: si aparece modificado en git, el resultado
+  ha cambiado; míralo antes de dar el cambio por bueno.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
   515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). Con
   `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`. `layOutPaged(alto, …)` pagina

@@ -47,7 +47,7 @@ depuración y PDF. Queda el pulido de la hoja de ruta (hito 7).
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del template | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
-| Texto justificado (`Text align: justify` se coloca como `left`) | Pendiente |
+| Texto justificado (`Text align: justify`) | Hecho y probado |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
 | `FlexLayout` e intrínsecos de flex | Hecho y probado |
 | `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
@@ -58,7 +58,11 @@ depuración y PDF. Queda el pulido de la hoja de ruta (hito 7).
 | Fuentes registradas (TrueType) en la salida PDF | Pendiente |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
-caso deja un SVG de depuración en `target/golden-svg/`, y `PdfCanvasTest` deja sus PDF en
+caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
+`src/test/resources/golden/`, el PDF (`output.pdf`, ignorado por git) y una imagen por página
+(`page-N.png`, versionada): si un cambio altera el resultado, la imagen aparece modificada en
+git. Las imágenes dependen de las fuentes del sistema con que PDFBox pinta las 14 estándar, así
+que en otro sistema operativo pueden salir distintas. `PdfCanvasTest` deja sus PDF en
 `target/pdf/`.
 
 ## Hoja de ruta

@@ -60,10 +60,12 @@ public final class SvgCanvas implements Canvas {
     }
 
     @Override
-    public void text(double x, double baselineY, String text, String font, double fontSize, String color) {
+    public void text(double x, double baselineY, String text, String font, double fontSize, String color,
+                     double wordSpacing) {
+        String spacing = wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing);
         svg.append(String.format(Locale.ROOT,
-                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\" font-size=\"%.2f\" fill=\"%s\">%s</text>%n",
-                x, baselineY, escape(font), fontSize, color, escape(text)));
+                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\" font-size=\"%.2f\" fill=\"%s\"%s>%s</text>%n",
+                x, baselineY, escape(font), fontSize, color, spacing, escape(text)));
     }
 
     private static String escape(String s) {

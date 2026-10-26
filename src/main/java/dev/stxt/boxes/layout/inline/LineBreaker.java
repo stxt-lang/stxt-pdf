@@ -76,6 +76,25 @@ public final class LineBreaker {
         };
     }
 
+    /**
+     * Espacio extra por cada espacio entre palabras con {@code justify}: el sobrante de la línea
+     * repartido entre sus espacios. La última línea de cada párrafo y las líneas de una sola
+     * palabra no se justifican (se alinean a la izquierda), y una línea que desborda no se
+     * comprime.
+     *
+     * @param line      texto de la línea, con las palabras separadas por un espacio
+     * @param lineWidth ancho natural de la línea
+     * @param last      es la última línea de su párrafo
+     */
+    public static double wordSpacing(String line, double lineWidth, double available, Style.TextAlign textAlign,
+                                     boolean last) {
+        if (textAlign != Style.TextAlign.JUSTIFY || last) {
+            return 0;
+        }
+        long spaces = line.chars().filter(c -> c == ' ').count();
+        return spaces == 0 ? 0 : Math.max(0, available - lineWidth) / spaces;
+    }
+
     private static List<List<String>> paragraphs(String text) {
         List<List<String>> result = new ArrayList<>();
         for (String block : text.split("\\n\\s*\\n")) {

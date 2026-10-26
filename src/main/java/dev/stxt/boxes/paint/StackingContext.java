@@ -146,7 +146,7 @@ public final class StackingContext {
         for (TextLine l : p.f().lines()) {
             // Línea base aproximada: centrada en la line box con el 80 % del tamaño por encima.
             double baseline = content.y() + l.y() + (l.height() - s.fontSize) / 2 + s.fontSize * 0.8;
-            canvas.text(content.x() + l.x(), baseline, l.text(), s.font, s.fontSize, s.color);
+            canvas.text(content.x() + l.x(), baseline, l.text(), s.font, s.fontSize, s.color, l.wordSpacing());
         }
     }
 }

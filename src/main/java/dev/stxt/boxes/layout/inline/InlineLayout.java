@@ -21,15 +21,13 @@ import java.util.List;
  * Layout {@code inline}: texto repartido en line boxes (ESPECIFICACION.md §5.4).
  *
  * <p>Pasos: resolver el ancho de contenido, partir con {@link LineBreaker}, alinear cada línea,
- * altura = número de líneas × {@code Line height}.</p>
+ * altura = número de líneas × {@code Line height}. Con {@code justify}, el sobrante de cada línea
+ * se reparte entre sus espacios ({@link TextLine#wordSpacing()}), salvo en la última de cada
+ * párrafo; una línea cortada por un salto de página no es la última de su párrafo.</p>
  *
  * <p>En modo paginado (§5.10) se colocan las líneas que caben desde la del {@link BreakToken.Line}
  * respetando viudas y huérfanas en cada párrafo ({@link BreakRules#cutLines}); si no cabe
  * ninguna, se devuelve {@link BreakToken#BEFORE} para que el padre corte antes de la caja.</p>
- *
- * <p>Pendiente: {@code justify} se coloca como {@code left}; repartir el sobrante entre los
- * espacios necesita que {@link TextLine} y el {@code Canvas} sepan del espaciado entre
- * palabras.</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
@@ -82,10 +80,18 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
 
         List<TextLine> lines = new ArrayList<>();
-        for (String text : texts.subList(start, end)) {
+        int paragraph = 0;
+        for (int j = start; j < end; j++) {
+            String text = texts.get(j);
+            while (paragraphEnds[paragraph] <= j) {
+                paragraph++;
+            }
             double width = measurer.width(text, s.font, s.fontSize);
             double x = LineBreaker.offset(width, available, s.textAlign);
-            lines.add(new TextLine(x, lines.size() * lineHeight, width, lineHeight, text));
+            double spacing = LineBreaker.wordSpacing(text, width, available, s.textAlign,
+                    j == paragraphEnds[paragraph] - 1);
+            width += spacing * text.chars().filter(c -> c == ' ').count();
+            lines.add(new TextLine(x, lines.size() * lineHeight, width, lineHeight, text, spacing));
         }
 
         Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,

@@ -42,5 +42,20 @@ class LineBreakerTest {
     void alignment() {
         assertEquals(15, LineBreaker.offset(70, 100, Style.TextAlign.CENTER), 1e-9);
         assertEquals(30, LineBreaker.offset(70, 100, Style.TextAlign.RIGHT), 1e-9);
+        assertEquals(0, LineBreaker.offset(70, 100, Style.TextAlign.JUSTIFY), 1e-9);
+    }
+
+    @Test
+    void justifySpreadsTheRemainderBetweenSpaces() {
+        assertEquals(10, LineBreaker.wordSpacing("uno dos tres", 70, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
+    }
+
+    @Test
+    void justifyLeavesSomeLinesAlone() {
+        // Última línea del párrafo, una sola palabra, línea que desborda y otra alineación.
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, Style.TextAlign.JUSTIFY, true), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("palabra", 70, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 100, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, Style.TextAlign.LEFT, false), 1e-9);
     }
 }
