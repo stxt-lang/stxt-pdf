@@ -52,6 +52,8 @@ import java.util.stream.Collectors;
 public final class BoxTreeBuilder {
 
     private static final Pattern COLOR = Pattern.compile("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})");
+    /** Etiqueta de idioma BCP 47: la lengua (2 o 3 letras) y subetiquetas de 1 a 8 letras o cifras. */
+    private static final Pattern LANGUAGE = Pattern.compile("[a-zA-Z]{2,3}(-[a-zA-Z0-9]{1,8})*");
 
     /** Clases de valor, para comprobar lo que admite cada propiedad (§3.1 y §4). */
     private enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, MINMAX }
@@ -85,8 +87,8 @@ public final class BoxTreeBuilder {
             "weight", "font-weight", "style", "font-style", "size", "font-size", "align", "text-align",
             "before", "break-before", "after", "break-after", "inside", "break-inside");
 
-    /** Resultado: el medio y una caja raíz anónima que representa el área útil. */
-    public record Result(Media media, Box root) {
+    /** Resultado: el medio, una caja raíz anónima que representa el área útil, y el título y el idioma. */
+    public record Result(Media media, Box root, Metadata metadata) {
     }
 
     /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
@@ -122,6 +124,7 @@ public final class BoxTreeBuilder {
         }
         DocumentSchema.validate(document);
         Media media = media(inline(child(document, "media").orElseThrow()));
+        Metadata metadata = metadata(document);
         styles(document);
 
         // El Typography de Document lo heredan todas las cajas.
@@ -137,7 +140,27 @@ public final class BoxTreeBuilder {
                         "Ningún elemento tiene el Id " + rule.getKey() + " de esta regla For id");
             }
         }
-        return new Result(media, root);
+        return new Result(media, root, metadata);
+    }
+
+    /** {@code Title} y {@code Language} de {@code Document}: un título no vacío y una etiqueta BCP 47. */
+    private static Metadata metadata(InlineNode document) {
+        String title = child(document, "title").map(n -> {
+            String t = n.getText().trim();
+            if (t.isEmpty()) {
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Title necesita un texto");
+            }
+            return t;
+        }).orElse(null);
+        String language = child(document, "language").map(n -> {
+            String l = n.getText().trim();
+            if (!LANGUAGE.matcher(l).matches()) {
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Language espera una etiqueta de idioma BCP 47 "
+                        + "(es, en-US, ca…): '" + l + "'");
+            }
+            return l;
+        }).orElse(null);
+        return new Metadata(title, language);
     }
 
     // ------------------------------------------------------------------------------------------

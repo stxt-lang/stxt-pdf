@@ -5,6 +5,7 @@ import dev.stxt.boxes.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -29,6 +30,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Escribe los PDF en {@code target/pdf/} para revisarlos a mano. */
@@ -163,6 +165,30 @@ class PdfCanvasTest {
                     || content.contains("/Span <</MCID " + ref.getMCID() + ">> BDC"), content);
             assertTrue(content.contains("/Artifact BMC"), content);
             assertEquals(2, pdf.getPage(1).getStructParents() + 1);
+        }
+    }
+
+    @Test
+    void titleAndLanguage() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\tTitle: Informe <trimestral> & resumen\n\tLanguage: es-ES\n"
+                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n\tText: Hola\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "title-language"))) {
+            PDDocumentCatalog catalog = pdf.getDocumentCatalog();
+            assertEquals("es-ES", catalog.getLanguage());
+            assertEquals("Informe <trimestral> & resumen", pdf.getDocumentInformation().getTitle());
+            assertTrue(catalog.getViewerPreferences().displayDocTitle());
+            String xmp = new String(catalog.getMetadata().toByteArray(), StandardCharsets.UTF_8);
+            assertTrue(xmp.contains("<rdf:li xml:lang=\"x-default\">Informe &lt;trimestral&gt; &amp; resumen</rdf:li>"), xmp);
+        }
+    }
+
+    @Test
+    void withoutTitleNorLanguageTheyAreNotWritten() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
+            assertNull(pdf.getDocumentCatalog().getLanguage());
+            assertNull(pdf.getDocumentInformation().getTitle());
+            assertNull(pdf.getDocumentCatalog().getMetadata());
         }
     }
 

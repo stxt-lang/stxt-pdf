@@ -4,12 +4,15 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Metadata;
 import dev.stxt.boxes.tree.Style;
 import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PageMode;
+import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
@@ -21,7 +24,10 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineNode;
+import org.apache.pdfbox.pdmodel.interactive.viewerpreferences.PDViewerPreferences;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -41,6 +47,9 @@ import java.util.Map;
  * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
  * bordes y los {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte
  * del contenido.</p>
+ *
+ * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
+ * información del documento, a los metadatos XMP y al catálogo.</p>
  *
  * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, §6), que
  * llevan a la esquina superior izquierda de su primer fragmento.</p>
@@ -80,6 +89,42 @@ final class PdfStructure {
                 build(child, e);
             }
         }
+    }
+
+    /**
+     * Título e idioma del documento. El título va en la información del documento y en los
+     * metadatos XMP ({@code dc:title}), y el visor lo muestra en lugar del nombre del fichero; el
+     * idioma ({@code Lang} del catálogo) es el de todo el contenido.
+     */
+    static void metadata(PDDocument doc, Metadata metadata) throws IOException {
+        PDDocumentCatalog catalog = doc.getDocumentCatalog();
+        if (metadata.language() != null) {
+            catalog.setLanguage(metadata.language());
+        }
+        if (metadata.title() == null) {
+            return;
+        }
+        doc.getDocumentInformation().setTitle(metadata.title());
+        PDViewerPreferences preferences = new PDViewerPreferences(new COSDictionary());
+        preferences.setDisplayDocTitle(true);
+        catalog.setViewerPreferences(preferences);
+        PDMetadata xmp = new PDMetadata(doc);
+        xmp.importXMPMetadata(xmp(metadata.title()).getBytes(StandardCharsets.UTF_8));
+        catalog.setMetadata(xmp);
+    }
+
+    /** Paquete XMP mínimo con el título. */
+    static String xmp(String title) {
+        String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        return "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
+                + "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n"
+                + "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
+                + "<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n"
+                + "<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">" + escaped + "</rdf:li></rdf:Alt></dc:title>\n"
+                + "</rdf:Description>\n"
+                + "</rdf:RDF>\n"
+                + "</x:xmpmeta>\n"
+                + "<?xpacket end=\"w\"?>";
     }
 
     /** Tipo estándar de estructura de la caja (decisión G1 de la hoja de ruta). */

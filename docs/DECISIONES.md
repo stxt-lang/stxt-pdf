@@ -340,7 +340,10 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     (`PARAGRAPH_BLANK_LINE`), aunque en un `Text` separa párrafos. *Alternativa:* permitirlo,
     con un `P` en el PDF que contiene varios párrafos.
 
-87. **PDF etiquetado sin idioma.** El árbol de estructura tiene un elemento por caja
+87. **(Resuelta después en la misma sesión: `Title` y `Language` opcionales en `Document`,
+    que van a la información del documento, a XMP `dc:title`, a `DisplayDocTitle` y al `Lang`
+    del catálogo; sin ellos, el PDF no los declara. No se declara conformidad PDF/UA.)**
+    **PDF etiquetado sin idioma.** El árbol de estructura tiene un elemento por caja
     (`Document`, `H1`…`H6`, `P`, `Span`, `Div`) y los fondos, bordes y `Fixed` son
     *artifacts*, pero el documento no declara `Lang` (el modelo no tiene dónde) ni título, que
     PDF/UA exige. *Dónde:* `paint/PdfStructure`. *Alternativa:* una propiedad de idioma (y de

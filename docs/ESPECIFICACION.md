@@ -260,6 +260,12 @@ Obligatorio, exactamente uno, hijo de `Document`.
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
 elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
+**Título e idioma.** `Document` admite también, como mucho uno de cada, `Title` (un texto no
+vacío) y `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no, `VALUE_NOT_ALLOWED`). No
+afectan al layout: van al PDF ([§5.13](#513-encabezados-y-párrafos)) como título del documento
+(información, metadatos XMP y el que muestra el visor) e idioma del contenido etiquetado. Son
+opcionales; sin ellos, el PDF no los declara.
+
 ### 4.2 Propiedades del elemento
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |

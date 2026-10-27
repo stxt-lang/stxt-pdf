@@ -806,6 +806,24 @@ Errors:
 					Element: Grid
 						Box:
 							Background: rojo
+	Case: Idioma que no es una etiqueta BCP 47
+		Code: VALUE_NOT_ALLOWED
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Language: español
+	Case: Título vacío
+		Code: VALUE_NOT_ALLOWED
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Title:
 	Case: El primer encabezado no es Heading 1
 		Code: HEADING_LEVEL
 		Line: 8

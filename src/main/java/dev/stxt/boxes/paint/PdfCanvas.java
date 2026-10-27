@@ -12,6 +12,7 @@ import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
+import dev.stxt.boxes.tree.Metadata;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -86,18 +87,20 @@ public final class PdfCanvas implements Canvas {
     public static void write(InlineNode document, Resources resources, OutputStream target, boolean debug)
             throws IOException {
         List<Page> pages = new Engine(new PdfMetrics(resources)).layOutDocument(document);
-        write(pages, new BoxTreeBuilder().build(document).media(), resources, target, debug);
+        BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
+        write(pages, tree.media(), tree.metadata(), resources, target, debug);
     }
 
     /**
-     * Pinta las páginas, maquetadas con {@code new PdfMetrics(resources)}, y escribe el PDF en
-     * {@code target}, que no se cierra.
+     * Pinta las páginas, maquetadas con {@code new PdfMetrics(resources)}, con el título y el
+     * idioma de {@code metadata}, y escribe el PDF en {@code target}, que no se cierra.
      */
-    public static void write(List<Page> pages, Media media, Resources resources, OutputStream target,
-                             boolean debug) throws IOException {
+    public static void write(List<Page> pages, Media media, Metadata metadata, Resources resources,
+                             OutputStream target, boolean debug) throws IOException {
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
             PdfStructure structure = new PdfStructure(doc, root(pages));
+            PdfStructure.metadata(doc, metadata);
             Rect area = media.pageArea();
             List<PDPage> pdfPages = new ArrayList<>();
             for (Page p : pages) {

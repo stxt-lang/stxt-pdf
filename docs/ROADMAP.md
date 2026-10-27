@@ -514,6 +514,10 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (7).** `Title` y `Language` opcionales en `Document` (`tree/Metadata`), escritos
+  en el PDF por `PdfStructure.metadata`; casos de error y tests en `PdfCanvasTest`. `mvn test`
+  en verde. *Pendiente:* filas de `Title` y `Language` en las tablas del §9 de la
+  especificación y en el §2.
 - **2026-10-27 (6).** Hito 12 terminado. Aceptadas las propuestas H4b, H5, H8, P3 y G1–G3;
   H9 al revés (los saltos de nivel son error, y el primero es `Heading 1`) y H10 (encabezado
   en `Fixed`, error). Hechos schema, builder, `PdfStructure` (PDF etiquetado y marcadores),
