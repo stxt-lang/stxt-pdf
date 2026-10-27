@@ -4,7 +4,6 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
-import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Media;
 
@@ -45,19 +44,7 @@ public final class SvgCanvas implements Canvas {
     }
 
     @Override
-    public void border(Rect r, Insets w, String color) {
-        if (w.top() > 0) {
-            background(new Rect(r.x(), r.y(), r.width(), w.top()), color);
-        }
-        if (w.bottom() > 0) {
-            background(new Rect(r.x(), r.bottom() - w.bottom(), r.width(), w.bottom()), color);
-        }
-        if (w.left() > 0) {
-            background(new Rect(r.x(), r.y(), w.left(), r.height()), color);
-        }
-        if (w.right() > 0) {
-            background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
-        }
+    public void outline(Rect r) {
         if (debug) {
             svg.append(String.format(Locale.ROOT,
                     "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"none\" stroke=\"#d33\" stroke-width=\"0.3\" stroke-dasharray=\"2 2\"/>%n",

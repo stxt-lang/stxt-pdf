@@ -12,8 +12,29 @@ public interface Canvas {
     /** Fondo de la caja de relleno (puede ser {@code null}). */
     void background(Rect paddingBox, String color);
 
-    /** Borde alrededor de la caja de borde. */
-    void border(Rect borderBox, Insets widths, String color);
+    /**
+     * Borde alrededor de la caja de borde {@code r}: un fondo por cada lado con ancho, y después
+     * el {@link #outline contorno} de depuración.
+     */
+    default void border(Rect r, Insets w, String color) {
+        if (w.top() > 0) {
+            background(new Rect(r.x(), r.y(), r.width(), w.top()), color);
+        }
+        if (w.bottom() > 0) {
+            background(new Rect(r.x(), r.bottom() - w.bottom(), r.width(), w.bottom()), color);
+        }
+        if (w.left() > 0) {
+            background(new Rect(r.x(), r.y(), w.left(), r.height()), color);
+        }
+        if (w.right() > 0) {
+            background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
+        }
+        outline(r);
+    }
+
+    /** Contorno de depuración de una caja de borde. Por defecto no pinta nada. */
+    default void outline(Rect borderBox) {
+    }
 
     /**
      * Texto con la línea base en {@code baselineY}.

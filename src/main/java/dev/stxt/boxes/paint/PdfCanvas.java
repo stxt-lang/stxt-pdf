@@ -3,7 +3,6 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.model.FontFace;
-import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.Resources;
@@ -147,19 +146,7 @@ public final class PdfCanvas implements Canvas {
     }
 
     @Override
-    public void border(Rect r, Insets w, String color) {
-        if (w.top() > 0) {
-            background(new Rect(r.x(), r.y(), r.width(), w.top()), color);
-        }
-        if (w.bottom() > 0) {
-            background(new Rect(r.x(), r.bottom() - w.bottom(), r.width(), w.bottom()), color);
-        }
-        if (w.left() > 0) {
-            background(new Rect(r.x(), r.y(), w.left(), r.height()), color);
-        }
-        if (w.right() > 0) {
-            background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
-        }
+    public void outline(Rect r) {
         if (debug) {
             try {
                 out.beginMarkedContent(COSName.ARTIFACT);
