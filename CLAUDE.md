@@ -71,7 +71,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
-| `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `BoxTreeBuilder`, `InvalidModelException` |
+| `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
@@ -92,9 +92,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   elemento. Las propiedades de cada caja van en tres grupos (§4): `Box` (modelo de caja, no se
   hereda), `Typography` (texto, viudas y huérfanas; se hereda y se admite en `Document`) y
   `Break` (cortes de página; no en `Absolute` ni `Fixed`), con nombres cortos (`Size`,
-  `Weight`, `Align`, `Before`…). `BoxTreeBuilder.CHILDREN` repite la tabla de hijos del schema
-  para no interpretar mal un documento sin validar, e `INTERNAL` da el nombre interno de los
-  cortos (`Size` → `font-size`), que es el de `Style.line`.
+  `Weight`, `Align`, `Before`…). La estructura solo está en el schema: `DocumentSchema` lo
+  compila una vez, `DocumentReader` valida con él al leer y `BoxTreeBuilder` vuelve a validar el
+  árbol al empezar, así que el resto del builder da la estructura por buena. `INTERNAL` da el
+  nombre interno de los cortos (`Size` → `font-size`), que es el de `Style.line`.
 - **`BoxTreeBuilder`** traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen
   del elemento; las propiedades de `Item` y `Cell` pasan al elemento que envuelven), interpreta
   valores, aplica la herencia y comprueba las reglas del §6 que el schema no puede expresar. Los
@@ -248,8 +249,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 1. La especificación manda: si el código y `ESPECIFICACION.md` discrepan, aclara cuál es el
    correcto antes de cambiar ninguno de los dos.
 2. Si añades o cambias una propiedad, actualiza a la vez: el schema `.stxt` (en su grupo o
-   en cada elemento que la admite), el resumen del §9, la tabla del §4, `Style` y `BoxTreeBuilder` (su tabla
-   `CHILDREN` y, si aplica, la validación del §6).
+   en cada elemento que la admite), el resumen del §9, la tabla del §4, `Style` y
+   `BoxTreeBuilder` (su lectura y, si aplica, la validación del §6).
    Una regla de validación nueva lleva su `ErrorCode`, su fila en la tabla del §6 y un caso en
    el catálogo de errores.
 3. Al completar un hito, actualiza la tabla de estado y la hoja de ruta del README y elimina sus

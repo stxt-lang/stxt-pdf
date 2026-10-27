@@ -1,6 +1,8 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
+import dev.stxt.exceptions.ParseException;
+import dev.stxt.runtime.STXT;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -120,6 +122,27 @@ class BoxTreeBuilderTest {
                 "\tBlock:", "\t\tBox:", "\t\t\tWidth: 12,5")));
         // La línea es la de la propiedad, dentro del grupo, no la del grupo.
         assertEquals(8, e.line());
+    }
+
+    /** Sin pasar por DocumentReader, el builder valida contra el schema y da sus mismos errores. */
+    @Test
+    void unvalidatedDocumentsAreValidatedAgainstTheSchema() {
+        InlineNode misplaced = (InlineNode) STXT.rawParser().parse(document(
+                "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\tOffset: 5")).get(0);
+        ParseException e = assertThrows(ParseException.class, () -> new BoxTreeBuilder().build(misplaced));
+        assertEquals("CHILD_NOT_DECLARED", e.getCode());
+        assertEquals(9, e.getLine());
+
+        InlineNode noMedia = (InlineNode) STXT.rawParser().parse(
+                "Document (dev.stxt.boxes):\n\tBlock:\n\t\tId: a").get(0);
+        assertEquals("TOO_FEW_CHILDREN",
+                assertThrows(ParseException.class, () -> new BoxTreeBuilder().build(noMedia)).getCode());
+
+        // Sin el namespace no se validaría nada: es un error de raíz.
+        InlineNode noNamespace = (InlineNode) STXT.rawParser().parse(
+                "Document:\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595").get(0);
+        assertEquals(ErrorCode.DOCUMENT_ROOT,
+                assertThrows(InvalidModelException.class, () -> new BoxTreeBuilder().build(noNamespace)).code());
     }
 
     @Test

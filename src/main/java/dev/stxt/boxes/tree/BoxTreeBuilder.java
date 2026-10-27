@@ -21,7 +21,6 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
@@ -35,9 +34,11 @@ import java.util.stream.Stream;
  *
  * <p>Trabaja sobre los nodos de {@code stxt-core}. Los nombres se comparan por su nombre
  * canónico ({@link Node#getCanonicalName()}: minúsculas y los espacios convertidos en guiones,
- * de modo que {@code Min width} es {@code min-width}). Comprueba también los hijos que admite
- * cada elemento, como el schema, para no interpretar mal un documento que no se ha validado.
- * No es reentrante: cada llamada a {@link #build} usa su propio estado.</p>
+ * de modo que {@code Min width} es {@code min-width}). Antes de construir valida el documento
+ * contra el schema ({@link DocumentSchema}), aunque ya venga validado de {@code DocumentReader}:
+ * así la estructura (qué hijos admite cada nodo) solo está definida en el schema, y el resto
+ * del código puede darla por buena. No es reentrante: cada llamada a {@link #build} usa su propio
+ * estado.</p>
  */
 public final class BoxTreeBuilder {
 
@@ -50,31 +51,13 @@ public final class BoxTreeBuilder {
     private static final Set<Kind> LENGTH_OR_AUTO = EnumSet.of(Kind.LENGTH, Kind.AUTO);
     private static final Set<Kind> LENGTH = EnumSet.of(Kind.LENGTH);
 
-    // --- Hijos de cada elemento y de cada grupo, como en el schema (§9) ------------------------
+    // --- Clases de nodos (la estructura completa está en el schema, §9) --------------------------
     private static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
     private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "relative", "absolute", "fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
     private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "relative");
-    /** Lo que admiten todos los elementos de caja: {@code Id} y los grupos {@code Box} y {@code Typography}. */
-    private static final Set<String> COMMON = Set.of("id", "box", "typography");
-    private static final Map<String, Set<String>> CHILDREN = Map.ofEntries(
-            Map.entry("block", union(COMMON, Set.of("break", "isolate"), ELEMENTS)),
-            Map.entry("flex", union(COMMON, Set.of("break"), FLEX, Set.of("item", "absolute", "fixed"))),
-            Map.entry("grid", union(COMMON, Set.of("break"), GRID, Set.of("cell", "absolute", "fixed"))),
-            Map.entry("text", union(COMMON, Set.of("break", "content"))),
-            Map.entry("relative", union(COMMON, Set.of("break", "isolate", "offset", "layer"), ELEMENTS)),
-            Map.entry("absolute", union(COMMON, Set.of("offset", "layer"), ELEMENTS)),
-            Map.entry("fixed", union(COMMON, Set.of("offset", "layer"), ELEMENTS)),
-            Map.entry("item", union(Set.of("grow", "shrink", "basis", "cross-axis", "layer"), IN_FLOW)),
-            Map.entry("cell", union(Set.of("horizontal", "vertical", "layer"), IN_FLOW)),
-            Map.entry("document", union(Set.of("media", "typography"), ELEMENTS)),
-            Map.entry("box", Set.of("width", "height", "min-width", "max-width", "min-height", "max-height",
-                    "aspect-ratio", "margin", "padding", "border", "border-color", "background")),
-            Map.entry("typography", Set.of("font", "weight", "style", "size", "line-height", "align", "color",
-                    "text-wrap", "widows", "orphans")),
-            Map.entry("break", Set.of("before", "after", "inside", "decoration")));
 
     /**
      * Nombre interno de cada propiedad de {@code Typography} y {@code Break} cuyo nombre en el
@@ -93,17 +76,22 @@ public final class BoxTreeBuilder {
     /** Si el alto de la caja de contenido es definido: base de los porcentajes verticales (§3.6). */
     private Map<Box, Boolean> definiteHeight;
 
+    /**
+     * Construye el árbol de un documento, validado o no.
+     *
+     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (§9)
+     * @throws InvalidModelException si incumple una regla del modelo (§6)
+     */
     public Result build(InlineNode document) {
         ids = new HashMap<>();
         definiteHeight = new HashMap<>();
-        if (!is(document, "document")) {
-            throw error(document, ErrorCode.DOCUMENT_ROOT, "La raíz del documento debe ser Document");
+        // Sin el namespace, el schema no validaría nada.
+        if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
+            throw error(document, ErrorCode.DOCUMENT_ROOT,
+                    "El nodo raíz debe ser Document (" + DocumentSchema.NAMESPACE + "):");
         }
-        checkChildren(document);
-        InlineNode mediaNode = child(document, "media")
-                .map(BoxTreeBuilder::inline)
-                .orElseThrow(() -> error(document, ErrorCode.DOCUMENT_STRUCTURE, "Falta el nodo Media"));
-        Media media = media(mediaNode);
+        DocumentSchema.validate(document);
+        Media media = media(inline(child(document, "media").orElseThrow()));
 
         // El Typography de Document lo heredan todas las cajas.
         Style rootStyle = new Style();
@@ -163,7 +151,6 @@ public final class BoxTreeBuilder {
                 box.addChild(element(inline(h), box, null));
             } else if (name.equals("item") || name.equals("cell")) {
                 InlineNode wrapper = inline(h);
-                checkChildren(wrapper);
                 List<Node> elements = wrapper.getChildren().stream()
                         .filter(e -> IN_FLOW.contains(e.getCanonicalName()))
                         .toList();
@@ -179,7 +166,6 @@ public final class BoxTreeBuilder {
     /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Cell}, si es un ítem. */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
         String kind = n.getCanonicalName();
-        checkChildren(n);
         Style s = Style.inheriting(parent.style);
         s.layout = switch (kind) {
             case "flex" -> Style.Layout.FLEX;
@@ -220,8 +206,7 @@ public final class BoxTreeBuilder {
                         case "id" -> id = id(p);
                         case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                         case "layer" -> s.layer = integer(p);
-                        case "isolate" -> s.isolate = bool(p);
-                        default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida: " + p.getName());
+                        default -> s.isolate = bool(p);
                     }
                 }
             }
@@ -270,7 +255,6 @@ public final class BoxTreeBuilder {
 
     /** Grupo {@code Box}: el modelo de caja, que no se hereda. */
     private static void box(InlineNode group, Style s) {
-        checkChildren(group);
         for (Node p : group.getChildren()) {
             s.declared(p.getCanonicalName(), p.getLine());
             switch (p.getCanonicalName()) {
@@ -295,7 +279,6 @@ public final class BoxTreeBuilder {
      * guardan con el nombre interno ({@code Size} es {@code font-size}).
      */
     private static void typography(InlineNode group, Style s) {
-        checkChildren(group);
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
             s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
@@ -316,7 +299,6 @@ public final class BoxTreeBuilder {
 
     /** Grupo {@code Break}: los cortes de página, que no se heredan. */
     private static void fragmentation(InlineNode group, Style s) {
-        checkChildren(group);
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
             s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
@@ -407,16 +389,6 @@ public final class BoxTreeBuilder {
     // Reglas que el schema no puede expresar (§6)
     // ------------------------------------------------------------------------------------------
 
-    /** Los hijos que admite el elemento; con el documento validado, nunca falla. */
-    private static void checkChildren(InlineNode n) {
-        Set<String> allowed = CHILDREN.get(n.getCanonicalName());
-        for (Node c : n.getChildren()) {
-            if (!allowed.contains(c.getCanonicalName())) {
-                throw error(c, ErrorCode.DOCUMENT_STRUCTURE, n.getName() + " no admite " + c.getName());
-            }
-        }
-    }
-
     private void validateBox(Style s, Box parent, InlineNode wrapper) {
         Style.Layout parentLayout = parent.style.layout;
         boolean flexItem = wrapper != null && parentLayout == Style.Layout.FLEX;
@@ -436,11 +408,6 @@ public final class BoxTreeBuilder {
         validateMinMax(s, "width", s.width, "min-width", s.minWidth, "max-width", s.maxWidth);
         validateMinMax(s, "height", s.height, "min-height", s.minHeight, "max-height", s.maxHeight);
         validatePercentages(s, parent, flexItem, gridItem);
-    }
-
-    @SafeVarargs
-    private static Set<String> union(Set<String>... sets) {
-        return Stream.of(sets).flatMap(Set::stream).collect(Collectors.toUnmodifiableSet());
     }
 
     private static void validateOffset(Style s) {
@@ -621,18 +588,14 @@ public final class BoxTreeBuilder {
         return n.getChildren().stream().filter(h -> is(h, canonicalName)).findFirst();
     }
 
-    /** Los nodos con hijos no pueden ser bloques de texto ({@code >>}). */
+    /** Un nodo con hijos: el schema no admite que se escriba como bloque de texto ({@code >>}). */
     private static InlineNode inline(Node n) {
-        if (n instanceof InlineNode i) {
-            return i;
-        }
-        throw error(n, ErrorCode.DOCUMENT_STRUCTURE, n.getName() + " no puede ser un bloque de texto (>>)");
+        return (InlineNode) n;
     }
 
-    /** Hijo obligatorio ({@code "Type"}). */
+    /** Hijo obligatorio ({@code "Type"}), que el schema garantiza. */
     private static Node required(InlineNode n, String child) {
-        return child(n, child.toLowerCase(Locale.ROOT))
-                .orElseThrow(() -> error(n, ErrorCode.DOCUMENT_STRUCTURE, n.getName() + " necesita " + child));
+        return child(n, child.toLowerCase(Locale.ROOT)).orElseThrow();
     }
 
     // ------------------------------------------------------------------------------------------

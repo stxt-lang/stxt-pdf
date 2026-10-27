@@ -150,8 +150,8 @@ tiene un caso por código.
     *Dónde:* `tree/BoxTreeBuilder.validateContainer`.
 
 59. **Sin código propio lo que ya rechaza el schema** (antes, el template): `Main axis: stretch` y
-    `Break inside: page` son `VALUE_NOT_ALLOWED`, y un bloque `>>` donde van hijos,
-    `DOCUMENT_STRUCTURE`; con `DocumentReader` salen antes los códigos de `stxt-core`.
+    `Break inside: page` son `VALUE_NOT_ALLOWED`; un bloque `>>` donde van hijos lo rechaza el
+    schema con su código de `stxt-core`, también sin `DocumentReader` (decisión 73).
 
 60. ~~**Solo las propiedades de la fuente en `Document`**~~, resuelta en el hito 10: `Document`
     admite el `Typography` entero, que es todo lo que se hereda.
@@ -244,13 +244,15 @@ imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, 
 72. ~~**El schema no tiene grupos de hijos**~~, resuelta en el hito 10 con los grupos `Box`,
     `Typography` y `Break`: cada elemento declara tres grupos en lugar de unas 30 propiedades.
 
-73. **`BoxTreeBuilder` repite la tabla de hijos del schema** (`CHILDREN`): con el documento
-    validado nunca falla, pero un árbol construido sin validar (`STXT.rawParser()`) da
-    `DOCUMENT_STRUCTURE` en lugar de interpretar mal una propiedad fuera de su sitio (un
-    `Offset` en un `Block` lo convertiría en `static` desplazado). Hay que mantener las dos
-    tablas a la vez.
-    *Dónde:* `tree/BoxTreeBuilder.CHILDREN`, `checkChildren`.
-    *Alternativa:* validar contra el schema dentro del builder, o no comprobar nada sin validar.
+73. **`BoxTreeBuilder` valida contra el schema al empezar**, aunque el documento venga de
+    `DocumentReader`: la estructura solo está definida en el schema y el builder la da por
+    buena. Un árbol construido sin validar (`STXT.rawParser()`) da los mismos errores que el
+    lector, con los códigos de `stxt-core`, en lugar de interpretar mal una propiedad fuera de
+    su sitio. Sustituye a una copia de la tabla de hijos en el builder (`CHILDREN`) y al código
+    `DOCUMENT_STRUCTURE`, que desaparecen. Cuesta validar dos veces lo que viene del lector.
+    *Dónde:* `tree/DocumentSchema`, `tree/BoxTreeBuilder.build`.
+    *Alternativa:* generar la tabla del builder a partir del schema, o no comprobar nada sin
+    validar.
 
 ## Hito 10: grupos `Box`, `Typography` y `Break` (2026-10-27)
 

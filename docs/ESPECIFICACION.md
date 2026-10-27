@@ -910,7 +910,9 @@ La validación se hace en cuatro niveles:
    cardinalidades, valores vacíos donde no se admiten, bloques `>>` y tipos `ENUM`, `INTEGER` y
    `BOOLEAN`. La realiza la librería STXT con sus propios códigos (`CHILD_NOT_DECLARED`,
    `TOO_MANY_CHILDREN`, `INVALID_VALUE`…). Es donde se detecta una propiedad fuera de su
-   elemento: `Offset` en un `Block`, `Grow` en un `Cell`, `Columns` en un `Flex`.
+   elemento: `Offset` en un `Block`, `Grow` en un `Cell`, `Columns` en un `Flex`. El motor
+   valida también los documentos que no se han leído con el lector, así que estos errores salen
+   siempre con los códigos de la librería.
 2. **Modelo:** las reglas que el schema no puede expresar, al construir el árbol de cajas.
 3. **Fuentes** ([§5.11](#511-recursos-y-fuentes)): con las métricas reales (la salida PDF),
    antes de maquetar, porque necesitan la carpeta de fuentes.
@@ -946,7 +948,6 @@ La validación se hace en cuatro niveles:
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
-| `DOCUMENT_STRUCTURE` | Lo que el schema ya rechaza (falta `Media`, un hijo que el elemento no admite, un bloque `>>` mal puesto…), si se construye el árbol sin validar el documento | `Falta el nodo Media` |
 
 Las propiedades de fragmentación (`Break`, `Widows`…) no son errores en modo continuo:
 un mismo documento debe poder maquetarse en los dos modos.

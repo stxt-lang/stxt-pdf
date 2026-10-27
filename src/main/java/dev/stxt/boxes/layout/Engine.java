@@ -53,8 +53,9 @@ public final class Engine {
     }
 
     /**
-     * Documento STXT ya validado ({@link dev.stxt.boxes.stxt.DocumentReader}) → páginas. En modo
-     * continuo devuelve una sola página. Antes de maquetar comprueba con el {@link TextMeasurer}
+     * Documento STXT → páginas. Lo normal es leerlo con {@link dev.stxt.boxes.stxt.DocumentReader};
+     * si no está validado, {@link BoxTreeBuilder} lo valida contra el schema. En modo continuo
+     * devuelve una sola página. Antes de maquetar comprueba con el {@link TextMeasurer}
      * que se puede medir todo el texto (las fuentes, en la salida PDF), y después que nada
      * desborda ({@link Overflow}).
      */

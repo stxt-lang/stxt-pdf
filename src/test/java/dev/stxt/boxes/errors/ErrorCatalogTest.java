@@ -38,9 +38,6 @@ class ErrorCatalogTest {
 
     /** Códigos sin caso en el catálogo, con el motivo. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
-            // El schema detecta antes la falta de Media, Type o Width, los hijos que un elemento no
-            // admite y los bloques >> mal puestos.
-            ErrorCode.DOCUMENT_STRUCTURE,
             // Las fuentes del repositorio tienen las cuatro variantes: lo prueba PdfMetricsTest.
             ErrorCode.FONT_VARIANT_MISSING);
 

@@ -11,12 +11,6 @@ public enum ErrorCode {
     // --- Documento y medio ------------------------------------------------------------------
     /** El documento no tiene un único nodo raíz {@code Document} con el namespace del modelo. */
     DOCUMENT_ROOT,
-    /**
-     * Estructura que el schema ya rechaza (falta {@code Media}, un hijo que el elemento no admite,
-     * un nodo con hijos escrito como bloque {@code >>}…): solo aparece si se construye el árbol
-     * sin validar el documento.
-     */
-    DOCUMENT_STRUCTURE,
     /** Con {@code Type: paged}, {@code Media} necesita {@code Height}. */
     MEDIA_HEIGHT_REQUIRED,
     /** {@code Height} del medio con {@code Type: continuous}, donde no tiene efecto. */
