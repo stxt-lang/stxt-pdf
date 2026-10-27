@@ -5,11 +5,14 @@ import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.TextFormat;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LineBreakerTest {
@@ -17,6 +20,13 @@ class LineBreakerTest {
     // Factor 1 y tamaño 1: cada carácter mide 1 pt; un espacio también.
     private final TextMeasurer measurer = new FixedMetrics(1);
     private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
+    /** Como {@link #measurer}, pero cada carácter en negrita mide 2 pt. */
+    private final TextMeasurer boldIsWider = (text, font, fontSize) ->
+            text.codePointCount(0, text.length()) * fontSize * (font.weight() == FontWeight.BOLD ? 2 : 1);
+
+    private static List<String> texts(List<LineBreaker.Line> lines) {
+        return lines.stream().map(LineBreaker.Line::text).toList();
+    }
 
     @Test
     void greedyFirstFit() {
@@ -99,5 +109,82 @@ class LineBreakerTest {
         s.textAlign = Style.TextAlign.CENTER;
         assertEquals(new TextLine(4, 0, 12, 12, "uno dos tres", 0),
                 LineBreaker.place("uno dos tres", measurer, s, 20, true, 0, 12));
+    }
+
+    @Test
+    void aWordCanHavePartsOfSeveralRuns() {
+        // "uno ne**gri**ta dos": negrita es una sola palabra de tres partes.
+        List<TextRun> runs = List.of(run("uno ne"), run("gri", "b"), run("ta dos"));
+        List<LineBreaker.Word> words = LineBreaker.paragraphs(runs).get(0);
+        assertEquals(3, words.size());
+        assertEquals(List.of(run("ne"), run("gri", "b"), run("ta")), words.get(1).parts());
+        // Cada parte con su fuente: ne (2) + gri (6) + ta (2).
+        IntrinsicSizes s = LineBreaker.intrinsics(runs, boldIsWider, F, 1);
+        assertEquals(10, s.minContent(), 1e-9);
+        assertEquals(3 + 1 + 10 + 1 + 3, s.maxContent(), 1e-9);
+    }
+
+    @Test
+    void greedyMeasuresEachRunWithItsFont() {
+        // Sin formato, "aa bb" (5) cabe en 6; con "bb cc" en negrita, "aa bb" mide 7.
+        List<TextRun> runs = List.of(run("aa "), run("bb cc", "b"));
+        assertEquals(List.of("aa bb", "cc"),
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, Style.TextWrap.AUTO).get(0)));
+        List<LineBreaker.Line> lines = LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1,
+                Style.TextWrap.AUTO).get(0);
+        assertEquals(List.of("aa", "bb", "cc"), texts(lines));
+        assertEquals(List.of(run("bb", "b")), lines.get(1).runs());
+    }
+
+    @Test
+    void prettyMeasuresEachRunWithItsFont() {
+        // "a bb c": con bb en negrita, la palabra mide 4 y no cabe con las otras en 6.
+        List<TextRun> runs = List.of(run("a "), run("bb", "b"), run(" c"));
+        assertEquals(List.of("a bb c"),
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, Style.TextWrap.PRETTY).get(0)));
+        assertEquals(2, LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1, Style.TextWrap.PRETTY)
+                .get(0).size());
+    }
+
+    @Test
+    void theSpaceTakesTheFormatOfItsFirstWhitespace() {
+        TextFormat underline = new TextFormat(false, false, true, false);
+        // Dentro de un tramo subrayado, el espacio también lo está.
+        assertEquals(List.of(new TextRun("a b", underline)),
+                LineBreaker.breakParagraphs(List.of(run("a b", "u")), 100, measurer, F, 1, Style.TextWrap.AUTO)
+                        .get(0).get(0).runs());
+        // Entre dos tramos subrayados separados por un espacio sin formato, no.
+        assertEquals(List.of(run("a", "u"), run(" "), run("b c", "u")),
+                LineBreaker.breakParagraphs(List.of(run("a", "u"), run(" "), run("b c", "u")), 100, measurer, F, 1,
+                        Style.TextWrap.AUTO).get(0).get(0).runs());
+        // Los espacios seguidos valen uno, con el formato del primero.
+        assertEquals(List.of(run("a ", "u"), run("b")),
+                LineBreaker.breakParagraphs(List.of(run("a  ", "u"), run("\n b")), 100, measurer, F, 1,
+                        Style.TextWrap.AUTO).get(0).get(0).runs());
+    }
+
+    @Test
+    void aBlankLineAcrossRunsSeparatesParagraphs() {
+        List<List<LineBreaker.Line>> p = LineBreaker.breakParagraphs(List.of(run("uno\n", "b"), run("\ndos")), 100,
+                measurer, F, 1, Style.TextWrap.AUTO);
+        assertEquals(2, p.size());
+        assertEquals(List.of(run("uno", "b")), p.get(0).get(0).runs());
+        assertEquals(List.of(run("dos")), p.get(1).get(0).runs());
+    }
+
+    @Test
+    void placePositionsEachRunAndSpreadsTheJustification() {
+        Style s = new Style();
+        s.font = "F";
+        s.fontSize = 1;
+        s.textAlign = Style.TextAlign.JUSTIFY;
+        // "uno " (4) + "dos" en negrita (6) + " tres" (5) = 15 en 20: 2,5 más por espacio.
+        TextLine l = LineBreaker.place(List.of(run("uno "), run("dos", "b"), run(" tres")), boldIsWider, s, 20,
+                true, 0, 12);
+        assertEquals(List.of(new TextLine.Run(0, 6.5, "uno ", TextFormat.PLAIN),
+                        new TextLine.Run(6.5, 6, "dos", run("dos", "b").format()),
+                        new TextLine.Run(12.5, 7.5, " tres", TextFormat.PLAIN)),
+                l.runs());
+        assertEquals(new TextLine(0, 0, 20, 12, "uno dos tres", 2.5, l.runs()), l);
     }
 }

@@ -13,6 +13,7 @@ import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.Slice;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
 
@@ -43,7 +44,7 @@ import java.util.Map;
 public final class InlineLayout implements LayoutAlgorithm {
 
     /** Un texto repartido en líneas: todas, y dónde acaba cada párrafo (índice tras su última línea). */
-    private record Broken(List<String> lines, int[] paragraphEnds) {
+    private record Broken(List<LineBreaker.Line> lines, int[] paragraphEnds) {
     }
 
     private record BrokenKey(Box box, double available) {
@@ -95,8 +96,9 @@ public final class InlineLayout implements LayoutAlgorithm {
                 continue;
             }
             changed = true;
-            String text = PageNumbers.apply(l.text(), page, pages);
-            lines.add(LineBreaker.place(text, real, s, available, l.wordSpacing() > 0, l.y(), l.height()));
+            List<TextRun> runs = l.runs().stream()
+                    .map(r -> new TextRun(PageNumbers.apply(r.text(), page, pages), r.format())).toList();
+            lines.add(LineBreaker.place(runs, real, s, available, l.wordSpacing() > 0, l.y(), l.height()));
         }
         if (!changed) {
             return f;
@@ -107,10 +109,10 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     private Broken breakText(Box box, double available) {
         Style s = box.style;
-        List<List<String>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.fontFace(), s.fontSize, s.textWrap)
+        List<List<LineBreaker.Line>> paragraphs = box.hasText()
+                ? LineBreaker.breakParagraphs(box.runs(), available, measurer, s.fontFace(), s.fontSize, s.textWrap)
                 : List.of();
-        List<String> texts = new ArrayList<>();
+        List<LineBreaker.Line> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
         for (int p = 0; p < paragraphs.size(); p++) {
             texts.addAll(paragraphs.get(p));
@@ -122,7 +124,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
-                ? LineBreaker.intrinsics(box.text, measurer, box.style.fontFace(), box.style.fontSize)
+                ? LineBreaker.intrinsics(box.runs(), measurer, box.style.fontFace(), box.style.fontSize)
                 : IntrinsicSizes.ZERO;
         return content;
     }
@@ -137,7 +139,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
         Broken b = broken.computeIfAbsent(new BrokenKey(box, available), k -> breakText(box, available));
-        List<String> texts = b.lines();
+        List<LineBreaker.Line> texts = b.lines();
         int[] paragraphEnds = b.paragraphEnds();
 
         int end = texts.size();
@@ -160,7 +162,7 @@ public final class InlineLayout implements LayoutAlgorithm {
                 paragraph++;
             }
             boolean justify = j != paragraphEnds[paragraph] - 1;
-            lines.add(LineBreaker.place(texts.get(j), measurer, s, available, justify, lines.size() * lineHeight,
+            lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, available, justify, lines.size() * lineHeight,
                     lineHeight));
         }
 

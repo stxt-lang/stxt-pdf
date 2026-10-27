@@ -1,5 +1,6 @@
 package dev.stxt.boxes.resources;
 
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
 import org.apache.fontbox.ttf.CmapLookup;
@@ -24,6 +25,7 @@ public final class FontFile {
     private final CmapLookup cmap;
     private final double unitsPerEm;
     private final VerticalMetrics vertical;
+    private final DecorationMetrics decoration;
 
     FontFile(Path path, FontFace face, TrueTypeFont ttf) throws IOException {
         this.path = path;
@@ -33,6 +35,10 @@ public final class FontFile {
         this.unitsPerEm = ttf.getUnitsPerEm();
         this.vertical = new VerticalMetrics(ttf.getHorizontalHeader().getAscender() / unitsPerEm,
                 -ttf.getHorizontalHeader().getDescender() / unitsPerEm);
+        this.decoration = new DecorationMetrics(ttf.getPostScript().getUnderlinePosition() / unitsPerEm,
+                ttf.getPostScript().getUnderlineThickness() / unitsPerEm,
+                ttf.getOS2Windows().getStrikeoutPosition() / unitsPerEm,
+                ttf.getOS2Windows().getStrikeoutSize() / unitsPerEm);
     }
 
     public Path path() {
@@ -46,6 +52,11 @@ public final class FontFile {
     /** Ascendente y descendente de la tabla {@code hhea}. */
     public VerticalMetrics vertical() {
         return vertical;
+    }
+
+    /** Subrayado (tabla {@code post}) y tachado (tabla {@code OS/2}). */
+    public DecorationMetrics decoration() {
+        return decoration;
     }
 
     /** Si la fuente tiene un glifo para el carácter. */

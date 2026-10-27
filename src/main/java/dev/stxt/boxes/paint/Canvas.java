@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
@@ -60,5 +61,10 @@ public interface Canvas {
      */
     default VerticalMetrics vertical(FontFace font) {
         return VerticalMetrics.APPROXIMATE;
+    }
+
+    /** Posición y grosor del subrayado y del tachado de la fuente (§5.4). Por defecto, la aproximación sin fuente. */
+    default DecorationMetrics decoration(FontFace font) {
+        return DecorationMetrics.APPROXIMATE;
     }
 }

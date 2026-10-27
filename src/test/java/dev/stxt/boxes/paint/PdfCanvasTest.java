@@ -1,7 +1,12 @@
 package dev.stxt.boxes.paint;
 
 import dev.stxt.InlineNode;
+import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.inline.PdfMetrics;
+import dev.stxt.boxes.model.TextRun;
+import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.TextRuns;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,7 +33,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -45,6 +52,18 @@ class PdfCanvasTest {
     private static byte[] render(InlineNode document, String name) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter.write(document, out);
+        Files.createDirectories(PDF_DIR);
+        Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
+        return out.toByteArray();
+    }
+
+    /** Como {@link #render(InlineNode, String)}, con los tramos de cada texto por su {@code Id}. */
+    private static byte[] render(InlineNode document, Map<String, List<TextRun>> runs, String name)
+            throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Resources resources = new Resources();
+        PdfCanvas.write(new Engine(new PdfMetrics(resources)).layOutDocument(TextRuns.build(document, runs)),
+                resources, out, false);
         Files.createDirectories(PDF_DIR);
         Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
         return out.toByteArray();
@@ -295,5 +314,45 @@ class PdfCanvasTest {
     void colors() {
         assertArrayEquals(new float[]{1, 0, 0}, PdfCanvas.rgb("#F00"));
         assertArrayEquals(new float[]{0xA3 / 255f, 0x2D / 255f, 0x2D / 255f}, PdfCanvas.rgb("#A32D2D"));
+    }
+
+    private static final String RUNS = "Uno negrita, cursiva, las dos, subrayado y tachado. Una palabra en "
+            + "negrita a medias y un texto justificado que ocupa varias líneas con sus tramos.";
+
+    /**
+     * Cada tramo con su fuente, en el mismo contenido marcado del párrafo; el subrayado y el
+     * tachado, <em>artifacts</em> (§5.4). Se revisa a ojo en {@code target/pdf/runs.pdf}.
+     */
+    @Test
+    void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 12\n"
+                + "\t\tAlign: justify\n\tParagraph: " + RUNS + "\n\t\tId: P\n");
+        List<TextRun> runs = List.of(run("Uno "), run("negrita", "b"), run(", "), run("cursiva", "i"), run(", "),
+                run("las dos", "bi"), run(", "), run("subrayado", "u"), run(" y "), run("tachado", "s"),
+                run(". Una palabra en "), run("neg", "b"), run("rita a medias y un "),
+                run("texto justificado que ocupa varias líneas con sus tramos", "u"), run("."));
+        try (PDDocument pdf = Loader.loadPDF(render(doc, Map.of("P", runs), "runs"))) {
+            List<String> names = new ArrayList<>();
+            PDResources resources = pdf.getPage(0).getResources();
+            for (COSName name : resources.getFontNames()) {
+                String font = resources.getFont(name).getName();
+                names.add(font.substring(font.indexOf('+') + 1));
+            }
+            names.sort(null);
+            assertEquals(List.of("IBMPlexSans", "IBMPlexSans-Bold", "IBMPlexSans-BoldItalic", "IBMPlexSans-Italic"),
+                    names);
+            String text = new PDFTextStripper().getText(pdf).replaceAll("\\s+", " ");
+            assertTrue(text.contains("Uno negrita, cursiva, las dos, subrayado y tachado."), text);
+            assertTrue(text.contains("negrita a medias"), text);
+            // Un solo P con un solo contenido marcado: los tramos no tienen elemento propio.
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("P"), types(document));
+            PDStructureElement p = (PDStructureElement) document.getKids().get(0);
+            assertEquals(1, p.getKids().size());
+            String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.contains("/Artifact BMC"), content);
+        }
     }
 }

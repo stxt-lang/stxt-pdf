@@ -2,6 +2,7 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.LaidOutDocument;
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
@@ -184,6 +185,11 @@ public final class PdfCanvas implements Canvas {
     @Override
     public VerticalMetrics vertical(FontFace font) {
         return resources.fonts().find(font).vertical();
+    }
+
+    @Override
+    public DecorationMetrics decoration(FontFace font) {
+        return resources.fonts().find(font).decoration();
     }
 
     /** La fuente incrustada; se carga la primera vez que se usa en el documento. */

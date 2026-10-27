@@ -1,5 +1,7 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.TextRun;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +32,11 @@ public final class Box {
     public Box parent;
     /** Contenido en línea, si la caja contiene texto directamente. */
     public String text;
+    /**
+     * Tramos del texto con su formato (ESPECIFICACION.md §5.4), cuyo texto seguido es
+     * {@link #text}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
+     */
+    public List<TextRun> runs;
     /** Línea del nodo {@code Text}. */
     public int textLine;
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
@@ -122,6 +129,11 @@ public final class Box {
     /** Si es la caja generada del marcador de un {@code List item}. */
     public boolean isMarker() {
         return element == Element.MARKER;
+    }
+
+    /** Tramos del texto: los de {@link #runs} o, sin formato, un único tramo con todo el texto. */
+    public List<TextRun> runs() {
+        return runs != null ? runs : TextRun.plain(text);
     }
 
     public boolean hasText() {

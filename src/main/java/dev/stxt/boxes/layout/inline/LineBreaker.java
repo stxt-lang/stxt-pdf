@@ -3,11 +3,17 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.TextFormat;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
@@ -20,6 +26,11 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  * <p>Tratamiento del espacio en blanco: los saltos de línea simples del bloque {@code Text} y
  * las secuencias de espacios valen un espacio; una línea en blanco separa párrafos y fuerza un
  * salto. Una palabra más ancha que la línea ocupa una línea propia y desborda.</p>
+ *
+ * <p>El texto es una lista de tramos con formato ({@link TextRun}). Una palabra puede tener
+ * partes de varios tramos ({@code **neg**rita}) y mide lo que suman sus partes, cada una con su
+ * fuente; el espacio entre dos palabras tiene el formato del tramo en que está el primero de sus
+ * espacios en blanco. Un texto sin formato es un único tramo y se mide igual que una cadena.</p>
  */
 public final class LineBreaker {
 
@@ -29,6 +40,26 @@ public final class LineBreaker {
     private static final double MAX_BADNESS = 10_000;
     /** Cuánto se puede estirar cada espacio, en proporción a su ancho (el de TeX). */
     private static final double STRETCH = 0.5;
+    private static final Pattern WORD = Pattern.compile("\\S+");
+
+    /**
+     * Una palabra: sus partes, con los tramos seguidos del mismo formato unidos, y el formato
+     * del espacio que la separa de la siguiente.
+     */
+    record Word(List<TextRun> parts, TextFormat gap) {
+    }
+
+    /** Una línea del reparto: sus tramos, con los seguidos del mismo formato unidos. */
+    public record Line(List<TextRun> runs) {
+
+        public Line {
+            runs = List.copyOf(runs);
+        }
+
+        public String text() {
+            return TextRun.text(runs);
+        }
+    }
 
     private LineBreaker() {
     }
@@ -41,37 +72,46 @@ public final class LineBreaker {
         return lines;
     }
 
-    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(String, double, TextMeasurer, FontFace, double, Style.TextWrap)}). */
+    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}). */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
                                                      FontFace font, double fontSize) {
         return breakParagraphs(text, available, measurer, font, fontSize, Style.TextWrap.AUTO);
     }
 
-    /** Líneas de cada párrafo del texto para un ancho disponible (las viudas y huérfanas son por párrafo). */
+    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}, para un texto sin formato. */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
                                                      FontFace font, double fontSize, Style.TextWrap wrap) {
-        List<List<String>> result = new ArrayList<>();
-        for (List<String> paragraph : paragraphs(text)) {
+        return breakParagraphs(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
+                .map(p -> p.stream().map(Line::text).toList()).toList();
+    }
+
+    /**
+     * Líneas de cada párrafo del texto para un ancho disponible (las viudas y huérfanas son por
+     * párrafo). {@code font} es la fuente de la caja; cada tramo la cambia con su formato.
+     */
+    public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
+                                                   FontFace font, double fontSize, Style.TextWrap wrap) {
+        List<List<Line>> result = new ArrayList<>();
+        for (List<Word> paragraph : paragraphs(runs)) {
             if (wrap == Style.TextWrap.PRETTY) {
                 result.add(optimal(paragraph, available, measurer, font, fontSize));
                 continue;
             }
-            List<String> lines = new ArrayList<>();
+            List<Line> lines = new ArrayList<>();
             result.add(lines);
-            StringBuilder current = new StringBuilder();
-            for (String word : paragraph) {
-                String candidate = current.length() == 0 ? word : current + " " + word;
-                if (current.length() == 0 || fits(measurer.width(candidate, font, fontSize), available)) {
-                    current.setLength(0);
-                    current.append(candidate);
-                } else {
-                    lines.add(current.toString());
-                    current.setLength(0);
-                    current.append(word);
+            List<Word> current = new ArrayList<>();
+            for (Word word : paragraph) {
+                current.add(word);
+                if (current.size() > 1
+                        && !fits(width(line(current).runs(), measurer, font, fontSize), available)) {
+                    current.remove(current.size() - 1);
+                    lines.add(line(current));
+                    current.clear();
+                    current.add(word);
                 }
             }
-            if (current.length() > 0) {
-                lines.add(current.toString());
+            if (!current.isEmpty()) {
+                lines.add(line(current));
             }
         }
         return result;
@@ -92,13 +132,20 @@ public final class LineBreaker {
      *
      * <p>El ancho de una línea es la suma de los de sus palabras y espacios.</p>
      */
-    static List<String> optimal(List<String> words, double available, TextMeasurer measurer,
-                                FontFace font, double fontSize) {
+    static List<Line> optimal(List<Word> words, double available, TextMeasurer measurer,
+                              FontFace font, double fontSize) {
         int n = words.size();
-        double space = measurer.width(" ", font, fontSize);
+        Map<TextFormat, Double> spaces = new HashMap<>();
+        // prefix[i]: ancho de las i primeras palabras; gaps[i]: el de los i primeros espacios.
         double[] prefix = new double[n + 1];
+        double[] gaps = new double[n];
         for (int i = 0; i < n; i++) {
-            prefix[i + 1] = prefix[i] + measurer.width(words.get(i), font, fontSize);
+            Word w = words.get(i);
+            prefix[i + 1] = prefix[i] + width(w.parts(), measurer, font, fontSize);
+            if (i + 1 < n) {
+                gaps[i + 1] = gaps[i] + spaces.computeIfAbsent(w.gap(),
+                        f -> measurer.width(" ", f.face(font), fontSize));
+            }
         }
         // best[j]: deméritos mínimos de las líneas con las j primeras palabras; from[j]: primera
         // palabra de la última de esas líneas.
@@ -108,22 +155,23 @@ public final class LineBreaker {
         best[0] = 0;
         for (int j = 1; j <= n; j++) {
             for (int i = j - 1; i >= 0; i--) {
-                int spaces = j - i - 1;
-                double width = prefix[j] - prefix[i] + space * spaces;
-                if (spaces > 0 && !fits(width, available)) {
+                boolean spaced = j - i > 1;
+                double space = gaps[j - 1] - gaps[i];
+                double width = prefix[j] - prefix[i] + space;
+                if (spaced && !fits(width, available)) {
                     // Con más palabras sería aún más ancha; una sola sí puede desbordar.
                     break;
                 }
-                double d = best[i] + demerits(available - width, spaces * space * STRETCH, j == n);
+                double d = best[i] + demerits(available - width, space * STRETCH, j == n);
                 if (d < best[j]) {
                     best[j] = d;
                     from[j] = i;
                 }
             }
         }
-        List<String> lines = new ArrayList<>();
+        List<Line> lines = new ArrayList<>();
         for (int j = n; j > 0; j = from[j]) {
-            lines.add(0, String.join(" ", words.subList(from[j], j)));
+            lines.add(0, line(words.subList(from[j], j)));
         }
         return lines;
     }
@@ -143,15 +191,21 @@ public final class LineBreaker {
         return (LINE_PENALTY + badness) * (LINE_PENALTY + badness);
     }
 
-    /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
+    /** Como {@link #intrinsics(List, TextMeasurer, FontFace, double)}, para un texto sin formato. */
     public static IntrinsicSizes intrinsics(String text, TextMeasurer measurer, FontFace font, double fontSize) {
+        return intrinsics(TextRun.plain(text), measurer, font, fontSize);
+    }
+
+    /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
+    public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
+                                            double fontSize) {
         double min = 0;
         double max = 0;
-        for (List<String> paragraph : paragraphs(text)) {
-            for (String word : paragraph) {
-                min = Math.max(min, measurer.width(word, font, fontSize));
+        for (List<Word> paragraph : paragraphs(runs)) {
+            for (Word word : paragraph) {
+                min = Math.max(min, width(word.parts(), measurer, font, fontSize));
             }
-            max = Math.max(max, measurer.width(String.join(" ", paragraph), font, fontSize));
+            max = Math.max(max, width(line(paragraph).runs(), measurer, font, fontSize));
         }
         return new IntrinsicSizes(min, max);
     }
@@ -181,35 +235,167 @@ public final class LineBreaker {
         if (textAlign != Style.TextAlign.JUSTIFY || last) {
             return 0;
         }
-        long spaces = line.chars().filter(c -> c == ' ').count();
+        long spaces = spaces(line);
         return spaces == 0 ? 0 : Math.max(0, available - lineWidth) / spaces;
     }
 
+    /** Como {@link #place(List, TextMeasurer, Style, double, boolean, double, double)}, para un texto sin formato. */
+    public static TextLine place(String text, TextMeasurer measurer, Style s, double available, boolean justify,
+                                 double y, double height) {
+        return place(TextRun.plain(text), measurer, s, available, justify, y, height);
+    }
+
     /**
-     * Una línea colocada en la caja de contenido (§5.4): el texto medido con la fuente de
-     * {@code s}, alineado en {@code available} y, si se justifica, con el espacio extra entre
-     * palabras sumado a su ancho.
+     * Una línea colocada en la caja de contenido (§5.4): cada tramo medido con la fuente de
+     * {@code s} y su formato, la línea alineada en {@code available} y, si se justifica, con el
+     * espacio extra entre palabras sumado a su ancho y al de cada tramo.
      *
+     * @param runs    tramos de la línea, con las palabras separadas por un espacio
      * @param justify si la línea se puede justificar: no es la última de su párrafo (al numerar
      *                las páginas, si ya estaba justificada)
      */
-    public static TextLine place(String text, TextMeasurer measurer, Style s, double available, boolean justify,
-                                 double y, double height) {
-        double width = measurer.width(text, s.fontFace(), s.fontSize);
-        double x = offset(width, available, s.textAlign);
-        double spacing = wordSpacing(text, width, available, s.textAlign, !justify);
-        width += spacing * text.chars().filter(c -> c == ' ').count();
-        return new TextLine(x, y, width, height, text, spacing);
+    public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available,
+                                 boolean justify, double y, double height) {
+        FontFace font = s.fontFace();
+        double[] widths = new double[runs.size()];
+        double natural = 0;
+        for (int i = 0; i < widths.length; i++) {
+            TextRun r = runs.get(i);
+            widths[i] = measurer.width(r.text(), r.format().face(font), s.fontSize);
+            natural += widths[i];
+        }
+        String text = TextRun.text(runs);
+        double x = offset(natural, available, s.textAlign);
+        double spacing = wordSpacing(text, natural, available, s.textAlign, !justify);
+        List<TextLine.Run> placed = new ArrayList<>(runs.size());
+        double at = 0;
+        for (int i = 0; i < widths.length; i++) {
+            TextRun r = runs.get(i);
+            double w = widths[i] + spacing * spaces(r.text());
+            placed.add(new TextLine.Run(at, w, r.text(), r.format()));
+            at += w;
+        }
+        return new TextLine(x, y, natural + spacing * spaces(text), height, text, spacing, placed);
     }
 
-    private static List<List<String>> paragraphs(String text) {
-        List<List<String>> result = new ArrayList<>();
-        for (String block : text.split("\\n\\s*\\n")) {
-            String clean = block.strip();
-            if (!clean.isEmpty()) {
-                result.add(List.of(clean.split("\\s+")));
+    /** Ancho de unos tramos, cada uno con su fuente. */
+    static double width(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize) {
+        double width = 0;
+        for (TextRun r : runs) {
+            width += measurer.width(r.text(), r.format().face(font), fontSize);
+        }
+        return width;
+    }
+
+    /** Las palabras de cada párrafo del texto (ver la descripción de la clase). */
+    static List<List<Word>> paragraphs(List<TextRun> runs) {
+        String text = TextRun.text(runs);
+        // starts[i]: posición en el texto donde empieza el tramo i.
+        int[] starts = new int[runs.size() + 1];
+        for (int i = 0; i < runs.size(); i++) {
+            starts[i + 1] = starts[i] + runs.get(i).text().length();
+        }
+        RunCursor cursor = new RunCursor(runs, starts);
+        List<List<Word>> result = new ArrayList<>();
+        List<Word> paragraph = new ArrayList<>();
+        List<TextRun> previous = null;
+        int previousEnd = 0;
+        Matcher m = WORD.matcher(text);
+        while (m.find()) {
+            if (previous != null) {
+                String gap = text.substring(previousEnd, m.start());
+                // Una línea en blanco: dos saltos de línea con solo espacio en blanco entre ellos.
+                boolean blankLine = gap.indexOf('\n') != gap.lastIndexOf('\n');
+                paragraph.add(new Word(previous, blankLine ? TextFormat.PLAIN : cursor.format(previousEnd)));
+                if (blankLine) {
+                    result.add(paragraph);
+                    paragraph = new ArrayList<>();
+                }
             }
+            previous = cursor.parts(text, m.start(), m.end());
+            previousEnd = m.end();
+        }
+        if (previous != null) {
+            paragraph.add(new Word(previous, TextFormat.PLAIN));
+            result.add(paragraph);
         }
         return result;
+    }
+
+    /** Recorre los tramos hacia delante: las posiciones que se le piden nunca retroceden. */
+    private static final class RunCursor {
+        private final List<TextRun> runs;
+        private final int[] starts;
+        private int run;
+
+        RunCursor(List<TextRun> runs, int[] starts) {
+            this.runs = runs;
+            this.starts = starts;
+        }
+
+        /** Formato del carácter en la posición {@code index}. */
+        TextFormat format(int index) {
+            while (starts[run + 1] <= index) {
+                run++;
+            }
+            return runs.get(run).format();
+        }
+
+        /** Las partes del texto entre {@code start} y {@code end}, cada una con su formato. */
+        List<TextRun> parts(String text, int start, int end) {
+            Runs parts = new Runs();
+            for (int i = start; i < end; ) {
+                TextFormat f = format(i);
+                int stop = Math.min(end, starts[run + 1]);
+                parts.add(text.substring(i, stop), f);
+                i = stop;
+            }
+            return parts.build();
+        }
+    }
+
+    /** Las palabras en una línea, separadas por un espacio con el formato de la palabra anterior. */
+    private static Line line(List<Word> words) {
+        Runs runs = new Runs();
+        for (int i = 0; i < words.size(); i++) {
+            if (i > 0) {
+                runs.add(" ", words.get(i - 1).gap());
+            }
+            for (TextRun part : words.get(i).parts()) {
+                runs.add(part.text(), part.format());
+            }
+        }
+        return new Line(runs.build());
+    }
+
+    /** Acumula tramos, uniendo los seguidos del mismo formato. */
+    private static final class Runs {
+        private final List<TextRun> runs = new ArrayList<>(1);
+        private final StringBuilder text = new StringBuilder();
+        private TextFormat format;
+
+        void add(String s, TextFormat f) {
+            if (format != null && !format.equals(f)) {
+                flush();
+            }
+            format = f;
+            text.append(s);
+        }
+
+        List<TextRun> build() {
+            if (format != null) {
+                flush();
+            }
+            return runs;
+        }
+
+        private void flush() {
+            runs.add(new TextRun(text.toString(), format));
+            text.setLength(0);
+        }
+    }
+
+    private static long spaces(String text) {
+        return text.chars().filter(c -> c == ' ').count();
     }
 }

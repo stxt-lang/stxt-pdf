@@ -2,6 +2,7 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
@@ -198,6 +199,11 @@ public final class StackingContext {
         }
     }
 
+    /**
+     * Las líneas de texto, cada tramo con su fuente (§5.4). Como en CSS, el subrayado se pinta
+     * antes que el texto y el tachado después; los dos fuera del contenido marcado, porque no son
+     * texto (en el PDF etiquetado, <em>artifacts</em>).
+     */
     private static void paintText(Canvas canvas, Piece p) {
         if (p.f().lines().isEmpty()) {
             return;
@@ -206,11 +212,34 @@ public final class StackingContext {
         FontFace font = s.fontFace();
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        paintDecorations(canvas, p, content, metrics, true);
         canvas.beginText(p.f().box());
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
-            canvas.text(content.x() + l.x(), baseline, l.text(), font, s.fontSize, s.color, l.wordSpacing());
+            for (TextLine.Run r : l.runs()) {
+                canvas.text(content.x() + l.x() + r.x(), baseline, r.text(), r.format().face(font), s.fontSize,
+                        s.color, l.wordSpacing());
+            }
         }
         canvas.endText();
+        paintDecorations(canvas, p, content, metrics, false);
+    }
+
+    /** Rayas de subrayado ({@code underline}) o de tachado de los tramos, con el color del texto. */
+    private static void paintDecorations(Canvas canvas, Piece p, Rect content, VerticalMetrics metrics,
+                                         boolean underline) {
+        Style s = p.f().box().style;
+        for (TextLine l : p.f().lines()) {
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
+            for (TextLine.Run r : l.runs()) {
+                if (underline ? !r.format().underline() : !r.format().strike()) {
+                    continue;
+                }
+                DecorationMetrics d = canvas.decoration(r.format().face(s.fontFace()));
+                double x = content.x() + l.x() + r.x();
+                canvas.background(underline ? d.underline(x, baseline, r.width(), s.fontSize)
+                        : d.strikeout(x, baseline, r.width(), s.fontSize), s.color);
+            }
+        }
     }
 }

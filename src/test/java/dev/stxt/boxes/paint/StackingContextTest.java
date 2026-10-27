@@ -6,11 +6,14 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.TextRuns;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Orden de pintado (ESPECIFICACION.md §5.6), visto por los colores de fondo que se pintan. */
@@ -22,11 +25,14 @@ class StackingContextTest {
     private static final class Recorder implements Canvas {
         final List<String> backgrounds = new ArrayList<>();
         final List<Rect> rects = new ArrayList<>();
+        /** Fondos y textos en el orden en que se pintan. */
+        final List<String> events = new ArrayList<>();
 
         @Override
         public void background(Rect paddingBox, String color) {
             backgrounds.add(color);
             rects.add(paddingBox);
+            events.add("background " + color);
         }
 
         @Override
@@ -36,6 +42,7 @@ class StackingContextTest {
         @Override
         public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                          double wordSpacing) {
+            events.add("text '" + text + "' " + font.variant());
         }
     }
 
@@ -44,9 +51,13 @@ class StackingContextTest {
     }
 
     private static Recorder record(String... boxLines) {
+        return record(Map.of(), boxLines);
+    }
+
+    private static Recorder record(Map<String, List<dev.stxt.boxes.model.TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
-        Page page = new Engine().layOutDocument(READER.read(doc)).pages().get(0);
+        Page page = new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages().get(0);
         Recorder canvas = new Recorder();
         StackingContext.build(page.content(), page.fixed(), 40, 40).paint(canvas);
         return canvas;
@@ -115,5 +126,26 @@ class StackingContextTest {
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid");
         assertEquals(List.of("#00F"), r.backgrounds);
+    }
+
+    /** Cada tramo con su fuente; el subrayado antes del texto y el tachado después (§5.4). */
+    @Test
+    void runsWithTheirFontAndDecorations() {
+        Recorder r = record(Map.of("T", List.of(run("uno ", "u"), run("dos", "bs"), run(" tres"))),
+                "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10", "\t\tColor: #112233",
+                "\tText: uno dos tres", "\t\tId: T");
+        assertEquals(List.of("background #112233", "text 'uno ' normal", "text 'dos' bold", "text ' tres' normal",
+                "background #112233"), r.events);
+        // Línea de 12 pt desde y = 40: línea base en 40 + (12 − 10) / 2 + 8 = 49 (aproximación del SVG).
+        assertEquals(new Rect(40, 50, 20, 0.6).toString(), round(r.rects.get(0)).toString());
+        assertEquals(new Rect(60, 45.9, 15, 0.6).toString(), round(r.rects.get(1)).toString());
+    }
+
+    private static Rect round(Rect r) {
+        return new Rect(round(r.x()), round(r.y()), round(r.width()), round(r.height()));
+    }
+
+    private static double round(double v) {
+        return Math.round(v * 1000) / 1000.0;
     }
 }

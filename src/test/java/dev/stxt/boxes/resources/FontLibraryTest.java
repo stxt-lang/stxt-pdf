@@ -58,6 +58,19 @@ class FontLibraryTest {
     }
 
     @Test
+    void decorationMetricsFromPostAndOs2() {
+        // post: underlinePosition −95 y underlineThickness 60; OS/2: yStrikeoutPosition 309 y yStrikeoutSize 60.
+        FontFile f = new Resources().fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL));
+        assertEquals(-0.095, f.decoration().underlinePosition(), 1e-9);
+        assertEquals(0.06, f.decoration().underlineThickness(), 1e-9);
+        assertEquals(0.309, f.decoration().strikeoutPosition(), 1e-9);
+        assertEquals(0.06, f.decoration().strikeoutThickness(), 1e-9);
+        // La negrita tiene la raya más gruesa.
+        assertEquals(0.1, new Resources().fonts().find(plex(FontWeight.BOLD, FontStyle.NORMAL)).decoration()
+                .underlineThickness(), 1e-9);
+    }
+
+    @Test
     void missingVariant() throws IOException {
         Resources r = copy("plex", "Regular", "Bold");
         ResourceException e = assertThrows(ResourceException.class,

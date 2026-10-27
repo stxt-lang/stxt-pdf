@@ -3,12 +3,16 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.model.TextFormat;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
+import static dev.stxt.boxes.layout.LayoutFixture.layOutRuns;
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Con {@link FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}. */
@@ -102,5 +106,27 @@ class InlineLayoutTest {
                 "\t\tText: hola", "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 10");
         assertEquals(12, l.rect("C").y() - 40, 1e-9);
         assertEquals(22, l.rect("P").height(), 1e-9);
+    }
+
+    @Test
+    void runsArePlacedOneAfterTheOther() {
+        // "uno " (20) + "dos" (15) + " tres" (25) = 60, centrado en 100.
+        TextLine l = layOutRuns(Map.of("T", List.of(run("uno "), run("dos", "b"), run(" tres"))),
+                "\tText: uno dos tres", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\tTypography:",
+                "\t\t\tAlign: center").fragment("T").lines().get(0);
+        assertEquals(20, l.x(), 1e-9);
+        assertEquals(List.of(new TextLine.Run(0, 20, "uno ", TextFormat.PLAIN),
+                new TextLine.Run(20, 15, "dos", run("dos", "b").format()),
+                new TextLine.Run(35, 25, " tres", TextFormat.PLAIN)), l.runs());
+    }
+
+    @Test
+    void pageNumbersKeepTheirRun() {
+        TextLine l = layOutRuns(Map.of("T", List.of(run("Página "), run("{page}", "b"), run(" de {pages}"))),
+                "\tText: Página {page} de {pages}", "\t\tId: T").fragment("T").lines().get(0);
+        assertEquals("Página 1 de 1", l.text());
+        assertEquals(List.of(new TextLine.Run(0, 35, "Página ", TextFormat.PLAIN),
+                new TextLine.Run(35, 5, "1", run("1", "b").format()),
+                new TextLine.Run(40, 25, " de 1", TextFormat.PLAIN)), l.runs());
     }
 }

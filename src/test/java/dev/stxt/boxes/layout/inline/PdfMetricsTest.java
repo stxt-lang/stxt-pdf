@@ -8,13 +8,17 @@ import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
+import dev.stxt.boxes.tree.TextRuns;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -89,5 +93,33 @@ class PdfMetricsTest {
         assertEquals(ErrorCode.GLYPH_MISSING, e.code());
         assertEquals(16, e.line());
         assertEquals("línea 16: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
+    }
+
+    @Test
+    void missingVariantOfARunAtTheLineOfTheRun(@TempDir Path dir) throws IOException {
+        Path fonts = Files.createDirectories(dir.resolve("fonts"));
+        Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("r.ttf"));
+        PdfMetrics regularOnly = new PdfMetrics(new Resources(dir));
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tText:\n\t\tId: T\n\t\tContent >>\n\t\t\tPrimera línea\n\t\t\tsegunda línea";
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> regularOnly.validate(TextRuns.build(new DocumentReader().read(doc),
+                        Map.of("T", List.of(run("Primera línea\nsegunda "), run("línea", "bi")))).root()));
+        assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.code());
+        assertEquals(12, e.line());
+        assertTrue(e.getMessage().endsWith("(texto con formato bold italic)"), e.getMessage());
+    }
+
+    @Test
+    void missingCharacterOfARunAtItsLine() {
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tText:\n\t\tId: T\n\t\tContent >>\n\t\t\tPrimera línea\n\t\t\tKanji 漢";
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> metrics.validate(TextRuns.build(new DocumentReader().read(doc),
+                        Map.of("T", List.of(run("Primera "), run("línea\nKanji 漢", "i")))).root()));
+        assertEquals(ErrorCode.GLYPH_MISSING, e.code());
+        assertEquals("línea 12: La fuente IBM Plex Sans italic no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
 }

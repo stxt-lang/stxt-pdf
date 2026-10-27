@@ -1,10 +1,17 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.LayoutFixture;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.TextFormat;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static dev.stxt.boxes.layout.LayoutFixture.layOutPaged;
+import static dev.stxt.boxes.layout.LayoutFixture.layOutPagedRuns;
+import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -84,4 +91,16 @@ class InlineFragmentationTest {
     }
 
     // Una línea más alta que la página no se puede partir: es un error (catálogo de errores).
+
+    @Test
+    void runsContinueOnTheNextPage() {
+        // La novena palabra, en negrita, abre la página 2.
+        LayoutFixture l = layOutPagedRuns(PAGE,
+                Map.of("P", List.of(run(words(8) + " "), run("aaaaa", "b"), run(" aaaaa"))),
+                "\tText: " + words(10), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
+        assertEquals(8, lines(l, 1, "P"));
+        List<TextLine> lines = l.fragment(2, "P").lines();
+        assertEquals(List.of(new TextLine.Run(0, 25, "aaaaa", run("aaaaa", "b").format())), lines.get(0).runs());
+        assertEquals(List.of(new TextLine.Run(0, 25, "aaaaa", TextFormat.PLAIN)), lines.get(1).runs());
+    }
 }

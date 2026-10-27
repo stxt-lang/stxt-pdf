@@ -3,7 +3,9 @@ package dev.stxt.boxes.layout;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.TextRuns;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
     private static final String FONT = "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+    private static final String A4 = "\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n";
     /** Sufijo de la clave del marcador de un ítem. */
     private static final String MARKER = "#marker";
 
@@ -47,17 +50,35 @@ public final class LayoutFixture {
      * tabuladores como en el documento.
      */
     public static LayoutFixture layOut(String... boxLines) {
-        return layOut("\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n", boxLines);
+        return layOut(A4, boxLines);
     }
 
     /** Documento con páginas de {@code height} pt: el área útil mide {@code height − 80}. */
     public static LayoutFixture layOutPaged(double height, String... boxLines) {
-        return layOut("\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n", boxLines);
+        return layOut(paged(height), boxLines);
+    }
+
+    /** Como {@link #layOut(String...)}, con los tramos de cada texto por su {@code Id} ({@link TextRuns}). */
+    public static LayoutFixture layOutRuns(Map<String, List<TextRun>> runs, String... boxLines) {
+        return layOut(A4, runs, boxLines);
+    }
+
+    /** Como {@link #layOutPaged(double, String...)}, con tramos ({@link #layOutRuns}). */
+    public static LayoutFixture layOutPagedRuns(double height, Map<String, List<TextRun>> runs, String... boxLines) {
+        return layOut(paged(height), runs, boxLines);
+    }
+
+    private static String paged(double height) {
+        return "\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n";
     }
 
     private static LayoutFixture layOut(String media, String... boxLines) {
+        return layOut(media, Map.of(), boxLines);
+    }
+
+    private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
-        return new LayoutFixture(new Engine().layOutDocument(READER.read(doc)).pages());
+        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages());
     }
 
     public int pages() {

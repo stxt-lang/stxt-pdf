@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.FontFile;
 import dev.stxt.boxes.resources.FontLibrary;
@@ -25,7 +26,9 @@ import static dev.stxt.boxes.tree.PropertyKey.FONT_WEIGHT;
  * esas mismas fuentes: {@code new Engine(new PdfMetrics(resources))}.
  *
  * <p>{@link #validate(Box)} comprueba antes de maquetar que cada texto tiene su fuente (familia,
- * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución.</p>
+ * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución. Un
+ * texto con tramos (§5.4) necesita la variante de cada tramo, y cada tramo, sus caracteres en
+ * ella.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
@@ -77,33 +80,50 @@ public final class PdfMetrics implements TextMeasurer {
 
     private static void check(Box box, FontLibrary fonts) {
         Style s = box.style;
-        FontFile font;
+        int start = 0;
+        for (TextRun run : box.runs()) {
+            FontFile font = font(box, fonts, run.format().face(s.fontFace()), start);
+            String text = run.text();
+            for (int i = 0; i < text.length(); ) {
+                String marker = text.startsWith(PageNumbers.PAGES, i) ? PageNumbers.PAGES
+                        : text.startsWith(PageNumbers.PAGE, i) ? PageNumbers.PAGE : null;
+                if (marker != null) {
+                    // Se pinta como cifras.
+                    for (char d : DIGITS.toCharArray()) {
+                        requireGlyph(box, font, d, start + i);
+                    }
+                    i += marker.length();
+                    continue;
+                }
+                int cp = text.codePointAt(i);
+                // Los espacios en blanco del documento se pintan como espacios (§5.4).
+                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
+                i += Character.charCount(cp);
+            }
+            start += text.length();
+        }
+    }
+
+    /**
+     * La fuente de un tramo que empieza en el carácter {@code index} del texto. Si no existe la
+     * variante de la caja, el error señala el texto y las declaraciones; si es la de un tramo con
+     * formato, la línea del tramo.
+     */
+    private static FontFile font(Box box, FontLibrary fonts, FontFace face, int index) {
+        Style s = box.style;
         try {
-            font = fonts.find(s.fontFace());
+            return fonts.find(face);
         } catch (ResourceException e) {
             if (!fonts.families().contains(s.font)) {
                 // El culpable es la declaración de Font, aunque esté en una antecesora.
                 throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }
+            if (!face.equals(s.fontFace())) {
+                throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_VARIANT_MISSING,
+                        e.getMessage() + " (texto con formato " + face.variant() + ")");
+            }
             throw new InvalidModelException(box.textLine, ErrorCode.FONT_VARIANT_MISSING,
                     e.getMessage() + " (" + declarations(s) + ")");
-        }
-        String text = box.text;
-        for (int i = 0; i < text.length(); ) {
-            String marker = text.startsWith(PageNumbers.PAGES, i) ? PageNumbers.PAGES
-                    : text.startsWith(PageNumbers.PAGE, i) ? PageNumbers.PAGE : null;
-            if (marker != null) {
-                // Se pinta como cifras.
-                for (char d : DIGITS.toCharArray()) {
-                    requireGlyph(box, font, d, i);
-                }
-                i += marker.length();
-                continue;
-            }
-            int cp = text.codePointAt(i);
-            // Los espacios en blanco del documento se pintan como espacios (§5.4).
-            requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, i);
-            i += Character.charCount(cp);
         }
     }
 

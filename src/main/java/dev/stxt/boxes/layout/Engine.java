@@ -66,7 +66,15 @@ public final class Engine {
      * ({@link Overflow}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
-        BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
+        return layOutDocument(new BoxTreeBuilder().build(document));
+    }
+
+    /**
+     * Como {@link #layOutDocument(InlineNode)}, con el árbol ya construido. Sirve para retocar el
+     * árbol antes de maquetarlo (los tests ponen así tramos con formato en un texto, §5.4); el
+     * árbol no se puede cambiar después.
+     */
+    public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
         measurer.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
         List<Page> pages = new Paginator(this).paginate(tree.root(), tree.media());
