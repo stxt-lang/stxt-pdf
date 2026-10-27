@@ -19,6 +19,9 @@
 - Httpservice para probar, que se pueda ejecutar en maven, etc. 
 - Un docker para esto
 - Refactor de código
+- Revisar ThreadSafe
+- Revisar rendimiento
+- Falta nodo con markdown. Qué estrategia hacer, etc.
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
 - ...
