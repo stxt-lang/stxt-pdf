@@ -279,8 +279,8 @@ Pequeñas, independientes y de bajo riesgo; se pueden hacer de una en una:
 - [ ] **Épsilon:** siete constantes `EPSILON = 1e-9` (`BlockLayout`, `Engine`, `Slice`,
       `UnitBreaker`, `TableLayout`, `BreakRules`, `TrackSizing` como `EPS`) y seis literales
       `1e-9` (`FlexLayout:366,429`, `FlexResolver:98`, `LineBreaker:60,109,130,132`). Una sola
-      constante en `Sizing` con `fits(a, b)`/`same(a, b)`. `Overflow` usa 0.01 a propósito
-      (tolerancia del documento): que se vea en el nombre.
+      constante en `Sizing` con `fits(a, b)`/`same(a, b)`. `Overflow` usa 0.01: si es una
+      tolerancia deliberada, que lo diga el nombre.
 - [ ] **"No cabe nada":** el mismo `LayoutResult` con `BreakToken.BEFORE` en
       `BlockLayout:277`, `UnitBreaker:309` e `InlineLayout:127` → `LayoutResult.before(box)`.
 - [ ] **Alineación en un eje:** el `switch START/STRETCH/END/CENTER` de `FlexLayout:232` y
@@ -288,8 +288,9 @@ Pequeñas, independientes y de bajo riesgo; se pueden hacer de una en una:
 - [ ] **Bordes del canvas:** `border()` es idéntico en `SvgCanvas:47` y `PdfCanvas:171` →
       método por defecto en `Canvas` que pinta cuatro `background`, con un `outline(Rect)` para
       el contorno de depuración.
-- [ ] **Mensajes:** `name(Box)` y `pt(double)` en `Overflow:226-230` y `TableLayout:99-103`, con
-      **formatos distintos** (`2.5` frente a `2.50` según la clase) → un `Messages` compartido.
+- [ ] **Mensajes:** `name(Box)` y `pt(double)` están en `Overflow:226-230` y en
+      `TableLayout:99-103`, y `pt` tiene dos implementaciones distintas para el mismo formato
+      → un `Messages` compartido.
 - [ ] **Caja de contenido de un fragmento:** `f.width() - f.border().horizontal() -
       f.padding().horizontal()` en `Overflow`, `InlineLayout.number` y otros →
       `Fragment.contentWidth()`, `contentHeight()`.
