@@ -59,7 +59,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 1 | [Ramas `default` silenciosas en la lectura de propiedades](#1-ramas-default-silenciosas) | QA | S | — | hecho |
 | 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | hecho |
 | 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | hecho |
-| 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | pendiente |
+| 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | hecho |
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | pendiente |
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | pendiente |
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | pendiente |
@@ -191,16 +191,51 @@ No hay medida de cobertura ni análisis estático en el `pom.xml`.
 
 **Cómo.**
 
-- [ ] `SliceTest`: tabla de casos (primer/intermedio/último fragmento × `slice`/`clone` × alto
-      `auto`/definido/con mínimo y máximo × el contenido termina o no).
-- [ ] `BoxModelTest`: porcentajes, `Aspect ratio`, `fixedWidth`/`fixedHeight`,
-      `measuringContentHeight`, `intrinsic` con `Width` fijo y con mínimo y máximo.
-- [ ] `LayoutCacheTest` / test de regresión de anidamiento: 8–10 niveles de `Flex` y `Grid`
-      anidados; el número de *misses* crece de forma lineal (o se acota con `assertTimeout`).
-- [ ] `UnitBreakerTest` directo con `Units` sintéticas: corte entre unidades, grupo que no se
-      puede cortar, partición en paralelo, `Repeat`.
-- [ ] JaCoCo en el `pom.xml`, solo el informe (sin umbral al principio), para ver qué ramas
-      de `BoxTreeBuilder`, `Overflow` y `UnitBreaker` no ejecuta nadie.
+- [x] `SliceTest` (11 casos): sin fragmentación; `slice` con alto `auto` en primer, intermedio
+      y último fragmento; `Height` definido repartido (el contenido termina y el alto no cabe, y
+      cortado dentro del contenido sin pasar del alto que queda); `Min height` y `Max height`
+      sobre el total; `clone` con alto `auto` y con `Height` (240 de caja de contenido en
+      90 + 90 + 60); `top`, `contentRemaining` y `contentHeight`.
+- [x] `BoxModelTest` (13 casos): porcentajes de margen, borde y relleno; `Width` en
+      porcentaje con mínimo y máximo (gana el mínimo); `fixedWidth`/`fixedHeight`; palabras
+      clave intrínsecas; `Height` en porcentaje con y sin base; `Aspect ratio` con máximo;
+      `measuringContentHeight`; `usedHeight`; `intrinsic` con `Width` fijo, porcentaje,
+      mínimo y máximo; `childSpace`; los intrínsecos solo se piden si hacen falta.
+- [x] `LayoutCacheTest`: `Flex` y `Grid` alternos de 4, 8 y 12 niveles. Como
+      `Engine.cache()` ya no existe ([tarea 3](#3-resultado-del-documento-y-fachada)), el trabajo
+      se mide con un `TextMeasurer` que cuenta las mediciones: 38, 66 y 94 (lineal, 7 por
+      nivel). Sin caché salen 180, 1 068 y 4 800, y el test falla. `LayoutCache.stats()` se
+      queda: lo usa `Engine.toString`; su javadoc ya no cita tests que no existían.
+- [x] `UnitBreakerTest` (7 casos) con `Units` y `Placed` sintéticos: sin fragmentación;
+      corte entre unidades y continuación; grupo que no se puede separar (`BEFORE` fuera del
+      principio de página, `FORCED` al principio); corte forzado; `Repeat` con cabecera y pie
+      en los dos fragmentos; partición en paralelo de una unidad más alta que la página (solo
+      continúa el ítem que no ha terminado); unidad no partible colocada entera.
+- [x] JaCoCo 0.8.13 en el `pom.xml`, solo el informe: `mvn test` lo deja en
+      `target/site/jacoco/index.html`.
+
+**Verificación.** `mvn test` (587 tests), sin cambios en los PNG ni en los `expected.stxt`.
+
+**Lo que dice el primer informe** (2026-10-27): 95,1 % de líneas y 86,1 % de ramas. Las piezas
+de esta tarea quedan en 92–100 % de ramas. Lo que más ramas deja sin ejecutar:
+
+| Clase | Ramas | Ramas sin cubrir |
+|---|---|---|
+| `tree.BoxTreeBuilder` | 84,9 % | 101 |
+| `layout.Overflow` | 62,7 % | 38 |
+| `model.ValueParser` | 75,0 % | 18 |
+| `layout.grid.TrackSizing` | 91,0 % | 15 |
+| `layout.inline.InlineLayout` | 74,1 % | 15 |
+| `layout.grid.Placement` | 71,4 % (76,4 % de líneas) | 8 |
+
+`RelativeOffset` y `MarkerLayout`, que el problema citaba, siguen sin test propio: los tests de
+`position` y de listas ejecutan el 100 % y el 67 % de sus ramas, y no se les ha añadido uno
+por ahora.
+
+`Overflow` es el hueco más claro: es la última red contra los desbordamientos (§5.12) y el
+catálogo de errores solo ejecuta dos tercios de sus ramas. Antes de poner un umbral, conviene
+mirar en el informe qué ramas de `Overflow` y de `Placement` son casos reales sin probar y
+cuáles son código muerto.
 
 ## 5. Quitar la geometría mutable de `Box`
 
@@ -418,3 +453,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 12 (nueva) | `GoldenTest` tolera el antialiasing entre máquinas al comparar los PNG; 549 tests en verde | Tarea 2 |
 | 2026-10-27 | 2 | `ConstraintSpace` con fábricas con nombre y *withers* que conservan `contentHeight`; `ConstraintSpaceTest`; 555 tests en verde | Tarea 3 |
 | 2026-10-27 | 3 | `layOutDocument` devuelve `LaidOutDocument`; fachada `PdfWriter`; sin `Engine.cache()`; 555 tests en verde | Tarea 4 |
+| 2026-10-27 | 4 | `SliceTest`, `BoxModelTest`, `LayoutCacheTest` y `UnitBreakerTest`; JaCoCo (95,1 % de líneas, 86,1 % de ramas); 587 tests en verde | Tarea 5; revisar las ramas de `Overflow` |

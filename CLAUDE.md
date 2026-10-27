@@ -28,7 +28,8 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 Java 17 y Maven (`dev.stxt:stxt-boxes`, package raíz `dev.stxt.boxes`).
 
 ```bash
-mvn test                                   # compila y ejecuta todos los tests
+mvn test                                   # compila, ejecuta todos los tests y deja la cobertura
+                                           # (JaCoCo) en target/site/jacoco/index.html
 mvn test -Dtest=ValueParserTest            # una clase
 mvn test -Dtest='TrackSizingTest#nombre'   # un método
 ```

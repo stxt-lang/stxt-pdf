@@ -65,7 +65,10 @@ public final class LayoutCache {
         layouts.clear();
     }
 
-    /** Para diagnosticar la eficacia de la caché en los tests de anidamiento profundo. */
+    /**
+     * Para diagnosticar la eficacia de la caché ({@link Engine#toString}). Lo que la protege es
+     * {@code LayoutCacheTest}, que mide el trabajo de documentos muy anidados.
+     */
     public String stats() {
         return "hits=" + hits + " misses=" + misses;
     }
