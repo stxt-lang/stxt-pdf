@@ -214,46 +214,41 @@ public final class BreakRules {
     }
 
     /**
-     * Corte entre unidades que no se parten: las líneas de un contenedor flex en {@code row}, los
-     * ítems de uno en {@code column} o las filas de una rejilla. Las posiciones son las del layout
-     * sin fragmentar, desde el principio de la caja de contenido.
+     * Corte entre unidades que no se parten ({@link Unit}). Las posiciones son las del layout sin
+     * fragmentar, desde el principio de la caja de contenido.
      *
-     * @param starts    posición de cada unidad
-     * @param ends      final de cada unidad
+     * @param units     las unidades del contenedor
      * @param first     primera unidad de este fragmento
      * @param space     alto disponible desde el principio de la unidad {@code first}
-     * @param appeal    calidad del corte delante de cada unidad; negativa si ahí no se puede
-     *                  cortar (un ítem de grid que ocupa las dos filas)
-     * @param forced    hay un corte forzado delante de cada unidad
      * @param mustPlace garantía de progreso: hay que colocar al menos una unidad aunque desborde
      */
-    public static Cut cutUnits(double[] starts, double[] ends, int first, double space,
-                               int[] appeal, boolean[] forced, boolean mustPlace) {
-        int n = starts.length;
+    public static Cut cutUnits(List<Unit> units, int first, double space, boolean mustPlace) {
+        int n = units.size();
         if (first >= n) {
             return new Cut(n, BreakAppeal.PERFECT_BREAK);
         }
-        double origin = starts[first];
+        double origin = units.get(first).start();
         int best = -1;
         boolean overflowing = false;
         for (int i = first; i < n; i++) {
+            Unit u = units.get(i);
             if (i > first) {
-                if (forced[i]) {
+                if (u.forcedBefore()) {
                     return new Cut(i, BreakAppeal.PERFECT_BREAK);
                 }
-                if (appeal[i] >= 0) {
+                if (u.breakableBefore()) {
                     if (overflowing) {
                         // Se ha colocado a la fuerza lo que no se podía separar: se corta en cuanto se puede.
                         return new Cut(i, BreakAppeal.FORCED);
                     }
-                    if (best < 0 || appeal[i] >= appeal[best]) {
+                    if (best < 0 || u.appealBefore() >= units.get(best).appealBefore()) {
                         best = i;
                     }
                 }
             }
-            if (!overflowing && !fits(ends[i] - origin, space)) {
+            if (!overflowing && !fits(u.end() - origin, space)) {
                 if (best >= 0) {
-                    return new Cut(best, appeal[best]);
+                    return new Cut(best, units.get(best).appealBefore());
                 }
                 if (!mustPlace) {
                     return new Cut(first, BreakAppeal.FORCED);

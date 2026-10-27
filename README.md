@@ -161,7 +161,7 @@ src/main/java/dev/stxt/boxes/
     grid/       GridLayout, TrackSizing, Track, Placement, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
     table/      TableLayout
-  fragment/     Fragment, BreakToken, BreakAppeal, Page, BreakRules, TextLine
+  fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure
   output/       StxtDump
 ```

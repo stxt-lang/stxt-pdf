@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout.grid;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.Engine;
@@ -106,22 +107,16 @@ public final class GridLayout implements LayoutAlgorithm {
         return new IntrinsicSizes(min, Math.max(min, max));
     }
 
-    /**
-     * El grid maquetado sin fragmentar, antes de cortarlo: lo que necesita {@link UnitBreaker}.
-     * Las filas son las unidades; {@code Units.starts} da dónde empieza cada una.
-     */
-    public record Arranged(BoxModel model, List<UnitBreaker.Placed> placed, List<PendingAbsolute> outOfFlow,
-                           UnitBreaker.Units units) {
-    }
-
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        Arranged a = arrange(box, space);
-        return UnitBreaker.fragment(engine, box, a.model(), space, from, a.placed(), a.outOfFlow(), a.units());
+        return UnitBreaker.fragment(engine, box, space, from, arrange(box, space));
     }
 
-    /** Coloca los ítems y dimensiona las pistas, sin fragmentar; la tabla lo usa para cortar solo su cuerpo. */
-    public Arranged arrange(Box box, ConstraintSpace space) {
+    /**
+     * Coloca los ítems y dimensiona las pistas, sin fragmentar: las filas son las unidades. La
+     * tabla lo usa para cortar solo su cuerpo.
+     */
+    public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
         Style s = box.style;
         double contentWidth = model.contentWidth();
@@ -194,7 +189,7 @@ public final class GridLayout implements LayoutAlgorithm {
         }
 
         double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        return new Arranged(model, placed, pending, rowUnits(g, rows, y, extent));
+        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent));
     }
 
     /**
@@ -203,33 +198,33 @@ public final class GridLayout implements LayoutAlgorithm {
      * antes y de los que empiezan después.
      */
     private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
-        int n = rows.length;
-        double[] ends = new double[n];
-        int[] appeal = new int[n];
-        boolean[] forced = new boolean[n];
-        for (int r = 0; r < n; r++) {
-            ends[r] = y[r] + rows[r];
-            if (r == 0) {
-                continue;
-            }
-            List<Box> before = new ArrayList<>();
-            List<Box> after = new ArrayList<>();
-            boolean spanned = false;
-            for (int i = 0; i < g.items().size(); i++) {
-                Area a = g.areas().get(i);
-                int from = a.row() - 1;
-                int to = from + a.rows();
-                spanned |= from < r && to > r;
-                if (to == r) {
-                    before.add(g.items().get(i));
-                } else if (from == r) {
-                    after.add(g.items().get(i));
-                }
-            }
-            appeal[r] = spanned ? -1 : BreakRules.between(before, after);
-            forced[r] = !spanned && BreakRules.forcedBetween(before, after);
+        List<Unit> units = new ArrayList<>();
+        for (int r = 0; r < rows.length; r++) {
+            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, false) : rowUnit(g, r, y[r], y[r] + rows[r]));
         }
-        return new UnitBreaker.Units(y, ends, appeal, forced, extent, true);
+        return new UnitBreaker.Units(units, extent, true);
+    }
+
+    /** La fila de índice {@code r} (no la primera) como unidad, con la calidad del corte delante de ella. */
+    private static Unit rowUnit(Grid g, int r, double start, double end) {
+        List<Box> before = new ArrayList<>();
+        List<Box> after = new ArrayList<>();
+        boolean spanned = false;
+        for (int i = 0; i < g.items().size(); i++) {
+            Area a = g.areas().get(i);
+            int from = a.row() - 1;
+            int to = from + a.rows();
+            spanned |= from < r && to > r;
+            if (to == r) {
+                before.add(g.items().get(i));
+            } else if (from == r) {
+                after.add(g.items().get(i));
+            }
+        }
+        if (spanned) {
+            return new Unit(start, end, -1, false);
+        }
+        return new Unit(start, end, BreakRules.between(before, after), BreakRules.forcedBetween(before, after));
     }
 
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */

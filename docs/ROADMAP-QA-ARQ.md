@@ -65,7 +65,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | hecho |
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | hecho |
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | hecho |
-| 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | pendiente |
+| 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | hecho |
 | 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | pendiente |
 | 12 | [PNG golden que cambian según la máquina](#12-png-golden-y-antialiasing) | QA | S | — | hecho |
 
@@ -452,8 +452,8 @@ Pequeñas, independientes y de bajo riesgo; se han hecho de una en una, con un c
       `layout` ([tarea 8](#8-ciclos-de-packages-y-colocación-de-grid)). Las comparaciones
       `a > b + EPSILON` pasan a `!fits(a, b)` y `|a - b| > EPSILON` a `!same(a, b)`, que son
       equivalentes; las demás usan la constante. El 0.01 de `Overflow` se llama `TOLERANCE` y
-      su javadoc dice que es una tolerancia del modelo, no de redondeo. **Abierto:** con 1e-9 la
-      suite también pasa, así que ningún test depende de ese 0.01; decidir si se queda.
+      su javadoc dice que es una tolerancia del modelo, no de redondeo. Con 1e-9 la suite
+      también pasa (ningún test depende de ese 0.01), pero se queda: decidido con el usuario.
 - [x] **"No cabe nada":** el mismo `LayoutResult` con `BreakToken.BEFORE` en `BlockLayout`,
       `UnitBreaker` e `InlineLayout` → `LayoutResult.before(box)`.
 - [x] **Alineación en un eje:** el `switch START/STRETCH/END/CENTER` de `FlexLayout` y
@@ -487,13 +487,23 @@ parámetros. Es el código más difícil de seguir del motor y el hito 15 lo va 
 
 **Cómo.**
 
-- [ ] `record Unit(double start, double end, int appealBefore, boolean forcedBefore)` y
-      `Units(List<Unit>, extent, splittable)` con `slice(from, to, origin)` para la tabla.
-- [ ] `GridLayout.Arranged` pasa a `layout` como resultado común de "contenedor maquetado sin
-      fragmentar" (lo producen flex y grid y lo consume `UnitBreaker`), y `fragment` recibe
-      `(engine, box, space, from, arranged, repeat)`.
-- [ ] `FlexLayout.Run.layOut` (110 líneas) separa los pasos 6-8 de la construcción de las
-      unidades.
+- [x] `record Unit(double start, double end, int appealBefore, boolean forcedBefore)`, con
+      `breakableBefore()` y `shifted(origin)`, y `UnitBreaker.Units(List<Unit>, extent,
+      splittable)` con `slice(from, to, origin)` para la tabla, que ya no copia cuatro arrays.
+      `Unit` va en `fragment` y no en `layout` porque `BreakRules.cutUnits` también la recibe:
+      pasa de siete parámetros (cuatro arrays) a cuatro (`units, first, space, mustPlace`). Al
+      ser `record` sin arrays, `Units` tiene un `equals` de verdad.
+- [x] `GridLayout.Arranged` pasa a `UnitBreaker.Arranged` (modelo, ítems colocados, cajas fuera
+      de flujo y unidades), el resultado común de flex y grid, y `fragment` recibe `(engine, box,
+      space, from, arranged[, repeat])`: de nueve parámetros a seis.
+- [x] `FlexLayout.Run.layOut` (de 106 líneas a 22) separa el paso 6 (`crossSizes`), el 7
+      (`stretchItems`) y el 8 (`arrange`), y la construcción de las unidades (`units`, a partir
+      de un `Span` por unidad en lugar de tres listas paralelas). `GridLayout.rowUnits` saca a
+      `rowUnit` el corte delante de cada fila.
+- [x] Tests: `UnitBreakerTest` con `Unit` (y un caso de `slice`), y los de `cutUnits` en
+      `BreakRulesTest`.
+
+**Verificación.** `mvn test` (624 tests), sin cambios en los PNG ni en los `expected.stxt`.
 
 ## 11. Rendimiento del texto largo
 
@@ -573,3 +583,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 7 | `BoxTreeBuilder` de 1 393 a 346 líneas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext` y `Nodes`; claves en `PropertyKey` con `PropertyKeyTest`; 615 tests en verde | Tarea 8 (ciclos de packages) o 9; revisar `Placement` |
 | 2026-10-27 | 8 | Sin ciclos de packages: colocación de grid, `FontFace`, `FontWeight` y `FontStyle` en `model`; `BreakAppeal` en `fragment`; `Paginator` en `layout`; `Areas` y `Area` se interpretan una vez, al leer; `ArchitectureTest`; 619 tests en verde | Tarea 9 (duplicaciones) o 10; revisar `Placement` |
 | 2026-10-27 | 9 | `model.Tolerance` (una sola épsilon), `LayoutResult.before`, `Sizing.align`/`sum`, `Canvas.border` por defecto con `outline`, `layout.Messages`, `Fragment.contentWidth`/`contentHeight`, `LineBreaker.place`; 623 tests en verde | Tarea 10 (`UnitBreaker`) u 11; decidir el 0.01 de `Overflow`; revisar `Placement` |
+| 2026-10-27 | 10 | `fragment.Unit` y `UnitBreaker.Units(List<Unit>, …)` con `slice`; `UnitBreaker.Arranged` común a flex, grid y tabla; `FlexLayout.Run.layOut` en pasos 6, 7 y 8; el 0.01 de `Overflow` se queda; 624 tests en verde | Tarea 11 (medir el texto largo); revisar `Placement` |

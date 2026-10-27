@@ -14,7 +14,6 @@ import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static dev.stxt.boxes.layout.Messages.name;
@@ -53,13 +52,13 @@ public final class TableLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        GridLayout.Arranged a = grid.arrange(box, space);
+        UnitBreaker.Arranged a = grid.arrange(box, space);
         UnitBreaker.Units all = a.units();
         int head = box.headRows;
-        int bodyEnd = all.starts().length - box.footRows;
+        int bodyEnd = all.size() - box.footRows;
         // La cabecera mide hasta el principio del cuerpo y el pie desde su final: los dos, con su hueco.
-        double bodyStart = all.starts()[head];
-        double bodyBottom = all.ends()[bodyEnd - 1];
+        double bodyStart = all.get(head).start();
+        double bodyBottom = all.get(bodyEnd - 1).end();
         double footHeight = box.footRows == 0 ? 0 : all.extent() - bodyBottom;
         if (head + box.footRows > 0 && space.fragmenting() && space.atFragmentainerStart()
                 && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
@@ -82,18 +81,9 @@ public final class TableLayout implements LayoutAlgorithm {
                         p.unit(), p.relative()));
             }
         }
-        double[] starts = shifted(Arrays.copyOfRange(all.starts(), head, bodyEnd), bodyStart);
-        double[] ends = shifted(Arrays.copyOfRange(all.ends(), head, bodyEnd), bodyStart);
-        UnitBreaker.Units units = new UnitBreaker.Units(starts, ends, Arrays.copyOfRange(all.appeal(), head, bodyEnd),
-                Arrays.copyOfRange(all.forced(), head, bodyEnd), bodyBottom - bodyStart, all.splittable());
+        UnitBreaker.Arranged bodyOnly = new UnitBreaker.Arranged(a.model(), body, a.outOfFlow(),
+                all.slice(head, bodyEnd, bodyStart));
         UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight);
-        return UnitBreaker.fragment(engine, box, a.model(), space, from, body, a.outOfFlow(), units, repeat);
-    }
-
-    private static double[] shifted(double[] values, double origin) {
-        for (int i = 0; i < values.length; i++) {
-            values[i] -= origin;
-        }
-        return values;
+        return UnitBreaker.fragment(engine, box, space, from, bodyOnly, repeat);
     }
 }

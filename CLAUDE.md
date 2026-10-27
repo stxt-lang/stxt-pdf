@@ -85,7 +85,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
-| `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Page`, `BreakRules`, `TextLine` |
+| `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
 | `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
@@ -210,7 +210,9 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   viudas y huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`.
   `Slice` calcula alto, borde y relleno de cada fragmento (`Decoration: slice` y `clone`; usa
   `Slice.contentRemaining` para lo que queda al contenido). Flex y grid cortan entre unidades
-  (líneas, ítems o filas) con `UnitBreaker`; una unidad que no cabe ni al principio de página
+  (líneas, ítems o filas; `fragment.Unit`) con `UnitBreaker`: se maquetan enteros sin
+  fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se
+  queda con lo que cabe en la página. Una unidad que no cabe ni al principio de página
   parte sus ítems en paralelo, repitiendo su layout con `ConstraintSpace.fragmented` y el
   espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de cada
   ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso).

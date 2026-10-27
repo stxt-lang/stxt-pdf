@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout.flex;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
 import dev.stxt.boxes.layout.Engine;
@@ -122,6 +123,14 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
     }
 
+    /** Tamaño cruzado de cada línea y lo que sobra en el eje cruzado (paso 6). */
+    private record CrossSizes(double[] lines, double free) {
+    }
+
+    /** Lo que ocupa una unidad en el eje en que se corta, y sus ítems. */
+    private record Span(double start, double end, List<Box> boxes) {
+    }
+
     /** Layout de un contenedor concreto. */
     private final class Run {
         final Box box;
@@ -175,7 +184,13 @@ public final class FlexLayout implements LayoutAlgorithm {
                 line.forEach(it -> layOutItem(it, OptionalDouble.empty()));
             }
 
-            // Paso 6: tamaño cruzado de cada línea.
+            CrossSizes cross = crossSizes(lines);
+            stretchItems(lines, cross.lines());
+            return UnitBreaker.fragment(engine, box, space, from, arrange(lines, cross, pending));
+        }
+
+        /** Paso 6: tamaño cruzado de cada línea y lo que sobra en el eje cruzado. */
+        CrossSizes crossSizes(List<List<Item>> lines) {
             int n = lines.size();
             double[] lineCross = new double[n];
             for (int l = 0; l < n; l++) {
@@ -196,23 +211,30 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 crossFree = 0;
             }
+            return new CrossSizes(lineCross, crossFree);
+        }
 
-            // Paso 7: estirar.
-            for (int l = 0; l < n; l++) {
+        /** Paso 7: estirar los ítems con {@code stretch} al tamaño cruzado de su línea. */
+        void stretchItems(List<List<Item>> lines, double[] lineCross) {
+            for (int l = 0; l < lines.size(); l++) {
                 for (Item it : lines.get(l)) {
                     if (it.align == Style.Alignment.STRETCH) {
                         stretch(it, lineCross[l]);
                     }
                 }
             }
+        }
 
-            // Paso 8: alinear. Las unidades de la fragmentación son las líneas en row y los ítems
-            // en column (con Wrap, el contenedor entero).
+        /**
+         * Paso 8: alinear. Las unidades de la fragmentación son las líneas en row y los ítems en
+         * column (con Wrap, el contenedor entero).
+         */
+        UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingAbsolute> pending) {
+            int n = lines.size();
+            double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
-            List<Double> starts = new ArrayList<>();
-            List<Double> ends = new ArrayList<>();
-            List<List<Box>> groups = new ArrayList<>();
-            double[] lineDistribution = distribute(multiLine ? s.flexLines : Style.Distribution.START, crossFree, n);
+            List<Span> spans = new ArrayList<>();
+            double[] lineDistribution = distribute(multiLine ? s.flexLines : Style.Distribution.START, cross.free(), n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
             for (int l = 0; l < n; l++) {
@@ -226,17 +248,13 @@ public final class FlexLayout implements LayoutAlgorithm {
                 double[] d = distribute(s.flexMainAxis, free, line.size());
                 double mainPos = d[0];
                 if (row) {
-                    starts.add(crossPos);
-                    ends.add(crossPos + lineCross[l]);
-                    groups.add(line.stream().map(it -> it.box).toList());
+                    spans.add(new Span(crossPos, crossPos + lineCross[l], line.stream().map(it -> it.box).toList()));
                 }
                 for (Item it : line) {
                     double offset = Sizing.align(it.align, lineCross[l], it.cross);
-                    int unit = row ? l : multiLine ? 0 : groups.size();
+                    int unit = row ? l : multiLine ? 0 : spans.size();
                     if (!row && !multiLine) {
-                        starts.add(mainPos);
-                        ends.add(mainPos + it.main);
-                        groups.add(List.of(it.box));
+                        spans.add(new Span(mainPos, mainPos + it.main, List.of(it.box)));
                     }
                     placed.add(place(it, mainPos, crossPos + offset, unit));
                     mainPos += it.main + mainGap + d[1];
@@ -247,21 +265,25 @@ public final class FlexLayout implements LayoutAlgorithm {
             double crossExtent = Sizing.sum(lineCross) + crossGap * Math.max(0, n - 1);
             double extent = row ? crossExtent : mainExtent;
             if (!row && multiLine && n > 0) {
-                starts.add(0.0);
-                ends.add(extent);
-                groups.add(List.of());
+                spans.add(new Span(0, extent, List.of()));
             }
-            int units = starts.size();
-            int[] appeal = new int[units];
-            boolean[] forced = new boolean[units];
-            for (int u = 1; u < units; u++) {
-                appeal[u] = BreakRules.between(groups.get(u - 1), groups.get(u));
-                forced[u] = BreakRules.forcedBetween(groups.get(u - 1), groups.get(u));
+            return new UnitBreaker.Arranged(model, placed, pending, units(spans, extent));
+        }
+
+        /** Las unidades, con la calidad del corte entre cada una y la anterior según sus ítems. */
+        UnitBreaker.Units units(List<Span> spans, double extent) {
+            List<Unit> units = new ArrayList<>();
+            for (int u = 0; u < spans.size(); u++) {
+                Span span = spans.get(u);
+                if (u == 0) {
+                    units.add(new Unit(span.start(), span.end(), 0, false));
+                    continue;
+                }
+                List<Box> before = spans.get(u - 1).boxes();
+                units.add(new Unit(span.start(), span.end(), BreakRules.between(before, span.boxes()),
+                        BreakRules.forcedBetween(before, span.boxes())));
             }
-            return UnitBreaker.fragment(engine, box, model, space, from, placed, pending, new UnitBreaker.Units(
-                    starts.stream().mapToDouble(Double::doubleValue).toArray(),
-                    ends.stream().mapToDouble(Double::doubleValue).toArray(), appeal, forced, extent,
-                    row || !multiLine));
+            return new UnitBreaker.Units(units, extent, row || !multiLine);
         }
 
         // --- Pasos 2 y 3: base, mínimo y máximo de cada ítem ------------------------------------

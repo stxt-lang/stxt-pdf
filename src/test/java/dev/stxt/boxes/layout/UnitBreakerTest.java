@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout;
 import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
@@ -11,6 +12,7 @@ import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -54,9 +56,13 @@ class UnitBreakerTest {
         return List.of(placed(item("A", 40), 0, 0), placed(item("B", 40), 40, 1), placed(item("D", 40), 80, 2));
     }
 
+    /** Tres unidades de 40, con la calidad del corte y el corte forzado delante de cada una. */
     private static UnitBreaker.Units units(int[] appeal, boolean[] forced, boolean splittable) {
-        return new UnitBreaker.Units(new double[]{0, 40, 80}, new double[]{40, 80, 120}, appeal, forced, 120,
-                splittable);
+        List<Unit> units = new ArrayList<>();
+        for (int u = 0; u < 3; u++) {
+            units.add(new Unit(40 * u, 40 * u + 40, appeal[u], forced[u]));
+        }
+        return new UnitBreaker.Units(units, 120, splittable);
     }
 
     private static final UnitBreaker.Units THREE = units(new int[]{PERFECT, PERFECT, PERFECT},
@@ -68,7 +74,8 @@ class UnitBreakerTest {
 
     private LayoutResult fragment(ConstraintSpace space, BreakToken from, List<UnitBreaker.Placed> placed,
                                   UnitBreaker.Units units, UnitBreaker.Repeat repeat) {
-        return UnitBreaker.fragment(engine, container, model, space, from, placed, List.of(), units, repeat);
+        return UnitBreaker.fragment(engine, container, space, from,
+                new UnitBreaker.Arranged(model, placed, List.of(), units), repeat);
     }
 
     private static List<Double> ys(Fragment f) {
@@ -150,8 +157,7 @@ class UnitBreakerTest {
         Box a = item("A", 150);
         Box b = item("B", 60);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0), placed(b, 0, 0));
-        UnitBreaker.Units one = new UnitBreaker.Units(new double[]{0}, new double[]{150}, new int[]{PERFECT},
-                new boolean[1], 150, true);
+        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, false)), 150, true);
 
         LayoutResult first = fragment(page(100, true), null, placed, one, UnitBreaker.Repeat.NONE);
         BreakToken.Container token = assertInstanceOf(BreakToken.Container.class, first.breakToken());
@@ -171,11 +177,20 @@ class UnitBreakerTest {
     }
 
     @Test
+    void sliceShiftsTheUnitsAndEndsAtTheLastOne() {
+        UnitBreaker.Units all = units(new int[]{PERFECT, BreakAppeal.FORCED, -1}, new boolean[]{false, true, false},
+                true);
+        UnitBreaker.Units body = all.slice(1, 3, 40);
+        assertEquals(List.of(new Unit(0, 40, BreakAppeal.FORCED, true), new Unit(40, 80, -1, false)), body.list());
+        assertEquals(80, body.extent(), 1e-9);
+        assertEquals(true, body.splittable());
+    }
+
+    @Test
     void unsplittableUnitsAreNotSplitInParallel() {
         Box a = item("A", 150);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0));
-        UnitBreaker.Units one = new UnitBreaker.Units(new double[]{0}, new double[]{150}, new int[]{PERFECT},
-                new boolean[1], 150, false);
+        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, false)), 150, false);
         // Se coloca entera, desbordando (garantía de progreso).
         LayoutResult r = fragment(page(100, true), null, placed, one, UnitBreaker.Repeat.NONE);
         assertNull(r.breakToken());

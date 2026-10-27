@@ -89,51 +89,48 @@ class BreakRulesTest {
         assertNull(BreakRules.best(List.<int[]>of(), c -> c[1]));
     }
 
-    private static final double[] STARTS = {0, 50, 100};
-    private static final double[] ENDS = {40, 90, 140};
-    private static final boolean[] NOT_FORCED = {false, false, false};
+    /** Tres unidades de 40 separadas por huecos de 10, con la calidad del corte delante de cada una. */
+    private static List<Unit> units(int... appeal) {
+        return List.of(new Unit(0, 40, appeal[0], false), new Unit(50, 90, appeal[1], false),
+                new Unit(100, 140, appeal[2], false));
+    }
 
     @Test
     void cutUnitsAtTheLastThatFits() {
         assertEquals(new BreakRules.Cut(2, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, 3}, NOT_FORCED, false));
+                BreakRules.cutUnits(units(0, 3, 3), 0, 100, false));
     }
 
     @Test
     void cutUnitsPrefersAnEarlierBetterBreak() {
         assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, 1}, NOT_FORCED, false));
+                BreakRules.cutUnits(units(0, 3, 1), 0, 100, false));
     }
 
     @Test
     void cutUnitsForced() {
-        assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutUnits(STARTS, ENDS, 0, 1000, new int[]{0, 3, 3}, new boolean[]{false, true, false}, false));
+        List<Unit> units = List.of(new Unit(0, 40, 0, false), new Unit(50, 90, 3, true), new Unit(100, 140, 3, false));
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK), BreakRules.cutUnits(units, 0, 1000, false));
     }
 
     @Test
     void cutUnitsSkipsUnbreakablePoints() {
         // Entre 1 y 2 no se puede cortar: 1 y 2 van juntas a la página siguiente.
         assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, -1}, NOT_FORCED, false));
+                BreakRules.cutUnits(units(0, 3, -1), 0, 100, false));
     }
 
     @Test
     void cutUnitsOverflowOnlyAtThePageStart() {
-        double[] starts = {0, 200};
-        double[] ends = {150, 250};
-        int[] appeal = {0, 3};
-        boolean[] forced = {false, false};
-        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED),
-                BreakRules.cutUnits(starts, ends, 0, 100, appeal, forced, false));
-        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED),
-                BreakRules.cutUnits(starts, ends, 0, 100, appeal, forced, true));
+        List<Unit> units = List.of(new Unit(0, 150, 0, false), new Unit(200, 250, 3, false));
+        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED), BreakRules.cutUnits(units, 0, 100, false));
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED), BreakRules.cutUnits(units, 0, 100, true));
     }
 
     @Test
     void cutUnitsResumesFromTheFirstUnitOfTheFragment() {
         // Desde la unidad 1, el espacio se mide desde su principio (50): caben 1 y 2.
         assertEquals(new BreakRules.Cut(3, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutUnits(STARTS, ENDS, 1, 100, new int[]{0, 3, 3}, NOT_FORCED, true));
+                BreakRules.cutUnits(units(0, 3, 3), 1, 100, true));
     }
 }

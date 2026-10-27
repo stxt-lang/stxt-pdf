@@ -4,6 +4,7 @@ import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.tree.Box;
 
@@ -56,16 +57,44 @@ public final class UnitBreaker {
     /**
      * Las unidades del contenedor, con las posiciones del layout sin fragmentar.
      *
-     * @param starts     principio de cada unidad, desde la caja de contenido
-     * @param ends       final de cada unidad
-     * @param appeal     calidad del corte delante de cada unidad; negativa si no se puede cortar ahí
-     * @param forced     hay un corte forzado delante de cada unidad
+     * @param list       las unidades, en orden
      * @param extent     alto del contenido completo
      * @param splittable los ítems de una unidad que no cabe en una página se pueden partir en
      *                   paralelo
      */
-    public record Units(double[] starts, double[] ends, int[] appeal, boolean[] forced, double extent,
-                        boolean splittable) {
+    public record Units(List<Unit> list, double extent, boolean splittable) {
+
+        public Units {
+            list = List.copyOf(list);
+        }
+
+        public int size() {
+            return list.size();
+        }
+
+        public Unit get(int index) {
+            return list.get(index);
+        }
+
+        /**
+         * Las unidades {@code [from, to)} con las posiciones desde {@code origin}; el contenido
+         * acaba al final de la última. La tabla lo usa para cortar solo su cuerpo.
+         */
+        public Units slice(int from, int to, double origin) {
+            List<Unit> slice = list.subList(from, to).stream().map(u -> u.shifted(origin)).toList();
+            return new Units(slice, list.get(to - 1).end() - origin, splittable);
+        }
+    }
+
+    /**
+     * Un contenedor maquetado sin fragmentar, antes de cortarlo: lo producen flex y grid.
+     *
+     * @param model     modelo de caja del contenedor
+     * @param placed    ítems colocados, en orden del árbol
+     * @param outOfFlow cajas {@code absolute} y {@code fixed} del contenedor; van con el primer fragmento
+     * @param units     las unidades en que se agrupan los ítems
+     */
+    public record Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units) {
     }
 
     /**
@@ -86,22 +115,18 @@ public final class UnitBreaker {
      * Fragmento del contenedor en lo que queda de página, o el contenedor entero sin
      * fragmentación.
      *
-     * @param from      token del contenedor; {@code null} en su primer fragmento
-     * @param placed    ítems colocados, en orden del árbol
-     * @param outOfFlow cajas {@code absolute} y {@code fixed} del contenedor; van con el primer fragmento
+     * @param from     token del contenedor; {@code null} en su primer fragmento
+     * @param arranged el contenedor maquetado sin fragmentar
      */
-    public static LayoutResult fragment(Engine engine, Box box, BoxModel model, ConstraintSpace space,
-                                        BreakToken from, List<Placed> placed, List<PendingAbsolute> outOfFlow,
-                                        Units units) {
-        return fragment(engine, box, model, space, from, placed, outOfFlow, units, Repeat.NONE);
+    public static LayoutResult fragment(Engine engine, Box box, ConstraintSpace space, BreakToken from,
+                                        Arranged arranged) {
+        return fragment(engine, box, space, from, arranged, Repeat.NONE);
     }
 
-    /** Como {@link #fragment(Engine, Box, BoxModel, ConstraintSpace, BreakToken, List, List, Units)}, con ítems que se repiten en cada fragmento. */
-    public static LayoutResult fragment(Engine engine, Box box, BoxModel model, ConstraintSpace space,
-                                        BreakToken from, List<Placed> placed, List<PendingAbsolute> outOfFlow,
-                                        Units units, Repeat repeat) {
-        return new Run(engine, box, model, space, (BreakToken.Container) from, placed, units, repeat)
-                .layOut(outOfFlow);
+    /** Como {@link #fragment(Engine, Box, ConstraintSpace, BreakToken, Arranged)}, con ítems que se repiten en cada fragmento. */
+    public static LayoutResult fragment(Engine engine, Box box, ConstraintSpace space, BreakToken from,
+                                        Arranged arranged, Repeat repeat) {
+        return new Run(engine, box, space, (BreakToken.Container) from, arranged, repeat).layOut();
     }
 
     /** Un ítem en este fragmento: su fragmento ya colocado y sus cajas absolutas. */
@@ -128,6 +153,7 @@ public final class UnitBreaker {
         final BreakToken.Container from;
         final boolean first;
         final List<Placed> placed;
+        final List<PendingAbsolute> outOfFlow;
         final Units units;
         final Repeat repeat;
         final int n;
@@ -136,30 +162,31 @@ public final class UnitBreaker {
         /** Ítem de cada índice de {@code placed} colocado en este fragmento. */
         final Piece[] pieces;
 
-        Run(Engine engine, Box box, BoxModel model, ConstraintSpace space, BreakToken.Container from,
-            List<Placed> placed, Units units, Repeat repeat) {
+        Run(Engine engine, Box box, ConstraintSpace space, BreakToken.Container from, Arranged arranged,
+            Repeat repeat) {
             this.engine = engine;
             this.box = box;
-            this.model = model;
+            this.model = arranged.model();
             this.space = space;
             this.from = from;
             this.first = from == null;
-            this.placed = placed;
-            this.units = units;
+            this.placed = arranged.placed();
+            this.outOfFlow = arranged.outOfFlow();
+            this.units = arranged.units();
             this.repeat = repeat;
-            this.n = units.starts().length;
+            this.n = units.size();
             this.remaining = space.fragmenting()
                     ? Slice.contentRemaining(model, first, space) - repeat.headHeight() - repeat.footHeight()
                     : Double.POSITIVE_INFINITY;
             this.pieces = new Piece[placed.size()];
         }
 
-        LayoutResult layOut(List<PendingAbsolute> outOfFlow) {
+        LayoutResult layOut() {
             int next = first ? 0 : from.nextLine();
             // Posición en el fragmento = posición sin fragmentar − origin. El primer fragmento
             // conserva el hueco inicial (alineación); los siguientes empiezan en su primera unidad
             // o, si solo queda el alto propio de la caja, al final del contenido.
-            double origin = first ? 0 : next < n ? units.starts()[next] : units.extent();
+            double origin = first ? 0 : next < n ? units.get(next).start() : units.extent();
             double top = 0;
             boolean continued = false;
             if (!first && !from.itemTokens().isEmpty()) {
@@ -171,7 +198,7 @@ public final class UnitBreaker {
                 }
                 commit(s);
                 if (s.broken()) {
-                    return result(s.bottom(), false, next, s.tokens(), s.appeal(), outOfFlow);
+                    return result(s.bottom(), false, next, s.tokens(), s.appeal());
                 }
                 // Las unidades siguientes, detrás del ítem más largo.
                 origin = bottom(next, end) - s.bottom();
@@ -190,17 +217,17 @@ public final class UnitBreaker {
                     Split s = split(next, groupEnd, null, origin);
                     if (s != null && s.broken()) {
                         commit(s);
-                        return result(s.bottom(), false, next, s.tokens(), s.appeal(), outOfFlow);
+                        return result(s.bottom(), false, next, s.tokens(), s.appeal());
                     }
                 }
-                BreakRules.Cut cut = BreakRules.cutUnits(units.starts(), units.ends(), next,
-                        remaining - (units.starts()[next] - origin), units.appeal(), units.forced(), mustPlace);
+                BreakRules.Cut cut = BreakRules.cutUnits(units.list(), next,
+                        remaining - (units.get(next).start() - origin), mustPlace);
                 if (cut.end() == next) {
                     if (!continued) {
                         return LayoutResult.before(box);
                     }
                     // Solo cabe la continuación del grupo: se corta detrás de ella.
-                    return result(top, false, next, List.of(), units.appeal()[next], outOfFlow);
+                    return result(top, false, next, List.of(), units.get(next).appealBefore());
                 }
                 end = cut.end();
                 appeal = cut.appeal();
@@ -215,7 +242,7 @@ public final class UnitBreaker {
             double contentHeight = contentFinished
                     ? Math.max(top, units.extent() - origin)
                     : bottom(next, end) - origin;
-            return result(contentHeight, contentFinished, end, List.of(), appeal, outOfFlow);
+            return result(contentHeight, contentFinished, end, List.of(), appeal);
         }
 
         /**
@@ -292,7 +319,7 @@ public final class UnitBreaker {
         /** Primera unidad detrás del grupo que empieza en {@code start}: la siguiente delante de la que se puede cortar. */
         int groupEnd(int start) {
             int end = start + 1;
-            while (end < n && units.appeal()[end] < 0) {
+            while (end < n && !units.get(end).breakableBefore()) {
                 end++;
             }
             return end;
@@ -300,9 +327,9 @@ public final class UnitBreaker {
 
         /** Final de la unidad más baja de {@code [start, end)} en el layout sin fragmentar. */
         double bottom(int start, int end) {
-            double bottom = units.starts()[start];
+            double bottom = units.get(start).start();
             for (int u = start; u < end; u++) {
-                bottom = Math.max(bottom, units.ends()[u]);
+                bottom = Math.max(bottom, units.get(u).end());
             }
             return bottom;
         }
@@ -314,7 +341,7 @@ public final class UnitBreaker {
          * @param itemTokens tokens de los ítems de un grupo partido en paralelo, o vacía
          */
         LayoutResult result(double contentHeight, boolean contentFinished, int nextLine, List<BreakToken> itemTokens,
-                            int appeal, List<PendingAbsolute> outOfFlow) {
+                            int appeal) {
             List<Fragment> fragments = new ArrayList<>();
             List<PendingAbsolute> pending = new ArrayList<>(first ? outOfFlow : List.of());
             double units = Math.max(0, contentHeight);
