@@ -19,7 +19,8 @@ import java.util.List;
  *
  * <p>Orden de pintado dentro de un contexto, de abajo arriba:</p>
  * <ol>
- *   <li>Fondo y borde de la caja que crea el contexto.</li>
+ *   <li>Fondo y borde de la caja que crea el contexto (y, en un {@code Multicol}, la línea entre
+ *       columnas).</li>
  *   <li>Contextos hijos con {@code Layer} negativa, de menor a mayor.</li>
  *   <li>Cajas en flujo en orden del árbol: primero fondos y bordes, después el texto.</li>
  *   <li>Posicionadas sin {@code Layer} (o con 0), en orden del árbol.</li>
@@ -173,6 +174,28 @@ public final class StackingContext {
             canvas.background(borderBox.shrink(p.f().border()), s.background);
         }
         canvas.border(borderBox, p.f().border(), s.borderColor != null ? s.borderColor : s.color);
+        if (s.multicolRule > 0) {
+            paintRules(canvas, p);
+        }
+    }
+
+    /**
+     * La línea entre cada dos columnas con contenido de un fragmento de un {@code Multicol}
+     * (§5.16): centrada en el hueco, desde arriba de la caja de contenido y con el alto de la
+     * columna más alta. Sus hijos son las columnas, en orden.
+     */
+    private static void paintRules(Canvas canvas, Piece p) {
+        Style s = p.f().box().style;
+        List<Fragment> columns = p.f().children();
+        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        double height = columns.stream().mapToDouble(Fragment::height).max().orElse(0);
+        String color = s.multicolRuleColor != null ? s.multicolRuleColor : s.color;
+        for (int i = 1; i < columns.size(); i++) {
+            Fragment left = columns.get(i - 1);
+            double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
+            canvas.background(new Rect(content.x() + middle - s.multicolRule / 2, content.y(), s.multicolRule, height),
+                    color);
+        }
     }
 
     private static void paintText(Canvas canvas, Piece p) {

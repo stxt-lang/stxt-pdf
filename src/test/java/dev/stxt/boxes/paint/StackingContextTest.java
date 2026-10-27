@@ -21,10 +21,12 @@ class StackingContextTest {
     /** Lienzo que solo apunta los colores de fondo, en orden. */
     private static final class Recorder implements Canvas {
         final List<String> backgrounds = new ArrayList<>();
+        final List<Rect> rects = new ArrayList<>();
 
         @Override
         public void background(Rect paddingBox, String color) {
             backgrounds.add(color);
+            rects.add(paddingBox);
         }
 
         @Override
@@ -38,12 +40,16 @@ class StackingContextTest {
     }
 
     private static List<String> paint(String... boxLines) {
+        return record(boxLines).backgrounds;
+    }
+
+    private static Recorder record(String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(READER.read(doc)).pages().get(0);
         Recorder canvas = new Recorder();
         StackingContext.build(page.content(), page.fixed(), 40, 40).paint(canvas);
-        return canvas.backgrounds;
+        return canvas;
     }
 
     /** La {@code absolute} cuelga del fragmento de su containing block, detrás de la {@code relative}. */
@@ -83,5 +89,31 @@ class StackingContextTest {
                 "\tRelative:", "\t\tLayer: 1", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222",
                 "\tRelative:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #333");
         assertEquals(List.of("#333", "#222", "#111"), order);
+    }
+
+    /**
+     * La línea entre columnas va con el fondo del {@code Multicol}, y solo entre columnas con
+     * contenido: tres columnas de 165 con huecos de 10 y dos bloques, una sola línea, centrada en
+     * el primer hueco y con el alto de la columna más alta.
+     */
+    @Test
+    void multicolRuleBetweenColumnsWithContent() {
+        Recorder r = record("\tMulticol:", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tRule: 2",
+                "\t\tRule color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #111", "\t\t\tBreak:",
+                "\t\t\t\tInside: avoid",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tBackground: #222", "\t\t\tBreak:",
+                "\t\t\t\tInside: avoid");
+        assertEquals(List.of("#000", "#F00", "#111", "#222"), r.backgrounds);
+        assertEquals(new Rect(209, 40, 2, 30), r.rects.get(1));
+    }
+
+    @Test
+    void ruleColorIsTheTextColorByDefault() {
+        Recorder r = record("\tMulticol:", "\t\tCount: 2", "\t\tColumn gap: 10", "\t\tRule: 1",
+                "\t\tTypography:", "\t\t\tColor: #00F",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid");
+        assertEquals(List.of("#00F"), r.backgrounds);
     }
 }

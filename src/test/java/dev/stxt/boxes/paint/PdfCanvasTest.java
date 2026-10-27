@@ -268,6 +268,24 @@ class PdfCanvasTest {
         }
     }
 
+    /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
+    @Test
+    void multicolIsADivWithoutColumns() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 0.5\n"
+                + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "multicol"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement multicol = (PDStructureElement) document.getKids().get(0);
+            assertEquals("Div", multicol.getStructureType());
+            assertEquals(List.of("P", "P"), types(multicol));
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("Uno") && text.contains("Dos"), text);
+        }
+    }
+
     private static List<String> types(PDStructureElement e) {
         return e.getKids().stream().filter(k -> k instanceof PDStructureElement)
                 .map(k -> ((PDStructureElement) k).getStructureType()).toList();

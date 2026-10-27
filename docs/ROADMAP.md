@@ -618,7 +618,7 @@ Multicol:
       sus casos en el catálogo.
 - [x] `MulticolLayout` sin equilibrado (llenado en orden), en una y en varias páginas.
 - [x] Equilibrado.
-- [ ] Línea entre columnas en el pintado.
+- [x] Línea entre columnas en el pintado.
 - [x] Tests de layout y de fragmentación; casos de error.
 - [ ] Especificación; caso golden con texto en dos columnas a lo largo de dos páginas.
 

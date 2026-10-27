@@ -51,7 +51,8 @@ import java.util.Set;
  * para {@code Paragraph}, {@code Span} para {@code Text}, {@code L} y {@code LI} para las listas
  * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
  * {@code Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y
- * {@code TD} para las tablas (§5.15) y {@code Div} para el resto. El texto de
+ * {@code TD} para las tablas (§5.15) y {@code Div} para el resto, también un {@code Multicol}
+ * (§5.16), cuyas columnas no tienen elemento propio. El texto de
  * cada fragmento es contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del
  * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
  * bordes y los {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte
@@ -91,8 +92,15 @@ final class PdfStructure {
         build(root, treeRoot);
     }
 
-    /** Elementos de la caja y de sus descendientes, salvo los {@code Fixed}. */
+    /**
+     * Elementos de la caja y de sus descendientes, salvo los {@code Fixed}. El flujo de columnas
+     * de un {@code Multicol} no tiene elemento: su contenido cuelga del {@code Multicol}.
+     */
     private void build(Box box, PDStructureNode parent) {
+        if (box.element == Element.COLUMNS) {
+            box.children.forEach(child -> build(child, parent));
+            return;
+        }
         PDStructureElement e = new PDStructureElement(type(box), parent);
         parent.appendKid(e);
         elements.put(box, e);
