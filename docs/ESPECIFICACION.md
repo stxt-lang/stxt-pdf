@@ -60,7 +60,8 @@ sentido en él: sus propiedades y, si es un contenedor, otros elementos. El sche
 en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta al leer, también
 en el editor.
 
-El nodo raíz es `Document`, con exactamente un `Media`, un `Typography` opcional que heredan
+El nodo raíz es `Document`, con exactamente un `Media`, un `Title` y un `Language` opcionales
+(el título y el idioma del documento, [§4.1](#41-media)), un `Typography` opcional que heredan
 todas las cajas (la fuente del documento), un `Styles` opcional con las reglas reutilizables
 ([§4.10](#410-reglas-reutilizables-styles)) y los elementos de primer nivel.
 
@@ -999,7 +1000,7 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
   cambia.
 - **Jerarquía:** los niveles tienen que ser correctos (`HEADING_LEVEL`). En orden del documento,
   el primer encabezado es `Heading 1`, y cada uno sube como mucho un nivel respecto al anterior:
-  a un `Heading 1` le puede seguir un `Heading 2`, pero no un `Heading 3`. Bajar se puede bajar
+  a un `Heading 1` le puede seguir un `Heading 2`, pero no un `Heading 3`. Se puede bajar
   los niveles que se quiera.
 - **Dónde:** donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de
   un `Fixed` (`HEADING_IN_FIXED`), que se repite en cada página y no forma parte del contenido.
@@ -1016,6 +1017,9 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
 - **Marcadores:** uno por encabezado, con el texto de sus `Text` unido por espacios, anidados por
   nivel y que llevan a la esquina superior izquierda de su primer fragmento. El visor los
   muestra al abrir el documento.
+- **Título e idioma:** `Title` va a la información del documento y a los metadatos XMP, y el
+  visor lo muestra en lugar del nombre del fichero; `Language` es el idioma de todo el
+  contenido ([§4.1](#41-media)). Sin ellos, el PDF no los declara.
 
 El volcado de resultados ([§7](#7-formato-de-resultados)) no cambia: no incluye el tipo de
 elemento.
@@ -1056,7 +1060,7 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0 | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Title` no vacío y `Language` una etiqueta BCP 47 | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Cell` contienen exactamente un elemento | `Un Cell contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -1181,7 +1185,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Typography`, `Styles`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language`, `Typography`, `Styles`; elementos |
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id` (varios de cada) |
 | `Element`, `For class`, `For id` | `INLINE` | `Box`, `Typography`, `Break` |
