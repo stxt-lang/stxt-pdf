@@ -76,12 +76,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             }
             changed = true;
             String text = PageNumbers.apply(l.text(), page, pages);
-            double width = real.width(text, s.fontFace(), s.fontSize);
-            double spacing = l.wordSpacing() > 0
-                    ? LineBreaker.wordSpacing(text, width, available, s.textAlign, false) : 0;
-            double x = LineBreaker.offset(width, available, s.textAlign);
-            width += spacing * text.chars().filter(c -> c == ' ').count();
-            lines.add(new TextLine(x, l.y(), width, l.height(), text, spacing));
+            lines.add(LineBreaker.place(text, real, s, available, l.wordSpacing() > 0, l.y(), l.height()));
         }
         if (!changed) {
             return f;
@@ -133,16 +128,12 @@ public final class InlineLayout implements LayoutAlgorithm {
         List<TextLine> lines = new ArrayList<>();
         int paragraph = 0;
         for (int j = start; j < end; j++) {
-            String text = texts.get(j);
             while (paragraphEnds[paragraph] <= j) {
                 paragraph++;
             }
-            double width = measurer.width(text, s.fontFace(), s.fontSize);
-            double x = LineBreaker.offset(width, available, s.textAlign);
-            double spacing = LineBreaker.wordSpacing(text, width, available, s.textAlign,
-                    j == paragraphEnds[paragraph] - 1);
-            width += spacing * text.chars().filter(c -> c == ' ').count();
-            lines.add(new TextLine(x, lines.size() * lineHeight, width, lineHeight, text, spacing));
+            boolean justify = j != paragraphEnds[paragraph] - 1;
+            lines.add(LineBreaker.place(texts.get(j), measurer, s, available, justify, lines.size() * lineHeight,
+                    lineHeight));
         }
 
         Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,

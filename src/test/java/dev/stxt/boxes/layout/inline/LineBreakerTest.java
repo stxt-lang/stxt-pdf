@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
@@ -81,5 +82,22 @@ class LineBreakerTest {
         assertEquals(0, LineBreaker.wordSpacing("palabra", 70, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
         assertEquals(0, LineBreaker.wordSpacing("uno dos", 100, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
         assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, Style.TextAlign.LEFT, false), 1e-9);
+    }
+
+    @Test
+    void placeMeasuresAlignsAndJustifies() {
+        Style s = new Style();
+        s.font = "F";
+        s.fontSize = 1;
+        s.textAlign = Style.TextAlign.JUSTIFY;
+        // "uno dos tres" mide 12 en 20: 8 de sobrante entre 2 espacios, 4 por espacio.
+        TextLine l = LineBreaker.place("uno dos tres", measurer, s, 20, true, 30, 12);
+        assertEquals(new TextLine(0, 30, 20, 12, "uno dos tres", 4), l);
+        // La última línea del párrafo no se justifica.
+        assertEquals(new TextLine(0, 30, 12, 12, "uno dos tres", 0),
+                LineBreaker.place("uno dos tres", measurer, s, 20, false, 30, 12));
+        s.textAlign = Style.TextAlign.CENTER;
+        assertEquals(new TextLine(4, 0, 12, 12, "uno dos tres", 0),
+                LineBreaker.place("uno dos tres", measurer, s, 20, true, 0, 12));
     }
 }

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.tree.Style;
@@ -182,6 +183,23 @@ public final class LineBreaker {
         }
         long spaces = line.chars().filter(c -> c == ' ').count();
         return spaces == 0 ? 0 : Math.max(0, available - lineWidth) / spaces;
+    }
+
+    /**
+     * Una línea colocada en la caja de contenido (§5.4): el texto medido con la fuente de
+     * {@code s}, alineado en {@code available} y, si se justifica, con el espacio extra entre
+     * palabras sumado a su ancho.
+     *
+     * @param justify si la línea se puede justificar: no es la última de su párrafo (al numerar
+     *                las páginas, si ya estaba justificada)
+     */
+    public static TextLine place(String text, TextMeasurer measurer, Style s, double available, boolean justify,
+                                 double y, double height) {
+        double width = measurer.width(text, s.fontFace(), s.fontSize);
+        double x = offset(width, available, s.textAlign);
+        double spacing = wordSpacing(text, width, available, s.textAlign, !justify);
+        width += spacing * text.chars().filter(c -> c == ' ').count();
+        return new TextLine(x, y, width, height, text, spacing);
     }
 
     private static List<List<String>> paragraphs(String text) {
