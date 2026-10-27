@@ -35,7 +35,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
 | 14 | Tablas, con cabecera y pie repetidos | hecho | 11 |
-| 15 | Bloque en columnas (multicolumna) | pendiente | — |
+| 15 | Bloque en columnas (multicolumna) | en curso | — |
 
 **Orden**, de menor a mayor impacto en el motor:
 
@@ -85,12 +85,6 @@ Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
 
 **Abiertas:**
 
-- **T3. Nombres que chocan.** `Item` (hijo de `Flex`), `Area` (hijo de `Grid`, antes `Cell`)
-  y `Columns` (pistas de `Grid`) ya existen y tienen una única definición en el namespace. Las
-  listas, las tablas y las columnas tienen que usar otros nombres o compartir el significado.
-  Se decide en cada hito; ver sus decisiones abiertas. Resuelto para las listas (L1: `List
-  item`) y las tablas (TB1: el `Cell` de `Grid` pasa a `Area`; `Columns` y `Gap` se
-  reutilizan). Queda el hito 15, donde `Columns` ya es la lista de pistas.
 - **T4. Texto con formato dentro de una línea.** Hoy un `Text` tiene un único estilo. Un
   encabezado o un ítem de lista con una palabra en negrita necesitaría tramos (*spans*).
   Propuesta: fuera de alcance de estos hitos; si hace falta, sería un hito propio.
@@ -105,6 +99,11 @@ Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
   (*outline*) para los encabezados **y el PDF etiquetado** (*tagged PDF*, accesibilidad) para
   todo el documento. Cada hito siguiente etiqueta sus elementos (listas, tablas…). Queda por
   decidir en el hito 12 si el volcado del §7 incluye el tipo de elemento (G3).
+- **T3. Nombres que chocan** (2026-10-27). `Item` (hijo de `Flex`), `Area` (hijo de `Grid`,
+  antes `Cell`) y `Columns` (pistas de `Grid`) tienen una única definición en el namespace, y
+  cada hito eligió nombres que no chocan o que comparten el significado: las listas, `List
+  item` (L1); las tablas, `Cell` (el de `Grid` pasa a `Area`) y `Columns` y `Gap` reutilizados
+  (TB1); las columnas, nombres propios (`Count`, `Column gap`…, C1).
 
 ---
 
@@ -544,58 +543,81 @@ Table:
 revista: el texto llena la primera columna, sigue en la segunda, y al acabar la página
 continúa en la primera columna de la siguiente.
 
-**Borrador de sintaxis** (a confirmar; `Columns` ya es la propiedad de pistas de `Grid`):
+**Sintaxis** (decidida en C1):
 
 ```
 Multicol:
 	Count: 2
-	Gap: 20
-	Rule: 0.5 #999
+	Column gap: 20
+	Rule: 0.5
+	Rule color: #999999
+	Fill: balance
 	Text:
 		Content >>
 			Texto largo que fluye por las dos columnas…
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] C1. Nombre del elemento (`Multicol`, `Columned`, `Article`…) y de sus propiedades
-      (`Count`, `Column width`, `Gap` —reutilizable si admite lo mismo—, `Rule`).
-- [ ] C2. ¿Número fijo de columnas, ancho mínimo de columna (`column-width`: tantas como
-      quepan) o los dos?
-- [ ] C3. Equilibrado: ¿se igualan las columnas al final del bloque (`balance`, por defecto
-      en CSS) o se llenan en orden (`auto`)? ¿Configurable?
-- [ ] C4. Elementos que ocupan todas las columnas (`column-span: all`), como un título en
-      medio del texto. Complica bastante el algoritmo.
-- [ ] C5. Cortes de columna: ¿`Before: column` en `Break`, además de `page`?
-- [ ] C6. Qué elementos admite dentro: ¿todos los de flujo, o solo texto, encabezados y
-      listas? ¿`Absolute`/`Fixed` dentro de columnas?
-- [ ] C7. `Height` del bloque: con alto definido, las columnas se llenan hasta ese alto y lo
-      que sobra es error o pasa a la siguiente página.
-- [ ] C8. Línea entre columnas (`column-rule`): grosor, color, ¿estilo?
+**Decisiones tomadas** (2026-10-27, todas con la propuesta aceptada):
 
-**Decisiones tomadas:** *(ninguna todavía)*
+- [x] C1. Elemento **`Multicol`**, con **`Count`**, **`Column width`**, **`Column gap`**,
+      **`Rule`** y **`Rule color`** (como `Border` y `Border color`) y **`Fill`**. No se
+      reutiliza `Gap`, que en `Flex`, `Grid` y `Table` admite dos valores: un nombre
+      compartido debe admitir los mismos valores. Admite además `Id`, `Class`, `Box`,
+      `Typography` y `Break`, como un bloque.
+- [x] C2. **Las dos formas, como en CSS:** `Count` fijo, `Column width` mínimo (tantas
+      columnas como quepan) o las dos (`Count` es entonces el máximo). Sin ninguna, error.
+- [x] C3. **`Fill: balance | auto`**, `balance` por defecto: con `balance` se equilibra el
+      último fragmento (como `column-fill: balance` en CSS); con `auto`, las columnas se
+      llenan en orden.
+- [x] C4. **Sin `column-span`** en este hito: un título en medio del texto se escribe partiendo
+      el `Multicol` en dos.
+- [x] C5. **`Before: column` y `After: column`** en `Break`. Fuera de un `Multicol`, error.
+- [x] C6. Dentro admite **todo el flujo** (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`,
+      encabezados, `List`, `Table`, `Relative` y otro `Multicol`). `Absolute` y `Fixed`
+      dentro de un `Multicol`, a cualquier profundidad, son un error.
+- [x] C7. Con **`Height` definido**, las columnas se llenan hasta ese alto; lo que no cabe es
+      un desbordamiento (`BOX_OVERFLOW`).
+- [x] C8. **Línea entre columnas** continua, con grosor (`Rule`) y color (`Rule color`, por
+      defecto el `Color` del texto). Solo entre dos columnas con contenido.
 
-**Diseño técnico (previsto):**
+**Diseño técnico:**
 
-- Algoritmo nuevo `layout/multicol/MulticolLayout`. Cada columna es un fragmentainer anidado:
-  el contenido se maqueta como un flujo de bloque con `fragmentainerRemaining` igual al alto
-  de la columna, y el `BreakToken` de una columna es el `from` de la siguiente. Los
-  algoritmos existentes ya saben partir, así que no cambian.
-- Alto de las columnas en una página: el que queda en la página. Con equilibrado, la
-  búsqueda del alto mínimo en que todo cabe en las columnas disponibles (búsqueda binaria
-  sobre el alto, repitiendo el layout; la `LayoutCache` ayuda).
-- Al acabar la página, el token de la última columna pasa al `BreakToken` del bloque
-  multicolumna y la siguiente página empieza otra vez en la primera columna.
-- Intrínsecos: min-content = el de la columna × número de columnas + huecos.
-- Calidad del corte: el corte de página del bloque es el de su última columna; las reglas de
-  viudas y huérfanas se aplican en cada columna.
+- **Flujo de columnas.** `BoxTreeBuilder` mete los hijos del `Multicol` en una caja de bloque
+  generada (`Element.COLUMNS`, como el marcador de las listas), su único hijo: crea un contexto
+  de formato de bloque (los márgenes de dentro no salen) y su alto no es definido (los
+  porcentajes verticales de dentro son un error). Cada columna es un fragmento de esa caja:
+  `MulticolLayout` la maqueta con `engine.layout` una vez por columna, con el alto de la
+  columna como `fragmentainerRemaining` y el token de la columna anterior como `from`. Los
+  algoritmos que ya saben partir no cambian, y la caché sirve.
+- **Número y ancho de las columnas:** el pseudoalgoritmo de CSS (`column-count`,
+  `column-width`) sobre el ancho de contenido.
+- **Alto de las columnas** en un fragmento: lo que queda de página para el contenido y, si el
+  `Multicol` tiene `Height` (o `Max height`), lo que le queda de él. Se llenan en orden; si el
+  contenido termina en este fragmento y `Fill` es `balance`, se busca el alto mínimo en que
+  cabe en las columnas (búsqueda binaria repitiendo el layout). Fuera de una página y sin
+  alto definido (un ítem de flex, un `Absolute`) no hay nada que llenar: se equilibra siempre.
+- **Cortes.** Un corte forzado de columna es un corte forzado más dentro del flujo; uno de
+  página debe atravesar las columnas: su calidad es `BreakAppeal.FORCED_PAGE`, por encima de
+  `PERFECT_BREAK`, y `MulticolLayout` deja de llenar columnas al verlo. El token del `Multicol`
+  es un `BreakToken.Block` con el token del flujo; la página siguiente empieza otra vez en la
+  primera columna. Si la primera columna no coloca nada, el `Multicol` corta antes de él; si
+  no coloca nada otra columna, se pasa a la página siguiente. La calidad del corte de página
+  es la de la última columna.
+- **Intrínsecos:** con `Count`, `Count` columnas de min-content o max-content del contenido más
+  los huecos; con solo `Column width`, una columna.
+- **Pintado:** la línea se pinta con el fondo del `Multicol`, centrada en el hueco y con el
+  alto de la columna más alta del fragmento. En el PDF etiquetado, el `Multicol` es un `Div` y
+  el flujo de columnas no tiene elemento propio.
 
 **Tareas:**
 
-- [ ] Resolver C1–C8.
+- [x] Resolver C1–C8.
+- [ ] Schema, `Element`, `Style`, builder (con el flujo de columnas) y los errores nuevos, con
+      sus casos en el catálogo.
 - [ ] `MulticolLayout` sin equilibrado (llenado en orden), en una y en varias páginas.
 - [ ] Equilibrado.
-- [ ] `column-span` (si se decide en C4).
 - [ ] Línea entre columnas en el pintado.
 - [ ] Tests de layout y de fragmentación; casos de error.
 - [ ] Especificación; caso golden con texto en dos columnas a lo largo de dos páginas.
