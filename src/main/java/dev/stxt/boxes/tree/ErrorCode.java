@@ -39,9 +39,9 @@ public enum ErrorCode {
     SINGLE_ELEMENT,
     /** Un {@code Text} sin texto, o con texto en el valor y en {@code Content}. */
     TEXT_CONTENT,
-    /** Texto sin {@code Font}, propia o heredada. */
+    /** Texto sin {@code Font} en {@code Typography}, propia o heredada. */
     TEXT_WITHOUT_FONT,
-    /** Texto sin {@code Font size}, propio o heredado. */
+    /** Texto sin {@code Size} en {@code Typography}, propio o heredado. */
     TEXT_WITHOUT_FONT_SIZE,
 
     // --- Combinaciones sin efecto o contradictorias --------------------------------------------
@@ -75,7 +75,7 @@ public enum ErrorCode {
     // --- Fuentes ------------------------------------------------------------------------------
     /** {@code Font} no está en la carpeta de fuentes. */
     FONT_UNKNOWN,
-    /** La familia no tiene la variante de {@code Font weight} y {@code Font style}. */
+    /** La familia no tiene la variante de {@code Weight} y {@code Style}. */
     FONT_VARIANT_MISSING,
     /** La fuente no tiene un carácter del texto. */
     GLYPH_MISSING

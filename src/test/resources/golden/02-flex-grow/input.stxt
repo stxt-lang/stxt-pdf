@@ -12,15 +12,18 @@ Document (dev.stxt.boxes):
 			Grow: 1
 			Block:
 				Id: A
-				Height: 50
+				Box:
+					Height: 50
 		Item:
 			Basis: 150
 			Grow: 3
 			Block:
 				Id: B
-				Height: 50
+				Box:
+					Height: 50
 		Item:
 			Block:
 				Id: C
-				Width: 65
-				Height: 50
+				Box:
+					Width: 65
+					Height: 50

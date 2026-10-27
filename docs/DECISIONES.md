@@ -153,11 +153,8 @@ tiene un caso por código.
     `Break inside: page` son `VALUE_NOT_ALLOWED`, y un bloque `>>` donde van hijos,
     `DOCUMENT_STRUCTURE`; con `DocumentReader` salen antes los códigos de `stxt-core`.
 
-60. **Solo las propiedades de la fuente en `Document`** (`Font`, `Font weight`, `Font style` y
-    `Font size`): es lo que se decidió para no repetirlas. `Color`, `Line height`,
-    `Text align`… se heredan igual, pero hay que declararlas en una caja.
-    *Dónde:* template, `tree/BoxTreeBuilder.build`, `Style.FONT_PROPERTIES`.
-    *Alternativa:* admitir en `Document` todas las propiedades que se heredan.
+60. ~~**Solo las propiedades de la fuente en `Document`**~~, resuelta en el hito 10: `Document`
+    admite el `Typography` entero, que es todo lo que se hereda.
 
 61. **Los desbordamientos se comprueban sobre el resultado final**, una vez paginado, y no
     durante el layout: así no cuentan las pasadas de medida. Cuentan las líneas y los hijos en
@@ -215,11 +212,12 @@ imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, 
     *Alternativa:* que `Relative`, `Absolute` y `Fixed` sean envoltorios de un elemento, como
     `Cell`; se leería peor en el caso habitual (un sello, una cabecera).
 
-67. **`Absolute` y `Fixed` no admiten las propiedades de fragmentación** (`Break before`,
-    `Break after`, `Break inside`, `Decoration`, `Widows`, `Orphans`), porque no se parten ni
-    están en el flujo de la página. Antes solo era un error el corte forzado
-    (`BREAK_NOT_ALLOWED`); `avoid` y `Decoration` se aceptaban sin efecto. Sus descendientes sí
-    las admiten (el schema no distingue dónde está un `Block`), aunque tampoco se parten.
+67. **`Absolute` y `Fixed` no admiten el grupo `Break`** (`Before`, `After`, `Inside` y
+    `Decoration`), porque no se parten ni están en el flujo de la página. `Widows` y `Orphans`
+    van en `Typography` desde el hito 10 y se admiten, porque se heredan. Antes solo era un
+    error el corte forzado (`BREAK_NOT_ALLOWED`); `avoid` y `Decoration` se aceptaban sin
+    efecto. Sus descendientes sí admiten `Break` (el schema no distingue dónde está un
+    `Block`), aunque tampoco se parten.
     *Dónde:* schema.
 
 68. **El texto de un `Text` va en el valor o en `Content >>`**, uno de los dos
@@ -243,10 +241,8 @@ imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, 
     *Alternativa:* solo como hijo de `Document`, que es donde tiene sentido una cabecera o un
     pie.
 
-72. **El schema no tiene grupos de hijos**, así que cada elemento enumera sus ~30 propiedades
-    y el fichero es largo (unas 750 líneas). Añadir una propiedad común obliga a añadirla en
-    cada elemento.
-    *Alternativa:* generar el schema con un script a partir de los grupos del §9.
+72. ~~**El schema no tiene grupos de hijos**~~, resuelta en el hito 10 con los grupos `Box`,
+    `Typography` y `Break`: cada elemento declara tres grupos en lugar de unas 30 propiedades.
 
 73. **`BoxTreeBuilder` repite la tabla de hijos del schema** (`CHILDREN`): con el documento
     validado nunca falla, pero un árbol construido sin validar (`STXT.rawParser()`) da
@@ -255,3 +251,31 @@ imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, 
     tablas a la vez.
     *Dónde:* `tree/BoxTreeBuilder.CHILDREN`, `checkChildren`.
     *Alternativa:* validar contra el schema dentro del builder, o no comprobar nada sin validar.
+
+## Hito 10: grupos `Box`, `Typography` y `Break` (2026-10-27)
+
+Las propiedades de cada caja pasan a tres grupos, hijos del elemento (§4): `Box` (modelo de
+caja), `Typography` (texto) y `Break` (cortes de página). El schema baja de 749 a 512 líneas, la
+mayoría descripciones y valores de los ENUM. El motor no cambia: `BoxTreeBuilder` guarda cada
+propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así que `Style.line`,
+`Overflow` y `PdfMetrics` no cambian.
+
+74. **Lo que se hereda va en `Typography` y lo que no, en `Box` o `Break`.** Por eso
+    `Background` y `Border color` van en `Box` (no son geometría, pero no se heredan) y
+    `Widows` y `Orphans` en `Typography` (son de los párrafos y se heredan), no en `Break`.
+    *Alternativa:* un cuarto grupo de pintado (`Background`, `Border color`), o `Widows` y
+    `Orphans` en `Break`; en los dos casos un grupo mezclaría heredables y no heredables.
+
+75. **Nombres cortos dentro de los grupos** (`Size`, `Weight`, `Style`, `Align`, `Before`,
+    `After`, `Inside`) salvo donde chocan con otro nodo del namespace: `Text wrap` no puede ser
+    `Wrap`, que es el booleano de `Flex`. Los de `Box` ya eran cortos y se conservan.
+    *Dónde:* schema; `tree/BoxTreeBuilder.INTERNAL` traduce los cortos al nombre interno.
+    *Alternativa:* renombrar `Wrap` de `Flex` (por ejemplo, `Multiline`) para poder usar `Wrap`
+    en `Typography`.
+
+76. **Fuera de los grupos queda lo que define al elemento**: `Id`, `Isolate`, `Offset`,
+    `Layer`, las propiedades de `Flex` y `Grid` y las de `Item` y `Cell`. Un grupo
+    `Position` (`Offset`, `Layer`) se descartó porque solo existe en los elementos
+    posicionados, que ya lo dicen con su nombre.
+
+77. **Los errores señalan la línea de la propiedad**, dentro del grupo, nunca la del grupo.

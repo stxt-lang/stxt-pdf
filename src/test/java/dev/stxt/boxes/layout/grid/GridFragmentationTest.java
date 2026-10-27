@@ -24,7 +24,8 @@ class GridFragmentationTest {
     private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumns: 1fr 1fr"};
 
     private static String[] cell(String id, String cell) {
-        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tHeight: 40"};
+        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
+                "\t\t\t\t\tHeight: 40"};
     }
 
     private static String[] concat(String[]... parts) {
@@ -44,7 +45,8 @@ class GridFragmentationTest {
     }
 
     private static String[] box(String id, String height, String cell) {
-        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tHeight: " + height};
+        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
+                "\t\t\t\t\tHeight: " + height};
     }
 
     @Test
@@ -69,7 +71,7 @@ class GridFragmentationTest {
         // Tras X (30), la fila de 80 no cabe en lo que queda de página pero sí en una entera: pasa
         // entera a la página 2 (como breaksBetweenRows).
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tBlock:", "\t\tId: X", "\t\tHeight: 30"}, GRID,
+                new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
                 box("A", "80", "1 1"), box("B", "40", "1 2")));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "G"));

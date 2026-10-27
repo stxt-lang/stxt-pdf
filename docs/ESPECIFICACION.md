@@ -45,7 +45,7 @@ resumen en el [§8](#8-diferencias-con-css).
 - **Todas las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada). Un A4 mide
   595 × 842 pt.
 - **Los nombres de nodos y valores están en inglés** y siguen, cuando existe, el término de CSS:
-  `Margin`, `Padding`, `Absolute`, `Break inside: avoid`. El texto de un `Text` puede estar en
+  `Margin`, `Padding`, `Absolute`, `Decoration: slice`. El texto de un `Text` puede estar en
   cualquier idioma.
 - **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*; *vertical* es el de
   `Height` y *arriba/abajo*. La escritura es siempre horizontal, de izquierda a derecha.
@@ -64,9 +64,8 @@ sentido en él: sus propiedades y, si es un contenedor, otros elementos. El sche
 en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta al leer, también
 en el editor.
 
-El nodo raíz es `Document`, con exactamente un `Media`, las propiedades de la fuente que heredan
-todas las cajas (`Font`, `Font weight`, `Font style` y `Font size`, opcionales) y los elementos
-de primer nivel.
+El nodo raíz es `Document`, con exactamente un `Media`, un `Typography` opcional que heredan
+todas las cajas (la fuente del documento) y los elementos de primer nivel.
 
 | Elemento | Qué es | Contiene |
 |---|---|---|
@@ -86,6 +85,10 @@ son ítems. Los siete son **elementos de caja**: cada uno es una caja del árbol
 ([§5.1](#51-árbol-de-cajas)). `Item` y `Cell` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor.
 
+Las propiedades de una caja van agrupadas por su significado ([§4](#4-referencia-de-propiedades)):
+`Box` (el modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de
+página).
+
 ```
 Document (dev.stxt.boxes):
 	Media:
@@ -93,11 +96,13 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Text: Un título
 		Id: title
-		Font size: 20
+		Typography:
+			Size: 20
 	Flex:
 		Id: body
 		Gap: 10
@@ -110,8 +115,9 @@ Document (dev.stxt.boxes):
 					Segundo párrafo.
 		Item:
 			Block:
-				Width: 100
-				Background: #F1EFE8
+				Box:
+					Width: 100
+					Background: #F1EFE8
 ```
 
 **El orden importa.** STXT conserva el orden de los nodos, y el motor coloca los elementos en el
@@ -193,7 +199,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Basis` (ítem flex) | el tamaño del contenedor flex en el eje principal (en `column`, su alto, que debe ser definido) |
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
 | Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
-| `Line height` | el `Font size` de la propia caja |
+| `Line height` | el `Size` de la propia caja |
 
 `Border` no admite porcentajes.
 
@@ -214,10 +220,32 @@ flex estirado **no** da un alto definido a sus hijos: si lo necesitan, declara s
 
 ## 4. Referencia de propiedades
 
-En las tablas, **Hereda** indica si una caja que no declara la propiedad toma el valor de su
-padre. No hay cascada: solo se heredan las propiedades marcadas. Las propiedades son hijas
-directas de su elemento; qué elementos admite cada una lo dice cada apartado, y el detalle
-completo, el schema ([§9](#9-schema)).
+Casi todas las propiedades van en uno de tres **grupos**, hijos de cada elemento de caja:
+
+| Grupo | Contenido | Se hereda | Elementos |
+|---|---|---|---|
+| `Box` ([§4.3](#43-box)) | El modelo de caja: tamaño, márgenes, relleno, borde y fondo | No | Todos los de caja |
+| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación y color del texto, viudas y huérfanas | **Sí** | Todos los de caja, y `Document` |
+| `Break` ([§4.5](#45-break)) | Cortes de página y decoración en los cortes | No | Todos los de caja salvo `Absolute` y `Fixed` |
+
+Lo que hay en `Typography` lo hereda toda la descendencia; lo de `Box` y `Break` es solo de la
+caja que lo declara. No hay cascada. Dentro de cada grupo, una propiedad aparece como mucho una
+vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las propiedades que
+definen el propio elemento: `Id` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
+`Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Cell`
+([§4.8](#48-item-y-cell)) y las de posicionamiento ([§4.9](#49-posicionamiento)).
+
+```
+Text: Resultados del trimestre
+	Id: title
+	Box:
+		Margin: 0 0 16 0
+	Typography:
+		Weight: bold
+		Size: 20
+	Break:
+		After: avoid
+```
 
 ### 4.1 `Media`
 
@@ -233,68 +261,72 @@ Obligatorio, exactamente uno, hijo de `Document`.
 El **área útil** es el rectángulo del medio menos sus márgenes. Es el containing block de los
 elementos de primer nivel y de los `Fixed`. En modo continuo su altura es infinita.
 
-### 4.2 Identificación y aislamiento
+### 4.2 Propiedades del elemento
 
-| Propiedad | Valores | Por defecto | Hereda | Elementos | Notas |
-|---|---|---|---|---|---|
-| `Id` | texto | — | No | De caja | Identificador para volcados, tests y mensajes. Único en el documento. |
-| `Isolate` | booleano | `false` | No | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
-
-Las propiedades de dimensiones, modelo de caja, pintado y texto (§4.3 a §4.6) se admiten en todos
-los elementos de caja.
-
-### 4.3 Dimensiones
-
-| Propiedad | Valores | Por defecto | Hereda | Notas |
+| Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Width` | número, %, `auto`, intrínsecos, funciones | `auto` | No | |
-| `Height` | número, %, `auto`, intrínsecos, funciones | `auto` | No | |
-| `Min width`, `Min height` | número, %, `auto` | `auto` | No | `auto` = min-content en ítems de flex y grid; 0 en el resto. |
-| `Max width`, `Max height` | número, % | sin máximo | No | |
-| `Aspect ratio` | `ancho/alto` o número | — | No | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error. |
+| `Id` | texto | — | De caja | Identificador para volcados, tests y mensajes. Único en el documento. |
+| `Isolate` | booleano | `false` | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
 
-### 4.4 Modelo de caja
+### 4.3 `Box`
 
-| Propiedad | Valores | Por defecto | Hereda | Notas |
-|---|---|---|---|---|
-| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | No | Puede ser negativo. `auto` solo centra: en flujo de bloque, en horizontal y con `Width` o `Max width`; en `Absolute` y `Fixed`, con inicio, tamaño y fin declarados. En cualquier otro caso es un error. |
-| `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | No | |
-| `Border` | 1 a 4 números ≥ 0 | `0` | No | Grosor. El color va en `Border color`. |
+El modelo de caja. No se hereda.
 
-### 4.5 Pintado
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Width` | número, %, `auto`, intrínsecos, funciones | `auto` | |
+| `Height` | número, %, `auto`, intrínsecos, funciones | `auto` | |
+| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = min-content en ítems de flex y grid; 0 en el resto. |
+| `Max width`, `Max height` | número, % | sin máximo | |
+| `Aspect ratio` | `ancho/alto` o número | — | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error. |
+| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra: en flujo de bloque, en horizontal y con `Width` o `Max width`; en `Absolute` y `Fixed`, con inicio, tamaño y fin declarados. En cualquier otro caso es un error. |
+| `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
+| `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
+| `Border color` | color | el `Color` del texto | No afecta al layout. |
+| `Background` | color | transparente | Se pinta en la caja de relleno. No afecta al layout. |
 
-No afectan al layout.
+### 4.4 `Typography`
 
-| Propiedad | Valores | Por defecto | Hereda | Notas |
-|---|---|---|---|---|
-| `Background` | color | transparente | No | Se pinta en la caja de relleno. |
-| `Color` | color | `#000000` | **Sí** | Color del texto. |
-| `Border color` | color | el de `Color` | No | |
+El texto y cómo se reparte en líneas. **Se hereda**: lo que declara un elemento vale para él y
+para todos sus descendientes que no lo cambien. También se admite en `Document`, y es lo
+habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 
-### 4.6 Texto
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Font` | nombre de familia | — | **Obligatoria** en todo `Text`, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
+| `Weight` | `normal`, `bold` | `normal` | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
+| `Style` | `normal`, `italic` | `normal` | |
+| `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo `Text`, propio o heredado (también de `Document`). |
+| `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
+| `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
+| `Color` | color | `#000000` | Color del texto. |
+| `Text wrap` | `auto`, `pretty` | `auto` | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
+| `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
+| `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 
-`Font`, `Font weight`, `Font style` y `Font size` se pueden declarar también en `Document`, y
-entonces las heredan todas las cajas. Es lo habitual para la fuente del documento: cada caja
-declara solo lo que cambia. Las propiedades heredables se pueden declarar en cualquier
-elemento de caja, también en los contenedores, para que las hereden sus descendientes.
-
-| Propiedad | Valores | Por defecto | Hereda | Notas |
-|---|---|---|---|---|
-| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en todo `Text`, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
-| `Font weight` | `normal`, `bold` | `normal` | **Sí** | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
-| `Font style` | `normal`, `italic` | `normal` | **Sí** | |
-| `Font size` | número > 0 | — | **Sí** | Cuerpo de la fuente. **Obligatorio** en todo `Text`, propio o heredado (también de `Document`). |
-| `Line height` | número o % | `120%` | **Sí** | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
-| `Text align` | `left`, `right`, `center`, `justify` | `left` | **Sí** | La última línea de un párrafo justificado se alinea a la izquierda. |
-| `Text wrap` | `auto`, `pretty` | `auto` | **Sí** | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
+`Text wrap` conserva el nombre largo porque `Wrap` ya es una propiedad de `Flex`, y un nombre
+es el mismo nodo en todo el schema.
 
 **El texto de un `Text`** va en su valor (`Text: Un título`) o en un hijo `Content >>` con un
 bloque indentado, que admite párrafos. Uno de los dos es obligatorio, y no se admiten ambos. Ver
 [§5.4](#54-texto).
 
-### 4.7 `Flex`
+### 4.5 `Break`
 
-Propiedades del elemento `Flex`. Sus hijos en flujo son `Item` ([§4.9](#49-item-y-cell)).
+Los cortes de página. Solo tienen efecto en modo paginado y no se heredan. No se admite en
+`Absolute` ni en `Fixed`, que no se parten ni están en el flujo de la página.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Before` | `auto`, `page`, `avoid` | `auto` | `page` fuerza un salto antes de la caja. |
+| `After` | `auto`, `page`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
+| `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja. |
+| `Decoration` | `slice`, `clone` | `slice` | Qué pasa con borde y relleno en un corte. |
+
+### 4.6 `Flex`
+
+Propiedades del elemento `Flex`, hijas directas suyas. Sus hijos en flujo son `Item`
+([§4.8](#48-item-y-cell)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -305,9 +337,10 @@ Propiedades del elemento `Flex`. Sus hijos en flujo son `Item` ([§4.9](#49-item
 | `Cross axis` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación de los ítems dentro de su línea. |
 | `Lines` | `start`, `end`, `center`, `between`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true`. |
 
-### 4.8 `Grid`
+### 4.7 `Grid`
 
-Propiedades del elemento `Grid`. Sus hijos en flujo son `Cell` ([§4.9](#49-item-y-cell)).
+Propiedades del elemento `Grid`, hijas directas suyas. Sus hijos en flujo son `Cell`
+([§4.8](#48-item-y-cell)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -322,11 +355,11 @@ Propiedades del elemento `Grid`. Sus hijos en flujo son `Cell` ([§4.9](#49-item
 Pistas válidas: número, %, `auto`, `min-content`, `max-content`, fracción, `minmax(a, b)` y
 `repeat(n, patrón)`.
 
-### 4.9 `Item` y `Cell`
+### 4.8 `Item` y `Cell`
 
 Cada hijo en flujo de un `Flex` es un `Item`, y cada uno de un `Grid`, un `Cell`. Contienen
 **exactamente un elemento en flujo** (`Block`, `Flex`, `Grid`, `Text` o `Relative`), que es el
-ítem: sus dimensiones, márgenes y demás propiedades van en ese elemento. El `Item` o el `Cell`
+ítem: su `Box`, su `Typography` y demás propiedades van en ese elemento. El `Item` o el `Cell`
 solo añade cómo participa en su contenedor. No son cajas y no admiten `Id`.
 
 ```
@@ -336,7 +369,8 @@ Flex:
 		Text: Crece
 	Item:
 		Block:
-			Width: 100
+			Box:
+				Width: 100
 Grid:
 	Columns: 1fr 1fr
 	Cell: 1 2
@@ -356,29 +390,16 @@ Grid:
 | `Cell` | `Vertical` | como en `Grid` | el del contenedor | |
 | Los dos | `Layer` | entero | `auto` | Orden de apilamiento del ítem. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
 
-### 4.10 Posicionamiento
+### 4.9 Posicionamiento
 
-Propiedades de `Relative`, `Absolute` y `Fixed`, los **elementos posicionados**. Son bloques
-(apilan sus hijos como un `Block`); para posicionar un flex o un grid, se pone dentro.
+Propiedades de `Relative`, `Absolute` y `Fixed`, los **elementos posicionados**, hijas directas
+suyas. Son bloques (apilan sus hijos como un `Block`); para posicionar un flex o un grid, se pone
+dentro.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
 | `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Cell`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
-
-### 4.11 Fragmentación
-
-Solo tienen efecto en modo paginado. Se admiten en todos los elementos de caja salvo `Absolute` y
-`Fixed`, que no se parten ni están en el flujo de la página.
-
-| Propiedad | Valores | Por defecto | Hereda | Notas |
-|---|---|---|---|---|
-| `Break before` | `auto`, `page`, `avoid` | `auto` | No | `page` fuerza un salto antes de la caja. |
-| `Break after` | `auto`, `page`, `avoid` | `auto` | No | `avoid` mantiene la caja con la siguiente (títulos). |
-| `Break inside` | `auto`, `avoid` | `auto` | No | `avoid` intenta no partir la caja. |
-| `Widows` | entero ≥ 1 | `2` | **Sí** | Mínimo de líneas de un párrafo que pasan a la página siguiente. |
-| `Orphans` | entero ≥ 1 | `2` | **Sí** | Mínimo de líneas de un párrafo que quedan al final de una página. |
-| `Decoration` | `slice`, `clone` | `slice` | No | Qué pasa con borde y relleno en un corte. |
 
 ---
 
@@ -467,7 +488,7 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   por `Line height`.
 - **Línea base.** La caja de la fuente (su ascendente más su descendente, de la tabla `hhea`
   del fichero TTF) se centra en la línea, como el *half-leading* de CSS:
-  `línea base = arriba + (Line height − (ascendente + descendente) · Font size) / 2 + ascendente · Font size`.
+  `línea base = arriba + (Line height − (ascendente + descendente) · Size) / 2 + ascendente · Size`.
   No afecta al layout, solo al pintado.
 - **Alineación.** `left`, `right` y `center` desplazan cada línea; `justify` reparte
   el sobrante a partes iguales entre los espacios de la línea. No se justifican la última
@@ -726,8 +747,8 @@ dentro de un hijo.
 regla. Si no hay ninguno, relaja las reglas en este orden:
 
 1. `Widows` y `Orphans`;
-2. `Break before/after: avoid`;
-3. `Break inside: avoid`.
+2. `Before` y `After: avoid` (de `Break`);
+3. `Inside: avoid` (de `Break`).
 
 Si sigue sin haber corte posible, corta donde se acaba el espacio.
 
@@ -744,10 +765,10 @@ cortarlo a la fuerza. Lo que no se puede partir y no cabe en una página entera 
 alta que el área útil, una fila con un ítem que no puede colocar nada) es un error
 ([§5.12](#512-desbordamiento)).
 
-**Cortes forzados.** `Break before: page` y `Break after: page` fuerzan un salto. Solo se
-aplican a cajas en flujo: `Absolute` y `Fixed` no los admiten. El `Break before: page` del primer hijo de un bloque y el
-`Break after: page` del último se propagan al bloque. Un corte forzado al principio de una
-página se ignora (no deja páginas en blanco), igual que el `Break after: page` de la última
+**Cortes forzados.** `Before: page` y `After: page` (de `Break`) fuerzan un salto. Solo se
+aplican a cajas en flujo: `Absolute` y `Fixed` no admiten `Break`. El `Before: page` del primer hijo de un bloque y el
+`After: page` del último se propagan al bloque. Un corte forzado al principio de una
+página se ignora (no deja páginas en blanco), igual que el `After: page` de la última
 caja del documento.
 
 **Márgenes en los cortes.** En un corte no forzado, los márgenes que tocan el corte se truncan
@@ -769,7 +790,7 @@ modo que se corta antes (o pasa entera a la página siguiente) y termina allí c
 relleno. Si la caja se corta de todos modos, su fragmento llega hasta el final de la página.
 
 Una caja con `Height` definido se parte como cualquier otra, aunque no tenga contenido: lo que
-no cabe de su alto pasa a la página siguiente. Para evitarlo se declara `Break inside: avoid`,
+no cabe de su alto pasa a la página siguiente. Para evitarlo se declara `Inside: avoid`,
 que no impide partirla si no cabe en una página entera. Un fragmento cortado de una caja con
 alto `auto` mide hasta el corte; con alto definido, llega hasta el final de la página sin pasar
 del alto que le queda.
@@ -903,16 +924,16 @@ La validación se hace en cuatro niveles:
 | `MEDIA_HEIGHT_CONTINUOUS` | Con `Type: continuous`, `Media` no admite `Height` | `Height del medio no tiene efecto con Type: continuous…` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Font size` > 0 | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0 | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Cell` contienen exactamente un elemento | `Un Cell contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
-| `TEXT_WITHOUT_FONT` | El texto necesita `Font`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en la caja, en una antecesora o en Document` |
-| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Font size`, propio o heredado (también de `Document`) | `El texto necesita Font size: decláralo en la caja, en una antecesora o en Document` |
+| `TEXT_WITHOUT_FONT` | El texto necesita `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
+| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
-| `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([§4.4](#44-modelo-de-caja)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
+| `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([§4.3](#43-box)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
@@ -920,14 +941,14 @@ La validación se hace en cuatro niveles:
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Cell` válido y con áreas existentes | `Área desconocida en Cell: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
-| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Font weight` y `Font style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
+| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 | `DOCUMENT_STRUCTURE` | Lo que el schema ya rechaza (falta `Media`, un hijo que el elemento no admite, un bloque `>>` mal puesto…), si se construye el árbol sin validar el documento | `Falta el nodo Media` |
 
-Las propiedades de fragmentación (`Break before`, `Widows`…) no son errores en modo continuo:
+Las propiedades de fragmentación (`Break`, `Widows`…) no son errores en modo continuo:
 un mismo documento debe poder maquetarse en los dos modos.
 
 **Catálogo de errores.** [`src/test/resources/errors/errors.stxt`](../src/test/resources/errors/errors.stxt)
@@ -969,7 +990,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT de elementos; cada uno declara sus propiedades y solo admite las que tienen sentido en él |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
-| Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
+| Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, viudas y huérfanas) |
 | `display` | Combina tipo exterior e interior | El elemento (`Block`, `Flex`, `Grid`, `Text`) fija el interior; el exterior lo decide el padre. No hay `inline-block`. |
 | `position` | Propiedad de cualquier caja | Elementos `Relative`, `Absolute` y `Fixed`, que son bloques: un flex o grid posicionado va dentro de uno de ellos |
 | Propiedades de ítem (`flex-grow`, `grid-area`…) | En el propio ítem, con efecto solo si el padre es flex o grid | En el envoltorio `Item` o `Cell`, que solo existe dentro de su contenedor |
@@ -978,7 +999,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `line-height` sin unidad | Multiplicador | **Un número son puntos**; el relativo se escribe con % |
 | Altura de línea | Calculada por fuente, *half-leading* y *baseline* | Cada línea mide `Line height`; la línea base se coloca con el *half-leading* de su fuente |
 | Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
-| `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Font weight: normal` o `bold` y `Font style: normal` o `italic`, sin síntesis: el fichero debe existir |
+| `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Weight: normal` o `bold` y `Style: normal` o `italic`, sin síntesis: el fichero debe existir |
 | Kerning y ligaduras | Sí | No |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
@@ -1014,29 +1035,27 @@ su tipo, su descripción y los hijos que admite (cada propiedad, como mucho una 
 elemento solo puede tener los hijos que declara su definición, así que el schema es lo que
 garantiza que cada propiedad está en un elemento donde tiene efecto.
 
-El schema no tiene grupos de hijos reutilizables: cada elemento enumera todos los suyos. Este
-resumen los agrupa; si difiere del fichero, manda el fichero.
-
-| Grupo | Propiedades |
-|---|---|
-| **Caja** | `Id`, `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Background`, `Border color` |
-| **Texto** (se heredan) | `Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap` |
-| **Fragmentación** | `Break before`, `Break after`, `Break inside`, `Decoration`, `Widows`, `Orphans` |
-| **Elementos** | `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed` |
-| **Elementos en flujo** | `Block`, `Flex`, `Grid`, `Text`, `Relative` |
+Este resumen da los hijos de cada nodo con hijos; si difiere del fichero, manda el fichero.
+Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno); `Font`, `Font weight`, `Font style`, `Font size`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Typography`; elementos |
 | `Media` | `GROUP` | `Type` y `Width` (obligatorios), `Height`, `Margin` |
-| `Block` | `GROUP` | caja, texto, fragmentación, `Isolate`; elementos |
-| `Flex` | `GROUP` | caja, texto, fragmentación, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
-| `Grid` | `GROUP` | caja, texto, fragmentación, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
-| `Text` | `INLINE` | caja, texto, fragmentación, `Content` |
-| `Relative` | `GROUP` | caja, texto, fragmentación, `Isolate`, `Offset`, `Layer`; elementos |
-| `Absolute`, `Fixed` | `GROUP` | caja, texto, `Offset`, `Layer`; elementos |
-| `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; elementos en flujo (como mucho uno de cada) |
-| `Cell` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; elementos en flujo (como mucho uno de cada) |
+| `Block` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
+| `Flex` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
+| `Grid` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
+| `Text` | `INLINE` | `Id`, `Box`, `Typography`, `Break`, `Content` |
+| `Relative` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
+| `Absolute`, `Fixed` | `GROUP` | `Id`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
+| `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
+| `Cell` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
+| `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Widows`, `Orphans` |
+| `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
+
+*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute` y `Fixed`; *elementos
+en flujo*, los cinco primeros.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows` y `Orphans`, `INTEGER`; las de valores
@@ -1048,10 +1067,10 @@ que `Item` y `Cell` tengan exactamente un elemento (el schema solo limita cada t
 un `Text` tenga su texto en un sitio y solo uno, y que la raíz sea `Document` (en un schema
 cualquier nodo puede ser raíz).
 
-Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de un `Block`
+Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de `Box`
 comparten definición, y solo cambia la cardinalidad que fija cada padre. Por eso `Cross axis`,
 `Horizontal`, `Vertical` y `Gap` tienen los mismos valores en el contenedor y en `Item` o
-`Cell`.
+`Cell`, y por eso `Text wrap` no se acorta a `Wrap`, que ya es de `Flex`.
 
 ---
 
@@ -1066,29 +1085,38 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Fixed:
 		Id: header
 		Offset: -30 0 auto 0
-		Height: 20
-		Font size: 8
-		Color: #5F5E5A
+		Box:
+			Height: 20
+		Typography:
+			Size: 8
+			Color: #5F5E5A
 		Text: Informe trimestral
 	Fixed:
 		Id: footer
 		Offset: auto 0 -30 0
-		Height: 20
-		Font size: 8
+		Box:
+			Height: 20
+		Typography:
+			Size: 8
 		Text: Página {page} de {pages}
-			Text align: right
+			Typography:
+				Align: right
 	Text: Resultados del trimestre
 		Id: title
-		Font weight: bold
-		Font size: 20
-		Line height: 24
-		Margin: 0 0 16 0
-		Break after: avoid
+		Typography:
+			Weight: bold
+			Size: 20
+			Line height: 24
+		Box:
+			Margin: 0 0 16 0
+		Break:
+			After: avoid
 	Grid:
 		Id: body
 		Columns: 150 1fr
@@ -1096,16 +1124,19 @@ Document (dev.stxt.boxes):
 		Cell:
 			Text:
 				Id: side
-				Background: #F1EFE8
-				Padding: 10
-				Break inside: avoid
+				Box:
+					Background: #F1EFE8
+					Padding: 10
+				Break:
+					Inside: avoid
 				Content >>
 					Resumen de las cifras clave
 					del trimestre.
 		Cell:
 			Text:
 				Id: main
-				Text align: justify
+				Typography:
+					Align: justify
 				Content >>
 					Primer párrafo del informe. Los saltos de línea simples
 					dentro del bloque equivalen a espacios.
@@ -1114,20 +1145,22 @@ Document (dev.stxt.boxes):
 	Absolute:
 		Id: stamp
 		Offset: 0 0 auto auto
-		Width: 80
-		Height: 30
-		Border: 1
-		Border color: #A32D2D
+		Box:
+			Width: 80
+			Height: 30
+			Border: 1
+			Border color: #A32D2D
 		Layer: 1
 		Text: BORRADOR
-			Text align: center
+			Typography:
+				Align: center
 ```
 
 **Cómo se maqueta:**
 
 - **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
-- **Fuentes:** `Document` declara `Font` y `Font size`, que heredan todas las cajas. El título
+- **Fuentes:** el `Typography` de `Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
 - **`header`** (`Fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
@@ -1137,12 +1170,12 @@ Document (dev.stxt.boxes):
   y = 40 + 772 = **812**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
   en cada página.
 - **`title`**: primer elemento en flujo, en y = **40**, con una línea de 24 pt. Su margen
-  inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `Break after: avoid`, nunca queda
+  inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `After: avoid` en su `Break`, nunca queda
   solo al final de una página.
 - **`body`** (`Grid`): 515 − 20 de hueco = 495 para pistas. La columna fija mide **150** y la
   fracción recibe **345**. Los dos `Cell` no tienen valor y se colocan automáticamente, uno en
   cada columna: `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**. `side` no se
-  parte (`Break inside: avoid`); `main` puede partirse entre páginas respetando viudas y
+  parte (`Inside: avoid`); `main` puede partirse entre páginas respetando viudas y
   huérfanas (2 por defecto).
 - **`stamp`** (`Absolute`): no hay ancestro posicionado, así que su containing block es el área
   útil. Arriba 0 y derecha 0 con ancho 80 la anclan a la esquina superior derecha:

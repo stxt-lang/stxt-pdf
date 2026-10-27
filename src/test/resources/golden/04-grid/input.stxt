@@ -5,8 +5,9 @@ Document (dev.stxt.boxes):
 		Type: continuous
 		Width: 595
 		Margin: 40
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Grid:
 		Id: page
 		Columns: 150 1fr
@@ -18,36 +19,44 @@ Document (dev.stxt.boxes):
 		Cell: head
 			Block:
 				Id: head
-				Height: 30
+				Box:
+					Height: 30
 		Cell: side
 			Text: Resumen
 				Id: side
 		Cell: main
 			Block:
 				Id: main
-				Height: 60
+				Box:
+					Height: 60
 		Cell: foot
 			Block:
 				Id: foot
-				Height: 20
+				Box:
+					Height: 20
 	Grid:
 		Id: cards
-		Margin: 20 0 0 0
+		Box:
+			Margin: 20 0 0 0
 		Columns: repeat(3, 1fr)
 		Gap: 10
 		Cell:
 			Block:
 				Id: c1
-				Height: 40
+				Box:
+					Height: 40
 		Cell:
 			Block:
 				Id: c2
-				Height: 50
+				Box:
+					Height: 50
 		Cell:
 			Block:
 				Id: c3
-				Height: 30
+				Box:
+					Height: 30
 		Cell:
 			Block:
 				Id: c4
-				Height: 20
+				Box:
+					Height: 20

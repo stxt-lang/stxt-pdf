@@ -14,7 +14,8 @@ inglés; la documentación y los comentarios, en castellano.
 
 Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`,
 `Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
-en `Item` y los de un `Grid`, en `Cell`:
+en `Item` y los de un `Grid`, en `Cell`. Las propiedades de cada caja se agrupan en `Box` (el
+modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de página):
 
 ```
 Document (dev.stxt.boxes):
@@ -23,10 +24,14 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Text: Un título
-		Font size: 20
+		Box:
+			Margin: 0 0 10 0
+		Typography:
+			Size: 20
 	Grid:
 		Columns: 150 1fr
 		Gap: 20
@@ -63,23 +68,24 @@ directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
-por la familia, el peso y el estilo que declara. `Font` y `Font size` son obligatorias en el
-texto y no tienen valor por defecto. El repositorio incluye
+por la familia, el peso y el estilo que declara. `Font` y `Size` (de `Typography`) son
+obligatorios en el texto y no tienen valor por defecto. El repositorio incluye
 [IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/) (normal, negrita, cursiva y negrita
-cursiva), con licencia SIL Open Font License. `Font` y `Font size` se suelen declarar en
-`Document`, de donde las heredan todas las cajas. Los detalles están en el §5.11 de la
-especificación.
+cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar en el
+`Typography` de `Document`, de donde los heredan todas las cajas. Los detalles están en el
+§5.11 de la especificación.
 
 ## Estado
 
 Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
-depuración y PDF con las fuentes incrustadas. Los nueve hitos de la hoja de ruta están
+depuración y PDF con las fuentes incrustadas. Los diez hitos de la hoja de ruta están
 terminados.
 
 | Pieza | Estado |
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
 | Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Cell`, validados con `@stxt.schema` | Hecho y probado |
+| Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
@@ -92,7 +98,7 @@ terminados.
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del schema | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
-| Texto justificado (`Text align: justify`) | Hecho y probado |
+| Texto justificado (`Align: justify`) | Hecho y probado |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
 | `FlexLayout` e intrínsecos de flex | Hecho y probado |
 | `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
@@ -101,7 +107,7 @@ terminados.
 | Salida PDF con PDFBox (`PdfCanvas`) y métricas reales de las fuentes (`PdfMetrics`) | Hecho y probado |
 | Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
 | Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
-| Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real | Hecho y probado |
+| Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Weight` y `Style`, línea base real | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
@@ -122,6 +128,7 @@ en `target/pdf/`.
 7. ~~**Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass (caso 07).~~ Hecho.
 8. ~~**Fuentes.** Carpeta de recursos, fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real.~~ Hecho.
 9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
+10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
 
 ## Estructura
 

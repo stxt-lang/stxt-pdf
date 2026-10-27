@@ -68,8 +68,7 @@ class DocumentReaderTest {
     @Test
     void nodesBlocksAndNamespace() {
         InlineNode root = reader.read(doc(
-                "\tText:", "\t\tId: main", "\t\tContent >>", "\t\t\tPrimera línea: con dos puntos", "",
-                "\t\t\t\tSangrada"));
+                "\tText:", "\t\tId: main", "\t\tContent >>", "\t\t\tPrimera línea: con dos puntos", "", "\t\t\t\tSangrada"));
         assertEquals("dev.stxt.boxes", root.getNamespace());
         InlineNode text = assertInstanceOf(InlineNode.class, root.getChild("Text"));
         assertEquals("dev.stxt.boxes", text.getNamespace());
@@ -84,9 +83,9 @@ class DocumentReaderTest {
     @Test
     void schemaErrorsHaveCodeAndLine() {
         ParseException e = assertThrows(ParseException.class,
-                () -> reader.read(doc("\tText: a", "\t\tText align: middle")));
+                () -> reader.read(doc("\tText: a", "\t\tTypography:", "\t\t\tAlign: middle")));
         assertEquals("INVALID_VALUE", e.getCode());
-        assertEquals(6, e.getLine());
+        assertEquals(7, e.getLine());
 
         ParseException noMedia = assertThrows(ParseException.class,
                 () -> reader.read("Document (dev.stxt.boxes):\n\tBlock:\n\t\tId: a"));
@@ -122,7 +121,7 @@ class DocumentReaderTest {
         assertEquals(7, twoRoots.line());
         // El schema admite cualquier elemento como raíz; el motor, solo Document.
         InvalidModelException block = assertThrows(InvalidModelException.class,
-                () -> reader.read("Block (dev.stxt.boxes):\n\tHeight: 10"));
+                () -> reader.read("Block (dev.stxt.boxes):\n\tId: a"));
         assertEquals(ErrorCode.DOCUMENT_ROOT, block.code());
     }
 }

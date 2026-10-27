@@ -34,7 +34,7 @@ class InlineFragmentationTest {
 
     @Test
     void paragraphFillsThePage() {
-        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(10), "\t\tId: P", "\t\tWidth: 30");
+        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(10), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(2, l.pages());
         assertRect(40, 40, 30, 96, l.rect(1, "P"));
         assertRect(40, 40, 30, 24, l.rect(2, "P"));
@@ -44,7 +44,7 @@ class InlineFragmentationTest {
     @Test
     void widowsTakeALineToTheNextPage() {
         // 8 + 1 dejaría una viuda: 7 + 2.
-        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(9), "\t\tId: P", "\t\tWidth: 30");
+        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(7, lines(l, 1, "P"));
         assertEquals(2, lines(l, 2, "P"));
     }
@@ -53,8 +53,8 @@ class InlineFragmentationTest {
     void orphanMovesTheWholeParagraph() {
         // Solo cabe una línea: quedaría huérfana, y cortar antes del párrafo no incumple nada.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBlock:", "\t\tId: X", "\t\tHeight: 80",
-                "\tText: " + words(9), "\t\tId: P", "\t\tWidth: 30");
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
+                "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(3, l.pages());
         assertFalse(l.has(1, "P"));
         assertEquals(7, lines(l, 2, "P"));
@@ -65,8 +65,8 @@ class InlineFragmentationTest {
     void orphansAreRelaxedBeforeAvoid() {
         // Cortar antes de P incumpliría el avoid de T; dejar una huérfana es menos grave (§5.10).
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBlock:", "\t\tId: T", "\t\tHeight: 80", "\t\tBreak after: avoid",
-                "\tText: " + words(9), "\t\tId: P", "\t\tWidth: 30");
+                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tAfter: avoid",
+                "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(2, l.pages());
         assertRect(40, 120, 30, 12, l.rect(1, "P"));
         assertRect(40, 40, 30, 96, l.rect(2, "P"));
@@ -75,8 +75,9 @@ class InlineFragmentationTest {
     @Test
     void breakBetweenParagraphs() {
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBlock:", "\t\tId: X", "\t\tHeight: 30",
-                "\tText:", "\t\tId: P", "\t\tWidth: 30", "\t\tContent >>", "\t\t\t" + words(5), "", "\t\t\t" + words(5));
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30",
+                "\tText:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30", "\t\tContent >>", "\t\t\t" + words(5), "",
+                "\t\t\t" + words(5));
         assertEquals(2, l.pages());
         assertRect(40, 70, 30, 60, l.rect(1, "P"));
         assertRect(40, 40, 30, 60, l.rect(2, "P"));

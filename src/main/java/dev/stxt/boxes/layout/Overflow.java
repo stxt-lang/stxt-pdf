@@ -185,7 +185,7 @@ public final class Overflow {
         int line = index >= 0 ? box.textLineAt(index) : box.textLine;
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + word + "' no cabe en "
                 + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)
-                + "; ensancha la caja o reduce el Font size");
+                + "; ensancha la caja o reduce el Size del texto");
     }
 
     private static double contentWidth(Fragment f) {

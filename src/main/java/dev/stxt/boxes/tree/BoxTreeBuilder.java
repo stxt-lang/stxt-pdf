@@ -50,30 +50,39 @@ public final class BoxTreeBuilder {
     private static final Set<Kind> LENGTH_OR_AUTO = EnumSet.of(Kind.LENGTH, Kind.AUTO);
     private static final Set<Kind> LENGTH = EnumSet.of(Kind.LENGTH);
 
-    // --- Hijos de cada elemento, como en el schema (§9) -----------------------------------------
-    private static final Set<String> BOX = Set.of("id", "width", "height", "min-width", "max-width",
-            "min-height", "max-height", "aspect-ratio", "margin", "padding", "border", "background", "border-color");
-    private static final Set<String> INHERITED = Set.of("color", "font", "font-weight", "font-style", "font-size",
-            "line-height", "text-align", "text-wrap");
-    private static final Set<String> FRAGMENTATION = Set.of("break-before", "break-after", "break-inside",
-            "decoration", "widows", "orphans");
+    // --- Hijos de cada elemento y de cada grupo, como en el schema (§9) ------------------------
     private static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
     private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "relative", "absolute", "fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
     private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "relative");
-    private static final Map<String, Set<String>> CHILDREN = Map.of(
-            "block", union(BOX, INHERITED, FRAGMENTATION, Set.of("isolate"), ELEMENTS),
-            "flex", union(BOX, INHERITED, FRAGMENTATION, FLEX, Set.of("item", "absolute", "fixed")),
-            "grid", union(BOX, INHERITED, FRAGMENTATION, GRID, Set.of("cell", "absolute", "fixed")),
-            "text", union(BOX, INHERITED, FRAGMENTATION, Set.of("content")),
-            "relative", union(BOX, INHERITED, FRAGMENTATION, Set.of("isolate", "offset", "layer"), ELEMENTS),
-            "absolute", union(BOX, INHERITED, Set.of("offset", "layer"), ELEMENTS),
-            "fixed", union(BOX, INHERITED, Set.of("offset", "layer"), ELEMENTS),
-            "item", union(Set.of("grow", "shrink", "basis", "cross-axis", "layer"), IN_FLOW),
-            "cell", union(Set.of("horizontal", "vertical", "layer"), IN_FLOW),
-            "document", union(Set.of("media"), Set.copyOf(Style.FONT_PROPERTIES), ELEMENTS));
+    /** Lo que admiten todos los elementos de caja: {@code Id} y los grupos {@code Box} y {@code Typography}. */
+    private static final Set<String> COMMON = Set.of("id", "box", "typography");
+    private static final Map<String, Set<String>> CHILDREN = Map.ofEntries(
+            Map.entry("block", union(COMMON, Set.of("break", "isolate"), ELEMENTS)),
+            Map.entry("flex", union(COMMON, Set.of("break"), FLEX, Set.of("item", "absolute", "fixed"))),
+            Map.entry("grid", union(COMMON, Set.of("break"), GRID, Set.of("cell", "absolute", "fixed"))),
+            Map.entry("text", union(COMMON, Set.of("break", "content"))),
+            Map.entry("relative", union(COMMON, Set.of("break", "isolate", "offset", "layer"), ELEMENTS)),
+            Map.entry("absolute", union(COMMON, Set.of("offset", "layer"), ELEMENTS)),
+            Map.entry("fixed", union(COMMON, Set.of("offset", "layer"), ELEMENTS)),
+            Map.entry("item", union(Set.of("grow", "shrink", "basis", "cross-axis", "layer"), IN_FLOW)),
+            Map.entry("cell", union(Set.of("horizontal", "vertical", "layer"), IN_FLOW)),
+            Map.entry("document", union(Set.of("media", "typography"), ELEMENTS)),
+            Map.entry("box", Set.of("width", "height", "min-width", "max-width", "min-height", "max-height",
+                    "aspect-ratio", "margin", "padding", "border", "border-color", "background")),
+            Map.entry("typography", Set.of("font", "weight", "style", "size", "line-height", "align", "color",
+                    "text-wrap", "widows", "orphans")),
+            Map.entry("break", Set.of("before", "after", "inside", "decoration")));
+
+    /**
+     * Nombre interno de cada propiedad de {@code Typography} y {@code Break} cuyo nombre en el
+     * documento es corto: {@link Style#line} y los mensajes usan el interno ({@code font-size}).
+     */
+    private static final Map<String, String> INTERNAL = Map.of(
+            "weight", "font-weight", "style", "font-style", "size", "font-size", "align", "text-align",
+            "before", "break-before", "after", "break-after", "inside", "break-inside");
 
     /** Resultado: el medio y una caja raíz anónima que representa el área útil. */
     public record Result(Media media, Box root) {
@@ -96,14 +105,9 @@ public final class BoxTreeBuilder {
                 .orElseThrow(() -> error(document, ErrorCode.DOCUMENT_STRUCTURE, "Falta el nodo Media"));
         Media media = media(mediaNode);
 
-        // Las propiedades de la fuente de Document las heredan todas las cajas.
+        // El Typography de Document lo heredan todas las cajas.
         Style rootStyle = new Style();
-        for (Node p : document.getChildren()) {
-            if (Style.FONT_PROPERTIES.contains(p.getCanonicalName())) {
-                rootStyle.declared(p.getCanonicalName(), p.getLine());
-                font(p, rootStyle);
-            }
-        }
+        child(document, "typography").map(BoxTreeBuilder::inline).ifPresent(t -> typography(t, rootStyle));
         Box root = new Box(null, rootStyle, true, document.getLine());
         // El área útil: definida en modo paginado; infinita en continuo.
         definiteHeight.put(root, media.paged());
@@ -206,36 +210,20 @@ public final class BoxTreeBuilder {
                 grid(p, s);
                 continue;
             }
-            s.declared(name, p.getLine());
             switch (name) {
-                case "id" -> id = id(p);
-                case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
-                case "layer" -> s.layer = integer(p);
-                case "isolate" -> s.isolate = bool(p);
-                case "width" -> s.width = value(p, SIZE, false);
-                case "height" -> s.height = value(p, SIZE, false);
-                case "min-width" -> s.minWidth = value(p, LENGTH_OR_AUTO, false);
-                case "max-width" -> s.maxWidth = value(p, LENGTH, false);
-                case "min-height" -> s.minHeight = value(p, LENGTH_OR_AUTO, false);
-                case "max-height" -> s.maxHeight = value(p, LENGTH, false);
-                case "aspect-ratio" -> s.aspectRatio = aspectRatio(p);
-                case "margin" -> s.margin = sides(p, LENGTH_OR_AUTO, true);
-                case "padding" -> s.padding = nonNegativeSides(p, true);
-                case "border" -> s.border = nonNegativeSides(p, false);
-                case "background" -> s.background = color(p);
-                case "color" -> s.color = color(p);
-                case "border-color" -> s.borderColor = color(p);
-                case "font", "font-weight", "font-style", "font-size" -> font(p, s);
-                case "line-height" -> s.lineHeight = value(p, LENGTH, false);
-                case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
-                case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
-                case "break-before" -> s.breakBefore = enumValue(Style.Break.class, p);
-                case "break-after" -> s.breakAfter = enumValue(Style.Break.class, p);
-                case "break-inside" -> s.avoidBreakInside = breakInside(p);
-                case "widows" -> s.widows = positiveInteger(p);
-                case "orphans" -> s.orphans = positiveInteger(p);
-                case "decoration" -> s.decoration = enumValue(Style.Decoration.class, p);
-                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida: " + p.getName());
+                case "box" -> box(inline(p), s);
+                case "typography" -> typography(inline(p), s);
+                case "break" -> fragmentation(inline(p), s);
+                default -> {
+                    s.declared(name, p.getLine());
+                    switch (name) {
+                        case "id" -> id = id(p);
+                        case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
+                        case "layer" -> s.layer = integer(p);
+                        case "isolate" -> s.isolate = bool(p);
+                        default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida: " + p.getName());
+                    }
+                }
             }
         }
         if (kind.equals("flex")) {
@@ -269,15 +257,76 @@ public final class BoxTreeBuilder {
         Node source = content.orElse(n);
         if (box.style.font == null) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT,
-                    "El texto necesita Font: declárala en el Text, en un antecesor o en Document");
+                    "El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document");
         }
         if (!box.style.isDeclared("font-size")) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE,
-                    "El texto necesita Font size: decláralo en el Text, en un antecesor o en Document");
+                    "El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document");
         }
         box.text = source.getText();
         box.textLine = source.getLine();
         box.textBlock = source instanceof TextNode;
+    }
+
+    /** Grupo {@code Box}: el modelo de caja, que no se hereda. */
+    private static void box(InlineNode group, Style s) {
+        checkChildren(group);
+        for (Node p : group.getChildren()) {
+            s.declared(p.getCanonicalName(), p.getLine());
+            switch (p.getCanonicalName()) {
+                case "width" -> s.width = value(p, SIZE, false);
+                case "height" -> s.height = value(p, SIZE, false);
+                case "min-width" -> s.minWidth = value(p, LENGTH_OR_AUTO, false);
+                case "max-width" -> s.maxWidth = value(p, LENGTH, false);
+                case "min-height" -> s.minHeight = value(p, LENGTH_OR_AUTO, false);
+                case "max-height" -> s.maxHeight = value(p, LENGTH, false);
+                case "aspect-ratio" -> s.aspectRatio = aspectRatio(p);
+                case "margin" -> s.margin = sides(p, LENGTH_OR_AUTO, true);
+                case "padding" -> s.padding = nonNegativeSides(p, true);
+                case "border" -> s.border = nonNegativeSides(p, false);
+                case "border-color" -> s.borderColor = color(p);
+                default -> s.background = color(p);
+            }
+        }
+    }
+
+    /**
+     * Grupo {@code Typography}, en un elemento o en {@code Document}: se hereda. Las líneas se
+     * guardan con el nombre interno ({@code Size} es {@code font-size}).
+     */
+    private static void typography(InlineNode group, Style s) {
+        checkChildren(group);
+        for (Node p : group.getChildren()) {
+            String name = p.getCanonicalName();
+            s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
+            switch (name) {
+                case "font" -> s.font = fontFamily(p);
+                case "weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
+                case "style" -> s.fontStyle = enumValue(Style.FontStyle.class, p);
+                case "size" -> s.fontSize = positive(p);
+                case "line-height" -> s.lineHeight = value(p, LENGTH, false);
+                case "align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
+                case "color" -> s.color = color(p);
+                case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
+                case "widows" -> s.widows = positiveInteger(p);
+                default -> s.orphans = positiveInteger(p);
+            }
+        }
+    }
+
+    /** Grupo {@code Break}: los cortes de página, que no se heredan. */
+    private static void fragmentation(InlineNode group, Style s) {
+        checkChildren(group);
+        for (Node p : group.getChildren()) {
+            String name = p.getCanonicalName();
+            s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
+            switch (name) {
+                case "before" -> s.breakBefore = enumValue(Style.Break.class, p);
+                case "after" -> s.breakAfter = enumValue(Style.Break.class, p);
+                case "inside" -> s.avoidBreakInside = breakInside(p);
+                default -> s.decoration = enumValue(Style.Decoration.class, p);
+            }
+        }
     }
 
     /** Propiedades de flex, hijas del elemento {@code Flex}; su línea se guarda con prefijo ({@code flex.gap}). */
@@ -731,7 +780,7 @@ public final class BoxTreeBuilder {
     private static boolean breakInside(Node n) {
         Style.Break b = enumValue(Style.Break.class, n);
         if (b == Style.Break.PAGE) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Break inside solo admite auto o avoid");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Inside solo admite auto o avoid");
         }
         return b == Style.Break.AVOID;
     }
@@ -826,16 +875,6 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (usa #RGB o #RRGGBB): " + t);
         }
         return t;
-    }
-
-    /** {@code Font}, {@code Font weight}, {@code Font style} o {@code Font size}, en un elemento o en {@code Document}. */
-    private static void font(Node p, Style s) {
-        switch (p.getCanonicalName()) {
-            case "font" -> s.font = fontFamily(p);
-            case "font-weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
-            case "font-style" -> s.fontStyle = enumValue(Style.FontStyle.class, p);
-            default -> s.fontSize = positive(p);
-        }
     }
 
     private static String fontFamily(Node n) {

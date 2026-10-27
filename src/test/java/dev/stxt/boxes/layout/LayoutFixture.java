@@ -15,14 +15,14 @@ import java.util.Map;
  * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página,
  * incluidos los de las cajas {@code fixed}. Sin número de página, se refiere a la primera.
  *
- * <p>Declara en {@code Document} {@code Font: IBM Plex Sans} y {@code Font size: 10}, porque el
- * texto los necesita (§6); con {@link dev.stxt.boxes.layout.inline.FixedMetrics} la familia no
+ * <p>Declara en el {@code Typography} de {@code Document} {@code Font: IBM Plex Sans} y
+ * {@code Size: 10}, porque el texto los necesita (§6); con {@link dev.stxt.boxes.layout.inline.FixedMetrics} la familia no
  * influye en las medidas.</p>
  */
 public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String FONT = "\tFont: IBM Plex Sans\n\tFont size: 10\n";
+    private static final String FONT = "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
 
     private final List<Page> pages;
     private final List<Map<String, Fragment>> fragments = new ArrayList<>();

@@ -7,29 +7,38 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Fixed:
 		Id: header
 		Offset: -30 0 auto 0
-		Height: 20
-		Font size: 8
-		Color: #5F5E5A
+		Box:
+			Height: 20
+		Typography:
+			Size: 8
+			Color: #5F5E5A
 		Text: Informe trimestral
 	Fixed:
 		Id: footer
 		Offset: auto 0 -30 0
-		Height: 20
-		Font size: 8
+		Box:
+			Height: 20
+		Typography:
+			Size: 8
 		Text: Página {page} de {pages}
-			Text align: right
+			Typography:
+				Align: right
 	Text: Resultados del trimestre
 		Id: title
-		Font weight: bold
-		Font size: 20
-		Line height: 24
-		Margin: 0 0 16 0
-		Break after: avoid
+		Typography:
+			Weight: bold
+			Size: 20
+			Line height: 24
+		Box:
+			Margin: 0 0 16 0
+		Break:
+			After: avoid
 	Grid:
 		Id: body
 		Columns: 150 1fr
@@ -37,16 +46,19 @@ Document (dev.stxt.boxes):
 		Cell:
 			Text:
 				Id: side
-				Background: #F1EFE8
-				Padding: 10
-				Break inside: avoid
+				Box:
+					Background: #F1EFE8
+					Padding: 10
+				Break:
+					Inside: avoid
 				Content >>
 					Resumen de las cifras clave
 					del trimestre.
 		Cell:
 			Text:
 				Id: main
-				Text align: justify
+				Typography:
+					Align: justify
 				Content >>
 					Primer párrafo del informe. Los saltos de línea simples
 					dentro del bloque equivalen a espacios.
@@ -55,10 +67,12 @@ Document (dev.stxt.boxes):
 	Absolute:
 		Id: stamp
 		Offset: 0 0 auto auto
-		Width: 80
-		Height: 30
-		Border: 1
-		Border color: #A32D2D
+		Box:
+			Width: 80
+			Height: 30
+			Border: 1
+			Border color: #A32D2D
 		Layer: 1
 		Text: BORRADOR
-			Text align: center
+			Typography:
+				Align: center

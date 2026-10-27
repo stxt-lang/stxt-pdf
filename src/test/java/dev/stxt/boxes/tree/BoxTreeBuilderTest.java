@@ -32,7 +32,7 @@ class BoxTreeBuilderTest {
     @Test
     void textIsAnElementBetweenBoxes() {
         BoxTreeBuilder.Result r = build(document(
-                "\tBlock:", "\t\tId: parent", "\t\tFont: IBM Plex Sans", "\t\tFont size: 10",
+                "\tBlock:", "\t\tId: parent", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\t\tText: antes", "\t\tBlock:", "\t\t\tId: child"));
         Box parent = r.root().children.get(0);
         assertEquals(2, parent.children.size());
@@ -45,7 +45,7 @@ class BoxTreeBuilderTest {
     @Test
     void elementsGiveLayoutAndPosition() {
         Box root = build(document(
-                "\tText: hola", "\t\tFont: IBM Plex Sans", "\t\tFont size: 10",
+                "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\tGrid:", "\tRelative:", "\tAbsolute:", "\tFixed:")).root();
         assertEquals(List.of(Style.Layout.INLINE, Style.Layout.FLEX, Style.Layout.GRID, Style.Layout.BLOCK,
                 Style.Layout.BLOCK, Style.Layout.BLOCK), root.children.stream().map(b -> b.style.layout).toList());
@@ -57,19 +57,17 @@ class BoxTreeBuilderTest {
 
     @Test
     void textInAContentBlock() {
-        Box b = build(document("\tText:", "\t\tFont: IBM Plex Sans", "\t\tFont size: 10",
+        Box b = build(document("\tText:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\t\tContent >>", "\t\t\tuno", "\t\t\tdos")).root().children.get(0);
         assertEquals("uno\ndos", b.text);
-        assertEquals(9, b.textLine);
+        assertEquals(10, b.textLine);
         assertTrue(b.textBlock);
     }
 
     @Test
     void itemAndCellPropertiesGoToTheirElement() {
         Box root = build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a",
-                "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tCell: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b",
-                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: c")).root();
+                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tCell: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: c")).root();
         Box a = root.children.get(0).children.get(0);
         assertEquals("a", a.id);
         assertEquals(2, a.style.itemGrow, 1e-9);
@@ -84,8 +82,8 @@ class BoxTreeBuilderTest {
     @Test
     void onlyTextAndFragmentationPropertiesAreInherited() {
         Box child = build(document(
-                "\tBlock:", "\t\tFont: IBM Plex Sans", "\t\tFont weight: bold", "\t\tFont style: italic",
-                "\t\tFont size: 14", "\t\tWidows: 3", "\t\tPadding: 10",
+                "\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tWeight: bold", "\t\t\tStyle: italic",
+                "\t\t\tSize: 14", "\t\t\tWidows: 3", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tText: x")).root().children.get(0).children.get(0);
         assertEquals(new FontFace("IBM Plex Sans", Style.FontWeight.BOLD, Style.FontStyle.ITALIC),
                 child.style.fontFace());
@@ -98,7 +96,7 @@ class BoxTreeBuilderTest {
     @Test
     void rulesTheSchemaCannotExpress() {
         assertThrows(InvalidModelException.class, () -> build(
-                "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 595\n\tBlock:\n\t\tHeight: 10"));
+                "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 595\n\tBlock:\n\t\tId: a"));
         InvalidModelException single = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tGrid:", "\t\tCell:", "\t\t\tBlock:", "\t\t\tText: a")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, single.code());
@@ -108,7 +106,7 @@ class BoxTreeBuilderTest {
         assertEquals(ErrorCode.SINGLE_ELEMENT, empty.code());
         assertEquals(7, empty.line());
         InvalidModelException noText = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tText:", "\t\tFont size: 10")));
+                "\tText:", "\t\tTypography:", "\t\t\tSize: 10")));
         assertEquals(ErrorCode.TEXT_CONTENT, noText.code());
         InvalidModelException twice = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tContent >>", "\t\t\tb")));
@@ -117,10 +115,11 @@ class BoxTreeBuilderTest {
         assertThrows(InvalidModelException.class, () -> build(document(
                 "\tGrid:", "\t\tAreas >>", "\t\t\ta a", "\t\t\ta b", "\t\t\tb b")));
         assertThrows(InvalidModelException.class, () -> build(document(
-                "\tBlock:", "\t\tWidows: 0")));
+                "\tBlock:", "\t\tTypography:", "\t\t\tWidows: 0")));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tBlock:", "\t\tWidth: 12,5")));
-        assertEquals(7, e.line());
+                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 12,5")));
+        // La línea es la de la propiedad, dentro del grupo, no la del grupo.
+        assertEquals(8, e.line());
     }
 
     @Test
@@ -131,24 +130,24 @@ class BoxTreeBuilderTest {
     @Test
     void textNeedsAFont() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tText: hola", "\t\tFont size: 12")));
+                "\tText: hola", "\t\tTypography:", "\t\t\tSize: 12")));
         assertEquals(6, e.line());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
-        assertEquals("línea 6: El texto necesita Font: declárala en el Text, en un antecesor o en Document",
-                e.getMessage());
+        assertEquals("línea 6: El texto necesita Font: declárala en el Typography del Text, de un antecesor "
+                + "o de Document", e.getMessage());
         // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tText: a", "\t\tFont: IBM Plex Sans", "\t\tFont size: 10",
+                "\tText: a", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\t\tItem:", "\t\t\tText: b")));
-        assertEquals(11, item.line());
+        assertEquals(12, item.line());
         // Un elemento sin texto no la necesita.
-        build(document("\tBlock:", "\t\tHeight: 10"));
+        build(document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 10"));
     }
 
     @Test
     void textNeedsAFontSize() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tText: hola", "\t\tFont: IBM Plex Sans")));
+                "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans")));
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT_SIZE, e.code());
         assertEquals(6, e.line());
     }
@@ -156,12 +155,16 @@ class BoxTreeBuilderTest {
     @Test
     void fontPropertiesOfTheDocumentAreInherited() {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n"
-                + "\tFont: IBM Plex Sans\n\tFont size: 12\n\tBlock:\n\t\tFont weight: bold\n\t\tText: x";
+                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 12\n\t\tColor: #333\n\t\tLine height: 20\n"
+                + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).root().children.get(0).children.get(0);
         assertEquals(new FontFace("IBM Plex Sans", Style.FontWeight.BOLD, Style.FontStyle.NORMAL), text.style.fontFace());
         assertEquals(12, text.style.fontSize, 1e-9);
+        // Document admite todo Typography, no solo la fuente.
+        assertEquals("#333", text.style.color);
+        assertEquals(20, text.style.usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
-        assertEquals(5, text.style.line("font"));
+        assertEquals(6, text.style.line("font"));
     }
 
     @Test

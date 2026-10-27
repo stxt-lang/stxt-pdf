@@ -105,7 +105,7 @@ public final class PdfMetrics implements TextMeasurer {
         List<String> parts = new ArrayList<>();
         for (String p : List.of("font", "font-weight", "font-style")) {
             if (s.isDeclared(p)) {
-                String name = p.equals("font") ? "Font" : p.equals("font-weight") ? "Font weight" : "Font style";
+                String name = p.equals("font") ? "Font" : p.equals("font-weight") ? "Weight" : "Style";
                 parts.add(name + " en la línea " + s.line(p));
             }
         }

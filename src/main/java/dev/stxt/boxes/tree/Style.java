@@ -142,7 +142,7 @@ public final class Style {
      */
     private final Map<String, Integer> lines = new HashMap<>();
 
-    /** Propiedades de la fuente: se heredan con su línea y se pueden declarar en {@code Document}. */
+    /** Propiedades de la fuente (las de {@code Typography} que la eligen): se heredan con su línea, para señalarla en los errores. */
     public static final List<String> FONT_PROPERTIES = List.of("font", "font-weight", "font-style", "font-size");
 
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */

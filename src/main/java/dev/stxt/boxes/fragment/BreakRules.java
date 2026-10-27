@@ -15,7 +15,7 @@ import java.util.function.ToIntFunction;
  * <p>La calidad de un corte es una de las constantes de {@link LayoutResult}: mayor es mejor.
  * Se elige el <strong>último</strong> corte de mayor calidad, que es lo mismo que relajar las
  * reglas en el orden de la especificación: primero viudas y huérfanas, después
- * {@code Break before/after: avoid} y por último {@code Break inside: avoid}.</p>
+ * {@code Before}/{@code After: avoid} y por último {@code Inside: avoid} (de {@code Break}).</p>
  */
 public final class BreakRules {
 
@@ -137,7 +137,7 @@ public final class BreakRules {
     }
 
     /**
-     * {@code Break before: page} de la caja o, si es un bloque, de su primer hijo en flujo:
+     * {@code Before: page} (de {@code Break}) de la caja o, si es un bloque, de su primer hijo en flujo:
      * como en CSS, el corte forzado del primer hijo se propaga al padre, porque los dos empiezan
      * en el mismo punto.
      */
@@ -149,7 +149,7 @@ public final class BreakRules {
         return !children.isEmpty() && forcedBefore(children.get(0));
     }
 
-    /** {@code Break after: page} de la caja o, si es un bloque, de su último hijo en flujo. */
+    /** {@code After: page} (de {@code Break}) de la caja o, si es un bloque, de su último hijo en flujo. */
     public static boolean forcedAfter(Box box) {
         if (box.style.breakAfter == Style.Break.PAGE) {
             return true;
@@ -180,7 +180,7 @@ public final class BreakRules {
         return before.stream().anyMatch(BreakRules::forcedAfter) || after.stream().anyMatch(BreakRules::forcedBefore);
     }
 
-    /** Calidad de un corte dentro de una caja: {@code Break inside: avoid} lo deja en {@link LayoutResult#FORCED}. */
+    /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link LayoutResult#FORCED}. */
     public static int inside(Box box, int appeal) {
         return box.style.avoidBreakInside ? LayoutResult.FORCED : appeal;
     }

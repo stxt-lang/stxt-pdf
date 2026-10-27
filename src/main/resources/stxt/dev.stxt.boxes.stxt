@@ -1,6 +1,7 @@
 # Schema del modelo de cajas (docs/ESPECIFICACION.md §9).
-# Primero los elementos y después las propiedades. Cada nombre tiene una única definición en
-# todo el namespace: el Width de Media y el de un elemento son el mismo nodo.
+# Primero los elementos, después los grupos (Box, Typography, Break) y al final las propiedades.
+# Cada nombre tiene una única definición en todo el namespace: el Width de Media y el de Box son
+# el mismo nodo.
 Schema (@stxt.schema): dev.stxt.boxes
 	Description: Documentos del motor de cajas. Referencia completa en docs/ESPECIFICACION.md.
 
@@ -8,18 +9,12 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio, la fuente por defecto y los elementos de primer nivel, en orden.
+		Description: Documento de cajas: el medio, la tipografía por defecto y los elementos de primer nivel, en orden.
 		Children:
 			Child: Media
 				Min: 1
 				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
+			Child: Typography
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -48,57 +43,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
+			Child: Typography
 				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
-				Max: 1
-			Child: Break before
-				Max: 1
-			Child: Break after
-				Max: 1
-			Child: Break inside
-				Max: 1
-			Child: Decoration
-				Max: 1
-			Child: Widows
-				Max: 1
-			Child: Orphans
+			Child: Break
 				Max: 1
 			Child: Isolate
 				Max: 1
@@ -115,57 +64,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
+			Child: Typography
 				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
-				Max: 1
-			Child: Break before
-				Max: 1
-			Child: Break after
-				Max: 1
-			Child: Break inside
-				Max: 1
-			Child: Decoration
-				Max: 1
-			Child: Widows
-				Max: 1
-			Child: Orphans
+			Child: Break
 				Max: 1
 			Child: Direction
 				Max: 1
@@ -188,57 +91,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
+			Child: Typography
 				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
-				Max: 1
-			Child: Break before
-				Max: 1
-			Child: Break after
-				Max: 1
-			Child: Break inside
-				Max: 1
-			Child: Decoration
-				Max: 1
-			Child: Widows
-				Max: 1
-			Child: Orphans
+			Child: Break
 				Max: 1
 			Child: Columns
 				Max: 1
@@ -263,57 +120,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
+			Child: Typography
 				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
-				Max: 1
-			Child: Break before
-				Max: 1
-			Child: Break after
-				Max: 1
-			Child: Break inside
-				Max: 1
-			Child: Decoration
-				Max: 1
-			Child: Widows
-				Max: 1
-			Child: Orphans
+			Child: Break
 				Max: 1
 			Child: Content
 				Max: 1
@@ -323,57 +134,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
+			Child: Typography
 				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
-				Max: 1
-			Child: Break before
-				Max: 1
-			Child: Break after
-				Max: 1
-			Child: Break inside
-				Max: 1
-			Child: Decoration
-				Max: 1
-			Child: Widows
-				Max: 1
-			Child: Orphans
+			Child: Break
 				Max: 1
 			Child: Isolate
 				Max: 1
@@ -394,45 +159,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
-				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
+			Child: Typography
 				Max: 1
 			Child: Offset
 				Max: 1
@@ -451,45 +180,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
-			Child: Width
+			Child: Box
 				Max: 1
-			Child: Height
-				Max: 1
-			Child: Min width
-				Max: 1
-			Child: Max width
-				Max: 1
-			Child: Min height
-				Max: 1
-			Child: Max height
-				Max: 1
-			Child: Aspect ratio
-				Max: 1
-			Child: Margin
-				Max: 1
-			Child: Padding
-				Max: 1
-			Child: Border
-				Max: 1
-			Child: Background
-				Max: 1
-			Child: Border color
-				Max: 1
-			Child: Color
-				Max: 1
-			Child: Font
-				Max: 1
-			Child: Font weight
-				Max: 1
-			Child: Font style
-				Max: 1
-			Child: Font size
-				Max: 1
-			Child: Line height
-				Max: 1
-			Child: Text align
-				Max: 1
-			Child: Text wrap
+			Child: Typography
 				Max: 1
 			Child: Offset
 				Max: 1
@@ -547,10 +240,91 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Relative
 				Max: 1
 
-	# Caja
+	# Grupos
+
+	Node: Box
+		Type: GROUP
+		Description: Modelo de caja: tamaño, márgenes, relleno, borde y fondo. No se hereda.
+		Children:
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Background
+				Max: 1
+	Node: Typography
+		Type: GROUP
+		Description: Fuente, tamaño, interlineado, alineación y color del texto, y viudas y huérfanas. Se hereda.
+		Children:
+			Child: Font
+				Max: 1
+			Child: Weight
+				Max: 1
+			Child: Style
+				Max: 1
+			Child: Size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Align
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+	Node: Break
+		Type: GROUP
+		Description: Cortes de página: antes, después y dentro de la caja, y su decoración. No se hereda.
+		Children:
+			Child: Before
+				Max: 1
+			Child: After
+				Max: 1
+			Child: Inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+
+	# Elemento
 
 	Node: Id
 		Description: Identificador para volcados, tests y mensajes. Único en el documento.
+	Node: Isolate
+		Type: BOOLEAN
+		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
+	Node: Offset
+		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Layer
+		Type: INTEGER
+		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
+	Node: Content
+		Type: BLOCK
+		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+
+	# Box
+
 	Node: Width
 		Description: Ancho de la caja de borde (en Media, de la página).
 	Node: Height
@@ -571,58 +345,82 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Relleno: arriba, derecha, abajo, izquierda (1 a 4 valores).
 	Node: Border
 		Description: Grosor del borde: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Border color
+		Description: Color del borde. Por defecto, el Color del texto.
 	Node: Background
 		Description: Color de fondo, pintado en la caja de relleno.
-	Node: Border color
-		Description: Color del borde. Por defecto, el de Color.
-	Node: Isolate
-		Type: BOOLEAN
-		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
-	Node: Offset
-		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
-	Node: Layer
-		Type: INTEGER
-		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 
-	# Texto
+	# Typography
 
-	Node: Color
-		Description: Color del texto. Se hereda.
 	Node: Font
-		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document). Se hereda.
-	Node: Font weight
+		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document).
+	Node: Weight
 		Type: ENUM
-		Description: Peso: normal (por defecto) o bold. Se hereda.
+		Description: Peso: normal (por defecto) o bold.
 		Values:
 			Value: normal
 			Value: bold
-	Node: Font style
+	Node: Style
 		Type: ENUM
-		Description: Estilo: normal (por defecto) o italic. Se hereda.
+		Description: Estilo: normal (por defecto) o italic.
 		Values:
 			Value: normal
 			Value: italic
-	Node: Font size
-		Description: Cuerpo de la fuente, en puntos. Obligatorio en el texto, propio o heredado (también de Document). Se hereda.
+	Node: Size
+		Description: Cuerpo de la fuente, en puntos. Obligatorio en el texto, propio o heredado (también de Document).
 	Node: Line height
-		Description: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size. Se hereda.
-	Node: Text align
+		Description: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Size.
+	Node: Align
 		Type: ENUM
-		Description: Alineación de las líneas. Se hereda.
+		Description: Alineación de las líneas.
 		Values:
 			Value: left
 			Value: right
 			Value: center
 			Value: justify
+	Node: Color
+		Description: Color del texto.
 	Node: Text wrap
 		Type: ENUM
-		Description: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo). Se hereda.
+		Description: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo).
 		Values:
 			Value: auto
 			Value: pretty
-	Node: Content
-		Type: BLOCK
-		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+	Node: Widows
+		Type: INTEGER
+		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.
+	Node: Orphans
+		Type: INTEGER
+		Description: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2.
+
+	# Break
+
+	Node: Before
+		Type: ENUM
+		Description: Corte antes de la caja: page lo fuerza, avoid lo evita.
+		Values:
+			Value: auto
+			Value: page
+			Value: avoid
+	Node: After
+		Type: ENUM
+		Description: Corte después de la caja: page lo fuerza, avoid la mantiene con la siguiente.
+		Values:
+			Value: auto
+			Value: page
+			Value: avoid
+	Node: Inside
+		Type: ENUM
+		Description: avoid intenta no partir la caja.
+		Values:
+			Value: auto
+			Value: avoid
+	Node: Decoration
+		Type: ENUM
+		Description: Borde y relleno en un corte: slice (por defecto) los corta, clone los repite en cada fragmento.
+		Values:
+			Value: slice
+			Value: clone
 
 	# Flex
 
@@ -703,41 +501,6 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: end
 			Value: center
 			Value: stretch
-
-	# Fragmentación
-
-	Node: Break before
-		Type: ENUM
-		Description: Corte antes de la caja: page lo fuerza, avoid lo evita.
-		Values:
-			Value: auto
-			Value: page
-			Value: avoid
-	Node: Break after
-		Type: ENUM
-		Description: Corte después de la caja: page lo fuerza, avoid la mantiene con la siguiente.
-		Values:
-			Value: auto
-			Value: page
-			Value: avoid
-	Node: Break inside
-		Type: ENUM
-		Description: avoid intenta no partir la caja.
-		Values:
-			Value: auto
-			Value: avoid
-	Node: Decoration
-		Type: ENUM
-		Description: Borde y relleno en un corte: slice (por defecto) los corta, clone los repite en cada fragmento.
-		Values:
-			Value: slice
-			Value: clone
-	Node: Widows
-		Type: INTEGER
-		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2. Se hereda.
-	Node: Orphans
-		Type: INTEGER
-		Description: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2. Se hereda.
 
 	# Medio
 

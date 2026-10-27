@@ -21,12 +21,13 @@ class FlexFragmentationTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    private static String[] item(String id, String... extra) {
-        String[] base = {"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tHeight: 40"};
-        String[] all = new String[base.length + extra.length];
+    /** Ítem de 40 de alto; {@code box} son más propiedades de su {@code Box} ({@code "Width: 300"}). */
+    private static String[] item(String id, String... box) {
+        String[] base = {"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40"};
+        String[] all = new String[base.length + box.length];
         System.arraycopy(base, 0, all, 0, base.length);
-        for (int i = 0; i < extra.length; i++) {
-            all[base.length + i] = "\t\t\t\t" + extra[i];
+        for (int i = 0; i < box.length; i++) {
+            all[base.length + i] = "\t\t\t\t\t" + box[i];
         }
         return all;
     }
@@ -68,7 +69,7 @@ class FlexFragmentationTest {
         // Cortar antes de C incumple su avoid: se corta antes de B.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: column"},
-                item("A"), item("B"), item("C", "Break before: avoid")));
+                item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tBefore: avoid"}));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
         assertRect(40, 40, 515, 40, l.rect(2, "B"));
@@ -82,8 +83,8 @@ class FlexFragmentationTest {
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE,
                 "\tFlex:", "\t\tId: F",
-                "\t\tItem:", "\t\t\tText: " + text, "\t\t\t\tId: A", "\t\t\t\tWidth: 30",
-                "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tWidth: 100");
+                "\t\tItem:", "\t\t\tText: " + text, "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 30",
+                "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100");
         assertEquals(3, l.pages());
         assertRect(40, 40, 30, 96, l.rect(1, "A"));
         assertRect(70, 40, 100, 100, l.rect(1, "B"));
@@ -98,7 +99,7 @@ class FlexFragmentationTest {
     void columnItemTallerThanAPageIsBroken() {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: column"},
-                new String[]{"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tHeight: 150"}, item("B")));
+                new String[]{"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 150"}, item("B")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
         assertRect(40, 40, 515, 50, l.rect(2, "A"));
@@ -110,7 +111,7 @@ class FlexFragmentationTest {
     void containerThatDoesNotFitMovesToTheNextPage() {
         // Tras X (70) no cabe ni la primera línea: el contenedor entero pasa a la página 2.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tBlock:", "\t\tId: X", "\t\tHeight: 70"},
+                new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70"},
                 new String[]{"\tFlex:", "\t\tId: F"},
                 item("A")));
         assertEquals(2, l.pages());

@@ -23,9 +23,9 @@ public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAp
     public static final int PERFECT_BREAK = 3;
     /** Incumple viudas o huérfanas. */
     public static final int VIOLATES_WIDOWS = 2;
-    /** Incumple {@code Break before/after: avoid}. */
+    /** Incumple {@code Before}/{@code After: avoid} de {@code Break}. */
     public static final int VIOLATES_AVOID_BETWEEN = 1;
-    /** Incumple {@code Break inside: avoid} o corta a la fuerza. */
+    /** Incumple {@code Inside: avoid} de {@code Break} o corta a la fuerza. */
     public static final int FORCED = 0;
 
     public LayoutResult {

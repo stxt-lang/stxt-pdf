@@ -4,7 +4,7 @@
 #   6 líneas: partirlo deja huérfanas (calidad 2) y cortar antes de text incumple el avoid de
 #   title (calidad 1). Cortar antes de title no incumple nada (calidad 3): gana.
 # Página 2: title arriba, sin su margen superior (corte no forzado), y text entero en 30.
-#   grid tiene Break before: page.
+#   grid tiene Before: page en su Break.
 # Página 3: filas de grid en 0..50, 60..110 y 120..170; caben las dos primeras.
 # Página 4: la tercera fila, sin el hueco que la separaba de la segunda, y end.
 Document (dev.stxt.boxes):
@@ -13,57 +13,73 @@ Document (dev.stxt.boxes):
 		Width: 300
 		Height: 200
 		Margin: 20
-	Font: IBM Plex Sans
-	Font size: 10
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
 	Fixed:
 		Id: header
 		Offset: -15 0 auto 0
-		Height: 10
-		Font size: 8
+		Box:
+			Height: 10
+		Typography:
+			Size: 8
 		Text: Cabecera
 	Fixed:
 		Id: footer
 		Offset: auto 0 -15 0
-		Height: 10
-		Font size: 8
-		Text align: right
+		Box:
+			Height: 10
+		Typography:
+			Size: 8
+			Align: right
 		Text: Pie
 	Block:
 		Id: intro
-		Height: 100
+		Box:
+			Height: 100
 	Text: Título
 		Id: title
-		Height: 20
-		Margin: 10 0 10 0
-		Break after: avoid
+		Box:
+			Height: 20
+			Margin: 10 0 10 0
+		Break:
+			After: avoid
 	Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
 		Id: text
-		Width: 30
+		Box:
+			Width: 30
 	Grid:
 		Id: grid
-		Break before: page
+		Break:
+			Before: page
 		Columns: 1fr 1fr
 		Gap: 10
 		Cell:
 			Block:
 				Id: g1
-				Height: 50
+				Box:
+					Height: 50
 		Cell:
 			Block:
 				Id: g2
-				Height: 50
+				Box:
+					Height: 50
 		Cell:
 			Block:
 				Id: g3
-				Height: 50
+				Box:
+					Height: 50
 		Cell:
 			Block:
 				Id: g4
-				Height: 50
+				Box:
+					Height: 50
 		Cell:
 			Block:
 				Id: g5
-				Height: 50
+				Box:
+					Height: 50
 	Block:
 		Id: end
-		Height: 10
+		Box:
+			Height: 10
