@@ -1793,3 +1793,174 @@ Errors:
 							Text: C
 								Break:
 									Before: column
+	Case: Enlace en Markdown
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Texto con un [enlace](https://stxt.dev).
+	Case: Cita en Markdown
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Primer párrafo.
+
+						> Una cita
+	Case: Salto de línea forzado en Markdown
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Primera línea\
+						segunda línea
+	Case: Encabezado en un ítem de lista de Markdown
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Bullet: disc
+					Content >>
+						- Uno
+						- # Dos
+	Case: Tabla de Markdown sin filas debajo de la cabecera
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Table columns: auto
+					Content >>
+						| A | B |
+						|---|---|
+	Case: Lista de Markdown sin Bullet
+		Code: MARKDOWN_PROPERTY_MISSING
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Párrafo.
+
+						- uno
+	Case: Lista numerada de Markdown sin Numbering
+		Code: MARKDOWN_PROPERTY_MISSING
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Bullet: disc
+					Content >>
+						1. uno
+	Case: Tabla de Markdown sin Table columns
+		Code: MARKDOWN_PROPERTY_MISSING
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						| A | B |
+						|---|---|
+						| 1 | 2 |
+	Case: Bullet con una numeración
+		Code: VALUE_NOT_ALLOWED
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Bullet: disc decimal
+					Content >>
+						- uno
+	Case: Encabezado de Markdown que salta de nivel
+		Code: HEADING_LEVEL
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						# Uno
+
+						### Tres
+	Case: Encabezado de Markdown vacío
+		Code: TEXT_CONTENT
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Párrafo.
+
+						#

@@ -355,4 +355,28 @@ class PdfCanvasTest {
             assertTrue(content.contains("/Artifact BMC"), content);
         }
     }
+
+    /** Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor (§5.17). */
+    @Test
+    void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tStyles:\n\t\tElement: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 15\n"
+                + "\tMarkdown:\n\t\tBullet: disc\n\t\tTable columns: equal\n\t\tContent >>\n"
+                + "\t\t\t# Informe\n\n\t\t\tCon **negrita** y ++subrayado++.\n\n\t\t\t## Datos\n\n"
+                + "\t\t\t- uno\n\t\t\t- dos\n\n\t\t\t| A | B |\n\t\t\t|---|---|\n\t\t\t| 1 | 2 |\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "markdown"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("Div"), types(document));
+            PDStructureElement md = (PDStructureElement) document.getKids().get(0);
+            assertEquals(List.of("H1", "P", "H2", "L", "Table"), types(md));
+            PDOutlineItem informe = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild();
+            assertEquals("Informe", informe.getTitle());
+            assertEquals("Datos", informe.getFirstChild().getTitle());
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("Con negrita y subrayado."), text);
+        }
+    }
 }
+

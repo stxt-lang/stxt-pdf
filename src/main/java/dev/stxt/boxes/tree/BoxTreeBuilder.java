@@ -84,10 +84,11 @@ public final class BoxTreeBuilder {
 
     /**
      * Hijos de un elemento que no son propiedades suyas: los envoltorios y el texto, las clases
-     * (aplicadas ya con sus reglas), y los grupos de filas y el {@code Span}, que lee {@link TableBuilder}.
+     * (aplicadas ya con sus reglas), los grupos de filas y el {@code Span}, que lee {@link TableBuilder},
+     * y lo que lee {@link MarkdownBuilder}.
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
-            "foot", "span");
+            "foot", "span", "bullet", "numbering", "table-columns");
 
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
@@ -290,8 +291,10 @@ public final class BoxTreeBuilder {
         }
         if (kind.hasText()) {
             text(n, box);
+            box.runs = ctx.runs.get(n);
         } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
             cellText(n, box);
+            box.runs = ctx.runs.get(n);
         } else {
             boolean outerFixed = ctx.insideFixed;
             ctx.insideFixed |= s.position == Style.Position.FIXED;
@@ -299,6 +302,8 @@ public final class BoxTreeBuilder {
                 table(n, box, (cell, row) -> element(ctx, cell, box, row));
             } else if (kind == Element.MULTICOL) {
                 columns(ctx, n, box);
+            } else if (kind == Element.MARKDOWN) {
+                markdown(ctx, n, box);
             } else {
                 buildContent(ctx, n, box);
             }
@@ -326,6 +331,18 @@ public final class BoxTreeBuilder {
         ctx.insideMulticol = true;
         buildContent(ctx, n, flow);
         ctx.insideMulticol = outer;
+    }
+
+    /**
+     * El contenido de un {@code Markdown} (§5.17): los elementos que genera {@link MarkdownBuilder},
+     * construidos como si los hubiera escrito el autor; sus textos con formato llevan sus tramos.
+     */
+    private void markdown(BuildContext ctx, InlineNode n, Box box) {
+        MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
+        ctx.runs.putAll(t.runs());
+        for (InlineNode e : t.elements()) {
+            box.addChild(element(ctx, e, box, null));
+        }
     }
 
     /**

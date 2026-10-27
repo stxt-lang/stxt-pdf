@@ -35,6 +35,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -80,6 +81,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -304,6 +306,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Text
 			Child: Paragraph
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -347,6 +350,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -382,6 +386,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -415,6 +420,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -448,6 +454,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -490,6 +497,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 				Max: 1
 			Child: List
+			Child: Markdown
 				Max: 1
 			Child: Table
 				Max: 1
@@ -530,6 +538,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 				Max: 1
 			Child: List
+			Child: Markdown
 				Max: 1
 			Child: Table
 				Max: 1
@@ -611,11 +620,36 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Text
 			Child: Paragraph
 			Child: List
+			Child: Markdown
 			Child: Table
 			Child: Multicol
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
+
+	Node: Markdown
+		Type: GROUP
+		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~), que se traduce a Heading, Paragraph, List y Table. Un bloque.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Bullet
+				Max: 1
+			Child: Numbering
+				Max: 1
+			Child: Table columns
+				Max: 1
+			Child: Content
+				Min: 1
+				Max: 1
 
 	# Reglas reutilizables
 
@@ -974,4 +1008,17 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Reparto entre columnas: balance (por defecto) iguala las columnas del último fragmento; auto las llena en orden.
 		Values:
 			Value: balance
+			Value: auto
+
+	# Markdown
+
+	Node: Bullet
+		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): disc, dash o none.
+	Node: Numbering
+		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
+	Node: Table columns
+		Type: ENUM
+		Description: Columnas de las tablas de un Markdown: equal, todas del mismo ancho (repeat(n, 1fr)); auto, cada una según su contenido (repeat(n, auto)).
+		Values:
+			Value: equal
 			Value: auto

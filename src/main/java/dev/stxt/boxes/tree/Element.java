@@ -41,6 +41,11 @@ public enum Element {
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
     /** Bloque en columnas (§5.16): su contenido va en el flujo de columnas, {@link #COLUMNS}. */
     MULTICOL("Multicol", Layout.MULTICOL, Position.STATIC, true, false, 0),
+    /**
+     * Contenido en Markdown (§5.17): un bloque cuyos hijos son los elementos que
+     * {@link MarkdownBuilder} genera a partir de su {@code Content}.
+     */
+    MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
     RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
     ABSOLUTE("Absolute", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
     FIXED("Fixed", Layout.BLOCK, Position.FIXED, false, false, 0),

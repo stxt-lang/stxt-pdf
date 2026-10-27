@@ -1,5 +1,6 @@
 package dev.stxt.boxes.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,5 +24,39 @@ public record TextRun(String text, TextFormat format) {
     /** El texto de los tramos, seguido. */
     public static String text(List<TextRun> runs) {
         return runs.size() == 1 ? runs.get(0).text() : runs.stream().map(TextRun::text).collect(Collectors.joining());
+    }
+
+    /** Si algún tramo tiene formato. */
+    public static boolean formatted(List<TextRun> runs) {
+        return runs.stream().anyMatch(r -> !r.format().equals(TextFormat.PLAIN));
+    }
+
+    /** Acumula tramos en orden, uniendo los seguidos que tienen el mismo formato. */
+    public static final class Joiner {
+        private final List<TextRun> runs = new ArrayList<>(1);
+        private final StringBuilder text = new StringBuilder();
+        private TextFormat format;
+
+        public Joiner add(String s, TextFormat f) {
+            if (format != null && !format.equals(f)) {
+                flush();
+            }
+            format = f;
+            text.append(s);
+            return this;
+        }
+
+        /** Los tramos acumulados; vacía si no se ha añadido nada. */
+        public List<TextRun> build() {
+            if (format != null && text.length() > 0) {
+                flush();
+            }
+            return List.copyOf(runs);
+        }
+
+        private void flush() {
+            runs.add(new TextRun(text.toString(), format));
+            text.setLength(0);
+        }
     }
 }

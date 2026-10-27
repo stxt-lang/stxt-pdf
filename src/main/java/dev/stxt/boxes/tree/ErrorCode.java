@@ -76,6 +76,12 @@ public enum ErrorCode {
     /** Un {@code Absolute} o un {@code Fixed} dentro de un {@code Multicol}. */
     POSITIONED_IN_MULTICOL,
 
+    // --- Markdown ------------------------------------------------------------------------------
+    /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes, código, citas, HTML… */
+    MARKDOWN_UNSUPPORTED,
+    /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet}, {@code Numbering} o {@code Table columns}. */
+    MARKDOWN_PROPERTY_MISSING,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,

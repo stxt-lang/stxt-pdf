@@ -16,6 +16,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.2</junit.version>
+        <commonmark.version>0.30.1</commonmark.version>
         <excludedGroups>perf</excludedGroups>
     </properties>
 
@@ -33,6 +34,29 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>3.0.8</version>
+        </dependency>
+
+        <!-- Elemento Markdown (tree.MarkdownBuilder): CommonMark con las tablas y el tachado de GFM
+             y el subrayado de la extensión ins (++texto++). -->
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>${commonmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-gfm-tables</artifactId>
+            <version>${commonmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-gfm-strikethrough</artifactId>
+            <version>${commonmark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-ins</artifactId>
+            <version>${commonmark.version}</version>
         </dependency>
 
         <dependency>

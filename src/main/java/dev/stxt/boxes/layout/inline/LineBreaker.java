@@ -343,7 +343,7 @@ public final class LineBreaker {
 
         /** Las partes del texto entre {@code start} y {@code end}, cada una con su formato. */
         List<TextRun> parts(String text, int start, int end) {
-            Runs parts = new Runs();
+            TextRun.Joiner parts = new TextRun.Joiner();
             for (int i = start; i < end; ) {
                 TextFormat f = format(i);
                 int stop = Math.min(end, starts[run + 1]);
@@ -356,7 +356,7 @@ public final class LineBreaker {
 
     /** Las palabras en una línea, separadas por un espacio con el formato de la palabra anterior. */
     private static Line line(List<Word> words) {
-        Runs runs = new Runs();
+        TextRun.Joiner runs = new TextRun.Joiner();
         for (int i = 0; i < words.size(); i++) {
             if (i > 0) {
                 runs.add(" ", words.get(i - 1).gap());
@@ -366,33 +366,6 @@ public final class LineBreaker {
             }
         }
         return new Line(runs.build());
-    }
-
-    /** Acumula tramos, uniendo los seguidos del mismo formato. */
-    private static final class Runs {
-        private final List<TextRun> runs = new ArrayList<>(1);
-        private final StringBuilder text = new StringBuilder();
-        private TextFormat format;
-
-        void add(String s, TextFormat f) {
-            if (format != null && !format.equals(f)) {
-                flush();
-            }
-            format = f;
-            text.append(s);
-        }
-
-        List<TextRun> build() {
-            if (format != null) {
-                flush();
-            }
-            return runs;
-        }
-
-        private void flush() {
-            runs.add(new TextRun(text.toString(), format));
-            text.setLength(0);
-        }
     }
 
     private static long spaces(String text) {
