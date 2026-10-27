@@ -106,8 +106,22 @@ public final class GridLayout implements LayoutAlgorithm {
         return new IntrinsicSizes(min, Math.max(min, max));
     }
 
+    /**
+     * El grid maquetado sin fragmentar, antes de cortarlo: lo que necesita {@link UnitBreaker}.
+     * Las filas son las unidades; {@code Units.starts} da dónde empieza cada una.
+     */
+    public record Arranged(BoxModel model, List<UnitBreaker.Placed> placed, List<PendingAbsolute> outOfFlow,
+                           UnitBreaker.Units units) {
+    }
+
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        Arranged a = arrange(box, space);
+        return UnitBreaker.fragment(engine, box, a.model(), space, from, a.placed(), a.outOfFlow(), a.units());
+    }
+
+    /** Coloca los ítems y dimensiona las pistas, sin fragmentar; la tabla lo usa para cortar solo su cuerpo. */
+    public Arranged arrange(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
         model.applyTo(box);
         Style s = box.style;
@@ -179,7 +193,7 @@ public final class GridLayout implements LayoutAlgorithm {
         }
 
         double extent = sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        return UnitBreaker.fragment(engine, box, model, space, from, placed, pending, rowUnits(g, rows, y, extent));
+        return new Arranged(model, placed, pending, rowUnits(g, rows, y, extent));
     }
 
     /**

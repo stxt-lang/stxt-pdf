@@ -980,7 +980,10 @@ un error con la primera de estas situaciones:
 - **algo del flujo que no cabe en el área útil de una página y no se puede
   partir** (`PAGE_OVERFLOW`), en la línea de su `Height` o su `Line height` si los declara;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
-  línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página.
+  línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página;
+- **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página
+  (`TABLE_REPEAT_OVERFLOW`, [§5.15](#515-tablas)), en la línea de la `Table`. Se detecta al
+  maquetar, porque sin sitio la tabla no avanza.
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro,
 se nombra lo de dentro. Los `Relative` se comprueban en su sitio, sin el desplazamiento de
@@ -1178,9 +1181,16 @@ siquiera desde una regla (`STYLE_NOT_ALLOWED`).
 **Cortes.** Una tabla se corta entre filas, como un grid ([§5.10](#510-fragmentación)): una fila
 que no cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus
 celdas en paralelo, si no cabe ni en una página vacía. Las filas de `Head` y `Foot` se
-**repiten** en cada página de la tabla, la cabecera arriba y el pie abajo; no se parten nunca y
-no admiten `Break` (`TABLE_ROW_BREAK`). Si la cabecera, el pie y la primera fila del cuerpo que
-va en la página no caben en una página vacía, es un error.
+**repiten** en cada página de la tabla: la cabecera arriba y el pie justo detrás de la última
+fila del cuerpo de esa página, cada uno con el `Gap` que lo separa del cuerpo. No se parten
+nunca y no admiten `Break` (`TABLE_ROW_BREAK`). Las filas del cuerpo se cortan en lo que dejan
+la cabecera y el pie: si no cabe ninguna, la tabla entera pasa a la página siguiente, y la
+cabecera no se queda sola. Si al principio de una página la cabecera y el pie no dejan sitio al
+cuerpo, la tabla no puede avanzar y es un error (`TABLE_REPEAT_OVERFLOW`); una fila del cuerpo
+que no cabe en el sitio que dejan se parte en paralelo, como cualquier fila, y si no se puede
+partir desborda la página (`PAGE_OVERFLOW`, [§5.12](#512-desbordamiento)). Las cajas
+`Absolute` y `Fixed` de las celdas de la cabecera y el pie solo van en el primer fragmento de
+la tabla.
 
 **Salida PDF.** Una `Table` es `Table`; `Head`, `Body` y `Foot` son `THead`, `TBody` y `TFoot`;
 cada fila, `TR`, y cada celda, `TH` en `Head` y `TD` en el resto, con los atributos `RowSpan` y
@@ -1262,6 +1272,7 @@ La validación se hace en cuatro niveles:
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
+| `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 
 **Catálogo de errores.** [`src/test/resources/errors/errors.stxt`](../src/test/resources/errors/errors.stxt)

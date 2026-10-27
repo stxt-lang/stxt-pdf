@@ -420,3 +420,21 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 99. **`Span: 1 1` explícito se admite**, aunque no tenga efecto, como `Start: 1` en una lista:
     es el valor por defecto escrito, no una contradicción. *Dónde:* `BoxTreeBuilder.span`.
     *Alternativa:* error de valor sin efecto.
+
+100. **El error de cabecera y pie (`TABLE_REPEAT_OVERFLOW`) es solo cuando no dejan sitio al
+     cuerpo** al principio de una página, no cuando no caben con una fila entera del cuerpo
+     (como decía TB9): una fila más alta que el sitio que dejan se parte en paralelo, como
+     decide TB7 para cualquier fila, y si no se puede partir es un `PAGE_OVERFLOW`. Así una
+     celda con un párrafo largo en una tabla con cabecera no es un error. Se detecta al
+     maquetar, no en `Overflow`, porque sin sitio la tabla no avanza. *Dónde:*
+     `layout/table/TableLayout`. *Alternativa:* el error de TB9 al pie de la letra, con la
+     primera fila del cuerpo de cada página entera.
+
+101. **El pie va detrás de la última fila del cuerpo de cada página**, no pegado al final del
+     área útil: el fragmento de la tabla mide lo que su contenido. *Dónde:* `UnitBreaker.Repeat`.
+     *Alternativa:* estirar el último fragmento de cada página hasta el final del área útil.
+
+102. **Las cajas `Absolute` y `Fixed` de las celdas que se repiten solo van en el primer
+     fragmento de la tabla**, como las del propio contenedor; en los demás, la cabecera y el
+     pie se repiten sin ellas. *Dónde:* `UnitBreaker.Run.repeated`. *Alternativa:* repetirlas
+     con su fila.

@@ -481,7 +481,9 @@ Table:
       sus columnas, contando los `Span` de las filas de arriba; un `Span` no se sale de la
       tabla ni de su grupo (`Head`, `Body`, `Foot`); los grupos van en ese orden, con un solo
       `Body`, obligatorio; que la cabecera, el pie y una fila del cuerpo no quepan en una
-      página vacía es un error, no se deja de repetir.
+      página vacía es un error, no se deja de repetir. Precisado al implementarlo (decisión
+      100): el error es cuando la cabecera y el pie no dejan sitio al cuerpo; una fila del
+      cuerpo más alta que ese sitio se parte en paralelo (TB7).
 - [x] TB10. **PDF etiquetado:** `Table` → `Table`; `Head`/`Body`/`Foot` →
       `THead`/`TBody`/`TFoot`; `Row` → `TR`; `Cell` → `TH` en `Head` y `TD` en el resto, con
       `RowSpan` y `ColSpan`.
@@ -516,12 +518,15 @@ Table:
       catálogo; `STYLE_NOT_ALLOWED` cubre `Break` en una `Cell` desde una regla. Tests en
       `tree/TablesTest` y `GridLayoutTest.tableCellsAreGridItems`.
 - [x] Especificación: §2, §4 (§4.12 nueva), §5.15 nueva, §6 y §8.
-- [ ] Layout y repetición de cabecera y pie al fragmentar (`TableLayout` sobre `GridLayout`;
-      hoy una tabla se maqueta como un grid, sin repetir cabecera ni pie), filas de `Head` y
-      `Foot` que no se parten, y el error de cabecera y pie que no caben en una página vacía.
+- [x] Layout y repetición de cabecera y pie al fragmentar: `layout/table/TableLayout`
+      (despachado por `Engine` para las cajas `GRID` del elemento `table`) maqueta el grid con
+      `GridLayout.arrange` y corta solo el cuerpo con `UnitBreaker`, que repite la cabecera y
+      el pie enteros (`UnitBreaker.Repeat`). `TABLE_REPEAT_OVERFLOW` (al maquetar) cuando no
+      dejan sitio al cuerpo en una página vacía (decisión 100, que precisa TB9). Tests en
+      `layout/table/TableFragmentationTest`; caso en el catálogo.
 - [ ] PDF etiquetado del TB10 (hoy la tabla y sus celdas salen como `Div`).
 - [ ] Bordes (según TB4) en el pintado.
-- [ ] Tests de layout, de fragmentación (cabecera repetida, pie, fila partida) y casos de
+- [x] Tests de layout, de fragmentación (cabecera repetida, pie, fila partida) y casos de
       error.
 - [ ] Especificación §7 y §9 si cambian; caso golden con una tabla de tres páginas.
 
@@ -596,6 +601,13 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (14).** Hito 14: `TableLayout` repite la cabecera y el pie en cada fragmento
+  (`UnitBreaker.Repeat`; `GridLayout.arrange` separa el layout sin fragmentar del corte), sin
+  partirlos, y `TABLE_REPEAT_OVERFLOW` cuando no dejan sitio al cuerpo. Especificación §5.12,
+  §5.15 y §6; `DECISIONES.md` (100–102). `mvn test` en verde; los PNG no cambian.
+  *Siguiente paso:* PDF etiquetado del TB10 (`Table`, `THead`/`TBody`/`TFoot`, `TR`,
+  `TH`/`TD` con `RowSpan`/`ColSpan`; las filas repetidas, *artifact*), el caso golden de tres
+  páginas, README y `CLAUDE.md`.
 - **2026-10-27 (13).** Hito 14 en curso. `BoxTreeBuilder` traduce la tabla a un grid con
   colocación explícita (`Cell` con valor como texto, sin valor como bloque; `Typography` y
   `Break` de la `Row` a sus celdas) y comprueba los errores del TB9 que no dependen del layout

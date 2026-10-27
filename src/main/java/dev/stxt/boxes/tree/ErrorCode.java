@@ -110,6 +110,8 @@ public enum ErrorCode {
     PAGE_OVERFLOW,
     /** El marcador de un ítem no cabe en la sangría: el relleno izquierdo de la lista más el margen del ítem. */
     LIST_MARKER_OVERFLOW,
+    /** La cabecera y el pie de una tabla, que se repiten en cada página, no dejan sitio al cuerpo en una página vacía. */
+    TABLE_REPEAT_OVERFLOW,
 
     // --- Fuentes ------------------------------------------------------------------------------
     /** {@code Font} no está en la carpeta de fuentes. */

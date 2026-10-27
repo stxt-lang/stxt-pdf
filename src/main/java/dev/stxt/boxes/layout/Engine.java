@@ -13,6 +13,7 @@ import dev.stxt.boxes.layout.inline.InlineLayout;
 import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
+import dev.stxt.boxes.layout.table.TableLayout;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 
@@ -32,6 +33,7 @@ public final class Engine {
     private final InlineLayout inline;
     private final FlexLayout flex;
     private final GridLayout grid;
+    private final TableLayout table;
     private final AbsoluteLayout absolute;
 
     /**
@@ -49,6 +51,7 @@ public final class Engine {
         this.inline = new InlineLayout(measurer);
         this.flex = new FlexLayout(this);
         this.grid = new GridLayout(this);
+        this.table = new TableLayout(this, grid);
         this.absolute = new AbsoluteLayout(this);
     }
 
@@ -143,7 +146,8 @@ public final class Engine {
             case BLOCK -> block;
             case INLINE -> inline;
             case FLEX -> flex;
-            case GRID -> grid;
+            // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
+            case GRID -> "table".equals(box.element) ? table : grid;
         };
     }
 

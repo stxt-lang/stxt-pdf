@@ -24,6 +24,9 @@ import java.util.List;
  * su margen superior; mide lo que el más largo de ellos y las unidades siguientes van detrás.
  * Las unidades entre las que no se puede cortar (las filas que ocupa un mismo ítem) se parten
  * juntas, como un <em>grupo</em>. La calidad del corte es la peor de los ítems que se parten.</p>
+ *
+ * <p>Una tabla repite su cabecera y su pie en cada fragmento ({@link Repeat}): van fuera de
+ * las unidades, enteros, y las unidades se cortan en lo que dejan.</p>
  */
 public final class UnitBreaker {
 
@@ -62,6 +65,20 @@ public final class UnitBreaker {
     }
 
     /**
+     * Ítems que se repiten enteros en cada fragmento, fuera de las unidades: la cabecera de una
+     * tabla arriba y su pie debajo de las unidades colocadas (ESPECIFICACION.md §5.15). Nunca se
+     * parten, y lo que queda de página para las unidades es el resto.
+     *
+     * @param head       ítems de la cabecera, con su posición desde la caja de contenido
+     * @param headHeight alto de la cabecera, con el hueco que la separa de las unidades
+     * @param foot       ítems del pie, con su posición desde el final de las unidades
+     * @param footHeight alto del pie, con el hueco que lo separa de las unidades
+     */
+    public record Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight) {
+        public static final Repeat NONE = new Repeat(List.of(), 0, List.of(), 0);
+    }
+
+    /**
      * Fragmento del contenedor en lo que queda de página, o el contenedor entero sin
      * fragmentación.
      *
@@ -72,7 +89,15 @@ public final class UnitBreaker {
     public static LayoutResult fragment(Engine engine, Box box, BoxModel model, ConstraintSpace space,
                                         BreakToken from, List<Placed> placed, List<PendingAbsolute> outOfFlow,
                                         Units units) {
-        return new Run(engine, box, model, space, (BreakToken.Container) from, placed, units).layOut(outOfFlow);
+        return fragment(engine, box, model, space, from, placed, outOfFlow, units, Repeat.NONE);
+    }
+
+    /** Como {@link #fragment(Engine, Box, BoxModel, ConstraintSpace, BreakToken, List, List, Units)}, con ítems que se repiten en cada fragmento. */
+    public static LayoutResult fragment(Engine engine, Box box, BoxModel model, ConstraintSpace space,
+                                        BreakToken from, List<Placed> placed, List<PendingAbsolute> outOfFlow,
+                                        Units units, Repeat repeat) {
+        return new Run(engine, box, model, space, (BreakToken.Container) from, placed, units, repeat)
+                .layOut(outOfFlow);
     }
 
     /** Un ítem en este fragmento: su fragmento ya colocado y sus cajas absolutas. */
@@ -100,14 +125,15 @@ public final class UnitBreaker {
         final boolean first;
         final List<Placed> placed;
         final Units units;
+        final Repeat repeat;
         final int n;
-        /** Lo que queda de página para el contenido; sin fragmentación no hay límite. */
+        /** Lo que queda de página para las unidades; sin fragmentación no hay límite. */
         final double remaining;
         /** Ítem de cada índice de {@code placed} colocado en este fragmento. */
         final Piece[] pieces;
 
         Run(Engine engine, Box box, BoxModel model, ConstraintSpace space, BreakToken.Container from,
-            List<Placed> placed, Units units) {
+            List<Placed> placed, Units units, Repeat repeat) {
             this.engine = engine;
             this.box = box;
             this.model = model;
@@ -116,9 +142,11 @@ public final class UnitBreaker {
             this.first = from == null;
             this.placed = placed;
             this.units = units;
+            this.repeat = repeat;
             this.n = units.starts().length;
             this.remaining = space.fragmenting()
-                    ? Slice.contentRemaining(model, first, space) : Double.POSITIVE_INFINITY;
+                    ? Slice.contentRemaining(model, first, space) - repeat.headHeight() - repeat.footHeight()
+                    : Double.POSITIVE_INFINITY;
             this.pieces = new Piece[placed.size()];
         }
 
@@ -176,7 +204,7 @@ public final class UnitBreaker {
             for (int k = 0; k < placed.size(); k++) {
                 Placed p = placed.get(k);
                 if (p.unit() >= next && p.unit() < end) {
-                    pieces[k] = piece(p, p.result(), p.y() - origin);
+                    pieces[k] = piece(p, p.result(), p.y() - origin + repeat.headHeight());
                 }
             }
             boolean contentFinished = end == n;
@@ -219,7 +247,7 @@ public final class UnitBreaker {
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return null;
                 }
-                split[k] = piece(p, r, y);
+                split[k] = piece(p, r, y + repeat.headHeight());
                 next.add(r.breakToken());
                 if (!r.isFinished()) {
                     broken = true;
@@ -246,6 +274,17 @@ public final class UnitBreaker {
             double dx = p.x() + f.border().left() + f.padding().left();
             double dy = y + f.border().top() + f.padding().top();
             return new Piece(f.moved(p.x(), y), r.pending().stream().map(q -> q.translated(dx, dy)).toList());
+        }
+
+        /**
+         * Un ítem que se repite: su fragmento va en todos, pero sus cajas absolutas solo en el
+         * primero, como las del contenedor.
+         */
+        void repeated(Piece piece, List<Fragment> fragments, List<PendingAbsolute> pending) {
+            fragments.add(piece.fragment());
+            if (first) {
+                pending.addAll(piece.pending());
+            }
         }
 
         /** Primera unidad detrás del grupo que empieza en {@code start}: la siguiente delante de la que se puede cortar. */
@@ -282,14 +321,21 @@ public final class UnitBreaker {
                             int appeal, List<PendingAbsolute> outOfFlow) {
             List<Fragment> fragments = new ArrayList<>();
             List<PendingAbsolute> pending = new ArrayList<>(first ? outOfFlow : List.of());
+            double units = Math.max(0, contentHeight);
+            for (Placed p : repeat.head()) {
+                repeated(piece(p, p.result(), p.y()), fragments, pending);
+            }
             for (Piece piece : pieces) {
                 if (piece != null) {
                     fragments.add(piece.fragment());
                     pending.addAll(piece.pending());
                 }
             }
-            Slice slice = Slice.of(model, first, BreakToken.consumed(from), Math.max(0, contentHeight),
-                    contentFinished, space);
+            for (Placed p : repeat.foot()) {
+                repeated(piece(p, p.result(), repeat.headHeight() + units + p.y()), fragments, pending);
+            }
+            Slice slice = Slice.of(model, first, BreakToken.consumed(from),
+                    repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
             box.height = slice.height();
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
                     slice.padding(), fragments, List.of(), first, slice.finished());
