@@ -77,8 +77,7 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 16 están
-terminados; el 17 (Markdown) está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 17 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -97,12 +96,14 @@ terminados; el 17 (Markdown) está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |
-| Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; el documento podrá escribirlos con `Markdown` (hito 17) |
+| Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; se escriben con `Markdown` |
+| Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM y formato dentro de la línea, traducidos a los elementos de siempre; el resto, error | Hecho y probado |
 | Reparto flex con congelación | Hecho y probado |
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del schema | Hecho y probado |
+| Markdown con commonmark-java 0.30.1 (CommonMark, tablas y tachado de GFM, subrayado `++…++`) | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Align: justify`) | Hecho y probado |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
@@ -141,8 +142,8 @@ en `target/pdf/`.
 14. ~~**Tablas.** `Table` con `Head`, `Body` y `Foot`, filas `Row` y celdas `Cell` con `Span`, maquetada como un grid; cabecera y pie repetidos en cada página (caso 11). El `Cell` de `Grid` pasa a llamarse `Area`.~~ Hecho.
 
 15. ~~**Columnas.** `Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`; las columnas son fragmentainers dentro de la página, equilibradas al final, y `Before`/`After: column` (caso 12).~~ Hecho.
-16. ~~**Tramos.** Negrita, cursiva, subrayado y tachado dentro de una misma línea, con las métricas de cada variante de la fuente.~~ Hecho; su caso golden va con el hito 17, que da la sintaxis.
-17. **Markdown.** Elemento `Markdown` con un subconjunto cerrado (formato dentro de la línea, encabezados, listas y tablas) que se traduce a los elementos que ya existen (caso 13).
+16. ~~**Tramos.** Negrita, cursiva, subrayado y tachado dentro de una misma línea, con las métricas de cada variante de la fuente.~~ Hecho (caso 13, con el hito 17).
+17. ~~**Markdown.** Elemento `Markdown` con un subconjunto cerrado (formato dentro de la línea, encabezados, listas y tablas) que se traduce a los elementos que ya existen (caso 13).~~ Hecho.
 
 El plan, las decisiones y el registro de sesiones de los hitos 16 y 17 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -159,7 +160,8 @@ src/main/java/dev/stxt/boxes/
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ResourceException
   tree/         Box, Element, Style, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
-                StyleRules, TableBuilder, ListBuilder, ModelValidator…), InvalidModelException
+                StyleRules, TableBuilder, ListBuilder, MarkdownBuilder, ModelValidator…),
+                InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
                 Slice, UnitBreaker, Paginator, Messages

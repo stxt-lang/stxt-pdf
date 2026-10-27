@@ -33,8 +33,10 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 
 | Hito | Trabajo | Estado | Caso golden |
 |---|---|---|---|
-| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | hecho | — (con el 17) |
-| 17 | Elemento `Markdown`, traducido a elementos conocidos | diseño | 13 |
+| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | hecho | 13 (con el 17) |
+| 17 | Elemento `Markdown`, traducido a elementos conocidos | hecho | 13 |
+
+Los dos hitos están terminados (2026-10-27).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -154,7 +156,7 @@ el autor.
 ```
 Markdown:
 	Class: informe
-	Bullet: disc circle square
+	Bullet: disc dash
 	Numbering: decimal
 	Table columns: equal
 	Content >>
@@ -210,48 +212,59 @@ Markdown:
       imágenes, código, citas, HTML, líneas horizontales y saltos de línea forzados son un
       error (`MARKDOWN_UNSUPPORTED`) con su línea.
 
-**Decisiones abiertas** (propuestas):
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] K1. **Dónde se admite `Markdown`:** donde va un elemento de flujo (como `List`): en
-      `Document`, `Block`, los envoltorios, `List item`, `Cell` y `Multicol`. Dentro de un
-      `Fixed`, solo sin encabezados (los encabezados en `Fixed` ya son un error).
-- [ ] K2. **Ítems de lista:** cada párrafo de un ítem es un `Paragraph`; una lista anidada,
+**Decisiones tomadas** en el diseño (2026-10-27, todas con la propuesta aceptada; las
+interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 127–134):
+
+- [x] K1. **Dónde se admite `Markdown`:** donde va un elemento de flujo (como `List`): en
+      `Document`, `Block`, los posicionados, los envoltorios, `List item`, `Cell` y
+      `Multicol`. Dentro de un `Fixed`, solo sin encabezados (los encabezados en `Fixed` ya son
+      un error).
+- [x] K2. **Ítems de lista:** cada párrafo de un ítem es un `Paragraph`; una lista anidada,
       una `List` dentro del `List item`. Listas compactas y separadas (*tight* y *loose*) se
       traducen igual: el espaciado lo dan las reglas de `Styles`.
-- [ ] K3. **Celdas:** una celda con texto es un `Cell` con valor y tramos; una celda vacía,
+- [x] K3. **Celdas:** una celda con texto es un `Cell` con valor y tramos; una celda vacía,
       un `Cell` vacío.
-- [ ] K4. **Saltos de línea simples** dentro de un párrafo equivalen a un espacio, como en
+- [x] K4. **Saltos de línea simples** dentro de un párrafo equivalen a un espacio, como en
       `Text` (§5.4).
-- [ ] K5. **Líneas de los errores:** las de lo generado son la línea del documento donde
-      empieza el nodo de Markdown (la del `Content >>` más el desplazamiento).
-- [ ] K6. **Propiedades obligatorias:** `Bullet`, `Numbering` y `Table columns` solo son
+- [x] K5. **Líneas de los errores:** las de lo generado son la línea del documento donde
+      empieza su bloque de Markdown (la del `Content >>` más el desplazamiento).
+- [x] K6. **Propiedades obligatorias:** `Bullet`, `Numbering` y `Table columns` solo son
       obligatorias si el contenido tiene listas de ese tipo o tablas; si faltan, error con la
-      línea del primer nodo que las necesita.
+      línea de la lista o la tabla. Si sobran, no es error (decisión 130).
 
-**Diseño técnico:**
+Al implementar salió además que `Marker` solo tiene `disc`, `dash` y `none` como viñetas (el
+ejemplo de arriba usaba `circle` y `square`, que no existen), y que una tabla GFM sin filas
+debajo de la cabecera no tiene traducción (una `Table` necesita su `Body`).
 
-- **Traducción a nodos STXT.** Una pieza nueva en `tree` (`MarkdownBuilder`) recorre el árbol
-  de commonmark-java y crea `InlineNode` de `stxt-core` con su línea (`Heading 1`, `Text`,
-  `Paragraph`, `List`, `List item`, `Table`, `Head`, `Body`, `Row`, `Cell`). Los nodos
-  generados sustituyen al `Markdown` antes de la validación del builder, así que el schema,
-  `Styles` y `ModelValidator` los tratan como cualquier otro.
-- **Tramos.** El formato dentro de una línea no cabe en un nodo STXT: el `MarkdownBuilder`
-  guarda aparte los tramos de cada `Text`, `Paragraph` y `Cell` generado, y el builder los
-  pone en la `Box` (hito 16).
-- **Encabezados y marcadores del PDF:** salen solos, porque los encabezados generados son
-  `Heading N`.
+**Diseño técnico** (como quedó):
+
+- **Traducción a nodos STXT.** `tree/MarkdownBuilder` parsea el `Content` con commonmark-java
+  0.30.1 (tablas y tachado de GFM, con dos tildes, y la extensión `ins`) y crea `InlineNode`
+  de `stxt-core` con la línea de su bloque (`Heading N` con un `Text`, `Paragraph`, `List` con
+  `Marker` y `Start`, `List item`, `Table` con `Columns`, `Head`, `Body`, `Row`, `Cell` con su
+  `Typography`/`Align`). Lo generado se valida con el schema y `BoxTreeBuilder.markdown` lo
+  construye con `element(...)` como hijos de la caja del `Markdown` (`Element.MARKDOWN`, un
+  bloque), así que `Styles`, `ModelValidator`, la jerarquía de encabezados, el PDF etiquetado y
+  los marcadores lo tratan como cualquier otro elemento.
+- **Tramos.** `Translation.runs` guarda aparte los tramos de cada `Text`, `Paragraph` y `Cell`
+  generado con formato; van a `BuildContext.runs` y el builder los pone en `Box.runs`.
+  `TextRun.Joiner` une los tramos seguidos del mismo formato (lo usa también `LineBreaker`).
+- **Errores.** `MARKDOWN_UNSUPPORTED` y `MARKDOWN_PROPERTY_MISSING`, nuevos; `TEXT_CONTENT`
+  para los textos vacíos y `VALUE_NOT_ALLOWED` para los marcadores de `Bullet` y `Numbering`.
 
 **Tareas:**
 
-- [ ] Resolver K1–K6.
-- [ ] Dependencia de commonmark-java y sus extensiones en `pom.xml`.
-- [ ] Schema (`Markdown`, `Bullet`, `Numbering`, `Table columns`) y `Element`.
-- [ ] `MarkdownBuilder`: bloques (encabezados, párrafos, listas anidadas, tablas) y tramos.
-- [ ] `MARKDOWN_UNSUPPORTED` y los errores de K6, con sus casos en el catálogo.
-- [ ] Tests de la traducción (Markdown → nodos) y de layout.
-- [ ] Especificación (§2, §4, §5 nueva, §6, §8, §9); caso golden 13 con un documento
-      completo en Markdown, con los cuatro formatos dentro de la línea (también es el caso del
-      hito 16).
+- [x] Resolver K1–K6.
+- [x] Dependencia de commonmark-java y sus extensiones en `pom.xml`.
+- [x] Schema (`Markdown`, `Bullet`, `Numbering`, `Table columns`) y `Element`.
+- [x] `MarkdownBuilder`: bloques (encabezados, párrafos, listas anidadas, tablas) y tramos.
+- [x] `MARKDOWN_UNSUPPORTED` y los errores de K6, con sus casos en el catálogo (11 casos).
+- [x] Tests de la traducción (`MarkdownBuilderTest`), del árbol (`MarkdownTest`) y del PDF
+      etiquetado (`PdfCanvasTest.markdownIsTaggedAndItsHeadingsAreBookmarks`).
+- [x] Especificación (§2, §4.14, §5.4, §5.17 nueva, §6, §8, §9, glosario y un ejemplo);
+      caso golden `13-markdown` de dos páginas, calculado a mano y con los PNG revisados.
 
 ---
 
@@ -260,6 +273,14 @@ Markdown:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (3).** Hito 17 terminado. Aceptadas K1–K6. commonmark-java 0.30.1; schema
+  (`Markdown`, `Bullet`, `Numbering`, `Table columns`, admitido donde va un `List`);
+  `MarkdownBuilder` traduce a nodos STXT y `BoxTreeBuilder` los construye; dos `ErrorCode`
+  nuevos y 11 casos en el catálogo. Caso golden `13-markdown` (también el del hito 16), que pasa
+  con el resultado calculado a mano. Especificación, `DECISIONES.md` (127–134), README y
+  `CLAUDE.md`. `mvn test` en verde (746 tests).
+  *Siguiente paso:* los hitos de esta hoja de ruta están terminados. Pendiente: repasar las
+  decisiones de `DECISIONES.md` y elegir el siguiente trabajo (ideas en `TODO.md`).
 - **2026-10-27 (2).** Hito 16 terminado. Aceptadas R1–R6. Tramos en `model` (`TextRun`,
   `TextFormat`, `DecorationMetrics`) y en `Box`; `LineBreaker` con palabras de varias partes;
   `TextLine` con tramos; pintado de cada tramo, subrayado y tachado con las métricas de

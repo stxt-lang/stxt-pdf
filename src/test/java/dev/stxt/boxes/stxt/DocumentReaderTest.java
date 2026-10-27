@@ -50,7 +50,8 @@ class DocumentReaderTest {
                 "src/test/resources/golden/09-headings/input.stxt",
                 "src/test/resources/golden/10-lists/input.stxt",
                 "src/test/resources/golden/11-tables/input.stxt",
-                "src/test/resources/golden/12-multicol/input.stxt"}) {
+                "src/test/resources/golden/12-multicol/input.stxt",
+                "src/test/resources/golden/13-markdown/input.stxt"}) {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }
@@ -67,7 +68,7 @@ class DocumentReaderTest {
             new Engine(new PdfMetrics(new Resources())).layOutDocument(reader.read(m.group(1)));
             examples++;
         }
-        assertEquals(2, examples);
+        assertEquals(3, examples);
     }
 
     @Test

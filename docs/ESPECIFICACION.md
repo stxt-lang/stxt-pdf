@@ -80,6 +80,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
+| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas y tablas ([§5.17](#517-markdown)) | Su texto en `Content` |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
@@ -88,7 +89,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 
 **Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
 flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
-encabezados, `List`, `Table`, `Multicol` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
+encabezados, `List`, `Table`, `Multicol`, `Markdown` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
 ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Area` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor. `Head`, `Body`, `Foot` y
@@ -522,6 +523,20 @@ Propiedades del elemento `Multicol`, hijas directas suyas ([§5.16](#516-bloques
 `Count`, `Column width` o los dos son obligatorios. No van en las reglas de `Styles`, que solo
 admiten los grupos.
 
+### 4.14 Markdown
+
+Propiedades del elemento `Markdown`, hijas directas suyas ([§5.17](#517-markdown)). Admite
+además `Id`, `Class`, `Box`, `Typography` y `Break`, como un `Block`.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Content` | bloque `>>` | — | El Markdown. Obligatorio. |
+| `Bullet` | lista de `disc`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
+| `Numbering` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
+| `Table columns` | `equal`, `auto` | — | Las `Columns` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+
+No van en las reglas de `Styles`, que solo admiten los grupos.
+
 ---
 
 ## 5. Semántica del layout
@@ -631,7 +646,7 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   partes; el espacio entre dos palabras tiene el formato del tramo en que está su primer espacio
   en blanco. Con `justify`, el espacio extra de cada espacio pertenece a su tramo. Un texto sin
   formato es un único tramo. Un `Text` no tiene sintaxis para escribirlos: los genera el
-  elemento `Markdown` (pendiente, hito 17).
+  elemento `Markdown` ([§5.17](#517-markdown)).
 - **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
   espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
   los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
@@ -1350,6 +1365,116 @@ fragmento propio: una caja partida entre dos columnas tiene dos fragmentos en la
 En el PDF etiquetado, un `Multicol` es un `Div` y su contenido cuelga de él en orden de
 lectura, de columna en columna.
 
+
+### 5.17 Markdown
+
+Un `Markdown` es un bloque cuyo contenido se escribe en Markdown, en su `Content`. Al construir
+el árbol, ese contenido se **traduce a los elementos que ya existen**, y lo generado se trata
+como si lo hubiera escrito el autor: pasa por el schema, por las reglas de `Styles`, por la
+validación del [§6](#6-validación) y por el PDF etiquetado y los marcadores. El `Markdown` es la
+caja que lo contiene, un bloque como un `Block`: sus `Box`, `Typography` y `Break` son los
+suyos, y lo generado hereda su `Typography`.
+
+```
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 18
+		Element: List
+			Box:
+				Padding: 0 0 0 20
+	Markdown:
+		Bullet: disc dash
+		Numbering: decimal
+		Table columns: equal
+		Content >>
+			# Resultados
+
+			Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
+			con ~~pérdidas~~ beneficios.
+
+			- Ventas en alza
+			- Costes:
+			  - personal
+			  - material
+
+			1. Revisar
+			2. Aprobar
+
+			| Región | Ventas |
+			|--------|-------:|
+			| Norte  | 120    |
+			| Sur    | **95** |
+```
+
+**El subconjunto.** El Markdown es [CommonMark](https://commonmark.org) con las tablas y el
+tachado de GFM y el subrayado `++…++`. Se traduce así:
+
+| Markdown | Elemento |
+|---|---|
+| `#` … `######` (y los subrayados con `===` y `---`) | `Heading 1` … `Heading 6`, con un `Text` |
+| Párrafo | `Paragraph` |
+| `-`, `*`, `+` | `List` con el `Marker` de `Bullet` para su nivel; un `List item` por ítem |
+| `1.`, `1)` | `List` con el `Marker` de `Numbering` para su nivel y `Start`, el primer número si no es 1 |
+| Tabla | `Table` con las `Columns` de `Table columns`; la fila de cabecera en `Head` y el resto en `Body` |
+| `**x**`, `__x__` | tramo en negrita ([§5.4](#54-texto)) |
+| `*x*`, `_x_` | tramo en cursiva |
+| `++x++` | tramo subrayado |
+| `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
+
+Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces, imágenes, código (en línea o en
+bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
+de la línea) y definiciones de enlaces. Un encabezado tampoco puede ir dentro de un ítem de
+lista, como en un `List item`, ni una tabla quedarse sin filas debajo de la cabecera.
+
+**Texto.** Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Text`. El
+formato dentro de la línea se suma: `***x***` es negrita y cursiva. Un encabezado o un párrafo
+sin texto es un error (`TEXT_CONTENT`).
+
+**Listas.** El nivel de una lista es el número de listas de su mismo tipo que la contienen: la
+primera lista con viñetas usa el primer marcador de `Bullet`; una con viñetas dentro de esa, el
+segundo, y así hasta el último, que sirve para los niveles más profundos. Las numeradas cuentan
+aparte, con `Numbering`. Cada párrafo de un ítem es un `Paragraph`, y una lista anidada, una
+`List` dentro del `List item`. Las listas compactas y las separadas por líneas en blanco se
+traducen igual: el espacio entre ítems lo dan las reglas de `Styles`. Como cualquier lista, la
+sangría que deja sitio al marcador es su `Padding` izquierdo, que se suele declarar en la regla
+`Element: List` ([§5.14](#514-listas)).
+
+**Tablas.** Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`) como
+`Align` de sus celdas; sin alineación, la de la caja. Una celda con texto es una `Cell` con
+valor; una vacía, una `Cell` vacía. Como en GFM, a una fila con menos celdas que la cabecera se
+le añaden celdas vacías y las que sobran se descartan.
+
+**Estilo.** Lo generado no tiene `Id` ni `Class`: se le da estilo con las reglas `Element` de
+`Styles` (`Element: Heading 1`, `Element: Paragraph`…), que se aplican a todo el documento, y
+con el `Typography` del `Markdown`, que hereda.
+
+**Encabezados.** `#` es siempre `Heading 1`, y la jerarquía se comprueba en orden del documento
+junto con los encabezados escritos fuera del `Markdown` ([§5.13](#513-encabezados-y-párrafos)):
+después de un `Heading 1`, un Markdown puede empezar por `##`. Dentro de un `Fixed`, un Markdown
+no puede tener encabezados.
+
+**Dónde va.** Donde va un elemento en flujo: en `Document`, `Block`, `Relative`, `Absolute`,
+`Fixed`, `Multicol`, `List item`, `Cell` y como elemento de un `Item` o un `Area`.
+
+**Errores.** Los errores de lo generado señalan la línea del documento donde empieza su bloque
+de Markdown (la del ítem, la de la fila de la tabla); los del marcador de una lista, la de
+`Bullet` o `Numbering`, y los de las columnas de una tabla, la de `Table columns`. Una lista o
+una tabla sin su propiedad es un error con la línea de la lista o la tabla
+(`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es.
+
+**Salida.** En el PDF etiquetado, el `Markdown` es un `Div` y lo generado cuelga de él con sus
+etiquetas (`H1`, `P`, `L`, `Table`…); sus encabezados son marcadores. En el volcado del
+[§7](#7-formato-de-resultados) solo sale el `Markdown`, si tiene `Id`: lo generado no lo tiene.
+
 ---
 
 ## 6. Validación
@@ -1386,11 +1511,11 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` no vacío y `Language` una etiqueta BCP 47 | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` no vacío y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
-| `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
+| `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
 | `TEXT_WITHOUT_FONT` | El texto necesita `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
@@ -1414,6 +1539,8 @@ La validación se hace en cuatro niveles:
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces, ni imágenes, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite enlaces: solo admite encabezados, párrafos, listas, tablas y…` |
+| `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1528,6 +1655,8 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `thead` y `tfoot` al imprimir | Se repiten según el navegador | Se repiten siempre en cada página |
 | Multicolumna (`column-count`, `column-width`) | Propiedades de cualquier bloque; `column-gap` por defecto `1em` y con porcentajes | Elemento `Multicol` con `Count` y `Column width`; `Column gap` por defecto 0 y solo en puntos ([§5.16](#516-bloques-en-columnas)) |
 | `column-span: all` | Sí | No: se parte el `Multicol` en dos |
+| Markdown (CommonMark y GFM) | Se acepta todo; lo que no tiene traducción se deja como texto o se ignora | Un subconjunto cerrado; el resto es un error. El subrayado (`++x++`) no es de CommonMark ni de GFM ([§5.17](#517-markdown)) |
+| Estilo por defecto del Markdown | La hoja de estilo del navegador da tamaño a los encabezados, sangría a las listas… | Ninguno: se declara en `Styles` |
 | `column-fill` | `balance`, `balance-all`, `auto` | `Fill: balance` o `auto`, sin `balance-all`. Sin página ni alto que llenar se equilibra siempre, y el equilibrado no incumple reglas de corte que el reparto en orden respeta |
 | `column-rule` | Grosor, estilo y color; se pinta sobre el contenido si es más ancha que el hueco | `Rule` y `Rule color`, siempre continua; más ancha que `Column gap` es un error |
 | Columnas que no caben en el alto del contenedor | Columnas de desbordamiento a un lado | Error (`BOX_OVERFLOW`) |
@@ -1568,6 +1697,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
 | `Cell` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
+| `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
@@ -1577,12 +1707,12 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
-`List`, `Table`, `Multicol`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`List`, `Table`, `Multicol`, `Markdown`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; las de valores
-cerrados, `ENUM` con los valores del §4; el resto, `INLINE` sin hijos, y su forma la comprueba el
+cerrados (`Table columns` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet` y `Numbering` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
@@ -1593,7 +1723,8 @@ cualquier nodo puede ser raíz) y lo que depende de dónde está un elemento: qu
 encabezado no tenga `Break`, y la jerarquía y el sitio de los encabezados
 ([§5.13](#513-encabezados-y-párrafos)). En una `Table`, el motor comprueba además el orden
 `Head`, `Body`, `Foot`, que una `Cell` no tenga a la vez texto en el valor y elementos, y que
-cada fila llene exactamente sus columnas.
+cada fila llene exactamente sus columnas. El contenido de un `Markdown` lo traduce el motor, y
+lo generado pasa por el schema como lo que escribe el autor.
 
 Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de `Box`
 comparten definición, y solo cambia la cardinalidad que fija cada padre. Por eso `Cross axis`,
@@ -1742,6 +1873,7 @@ Document (dev.stxt.boxes):
 | **Fragmentainer** | Contenedor de fragmentos: cada página y, dentro de un `Multicol`, cada columna. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
+| **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas y tablas ([§5.17](#517-markdown)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |

@@ -1,0 +1,27 @@
+# Página 1: intro desde y = 40: el Heading 1 (Size 20, una línea de 24) y su margen de 8, y el
+# párrafo (12): 44. points desde 84: el Heading 2 (Size 15, 18), la lista de viñetas (12 de
+# "Ventas en alza" y 36 del ítem "Costes:", su párrafo y la lista anidada de dos ítems) y la
+# numerada (24): 90. table desde 174: la fila de Head y las tres de Body, de 12: 48.
+# long es un párrafo de 61 palabras de 7 letras: 13 por línea (103 caracteres), así que 5
+# líneas. Empieza en 222 y le quedan 38: caben 3 y quedan 2, que respeta viudas y huérfanas.
+# foot (Fixed, Offset auto 0 -30 0) acaba 30 por debajo del área útil, en 290: y = 278.
+# Página 2: las 2 líneas que faltan de long y after.
+Result:
+	Page: 1
+		Fragment: intro
+			Rect: 40 40 515 44
+		Fragment: points
+			Rect: 40 84 515 90
+		Fragment: table
+			Rect: 40 174 515 48
+		Fragment: long
+			Rect: 40 222 515 36
+		Fragment: foot
+			Rect: 40 278 515 12
+	Page: 2
+		Fragment: long
+			Rect: 40 40 515 24
+		Fragment: after
+			Rect: 40 64 515 12
+		Fragment: foot
+			Rect: 40 278 515 12

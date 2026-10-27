@@ -630,3 +630,53 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      caracteres de cada tramo se comprueban en su variante (`GLYPH_MISSING`). *Dónde:*
      `layout/inline/PdfMetrics.check`. *Alternativa:* un código propio para la variante de un
      tramo.
+
+## Hito 17: elemento `Markdown` (2026-10-27)
+
+127. **El Markdown se traduce a nodos STXT, no a cajas**: `MarkdownBuilder` genera `Heading N`,
+     `Paragraph`, `List` y `Table` con su línea, y `BoxTreeBuilder` los construye como cualquier
+     otro elemento. Así las reglas de `Styles`, la validación del §6, el PDF etiquetado y los
+     marcadores no tienen ningún caso especial. Lo generado se valida además contra el schema,
+     como red de seguridad. *Dónde:* `tree/MarkdownBuilder.translate`,
+     `tree/BoxTreeBuilder.markdown`. *Alternativa:* construir las cajas directamente desde el
+     árbol de commonmark-java.
+
+128. **Parser: commonmark-java 0.30.1** con las extensiones de tablas y tachado de GFM y la de
+     subrayado (`ins`). El tachado exige dos tildes (`~x~` queda como texto), como en el resto
+     de la sintaxis, que dobla el delimitador. *Dónde:* `MarkdownBuilder.PARSER`, `pom.xml`.
+     *Alternativa:* un parser propio del subconjunto; el tachado con una tilde, como GFM.
+
+129. **El nivel de una lista se cuenta por tipo** (M2): el de una lista con viñetas es el número
+     de listas con viñetas que la contienen, y las numeradas cuentan aparte. Una lista numerada
+     dentro de una con viñetas usa el primer marcador de `Numbering`. `Start` solo se genera si
+     el primer número no es 1. *Dónde:* `MarkdownBuilder.Translator.list`. *Alternativa:* un
+     nivel común a los dos tipos, como el anidamiento de `ul` y `ol` en CSS.
+
+130. **Las propiedades que no se usan no son un error** (K6): un `Bullet` sin listas con
+     viñetas, o un `Table columns` sin tablas, se aceptan, aunque el §6 rechaza en general lo que
+     no tiene efecto. El contenido de un Markdown cambia a menudo y obligaría a quitar y poner
+     las propiedades; su valor sí se comprueba siempre. *Dónde:* `MarkdownBuilder.Translator`.
+     *Alternativa:* el error de siempre de lo que no tiene efecto.
+
+131. **Las filas de una tabla con celdas de menos o de más siguen a GFM**: se completan con
+     celdas vacías y las que sobran se descartan, sin error, a diferencia de una `Table` escrita
+     en STXT (`TABLE_ROW_CELLS`). commonmark-java no conserva las celdas que sobran. *Dónde:*
+     `MarkdownBuilder.Translator.rows`. *Alternativa:* contar las celdas de cada línea en el
+     texto y dar el error.
+
+132. **Las líneas son las del principio de cada bloque** (K5): los errores de un párrafo de
+     varias líneas señalan la primera, y los de una celda, la de su fila (commonmark-java no da
+     la línea de cada celda). Los del marcador de una lista señalan `Bullet` o `Numbering`, y los
+     de las columnas, `Table columns`. *Dónde:* `MarkdownBuilder.Translator.line`.
+     *Alternativa:* posiciones dentro del bloque (`IncludeSourceSpans.BLOCKS_AND_INLINES`).
+
+133. **Los textos vacíos usan `TEXT_CONTENT`** (un `Markdown` sin contenido, un encabezado `#`
+     sin texto), y lo que el subconjunto no puede traducir, `MARKDOWN_UNSUPPORTED`: también un
+     encabezado dentro de un ítem de lista (como en un `List item`) y una tabla sin filas debajo
+     de la cabecera (una `Table` necesita su `Body`). Un `Bullet` o un `Numbering` con un
+     marcador del otro tipo es `VALUE_NOT_ALLOWED`. *Dónde:* `MarkdownBuilder`. *Alternativa:*
+     códigos propios para cada caso.
+
+134. **El `Markdown` es un `Div` en el PDF etiquetado**, como un `Block`, y lo generado cuelga de
+     él. *Dónde:* `paint/PdfStructure.type`. *Alternativa:* que no tenga elemento propio y lo
+     generado cuelgue de su padre.

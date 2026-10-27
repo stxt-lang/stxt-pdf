@@ -1,0 +1,76 @@
+# Hitos 16 y 17: tramos y Markdown (ESPECIFICACION.md §5.4 y §5.17). Páginas de 595 × 300 con
+# márgenes de 40: área útil de 515 × 220 desde (40, 40), que acaba en y = 260. Líneas de 12
+# (Size 10); con 5 pt por carácter caben 103 caracteres por línea.
+#
+# Los elementos que genera un Markdown no tienen Id: el volcado solo enseña cada Markdown, y su
+# alto comprueba la traducción. El estilo de cada tipo de elemento está en Styles (Heading 1 de
+# 20 con 8 de margen inferior, Heading 2 de 15, la sangría de las listas). Los tramos (negrita,
+# cursiva, subrayado y tachado) no cambian las medidas con 5 pt por carácter; se ven en los PNG.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Heading 1
+			Box:
+				Margin: 0 0 8 0
+			Typography:
+				Size: 20
+		Element: Heading 2
+			Typography:
+				Size: 15
+		Element: List
+			Box:
+				Padding: 0 0 0 20
+	Fixed:
+		Id: foot
+		Offset: auto 0 -30 0
+		Markdown:
+			Content >>
+				Página **{page}** de {pages}
+	Markdown:
+		Id: intro
+		Content >>
+			# Informe trimestral
+
+			Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
+			con ~~pérdidas~~ beneficios.
+	Markdown:
+		Id: points
+		Bullet: disc dash
+		Numbering: decimal
+		Content >>
+			## Puntos clave
+
+			- Ventas en alza
+			- Costes:
+			  - personal
+			  - material
+
+			1. Revisar
+			2. Aprobar
+	Markdown:
+		Id: table
+		Table columns: equal
+		Content >>
+			| Región | Ventas |
+			|--------|-------:|
+			| Norte  | 120    |
+			| Sur    | **95** |
+			| Este   | ~~80~~ 85 |
+	Markdown:
+		Id: long
+		Content >>
+			**informe** balance *factura* cliente ++archivo++ partida ~~importe~~ resumen detalle ingreso
+			informe balance factura cliente archivo partida importe resumen detalle ingreso
+			informe balance factura cliente archivo partida importe resumen detalle ingreso
+			informe balance factura cliente archivo partida importe resumen detalle ingreso
+			informe balance factura cliente archivo partida importe resumen detalle ingreso
+			informe balance factura cliente archivo partida importe resumen detalle ingreso
+			**informe**
+	Paragraph: Fin.
+		Id: after
