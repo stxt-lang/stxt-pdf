@@ -1,4 +1,4 @@
-package dev.stxt.boxes.layout.grid;
+package dev.stxt.boxes.model;
 
 /** Rectángulo de celdas en la rejilla. Filas y columnas empiezan en 1, como las líneas de CSS. */
 public record Area(int row, int column, int rows, int columns) {

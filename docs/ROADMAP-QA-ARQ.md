@@ -63,7 +63,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | hecho |
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | hecho |
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | hecho |
-| 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | pendiente |
+| 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | hecho |
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | pendiente |
 | 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | pendiente |
 | 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | pendiente |
@@ -404,14 +404,41 @@ grid (`GridLayout:60`); la tabla escribe la colocación de cada celda como texto
 
 **Cómo.**
 
-- [ ] `Area`, `Cell` y `GridAreas` (parseo puro) pasan a `model` (o a `tree.grid`).
-- [ ] `Style` guarda la colocación ya parseada (`Cell`, y las áreas con nombre como
-      `Map<String, Area>`); la tabla crea el `Cell` directamente.
-- [ ] Las calidades de corte (`PERFECT_BREAK`…`FORCED`) salen de `LayoutResult` a
-      `fragment.BreakAppeal`; `Paginator` pasa a `layout` (o `layout.page`).
-- [ ] `FontFace` pasa a `model`.
-- [ ] Test de arquitectura (ArchUnit, o uno a mano que lea los `import`) que prohíba los
-      ciclos y que `tree` dependa de `layout` o `paint`.
+- [x] `Area`, `Cell` y `GridAreas` (parseo puro) pasan a `model`. `GridAreas` es un `record`
+      con las áreas con nombre y las filas y columnas que declara el bloque (`GridAreas.NONE`
+      sin `Areas`), y `Cell.parse` busca los nombres en él. Los tests de la sintaxis pasan a
+      `model/GridAreasTest`; `AreasAndPlacementTest` se queda con la colocación y se llama
+      `PlacementTest`.
+- [x] `Style.gridAreas` es un `GridAreas` y `Style.itemArea` un `Cell` (`Cell.AUTO` = colocación
+      automática), interpretados una sola vez al leer: `Areas` en `PropertyReader.grid` y el
+      valor de `Area` en `PropertyReader.item`, con las `Areas` del grid padre (antes se
+      interpretaba otra vez en `ModelValidator.validateBox`). `GridLayout` ya no parsea nada y
+      `TableBuilder` crea el `Cell` de cada celda. `Nodes.placement` devuelve el valor
+      interpretado. `DECISIONES.md` 108.
+- [x] `PdfStructure.placement`, que volvía a partir el texto de la colocación de cada celda de
+      tabla (no estaba en la lista), desaparece: lee el `Cell`.
+- [x] Las calidades de corte (`PERFECT_BREAK`…`FORCED`) salen de `LayoutResult` a
+      `fragment.BreakAppeal`; `Paginator` pasa a `layout`, junto a `Engine`, que es quien lo usa.
+- [x] `FontFace` pasa a `model`, y con ella `FontWeight` y `FontStyle`, que eran enums de
+      `Style`: sin ellos `resources` seguía dependiendo de `tree` (`FontLibrary` usaba
+      `Style.FontWeight`, cosa que el diagnóstico no recogía).
+- [x] `ArchitectureTest`, a mano (sin dependencias nuevas): lee los `import` y los nombres
+      cualificados fuera de los comentarios de `src/main/java`, cuenta cada package con sus
+      subpackages y exige que no haya ciclos, que `model` no dependa de nada y que `tree` solo
+      dependa de `model`.
+
+Dependencias que quedan (todas en un sentido):
+
+```
+stxt -> tree -> model          resources -> model
+layout -> fragment, model, resources, tree      fragment -> model, tree
+paint -> layout, fragment, model, resources, tree      output -> fragment, model
+```
+
+**Verificación.** `mvn test` (619 tests), sin cambios en los PNG ni en los `expected.stxt`; con
+un `import dev.stxt.boxes.layout.Engine` en `tree/Box`, `ArchitectureTest` falla en
+`noCyclesBetweenPackages` (`fragment -> tree -> layout -> fragment`) y en
+`treeDependsOnlyOnModel`.
 
 ## 9. Lote de duplicaciones
 
@@ -533,3 +560,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | Culpable vertical de `Overflow` | `Aspect ratio`, `Rows`, `Padding`, `Border` y `Size` como culpables (§5.12); `Line height` heredado con su línea; 609 tests en verde | Tarea 6 o 9; revisar `Placement` |
 | 2026-10-27 | 6 | `enum Element` en `Box.element`; sin listas paralelas ni `switch` de `layout` y `position`; `ElementTest` contra el schema; 613 tests en verde | Tarea 7 (partir `BoxTreeBuilder`) o 9; revisar `Placement` |
 | 2026-10-27 | 7 | `BoxTreeBuilder` de 1 393 a 346 líneas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext` y `Nodes`; claves en `PropertyKey` con `PropertyKeyTest`; 615 tests en verde | Tarea 8 (ciclos de packages) o 9; revisar `Placement` |
+| 2026-10-27 | 8 | Sin ciclos de packages: colocación de grid, `FontFace`, `FontWeight` y `FontStyle` en `model`; `BreakAppeal` en `fragment`; `Paginator` en `layout`; `Areas` y `Area` se interpretan una vez, al leer; `ArchitectureTest`; 619 tests en verde | Tarea 9 (duplicaciones) o 10; revisar `Placement` |

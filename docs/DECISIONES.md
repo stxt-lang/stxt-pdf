@@ -485,3 +485,15 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      `tree/Style`. *Límite:* una caja cuyo alto impone el padre (un ítem estirado a una fila
      fija) se señala a sí misma, no el `Rows` del grid; buscarlo exige subir por los padres.
      *Alternativa:* la línea de la caja, como antes.
+
+108. **Los packages dependen en un solo sentido**, y lo comprueba `ArchitectureTest`: `model`
+     no depende de nada; `tree`, solo de `model`; y no hay ciclos. Por eso la colocación de
+     grid (`Area`, `Cell`, `GridAreas`), `FontFace` y sus enums (`FontWeight`, `FontStyle`)
+     están en `model`; las calidades de corte, en `fragment/BreakAppeal`; y el `Paginator`, en
+     `layout`. `Style` guarda `Areas` y la colocación de cada ítem ya interpretados: el valor de
+     un `Area` se interpreta al leer el envoltorio, con las `Areas` del grid padre, y no al
+     validar la caja; la tabla da a cada celda su `Cell` directamente. Un documento con dos
+     errores puede dar ahora primero el de `Area` (`GRID_PLACEMENT`), que se encuentra antes que
+     los de las propiedades del elemento. *Dónde:* `model`, `tree/PropertyReader.item`,
+     `tree/TableBuilder`, `layout/grid/GridLayout`, `paint/PdfStructure`. *Alternativa:*
+     guardar el texto y volver a interpretarlo en cada layout, como antes.

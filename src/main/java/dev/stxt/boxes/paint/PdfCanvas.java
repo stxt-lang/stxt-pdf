@@ -2,12 +2,12 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.LaidOutDocument;
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;

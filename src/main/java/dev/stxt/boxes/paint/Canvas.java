@@ -1,10 +1,10 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.FontFace;
 
 /** Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. */
 public interface Canvas {

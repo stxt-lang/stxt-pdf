@@ -1,5 +1,7 @@
 package dev.stxt.boxes.layout.grid;
 
+import dev.stxt.boxes.model.Area;
+import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;

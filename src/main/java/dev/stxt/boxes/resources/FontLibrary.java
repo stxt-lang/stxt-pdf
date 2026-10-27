@@ -1,7 +1,8 @@
 package dev.stxt.boxes.resources;
 
-import dev.stxt.boxes.tree.FontFace;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import org.apache.fontbox.ttf.NameRecord;
 import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeFont;
@@ -143,11 +144,11 @@ public final class FontLibrary {
             }
             family = family.trim();
             int weightClass = ttf.getOS2Windows().getWeightClass();
-            Style.FontStyle style = (ttf.getOS2Windows().getFsSelection() & 1) != 0
-                    ? Style.FontStyle.ITALIC : Style.FontStyle.NORMAL;
-            Style.FontWeight weight = switch (weightClass) {
-                case NORMAL_WEIGHT -> Style.FontWeight.NORMAL;
-                case BOLD_WEIGHT -> Style.FontWeight.BOLD;
+            FontStyle style = (ttf.getOS2Windows().getFsSelection() & 1) != 0
+                    ? FontStyle.ITALIC : FontStyle.NORMAL;
+            FontWeight weight = switch (weightClass) {
+                case NORMAL_WEIGHT -> FontWeight.NORMAL;
+                case BOLD_WEIGHT -> FontWeight.BOLD;
                 default -> null;
             };
             return new Entry(family, weight == null ? null : new FontFile(file, new FontFace(family, weight, style), ttf));

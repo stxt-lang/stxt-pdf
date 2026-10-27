@@ -2,10 +2,10 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;

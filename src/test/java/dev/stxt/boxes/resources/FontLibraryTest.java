@@ -1,7 +1,8 @@
 package dev.stxt.boxes.resources;
 
-import dev.stxt.boxes.tree.FontFace;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,7 +23,7 @@ class FontLibraryTest {
     @TempDir
     Path dir;
 
-    private static FontFace plex(Style.FontWeight weight, Style.FontStyle style) {
+    private static FontFace plex(FontWeight weight, FontStyle style) {
         return new FontFace("IBM Plex Sans", weight, style);
     }
 
@@ -40,18 +41,18 @@ class FontLibraryTest {
         FontLibrary fonts = new Resources().fonts();
         assertEquals(Set.of("IBM Plex Sans"), fonts.families());
         assertEquals("IBMPlexSans-Regular.ttf",
-                fonts.find(plex(Style.FontWeight.NORMAL, Style.FontStyle.NORMAL)).path().getFileName().toString());
+                fonts.find(plex(FontWeight.NORMAL, FontStyle.NORMAL)).path().getFileName().toString());
         assertEquals("IBMPlexSans-Bold.ttf",
-                fonts.find(plex(Style.FontWeight.BOLD, Style.FontStyle.NORMAL)).path().getFileName().toString());
+                fonts.find(plex(FontWeight.BOLD, FontStyle.NORMAL)).path().getFileName().toString());
         assertEquals("IBMPlexSans-Italic.ttf",
-                fonts.find(plex(Style.FontWeight.NORMAL, Style.FontStyle.ITALIC)).path().getFileName().toString());
+                fonts.find(plex(FontWeight.NORMAL, FontStyle.ITALIC)).path().getFileName().toString());
         assertEquals("IBMPlexSans-BoldItalic.ttf",
-                fonts.find(plex(Style.FontWeight.BOLD, Style.FontStyle.ITALIC)).path().getFileName().toString());
+                fonts.find(plex(FontWeight.BOLD, FontStyle.ITALIC)).path().getFileName().toString());
     }
 
     @Test
     void verticalMetricsFromHhea() {
-        FontFile f = new Resources().fonts().find(plex(Style.FontWeight.NORMAL, Style.FontStyle.NORMAL));
+        FontFile f = new Resources().fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL));
         assertEquals(1.025, f.vertical().ascent(), 1e-9);
         assertEquals(0.275, f.vertical().descent(), 1e-9);
     }
@@ -60,7 +61,7 @@ class FontLibraryTest {
     void missingVariant() throws IOException {
         Resources r = copy("plex", "Regular", "Bold");
         ResourceException e = assertThrows(ResourceException.class,
-                () -> r.fonts().find(plex(Style.FontWeight.BOLD, Style.FontStyle.ITALIC)));
+                () -> r.fonts().find(plex(FontWeight.BOLD, FontStyle.ITALIC)));
         assertEquals("La fuente IBM Plex Sans no tiene la variante bold italic. Variantes en "
                 + r.fontsFolder() + ": bold, normal", e.getMessage());
     }
@@ -69,7 +70,7 @@ class FontLibraryTest {
     void unknownFamily() throws IOException {
         Resources r = copy("plex", "Regular");
         ResourceException e = assertThrows(ResourceException.class, () -> r.fonts().find(
-                new FontFace("Helvetica", Style.FontWeight.NORMAL, Style.FontStyle.NORMAL)));
+                new FontFace("Helvetica", FontWeight.NORMAL, FontStyle.NORMAL)));
         assertEquals("Fuente desconocida: Helvetica. Familias en " + r.fontsFolder() + ": IBM Plex Sans",
                 e.getMessage());
     }

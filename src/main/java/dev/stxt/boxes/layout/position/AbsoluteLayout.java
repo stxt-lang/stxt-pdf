@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  *       esa caja. Sus fragmentos se añaden al final de los hijos del fragmento del containing
  *       block, no de su padre en el árbol de cajas.</li>
  *   <li>Las {@code fixed} suben hasta la raíz y las resuelve el
- *       {@link dev.stxt.boxes.fragment.Paginator} en cada página, con {@link #layOut}.</li>
+ *       {@link dev.stxt.boxes.layout.Paginator} en cada página, con {@link #layOut}.</li>
  * </ul>
  *
  * <p>En cada eje se resuelve la ecuación de {@link AbsoluteEquation}. El ancho automático es el

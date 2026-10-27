@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.block;
 
+import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
@@ -152,7 +153,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 }
                 if (fragmenting && progress) {
                     if (BreakRules.forcedBetween(previous, child)) {
-                        return broken(mark(i, LayoutResult.PERFECT_BREAK));
+                        return broken(mark(i, BreakAppeal.PERFECT_BREAK));
                     }
                     marks.add(mark(i, BreakRules.between(previous, child)));
                 }
@@ -274,7 +275,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /** Nada de la caja cabe en lo que queda de página: el padre debe cortar antes de ella. */
         LayoutResult before() {
-            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, LayoutResult.PERFECT_BREAK,
+            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
                     List.of(), AdjoiningMargins.NONE);
         }
 
@@ -335,7 +336,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             // El contenido ha terminado, pero el alto propio de la caja sigue en la página siguiente.
             BreakToken token = new BreakToken.Block(box.children.size(), null, slice.consumed());
-            return new LayoutResult(fragment, token, LayoutResult.PERFECT_BREAK, pending,
+            return new LayoutResult(fragment, token, BreakAppeal.PERFECT_BREAK, pending,
                     new AdjoiningMargins(out.top(), MarginStrut.EMPTY, false));
         }
     }

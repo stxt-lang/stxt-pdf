@@ -1,6 +1,4 @@
-package dev.stxt.boxes.layout.grid;
-
-import java.util.Map;
+package dev.stxt.boxes.model;
 
 /**
  * Colocación de un ítem de grid, la pedida por su {@code Area} (ESPECIFICACION.md §4.8).
@@ -22,13 +20,14 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
         return row != null && column != null;
     }
 
-    public static Cell parse(String text, Map<String, Area> areas) {
+    /** Interpreta el valor de {@code Area}; los nombres se buscan en las {@code Areas} del grid. */
+    public static Cell parse(String text, GridAreas areas) {
         if (text == null || text.isBlank()) {
             return AUTO;
         }
         String[] t = text.trim().split("\\s+");
         if (t.length == 1 && !t[0].equals("auto") && !t[0].matches("\\d+")) {
-            Area a = areas.get(t[0]);
+            Area a = areas.named().get(t[0]);
             if (a == null) {
                 throw new IllegalArgumentException("Área desconocida en Area: " + t[0]);
             }

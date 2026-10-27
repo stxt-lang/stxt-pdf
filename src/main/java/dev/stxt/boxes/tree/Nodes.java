@@ -5,6 +5,7 @@ import dev.stxt.Node;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Acceso a los nodos de {@code stxt-core} y errores del builder: lo comparten
@@ -62,7 +63,7 @@ final class Nodes {
     }
 
     /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */
-    static <T> T parse(Node n, java.util.function.Supplier<T> parser) {
+    static <T> T parse(Node n, Supplier<T> parser) {
         try {
             return parser.get();
         } catch (IllegalArgumentException ex) {
@@ -70,16 +71,12 @@ final class Nodes {
         }
     }
 
-    /** {@code Areas} y {@code Area}: sus errores son de colocación. */
-    static void placement(Node n, Runnable check) {
-        placement(n.getLine(), check);
-    }
-
-    static void placement(int line, Runnable check) {
+    /** Interpreta {@code Areas} o {@code Area}: sus errores son de colocación y llevan la línea del nodo. */
+    static <T> T placement(Node n, Supplier<T> parser) {
         try {
-            check.run();
+            return parser.get();
         } catch (IllegalArgumentException ex) {
-            throw error(line, ErrorCode.GRID_PLACEMENT, ex.getMessage());
+            throw error(n, ErrorCode.GRID_PLACEMENT, ex.getMessage());
         }
     }
 

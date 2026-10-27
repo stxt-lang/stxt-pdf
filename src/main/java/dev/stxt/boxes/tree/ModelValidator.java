@@ -2,18 +2,13 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
-import dev.stxt.boxes.layout.grid.Area;
-import dev.stxt.boxes.layout.grid.Cell;
-import dev.stxt.boxes.layout.grid.GridAreas;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
 import java.util.List;
-import java.util.Map;
 
 import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.label;
-import static dev.stxt.boxes.tree.Nodes.placement;
 import static dev.stxt.boxes.tree.Nodes.position;
 import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.boxes.tree.PropertyKey.FLEX_GAP;
@@ -23,7 +18,6 @@ import static dev.stxt.boxes.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.boxes.tree.PropertyKey.GRID_GAP;
 import static dev.stxt.boxes.tree.PropertyKey.GRID_ROWS;
 import static dev.stxt.boxes.tree.PropertyKey.HEIGHT;
-import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
 import static dev.stxt.boxes.tree.PropertyKey.ITEM_BASIS;
 import static dev.stxt.boxes.tree.PropertyKey.ITEM_GROW;
 import static dev.stxt.boxes.tree.PropertyKey.MARGIN;
@@ -67,11 +61,6 @@ final class ModelValidator {
         boolean flexItem = !s.isOutOfFlow() && parentLayout == Style.Layout.FLEX;
         boolean gridItem = !s.isOutOfFlow() && parentLayout == Style.Layout.GRID;
 
-        if (gridItem && s.itemArea != null) {
-            Map<String, Area> areas = parent.style.gridAreas == null
-                    ? Map.of() : GridAreas.parse(parent.style.gridAreas);
-            placement(s.line(ITEM_AREA), () -> Cell.parse(s.itemArea, areas));
-        }
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.width.isAuto() && !s.height.isAuto()) {

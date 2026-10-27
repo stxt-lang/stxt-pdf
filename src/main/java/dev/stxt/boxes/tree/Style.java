@@ -1,5 +1,10 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.GridAreas;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
@@ -28,10 +33,6 @@ public final class Style {
     public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
 
     public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }
-
-    public enum FontWeight { NORMAL, BOLD }
-
-    public enum FontStyle { NORMAL, ITALIC }
 
     /** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
     public enum TextWrap { AUTO, PRETTY }
@@ -117,8 +118,8 @@ public final class Style {
     // --- Grid ------------------------------------------------------------------------------------
     public List<Value> gridColumns = List.of();
     public List<Value> gridRows = List.of();
-    /** Bloque de texto de {@code Areas}, o {@code null}. */
-    public String gridAreas;
+    /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
+    public GridAreas gridAreas = GridAreas.NONE;
     public Direction gridFlow = Direction.ROW;
     public Alignment gridHorizontal = Alignment.STRETCH;
     public Alignment gridVertical = Alignment.STRETCH;
@@ -129,8 +130,11 @@ public final class Style {
     public Value itemBasis = Value.AUTO;
     /** {@code null} = la del contenedor. */
     public Alignment itemCrossAxis;
-    /** Texto de {@code Area}, o {@code null} = colocación automática. */
-    public String itemArea;
+    /**
+     * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
+     * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
+     */
+    public Cell itemArea = Cell.AUTO;
     /** {@code null} = la del contenedor. */
     public Alignment itemHorizontal;
     /** {@code null} = la del contenedor. */

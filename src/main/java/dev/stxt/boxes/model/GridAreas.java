@@ -1,20 +1,29 @@
-package dev.stxt.boxes.layout.grid;
+package dev.stxt.boxes.model;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Interpreta el bloque {@code Areas} (ESPECIFICACION.md §4.8): una fila de la rejilla por línea,
- * nombres separados por espacios y {@code .} para una celda vacía. Cada nombre debe formar un
- * rectángulo.
+ * El bloque {@code Areas} de un grid ya interpretado (ESPECIFICACION.md §4.7): una fila de la
+ * rejilla por línea, nombres separados por espacios y {@code .} para una celda vacía. Cada nombre
+ * debe formar un rectángulo.
+ *
+ * @param named   las áreas con nombre, en orden de aparición
+ * @param rows    número de filas que declara el bloque
+ * @param columns número de columnas que declara el bloque
  */
-public final class GridAreas {
+public record GridAreas(Map<String, Area> named, int rows, int columns) {
 
-    private GridAreas() {
+    /** Un grid sin {@code Areas}. */
+    public static final GridAreas NONE = new GridAreas(Map.of(), 0, 0);
+
+    public GridAreas {
+        named = Collections.unmodifiableMap(new LinkedHashMap<>(named));
     }
 
-    public static Map<String, Area> parse(String block) {
+    public static GridAreas parse(String block) {
         List<String[]> rows = block.lines()
                 .filter(l -> !l.isBlank())
                 .map(l -> l.trim().split("\\s+"))
@@ -58,17 +67,6 @@ public final class GridAreas {
             }
             areas.put(e.getKey(), new Area(b[0] + 1, b[1] + 1, b[2] - b[0] + 1, b[3] - b[1] + 1));
         }
-        return areas;
-    }
-
-    /** Número de columnas que declara el bloque. */
-    public static int columns(String block) {
-        return block.lines().filter(l -> !l.isBlank()).findFirst()
-                .map(l -> l.trim().split("\\s+").length).orElse(0);
-    }
-
-    /** Número de filas que declara el bloque. */
-    public static int rows(String block) {
-        return (int) block.lines().filter(l -> !l.isBlank()).count();
+        return new GridAreas(areas, rows.size(), columns);
     }
 }

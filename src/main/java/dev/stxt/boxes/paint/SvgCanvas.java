@@ -1,11 +1,12 @@
 package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Page;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
-import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.Locale;
 
@@ -68,8 +69,8 @@ public final class SvgCanvas implements Canvas {
     public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                      double wordSpacing) {
         String spacing = wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing);
-        String weight = font.weight() == Style.FontWeight.BOLD ? " font-weight=\"bold\"" : "";
-        String style = font.style() == Style.FontStyle.ITALIC ? " font-style=\"italic\"" : "";
+        String weight = font.weight() == FontWeight.BOLD ? " font-weight=\"bold\"" : "";
+        String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,
                 "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\" fill=\"%s\"%s>%s</text>%n",
                 x, baselineY, escape(font.family()), weight, style, fontSize, color, spacing, escape(text)));

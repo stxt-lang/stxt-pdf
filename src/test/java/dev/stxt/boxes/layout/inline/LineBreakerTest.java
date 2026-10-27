@@ -1,7 +1,9 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.layout.IntrinsicSizes;
-import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ class LineBreakerTest {
 
     // Factor 1 y tamaño 1: cada carácter mide 1 pt; un espacio también.
     private final TextMeasurer measurer = new FixedMetrics(1);
-    private static final FontFace F = new FontFace("F", Style.FontWeight.NORMAL, Style.FontStyle.NORMAL);
+    private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
 
     @Test
     void greedyFirstFit() {

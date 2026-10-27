@@ -2,6 +2,7 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Cell;
 
 import java.util.List;
 import java.util.Optional;
@@ -102,7 +103,7 @@ final class TableBuilder {
                     }
                     Box box = cells.build(cell, row);
                     box.style.declared(ITEM_AREA, cell.getLine());
-                    box.style.itemArea = (firstRow + r + 1) + " " + (c + 1) + " " + span.rows() + " " + span.columns();
+                    box.style.itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
                     table.addChild(box);
                     c += span.columns();
                 }

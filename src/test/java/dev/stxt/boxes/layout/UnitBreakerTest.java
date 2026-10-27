@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.position.RelativeOffset;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class UnitBreakerTest {
 
     private static final OptionalDouble NONE = OptionalDouble.empty();
-    private static final int PERFECT = LayoutResult.PERFECT_BREAK;
+    private static final int PERFECT = BreakAppeal.PERFECT_BREAK;
 
     private final Engine engine = new Engine();
     private final Box container = new Box("C", Element.FLEX, new Style(), false, 1);
@@ -111,7 +112,7 @@ class UnitBreakerTest {
         // Al principio de página, el grupo se coloca aunque desborde y se corta en cuanto se puede.
         LayoutResult forced = fragment(page(60, true), null, threeItems(), grouped, UnitBreaker.Repeat.NONE);
         assertEquals(new BreakToken.Container(2, List.of(), 80), forced.breakToken());
-        assertEquals(LayoutResult.FORCED, forced.breakAppeal());
+        assertEquals(BreakAppeal.FORCED, forced.breakAppeal());
         assertEquals(80, forced.fragment().height(), 1e-9);
     }
 

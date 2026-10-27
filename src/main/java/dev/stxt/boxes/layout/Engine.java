@@ -4,7 +4,6 @@ import dev.stxt.InlineNode;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
-import dev.stxt.boxes.fragment.Paginator;
 import dev.stxt.boxes.layout.block.BlockLayout;
 import dev.stxt.boxes.layout.flex.FlexLayout;
 import dev.stxt.boxes.layout.grid.GridLayout;

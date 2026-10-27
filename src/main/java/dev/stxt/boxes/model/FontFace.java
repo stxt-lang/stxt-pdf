@@ -1,12 +1,12 @@
-package dev.stxt.boxes.tree;
+package dev.stxt.boxes.model;
 
 import java.util.Objects;
 
 /**
- * Fuente de un texto: familia, peso y estilo (ESPECIFICACION.md §4.6). En la salida PDF
+ * Fuente de un texto: familia, peso y estilo (ESPECIFICACION.md §4.4). En la salida PDF
  * identifica un fichero TTF de la carpeta de fuentes (§5.11).
  */
-public record FontFace(String family, Style.FontWeight weight, Style.FontStyle style) {
+public record FontFace(String family, FontWeight weight, FontStyle style) {
 
     public FontFace {
         Objects.requireNonNull(family, "family");
@@ -16,8 +16,8 @@ public record FontFace(String family, Style.FontWeight weight, Style.FontStyle s
 
     /** Variante para los mensajes: {@code normal}, {@code bold}, {@code italic} o {@code bold italic}. */
     public String variant() {
-        boolean bold = weight == Style.FontWeight.BOLD;
-        boolean italic = style == Style.FontStyle.ITALIC;
+        boolean bold = weight == FontWeight.BOLD;
+        boolean italic = style == FontStyle.ITALIC;
         if (bold && italic) {
             return "bold italic";
         }

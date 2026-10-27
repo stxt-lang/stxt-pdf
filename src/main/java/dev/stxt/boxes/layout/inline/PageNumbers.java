@@ -12,7 +12,7 @@ package dev.stxt.boxes.layout.inline;
  *       justificación. Los saltos de línea no cambian.</li>
  * </ol>
  *
- * <p>Si el total tiene más cifras que el número de prueba, el {@link dev.stxt.boxes.fragment.Paginator}
+ * <p>Si el total tiene más cifras que el número de prueba, el {@link dev.stxt.boxes.layout.Paginator}
  * vuelve a paginar reservando las cifras del total, hasta que basten.</p>
  */
 public final class PageNumbers {

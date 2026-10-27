@@ -1,6 +1,5 @@
 package dev.stxt.boxes.fragment;
 
-import dev.stxt.boxes.layout.LayoutResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -54,32 +53,32 @@ class BreakRulesTest {
 
     @Test
     void cutLinesInsideTheSecondParagraph() {
-        assertEquals(new BreakRules.Cut(7, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(7, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutLines(new int[]{5, 10}, 0, 7, 2, 2, false));
     }
 
     @Test
     void cutLinesBetweenParagraphs() {
         // En el segundo párrafo solo cabría una línea huérfana.
-        assertEquals(new BreakRules.Cut(5, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(5, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutLines(new int[]{5, 10}, 0, 6, 2, 2, false));
     }
 
     @Test
     void cutLinesRelaxesWhenNothingElseIsPlaced() {
-        assertEquals(new BreakRules.Cut(1, LayoutResult.VIOLATES_WIDOWS),
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.VIOLATES_WIDOWS),
                 BreakRules.cutLines(new int[]{9}, 0, 1, 2, 2, false));
     }
 
     @Test
     void cutLinesWithoutRoom() {
-        assertEquals(new BreakRules.Cut(0, LayoutResult.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, false));
-        assertEquals(new BreakRules.Cut(1, LayoutResult.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, true));
+        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, false));
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, true));
     }
 
     @Test
     void cutLinesResumesInTheMiddle() {
-        assertEquals(new BreakRules.Cut(9, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(9, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutLines(new int[]{9}, 7, 8, 2, 2, true));
     }
 
@@ -96,26 +95,26 @@ class BreakRulesTest {
 
     @Test
     void cutUnitsAtTheLastThatFits() {
-        assertEquals(new BreakRules.Cut(2, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(2, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, 3}, NOT_FORCED, false));
     }
 
     @Test
     void cutUnitsPrefersAnEarlierBetterBreak() {
-        assertEquals(new BreakRules.Cut(1, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, 1}, NOT_FORCED, false));
     }
 
     @Test
     void cutUnitsForced() {
-        assertEquals(new BreakRules.Cut(1, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(STARTS, ENDS, 0, 1000, new int[]{0, 3, 3}, new boolean[]{false, true, false}, false));
     }
 
     @Test
     void cutUnitsSkipsUnbreakablePoints() {
         // Entre 1 y 2 no se puede cortar: 1 y 2 van juntas a la página siguiente.
-        assertEquals(new BreakRules.Cut(1, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(STARTS, ENDS, 0, 100, new int[]{0, 3, -1}, NOT_FORCED, false));
     }
 
@@ -125,16 +124,16 @@ class BreakRulesTest {
         double[] ends = {150, 250};
         int[] appeal = {0, 3};
         boolean[] forced = {false, false};
-        assertEquals(new BreakRules.Cut(0, LayoutResult.FORCED),
+        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED),
                 BreakRules.cutUnits(starts, ends, 0, 100, appeal, forced, false));
-        assertEquals(new BreakRules.Cut(1, LayoutResult.FORCED),
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED),
                 BreakRules.cutUnits(starts, ends, 0, 100, appeal, forced, true));
     }
 
     @Test
     void cutUnitsResumesFromTheFirstUnitOfTheFragment() {
         // Desde la unidad 1, el espacio se mide desde su principio (50): caben 1 y 2.
-        assertEquals(new BreakRules.Cut(3, LayoutResult.PERFECT_BREAK),
+        assertEquals(new BreakRules.Cut(3, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(STARTS, ENDS, 1, 100, new int[]{0, 3, 3}, NOT_FORCED, true));
     }
 }

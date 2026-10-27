@@ -1,12 +1,13 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.ErrorCode;
-import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.InvalidModelException;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Con las fuentes del repositorio ({@code resources/fonts}): IBM Plex Sans en sus cuatro variantes. */
 class PdfMetricsTest {
 
-    private static final FontFace REGULAR = face(Style.FontWeight.NORMAL, Style.FontStyle.NORMAL);
-    private static final FontFace BOLD = face(Style.FontWeight.BOLD, Style.FontStyle.NORMAL);
+    private static final FontFace REGULAR = face(FontWeight.NORMAL, FontStyle.NORMAL);
+    private static final FontFace BOLD = face(FontWeight.BOLD, FontStyle.NORMAL);
 
     private final PdfMetrics metrics = new PdfMetrics(new Resources());
 
-    private static FontFace face(Style.FontWeight weight, Style.FontStyle style) {
+    private static FontFace face(FontWeight weight, FontStyle style) {
         return new FontFace("IBM Plex Sans", weight, style);
     }
 

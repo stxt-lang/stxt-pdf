@@ -1,6 +1,5 @@
 package dev.stxt.boxes.fragment;
 
-import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
 
@@ -12,7 +11,7 @@ import java.util.function.ToIntFunction;
  * cajas, cortes forzados y elección del corte. Son piezas puras; los algoritmos de layout las
  * usan para decidir dónde se parte cada caja.
  *
- * <p>La calidad de un corte es una de las constantes de {@link LayoutResult}: mayor es mejor.
+ * <p>La calidad de un corte es una de las constantes de {@link BreakAppeal}: mayor es mejor.
  * Se elige el <strong>último</strong> corte de mayor calidad, que es lo mismo que relajar las
  * reglas en el orden de la especificación: primero viudas y huérfanas, después
  * {@code Before}/{@code After: avoid} y por último {@code Inside: avoid} (de {@code Break}).</p>
@@ -97,19 +96,19 @@ public final class BreakRules {
             }
             int k = linesThatFit(pending, left, widows, orphans, false);
             if (k > 0) {
-                return new Cut(from + k, LayoutResult.PERFECT_BREAK);
+                return new Cut(from + k, BreakAppeal.PERFECT_BREAK);
             }
             if (placed > 0) {
                 // Todo el párrafo a la página siguiente: el corte queda entre dos párrafos.
-                return new Cut(from, LayoutResult.PERFECT_BREAK);
+                return new Cut(from, BreakAppeal.PERFECT_BREAK);
             }
             if (left > 0) {
-                return new Cut(from + relaxedLines(pending, left, widows), LayoutResult.VIOLATES_WIDOWS);
+                return new Cut(from + relaxedLines(pending, left, widows), BreakAppeal.VIOLATES_WIDOWS);
             }
             // No cabe ni una línea: al principio de página se coloca igualmente (garantía de progreso).
-            return new Cut(atFragmentainerStart ? from + 1 : from, LayoutResult.FORCED);
+            return new Cut(atFragmentainerStart ? from + 1 : from, BreakAppeal.FORCED);
         }
-        return new Cut(paragraphStart, LayoutResult.PERFECT_BREAK);
+        return new Cut(paragraphStart, BreakAppeal.PERFECT_BREAK);
     }
 
     /** Capacidad en líneas de un espacio vertical. */
@@ -128,7 +127,7 @@ public final class BreakRules {
     /** Calidad del corte entre dos cajas hermanas en flujo: {@code avoid} en cualquiera lo empeora. */
     public static int between(Box before, Box after) {
         return before.style.breakAfter == Style.Break.AVOID || after.style.breakBefore == Style.Break.AVOID
-                ? LayoutResult.VIOLATES_AVOID_BETWEEN : LayoutResult.PERFECT_BREAK;
+                ? BreakAppeal.VIOLATES_AVOID_BETWEEN : BreakAppeal.PERFECT_BREAK;
     }
 
     /** Hay un corte forzado entre dos cajas hermanas en flujo. */
@@ -166,7 +165,7 @@ public final class BreakRules {
      * @param after  cajas que empiezan después
      */
     public static int between(List<Box> before, List<Box> after) {
-        int appeal = LayoutResult.PERFECT_BREAK;
+        int appeal = BreakAppeal.PERFECT_BREAK;
         for (Box b : before) {
             for (Box a : after) {
                 appeal = Math.min(appeal, between(b, a));
@@ -180,9 +179,9 @@ public final class BreakRules {
         return before.stream().anyMatch(BreakRules::forcedAfter) || after.stream().anyMatch(BreakRules::forcedBefore);
     }
 
-    /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link LayoutResult#FORCED}. */
+    /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link BreakAppeal#FORCED}. */
     public static int inside(Box box, int appeal) {
-        return box.style.avoidBreakInside ? LayoutResult.FORCED : appeal;
+        return box.style.avoidBreakInside ? BreakAppeal.FORCED : appeal;
     }
 
     // --- Elección del corte -----------------------------------------------------------------------
@@ -191,7 +190,7 @@ public final class BreakRules {
      * El último de los cortes de mayor calidad; {@code null} si no hay ninguno.
      *
      * @param candidates cortes posibles, en orden
-     * @param appeal     calidad de cada corte (constantes de {@link LayoutResult})
+     * @param appeal     calidad de cada corte (constantes de {@link BreakAppeal})
      */
     public static <T> T best(List<T> candidates, ToIntFunction<T> appeal) {
         T best = null;
@@ -231,7 +230,7 @@ public final class BreakRules {
                                int[] appeal, boolean[] forced, boolean mustPlace) {
         int n = starts.length;
         if (first >= n) {
-            return new Cut(n, LayoutResult.PERFECT_BREAK);
+            return new Cut(n, BreakAppeal.PERFECT_BREAK);
         }
         double origin = starts[first];
         int best = -1;
@@ -239,12 +238,12 @@ public final class BreakRules {
         for (int i = first; i < n; i++) {
             if (i > first) {
                 if (forced[i]) {
-                    return new Cut(i, LayoutResult.PERFECT_BREAK);
+                    return new Cut(i, BreakAppeal.PERFECT_BREAK);
                 }
                 if (appeal[i] >= 0) {
                     if (overflowing) {
                         // Se ha colocado a la fuerza lo que no se podía separar: se corta en cuanto se puede.
-                        return new Cut(i, LayoutResult.FORCED);
+                        return new Cut(i, BreakAppeal.FORCED);
                     }
                     if (best < 0 || appeal[i] >= appeal[best]) {
                         best = i;
@@ -256,11 +255,11 @@ public final class BreakRules {
                     return new Cut(best, appeal[best]);
                 }
                 if (!mustPlace) {
-                    return new Cut(first, LayoutResult.FORCED);
+                    return new Cut(first, BreakAppeal.FORCED);
                 }
                 overflowing = true;
             }
         }
-        return new Cut(n, LayoutResult.PERFECT_BREAK);
+        return new Cut(n, BreakAppeal.PERFECT_BREAK);
     }
 }

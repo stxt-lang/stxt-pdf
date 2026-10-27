@@ -1,6 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
-import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.model.FontFace;
 
 /**
  * Métrica aproximada para enseñar y para tests deterministas: cada carácter mide

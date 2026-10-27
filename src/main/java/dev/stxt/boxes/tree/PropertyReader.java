@@ -2,7 +2,10 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
-import dev.stxt.boxes.layout.grid.GridAreas;
+import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.GridAreas;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
@@ -84,8 +87,8 @@ final class PropertyReader {
             s.declared(PropertyKey.internal(name), p.getLine());
             switch (name) {
                 case "font" -> s.font = fontFamily(p);
-                case "weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
-                case "style" -> s.fontStyle = enumValue(Style.FontStyle.class, p);
+                case "weight" -> s.fontWeight = enumValue(FontWeight.class, p);
+                case "style" -> s.fontStyle = enumValue(FontStyle.class, p);
                 case "size" -> s.fontSize = positive(p);
                 case "line-height" -> s.lineHeight = value(p, LENGTH, false);
                 case "align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
@@ -134,11 +137,7 @@ final class PropertyReader {
             case "columns" -> s.gridColumns = tracks(p);
             case "rows" -> s.gridRows = tracks(p);
             case "gap" -> gap(p, s);
-            case "areas" -> {
-                s.gridAreas = p.getText();
-                // valida rectángulos y filas de igual longitud
-                placement(p, () -> GridAreas.parse(p.getText()));
-            }
+            case "areas" -> s.gridAreas = placement(p, () -> GridAreas.parse(p.getText()));
             case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
             case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
             case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, p);
@@ -149,12 +148,13 @@ final class PropertyReader {
     /**
      * Propiedades de {@code Item} o {@code Area}, que pasan al elemento que envuelven; su línea se
      * guarda con prefijo ({@code item.grow}), salvo {@code Layer}. El valor de {@code Area} es la
-     * colocación ({@code item.area}, con la línea del {@code Area}).
+     * colocación ({@code item.area}, con la línea del {@code Area}), con los nombres buscados en
+     * {@code areas}, las del grid padre.
      */
-    static void item(InlineNode w, Style s) {
+    static void item(InlineNode w, Style s, GridAreas areas) {
         if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
             s.declared(PropertyKey.ITEM_AREA, w.getLine());
-            s.itemArea = w.getText().trim();
+            s.itemArea = placement(w, () -> Cell.parse(w.getText(), areas));
         }
         for (Node p : w.getChildren()) {
             String name = p.getCanonicalName();

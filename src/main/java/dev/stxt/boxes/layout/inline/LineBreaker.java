@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.layout.IntrinsicSizes;
-import dev.stxt.boxes.tree.FontFace;
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;

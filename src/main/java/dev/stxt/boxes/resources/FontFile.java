@@ -1,7 +1,7 @@
 package dev.stxt.boxes.resources;
 
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
-import dev.stxt.boxes.tree.FontFace;
 import org.apache.fontbox.ttf.CmapLookup;
 import org.apache.fontbox.ttf.TrueTypeFont;
 

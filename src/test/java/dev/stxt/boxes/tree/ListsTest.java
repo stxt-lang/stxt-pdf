@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -90,7 +91,7 @@ class ListsTest {
                 "\t\tElement: List item", "\t\t\tTypography:", "\t\t\t\tWeight: bold",
                 "\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tText: a").children.get(0);
         assertEquals(18, ((dev.stxt.boxes.model.Value.Points) list.style.padding.left()).pt());
-        assertEquals(Style.FontWeight.BOLD, list.children.get(0).style.fontWeight);
+        assertEquals(FontWeight.BOLD, list.children.get(0).style.fontWeight);
     }
 
     @Test

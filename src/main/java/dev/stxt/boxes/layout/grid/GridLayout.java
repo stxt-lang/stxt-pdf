@@ -13,6 +13,8 @@ import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.layout.UnitBreaker;
 import dev.stxt.boxes.layout.position.RelativeOffset;
+import dev.stxt.boxes.model.Area;
+import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
@@ -20,7 +22,6 @@ import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.OptionalDouble;
 
 /**
@@ -57,11 +58,10 @@ public final class GridLayout implements LayoutAlgorithm {
 
     private static Grid grid(Box box) {
         Style s = box.style;
-        Map<String, Area> named = s.gridAreas == null ? Map.of() : GridAreas.parse(s.gridAreas);
-        int explicitColumns = Math.max(s.gridColumns.size(), s.gridAreas == null ? 0 : GridAreas.columns(s.gridAreas));
-        int explicitRows = Math.max(s.gridRows.size(), s.gridAreas == null ? 0 : GridAreas.rows(s.gridAreas));
+        int explicitColumns = Math.max(s.gridColumns.size(), s.gridAreas.columns());
+        int explicitRows = Math.max(s.gridRows.size(), s.gridAreas.rows());
         List<Box> items = box.inFlowChildren();
-        List<Cell> cells = items.stream().map(i -> Cell.parse(i.style.itemArea, named)).toList();
+        List<Cell> cells = items.stream().map(i -> i.style.itemArea).toList();
         List<Area> areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow);
         int columns = Math.max(1, explicitColumns);
         int rows = explicitRows;

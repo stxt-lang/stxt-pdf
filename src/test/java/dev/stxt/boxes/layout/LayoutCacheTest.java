@@ -2,8 +2,8 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.stxt.DocumentReader;
-import dev.stxt.boxes.tree.FontFace;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

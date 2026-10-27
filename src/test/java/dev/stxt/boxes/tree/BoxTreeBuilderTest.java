@@ -3,6 +3,10 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.exceptions.ParseException;
 import dev.stxt.runtime.STXT;
+import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -15,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -75,10 +78,10 @@ class BoxTreeBuilderTest {
         assertEquals(2, a.style.itemGrow, 1e-9);
         assertEquals(1, a.style.layer);
         Box b = root.children.get(1).children.get(0);
-        assertEquals("1 2", b.style.itemArea);
+        assertEquals(new Cell(1, 2, 1, 1), b.style.itemArea);
         assertEquals(Style.Alignment.CENTER, b.style.itemVertical);
         assertEquals(14, b.style.line("item.area"));
-        assertNull(root.children.get(1).children.get(1).style.itemArea);
+        assertEquals(Cell.AUTO, root.children.get(1).children.get(1).style.itemArea);
     }
 
     @Test
@@ -87,7 +90,7 @@ class BoxTreeBuilderTest {
                 "\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tWeight: bold", "\t\t\tStyle: italic",
                 "\t\t\tSize: 14", "\t\t\tWidows: 3", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tText: x")).root().children.get(0).children.get(0);
-        assertEquals(new FontFace("IBM Plex Sans", Style.FontWeight.BOLD, Style.FontStyle.ITALIC),
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.ITALIC),
                 child.style.fontFace());
         assertEquals(14, child.style.fontSize, 1e-9);
         assertEquals(3, child.style.widows);
@@ -179,7 +182,7 @@ class BoxTreeBuilderTest {
                 + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 12\n\t\tColor: #333\n\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).root().children.get(0).children.get(0);
-        assertEquals(new FontFace("IBM Plex Sans", Style.FontWeight.BOLD, Style.FontStyle.NORMAL), text.style.fontFace());
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style.fontFace());
         assertEquals(12, text.style.fontSize, 1e-9);
         // Document admite todo Typography, no solo la fuente.
         assertEquals("#333", text.style.color);

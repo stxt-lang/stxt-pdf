@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.FontFace;
 
 /** Mide el ancho de un texto en puntos. */
 public interface TextMeasurer {

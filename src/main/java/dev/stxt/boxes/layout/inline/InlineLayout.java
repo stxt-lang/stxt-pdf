@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
@@ -117,13 +118,13 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
 
         int end = texts.size();
-        int appeal = LayoutResult.PERFECT_BREAK;
+        int appeal = BreakAppeal.PERFECT_BREAK;
         if (space.fragmenting()) {
             double remaining = Slice.contentRemaining(model, first, space);
             BreakRules.Cut cut = BreakRules.cutLines(paragraphEnds, start, BreakRules.capacity(remaining, lineHeight),
                     s.widows, s.orphans, space.atFragmentainerStart());
             if (cut.end() == start && start < texts.size()) {
-                return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, LayoutResult.PERFECT_BREAK,
+                return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
                         List.of(), AdjoiningMargins.NONE);
             }
             end = cut.end();
@@ -152,7 +153,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (!slice.finished()) {
             // Faltan líneas o, si han terminado, el alto propio de la caja.
             return new LayoutResult(fragment, new BreakToken.Line(end, slice.consumed()),
-                    end == texts.size() ? LayoutResult.PERFECT_BREAK : appeal, List.of(), AdjoiningMargins.NONE);
+                    end == texts.size() ? BreakAppeal.PERFECT_BREAK : appeal, List.of(), AdjoiningMargins.NONE);
         }
         // Una caja sin líneas, borde, relleno ni alto deja colapsar sus márgenes (§5.3).
         boolean empty = first && lines.isEmpty() && slice.height() == 0 && model.openAtTop() && model.openAtBottom()

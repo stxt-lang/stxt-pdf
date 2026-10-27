@@ -2,8 +2,9 @@ package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.LayoutFixture;
-import dev.stxt.boxes.tree.FontFace;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PageNumbersTest {
 
     private static final double PAGE = 180;
-    private static final FontFace F = new FontFace("F", Style.FontWeight.NORMAL, Style.FontStyle.NORMAL);
+    private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
 
     /** Pie fijo; el {@code Id} está en su {@code Text}, que ocupa todo el ancho del pie. */
     private static final String[] FOOTER = {"\tFixed:", "\t\tOffset: auto 0 -30 0", "\t\tBox:", "\t\t\tHeight: 20",

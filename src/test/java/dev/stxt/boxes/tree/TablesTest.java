@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ class TablesTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(doc)).root();
     }
 
+    /** Colocación de cada celda como {@code fila columna filas columnas}. */
     private static List<String> areas(Box table) {
-        return table.children.stream().map(c -> c.style.itemArea).toList();
+        return table.children.stream().map(c -> c.style.itemArea)
+                .map(a -> a.row() + " " + a.column() + " " + a.rows() + " " + a.columns()).toList();
     }
 
     @Test
@@ -83,11 +86,11 @@ class TablesTest {
         Box a = table.children.get(0);
         Box b = table.children.get(1);
         assertEquals("#333333", a.style.color);
-        assertEquals(Style.FontWeight.BOLD, a.style.fontWeight);
+        assertEquals(FontWeight.BOLD, a.style.fontWeight);
         // La regla gana a lo heredado de la fila; lo propio de la celda, a los dos.
         assertEquals(8, a.style.fontSize);
         assertEquals(Value.pt(3), a.style.padding.top());
-        assertEquals(Style.FontWeight.NORMAL, b.style.fontWeight);
+        assertEquals(FontWeight.NORMAL, b.style.fontWeight);
     }
 
     @Test

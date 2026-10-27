@@ -47,7 +47,7 @@ actualízala.
 |---|---|---|
 | 1 | ~~Conectar con `dev.stxt:stxt-core` y validar contra el template~~ (hecho) | `stxt/DocumentReader` |
 | 2 | ~~Flujo de bloque y texto; activar `GoldenTest` (caso 01)~~ (hecho) | `layout/block/BlockLayout`, `layout/inline/InlineLayout` |
-| 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `fragment/Paginator` |
+| 3 | ~~`relative`, `absolute`, `fixed` (esta en el `Paginator`)~~ (hecho; caso 03) | `layout/position`, `layout/Paginator` |
 | 4 | ~~`intrinsic()` en todos los algoritmos; flex (caso 02)~~ (hecho) | `layout/flex/FlexLayout` sobre `FlexResolver` |
 | 5 | ~~Grid~~ (hecho; casos 04 y 05) | `layout/grid/GridLayout` sobre `Placement` y `TrackSizing` |
 | 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
@@ -79,15 +79,19 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
-| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `LaidOutDocument` |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
+| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument` |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
-| `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
+| `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Page`, `BreakRules`, `TextLine` |
 | `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
+
+Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
+de `model`, y no hay ciclos (`ArchitectureTest`, que cuenta cada package con sus subpackages).
+Un tipo que necesitan `tree` y `layout` va en `model`.
 
 ### Piezas clave
 
@@ -156,7 +160,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   busca en el resultado ya paginado y señala al culpable más interior. `Font` y `Size` no
   tienen valor por defecto y se suelen declarar en el `Typography` de `Document`. No
   generalices una regla nueva sin comentarlo con el usuario.
-- **Enums de `Style`:** los valores STXT se convierten con `Enum.valueOf` sobre el texto en
+- **Enums de `Style`** (y `FontWeight` y `FontStyle`, que están en `model`): los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas y con el guion como guion bajo, así que **cada constante debe llamarse igual que
   su valor en el documento** (`TextAlign.JUSTIFY` ↔ `justify`, `Marker.LOWER_ALPHA` ↔
   `lower-alpha`). Si cambias un valor, cambia la constante y el schema.
@@ -175,7 +179,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   fragmentación), si la caja empieza la página y si se mide el alto de su contenido ignorando
   su `Height` (`measuringContentHeight()`).
 - **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad
-  del corte (`PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su
+  del corte (`BreakAppeal.PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su
   containing block (con la posición estática relativa a la caja de contenido de quien devuelve
   el resultado) y los `AdjoiningMargins`.
 - **`BoxModel`**: margen, borde, relleno, ancho de la caja de borde y alto si es definido, a

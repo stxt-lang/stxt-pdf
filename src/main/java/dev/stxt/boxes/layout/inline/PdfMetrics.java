@@ -1,12 +1,12 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.FontFile;
 import dev.stxt.boxes.resources.FontLibrary;
 import dev.stxt.boxes.resources.ResourceException;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Style;

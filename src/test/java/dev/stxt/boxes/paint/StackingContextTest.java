@@ -2,10 +2,10 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.stxt.DocumentReader;
-import dev.stxt.boxes.tree.FontFace;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -200,7 +200,7 @@ public final class BoxTreeBuilder {
             // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
             child(wrapper, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
         } else if (wrapper != null) {
-            item(wrapper, s);
+            item(wrapper, s, parent.style.gridAreas);
         }
         ctx.rules.apply(n, kind, s, parent);
         String id = null;

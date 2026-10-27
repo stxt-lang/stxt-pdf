@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -41,7 +42,7 @@ class StylesTest {
                 "\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tWeight: bold",
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 14").children.get(0);
         assertEquals(14, text.style.fontSize, 1e-9);
-        assertEquals(Style.FontWeight.BOLD, text.style.fontWeight);
+        assertEquals(FontWeight.BOLD, text.style.fontWeight);
         assertEquals(15, text.style.line("font-size"));
         assertEquals(12, text.style.line("font-weight"));
     }

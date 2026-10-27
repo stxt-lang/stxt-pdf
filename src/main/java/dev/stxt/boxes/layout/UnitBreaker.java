@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
@@ -180,7 +181,7 @@ public final class UnitBreaker {
             }
 
             int end = n;
-            int appeal = LayoutResult.PERFECT_BREAK;
+            int appeal = BreakAppeal.PERFECT_BREAK;
             if (space.fragmenting() && next < n) {
                 boolean mustPlace = space.atFragmentainerStart() && !continued;
                 int groupEnd = groupEnd(next);
@@ -228,7 +229,7 @@ public final class UnitBreaker {
         Split split(int start, int end, List<BreakToken> tokens, double origin) {
             Piece[] split = new Piece[placed.size()];
             List<BreakToken> next = new ArrayList<>();
-            int appeal = LayoutResult.PERFECT_BREAK;
+            int appeal = BreakAppeal.PERFECT_BREAK;
             double bottom = 0;
             boolean broken = false;
             int j = 0;
@@ -308,7 +309,7 @@ public final class UnitBreaker {
 
         /** Nada del contenedor cabe en lo que queda de página: el padre debe cortar antes de él. */
         LayoutResult before() {
-            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, LayoutResult.PERFECT_BREAK,
+            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
                     List.of(), AdjoiningMargins.NONE);
         }
 
@@ -344,7 +345,7 @@ public final class UnitBreaker {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
             }
             BreakToken token = new BreakToken.Container(nextLine, itemTokens, slice.consumed());
-            return new LayoutResult(fragment, token, contentFinished ? LayoutResult.PERFECT_BREAK : appeal,
+            return new LayoutResult(fragment, token, contentFinished ? BreakAppeal.PERFECT_BREAK : appeal,
                     pending, AdjoiningMargins.NONE);
         }
     }

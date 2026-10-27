@@ -2,6 +2,7 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
+import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
@@ -138,30 +139,30 @@ final class PdfStructure {
         PDStructureElement row = null;
         int rowIndex = -1;
         for (Box cell : table.children) {
-            int[] p = placement(cell);
+            Cell p = cell.style.itemArea;
             int group = group(cell);
             if (groups[group] == null) {
                 groups[group] = new PDStructureElement(TABLE_GROUPS[group], e);
                 e.appendKid(groups[group]);
             }
-            if (p[0] != rowIndex) {
+            if (p.row() != rowIndex) {
                 row = new PDStructureElement("TR", groups[group]);
                 groups[group].appendKid(row);
-                rowIndex = p[0];
+                rowIndex = p.row();
             }
             PDStructureElement c = new PDStructureElement(type(cell), row);
             row.appendKid(c);
             elements.put(cell, c);
-            if (group == 0 || p[1] > 1 || p[2] > 1) {
+            if (group == 0 || p.rows() > 1 || p.columns() > 1) {
                 PDTableAttributeObject attributes = new PDTableAttributeObject();
                 if (group == 0) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_COLUMN);
                 }
-                if (p[1] > 1) {
-                    attributes.setRowSpan(p[1]);
+                if (p.rows() > 1) {
+                    attributes.setRowSpan(p.rows());
                 }
-                if (p[2] > 1) {
-                    attributes.setColSpan(p[2]);
+                if (p.columns() > 1) {
+                    attributes.setColSpan(p.columns());
                 }
                 c.addAttribute(attributes);
             }
@@ -185,20 +186,16 @@ final class PdfStructure {
         box.children.forEach(this::repeats);
     }
 
-    /** Fila (desde 0), filas y columnas de una celda: su colocación en el grid de la tabla. */
-    private static int[] placement(Box cell) {
-        String[] t = cell.style.itemArea.split(" ");
-        return new int[]{Integer.parseInt(t[0]) - 1, Integer.parseInt(t[2]), Integer.parseInt(t[3])};
-    }
-
     /** Grupo de una celda de tabla: 0 en la cabecera, 1 en el cuerpo, 2 en el pie. */
     private static int group(Box cell) {
         Box table = cell.parent;
-        int row = placement(cell)[0];
+        // Fila desde 0 de la celda en el grid de la tabla; la colocación la da TableBuilder.
+        int row = cell.style.itemArea.row() - 1;
         if (row < table.headRows) {
             return 0;
         }
-        int rows = table.children.stream().mapToInt(c -> placement(c)[0] + placement(c)[1]).max().orElse(0);
+        int rows = table.children.stream().mapToInt(c -> c.style.itemArea.row() - 1 + c.style.itemArea.rows())
+                .max().orElse(0);
         return row >= rows - table.footRows ? 2 : 1;
     }
 
