@@ -25,7 +25,7 @@ import java.util.List;
  * se reparte entre sus espacios ({@link TextLine#wordSpacing()}), salvo en la última de cada
  * párrafo; una línea cortada por un salto de página no es la última de su párrafo.</p>
  *
- * <p>En modo paginado (§5.10) se colocan las líneas que caben desde la del {@link BreakToken.Line}
+ * <p>En cada página (§5.10) se colocan las líneas que caben desde la del {@link BreakToken.Line}
  * respetando viudas y huérfanas en cada párrafo ({@link BreakRules#cutLines}); si no cabe
  * ninguna, se devuelve {@link BreakToken#BEFORE} para que el padre corte antes de la caja.</p>
  *

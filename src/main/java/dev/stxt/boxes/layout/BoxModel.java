@@ -170,8 +170,8 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Espacio para los hijos en flujo: la caja de contenido es su containing block. En modo
-     * paginado, lo que queda de página se mide desde el principio de la caja de contenido (y,
+     * Espacio para los hijos en flujo: la caja de contenido es su containing block. Lo que
+     * queda de página se mide desde el principio de la caja de contenido (y,
      * con {@code Decoration: clone}, sin el borde y el relleno inferiores).
      *
      * @param first es el primer fragmento de la caja (con {@code slice}, los siguientes no llevan

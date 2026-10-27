@@ -84,7 +84,7 @@ class GoldenTest {
     private static void writeSvg(String name, List<Page> pages, Media media) throws IOException {
         Files.createDirectories(SVG_DIR);
         for (Page p : pages) {
-            String svg = SvgCanvas.page(p, media, p.content().height(), true);
+            String svg = SvgCanvas.page(p, media, true);
             Files.writeString(SVG_DIR.resolve(name + "-" + p.number() + ".svg"), svg, StandardCharsets.UTF_8);
         }
     }

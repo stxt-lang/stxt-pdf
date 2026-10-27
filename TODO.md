@@ -6,6 +6,7 @@
 - Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...
 - Imágenes en carpeta de recursos también
 - Cambiar de src/test/resources a test
+- Columnas para texto en línea
 - Muchos más ejemplos y pruebas de uso
 - Revisar puntos que han quedado aparcados
 - Refactor de código

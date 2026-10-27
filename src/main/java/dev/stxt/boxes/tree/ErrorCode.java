@@ -11,10 +11,6 @@ public enum ErrorCode {
     // --- Documento y medio ------------------------------------------------------------------
     /** El documento no tiene un único nodo raíz {@code Document} con el namespace del modelo. */
     DOCUMENT_ROOT,
-    /** Con {@code Type: paged}, {@code Media} necesita {@code Height}. */
-    MEDIA_HEIGHT_REQUIRED,
-    /** {@code Height} del medio con {@code Type: continuous}, donde no tiene efecto. */
-    MEDIA_HEIGHT_CONTINUOUS,
     /** Un tamaño o un margen del medio no válido, o márgenes que no dejan área útil. */
     MEDIA_SIZE,
 

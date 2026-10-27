@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Salida PDF con PDFBox: una página PDF por página del resultado, en pt. En modo continuo hay
- * una sola página, con el alto del contenido más los márgenes del medio.
+ * Salida PDF con PDFBox: una página PDF por página del resultado, en pt, del tamaño del medio.
  *
  * <p>El texto se pinta con las fuentes TTF de la carpeta de recursos (ESPECIFICACION.md §5.11),
  * incrustadas como subconjunto (solo los glifos usados) en una fuente Type 0 con codificación
@@ -92,14 +91,11 @@ public final class PdfCanvas implements Canvas {
             Map<FontFace, PDFont> fonts = new HashMap<>();
             Rect area = media.pageArea();
             for (Page p : pages) {
-                double height = media.paged()
-                        ? media.height().getAsDouble()
-                        : p.content().height() + media.margin().vertical();
-                PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) height));
+                PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) media.height()));
                 doc.addPage(page);
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                     StackingContext.build(p.content(), p.fixed(), area.x(), area.y())
-                            .paint(new PdfCanvas(doc, cs, height, resources, fonts, debug));
+                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, debug));
                 }
             }
             doc.save(target);

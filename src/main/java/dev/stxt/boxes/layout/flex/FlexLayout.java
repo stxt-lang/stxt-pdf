@@ -48,7 +48,7 @@ import java.util.OptionalDouble;
  * <p>Simplificación: en {@code column}, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
  *
- * <p>En modo paginado (§5.10) se corta entre líneas en {@code row} y entre ítems en
+ * <p>Entre páginas (§5.10) se corta entre líneas en {@code row} y entre ítems en
  * {@code column}, con {@link UnitBreaker}; una línea (en {@code column}, un ítem) que no cabe en
  * una página se parte en paralelo. Un contenedor {@code column} con {@code Wrap} no se parte.</p>
  */

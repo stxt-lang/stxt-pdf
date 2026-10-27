@@ -2,8 +2,8 @@
 # automática con filas implícitas.
 Document (dev.stxt.boxes):
 	Media:
-		Type: continuous
 		Width: 595
+		Height: 842
 		Margin: 40
 	Typography:
 		Font: IBM Plex Sans

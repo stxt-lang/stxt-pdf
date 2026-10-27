@@ -29,12 +29,8 @@ cada caja. Describe el modelo completo; el estado de implementación de cada par
 
 Un documento describe un **árbol de cajas** con elementos (`Block`, `Flex`, `Grid`, `Text`…)
 que solo admiten las propiedades que tienen sentido en ellos. El motor calcula la posición y el
-tamaño de cada caja dentro de un **medio**, que puede ser:
-
-- **Continuo** (`continuous`): una franja de ancho fijo y altura infinita, como la ventana de un
-  navegador.
-- **Paginado** (`paged`): una secuencia de páginas de tamaño fijo, como un PDF. Las cajas que
-  no caben se parten entre páginas.
+tamaño de cada caja dentro de un **medio**: una secuencia de páginas de tamaño fijo, como un
+PDF. Las cajas que no caben en una página se parten entre páginas.
 
 El modelo es un subconjunto de los mecanismos de maquetación de CSS (flujo de bloque, texto,
 posicionamiento, flex y grid, fragmentación) sin HTML y sin cascada. Las diferencias se
@@ -92,7 +88,6 @@ página).
 ```
 Document (dev.stxt.boxes):
 	Media:
-		Type: paged
 		Width: 595
 		Height: 842
 		Margin: 40
@@ -206,7 +201,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 **Alto definido.** Los anchos se conocen siempre al maquetar; los altos, no. Un porcentaje
 vertical es un error si su base no es un **alto definido**, que se decide al leer el documento:
 
-- el área útil en modo paginado (en continuo, su alto es infinito);
+- el área útil;
 - el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
 - el de una caja con `Height: auto` y `Aspect ratio`;
 - el de un `Absolute` o un `Fixed` con `Height: auto` estirado entre arriba y abajo;
@@ -253,13 +248,12 @@ Obligatorio, exactamente uno, hijo de `Document`.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Type` | `continuous`, `paged` | — (obligatorio) | |
-| `Width` | número > 0 | — (obligatorio) | Ancho de la página o de la franja. |
-| `Height` | número > 0 | — | Obligatorio en modo paginado. En modo continuo es un error: la franja no tiene alto. |
+| `Width` | número > 0 | — (obligatorio) | Ancho de la página. |
+| `Height` | número > 0 | — (obligatorio) | Alto de la página. |
 | `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo puntos. |
 
-El **área útil** es el rectángulo del medio menos sus márgenes. Es el containing block de los
-elementos de primer nivel y de los `Fixed`. En modo continuo su altura es infinita.
+El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
+elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
 ### 4.2 Propiedades del elemento
 
@@ -313,7 +307,7 @@ bloque indentado, que admite párrafos. Uno de los dos es obligatorio, y no se a
 
 ### 4.5 `Break`
 
-Los cortes de página. Solo tienen efecto en modo paginado y no se heredan. No se admite en
+Los cortes de página. No se heredan. No se admite en
 `Absolute` ni en `Fixed`, que no se parten ni están en el flujo de la página.
 
 | Propiedad | Valores | Por defecto | Notas |
@@ -440,7 +434,7 @@ El **containing block** de una caja es el rectángulo de referencia para porcent
 |---|---|
 | En flujo (también `Relative`) | caja de **contenido** del padre |
 | `Absolute` | caja de **relleno** del elemento posicionado (`Relative`, `Absolute` o `Fixed`) más cercano entre sus ancestros; si no hay ninguno, el área útil |
-| `Fixed` | área útil del medio (de cada página, en modo paginado) |
+| `Fixed` | área útil de cada página |
 
 ### 5.3 Flujo de bloque
 
@@ -498,7 +492,7 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
 - **Tamaños intrínsecos.** min-content = la palabra más ancha; max-content = el párrafo más
   largo en una sola línea.
 - **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
-  página y el total de páginas; en modo continuo, por 1 y 1. Ver [§5.10](#510-fragmentación).
+  página y el total de páginas. Ver [§5.10](#510-fragmentación).
 
 ### 5.5 Posicionamiento
 
@@ -545,17 +539,15 @@ el ajuste al contenido (`fit-content`) en horizontal y la altura del contenido e
   sin colapsar con el margen superior de la propia caja, que se suma después según la ecuación;
 - dentro de un contenedor flex o grid, la esquina superior izquierda de su caja de contenido.
 
-**`Fixed`.** Como `Absolute`, pero su containing block es el área útil. En modo paginado **se
-pinta en todas las páginas** (cabeceras, pies, marcas de agua). En modo continuo no hay ventana,
-y se comporta como un `Absolute` respecto al área útil del documento. Los `Fixed` no reservan
+**`Fixed`.** Como `Absolute`, pero su containing block es el área útil, y **se pinta en
+todas las páginas** (cabeceras, pies, marcas de agua). Los `Fixed` no reservan
 espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de
 la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de
 su posición estática (desplazamientos `auto`), se toma la de la primera página en la que
 aparece y se repite igual en todas.
 
 **Orden de cálculo.** Las cajas posicionadas fuera de flujo se resuelven cuando su containing
-block ya conoce su tamaño, después del layout en flujo. En modo continuo, cuando el containing
-block es el área útil, su alto es el del flujo del documento (el área útil no tiene alto).
+block ya conoce su tamaño, después del layout en flujo.
 
 ### 5.6 Apilamiento y orden de pintado
 
@@ -716,9 +708,8 @@ las fracciones lleguen al max-content de su contenido.
 
 **Definido e indefinido.** Un tamaño es **definido** si se conoce sin hacer el layout del
 contenido. Los anchos lo son siempre al maquetar; qué altos lo son está en el
-[§3.6](#36-bases-de-los-porcentajes), y un porcentaje de un alto que no lo es, un error. En modo
-paginado el área útil es definida: una caja de primer nivel con `Height: 100%` ocupa la página.
-En modo continuo, el mismo valor es un error.
+[§3.6](#36-bases-de-los-porcentajes), y un porcentaje de un alto que no lo es, un error. El área
+útil es definida: una caja de primer nivel con `Height: 100%` ocupa la página.
 
 **Mínimos y máximos.** Se calcula el tamaño provisional, se limita por el máximo y se sube al
 mínimo. Si se pueden comparar al leer el documento (los dos en puntos o los dos en
@@ -730,9 +721,8 @@ el mínimo**.
 
 ### 5.10 Fragmentación
 
-**Modelo.** Un *fragmentainer* es el contenedor donde caen los fragmentos de las cajas: en
-modo continuo hay uno de altura infinita; en modo paginado, uno por página, con la altura del
-área útil. Cada caja produce un **fragmento** por página en la que aparece.
+**Modelo.** Un *fragmentainer* es el contenedor donde caen los fragmentos de las cajas: uno
+por página, con la altura del área útil. Cada caja produce un **fragmento** por página en la que aparece.
 
 **Oportunidades de corte:**
 
@@ -878,7 +868,7 @@ un error con la primera de estas situaciones:
   declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en un `Height` o un
   `Max height` (`BOX_OVERFLOW`), en la línea de esa propiedad;
-- en modo paginado, **algo del flujo que no cabe en el área útil de una página y no se puede
+- **algo del flujo que no cabe en el área útil de una página y no se puede
   partir** (`PAGE_OVERFLOW`), en la línea de su `Height` o su `Line height` si los declara;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página.
@@ -922,8 +912,6 @@ La validación se hace en cuatro niveles:
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
-| `MEDIA_HEIGHT_REQUIRED` | Con `Type: paged`, `Media` necesita `Height` | `Con Type: paged, Media necesita Height` |
-| `MEDIA_HEIGHT_CONTINUOUS` | Con `Type: continuous`, `Media` no admite `Height` | `Height del medio no tiene efecto con Type: continuous…` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
 | `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0 | `Width no admite 1fr: usa un número…` |
@@ -948,9 +936,6 @@ La validación se hace en cuatro niveles:
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
-
-Las propiedades de fragmentación (`Break`, `Widows`…) no son errores en modo continuo:
-un mismo documento debe poder maquetarse en los dos modos.
 
 **Catálogo de errores.** [`src/test/resources/errors/errors.stxt`](../src/test/resources/errors/errors.stxt)
 tiene un documento de ejemplo por regla, con el código y la línea que debe dar.
@@ -1005,7 +990,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
 | `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
-| `position: fixed` en pantalla | Relativo a la ventana | En continuo, relativo al documento |
+| Medio continuo (pantalla) | Sí | No: siempre páginas |
 | `position: fixed` en impresión | Repetido en cada página | Igual: repetido, relativo al área útil |
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
 | `z-index` | Propiedad `z-index` | `Layer` |
@@ -1042,7 +1027,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | Nodo | Tipo | Hijos |
 |---|---|---|
 | `Document` | `GROUP` | `Media` (exactamente uno), `Typography`; elementos |
-| `Media` | `GROUP` | `Type` y `Width` (obligatorios), `Height`, `Margin` |
+| `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
 | `Block` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
 | `Flex` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
@@ -1082,7 +1067,6 @@ Fichero: [`src/test/resources/examples/report.stxt`](../src/test/resources/examp
 ```
 Document (dev.stxt.boxes):
 	Media:
-		Type: paged
 		Width: 595
 		Height: 842
 		Margin: 40
@@ -1199,7 +1183,7 @@ Document (dev.stxt.boxes):
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
 | **Envoltorio** | `Item` o `Cell`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
-| **Fragmentainer** | Contenedor de fragmentos: la franja infinita o cada página. |
+| **Fragmentainer** | Contenedor de fragmentos: cada página. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |

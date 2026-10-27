@@ -25,15 +25,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Fixed
 	Node: Media
 		Type: GROUP
-		Description: Medio de salida. Define el área útil, que es el containing block inicial.
+		Description: Medio de salida: el tamaño de las páginas. Define el área útil, que es el containing block inicial.
 		Children:
-			Child: Type
-				Min: 1
-				Max: 1
 			Child: Width
 				Min: 1
 				Max: 1
 			Child: Height
+				Min: 1
 				Max: 1
 			Child: Margin
 				Max: 1
@@ -501,12 +499,3 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: end
 			Value: center
 			Value: stretch
-
-	# Medio
-
-	Node: Type
-		Type: ENUM
-		Description: Modo: continuous (franja de alto infinito) o paged (páginas).
-		Values:
-			Value: continuous
-			Value: paged

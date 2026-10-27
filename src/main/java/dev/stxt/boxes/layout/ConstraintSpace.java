@@ -15,8 +15,8 @@ import java.util.OptionalDouble;
  * @param percentBaseWidth        base para porcentajes horizontales
  * @param percentBaseHeight       base para porcentajes verticales; vacío = indefinida
  * @param fragmentainerRemaining  espacio que queda en la página actual desde el borde superior de
- *                                la caja (puede ser negativo); vacío = sin fragmentación (modo
- *                                continuo, o una caja que no se parte, como un ítem de flex)
+ *                                la caja (puede ser negativo); vacío = sin fragmentación (una
+ *                                caja que no se parte, como un ítem de flex)
  * @param atFragmentainerStart    no hay nada antes de la caja en esta página: debe colocar algo
  *                                aunque no quepa (garantía de progreso)
  * @param contentHeight           se mide el alto del contenido: la caja ignora su {@code Height}
@@ -41,11 +41,11 @@ public record ConstraintSpace(
                 fragmentainerRemaining, atFragmentainerStart, false);
     }
 
-    /** Espacio de la caja raíz al empezar una página (o el documento, en modo continuo). */
+    /** Espacio de la caja raíz al empezar una página: el área útil entera. */
     public static ConstraintSpace forPage(Media media) {
         double width = media.pageArea().width();
-        OptionalDouble height = media.fragmentainerHeight();
-        return new ConstraintSpace(width, height, true, height.isPresent(), width, height, height, true);
+        OptionalDouble height = OptionalDouble.of(media.pageArea().height());
+        return new ConstraintSpace(width, height, true, true, width, height, height, true);
     }
 
     public boolean fragmenting() {

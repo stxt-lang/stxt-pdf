@@ -82,7 +82,7 @@ class PdfCanvasTest {
 
     @Test
     void onePdfPagePerPage() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n"
                 + "\t\tHeight: 200\n\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
                 + "\tText: Uno\n\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "two-pages"))) {
@@ -95,12 +95,13 @@ class PdfCanvasTest {
     }
 
     @Test
-    void continuousIsOnePageAsTallAsTheContent() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 300\n"
+    void pageHasTheSizeOfTheMedia() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 842\n"
                 + "\t\tMargin: 20\n\tBlock:\n\t\tBox:\n\t\t\tHeight: 500\n\t\t\tBackground: #F1EFE8\n");
-        try (PDDocument pdf = Loader.loadPDF(render(doc, "continuous"))) {
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "media-size"))) {
             assertEquals(1, pdf.getNumberOfPages());
-            assertEquals(540, pdf.getPage(0).getMediaBox().getHeight(), 1e-3);
+            assertEquals(300, pdf.getPage(0).getMediaBox().getWidth(), 1e-3);
+            assertEquals(842, pdf.getPage(0).getMediaBox().getHeight(), 1e-3);
         }
     }
 

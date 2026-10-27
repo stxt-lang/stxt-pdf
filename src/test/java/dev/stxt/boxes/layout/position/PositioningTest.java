@@ -53,7 +53,7 @@ class PositioningTest {
 
     @Test
     void absoluteWithoutPositionedAncestorUsesThePageArea() {
-        // En modo continuo, el alto del área útil es el del flujo: 100.
+        // El área útil mide 515 × 762 desde (40, 40), sea cual sea el alto del flujo.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tAbsolute:", "\t\tId: S", "\t\tOffset: 0 0 auto auto", "\t\tBox:", "\t\t\tWidth: 80",
@@ -61,7 +61,7 @@ class PositioningTest {
                 "\tAbsolute:", "\t\tId: F", "\t\tOffset: auto 0 0 auto", "\t\tBox:", "\t\t\tWidth: 80",
                 "\t\t\tHeight: 30");
         assertRect(475, 40, 80, 30, l.rect("S"));
-        assertRect(475, 110, 80, 30, l.rect("F"));
+        assertRect(475, 772, 80, 30, l.rect("F"));
     }
 
     @Test
@@ -160,11 +160,11 @@ class PositioningTest {
     }
 
     @Test
-    void fixedInContinuousModeUsesTheDocumentHeight() {
+    void fixedUsesThePageArea() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tFixed:", "\t\tId: F", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 20");
-        assertRect(40, 120, 515, 20, l.rect("F"));
+        assertRect(40, 782, 515, 20, l.rect("F"));
     }
 
     @Test

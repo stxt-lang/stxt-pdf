@@ -2,7 +2,6 @@
 # fixed en el margen de la página.
 Document (dev.stxt.boxes):
 	Media:
-		Type: paged
 		Width: 595
 		Height: 842
 		Margin: 40

@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>Motor de cajas</name>
-    <description>Motor de layout de cajas descrito en STXT, en modo continuo o paginado (ver docs/ESPECIFICACION.md).</description>
+    <description>Motor de layout de cajas descrito en STXT, en páginas (ver docs/ESPECIFICACION.md).</description>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>

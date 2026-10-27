@@ -10,8 +10,8 @@ valores STXT. El contenido de `Text` en los documentos puede estar en cualquier 
 ## Qué es
 
 Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
-[STXT](https://stxt.dev). Un mismo documento se maqueta en **modo continuo** (franja de altura
-infinita, como un navegador) o **paginado** (páginas, como un PDF). Todas las medidas están en
+[STXT](https://stxt.dev). Los documentos se maquetan siempre en **páginas** de tamaño fijo
+(como un PDF), definidas por `Media` (`Width` y `Height`). Todas las medidas están en
 **puntos tipográficos** (1 pt = 1/72 in; A4 = 595 × 842).
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
@@ -35,7 +35,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los diez
+Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los diez
 hitos están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
@@ -149,8 +149,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya
   consumido por la caja (un `Height` definido es el total de todos los fragmentos), y `BEFORE`:
   "no cabe nada, corta antes de mí", que nunca se pasa como `from`. El `Paginator` detecta la
-  falta de progreso comparando tokens; el mismo bucle sirve para los dos modos (en continuo da
-  una sola vuelta). El token de la raíz no acumula alto: cada página tiene el área útil entera.
+  falta de progreso comparando tokens. El token de la raíz no acumula alto: cada página tiene
+  el área útil entera.
 - **Fragmentación (§5.10):** cada algoritmo coloca lo que cabe en `fragmentainerRemaining` y
   devuelve el corte con su calidad; el padre lo compara con los cortes entre sus hijos y se
   queda con el **último de mayor calidad** (`BreakRules.best`). Relajar las reglas en el orden
@@ -230,8 +230,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   `page-N.png` por página (versionados, con los contornos de las cajas y las métricas reales).
   Un PNG solo se reescribe si cambian sus píxeles: si aparece modificado en git, el resultado
   ha cambiado; míralo antes de dar el cambio por bueno.
-- Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
-  515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
+- Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área útil de
+  515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
   declara en el `Typography` de `Document` `Font: IBM Plex Sans` y `Size: 10`; los demás
   documentos de test con texto deben declararlos ellos mismos. Los documentos se escriben como
   listas de líneas con tabuladores (`"\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A",

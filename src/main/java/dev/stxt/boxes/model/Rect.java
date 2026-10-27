@@ -1,6 +1,6 @@
 package dev.stxt.boxes.model;
 
-/** Rectángulo en puntos. Con altura infinita representa el medio continuo. */
+/** Rectángulo en puntos. */
 public record Rect(double x, double y, double width, double height) {
 
     public Rect expand(Insets i) {

@@ -25,9 +25,9 @@ public final class SvgCanvas implements Canvas {
         this.debug = debug;
     }
 
-    /** SVG completo de una página. En modo continuo usa {@code contentHeight} como alto. */
-    public static String page(Page page, Media media, double contentHeight, boolean debug) {
-        double height = media.paged() ? media.height().getAsDouble() : contentHeight + media.margin().vertical();
+    /** SVG completo de una página, del tamaño del medio. */
+    public static String page(Page page, Media media, boolean debug) {
+        double height = media.height();
         SvgCanvas c = new SvgCanvas(debug);
         Rect area = media.pageArea();
         StackingContext.build(page.content(), page.fixed(), area.x(), area.y()).paint(c);

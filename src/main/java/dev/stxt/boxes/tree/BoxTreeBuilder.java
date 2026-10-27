@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -97,8 +96,8 @@ public final class BoxTreeBuilder {
         Style rootStyle = new Style();
         child(document, "typography").map(BoxTreeBuilder::inline).ifPresent(t -> typography(t, rootStyle));
         Box root = new Box(null, rootStyle, true, document.getLine());
-        // El área útil: definida en modo paginado; infinita en continuo.
-        definiteHeight.put(root, media.paged());
+        // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
+        definiteHeight.put(root, true);
         buildContent(document, root);
         return new Result(media, root);
     }
@@ -108,20 +107,11 @@ public final class BoxTreeBuilder {
     // ------------------------------------------------------------------------------------------
 
     private Media media(InlineNode n) {
-        Media.Type type = enumValue(Media.Type.class, required(n, "Type"));
         double width = points(required(n, "Width"));
-        Optional<Node> heightNode = child(n, "height");
-        if (type == Media.Type.CONTINUOUS && heightNode.isPresent()) {
-            throw error(heightNode.get(), ErrorCode.MEDIA_HEIGHT_CONTINUOUS,
-                    "Height del medio no tiene efecto con Type: continuous, cuya altura es infinita");
-        }
-        if (type == Media.Type.PAGED && heightNode.isEmpty()) {
-            throw error(n, ErrorCode.MEDIA_HEIGHT_REQUIRED, "Con Type: paged, Media necesita Height");
-        }
-        OptionalDouble height = heightNode.map(h -> OptionalDouble.of(points(h))).orElse(OptionalDouble.empty());
+        double height = points(required(n, "Height"));
         Optional<Node> marginNode = child(n, "margin");
         Insets margin = marginNode.map(BoxTreeBuilder::mediaMargin).orElse(Insets.ZERO);
-        Media media = new Media(type, width, height, margin);
+        Media media = new Media(width, height, margin);
         if (media.pageArea().width() <= 0 || media.pageArea().height() <= 0) {
             throw error(marginNode.orElse(n), ErrorCode.MEDIA_SIZE, "Los márgenes del medio no dejan área útil");
         }

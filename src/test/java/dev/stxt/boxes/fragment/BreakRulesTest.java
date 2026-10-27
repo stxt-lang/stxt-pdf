@@ -34,7 +34,7 @@ class BreakRulesTest {
     }
 
     @Test
-    void continuousHasNoLimit() {
+    void infiniteSpaceHasNoLimit() {
         assertEquals(Integer.MAX_VALUE, BreakRules.capacity(Double.POSITIVE_INFINITY, 15));
     }
 

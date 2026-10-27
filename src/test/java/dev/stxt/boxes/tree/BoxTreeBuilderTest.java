@@ -27,7 +27,7 @@ class BoxTreeBuilderTest {
     }
 
     private static String document(String... boxes) {
-        return "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n\t\tMargin: 40\n"
+        return "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxes);
     }
 
@@ -97,8 +97,6 @@ class BoxTreeBuilderTest {
 
     @Test
     void rulesTheSchemaCannotExpress() {
-        assertThrows(InvalidModelException.class, () -> build(
-                "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 595\n\tBlock:\n\t\tId: a"));
         InvalidModelException single = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tGrid:", "\t\tCell:", "\t\t\tBlock:", "\t\t\tText: a")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, single.code());
@@ -140,7 +138,7 @@ class BoxTreeBuilderTest {
 
         // Sin el namespace no se validaría nada: es un error de raíz.
         InlineNode noNamespace = (InlineNode) STXT.rawParser().parse(
-                "Document:\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595").get(0);
+                "Document:\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842").get(0);
         assertEquals(ErrorCode.DOCUMENT_ROOT,
                 assertThrows(InvalidModelException.class, () -> new BoxTreeBuilder().build(noNamespace)).code());
     }
@@ -177,7 +175,7 @@ class BoxTreeBuilderTest {
 
     @Test
     void fontPropertiesOfTheDocumentAreInherited() {
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n"
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 12\n\t\tColor: #333\n\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).root().children.get(0).children.get(0);
@@ -195,7 +193,6 @@ class BoxTreeBuilderTest {
         try (InputStream in = getClass().getResourceAsStream("/examples/report.stxt")) {
             String doc = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             BoxTreeBuilder.Result r = build(doc);
-            assertTrue(r.media().paged());
             assertEquals(515, r.media().pageArea().width(), 1e-9);
             assertEquals(762, r.media().pageArea().height(), 1e-9);
         }

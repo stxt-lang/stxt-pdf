@@ -40,14 +40,17 @@ public final class LayoutFixture {
         }
     }
 
-    /** Documento continuo. Líneas de las cajas de primer nivel, con tabuladores como en el documento. */
+    /**
+     * Documento A4 (595 × 842; área útil de 515 × 762). Líneas de las cajas de primer nivel, con
+     * tabuladores como en el documento.
+     */
     public static LayoutFixture layOut(String... boxLines) {
-        return layOut("\t\tType: continuous\n\t\tWidth: 595\n\t\tMargin: 40\n", boxLines);
+        return layOut("\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n", boxLines);
     }
 
-    /** Documento paginado con páginas de {@code height} pt: el área útil mide {@code height − 80}. */
+    /** Documento con páginas de {@code height} pt: el área útil mide {@code height − 80}. */
     public static LayoutFixture layOutPaged(double height, String... boxLines) {
-        return layOut("\t\tType: paged\n\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n", boxLines);
+        return layOut("\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n", boxLines);
     }
 
     private static LayoutFixture layOut(String media, String... boxLines) {

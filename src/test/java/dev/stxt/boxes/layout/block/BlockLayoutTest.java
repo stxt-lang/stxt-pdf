@@ -122,7 +122,7 @@ class BlockLayoutTest {
 
     @Test
     void percentHeightOfADefiniteContainingBlock() {
-        // Sin alto definido (el área útil en modo continuo), es un error (catálogo de errores).
+        // El área útil siempre tiene alto definido; un padre con alto auto, no (catálogo de errores).
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
                 "\t\tBlock:", "\t\t\tId: half", "\t\t\tBox:", "\t\t\t\tHeight: 50%");

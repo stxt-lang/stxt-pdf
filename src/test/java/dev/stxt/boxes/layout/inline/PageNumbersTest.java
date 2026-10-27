@@ -87,7 +87,7 @@ class PageNumbersTest {
     }
 
     @Test
-    void continuousDocumentIsPageOneOfOne() {
+    void singlePageDocumentIsPageOneOfOne() {
         LayoutFixture l = layOut("\tText: Página {page} de {pages}", "\t\tId: N");
         assertEquals("Página 1 de 1", l.fragment("N").lines().get(0).text());
     }

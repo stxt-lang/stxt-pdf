@@ -21,7 +21,7 @@ import java.util.OptionalDouble;
 /**
  * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
  * cada hijo en flujo (con sus márgenes horizontales) caben en la caja de contenido de su padre;
- * en modo paginado, el flujo cabe en el área útil de cada página, y las cajas {@code absolute} y
+ * el flujo cabe en el área útil de cada página, y las cajas {@code absolute} y
  * {@code fixed} caben en la página. Se mira el resultado final, no las pasadas de medida.
  *
  * <p>El error señala al culpable más profundo: la palabra que no cabe en su línea, la caja más
@@ -39,11 +39,9 @@ public final class Overflow {
         Rect area = media.pageArea();
         Insets m = media.margin();
         // La página física, en coordenadas del área útil.
-        Rect page = new Rect(-m.left(), -m.top(), media.width(),
-                media.paged() ? media.height().getAsDouble() : Double.POSITIVE_INFINITY);
+        Rect page = new Rect(-m.left(), -m.top(), media.width(), media.height());
         for (Page p : pages) {
-            double height = media.paged() ? area.height() : Double.POSITIVE_INFINITY;
-            content(p.content(), 0, 0, area.width(), height, media.paged(), page);
+            content(p.content(), 0, 0, area.width(), area.height(), true, page);
             for (Fragment f : p.fixed()) {
                 fragment(f, 0, 0, page);
             }

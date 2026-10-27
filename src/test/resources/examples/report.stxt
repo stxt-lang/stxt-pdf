@@ -2,7 +2,6 @@
 # título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto.
 Document (dev.stxt.boxes):
 	Media:
-		Type: paged
 		Width: 595
 		Height: 842
 		Margin: 40

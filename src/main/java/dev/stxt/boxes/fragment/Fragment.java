@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * El trozo de una caja que cae en un fragmentainer (ESPECIFICACION.md §5.10). En modo continuo
- * cada caja produce un único fragmento; en modo paginado puede producir varios.
+ * El trozo de una caja que cae en un fragmentainer (ESPECIFICACION.md §5.10). Una caja que se
+ * parte entre páginas produce varios.
  *
  * @param box      caja de origen (sus propiedades de pintado se leen de su estilo)
  * @param x        posición de la caja de borde, relativa a la caja de contenido del padre
@@ -34,7 +34,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
         lines = List.copyOf(lines);
     }
 
-    /** Fragmento único (modo continuo o caja que no se ha partido). */
+    /** Fragmento único: una caja que no se ha partido. */
     public static Fragment complete(Box box, double x, double y, double width, double height,
                                     List<Fragment> children, List<TextLine> lines) {
         return new Fragment(box, x, y, width, height, box.border, box.padding, children, lines, true, true);

@@ -3,7 +3,7 @@ package dev.stxt.boxes.fragment;
 import java.util.List;
 
 /**
- * Una página del resultado. En modo continuo hay una sola.
+ * Una página del resultado.
  *
  * @param number  número de página, desde 1
  * @param content fragmento raíz con el flujo de esta página

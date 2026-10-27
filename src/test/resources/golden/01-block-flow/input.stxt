@@ -1,8 +1,8 @@
 # Módulo 2: flujo de bloque, colapso de márgenes y centrado con márgenes auto.
 Document (dev.stxt.boxes):
 	Media:
-		Type: continuous
 		Width: 595
+		Height: 842
 		Margin: 40
 	Block:
 		Id: A

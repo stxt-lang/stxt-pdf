@@ -40,7 +40,7 @@ import java.util.OptionalDouble;
  * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
  *
- * <p>En modo paginado (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems de una
+ * <p>Entre páginas (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems de una
  * fila que no cabe en una página se parten en paralelo.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {

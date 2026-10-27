@@ -32,7 +32,7 @@ class PdfMetricsTest {
     }
 
     private void validate(String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n"
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tTypography:\n\t\tSize: 10\n" + String.join("\n", boxLines);
         metrics.validate(new BoxTreeBuilder().build(new DocumentReader().read(doc)).root());
     }
@@ -69,7 +69,7 @@ class PdfMetricsTest {
         Path fonts = Files.createDirectories(dir.resolve("fonts"));
         Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("r.ttf"));
         PdfMetrics regularOnly = new PdfMetrics(new Resources(dir));
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595\n"
+        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: Hola";
         InvalidModelException e = assertThrows(InvalidModelException.class,

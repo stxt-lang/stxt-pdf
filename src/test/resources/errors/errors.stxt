@@ -10,8 +10,8 @@ Errors:
 		Document >>
 			Document:
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -27,31 +27,18 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Typography:
 						Align: middle
-	Case: Paginado sin alto
-		Code: MEDIA_HEIGHT_REQUIRED
+	Case: Medio sin alto
+		Code: TOO_FEW_CHILDREN
 		Line: 2
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: paged
 					Width: 595
-				Block:
-					Box:
-						Height: 10
-	Case: Alto del medio en continuo
-		Code: MEDIA_HEIGHT_CONTINUOUS
-		Line: 5
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -61,8 +48,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 					Margin: 300
 				Block:
 					Box:
@@ -73,8 +60,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 12,5
@@ -84,8 +71,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 1fr
@@ -95,8 +82,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: -10
@@ -106,8 +93,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Max width: max-content
@@ -117,8 +104,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Gap: auto
 	Case: fit-content como pista
@@ -127,8 +114,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Columns: fit-content 1fr
 	Case: Id repetido
@@ -137,8 +124,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Id: a
 					Box:
@@ -153,8 +140,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Text: hola
 					Block:
 						Box:
@@ -165,8 +152,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Cell:
 						Block:
@@ -179,8 +166,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Item:
 						Grow: 1
@@ -190,8 +177,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Text: hola
 					Content >>
 						adiós
@@ -201,8 +188,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Text:
 					Box:
 						Height: 10
@@ -212,8 +199,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Text: hola
 					Typography:
 						Size: 12
@@ -223,8 +210,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: IBM Plex Sans
 				Text: hola
@@ -234,8 +221,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Item:
 						Text: hola
@@ -245,8 +232,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Text >>
 					Primer párrafo.
 	Case: Propiedad de grid en un Flex
@@ -255,8 +242,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Columns: 1fr 1fr
 	Case: Grow en una celda de grid
@@ -265,8 +252,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Cell:
 						Grow: 1
@@ -279,8 +266,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Cell: 1 1
 						Block:
@@ -292,8 +279,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -304,8 +291,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Relative:
 					Offset: 5 auto 9 auto
 					Box:
@@ -316,8 +303,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Relative:
 					Offset: auto 7 auto 11
 					Box:
@@ -328,8 +315,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Absolute:
 					Offset: 0 10 auto 10
 					Box:
@@ -341,8 +328,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Item:
 						Block:
@@ -356,8 +343,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -368,8 +355,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -380,8 +367,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Absolute:
 					Box:
 						Width: 100
@@ -393,8 +380,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -405,8 +392,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Lines: center
 	Case: Grow en column sin alto
@@ -415,8 +402,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Direction: column
 					Item:
@@ -428,8 +415,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 100
@@ -441,8 +428,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 10
@@ -454,31 +441,31 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 60%
 						Max width: 50%
 						Height: 10
-	Case: Porcentaje de alto en continuo
-		Code: INDEFINITE_PERCENTAGE
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Block:
-					Box:
-						Height: 50%
 	Case: Porcentaje de alto con el padre en auto
 		Code: INDEFINITE_PERCENTAGE
-		Line: 9
+		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: paged
+					Width: 595
+					Height: 842
+				Block:
+					Block:
+						Box:
+							Height: 50%
+	Case: Porcentaje en una función con el padre en auto
+		Code: INDEFINITE_PERCENTAGE
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
 					Width: 595
 					Height: 842
 				Block:
@@ -487,24 +474,25 @@ Errors:
 							Min height: min(20, 10%)
 	Case: Desplazamiento vertical en porcentaje
 		Code: INDEFINITE_PERCENTAGE
-		Line: 6
+		Line: 7
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
-				Relative:
-					Offset: 10% auto auto auto
-					Box:
-						Height: 10
+					Height: 842
+				Block:
+					Relative:
+						Offset: 10% auto auto auto
+						Box:
+							Height: 10
 	Case: Filas en porcentaje sin alto
 		Code: INDEFINITE_PERCENTAGE
 		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Rows: 50% 50%
 	Case: Basis en porcentaje en column sin alto
@@ -513,8 +501,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Flex:
 					Direction: column
 					Item:
@@ -526,17 +514,16 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Gap: 5% 10
 	Case: Cortes en un Absolute
 		Code: CHILD_NOT_DECLARED
-		Line: 9
+		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: paged
 					Width: 595
 					Height: 842
 				Absolute:
@@ -550,8 +537,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Areas >>
 						a a
@@ -563,8 +550,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Grid:
 					Areas: a b
 					Cell: c
@@ -577,8 +564,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: Helvetica
 					Size: 10
@@ -590,8 +577,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: IBM Plex Sans
 					Size: 10
@@ -606,8 +593,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: IBM Plex Sans
 					Size: 10
@@ -623,8 +610,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 600
@@ -635,8 +622,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Width: 100
@@ -650,8 +637,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: IBM Plex Sans
 					Size: 10
@@ -667,8 +654,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Typography:
 					Font: IBM Plex Sans
 					Size: 10
@@ -682,8 +669,8 @@ Errors:
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: continuous
 					Width: 595
+					Height: 842
 				Block:
 					Box:
 						Height: 50
@@ -692,11 +679,10 @@ Errors:
 							Height: 80
 	Case: Absolute fuera de la página
 		Code: BOX_OVERFLOW
-		Line: 7
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: paged
 					Width: 595
 					Height: 842
 				Absolute:
@@ -706,11 +692,10 @@ Errors:
 						Height: 10
 	Case: Línea más alta que la página
 		Code: PAGE_OVERFLOW
-		Line: 12
+		Line: 11
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
-					Type: paged
 					Width: 595
 					Height: 842
 					Margin: 40

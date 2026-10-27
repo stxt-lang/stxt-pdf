@@ -281,3 +281,16 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     posicionados, que ya lo dicen con su nombre.
 
 77. **Los errores señalan la línea de la propiedad**, dentro del grupo, nunca la del grupo.
+
+## Solo modo paginado (2026-10-27)
+
+78. **Se elimina el modo continuo y, con él, `Type` de `Media`.** El medio es siempre una
+    secuencia de páginas: `Width` y `Height` son obligatorios (lo exige el schema, con
+    `TOO_FEW_CHILDREN`) y el área útil tiene siempre alto definido, así que un porcentaje
+    vertical en una caja de primer nivel o en un `Relative` de primer nivel es válido.
+    Desaparecen `MEDIA_HEIGHT_REQUIRED` y `MEDIA_HEIGHT_CONTINUOUS`. El `ConstraintSpace` sigue
+    admitiendo `fragmentainerRemaining` vacío para las cajas que no se parten (ítems de flex,
+    pasadas de medida). *Dónde:* schema, `tree/Media`, `tree/BoxTreeBuilder`,
+    `fragment/Paginator`, `layout/Overflow`, `paint/SvgCanvas`, `paint/PdfCanvas`.
+    *Alternativa:* conservar el modo continuo para pantalla, a costa de un caso especial en el
+    paginador, en el desbordamiento y en el alto definido del área útil.

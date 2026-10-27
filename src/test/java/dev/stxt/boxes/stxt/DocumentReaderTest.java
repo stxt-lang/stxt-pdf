@@ -28,7 +28,7 @@ class DocumentReaderTest {
     private static String doc(String... boxLines) {
         StringBuilder sb = new StringBuilder(String.join("\n",
                 "Document (dev.stxt.boxes):",
-                "\tMedia:", "\t\tType: continuous", "\t\tWidth: 595"));
+                "\tMedia:", "\t\tWidth: 595", "\t\tHeight: 842"));
         for (String l : boxLines) {
             sb.append('\n').append(l);
         }
@@ -114,7 +114,7 @@ class DocumentReaderTest {
     @Test
     void rootMustDeclareNamespace() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> reader.read("Document:\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 595"));
+                () -> reader.read("Document:\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842"));
         assertEquals(1, e.line());
         InvalidModelException twoRoots = assertThrows(InvalidModelException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tId: a") + "\nOther:"));

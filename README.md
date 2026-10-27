@@ -1,9 +1,9 @@
 # Motor de cajas
 
 Motor de layout de cajas descrito en [STXT](https://stxt.dev), inspirado en el modelo de
-maquetación de CSS. Un mismo documento se maqueta en **modo continuo** (una franja de altura
-infinita, como un navegador) o en **modo paginado** (páginas, como un PDF). Todas las medidas
-están en **puntos tipográficos**.
+maquetación de CSS. Los documentos se maquetan en **páginas** de tamaño fijo, como un PDF, y
+las cajas que no caben se parten entre páginas. Todas las medidas están en **puntos
+tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Schema STXT del modelo** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
@@ -20,7 +20,6 @@ modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de
 ```
 Document (dev.stxt.boxes):
 	Media:
-		Type: paged
 		Width: 595
 		Height: 842
 		Margin: 40
@@ -77,8 +76,7 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 
 ## Estado
 
-Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
-depuración y PDF con las fuentes incrustadas. Los diez hitos de la hoja de ruta están
+Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las fuentes incrustadas. Los diez hitos de la hoja de ruta están
 terminados.
 
 | Pieza | Estado |

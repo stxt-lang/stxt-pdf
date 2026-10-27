@@ -16,17 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Bucle de paginación (módulo 8). En modo continuo el espacio no tiene límite, el
- * {@link BreakToken} vuelve siempre como {@code null} y el bucle da una sola vuelta:
- * el mismo motor sirve para los dos modos.
+ * Bucle de paginación (ESPECIFICACION.md §5.10): maqueta la raíz una vez por página, desde el
+ * {@link BreakToken} de la anterior, hasta que vuelve como {@code null}.
  *
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
  * y se repiten en todas las páginas (ESPECIFICACION.md §5.5). Su containing block es el área
- * útil; en modo continuo, que no tiene alto, se toma el alto del flujo del documento.</p>
+ * útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
- * líneas de cada página ({@link PageNumbers}). En modo continuo hay una página de una. Si el
- * total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
+ * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
  */
 public final class Paginator {
 
@@ -54,18 +52,17 @@ public final class Paginator {
             results = flow(root, media, fixed);
         }
 
-        // Segunda fase de la numeración: ya se sabe cuántas páginas hay (en continuo, una).
+        // Segunda fase de la numeración: ya se sabe cuántas páginas hay.
         int total = results.size();
+        Rect area = media.pageArea();
         List<Page> pages = new ArrayList<>();
         for (LayoutResult r : results) {
             int number = pages.size() + 1;
-            Rect area = media.pageArea();
-            double height = media.paged() ? area.height() : r.fragment().height();
             List<Fragment> fixedFragments = new ArrayList<>();
             // Una fixed dentro de otra sale en su resultado y se coloca después.
             List<PendingAbsolute> queue = new ArrayList<>(fixed.values());
             for (int i = 0; i < queue.size(); i++) {
-                LayoutResult f = engine.absolute().layOut(queue.get(i), area.width(), height, Insets.ZERO);
+                LayoutResult f = engine.absolute().layOut(queue.get(i), area.width(), area.height(), Insets.ZERO);
                 fixedFragments.add(numbered ? engine.number(f.fragment(), number, total) : f.fragment());
                 queue.addAll(f.pending());
             }
