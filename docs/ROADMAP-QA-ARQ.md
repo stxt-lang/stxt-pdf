@@ -67,6 +67,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | pendiente |
 | 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | pendiente |
 | 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | pendiente |
+| 12 | [PNG golden que cambian según la máquina](#12-png-golden-y-antialiasing) | QA | S | — | hecho |
 
 **Orden recomendado:** 1 → 2 → 3 → 4 en una o dos sesiones (red de seguridad barata); después
 5 (lo que más reduce riesgo antes del hito 15); 6 → 7 → 8 cuando toque añadir elementos nuevos;
@@ -343,6 +344,28 @@ documento real lo nota.
       `InlineLayout`, vaciado con la caché en `reservePageDigits`.
 - [ ] `InlineLayout` recibe el `Engine` (como los demás algoritmos) para usar su caché.
 
+## 12. PNG golden y antialiasing
+
+**Problema.** Tras un `git pull` de un commit hecho en otro equipo, `mvn test` reescribía los
+21 `page-N.png` con el layout intacto (los `expected.stxt` pasaban). `GoldenTest.samePixels`
+exigía píxeles idénticos, y el antialiasing de PDFBox/Java2D cambia de una máquina a otra:
+de 2 a 30 píxeles por imagen, con diferencias de hasta 10 (sobre 255) por canal, en las
+esquinas de los contornos de depuración. Así, "un PNG modificado en git = el resultado ha
+cambiado" daba falsos positivos en cada cambio de equipo y enseñaba a ignorar el aviso.
+
+**Cómo.**
+
+- [x] `samePixels` tolera una diferencia por canal de hasta `PIXEL_TOLERANCE` (16). Un cambio
+      real de layout mueve líneas y texto, con diferencias cercanas a 255.
+- [x] `CLAUDE.md` (sección Tests) lo explica.
+
+**Verificación.** Con los PNG del otro equipo, `GoldenTest` ya no modifica ninguno; con un
+cuadrado negro de 11 × 11 píxeles pintado en `04-grid/page-1.png`, lo reescribe.
+
+**Límite conocido.** Si el PNG se reescribe por un cambio real, el fichero nuevo lleva
+también el antialiasing de la máquina que lo genera. Un cambio de color de menos de 16 por
+canal no reescribe el PNG; las posiciones las protege igualmente `expected.stxt`.
+
 ---
 
 ## Lo que no merece la pena (KISS)
@@ -368,3 +391,4 @@ Para no hacerlo por inercia:
 |---|---|---|---|
 | 2026-10-27 | Revisión inicial | Esta hoja de ruta; suite en verde (388 tests) | Tarea 1 |
 | 2026-10-27 | 1 | Ramas `default` explícitas en `BoxTreeBuilder` y `SchemaCoverageTest` (161 pares); 549 tests en verde | Tarea 2 |
+| 2026-10-27 | 12 (nueva) | `GoldenTest` tolera el antialiasing entre máquinas al comparar los PNG; 549 tests en verde | Tarea 2 |

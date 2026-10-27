@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -55,6 +54,13 @@ class GoldenTest {
     private static final Path SOURCE_DIR = Path.of("src", "test", "resources", "golden");
     private static final float IMAGE_DPI = 100;
     private static final Pattern PAGE_IMAGE = Pattern.compile("page-(\\d+)\\.png");
+    /**
+     * Diferencia máxima por canal (de 0 a 255) entre dos píxeles que se consideran iguales. El
+     * antialiasing de PDFBox cambia de una máquina a otra: entre dos equipos se han visto hasta 30
+     * píxeles por imagen con diferencias de hasta 10, en las esquinas de los contornos. Un cambio
+     * real de layout mueve líneas y texto, con diferencias cercanas a 255.
+     */
+    private static final int PIXEL_TOLERANCE = 16;
 
     /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
     private static final Map<String, String> PENDING = Map.of();
@@ -92,7 +98,8 @@ class GoldenTest {
     /**
      * Escribe en la carpeta del caso, en el código fuente, {@code output.pdf} (ignorado por git)
      * y un {@code page-N.png} por página (versionados): así un cambio en el resultado se ve en el
-     * diff. Un PNG solo se reescribe si cambian sus píxeles, y se borran los de páginas que ya no
+     * diff. Un PNG solo se reescribe si cambian sus píxeles más allá del antialiasing
+     * ({@link #PIXEL_TOLERANCE}), y se borran los de páginas que ya no
      * existen. El PDF lleva los contornos de depuración de las cajas y se maqueta con las métricas
      * reales de las fuentes de {@code resources/fonts}, que se incrustan ({@link PdfCanvas#write(InlineNode,
      * Resources, java.io.OutputStream, boolean)}), no con las de la comparación.
@@ -139,7 +146,16 @@ class GoldenTest {
         }
         int w = a.getWidth();
         int h = a.getHeight();
-        return Arrays.equals(a.getRGB(0, 0, w, h, null, 0, w), b.getRGB(0, 0, w, h, null, 0, w));
+        int[] p = a.getRGB(0, 0, w, h, null, 0, w);
+        int[] q = b.getRGB(0, 0, w, h, null, 0, w);
+        for (int i = 0; i < p.length; i++) {
+            for (int shift = 0; shift < 24; shift += 8) {
+                if (Math.abs((p[i] >> shift & 0xff) - (q[i] >> shift & 0xff)) > PIXEL_TOLERANCE) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static void compare(Node expected, Node actual, String path) {

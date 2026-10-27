@@ -268,8 +268,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   motivo: al completar el hito, quítalos de ahí. Cada caso escribe un SVG de depuración en
   `target/golden-svg/` y, en su carpeta del código fuente, `output.pdf` (ignorado por git) y
   `page-N.png` por página (versionados, con los contornos de las cajas y las métricas reales).
-  Un PNG solo se reescribe si cambian sus píxeles: si aparece modificado en git, el resultado
-  ha cambiado; míralo antes de dar el cambio por bueno.
+  Un PNG solo se reescribe si cambian sus píxeles más allá del antialiasing, que varía entre
+  máquinas (`GoldenTest.PIXEL_TOLERANCE`, 16 por canal): si aparece modificado en git, el
+  resultado ha cambiado; míralo antes de dar el cambio por bueno.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área útil de
   515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
   declara en el `Typography` de `Document` `Font: IBM Plex Sans` y `Size: 10`; los demás
