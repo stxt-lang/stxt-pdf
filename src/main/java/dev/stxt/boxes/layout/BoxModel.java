@@ -183,6 +183,6 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         OptionalDouble remaining = space.fragmenting()
                 ? OptionalDouble.of(Slice.contentRemaining(this, first, space))
                 : OptionalDouble.empty();
-        return new ConstraintSpace(w, h, false, false, w, h, remaining, space.atFragmentainerStart());
+        return ConstraintSpace.forChildren(w, h, remaining, space.atFragmentainerStart());
     }
 }

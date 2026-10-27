@@ -272,7 +272,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style;
             Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
             double margins = it.margin.horizontal();
-            BoxModel probe = BoxModel.resolve(b, itemSpace(contentWidth, false, OptionalDouble.empty()),
+            BoxModel probe = BoxModel.resolve(b, probeSpace(),
                     () -> engine.intrinsic(b));
             double extra = probe.border().horizontal() + probe.padding().horizontal();
             IntrinsicSizes intrinsic = engine.intrinsic(b);
@@ -301,7 +301,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style;
             Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
             double margins = it.margin.vertical();
-            BoxModel probe = BoxModel.resolve(b, itemSpace(contentWidth, false, OptionalDouble.empty()),
+            BoxModel probe = BoxModel.resolve(b, probeSpace(),
                     () -> engine.intrinsic(b));
 
             // Ancho con el que se mide: el declarado, el del contenedor (stretch) o el ajuste al contenido.
@@ -315,7 +315,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             }
             it.crossWidth = BoxModel.constrainWidth(is, width, contentWidth);
 
-            ConstraintSpace measure = itemSpace(it.crossWidth, true, OptionalDouble.empty());
+            ConstraintSpace measure = itemSpace(it.crossWidth, OptionalDouble.empty());
             BoxModel sized = BoxModel.resolve(b, measure, () -> engine.intrinsic(b));
             double contentSize = engine.layout(b, measure, null).fragment().height();
 
@@ -396,13 +396,13 @@ public final class FlexLayout implements LayoutAlgorithm {
         void layOutItem(Item it, OptionalDouble cross) {
             if (row) {
                 double width = Math.max(0, it.main - it.margin.horizontal());
-                it.space = itemSpace(width, true, cross);
+                it.space = itemSpace(width, cross);
                 it.result = engine.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().height() + it.margin.vertical();
             } else {
                 double height = Math.max(0, it.main - it.margin.vertical());
                 double width = cross.orElse(it.crossWidth);
-                it.space = itemSpace(width, true, OptionalDouble.of(height));
+                it.space = itemSpace(width, OptionalDouble.of(height));
                 it.result = engine.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().width() + it.margin.horizontal();
             }
@@ -414,7 +414,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double target;
             if (row) {
                 Fragment f = it.result.fragment();
-                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), true, OptionalDouble.empty()),
+                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()),
                         () -> engine.intrinsic(it.box));
                 if (m.height().isPresent()) {
                     return;
@@ -441,10 +441,17 @@ public final class FlexLayout implements LayoutAlgorithm {
             return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit);
         }
 
-        /** Los porcentajes de los ítems se resuelven contra la caja de contenido del contenedor. */
-        ConstraintSpace itemSpace(double width, boolean fixedWidth, OptionalDouble fixedHeight) {
-            return new ConstraintSpace(width, fixedHeight, fixedWidth, fixedHeight.isPresent(),
-                    contentWidth, contentHeight, OptionalDouble.empty(), atStart);
+        /**
+         * Espacio de un ítem con el ancho y, si lo hay, el alto impuestos. Los porcentajes de los
+         * ítems se resuelven contra la caja de contenido del contenedor.
+         */
+        ConstraintSpace itemSpace(double width, OptionalDouble fixedHeight) {
+            return ConstraintSpace.fixed(width, fixedHeight, contentWidth, contentHeight, atStart);
+        }
+
+        /** Espacio de la sonda que resuelve márgenes, borde, relleno y tamaños declarados del ítem. */
+        ConstraintSpace probeSpace() {
+            return ConstraintSpace.free(contentWidth, contentWidth, contentHeight, atStart);
         }
     }
 

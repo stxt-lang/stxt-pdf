@@ -34,28 +34,54 @@ public record ConstraintSpace(
         boolean atFragmentainerStart,
         boolean contentHeight) {
 
-    public ConstraintSpace(double availableWidth, OptionalDouble availableHeight, boolean fixedWidth,
-                           boolean fixedHeight, double percentBaseWidth, OptionalDouble percentBaseHeight,
-                           OptionalDouble fragmentainerRemaining, boolean atFragmentainerStart) {
-        this(availableWidth, availableHeight, fixedWidth, fixedHeight, percentBaseWidth, percentBaseHeight,
-                fragmentainerRemaining, atFragmentainerStart, false);
-    }
-
     /** Espacio de la caja raíz al empezar una página: el área útil entera. */
     public static ConstraintSpace forPage(Media media) {
         double width = media.pageArea().width();
         OptionalDouble height = OptionalDouble.of(media.pageArea().height());
-        return new ConstraintSpace(width, height, true, true, width, height, height, true);
+        return new ConstraintSpace(width, height, true, true, width, height, height, true, false);
+    }
+
+    /**
+     * Espacio de los hijos en flujo de una caja: su caja de contenido es a la vez el espacio
+     * disponible y la base de los porcentajes, y nada impone el tamaño.
+     */
+    public static ConstraintSpace forChildren(double width, OptionalDouble height, OptionalDouble remaining,
+                                              boolean atStart) {
+        return new ConstraintSpace(width, height, false, false, width, height, remaining, atStart, false);
+    }
+
+    /**
+     * Sin tamaños impuestos, con el alto indefinido y sin fragmentación: las sondas que resuelven
+     * márgenes, borde, relleno y tamaños declarados ({@link BoxModel#resolve}).
+     */
+    public static ConstraintSpace free(double width, double baseWidth, OptionalDouble baseHeight, boolean atStart) {
+        return new ConstraintSpace(width, OptionalDouble.empty(), false, false, baseWidth, baseHeight,
+                OptionalDouble.empty(), atStart, false);
+    }
+
+    /**
+     * El padre impone el ancho y, si lo hay, el alto, sin fragmentación: los ítems de flex y grid
+     * y las cajas {@code absolute}.
+     */
+    public static ConstraintSpace fixed(double width, OptionalDouble height, double baseWidth,
+                                        OptionalDouble baseHeight, boolean atStart) {
+        return new ConstraintSpace(width, height, true, height.isPresent(), baseWidth, baseHeight,
+                OptionalDouble.empty(), atStart, false);
     }
 
     public boolean fragmenting() {
         return fragmentainerRemaining.isPresent();
     }
 
+    /**
+     * El mismo espacio con otro resto de página. Solo tiene sentido si el espacio fragmenta:
+     * para añadir la fragmentación está {@link #fragmented}.
+     */
     public ConstraintSpace withRemaining(double remaining, boolean atStart) {
-        return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
-                percentBaseWidth, percentBaseHeight,
-                fragmenting() ? OptionalDouble.of(remaining) : OptionalDouble.empty(), atStart);
+        if (!fragmenting()) {
+            throw new IllegalStateException("withRemaining sobre un espacio sin fragmentación");
+        }
+        return fragmented(remaining, atStart);
     }
 
     /** El mismo espacio, para medir el alto del contenido sin el {@code Height} de la caja. */
@@ -67,6 +93,6 @@ public record ConstraintSpace(
     /** El mismo espacio, con fragmentación aunque no la tuviera (los ítems que se parten en paralelo). */
     public ConstraintSpace fragmented(double remaining, boolean atStart) {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
-                percentBaseWidth, percentBaseHeight, OptionalDouble.of(remaining), atStart);
+                percentBaseWidth, percentBaseHeight, OptionalDouble.of(remaining), atStart, contentHeight);
     }
 }

@@ -57,7 +57,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | # | Tarea | Tipo | Coste | Depende de | Estado |
 |---|---|---|---|---|---|
 | 1 | [Ramas `default` silenciosas en la lectura de propiedades](#1-ramas-default-silenciosas) | QA | S | — | hecho |
-| 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | pendiente |
+| 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | hecho |
 | 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | pendiente |
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | pendiente |
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | pendiente |
@@ -128,11 +128,23 @@ Las 11 construcciones con `new ConstraintSpace(w, h, false, false, w, h, empty, 
 
 **Cómo.**
 
-- [ ] `withRemaining` y `fragmented` conservan `contentHeight` (constructor canónico).
-- [ ] Fábricas con nombre para los casos que se repiten: `ConstraintSpace.free(width, baseW,
-      baseH)` (sondas de `BoxModel`), `ConstraintSpace.fixed(width, height, baseW, baseH)`
-      (ítems de flex y grid, `AbsoluteLayout`), además de `forPage`.
-- [ ] `ConstraintSpaceTest`: los *withers* conservan todo lo que no cambian.
+- [x] `withRemaining` y `fragmented` conservan `contentHeight` (constructor canónico).
+      `withRemaining` sobre un espacio sin fragmentación lanza `IllegalStateException` (error
+      del motor; sus dos llamadas, en `Engine` y `BlockLayout`, ya lo comprobaban) en lugar de
+      ignorar `remaining`; para añadir la fragmentación está `fragmented`.
+- [x] Fábricas con nombre: `free(width, baseW, baseH, atStart)` (sondas de `BoxModel` en
+      flex, grid y `AbsoluteLayout`), `fixed(width, height, baseW, baseH, atStart)` (ítems de
+      flex y grid, `AbsoluteLayout`; el alto se impone si está presente) y
+      `forChildren(width, height, remaining, atStart)` (`BoxModel.childSpace`), además de
+      `forPage`. Llevan `atStart` porque forma parte de la clave de la caché y quitarlo
+      podría cambiar resultados. Se elimina el constructor de 8 argumentos: fuera de
+      `ConstraintSpace` nadie construye el `record` directamente, y `FlexLayout.itemSpace` y
+      `GridLayout.itemSpace` dejan de tener el booleano `fixedWidth` (el de grid desaparece).
+- [x] `ConstraintSpaceTest`: los *withers* conservan todo lo que no cambian, las fábricas y
+      `withRemaining` sin fragmentación.
+
+**Verificación.** `mvn test` (555 tests), sin cambios en los PNG ni en los `expected.stxt`;
+volviendo a poner `false` en `fragmented`, fallan dos tests de `ConstraintSpaceTest`.
 
 ## 3. Resultado del documento y fachada
 
@@ -392,3 +404,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | Revisión inicial | Esta hoja de ruta; suite en verde (388 tests) | Tarea 1 |
 | 2026-10-27 | 1 | Ramas `default` explícitas en `BoxTreeBuilder` y `SchemaCoverageTest` (161 pares); 549 tests en verde | Tarea 2 |
 | 2026-10-27 | 12 (nueva) | `GoldenTest` tolera el antialiasing entre máquinas al comparar los PNG; 549 tests en verde | Tarea 2 |
+| 2026-10-27 | 2 | `ConstraintSpace` con fábricas con nombre y *withers* que conservan `contentHeight`; `ConstraintSpaceTest`; 555 tests en verde | Tarea 3 |

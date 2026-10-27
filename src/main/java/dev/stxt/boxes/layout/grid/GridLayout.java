@@ -156,7 +156,8 @@ public final class GridLayout implements LayoutAlgorithm {
             areaWidths[i] = span(columns, a.column() - 1, a.columns(), columnGap);
             margins[i] = Insets.resolve(item.style.margin, areaWidths[i]);
             itemWidths[i] = itemWidth(item, areaWidths[i], margins[i], horizontal(item, s), atStart);
-            spaces[i] = itemSpace(itemWidths[i], OptionalDouble.empty(), areaWidths[i], OptionalDouble.empty(), atStart);
+            spaces[i] = ConstraintSpace.fixed(itemWidths[i], OptionalDouble.empty(), areaWidths[i],
+                    OptionalDouble.empty(), atStart);
             results[i] = engine.layout(item, spaces[i], null);
             double h = results[i].fragment().height() + margins[i].vertical();
             heights.add(new ItemContribution(a.row() - 1, a.rows(), h, h));
@@ -234,8 +235,7 @@ public final class GridLayout implements LayoutAlgorithm {
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */
     private double itemWidth(Box item, double areaWidth, Insets margin, Style.Alignment horizontal, boolean atStart) {
         Style is = item.style;
-        ConstraintSpace free = new ConstraintSpace(areaWidth, OptionalDouble.empty(), false, false,
-                areaWidth, OptionalDouble.empty(), OptionalDouble.empty(), atStart);
+        ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
         BoxModel probe = BoxModel.resolve(item, free, () -> engine.intrinsic(item));
         if (!is.width.isAuto()) {
             return probe.width();
@@ -258,8 +258,8 @@ public final class GridLayout implements LayoutAlgorithm {
         OptionalDouble base = OptionalDouble.of(areaHeight);
         OptionalDouble fixedHeight = OptionalDouble.empty();
         if (vertical == Style.Alignment.STRETCH) {
-            BoxModel m = BoxModel.resolve(item, itemSpace(width, OptionalDouble.empty(), areaWidth, base, atStart),
-                    () -> engine.intrinsic(item));
+            ConstraintSpace probe = ConstraintSpace.fixed(width, OptionalDouble.empty(), areaWidth, base, atStart);
+            BoxModel m = BoxModel.resolve(item, probe, () -> engine.intrinsic(item));
             if (m.height().isEmpty()) {
                 fixedHeight = OptionalDouble.of(Sizing.constrain(
                         Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));
@@ -270,7 +270,7 @@ public final class GridLayout implements LayoutAlgorithm {
         if (fixedHeight.isEmpty() && !dependsOnHeightBase(is)) {
             return measureSpace;
         }
-        return itemSpace(width, fixedHeight, areaWidth, base, atStart);
+        return ConstraintSpace.fixed(width, fixedHeight, areaWidth, base, atStart);
     }
 
     /** El alto del ítem se declara con un porcentaje (o una función que lo contiene). */
@@ -280,12 +280,6 @@ public final class GridLayout implements LayoutAlgorithm {
 
     private static boolean dependsOnBase(Value v) {
         return v.resolve(OptionalDouble.empty()).isEmpty() && v.resolve(1).isPresent();
-    }
-
-    private static ConstraintSpace itemSpace(double width, OptionalDouble fixedHeight, double baseWidth,
-                                             OptionalDouble baseHeight, boolean atStart) {
-        return new ConstraintSpace(width, fixedHeight, true, fixedHeight.isPresent(),
-                baseWidth, baseHeight, OptionalDouble.empty(), atStart);
     }
 
     private static Style.Alignment horizontal(Box item, Style container) {

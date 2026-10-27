@@ -99,8 +99,7 @@ public final class AbsoluteLayout {
         double staticY = p.staticY() + cbPadding.top();
 
         // Márgenes, borde, relleno y ancho declarado; los porcentajes son del containing block.
-        ConstraintSpace probe = new ConstraintSpace(cbWidth, OptionalDouble.empty(), false, false,
-                cbWidth, cbHeightBase, OptionalDouble.empty(), false);
+        ConstraintSpace probe = ConstraintSpace.free(cbWidth, cbWidth, cbHeightBase, false);
         BoxModel model = BoxModel.resolve(box, probe, intrinsic);
         Insets margin = model.margin();
 
@@ -126,8 +125,7 @@ public final class AbsoluteLayout {
         OptionalDouble bottom = s.offset.bottom().resolve(cbHeightBase);
         OptionalDouble marginTop = term(s.margin.top(), margin.top());
         OptionalDouble marginBottom = term(s.margin.bottom(), margin.bottom());
-        ConstraintSpace space = new ConstraintSpace(h.size(), OptionalDouble.empty(), true, false,
-                cbWidth, cbHeightBase, OptionalDouble.empty(), false);
+        ConstraintSpace space = ConstraintSpace.fixed(h.size(), OptionalDouble.empty(), cbWidth, cbHeightBase, false);
         BoxModel sized = BoxModel.resolve(box, space, intrinsic);
         OptionalDouble height = sized.height();
         if (height.isEmpty() && top.isPresent() && bottom.isPresent()) {
@@ -135,8 +133,7 @@ public final class AbsoluteLayout {
             double stretched = Math.max(0, cbHeight - top.getAsDouble() - bottom.getAsDouble()
                     - marginTop.orElse(0) - marginBottom.orElse(0));
             height = OptionalDouble.of(Sizing.constrain(stretched, sized.minHeight(), sized.maxHeight()));
-            space = new ConstraintSpace(h.size(), height, true, true,
-                    cbWidth, cbHeightBase, OptionalDouble.empty(), false);
+            space = ConstraintSpace.fixed(h.size(), height, cbWidth, cbHeightBase, false);
         }
         LayoutResult r = engine.layout(box, space, null);
         Fragment f = r.fragment();
