@@ -1,0 +1,244 @@
+package dev.stxt.boxes.tree;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.boxes.layout.grid.Area;
+import dev.stxt.boxes.layout.grid.Cell;
+import dev.stxt.boxes.layout.grid.GridAreas;
+import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.Value;
+
+import java.util.List;
+import java.util.Map;
+
+import static dev.stxt.boxes.tree.Nodes.error;
+import static dev.stxt.boxes.tree.Nodes.label;
+import static dev.stxt.boxes.tree.Nodes.placement;
+import static dev.stxt.boxes.tree.Nodes.position;
+import static dev.stxt.boxes.tree.ValueReader.amount;
+import static dev.stxt.boxes.tree.ValueReader.comparable;
+import static dev.stxt.boxes.tree.ValueReader.hasPercentage;
+
+/**
+ * Reglas del modelo que el schema no puede expresar (ESPECIFICACION.md §6) y que miran la caja
+ * ya leída: desplazamientos, márgenes {@code auto}, mínimo y máximo, porcentajes verticales y si
+ * el alto es definido (§3.6), y la fuente de los textos.
+ */
+final class ModelValidator {
+
+    private ModelValidator() {
+    }
+
+    /** {@code Main axis} y {@code Lines} de un {@code Flex}. */
+    static void validateFlex(Style s) {
+        if (s.flexMainAxis == Style.Distribution.STRETCH) {
+            throw error(s.line("flex.main-axis"), ErrorCode.VALUE_NOT_ALLOWED,
+                    "Main axis no admite 'stretch'; usa Grow en los ítems");
+        }
+        if (s.isDeclared("flex.lines") && !s.flexWrap) {
+            throw error(s.line("flex.lines"), ErrorCode.LINES_WITHOUT_WRAP,
+                    "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
+        }
+    }
+
+    /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños y porcentajes. */
+    static void validateBox(BuildContext ctx, Style s, Box parent) {
+        Style.Layout parentLayout = parent.style.layout;
+        // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
+        // de una Table, ítems de su grid.
+        boolean flexItem = !s.isOutOfFlow() && parentLayout == Style.Layout.FLEX;
+        boolean gridItem = !s.isOutOfFlow() && parentLayout == Style.Layout.GRID;
+
+        if (gridItem && s.itemArea != null) {
+            Map<String, Area> areas = parent.style.gridAreas == null
+                    ? Map.of() : GridAreas.parse(parent.style.gridAreas);
+            placement(s.line("item.area"), () -> Cell.parse(s.itemArea, areas));
+        }
+        validateOffset(s);
+        validateMargins(s, parentLayout, flexItem, gridItem);
+        if (s.isDeclared("aspect-ratio") && !s.width.isAuto() && !s.height.isAuto()) {
+            throw error(s.line("aspect-ratio"), ErrorCode.ASPECT_RATIO_CONFLICT,
+                    "Aspect ratio no tiene efecto si Width y Height están declarados");
+        }
+        validateMinMax(s, "width", s.width, "min-width", s.minWidth, "max-width", s.maxWidth);
+        validateMinMax(s, "height", s.height, "min-height", s.minHeight, "max-height", s.maxHeight);
+        validatePercentages(ctx, s, parent, flexItem, gridItem);
+    }
+
+    private static void validateOffset(Style s) {
+        if (!s.isDeclared("offset")) {
+            return;
+        }
+        int line = s.line("offset");
+        Sides<Value> o = s.offset;
+        if (s.position == Style.Position.RELATIVE) {
+            if (!o.top().isAuto() && !o.bottom().isAuto()) {
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
+                        + "desde arriba y desde abajo: deja uno de los dos en auto");
+            }
+            if (!o.left().isAuto() && !o.right().isAuto()) {
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
+                        + "desde la izquierda y desde la derecha: deja uno de los dos en auto");
+            }
+            return;
+        }
+        // Absolute y Fixed: inicio + tamaño + fin no puede fijar la posición dos veces.
+        if (!o.left().isAuto() && !s.width.isAuto() && !o.right().isAuto()
+                && !s.margin.left().isAuto() && !s.margin.right().isAuto()) {
+            throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
+                    + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
+        }
+        if (!o.top().isAuto() && !s.height.isAuto() && !o.bottom().isAuto()
+                && !s.margin.top().isAuto() && !s.margin.bottom().isAuto()) {
+            throw error(line, ErrorCode.OVERCONSTRAINED, "Arriba, Height y abajo declarados fijan la "
+                    + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
+        }
+    }
+
+    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Absolute y Fixed, con inicio, tamaño y fin. */
+    private static void validateMargins(Style s, Style.Layout parentLayout, boolean flexItem, boolean gridItem) {
+        Sides<Value> m = s.margin;
+        boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
+        boolean verticalAuto = m.top().isAuto() || m.bottom().isAuto();
+        if (!horizontalAuto && !verticalAuto) {
+            return;
+        }
+        int line = s.line("margin");
+        if (flexItem || gridItem) {
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de flex o "
+                    + "grid; alinea con Main axis, Cross axis, Horizontal o Vertical");
+        }
+        if (s.isOutOfFlow()) {
+            Sides<Value> o = s.offset;
+            if (horizontalAuto && (o.left().isAuto() || s.width.isAuto() || o.right().isAuto())) {
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
+                        + position(s) + " con izquierda, Width y derecha declarados");
+            }
+            if (verticalAuto && (o.top().isAuto() || s.height.isAuto() || o.bottom().isAuto())) {
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
+                        + position(s) + " con arriba, Height y abajo declarados");
+            }
+            return;
+        }
+        if (parentLayout == Style.Layout.BLOCK) {
+            if (verticalAuto) {
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
+                        "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
+            }
+            if (s.width.isAuto() && s.maxWidth == null) {
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
+                        + "todo el ancho: declara Width o Max width");
+            }
+        }
+    }
+
+    /** Tamaño, mínimo y máximo comparables (los dos en puntos o los dos en porcentaje) que se contradicen. */
+    private static void validateMinMax(Style s, String size, Value value, String min, Value minValue,
+                                       String max, Value maxValue) {
+        if (maxValue != null && comparable(minValue, maxValue) && amount(minValue) > amount(maxValue)) {
+            throw error(s.line(min), ErrorCode.MIN_MAX_CONFLICT,
+                    label(min) + " es mayor que " + label(max) + " (línea " + s.line(max) + ")");
+        }
+        if (comparable(value, minValue) && amount(value) < amount(minValue)) {
+            throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
+                    label(size) + " es menor que " + label(min) + " (línea " + s.line(min) + ")");
+        }
+        if (maxValue != null && comparable(value, maxValue) && amount(value) > amount(maxValue)) {
+            throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
+                    label(size) + " es mayor que " + label(max) + " (línea " + s.line(max) + ")");
+        }
+    }
+
+    /**
+     * Porcentajes verticales de la caja: su base debe ser un alto definido (§3.6). La base de
+     * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
+     * definido para Absolute y Fixed) o el área (los ítems de grid); la de los desplazamientos
+     * de un Relative y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
+     */
+    private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean flexItem,
+                                            boolean gridItem) {
+        boolean ownBase = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
+        for (String p : List.of("height", "min-height", "max-height")) {
+            Value v = switch (p) {
+                case "height" -> s.height;
+                case "min-height" -> s.minHeight;
+                default -> s.maxHeight;
+            };
+            if (!ownBase && v != null && hasPercentage(v)) {
+                throw indefinite(s.line(p), label(p));
+            }
+        }
+        boolean parentDefinite = ctx.isDefinite(parent);
+        if (s.position == Style.Position.RELATIVE && !parentDefinite
+                && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
+            throw indefinite(s.line("offset"), "El desplazamiento vertical de Offset");
+        }
+        boolean column = parent.style.flexDirection == Style.Direction.COLUMN;
+        if (flexItem && column && !parentDefinite) {
+            if (hasPercentage(s.itemBasis)) {
+                throw indefinite(s.line("item.basis"), "Basis en un flex column");
+            }
+            if (s.itemGrow > 0) {
+                throw error(s.line("item.grow"), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
+                        + "column del padre no tiene un alto definido que repartir; declara su Height");
+            }
+        }
+    }
+
+    /** Porcentajes verticales del propio contenedor: filas y hueco entre filas. */
+    static void validateContainer(BuildContext ctx, Style s, Box box) {
+        if (ctx.isDefinite(box)) {
+            return;
+        }
+        if (s.gridRows.stream().anyMatch(ValueReader::hasPercentage)) {
+            throw indefinite(s.line("grid.rows"), "Rows");
+        }
+        // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
+        boolean rowGapUsed = s.layout == Style.Layout.GRID
+                || (s.layout == Style.Layout.FLEX && (s.flexWrap || s.flexDirection == Style.Direction.COLUMN));
+        if (rowGapUsed && hasPercentage(s.rowGap)) {
+            String gap = s.layout == Style.Layout.GRID ? "grid.gap" : "flex.gap";
+            throw indefinite(s.line(gap), "El hueco entre filas de Gap");
+        }
+    }
+
+    /**
+     * Si el alto de la caja de contenido es definido, sin maquetar: un {@code Height} que se
+     * resuelve (puntos, o porcentaje de una base definida), {@code Aspect ratio} con alto
+     * {@code auto}, un Absolute o un Fixed estirado entre arriba y abajo, o un ítem de grid
+     * estirado ({@code Vertical: stretch}) en su área.
+     */
+    static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
+        boolean gridItem = !s.isOutOfFlow() && parent.style.layout == Style.Layout.GRID;
+        boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
+        Value h = s.height;
+        if (!h.isAuto() && !h.isIntrinsic()) {
+            return base || !hasPercentage(h);
+        }
+        if (h.isAuto() && s.aspectRatio != null) {
+            return true;
+        }
+        if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
+            return true;
+        }
+        Style.Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style.gridVertical;
+        return h.isAuto() && gridItem && vertical == Style.Alignment.STRETCH;
+    }
+
+    private static InvalidModelException indefinite(int line, String what) {
+        return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " usa un porcentaje de un alto que no es "
+                + "definido: declara el Height del containing block, o usa puntos");
+    }
+
+    /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
+    static void font(InlineNode n, Node source, Box box) {
+        if (box.style.font == null) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
+        }
+        if (!box.style.isDeclared("font-size")) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
+        }
+    }
+}

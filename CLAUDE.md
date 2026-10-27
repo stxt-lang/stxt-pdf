@@ -82,7 +82,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `BoxTreeBuilder`, `InvalidModelException` |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `LaidOutDocument` |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
@@ -113,8 +113,13 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
   culpable**: la de la propiedad (`Style.line("height")`, `"grid.rows"`, `"item.grow"`…), no la
   de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
+  `BoxTreeBuilder` es el orquestador (elementos, encabezados y texto) y no guarda estado: lo de
+  cada llamada va en un `BuildContext`. Los valores los interpreta `ValueReader`; los grupos y
+  las propiedades de `Flex`, `Grid` e `Item`, `PropertyReader`; las reglas de `Styles`,
+  `StyleRules`; tablas y listas, `TableBuilder` y `ListBuilder`; y las reglas del §6 que miran
+  la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
 - **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class` y `For id` con `Box`,
-  `Typography` y `Break`. `BoxTreeBuilder.applyRules` las aplica entre la herencia y lo propio
+  `Typography` y `Break`. `StyleRules.apply` las aplica entre la herencia y lo propio
   del elemento (prioridad: elemento > id > clases en orden de `Styles` > tipo > herencia), con
   las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
   regla y se valida como si la declarara el elemento.
@@ -146,7 +151,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
-  `BoxTreeBuilder.definiteHeight`). Los desbordamientos (§5.12) son errores: `Overflow` los
+  `ModelValidator.definiteHeight`). Los desbordamientos (§5.12) son errores: `Overflow` los
   busca en el resultado ya paginado y señala al culpable más interior. `Font` y `Size` no
   tienen valor por defecto y se suelen declarar en el `Typography` de `Document`. No
   generalices una regla nueva sin comentarlo con el usuario.
@@ -295,8 +300,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 1. La especificación manda: si el código y `ESPECIFICACION.md` discrepan, aclara cuál es el
    correcto antes de cambiar ninguno de los dos.
 2. Si añades o cambias una propiedad, actualiza a la vez: el schema `.stxt` (en su grupo o
-   en cada elemento que la admite), el resumen del §9, la tabla del §4, `Style` y
-   `BoxTreeBuilder` (su lectura y, si aplica, la validación del §6).
+   en cada elemento que la admite), el resumen del §9, la tabla del §4, `Style`,
+   su lectura (`PropertyReader`, o `BoxTreeBuilder.element` si es propia de un elemento) y, si
+   aplica, la validación del §6 (`ModelValidator`).
    Una regla de validación nueva lleva su `ErrorCode`, su fila en la tabla del §6 y un caso en
    el catálogo de errores.
 3. Al completar un hito, actualiza la tabla de estado y la hoja de ruta del README y elimina sus

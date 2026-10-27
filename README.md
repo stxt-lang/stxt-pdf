@@ -149,7 +149,8 @@ src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ResourceException
-  tree/         Box, Style, FontFace, Media, BoxTreeBuilder, InvalidModelException
+  tree/         Box, Element, Style, FontFace, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
+                StyleRules, TableBuilder, ListBuilder, ModelValidator…), InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
                 Slice, UnitBreaker

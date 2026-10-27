@@ -107,7 +107,7 @@ tiene un caso por código.
 51. **El alto definido se decide al leer el documento**, con una regla fija (§3.6), no al
     maquetar. Es más estricta que el motor y que CSS: un ítem de flex estirado no da un alto
     definido a sus hijos, aunque el motor sí lo conoce al maquetarlos.
-    *Dónde:* `tree/BoxTreeBuilder.definiteHeight` y `validatePercentages`.
+    *Dónde:* `tree/ModelValidator.definiteHeight` y `validatePercentages`.
     *Alternativa:* detectar los porcentajes sin base durante el layout final, distinguiéndolo de
     las pasadas de medida (grid mide sus ítems sin base y luego los maqueta con el alto del área).
 
@@ -121,19 +121,19 @@ tiene un caso por código.
     `auto` la caja ocupa toda la línea y los márgenes valdrían 0. También son error los
     verticales en flujo de bloque y los de las `absolute` sin inicio, tamaño y fin. Amplían la
     regla acordada (márgenes `auto` en ítems de flex y grid) con el mismo criterio.
-    *Dónde:* `tree/BoxTreeBuilder.validateMargins`.
+    *Dónde:* `tree/ModelValidator.validateMargins`.
 
 54. **Mínimos y máximos solo se comparan en las mismas unidades** (puntos con puntos,
     porcentaje con porcentaje). Si no se pueden comparar al leer, al maquetar sigue ganando el
     mínimo.
-    *Dónde:* `tree/BoxTreeBuilder.validateMinMax`, `layout/Sizing.constrain`.
+    *Dónde:* `tree/ModelValidator.validateMinMax`, `layout/Sizing.constrain`.
     *Alternativa:* comparar también al maquetar y dar un error de layout.
 
 55. **Formas de valor por propiedad:** `Width: 1fr`, `Max width: max-content`, `Gap: auto`,
     un `minmax()` fuera de las pistas o un número negativo fuera de `Margin` y `Offset` son
     errores (`VALUE_NOT_ALLOWED`); antes se comportaban como `auto` o se aceptaban. Sigue la
     columna *Valores* del §4.
-    *Dónde:* `tree/BoxTreeBuilder.value`, `sides`, `tracks`.
+    *Dónde:* `tree/ValueReader.value`, `sides`, `tracks`.
 
 56. **Se para en el primer error.** Acumularlos tiene el problema de los errores en cascada
     (una caja mal definida provoca otros en sus hijos).
@@ -147,7 +147,7 @@ tiene un caso por código.
 
 58. **El hueco entre filas de un flex `row` sin `Wrap` no se comprueba**: no se usa, así que
     `Gap: 5%` en un flex de una línea sin alto definido no es un error.
-    *Dónde:* `tree/BoxTreeBuilder.validateContainer`.
+    *Dónde:* `tree/ModelValidator.validateContainer`.
 
 59. **Sin código propio lo que ya rechaza el schema** (antes, el template): `Main axis: stretch` y
     `Break inside: page` son `VALUE_NOT_ALLOWED`; un bloque `>>` donde van hijos lo rechaza el
@@ -190,7 +190,7 @@ imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, 
     (`SINGLE_ELEMENT`, porque el schema solo puede limitar cada tipo de elemento a uno). Las
     dimensiones, márgenes e `Id` van en el elemento; el envoltorio solo lleva lo que depende del
     contenedor. Así cada ítem sigue siendo una única `Box`, como ahora.
-    *Dónde:* schema; `tree/BoxTreeBuilder.buildContent` e `item`.
+    *Dónde:* schema; `tree/BoxTreeBuilder.buildContent` y `PropertyReader.item`.
     *Alternativa:* que `Cell` e `Item` sean cajas de bloque con varios hijos; añadiría una caja
     por ítem, y un flex dentro de una celda ya no se estiraría al alto del área.
 
@@ -271,7 +271,7 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 75. **Nombres cortos dentro de los grupos** (`Size`, `Weight`, `Style`, `Align`, `Before`,
     `After`, `Inside`) salvo donde chocan con otro nodo del namespace: `Text wrap` no puede ser
     `Wrap`, que es el booleano de `Flex`. Los de `Box` ya eran cortos y se conservan.
-    *Dónde:* schema; `tree/BoxTreeBuilder.INTERNAL` traduce los cortos al nombre interno.
+    *Dónde:* schema; `tree/PropertyReader.INTERNAL` traduce los cortos al nombre interno.
     *Alternativa:* renombrar `Wrap` de `Flex` (por ejemplo, `Multiline`) para poder usar `Wrap`
     en `Typography`.
 
@@ -300,7 +300,7 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 79. **Prioridad fija en lugar de especificidad.** De más a menos fuerte: el elemento,
     `For id`, `For class` (entre clases, la que va después en `Styles`), `Element`, la
     herencia y el valor por defecto. Una regla gana a la herencia, como en CSS cualquier
-    regla que se aplica al elemento gana a lo heredado. *Dónde:* `BoxTreeBuilder.applyRules`.
+    regla que se aplica al elemento gana a lo heredado. *Dónde:* `StyleRules.apply`.
     *Alternativa:* especificidad calculada y selectores compuestos, como CSS; más potente,
     pero menos predecible y sin necesidad todavía.
 
@@ -375,7 +375,7 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 92. **La primera línea se busca bajando por el primer hijo en flujo** de cada bloque hasta un
     texto, y si no se llega (un `Flex`, un `Grid` o un bloque vacío al principio) es un error
     (`LIST_ITEM_WITHOUT_LINE`), comprobado ya al construir el árbol. CSS mira también la línea
-    base de flex y grid y salta los bloques vacíos. *Dónde:* `BoxTreeBuilder.markerLine`,
+    base de flex y grid y salta los bloques vacíos. *Dónde:* `ListBuilder.markerLine`,
     `layout/block/MarkerLayout`. *Alternativa:* exportar la línea base de flex y grid, o alinear
     el marcador con el borde superior del ítem.
 
@@ -409,8 +409,8 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 97. **El `Break` de una `Row` es el de sus celdas**, porque la fila no es una caja: se copia a
     cada celda (con la línea del `Break` de la fila) y el corte entre filas sale de las reglas
     de corte del grid (`BreakRules.between`). Su `Typography` se aplica como herencia, antes
-    de las reglas, así que `Element: Cell` le gana. *Dónde:* `BoxTreeBuilder.element` (las
-    celdas). *Alternativa:* que la `Row` sea una caja con su propio `Box` (fondo de fila),
+    de las reglas, así que `Element: Cell` le gana. *Dónde:* `BoxTreeBuilder.element` y
+    `TableBuilder` (las celdas). *Alternativa:* que la `Row` sea una caja con su propio `Box` (fondo de fila),
     pintada detrás de sus celdas.
 
 98. **Los márgenes de una `Cell` son los de un ítem de grid**: separan la caja de la celda de
@@ -418,7 +418,7 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     propio. *Alternativa:* error si una celda declara `Margin`.
 
 99. **`Span: 1 1` explícito se admite**, aunque no tenga efecto, como `Start: 1` en una lista:
-    es el valor por defecto escrito, no una contradicción. *Dónde:* `BoxTreeBuilder.span`.
+    es el valor por defecto escrito, no una contradicción. *Dónde:* `TableBuilder.span`.
     *Alternativa:* error de valor sin efecto.
 
 100. **El error de cabecera y pie (`TABLE_REPEAT_OVERFLOW`) es solo cuando no dejan sitio al
