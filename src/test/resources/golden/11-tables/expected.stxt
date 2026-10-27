@@ -1,0 +1,61 @@
+# Página 1: t en y = 60; h1 (60..77), b1…b5 de 16 en 16 desde 77 (b5 acaba en 157) y f en 157.
+#   t mide 17 + 80 + 16 = 113.
+# Página 2: h1 arriba (20..37), b6 en 37, b7 en 53, b8 y b8v en 69 (28), b9…b12 desde 97 (b12
+#   acaba en 161) y f en 161. t mide 17 + 124 + 16 = 157.
+# Página 3: h1, b13 en 37, b14 en 53 y f en 69; t mide 17 + 32 + 16 = 65 y end va en 85.
+Result:
+	Page: 1
+		Fragment: intro
+			Rect: 20 20 260 40
+		Fragment: t
+			Rect: 20 60 260 113
+			Fragment: h1
+				Rect: 20 60 100 17
+			Fragment: b1
+				Rect: 20 77 100 16
+			Fragment: b2
+				Rect: 20 93 100 16
+			Fragment: b3
+				Rect: 20 109 100 16
+			Fragment: b4
+				Rect: 20 125 100 16
+			Fragment: b5
+				Rect: 20 141 100 16
+			Fragment: f
+				Rect: 20 157 260 16
+	Page: 2
+		Fragment: t
+			Rect: 20 20 260 157
+			Fragment: h1
+				Rect: 20 20 100 17
+			Fragment: b6
+				Rect: 20 37 100 16
+			Fragment: b7
+				Rect: 20 53 100 16
+			Fragment: b8
+				Rect: 20 69 100 28
+			Fragment: b8v
+				Rect: 130 69 150 28
+			Fragment: b9
+				Rect: 20 97 100 16
+			Fragment: b10
+				Rect: 20 113 100 16
+			Fragment: b11
+				Rect: 20 129 100 16
+			Fragment: b12
+				Rect: 20 145 100 16
+			Fragment: f
+				Rect: 20 161 260 16
+	Page: 3
+		Fragment: t
+			Rect: 20 20 260 65
+			Fragment: h1
+				Rect: 20 20 100 17
+			Fragment: b13
+				Rect: 20 37 100 16
+			Fragment: b14
+				Rect: 20 53 100 16
+			Fragment: f
+				Rect: 20 69 260 16
+		Fragment: end
+			Rect: 20 85 260 12

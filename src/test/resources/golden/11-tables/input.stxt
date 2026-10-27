@@ -1,0 +1,108 @@
+# Tablas (ESPECIFICACION.md §5.15). Área útil de 260 × 160 desde (20, 20).
+#
+# Columnas: 100 y 1fr con 10 de hueco: 260 − 100 − 10 = 150, desde x = 130. Cada celda tiene
+# Padding 2 4: una línea mide 12 + 4 = 16, y la cabecera, con su borde inferior, 17. El pie
+# (16) ocupa las dos columnas. b8 tiene dos líneas (92 de ancho: caben 18 caracteres), 28, y
+# estira a b8v. La cabecera y el pie (33) se repiten en cada página.
+# Página 1: intro (40) deja 120 a la tabla y 87 al cuerpo: b1…b5 (80).
+# Página 2: 127 para el cuerpo: b6…b12 (16 × 6 + 28 = 124); b13 ya no cabe.
+# Página 3: b13 y b14, el pie detrás, y end.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Cell
+			Box:
+				Padding: 2 4
+		For class: rule
+			Box:
+				Border: 0 0 1 0
+	Block:
+		Id: intro
+		Box:
+			Height: 40
+	Table:
+		Id: t
+		Columns: 100 1fr
+		Gap: 0 10
+		Head:
+			Row:
+				Typography:
+					Weight: bold
+				Cell: Concepto
+					Id: h1
+					Class: rule
+				Cell: Valor
+					Class: rule
+		Body:
+			Row:
+				Cell: Fila 1
+					Id: b1
+				Cell: 1
+			Row:
+				Cell: Fila 2
+					Id: b2
+				Cell: 2
+			Row:
+				Cell: Fila 3
+					Id: b3
+				Cell: 3
+			Row:
+				Cell: Fila 4
+					Id: b4
+				Cell: 4
+			Row:
+				Cell: Fila 5
+					Id: b5
+				Cell: 5
+			Row:
+				Cell: Fila 6
+					Id: b6
+				Cell: 6
+			Row:
+				Cell: Fila 7
+					Id: b7
+				Cell: 7
+			Row:
+				Cell: aaaa bbbb cccc dddd
+					Id: b8
+				Cell: 8
+					Id: b8v
+			Row:
+				Cell: Fila 9
+					Id: b9
+				Cell: 9
+			Row:
+				Cell: Fila 10
+					Id: b10
+				Cell: 10
+			Row:
+				Cell: Fila 11
+					Id: b11
+				Cell: 11
+			Row:
+				Cell: Fila 12
+					Id: b12
+				Cell: 12
+			Row:
+				Cell: Fila 13
+					Id: b13
+				Cell: 13
+			Row:
+				Cell: Fila 14
+					Id: b14
+				Cell: 14
+		Foot:
+			Row:
+				Typography:
+					Weight: bold
+				Cell: Total
+					Id: f
+					Span: 1 2
+	Paragraph: Fin
+		Id: end

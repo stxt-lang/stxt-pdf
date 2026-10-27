@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
@@ -218,6 +219,52 @@ class PdfCanvasTest {
             assertTrue(text.contains("1."), text);
             assertTrue(text.contains("2."), text);
             assertTrue(text.contains("•"), text);
+        }
+    }
+
+    @Test
+    void tablesAreTaggedAndTheirRepeatedRowsAreArtifacts() throws Exception {
+        StringBuilder body = new StringBuilder();
+        for (int i = 1; i <= 15; i++) {
+            body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
+        }
+        // Área útil de 160: la cabecera y el pie (12 cada uno) dejan 136, once filas por página.
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tTable:\n\t\tColumns: 1fr 60\n"
+                + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Valor\n"
+                + "\t\tBody:\n" + body
+                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tSpan: 1 2\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "tables"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement table = (PDStructureElement) document.getKids().get(0);
+            assertEquals("Table", table.getStructureType());
+            assertEquals(List.of("THead", "TBody", "TFoot"), types(table));
+            PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
+            assertEquals(List.of("TH", "TH"), types(headRow));
+            PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
+            assertEquals(PDTableAttributeObject.SCOPE_COLUMN,
+                    ((PDTableAttributeObject) th.getAttributes().getObject(0)).getScope());
+            // La cabecera es contenido solo en la página 1; en la 2 se repite como artifact.
+            assertEquals(1, th.getKids().size());
+            assertEquals(pdf.getPage(0), ((PDMarkedContentReference) th.getKids().get(0)).getPage());
+            PDStructureElement tbody = (PDStructureElement) table.getKids().get(1);
+            assertEquals(15, types(tbody).size());
+            assertEquals(List.of("TD", "TD"), types((PDStructureElement) tbody.getKids().get(14)));
+            PDStructureElement footRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(2)).getKids().get(0);
+            assertEquals(List.of("TD"), types(footRow));
+            PDStructureElement total = (PDStructureElement) footRow.getKids().get(0);
+            assertEquals(2, ((PDTableAttributeObject) total.getAttributes().getObject(0)).getColSpan());
+
+            String second = new String(pdf.getPage(1).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(second.contains("/Artifact BMC"), second);
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setStartPage(2);
+            stripper.setEndPage(2);
+            String text = stripper.getText(pdf);
+            assertTrue(text.contains("Concepto") && text.contains("Fila 15") && text.contains("Total"), text);
         }
     }
 

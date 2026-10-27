@@ -1193,8 +1193,10 @@ partir desborda la página (`PAGE_OVERFLOW`, [§5.12](#512-desbordamiento)). Las
 la tabla.
 
 **Salida PDF.** Una `Table` es `Table`; `Head`, `Body` y `Foot` son `THead`, `TBody` y `TFoot`;
-cada fila, `TR`, y cada celda, `TH` en `Head` y `TD` en el resto, con los atributos `RowSpan` y
-`ColSpan` si ocupa más de una fila o columna.
+cada fila, `TR`, y cada celda, `TH` en `Head` (con `Scope: Column`) y `TD` en el resto, con
+los atributos `RowSpan` y `ColSpan` si ocupa más de una fila o columna. La cabecera y el pie
+son contenido en la primera página en que salen; donde se repiten, son *artifacts*, como los
+`Fixed`, y el texto de la tabla se lee una sola vez.
 
 ---
 

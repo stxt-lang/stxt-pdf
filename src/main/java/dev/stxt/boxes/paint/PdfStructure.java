@@ -21,6 +21,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -33,9 +34,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Significado del documento en el PDF (ESPECIFICACION.md §5.13): el árbol de estructura del PDF
@@ -44,8 +47,9 @@ import java.util.Map;
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
  * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P}
  * para {@code Paragraph}, {@code Span} para {@code Text}, {@code L} y {@code LI} para las listas
- * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14) y
- * {@code Div} para el resto. El texto de
+ * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
+ * {@code Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y
+ * {@code TD} para las tablas (§5.15) y {@code Div} para el resto. El texto de
  * cada fragmento es contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del
  * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
  * bordes y los {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte
@@ -66,6 +70,12 @@ final class PdfStructure {
     private final Map<Integer, PDParentTreeValue> parents = new HashMap<>();
     /** Encabezados en orden del documento. */
     private final List<Box> headings = new ArrayList<>();
+    /** Cajas de la cabecera y el pie de las tablas, que se repiten en cada página de su tabla. */
+    private final Set<Box> repeated = new HashSet<>();
+    /** Primera página con contenido de cada caja de {@link #repeated}: en las demás es un <em>artifact</em>. */
+    private final Map<Box, PDPage> firstPage = new HashMap<>();
+
+    private static final String[] TABLE_GROUPS = {"THead", "TBody", "TFoot"};
 
     private PDPage page;
     private COSArray pageParents;
@@ -92,6 +102,10 @@ final class PdfStructure {
             numbering.setListNumbering(listNumbering(box.style.listMarker));
             e.addAttribute(numbering);
         }
+        if ("table".equals(box.element)) {
+            table(box, e);
+            return;
+        }
         PDStructureNode content = e;
         if ("list-item".equals(box.element)) {
             // LI: el marcador (Lbl) y el contenido (LBody).
@@ -109,6 +123,82 @@ final class PdfStructure {
                 build(child, content);
             }
         }
+    }
+
+    /**
+     * Una tabla (§5.15): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
+     * {@code TFoot}, una {@code TR} por fila. Cada celda es {@code TH} (con {@code Scope:
+     * Column}) en la cabecera y {@code TD} en el resto, con {@code RowSpan} y {@code ColSpan} si
+     * ocupa más de una fila o columna. Las celdas de la cabecera y el pie, y lo que contienen, se
+     * repiten en cada página: solo la primera vez son contenido.
+     */
+    private void table(Box table, PDStructureElement e) {
+        PDStructureElement[] groups = new PDStructureElement[TABLE_GROUPS.length];
+        PDStructureElement row = null;
+        int rowIndex = -1;
+        for (Box cell : table.children) {
+            int[] p = placement(cell);
+            int group = group(cell);
+            if (groups[group] == null) {
+                groups[group] = new PDStructureElement(TABLE_GROUPS[group], e);
+                e.appendKid(groups[group]);
+            }
+            if (p[0] != rowIndex) {
+                row = new PDStructureElement("TR", groups[group]);
+                groups[group].appendKid(row);
+                rowIndex = p[0];
+            }
+            PDStructureElement c = new PDStructureElement(type(cell), row);
+            row.appendKid(c);
+            elements.put(cell, c);
+            if (group == 0 || p[1] > 1 || p[2] > 1) {
+                PDTableAttributeObject attributes = new PDTableAttributeObject();
+                if (group == 0) {
+                    attributes.setScope(PDTableAttributeObject.SCOPE_COLUMN);
+                }
+                if (p[1] > 1) {
+                    attributes.setRowSpan(p[1]);
+                }
+                if (p[2] > 1) {
+                    attributes.setColSpan(p[2]);
+                }
+                c.addAttribute(attributes);
+            }
+            if (group != 1) {
+                repeats(cell);
+            }
+            for (Box child : cell.children) {
+                if (child.style.position != Style.Position.FIXED) {
+                    build(child, c);
+                }
+            }
+        }
+    }
+
+    /** Apunta la caja y su descendencia (y el marcador de los ítems) como contenido que se repite. */
+    private void repeats(Box box) {
+        repeated.add(box);
+        if (box.marker != null) {
+            repeated.add(box.marker);
+        }
+        box.children.forEach(this::repeats);
+    }
+
+    /** Fila (desde 0), filas y columnas de una celda: su colocación en el grid de la tabla. */
+    private static int[] placement(Box cell) {
+        String[] t = cell.style.itemArea.split(" ");
+        return new int[]{Integer.parseInt(t[0]) - 1, Integer.parseInt(t[2]), Integer.parseInt(t[3])};
+    }
+
+    /** Grupo de una celda de tabla: 0 en la cabecera, 1 en el cuerpo, 2 en el pie. */
+    private static int group(Box cell) {
+        Box table = cell.parent;
+        int row = placement(cell)[0];
+        if (row < table.headRows) {
+            return 0;
+        }
+        int rows = table.children.stream().mapToInt(c -> placement(c)[0] + placement(c)[1]).max().orElse(0);
+        return row >= rows - table.footRows ? 2 : 1;
     }
 
     /** {@code ListNumbering} de una lista; {@code dash} no tiene equivalente y es {@code None}. */
@@ -173,6 +263,8 @@ final class PdfStructure {
             case "text" -> "Span";
             case "list" -> "L";
             case "list-item" -> "LI";
+            case "table" -> "Table";
+            case "cell" -> group(box) == 0 ? "TH" : "TD";
             default -> "Div";
         };
     }
@@ -194,6 +286,13 @@ final class PdfStructure {
         PDStructureElement e = elements.get(box);
         if (e == null) {
             return -1;
+        }
+        if (repeated.contains(box)) {
+            // La cabecera y el pie de una tabla son contenido en la primera página en que salen.
+            PDPage first = firstPage.putIfAbsent(box, page);
+            if (first != null && first != page) {
+                return -1;
+            }
         }
         int mcid = pageParents.size();
         pageParents.add(e);

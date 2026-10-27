@@ -438,3 +438,9 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      fragmento de la tabla**, como las del propio contenedor; en los demás, la cabecera y el
      pie se repiten sin ellas. *Dónde:* `UnitBreaker.Run.repeated`. *Alternativa:* repetirlas
      con su fila.
+
+103. **La cabecera y el pie repetidos son *artifacts*** salvo en la primera página en que sale
+     cada celda: el árbol de estructura tiene una sola `THead` y una sola `TFoot`, y un lector
+     de pantalla no lee la cabecera en cada página. Las `TH` llevan `Scope: Column`, que TB10 no
+     decía. *Dónde:* `paint/PdfStructure` (`repeated`, `mark`). *Alternativa:* marcar cada
+     repetición como contenido de la misma celda.

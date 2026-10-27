@@ -77,8 +77,8 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 13 están terminados; los
-siguientes, en
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 14 están terminados; el
+siguiente, en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Pieza | Estado |
@@ -89,7 +89,8 @@ siguientes, en
 | Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
 | Listas (`List`, `List item`): viñetas y numeraciones, marcador alineado con la primera línea, listas anidadas y partidas entre páginas | Hecho y probado |
-| PDF etiquetado (árbol de estructura, *artifacts*, listas con `Lbl` y `LBody`) y marcadores de los encabezados | Hecho y probado |
+| Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`): columnas con las pistas de grid, `Span`, cabecera y pie repetidos en cada página | Hecho y probado |
+| PDF etiquetado (árbol de estructura, *artifacts*, listas con `Lbl` y `LBody`, tablas con `THead`, `TBody`, `TFoot`, `TH` y `TD`) y marcadores de los encabezados | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
@@ -136,8 +137,9 @@ en `target/pdf/`.
 11. ~~**Reglas reutilizables.** `Styles` con reglas `Element`, `For class` y `For id`; `Class` en los elementos (caso 08).~~ Hecho.
 12. ~~**Encabezados y párrafos.** `Heading 1`…`Heading 6` y `Paragraph`; PDF etiquetado y marcadores (caso 09).~~ Hecho.
 13. ~~**Listas.** `List` con `Marker`, `Start` y `List item` con `Number`; el marcador cuelga en la sangría, alineado con la primera línea (caso 10).~~ Hecho.
+14. ~~**Tablas.** `Table` con `Head`, `Body` y `Foot`, filas `Row` y celdas `Cell` con `Span`, maquetada como un grid; cabecera y pie repetidos en cada página (caso 11). El `Cell` de `Grid` pasa a llamarse `Area`.~~ Hecho.
 
-Los siguientes hitos (14 y 15: tablas y bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, están en
+El siguiente hito (15: bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, está en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Estructura
@@ -156,6 +158,7 @@ src/main/java/dev/stxt/boxes/
     flex/       FlexLayout, FlexResolver, FlexItem
     grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
+    table/      TableLayout
   fragment/     Fragment, BreakToken, Paginator, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure
   output/       StxtDump

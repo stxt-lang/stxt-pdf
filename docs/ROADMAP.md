@@ -34,7 +34,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
-| 14 | Tablas, con cabecera y pie repetidos | en curso | — |
+| 14 | Tablas, con cabecera y pie repetidos | hecho | 11 |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
 **Orden**, de menor a mayor impacto en el motor:
@@ -524,11 +524,17 @@ Table:
       el pie enteros (`UnitBreaker.Repeat`). `TABLE_REPEAT_OVERFLOW` (al maquetar) cuando no
       dejan sitio al cuerpo en una página vacía (decisión 100, que precisa TB9). Tests en
       `layout/table/TableFragmentationTest`; caso en el catálogo.
-- [ ] PDF etiquetado del TB10 (hoy la tabla y sus celdas salen como `Div`).
-- [ ] Bordes (según TB4) en el pintado.
+- [x] PDF etiquetado del TB10 en `PdfStructure`: `Table`, `THead`/`TBody`/`TFoot`, `TR`,
+      `TH` (con `Scope: Column`) y `TD`, con `RowSpan` y `ColSpan`; la cabecera y el pie
+      repetidos son *artifacts* (decisión 103). Test en `PdfCanvasTest`.
+- [x] Bordes (según TB4) en el pintado: los de cada celda, sin código nuevo.
 - [x] Tests de layout, de fragmentación (cabecera repetida, pie, fila partida) y casos de
       error.
-- [ ] Especificación §7 y §9 si cambian; caso golden con una tabla de tres páginas.
+- [x] Especificación §7 y §9 (sin cambios: el volcado no conoce las tablas); caso golden
+      `11-tables` (tabla de tres páginas, con una fila de dos líneas y el pie en dos
+      columnas), añadido a `DocumentReaderTest`; PNG revisados.
+- [x] README (tabla de estado y hoja de ruta), `CLAUDE.md` (tabla de hitos y piezas clave) y
+      `DECISIONES.md` (96–103).
 
 ---
 
@@ -601,6 +607,13 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (15).** Hito 14 terminado. PDF etiquetado de las tablas (`Table`,
+  `THead`/`TBody`/`TFoot`, `TR`, `TH`/`TD` con `RowSpan`/`ColSpan`; la cabecera y el pie
+  repetidos, *artifacts*). Caso golden `11-tables` de tres páginas, calculado a mano y con los
+  PNG revisados. Especificación §5.15, README, `CLAUDE.md` y `DECISIONES.md` (103).
+  `mvn test` en verde.
+  *Siguiente paso:* hito 15 (bloque en columnas), resolver C1–C8 (y T3 para `Columns`, que ya
+  es la lista de pistas de `Grid` y `Table`).
 - **2026-10-27 (14).** Hito 14: `TableLayout` repite la cabecera y el pie en cada fragmento
   (`UnitBreaker.Repeat`; `GridLayout.arrange` separa el layout sin fragmentar del corte), sin
   partirlos, y `TABLE_REPEAT_OVERFLOW` cuando no dejan sitio al cuerpo. Especificación §5.12,
