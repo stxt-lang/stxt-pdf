@@ -1282,6 +1282,10 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Box`, `Typography`; `Text` (al menos uno, varios) |
 | `List` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
 | `List item` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
+| `Table` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Gap`; `Head`, `Body` (obligatorio), `Foot` |
+| `Head`, `Body`, `Foot` | `GROUP` | `Row` (al menos uno, varios) |
+| `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
+| `Cell` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
@@ -1291,7 +1295,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
-`List`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`List`, `Table`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start` y `Number`,
@@ -1305,12 +1309,15 @@ que `Item` y `Area` tengan exactamente un elemento (el schema solo limita cada t
 un `Text` tenga su texto en un sitio y solo uno, que la raíz sea `Document` (en un schema
 cualquier nodo puede ser raíz) y lo que depende de dónde está un elemento: que un `Text` de un
 encabezado no tenga `Break`, y la jerarquía y el sitio de los encabezados
-([§5.13](#513-encabezados-y-párrafos)).
+([§5.13](#513-encabezados-y-párrafos)). En una `Table`, el motor comprueba además el orden
+`Head`, `Body`, `Foot`, que una `Cell` no tenga a la vez texto en el valor y elementos, y que
+cada fila llene exactamente sus columnas.
 
 Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de `Box`
 comparten definición, y solo cambia la cardinalidad que fija cada padre. Por eso `Cross axis`,
 `Horizontal`, `Vertical` y `Gap` tienen los mismos valores en el contenedor y en `Item` o
-`Area`, y por eso `Text wrap` no se acorta a `Wrap`, que ya es de `Flex`.
+`Area`; `Columns` y `Gap` significan lo mismo en `Grid` y en `Table`, y `Text wrap` no se
+acorta a `Wrap`, que ya es de `Flex`.
 
 ---
 

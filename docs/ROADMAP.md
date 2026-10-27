@@ -446,23 +446,9 @@ Table:
 				Span: 1 3
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] TB2. Contenido de la celda: texto en el valor (`Cell: Ventas`) y, además, elementos
-      (un `Block` con varios párrafos, una lista…).
-- [ ] TB4. Bordes: separados (cada celda con su `Box`) o colapsados (`border-collapse`).
-      Bordes colapsados es lo típico en tablas editoriales, pero es un modelo nuevo.
-- [ ] TB5. Estilo por fila, por columna o para toda la tabla (filas alternas con fondo):
-      ¿solo en cada celda o con herencia desde `Row`/`Table`? `Box` no se hereda (§4).
-- [ ] TB6. Repetición: ¿cabecera y pie siempre se repiten, o con una propiedad
-      (`Repeat: true`)? ¿El pie se repite en todas las páginas o solo al final?
-- [ ] TB7. Corte dentro de una fila: ¿una fila puede partirse entre páginas (como las filas
-      de grid, en paralelo) o una fila no se parte nunca?
-- [ ] TB8. Título (`caption`): ¿hace falta, o basta con un `Heading`/`Text` antes?
-- [ ] TB9. Errores: filas con distinto número de celdas, `Span` que se sale de la tabla,
-      cabecera y pie que no caben en una página.
-
-**Decisiones tomadas** (2026-10-27):
+**Decisiones tomadas** (2026-10-27, TB2 y TB4–TB10 con la propuesta aceptada):
 
 - [x] TB1. Nombres: **`Table`**, **`Head`**, **`Body`** y **`Foot`** (con `Body` explícito;
       `Header`/`Footer` quedan libres para cabeceras de página), **`Row`** y **`Cell`**.
@@ -472,11 +458,38 @@ Table:
       `Area` y de `Gap`; no `Column span`, que sería el `column-span` del hito 15.
 - [x] TB3. Los anchos se calculan con el **dimensionado de pistas de grid**: `Columns` y
       `Gap` de la tabla son los mismos nodos que en `Grid` (mismo significado y valores).
+- [x] TB2. Una **`Cell` es una caja** con dos formas, como `Text`: con valor
+      (`Cell: 100`), una caja de texto de una línea; sin valor, un bloque con hijos
+      (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `List`, `Table`, `Relative`, `Absolute`,
+      `Fixed`). Las dos cosas a la vez son un error; `Cell:` sin nada es una celda vacía y se
+      permite. Sin `Content` (para texto largo, un `Paragraph` dentro) ni encabezados (como
+      `List item`: H9 y los marcadores). Admite `Id`, `Class`, `Box`, `Typography` y `Span`.
+- [x] TB4. **Bordes separados**, con el `Box` de cada celda; `Gap` hace de
+      `border-spacing`. Las líneas simples se dibujan con bordes de un lado
+      (`Border: 0 0 0.5 0`). Bordes colapsados, más adelante.
+- [x] TB5. **`Row` no es una caja** (como `Item` y `Area`): admite `Typography`, que heredan
+      sus celdas, y `Break`. El estilo de las celdas va en `Element: Cell` o en `Class`. Sin
+      estilo por columna; el fondo de fila (filas alternas), más adelante. `Table` y `Cell`
+      se pueden nombrar en `Element`; `Head`, `Body`, `Foot` y `Row`, no (R9).
+- [x] TB6. **`Head` y `Foot` se repiten siempre** en cada fragmento de la tabla, sin
+      propiedad (como la impresión de HTML).
+- [x] TB7. **Una fila se corta como las de grid:** si no cabe pasa entera a la página
+      siguiente, y solo se parte en paralelo si no cabe ni en una página vacía. Las filas de
+      `Head` y `Foot` no se parten nunca.
+- [x] TB8. **Sin `caption`:** un `Heading` o un `Paragraph` antes de la tabla.
+- [x] TB9. **Errores:** `Columns` es obligatorio en `Table`; cada fila llena exactamente
+      sus columnas, contando los `Span` de las filas de arriba; un `Span` no se sale de la
+      tabla ni de su grupo (`Head`, `Body`, `Foot`); los grupos van en ese orden, con un solo
+      `Body`, obligatorio; que la cabecera, el pie y una fila del cuerpo no quepan en una
+      página vacía es un error, no se deja de repetir.
+- [x] TB10. **PDF etiquetado:** `Table` → `Table`; `Head`/`Body`/`Foot` →
+      `THead`/`TBody`/`TFoot`; `Row` → `TR`; `Cell` → `TH` en `Head` y `TD` en el resto, con
+      `RowSpan` y `ColSpan`.
 
 **Diseño técnico (previsto):**
 
 - Con grid (TB3): `BoxTreeBuilder` traduce la tabla a un grid con colocación
-  explícita (fila y columna salen del orden de `Row` y `Data`, más los `Span`), y un
+  explícita (fila y columna salen del orden de `Row` y `Cell`, más los `Span`), y un
   `TableLayout` envuelve `GridLayout` para la repetición. `Placement` y `TrackSizing` no
   cambian.
 - Repetición: al partir, cada fragmento de la tabla empieza con las filas de la cabecera y
@@ -484,15 +497,19 @@ Table:
   menos el alto de los dos. El `BreakToken.Container` de la tabla solo lleva la posición
   del cuerpo. Se parece a `Decoration: clone`, pero con filas en lugar de borde y relleno.
 - Garantía de progreso: si la cabecera, el pie y una fila del cuerpo no caben en una página
-  vacía, se deja de repetir (o es un error, según TB9).
+  vacía, es un error (TB9).
 
 **Tareas:**
 
 - [x] Resolver TB1 y TB3.
 - [x] Renombrar el `Cell` de `Grid` a `Area` (schema, builder, especificación, tests,
       catálogo y casos golden; sin cambios en los resultados ni en los PNG).
-- [ ] Resolver TB2 y TB4–TB9.
-- [ ] Schema, `Style`, `BoxTreeBuilder` (traducción a filas y columnas, `Span`).
+- [x] Resolver TB2 y TB4–TB10.
+- [x] Schema (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`, `Span`; `Table` donde va un
+      `Block`) y resumen del §9; `DocumentReaderTest.tablesValidateAgainstTheSchema`.
+      `BoxTreeBuilder` admite `Table` y `Cell` en `Element` y lanza
+      `UnsupportedOperationException` (`TODO(hito 14)`) al encontrar una `Table`.
+- [ ] `Style`, `BoxTreeBuilder` (traducción a filas y columnas, `Span`, errores del TB9).
 - [ ] Layout y repetición de cabecera y pie al fragmentar.
 - [ ] Bordes (según TB4) en el pintado.
 - [ ] Tests de layout, de fragmentación (cabecera repetida, pie, fila partida) y casos de
@@ -574,8 +591,12 @@ siguiente paso concreto.
   `Foot`, `Row`, `Cell`, `Span`) y TB3 (anchos con las pistas de grid; `Columns` y `Gap`
   reutilizados). Para liberar `Cell`, el envoltorio de `Grid` pasa a llamarse `Area` en
   schema, builder (`Style.itemArea`), especificación, README, `CLAUDE.md`, tests, catálogo y
-  casos golden (decisión 96). `mvn test` en verde; los PNG no cambian.
-  *Siguiente paso:* resolver TB2 y TB4–TB9 y empezar por el schema de la tabla.
+  casos golden (decisión 96). Aceptadas las propuestas TB2 y TB4–TB10. Hecho el schema de la
+  tabla y el resumen del §9; el builder lanza `UnsupportedOperationException` con una
+  `Table`. `mvn test` en verde; los PNG no cambian.
+  *Siguiente paso:* `BoxTreeBuilder`: traducir la tabla a un grid con colocación explícita
+  (`Cell` con valor como caja de texto, sin valor como bloque) y los errores del TB9, con sus
+  `ErrorCode` y casos en el catálogo.
 - **2026-10-27 (11).** Hito 13 terminado. Caso golden `10-lists`, que pasa con el resultado
   calculado a mano; PNG revisados (marcadores alineados a la derecha, el de una lista anidada
   en la misma línea que el del ítem, y el de un ítem partido solo en la página 1). El marcador

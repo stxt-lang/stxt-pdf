@@ -35,6 +35,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -78,6 +79,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -300,6 +302,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Text
 			Child: Paragraph
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -335,6 +338,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -366,6 +370,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -397,6 +402,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 			Child: Heading 6
 			Child: List
+			Child: Table
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -438,6 +444,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: List
 				Max: 1
+			Child: Table
+				Max: 1
 			Child: Relative
 				Max: 1
 	Node: Area
@@ -474,8 +482,88 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: List
 				Max: 1
+			Child: Table
+				Max: 1
 			Child: Relative
 				Max: 1
+	Node: Table
+		Type: GROUP
+		Description: Tabla: sus filas (Row) en Head, Body y Foot, en ese orden, sobre las columnas de Columns. Al partirse, Head y Foot se repiten en cada página.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Columns
+				Min: 1
+				Max: 1
+			Child: Gap
+				Max: 1
+			Child: Head
+				Max: 1
+			Child: Body
+				Min: 1
+				Max: 1
+			Child: Foot
+				Max: 1
+	Node: Head
+		Type: GROUP
+		Description: Filas de cabecera de una Table: van al principio de cada página de la tabla.
+		Children:
+			Child: Row
+				Min: 1
+	Node: Body
+		Type: GROUP
+		Description: Filas del cuerpo de una Table.
+		Children:
+			Child: Row
+				Min: 1
+	Node: Foot
+		Type: GROUP
+		Description: Filas de pie de una Table: van al final de cada página de la tabla.
+		Children:
+			Child: Row
+				Min: 1
+	Node: Row
+		Type: GROUP
+		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja; su Typography lo heredan sus celdas.
+		Children:
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Cell
+				Min: 1
+	Node: Cell
+		Type: INLINE
+		Description: Celda de una tabla. Con valor, una caja de texto de una línea; sin valor, un bloque con sus elementos (o vacía).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Span
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Paragraph
+			Child: List
+			Child: Table
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
 
 	# Reglas reutilizables
 
@@ -808,3 +896,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Number
 		Type: INTEGER
 		Description: Número de este ítem de una lista numerada; los siguientes continúan desde él.
+
+	# Table
+
+	Node: Span
+		Description: Filas y columnas que ocupa la celda, en ese orden (1 1 por defecto): 1 3 ocupa tres columnas de su fila.

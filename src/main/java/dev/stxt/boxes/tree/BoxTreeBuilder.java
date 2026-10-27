@@ -67,15 +67,15 @@ public final class BoxTreeBuilder {
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
     private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "list-item", "relative",
-            "absolute", "fixed");
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "list-item", "table", "cell",
+            "relative", "absolute", "fixed");
     /** Los elementos de caja como se escriben, para los mensajes. */
     private static final List<String> ELEMENT_NAMES = List.of("Block", "Flex", "Grid", "Text", "Paragraph",
             "Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6", "List", "List item",
-            "Relative", "Absolute", "Fixed");
+            "Table", "Cell", "Relative", "Absolute", "Fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
     private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "relative");
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "table", "relative");
     /** Elementos con el texto en el valor o en {@code Content}. */
     private static final Set<String> TEXTS = Set.of("text", "paragraph");
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
@@ -358,6 +358,10 @@ public final class BoxTreeBuilder {
     /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem. */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
         String kind = n.getCanonicalName();
+        if (kind.equals("table")) {
+            // TODO(hito 14): traducir la tabla a un grid con colocación explícita (docs/ROADMAP.md).
+            throw new UnsupportedOperationException("Table todavía no se maqueta (hito 14), línea " + n.getLine());
+        }
         int level = Box.headingLevel(kind);
         if (level > 0) {
             heading(n, level);

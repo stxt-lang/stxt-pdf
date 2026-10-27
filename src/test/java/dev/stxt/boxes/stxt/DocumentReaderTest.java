@@ -109,6 +109,35 @@ class DocumentReaderTest {
     }
 
     @Test
+    void tablesValidateAgainstTheSchema() {
+        InlineNode root = reader.read(doc(
+                "\tTable:", "\t\tId: t", "\t\tColumns: 120 1fr 1fr", "\t\tGap: 2",
+                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tWeight: bold",
+                "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
+                "\t\t\t\tCell: Ventas", "\t\t\t\tCell:", "\t\t\t\t\tParagraph: 100", "\t\t\t\tCell:",
+                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3",
+                "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 4"));
+        Node cell = root;
+        for (String name : new String[] {"Table", "Foot", "Row", "Cell"}) {
+            cell = assertInstanceOf(InlineNode.class, cell).getChild(name);
+        }
+        assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
+
+        // Columns y Body son obligatorios; las filas van en su grupo y Span solo en Cell.
+        assertEquals("TOO_FEW_CHILDREN", assertThrows(ParseException.class, () -> reader.read(doc(
+                "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).getCode());
+        assertEquals("TOO_FEW_CHILDREN", assertThrows(ParseException.class, () -> reader.read(doc(
+                "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).getCode());
+        ParseException row = assertThrows(ParseException.class, () -> reader.read(doc(
+                "\tTable:", "\t\tColumns: 1fr", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
+        assertEquals("CHILD_NOT_DECLARED", row.getCode());
+        assertEquals(7, row.getLine());
+        assertEquals("CHILD_NOT_DECLARED", assertThrows(ParseException.class, () -> reader.read(doc(
+                "\tGrid:", "\t\tArea:", "\t\t\tSpan: 1 2", "\t\t\tBlock:"))).getCode());
+    }
+
+    @Test
     void syntaxErrorsWithLine() {
         ParseException e = assertThrows(ParseException.class, () -> reader.read(doc("\t\t\tBlock:")));
         assertEquals(5, e.getLine());
