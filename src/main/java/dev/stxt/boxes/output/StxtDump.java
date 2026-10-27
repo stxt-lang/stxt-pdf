@@ -52,16 +52,29 @@ public final class StxtDump {
                                      int level, boolean includeWithoutId) {
         double x = originX + f.x();
         double y = originY + f.y();
+        if (f.box().isMarker()) {
+            // Va dentro del ítem: solo si se vuelca el ítem.
+            if (f.box().parent.id != null || includeWithoutId) {
+                String tab = "\t".repeat(level);
+                sb.append(tab).append("Marker: ").append(f.box().text.strip()).append('\n');
+                appendRect(sb, tab, x, y, f);
+            }
+            return;
+        }
         boolean visible = f.box().id != null || includeWithoutId;
         int childLevel = level;
         if (visible) {
             String tab = "\t".repeat(level);
             sb.append(tab).append("Fragment: ").append(f.box().describe()).append('\n');
-            sb.append(tab).append("\tRect: ").append(format(x)).append(' ').append(format(y)).append(' ')
-                    .append(format(f.width())).append(' ').append(format(f.height())).append('\n');
+            appendRect(sb, tab, x, y, f);
             childLevel = level + 1;
         }
         dumpChildren(sb, f, x, y, childLevel, includeWithoutId);
+    }
+
+    private static void appendRect(StringBuilder sb, String tab, double x, double y, Fragment f) {
+        sb.append(tab).append("\tRect: ").append(format(x)).append(' ').append(format(y)).append(' ')
+                .append(format(f.width())).append(' ').append(format(f.height())).append('\n');
     }
 
     /** Hasta 2 decimales, sin ceros finales. */

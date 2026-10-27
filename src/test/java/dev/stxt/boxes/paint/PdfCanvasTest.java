@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
@@ -189,6 +190,34 @@ class PdfCanvasTest {
             assertNull(pdf.getDocumentCatalog().getLanguage());
             assertNull(pdf.getDocumentInformation().getTitle());
             assertNull(pdf.getDocumentCatalog().getMetadata());
+        }
+    }
+
+    @Test
+    void listsAreTaggedWithLabelAndBody() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tList:\n\t\tMarker: decimal\n\t\tBox:\n\t\t\tPadding: 0 0 0 20\n"
+                + "\t\tList item:\n\t\t\tText: Uno\n"
+                + "\t\tList item:\n\t\t\tText: Dos\n"
+                + "\t\t\tList:\n\t\t\t\tMarker: disc\n\t\t\t\tBox:\n\t\t\t\t\tPadding: 0 0 0 20\n"
+                + "\t\t\t\tList item:\n\t\t\t\t\tText: Dentro\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "lists"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement list = (PDStructureElement) document.getKids().get(0);
+            assertEquals("L", list.getStructureType());
+            assertEquals(PDListAttributeObject.LIST_NUMBERING_DECIMAL,
+                    ((PDListAttributeObject) list.getAttributes().getObject(0)).getListNumbering());
+            assertEquals(List.of("LI", "LI"), types(list));
+            PDStructureElement second = (PDStructureElement) list.getKids().get(1);
+            assertEquals(List.of("Lbl", "LBody"), types(second));
+            PDStructureElement body = (PDStructureElement) second.getKids().get(1);
+            assertEquals(List.of("Span", "L"), types(body));
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("1."), text);
+            assertTrue(text.contains("2."), text);
+            assertTrue(text.contains("•"), text);
         }
     }
 

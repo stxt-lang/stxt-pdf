@@ -18,7 +18,7 @@ class ListsTest {
     }
 
     private static List<String> markers(Box list) {
-        return list.children.stream().map(b -> b.marker).toList();
+        return list.children.stream().map(b -> b.marker == null ? null : b.marker.text).toList();
     }
 
     @Test

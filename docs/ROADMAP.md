@@ -394,18 +394,28 @@ List:
 
 - [x] Resolver L1–L8.
 - [x] Schema: `List`, `List item`, `Marker`, `Start`, `Number`.
-- [ ] Línea base de la primera línea en el resultado del layout de bloque.
-- [x] `Style`, `BoxTreeBuilder` (con la numeración y los enums con guion): `Box.marker` lleva
-      el texto del marcador; `ListMarkers` lo escribe. Errores del árbol `LIST_ITEM_EMPTY`,
+- [x] Línea base de la primera línea: no va en el `LayoutResult`; `MarkerLayout.firstBaseline`
+      la saca de los fragmentos hijos ya colocados, con `TextMeasurer.vertical` (las métricas
+      verticales del pintado: `hhea` en PDF, 0,8/0,2 en el resto).
+- [x] `Style`, `BoxTreeBuilder` (con la numeración y los enums con guion): `Box.marker` es la
+      caja generada del marcador (texto con la tipografía del ítem, fuera de `children`);
+      `ListMarkers` escribe su texto. Errores del árbol `LIST_ITEM_EMPTY`,
       `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE` y `LIST_ITEM_WITHOUT_LINE` (este se
       comprueba en el árbol: bajando por el primer hijo en flujo hay que llegar a un texto),
       con sus casos en el catálogo. Tests en `tree/ListsTest` y `tree/ListMarkersTest`.
-- [x] Especificación: §2, §4 (§4.11 nueva), §5.14 nueva, §6 y §9. Faltan §7 (`Marker` en el
-      volcado), §8 y el PDF etiquetado de §5.13/§5.14.
-- [ ] `LIST_MARKER_OVERFLOW` (necesita las métricas: al maquetar) con su caso.
-- [ ] Caja de marcador en el layout y en el pintado.
-- [ ] Tests de layout y de fragmentación; casos de error.
-- [ ] Especificación; caso golden con listas anidadas y una lista partida entre páginas.
+- [x] Especificación: §2, §4 (§4.11 nueva), §5.13 (etiquetas), §5.14 nueva, §6, §7 y §9.
+      Falta §8 (diferencias con CSS).
+- [x] `LIST_MARKER_OVERFLOW` (necesita las métricas: en `Overflow`) con su caso.
+- [x] Caja de marcador en el layout (`layout/block/MarkerLayout`, desde `BlockLayout` en el
+      primer fragmento del ítem) y en el pintado: es un fragmento hijo del ítem con una línea,
+      que se pinta como cualquier texto. `Overflow` lo salta y lo comprueba contra la sangría.
+- [x] PDF etiquetado: `L` (con `ListNumbering`), `LI`, `Lbl` y `LBody` (`PdfCanvasTest`).
+- [x] Volcado del §7: `Marker` dentro de los ítems con `Id` (`StxtDump`).
+- [x] Tests de layout y de fragmentación (`layout/block/ListLayoutTest`); casos de error.
+- [ ] Caso golden con listas anidadas y una lista partida entre páginas, añadido a
+      `DocumentReaderTest`; revisar su PNG.
+- [ ] §8, README, `CLAUDE.md` (tabla de hitos) y `DECISIONES.md` (L1–L8 y las de la
+      implementación) para cerrar el hito.
 
 ---
 
@@ -552,6 +562,15 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (10).** Hito 13: el marcador en el layout. `Box.marker` pasa a ser la caja
+  generada del marcador; `MarkerLayout` la coloca en el primer fragmento del ítem, a la
+  izquierda de su caja de borde y con la línea base de su primera línea (`TextMeasurer.vertical`
+  nuevo, con las métricas `hhea` en `PdfMetrics`). `Overflow` comprueba la sangría
+  (`LIST_MARKER_OVERFLOW`), `PdfStructure` etiqueta `L`/`LI`/`Lbl`/`LBody` y `StxtDump` vuelca
+  `Marker`. Revisado a ojo el PDF de `PdfCanvasTest.listsAreTaggedWithLabelAndBody`.
+  `mvn test` en verde.
+  *Siguiente paso:* caso golden `10-lists` (listas anidadas, numeraciones y una lista partida
+  entre páginas), §8, `DECISIONES.md`, README y `CLAUDE.md` para cerrar el hito.
 - **2026-10-27 (9).** Hito 13: `Style` (`Marker`, `listMarker`, `listStart`, `listNumber`),
   `Box.marker`, `ListMarkers` (símbolos, letras, romanos y rangos) y `BoxTreeBuilder` (`List` y
   `List item` como cajas de bloque, numeración, enums con guion como guion bajo, cuatro

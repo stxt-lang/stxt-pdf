@@ -40,10 +40,13 @@ public final class Box {
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
     public boolean textBlock;
     /**
-     * Texto del marcador de un {@code List item}, con el espacio que lo separa del contenido
-     * ({@code "3. "}, {@code "• "}); {@code null} si la caja no lleva marcador.
+     * Caja del marcador de un {@code List item} (ESPECIFICACION.md §5.14), generada por el motor:
+     * una caja de texto ({@code element} {@code marker}) con la tipografía del ítem y el texto del
+     * marcador más el espacio que lo separa del contenido ({@code "3. "}, {@code "• "}). No está
+     * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
+     * lleva marcador.
      */
-    public String marker;
+    public Box marker;
 
     // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
     // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.
@@ -128,6 +131,11 @@ public final class Box {
             }
         }
         return line;
+    }
+
+    /** Si es la caja generada del marcador de un {@code List item}. */
+    public boolean isMarker() {
+        return "marker".equals(element);
     }
 
     public boolean hasText() {

@@ -49,6 +49,9 @@ import java.util.List;
  * forzados se aplican en cuanto aparecen. En un corte no forzado, los márgenes que lo tocan se
  * truncan; en uno forzado, se conserva el margen superior del hijo que empieza la página.</p>
  *
+ * <p>Un {@code List item} lleva además su marcador en el primer fragmento, colgado a su
+ * izquierda ({@link MarkerLayout}).</p>
+ *
  * <p>Simplificación: solo se vuelve atrás a cortes <em>entre</em> hijos; nunca se repite el
  * layout de un hijo anterior con menos espacio para cortarlo por dentro.</p>
  */
@@ -284,10 +287,27 @@ public final class BlockLayout implements LayoutAlgorithm {
             Slice slice = Slice.of(model, first, consumed, m.cursor(), false, space);
             box.height = slice.height();
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
-                    slice.padding(), kept, List.of(), first, false);
+                    slice.padding(), withMarker(kept, slice), List.of(), first, false);
             BreakToken token = new BreakToken.Block(m.index(), m.childToken(), slice.consumed());
             return new LayoutResult(fragment, token, m.appeal(), keptPending,
                     new AdjoiningMargins(topOut, MarginStrut.EMPTY, false));
+        }
+
+        /**
+         * Los fragmentos hijos y, en el primer fragmento de un {@code List item}, su marcador
+         * detrás (§5.14): va con la primera línea, que está en este fragmento si hay alguno.
+         */
+        List<Fragment> withMarker(List<Fragment> children, Slice slice) {
+            if (box.marker == null || !first) {
+                return children;
+            }
+            return MarkerLayout.place(box, children, slice.border(), slice.padding(), engine.measurer())
+                    .map(marker -> {
+                        List<Fragment> all = new ArrayList<>(children);
+                        all.add(marker);
+                        return all;
+                    })
+                    .orElse(children);
         }
 
         /** Todos los hijos colocados. */
@@ -312,7 +332,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             Slice slice = Slice.of(model, first, consumed, contentHeight, true, space);
             box.height = slice.height();
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
-                    slice.padding(), fragments, List.of(), first, slice.finished());
+                    slice.padding(), withMarker(fragments, slice), List.of(), first, slice.finished());
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, out);
             }

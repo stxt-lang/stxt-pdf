@@ -20,6 +20,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDParentTr
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -42,7 +43,9 @@ import java.util.Map;
  *
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
  * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P}
- * para {@code Paragraph}, {@code Span} para {@code Text} y {@code Div} para el resto. El texto de
+ * para {@code Paragraph}, {@code Span} para {@code Text}, {@code L} y {@code LI} para las listas
+ * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14) y
+ * {@code Div} para el resto. El texto de
  * cada fragmento es contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del
  * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
  * bordes y los {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte
@@ -84,11 +87,41 @@ final class PdfStructure {
         if (box.headingLevel() > 0) {
             headings.add(box);
         }
+        if ("list".equals(box.element)) {
+            PDListAttributeObject numbering = new PDListAttributeObject();
+            numbering.setListNumbering(listNumbering(box.style.listMarker));
+            e.addAttribute(numbering);
+        }
+        PDStructureNode content = e;
+        if ("list-item".equals(box.element)) {
+            // LI: el marcador (Lbl) y el contenido (LBody).
+            if (box.marker != null) {
+                PDStructureElement label = new PDStructureElement("Lbl", e);
+                e.appendKid(label);
+                elements.put(box.marker, label);
+            }
+            PDStructureElement body = new PDStructureElement("LBody", e);
+            e.appendKid(body);
+            content = body;
+        }
         for (Box child : box.children) {
             if (child.style.position != Style.Position.FIXED) {
-                build(child, e);
+                build(child, content);
             }
         }
+    }
+
+    /** {@code ListNumbering} de una lista; {@code dash} no tiene equivalente y es {@code None}. */
+    private static String listNumbering(Style.Marker marker) {
+        return switch (marker) {
+            case DISC -> PDListAttributeObject.LIST_NUMBERING_DISC;
+            case DASH, NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
+            case DECIMAL -> PDListAttributeObject.LIST_NUMBERING_DECIMAL;
+            case LOWER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_LOWER_ALPHA;
+            case UPPER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_UPPER_ALPHA;
+            case LOWER_ROMAN -> PDListAttributeObject.LIST_NUMBERING_LOWER_ROMAN;
+            case UPPER_ROMAN -> PDListAttributeObject.LIST_NUMBERING_UPPER_ROMAN;
+        };
     }
 
     /**
@@ -138,6 +171,8 @@ final class PdfStructure {
         return switch (box.element) {
             case "paragraph" -> "P";
             case "text" -> "Span";
+            case "list" -> "L";
+            case "list-item" -> "LI";
             default -> "Div";
         };
     }

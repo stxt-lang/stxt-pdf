@@ -1024,7 +1024,7 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
 
 - **Árbol de estructura:** un elemento por caja, en orden del documento, que es el orden de
   lectura: `Document` (la raíz), `H1` … `H6` (los encabezados), `P` (`Paragraph`), `Span`
-  (`Text`) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
+  (`Text`), `L` y `LI` (las listas, [§5.14](#514-listas)) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
   caja partida entre páginas tiene contenido en varias.
 - ***Artifacts*:** los fondos, los bordes y todo lo que hay dentro de un `Fixed` no forman parte
   del contenido.
@@ -1084,7 +1084,18 @@ de la `List`, más el margen izquierdo del ítem. Su línea base es la de la **p
 ítem: la que se encuentra bajando por el primer hijo en flujo de cada bloque hasta un texto
 (con una lista anidada al principio, los dos marcadores quedan en la misma línea). Un ítem con
 marcador cuyo contenido no lleva así a un texto (empieza con un `Flex`, un `Grid` o un bloque
-vacío) es un error (`LIST_ITEM_WITHOUT_LINE`).
+vacío) es un error (`LIST_ITEM_WITHOUT_LINE`). Un marcador más ancho que su sangría también
+(`LIST_MARKER_OVERFLOW`, al maquetar, porque depende de las métricas): no se sale de la lista.
+
+**Cortes.** El marcador va pegado a la primera línea: si no cabe en lo que queda de página,
+pasan los dos a la siguiente, y si el ítem se parte, el marcador solo está en su primer
+fragmento. No cambia las reglas de corte (§5.10).
+
+**Salida PDF.** Una `List` es `L`, con el atributo `ListNumbering` (`Disc`, `Decimal`,
+`LowerAlpha`, `UpperAlpha`, `LowerRoman`, `UpperRoman`; `None` para `dash` y `none`); cada
+ítem es `LI`, con el marcador en `Lbl` y su contenido en `LBody`. En el volcado
+([§7](#7-formato-de-resultados)), el marcador de un ítem con `Id` aparece dentro de él como
+`Marker`, con su texto y su `Rect` (el espacio final incluido en el ancho).
 
 ---
 
@@ -1156,6 +1167,7 @@ La validación se hace en cuatro niveles:
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 
 **Catálogo de errores.** [`src/test/resources/errors/errors.stxt`](../src/test/resources/errors/errors.stxt)
@@ -1181,6 +1193,8 @@ Result:
 ```
 
 Por defecto solo se vuelcan las cajas con `Id`; las descendientes con `Id` se anidan dentro.
+El marcador de un `List item` con `Id` se vuelca dentro del ítem como `Marker: 3.`, con su
+`Rect` ([§5.14](#514-listas)).
 Un `Absolute` se anida dentro de su containing block, detrás de sus hijos en flujo, y no dentro
 de su padre.
 Las cajas sin `Id` pueden incluirse para depurar.

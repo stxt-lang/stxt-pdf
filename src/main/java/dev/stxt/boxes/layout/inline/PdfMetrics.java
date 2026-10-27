@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.FontFile;
 import dev.stxt.boxes.resources.FontLibrary;
 import dev.stxt.boxes.resources.ResourceException;
@@ -43,6 +44,12 @@ public final class PdfMetrics implements TextMeasurer {
         return resources.fonts().find(font).width(text, fontSize);
     }
 
+    /** Las de la tabla {@code hhea} de la fuente, las mismas con que pinta {@link dev.stxt.boxes.paint.PdfCanvas}. */
+    @Override
+    public VerticalMetrics vertical(FontFace font) {
+        return resources.fonts().find(font).vertical();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -57,6 +64,9 @@ public final class PdfMetrics implements TextMeasurer {
     private static void validate(Box box, FontLibrary fonts) {
         if (box.hasText()) {
             check(box, fonts);
+        }
+        if (box.marker != null) {
+            check(box.marker, fonts);
         }
         box.children.forEach(child -> validate(child, fonts));
     }

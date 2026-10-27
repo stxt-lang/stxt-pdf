@@ -23,6 +23,8 @@ public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
     private static final String FONT = "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+    /** Sufijo de la clave del marcador de un ítem. */
+    private static final String MARKER = "#marker";
 
     private final List<Page> pages;
     private final List<Map<String, Fragment>> fragments = new ArrayList<>();
@@ -79,6 +81,19 @@ public final class LayoutFixture {
         return rects.get(page - 1).containsKey(id);
     }
 
+    /** Caja del marcador del {@code List item} con ese {@code Id} (§5.14). */
+    public Rect marker(String id) {
+        return marker(1, id);
+    }
+
+    public Rect marker(int page, String id) {
+        return rect(page, id + MARKER);
+    }
+
+    public boolean hasMarker(int page, String id) {
+        return has(page, id + MARKER);
+    }
+
     public Fragment fragment(String id) {
         return fragment(1, id);
     }
@@ -93,6 +108,9 @@ public final class LayoutFixture {
                              Map<String, Fragment> fragments, Map<String, Rect> rects) {
         for (Fragment f : children) {
             Rect border = new Rect(x + f.x(), y + f.y(), f.width(), f.height());
+            if (f.box().isMarker() && f.box().parent.id != null) {
+                rects.put(f.box().parent.id + MARKER, border);
+            }
             if (f.box().id != null) {
                 fragments.put(f.box().id, f);
                 rects.put(f.box().id, border);

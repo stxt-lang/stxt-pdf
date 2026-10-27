@@ -76,6 +76,11 @@ public final class Engine {
         cache.clear();
     }
 
+    /** Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (§5.14). */
+    public TextMeasurer measurer() {
+        return measurer;
+    }
+
     /** min-content y max-content de la caja de margen (§5.9). */
     public IntrinsicSizes intrinsic(Box box) {
         return cache.intrinsic(box, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));

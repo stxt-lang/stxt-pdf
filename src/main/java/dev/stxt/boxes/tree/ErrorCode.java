@@ -96,6 +96,8 @@ public enum ErrorCode {
     BOX_OVERFLOW,
     /** Algo del flujo más alto que la página que no se puede partir. */
     PAGE_OVERFLOW,
+    /** El marcador de un ítem no cabe en la sangría: el relleno izquierdo de la lista más el margen del ítem. */
+    LIST_MARKER_OVERFLOW,
 
     // --- Fuentes ------------------------------------------------------------------------------
     /** {@code Font} no está en la carpeta de fuentes. */

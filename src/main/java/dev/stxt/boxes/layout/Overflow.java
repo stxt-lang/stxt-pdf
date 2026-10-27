@@ -81,6 +81,14 @@ public final class Overflow {
             }
         }
         for (Fragment c : f.children()) {
+            if (c.box().isMarker()) {
+                // Cuelga fuera del ítem: se comprueba en la sangría de su lista (marker).
+                fragment(c, cx, cy, page);
+                continue;
+            }
+            if ("list".equals(f.box().element)) {
+                marker(f, c);
+            }
             if (!c.box().style.isOutOfFlow()) {
                 // Las relative se comprueban en su sitio, sin el desplazamiento.
                 RelativeOffset o = RelativeOffset.of(c.box().style, width,
@@ -102,6 +110,25 @@ public final class Overflow {
         }
     }
 
+    /**
+     * El marcador de un ítem cabe en su sangría (§5.14): el relleno izquierdo de la lista más el
+     * margen izquierdo del ítem.
+     */
+    private static void marker(Fragment list, Fragment item) {
+        for (Fragment m : item.children()) {
+            if (!m.box().isMarker()) {
+                continue;
+            }
+            double room = item.x() + list.padding().left();
+            if (m.width() > room + EPSILON) {
+                throw new InvalidModelException(item.box().line, ErrorCode.LIST_MARKER_OVERFLOW, "El marcador '"
+                        + m.box().text.strip() + "' del List item " + name(item.box()) + " mide " + pt(m.width())
+                        + " con su espacio, y la sangría deja " + pt(room) + ": aumenta el Padding izquierdo de "
+                        + "la lista o el margen izquierdo del ítem");
+            }
+        }
+    }
+
     // ------------------------------------------------------------------------------------------
     // Culpables
     // ------------------------------------------------------------------------------------------
@@ -120,7 +147,8 @@ public final class Overflow {
             Fragment inner = null;
             for (Fragment d : c.children()) {
                 double dx = cx + d.x();
-                if (!d.box().style.isOutOfFlow() && (dx < left - EPSILON || dx + d.width() > right + EPSILON)) {
+                if (!d.box().style.isOutOfFlow() && !d.box().isMarker()
+                        && (dx < left - EPSILON || dx + d.width() > right + EPSILON)) {
                     inner = d;
                     x = dx;
                     y = cy + d.y();
@@ -157,7 +185,7 @@ public final class Overflow {
             double cy = y + c.border().top() + c.padding().top();
             Fragment inner = null;
             for (Fragment d : c.children()) {
-                if (!d.box().style.isOutOfFlow() && cy + d.y() + d.height() > bottom + EPSILON) {
+                if (!d.box().style.isOutOfFlow() && !d.box().isMarker() && cy + d.y() + d.height() > bottom + EPSILON) {
                     inner = d;
                     x = cx + d.x();
                     y = cy + d.y();

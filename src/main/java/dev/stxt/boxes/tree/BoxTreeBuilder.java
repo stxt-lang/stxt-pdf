@@ -438,10 +438,13 @@ public final class BoxTreeBuilder {
         validateContainer(s, box);
         if (number != null) {
             itemNumbers.put(box, number);
-            box.marker = ListMarkers.text(parent.style.listMarker, number);
             if (n.getChildren().stream().noneMatch(c -> ELEMENTS.contains(c.getCanonicalName()))) {
                 throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
                         + "un Paragraph, un Text, un Block…");
+            }
+            String marker = ListMarkers.text(parent.style.listMarker, number);
+            if (marker != null) {
+                box.marker = marker(n, box, marker);
             }
         }
         if (TEXTS.contains(kind)) {
@@ -481,6 +484,28 @@ public final class BoxTreeBuilder {
                             + ", que numera " + ListMarkers.range(marker));
         }
         return number;
+    }
+
+    /**
+     * La caja generada del marcador de un {@code List item} (§5.14): texto con la tipografía del
+     * ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
+     */
+    private static Box marker(InlineNode n, Box item, String text) {
+        if (item.style.font == null) {
+            throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
+                    + "el Typography del List item, de un antecesor o de Document");
+        }
+        if (!item.style.isDeclared("font-size")) {
+            throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: decláralo "
+                    + "en el Typography del List item, de un antecesor o de Document");
+        }
+        Style s = Style.inheriting(item.style);
+        s.layout = Style.Layout.INLINE;
+        Box marker = new Box(null, "marker", s, false, n.getLine());
+        marker.parent = item;
+        marker.text = text;
+        marker.textLine = n.getLine();
+        return marker;
     }
 
     /**
