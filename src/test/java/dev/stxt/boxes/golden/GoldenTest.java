@@ -4,13 +4,12 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.output.StxtDump;
-import dev.stxt.boxes.paint.PdfCanvas;
+import dev.stxt.boxes.paint.PdfWriter;
 import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
-import dev.stxt.boxes.tree.BoxTreeBuilder;
-import dev.stxt.boxes.tree.Media;
 import dev.stxt.runtime.STXT;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -77,20 +76,19 @@ class GoldenTest {
                 assumeTrue(!PENDING.containsKey(name), () -> name + ": " + PENDING.get(name));
                 InlineNode input = reader.read(dir.resolve("input.stxt"));
                 Node expected = STXT.rawParser().parseFile(dir.resolve("expected.stxt").toFile()).get(0);
-                List<Page> pages = new Engine().layOutDocument(input);
-                Media media = new BoxTreeBuilder().build(input).media();
-                writeSvg(name, pages, media);
+                LaidOutDocument document = new Engine().layOutDocument(input);
+                writeSvg(name, document);
                 writePdfAndImages(SOURCE_DIR.resolve(name), input);
-                String dump = StxtDump.dump(pages, media.pageArea(), false);
+                String dump = StxtDump.dump(document.pages(), document.media().pageArea(), false);
                 compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
             }));
         }
     }
 
-    private static void writeSvg(String name, List<Page> pages, Media media) throws IOException {
+    private static void writeSvg(String name, LaidOutDocument document) throws IOException {
         Files.createDirectories(SVG_DIR);
-        for (Page p : pages) {
-            String svg = SvgCanvas.page(p, media, true);
+        for (Page p : document.pages()) {
+            String svg = SvgCanvas.page(p, document.media(), true);
             Files.writeString(SVG_DIR.resolve(name + "-" + p.number() + ".svg"), svg, StandardCharsets.UTF_8);
         }
     }
@@ -101,7 +99,7 @@ class GoldenTest {
      * diff. Un PNG solo se reescribe si cambian sus píxeles más allá del antialiasing
      * ({@link #PIXEL_TOLERANCE}), y se borran los de páginas que ya no
      * existen. El PDF lleva los contornos de depuración de las cajas y se maqueta con las métricas
-     * reales de las fuentes de {@code resources/fonts}, que se incrustan ({@link PdfCanvas#write(InlineNode,
+     * reales de las fuentes de {@code resources/fonts}, que se incrustan ({@link PdfWriter#write(InlineNode,
      * Resources, java.io.OutputStream, boolean)}), no con las de la comparación.
      */
     private static void writePdfAndImages(Path dir, InlineNode input) throws IOException {
@@ -109,7 +107,7 @@ class GoldenTest {
             return;
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(input, new Resources(), out, true);
+        PdfWriter.write(input, new Resources(), out, true);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         int pages;
         try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {

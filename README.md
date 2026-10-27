@@ -55,7 +55,7 @@ Para obtener un PDF, el layout debe usar las métricas reales de las fuentes:
 ```java
 InlineNode doc = new DocumentReader().read(Path.of("report.stxt"));
 try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
-    PdfCanvas.write(doc, out);   // maqueta con new Engine(new PdfMetrics()) y pinta
+    PdfWriter.write(doc, out);   // maqueta con new Engine(new PdfMetrics()) y pinta
 }
 ```
 
@@ -63,7 +63,7 @@ try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
 
 Las fuentes y las imágenes están en una carpeta de recursos, por defecto `resources/` en el
 directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
-`PdfCanvas.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
+`PdfWriter.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce

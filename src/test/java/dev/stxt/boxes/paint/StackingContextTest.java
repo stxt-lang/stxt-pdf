@@ -40,7 +40,7 @@ class StackingContextTest {
     private static List<String> paint(String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
-        Page page = new Engine().layOutDocument(READER.read(doc)).get(0);
+        Page page = new Engine().layOutDocument(READER.read(doc)).pages().get(0);
         Recorder canvas = new Recorder();
         StackingContext.build(page.content(), page.fixed(), 40, 40).paint(canvas);
         return canvas.backgrounds;

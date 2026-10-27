@@ -1,18 +1,14 @@
 package dev.stxt.boxes.paint;
 
-import dev.stxt.InlineNode;
 import dev.stxt.boxes.fragment.Page;
-import dev.stxt.boxes.layout.Engine;
-import dev.stxt.boxes.layout.inline.PdfMetrics;
+import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
-import dev.stxt.boxes.tree.Metadata;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -72,35 +68,18 @@ public final class PdfCanvas implements Canvas {
     }
 
     /**
-     * Maqueta un documento ya validado ({@link dev.stxt.boxes.stxt.DocumentReader}) con las
-     * fuentes de la carpeta de recursos por defecto y escribe el PDF en {@code target}, que no
-     * se cierra.
+     * Pinta un documento maquetado con {@code new PdfMetrics(resources)}, con el título y el
+     * idioma de sus metadatos, y escribe el PDF en {@code target}, que no se cierra. Para maquetar
+     * y pintar en una llamada está {@link PdfWriter}.
      */
-    public static void write(InlineNode document, OutputStream target) throws IOException {
-        write(document, new Resources(), target, false);
-    }
-
-    /**
-     * Como {@link #write(InlineNode, OutputStream)}, con otra carpeta de recursos y los contornos
-     * de depuración si {@code debug}.
-     */
-    public static void write(InlineNode document, Resources resources, OutputStream target, boolean debug)
+    public static void write(LaidOutDocument document, Resources resources, OutputStream target, boolean debug)
             throws IOException {
-        List<Page> pages = new Engine(new PdfMetrics(resources)).layOutDocument(document);
-        BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
-        write(pages, tree.media(), tree.metadata(), resources, target, debug);
-    }
-
-    /**
-     * Pinta las páginas, maquetadas con {@code new PdfMetrics(resources)}, con el título y el
-     * idioma de {@code metadata}, y escribe el PDF en {@code target}, que no se cierra.
-     */
-    public static void write(List<Page> pages, Media media, Metadata metadata, Resources resources,
-                             OutputStream target, boolean debug) throws IOException {
+        List<Page> pages = document.pages();
+        Media media = document.media();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
             PdfStructure structure = new PdfStructure(doc, root(pages));
-            PdfStructure.metadata(doc, metadata);
+            PdfStructure.metadata(doc, document.metadata());
             Rect area = media.pageArea();
             List<PDPage> pdfPages = new ArrayList<>();
             for (Page p : pages) {

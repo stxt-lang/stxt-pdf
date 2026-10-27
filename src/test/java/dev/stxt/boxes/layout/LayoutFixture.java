@@ -57,7 +57,7 @@ public final class LayoutFixture {
 
     private static LayoutFixture layOut(String media, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
-        return new LayoutFixture(new Engine().layOutDocument(READER.read(doc)));
+        return new LayoutFixture(new Engine().layOutDocument(READER.read(doc)).pages());
     }
 
     public int pages() {

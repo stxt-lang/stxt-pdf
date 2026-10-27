@@ -72,7 +72,7 @@ Flujo de datos:
 
 ```
 texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media
-   ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ List<Page> (árbol de Fragment por página)
+   ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ LaidOutDocument (Media, Metadata, List<Page>)
    ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PdfCanvas)
 ```
 
@@ -82,10 +82,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
 | `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `BoxTreeBuilder`, `InvalidModelException` |
-| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
+| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `LaidOutDocument` |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 ### Piezas clave
@@ -210,7 +210,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
 - **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
   el de todos los tests de layout, y no necesita fuentes; `PdfMetrics` da las métricas reales de
-  las fuentes TTF de `Resources` y es el que usa `PdfCanvas.write(document, out)`.
+  las fuentes TTF de `Resources` y es el que usa `PdfWriter.write(document, out)`.
   `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics` comprueba que
   existen las fuentes y tienen todos los caracteres (errores con línea).
 - **Recursos (§5.11):** carpeta fija, por defecto `resources/` del directorio de trabajo, con

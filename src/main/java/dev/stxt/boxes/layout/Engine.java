@@ -56,18 +56,19 @@ public final class Engine {
     }
 
     /**
-     * Documento STXT → páginas. Lo normal es leerlo con {@link dev.stxt.boxes.stxt.DocumentReader};
-     * si no está validado, {@link BoxTreeBuilder} lo valida contra el schema. Antes de maquetar comprueba con el {@link TextMeasurer}
-     * que se puede medir todo el texto (las fuentes, en la salida PDF), y después que nada
-     * desborda ({@link Overflow}).
+     * Documento STXT → páginas, con el medio y los metadatos. Lo normal es leerlo con
+     * {@link dev.stxt.boxes.stxt.DocumentReader}; si no está validado, {@link BoxTreeBuilder} lo
+     * valida contra el schema. Antes de maquetar comprueba con el {@link TextMeasurer} que se
+     * puede medir todo el texto (las fuentes, en la salida PDF), y después que nada desborda
+     * ({@link Overflow}).
      */
-    public List<Page> layOutDocument(InlineNode document) {
+    public LaidOutDocument layOutDocument(InlineNode document) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);
         measurer.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
         List<Page> pages = new Paginator(this).paginate(tree.root(), tree.media());
         Overflow.check(pages, tree.media());
-        return pages;
+        return new LaidOutDocument(tree.media(), tree.metadata(), pages);
     }
 
     /**
@@ -122,10 +123,6 @@ public final class Engine {
     private LayoutResult layoutOnce(Box box, ConstraintSpace space, BreakToken from) {
         return cache.layout(box, space, from,
                 () -> absolute.resolvePending(box, algorithm(box).layout(box, space, from)));
-    }
-
-    public LayoutCache cache() {
-        return cache;
     }
 
     /**

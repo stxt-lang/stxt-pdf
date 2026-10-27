@@ -44,7 +44,7 @@ class PdfCanvasTest {
 
     private static byte[] render(InlineNode document, String name) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(document, out);
+        PdfWriter.write(document, out);
         Files.createDirectories(PDF_DIR);
         Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
         return out.toByteArray();

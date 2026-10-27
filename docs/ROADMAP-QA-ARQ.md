@@ -58,7 +58,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 |---|---|---|---|---|---|
 | 1 | [Ramas `default` silenciosas en la lectura de propiedades](#1-ramas-default-silenciosas) | QA | S | — | hecho |
 | 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | hecho |
-| 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | pendiente |
+| 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | hecho |
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | pendiente |
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | pendiente |
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | pendiente |
@@ -158,12 +158,24 @@ tiene otras `Box` que las de los fragmentos. `PdfCanvas` mezcla dos responsabili
 
 **Cómo.**
 
-- [ ] `record LaidOutDocument(Media media, Metadata metadata, List<Page> pages)` como
-      resultado de `layOutDocument` (o un método nuevo, si se quiere conservar la firma).
-- [ ] Sacar `PdfCanvas.write(InlineNode, …)` a una fachada (`PdfWriter` o `Boxes.toPdf`), y
-      dejar en `PdfCanvas` solo el pintado y el `write(LaidOutDocument, …)`.
-- [ ] Tests y `GoldenTest` usan el resultado en lugar de reconstruir.
-- [ ] Quitar `Engine.cache()` (público y sin uso).
+- [x] `record LaidOutDocument(Media media, Metadata metadata, List<Page> pages)` (en
+      `layout`, junto a `Engine`) como resultado de `layOutDocument`: se cambia la firma en
+      lugar de añadir un método, para que solo haya una forma de maquetar un documento.
+- [x] `paint.PdfWriter.write(InlineNode, …)` es la fachada que maqueta con `PdfMetrics` y
+      pinta; en `PdfCanvas` queda el pintado y `write(LaidOutDocument, resources, target,
+      debug)`, que sustituye al de páginas, medio y metadatos sueltos.
+- [x] `GoldenTest` y `PdfCanvasTest` usan el resultado o la fachada, y `LayoutFixture` y
+      `StackingContextTest`, `pages()`. Los "otros 11 sitios" eran sobre todo tests de `tree` que
+      construyen el árbol sin maquetar (`StylesTest`, `ListsTest`, `PdfMetricsTest`…): no hay
+      doble construcción y se quedan como están.
+- [x] Quitar `Engine.cache()` (público y sin uso).
+- [x] README y `CLAUDE.md` usan `PdfWriter` en los ejemplos y el flujo de datos.
+
+**Verificación.** `mvn test` (555 tests), sin cambios en los PNG ni en los `expected.stxt`.
+
+**Pendiente fuera de esta tarea.** `PdfCanvas.root(pages)` sigue buscando la raíz subiendo por
+`parent` desde la primera página; con la [tarea 5](#5-quitar-la-geometría-mutable-de-box) o la
+[7](#7-partir-boxtreebuilder) puede ir en `LaidOutDocument` si hace falta.
 
 ## 4. Tests de piezas puras y cobertura
 
@@ -405,3 +417,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 1 | Ramas `default` explícitas en `BoxTreeBuilder` y `SchemaCoverageTest` (161 pares); 549 tests en verde | Tarea 2 |
 | 2026-10-27 | 12 (nueva) | `GoldenTest` tolera el antialiasing entre máquinas al comparar los PNG; 549 tests en verde | Tarea 2 |
 | 2026-10-27 | 2 | `ConstraintSpace` con fábricas con nombre y *withers* que conservan `contentHeight`; `ConstraintSpaceTest`; 555 tests en verde | Tarea 3 |
+| 2026-10-27 | 3 | `layOutDocument` devuelve `LaidOutDocument`; fachada `PdfWriter`; sin `Engine.cache()`; 555 tests en verde | Tarea 4 |
