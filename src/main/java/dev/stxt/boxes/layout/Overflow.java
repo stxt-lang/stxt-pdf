@@ -18,6 +18,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
+import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
+import static dev.stxt.boxes.tree.PropertyKey.BORDER;
+import static dev.stxt.boxes.tree.PropertyKey.FONT_SIZE;
+import static dev.stxt.boxes.tree.PropertyKey.GRID_ROWS;
+import static dev.stxt.boxes.tree.PropertyKey.HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.LINE_HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.MAX_HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.MIN_WIDTH;
+import static dev.stxt.boxes.tree.PropertyKey.OFFSET;
+import static dev.stxt.boxes.tree.PropertyKey.PADDING;
+import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
+
 /**
  * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
  * cada hijo en flujo (con sus márgenes horizontales) caben en la caja de contenido de su padre;
@@ -56,7 +68,7 @@ public final class Overflow {
             if (x < page.x() - EPSILON || y < page.y() - EPSILON
                     || x + f.width() > page.right() + EPSILON || y + f.height() > page.bottom() + EPSILON) {
                 Style s = f.box().style;
-                throw new InvalidModelException(s.isDeclared("offset") ? s.line("offset") : f.box().line,
+                throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : f.box().line,
                         ErrorCode.BOX_OVERFLOW, "La caja " + name(f.box()) + " se sale de la página: revisa su "
                         + "Offset y su tamaño");
             }
@@ -147,7 +159,7 @@ public final class Overflow {
                 }
             }
             Style s = c.box().style;
-            boolean sized = s.isDeclared("width") || s.isDeclared("min-width");
+            boolean sized = s.isDeclared(WIDTH) || s.isDeclared(MIN_WIDTH);
             Fragment inner = null;
             for (Fragment d : c.children()) {
                 if (d.box().style.isOutOfFlow() || d.box().isMarker()) {
@@ -165,7 +177,7 @@ public final class Overflow {
                 }
             }
             if (inner == null) {
-                String property = s.isDeclared("width") ? "width" : s.isDeclared("min-width") ? "min-width" : null;
+                String property = s.isDeclared(WIDTH) ? WIDTH : s.isDeclared(MIN_WIDTH) ? MIN_WIDTH : null;
                 return new InvalidModelException(property != null ? s.line(property) : c.box().line,
                         ErrorCode.BOX_OVERFLOW, "La caja " + name(c.box()) + " no cabe a lo ancho: mide "
                         + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left)
@@ -183,7 +195,7 @@ public final class Overflow {
     private static InvalidModelException tooTall(Fragment container, double needed, double height, Fragment child) {
         Box box = container.box();
         Style s = box.style;
-        String property = Stream.of("height", "max-height", "aspect-ratio", "grid.rows")
+        String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO, GRID_ROWS)
                 .filter(s::isDeclared).findFirst().orElse(null);
         String what = child == null ? "su texto" : "la caja " + name(child.box());
         return new InvalidModelException(property != null ? s.line(property) : box.line, ErrorCode.BOX_OVERFLOW,
@@ -216,11 +228,11 @@ public final class Overflow {
                 Style s = c.box().style;
                 String property;
                 if (c.border().vertical() + c.padding().vertical() > pageHeight + EPSILON) {
-                    property = c.padding().vertical() >= c.border().vertical() ? "padding" : "border";
+                    property = c.padding().vertical() >= c.border().vertical() ? PADDING : BORDER;
                 } else if (!c.lines().isEmpty()) {
-                    property = s.isDeclared("line-height") ? "line-height" : "font-size";
+                    property = s.isDeclared(LINE_HEIGHT) ? LINE_HEIGHT : FONT_SIZE;
                 } else {
-                    property = "height";
+                    property = HEIGHT;
                 }
                 int line = s.isDeclared(property) ? s.line(property) : c.box().line;
                 return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "La caja " + name(c.box())

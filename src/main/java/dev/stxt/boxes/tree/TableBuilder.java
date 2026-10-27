@@ -12,6 +12,7 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
 import static dev.stxt.boxes.tree.Nodes.is;
 import static dev.stxt.boxes.tree.Nodes.label;
+import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
 
 /**
  * Las filas de una {@code Table} (ESPECIFICACION.md §5.15) como ítems de un grid con colocación
@@ -100,7 +101,7 @@ final class TableBuilder {
                         }
                     }
                     Box box = cells.build(cell, row);
-                    box.style.declared("item.area", cell.getLine());
+                    box.style.declared(ITEM_AREA, cell.getLine());
                     box.style.itemArea = (firstRow + r + 1) + " " + (c + 1) + " " + span.rows() + " " + span.columns();
                     table.addChild(box);
                     c += span.columns();

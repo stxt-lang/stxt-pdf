@@ -7,7 +7,6 @@ import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -50,14 +49,6 @@ final class PropertyReader {
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
 
-    /**
-     * Nombre interno de cada propiedad de {@code Typography} y {@code Break} cuyo nombre en el
-     * documento es corto: {@link Style#line} y los mensajes usan el interno ({@code font-size}).
-     */
-    private static final Map<String, String> INTERNAL = Map.of(
-            "weight", "font-weight", "style", "font-style", "size", "font-size", "align", "text-align",
-            "before", "break-before", "after", "break-after", "inside", "break-inside");
-
     private PropertyReader() {
     }
 
@@ -90,7 +81,7 @@ final class PropertyReader {
     static void typography(InlineNode group, Style s) {
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
-            s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
+            s.declared(PropertyKey.internal(name), p.getLine());
             switch (name) {
                 case "font" -> s.font = fontFamily(p);
                 case "weight" -> s.fontWeight = enumValue(Style.FontWeight.class, p);
@@ -111,7 +102,7 @@ final class PropertyReader {
     static void fragmentation(InlineNode group, Style s) {
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
-            s.declared(INTERNAL.getOrDefault(name, name), p.getLine());
+            s.declared(PropertyKey.internal(name), p.getLine());
             switch (name) {
                 case "before" -> s.breakBefore = enumValue(Style.Break.class, p);
                 case "after" -> s.breakAfter = enumValue(Style.Break.class, p);
@@ -124,7 +115,7 @@ final class PropertyReader {
 
     /** Propiedades de flex, hijas del elemento {@code Flex}; su línea se guarda con prefijo ({@code flex.gap}). */
     static void flex(Node p, Style s) {
-        s.declared("flex." + p.getCanonicalName(), p.getLine());
+        s.declared(PropertyKey.flex(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
             case "direction" -> s.flexDirection = enumValue(Style.Direction.class, p);
             case "wrap" -> s.flexWrap = bool(p);
@@ -138,7 +129,7 @@ final class PropertyReader {
 
     /** Propiedades de grid, hijas del elemento {@code Grid}; su línea se guarda con prefijo ({@code grid.rows}). */
     static void grid(Node p, Style s) {
-        s.declared("grid." + p.getCanonicalName(), p.getLine());
+        s.declared(PropertyKey.grid(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
             case "columns" -> s.gridColumns = tracks(p);
             case "rows" -> s.gridRows = tracks(p);
@@ -162,7 +153,7 @@ final class PropertyReader {
      */
     static void item(InlineNode w, Style s) {
         if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
-            s.declared("item.area", w.getLine());
+            s.declared(PropertyKey.ITEM_AREA, w.getLine());
             s.itemArea = w.getText().trim();
         }
         for (Node p : w.getChildren()) {
@@ -171,11 +162,11 @@ final class PropertyReader {
                 continue;
             }
             if (name.equals("layer")) {
-                s.declared("layer", p.getLine());
+                s.declared(PropertyKey.LAYER, p.getLine());
                 s.layer = integer(p);
                 continue;
             }
-            s.declared("item." + name, p.getLine());
+            s.declared(PropertyKey.item(name), p.getLine());
             switch (name) {
                 case "grow" -> s.itemGrow = nonNegative(p);
                 case "shrink" -> s.itemShrink = nonNegative(p);

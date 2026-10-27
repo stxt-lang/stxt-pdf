@@ -82,7 +82,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes` |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `LaidOutDocument` |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
@@ -105,14 +105,15 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   `Break` (cortes de página; no en `Absolute` ni `Fixed`), con nombres cortos (`Size`,
   `Weight`, `Align`, `Before`…). La estructura solo está en el schema: `DocumentSchema` lo
   compila una vez, `DocumentReader` valida con él al leer y `BoxTreeBuilder` vuelve a validar el
-  árbol al empezar, así que el resto del builder da la estructura por buena. `INTERNAL` da el
-  nombre interno de los cortos (`Size` → `font-size`), que es el de `Style.line`.
+  árbol al empezar, así que el resto del builder da la estructura por buena.
+  `PropertyKey.internal` da el nombre interno de los cortos (`Size` → `font-size`), que es la
+  clave de `Style.line`.
 - **`BoxTreeBuilder`** traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen
   del elemento; las propiedades de `Item` y `Area` pasan al elemento que envuelven), interpreta
   valores, aplica la herencia y comprueba las reglas del §6 que el schema no puede expresar. Los
   errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
-  culpable**: la de la propiedad (`Style.line("height")`, `"grid.rows"`, `"item.grow"`…), no la
-  de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
+  culpable**: la de la propiedad (`Style.line(HEIGHT)`, `GRID_ROWS`, `ITEM_GROW`…, con las
+  claves de `PropertyKey`), no la de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
   `BoxTreeBuilder` es el orquestador (elementos, encabezados y texto) y no guarda estado: lo de
   cada llamada va en un `BuildContext`. Los valores los interpreta `ValueReader`; los grupos y
   las propiedades de `Flex`, `Grid` e `Item`, `PropertyReader`; las reglas de `Styles`,

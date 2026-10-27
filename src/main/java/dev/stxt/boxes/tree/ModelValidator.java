@@ -15,6 +15,24 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.label;
 import static dev.stxt.boxes.tree.Nodes.placement;
 import static dev.stxt.boxes.tree.Nodes.position;
+import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
+import static dev.stxt.boxes.tree.PropertyKey.FLEX_GAP;
+import static dev.stxt.boxes.tree.PropertyKey.FLEX_LINES;
+import static dev.stxt.boxes.tree.PropertyKey.FLEX_MAIN_AXIS;
+import static dev.stxt.boxes.tree.PropertyKey.FONT_SIZE;
+import static dev.stxt.boxes.tree.PropertyKey.GRID_GAP;
+import static dev.stxt.boxes.tree.PropertyKey.GRID_ROWS;
+import static dev.stxt.boxes.tree.PropertyKey.HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
+import static dev.stxt.boxes.tree.PropertyKey.ITEM_BASIS;
+import static dev.stxt.boxes.tree.PropertyKey.ITEM_GROW;
+import static dev.stxt.boxes.tree.PropertyKey.MARGIN;
+import static dev.stxt.boxes.tree.PropertyKey.MAX_HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.MAX_WIDTH;
+import static dev.stxt.boxes.tree.PropertyKey.MIN_HEIGHT;
+import static dev.stxt.boxes.tree.PropertyKey.MIN_WIDTH;
+import static dev.stxt.boxes.tree.PropertyKey.OFFSET;
+import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
 import static dev.stxt.boxes.tree.ValueReader.amount;
 import static dev.stxt.boxes.tree.ValueReader.comparable;
 import static dev.stxt.boxes.tree.ValueReader.hasPercentage;
@@ -32,11 +50,11 @@ final class ModelValidator {
     /** {@code Main axis} y {@code Lines} de un {@code Flex}. */
     static void validateFlex(Style s) {
         if (s.flexMainAxis == Style.Distribution.STRETCH) {
-            throw error(s.line("flex.main-axis"), ErrorCode.VALUE_NOT_ALLOWED,
+            throw error(s.line(FLEX_MAIN_AXIS), ErrorCode.VALUE_NOT_ALLOWED,
                     "Main axis no admite 'stretch'; usa Grow en los ítems");
         }
-        if (s.isDeclared("flex.lines") && !s.flexWrap) {
-            throw error(s.line("flex.lines"), ErrorCode.LINES_WITHOUT_WRAP,
+        if (s.isDeclared(FLEX_LINES) && !s.flexWrap) {
+            throw error(s.line(FLEX_LINES), ErrorCode.LINES_WITHOUT_WRAP,
                     "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
         }
     }
@@ -52,24 +70,24 @@ final class ModelValidator {
         if (gridItem && s.itemArea != null) {
             Map<String, Area> areas = parent.style.gridAreas == null
                     ? Map.of() : GridAreas.parse(parent.style.gridAreas);
-            placement(s.line("item.area"), () -> Cell.parse(s.itemArea, areas));
+            placement(s.line(ITEM_AREA), () -> Cell.parse(s.itemArea, areas));
         }
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
-        if (s.isDeclared("aspect-ratio") && !s.width.isAuto() && !s.height.isAuto()) {
-            throw error(s.line("aspect-ratio"), ErrorCode.ASPECT_RATIO_CONFLICT,
+        if (s.isDeclared(ASPECT_RATIO) && !s.width.isAuto() && !s.height.isAuto()) {
+            throw error(s.line(ASPECT_RATIO), ErrorCode.ASPECT_RATIO_CONFLICT,
                     "Aspect ratio no tiene efecto si Width y Height están declarados");
         }
-        validateMinMax(s, "width", s.width, "min-width", s.minWidth, "max-width", s.maxWidth);
-        validateMinMax(s, "height", s.height, "min-height", s.minHeight, "max-height", s.maxHeight);
+        validateMinMax(s, WIDTH, s.width, MIN_WIDTH, s.minWidth, MAX_WIDTH, s.maxWidth);
+        validateMinMax(s, HEIGHT, s.height, MIN_HEIGHT, s.minHeight, MAX_HEIGHT, s.maxHeight);
         validatePercentages(ctx, s, parent, flexItem, gridItem);
     }
 
     private static void validateOffset(Style s) {
-        if (!s.isDeclared("offset")) {
+        if (!s.isDeclared(OFFSET)) {
             return;
         }
-        int line = s.line("offset");
+        int line = s.line(OFFSET);
         Sides<Value> o = s.offset;
         if (s.position == Style.Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
@@ -103,7 +121,7 @@ final class ModelValidator {
         if (!horizontalAuto && !verticalAuto) {
             return;
         }
-        int line = s.line("margin");
+        int line = s.line(MARGIN);
         if (flexItem || gridItem) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de flex o "
                     + "grid; alinea con Main axis, Cross axis, Horizontal o Vertical");
@@ -158,10 +176,10 @@ final class ModelValidator {
     private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean flexItem,
                                             boolean gridItem) {
         boolean ownBase = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
-        for (String p : List.of("height", "min-height", "max-height")) {
+        for (String p : List.of(HEIGHT, MIN_HEIGHT, MAX_HEIGHT)) {
             Value v = switch (p) {
-                case "height" -> s.height;
-                case "min-height" -> s.minHeight;
+                case HEIGHT -> s.height;
+                case MIN_HEIGHT -> s.minHeight;
                 default -> s.maxHeight;
             };
             if (!ownBase && v != null && hasPercentage(v)) {
@@ -171,15 +189,15 @@ final class ModelValidator {
         boolean parentDefinite = ctx.isDefinite(parent);
         if (s.position == Style.Position.RELATIVE && !parentDefinite
                 && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
-            throw indefinite(s.line("offset"), "El desplazamiento vertical de Offset");
+            throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
         boolean column = parent.style.flexDirection == Style.Direction.COLUMN;
         if (flexItem && column && !parentDefinite) {
             if (hasPercentage(s.itemBasis)) {
-                throw indefinite(s.line("item.basis"), "Basis en un flex column");
+                throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
             }
             if (s.itemGrow > 0) {
-                throw error(s.line("item.grow"), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
+                throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
                         + "column del padre no tiene un alto definido que repartir; declara su Height");
             }
         }
@@ -191,13 +209,13 @@ final class ModelValidator {
             return;
         }
         if (s.gridRows.stream().anyMatch(ValueReader::hasPercentage)) {
-            throw indefinite(s.line("grid.rows"), "Rows");
+            throw indefinite(s.line(GRID_ROWS), "Rows");
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
         boolean rowGapUsed = s.layout == Style.Layout.GRID
                 || (s.layout == Style.Layout.FLEX && (s.flexWrap || s.flexDirection == Style.Direction.COLUMN));
         if (rowGapUsed && hasPercentage(s.rowGap)) {
-            String gap = s.layout == Style.Layout.GRID ? "grid.gap" : "flex.gap";
+            String gap = s.layout == Style.Layout.GRID ? GRID_GAP : FLEX_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
         }
     }
@@ -236,7 +254,7 @@ final class ModelValidator {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
                     + n.getName() + ", de un antecesor o de Document");
         }
-        if (!box.style.isDeclared("font-size")) {
+        if (!box.style.isDeclared(FONT_SIZE)) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
                     + n.getName() + ", de un antecesor o de Document");
         }

@@ -1,21 +1,14 @@
 package dev.stxt.boxes.tree;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
 import dev.stxt.boxes.stxt.DocumentReader;
-import dev.stxt.runtime.STXT;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -164,7 +157,7 @@ class SchemaCoverageTest {
     }
 
     @TestFactory
-    Stream<DynamicTest> everyPropertyOfTheSchemaIsRead() throws IOException {
+    Stream<DynamicTest> everyPropertyOfTheSchemaIsRead() {
         DocumentReader reader = new DocumentReader();
         return pairs().stream().map(pair -> DynamicTest.dynamicTest(pair.parent() + " > " + pair.child(), () -> {
             Template template = TEMPLATES.get(pair.parent());
@@ -182,28 +175,13 @@ class SchemaCoverageTest {
     }
 
     /** Pares (nodo, hijo) del schema cuyo hijo es una propiedad (un nodo sin hijos) o un grupo. */
-    private static List<Pair> pairs() throws IOException {
-        Map<String, List<String>> children = new LinkedHashMap<>();
-        for (Node n : ((InlineNode) STXT.rawParser().parse(schema()).get(0)).getChildren()) {
-            if (n.getCanonicalName().equals("node")) {
-                children.put(n.getText().trim(), ((InlineNode) n).getChildren().stream()
-                        .filter(c -> c.getCanonicalName().equals("children"))
-                        .flatMap(c -> ((InlineNode) c).getChildren().stream())
-                        .map(c -> c.getText().trim())
-                        .collect(Collectors.toList()));
-            }
-        }
+    private static List<Pair> pairs() {
+        Map<String, List<String>> children = SchemaNodes.children();
         List<Pair> pairs = new ArrayList<>();
         children.forEach((parent, kids) -> kids.stream()
                 .filter(kid -> GROUPS.contains(kid) || children.getOrDefault(kid, List.of()).isEmpty())
                 .forEach(kid -> pairs.add(new Pair(parent, kid))));
         return pairs;
-    }
-
-    private static String schema() throws IOException {
-        try (InputStream in = SchemaCoverageTest.class.getResourceAsStream("/stxt/dev.stxt.boxes.stxt")) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        }
     }
 
     /** La plantilla con la propiedad en la línea {@code {}}, con su sangría; sin ella si ya la declara. */

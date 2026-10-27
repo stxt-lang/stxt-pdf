@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static dev.stxt.boxes.tree.PropertyKey.FONT;
+import static dev.stxt.boxes.tree.PropertyKey.FONT_STYLE;
+import static dev.stxt.boxes.tree.PropertyKey.FONT_WEIGHT;
+
 /**
  * Métricas reales de las fuentes TTF de la carpeta de recursos (ESPECIFICACION.md §5.11): es la
  * métrica que corresponde a la salida de {@link dev.stxt.boxes.paint.PdfCanvas}, que incrusta
@@ -79,7 +83,7 @@ public final class PdfMetrics implements TextMeasurer {
         } catch (ResourceException e) {
             if (!fonts.families().contains(s.font)) {
                 // El culpable es la declaración de Font, aunque esté en una antecesora.
-                throw new InvalidModelException(s.line("font"), ErrorCode.FONT_UNKNOWN, e.getMessage());
+                throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }
             throw new InvalidModelException(box.textLine, ErrorCode.FONT_VARIANT_MISSING,
                     e.getMessage() + " (" + declarations(s) + ")");
@@ -113,9 +117,9 @@ public final class PdfMetrics implements TextMeasurer {
     /** Dónde se declaran la familia, el peso y el estilo, para los mensajes. */
     private static String declarations(Style s) {
         List<String> parts = new ArrayList<>();
-        for (String p : List.of("font", "font-weight", "font-style")) {
+        for (String p : List.of(FONT, FONT_WEIGHT, FONT_STYLE)) {
             if (s.isDeclared(p)) {
-                String name = p.equals("font") ? "Font" : p.equals("font-weight") ? "Weight" : "Style";
+                String name = p.equals(FONT) ? "Font" : p.equals(FONT_WEIGHT) ? "Weight" : "Style";
                 parts.add(name + " en la línea " + s.line(p));
             }
         }

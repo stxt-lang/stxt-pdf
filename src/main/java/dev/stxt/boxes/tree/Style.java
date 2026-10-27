@@ -155,8 +155,9 @@ public final class Style {
     public Decoration decoration = Decoration.SLICE;
 
     /**
-     * Línea del documento de cada propiedad declarada, por su nombre canónico ({@code "height"};
-     * las de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.rows"}). Las
+     * Línea del documento de cada propiedad declarada, por su clave ({@link PropertyKey}): el
+     * nombre canónico ({@code "height"}; las de {@code Flex}, {@code Grid} e {@code Item}, con
+     * prefijo: {@code "grid.rows"}). Las
      * de {@link #LINED_PROPERTIES} se heredan con su valor, para señalar dónde se declaró.
      */
     private final Map<String, Integer> lines = new HashMap<>();
@@ -166,8 +167,8 @@ public final class Style {
      * (las de {@code Typography} que la eligen) y {@code Line height}, que fijan el alto de las
      * líneas (§5.12).
      */
-    public static final List<String> LINED_PROPERTIES = List.of("font", "font-weight", "font-style", "font-size",
-            "line-height");
+    public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
+            PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT);
 
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
     public static Style inheriting(Style parent) {

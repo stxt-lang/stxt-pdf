@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Locale;
 
 import static dev.stxt.boxes.tree.Nodes.error;
+import static dev.stxt.boxes.tree.PropertyKey.FONT_SIZE;
+import static dev.stxt.boxes.tree.PropertyKey.NUMBER;
+import static dev.stxt.boxes.tree.PropertyKey.START;
 
 /**
  * Listas (ESPECIFICACION.md §5.14): numeración de los {@code List item}, la caja generada de su
@@ -23,8 +26,8 @@ final class ListBuilder {
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
         Style.Marker marker = list.style.listMarker;
         if (!marker.numbered()) {
-            if (s.isDeclared("number")) {
-                throw error(s.line("number"), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
+            if (s.isDeclared(NUMBER)) {
+                throw error(s.line(NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
                         + "(línea " + list.line + ") tiene Marker: " + markerName(marker) + ", que no numera sus ítems");
             }
             return 0;
@@ -34,7 +37,7 @@ final class ListBuilder {
                 : previous.isEmpty() ? list.style.listStart
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
-            throw error(s.listNumber != null ? s.line("number") : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
+            throw error(s.listNumber != null ? s.line(NUMBER) : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
                     "El número " + number + " no se puede escribir con Marker: " + markerName(marker)
                             + ", que numera " + ListMarkers.range(marker));
         }
@@ -50,7 +53,7 @@ final class ListBuilder {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
                     + "el Typography del List item, de un antecesor o de Document");
         }
-        if (!item.style.isDeclared("font-size")) {
+        if (!item.style.isDeclared(FONT_SIZE)) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: decláralo "
                     + "en el Typography del List item, de un antecesor o de Document");
         }
@@ -87,15 +90,15 @@ final class ListBuilder {
 
     /** {@code Start} solo numera, y en el rango de la numeración. */
     static void validateList(Style s) {
-        if (!s.isDeclared("start")) {
+        if (!s.isDeclared(START)) {
             return;
         }
         if (!s.listMarker.numbered()) {
-            throw error(s.line("start"), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Start no tiene efecto con Marker: "
+            throw error(s.line(START), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Start no tiene efecto con Marker: "
                     + markerName(s.listMarker) + ", que no numera los ítems");
         }
         if (!ListMarkers.inRange(s.listMarker, s.listStart)) {
-            throw error(s.line("start"), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.listStart + " no se puede "
+            throw error(s.line(START), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.listStart + " no se puede "
                     + "escribir con Marker: " + markerName(s.listMarker) + ", que numera "
                     + ListMarkers.range(s.listMarker));
         }

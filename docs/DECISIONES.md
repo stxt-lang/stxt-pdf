@@ -271,7 +271,7 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 75. **Nombres cortos dentro de los grupos** (`Size`, `Weight`, `Style`, `Align`, `Before`,
     `After`, `Inside`) salvo donde chocan con otro nodo del namespace: `Text wrap` no puede ser
     `Wrap`, que es el booleano de `Flex`. Los de `Box` ya eran cortos y se conservan.
-    *Dónde:* schema; `tree/PropertyReader.INTERNAL` traduce los cortos al nombre interno.
+    *Dónde:* schema; `tree/PropertyKey.internal` traduce los cortos al nombre interno.
     *Alternativa:* renombrar `Wrap` de `Flex` (por ejemplo, `Multiline`) para poder usar `Wrap`
     en `Typography`.
 

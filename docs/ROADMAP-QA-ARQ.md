@@ -62,7 +62,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | hecho |
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | hecho |
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | hecho |
-| 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | pendiente |
+| 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | hecho |
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | pendiente |
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | pendiente |
 | 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | pendiente |
@@ -354,21 +354,37 @@ reentrante). Es la clase que más cambia en cada hito y la más difícil de revi
 
 **Cómo** (solo mover código; el catálogo de errores y los tests de `tree` son la red):
 
-- [ ] `ValueReader` (estático): `value`, `sides`, `tracks`, `gap`, `enumValue`, `color`,
-      `integer`, `aspectRatio`… y `Kind` (≈ 300 líneas).
-- [ ] `PropertyReader`: los grupos `Box`, `Typography`, `Break` y las propiedades de `Flex`,
-      `Grid` e `Item`, compartidos por elementos y reglas.
-- [ ] `StyleRules`: lectura de `Styles` y `applyRules`.
-- [ ] `TableBuilder` (tabla → celdas colocadas) y `ListBuilder` (numeración y marcador).
-- [ ] `ModelValidator`: reglas del §6 que miran la caja ya leída (`validateBox`, `Offset`,
-      márgenes, mínimo y máximo, porcentajes, `definiteHeight`).
-- [ ] Un `BuildContext` por llamada con `ids`, `definiteHeight`, `headingLevel`,
-      `insideFixed` e `itemNumbers`, en lugar de campos que se reinician.
-- [ ] Las claves de `Style.line(...)` (`"item.grow"`, `"flex.gap"`, `"font-size"` y el mapa
-      `INTERNAL`) como constantes en un solo sitio: un error tipográfico hoy solo salta
-      (`IllegalStateException`) cuando se produce el error del documento que la usa.
+- [x] `ValueReader` (estático, 265 líneas): `value`, `sides`, `tracks`, `enumValue`, `color`,
+      `integer`, `aspectRatio`… y `Kind`. `gap` escribe en el `Style` y va en `PropertyReader`.
+- [x] `PropertyReader`: los grupos `Box`, `Typography`, `Break` y las propiedades de `Flex`,
+      `Grid` e `Item`, compartidos por elementos y reglas. Las propiedades propias de un
+      elemento (`Id`, `Offset`, `Layer`, `Marker`, `Start`, `Number`, `Isolate`) se quedan en
+      `BoxTreeBuilder.element`, que es quien sabe de qué elemento son.
+- [x] `StyleRules`: lee `Styles` en su constructor, `apply` aplica las reglas a un elemento y
+      `checkIds` comprueba al final que cada `For id` tiene su elemento.
+- [x] `TableBuilder` (tabla → celdas colocadas; la caja de cada celda la construye el builder
+      con un *callback*, `TableBuilder.Cells`) y `ListBuilder` (numeración, marcador y las
+      reglas de `Start` y `Number`).
+- [x] `ModelValidator`: reglas del §6 que miran la caja ya leída (`validateBox`, `Offset`,
+      márgenes, mínimo y máximo, porcentajes, `definiteHeight`), `validateFlex` y la fuente de
+      los textos.
+- [x] Un `BuildContext` por llamada con las reglas, `ids`, `definiteHeight`, `headingLevel`,
+      `insideFixed` e `itemNumbers`: `BoxTreeBuilder` ya no tiene campos y es reentrante.
+- [x] `Nodes` (no estaba previsto): acceso a los nodos (`child`, `inline`, `isElement`…) y
+      errores (`error`, `unread`, `parse`, `placement`), que comparten todas las piezas.
+- [x] Las claves de `Style.line(...)` como constantes en `PropertyKey` (`ITEM_GROW`,
+      `FLEX_GAP`, `FONT_SIZE`…), con `internal(...)` (el antiguo `INTERNAL`) y los prefijos
+      `flex(...)`, `grid(...)` e `item(...)`. Las usan también `Overflow` y `PdfMetrics`.
+      `PropertyKeyTest` comprueba que cada constante es una propiedad del schema en su sitio:
+      una errata ya no compila o falla en el test, en lugar de saltar solo con el error del
+      documento que la usa. Los tests que leen el schema (`SchemaCoverageTest`, `ElementTest`,
+      `PropertyKeyTest`) comparten `SchemaNodes`.
 
-`BoxTreeBuilder` queda como orquestador de unas 300 líneas.
+`BoxTreeBuilder` queda como orquestador de 346 líneas (antes 1 393): `build`, `Media` y
+metadatos, elementos, encabezados y texto.
+
+**Verificación.** `mvn test` (615 tests), sin cambios en los PNG ni en los `expected.stxt`;
+con una errata en `PropertyKey.ITEM_BASIS`, falla `PropertyKeyTest`.
 
 ## 8. Ciclos de packages y colocación de grid
 
@@ -382,9 +398,9 @@ resources -> tree           (FontLibrary usa tree.FontFace)
 
 El árbol de cajas depende del layout para validar, y `fragment` y `layout` son un solo
 módulo partido en dos. Además la colocación se parsea muchas veces: `GridAreas.parse` corre en
-`BoxTreeBuilder:851`, otra vez **por cada ítem** en `:904` y en **cada** layout e intrínseco del
+`PropertyReader.grid`, otra vez **por cada ítem** en `ModelValidator.validateBox` y en **cada** layout e intrínseco del
 grid (`GridLayout:60`); la tabla escribe la colocación de cada celda como texto
-(`"3 1 1 2"`, `BoxTreeBuilder:651`) para que `Cell.parse` la vuelva a leer.
+(`"3 1 1 2"`, `TableBuilder.table`) para que `Cell.parse` la vuelva a leer.
 
 **Cómo.**
 
@@ -516,3 +532,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | Ramas de `Overflow` | Dos bugs corregidos (`Relative` en padre partido, culpable horizontal), 16 casos en el catálogo; `Overflow` al 93,8 % de ramas; 606 tests en verde | Tarea 6 o 9; revisar `Placement` |
 | 2026-10-27 | Culpable vertical de `Overflow` | `Aspect ratio`, `Rows`, `Padding`, `Border` y `Size` como culpables (§5.12); `Line height` heredado con su línea; 609 tests en verde | Tarea 6 o 9; revisar `Placement` |
 | 2026-10-27 | 6 | `enum Element` en `Box.element`; sin listas paralelas ni `switch` de `layout` y `position`; `ElementTest` contra el schema; 613 tests en verde | Tarea 7 (partir `BoxTreeBuilder`) o 9; revisar `Placement` |
+| 2026-10-27 | 7 | `BoxTreeBuilder` de 1 393 a 346 líneas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext` y `Nodes`; claves en `PropertyKey` con `PropertyKeyTest`; 615 tests en verde | Tarea 8 (ciclos de packages) o 9; revisar `Placement` |
