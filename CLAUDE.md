@@ -109,6 +109,11 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
   culpable**: la de la propiedad (`Style.line("height")`, `"grid.rows"`, `"item.grow"`…), no la
   de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
+- **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class` y `For id` con `Box`,
+  `Typography` y `Break`. `BoxTreeBuilder.applyRules` las aplica entre la herencia y lo propio
+  del elemento (prioridad: elemento > id > clases en orden de `Styles` > tipo > herencia), con
+  las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
+  regla y se valida como si la declarara el elemento.
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,

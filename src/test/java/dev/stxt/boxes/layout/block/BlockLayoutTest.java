@@ -31,6 +31,20 @@ class BlockLayoutTest {
     }
 
     @Test
+    void stylesRulesShapeTheLayout() {
+        // La regla da a cada Block 30 de alto y 10 de margen inferior; B la sobrescribe con 50.
+        LayoutFixture l = layOut(
+                "\tStyles:", "\t\tElement: Block", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 0 0 10 0",
+                "\t\tFor class: narrow", "\t\t\tBox:", "\t\t\t\tWidth: 100",
+                "\tBlock:", "\t\tId: A",
+                "\tBlock:", "\t\tId: B", "\t\tClass: narrow", "\t\tBox:", "\t\t\tHeight: 50",
+                "\tBlock:", "\t\tId: C");
+        assertRect(40, 40, 515, 30, l.rect("A"));
+        assertRect(40, 80, 100, 50, l.rect("B"));
+        assertRect(40, 140, 515, 30, l.rect("C"));
+    }
+
+    @Test
     void paddingStopsTheCollapse() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tMargin: 10 0 0 0", "\t\t\tPadding: 5 0 0 0",

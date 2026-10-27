@@ -34,6 +34,18 @@ public enum ErrorCode {
     /** Texto sin {@code Size} en {@code Typography}, propio o heredado. */
     TEXT_WITHOUT_FONT_SIZE,
 
+    // --- Reglas reutilizables (Styles) ---------------------------------------------------------
+    /** {@code Element} con un nombre que no es un elemento de caja. */
+    STYLE_UNKNOWN_ELEMENT,
+    /** {@code For id} con un {@code Id} que no tiene ningún elemento. */
+    STYLE_UNKNOWN_ID,
+    /** Dos reglas con el mismo selector. */
+    STYLE_DUPLICATE,
+    /** Una regla aplica un grupo que el elemento no admite ({@code Break} en {@code Absolute} o {@code Fixed}). */
+    STYLE_NOT_ALLOWED,
+    /** Una clase de {@code Class} sin regla {@code For class}. */
+    CLASS_WITHOUT_RULE,
+
     // --- Combinaciones sin efecto o contradictorias --------------------------------------------
     /** Un {@code Relative} con arriba y abajo, o con izquierda y derecha. */
     OFFSET_CONFLICT,

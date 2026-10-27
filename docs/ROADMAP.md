@@ -31,7 +31,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 
 | Hito | Elemento | Estado | Caso golden |
 |---|---|---|---|
-| 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | diseño | — |
+| 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | en curso | — |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | pendiente | — |
 | 13 | Listas (`ul`, `ol`, `li`) | pendiente | — |
 | 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
@@ -174,48 +174,52 @@ Document (dev.stxt.boxes):
 - [x] R11. Importar reglas de un fichero de la carpeta de recursos queda **para más
       adelante**.
 
-**Decisiones abiertas** (con propuesta):
+Decididas también (2026-10-27), con la propuesta aceptada:
 
-- [ ] S1. Sintaxis de las clases: `For class: note` en las reglas y `Class: note aside` en el
-      elemento (lista separada por espacios). Son dos nodos distintos, porque `Class` no tiene
-      hijos y `For class` sí. ¿`Class` en todos los elementos de caja?
-- [ ] S2. Varias clases de un mismo elemento que declaran la misma propiedad: gana la regla
+- [x] S1. `For class: note` en las reglas y `Class: note aside` en el elemento (lista
+      separada por espacios, sin repetir). Son dos nodos distintos, porque `Class` no tiene
+      hijos y `For class` sí. `Class` se admite en todos los elementos de caja.
+- [x] S2. Varias clases de un mismo elemento que declaran la misma propiedad: gana la regla
       que va **después en `Styles`** (como en CSS), no el orden de `Class: a b`.
-- [ ] S3. Dos reglas iguales (dos `Element: Text`, dos `For id: x`): ¿error, o se mezclan
-      en orden? Propuesta: error, por la política estricta.
-- [ ] S4. Un elemento con `Class: x` sin ninguna regla `For class: x`: ¿error (no tiene
-      efecto) o se permite? Propuesta: error. Un `For class` sin elementos con esa clase se
-      permite (como R8).
-- [ ] S5. `Typography` del `Document`: sigue siendo lo que hereda la raíz. ¿Se mantiene, o se
-      sustituye por una regla (`Element: Document`)? Propuesta: se mantiene.
+- [x] S3. Dos reglas con el mismo selector son un error (`STYLE_DUPLICATE`). Los nombres de
+      `Element` se comparan en forma canónica: `Element: block` repite `Element: Block`.
+- [x] S4. Una clase de `Class` sin regla `For class` es un error (`CLASS_WITHOUT_RULE`). Un
+      `For class` sin elementos con esa clase se permite (como R8).
+- [x] S5. El `Typography` de `Document` se mantiene como lo que hereda la raíz; las reglas no
+      se aplican a `Document`.
 
-**Diseño técnico (previsto):**
+**Diseño técnico (implementado):**
 
 - Schema: `Styles` (`GROUP`, hijo de `Document`) con `Element`, `For class` y `For id`
   (`INLINE`: el valor es el selector; hijos `Box`, `Typography` y `Break`). `Class` en los
-  elementos de caja. El valor de `Element` no se puede validar en el schema: lo comprueba el
-  builder.
-- `BoxTreeBuilder` lee primero las reglas (por tipo, por clase en orden del documento y por
-  id). Para cada elemento aplica, en este orden y con la misma función que ya lee los grupos:
-  herencia del padre, regla `Element`, reglas `For class`, regla `For id` y lo propio. Cada
-  propiedad conserva la línea de donde viene, así que los errores la señalan sin más.
-- Repasar el orden actual de herencia y lectura de `Typography`: la regla tiene que quedar
-  entre las dos.
-- Errores nuevos (nombres a confirmar): tipo desconocido en `Element`, `For id` sin elemento,
-  regla repetida (S3) y clase sin regla (S4).
+  siete elementos de caja. El valor de `Element` lo comprueba el builder.
+- `BoxTreeBuilder.styles` lee las reglas al empezar (por tipo, por clase en orden del
+  documento y por id) y comprueba sus valores sobre un `Style` vacío, aunque no se apliquen.
+  `applyRules` las aplica a cada elemento después de `Style.inheriting` y de las propiedades de
+  `Item`/`Cell`, y antes de las propias, con las mismas funciones `box`, `typography` y
+  `fragmentation`: cada propiedad guarda la línea de la regla, así que la mezcla por propiedad
+  y la validación estricta salen sin código específico.
+- Errores nuevos: `STYLE_UNKNOWN_ELEMENT`, `STYLE_UNKNOWN_ID` (se comprueba al final, con todos
+  los `Id` leídos), `STYLE_DUPLICATE`, `STYLE_NOT_ALLOWED` (`Break` a un `Absolute` o un
+  `Fixed`, en la línea del `Break` de la regla) y `CLASS_WITHOUT_RULE`. Una clase repetida en
+  `Class` o un selector vacío o con espacios es `VALUE_NOT_ALLOWED`.
 - No cambian el layout, el pintado ni el volcado del §7.
 
 **Tareas:**
 
-- [ ] Resolver S1–S5.
-- [ ] Schema: `Styles`, `Element`, `For class`, `For id`, `Class`.
-- [ ] `BoxTreeBuilder`: lectura de reglas, aplicación con su prioridad, validaciones.
-- [ ] Tests en `BoxTreeBuilderTest` (prioridad, mezcla por propiedad, regla frente a
-      herencia, clases en orden) y de layout con reglas.
-- [ ] `ErrorCode` y casos en el catálogo de errores.
-- [ ] Especificación: §2, §4 (sección nueva de reglas), §6, §8 (diferencias con CSS: sin
-      selectores compuestos ni especificidad), §9 y §10.
-- [ ] Caso golden: un documento con estilo solo en `Styles`.
+- [x] Resolver S1–S5.
+- [x] Schema: `Styles`, `Element`, `For class`, `For id`, `Class`.
+- [x] `BoxTreeBuilder`: lectura de reglas, aplicación con su prioridad, validaciones.
+- [x] Tests de las reglas en `tree/StylesTest` (prioridad, mezcla por propiedad, regla frente a
+      herencia, clases en orden de `Styles`, ítems, nombres canónicos, reglas sin usar) y de
+      layout en `BlockLayoutTest.stylesRulesShapeTheLayout`.
+- [x] `ErrorCode` y casos en el catálogo de errores (los cinco códigos nuevos, más una regla
+      con `Margin: auto` en un ítem y un valor no válido en una regla sin usar).
+- [x] Especificación: §2, §4.2 (`Class`), §4.10 (nueva, reglas), §6, §8 y §9.
+- [ ] Especificación §10: decidir si el ejemplo completo usa `Styles` (cambiaría también
+      `report.stxt` y la copia del caso golden 05).
+- [ ] Caso golden: un documento con el estilo solo en `Styles`, añadido a `DocumentReaderTest`.
+- [ ] README (tabla de estado), `CLAUDE.md` (tabla de hitos) y `DECISIONES.md` al cerrar.
 
 ---
 
@@ -478,6 +482,12 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (3).** Hito 11: aceptadas las propuestas S1–S5. Hechos el schema,
+  `BoxTreeBuilder` (lectura y aplicación de reglas con su prioridad), los cinco `ErrorCode`
+  nuevos con sus casos en el catálogo, `StylesTest`, un test de layout y la especificación
+  (§2, §4.2, §4.10, §6, §8, §9). `mvn test` en verde.
+  *Siguiente paso:* caso golden con el estilo en `Styles`, decidir si el §10 usa `Styles`, y
+  cerrar el hito (README, `CLAUDE.md`, `DECISIONES.md`).
 - **2026-10-27 (2).** Se añade el hito 11, reglas reutilizables (`Styles`), y los demás pasan
   a ser del 12 al 15. Decididos los nombres (`Styles`, `Element`, `For class`, `For id`), la
   prioridad, la mezcla por propiedad, la validación estricta y que las clases entran en este

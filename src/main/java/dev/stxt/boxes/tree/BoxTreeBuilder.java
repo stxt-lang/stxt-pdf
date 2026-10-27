@@ -11,8 +11,11 @@ import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,7 +28,13 @@ import java.util.stream.Collectors;
  * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
  * elemento a una caja con su {@link Style.Layout} y su {@link Style.Position}, pasa las
  * propiedades de {@code Item} y {@code Cell} al elemento que envuelven, interpreta los valores,
- * aplica la herencia y comprueba las reglas que el schema no puede expresar (§6).
+ * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
+ * puede expresar (§6).
+ *
+ * <p>Prioridad de cada propiedad, de menos a más: el valor por defecto, lo heredado, la regla
+ * {@code Element} del tipo, las reglas {@code For class} de sus clases, la regla {@code For id}
+ * y lo que declara el propio elemento. Lo que aporta una regla se valida como si lo declarara
+ * el elemento, y sus errores señalan la línea de la regla.</p>
  *
  * <p>Los errores señalan la línea del nodo culpable: la de la propiedad, no la de su caja.
  * Son errores también las combinaciones que no tendrían efecto o se contradicen: el modelo las
@@ -55,6 +64,9 @@ public final class BoxTreeBuilder {
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
     private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "relative", "absolute", "fixed");
+    /** Los elementos de caja como se escriben, para los mensajes. */
+    private static final List<String> ELEMENT_NAMES =
+            List.of("Block", "Flex", "Grid", "Text", "Relative", "Absolute", "Fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
     private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "relative");
 
@@ -72,6 +84,12 @@ public final class BoxTreeBuilder {
 
     /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
     private Map<String, Integer> ids;
+    /** Reglas {@code Element}, por el nombre canónico del elemento ({@code heading-1}). */
+    private Map<String, InlineNode> elementRules;
+    /** Reglas {@code For class}, por clase y en el orden del documento: en ese orden se aplican. */
+    private Map<String, InlineNode> classRules;
+    /** Reglas {@code For id}, por {@code Id}. */
+    private Map<String, InlineNode> idRules;
     /** Si el alto de la caja de contenido es definido: base de los porcentajes verticales (§3.6). */
     private Map<Box, Boolean> definiteHeight;
 
@@ -91,6 +109,7 @@ public final class BoxTreeBuilder {
         }
         DocumentSchema.validate(document);
         Media media = media(inline(child(document, "media").orElseThrow()));
+        styles(document);
 
         // El Typography de Document lo heredan todas las cajas.
         Style rootStyle = new Style();
@@ -99,7 +118,131 @@ public final class BoxTreeBuilder {
         // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
         definiteHeight.put(root, true);
         buildContent(document, root);
+        for (Map.Entry<String, InlineNode> rule : idRules.entrySet()) {
+            if (!ids.containsKey(rule.getKey())) {
+                throw error(rule.getValue(), ErrorCode.STYLE_UNKNOWN_ID,
+                        "Ningún elemento tiene el Id " + rule.getKey() + " de esta regla For id");
+            }
+        }
         return new Result(media, root);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    // Reglas reutilizables (Styles)
+    // ------------------------------------------------------------------------------------------
+
+    /**
+     * Lee las reglas de {@code Styles}. Sus valores se comprueban aquí, aunque la regla no se
+     * aplique a ningún elemento; lo que depende del elemento (§6), al aplicarla.
+     */
+    private void styles(InlineNode document) {
+        elementRules = new HashMap<>();
+        classRules = new LinkedHashMap<>();
+        idRules = new HashMap<>();
+        Optional<Node> styles = child(document, "styles");
+        if (styles.isEmpty()) {
+            return;
+        }
+        for (Node r : inline(styles.get()).getChildren()) {
+            InlineNode rule = inline(r);
+            String selector = rule.getText().trim();
+            Map<String, InlineNode> rules;
+            String key;
+            switch (rule.getCanonicalName()) {
+                case "element" -> {
+                    rules = elementRules;
+                    key = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
+                    if (!ELEMENTS.contains(key)) {
+                        throw error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
+                                + "' no es un elemento de caja (" + String.join(", ", ELEMENT_NAMES) + ")");
+                    }
+                }
+                case "for-class" -> {
+                    rules = classRules;
+                    key = name(rule, "For class");
+                }
+                default -> {
+                    rules = idRules;
+                    key = name(rule, "For id");
+                }
+            }
+            InlineNode previous = rules.putIfAbsent(key, rule);
+            if (previous != null) {
+                throw error(rule, ErrorCode.STYLE_DUPLICATE, "Regla repetida: " + rule.getName() + ": " + selector
+                        + " (ya está en la línea " + previous.getLine() + ")");
+            }
+            apply(rule, new Style());
+        }
+    }
+
+    /** El nombre de una clase o de un {@code Id} en una regla: una sola palabra. */
+    private static String name(InlineNode rule, String what) {
+        String name = rule.getText().trim();
+        if (name.isEmpty() || name.chars().anyMatch(Character::isWhitespace)) {
+            throw error(rule, ErrorCode.VALUE_NOT_ALLOWED, what + " necesita un solo nombre, sin espacios: '"
+                    + name + "'");
+        }
+        return name;
+    }
+
+    /**
+     * Aplica las reglas que corresponden a un elemento, de menos a más prioridad: la de su tipo,
+     * las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}. Van después de la
+     * herencia y antes de lo que declara el propio elemento, y se mezclan propiedad a propiedad.
+     */
+    private void applyRules(InlineNode n, String kind, Style s) {
+        List<InlineNode> rules = new ArrayList<>();
+        Optional.ofNullable(elementRules.get(kind)).ifPresent(rules::add);
+        Optional<Node> classNode = child(n, "class");
+        if (classNode.isPresent()) {
+            Set<String> classes = classes(classNode.get());
+            classRules.forEach((name, rule) -> {
+                if (classes.contains(name)) {
+                    rules.add(rule);
+                }
+            });
+        }
+        child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::add);
+        for (InlineNode rule : rules) {
+            if (s.isOutOfFlow()) {
+                child(rule, "break").ifPresent(b -> {
+                    throw error(b, ErrorCode.STYLE_NOT_ALLOWED, "La regla " + rule.getName() + ": "
+                            + rule.getText().trim() + " aplica Break a un " + position(s) + " (línea " + n.getLine()
+                            + "), que no se parte ni está en el flujo de la página");
+                });
+            }
+            apply(rule, s);
+        }
+    }
+
+    /** Las clases de un {@code Class}: cada una con su regla {@code For class} y sin repetir. */
+    private Set<String> classes(Node n) {
+        String[] names = n.getText().trim().split("\\s+");
+        if (names[0].isEmpty()) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Class necesita al menos una clase");
+        }
+        Set<String> classes = new HashSet<>();
+        for (String name : names) {
+            if (!classes.add(name)) {
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Clase repetida en Class: " + name);
+            }
+            if (!classRules.containsKey(name)) {
+                throw error(n, ErrorCode.CLASS_WITHOUT_RULE, "La clase " + name + " no tiene regla: añade "
+                        + "'For class: " + name + "' en Styles");
+            }
+        }
+        return classes;
+    }
+
+    /** Los grupos de una regla, con la misma lectura que en un elemento: cada valor con su línea. */
+    private static void apply(InlineNode rule, Style s) {
+        for (Node g : rule.getChildren()) {
+            switch (g.getCanonicalName()) {
+                case "box" -> box(inline(g), s);
+                case "typography" -> typography(inline(g), s);
+                default -> fragmentation(inline(g), s);
+            }
+        }
     }
 
     // ------------------------------------------------------------------------------------------
@@ -172,10 +315,13 @@ public final class BoxTreeBuilder {
         if (wrapper != null) {
             item(wrapper, s);
         }
+        applyRules(n, kind, s);
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("cell") || name.equals("content")) {
+            // Las clases ya se han aplicado con sus reglas.
+            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("cell") || name.equals("content")
+                    || name.equals("class")) {
                 continue;
             }
             if (kind.equals("flex") && FLEX.contains(name)) {

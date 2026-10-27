@@ -1,5 +1,6 @@
 # Schema del modelo de cajas (docs/ESPECIFICACION.md §9).
-# Primero los elementos, después los grupos (Box, Typography, Break) y al final las propiedades.
+# Primero los elementos, después las reglas reutilizables (Styles), los grupos (Box, Typography,
+# Break) y al final las propiedades.
 # Cada nombre tiene una única definición en todo el namespace: el Width de Media y el de Box son
 # el mismo nodo.
 Schema (@stxt.schema): dev.stxt.boxes
@@ -9,12 +10,14 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio, la tipografía por defecto y los elementos de primer nivel, en orden.
+		Description: Documento de cajas: el medio, la tipografía por defecto, las reglas reutilizables y los elementos de primer nivel, en orden.
 		Children:
 			Child: Media
 				Min: 1
 				Max: 1
 			Child: Typography
+				Max: 1
+			Child: Styles
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -41,6 +44,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
+			Child: Class
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -61,6 +66,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Contenedor flex: coloca sus ítems (Item) a lo largo de un eje.
 		Children:
 			Child: Id
+				Max: 1
+			Child: Class
 				Max: 1
 			Child: Box
 				Max: 1
@@ -88,6 +95,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Contenedor grid: coloca sus celdas (Cell) en una rejilla de filas y columnas.
 		Children:
 			Child: Id
+				Max: 1
+			Child: Class
 				Max: 1
 			Child: Box
 				Max: 1
@@ -118,6 +127,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
+			Child: Class
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -131,6 +142,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Caja de bloque que se desplaza con Offset sin mover a sus hermanos. Es el containing block de sus descendientes Absolute.
 		Children:
 			Child: Id
+				Max: 1
+			Child: Class
 				Max: 1
 			Child: Box
 				Max: 1
@@ -157,6 +170,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Children:
 			Child: Id
 				Max: 1
+			Child: Class
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -177,6 +192,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Caja de bloque fuera de flujo, colocada con Offset en el área útil. En modo paginado se repite en cada página.
 		Children:
 			Child: Id
+				Max: 1
+			Child: Class
 				Max: 1
 			Child: Box
 				Max: 1
@@ -236,6 +253,46 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Text
 				Max: 1
 			Child: Relative
+				Max: 1
+
+	# Reglas reutilizables
+
+	Node: Styles
+		Type: GROUP
+		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, de una clase o con un Id.
+		Children:
+			Child: Element
+			Child: For class
+			Child: For id
+	Node: Element
+		Type: INLINE
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block…).
+		Children:
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+	Node: For class
+		Type: INLINE
+		Description: Regla para los elementos con esa clase en su Class.
+		Children:
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+	Node: For id
+		Type: INLINE
+		Description: Regla para el elemento con ese Id.
+		Children:
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
 				Max: 1
 
 	# Grupos
@@ -308,7 +365,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 	# Elemento
 
 	Node: Id
-		Description: Identificador para volcados, tests y mensajes. Único en el documento.
+		Description: Identificador para volcados, tests, mensajes y reglas For id. Único en el documento.
+	Node: Class
+		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres.
 	Node: Isolate
 		Type: BOOLEAN
 		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.

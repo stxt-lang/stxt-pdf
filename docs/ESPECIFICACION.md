@@ -61,7 +61,8 @@ en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta a
 en el editor.
 
 El nodo raíz es `Document`, con exactamente un `Media`, un `Typography` opcional que heredan
-todas las cajas (la fuente del documento) y los elementos de primer nivel.
+todas las cajas (la fuente del documento), un `Styles` opcional con las reglas reutilizables
+([§4.10](#410-reglas-reutilizables-styles)) y los elementos de primer nivel.
 
 | Elemento | Qué es | Contiene |
 |---|---|---|
@@ -224,9 +225,11 @@ Casi todas las propiedades van en uno de tres **grupos**, hijos de cada elemento
 | `Break` ([§4.5](#45-break)) | Cortes de página y decoración en los cortes | No | Todos los de caja salvo `Absolute` y `Fixed` |
 
 Lo que hay en `Typography` lo hereda toda la descendencia; lo de `Box` y `Break` es solo de la
-caja que lo declara. No hay cascada. Dentro de cada grupo, una propiedad aparece como mucho una
+caja que lo declara. No hay cascada: las reglas de `Styles`
+([§4.10](#410-reglas-reutilizables-styles)) dan valores por defecto a los elementos de un tipo,
+de una clase o con un `Id`, y el elemento los puede sobrescribir. Dentro de cada grupo, una propiedad aparece como mucho una
 vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las propiedades que
-definen el propio elemento: `Id` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
+definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Cell`
 ([§4.8](#48-item-y-cell)) y las de posicionamiento ([§4.9](#49-posicionamiento)).
 
@@ -259,7 +262,8 @@ elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Id` | texto | — | De caja | Identificador para volcados, tests y mensajes. Único en el documento. |
+| `Id` | texto | — | De caja | Identificador para volcados, tests, mensajes y reglas `For id`. Único en el documento. |
+| `Class` | nombres separados por espacios | — | De caja | Clases del elemento: le aplican las reglas `For class` con esos nombres ([§4.10](#410-reglas-reutilizables-styles)). Cada clase necesita su regla y no se repite. |
 | `Isolate` | booleano | `false` | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
 
 ### 4.3 `Box`
@@ -394,6 +398,68 @@ dentro.
 |---|---|---|---|
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
 | `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Cell`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
+
+### 4.10 Reglas reutilizables (`Styles`)
+
+`Styles`, hijo opcional de `Document` (como mucho uno), declara una vez propiedades que se
+aplican por defecto a muchos elementos. Contiene reglas de tres clases:
+
+| Regla | Valor | Se aplica a |
+|---|---|---|
+| `Element` | nombre de un elemento de caja (`Block`, `Text`…) | todos los elementos de ese tipo |
+| `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
+| `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
+
+Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada; no admite
+las propiedades propias de un elemento (`Gap`, `Columns`, `Offset`…).
+
+```
+Styles:
+	Element: Text
+		Typography:
+			Align: justify
+	For class: note
+		Box:
+			Background: #F1EFE8
+			Padding: 8
+	For id: title
+		Typography:
+			Size: 20
+			Weight: bold
+Text: Resultados del trimestre
+	Id: title
+	Typography:
+		Align: left
+Text: Una nota al margen.
+	Class: note
+```
+
+**Prioridad.** Cada propiedad toma, de más a menos fuerte:
+
+1. lo que declara el propio elemento;
+2. la regla `For id` de su `Id`;
+3. las reglas `For class` de sus clases; si varias declaran la misma propiedad, gana la que va
+   **después en `Styles`**, no el orden de `Class`;
+4. la regla `Element` de su tipo;
+5. lo heredado del padre (solo `Typography`);
+6. el valor por defecto.
+
+Una regla gana a la herencia: con `Element: Text` y `Size: 10`, un `Text` mide 10 aunque su
+padre declare `Size: 20`. Las reglas se mezclan **propiedad a propiedad**, no por grupo: si la
+regla declara `Size` y el elemento `Weight`, se aplican las dos. Lo que una regla da a un
+elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
+`Item` y `Cell` no son cajas: las reglas se aplican al elemento que envuelven.
+
+**Validación.** Lo que aporta una regla se valida igual que si lo declarara el elemento
+([§6](#6-validación)), y el error señala la línea de la propiedad dentro de la regla. Los valores
+de una regla se comprueban aunque no se aplique a ningún elemento. Son errores: un `Element` que
+no nombra un elemento de caja, un `For id` sin elemento con ese `Id`, dos reglas con el mismo
+selector, una regla que da `Break` a un `Absolute` o un `Fixed`, y una clase de `Class` sin su
+regla `For class`. Un `Element` o un `For class` que no se aplican a ningún elemento no son
+errores: así las reglas se pueden reutilizar.
+
+El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no se aplican a
+`Document`.
 
 ---
 
@@ -921,6 +987,11 @@ La validación se hace en cuatro niveles:
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
 | `TEXT_WITHOUT_FONT` | El texto necesita `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document` |
+| `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
+| `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
+| `STYLE_DUPLICATE` | Dos reglas no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
+| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute` o un `Fixed` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([§4.3](#43-box)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
@@ -974,6 +1045,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Tema | CSS | Este modelo |
 |---|---|---|
 | Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT de elementos; cada uno declara sus propiedades y solo admite las que tienen sentido en él |
+| Reglas de estilo | Selectores compuestos, combinadores, especificidad calculada, `!important` | Tres selectores simples (`Element`, `For class`, `For id`) con prioridad fija, solo con `Box`, `Typography` y `Break` ([§4.10](#410-reglas-reutilizables-styles)) |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
 | Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, viudas y huérfanas) |
@@ -1026,14 +1098,16 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Typography`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Typography`, `Styles`; elementos |
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
-| `Block` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
-| `Flex` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
-| `Grid` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
-| `Text` | `INLINE` | `Id`, `Box`, `Typography`, `Break`, `Content` |
-| `Relative` | `GROUP` | `Id`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
-| `Absolute`, `Fixed` | `GROUP` | `Id`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
+| `Styles` | `GROUP` | `Element`, `For class`, `For id` (varios de cada) |
+| `Element`, `For class`, `For id` | `INLINE` | `Box`, `Typography`, `Break` |
+| `Block` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
+| `Flex` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
+| `Grid` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
+| `Text` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Content` |
+| `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
+| `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Cell` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |

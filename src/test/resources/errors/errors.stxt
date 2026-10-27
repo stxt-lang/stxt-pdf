@@ -705,3 +705,104 @@ Errors:
 				Text: a
 					Typography:
 						Line height: 900
+	Case: Regla para algo que no es un elemento de caja
+		Code: STYLE_UNKNOWN_ELEMENT
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					Element: Item
+						Box:
+							Padding: 4
+	Case: Regla For id sin elemento
+		Code: STYLE_UNKNOWN_ID
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					For id: summary
+						Box:
+							Padding: 4
+				Block:
+					Id: other
+	Case: Regla repetida
+		Code: STYLE_DUPLICATE
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					Element: Block
+						Box:
+							Padding: 4
+					Element: block
+						Box:
+							Margin: 4
+	Case: Regla que aplica Break a un Absolute
+		Code: STYLE_NOT_ALLOWED
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					For class: page
+						Box:
+							Height: 10
+						Break:
+							Before: page
+				Absolute:
+					Class: page
+	Case: Clase sin regla
+		Code: CLASS_WITHOUT_RULE
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					For class: note
+						Box:
+							Padding: 4
+				Block:
+					Class: note aside
+	Case: Margen auto de una regla en un ítem de flex
+		Code: MARGIN_AUTO_WITHOUT_EFFECT
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					Element: Block
+						Box:
+							Margin: auto
+							Width: 100
+				Flex:
+					Item:
+						Block:
+							Box:
+								Height: 10
+	Case: Valor no válido en una regla que no se aplica
+		Code: VALUE_SYNTAX
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					Element: Grid
+						Box:
+							Background: rojo
