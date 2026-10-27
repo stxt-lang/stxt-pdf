@@ -167,7 +167,7 @@ public final class UnitBreaker {
                 int end = groupEnd(next);
                 Split s = split(next, end, from.itemTokens(), 0);
                 if (s == null) {
-                    return before();
+                    return LayoutResult.before(box);
                 }
                 commit(s);
                 if (s.broken()) {
@@ -197,7 +197,7 @@ public final class UnitBreaker {
                         remaining - (units.starts()[next] - origin), units.appeal(), units.forced(), mustPlace);
                 if (cut.end() == next) {
                     if (!continued) {
-                        return before();
+                        return LayoutResult.before(box);
                     }
                     // Solo cabe la continuación del grupo: se corta detrás de ella.
                     return result(top, false, next, List.of(), units.appeal()[next], outOfFlow);
@@ -305,12 +305,6 @@ public final class UnitBreaker {
                 bottom = Math.max(bottom, units.ends()[u]);
             }
             return bottom;
-        }
-
-        /** Nada del contenedor cabe en lo que queda de página: el padre debe cortar antes de él. */
-        LayoutResult before() {
-            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
-                    List.of(), AdjoiningMargins.NONE);
         }
 
         /**

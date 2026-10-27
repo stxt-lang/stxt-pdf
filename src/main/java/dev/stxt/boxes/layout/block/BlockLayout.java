@@ -181,7 +181,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             LayoutResult r = layOutChild(child, y, childToken);
             if (r.breakToken() instanceof BreakToken.Before) {
-                return progress ? broken(BreakRules.best(marks, Mark::appeal)) : before();
+                return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
             }
             AdjoiningMargins adjoining = r.adjoining();
             MarginStrut childTop = noTopMargin ? MarginStrut.EMPTY : adjoining.top().add(margin.top());
@@ -193,7 +193,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 // Los márgenes que salen del hijo por arriba lo han bajado: lo que le queda de página cambia.
                 r = layOutChild(child, flowY, childToken);
                 if (r.breakToken() instanceof BreakToken.Before) {
-                    return progress ? broken(BreakRules.best(marks, Mark::appeal)) : before();
+                    return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
                 }
             }
             Fragment f = r.fragment();
@@ -273,12 +273,6 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         Mark mark(int index, int appeal) {
             return new Mark(index, null, appeal, cursor, fragments.size(), pending.size());
-        }
-
-        /** Nada de la caja cabe en lo que queda de página: el padre debe cortar antes de ella. */
-        LayoutResult before() {
-            return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
-                    List.of(), AdjoiningMargins.NONE);
         }
 
         /** Corta la caja en {@code m}: lo posterior pasa al fragmento siguiente. */

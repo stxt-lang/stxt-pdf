@@ -188,7 +188,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             }
             double crossFree = 0;
             if (multiLine && crossSize.isPresent()) {
-                crossFree = crossSize.getAsDouble() - sum(lineCross) - crossGap * Math.max(0, n - 1);
+                crossFree = crossSize.getAsDouble() - Sizing.sum(lineCross) - crossGap * Math.max(0, n - 1);
             }
             if (s.flexLines == Style.Distribution.STRETCH && crossFree > 0) {
                 for (int l = 0; l < n; l++) {
@@ -231,11 +231,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                     groups.add(line.stream().map(it -> it.box).toList());
                 }
                 for (Item it : line) {
-                    double offset = switch (it.align) {
-                        case START, STRETCH -> 0;
-                        case END -> lineCross[l] - it.cross;
-                        case CENTER -> (lineCross[l] - it.cross) / 2;
-                    };
+                    double offset = Sizing.align(it.align, lineCross[l], it.cross);
                     int unit = row ? l : multiLine ? 0 : groups.size();
                     if (!row && !multiLine) {
                         starts.add(mainPos);
@@ -248,7 +244,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 crossPos += lineCross[l] + crossGap + lineDistribution[1];
             }
 
-            double crossExtent = sum(lineCross) + crossGap * Math.max(0, n - 1);
+            double crossExtent = Sizing.sum(lineCross) + crossGap * Math.max(0, n - 1);
             double extent = row ? crossExtent : mainExtent;
             if (!row && multiLine && n > 0) {
                 starts.add(0.0);
@@ -484,14 +480,5 @@ public final class FlexLayout implements LayoutAlgorithm {
             case AROUND -> new double[]{free / (2 * n), free / n};
             case EVENLY -> new double[]{free / (n + 1), free / (n + 1)};
         };
-    }
-
-
-    private static double sum(double[] v) {
-        double r = 0;
-        for (double x : v) {
-            r += x;
-        }
-        return r;
     }
 }

@@ -2,6 +2,7 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
+import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
@@ -38,5 +39,23 @@ class SizingTest {
         // Módulo 2: C de 200 pt en 515 → 157.5 a cada lado.
         assertArrayEquals(new double[]{157.5, 157.5},
                 Sizing.horizontalMargins(515, 200, Value.AUTO, Value.AUTO), 1e-9);
+    }
+
+    @Test
+    void alignInOneAxis() {
+        // Una caja de 30 en un espacio de 100; con stretch ya mide 100 y empieza al principio.
+        assertEquals(0, Sizing.align(Style.Alignment.START, 100, 30), 1e-9);
+        assertEquals(0, Sizing.align(Style.Alignment.STRETCH, 100, 100), 1e-9);
+        assertEquals(70, Sizing.align(Style.Alignment.END, 100, 30), 1e-9);
+        assertEquals(35, Sizing.align(Style.Alignment.CENTER, 100, 30), 1e-9);
+        // Si no cabe, se sale por los dos lados (center) o por el principio (end).
+        assertEquals(-10, Sizing.align(Style.Alignment.CENTER, 100, 120), 1e-9);
+        assertEquals(-20, Sizing.align(Style.Alignment.END, 100, 120), 1e-9);
+    }
+
+    @Test
+    void sum() {
+        assertEquals(0, Sizing.sum(new double[0]), 1e-9);
+        assertEquals(6.5, Sizing.sum(new double[]{1, 2.5, 3}), 1e-9);
     }
 }

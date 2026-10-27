@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.grid;
 
+import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.model.Value;
 
 import java.util.Comparator;
@@ -120,7 +121,7 @@ public final class TrackSizing {
         }
 
         // 3. Maximizar.
-        double free = space - sum(base);
+        double free = space - Sizing.sum(base);
         boolean[] active = new boolean[n];
         for (int i = 0; i < n; i++) {
             active[i] = !tracks.get(i).flexible() && base[i] < limit[i];
@@ -177,7 +178,7 @@ public final class TrackSizing {
             }
         } else {
             // 5. Estirar pistas auto.
-            free = space - sum(base);
+            free = space - Sizing.sum(base);
             int autoTracks = 0;
             for (Track t : tracks) {
                 if (t.max().isAuto()) {
@@ -278,14 +279,6 @@ public final class TrackSizing {
             }
         }
         System.arraycopy(planned, 0, base, 0, base.length);
-    }
-
-    private static double sum(double[] v) {
-        double s = 0;
-        for (double x : v) {
-            s += x;
-        }
-        return s;
     }
 
     private static int count(boolean[] v) {

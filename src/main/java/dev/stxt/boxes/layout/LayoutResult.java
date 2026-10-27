@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout;
 import dev.stxt.boxes.fragment.BreakAppeal;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.tree.Box;
 
 import java.util.List;
 
@@ -22,6 +23,12 @@ public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAp
 
     public LayoutResult {
         pending = List.copyOf(pending);
+    }
+
+    /** Nada de la caja cabe en lo que queda de página: el padre debe cortar antes de ella. */
+    public static LayoutResult before(Box box) {
+        return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
+                List.of(), AdjoiningMargins.NONE);
     }
 
     public static LayoutResult finished(Fragment fragment) {

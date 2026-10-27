@@ -124,8 +124,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             BreakRules.Cut cut = BreakRules.cutLines(paragraphEnds, start, BreakRules.capacity(remaining, lineHeight),
                     s.widows, s.orphans, space.atFragmentainerStart());
             if (cut.end() == start && start < texts.size()) {
-                return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
-                        List.of(), AdjoiningMargins.NONE);
+                return LayoutResult.before(box);
             }
             end = cut.end();
             appeal = cut.appeal();

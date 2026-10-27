@@ -101,8 +101,8 @@ public final class GridLayout implements LayoutAlgorithm {
         double gaps = gap * Math.max(0, g.columns().size() - 1);
         // Sin containing block, las columnas en porcentaje cuentan como auto (§3.1).
         List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
-        double min = sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
-        double max = sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
+        double min = Sizing.sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
+        double max = Sizing.sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
         return new IntrinsicSizes(min, Math.max(min, max));
     }
 
@@ -185,15 +185,15 @@ public final class GridLayout implements LayoutAlgorithm {
             LayoutResult r = engine.layout(item, finalSpace, null);
             Fragment f = r.fragment();
             double px = x[a.column() - 1] + margin.left()
-                    + offset(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
+                    + Sizing.align(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
             double py = y[a.row() - 1] + margin.top()
-                    + offset(vertical, areaHeight, f.height() + margin.vertical());
+                    + Sizing.align(vertical, areaHeight, f.height() + margin.vertical());
             RelativeOffset relative = RelativeOffset.of(item.style, contentWidth, contentHeight);
             placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1,
                     relative));
         }
 
-        double extent = sum(rows) + rowGap * Math.max(0, rows.length - 1);
+        double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);
         return new Arranged(model, placed, pending, rowUnits(g, rows, y, extent));
     }
 
@@ -290,15 +290,6 @@ public final class GridLayout implements LayoutAlgorithm {
         return item.style.itemVertical != null ? item.style.itemVertical : container.gridVertical;
     }
 
-    /** Desplazamiento de la caja de margen del ítem dentro de su área. */
-    private static double offset(Style.Alignment alignment, double area, double size) {
-        return switch (alignment) {
-            case START, STRETCH -> 0;
-            case END -> area - size;
-            case CENTER -> (area - size) / 2;
-        };
-    }
-
     /** Posición de cada pista desde el principio de la caja de contenido. */
     private static double[] offsets(double[] sizes, double gap) {
         double[] r = new double[sizes.length];
@@ -315,14 +306,6 @@ public final class GridLayout implements LayoutAlgorithm {
         double r = gap * (count - 1);
         for (int i = from; i < from + count; i++) {
             r += sizes[i];
-        }
-        return r;
-    }
-
-    private static double sum(double[] v) {
-        double r = 0;
-        for (double x : v) {
-            r += x;
         }
         return r;
     }
