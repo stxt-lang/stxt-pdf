@@ -147,14 +147,14 @@ El siguiente hito (15: bloque en columnas), con sus decisiones abiertas, tareas 
 ```
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics, FontFace, FontWeight,
-                FontStyle, GridAreas, Area, Cell
+                FontStyle, GridAreas, Area, Cell, Tolerance
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ResourceException
   tree/         Box, Element, Style, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
                 StyleRules, TableBuilder, ListBuilder, ModelValidator…), InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
-                Slice, UnitBreaker, Paginator
+                Slice, UnitBreaker, Paginator, Messages
     block/      BlockLayout
     inline/     InlineLayout, LineBreaker, PageNumbers, TextMeasurer, FixedMetrics, PdfMetrics
     flex/       FlexLayout, FlexResolver, FlexItem

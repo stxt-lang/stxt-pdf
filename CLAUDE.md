@@ -79,11 +79,11 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada) |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
-| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument` |
+| `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Page`, `BreakRules`, `TextLine` |
 | `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
@@ -254,6 +254,9 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Inmutabilidad:** las entradas y salidas del layout son `record` con listas copiadas
   (`List.copyOf`). `Box` es mutable solo mientras `BoxTreeBuilder` construye el árbol; el layout no la
   escribe nunca. Su igualdad es por identidad (clave de la caché).
+- **Comparar medidas:** con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)` (o
+  `Tolerance.EPSILON`), nunca con un `1e-9` propio. `Overflow` usa su propia tolerancia, más
+  ancha (`TOLERANCE`, 0,01 pt).
 - **Min y max:** primero se aplica el máximo y luego el mínimo; si chocan, gana el mínimo
   (`Sizing.constrain`).
 - **Comentarios y javadoc** en castellano, con referencias a la especificación del tipo

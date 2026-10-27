@@ -64,7 +64,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | hecho |
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | hecho |
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | hecho |
-| 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | pendiente |
+| 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | hecho |
 | 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | pendiente |
 | 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | pendiente |
 | 12 | [PNG golden que cambian según la máquina](#12-png-golden-y-antialiasing) | QA | S | — | hecho |
@@ -442,29 +442,40 @@ un `import dev.stxt.boxes.layout.Engine` en `tree/Box`, `ArchitectureTest` falla
 
 ## 9. Lote de duplicaciones
 
-Pequeñas, independientes y de bajo riesgo; se pueden hacer de una en una:
+Pequeñas, independientes y de bajo riesgo; se han hecho de una en una, con un commit cada una:
 
-- [ ] **Épsilon:** siete constantes `EPSILON = 1e-9` (`BlockLayout`, `Engine`, `Slice`,
+- [x] **Épsilon:** siete constantes `EPSILON = 1e-9` (`BlockLayout`, `Engine`, `Slice`,
       `UnitBreaker`, `TableLayout`, `BreakRules`, `TrackSizing` como `EPS`) y seis literales
-      `1e-9` (`FlexLayout:366,429`, `FlexResolver:98`, `LineBreaker:60,109,130,132`). Una sola
-      constante en `Sizing` con `fits(a, b)`/`same(a, b)`. `Overflow` usa 0.01: si es una
-      tolerancia deliberada, que lo diga el nombre.
-- [ ] **"No cabe nada":** el mismo `LayoutResult` con `BreakToken.BEFORE` en
-      `BlockLayout:277`, `UnitBreaker:309` e `InlineLayout:127` → `LayoutResult.before(box)`.
-- [ ] **Alineación en un eje:** el `switch START/STRETCH/END/CENTER` de `FlexLayout:232` y
-      `GridLayout:300` → `Sizing.align(alignment, space, size)`. `sum(double[])` está en las dos.
-- [ ] **Bordes del canvas:** `border()` es idéntico en `SvgCanvas:47` y `PdfCanvas:171` →
-      método por defecto en `Canvas` que pinta cuatro `background`, con un `outline(Rect)` para
-      el contorno de depuración.
-- [ ] **Mensajes:** `name(Box)` y `pt(double)` están en `Overflow:226-230` y en
-      `TableLayout:99-103`, y `pt` tiene dos implementaciones distintas para el mismo formato
-      → un `Messages` compartido.
-- [ ] **Caja de contenido de un fragmento:** `f.width() - f.border().horizontal() -
-      f.padding().horizontal()` en `Overflow`, `InlineLayout.number` y otros →
-      `Fragment.contentWidth()`, `contentHeight()`.
-- [ ] **Colocar una línea:** medir, alinear, `wordSpacing` y ancho final está dos veces en
-      `InlineLayout` (`layout` y `number`) → un método de `LineBreaker` que devuelva la
-      `TextLine`.
+      `1e-9` (`FlexLayout`, `FlexResolver`, `LineBreaker`). Queda una sola en
+      `model.Tolerance`, con `fits(size, space)` y `same(a, b)`; va en `model` y no en `Sizing`
+      porque `BreakRules` (`fragment`) también la usa y `fragment` no puede depender de
+      `layout` ([tarea 8](#8-ciclos-de-packages-y-colocación-de-grid)). Las comparaciones
+      `a > b + EPSILON` pasan a `!fits(a, b)` y `|a - b| > EPSILON` a `!same(a, b)`, que son
+      equivalentes; las demás usan la constante. El 0.01 de `Overflow` se llama `TOLERANCE` y
+      su javadoc dice que es una tolerancia del modelo, no de redondeo. **Abierto:** con 1e-9 la
+      suite también pasa, así que ningún test depende de ese 0.01; decidir si se queda.
+- [x] **"No cabe nada":** el mismo `LayoutResult` con `BreakToken.BEFORE` en `BlockLayout`,
+      `UnitBreaker` e `InlineLayout` → `LayoutResult.before(box)`.
+- [x] **Alineación en un eje:** el `switch START/STRETCH/END/CENTER` de `FlexLayout` y
+      `GridLayout` → `Sizing.align(alignment, space, size)`. `sum(double[])` estaba en las dos y
+      en `TrackSizing` → `Sizing.sum`, con el mismo bucle (`DoubleStream.sum` compensa el
+      redondeo y podría cambiar el último decimal). Tests en `SizingTest`.
+- [x] **Bordes del canvas:** `border()` era idéntico en `SvgCanvas` y `PdfCanvas` → método por
+      defecto en `Canvas` que pinta cuatro `background` y llama a `outline(Rect)`, el contorno de
+      depuración, que es lo único que implementan los dos.
+- [x] **Mensajes:** `name(Box)` y `pt(double)` de `Overflow` y `TableLayout` → `layout.Messages`.
+      De las dos `pt` queda la de `Overflow` (`%.2f` sin ceros finales); la de `TableLayout`
+      pasaba a notación científica desde 10⁷. `MessagesTest`.
+- [x] **Caja de contenido de un fragmento:** `Fragment.contentWidth()` y `contentHeight()`, en
+      `Overflow` (sustituyen a dos métodos privados) e `InlineLayout.number`. El desplazamiento a
+      la caja de contenido (`x + f.border().left() + f.padding().left()`, seis veces) no se ha
+      tocado: sacarlo cambia el orden de las sumas.
+- [x] **Colocar una línea:** medir, alinear, `wordSpacing` y ancho final, dos veces en
+      `InlineLayout` (`layout` y `number`) → `LineBreaker.place(...)`, que devuelve la
+      `TextLine`. Test en `LineBreakerTest`.
+
+**Verificación.** `mvn test` (623 tests) después de cada punto, sin cambios en los PNG ni en los
+`expected.stxt`.
 
 ## 10. Unidades de `UnitBreaker`
 
@@ -561,3 +572,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 6 | `enum Element` en `Box.element`; sin listas paralelas ni `switch` de `layout` y `position`; `ElementTest` contra el schema; 613 tests en verde | Tarea 7 (partir `BoxTreeBuilder`) o 9; revisar `Placement` |
 | 2026-10-27 | 7 | `BoxTreeBuilder` de 1 393 a 346 líneas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext` y `Nodes`; claves en `PropertyKey` con `PropertyKeyTest`; 615 tests en verde | Tarea 8 (ciclos de packages) o 9; revisar `Placement` |
 | 2026-10-27 | 8 | Sin ciclos de packages: colocación de grid, `FontFace`, `FontWeight` y `FontStyle` en `model`; `BreakAppeal` en `fragment`; `Paginator` en `layout`; `Areas` y `Area` se interpretan una vez, al leer; `ArchitectureTest`; 619 tests en verde | Tarea 9 (duplicaciones) o 10; revisar `Placement` |
+| 2026-10-27 | 9 | `model.Tolerance` (una sola épsilon), `LayoutResult.before`, `Sizing.align`/`sum`, `Canvas.border` por defecto con `outline`, `layout.Messages`, `Fragment.contentWidth`/`contentHeight`, `LineBreaker.place`; 623 tests en verde | Tarea 10 (`UnitBreaker`) u 11; decidir el 0.01 de `Overflow`; revisar `Placement` |
