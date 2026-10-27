@@ -8,9 +8,11 @@ import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.Resources;
+import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.FontFace;
 import dev.stxt.boxes.tree.Media;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -39,6 +41,9 @@ import java.util.Map;
  * con Identity-H cada carácter ocupa dos: el espacio extra se añade tras cada espacio con
  * {@code TJ}.</p>
  *
+ * <p>El PDF va etiquetado (árbol de estructura y contenido marcado) y lleva los marcadores de
+ * los encabezados: ver {@link PdfStructure}.</p>
+ *
  * <p>Con {@code debug}, como {@link SvgCanvas}, dibuja además el contorno de cada caja de borde
  * (lo usan las imágenes de los tests de referencia).</p>
  */
@@ -50,15 +55,18 @@ public final class PdfCanvas implements Canvas {
     private final Resources resources;
     /** Fuentes incrustadas en el documento, compartidas por todas sus páginas. */
     private final Map<FontFace, PDFont> fonts;
+    /** Árbol de estructura del documento, compartido por todas sus páginas. */
+    private final PdfStructure structure;
     private final boolean debug;
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
-                      Map<FontFace, PDFont> fonts, boolean debug) {
+                      Map<FontFace, PDFont> fonts, PdfStructure structure, boolean debug) {
         this.doc = doc;
         this.out = out;
         this.pageHeight = pageHeight;
         this.resources = resources;
         this.fonts = fonts;
+        this.structure = structure;
         this.debug = debug;
     }
 
@@ -89,17 +97,31 @@ public final class PdfCanvas implements Canvas {
                              boolean debug) throws IOException {
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
+            PdfStructure structure = new PdfStructure(doc, root(pages));
             Rect area = media.pageArea();
+            List<PDPage> pdfPages = new ArrayList<>();
             for (Page p : pages) {
                 PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) media.height()));
                 doc.addPage(page);
+                pdfPages.add(page);
+                structure.startPage(page);
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                     StackingContext.build(p.content(), p.fixed(), area.x(), area.y())
-                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, debug));
+                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, structure, debug));
                 }
             }
+            structure.finish(doc, pages, pdfPages, area, media.height());
             doc.save(target);
         }
+    }
+
+    /** La raíz del árbol de cajas: la caja del fragmento raíz de cualquier página. */
+    private static Box root(List<Page> pages) {
+        Box b = pages.get(0).content().box();
+        while (b.parent != null) {
+            b = b.parent;
+        }
+        return b;
     }
 
     @Override
@@ -108,9 +130,35 @@ public final class PdfCanvas implements Canvas {
             return;
         }
         try {
+            // Fondos y bordes no son contenido: artifacts del PDF etiquetado.
+            out.beginMarkedContent(COSName.ARTIFACT);
             setColor(color);
             out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
             out.fill();
+            out.endMarkedContent();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void beginText(Box box) {
+        try {
+            int mcid = structure.mark(box);
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void endText() {
+        try {
+            out.endMarkedContent();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -132,11 +180,13 @@ public final class PdfCanvas implements Canvas {
         }
         if (debug) {
             try {
+                out.beginMarkedContent(COSName.ARTIFACT);
                 out.setStrokingColor(0xDD / 255f, 0x33 / 255f, 0x33 / 255f);
                 out.setLineWidth(0.3f);
                 out.setLineDashPattern(new float[]{2, 2}, 0);
                 out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
                 out.stroke();
+                out.endMarkedContent();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }

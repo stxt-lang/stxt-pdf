@@ -23,6 +23,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Flex
 			Child: Grid
 			Child: Text
+			Child: Paragraph
+			Child: Heading 1
+			Child: Heading 2
+			Child: Heading 3
+			Child: Heading 4
+			Child: Heading 5
+			Child: Heading 6
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -58,6 +65,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Flex
 			Child: Grid
 			Child: Text
+			Child: Paragraph
+			Child: Heading 1
+			Child: Heading 2
+			Child: Heading 3
+			Child: Heading 4
+			Child: Heading 5
+			Child: Heading 6
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -137,6 +151,106 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Content
 				Max: 1
+	Node: Paragraph
+		Type: INLINE
+		Description: Párrafo: un Text con significado (etiqueta P en el PDF). Un solo párrafo, sin líneas en blanco en Content.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Content
+				Max: 1
+	Node: Heading 1
+		Type: GROUP
+		Description: Encabezado de nivel 1: un bloque con uno o varios Text. Aparece en los marcadores del PDF y el motor evita cortar dentro y después.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
+	Node: Heading 2
+		Type: GROUP
+		Description: Encabezado de nivel 2 (ver Heading 1).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
+	Node: Heading 3
+		Type: GROUP
+		Description: Encabezado de nivel 3 (ver Heading 1).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
+	Node: Heading 4
+		Type: GROUP
+		Description: Encabezado de nivel 4 (ver Heading 1).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
+	Node: Heading 5
+		Type: GROUP
+		Description: Encabezado de nivel 5 (ver Heading 1).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
+	Node: Heading 6
+		Type: GROUP
+		Description: Encabezado de nivel 6 (ver Heading 1).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Text
+				Min: 1
 	Node: Relative
 		Type: GROUP
 		Description: Caja de bloque que se desplaza con Offset sin mover a sus hermanos. Es el containing block de sus descendientes Absolute.
@@ -161,6 +275,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Flex
 			Child: Grid
 			Child: Text
+			Child: Paragraph
+			Child: Heading 1
+			Child: Heading 2
+			Child: Heading 3
+			Child: Heading 4
+			Child: Heading 5
+			Child: Heading 6
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -184,6 +305,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Flex
 			Child: Grid
 			Child: Text
+			Child: Paragraph
+			Child: Heading 1
+			Child: Heading 2
+			Child: Heading 3
+			Child: Heading 4
+			Child: Heading 5
+			Child: Heading 6
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -207,6 +335,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Flex
 			Child: Grid
 			Child: Text
+			Child: Paragraph
+			Child: Heading 1
+			Child: Heading 2
+			Child: Heading 3
+			Child: Heading 4
+			Child: Heading 5
+			Child: Heading 6
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -232,6 +367,20 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Text
 				Max: 1
+			Child: Paragraph
+				Max: 1
+			Child: Heading 1
+				Max: 1
+			Child: Heading 2
+				Max: 1
+			Child: Heading 3
+				Max: 1
+			Child: Heading 4
+				Max: 1
+			Child: Heading 5
+				Max: 1
+			Child: Heading 6
+				Max: 1
 			Child: Relative
 				Max: 1
 	Node: Cell
@@ -252,6 +401,20 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Text
 				Max: 1
+			Child: Paragraph
+				Max: 1
+			Child: Heading 1
+				Max: 1
+			Child: Heading 2
+				Max: 1
+			Child: Heading 3
+				Max: 1
+			Child: Heading 4
+				Max: 1
+			Child: Heading 5
+				Max: 1
+			Child: Heading 6
+				Max: 1
 			Child: Relative
 				Max: 1
 
@@ -266,7 +429,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: For id
 	Node: Element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block…).
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…).
 		Children:
 			Child: Box
 				Max: 1

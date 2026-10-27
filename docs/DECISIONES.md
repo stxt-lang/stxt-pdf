@@ -318,3 +318,34 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 82. **Las reglas solo admiten `Box`, `Typography` y `Break`**, no las propiedades propias de
     un elemento (`Gap`, `Columns`, `Offset`…), que el schema no podría validar porque el tipo
     va en el valor de `Element`. *Alternativa:* admitirlas y validarlas en el builder.
+
+## Hito 12: encabezados y párrafos (2026-10-27)
+
+83. **El motor evita siempre el corte dentro y después de un encabezado**, en lugar de dejarlo
+    al autor con `Break`. Son `avoid` normales (se relajan si no hay otro corte), y el
+    encabezado y sus `Text` no admiten `Break`. *Dónde:* `BoxTreeBuilder.element`.
+    *Alternativa:* como CSS, un valor por defecto (`break-after: avoid`) que el autor puede
+    cambiar; contradice que no haya estilos implícitos (T1).
+
+84. **Los saltos de nivel son un error** (`HEADING_LEVEL`), y el primer encabezado tiene que
+    ser `Heading 1`. Se comprueba en orden del documento, en todo el árbol. *Dónde:*
+    `BoxTreeBuilder.heading`. *Alternativa:* permitirlos y colgar el marcador del último de
+    nivel menor, como hacen los navegadores.
+
+85. **Un encabezado es un bloque con hijos `Text`**, no un `Text` con otro nombre; su texto en
+    el índice es el de sus `Text` unido por espacios. Deja sitio a los tramos con formato (T4)
+    sin cambiar el elemento. *Alternativa:* el texto en el valor o en `Content`, como `Text`.
+
+86. **`Paragraph` es un solo párrafo**: una línea en blanco en su `Content` es un error
+    (`PARAGRAPH_BLANK_LINE`), aunque en un `Text` separa párrafos. *Alternativa:* permitirlo,
+    con un `P` en el PDF que contiene varios párrafos.
+
+87. **PDF etiquetado sin idioma.** El árbol de estructura tiene un elemento por caja
+    (`Document`, `H1`…`H6`, `P`, `Span`, `Div`) y los fondos, bordes y `Fixed` son
+    *artifacts*, pero el documento no declara `Lang` (el modelo no tiene dónde) ni título, que
+    PDF/UA exige. *Dónde:* `paint/PdfStructure`. *Alternativa:* una propiedad de idioma (y de
+    título) en `Document`; se puede añadir sin cambiar el resto.
+
+88. **Un encabezado dentro de un `Fixed` es un error** (`HEADING_IN_FIXED`): el `Fixed` se
+    repite en cada página y es *artifact*, así que no tendría marcador ni etiqueta.
+    *Alternativa:* permitirlo como un bloque sin significado.

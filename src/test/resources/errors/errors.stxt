@@ -806,3 +806,107 @@ Errors:
 					Element: Grid
 						Box:
 							Background: rojo
+	Case: El primer encabezado no es Heading 1
+		Code: HEADING_LEVEL
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Heading 2:
+					Text: Título
+	Case: Salto de nivel entre encabezados
+		Code: HEADING_LEVEL
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Heading 1:
+					Text: Uno
+				Block:
+					Heading 3:
+						Text: Tres
+	Case: Encabezado dentro de un Fixed
+		Code: HEADING_IN_FIXED
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Fixed:
+					Heading 1:
+						Text: Cabecera
+	Case: Encabezado sin Text
+		Code: TOO_FEW_CHILDREN
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Heading 1:
+					Id: vacío
+	Case: Break en un Text de un encabezado
+		Code: BREAK_IN_HEADING
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Heading 1:
+					Text: Título
+						Break:
+							Before: page
+	Case: Regla que aplica Break a un encabezado
+		Code: STYLE_NOT_ALLOWED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Styles:
+					Element: Heading 1
+						Break:
+							After: page
+				Heading 1:
+					Text: Título
+	Case: Paragraph con una línea en blanco
+		Code: PARAGRAPH_BLANK_LINE
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Paragraph:
+					Content >>
+						Primero.
+
+						Segundo.

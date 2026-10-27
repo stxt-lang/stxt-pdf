@@ -5,6 +5,7 @@ import dev.stxt.boxes.model.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Una caja del árbol de cajas (ESPECIFICACION.md §5.1): cada elemento de caja del documento
@@ -20,6 +21,12 @@ import java.util.List;
 public final class Box {
 
     public final String id;
+    /**
+     * Elemento del que procede, en forma canónica ({@code block}, {@code paragraph},
+     * {@code heading-1}…); {@code null} en la raíz. Da el significado: reglas {@code Element},
+     * marcadores y etiquetas del PDF.
+     */
+    public final String element;
     public final Style style;
     public final boolean anonymous;
     /** Línea del documento de la que procede, para mensajes de error. */
@@ -43,11 +50,28 @@ public final class Box {
     public Insets border = Insets.ZERO;
     public Insets padding = Insets.ZERO;
 
-    public Box(String id, Style style, boolean anonymous, int line) {
+    public Box(String id, String element, Style style, boolean anonymous, int line) {
         this.id = id;
+        this.element = element;
         this.style = style;
         this.anonymous = anonymous;
         this.line = line;
+    }
+
+    /** Nivel de un encabezado ({@code Heading 1} … {@code Heading 6}); 0 si no lo es. */
+    public int headingLevel() {
+        return headingLevel(element);
+    }
+
+    /** Nivel del encabezado con ese nombre canónico ({@code heading-2} → 2); 0 si no es un encabezado. */
+    public static int headingLevel(String element) {
+        return element != null && element.startsWith("heading-") ? element.charAt(8) - '0' : 0;
+    }
+
+    /** Texto de un encabezado para el índice: el de sus {@code Text}, unido y con los espacios normalizados. */
+    public String headingText() {
+        return children.stream().filter(Box::hasText).map(b -> b.text.strip())
+                .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");
     }
 
     public void addChild(Box child) {

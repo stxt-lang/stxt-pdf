@@ -214,6 +214,30 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void aHeadingStaysWithTheNextBoxWithoutDeclaringIt() {
+        // El motor fija After: avoid en H (24 pt, dos líneas de 12): se corta antes de H.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70",
+                "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 30", "\t\tBreak:", "\t\t\tInside: avoid");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "H"));
+        assertRect(40, 40, 515, 24, l.rect(2, "H"));
+        assertRect(40, 64, 515, 30, l.rect(2, "P"));
+    }
+
+    @Test
+    void aHeadingIsNotSplit() {
+        // Tras X quedan 20 pt: cabe la primera línea de H, pero el motor fija Inside: avoid.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
+                "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "H"));
+        assertRect(40, 40, 515, 24, l.rect(2, "H"));
+    }
+
+    @Test
     void avoidIsRelaxedWhenThereIsNoOtherBreak() {
         // T es lo primero de la página: no hay corte mejor que el que incumple avoid.
         LayoutFixture l = layOutPaged(PAGE,

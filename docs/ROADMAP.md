@@ -32,7 +32,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | Hito | Elemento | Estado | Caso golden |
 |---|---|---|---|
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
-| 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | pendiente | — |
+| 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | pendiente | — |
 | 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
@@ -85,10 +85,6 @@ Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
 
 **Abiertas:**
 
-- **T2. Significado en la salida.** Qué produce el significado de un elemento, además del
-  layout: marcadores del PDF (*outline*) para los encabezados, PDF etiquetado (*tagged PDF*,
-  accesibilidad) para todos, y el volcado del §7 (si incluye el tipo de elemento).
-  Propuesta: *outline* en el hito 12 y PDF etiquetado fuera de alcance por ahora.
 - **T3. Nombres que chocan.** `Item` (hijo de `Flex`), `Cell` (hijo de `Grid`) y `Columns`
   (pistas de `Grid`) ya existen y tienen una única definición en el namespace. Las listas,
   las tablas y las columnas tienen que usar otros nombres o compartir el significado. Se
@@ -103,6 +99,10 @@ Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
   implícitos en el motor: el estilo de cada tipo de elemento (un `Heading 1` más grande que un
   `Heading 2`) se declara una vez en las reglas `Styles` del documento (hito 11). Se respeta
   la política de "nada implícito" del §6.
+- **T2. Significado en la salida** (2026-10-27). En el hito 12 se hacen los marcadores del PDF
+  (*outline*) para los encabezados **y el PDF etiquetado** (*tagged PDF*, accesibilidad) para
+  todo el documento. Cada hito siguiente etiqueta sus elementos (listas, tablas…). Queda por
+  decidir en el hito 12 si el volcado del §7 incluye el tipo de elemento (G3).
 
 ---
 
@@ -230,11 +230,13 @@ Decididas también (2026-10-27), con la propuesta aceptada:
 `h1`…`h6`, que aparecen en los marcadores del PDF, y un elemento `Paragraph`. Su estilo sale
 de las reglas `Styles` (hito 11).
 
-**Borrador de sintaxis** (a confirmar):
+**Sintaxis** (decidida en H2, H6 y P2):
 
 ```
-Heading 1: Resultados del trimestre
+Heading 1:
 	Id: results
+	Class: chapter
+	Text: Resultados del trimestre
 Paragraph:
 	Content >>
 		Texto del párrafo.
@@ -244,38 +246,67 @@ Paragraph:
 
 - [x] H1. **Seis elementos**, `Heading 1` … `Heading 6`, no un `Heading` con `Level`: así una
       regla los nombra directamente (`Element: Heading 1`).
+- [x] H2. Un encabezado es un **contenedor de bloque** cuyos únicos hijos de contenido son
+      elementos **`Text`**, apilados como en un `Block`. No admite texto en el valor ni
+      `Content`. El título de su marcador es el texto de sus `Text` unido. Si llegan los tramos
+      (T4), caben aquí sin cambiar el elemento.
 - [x] H3. El estilo de cada nivel se declara en `Styles` (T1); el motor no tiene estilos
       implícitos.
+- [x] H4. **El motor evita siempre el corte** en los encabezados: no se declara, lo aplica él.
+      El encabezado no admite `Break`.
+- [x] H6. Además de sus `Text`, un encabezado admite **`Id`, `Class`, `Box` y `Typography`**.
+      `Box` y `Class` hacen falta para que las reglas `Styles` le den márgenes (se validan como
+      si los declarara el elemento, R7).
+- [x] H7. Marcadores del PDF y PDF etiquetado en este hito (T2).
 - [x] P1. Habrá un elemento **`Paragraph`**.
+- [x] P2. `Paragraph` es un **`Text` con significado**: admite lo mismo y se maqueta igual;
+      cambia su tipo (reglas `Element: Paragraph`, etiqueta `P` en el PDF). `Text` sigue
+      existiendo como caja de texto sin significado.
 
-**Decisiones abiertas:**
+Decididas también (2026-10-27), con la propuesta aceptada salvo H9:
 
-- [ ] H2. ¿Un encabezado es un `Text` con otro nombre (mismas propiedades, texto en el valor
-      o en `Content`) o puede contener otros elementos?
-- [ ] H4. `Break After: avoid` (un encabezado no se queda solo al final de la página): con
-      `Styles` lo puede declarar el autor (`Element: Heading 1` / `Break` / `After: avoid`).
-      ¿Basta, o el motor lo aplica siempre?
-- [ ] H5. Marcadores del PDF: ver T2. ¿Hace falta una propiedad para excluir un encabezado
-      del índice?
-- [ ] P2. ¿En qué se diferencia `Paragraph` de `Text`? ¿`Text` sigue existiendo como caja de
-      texto sin significado, o `Paragraph` lo sustituye? ¿Un `Content` con líneas en blanco
-      sigue dando varios párrafos dentro de un `Paragraph`?
+- [x] H4b. El motor fija `After: avoid` (no queda solo al final de la página) e
+      `Inside: avoid` (no se parte), relajables como cualquier `avoid` (§5.10); no `Before`.
+      Sin `Break` no hay `Before: page` en un encabezado; se acepta de momento.
+- [x] H5. No hay propiedad para excluir un encabezado del índice.
+- [x] H8. Los `Text` de un encabezado no admiten `Break` (chocaría con H4) y hay al menos uno.
+- [x] H9. **Los saltos de nivel son un error**: la jerarquía de encabezados tiene que ser
+      correcta. En orden del documento, el primero es `Heading 1` y cada uno sube como mucho
+      un nivel respecto al anterior (bajar, los que quiera).
+- [x] H10. Un encabezado dentro de un `Fixed` es un error: el `Fixed` es *artifact* y no
+      tendría marcador ni etiqueta.
+- [x] P3. Un `Paragraph` es un solo párrafo: líneas en blanco en su `Content` son un error.
+- [x] G1. Etiquetas del PDF: `Document` → `Document`; `Block`, `Flex`, `Grid`, `Relative`,
+      `Absolute` → `Div`; `Text` → `Span`; `Paragraph` → `P`; `Heading N` → `HN`; `Fixed`
+      (repetido en cada página) → *artifact*. Orden de lectura: el del documento.
+- [x] G2. Fondos y bordes son *artifact*.
+- [x] G3. El volcado del §7 no incluye el tipo de elemento.
 
-**Diseño técnico (previsto):**
+**Diseño técnico (implementado):**
 
-- `BoxTreeBuilder` los traduce a una `Box` de texto (`Layout.INLINE`) con su tipo de
-  elemento (para las reglas y los marcadores); el layout es el de `InlineLayout`, sin
-  algoritmo nuevo.
-- Marcadores: `PdfCanvas` recoge los encabezados al pintar (página y posición del primer
-  fragmento) y construye el *outline* de PDFBox (`PDDocumentOutline`) anidando por nivel.
+- `BoxTreeBuilder` traduce el encabezado a una `Box` de bloque (`Layout.BLOCK`) y el
+  `Paragraph` a una de texto (`Layout.INLINE`), con su tipo de elemento en `Box.element`
+  (reglas, marcadores, etiquetas). Sin algoritmo nuevo. El corte evitado del encabezado se
+  fija en su `Style` al construirlo; la jerarquía se comprueba en orden del documento.
+- `paint/PdfStructure`: árbol de estructura (`PDStructureTreeRoot`, `MarkInfo`) con un
+  elemento por caja, contenido marcado (`BDC`/`EMC` con `MCID`, desde
+  `Canvas.beginText`/`endText`) y árbol de padres por página; los marcadores
+  (`PDDocumentOutline`) se anidan por nivel y llevan al primer fragmento. Sin `Lang` (decisión
+  87 de `DECISIONES.md`).
+- Errores nuevos: `HEADING_LEVEL`, `HEADING_IN_FIXED`, `BREAK_IN_HEADING`,
+  `PARAGRAPH_BLANK_LINE`; `STYLE_NOT_ALLOWED` cubre también `Break` en encabezados.
 
 **Tareas:**
 
-- [ ] Resolver H2, H4, H5, P2 (y T2).
-- [ ] Schema, `Style`, `BoxTreeBuilder`.
-- [ ] Marcadores en `PdfCanvas`, con su test en `PdfCanvasTest`.
-- [ ] Especificación y casos de error.
-- [ ] Caso golden.
+- [x] Resolver H2, H4, P2 y T2.
+- [x] Resolver H4b, H5, H8, H9, H10, P3 y G1–G3.
+- [x] Schema, `Box`, `BoxTreeBuilder` (con el corte evitado del encabezado).
+- [x] Marcadores y PDF etiquetado (`PdfStructure`), con sus tests en `PdfCanvasTest`.
+- [x] Tests del árbol (`tree/HeadingsTest`) y de fragmentación (`BlockFragmentationTest`).
+- [x] Especificación (§2, §4.10, §5.1, §5.13 nueva, §6, §8, §9), catálogo de errores y
+      `DECISIONES.md` (83–88).
+- [x] Caso golden `09-headings`, añadido a `DocumentReaderTest`.
+- [x] README, `CLAUDE.md`.
 
 ---
 
@@ -483,6 +514,17 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (6).** Hito 12 terminado. Aceptadas las propuestas H4b, H5, H8, P3 y G1–G3;
+  H9 al revés (los saltos de nivel son error, y el primero es `Heading 1`) y H10 (encabezado
+  en `Fixed`, error). Hechos schema, builder, `PdfStructure` (PDF etiquetado y marcadores),
+  tests, catálogo, caso golden `09-headings`, especificación (§5.13 nueva), README,
+  `CLAUDE.md` y `DECISIONES.md` (83–88). `mvn test` en verde.
+  *Siguiente paso:* hito 13 (listas), resolver L1–L8. Pendiente opcional: usar `Heading 1` en
+  el ejemplo del §10 (`report.stxt`).
+- **2026-10-27 (5).** Hito 12 en diseño. Decididos H2 (encabezado = bloque con hijos `Text`),
+  H4 (el motor evita el corte), H6 (admite `Id`, `Class`, `Box`, `Typography`), P2
+  (`Paragraph` = `Text` con significado) y T2 (*outline* y PDF etiquetado en este hito).
+  *Siguiente paso:* resolver H4b, H5, H8, H9, P3 y G1–G3 y empezar por el schema.
 - **2026-10-27 (4).** Hito 11 terminado. El ejemplo del §10 (`report.stxt` y la copia del
   caso 05) usa `Styles` con el mismo resultado; caso golden `08-styles` nuevo; README,
   `CLAUDE.md` y `DECISIONES.md` (79–82) actualizados. `mvn test` en verde.

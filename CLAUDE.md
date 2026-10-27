@@ -39,7 +39,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 11 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 12 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -55,8 +55,9 @@ actualízala.
 | 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
 | 11 | ~~Reglas reutilizables `Styles` (`Element`, `For class`, `For id`) y `Class`~~ (hecho; caso 08) | schema, `tree/BoxTreeBuilder` |
+| 12 | ~~Encabezados (`Heading 1`…`Heading 6`) y `Paragraph`; PDF etiquetado y marcadores~~ (hecho; caso 09) | schema, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
 
-Los hitos 12 a 15 (encabezados y párrafos, listas, tablas y bloque en columnas) se siguen en
+Los hitos 13 a 15 (listas, tablas y bloque en columnas) se siguen en
 [`docs/ROADMAP.md`](docs/ROADMAP.md); al terminar uno, añádelo también a esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -82,7 +83,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
 | `layout.block` / `inline` / `flex` / `grid` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 ### Piezas clave
@@ -114,6 +115,13 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   del elemento (prioridad: elemento > id > clases en orden de `Styles` > tipo > herencia), con
   las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
   regla y se valida como si la declarara el elemento.
+- **Elementos con significado (§5.13):** `Paragraph` (un `Text` de un solo párrafo) y
+  `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element` guarda el nombre
+  canónico del elemento (`heading-2`) para las reglas, los marcadores y las etiquetas. El
+  builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su jerarquía
+  en orden del documento. `PdfStructure` construye el árbol de estructura del PDF etiquetado
+  (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
+  *artifacts*) y los marcadores.
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,

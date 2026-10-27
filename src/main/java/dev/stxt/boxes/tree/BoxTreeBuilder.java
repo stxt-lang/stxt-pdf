@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -63,12 +64,18 @@ public final class BoxTreeBuilder {
     private static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
-    private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "relative", "absolute", "fixed");
+    private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "relative", "absolute", "fixed");
     /** Los elementos de caja como se escriben, para los mensajes. */
-    private static final List<String> ELEMENT_NAMES =
-            List.of("Block", "Flex", "Grid", "Text", "Relative", "Absolute", "Fixed");
+    private static final List<String> ELEMENT_NAMES = List.of("Block", "Flex", "Grid", "Text", "Paragraph",
+            "Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6", "Relative", "Absolute", "Fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
-    private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "relative");
+    private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "relative");
+    /** Elementos con el texto en el valor o en {@code Content}. */
+    private static final Set<String> TEXTS = Set.of("text", "paragraph");
+    /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
+    private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
     /**
      * Nombre interno de cada propiedad de {@code Typography} y {@code Break} cuyo nombre en el
@@ -92,6 +99,10 @@ public final class BoxTreeBuilder {
     private Map<String, InlineNode> idRules;
     /** Si el alto de la caja de contenido es definido: base de los porcentajes verticales (§3.6). */
     private Map<Box, Boolean> definiteHeight;
+    /** Nivel del último encabezado, en orden del documento; 0 antes del primero. */
+    private int headingLevel;
+    /** Si se está construyendo el contenido de un {@code Fixed}. */
+    private boolean insideFixed;
 
     /**
      * Construye el árbol de un documento, validado o no.
@@ -102,6 +113,8 @@ public final class BoxTreeBuilder {
     public Result build(InlineNode document) {
         ids = new HashMap<>();
         definiteHeight = new HashMap<>();
+        headingLevel = 0;
+        insideFixed = false;
         // Sin el namespace, el schema no validaría nada.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
@@ -114,7 +127,7 @@ public final class BoxTreeBuilder {
         // El Typography de Document lo heredan todas las cajas.
         Style rootStyle = new Style();
         child(document, "typography").map(BoxTreeBuilder::inline).ifPresent(t -> typography(t, rootStyle));
-        Box root = new Box(null, rootStyle, true, document.getLine());
+        Box root = new Box(null, null, rootStyle, true, document.getLine());
         // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
         definiteHeight.put(root, true);
         buildContent(document, root);
@@ -190,7 +203,8 @@ public final class BoxTreeBuilder {
      * las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}. Van después de la
      * herencia y antes de lo que declara el propio elemento, y se mezclan propiedad a propiedad.
      */
-    private void applyRules(InlineNode n, String kind, Style s) {
+    private void applyRules(InlineNode n, String kind, Style s, Box parent) {
+        String noBreak = noBreak(n, kind, s, parent);
         List<InlineNode> rules = new ArrayList<>();
         Optional.ofNullable(elementRules.get(kind)).ifPresent(rules::add);
         Optional<Node> classNode = child(n, "class");
@@ -204,15 +218,32 @@ public final class BoxTreeBuilder {
         }
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::add);
         for (InlineNode rule : rules) {
-            if (s.isOutOfFlow()) {
+            if (noBreak != null) {
                 child(rule, "break").ifPresent(b -> {
                     throw error(b, ErrorCode.STYLE_NOT_ALLOWED, "La regla " + rule.getName() + ": "
-                            + rule.getText().trim() + " aplica Break a un " + position(s) + " (línea " + n.getLine()
-                            + "), que no se parte ni está en el flujo de la página");
+                            + rule.getText().trim() + " aplica Break a " + noBreak);
                 });
             }
             apply(rule, s);
         }
+    }
+
+    /**
+     * Por qué el elemento no admite {@code Break}, para el mensaje; {@code null} si lo admite.
+     * Lo que el schema no deja declarar tampoco puede llegar de una regla.
+     */
+    private static String noBreak(InlineNode n, String kind, Style s, Box parent) {
+        String where = " (línea " + n.getLine() + "), ";
+        if (s.isOutOfFlow()) {
+            return "un " + position(s) + where + "que no se parte ni está en el flujo de la página";
+        }
+        if (Box.headingLevel(kind) > 0) {
+            return "un " + n.getName() + where + "en el que el motor ya evita el corte";
+        }
+        if (parent.headingLevel() > 0) {
+            return "un Text de un encabezado" + where + "en el que el motor ya evita el corte";
+        }
+        return null;
     }
 
     /** Las clases de un {@code Class}: cada una con su regla {@code For class} y sin repetir. */
@@ -299,11 +330,15 @@ public final class BoxTreeBuilder {
     /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Cell}, si es un ítem. */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
         String kind = n.getCanonicalName();
+        int level = Box.headingLevel(kind);
+        if (level > 0) {
+            heading(n, level);
+        }
         Style s = Style.inheriting(parent.style);
         s.layout = switch (kind) {
             case "flex" -> Style.Layout.FLEX;
             case "grid" -> Style.Layout.GRID;
-            case "text" -> Style.Layout.INLINE;
+            case "text", "paragraph" -> Style.Layout.INLINE;
             default -> Style.Layout.BLOCK;
         };
         s.position = switch (kind) {
@@ -315,7 +350,7 @@ public final class BoxTreeBuilder {
         if (wrapper != null) {
             item(wrapper, s);
         }
-        applyRules(n, kind, s);
+        applyRules(n, kind, s, parent);
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
@@ -335,7 +370,13 @@ public final class BoxTreeBuilder {
             switch (name) {
                 case "box" -> box(inline(p), s);
                 case "typography" -> typography(inline(p), s);
-                case "break" -> fragmentation(inline(p), s);
+                case "break" -> {
+                    if (parent.headingLevel() > 0) {
+                        throw error(p, ErrorCode.BREAK_IN_HEADING, "Un Text de un encabezado no admite Break: "
+                                + "el motor ya evita cortar dentro del encabezado y después de él");
+                    }
+                    fragmentation(inline(p), s);
+                }
                 default -> {
                     s.declared(name, p.getLine());
                     switch (name) {
@@ -351,38 +392,77 @@ public final class BoxTreeBuilder {
             validateFlex(s);
         }
         validateBox(s, parent, wrapper);
+        if (level > 0) {
+            // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
+            s.breakAfter = Style.Break.AVOID;
+            s.avoidBreakInside = true;
+        }
 
-        Box box = new Box(id, s, false, n.getLine());
+        Box box = new Box(id, kind, s, false, n.getLine());
         definiteHeight.put(box, definiteHeight(s, parent));
         validateContainer(s, box);
-        if (kind.equals("text")) {
+        if (TEXTS.contains(kind)) {
             text(n, box);
         } else {
+            boolean outerFixed = insideFixed;
+            insideFixed |= s.position == Style.Position.FIXED;
             buildContent(n, box);
+            insideFixed = outerFixed;
         }
         return box;
     }
 
-    /** El texto de un {@code Text}: en su valor o en {@code Content}, uno de los dos. */
+    /**
+     * Comprueba que un encabezado está en su sitio (§5.13): fuera de un {@code Fixed} y sin
+     * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
+     * como mucho un nivel respecto al anterior.
+     */
+    private void heading(InlineNode n, int level) {
+        if (insideFixed) {
+            throw error(n, ErrorCode.HEADING_IN_FIXED, "Un " + n.getName() + " no puede estar dentro de un Fixed, "
+                    + "que se repite en cada página y no forma parte del contenido: usa un Text");
+        }
+        if (level > headingLevel + 1) {
+            throw error(n, ErrorCode.HEADING_LEVEL, headingLevel == 0
+                    ? "El primer encabezado del documento debe ser Heading 1, no " + n.getName()
+                    : "Salto de nivel: " + n.getName() + " después de Heading " + headingLevel
+                            + "; como mucho, Heading " + (headingLevel + 1));
+        }
+        headingLevel = level;
+    }
+
+    /** El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos. */
     private static void text(InlineNode n, Box box) {
         Optional<Node> content = child(n, "content");
         boolean value = !n.getText().isBlank();
         if (value && content.isPresent()) {
-            throw error(content.get(), ErrorCode.TEXT_CONTENT, "Text tiene el texto en el valor y en Content "
+            throw error(content.get(), ErrorCode.TEXT_CONTENT, n.getName() + " tiene el texto en el valor y en Content "
                     + "(línea " + n.getLine() + "): deja solo uno");
         }
         if (!value && content.isEmpty()) {
-            throw error(n, ErrorCode.TEXT_CONTENT,
-                    "Text necesita su texto: en el valor (Text: …) o en un bloque Content >>");
+            throw error(n, ErrorCode.TEXT_CONTENT, n.getName() + " necesita su texto: en el valor ("
+                    + n.getName() + ": …) o en un bloque Content >>");
         }
         Node source = content.orElse(n);
         if (box.style.font == null) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT,
-                    "El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document");
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
         }
         if (!box.style.isDeclared("font-size")) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE,
-                    "El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document");
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
+        }
+        if (n.getCanonicalName().equals("paragraph")) {
+            // Las líneas en blanco al principio o al final no separan nada.
+            String text = source.getText();
+            Matcher blank = BLANK_LINE.matcher(text)
+                    .region(text.length() - text.stripLeading().length(), text.stripTrailing().length());
+            if (blank.find()) {
+                // El bloque empieza en la línea siguiente a Content; la línea en blanco, tras el salto encontrado.
+                int line = source.getLine() + 2 + (int) text.substring(0, blank.start()).chars().filter(c -> c == '\n').count();
+                throw error(line, ErrorCode.PARAGRAPH_BLANK_LINE, "Un Paragraph es un solo párrafo: quita la línea "
+                        + "en blanco o usa un Paragraph para cada uno");
+            }
         }
         box.text = source.getText();
         box.textLine = source.getLine();

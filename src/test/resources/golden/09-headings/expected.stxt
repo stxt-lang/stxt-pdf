@@ -1,0 +1,21 @@
+# Página 1: h1 (48) + 10 → p1 (12) + 6 → h2a (16.8) + 4 → h3 (14.4, sin márgenes) → fill (80),
+# que acaba en 231.2. h2b iría en 237.2 y acabaría en 254, pero p2 (12, tras 4 de margen) no
+# cabe: cortar entre h2b y p2 incumple el After: avoid del encabezado y se corta antes de h2b.
+# Página 2: h2b arriba (margen truncado) y p2 tras su margen inferior de 4.
+Result:
+	Page: 1
+		Fragment: h1
+			Rect: 40 40 515 48
+		Fragment: p1
+			Rect: 40 98 515 12
+		Fragment: h2a
+			Rect: 40 116 515 16.8
+		Fragment: h3
+			Rect: 40 136.8 515 14.4
+		Fragment: fill
+			Rect: 40 151.2 515 80
+	Page: 2
+		Fragment: h2b
+			Rect: 40 40 515 16.8
+		Fragment: p2
+			Rect: 40 60.8 515 12

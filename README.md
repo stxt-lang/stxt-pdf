@@ -12,8 +12,8 @@ tipográficos**.
 Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
 inglés; la documentación y los comentarios, en castellano.
 
-Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`,
-`Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
+Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`,
+`Heading 1`…`Heading 6`, `Relative`, `Absolute`, `Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
 en `Item` y los de un `Grid`, en `Cell`. Las propiedades de cada caja se agrupan en `Box` (el
 modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de página):
 
@@ -77,7 +77,8 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas. Los hitos 1 a 11 están terminados; los siguientes, en
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 12 están terminados; los
+siguientes, en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Pieza | Estado |
@@ -86,6 +87,8 @@ fuentes incrustadas. Los hitos 1 a 11 están terminados; los siguientes, en
 | Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Cell`, validados con `@stxt.schema` | Hecho y probado |
 | Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
 | Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
+| Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
+| PDF etiquetado (árbol de estructura, *artifacts*) y marcadores de los encabezados | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
@@ -130,10 +133,9 @@ en `target/pdf/`.
 9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
 10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
 11. ~~**Reglas reutilizables.** `Styles` con reglas `Element`, `For class` y `For id`; `Class` en los elementos (caso 08).~~ Hecho.
+12. ~~**Encabezados y párrafos.** `Heading 1`…`Heading 6` y `Paragraph`; PDF etiquetado y marcadores (caso 09).~~ Hecho.
 
-Los siguientes hitos (12 a 15: encabezados y párrafos, listas, tablas y bloque en columnas),
-con sus
-decisiones abiertas, tareas y el registro de cada sesión, están en
+Los siguientes hitos (13 a 15: listas, tablas y bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Estructura
@@ -153,7 +155,7 @@ src/main/java/dev/stxt/boxes/
     grid/       GridLayout, TrackSizing, Track, Placement, Cell, GridAreas, Area, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
   fragment/     Fragment, BreakToken, Paginator, Page, BreakRules, TextLine
-  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas
+  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure
   output/       StxtDump
 ```
 

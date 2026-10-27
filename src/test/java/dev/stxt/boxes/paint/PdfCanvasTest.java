@@ -8,11 +8,19 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -103,6 +111,64 @@ class PdfCanvasTest {
             assertEquals(300, pdf.getPage(0).getMediaBox().getWidth(), 1e-3);
             assertEquals(842, pdf.getPage(0).getMediaBox().getHeight(), 1e-3);
         }
+    }
+
+    private static final String HEADINGS = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 400\n"
+            + "\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+            + "\tFixed:\n\t\tOffset: auto 0 -30 0\n\t\tText: Pie\n"
+            + "\tHeading 1:\n\t\tText: Uno\n"
+            + "\tParagraph: Hola.\n"
+            + "\tHeading 2:\n\t\tText: Uno\n\t\tText: punto uno\n"
+            + "\tParagraph: Adiós.\n\t\tBreak:\n\t\t\tAfter: page\n"
+            + "\tHeading 1:\n\t\tText: Dos\n";
+
+    @Test
+    void headingsBecomeNestedBookmarks() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDDocumentOutline outline = pdf.getDocumentCatalog().getDocumentOutline();
+            PDOutlineItem one = outline.getFirstChild();
+            assertEquals("Uno", one.getTitle());
+            assertEquals("Uno punto uno", one.getFirstChild().getTitle());
+            assertEquals(one.getFirstChild(), one.getLastChild());
+            PDOutlineItem two = one.getNextSibling();
+            assertEquals("Dos", two.getTitle());
+            assertEquals(two, outline.getLastChild());
+            assertEquals(0, ((PDPageDestination) one.getDestination()).retrievePageNumber());
+            PDPageXYZDestination target = (PDPageXYZDestination) two.getDestination();
+            assertEquals(1, target.retrievePageNumber());
+            // La esquina superior del encabezado: el área útil empieza 40 pt por debajo del borde.
+            assertEquals(400 - 40, target.getTop());
+            assertEquals(40, target.getLeft());
+        }
+    }
+
+    @Test
+    void theDocumentIsTagged() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
+            assertTrue(pdf.getDocumentCatalog().getMarkInfo().isMarked());
+            PDStructureTreeRoot treeRoot = pdf.getDocumentCatalog().getStructureTreeRoot();
+            PDStructureElement document = (PDStructureElement) treeRoot.getKids().get(0);
+            assertEquals("Document", document.getStructureType());
+            // El Fixed es un artifact: no está en el árbol. El orden es el del documento.
+            assertEquals(List.of("H1", "P", "H2", "P", "H1"), types(document));
+            PDStructureElement h2 = (PDStructureElement) document.getKids().get(2);
+            assertEquals(List.of("Span", "Span"), types(h2));
+            // Cada Span tiene su texto marcado en la página 1.
+            PDStructureElement span = (PDStructureElement) h2.getKids().get(0);
+            PDMarkedContentReference ref = (PDMarkedContentReference) span.getKids().get(0);
+            assertEquals(pdf.getPage(0), ref.getPage());
+            String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.contains("/Span <</MCID " + ref.getMCID() + " >>BDC")
+                    || content.contains("/Span <</MCID " + ref.getMCID() + ">> BDC"), content);
+            assertTrue(content.contains("/Artifact BMC"), content);
+            assertEquals(2, pdf.getPage(1).getStructParents() + 1);
+        }
+    }
+
+    private static List<String> types(PDStructureElement e) {
+        return e.getKids().stream().filter(k -> k instanceof PDStructureElement)
+                .map(k -> ((PDStructureElement) k).getStructureType()).toList();
     }
 
     @Test

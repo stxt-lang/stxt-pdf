@@ -70,16 +70,18 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Flex` | Contenedor flex ([§5.7](#57-flex)) | `Item`, `Absolute` y `Fixed` |
 | `Grid` | Contenedor grid ([§5.8](#58-grid)) | `Cell`, `Absolute` y `Fixed` |
 | `Text` | Caja de texto ([§5.4](#54-texto)) | Su texto: en el valor o en `Content` |
+| `Paragraph` | Un párrafo: un `Text` con significado ([§5.13](#513-encabezados-y-párrafos)) | Su texto: en el valor o en `Content`, sin líneas en blanco |
+| `Heading 1` … `Heading 6` | Encabezado de nivel 1 a 6 ([§5.13](#513-encabezados-y-párrafos)) | Uno o varios `Text` |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
 | `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Cell` | Celda de un `Grid`: dónde va y cómo se alinea | Exactamente un elemento en flujo |
 
-**Elementos** son los siete primeros, y **elementos en flujo**, los cinco que pueden ser un ítem
-(`Block`, `Flex`, `Grid`, `Text` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca
-son ítems. Los siete son **elementos de caja**: cada uno es una caja del árbol
-([§5.1](#51-árbol-de-cajas)). `Item` y `Cell` no son cajas: envuelven al elemento que hace de
+**Elementos** son todos menos `Item` y `Cell`, y **elementos en flujo**, los que pueden ser un
+ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados y `Relative`); `Absolute` y
+`Fixed` salen del flujo y nunca son ítems. Todos son **elementos de caja**: cada uno es una caja
+del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Cell` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor.
 
 Las propiedades de una caja van agrupadas por su significado ([§4](#4-referencia-de-propiedades)):
@@ -406,7 +408,7 @@ aplican por defecto a muchos elementos. Contiene reglas de tres clases:
 
 | Regla | Valor | Se aplica a |
 |---|---|---|
-| `Element` | nombre de un elemento de caja (`Block`, `Text`…) | todos los elementos de ese tipo |
+| `Element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
 | `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 
@@ -454,8 +456,9 @@ elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declar
 ([§6](#6-validación)), y el error señala la línea de la propiedad dentro de la regla. Los valores
 de una regla se comprueban aunque no se aplique a ningún elemento. Son errores: un `Element` que
 no nombra un elemento de caja, un `For id` sin elemento con ese `Id`, dos reglas con el mismo
-selector, una regla que da `Break` a un `Absolute` o un `Fixed`, y una clase de `Class` sin su
-regla `For class`. Un `Element` o un `For class` que no se aplican a ningún elemento no son
+selector, una regla que da `Break` a un elemento que no lo admite (`Absolute`, `Fixed`, un
+encabezado o un `Text` de un encabezado, [§5.13](#513-encabezados-y-párrafos)), y una clase de
+`Class` sin su regla `For class`. Un `Element` o un `For class` que no se aplican a ningún elemento no son
 errores: así las reglas se pueden reutilizar.
 
 El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no se aplican a
@@ -475,10 +478,10 @@ Cada elemento determina **cómo coloca a sus hijos**:
 
 | Elemento | Coloca a sus hijos en flujo |
 |---|---|
-| `Document` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed` | En flujo de bloque ([§5.3](#53-flujo-de-bloque)) |
+| `Document` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed`, `Heading 1` … `Heading 6` | En flujo de bloque ([§5.3](#53-flujo-de-bloque)) |
 | `Flex` | En líneas flex ([§5.7](#57-flex)) |
 | `Grid` | En una rejilla ([§5.8](#58-grid)) |
-| `Text` | No tiene hijos: reparte su texto en líneas ([§5.4](#54-texto)) |
+| `Text`, `Paragraph` | No tiene hijos: reparte su texto en líneas ([§5.4](#54-texto)) |
 
 **Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque
 es un bloque apilado; dentro de un `Flex` o un `Grid` (envuelta en `Item` o `Cell`), un ítem.
@@ -944,6 +947,73 @@ se nombra lo de dentro. Los `Relative` se comprueban en su sitio, sin el desplaz
 `Offset`, y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino
 decisiones del autor. Tampoco cuentan los márgenes verticales, que colapsan.
 
+### 5.13 Encabezados y párrafos
+
+Algunos elementos tienen **significado**, además de su layout: `Paragraph` y los encabezados
+`Heading 1` … `Heading 6`. Se maquetan con los algoritmos de siempre; el significado se ve en las
+reglas `Element` ([§4.10](#410-reglas-reutilizables-styles)), en los cortes de página de los
+encabezados y en la salida PDF.
+
+**Sin estilos implícitos.** Un `Heading 1` no es más grande que un `Heading 2` por sí mismo: el
+estilo de cada tipo se declara una vez en `Styles`, igual que el de cualquier otro elemento.
+
+```
+Styles:
+	Element: Heading 1
+		Typography:
+			Size: 20
+			Weight: bold
+		Box:
+			Margin: 0 0 10 0
+	Element: Paragraph
+		Box:
+			Margin: 0 0 6 0
+Heading 1:
+	Id: results
+	Text: Resultados del trimestre
+Paragraph:
+	Content >>
+		Las ventas crecieron un 12 %.
+```
+
+**`Paragraph`** es un `Text` con significado: admite lo mismo (`Id`, `Class`, `Box`,
+`Typography`, `Break` y el texto en el valor o en `Content`) y se maqueta igual. Es **un solo
+párrafo**: una línea en blanco en su `Content` es un error (`PARAGRAPH_BLANK_LINE`); para varios
+párrafos se usan varios `Paragraph`. `Text` sigue existiendo como caja de texto sin significado.
+
+**Encabezados.** Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados
+como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada más. Su
+`Typography` lo heredan sus `Text`.
+
+- **Cortes:** el motor **evita siempre** cortar dentro de un encabezado y después de él, como si
+  declarara `Inside: avoid` y `After: avoid` ([§5.10](#510-fragmentación)): un título no queda
+  solo al final de una página ni se parte. Son `avoid`, así que se relajan como cualquier otro
+  cuando no hay un corte mejor. Por eso un encabezado no admite `Break`, ni sus `Text` tampoco
+  (`BREAK_IN_HEADING`), ni de una regla (`STYLE_NOT_ALLOWED`). El corte antes del encabezado no
+  cambia.
+- **Jerarquía:** los niveles tienen que ser correctos (`HEADING_LEVEL`). En orden del documento,
+  el primer encabezado es `Heading 1`, y cada uno sube como mucho un nivel respecto al anterior:
+  a un `Heading 1` le puede seguir un `Heading 2`, pero no un `Heading 3`. Bajar se puede bajar
+  los niveles que se quiera.
+- **Dónde:** donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de
+  un `Fixed` (`HEADING_IN_FIXED`), que se repite en cada página y no forma parte del contenido.
+
+**Salida PDF.** El PDF va **etiquetado** (*tagged PDF*, para accesibilidad) y lleva
+**marcadores** (*outline*):
+
+- **Árbol de estructura:** un elemento por caja, en orden del documento, que es el orden de
+  lectura: `Document` (la raíz), `H1` … `H6` (los encabezados), `P` (`Paragraph`), `Span`
+  (`Text`) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
+  caja partida entre páginas tiene contenido en varias.
+- ***Artifacts*:** los fondos, los bordes y todo lo que hay dentro de un `Fixed` no forman parte
+  del contenido.
+- **Marcadores:** uno por encabezado, con el texto de sus `Text` unido por espacios, anidados por
+  nivel y que llevan a la esquina superior izquierda de su primer fragmento. El visor los
+  muestra al abrir el documento.
+
+El volcado de resultados ([§7](#7-formato-de-resultados)) no cambia: no incluye el tipo de
+elemento.
+
 ---
 
 ## 6. Validación
@@ -990,7 +1060,11 @@ La validación se hace en cuatro niveles:
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
 | `STYLE_DUPLICATE` | Dos reglas no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute` o un `Fixed` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute`, un `Fixed`, un encabezado o un `Text` de un encabezado | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
+| `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
+| `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
+| `PARAGRAPH_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content` (línea de la línea en blanco) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1061,6 +1135,9 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Kerning y ligaduras | Sí | No |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
+| `h1` … `h6` | Tamaño, peso, márgenes y `break-after: avoid` de la hoja de estilo del navegador; cualquier contenido en línea; los niveles se pueden saltar | Sin estilo implícito (se declara en `Styles`); el motor evita siempre el corte dentro y después; solo contienen `Text`; los saltos de nivel son un error ([§5.13](#513-encabezados-y-párrafos)) |
+| `p` | Varios bloques de texto separados por elementos | `Paragraph`: un `Text` con significado, un solo párrafo |
+| Accesibilidad y marcadores | Los da el navegador al imprimir, según el caso | PDF etiquetado y marcadores de los encabezados, siempre |
 | `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
 | Medio continuo (pantalla) | Sí | No: siempre páginas |
 | `position: fixed` en impresión | Repetido en cada página | Igual: repetido, relativo al área útil |
@@ -1105,7 +1182,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Block` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
 | `Flex` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
-| `Text` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Content` |
+| `Text`, `Paragraph` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Content` |
+| `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Box`, `Typography`; `Text` (al menos uno, varios) |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
@@ -1114,8 +1192,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Widows`, `Orphans` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
-*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute` y `Fixed`; *elementos
-en flujo*, los cinco primeros.
+*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
+`Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows` y `Orphans`, `INTEGER`; las de valores
@@ -1124,8 +1202,10 @@ motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un err
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
 que `Item` y `Cell` tengan exactamente un elemento (el schema solo limita cada tipo a uno), que
-un `Text` tenga su texto en un sitio y solo uno, y que la raíz sea `Document` (en un schema
-cualquier nodo puede ser raíz).
+un `Text` tenga su texto en un sitio y solo uno, que la raíz sea `Document` (en un schema
+cualquier nodo puede ser raíz) y lo que depende de dónde está un elemento: que un `Text` de un
+encabezado no tenga `Break`, y la jerarquía y el sitio de los encabezados
+([§5.13](#513-encabezados-y-párrafos)).
 
 Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de `Box`
 comparten definición, y solo cambia la cardinalidad que fija cada padre. Por eso `Cross axis`,

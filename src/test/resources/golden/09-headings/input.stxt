@@ -1,0 +1,60 @@
+# Hito 12: encabezados y párrafos (ESPECIFICACION.md §5.13). Páginas de 595 × 300 con
+# márgenes de 40: área útil de 515 × 220 desde (40, 40), que acaba en y = 260.
+#
+# El estilo de cada tipo sale de Styles. Líneas de 1.2 × Size: 24 (Heading 1), 16.8
+# (Heading 2), 14.4 (Heading 3) y 12 (Paragraph).
+# h1: dos Text, 48 de alto. Los márgenes entre hermanos colapsan (el mayor).
+# h2b cabría al final de la página 1, pero p2 no: el motor evita el corte después de un
+# encabezado, así que h2b pasa a la página 2 con p2. Su margen superior se trunca en el corte.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 20
+				Weight: bold
+			Box:
+				Margin: 0 0 10 0
+		Element: Heading 2
+			Typography:
+				Size: 14
+				Weight: bold
+			Box:
+				Margin: 6 0 4 0
+		Element: Heading 3
+			Typography:
+				Size: 12
+				Style: italic
+		Element: Paragraph
+			Box:
+				Margin: 0 0 6 0
+	Heading 1:
+		Id: h1
+		Text: Resultados
+		Text: del trimestre
+	Paragraph:
+		Id: p1
+		Content >>
+			Primer párrafo.
+	Heading 2:
+		Id: h2a
+		Text: Ventas
+	Heading 3:
+		Id: h3
+		Text: Detalle
+	Block:
+		Id: fill
+		Box:
+			Height: 80
+			Background: #F1EFE8
+	Heading 2:
+		Id: h2b
+		Text: Costes
+	Paragraph: Segundo párrafo.
+		Id: p2

@@ -34,6 +34,16 @@ public enum ErrorCode {
     /** Texto sin {@code Size} en {@code Typography}, propio o heredado. */
     TEXT_WITHOUT_FONT_SIZE,
 
+    // --- Encabezados y párrafos ----------------------------------------------------------------
+    /** Un salto en la jerarquía de encabezados: el primero no es {@code Heading 1}, o uno sube más de un nivel. */
+    HEADING_LEVEL,
+    /** Un encabezado dentro de un {@code Fixed}. */
+    HEADING_IN_FIXED,
+    /** Un {@code Text} de un encabezado con {@code Break}: el motor ya evita el corte. */
+    BREAK_IN_HEADING,
+    /** Un {@code Paragraph} con líneas en blanco, que lo partirían en varios párrafos. */
+    PARAGRAPH_BLANK_LINE,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,
@@ -41,7 +51,10 @@ public enum ErrorCode {
     STYLE_UNKNOWN_ID,
     /** Dos reglas con el mismo selector. */
     STYLE_DUPLICATE,
-    /** Una regla aplica un grupo que el elemento no admite ({@code Break} en {@code Absolute} o {@code Fixed}). */
+    /**
+     * Una regla aplica un grupo que el elemento no admite: {@code Break} en {@code Absolute},
+     * {@code Fixed}, un encabezado o un {@code Text} de un encabezado.
+     */
     STYLE_NOT_ALLOWED,
     /** Una clase de {@code Class} sin regla {@code For class}. */
     CLASS_WITHOUT_RULE,

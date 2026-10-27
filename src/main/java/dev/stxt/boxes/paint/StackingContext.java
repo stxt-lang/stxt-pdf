@@ -183,9 +183,11 @@ public final class StackingContext {
         FontFace font = s.fontFace();
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        canvas.beginText(p.f().box());
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
             canvas.text(content.x() + l.x(), baseline, l.text(), font, s.fontSize, s.color, l.wordSpacing());
         }
+        canvas.endText();
     }
 }
