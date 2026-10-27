@@ -131,31 +131,69 @@ public final class BreakRules {
                 ? BreakAppeal.VIOLATES_AVOID_BETWEEN : BreakAppeal.PERFECT_BREAK;
     }
 
-    /** Hay un corte forzado entre dos cajas hermanas en flujo. */
-    public static boolean forcedBetween(Box before, Box after) {
-        return forcedAfter(before) || forcedBefore(after);
+    /**
+     * El corte forzado entre dos cajas hermanas en flujo: {@code PAGE}, {@code COLUMN} (solo
+     * dentro de un {@code Multicol}) o {@code AUTO} si no hay ninguno. Si hay de los dos, gana el
+     * de página.
+     */
+    public static Style.Break forcedBetween(Box before, Box after) {
+        return stronger(forcedAfter(before), forcedBefore(after));
     }
 
     /**
-     * {@code Before: page} (de {@code Break}) de la caja o, si es un bloque, de su primer hijo en flujo:
-     * como en CSS, el corte forzado del primer hijo se propaga al padre, porque los dos empiezan
-     * en el mismo punto.
+     * El corte forzado antes de la caja ({@code Before} de {@code Break}) o, si es un bloque, de
+     * su primer hijo en flujo: como en CSS, el corte forzado del primer hijo se propaga al padre,
+     * porque los dos empiezan en el mismo punto. De un {@code Multicol} solo sale el de página:
+     * el de columna se queda en su primera columna.
+     *
+     * @return {@code PAGE}, {@code COLUMN} o {@code AUTO}
      */
-    public static boolean forcedBefore(Box box) {
-        if (box.style.breakBefore == Style.Break.PAGE) {
-            return true;
-        }
-        List<Box> children = box.style.layout == Style.Layout.BLOCK ? box.inFlowChildren() : List.of();
-        return !children.isEmpty() && forcedBefore(children.get(0));
+    public static Style.Break forcedBefore(Box box) {
+        Style.Break own = forced(box.style.breakBefore);
+        List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
+        return children.isEmpty() ? own : stronger(own, fromInside(box, forcedBefore(children.get(0))));
     }
 
-    /** {@code After: page} (de {@code Break}) de la caja o, si es un bloque, de su último hijo en flujo. */
-    public static boolean forcedAfter(Box box) {
-        if (box.style.breakAfter == Style.Break.PAGE) {
-            return true;
+    /** El corte forzado después de la caja o, si es un bloque, de su último hijo en flujo (ver {@link #forcedBefore}). */
+    public static Style.Break forcedAfter(Box box) {
+        Style.Break own = forced(box.style.breakAfter);
+        List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
+        return children.isEmpty() ? own
+                : stronger(own, fromInside(box, forcedAfter(children.get(children.size() - 1))));
+    }
+
+    /** Si hay corte forzado: {@code PAGE} o {@code COLUMN}. */
+    public static boolean isForced(Style.Break forced) {
+        return forced == Style.Break.PAGE || forced == Style.Break.COLUMN;
+    }
+
+    /**
+     * Calidad de un corte forzado: {@link BreakAppeal#FORCED_PAGE} el de página, que debe salir
+     * de las columnas, y {@link BreakAppeal#PERFECT_BREAK} el de columna.
+     */
+    public static int forcedAppeal(Style.Break forced) {
+        return forced == Style.Break.PAGE ? BreakAppeal.FORCED_PAGE : BreakAppeal.PERFECT_BREAK;
+    }
+
+    /** Los cortes forzados de un bloque y de un {@code Multicol} son también los de sus hijos de los extremos. */
+    private static boolean propagates(Box box) {
+        return box.style.layout == Style.Layout.BLOCK || box.style.layout == Style.Layout.MULTICOL;
+    }
+
+    /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Multicol}, solo el de página. */
+    private static Style.Break fromInside(Box box, Style.Break forced) {
+        return box.style.layout == Style.Layout.MULTICOL && forced == Style.Break.COLUMN ? Style.Break.AUTO : forced;
+    }
+
+    private static Style.Break forced(Style.Break b) {
+        return isForced(b) ? b : Style.Break.AUTO;
+    }
+
+    private static Style.Break stronger(Style.Break a, Style.Break b) {
+        if (a == Style.Break.PAGE || b == Style.Break.PAGE) {
+            return Style.Break.PAGE;
         }
-        List<Box> children = box.style.layout == Style.Layout.BLOCK ? box.inFlowChildren() : List.of();
-        return !children.isEmpty() && forcedAfter(children.get(children.size() - 1));
+        return a == Style.Break.COLUMN || b == Style.Break.COLUMN ? Style.Break.COLUMN : Style.Break.AUTO;
     }
 
     /**
@@ -175,9 +213,16 @@ public final class BreakRules {
         return appeal;
     }
 
-    /** Hay un corte forzado entre dos grupos de cajas (ver {@link #between(List, List)}). */
-    public static boolean forcedBetween(List<Box> before, List<Box> after) {
-        return before.stream().anyMatch(BreakRules::forcedAfter) || after.stream().anyMatch(BreakRules::forcedBefore);
+    /** El corte forzado entre dos grupos de cajas (ver {@link #between(List, List)} y {@link #forcedBetween(Box, Box)}). */
+    public static Style.Break forcedBetween(List<Box> before, List<Box> after) {
+        Style.Break forced = Style.Break.AUTO;
+        for (Box b : before) {
+            forced = stronger(forced, forcedAfter(b));
+        }
+        for (Box a : after) {
+            forced = stronger(forced, forcedBefore(a));
+        }
+        return forced;
     }
 
     /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link BreakAppeal#FORCED}. */
@@ -233,8 +278,8 @@ public final class BreakRules {
         for (int i = first; i < n; i++) {
             Unit u = units.get(i);
             if (i > first) {
-                if (u.forcedBefore()) {
-                    return new Cut(i, BreakAppeal.PERFECT_BREAK);
+                if (isForced(u.forcedBefore())) {
+                    return new Cut(i, forcedAppeal(u.forcedBefore()));
                 }
                 if (u.breakableBefore()) {
                     if (overflowing) {

@@ -1741,3 +1741,55 @@ Errors:
 					Block:
 						Box:
 							Height: 50%
+	Case: Contenido que no cabe en las columnas del alto de un Multicol
+		Code: BOX_OVERFLOW
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Box:
+						Height: 50
+					Count: 2
+					Block:
+						Box:
+							Height: 40
+						Break:
+							Inside: avoid
+					Block:
+						Box:
+							Height: 40
+						Break:
+							Inside: avoid
+					Block:
+						Box:
+							Height: 40
+						Break:
+							Inside: avoid
+	Case: Más cortes de columna que columnas fuera de una página
+		Code: BOX_OVERFLOW
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Flex:
+					Item:
+						Multicol:
+							Count: 2
+							Text: A
+							Text: B
+								Break:
+									Before: column
+							Text: C
+								Break:
+									Before: column

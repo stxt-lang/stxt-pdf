@@ -1,0 +1,212 @@
+package dev.stxt.boxes.layout.multicol;
+
+import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.model.Rect;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static dev.stxt.boxes.layout.LayoutFixture.layOut;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)), ESPECIFICACION.md
+ * §5.16. Con {@code Count: 2} y {@code Column gap: 15}, las columnas miden 250 y la segunda
+ * empieza en x = 305.
+ */
+class MulticolLayoutTest {
+
+    static void assertRect(double x, double y, double w, double h, Rect r) {
+        assertEquals(new Rect(x, y, w, h).toString(),
+                new Rect(round(r.x()), round(r.y()), round(r.width()), round(r.height())).toString());
+    }
+
+    private static double round(double v) {
+        return Math.round(v * 100) / 100.0;
+    }
+
+    /** Un {@code Block} hijo del {@code Multicol} con su alto y, si {@code whole}, {@code Inside: avoid}. */
+    static List<String> block(String id, double height, boolean whole, String... more) {
+        List<String> lines = new ArrayList<>(List.of("\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:",
+                "\t\t\t\tHeight: " + height));
+        if (whole) {
+            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tInside: avoid"));
+        }
+        Collections.addAll(lines, more);
+        return lines;
+    }
+
+    /** Un {@code Block} hijo del {@code Multicol} con estas propiedades de {@code Box}. */
+    static List<String> sized(String id, boolean whole, String... box) {
+        List<String> lines = new ArrayList<>(List.of("\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:"));
+        for (String p : box) {
+            lines.add("\t\t\t\t" + p);
+        }
+        if (whole) {
+            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tInside: avoid"));
+        }
+        return lines;
+    }
+
+    /** Un {@code Multicol} con {@code M} de {@code Id}, sus propiedades y sus bloques. */
+    @SafeVarargs
+    static String[] multicol(List<String> properties, List<String>... blocks) {
+        List<String> lines = new ArrayList<>(List.of("\tMulticol:", "\t\tId: M"));
+        properties.forEach(p -> lines.add("\t\t" + p));
+        for (List<String> b : blocks) {
+            lines.addAll(b);
+        }
+        return lines.toArray(String[]::new);
+    }
+
+    private static final List<String> TWO = List.of("Count: 2", "Column gap: 15");
+
+    @Test
+    void balancedByDefault() {
+        LayoutFixture l = layOut(multicol(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false),
+                block("D", 30, false)));
+        assertRect(40, 40, 515, 60, l.rect("M"));
+        assertRect(40, 40, 250, 30, l.rect("A"));
+        assertRect(40, 70, 250, 30, l.rect("B"));
+        assertRect(305, 40, 250, 30, l.rect("C"));
+        assertRect(305, 70, 250, 30, l.rect("D"));
+    }
+
+    @Test
+    void fillAutoFillsInOrder() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto"), block("A", 30, false),
+                block("B", 30, false), block("C", 30, false), block("D", 30, false)));
+        assertRect(40, 40, 515, 120, l.rect("M"));
+        assertRect(40, 130, 250, 30, l.rect("D"));
+    }
+
+    @Test
+    void balanceKeepsWholeTheBoxesThatAvoidBreaks() {
+        LayoutFixture l = layOut(multicol(TWO, block("A", 30, true), block("B", 30, true), block("C", 30, true)));
+        assertRect(40, 40, 515, 60, l.rect("M"));
+        assertRect(40, 70, 250, 30, l.rect("B"));
+        assertRect(305, 40, 250, 30, l.rect("C"));
+    }
+
+    /** Un alto definido se parte como cualquier caja: 90 en dos columnas de 45. */
+    @Test
+    void balanceSlicesTheBoxesThatCanBreak() {
+        LayoutFixture l = layOut(multicol(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false)));
+        assertRect(40, 40, 515, 45, l.rect("M"));
+        // El fragmento de B en la segunda columna: los 15 que no caben en la primera.
+        assertRect(305, 40, 250, 15, l.rect("B"));
+        assertRect(305, 55, 250, 30, l.rect("C"));
+    }
+
+    @Test
+    void columnWidthFitsAsManyColumnsAsPossible() {
+        // Tres columnas de 165 con huecos de 10.
+        LayoutFixture l = layOut(multicol(List.of("Column width: 150", "Column gap: 10"), block("A", 30, true),
+                block("B", 30, true), block("C", 30, true)));
+        assertRect(40, 40, 515, 30, l.rect("M"));
+        assertRect(40, 40, 165, 30, l.rect("A"));
+        assertRect(215, 40, 165, 30, l.rect("B"));
+        assertRect(390, 40, 165, 30, l.rect("C"));
+    }
+
+    @Test
+    void columnBreak() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 3", "Column gap: 10", "Fill: auto"), block("A", 30, false),
+                block("B", 30, false, "\t\t\tBreak:", "\t\t\t\tBefore: column"), block("C", 30, false)));
+        assertRect(40, 40, 515, 60, l.rect("M"));
+        assertRect(40, 40, 165, 30, l.rect("A"));
+        assertRect(215, 40, 165, 30, l.rect("B"));
+        assertRect(215, 70, 165, 30, l.rect("C"));
+    }
+
+    @Test
+    void textIsBalancedBetweenParagraphs() {
+        LayoutFixture l = layOut("\tMulticol:", "\t\tId: M", "\t\tCount: 2", "\t\tColumn gap: 15", "\t\tText:",
+                "\t\t\tId: T", "\t\t\tContent >>", "\t\t\t\tUno", "", "\t\t\t\tDos", "", "\t\t\t\tTres", "",
+                "\t\t\t\tCuatro");
+        assertRect(40, 40, 515, 24, l.rect("M"));
+        // El segundo fragmento del texto, en la segunda columna.
+        assertRect(305, 40, 250, 24, l.rect("T"));
+        assertEquals("Tres", l.fragment("T").lines().get(0).text());
+    }
+
+    @Test
+    void heightIsFilledInOrderWithFillAuto() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:",
+                "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
+                block("D", 30, true)));
+        assertRect(40, 40, 515, 100, l.rect("M"));
+        assertRect(40, 100, 250, 30, l.rect("C"));
+        assertRect(305, 40, 250, 30, l.rect("D"));
+    }
+
+    @Test
+    void heightIsBalanced() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Box:", "\tHeight: 100"),
+                block("A", 30, true), block("B", 30, true), block("C", 30, true), block("D", 30, true)));
+        assertRect(40, 40, 515, 100, l.rect("M"));
+        assertRect(305, 40, 250, 30, l.rect("C"));
+    }
+
+    @Test
+    void borderAndPaddingSurroundTheColumns() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Box:", "\tPadding: 10",
+                "\tBorder: 1"), block("A", 30, true), block("B", 30, true)));
+        // Contenido de 493 de ancho: columnas de 239.
+        assertRect(40, 40, 515, 52, l.rect("M"));
+        assertRect(51, 51, 239, 30, l.rect("A"));
+        assertRect(305, 51, 239, 30, l.rect("B"));
+    }
+
+    @Test
+    void marginsOfTheContentDoNotLeaveTheColumns() {
+        LayoutFixture l = layOut(multicol(TWO, sized("A", true, "Height: 30", "Margin: 10 0")));
+        assertRect(40, 40, 515, 50, l.rect("M"));
+        assertRect(40, 50, 250, 30, l.rect("A"));
+    }
+
+    /** En un ítem de flex no hay página que llenar: se equilibra. El ancho es el max-content: 2 × 50 + 10. */
+    @Test
+    void flexItemIsBalancedAndSizedByItsColumns() {
+        List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tCross axis: start", "\t\tItem:"));
+        for (String line : multicol(List.of("Count: 2", "Column gap: 10", "Fill: auto"),
+                sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
+                block("C", 30, true), block("D", 30, true))) {
+            lines.add("\t\t" + line);
+        }
+        LayoutFixture l = layOut(lines.toArray(String[]::new));
+        assertRect(40, 40, 110, 60, l.rect("M"));
+        assertRect(40, 40, 50, 30, l.rect("A"));
+        assertRect(100, 40, 50, 30, l.rect("C"));
+    }
+
+    /** Tres palabras de 40 caracteres (200 pt): una por línea en una columna de 250. */
+    private static String[] threeLines(String... typography) {
+        List<String> lines = new ArrayList<>(List.of("\tMulticol:", "\t\tId: M", "\t\tCount: 2", "\t\tColumn gap: 15",
+                "\t\tText: " + "a".repeat(40) + " " + "b".repeat(40) + " " + "c".repeat(40), "\t\t\tId: T"));
+        if (typography.length > 0) {
+            lines.add("\t\t\tTypography:");
+            for (String t : typography) {
+                lines.add("\t\t\t\t" + t);
+            }
+        }
+        return lines.toArray(String[]::new);
+    }
+
+    /** Cualquier corte de un párrafo de tres líneas incumple viudas o huérfanas (2): no se equilibra. */
+    @Test
+    void balanceKeepsWidowsAndOrphans() {
+        LayoutFixture l = layOut(threeLines());
+        assertRect(40, 40, 515, 36, l.rect("M"));
+        assertRect(40, 40, 250, 36, l.rect("T"));
+    }
+
+    @Test
+    void balanceSplitsAParagraphThatAllowsIt() {
+        LayoutFixture l = layOut(threeLines("Widows: 1", "Orphans: 1"));
+        assertRect(40, 40, 515, 24, l.rect("M"));
+        assertRect(305, 40, 250, 12, l.rect("T"));
+    }
+}

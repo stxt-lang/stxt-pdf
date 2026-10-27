@@ -616,10 +616,10 @@ Multicol:
 - [x] Resolver C1–C8.
 - [x] Schema, `Element`, `Style`, builder (con el flujo de columnas) y los errores nuevos, con
       sus casos en el catálogo.
-- [ ] `MulticolLayout` sin equilibrado (llenado en orden), en una y en varias páginas.
-- [ ] Equilibrado.
+- [x] `MulticolLayout` sin equilibrado (llenado en orden), en una y en varias páginas.
+- [x] Equilibrado.
 - [ ] Línea entre columnas en el pintado.
-- [ ] Tests de layout y de fragmentación; casos de error.
+- [x] Tests de layout y de fragmentación; casos de error.
 - [ ] Especificación; caso golden con texto en dos columnas a lo largo de dos páginas.
 
 ---

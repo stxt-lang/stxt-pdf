@@ -1,5 +1,8 @@
 package dev.stxt.boxes.fragment;
 
+import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -91,8 +94,8 @@ class BreakRulesTest {
 
     /** Tres unidades de 40 separadas por huecos de 10, con la calidad del corte delante de cada una. */
     private static List<Unit> units(int... appeal) {
-        return List.of(new Unit(0, 40, appeal[0], false), new Unit(50, 90, appeal[1], false),
-                new Unit(100, 140, appeal[2], false));
+        return List.of(new Unit(0, 40, appeal[0], Style.Break.AUTO), new Unit(50, 90, appeal[1], Style.Break.AUTO),
+                new Unit(100, 140, appeal[2], Style.Break.AUTO));
     }
 
     @Test
@@ -109,7 +112,13 @@ class BreakRulesTest {
 
     @Test
     void cutUnitsForced() {
-        List<Unit> units = List.of(new Unit(0, 40, 0, false), new Unit(50, 90, 3, true), new Unit(100, 140, 3, false));
+        List<Unit> units = List.of(new Unit(0, 40, 0, Style.Break.AUTO), new Unit(50, 90, 3, Style.Break.PAGE), new Unit(100, 140, 3, Style.Break.AUTO));
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED_PAGE), BreakRules.cutUnits(units, 0, 1000, false));
+    }
+
+    @Test
+    void cutUnitsForcedColumnIsAPerfectBreak() {
+        List<Unit> units = List.of(new Unit(0, 40, 0, Style.Break.AUTO), new Unit(50, 90, 3, Style.Break.COLUMN));
         assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK), BreakRules.cutUnits(units, 0, 1000, false));
     }
 
@@ -122,7 +131,7 @@ class BreakRulesTest {
 
     @Test
     void cutUnitsOverflowOnlyAtThePageStart() {
-        List<Unit> units = List.of(new Unit(0, 150, 0, false), new Unit(200, 250, 3, false));
+        List<Unit> units = List.of(new Unit(0, 150, 0, Style.Break.AUTO), new Unit(200, 250, 3, Style.Break.AUTO));
         assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED), BreakRules.cutUnits(units, 0, 100, false));
         assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED), BreakRules.cutUnits(units, 0, 100, true));
     }
@@ -132,5 +141,42 @@ class BreakRulesTest {
         // Desde la unidad 1, el espacio se mide desde su principio (50): caben 1 y 2.
         assertEquals(new BreakRules.Cut(3, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(units(0, 3, 3), 1, 100, true));
+    }
+
+    // --- Cortes forzados de página y de columna ----------------------------------------------------
+
+    private static Box box(Element element, Style.Break before, Style.Break after) {
+        Style s = new Style();
+        s.layout = element.layout();
+        s.breakBefore = before;
+        s.breakAfter = after;
+        return new Box(null, element, s, false, 1);
+    }
+
+    @Test
+    void pageBeatsColumn() {
+        Box a = box(Element.BLOCK, Style.Break.AUTO, Style.Break.COLUMN);
+        Box b = box(Element.BLOCK, Style.Break.PAGE, Style.Break.AUTO);
+        assertEquals(Style.Break.PAGE, BreakRules.forcedBetween(a, b));
+        assertEquals(Style.Break.COLUMN, BreakRules.forcedBetween(a, box(Element.BLOCK, Style.Break.AVOID,
+                Style.Break.AUTO)));
+        assertEquals(Style.Break.AUTO, BreakRules.forcedBetween(b, a));
+        assertEquals(BreakAppeal.FORCED_PAGE, BreakRules.forcedAppeal(Style.Break.PAGE));
+        assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.forcedAppeal(Style.Break.COLUMN));
+    }
+
+    /** De un {@code Multicol} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él. */
+    @Test
+    void aMulticolOnlyPropagatesPageBreaks() {
+        Box multicol = box(Element.MULTICOL, Style.Break.AUTO, Style.Break.AUTO);
+        Box flow = box(Element.COLUMNS, Style.Break.AUTO, Style.Break.AUTO);
+        multicol.addChild(flow);
+        Box first = box(Element.BLOCK, Style.Break.COLUMN, Style.Break.AUTO);
+        Box last = box(Element.BLOCK, Style.Break.AUTO, Style.Break.PAGE);
+        flow.addChild(first);
+        flow.addChild(last);
+        assertEquals(Style.Break.COLUMN, BreakRules.forcedBefore(flow));
+        assertEquals(Style.Break.AUTO, BreakRules.forcedBefore(multicol));
+        assertEquals(Style.Break.PAGE, BreakRules.forcedAfter(multicol));
     }
 }

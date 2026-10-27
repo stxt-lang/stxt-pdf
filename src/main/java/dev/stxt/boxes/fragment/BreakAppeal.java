@@ -7,7 +7,13 @@ package dev.stxt.boxes.fragment;
  */
 public final class BreakAppeal {
 
-    /** Corte que no incumple ninguna regla. */
+    /**
+     * Corte forzado de página ({@code Before} o {@code After: page} de {@code Break}): mejor que
+     * cualquier otro, y distinto de un corte perfecto para que un {@code Multicol} no lo tome por
+     * el final de una columna y lo deje pasar hasta la página (§5.16).
+     */
+    public static final int FORCED_PAGE = 4;
+    /** Corte que no incumple ninguna regla; también el forzado de columna. */
     public static final int PERFECT_BREAK = 3;
     /** Incumple viudas o huérfanas. */
     public static final int VIOLATES_WIDOWS = 2;

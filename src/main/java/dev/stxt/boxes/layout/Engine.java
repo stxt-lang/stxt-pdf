@@ -11,6 +11,7 @@ import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.InlineLayout;
 import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
+import dev.stxt.boxes.layout.multicol.MulticolLayout;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.layout.table.TableLayout;
 import dev.stxt.boxes.tree.Box;
@@ -34,6 +35,7 @@ public final class Engine {
     private final FlexLayout flex;
     private final GridLayout grid;
     private final TableLayout table;
+    private final MulticolLayout multicol;
     private final AbsoluteLayout absolute;
 
     /**
@@ -52,6 +54,7 @@ public final class Engine {
         this.flex = new FlexLayout(this);
         this.grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
+        this.multicol = new MulticolLayout(this);
         this.absolute = new AbsoluteLayout(this);
     }
 
@@ -145,7 +148,7 @@ public final class Engine {
             case FLEX -> flex;
             // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
             case GRID -> box.element == Element.TABLE ? table : grid;
-            case MULTICOL -> throw new UnsupportedOperationException("Multicol: hito 15");
+            case MULTICOL -> multicol;
         };
     }
 

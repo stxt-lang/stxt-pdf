@@ -276,7 +276,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             for (int u = 0; u < spans.size(); u++) {
                 Span span = spans.get(u);
                 if (u == 0) {
-                    units.add(new Unit(span.start(), span.end(), 0, false));
+                    units.add(new Unit(span.start(), span.end(), 0, Style.Break.AUTO));
                     continue;
                 }
                 List<Box> before = spans.get(u - 1).boxes();

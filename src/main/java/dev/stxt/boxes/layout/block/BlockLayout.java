@@ -18,6 +18,7 @@ import dev.stxt.boxes.layout.Slice;
 import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,8 +155,9 @@ public final class BlockLayout implements LayoutAlgorithm {
                     continue;
                 }
                 if (fragmenting && progress) {
-                    if (BreakRules.forcedBetween(previous, child)) {
-                        return broken(mark(i, BreakAppeal.PERFECT_BREAK));
+                    Style.Break forced = BreakRules.forcedBetween(previous, child);
+                    if (BreakRules.isForced(forced)) {
+                        return broken(mark(i, BreakRules.forcedAppeal(forced)));
                     }
                     marks.add(mark(i, BreakRules.between(previous, child)));
                 }
@@ -265,10 +267,10 @@ public final class BlockLayout implements LayoutAlgorithm {
             for (int j = start - 1; j >= 0; j--) {
                 Box before = box.children.get(j);
                 if (!before.style.isOutOfFlow()) {
-                    return BreakRules.forcedBetween(before, next);
+                    return BreakRules.isForced(BreakRules.forcedBetween(before, next));
                 }
             }
-            return BreakRules.forcedBefore(next);
+            return BreakRules.isForced(BreakRules.forcedBefore(next));
         }
 
         Mark mark(int index, int appeal) {

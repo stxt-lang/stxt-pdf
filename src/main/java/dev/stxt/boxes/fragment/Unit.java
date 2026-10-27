@@ -1,5 +1,7 @@
 package dev.stxt.boxes.fragment;
 
+import dev.stxt.boxes.tree.Style;
+
 /**
  * Una unidad de la fragmentación de un contenedor (ESPECIFICACION.md §5.10): una línea de un
  * contenedor flex en {@code row}, un ítem de uno en {@code column} o una fila de una rejilla. Se
@@ -10,9 +12,10 @@ package dev.stxt.boxes.fragment;
  * @param appealBefore calidad del corte delante de la unidad ({@link BreakAppeal}); negativa si
  *                     ahí no se puede cortar (un ítem de grid que ocupa esta fila y la anterior).
  *                     La de la primera unidad no se usa
- * @param forcedBefore hay un corte forzado delante de la unidad
+ * @param forcedBefore corte forzado delante de la unidad: {@code PAGE}, {@code COLUMN} o {@code AUTO}
+ *                     si no hay ({@link BreakRules#forcedBetween(java.util.List, java.util.List)})
  */
-public record Unit(double start, double end, int appealBefore, boolean forcedBefore) {
+public record Unit(double start, double end, int appealBefore, Style.Break forcedBefore) {
 
     /** Si se puede cortar delante de la unidad. */
     public boolean breakableBefore() {

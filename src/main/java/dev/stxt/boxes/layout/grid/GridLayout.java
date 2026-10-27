@@ -220,7 +220,7 @@ public final class GridLayout implements LayoutAlgorithm {
     private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
         List<Unit> units = new ArrayList<>();
         for (int r = 0; r < rows.length; r++) {
-            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, false) : rowUnit(g, r, y[r], y[r] + rows[r]));
+            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, Style.Break.AUTO) : rowUnit(g, r, y[r], y[r] + rows[r]));
         }
         return new UnitBreaker.Units(units, extent, true);
     }
@@ -242,7 +242,7 @@ public final class GridLayout implements LayoutAlgorithm {
             }
         }
         if (spanned) {
-            return new Unit(start, end, -1, false);
+            return new Unit(start, end, -1, Style.Break.AUTO);
         }
         return new Unit(start, end, BreakRules.between(before, after), BreakRules.forcedBetween(before, after));
     }
