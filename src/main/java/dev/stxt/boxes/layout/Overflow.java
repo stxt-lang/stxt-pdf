@@ -15,9 +15,10 @@ import dev.stxt.boxes.tree.Style;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Stream;
 
+import static dev.stxt.boxes.layout.Messages.name;
+import static dev.stxt.boxes.layout.Messages.pt;
 import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.boxes.tree.PropertyKey.BORDER;
 import static dev.stxt.boxes.tree.PropertyKey.FONT_SIZE;
@@ -265,15 +266,5 @@ public final class Overflow {
 
     private static double contentHeight(Fragment f) {
         return f.height() - f.border().vertical() - f.padding().vertical();
-    }
-
-    /** {@code (Id main, línea 12)} o {@code de la línea 12}. */
-    private static String name(Box box) {
-        return box.id != null ? box.id + " (línea " + box.line + ")" : "de la línea " + box.line;
-    }
-
-    private static String pt(double v) {
-        String s = String.format(Locale.ROOT, "%.2f", v);
-        return s.replaceAll("\\.?0+$", "");
     }
 }

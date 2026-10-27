@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.stxt.boxes.layout.Messages.name;
+import static dev.stxt.boxes.layout.Messages.pt;
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 
 /**
@@ -93,14 +95,5 @@ public final class TableLayout implements LayoutAlgorithm {
             values[i] -= origin;
         }
         return values;
-    }
-
-    /** {@code t (línea 12)} o {@code de la línea 12}. */
-    private static String name(Box box) {
-        return box.id != null ? box.id + " (línea " + box.line + ")" : "de la línea " + box.line;
-    }
-
-    private static String pt(double v) {
-        return String.valueOf(Math.round(v * 100) / 100.0).replaceAll("\\.0$", "");
     }
 }
