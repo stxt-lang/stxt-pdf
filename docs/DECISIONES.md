@@ -473,3 +473,15 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      que lo causaba. En una caja de ancho `auto` sigue bajando, porque su ancho sale de su
      contenido. *Dónde:* `layout/Overflow.tooWide`. *Alternativa:* comparar siempre con la caja
      del padre inmediato, que en una caja `auto` señala la caja y no lo que la ensancha.
+
+107. **Los desbordamientos verticales señalan la propiedad que fija el alto** (§5.12), no solo
+     `Height`, `Max height` y `Line height`. En `BOX_OVERFLOW`, si la caja no declara `Height`
+     ni `Max height`: su `Aspect ratio` o, en un grid, sus `Rows` (unas filas `auto` crecerían
+     con su contenido). En `PAGE_OVERFLOW`, por este orden: el `Padding` o el `Border` si el
+     relleno y el borde del fragmento ya no caben en la página (antes se señalaba el `Height`,
+     que sí se puede partir); el `Line height` o, sin él, el `Size` de una línea de texto; el
+     `Height`. Para eso `Line height` se hereda con su línea, como las propiedades de la fuente
+     (`Style.LINED_PROPERTIES`). *Dónde:* `layout/Overflow` (`tooTall`, `pageOverflow`),
+     `tree/Style`. *Límite:* una caja cuyo alto impone el padre (un ítem estirado a una fila
+     fija) se señala a sí misma, no el `Rows` del grid; buscarlo exige subir por los padres.
+     *Alternativa:* la línea de la caja, como antes.

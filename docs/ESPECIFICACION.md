@@ -975,10 +975,15 @@ un error con la primera de estas situaciones:
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus
   márgenes horizontales (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo
   declara;
-- **contenido que pasa del alto de su caja**: líneas o hijos que no caben en un `Height` o un
-  `Max height` (`BOX_OVERFLOW`), en la línea de esa propiedad;
+- **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija
+  su `Height`, su `Max height`, su `Aspect ratio` o, en un `Grid`, sus filas de tamaño fijo
+  (`BOX_OVERFLOW`), en la línea de esa propiedad (`Rows` para las filas; si declara varias, la
+  primera de esta lista);
 - **algo del flujo que no cabe en el área útil de una página y no se puede
-  partir** (`PAGE_OVERFLOW`), en la línea de su `Height` o su `Line height` si los declara;
+  partir** (`PAGE_OVERFLOW`), en la línea de lo que impide partirlo: su `Padding` o su
+  `Border` si el relleno y el borde del fragmento ya no caben en la página; si no, su
+  `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no,
+  su `Height`;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página;
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página

@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 /**
  * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
@@ -97,7 +98,7 @@ public final class Overflow {
                 }
                 if (y + c.height() > height + EPSILON) {
                     if (isPage) {
-                        throw pageOverflow(c, cx + x, cy + y, cy + height);
+                        throw pageOverflow(c, cx + x, cy + y, cy + height, height);
                     }
                     throw tooTall(f, y + c.height(), height, c);
                 }
@@ -173,19 +174,30 @@ public final class Overflow {
         }
     }
 
-    /** El contenido de una caja pasa de su alto: el culpable es su {@code Height} (o su máximo). */
+    /**
+     * El contenido de una caja pasa de su alto: el culpable es lo que lo fija, por este orden, su
+     * {@code Height}, su {@code Max height}, su {@code Aspect ratio} o las filas de un grid
+     * ({@code Rows}; si fueran {@code auto}, crecerían con su contenido).
+     */
     private static InvalidModelException tooTall(Fragment container, double needed, double height, Fragment child) {
         Box box = container.box();
         Style s = box.style;
-        String property = s.isDeclared("height") ? "height" : s.isDeclared("max-height") ? "max-height" : null;
+        String property = Stream.of("height", "max-height", "aspect-ratio", "grid.rows")
+                .filter(s::isDeclared).findFirst().orElse(null);
         String what = child == null ? "su texto" : "la caja " + name(child.box());
         return new InvalidModelException(property != null ? s.line(property) : box.line, ErrorCode.BOX_OVERFLOW,
                 "El contenido de la caja " + name(box) + " no cabe en su alto: " + what + " llega a "
                         + pt(needed) + " y la caja deja " + pt(height));
     }
 
-    /** Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior que pasa del final. */
-    private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom) {
+    /**
+     * Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior
+     * que pasa del final, y en él, lo que no se puede partir: su borde y su relleno si ya no caben
+     * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
+     * o su {@code Height}.
+     */
+    private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom,
+                                                      double pageHeight) {
         while (true) {
             double cx = x + c.border().left() + c.padding().left();
             double cy = y + c.border().top() + c.padding().top();
@@ -201,8 +213,15 @@ public final class Overflow {
             }
             if (inner == null) {
                 Style s = c.box().style;
-                int line = s.isDeclared("height") ? s.line("height")
-                        : !c.lines().isEmpty() && s.isDeclared("line-height") ? s.line("line-height") : c.box().line;
+                String property;
+                if (c.border().vertical() + c.padding().vertical() > pageHeight + EPSILON) {
+                    property = c.padding().vertical() >= c.border().vertical() ? "padding" : "border";
+                } else if (!c.lines().isEmpty()) {
+                    property = s.isDeclared("line-height") ? "line-height" : "font-size";
+                } else {
+                    property = "height";
+                }
+                int line = s.isDeclared(property) ? s.line(property) : c.box().line;
                 return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "La caja " + name(c.box())
                         + " no cabe en la página y no se puede partir: mide " + pt(c.height())
                         + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");

@@ -849,9 +849,24 @@ Errors:
 					Block:
 						Box:
 							Height: 80
+	Case: Hija más alta que el Aspect ratio del padre
+		Code: BOX_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Width: 100
+						Aspect ratio: 2
+					Block:
+						Box:
+							Height: 80
 	Case: Hija más alta que la fila del grid
 		Code: BOX_OVERFLOW
-		Line: 5
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
@@ -937,7 +952,7 @@ Errors:
 								Line height: 900
 	Case: Texto más alto que la página sin Line height
 		Code: PAGE_OVERFLOW
-		Line: 8
+		Line: 10
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
@@ -951,7 +966,7 @@ Errors:
 						Size: 900
 	Case: Relleno más alto que la página
 		Code: PAGE_OVERFLOW
-		Line: 5
+		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
@@ -959,7 +974,34 @@ Errors:
 					Height: 842
 				Block:
 					Box:
+						Height: 950
 						Padding: 900 0 0 0
+	Case: Borde más alto que la página
+		Code: PAGE_OVERFLOW
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Border: 900 0 0 0
+	Case: Line height heredado más alto que la página
+		Code: PAGE_OVERFLOW
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Block:
+					Typography:
+						Line height: 900
+					Text: a
 	Case: Regla para algo que no es un elemento de caja
 		Code: STYLE_UNKNOWN_ELEMENT
 		Line: 6

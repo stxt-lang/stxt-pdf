@@ -157,12 +157,17 @@ public final class Style {
     /**
      * Línea del documento de cada propiedad declarada, por su nombre canónico ({@code "height"};
      * las de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.rows"}). Las
-     * de la fuente se heredan con su valor, para señalar dónde se declaró.
+     * de {@link #LINED_PROPERTIES} se heredan con su valor, para señalar dónde se declaró.
      */
     private final Map<String, Integer> lines = new HashMap<>();
 
-    /** Propiedades de la fuente (las de {@code Typography} que la eligen): se heredan con su línea, para señalarla en los errores. */
-    public static final List<String> FONT_PROPERTIES = List.of("font", "font-weight", "font-style", "font-size");
+    /**
+     * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
+     * (las de {@code Typography} que la eligen) y {@code Line height}, que fijan el alto de las
+     * líneas (§5.12).
+     */
+    public static final List<String> LINED_PROPERTIES = List.of("font", "font-weight", "font-style", "font-size",
+            "line-height");
 
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
     public static Style inheriting(Style parent) {
@@ -172,7 +177,7 @@ public final class Style {
             s.font = parent.font;
             s.fontWeight = parent.fontWeight;
             s.fontStyle = parent.fontStyle;
-            for (String p : FONT_PROPERTIES) {
+            for (String p : LINED_PROPERTIES) {
                 if (parent.lines.containsKey(p)) {
                     s.lines.put(p, parent.lines.get(p));
                 }
@@ -192,7 +197,7 @@ public final class Style {
         lines.put(property, line);
     }
 
-    /** Si la propiedad se declaró (en esta caja o, las de la fuente, en una antecesora). */
+    /** Si la propiedad se declaró (en esta caja o, las de {@link #LINED_PROPERTIES}, en una antecesora). */
     public boolean isDeclared(String property) {
         return lines.containsKey(property);
     }

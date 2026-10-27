@@ -263,10 +263,12 @@ Resultado: `Overflow` pasa del 62,7 % al 93,8 % de ramas (100 % de líneas); el 
 ya se prueban por otro lado (lado izquierdo y derecho de la misma comparación, `Absolute` o
 marcador que se salta al bajar). `Placement` sigue pendiente de revisar.
 
-**Abierto:** cuando el alto lo fija algo que no es `Height` ni `Max height` (una fila de grid
-de tamaño fijo, `Aspect ratio`), el culpable de `BOX_OVERFLOW` es la línea de la caja, no la
-de `Rows` o `Aspect ratio`; y un relleno más alto que la página con `Height` declarado señala
-el `Height`, no el `Padding`. Es lo que dice el §5.12; cambiarlo es una regla nueva.
+- [x] **Culpable de los desbordamientos verticales** (decidido con el usuario): `BOX_OVERFLOW`
+      señala también `Aspect ratio` y `Rows`, y `PAGE_OVERFLOW`, el `Padding` o el `Border` que no
+      caben en la página y el `Size` de una línea sin `Line height`; `Line height` se hereda con
+      su línea. Cambian el §5.12 y tres casos; cuatro casos nuevos (`Aspect ratio`, borde,
+      relleno con `Height`, `Line height` heredado). `DECISIONES.md` 107. Queda fuera la caja
+      cuyo alto impone el padre (ítem estirado a una fila fija), que se señala a sí misma.
 
 ## 5. Quitar la geometría mutable de `Box`
 
@@ -493,3 +495,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 4 | `SliceTest`, `BoxModelTest`, `LayoutCacheTest` y `UnitBreakerTest`; JaCoCo (95,1 % de líneas, 86,1 % de ramas); 587 tests en verde | Tarea 5; revisar las ramas de `Overflow` |
 | 2026-10-27 | 5 | `Box` sin geometría; el margen usado va en `Fragment.margin`; sin `BoxModel.applyTo` ni `Fragment.complete`; 588 tests en verde | Revisar las ramas de `Overflow`; tarea 6 o 9 |
 | 2026-10-27 | Ramas de `Overflow` | Dos bugs corregidos (`Relative` en padre partido, culpable horizontal), 16 casos en el catálogo; `Overflow` al 93,8 % de ramas; 606 tests en verde | Tarea 6 o 9; revisar `Placement` |
+| 2026-10-27 | Culpable vertical de `Overflow` | `Aspect ratio`, `Rows`, `Padding`, `Border` y `Size` como culpables (§5.12); `Line height` heredado con su línea; 609 tests en verde | Tarea 6 o 9; revisar `Placement` |
