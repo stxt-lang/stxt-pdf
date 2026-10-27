@@ -41,7 +41,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 15 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 16 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -61,7 +61,7 @@ actualízala.
 | 13 | ~~Listas (`List`, `List item`) con marcador y numeración~~ (hecho; caso 10) | schema, `tree/BoxTreeBuilder`, `tree/ListMarkers`, `layout/block/MarkerLayout`, `paint/PdfStructure` |
 | 14 | ~~Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`) con cabecera y pie repetidos; `Area` en lugar del `Cell` de `Grid`~~ (hecho; caso 11) | schema, `tree/BoxTreeBuilder`, `layout/table/TableLayout`, `layout/UnitBreaker`, `paint/PdfStructure` |
 | 15 | ~~Bloque en columnas (`Multicol`), equilibrado y cortes de columna~~ (hecho; caso 12) | schema, `tree/BoxTreeBuilder`, `layout/multicol/MulticolLayout`, `fragment/BreakRules`, `paint/StackingContext` |
-| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | `model`, `layout/inline`, `paint` |
+| 16 | ~~Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado)~~ (hecho; el caso golden, con el 17) | `model/TextRun`, `layout/inline/LineBreaker`, `fragment/TextLine`, `paint/StackingContext`, `layout/inline/PdfMetrics` |
 | 17 | Elemento `Markdown`, traducido a elementos conocidos | schema, `tree` |
 
 Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
@@ -82,7 +82,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
@@ -257,6 +257,16 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
   `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
   SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.
+- **Tramos (§5.4):** `Box.text` es siempre el texto entero y `Box.runs` (`null` sin formato) lo
+  parte en `TextRun` con un `TextFormat` (negrita, cursiva, subrayado, tachado, que se suman a
+  la fuente de la caja con `TextFormat.face`); usa `Box.runs()`, que da un único tramo si no
+  hay formato. `LineBreaker` reparte palabras que pueden tener partes de varios tramos
+  (`LineBreaker.Word`, `LineBreaker.Line`) y `TextLine.runs` guarda cada tramo colocado, con el
+  espaciado de `justify` incluido. `StackingContext` pinta cada tramo con su fuente y las rayas
+  con `Canvas.decoration(font)` (`post` y `OS/2` en PDF). Un texto sin formato debe medirse y
+  pintarse exactamente igual que una cadena: los PNG golden lo vigilan. El documento aún no
+  puede escribir tramos; los tests los ponen en el árbol con `TextRuns` y
+  `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
 
 ## Convenciones
 

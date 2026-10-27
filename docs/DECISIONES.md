@@ -582,3 +582,51 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      el alto de la columna más alta del fragmento; siempre continua (sin `column-rule-style`).
      *Dónde:* `paint/StackingContext.paintRules`, `tree/ModelValidator.validateMulticol`.
      *Alternativa:* la línea de CSS, con estilos y sin límite de grosor.
+
+## Hito 16: tramos con formato dentro del texto (2026-10-27)
+
+120. **La negrita y la cursiva de un tramo se suman a las de la caja** (R1): un tramo es un
+     conjunto de marcas (`TextFormat`: negrita, cursiva, subrayado, tachado), no un peso y un
+     estilo propios, así que no puede quitar la negrita de un texto en negrita. Es lo que hace
+     Markdown (`**` dentro de un encabezado en negrita sigue en negrita) y deja que `Styles`
+     cambie la fuente de la caja sin tocar los tramos. Familia, tamaño, color y `Line height`
+     son los de la caja: la altura de las líneas no cambia. *Dónde:* `model/TextFormat.face`.
+     *Alternativa:* tramos con `Weight` y `Style` explícitos, como un `<span>` de CSS.
+
+121. **El texto de la caja sigue siendo una cadena** (`Box.text`) y los tramos son una
+     partición suya (`Box.runs`, `null` sin formato): las líneas del documento, los mensajes,
+     los marcadores del PDF y `{page}` siguen trabajando sobre el texto entero. Un texto sin
+     formato es un único tramo y se mide y se pinta igual que antes (los PNG no cambian).
+     *Dónde:* `tree/Box.runs()`. *Alternativa:* guardar solo los tramos y derivar el texto.
+
+122. **El espacio entre dos palabras tiene el formato de su primer espacio en blanco** (R2): un
+     subrayado cubre los espacios de dentro de su tramo pero no el espacio entre dos tramos que
+     no lo llevan. El espacio que se pierde en el salto de línea no se pinta. Con `justify`, el
+     espacio extra va en el tramo de su espacio. *Dónde:* `layout/inline/LineBreaker.paragraphs`
+     y `place`. *Alternativa:* el formato del tramo de la palabra anterior, o el subrayado
+     continuo entre tramos subrayados.
+
+123. **Una palabra con partes de varios tramos es una sola palabra** (R3) y mide la suma de sus
+     partes, sin kerning entre ellas (tampoco se aplica dentro de un tramo). *Dónde:*
+     `LineBreaker.Word`. *Alternativa:* permitir el salto entre dos tramos.
+
+124. **Subrayado y tachado con las métricas del TTF** (R2): `post` (`underlinePosition`,
+     `underlineThickness`) y `OS/2` (`yStrikeoutPosition`, `yStrikeoutSize`), leídas como la
+     parte de arriba de la raya (lo que dice la especificación OpenType); con la variante de cada
+     tramo, así que la raya de la negrita es más gruesa. En SVG, una aproximación cercana a IBM
+     Plex Sans. Se pintan como rectángulos del color del texto, el subrayado antes del texto y
+     el tachado después (el orden de CSS), y como *artifacts* en el PDF etiquetado (R5).
+     *Dónde:* `resources/FontFile.decoration`, `model/DecorationMetrics`,
+     `paint/StackingContext.paintDecorations`. *Alternativa:* el subrayado centrado en la
+     posición (la definición de PostScript), o el atributo `TextDecorationType` en la estructura.
+
+125. **Los tramos no se vuelcan en el §7** (R4) ni tienen elemento propio en el PDF etiquetado
+     (R5): son contenido del mismo `P`, `Span` o `H1`, en el mismo contenido marcado. Se prueban
+     con tests de layout y de pintado. *Dónde:* `output/StxtDump`, `paint/PdfStructure`.
+     *Alternativa:* volcar las líneas con sus tramos; un `Span` por tramo en el PDF.
+
+126. **La variante de cada tramo debe existir** (R6): `FONT_VARIANT_MISSING` con la línea del
+     tramo (la del carácter en que empieza) y el mensaje `(texto con formato bold)`; los
+     caracteres de cada tramo se comprueban en su variante (`GLYPH_MISSING`). *Dónde:*
+     `layout/inline/PdfMetrics.check`. *Alternativa:* un código propio para la variante de un
+     tramo.

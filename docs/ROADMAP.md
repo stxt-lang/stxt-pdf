@@ -33,8 +33,8 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 
 | Hito | Trabajo | Estado | Caso golden |
 |---|---|---|---|
-| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | diseño | 13 |
-| 17 | Elemento `Markdown`, traducido a elementos conocidos | diseño | 14 |
+| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | hecho | — (con el 17) |
+| 17 | Elemento `Markdown`, traducido a elementos conocidos | diseño | 13 |
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -84,54 +84,60 @@ dentro de una misma línea, con las métricas reales de cada variante de la fuen
 **Sintaxis.** Ninguna nueva en el documento (M6): los tramos los crea el hito 17. Hasta
 entonces se prueban construyendo el árbol en los tests.
 
-**Decisiones abiertas** (propuestas):
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] R1. **Qué cambia de un tramo a otro:** solo `Weight`, `Style`, subrayado y tachado.
-      `Font`, `Size`, `Color` y `Line height` son los de la caja, así que la altura de la
-      línea y la línea base no cambian.
-- [ ] R2. **Subrayado y tachado:** con el color del texto; posición y grosor de la fuente
+**Decisiones tomadas** (2026-10-27, todas con la propuesta aceptada; detalle en
+[`DECISIONES.md`](DECISIONES.md), 120–126):
+
+- [x] R1. **Qué cambia de un tramo a otro:** solo la negrita, la cursiva, el subrayado y el
+      tachado, que se suman a la fuente de la caja. `Font`, `Size`, `Color` y `Line height`
+      son los de la caja, así que la altura de la línea y la línea base no cambian.
+- [x] R2. **Subrayado y tachado:** con el color del texto; posición y grosor de la fuente
       (`underlinePosition` y `underlineThickness` de la tabla `post`; `yStrikeoutPosition` y
-      `yStrikeoutSize` de `OS/2`), con la aproximación de siempre en SVG. Como
-      `text-decoration` de CSS, cubren también los espacios de dentro del tramo, pero no el
-      espacio entre dos tramos que no lo llevan.
-- [ ] R3. **Palabras partidas entre tramos** (`**neg**rita`): son una sola palabra para el
+      `yStrikeoutSize` de `OS/2`), con una aproximación en SVG. Como `text-decoration` de CSS,
+      cubren también los espacios de dentro del tramo, pero no el espacio entre dos tramos que
+      no lo llevan.
+- [x] R3. **Palabras partidas entre tramos** (`**neg**rita`): son una sola palabra para el
       reparto en líneas; su ancho es la suma de las partes.
-- [ ] R4. **Volcado (§7):** las líneas no se vuelcan hoy; los tramos tampoco. Se comprueban
-      con tests de layout y con el PNG del caso golden.
-- [ ] R5. **PDF etiquetado:** los tramos son contenido del mismo `P` (o `H1`…, `LBody`,
-      `TD`), sin elemento `Span` propio.
-- [ ] R6. **Errores:** la variante de cada tramo debe existir (`FONT_VARIANT_MISSING`, con la
-      línea del tramo) y tener todos sus caracteres.
+- [x] R4. **Volcado (§7):** ni las líneas ni sus tramos se vuelcan. Se comprueban con tests de
+      layout y de pintado.
+- [x] R5. **PDF etiquetado:** los tramos son contenido del mismo `P` (o `Span`, `H1`…,
+      `LBody`, `TD`), sin elemento propio; las rayas son *artifacts*.
+- [x] R6. **Errores:** la variante de cada tramo debe existir (`FONT_VARIANT_MISSING`, con la
+      línea del tramo) y tener todos sus caracteres (`GLYPH_MISSING`).
 
-**Diseño técnico:**
+**Diseño técnico** (como quedó):
 
-- **Modelo.** El texto de una `Box` pasa de `String` a una lista de tramos (texto, peso,
-  estilo, subrayado y tachado) en `model`. Un texto sin formato es un único tramo con los
-  valores de la caja: el comportamiento de hoy no cambia.
-- **Medida y reparto.** `TextMeasurer.width` se aplica a cada tramo con su `FontFace`.
-  `LineBreaker` trabaja con palabras que pueden tener varias partes (R3); voraz y Knuth-Plass
-  solo necesitan el ancho de cada palabra y de cada espacio. La memoria del reparto de
-  `InlineLayout` sigue sirviendo.
-- **Líneas.** `TextLine` guarda los tramos de la línea con su desplazamiento, además del texto;
-  `justify` reparte el sobrante entre los espacios como hoy. `{page}`/`{pages}` siguen
-  funcionando dentro de un tramo.
-- **Pintado.** `StackingContext` pinta cada tramo con `Canvas.text` y su `FontFace`, y el
-  subrayado y el tachado como rectángulos (R2). En PDF, `justify` sigue usando `TJ`.
-- **Validación.** `PdfMetrics.validate` comprueba la variante y los caracteres de cada tramo
-  (R6).
+- **Modelo.** `model.TextRun` (texto y `TextFormat`) y `model.TextFormat` (cuatro marcas;
+  `face(base)` da la fuente del tramo). `Box.text` sigue siendo el texto entero y `Box.runs`
+  lo parte (`null` sin formato; `Box.runs()` da entonces un único tramo).
+- **Reparto.** `LineBreaker.paragraphs` saca las palabras (`LineBreaker.Word`: sus partes y el
+  formato del espacio que la sigue) y el voraz y Knuth-Plass trabajan sobre ellas; cada línea es
+  un `LineBreaker.Line` con los tramos seguidos del mismo formato unidos. Un texto sin formato
+  hace las mismas mediciones que antes. La memoria del reparto de `InlineLayout` sigue sirviendo.
+- **Líneas.** `TextLine.runs` (`TextLine.Run`: desplazamiento, ancho con el espaciado de
+  `justify`, texto y formato). `InlineLayout.number` sustituye `{page}`/`{pages}` en cada tramo.
+- **Pintado.** `StackingContext.paintText` pinta cada tramo con su fuente y
+  `paintDecorations`, las rayas (`Canvas.decoration`, de `FontFile.decoration` en PDF y
+  `DecorationMetrics.APPROXIMATE` en SVG).
+- **Validación.** `PdfMetrics.check` recorre los tramos con su variante.
+- **Tests.** Hasta el hito 17 no hay sintaxis: `TextRuns` (en los tests) pone los tramos en el
+  árbol construido, y `Engine.layOutDocument(BoxTreeBuilder.Result)` lo maqueta.
 
 **Tareas:**
 
-- [ ] Resolver R1–R6.
-- [ ] Tramos en `model` y en `Box`; los textos de hoy, un único tramo.
-- [ ] `LineBreaker` e `InlineLayout` con palabras de varias partes; `TextLine` con tramos.
-- [ ] Métricas de subrayado y tachado en `PdfMetrics`; pintado en `StackingContext`,
-      `PdfCanvas` y `SvgCanvas`.
-- [ ] Validación de las variantes de cada tramo.
-- [ ] Tests de las piezas puras y de layout (justificado, Knuth-Plass, palabras partidas
-      entre tramos, cortes de página).
-- [ ] Especificación (§5.4, §5.11, §8); caso golden 13 con los cuatro formatos (construido
-      en el test hasta que exista `Markdown`, o junto con el hito 17).
+- [x] Resolver R1–R6.
+- [x] Tramos en `model` y en `Box`; los textos de hoy, un único tramo.
+- [x] `LineBreaker` e `InlineLayout` con palabras de varias partes; `TextLine` con tramos.
+- [x] Métricas de subrayado y tachado en `FontFile`; pintado en `StackingContext` (y
+      `Canvas.decoration` en `PdfCanvas`).
+- [x] Validación de las variantes de cada tramo.
+- [x] Tests de las piezas puras y de layout (justificado, Knuth-Plass, palabras partidas
+      entre tramos, numeración, cortes de página) y de pintado (SVG y PDF).
+- [x] Especificación (§5.4, §5.11, §6, §7, §8 y glosario); PDF revisado a ojo
+      (`PdfCanvasTest.runsUseTheirFontsAndDecorationsAreArtifacts`, `target/pdf/runs.pdf`).
+
+**Caso golden:** pasa al hito 17, porque `input.stxt` necesita la sintaxis de `Markdown`.
 
 ---
 
@@ -243,8 +249,9 @@ Markdown:
 - [ ] `MarkdownBuilder`: bloques (encabezados, párrafos, listas anidadas, tablas) y tramos.
 - [ ] `MARKDOWN_UNSUPPORTED` y los errores de K6, con sus casos en el catálogo.
 - [ ] Tests de la traducción (Markdown → nodos) y de layout.
-- [ ] Especificación (§2, §4, §5 nueva, §6, §8, §9); caso golden 14 con un documento
-      completo en Markdown.
+- [ ] Especificación (§2, §4, §5 nueva, §6, §8, §9); caso golden 13 con un documento
+      completo en Markdown, con los cuatro formatos dentro de la línea (también es el caso del
+      hito 16).
 
 ---
 
@@ -253,6 +260,14 @@ Markdown:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (2).** Hito 16 terminado. Aceptadas R1–R6. Tramos en `model` (`TextRun`,
+  `TextFormat`, `DecorationMetrics`) y en `Box`; `LineBreaker` con palabras de varias partes;
+  `TextLine` con tramos; pintado de cada tramo, subrayado y tachado con las métricas de
+  `post` y `OS/2`; validación por tramo. Un texto sin formato se maqueta igual que antes (los
+  PNG golden no cambian). Especificación, `DECISIONES.md` (120–126), README y `CLAUDE.md`.
+  `mvn test` en verde (710 tests). El caso golden pasa al hito 17.
+  *Siguiente paso:* hito 17, resolver K1–K6 y empezar por la dependencia de commonmark-java y
+  el schema de `Markdown`.
 - **2026-10-27.** Se borran las hojas de ruta terminadas y se crea esta. Aceptado el enfoque en
   dos hitos (tramos y `Markdown`) y las decisiones T4, M1–M6, el parser (commonmark-java) y
   el subconjunto cerrado. `mvn test` en verde (692 tests).

@@ -622,6 +622,23 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   largo en una sola línea.
 - **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
   página y el total de páginas. Ver [§5.10](#510-fragmentación).
+- **Tramos.** El texto puede tener partes con formato dentro de una misma línea: **negrita**,
+  *cursiva*, subrayado y tachado, combinables. Cada tramo mide y se pinta con su variante de la
+  fuente; la negrita y la cursiva se suman a las de la caja (una palabra en negrita de un texto
+  ya en negrita sigue en negrita). La familia, el tamaño, el color y `Line height` son los de la
+  caja, así que la altura de las líneas y su línea base no cambian. Una palabra con partes de
+  varios tramos (**neg**rita) es una sola palabra para el reparto, y mide lo que suman sus
+  partes; el espacio entre dos palabras tiene el formato del tramo en que está su primer espacio
+  en blanco. Con `justify`, el espacio extra de cada espacio pertenece a su tramo. Un texto sin
+  formato es un único tramo. Un `Text` no tiene sintaxis para escribirlos: los genera el
+  elemento `Markdown` (pendiente, hito 17).
+- **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
+  espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
+  los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
+  para el subrayado y `yStrikeoutPosition` y `yStrikeoutSize` de la tabla `OS/2` para el
+  tachado, medidos desde la línea base hasta la parte de arriba de la raya. El subrayado se
+  pinta antes que el texto y el tachado después. En el PDF etiquetado, los tramos son contenido
+  de su elemento (`P`, `Span`, `H1`…) sin elemento propio, y las rayas son *artifacts*.
 
 ### 5.5 Posicionamiento
 
@@ -993,8 +1010,11 @@ glifos.
 **Comprobaciones.** Con las métricas reales, antes de maquetar se comprueba que cada caja con
 texto tiene su fuente (familia, peso y estilo) en `fonts/` y que la fuente tiene todos los
 caracteres de su texto (los espacios en blanco se pintan como espacios; `{page}` y `{pages}`,
-como cifras). Una fuente desconocida, una variante que falta o un carácter que la fuente no
-tiene son errores con la línea de la caja ([§6](#6-validación)). También son errores, sin línea
+como cifras). Un texto con tramos ([§5.4](#54-texto)) necesita además la variante de cada
+tramo (`Weight: normal` con un tramo en negrita necesita la negrita), y cada tramo, sus
+caracteres en ella. Una fuente desconocida, una variante que falta o un carácter que la fuente
+no tiene son errores con la línea de la caja, o la del tramo si es la variante de un tramo
+([§6](#6-validación)). También son errores, sin línea
 porque no son del documento, que no exista `fonts/`, un fichero que no se puede leer, una fuente
 variable o dos ficheros con la misma familia, peso y estilo.
 
@@ -1405,7 +1425,7 @@ La validación se hace en cuatro niveles:
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella (§5.8) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
-| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
+| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
@@ -1442,7 +1462,8 @@ Un `Absolute` se anida dentro de su containing block, detrás de sus hijos en fl
 de su padre. Las columnas de un `Multicol` no tienen fragmento: sus hijos se anidan dentro del
 `Multicol`, y una caja partida entre dos columnas sale dos veces en la misma página
 ([§5.16](#516-bloques-en-columnas)).
-Las cajas sin `Id` pueden incluirse para depurar.
+Las cajas sin `Id` pueden incluirse para depurar. Las líneas de texto y sus tramos no se
+vuelcan.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`
 (el volcado esperado). Los números de `Rect` se comparan con una tolerancia de 0.01 pt.
@@ -1468,6 +1489,8 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
 | `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Weight: normal` o `bold` y `Style: normal` o `italic`, sin síntesis: el fichero debe existir |
 | Kerning y ligaduras | Sí | No |
+| Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color ([§5.4](#54-texto)) |
+| `text-decoration` | Estilos (`wavy`, `dotted`…), color, grosor y desplazamiento propios; el subrayado se interrumpe en los descendentes (`text-decoration-skip-ink`) | Una raya continua del color del texto, con la posición y el grosor de la fuente |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
 | `h1` … `h6` | Tamaño, peso, márgenes y `break-after: avoid` de la hoja de estilo del navegador; cualquier contenido en línea; los niveles se pueden saltar | Sin estilo implícito (se declara en `Styles`); el motor evita siempre el corte dentro y después; solo contienen `Text`; los saltos de nivel son un error ([§5.13](#513-encabezados-y-párrafos)) |
@@ -1722,4 +1745,5 @@ Document (dev.stxt.boxes):
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
+| **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado) ([§5.4](#54-texto)). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |
