@@ -77,7 +77,8 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 15 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 15 están
+terminados; los 16 y 17 (Markdown) están en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Pieza | Estado |
 |---|---|
@@ -139,6 +140,11 @@ en `target/pdf/`.
 14. ~~**Tablas.** `Table` con `Head`, `Body` y `Foot`, filas `Row` y celdas `Cell` con `Span`, maquetada como un grid; cabecera y pie repetidos en cada página (caso 11). El `Cell` de `Grid` pasa a llamarse `Area`.~~ Hecho.
 
 15. ~~**Columnas.** `Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`; las columnas son fragmentainers dentro de la página, equilibradas al final, y `Before`/`After: column` (caso 12).~~ Hecho.
+16. **Tramos.** Negrita, cursiva, subrayado y tachado dentro de una misma línea, con las métricas de cada variante de la fuente (caso 13).
+17. **Markdown.** Elemento `Markdown` con un subconjunto cerrado (formato dentro de la línea, encabezados, listas y tablas) que se traduce a los elementos que ya existen (caso 14).
+
+El plan, las decisiones y el registro de sesiones de los hitos 16 y 17 están en
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
 

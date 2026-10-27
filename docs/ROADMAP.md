@@ -1,0 +1,259 @@
+# Hoja de ruta: Markdown
+
+Plan de trabajo para escribir el contenido de un documento en Markdown: un subconjunto cerrado
+(negrita, cursiva, subrayado, tachado, encabezados, listas y tablas) que se traduce a los
+elementos que el motor ya conoce. Es el punto de partida de cada sesión: el estado, las
+decisiones tomadas y lo que queda por hacer están aquí, no en la memoria de la conversación.
+
+Los hitos 1 a 15 están terminados; ver la tabla de estado del [README](../README.md). Las
+hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el historial de git
+(commit `1b808ac`). Esta hoja de ruta continúa la numeración.
+
+## Cómo usar este documento
+
+**Al empezar una sesión:**
+
+1. Lee el [estado](#estado) y el [registro de sesiones](#registro-de-sesiones) para saber
+   dónde se quedó el trabajo.
+2. Abre el hito en curso: sus **decisiones abiertas** se resuelven con el usuario antes de
+   escribir código; sus **tareas** dicen qué falta.
+3. Ejecuta `mvn test` para comprobar que se parte de un estado verde.
+
+**Al terminar una sesión (o un bloque de trabajo):**
+
+1. Marca las tareas hechas (`[x]`) y actualiza la columna de estado del hito.
+2. Mueve las decisiones resueltas de "abiertas" a "tomadas", con la respuesta. Las que sean
+   interpretaciones de la especificación van además a [`DECISIONES.md`](DECISIONES.md).
+3. Añade una entrada al [registro de sesiones](#registro-de-sesiones): fecha, qué se hizo, en
+   qué se quedó y cuál es el siguiente paso concreto.
+
+**Estados:** `pendiente` · `diseño` (resolviendo decisiones) · `en curso` · `hecho`.
+
+## Estado
+
+| Hito | Trabajo | Estado | Caso golden |
+|---|---|---|---|
+| 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | diseño | 13 |
+| 17 | Elemento `Markdown`, traducido a elementos conocidos | diseño | 14 |
+
+**Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
+línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
+lo que genera ya se maqueta, se valida y se etiqueta.
+
+## Criterios comunes (definición de hecho)
+
+Cada hito está terminado cuando, además de sus tareas propias, cumple lo de "Al cambiar el
+comportamiento" de [`CLAUDE.md`](../CLAUDE.md):
+
+- [ ] Schema [`dev.stxt.boxes.stxt`](../src/main/resources/stxt/dev.stxt.boxes.stxt): elementos y
+      propiedades nuevos. **Cada nombre tiene una única definición en todo el namespace**: un
+      nombre que ya existe solo se reutiliza si significa lo mismo y admite los mismos valores.
+- [ ] Especificación: §2 (tabla de elementos), §4 (referencia de propiedades), §5 (semántica),
+      §6 (reglas de validación nuevas), §7 (volcado), §8 (diferencias con CSS/HTML), §9
+      (resumen del schema) y, si aplica, §10 (ejemplo).
+- [ ] `Style`, el builder (lectura y validación del §6) y, si hay layout nuevo, su algoritmo.
+- [ ] Cada regla de validación nueva: su `ErrorCode`, su fila en el §6 y su caso en
+      [`errors.stxt`](../src/test/resources/errors/errors.stxt).
+- [ ] Tests unitarios de las piezas puras y tests de layout con `LayoutFixture`, incluidos los
+      de fragmentación si el hito toca el corte.
+- [ ] Un caso golden nuevo en `src/test/resources/golden/NN-nombre/`, con el resultado
+      calculado a mano.
+- [ ] `DocumentReaderTest` valida los documentos nuevos.
+- [ ] Salida SVG y PDF revisada a ojo (PNG del caso golden).
+- [ ] README (tabla de estado y hoja de ruta), `CLAUDE.md` (tabla de hitos) y este documento
+      actualizados; decisiones apuntadas en `DECISIONES.md`.
+
+## Decisiones transversales
+
+**Tomadas** (2026-10-27, todas con la propuesta aceptada):
+
+- [x] **T4. Texto con formato dentro de una línea** (abierta en la hoja de ruta anterior). Se
+      hace en el hito 16, como tramos (*runs*) dentro del texto de una caja.
+- [x] **M6. Sintaxis de los tramos.** El formato dentro de una línea solo se escribe en
+      `Markdown`: `Text` y `Paragraph` siguen siendo literales (no hay que escapar los
+      asteriscos de los documentos que ya existen). El modelo de tramos es general, por si más
+      adelante se quiere una sintaxis STXT propia.
+
+---
+
+## Hito 16: tramos con formato dentro del texto
+
+**Objetivo.** Que el texto de una caja pueda mezclar negrita, cursiva, subrayado y tachado
+dentro de una misma línea, con las métricas reales de cada variante de la fuente.
+
+**Sintaxis.** Ninguna nueva en el documento (M6): los tramos los crea el hito 17. Hasta
+entonces se prueban construyendo el árbol en los tests.
+
+**Decisiones abiertas** (propuestas):
+
+- [ ] R1. **Qué cambia de un tramo a otro:** solo `Weight`, `Style`, subrayado y tachado.
+      `Font`, `Size`, `Color` y `Line height` son los de la caja, así que la altura de la
+      línea y la línea base no cambian.
+- [ ] R2. **Subrayado y tachado:** con el color del texto; posición y grosor de la fuente
+      (`underlinePosition` y `underlineThickness` de la tabla `post`; `yStrikeoutPosition` y
+      `yStrikeoutSize` de `OS/2`), con la aproximación de siempre en SVG. Como
+      `text-decoration` de CSS, cubren también los espacios de dentro del tramo, pero no el
+      espacio entre dos tramos que no lo llevan.
+- [ ] R3. **Palabras partidas entre tramos** (`**neg**rita`): son una sola palabra para el
+      reparto en líneas; su ancho es la suma de las partes.
+- [ ] R4. **Volcado (§7):** las líneas no se vuelcan hoy; los tramos tampoco. Se comprueban
+      con tests de layout y con el PNG del caso golden.
+- [ ] R5. **PDF etiquetado:** los tramos son contenido del mismo `P` (o `H1`…, `LBody`,
+      `TD`), sin elemento `Span` propio.
+- [ ] R6. **Errores:** la variante de cada tramo debe existir (`FONT_VARIANT_MISSING`, con la
+      línea del tramo) y tener todos sus caracteres.
+
+**Diseño técnico:**
+
+- **Modelo.** El texto de una `Box` pasa de `String` a una lista de tramos (texto, peso,
+  estilo, subrayado y tachado) en `model`. Un texto sin formato es un único tramo con los
+  valores de la caja: el comportamiento de hoy no cambia.
+- **Medida y reparto.** `TextMeasurer.width` se aplica a cada tramo con su `FontFace`.
+  `LineBreaker` trabaja con palabras que pueden tener varias partes (R3); voraz y Knuth-Plass
+  solo necesitan el ancho de cada palabra y de cada espacio. La memoria del reparto de
+  `InlineLayout` sigue sirviendo.
+- **Líneas.** `TextLine` guarda los tramos de la línea con su desplazamiento, además del texto;
+  `justify` reparte el sobrante entre los espacios como hoy. `{page}`/`{pages}` siguen
+  funcionando dentro de un tramo.
+- **Pintado.** `StackingContext` pinta cada tramo con `Canvas.text` y su `FontFace`, y el
+  subrayado y el tachado como rectángulos (R2). En PDF, `justify` sigue usando `TJ`.
+- **Validación.** `PdfMetrics.validate` comprueba la variante y los caracteres de cada tramo
+  (R6).
+
+**Tareas:**
+
+- [ ] Resolver R1–R6.
+- [ ] Tramos en `model` y en `Box`; los textos de hoy, un único tramo.
+- [ ] `LineBreaker` e `InlineLayout` con palabras de varias partes; `TextLine` con tramos.
+- [ ] Métricas de subrayado y tachado en `PdfMetrics`; pintado en `StackingContext`,
+      `PdfCanvas` y `SvgCanvas`.
+- [ ] Validación de las variantes de cada tramo.
+- [ ] Tests de las piezas puras y de layout (justificado, Knuth-Plass, palabras partidas
+      entre tramos, cortes de página).
+- [ ] Especificación (§5.4, §5.11, §8); caso golden 13 con los cuatro formatos (construido
+      en el test hasta que exista `Markdown`, o junto con el hito 17).
+
+---
+
+## Hito 17: elemento `Markdown`
+
+**Objetivo.** Escribir el contenido en Markdown y que se traduzca, al construir el árbol, a
+los elementos que ya existen. Nada nuevo en el layout: lo generado pasa por el schema,
+`Styles`, la validación del §6, el PDF etiquetado y los marcadores como si lo hubiera escrito
+el autor.
+
+**Sintaxis.** Como `Text`: las propiedades en el elemento y el contenido en un bloque
+`Content >>` (un nodo `>>` no admite hijos).
+
+```
+Markdown:
+	Class: informe
+	Bullet: disc circle square
+	Numbering: decimal
+	Table columns: equal
+	Content >>
+		# Resultados
+		Texto con **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~.
+
+		- uno
+		- dos
+		  1. dos punto uno
+
+		| Mes | Total |
+		|-----|------:|
+		| Ene |   120 |
+```
+
+**Traducción:**
+
+| Markdown | Elemento |
+|---|---|
+| `#` … `######` | `Heading 1` … `Heading 6` (un `Text` hijo) |
+| Párrafo | `Paragraph` |
+| `-`, `*`, `+` | `List` con el `Marker` de `Bullet` para su nivel, y un `List item` por ítem |
+| `1.`, `1)` | `List` con el `Marker` de `Numbering` y `Start` = el primer número |
+| Tabla GFM | `Table` con `Columns` de `Table columns`; la fila de cabecera en `Head`, el resto en `Body` |
+| `**x**`, `__x__` | tramo en negrita |
+| `*x*`, `_x_` | tramo en cursiva |
+| `++x++` | tramo subrayado |
+| `~~x~~` | tramo tachado |
+
+**Decisiones tomadas** (2026-10-27, todas con la propuesta aceptada):
+
+- [x] M1. **Subrayado con `++x++`**, la sintaxis de markdown-it y de la extensión `ins` de
+      commonmark-java. `__x__` es negrita en CommonMark y `<u>` sería HTML.
+- [x] M2. **Marcadores en propiedades de `Markdown`:** `List` exige `Marker` y `Styles` no
+      puede fijarlo (es propiedad del elemento, no de un grupo). `Bullet` es una lista de
+      marcadores, uno por nivel de anidamiento (el último se repite en los niveles más
+      profundos), y `Numbering`, igual para las listas numeradas. `Start` sale del primer
+      número de la lista.
+- [x] M3. **Columnas de las tablas en `Table columns`:** `equal` (`repeat(n, 1fr)`) o `auto`
+      (`repeat(n, auto)`). La alineación de la fila de separación (`:--`, `:-:`, `--:`) es el
+      `Align` de las celdas de esa columna.
+- [x] M4. **`#` es siempre `Heading 1`**, con la validación de jerarquía de siempre. Si hace
+      falta meter Markdown debajo de un encabezado del documento, se añadirá un
+      `Heading offset`.
+- [x] M5. **Estilo:** lo generado no lleva `Id` ni `Class`; se estila con las reglas `Element`
+      de `Styles` (T1). `Markdown` es un bloque con `Id`, `Class`, `Box`, `Typography` y
+      `Break`, y lo que contiene hereda de él.
+- [x] **Parser: commonmark-java** (`org.commonmark:commonmark`, con las extensiones de tablas
+      GFM, tachado e `ins`) en lugar de uno propio: las reglas de énfasis de CommonMark son
+      difíciles de reproducir, da la línea de cada nodo (*source spans*) y no tiene
+      dependencias.
+- [x] **Subconjunto cerrado:** se aceptan solo los nodos de la tabla de traducción. Enlaces,
+      imágenes, código, citas, HTML, líneas horizontales y saltos de línea forzados son un
+      error (`MARKDOWN_UNSUPPORTED`) con su línea.
+
+**Decisiones abiertas** (propuestas):
+
+- [ ] K1. **Dónde se admite `Markdown`:** donde va un elemento de flujo (como `List`): en
+      `Document`, `Block`, los envoltorios, `List item`, `Cell` y `Multicol`. Dentro de un
+      `Fixed`, solo sin encabezados (los encabezados en `Fixed` ya son un error).
+- [ ] K2. **Ítems de lista:** cada párrafo de un ítem es un `Paragraph`; una lista anidada,
+      una `List` dentro del `List item`. Listas compactas y separadas (*tight* y *loose*) se
+      traducen igual: el espaciado lo dan las reglas de `Styles`.
+- [ ] K3. **Celdas:** una celda con texto es un `Cell` con valor y tramos; una celda vacía,
+      un `Cell` vacío.
+- [ ] K4. **Saltos de línea simples** dentro de un párrafo equivalen a un espacio, como en
+      `Text` (§5.4).
+- [ ] K5. **Líneas de los errores:** las de lo generado son la línea del documento donde
+      empieza el nodo de Markdown (la del `Content >>` más el desplazamiento).
+- [ ] K6. **Propiedades obligatorias:** `Bullet`, `Numbering` y `Table columns` solo son
+      obligatorias si el contenido tiene listas de ese tipo o tablas; si faltan, error con la
+      línea del primer nodo que las necesita.
+
+**Diseño técnico:**
+
+- **Traducción a nodos STXT.** Una pieza nueva en `tree` (`MarkdownBuilder`) recorre el árbol
+  de commonmark-java y crea `InlineNode` de `stxt-core` con su línea (`Heading 1`, `Text`,
+  `Paragraph`, `List`, `List item`, `Table`, `Head`, `Body`, `Row`, `Cell`). Los nodos
+  generados sustituyen al `Markdown` antes de la validación del builder, así que el schema,
+  `Styles` y `ModelValidator` los tratan como cualquier otro.
+- **Tramos.** El formato dentro de una línea no cabe en un nodo STXT: el `MarkdownBuilder`
+  guarda aparte los tramos de cada `Text`, `Paragraph` y `Cell` generado, y el builder los
+  pone en la `Box` (hito 16).
+- **Encabezados y marcadores del PDF:** salen solos, porque los encabezados generados son
+  `Heading N`.
+
+**Tareas:**
+
+- [ ] Resolver K1–K6.
+- [ ] Dependencia de commonmark-java y sus extensiones en `pom.xml`.
+- [ ] Schema (`Markdown`, `Bullet`, `Numbering`, `Table columns`) y `Element`.
+- [ ] `MarkdownBuilder`: bloques (encabezados, párrafos, listas anidadas, tablas) y tramos.
+- [ ] `MARKDOWN_UNSUPPORTED` y los errores de K6, con sus casos en el catálogo.
+- [ ] Tests de la traducción (Markdown → nodos) y de layout.
+- [ ] Especificación (§2, §4, §5 nueva, §6, §8, §9); caso golden 14 con un documento
+      completo en Markdown.
+
+---
+
+## Registro de sesiones
+
+Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
+siguiente paso concreto.
+
+- **2026-10-27.** Se borran las hojas de ruta terminadas y se crea esta. Aceptado el enfoque en
+  dos hitos (tramos y `Markdown`) y las decisiones T4, M1–M6, el parser (commonmark-java) y
+  el subconjunto cerrado. `mvn test` en verde (692 tests).
+  *Siguiente paso:* hito 16, resolver R1–R6 y empezar por el modelo de tramos.
