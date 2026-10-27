@@ -17,6 +17,10 @@ import java.util.List;
  *   <li>Si un ítem no cabe en las filas existentes, se crean filas implícitas.</li>
  * </ol>
  *
+ * <p>Un ítem con la fila fija y la columna automática va a la primera columna libre de esa fila,
+ * sin mover el cursor; si no queda ninguna, es un error ({@link NoRoom}): la fila no crece. Con
+ * la columna fija y la fila automática, va a la primera fila libre desde el cursor.</p>
+ *
  * <p>{@code Flow: column} es el mismo algoritmo con los ejes intercambiados: se trasponen la
  * rejilla y las celdas, se coloca por filas y se deshace la trasposición.</p>
  */
@@ -26,11 +30,35 @@ public final class Placement {
     }
 
     /**
+     * Un ítem con la fila fija (la columna, con {@code Flow: column}) no cabe en ella.
+     *
+     * @param item   índice del ítem
+     * @param track  la fila (o la columna) que pide
+     * @param span   columnas (o filas) que ocupa
+     * @param tracks columnas (o filas) de la rejilla
+     */
+    public static final class NoRoom extends RuntimeException {
+        public final int item;
+        public final int track;
+        public final int span;
+        public final int tracks;
+
+        NoRoom(int item, int track, int span, int tracks) {
+            super("El ítem " + item + " no cabe en la pista " + track);
+            this.item = item;
+            this.track = track;
+            this.span = span;
+            this.tracks = tracks;
+        }
+    }
+
+    /**
      * @param cells   celdas pedidas, en orden del árbol
      * @param columns columnas de la rejilla explícita
      * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: column})
      * @param flow    dirección de la colocación automática
      * @return el área asignada a cada ítem, en el mismo orden
+     * @throws NoRoom si un ítem con la fila fija (la columna, en {@code column}) no cabe en ella
      */
     public static List<Area> place(List<Cell> cells, int columns, int rows, Style.Direction flow) {
         if (flow == Style.Direction.ROW) {
@@ -48,6 +76,7 @@ public final class Placement {
      * @param cells   celdas pedidas, en orden del árbol
      * @param columns columnas de la rejilla explícita
      * @return el área asignada a cada ítem, en el mismo orden
+     * @throws NoRoom si un ítem con la fila fija no cabe en ella
      */
     public static List<Area> place(List<Cell> cells, int columns) {
         int cols = Math.max(1, columns);
@@ -76,8 +105,11 @@ public final class Placement {
             if (c.row() != null) {
                 // Fila fija: primera columna libre de esa fila.
                 int col = 1;
-                while (!occupancy.isFree(c.row(), col, c.rows(), c.columns())) {
+                while (col + c.columns() - 1 <= cols && !occupancy.isFree(c.row(), col, c.rows(), c.columns())) {
                     col++;
+                }
+                if (col + c.columns() - 1 > cols) {
+                    throw new NoRoom(i, c.row(), c.columns(), cols);
                 }
                 result[i] = new Area(c.row(), col, c.rows(), c.columns());
             } else if (c.column() != null) {
@@ -116,7 +148,10 @@ public final class Placement {
         return List.of(result);
     }
 
-    /** Matriz de ocupación con filas que crecen bajo demanda. */
+    /**
+     * Matriz de ocupación con filas que crecen bajo demanda. Las áreas que recibe caben siempre en
+     * sus columnas: {@code place} las cuenta todas antes de empezar y no deja pasar de ellas.
+     */
     private static final class Occupancy {
         private final int columns;
         private final List<boolean[]> rows = new ArrayList<>();
@@ -126,9 +161,6 @@ public final class Placement {
         }
 
         boolean isFree(int row, int col, int nRows, int nCols) {
-            if (col + nCols - 1 > columns) {
-                return false;
-            }
             for (int r = row; r < row + nRows; r++) {
                 if (r - 1 >= rows.size()) {
                     continue;
@@ -149,9 +181,7 @@ public final class Placement {
             }
             for (int r = a.row(); r <= a.rowEnd(); r++) {
                 for (int c = a.column(); c <= a.columnEnd(); c++) {
-                    if (c - 1 < columns) {
-                        rows.get(r - 1)[c - 1] = true;
-                    }
+                    rows.get(r - 1)[c - 1] = true;
                 }
             }
         }

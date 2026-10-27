@@ -261,7 +261,25 @@ dos escondían errores:
 Resultado: `Overflow` pasa del 62,7 % al 93,8 % de ramas (100 % de líneas); el total, a
 95,6 % de líneas y 87,5 % de ramas. Las 7 ramas que quedan son combinaciones de condiciones que
 ya se prueban por otro lado (lado izquierdo y derecho de la misma comparación, `Absolute` o
-marcador que se salta al bajar). `Placement` sigue pendiente de revisar.
+marcador que se salta al bajar). `Placement`, más abajo.
+
+**Revisión de las ramas de `Placement`** (2026-10-27). Lo que no se ejecutaba eran los ítems con
+solo la fila o solo la columna fija (`Area: 2 auto`, `Area: auto 2`), que no tenía ningún test
+ni ningún caso golden; y dos comprobaciones de límite de `Occupancy`, código muerto:
+
+- [x] **Bug:** un ítem con la fila fija en una fila sin hueco (`Area: 1 auto` con las dos
+      columnas de la fila 1 ocupadas) buscaba columna sin límite: tras dos mil millones de
+      vueltas, `ArrayIndexOutOfBoundsException`. Ahora es `GRID_PLACEMENT` con la línea del
+      `Area` (decidido con el usuario; CSS crearía columnas implícitas). Con `Flow: column`, lo
+      mismo con la columna fija. `Placement.NoRoom` y `GridLayout.noRoom`; dos casos en el
+      catálogo; §5.8, §6 y `DECISIONES.md` 109, que apunta también la diferencia con CSS en el
+      orden de estos ítems.
+- [x] Tests en `PlacementTest`: fila fija (primera columna libre, sin mover el cursor),
+      columna fija (detrás del cursor pasa a la fila siguiente; ocupada, baja) y los dos errores.
+- [x] **Código muerto:** el límite de columnas de `Occupancy.isFree` y de `mark`: `place`
+      cuenta todas las columnas antes de empezar y ninguna área pasa de ellas.
+
+Resultado: `Placement` pasa del 71,4 % al 100 % de ramas y de líneas; 631 tests en verde.
 
 - [x] **Culpable de los desbordamientos verticales** (decidido con el usuario): `BOX_OVERFLOW`
       señala también `Aspect ratio` y `Rows`, y `PAGE_OVERFLOW`, el `Padding` o el `Border` que no
@@ -603,3 +621,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 9 | `model.Tolerance` (una sola épsilon), `LayoutResult.before`, `Sizing.align`/`sum`, `Canvas.border` por defecto con `outline`, `layout.Messages`, `Fragment.contentWidth`/`contentHeight`, `LineBreaker.place`; 623 tests en verde | Tarea 10 (`UnitBreaker`) u 11; decidir el 0.01 de `Overflow`; revisar `Placement` |
 | 2026-10-27 | 10 | `fragment.Unit` y `UnitBreaker.Units(List<Unit>, …)` con `slice`; `UnitBreaker.Arranged` común a flex, grid y tabla; `FlexLayout.Run.layOut` en pasos 6, 7 y 8; el 0.01 de `Overflow` se queda; 624 tests en verde | Tarea 11 (medir el texto largo); revisar `Placement` |
 | 2026-10-27 | 11 | Medido: el texto largo costaba de forma cuadrática (100 páginas: 11,2 M mediciones, 13 s con `PdfMetrics`). `InlineLayout` memoriza el reparto en líneas y usa `engine.intrinsic`: 118 560 mediciones y 0,16 s; `LongTextTest` (lineal en la suite, tiempos con `@Tag("perf")`); 625 tests en verde | Revisar las ramas de `Placement`; hoja de ruta terminada |
+| 2026-10-27 | Ramas de `Placement` | Bug: fila fija sin hueco (bucle sin límite y `ArrayIndexOutOfBoundsException`) → `GRID_PLACEMENT`; tests de fila y columna fijas; código muerto de `Occupancy`; `Placement` al 100 % de ramas; 631 tests en verde | Hoja de ruta terminada; hito 15 |

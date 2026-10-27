@@ -755,6 +755,13 @@ cada ítem y después **cuánto** mide cada pista.
    solo avanza, de modo que pueden quedar huecos atrás.
 4. Si un ítem cae fuera de la rejilla declarada, se crean pistas implícitas `auto`.
 
+Un ítem con **solo la fila fija** (`Area: 2 auto`) va a la primera columna de esa fila donde
+quepa, sin mover el cursor; si no queda ninguna, es un error (`GRID_PLACEMENT`): la fila no crea
+columnas implícitas. Uno con **solo la columna fija** (`Area: auto 2`) va a la primera fila
+libre desde el cursor, en la siguiente si la columna queda detrás de él, y mueve el cursor
+detrás de sí. Con `Flow: column` se intercambian filas y columnas. A diferencia de CSS, estos
+ítems se colocan en el paso 3, en orden del árbol con los automáticos, y no antes que ellos.
+
 **Valor de `Area`:** un nombre de área (`Area: side`) o `fila columna [filas columnas]`
 contando desde 1, donde fila y columna pueden ser `auto`: `Area: 1 1 1 2` ocupa la fila 1 y
 las columnas 1 y 2; `Area: auto auto 1 2` se coloca automáticamente ocupando dos columnas.
@@ -1272,7 +1279,7 @@ La validación se hace en cuatro niveles:
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([§5.9](#59-dimensionado)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
-| `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes | `Área desconocida en Area: foot` |
+| `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella (§5.8) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |

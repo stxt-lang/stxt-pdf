@@ -558,6 +558,51 @@ Errors:
 						Block:
 							Box:
 								Height: 10
+	Case: Fila fija sin hueco para el ítem
+		Code: GRID_PLACEMENT
+		Line: 15
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Grid:
+					Columns: 100 100
+					Area: 1 1
+						Block:
+							Box:
+								Height: 10
+					Area: 1 2
+						Block:
+							Box:
+								Height: 10
+					Area: 1 auto
+						Block:
+							Box:
+								Height: 10
+	Case: Columna fija sin hueco con Flow column
+		Code: GRID_PLACEMENT
+		Line: 16
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Grid:
+					Flow: column
+					Rows: 10 10
+					Area: 1 1
+						Block:
+							Box:
+								Height: 10
+					Area: 2 1
+						Block:
+							Box:
+								Height: 10
+					Area: auto 1
+						Block:
+							Box:
+								Height: 10
 	Case: Fuente desconocida, declarada en Document
 		Code: FONT_UNKNOWN
 		Line: 6

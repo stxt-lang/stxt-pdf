@@ -497,3 +497,13 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      los de las propiedades del elemento. *Dónde:* `model`, `tree/PropertyReader.item`,
      `tree/TableBuilder`, `layout/grid/GridLayout`, `paint/PdfStructure`. *Alternativa:*
      guardar el texto y volver a interpretarlo en cada layout, como antes.
+
+109. **Un ítem con la fila fija y sin hueco en ella es un error** (§5.8, decidido con el usuario):
+     `GRID_PLACEMENT` con la línea del `Area`. Antes la búsqueda de columna no tenía límite y el
+     motor acababa en `ArrayIndexOutOfBoundsException` tras dos mil millones de vueltas. CSS
+     crearía columnas implícitas, pero aquí la rejilla tendría que crecer a mitad de la
+     colocación, con los automáticos anteriores ya colocados con menos columnas. Además, los
+     ítems con solo la fila o solo la columna fija se colocan en orden del árbol con los
+     automáticos (el paso 3 del §5.8), no antes como en CSS, y el de fila fija toma la primera
+     columna libre, no la siguiente a los anteriores de esa fila. *Dónde:* `layout/grid/Placement`,
+     `layout/grid/GridLayout.noRoom`. *Alternativa:* la columna implícita de CSS.

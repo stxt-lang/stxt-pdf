@@ -19,11 +19,15 @@ import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.ErrorCode;
+import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
+
+import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
 
 /**
  * Layout {@code grid} (ESPECIFICACION.md §5.8). Pasos:
@@ -63,7 +67,12 @@ public final class GridLayout implements LayoutAlgorithm {
         int explicitRows = Math.max(s.gridRows.size(), s.gridAreas.rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style.itemArea).toList();
-        List<Area> areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow);
+        List<Area> areas;
+        try {
+            areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow);
+        } catch (Placement.NoRoom e) {
+            throw noRoom(items.get(e.item), e, s.gridFlow);
+        }
         int columns = Math.max(1, explicitColumns);
         int rows = explicitRows;
         for (Area a : areas) {
@@ -71,6 +80,17 @@ public final class GridLayout implements LayoutAlgorithm {
             rows = Math.max(rows, a.rowEnd());
         }
         return new Grid(items, areas, tracks(s.gridColumns, columns), tracks(s.gridRows, rows));
+    }
+
+    /** El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco (§5.8). */
+    private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Style.Direction flow) {
+        boolean row = flow == Style.Direction.ROW;
+        String track = row ? "fila" : "columna";
+        String across = row ? "columna" : "fila";
+        String hole = e.span == 1 ? "1 " + across + " libre" : e.span + " " + across + "s libres";
+        return new InvalidModelException(item.style.line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
+                + e.track + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks + " "
+                + across + (e.tracks == 1 ? "" : "s") + "): elige otra " + track + " o déjala en auto");
     }
 
     /** Pistas declaradas y, detrás, las implícitas {@code auto}. */
