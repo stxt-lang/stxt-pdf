@@ -47,12 +47,9 @@ final class MarkerLayout {
         // Su borde derecho, con el espacio final, toca la caja de borde del ítem.
         double x = -border.left() - padding.left() - width;
         double y = baseline.getAsDouble() - measurer.vertical(s.fontFace()).baseline(0, height, s.fontSize);
-        marker.x = x;
-        marker.y = y;
-        marker.width = width;
-        marker.height = height;
-        return Optional.of(Fragment.complete(marker, x, y, width, height, List.of(),
-                List.of(new TextLine(0, 0, width, height, marker.text))));
+        // La caja del marcador es generada: sin margen, borde ni relleno.
+        return Optional.of(new Fragment(marker, x, y, width, height, Insets.ZERO, Insets.ZERO, Insets.ZERO,
+                List.of(), List.of(new TextLine(0, 0, width, height, marker.text)), true, true));
     }
 
     /**

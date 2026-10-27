@@ -60,7 +60,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | hecho |
 | 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | hecho |
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | hecho |
-| 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | pendiente |
+| 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | hecho |
 | 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | pendiente |
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | pendiente |
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | pendiente |
@@ -258,15 +258,21 @@ el hito 15, en el que la misma caja se maqueta en columnas de anchos distintos. 
 
 **Cómo.**
 
-- [ ] El margen usado viaja con el resultado: campo `margin` en `Fragment` (o que `Overflow`
-      lo resuelva con la base que ya conoce, el ancho de contenido del padre).
-- [ ] `BlockLayout` y `UnitBreaker` usan variables locales en lugar de `child.x`/`p.box().x`.
-- [ ] `MarkerLayout` construye el `Fragment` sin pasar por la caja; quitar
-      `Fragment.complete` o hacer que reciba borde y relleno.
-- [ ] Borrar los siete campos y los cuatro métodos de geometría de `Box`, y
-      `BoxModel.applyTo`. `Box` queda inmutable salvo `parent`/`children` durante la
-      construcción (ver [7](#7-partir-boxtreebuilder)).
-- [ ] Apuntar en `DECISIONES.md` que la geometría solo existe en los fragmentos.
+- [x] El margen usado viaja con el resultado: campo `margin` en `Fragment`, que cada algoritmo
+      llena con el de su `BoxModel`. No vale resolverlo en `Overflow` con el ancho de contenido
+      del padre: los márgenes de los ítems de grid son del área (test
+      `GridLayoutTest.itemMarginsUseTheAreaWidth`).
+- [x] `BlockLayout`, `UnitBreaker` y `AbsoluteLayout` usan variables locales en lugar de
+      `child.x`/`p.box().x`/`box.x`; nadie escribe `box.height`.
+- [x] `MarkerLayout` construye el `Fragment` sin pasar por la caja (sin margen, borde ni
+      relleno, como antes); `Fragment.complete` desaparece.
+- [x] Borrados los siete campos y los cuatro métodos de geometría de `Box`, y
+      `BoxModel.applyTo`. `Box` solo cambia mientras `BoxTreeBuilder` construye el árbol
+      (`parent`, `children`, `text`, `marker`, `headRows`…), que es lo que queda para la
+      [tarea 7](#7-partir-boxtreebuilder).
+- [x] Apuntado en `DECISIONES.md` (104) y en `CLAUDE.md`.
+
+**Verificación.** `mvn test` (588 tests), sin cambios en los PNG ni en los `expected.stxt`.
 
 **Ganancia extra.** Sin estado en `Box`, el mismo árbol se puede maquetar dos veces (SVG y PDF,
 o con métricas distintas) sin interferencias, y la caché queda correcta por construcción.
@@ -454,3 +460,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 2 | `ConstraintSpace` con fábricas con nombre y *withers* que conservan `contentHeight`; `ConstraintSpaceTest`; 555 tests en verde | Tarea 3 |
 | 2026-10-27 | 3 | `layOutDocument` devuelve `LaidOutDocument`; fachada `PdfWriter`; sin `Engine.cache()`; 555 tests en verde | Tarea 4 |
 | 2026-10-27 | 4 | `SliceTest`, `BoxModelTest`, `LayoutCacheTest` y `UnitBreakerTest`; JaCoCo (95,1 % de líneas, 86,1 % de ramas); 587 tests en verde | Tarea 5; revisar las ramas de `Overflow` |
+| 2026-10-27 | 5 | `Box` sin geometría; el margen usado va en `Fragment.margin`; sin `BoxModel.applyTo` ni `Fragment.complete`; 588 tests en verde | Revisar las ramas de `Overflow`; tarea 6 o 9 |

@@ -444,3 +444,15 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      de pantalla no lee la cabecera en cada página. Las `TH` llevan `Scope: Column`, que TB10 no
      decía. *Dónde:* `paint/PdfStructure` (`repeated`, `mark`). *Alternativa:* marcar cada
      repetición como contenido de la misma celda.
+
+## Calidad y arquitectura (2026-10-27)
+
+104. **La geometría usada solo existe en los fragmentos**: `Box` ya no guarda `x`, `y`,
+     `width`, `height`, `margin`, `border` ni `padding` "del último layout". Una caja se maqueta
+     muchas veces (sondas, medidas, estirado, cada página) y la caché devuelve resultados sin
+     volver a escribirla, así que ese estado no correspondía a ningún fragmento. El margen usado,
+     que `Overflow` necesita para el desbordamiento horizontal, va en `Fragment.margin`, con la
+     base de porcentajes del layout que produjo el fragmento (el área en grid, la caja de
+     contenido del padre en bloque y flex). *Dónde:* `fragment/Fragment`, `layout/Overflow`,
+     `tree/Box`. *Alternativa:* que `Overflow` resuelva los márgenes con el ancho de contenido
+     del padre, que no es la base de los ítems de grid.

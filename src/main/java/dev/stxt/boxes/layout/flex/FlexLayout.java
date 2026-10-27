@@ -93,7 +93,6 @@ public final class FlexLayout implements LayoutAlgorithm {
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
-        model.applyTo(box);
         return new Run(box, model, space).layOut(from);
     }
 

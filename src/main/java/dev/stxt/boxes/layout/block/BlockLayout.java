@@ -80,7 +80,6 @@ public final class BlockLayout implements LayoutAlgorithm {
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
-        model.applyTo(box);
         return new Run(box, model, space, (BreakToken.Block) from).layOut();
     }
 
@@ -215,11 +214,11 @@ public final class BlockLayout implements LayoutAlgorithm {
                     child.style.margin.left(), child.style.margin.right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera (§5.5).
             RelativeOffset offset = RelativeOffset.of(child.style, contentWidth, childSpace.percentBaseHeight());
-            child.x = x + offset.dx();
-            child.y = flowY + offset.dy();
-            fragments.add(f.moved(child.x, child.y));
-            double dx = child.x + f.border().left() + f.padding().left();
-            double dy = child.y + f.border().top() + f.padding().top();
+            double childX = x + offset.dx();
+            double childY = flowY + offset.dy();
+            fragments.add(f.moved(childX, childY));
+            double dx = childX + f.border().left() + f.padding().left();
+            double dy = childY + f.border().top() + f.padding().top();
             r.pending().forEach(p -> pending.add(p.translated(dx, dy)));
 
             boolean hadProgress = progress;
@@ -285,9 +284,8 @@ public final class BlockLayout implements LayoutAlgorithm {
             List<PendingAbsolute> keptPending = pending.subList(0, m.pending());
             // Los márgenes que tocan el corte se truncan: el contenido acaba en el cursor.
             Slice slice = Slice.of(model, first, consumed, m.cursor(), false, space);
-            box.height = slice.height();
-            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
-                    slice.padding(), withMarker(kept, slice), List.of(), first, false);
+            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
+                    slice.border(), slice.padding(), withMarker(kept, slice), List.of(), first, false);
             BreakToken token = new BreakToken.Block(m.index(), m.childToken(), slice.consumed());
             return new LayoutResult(fragment, token, m.appeal(), keptPending,
                     new AdjoiningMargins(topOut, MarginStrut.EMPTY, false));
@@ -330,9 +328,8 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
 
             Slice slice = Slice.of(model, first, consumed, contentHeight, true, space);
-            box.height = slice.height();
-            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
-                    slice.padding(), withMarker(fragments, slice), List.of(), first, slice.finished());
+            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
+                    slice.border(), slice.padding(), withMarker(fragments, slice), List.of(), first, slice.finished());
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, out);
             }

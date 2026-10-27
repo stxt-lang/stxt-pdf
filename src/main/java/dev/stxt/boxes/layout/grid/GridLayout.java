@@ -123,7 +123,6 @@ public final class GridLayout implements LayoutAlgorithm {
     /** Coloca los ítems y dimensiona las pistas, sin fragmentar; la tabla lo usa para cortar solo su cuerpo. */
     public Arranged arrange(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
-        model.applyTo(box);
         Style s = box.style;
         double contentWidth = model.contentWidth();
         OptionalDouble contentHeight = model.contentHeight();

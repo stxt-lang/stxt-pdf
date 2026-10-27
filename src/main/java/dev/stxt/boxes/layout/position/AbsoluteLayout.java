@@ -142,8 +142,6 @@ public final class AbsoluteLayout {
 
         double x = h.start() + h.marginStart() - cbPadding.left();
         double y = v.start() + v.marginStart() - cbPadding.top();
-        box.x = x;
-        box.y = y;
         // Las cajas fixed del interior pasan de la caja de contenido de esta a la del containing block.
         double dx = x + f.border().left() + sized.padding().left();
         double dy = y + f.border().top() + sized.padding().top();

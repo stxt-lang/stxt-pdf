@@ -269,8 +269,6 @@ public final class UnitBreaker {
         /** Coloca el fragmento de un ítem en {@code y} del fragmento del contenedor. */
         Piece piece(Placed p, LayoutResult r, double y) {
             Fragment f = r.fragment();
-            p.box().x = p.x();
-            p.box().y = y;
             double dx = p.x() + f.border().left() + f.padding().left();
             double dy = y + f.border().top() + f.padding().top();
             return new Piece(f.moved(p.x(), y), r.pending().stream().map(q -> q.translated(dx, dy)).toList());
@@ -336,9 +334,8 @@ public final class UnitBreaker {
             }
             Slice slice = Slice.of(model, first, BreakToken.consumed(from),
                     repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
-            box.height = slice.height();
-            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(),
-                    slice.padding(), fragments, List.of(), first, slice.finished());
+            Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
+                    slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
             // Los márgenes de los ítems nunca colapsan con los del contenedor (§5.3).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);

@@ -1,8 +1,5 @@
 package dev.stxt.boxes.tree;
 
-import dev.stxt.boxes.model.Insets;
-import dev.stxt.boxes.model.Rect;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,16 +50,6 @@ public final class Box {
      */
     public int headRows;
     public int footRows;
-
-    // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
-    // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.
-    public double x;
-    public double y;
-    public double width;
-    public double height;
-    public Insets margin = Insets.ZERO;
-    public Insets border = Insets.ZERO;
-    public Insets padding = Insets.ZERO;
 
     public Box(String id, String element, Style style, boolean anonymous, int line) {
         this.id = id;
@@ -146,22 +133,6 @@ public final class Box {
 
     public boolean hasText() {
         return text != null && !text.isBlank();
-    }
-
-    public Rect borderBox() {
-        return new Rect(x, y, width, height);
-    }
-
-    public Rect marginBox() {
-        return borderBox().expand(margin);
-    }
-
-    public Rect paddingBox() {
-        return borderBox().shrink(border);
-    }
-
-    public Rect contentBox() {
-        return paddingBox().shrink(padding);
     }
 
     /** Nombre legible para mensajes y volcados. */

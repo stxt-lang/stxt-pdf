@@ -40,7 +40,8 @@ class UnitBreakerTest {
     /** Ítem ya maquetado sin fragmentar, en {@code y} de la caja de contenido del contenedor. */
     private static UnitBreaker.Placed placed(Box item, double y, int unit) {
         double h = ((Value.Points) item.style.height).pt();
-        LayoutResult r = LayoutResult.finished(Fragment.complete(item, 0, 0, 100, h, List.of(), List.of()));
+        LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
+                Insets.ZERO, List.of(), List.of(), true, true));
         return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit);
     }
 

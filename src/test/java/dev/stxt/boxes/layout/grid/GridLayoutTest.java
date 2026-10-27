@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout.grid;
 
 import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import org.junit.jupiter.api.Test;
 
@@ -185,5 +186,17 @@ class GridLayoutTest {
         assertRect(44, 43, 100, 50, l.rect("R"));
         assertRect(140, 40, 100, 50, l.rect("B"));
         assertRect(545, 80, 10, 10, l.rect("A"));
+    }
+
+    @Test
+    void itemMarginsUseTheAreaWidth() {
+        // El 10 % es del área (200), no del contenedor (515): 20 por lado. El fragmento lleva el
+        // margen usado, que es el que comprueba Overflow.
+        LayoutFixture l = layOut(
+                "\tGrid:", "\t\tColumns: 200 1fr",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10%",
+                "\t\t\t\t\tHeight: 10");
+        assertRect(60, 60, 160, 10, l.rect("M"));
+        assertEquals(Insets.all(20), l.fragment("M").margin());
     }
 }

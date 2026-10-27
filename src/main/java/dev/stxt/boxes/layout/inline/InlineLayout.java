@@ -85,8 +85,8 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (!changed) {
             return f;
         }
-        return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.border(), f.padding(), children, lines,
-                f.first(), f.last());
+        return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.margin(), f.border(), f.padding(),
+                children, lines, f.first(), f.last());
     }
 
     @Override
@@ -100,7 +100,6 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         BoxModel model = BoxModel.resolve(box, space, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
-        model.applyTo(box);
         Style s = box.style;
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();
@@ -148,9 +147,8 @@ public final class InlineLayout implements LayoutAlgorithm {
 
         Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,
                 end == texts.size(), space);
-        box.height = slice.height();
-        Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), slice.border(), slice.padding(),
-                List.of(), lines, first, slice.finished());
+        Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(), slice.border(),
+                slice.padding(), List.of(), lines, first, slice.finished());
         if (!slice.finished()) {
             // Faltan líneas o, si han terminado, el alto propio de la caja.
             return new LayoutResult(fragment, new BreakToken.Line(end, slice.consumed()),

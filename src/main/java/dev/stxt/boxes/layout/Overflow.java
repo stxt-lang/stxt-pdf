@@ -95,7 +95,7 @@ public final class Overflow {
                         Double.isFinite(height) ? OptionalDouble.of(height) : OptionalDouble.empty());
                 double x = c.x() - o.dx();
                 double y = c.y() - o.dy();
-                Insets margin = c.box().margin;
+                Insets margin = c.margin();
                 if (x - margin.left() < -EPSILON || x + c.width() + margin.right() > width + EPSILON) {
                     throw tooWide(c, cx + x, cy + y, cx, cx + width);
                 }

@@ -161,14 +161,6 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return border.bottom() == 0 && padding.bottom() == 0 && height.isEmpty();
     }
 
-    /** Guarda la geometría usada en la caja (la leen el volcado y el pintado). */
-    public void applyTo(Box box) {
-        box.margin = margin;
-        box.border = border;
-        box.padding = padding;
-        box.width = width;
-    }
-
     /**
      * Espacio para los hijos en flujo: la caja de contenido es su containing block. Lo que
      * queda de página se mide desde el principio de la caja de contenido (y,

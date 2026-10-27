@@ -209,6 +209,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
+  Lleva también el `margin` usado (con la base de porcentajes de su layout), que `Overflow`
+  necesita. La geometría solo existe en los fragmentos: `Box` no guarda posición ni tamaño.
 - **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
   el de todos los tests de layout, y no necesita fuentes; `PdfMetrics` da las métricas reales de
   las fuentes TTF de `Resources` y es el que usa `PdfWriter.write(document, out)`.
@@ -239,7 +241,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   cosa; `Width` y `Height` la miden siempre (no hay `Box sizing`). El ancho baja de padres a
   hijos y el alto sube de hijos a padres.
 - **Inmutabilidad:** las entradas y salidas del layout son `record` con listas copiadas
-  (`List.copyOf`). `Box` es mutable y su igualdad es por identidad (clave de la caché).
+  (`List.copyOf`). `Box` es mutable solo mientras `BoxTreeBuilder` construye el árbol; el layout no la
+  escribe nunca. Su igualdad es por identidad (clave de la caché).
 - **Min y max:** primero se aplica el máximo y luego el mínimo; si chocan, gana el mínimo
   (`Sizing.constrain`).
 - **Comentarios y javadoc** en castellano, con referencias a la especificación del tipo

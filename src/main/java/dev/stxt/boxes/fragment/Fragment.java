@@ -15,6 +15,9 @@ import java.util.List;
  * @param y        ídem
  * @param width    ancho de la caja de borde
  * @param height   alto de la caja de borde <em>en este fragmento</em>
+ * @param margin   márgenes usados de la caja en el layout que produjo el fragmento
+ *                 ({@code auto} = 0, como en {@link dev.stxt.boxes.layout.BoxModel}): los
+ *                 porcentajes dependen de la base de ese layout, que solo conoce el algoritmo
  * @param border   bordes pintados en este fragmento (con {@code Decoration: slice}, el
  *                 primero no tiene borde inferior y los siguientes no tienen superior)
  * @param padding  relleno de este fragmento, con el mismo criterio que {@code border}; la caja
@@ -25,8 +28,8 @@ import java.util.List;
  * @param first    es el primer fragmento de la caja
  * @param last     es el último fragmento de la caja
  */
-public record Fragment(Box box, double x, double y, double width, double height, Insets border,
-                       Insets padding, List<Fragment> children, List<TextLine> lines,
+public record Fragment(Box box, double x, double y, double width, double height, Insets margin,
+                       Insets border, Insets padding, List<Fragment> children, List<TextLine> lines,
                        boolean first, boolean last) {
 
     public Fragment {
@@ -34,25 +37,19 @@ public record Fragment(Box box, double x, double y, double width, double height,
         lines = List.copyOf(lines);
     }
 
-    /** Fragmento único: una caja que no se ha partido. */
-    public static Fragment complete(Box box, double x, double y, double width, double height,
-                                    List<Fragment> children, List<TextLine> lines) {
-        return new Fragment(box, x, y, width, height, box.border, box.padding, children, lines, true, true);
-    }
-
     /** Fragmento vacío de una caja que no cabe en lo que queda de página ({@link BreakToken.Before}). */
     public static Fragment empty(Box box) {
-        return new Fragment(box, 0, 0, 0, 0, Insets.ZERO, Insets.ZERO, List.of(), List.of(), false, false);
+        return new Fragment(box, 0, 0, 0, 0, Insets.ZERO, Insets.ZERO, Insets.ZERO, List.of(), List.of(), false, false);
     }
 
     public Fragment moved(double newX, double newY) {
-        return new Fragment(box, newX, newY, width, height, border, padding, children, lines, first, last);
+        return new Fragment(box, newX, newY, width, height, margin, border, padding, children, lines, first, last);
     }
 
     /** El mismo fragmento con más hijos al final (las cajas absolutas que resuelve esta caja). */
     public Fragment withMoreChildren(List<Fragment> more) {
         List<Fragment> all = new ArrayList<>(children);
         all.addAll(more);
-        return new Fragment(box, x, y, width, height, border, padding, all, lines, first, last);
+        return new Fragment(box, x, y, width, height, margin, border, padding, all, lines, first, last);
     }
 }
