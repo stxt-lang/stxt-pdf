@@ -16,7 +16,8 @@
 - Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...
 - Cambiar de src/test/resources a test
 - Muchos más ejemplos y pruebas de uso
-- Revisar puntos que han quedado aparcados
+- Httpservice para probar, que se pueda ejecutar en maven, etc. 
+- Un docker para esto
 - Refactor de código
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
 - ...
