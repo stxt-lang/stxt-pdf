@@ -7,10 +7,10 @@
    Style:
    		Elem: h1
    			Typography
-   			Bla
+   			...
    		Id: xxxx
    			Typography
-   			bla, bla, bla
+   			Box
    			
 - Que pasa con tablas? Que tengan header y footer, etc.
 - Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...
