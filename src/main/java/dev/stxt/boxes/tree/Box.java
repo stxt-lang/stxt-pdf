@@ -47,6 +47,12 @@ public final class Box {
      * lleva marcador.
      */
     public Box marker;
+    /**
+     * Filas de la rejilla de una {@code Table} que son de su {@code Head} y de su {@code Foot}
+     * (ESPECIFICACION.md §5.15): las primeras y las últimas. 0 en el resto de cajas.
+     */
+    public int headRows;
+    public int footRows;
 
     // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
     // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.

@@ -54,6 +54,18 @@ public enum ErrorCode {
     /** Un ítem con marcador cuyo contenido no empieza con un texto con el que alinearlo. */
     LIST_ITEM_WITHOUT_LINE,
 
+    // --- Tablas -----------------------------------------------------------------------------------
+    /** {@code Head}, {@code Body} y {@code Foot} fuera de ese orden. */
+    TABLE_ORDER,
+    /** Una fila que no llena exactamente las columnas de la tabla. */
+    TABLE_ROW_CELLS,
+    /** Un {@code Span} que sale de la tabla o de su grupo, o que se solapa con otra celda. */
+    TABLE_SPAN,
+    /** Una {@code Cell} con texto en el valor y elementos. */
+    CELL_CONTENT,
+    /** {@code Break} en una fila de {@code Head} o de {@code Foot}, que se repiten en cada página. */
+    TABLE_ROW_BREAK,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,
@@ -63,7 +75,7 @@ public enum ErrorCode {
     STYLE_DUPLICATE,
     /**
      * Una regla aplica un grupo que el elemento no admite: {@code Break} en {@code Absolute},
-     * {@code Fixed}, un encabezado o un {@code Text} de un encabezado.
+     * {@code Fixed}, un encabezado, un {@code Text} de un encabezado o una {@code Cell}.
      */
     STYLE_NOT_ALLOWED,
     /** Una clase de {@code Class} sin regla {@code For class}. */

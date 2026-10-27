@@ -78,6 +78,14 @@ public final class BoxTreeBuilder {
             "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "table", "relative");
     /** Elementos con el texto en el valor o en {@code Content}. */
     private static final Set<String> TEXTS = Set.of("text", "paragraph");
+    /** Grupos de filas de una {@code Table}, en el orden en que van. */
+    private static final List<String> TABLE_GROUPS = List.of("head", "body", "foot");
+    /**
+     * Hijos de un elemento que no son propiedades suyas: los envoltorios y el texto, las clases
+     * (aplicadas ya con sus reglas), y los grupos de filas y el {@code Span}, que lee {@link #table}.
+     */
+    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
+            "foot", "span");
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
@@ -271,6 +279,9 @@ public final class BoxTreeBuilder {
         if (parent.headingLevel() > 0) {
             return "un Text de un encabezado" + where + "en el que el motor ya evita el corte";
         }
+        if (kind.equals("cell")) {
+            return "una Cell" + where + "cuyos cortes son los de su Row";
+        }
         return null;
     }
 
@@ -355,13 +366,12 @@ public final class BoxTreeBuilder {
         }
     }
 
-    /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem. */
+    /**
+     * Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem, o
+     * la {@code Row} de una {@code Cell}.
+     */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
         String kind = n.getCanonicalName();
-        if (kind.equals("table")) {
-            // TODO(hito 14): traducir la tabla a un grid con colocación explícita (docs/ROADMAP.md).
-            throw new UnsupportedOperationException("Table todavía no se maqueta (hito 14), línea " + n.getLine());
-        }
         int level = Box.headingLevel(kind);
         if (level > 0) {
             heading(n, level);
@@ -369,8 +379,11 @@ public final class BoxTreeBuilder {
         Style s = Style.inheriting(parent.style);
         s.layout = switch (kind) {
             case "flex" -> Style.Layout.FLEX;
-            case "grid" -> Style.Layout.GRID;
+            // Una tabla se maqueta como un grid con colocación explícita (§5.15).
+            case "grid", "table" -> Style.Layout.GRID;
             case "text", "paragraph" -> Style.Layout.INLINE;
+            // Con valor, la celda es una caja de texto; sin valor, un bloque.
+            case "cell" -> n.getText().isBlank() ? Style.Layout.BLOCK : Style.Layout.INLINE;
             default -> Style.Layout.BLOCK;
         };
         s.position = switch (kind) {
@@ -379,23 +392,24 @@ public final class BoxTreeBuilder {
             case "fixed" -> Style.Position.FIXED;
             default -> Style.Position.STATIC;
         };
-        if (wrapper != null) {
+        if (kind.equals("cell")) {
+            // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
+            child(wrapper, "typography").map(BoxTreeBuilder::inline).ifPresent(t -> typography(t, s));
+        } else if (wrapper != null) {
             item(wrapper, s);
         }
         applyRules(n, kind, s, parent);
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            // Las clases ya se han aplicado con sus reglas.
-            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("area") || name.equals("content")
-                    || name.equals("class")) {
+            if (ELEMENTS.contains(name) || NOT_PROPERTIES.contains(name)) {
                 continue;
             }
             if (kind.equals("flex") && FLEX.contains(name)) {
                 flex(p, s);
                 continue;
             }
-            if (kind.equals("grid") && GRID.contains(name)) {
+            if ((kind.equals("grid") || kind.equals("table")) && GRID.contains(name)) {
                 grid(p, s);
                 continue;
             }
@@ -423,6 +437,10 @@ public final class BoxTreeBuilder {
                 }
             }
         }
+        if (kind.equals("cell")) {
+            // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
+            child(wrapper, "break").map(BoxTreeBuilder::inline).ifPresent(b -> fragmentation(b, s));
+        }
         if (kind.equals("flex")) {
             validateFlex(s);
         }
@@ -430,7 +448,7 @@ public final class BoxTreeBuilder {
             validateList(s);
         }
         Integer number = kind.equals("list-item") ? itemNumber(n, s, parent) : null;
-        validateBox(s, parent, wrapper);
+        validateBox(s, parent);
         if (level > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
             s.breakAfter = Style.Break.AVOID;
@@ -453,10 +471,16 @@ public final class BoxTreeBuilder {
         }
         if (TEXTS.contains(kind)) {
             text(n, box);
+        } else if (kind.equals("cell") && s.layout == Style.Layout.INLINE) {
+            cellText(n, box);
         } else {
             boolean outerFixed = insideFixed;
             insideFixed |= s.position == Style.Position.FIXED;
-            buildContent(n, box);
+            if (kind.equals("table")) {
+                table(n, box);
+            } else {
+                buildContent(n, box);
+            }
             insideFixed = outerFixed;
         }
         if (box.marker != null) {
@@ -555,6 +579,121 @@ public final class BoxTreeBuilder {
         return marker.name().toLowerCase(Locale.ROOT).replace('_', '-');
     }
 
+    /** Filas y columnas que ocupa una {@code Cell}, y la línea de su {@code Span} (o de la celda, sin él). */
+    private record Span(int rows, int columns, int line) {
+    }
+
+    /**
+     * Las filas de una {@code Table} (§5.15) como ítems de un grid con colocación explícita: cada
+     * {@code Cell} va en la primera columna libre de su fila, contando las que ocupan los
+     * {@code Span} de las filas de arriba. Los grupos van en el orden {@code Head}, {@code Body},
+     * {@code Foot}; cada fila llena exactamente las columnas de {@code Columns}, y un
+     * {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code Head} y {@code Foot}
+     * se repiten en cada página y no admiten {@code Break}.
+     */
+    private void table(InlineNode n, Box table) {
+        int columns = table.style.gridColumns.size();
+        int last = -1;
+        int firstRow = 0;
+        for (Node g : n.getChildren()) {
+            int group = TABLE_GROUPS.indexOf(g.getCanonicalName());
+            if (group < 0) {
+                continue;
+            }
+            if (group < last) {
+                throw error(g, ErrorCode.TABLE_ORDER, g.getName() + " va después de "
+                        + label(TABLE_GROUPS.get(last)) + ": los grupos de una Table van en el orden Head, Body, Foot");
+            }
+            last = group;
+            List<InlineNode> rows = inline(g).getChildren().stream().map(BoxTreeBuilder::inline).toList();
+            boolean[][] taken = new boolean[rows.size()][columns];
+            for (int r = 0; r < rows.size(); r++) {
+                InlineNode row = rows.get(r);
+                if (group != 1) {
+                    child(row, "break").ifPresent(b -> {
+                        throw error(b, ErrorCode.TABLE_ROW_BREAK, "Las filas de " + g.getName() + " se repiten en "
+                                + "cada página de la tabla y no se cortan: quita el Break");
+                    });
+                }
+                int c = 0;
+                for (Node h : row.getChildren()) {
+                    if (!is(h, "cell")) {
+                        continue;
+                    }
+                    InlineNode cell = inline(h);
+                    while (c < columns && taken[r][c]) {
+                        c++;
+                    }
+                    if (c == columns) {
+                        throw error(cell, ErrorCode.TABLE_ROW_CELLS, "No queda columna libre para esta Cell: la tabla "
+                                + "tiene " + columns + " (Columns), contando las que ocupan los Span de las filas de arriba");
+                    }
+                    Span span = span(cell);
+                    if (c + span.columns() > columns) {
+                        throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa de la columna " + (c + 1)
+                                + " a la " + (c + span.columns()) + ", y la tabla tiene " + columns + " (Columns)");
+                    }
+                    if (r + span.rows() > rows.size()) {
+                        throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa " + span.rows() + " filas y en su "
+                                + g.getName() + " quedan " + (rows.size() - r) + ": un Span no pasa de un grupo a otro");
+                    }
+                    for (int rr = r; rr < r + span.rows(); rr++) {
+                        for (int cc = c; cc < c + span.columns(); cc++) {
+                            if (taken[rr][cc]) {
+                                throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda se solapa en la columna "
+                                        + (cc + 1) + " con otra que ocupa varias filas");
+                            }
+                            taken[rr][cc] = true;
+                        }
+                    }
+                    Box box = element(cell, table, row);
+                    box.style.declared("item.area", cell.getLine());
+                    box.style.itemArea = (firstRow + r + 1) + " " + (c + 1) + " " + span.rows() + " " + span.columns();
+                    table.addChild(box);
+                    c += span.columns();
+                }
+                for (int cc = 0; cc < columns; cc++) {
+                    if (!taken[r][cc]) {
+                        throw error(row, ErrorCode.TABLE_ROW_CELLS, "La fila deja libre la columna " + (cc + 1)
+                                + " de " + columns + " (Columns): añade una Cell, vacía si hace falta, o usa Span");
+                    }
+                }
+            }
+            if (group == 0) {
+                table.headRows = rows.size();
+            } else if (group == 2) {
+                table.footRows = rows.size();
+            }
+            firstRow += rows.size();
+        }
+    }
+
+    /** El {@code Span} de una celda: {@code filas columnas}, dos enteros positivos; sin él, 1 1. */
+    private static Span span(InlineNode cell) {
+        Optional<Node> node = child(cell, "span");
+        if (node.isEmpty()) {
+            return new Span(1, 1, cell.getLine());
+        }
+        String text = node.get().getText().trim();
+        String[] t = text.split("\\s+");
+        if (t.length != 2 || !t[0].matches("[1-9]\\d*") || !t[1].matches("[1-9]\\d*")) {
+            throw error(node.get(), ErrorCode.VALUE_SYNTAX, "Span espera 'filas columnas', dos enteros "
+                    + "positivos: '" + text + "'");
+        }
+        return new Span(Integer.parseInt(t[0]), Integer.parseInt(t[1]), node.get().getLine());
+    }
+
+    /** El texto de una {@code Cell} con valor: una línea, sin elementos al lado. */
+    private static void cellText(InlineNode n, Box box) {
+        n.getChildren().stream().filter(c -> ELEMENTS.contains(c.getCanonicalName())).findFirst().ifPresent(e -> {
+            throw error(e, ErrorCode.CELL_CONTENT, "Una Cell tiene texto en el valor (línea " + n.getLine()
+                    + ") o elementos, no las dos cosas: pon el texto en un Paragraph");
+        });
+        font(n, n, box);
+        box.text = n.getText();
+        box.textLine = n.getLine();
+    }
+
     /**
      * Comprueba que un encabezado está en su sitio (§5.13): fuera de un {@code Fixed} y sin
      * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
@@ -587,14 +726,7 @@ public final class BoxTreeBuilder {
                     + n.getName() + ": …) o en un bloque Content >>");
         }
         Node source = content.orElse(n);
-        if (box.style.font == null) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
-                    + n.getName() + ", de un antecesor o de Document");
-        }
-        if (!box.style.isDeclared("font-size")) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
-                    + n.getName() + ", de un antecesor o de Document");
-        }
+        font(n, source, box);
         if (n.getCanonicalName().equals("paragraph")) {
             // Las líneas en blanco al principio o al final no separan nada.
             String text = source.getText();
@@ -610,6 +742,18 @@ public final class BoxTreeBuilder {
         box.text = source.getText();
         box.textLine = source.getLine();
         box.textBlock = source instanceof TextNode;
+    }
+
+    /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
+    private static void font(InlineNode n, Node source, Box box) {
+        if (box.style.font == null) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
+        }
+        if (!box.style.isDeclared("font-size")) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
+                    + n.getName() + ", de un antecesor o de Document");
+        }
     }
 
     /** Grupo {@code Box}: el modelo de caja, que no se hereda. */
@@ -748,10 +892,12 @@ public final class BoxTreeBuilder {
     // Reglas que el schema no puede expresar (§6)
     // ------------------------------------------------------------------------------------------
 
-    private void validateBox(Style s, Box parent, InlineNode wrapper) {
+    private void validateBox(Style s, Box parent) {
         Style.Layout parentLayout = parent.style.layout;
-        boolean flexItem = wrapper != null && parentLayout == Style.Layout.FLEX;
-        boolean gridItem = wrapper != null && parentLayout == Style.Layout.GRID;
+        // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
+        // de una Table, ítems de su grid.
+        boolean flexItem = !s.isOutOfFlow() && parentLayout == Style.Layout.FLEX;
+        boolean gridItem = !s.isOutOfFlow() && parentLayout == Style.Layout.GRID;
 
         if (gridItem && s.itemArea != null) {
             Map<String, Area> areas = parent.style.gridAreas == null

@@ -31,6 +31,21 @@ class GridLayoutTest {
     }
 
     @Test
+    void tableCellsAreGridItems() {
+        // Columnas 100 y 1fr con 5 de hueco: 515 - 100 - 5 = 410. La fila del cuerpo mide lo que
+        // la celda con relleno (12 + 8) y estira a la otra.
+        LayoutFixture l = layOut(
+                "\tTable:", "\t\tColumns: 100 1fr", "\t\tGap: 0 5",
+                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: aaa", "\t\t\t\t\tId: H1", "\t\t\t\tCell: bbb", "\t\t\t\t\tId: H2",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: ccc", "\t\t\t\t\tId: B1", "\t\t\t\t\tBox:",
+                "\t\t\t\t\t\tPadding: 4", "\t\t\t\tCell:", "\t\t\t\t\tId: B2");
+        assertRect(40, 40, 100, 12, l.rect("H1"));
+        assertRect(145, 40, 410, 12, l.rect("H2"));
+        assertRect(40, 52, 100, 20, l.rect("B1"));
+        assertRect(145, 52, 410, 20, l.rect("B2"));
+    }
+
+    @Test
     void alignmentInTheArea() {
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumns: 200 200", "\t\tRows: 100",

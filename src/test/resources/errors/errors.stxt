@@ -1043,3 +1043,196 @@ Errors:
 						Padding: 0 0 0 5
 					List item:
 						Text: Uno
+	Case: Grupos de la tabla fuera de orden
+		Code: TABLE_ORDER
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Foot:
+						Row:
+							Cell: a
+							Cell: b
+					Body:
+						Row:
+							Cell: c
+							Cell: d
+	Case: Fila con menos celdas que columnas
+		Code: TABLE_ROW_CELLS
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+	Case: Fila con más celdas que columnas
+		Code: TABLE_ROW_CELLS
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+							Cell: b
+							Cell: c
+	Case: Span que se sale de la tabla
+		Code: TABLE_SPAN
+		Line: 13
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+								Span: 1 3
+	Case: Span que pasa de Head a Body
+		Code: TABLE_SPAN
+		Line: 13
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Head:
+						Row:
+							Cell: a
+								Span: 2 2
+					Body:
+						Row:
+							Cell: b
+							Cell: c
+	Case: Span que se solapa con otra celda
+		Code: TABLE_SPAN
+		Line: 17
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+							Cell: b
+								Span: 2 1
+						Row:
+							Cell: c
+								Span: 1 2
+	Case: Span mal escrito
+		Code: VALUE_SYNTAX
+		Line: 13
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+								Span: 2
+							Cell: b
+	Case: Cell con texto en el valor y elementos
+		Code: CELL_CONTENT
+		Line: 13
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Body:
+						Row:
+							Cell: a
+								Paragraph: b
+							Cell: c
+	Case: Break en una fila de Head
+		Code: TABLE_ROW_BREAK
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Table:
+					Columns: 1fr 1fr
+					Head:
+						Row:
+							Break:
+								After: avoid
+							Cell: a
+							Cell: b
+					Body:
+						Row:
+							Cell: c
+							Cell: d
+	Case: Regla que aplica Break a una Cell
+		Code: STYLE_NOT_ALLOWED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Styles:
+					Element: Cell
+						Break:
+							Inside: avoid
+				Table:
+					Columns: 1fr
+					Body:
+						Row:
+							Cell: a

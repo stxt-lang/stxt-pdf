@@ -75,17 +75,23 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Heading 1` … `Heading 6` | Encabezado de nivel 1 a 6 ([§5.13](#513-encabezados-y-párrafos)) | Uno o varios `Text` |
 | `List` | Lista con marcadores o numerada ([§5.14](#514-listas)) | Uno o varios `List item` |
 | `List item` | Ítem de una `List`: un bloque con su marcador | Elementos, salvo los encabezados |
+| `Table` | Tabla, con cabecera y pie que se repiten en cada página ([§5.15](#515-tablas)) | `Head`, `Body` y `Foot`, en ese orden |
+| `Head`, `Body`, `Foot` | Cabecera, cuerpo y pie de una `Table` | Una o varias `Row` |
+| `Row` | Fila de una tabla | Una o varias `Cell` |
+| `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
 | `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Area` | Ítem de un `Grid`: el área que ocupa y cómo se alinea en ella | Exactamente un elemento en flujo |
 
-**Elementos** son todos menos `Item` y `Area`, y **elementos en flujo**, los que pueden ser un
-ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List` y `Relative`);
-`Absolute` y `Fixed` salen del flujo y nunca son ítems. `List item` solo va dentro de una `List`. Todos son **elementos de caja**: cada uno es una caja
+**Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
+flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
+encabezados, `List`, `Table` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
+ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Area` no son cajas: envuelven al elemento que hace de
-ítem y le añaden lo que solo tiene sentido dentro de su contenedor.
+ítem y le añaden lo que solo tiene sentido dentro de su contenedor. `Head`, `Body`, `Foot` y
+`Row` tampoco: agrupan las celdas de una tabla, que sí son cajas.
 
 Las propiedades de una caja van agrupadas por su significado ([§4](#4-referencia-de-propiedades)):
 `Box` (el modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de
@@ -236,8 +242,8 @@ de una clase o con un `Id`, y el elemento los puede sobrescribir. Dentro de cada
 vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las propiedades que
 definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Area`
-([§4.8](#48-item-y-area)), las de posicionamiento ([§4.9](#49-posicionamiento)) y las de las
-listas ([§4.11](#411-listas)).
+([§4.8](#48-item-y-area)), las de posicionamiento ([§4.9](#49-posicionamiento)), las de las
+listas ([§4.11](#411-listas)) y las de las tablas ([§4.12](#412-tablas)).
 
 ```
 Text: Resultados del trimestre
@@ -460,7 +466,8 @@ Una regla gana a la herencia: con `Element: Text` y `Size: 10`, un `Text` mide 1
 padre declare `Size: 20`. Las reglas se mezclan **propiedad a propiedad**, no por grupo: si la
 regla declara `Size` y el elemento `Weight`, se aplican las dos. Lo que una regla da a un
 elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
-`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven.
+`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. Tampoco `Head`,
+`Body`, `Foot` y `Row`, que no se pueden nombrar en `Element`; `Table` y `Cell`, sí.
 
 **Validación.** Lo que aporta una regla se valida igual que si lo declarara el elemento
 ([§6](#6-validación)), y el error señala la línea de la propiedad dentro de la regla. Los valores
@@ -484,6 +491,18 @@ El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no
 
 No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de los ítems es el
 `Padding` izquierdo de la `List` ([§5.14](#514-listas)).
+
+### 4.12 Tablas
+
+| Propiedad | Valores | Por defecto | Elementos | Notas |
+|---|---|---|---|---|
+| `Columns` | lista de pistas | — (obligatorio) | `Table` | Las columnas, como en `Grid` ([§4.7](#47-grid)). |
+| `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
+| `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda ([§5.15](#515-tablas)). |
+
+Una `Row` admite `Typography`, que heredan sus celdas, y `Break`, que es el de sus celdas; no
+tiene `Box`. Las filas de la tabla no tienen propiedad de tamaño: miden lo que su celda más
+alta.
 
 ---
 
@@ -1097,6 +1116,76 @@ fragmento. No cambia las reglas de corte (§5.10).
 ([§7](#7-formato-de-resultados)), el marcador de un ítem con `Id` aparece dentro de él como
 `Marker`, con su texto y su `Rect` (el espacio final incluido en el ancho).
 
+### 5.15 Tablas
+
+Una `Table` coloca sus celdas en filas y columnas: sus filas (`Row`) van en una cabecera
+(`Head`, opcional), un cuerpo (`Body`, obligatorio) y un pie (`Foot`, opcional), **en ese
+orden** (`TABLE_ORDER`), y cada fila tiene sus celdas (`Cell`) de izquierda a derecha. La
+`Table` admite `Id`, `Class`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo,
+también dentro de una celda.
+
+```
+Styles:
+	Element: Cell
+		Box:
+			Padding: 2 4
+			Border: 0 0 0.5 0
+Table:
+	Columns: 120 1fr 1fr
+	Head:
+		Row:
+			Typography:
+				Weight: bold
+			Cell: Concepto
+			Cell: T1
+			Cell: T2
+	Body:
+		Row:
+			Cell: Ventas
+			Cell: 100
+			Cell: 120
+	Foot:
+		Row:
+			Cell: Total
+				Span: 1 3
+```
+
+**Una tabla es un grid.** `Columns` (obligatorio) y `Gap` son los de `Grid` ([§5.8](#58-grid)):
+las columnas se dimensionan igual, con `auto`, fracciones, `minmax`…, y `Gap` separa las celdas
+(el `border-spacing` de CSS). Las filas son pistas `auto`: cada una mide lo que su celda más
+alta, y las celdas se estiran a su fila. Cada celda es un ítem del grid colocado
+explícitamente: va en la primera columna libre de su fila, y ocupa las filas y columnas de su
+`Span` (`filas columnas`, 1 1 por defecto; `Span: 1 3` ocupa tres columnas). Una columna está
+ocupada si la ocupa una celda de una fila de arriba con un `Span` de varias filas. Cada fila
+llena **exactamente** todas las columnas (`TABLE_ROW_CELLS`): una celda vacía se escribe
+`Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo a otro (de `Head` a `Body`, de
+`Body` a `Foot`) ni se solapa con otra celda (`TABLE_SPAN`).
+
+**Celdas.** Una `Cell` es una caja con dos formas, como un `Text`: con valor (`Cell: 100`), una
+caja de texto de una línea; sin valor, un bloque con elementos (`Block`, `Flex`, `Grid`,
+`Text`, `Paragraph`, `List`, `Table`, `Relative`, `Absolute` o `Fixed`; nunca encabezados), o
+vacía si no tiene ninguno. Las dos cosas a la vez son un error (`CELL_CONTENT`); un texto largo
+va en un `Paragraph`. Admite `Id`, `Class`, `Box`, `Typography` y `Span`. Los bordes son los
+de cada celda, separados ([§8](#8-diferencias-con-css)): una línea entre filas se dibuja con
+el borde inferior de las celdas.
+
+**Filas.** Una `Row` no es una caja: no tiene `Box` ni se nombra en `Element`, como `Head`,
+`Body` y `Foot`. Su `Typography` lo heredan sus celdas (las reglas `Styles` de la celda le
+ganan, como a cualquier herencia), y su `Break` es el de sus celdas: con él se fuerza o se
+evita el corte antes o después de la fila, o dentro de ella. Una celda no declara `Break`, ni
+siquiera desde una regla (`STYLE_NOT_ALLOWED`).
+
+**Cortes.** Una tabla se corta entre filas, como un grid ([§5.10](#510-fragmentación)): una fila
+que no cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus
+celdas en paralelo, si no cabe ni en una página vacía. Las filas de `Head` y `Foot` se
+**repiten** en cada página de la tabla, la cabecera arriba y el pie abajo; no se parten nunca y
+no admiten `Break` (`TABLE_ROW_BREAK`). Si la cabecera, el pie y la primera fila del cuerpo que
+va en la página no caben en una página vacía, es un error.
+
+**Salida PDF.** Una `Table` es `Table`; `Head`, `Body` y `Foot` son `THead`, `TBody` y `TFoot`;
+cada fila, `TR`, y cada celda, `TH` en `Head` y `TD` en el resto, con los atributos `RowSpan` y
+`ColSpan` si ocupa más de una fila o columna.
+
 ---
 
 ## 6. Validación
@@ -1143,7 +1232,7 @@ La validación se hace en cuatro niveles:
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
 | `STYLE_DUPLICATE` | Dos reglas no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute`, un `Fixed`, un encabezado o un `Text` de un encabezado | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -1152,6 +1241,11 @@ La validación se hace en cuatro niveles:
 | `LIST_NUMBER_NOT_ALLOWED` | `Start` y `Number` solo en las listas numeradas | `Start no tiene efecto con Marker: disc, que no numera los ítems` |
 | `LIST_NUMBER_RANGE` | El número cabe en la numeración: `decimal` desde 0, letras desde 1, romanos de 1 a 3999 (línea del `Start`, del `Number` o del ítem) | `El número 4000 no se puede escribir con Marker: upper-roman, que numera de 1 a 3999` |
 | `LIST_ITEM_WITHOUT_LINE` | Un ítem con marcador empieza con un texto con el que alinearlo (línea de la caja que lo impide) | `El marcador del List item de la línea 10 se alinea con su primera línea, y el ítem empieza con un Flex…` |
+| `TABLE_ORDER` | `Head`, `Body` y `Foot` van en ese orden ([§5.15](#515-tablas)) | `Body va después de Foot: los grupos de una Table van en el orden Head, Body, Foot` |
+| `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Columns`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): añade una Cell, vacía si hace falta, o usa Span` |
+| `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
+| `CELL_CONTENT` | Una `Cell` tiene texto en el valor o elementos, no las dos cosas | `Una Cell tiene texto en el valor (línea 12) o elementos, no las dos cosas: pon el texto en un Paragraph` |
+| `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1252,6 +1346,12 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Ítem sin primera línea (empieza con un flex, un grid o un bloque vacío) | El marcador se alinea con lo que haya | Error (`LIST_ITEM_WITHOUT_LINE`) |
 | `start` y `value` en una lista con viñetas | Se ignoran | Error (`LIST_NUMBER_NOT_ALLOWED`) |
 | `reversed` | Sí | No |
+| Anchos de las columnas de una tabla | `table-layout: auto` (o `fixed`), con su propio algoritmo | El dimensionado de pistas de grid, con `Columns` obligatorio ([§5.15](#515-tablas)) |
+| Bordes de tabla | `border-collapse: separate` o `collapse` | Solo separados, los de cada celda |
+| Fila con menos celdas que columnas, o `rowspan` que pasa de `tbody` a `tfoot` | Se completa con huecos; el `rowspan` se recorta | Error (`TABLE_ROW_CELLS`, `TABLE_SPAN`) |
+| Estilo de `tr`, `col` y `colgroup` | Fondo y bordes de fila y columna | `Row` solo da `Typography` y `Break` a sus celdas; sin columnas con estilo |
+| `caption` | Sí | No: un `Heading` o un `Paragraph` antes de la tabla |
+| `thead` y `tfoot` al imprimir | Se repiten según el navegador | Se repiten siempre en cada página |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |

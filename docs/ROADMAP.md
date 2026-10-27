@@ -34,7 +34,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
-| 14 | Tablas, con cabecera y pie repetidos | diseño | — |
+| 14 | Tablas, con cabecera y pie repetidos | en curso | — |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
 **Orden**, de menor a mayor impacto en el motor:
@@ -507,14 +507,23 @@ Table:
 - [x] Resolver TB2 y TB4–TB10.
 - [x] Schema (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`, `Span`; `Table` donde va un
       `Block`) y resumen del §9; `DocumentReaderTest.tablesValidateAgainstTheSchema`.
-      `BoxTreeBuilder` admite `Table` y `Cell` en `Element` y lanza
-      `UnsupportedOperationException` (`TODO(hito 14)`) al encontrar una `Table`.
-- [ ] `Style`, `BoxTreeBuilder` (traducción a filas y columnas, `Span`, errores del TB9).
-- [ ] Layout y repetición de cabecera y pie al fragmentar.
+- [x] `BoxTreeBuilder`: la `Table` es una caja `GRID` y cada `Cell` un ítem con colocación
+      explícita (`Style.itemArea`, en la línea de la celda); `Box.headRows` y `Box.footRows`
+      dicen qué filas de la rejilla son cabecera y pie. Una `Cell` con valor es `INLINE`; sin
+      valor, `BLOCK`. El `Typography` de la `Row` se aplica como herencia (antes de las
+      reglas) y su `Break`, a sus celdas. `ErrorCode` nuevos `TABLE_ORDER`,
+      `TABLE_ROW_CELLS`, `TABLE_SPAN`, `CELL_CONTENT` y `TABLE_ROW_BREAK`, con sus casos en el
+      catálogo; `STYLE_NOT_ALLOWED` cubre `Break` en una `Cell` desde una regla. Tests en
+      `tree/TablesTest` y `GridLayoutTest.tableCellsAreGridItems`.
+- [x] Especificación: §2, §4 (§4.12 nueva), §5.15 nueva, §6 y §8.
+- [ ] Layout y repetición de cabecera y pie al fragmentar (`TableLayout` sobre `GridLayout`;
+      hoy una tabla se maqueta como un grid, sin repetir cabecera ni pie), filas de `Head` y
+      `Foot` que no se parten, y el error de cabecera y pie que no caben en una página vacía.
+- [ ] PDF etiquetado del TB10 (hoy la tabla y sus celdas salen como `Div`).
 - [ ] Bordes (según TB4) en el pintado.
 - [ ] Tests de layout, de fragmentación (cabecera repetida, pie, fila partida) y casos de
       error.
-- [ ] Especificación; caso golden con una tabla de tres páginas.
+- [ ] Especificación §7 y §9 si cambian; caso golden con una tabla de tres páginas.
 
 ---
 
@@ -587,6 +596,14 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (13).** Hito 14 en curso. `BoxTreeBuilder` traduce la tabla a un grid con
+  colocación explícita (`Cell` con valor como texto, sin valor como bloque; `Typography` y
+  `Break` de la `Row` a sus celdas) y comprueba los errores del TB9 que no dependen del layout
+  (cinco `ErrorCode` nuevos, con sus casos). Especificación §2, §4.12, §5.15, §6 y §8;
+  `DECISIONES.md` (97–99). `mvn test` en verde. Una tabla ya se maqueta, como un grid.
+  *Siguiente paso:* `TableLayout`, que envuelve `GridLayout` y repite las filas de `Head`
+  (arriba) y `Foot` (abajo) en cada fragmento, sin partirlas, y el error de cabecera y pie que
+  no caben en una página vacía.
 - **2026-10-27 (12).** Hito 14 en diseño. Decididos TB1 (nombres: `Table`, `Head`, `Body`,
   `Foot`, `Row`, `Cell`, `Span`) y TB3 (anchos con las pistas de grid; `Columns` y `Gap`
   reutilizados). Para liberar `Cell`, el envoltorio de `Grid` pasa a llamarse `Area` en

@@ -405,3 +405,18 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     `item.area`). *Alternativa:* conservar `Cell` en `Grid` y llamar `Table cell` a la de la
     tabla, como `List item`; más largo en lo que más se repite de una tabla, y con dos
     "celdas" distintas en el namespace.
+
+97. **El `Break` de una `Row` es el de sus celdas**, porque la fila no es una caja: se copia a
+    cada celda (con la línea del `Break` de la fila) y el corte entre filas sale de las reglas
+    de corte del grid (`BreakRules.between`). Su `Typography` se aplica como herencia, antes
+    de las reglas, así que `Element: Cell` le gana. *Dónde:* `BoxTreeBuilder.element` (las
+    celdas). *Alternativa:* que la `Row` sea una caja con su propio `Box` (fondo de fila),
+    pintada detrás de sus celdas.
+
+98. **Los márgenes de una `Cell` son los de un ítem de grid**: separan la caja de la celda de
+    su área, como en `Grid`. HTML los ignora en las celdas. *Dónde:* `GridLayout`, sin código
+    propio. *Alternativa:* error si una celda declara `Margin`.
+
+99. **`Span: 1 1` explícito se admite**, aunque no tenga efecto, como `Start: 1` en una lista:
+    es el valor por defecto escrito, no una contradicción. *Dónde:* `BoxTreeBuilder.span`.
+    *Alternativa:* error de valor sin efecto.
