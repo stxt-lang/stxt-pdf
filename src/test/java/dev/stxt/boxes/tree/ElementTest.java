@@ -51,7 +51,9 @@ class ElementTest {
         // El marcador es generado y Marker es una propiedad de List: no es un elemento.
         assertTrue(Element.of("marker").isEmpty());
         assertTrue(Element.of("item").isEmpty());
-        assertEquals(Element.values().length - 1, Element.written().size());
+        // Ni el flujo de columnas de un Multicol, que también es generado.
+        assertTrue(Element.of("columns").isEmpty());
+        assertEquals(Element.values().length - 2, Element.written().size());
     }
 
     @Test

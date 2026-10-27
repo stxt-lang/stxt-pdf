@@ -1604,3 +1604,140 @@ Errors:
 							Cell:
 								Box:
 									Height: 300
+	Case: Multicol sin Count ni Column width
+		Code: MULTICOL_COLUMNS
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Column gap: 12
+					Text: Hola
+	Case: Count menor que 1
+		Code: VALUE_NOT_ALLOWED
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Count: 0
+					Text: Hola
+	Case: Column width en porcentaje
+		Code: VALUE_NOT_ALLOWED
+		Line: 9
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Column width: 30%
+					Text: Hola
+	Case: Línea entre columnas más ancha que el hueco
+		Code: COLUMN_RULE_WIDTH
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Count: 2
+					Column gap: 4
+					Rule: 6
+					Text: Hola
+	Case: Línea entre columnas sin hueco
+		Code: COLUMN_RULE_WIDTH
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Count: 2
+					Rule: 0.5
+					Text: Hola
+	Case: Corte de columna fuera de un Multicol
+		Code: COLUMN_BREAK_OUTSIDE_MULTICOL
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Paragraph: Uno
+					Break:
+						After: column
+				Paragraph: Dos
+	Case: Absolute como hijo de un Multicol
+		Code: CHILD_NOT_DECLARED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Count: 2
+					Absolute:
+						Text: Nota
+	Case: Fixed dentro de un Multicol
+		Code: POSITIONED_IN_MULTICOL
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Count: 2
+					Block:
+						Fixed:
+							Text: Nota
+	Case: Porcentaje vertical dentro de un Multicol
+		Code: INDEFINITE_PERCENTAGE
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Multicol:
+					Box:
+						Height: 200
+					Count: 2
+					Block:
+						Box:
+							Height: 50%

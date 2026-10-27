@@ -66,6 +66,16 @@ public enum ErrorCode {
     /** {@code Break} en una fila de {@code Head} o de {@code Foot}, que se repiten en cada página. */
     TABLE_ROW_BREAK,
 
+    // --- Columnas ------------------------------------------------------------------------------
+    /** Un {@code Multicol} sin {@code Count} ni {@code Column width}. */
+    MULTICOL_COLUMNS,
+    /** {@code Rule} más ancha que {@code Column gap}: la línea se pintaría sobre las columnas. */
+    COLUMN_RULE_WIDTH,
+    /** {@code Before} o {@code After: column} fuera de un {@code Multicol}. */
+    COLUMN_BREAK_OUTSIDE_MULTICOL,
+    /** Un {@code Absolute} o un {@code Fixed} dentro de un {@code Multicol}. */
+    POSITIONED_IN_MULTICOL,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,

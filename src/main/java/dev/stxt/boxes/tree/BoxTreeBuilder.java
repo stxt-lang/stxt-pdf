@@ -23,6 +23,7 @@ import static dev.stxt.boxes.tree.ModelValidator.font;
 import static dev.stxt.boxes.tree.ModelValidator.validateBox;
 import static dev.stxt.boxes.tree.ModelValidator.validateContainer;
 import static dev.stxt.boxes.tree.ModelValidator.validateFlex;
+import static dev.stxt.boxes.tree.ModelValidator.validateMulticol;
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
@@ -33,11 +34,13 @@ import static dev.stxt.boxes.tree.Nodes.required;
 import static dev.stxt.boxes.tree.Nodes.unread;
 import static dev.stxt.boxes.tree.PropertyReader.FLEX;
 import static dev.stxt.boxes.tree.PropertyReader.GRID;
+import static dev.stxt.boxes.tree.PropertyReader.MULTICOL;
 import static dev.stxt.boxes.tree.PropertyReader.box;
 import static dev.stxt.boxes.tree.PropertyReader.flex;
 import static dev.stxt.boxes.tree.PropertyReader.fragmentation;
 import static dev.stxt.boxes.tree.PropertyReader.grid;
 import static dev.stxt.boxes.tree.PropertyReader.item;
+import static dev.stxt.boxes.tree.PropertyReader.multicol;
 import static dev.stxt.boxes.tree.PropertyReader.typography;
 import static dev.stxt.boxes.tree.TableBuilder.cellText;
 import static dev.stxt.boxes.tree.TableBuilder.table;
@@ -188,6 +191,10 @@ public final class BoxTreeBuilder {
      */
     private Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper) {
         Element kind = Element.of(n.getCanonicalName()).orElseThrow();
+        if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
+            throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
+                    + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
+        }
         int level = kind.headingLevel();
         if (level > 0) {
             heading(ctx, n, level);
@@ -215,6 +222,10 @@ public final class BoxTreeBuilder {
             }
             if ((kind == Element.GRID || kind == Element.TABLE) && GRID.contains(name)) {
                 grid(p, s);
+                continue;
+            }
+            if (kind == Element.MULTICOL && MULTICOL.contains(name)) {
+                multicol(p, s);
                 continue;
             }
             switch (name) {
@@ -252,6 +263,9 @@ public final class BoxTreeBuilder {
         if (kind == Element.LIST) {
             validateList(s);
         }
+        if (kind == Element.MULTICOL) {
+            validateMulticol(s, n.getLine());
+        }
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (level > 0) {
@@ -283,6 +297,8 @@ public final class BoxTreeBuilder {
             ctx.insideFixed |= s.position == Style.Position.FIXED;
             if (kind == Element.TABLE) {
                 table(n, box, (cell, row) -> element(ctx, cell, box, row));
+            } else if (kind == Element.MULTICOL) {
+                columns(ctx, n, box);
             } else {
                 buildContent(ctx, n, box);
             }
@@ -292,6 +308,24 @@ public final class BoxTreeBuilder {
             markerLine(box);
         }
         return box;
+    }
+
+    /**
+     * El contenido de un {@code Multicol} (§5.16) va en su flujo de columnas, una caja de bloque
+     * generada que es su único hijo: cada columna es un fragmento suyo. Crea un contexto de
+     * formato de bloque, para que los márgenes no salgan de las columnas, y su alto no es
+     * definido: lo decide el reparto en columnas.
+     */
+    private void columns(BuildContext ctx, InlineNode n, Box multicol) {
+        Style s = Style.inheriting(multicol.style);
+        s.isolate = true;
+        Box flow = new Box(null, Element.COLUMNS, s, false, n.getLine());
+        multicol.addChild(flow);
+        ctx.definiteHeight.put(flow, false);
+        boolean outer = ctx.insideMulticol;
+        ctx.insideMulticol = true;
+        buildContent(ctx, n, flow);
+        ctx.insideMulticol = outer;
     }
 
     /**

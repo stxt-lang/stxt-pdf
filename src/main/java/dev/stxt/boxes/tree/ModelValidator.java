@@ -3,6 +3,7 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.model.Value;
 
 import java.util.List;
@@ -11,6 +12,10 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.label;
 import static dev.stxt.boxes.tree.Nodes.position;
 import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
+import static dev.stxt.boxes.tree.PropertyKey.BREAK_AFTER;
+import static dev.stxt.boxes.tree.PropertyKey.BREAK_BEFORE;
+import static dev.stxt.boxes.tree.PropertyKey.COLUMN_GAP;
+import static dev.stxt.boxes.tree.PropertyKey.RULE;
 import static dev.stxt.boxes.tree.PropertyKey.FLEX_GAP;
 import static dev.stxt.boxes.tree.PropertyKey.FLEX_LINES;
 import static dev.stxt.boxes.tree.PropertyKey.FLEX_MAIN_AXIS;
@@ -53,7 +58,24 @@ final class ModelValidator {
         }
     }
 
-    /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños y porcentajes. */
+    /**
+     * Un {@code Multicol} fija sus columnas con {@code Count}, {@code Column width} o los dos, y
+     * su línea entre columnas cabe en el hueco (§5.16).
+     */
+    static void validateMulticol(Style s, int line) {
+        if (s.multicolCount == null && s.multicolWidth == null) {
+            throw error(line, ErrorCode.MULTICOL_COLUMNS, "Un Multicol necesita Count, Column width o los dos: "
+                    + "Count fija el número de columnas y Column width su ancho mínimo");
+        }
+        if (s.multicolRule > s.multicolGap + Tolerance.EPSILON) {
+            String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (línea " + s.line(COLUMN_GAP) + ")"
+                    : "Column gap, que sin declarar es 0";
+            throw error(s.line(RULE), ErrorCode.COLUMN_RULE_WIDTH, "Rule es más ancha que " + gap
+                    + ": la línea se pintaría sobre las columnas; ensancha Column gap o adelgaza Rule");
+        }
+    }
+
+    /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
         Style.Layout parentLayout = parent.style.layout;
         // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
@@ -70,6 +92,21 @@ final class ModelValidator {
         validateMinMax(s, WIDTH, s.width, MIN_WIDTH, s.minWidth, MAX_WIDTH, s.maxWidth);
         validateMinMax(s, HEIGHT, s.height, MIN_HEIGHT, s.minHeight, MAX_HEIGHT, s.maxHeight);
         validatePercentages(ctx, s, parent, flexItem, gridItem);
+        validateColumnBreaks(ctx, s);
+    }
+
+    /** {@code Before} y {@code After: column} solo dentro de un {@code Multicol}, que es quien tiene columnas. */
+    private static void validateColumnBreaks(BuildContext ctx, Style s) {
+        if (ctx.insideMulticol) {
+            return;
+        }
+        String property = s.breakBefore == Style.Break.COLUMN ? BREAK_BEFORE
+                : s.breakAfter == Style.Break.COLUMN ? BREAK_AFTER : null;
+        if (property != null) {
+            throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, (property.equals(BREAK_BEFORE)
+                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Multicol: usa page para "
+                    + "cortar la página");
+        }
     }
 
     private static void validateOffset(Style s) {

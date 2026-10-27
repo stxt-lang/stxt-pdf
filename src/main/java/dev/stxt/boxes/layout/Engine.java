@@ -145,6 +145,7 @@ public final class Engine {
             case FLEX -> flex;
             // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
             case GRID -> box.element == Element.TABLE ? table : grid;
+            case MULTICOL -> throw new UnsupportedOperationException("Multicol: hito 15");
         };
     }
 

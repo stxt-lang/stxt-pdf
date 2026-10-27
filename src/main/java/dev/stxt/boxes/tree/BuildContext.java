@@ -26,6 +26,8 @@ final class BuildContext {
     int headingLevel;
     /** Si se está construyendo el contenido de un {@code Fixed}. */
     boolean insideFixed;
+    /** Si se está construyendo el contenido de un {@code Multicol}. */
+    boolean insideMulticol;
 
     BuildContext(StyleRules rules) {
         this.rules = rules;

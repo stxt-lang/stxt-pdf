@@ -12,8 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Elementos de caja del documento (ESPECIFICACION.md §2, §9) y el marcador que el motor genera
- * para cada {@code List item} (§5.14). Cada uno da su {@code Layout} y su {@code Position}, que
+ * Elementos de caja del documento (ESPECIFICACION.md §2, §9), el marcador que el motor genera
+ * para cada {@code List item} (§5.14) y el flujo de columnas de cada {@code Multicol} (§5.16). Cada uno da su {@code Layout} y su {@code Position}, que
  * no se declaran, y el significado que usan las reglas {@code Element}, los marcadores y las
  * etiquetas del PDF.
  *
@@ -39,11 +39,18 @@ public enum Element {
     TABLE("Table", Layout.GRID, Position.STATIC, true, false, 0),
     /** Sin valor, un bloque; con valor, una caja de texto ({@link BoxTreeBuilder} cambia el {@code Layout}). */
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
+    /** Bloque en columnas (§5.16): su contenido va en el flujo de columnas, {@link #COLUMNS}. */
+    MULTICOL("Multicol", Layout.MULTICOL, Position.STATIC, true, false, 0),
     RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
     ABSOLUTE("Absolute", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
     FIXED("Fixed", Layout.BLOCK, Position.FIXED, false, false, 0),
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
-    MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0);
+    MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
+    /**
+     * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos
+     * del {@code Multicol}, que es su único hijo. Cada columna es un fragmento suyo (§5.16).
+     */
+    COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0);
 
     /** Los elementos que se escriben en el documento, por su nombre canónico ({@code list-item}). */
     private static final Map<String, Element> BY_NAME = Arrays.stream(values())
@@ -76,7 +83,7 @@ public enum Element {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
     }
 
-    /** El nombre como se escribe ({@code List item}); {@code null} en el marcador. */
+    /** El nombre como se escribe ({@code List item}); {@code null} en las cajas generadas. */
     public String label() {
         return label;
     }

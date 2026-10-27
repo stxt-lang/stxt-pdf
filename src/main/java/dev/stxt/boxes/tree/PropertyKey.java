@@ -40,6 +40,15 @@ public final class PropertyKey {
     public static final String START = "start";
     public static final String NUMBER = "number";
 
+    // Multicol
+    public static final String COUNT = "count";
+    public static final String COLUMN_GAP = "column-gap";
+    public static final String RULE = "rule";
+
+    // Break
+    public static final String BREAK_BEFORE = "break-before";
+    public static final String BREAK_AFTER = "break-after";
+
     // Flex, Grid e Item
     public static final String FLEX_MAIN_AXIS = "flex.main-axis";
     public static final String FLEX_LINES = "flex.lines";
@@ -57,7 +66,7 @@ public final class PropertyKey {
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "weight", FONT_WEIGHT, "style", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
-            "before", "break-before", "after", "break-after", "inside", "break-inside");
+            "before", BREAK_BEFORE, "after", BREAK_AFTER, "inside", "break-inside");
 
     private PropertyKey() {
     }

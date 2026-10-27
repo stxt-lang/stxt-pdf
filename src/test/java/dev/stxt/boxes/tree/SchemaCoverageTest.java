@@ -95,7 +95,14 @@ class SchemaCoverageTest {
             // Listas
             Map.entry("Marker", "Marker: decimal"),
             Map.entry("Start", "Start: 3"),
-            Map.entry("Number", "Number: 5"));
+            Map.entry("Number", "Number: 5"),
+            // Multicol
+            Map.entry("Count", "Count: 3"),
+            Map.entry("Column width", "Column width: 100"),
+            Map.entry("Column gap", "Column gap: 12"),
+            Map.entry("Rule", "Rule: 1"),
+            Map.entry("Rule color", "Rule color: #999999"),
+            Map.entry("Fill", "Fill: auto"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -140,6 +147,9 @@ class SchemaCoverageTest {
                 Set.of("Marker")));
         t.put("List item", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\tList item:\n\t\t\t{}\n"
                 + "\t\t\tParagraph: Uno"));
+        // Rule necesita un Column gap que la contenga.
+        t.put("Multicol", new Template(HEADER + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\t{}\n"
+                + "\t\tText: Hola", Set.of("Count", "Column gap")));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
         String table = HEADER + "\tTable:\n\t\tColumns: 100\n";

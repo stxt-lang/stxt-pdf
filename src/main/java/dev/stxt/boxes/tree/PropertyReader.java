@@ -39,7 +39,7 @@ import static dev.stxt.boxes.tree.ValueReader.value;
 /**
  * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
  * y {@code Break} (ESPECIFICACION.md §4), que comparten los elementos y las reglas de
- * {@code Styles}, las propiedades de {@code Flex} y {@code Grid} y las de los envoltorios
+ * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Multicol} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
  * <p>Los {@code switch} no tienen una rama {@code default} que asigne: lo que el schema admite
@@ -51,6 +51,8 @@ final class PropertyReader {
     static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
+    /** Propiedades del elemento {@code Multicol}. */
+    static final Set<String> MULTICOL = Set.of("count", "column-width", "column-gap", "rule", "rule-color", "fill");
 
     private PropertyReader() {
     }
@@ -141,6 +143,23 @@ final class PropertyReader {
             case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
             case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
             case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, p);
+            default -> throw unread(p);
+        }
+    }
+
+    /**
+     * Propiedades de {@code Multicol}, hijas del elemento (§4.13); sus nombres no se repiten en
+     * otro elemento y su línea se guarda sin prefijo ({@code column-gap}).
+     */
+    static void multicol(Node p, Style s) {
+        s.declared(p.getCanonicalName(), p.getLine());
+        switch (p.getCanonicalName()) {
+            case "count" -> s.multicolCount = positiveInteger(p);
+            case "column-width" -> s.multicolWidth = positive(p);
+            case "column-gap" -> s.multicolGap = nonNegative(p);
+            case "rule" -> s.multicolRule = positive(p);
+            case "rule-color" -> s.multicolRuleColor = color(p);
+            case "fill" -> s.multicolFill = enumValue(Style.Fill.class, p);
             default -> throw unread(p);
         }
     }

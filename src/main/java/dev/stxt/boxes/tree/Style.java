@@ -27,7 +27,7 @@ import java.util.Map;
 public final class Style {
 
     /** Cómo coloca la caja a sus hijos: lo da el elemento. */
-    public enum Layout { BLOCK, INLINE, FLEX, GRID }
+    public enum Layout { BLOCK, INLINE, FLEX, GRID, MULTICOL }
 
     /** Cómo participa la caja en el flujo de su padre: {@code Relative}, {@code Absolute} y {@code Fixed}; el resto, {@code STATIC}. */
     public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
@@ -45,9 +45,13 @@ public final class Style {
     /** Alineación de un ítem dentro de su línea o celda. */
     public enum Alignment { START, END, CENTER, STRETCH }
 
-    public enum Break { AUTO, PAGE, AVOID }
+    /** {@code column} solo dentro de un {@code Multicol}: pasa a la columna siguiente. */
+    public enum Break { AUTO, PAGE, COLUMN, AVOID }
 
     public enum Decoration { SLICE, CLONE }
+
+    /** Reparto entre las columnas de un {@code Multicol}: equilibrado o en orden. */
+    public enum Fill { BALANCE, AUTO }
 
     /** Marcador de los ítems de una lista: un símbolo, ninguno o una numeración. */
     public enum Marker {
@@ -147,6 +151,19 @@ public final class Style {
     public int listStart = 1;
     /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
     public Integer listNumber;
+
+    // --- Multicol --------------------------------------------------------------------------------
+    /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
+    public Integer multicolCount;
+    /** {@code Column width}, en puntos; {@code null} = sin declarar. */
+    public Double multicolWidth;
+    /** {@code Column gap}, en puntos. */
+    public double multicolGap = 0;
+    /** Grosor de la línea entre columnas ({@code Rule}); 0 = sin línea. */
+    public double multicolRule = 0;
+    /** {@code Rule color}; {@code null} = igual que {@link #color}. */
+    public String multicolRuleColor;
+    public Fill multicolFill = Fill.BALANCE;
 
     // --- Fragmentación ---------------------------------------------------------------------------
     public Break breakBefore = Break.AUTO;

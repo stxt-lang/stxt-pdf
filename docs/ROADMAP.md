@@ -614,7 +614,7 @@ Multicol:
 **Tareas:**
 
 - [x] Resolver C1–C8.
-- [ ] Schema, `Element`, `Style`, builder (con el flujo de columnas) y los errores nuevos, con
+- [x] Schema, `Element`, `Style`, builder (con el flujo de columnas) y los errores nuevos, con
       sus casos en el catálogo.
 - [ ] `MulticolLayout` sin equilibrado (llenado en orden), en una y en varias páginas.
 - [ ] Equilibrado.

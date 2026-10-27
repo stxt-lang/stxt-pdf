@@ -156,7 +156,7 @@ final class ValueReader {
 
     static boolean breakInside(Node n) {
         Style.Break b = enumValue(Style.Break.class, n);
-        if (b == Style.Break.PAGE) {
+        if (b == Style.Break.PAGE || b == Style.Break.COLUMN) {
             throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Inside solo admite auto o avoid");
         }
         return b == Style.Break.AVOID;
