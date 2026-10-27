@@ -128,7 +128,8 @@ en `target/pdf/`.
 9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
 10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
 
-Los siguientes hitos (11 a 14: encabezados, listas, tablas y bloque en columnas), con sus
+Los siguientes hitos (11 a 15: reglas reutilizables `Styles`, encabezados y párrafos, listas,
+tablas y bloque en columnas), con sus
 decisiones abiertas, tareas y el registro de cada sesión, están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 

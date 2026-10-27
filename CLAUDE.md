@@ -55,7 +55,8 @@ actualízala.
 | 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
 
-Los hitos 11 a 14 (encabezados, listas, tablas y bloque en columnas) se siguen en
+Los hitos 11 a 15 (reglas reutilizables `Styles`, encabezados y párrafos, listas, tablas y
+bloque en columnas) se siguen en
 [`docs/ROADMAP.md`](docs/ROADMAP.md); al terminar uno, añádelo también a esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente

@@ -1,7 +1,7 @@
 # Hoja de ruta: elementos de documento
 
-Plan de trabajo para añadir al motor los elementos de documento: encabezados, listas, tablas y
-bloques en columnas. Es el punto de partida de cada sesión: el estado, las decisiones tomadas y
+Plan de trabajo para añadir al motor las reglas de estilo reutilizables y los elementos de
+documento: encabezados y párrafos, listas, tablas y bloques en columnas. Es el punto de partida de cada sesión: el estado, las decisiones tomadas y
 lo que queda por hacer están aquí, no en la memoria de la conversación.
 
 Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado del
@@ -31,16 +31,20 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 
 | Hito | Elemento | Estado | Caso golden |
 |---|---|---|---|
-| 11 | Encabezados (`h1`…`h6`) | pendiente | — |
-| 12 | Listas (`ul`, `ol`, `li`) | pendiente | — |
-| 13 | Tablas, con cabecera y pie repetidos | pendiente | — |
-| 14 | Bloque en columnas (multicolumna) | pendiente | — |
+| 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | diseño | — |
+| 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | pendiente | — |
+| 13 | Listas (`ul`, `ol`, `li`) | pendiente | — |
+| 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
+| 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
-**Orden propuesto**, de menor a mayor impacto en el motor:
+**Orden**, de menor a mayor impacto en el motor:
 
-- **Encabezados** primero: son casi un `Text` con significado. Sirven para fijar cómo se
-  comporta un elemento *semántico* (valores por defecto, marcadores en el PDF), y el resto de
-  hitos reutiliza esa decisión.
+- **Reglas reutilizables** primero: dan a cada tipo de elemento su estilo sin repetirlo en
+  cada caja (decisión T1), y los elementos semánticos que vienen después se apoyan en ellas.
+  Solo tocan la construcción del árbol, no el layout.
+- **Encabezados y párrafos**: son casi un `Text` con significado. Fijan cómo se comporta un
+  elemento *semántico* (marcadores en el PDF, cortes), y el resto de hitos reutiliza esa
+  decisión.
 - **Listas** después: añaden una caja nueva (el marcador) y la numeración, pero el flujo sigue
   siendo de bloque.
 - **Tablas**: un algoritmo de layout nuevo, o una variante de grid, y repetir cabecera y pie
@@ -77,21 +81,14 @@ comportamiento" de [`CLAUDE.md`](../CLAUDE.md):
 
 ## Decisiones transversales
 
-Afectan a varios hitos. Hay que resolverlas en el hito 11, o en el primero que las necesite.
+Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
 
 **Abiertas:**
 
-- **T1. Valores por defecto de los elementos semánticos.** No hay cascada ni hoja de estilos
-  del agente de usuario. Hay tres opciones para que un `h1` sea más grande que un `h2`:
-  (a) ningún estilo implícito: el autor declara `Typography` en cada encabezado;
-  (b) valores por defecto fijos en el motor (como `Widows: 2`);
-  (c) estilos por nivel declarados una vez en el `Document` (por ejemplo, un grupo
-  `Headings` con `Level 1`, `Level 2`…), que se heredan como `Typography`.
-  Con (a) o (c) se respeta la política de "nada implícito" del §6.
 - **T2. Significado en la salida.** Qué produce el significado de un elemento, además del
   layout: marcadores del PDF (*outline*) para los encabezados, PDF etiquetado (*tagged PDF*,
   accesibilidad) para todos, y el volcado del §7 (si incluye el tipo de elemento).
-  Propuesta: *outline* en el hito 11 y PDF etiquetado fuera de alcance por ahora.
+  Propuesta: *outline* en el hito 12 y PDF etiquetado fuera de alcance por ahora.
 - **T3. Nombres que chocan.** `Item` (hijo de `Flex`), `Cell` (hijo de `Grid`) y `Columns`
   (pistas de `Grid`) ya existen y tienen una única definición en el namespace. Las listas,
   las tablas y las columnas tienen que usar otros nombres o compartir el significado. Se
@@ -100,54 +97,184 @@ Afectan a varios hitos. Hay que resolverlas en el hito 11, o en el primero que l
   encabezado o un ítem de lista con una palabra en negrita necesitaría tramos (*spans*).
   Propuesta: fuera de alcance de estos hitos; si hace falta, sería un hito propio.
 
-**Tomadas:** *(ninguna todavía)*
+**Tomadas:**
+
+- **T1. Valores por defecto de los elementos semánticos** (2026-10-27). No hay estilos
+  implícitos en el motor: el estilo de cada tipo de elemento (un `Heading 1` más grande que un
+  `Heading 2`) se declara una vez en las reglas `Styles` del documento (hito 11). Se respeta
+  la política de "nada implícito" del §6.
 
 ---
 
-## Hito 11: encabezados
+## Hito 11: reglas reutilizables
 
-**Objetivo.** Un elemento de texto con nivel (1 a 6), equivalente a `h1`…`h6`, que no se separa
-del contenido que le sigue y que aparece en los marcadores del PDF.
+**Objetivo.** Declarar una vez, en el `Document`, propiedades que se aplican por defecto a
+todos los elementos de un tipo, a los que tienen una clase o a uno con un `Id` concreto. El
+elemento puede sobrescribirlas con sus propias propiedades.
+
+**Sintaxis** (nombres decididos; los detalles de `Class`, en S1):
+
+```
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 20
+				Weight: bold
+			Break:
+				After: avoid
+		Element: Paragraph
+			Box:
+				Margin: 0 0 6 0
+		For class: note
+			Box:
+				Background: #F1EFE8
+				Padding: 8
+		For id: summary
+			Typography:
+				Style: italic
+	Heading 1: Resultados
+	Paragraph: Texto normal.
+	Paragraph: Una nota.
+		Class: note
+	Paragraph: El resumen.
+		Id: summary
+```
+
+**Decisiones tomadas** (2026-10-27):
+
+- [x] R1. El contenedor es **`Styles`**, hijo de `Document` (como mucho uno). `Style` ya es
+      la propiedad `normal`/`italic` de `Typography`.
+- [x] R2. Las reglas son **`Element: <tipo>`**, **`For class: <clase>`** y
+      **`For id: <id>`**. `Id` no puede tener hijos: ya es una propiedad.
+- [x] R3. Las **clases entran en este hito**. Un elemento puede tener varias.
+- [x] R4. **Prioridad**, de más a menos fuerte: lo declarado en el propio elemento, la regla
+      `For id`, las reglas `For class`, la regla `Element`, lo heredado del padre y el valor
+      por defecto. Una regla gana a la herencia: un `Element: Text` con `Size: 10` se impone
+      al `Size: 20` que el `Text` heredaría de su padre.
+- [x] R5. **Mezcla por propiedad, no por grupo.** Si la regla declara `Typography / Size` y el
+      elemento `Typography / Weight`, se aplican las dos.
+- [x] R6. Una regla solo admite los grupos **`Box`, `Typography` y `Break`**; no las
+      propiedades propias de cada elemento (`Gap`, `Columns`, `Offset`…).
+- [x] R7. **Validación como si se hubiera declarado en el elemento** (política estricta del
+      §6): lo que una regla aporta se valida igual, y el error señala la línea de la
+      propiedad dentro de la regla. Si un caso concreto molesta, se relaja después.
+- [x] R8. Un `For id` con un `Id` que no existe es un error. Un `Element` sin elementos de ese
+      tipo en el documento no lo es, para que las reglas se puedan reutilizar.
+- [x] R9. `Item` y `Cell` no se pueden nombrar en `Element`: no son cajas.
+- [x] R10. Los tipos que se pueden nombrar son los elementos de caja (`Block`, `Flex`, `Grid`,
+      `Text`, `Relative`, `Absolute`, `Fixed`) y los que vengan (`Paragraph`, `Heading 1`…
+      `Heading 6`, listas, tablas…). Un nombre que no es un elemento es un error.
+- [x] R11. Importar reglas de un fichero de la carpeta de recursos queda **para más
+      adelante**.
+
+**Decisiones abiertas** (con propuesta):
+
+- [ ] S1. Sintaxis de las clases: `For class: note` en las reglas y `Class: note aside` en el
+      elemento (lista separada por espacios). Son dos nodos distintos, porque `Class` no tiene
+      hijos y `For class` sí. ¿`Class` en todos los elementos de caja?
+- [ ] S2. Varias clases de un mismo elemento que declaran la misma propiedad: gana la regla
+      que va **después en `Styles`** (como en CSS), no el orden de `Class: a b`.
+- [ ] S3. Dos reglas iguales (dos `Element: Text`, dos `For id: x`): ¿error, o se mezclan
+      en orden? Propuesta: error, por la política estricta.
+- [ ] S4. Un elemento con `Class: x` sin ninguna regla `For class: x`: ¿error (no tiene
+      efecto) o se permite? Propuesta: error. Un `For class` sin elementos con esa clase se
+      permite (como R8).
+- [ ] S5. `Typography` del `Document`: sigue siendo lo que hereda la raíz. ¿Se mantiene, o se
+      sustituye por una regla (`Element: Document`)? Propuesta: se mantiene.
+
+**Diseño técnico (previsto):**
+
+- Schema: `Styles` (`GROUP`, hijo de `Document`) con `Element`, `For class` y `For id`
+  (`INLINE`: el valor es el selector; hijos `Box`, `Typography` y `Break`). `Class` en los
+  elementos de caja. El valor de `Element` no se puede validar en el schema: lo comprueba el
+  builder.
+- `BoxTreeBuilder` lee primero las reglas (por tipo, por clase en orden del documento y por
+  id). Para cada elemento aplica, en este orden y con la misma función que ya lee los grupos:
+  herencia del padre, regla `Element`, reglas `For class`, regla `For id` y lo propio. Cada
+  propiedad conserva la línea de donde viene, así que los errores la señalan sin más.
+- Repasar el orden actual de herencia y lectura de `Typography`: la regla tiene que quedar
+  entre las dos.
+- Errores nuevos (nombres a confirmar): tipo desconocido en `Element`, `For id` sin elemento,
+  regla repetida (S3) y clase sin regla (S4).
+- No cambian el layout, el pintado ni el volcado del §7.
+
+**Tareas:**
+
+- [ ] Resolver S1–S5.
+- [ ] Schema: `Styles`, `Element`, `For class`, `For id`, `Class`.
+- [ ] `BoxTreeBuilder`: lectura de reglas, aplicación con su prioridad, validaciones.
+- [ ] Tests en `BoxTreeBuilderTest` (prioridad, mezcla por propiedad, regla frente a
+      herencia, clases en orden) y de layout con reglas.
+- [ ] `ErrorCode` y casos en el catálogo de errores.
+- [ ] Especificación: §2, §4 (sección nueva de reglas), §6, §8 (diferencias con CSS: sin
+      selectores compuestos ni especificidad), §9 y §10.
+- [ ] Caso golden: un documento con estilo solo en `Styles`.
+
+---
+
+## Hito 12: encabezados y párrafos
+
+**Objetivo.** Seis elementos de encabezado, `Heading 1` … `Heading 6`, equivalentes a
+`h1`…`h6`, que aparecen en los marcadores del PDF, y un elemento `Paragraph`. Su estilo sale
+de las reglas `Styles` (hito 11).
 
 **Borrador de sintaxis** (a confirmar):
 
 ```
-Heading: Resultados del trimestre
-	Level: 1
+Heading 1: Resultados del trimestre
 	Id: results
+Paragraph:
+	Content >>
+		Texto del párrafo.
 ```
+
+**Decisiones tomadas** (2026-10-27):
+
+- [x] H1. **Seis elementos**, `Heading 1` … `Heading 6`, no un `Heading` con `Level`: así una
+      regla los nombra directamente (`Element: Heading 1`).
+- [x] H3. El estilo de cada nivel se declara en `Styles` (T1); el motor no tiene estilos
+      implícitos.
+- [x] P1. Habrá un elemento **`Paragraph`**.
 
 **Decisiones abiertas:**
 
-- [ ] H1. ¿Un elemento con `Level` (`Heading` + `Level: 1`) o seis elementos (`H1`…`H6`)?
-- [ ] H2. ¿Es un `Text` con otro nombre (mismas propiedades, texto en el valor o en
-      `Content`) o puede contener otros elementos?
-- [ ] H3. Estilo por nivel: ver T1.
-- [ ] H4. `Break After: avoid` implícito (un encabezado no se queda solo al final de la
-      página). ¿Por defecto, o lo declara el autor?
+- [ ] H2. ¿Un encabezado es un `Text` con otro nombre (mismas propiedades, texto en el valor
+      o en `Content`) o puede contener otros elementos?
+- [ ] H4. `Break After: avoid` (un encabezado no se queda solo al final de la página): con
+      `Styles` lo puede declarar el autor (`Element: Heading 1` / `Break` / `After: avoid`).
+      ¿Basta, o el motor lo aplica siempre?
 - [ ] H5. Marcadores del PDF: ver T2. ¿Hace falta una propiedad para excluir un encabezado
       del índice?
-
-**Decisiones tomadas:** *(ninguna todavía)*
+- [ ] P2. ¿En qué se diferencia `Paragraph` de `Text`? ¿`Text` sigue existiendo como caja de
+      texto sin significado, o `Paragraph` lo sustituye? ¿Un `Content` con líneas en blanco
+      sigue dando varios párrafos dentro de un `Paragraph`?
 
 **Diseño técnico (previsto):**
 
-- `BoxTreeBuilder` lo traduce a una `Box` de texto (`Layout.INLINE`) con el nivel en `Style`
-  (o en `Box`); el layout es el de `InlineLayout`, sin algoritmo nuevo.
+- `BoxTreeBuilder` los traduce a una `Box` de texto (`Layout.INLINE`) con su tipo de
+  elemento (para las reglas y los marcadores); el layout es el de `InlineLayout`, sin
+  algoritmo nuevo.
 - Marcadores: `PdfCanvas` recoge los encabezados al pintar (página y posición del primer
   fragmento) y construye el *outline* de PDFBox (`PDDocumentOutline`) anidando por nivel.
 
 **Tareas:**
 
-- [ ] Resolver H1–H5 (y T1, T2).
+- [ ] Resolver H2, H4, H5, P2 (y T2).
 - [ ] Schema, `Style`, `BoxTreeBuilder`.
 - [ ] Marcadores en `PdfCanvas`, con su test en `PdfCanvasTest`.
-- [ ] Especificación y casos de error (nivel fuera de 1–6…).
+- [ ] Especificación y casos de error.
 - [ ] Caso golden.
 
 ---
 
-## Hito 12: listas
+## Hito 13: listas
 
 **Objetivo.** Listas sin numerar y numeradas (`ul`, `ol`, `li`), anidables, con el marcador
 fuera del contenido y alineado con la primera línea del ítem.
@@ -208,7 +335,7 @@ List:
 
 ---
 
-## Hito 13: tablas
+## Hito 14: tablas
 
 **Objetivo.** Tablas al estilo HTML: filas y celdas, celdas que ocupan varias filas o
 columnas, y una cabecera y un pie que se repiten en cada página cuando la tabla se parte.
@@ -282,7 +409,7 @@ Table:
 
 ---
 
-## Hito 14: bloque en columnas
+## Hito 15: bloque en columnas
 
 **Objetivo.** Un bloque cuyo contenido fluye por varias columnas seguidas, como en una
 revista: el texto llena la primera columna, sigue en la segunda, y al acabar la página
@@ -351,6 +478,12 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (2).** Se añade el hito 11, reglas reutilizables (`Styles`), y los demás pasan
+  a ser del 12 al 15. Decididos los nombres (`Styles`, `Element`, `For class`, `For id`), la
+  prioridad, la mezcla por propiedad, la validación estricta y que las clases entran en este
+  hito (R1–R11). Resuelve T1. Decidido también que los encabezados son seis elementos
+  (`Heading 1`…`Heading 6`) y que habrá `Paragraph`.
+  *Siguiente paso:* resolver S1–S5 del hito 11 y empezar por el schema y `BoxTreeBuilder`.
 - **2026-10-27.** Se crea esta hoja de ruta. Antes, en la misma sesión, se eliminó el modo
   continuo (decisión 78 de `DECISIONES.md`): el medio es siempre paginado.
-  *Siguiente paso:* resolver las decisiones transversales T1–T4 y las del hito 11 (H1–H5).
+  *Siguiente paso:* resolver las decisiones transversales T1–T4 y las del hito de encabezados (H1–H5; entonces era el 11, hoy el 12).
