@@ -49,7 +49,8 @@ class DocumentReaderTest {
                 "src/test/resources/golden/08-styles/input.stxt",
                 "src/test/resources/golden/09-headings/input.stxt",
                 "src/test/resources/golden/10-lists/input.stxt",
-                "src/test/resources/golden/11-tables/input.stxt"}) {
+                "src/test/resources/golden/11-tables/input.stxt",
+                "src/test/resources/golden/12-multicol/input.stxt"}) {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }

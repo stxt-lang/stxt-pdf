@@ -507,3 +507,78 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      automáticos (el paso 3 del §5.8), no antes como en CSS, y el de fila fija toma la primera
      columna libre, no la siguiente a los anteriores de esa fila. *Dónde:* `layout/grid/Placement`,
      `layout/grid/GridLayout.noRoom`. *Alternativa:* la columna implícita de CSS.
+
+## Hito 15: bloque en columnas (2026-10-27)
+
+110. **El contenido de un `Multicol` va en una caja generada, el flujo de columnas**
+     (`Element.COLUMNS`), su único hijo: cada columna es un fragmento de esa caja, maquetado
+     con los algoritmos de siempre. Crea un contexto de formato de bloque (los márgenes no
+     salen de las columnas, como en CSS). *Dónde:* `tree/BoxTreeBuilder.columns`,
+     `layout/multicol/MulticolLayout`, `paint/PdfStructure` (que la salta). *Alternativa:* que
+     `MulticolLayout` apile los hijos él mismo, repitiendo el flujo de bloque.
+
+111. **El alto de las columnas no es definido**: un porcentaje vertical dentro de un
+     `Multicol` es `INDEFINITE_PERCENTAGE`, aunque el `Multicol` tenga `Height`. El alto de
+     cada columna sale del reparto, no se conoce al leer. *Dónde:* `tree/BoxTreeBuilder.columns`.
+     *Alternativa:* tomar como base el alto de contenido del `Multicol` cuando es definido,
+     como CSS.
+
+112. **`Column width` y `Column gap` solo en puntos**, y `Column gap` vale 0 por defecto (en
+     CSS, `1em` y admite porcentajes). Como el resto del modelo, sin unidades relativas a la
+     fuente. *Dónde:* `tree/PropertyReader.multicol`. *Alternativa:* porcentajes del ancho de
+     contenido en `Column gap`.
+
+113. **El equilibrado no incumple reglas que el reparto en orden respeta.** Se busca el alto
+     mínimo (búsqueda binaria con precisión de 0,001 pt, que no cambia los cortes) en que el
+     contenido termina en las columnas sin pasar del alto y sin cortes entre columnas peores
+     que los del reparto en orden (perfectos, si no tiene cortes): un bloque con
+     `Inside: avoid` no se parte y un párrafo de tres líneas con viudas y huérfanas de 2 no se
+     reparte. Solo se equilibra el último fragmento, como `column-fill: balance`; no hay
+     `balance-all`. *Dónde:* `MulticolLayout.Run.balance`. *Alternativa:* el equilibrado de
+     los navegadores, que minimiza la falta de espacio y puede incumplir reglas.
+
+114. **Sin página ni alto que llenar, las columnas se equilibran siempre**, también con
+     `Fill: auto`: un `Multicol` que es un ítem de flex o está en un `Absolute` no tiene nada
+     que llenar en orden. No es un error porque no se sabe al leer: el mismo ítem se parte en
+     paralelo si no cabe en una página. *Dónde:* `MulticolLayout.Run.layOut`. *Alternativa:*
+     llenar en orden con un alto infinito, que dejaría todo en la primera columna.
+
+115. **El contenido que no cabe en las columnas y no puede seguir en otra página es
+     `BOX_OVERFLOW`, detectado al maquetar**: cuando el `Height` (o `Max height`) del
+     `Multicol` termina en esta página, en la línea de esa propiedad, o cuando, sin página ni
+     alto, hay más cortes de columna que columnas, en la línea de `Count`. *Dónde:*
+     `MulticolLayout.Run.tooTall` y `tooManyColumnBreaks`. *Alternativa:* las columnas de
+     desbordamiento de CSS, a un lado del contenedor; o una última columna sin límite y que lo
+     detecte `Overflow`.
+
+116. **Un corte forzado de página tiene una calidad propia, `BreakAppeal.FORCED_PAGE`**, por
+     encima de `PERFECT_BREAK`, para que atraviese las columnas: el `Multicol` deja de
+     llenarlas y pasa el corte a su padre. El de columna es un corte perfecto. Si una caja
+     fuerza los dos, gana el de página; de un `Multicol`, el `Before` y el `After` de sus
+     hijos de los extremos solo salen si son de página. Límite: en los ítems de flex y grid
+     partidos en paralelo, el corte del grupo es el peor de los ítems, así que un corte de
+     página dentro de uno de ellos actúa como de columna. *Dónde:* `fragment/BreakRules`
+     (`forcedBetween` devuelve el tipo), `fragment/Unit`, `layout/block/BlockLayout`.
+     *Alternativa:* un campo en `LayoutResult` que diga si el corte es de página.
+
+117. **Las columnas de una página empiezan donde el `Multicol`:** solo están "al principio de
+     página" (y deben colocar algo aunque no quepa) si lo está el `Multicol`. Si la primera no
+     puede colocar nada, el `Multicol` corta antes de él; si no puede otra, el resto pasa a la
+     página siguiente, porque las demás columnas tienen el mismo alto. La calidad del corte de
+     página es la de la última columna; los cortes entre columnas no cuentan para el padre.
+     *Dónde:* `MulticolLayout.Run.fill`. *Alternativa:* tratar cada columna como el principio
+     de un fragmentainer, que forzaría contenido que no cabe en la página.
+
+118. **Tamaños intrínsecos:** con `Count` y sin `Column width`, min-content = `Count`
+     columnas del min-content del contenido más los huecos; con `Column width`, una columna. El
+     max-content es `Count` columnas (una sin `Count`) del max-content del contenido o de
+     `Column width` si es mayor, más los huecos. *Dónde:* `MulticolLayout.contentIntrinsic`.
+     *Alternativa:* las reglas de CSS Multicol (min-content con `column-width` = el menor entre
+     él y el del contenido).
+
+119. **La línea entre columnas no puede ser más ancha que el hueco** (`COLUMN_RULE_WIDTH`):
+     en CSS no ocupa sitio y se pinta encima de las columnas. Se pinta con el fondo del
+     `Multicol`, solo entre columnas con contenido, desde arriba de la caja de contenido y con
+     el alto de la columna más alta del fragmento; siempre continua (sin `column-rule-style`).
+     *Dónde:* `paint/StackingContext.paintRules`, `tree/ModelValidator.validateMulticol`.
+     *Alternativa:* la línea de CSS, con estilos y sin límite de grosor.

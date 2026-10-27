@@ -1,0 +1,29 @@
+# Página 1: title en y = 20; m en 40, de 132. p1 en la primera columna (11 líneas); p2 (7) y
+#   las 4 primeras líneas de p3 en la segunda, desde x = 160.
+# Página 2: m en 20, de 72. p3 (4 líneas) y las 2 primeras de p4 en la primera columna; las 2
+#   últimas de p4 y p5 (3) en la segunda. end en 20 + 72 + 8 = 100.
+Result:
+	Page: 1
+		Fragment: title
+			Rect: 20 20 260 12
+		Fragment: m
+			Rect: 20 40 260 132
+			Fragment: p1
+				Rect: 20 40 120 132
+			Fragment: p2
+				Rect: 160 40 120 84
+			Fragment: p3
+				Rect: 160 124 120 48
+	Page: 2
+		Fragment: m
+			Rect: 20 20 260 72
+			Fragment: p3
+				Rect: 20 20 120 48
+			Fragment: p4
+				Rect: 20 68 120 24
+			Fragment: p4
+				Rect: 160 20 120 24
+			Fragment: p5
+				Rect: 160 44 120 36
+		Fragment: end
+			Rect: 20 100 260 12

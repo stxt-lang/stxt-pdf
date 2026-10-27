@@ -1,7 +1,8 @@
 # Hoja de ruta: elementos de documento
 
 Plan de trabajo para añadir al motor las reglas de estilo reutilizables y los elementos de
-documento: encabezados y párrafos, listas, tablas y bloques en columnas. Es el punto de partida de cada sesión: el estado, las decisiones tomadas y
+documento: encabezados y párrafos, listas, tablas y bloques en columnas. Todos los hitos están
+terminados (2026-10-27). Es el punto de partida de cada sesión: el estado, las decisiones tomadas y
 lo que queda por hacer están aquí, no en la memoria de la conversación.
 
 Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado del
@@ -35,7 +36,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
 | 14 | Tablas, con cabecera y pie repetidos | hecho | 11 |
-| 15 | Bloque en columnas (multicolumna) | en curso | — |
+| 15 | Bloque en columnas (multicolumna) | hecho | 12 |
 
 **Orden**, de menor a mayor impacto en el motor:
 
@@ -620,7 +621,7 @@ Multicol:
 - [x] Equilibrado.
 - [x] Línea entre columnas en el pintado.
 - [x] Tests de layout y de fragmentación; casos de error.
-- [ ] Especificación; caso golden con texto en dos columnas a lo largo de dos páginas.
+- [x] Especificación; caso golden con texto en dos columnas a lo largo de dos páginas.
 
 ---
 
@@ -628,6 +629,17 @@ Multicol:
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
+
+- **2026-10-27 (16).** Hito 15 terminado. Aceptadas las propuestas C1–C8. Schema y builder
+  (`Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`;
+  `column` en `Before` y `After`; el contenido en un flujo de columnas generado; cuatro
+  `ErrorCode` nuevos con sus casos), `MulticolLayout` (llenado en orden, equilibrado, cortes de
+  columna y de página con `BreakAppeal.FORCED_PAGE`), línea entre columnas y PDF etiquetado.
+  Caso golden `12-multicol` de dos páginas, calculado a mano y con los PNG revisados.
+  Especificación (§4.13 y §5.16 nuevas; §2, §4.5, §5.1, §5.3, §5.10, §5.12, §6, §7, §8, §9 y
+  glosario), README, `CLAUDE.md` y `DECISIONES.md` (110–119). `mvn test` en verde.
+  *Siguiente paso:* los hitos de esta hoja de ruta están terminados. Pendiente: repasar las
+  decisiones de `DECISIONES.md` y elegir el siguiente trabajo (ideas en `TODO.md`).
 
 - **2026-10-27 (15).** Hito 14 terminado. PDF etiquetado de las tablas (`Table`,
   `THead`/`TBody`/`TFoot`, `TR`, `TH`/`TD` con `RowSpan`/`ColSpan`; la cabecera y el pie

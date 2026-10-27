@@ -40,7 +40,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 14 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 15 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -59,9 +59,9 @@ actualízala.
 | 12 | ~~Encabezados (`Heading 1`…`Heading 6`) y `Paragraph`; PDF etiquetado y marcadores~~ (hecho; caso 09) | schema, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
 | 13 | ~~Listas (`List`, `List item`) con marcador y numeración~~ (hecho; caso 10) | schema, `tree/BoxTreeBuilder`, `tree/ListMarkers`, `layout/block/MarkerLayout`, `paint/PdfStructure` |
 | 14 | ~~Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`) con cabecera y pie repetidos; `Area` en lugar del `Cell` de `Grid`~~ (hecho; caso 11) | schema, `tree/BoxTreeBuilder`, `layout/table/TableLayout`, `layout/UnitBreaker`, `paint/PdfStructure` |
+| 15 | ~~Bloque en columnas (`Multicol`), equilibrado y cortes de columna~~ (hecho; caso 12) | schema, `tree/BoxTreeBuilder`, `layout/multicol/MulticolLayout`, `fragment/BreakRules`, `paint/StackingContext` |
 
-El hito 15 (bloque en columnas) se sigue en
-[`docs/ROADMAP.md`](docs/ROADMAP.md); al terminarlo, añádelo también a esta tabla.
+Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
@@ -84,7 +84,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
-| `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
+| `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
 | `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
@@ -153,6 +153,18 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   solo el cuerpo con `UnitBreaker`, repitiendo enteros la cabecera y el pie
   (`UnitBreaker.Repeat`). `PdfStructure` las etiqueta (`Table`, `THead`/`TBody`/`TFoot`, `TR`,
   `TH`/`TD`); las filas repetidas son contenido solo en su primera página.
+- **Columnas (§5.16):** el builder mete el contenido de un `Multicol` en el **flujo de
+  columnas**, una caja de bloque generada (`Element.COLUMNS`, fuera del documento como el
+  marcador) que es su único hijo: crea un contexto de formato de bloque y su alto no es
+  definido. `MulticolLayout` maqueta ese flujo una vez por columna con `engine.layout`, con el
+  alto de la columna como `fragmentainerRemaining` y el token de la columna anterior como
+  `from`; cada columna es un fragmento suyo, hijo del fragmento del `Multicol`. Llena en orden
+  y, si el contenido termina y `Fill` es `balance`, busca el alto mínimo (búsqueda binaria) sin
+  cortes entre columnas peores que los del reparto en orden. Los cortes forzados son `PAGE` o
+  `COLUMN` (`BreakRules.forcedBetween` devuelve el tipo): el de columna es un corte perfecto
+  dentro del flujo; el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de
+  `PERFECT_BREAK`, para que el `Multicol` deje de llenar columnas y lo pase al padre. Quien
+  recorra los hijos de un `Multicol` (o sus fragmentos) encuentra el flujo, no el contenido.
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,

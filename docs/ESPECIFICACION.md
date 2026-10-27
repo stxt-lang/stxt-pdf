@@ -79,6 +79,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Head`, `Body`, `Foot` | Cabecera, cuerpo y pie de una `Table` | Una o varias `Row` |
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
+| `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
@@ -87,7 +88,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 
 **Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
 flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
-encabezados, `List`, `Table` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
+encabezados, `List`, `Table`, `Multicol` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
 ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Area` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor. `Head`, `Body`, `Foot` y
@@ -243,7 +244,8 @@ vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las p
 definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Area`
 ([§4.8](#48-item-y-area)), las de posicionamiento ([§4.9](#49-posicionamiento)), las de las
-listas ([§4.11](#411-listas)) y las de las tablas ([§4.12](#412-tablas)).
+listas ([§4.11](#411-listas)), las de las tablas ([§4.12](#412-tablas)) y las de los bloques en
+columnas ([§4.13](#413-bloques-en-columnas)).
 
 ```
 Text: Resultados del trimestre
@@ -334,8 +336,8 @@ Los cortes de página. No se heredan. No se admite en
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Before` | `auto`, `page`, `avoid` | `auto` | `page` fuerza un salto antes de la caja. |
-| `After` | `auto`, `page`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
+| `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` fuerza un salto de página antes de la caja; `column`, un salto a la columna siguiente (solo dentro de un `Multicol`, [§5.16](#516-bloques-en-columnas)). |
+| `After` | `auto`, `page`, `column`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
 | `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja. |
 | `Decoration` | `slice`, `clone` | `slice` | Qué pasa con borde y relleno en un corte. |
 
@@ -504,6 +506,22 @@ Una `Row` admite `Typography`, que heredan sus celdas, y `Break`, que es el de s
 tiene `Box`. Las filas de la tabla no tienen propiedad de tamaño: miden lo que su celda más
 alta.
 
+### 4.13 Bloques en columnas
+
+Propiedades del elemento `Multicol`, hijas directas suyas ([§5.16](#516-bloques-en-columnas)).
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Count` | entero ≥ 1 | — | Número de columnas; con `Column width`, el máximo. |
+| `Column width` | número > 0 | — | Ancho mínimo de las columnas: caben tantas como permita el ancho. Solo puntos. |
+| `Column gap` | número ≥ 0 | `0` | Separación entre columnas. Solo puntos. |
+| `Rule` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Column gap`. |
+| `Rule color` | color | el `Color` del texto | No afecta al layout. |
+| `Fill` | `balance`, `auto` | `balance` | `balance` iguala las columnas del último fragmento; `auto` las llena en orden. |
+
+`Count`, `Column width` o los dos son obligatorios. No van en las reglas de `Styles`, que solo
+admiten los grupos.
+
 ---
 
 ## 5. Semántica del layout
@@ -521,6 +539,7 @@ Cada elemento determina **cómo coloca a sus hijos**:
 | `Document` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed`, `Heading 1` … `Heading 6` | En flujo de bloque ([§5.3](#53-flujo-de-bloque)) |
 | `Flex` | En líneas flex ([§5.7](#57-flex)) |
 | `Grid` | En una rejilla ([§5.8](#58-grid)) |
+| `Multicol` | En columnas, cada una en flujo de bloque ([§5.16](#516-bloques-en-columnas)) |
 | `Text`, `Paragraph` | No tiene hijos: reparte su texto en líneas ([§5.4](#54-texto)) |
 
 **Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque
@@ -572,7 +591,8 @@ El resultado de colapsar varios márgenes es **el mayor positivo más el más ne
 `20` y `30` dan 30; `20` y `−5` dan 15; `−10` y `−4` dan −10.
 
 **Contextos de formato de bloque.** Aíslan el colapso de márgenes. Los crean: el área útil,
-`Absolute` y `Fixed`, los ítems de flex y grid, y los `Block` y `Relative` con `Isolate: true`.
+`Absolute` y `Fixed`, los ítems de flex y grid, las columnas de un `Multicol` y los `Block` y
+`Relative` con `Isolate: true`.
 Los márgenes de los ítems de flex y grid nunca colapsan.
 
 ### 5.4 Texto
@@ -838,7 +858,9 @@ el mínimo**.
 ### 5.10 Fragmentación
 
 **Modelo.** Un *fragmentainer* es el contenedor donde caen los fragmentos de las cajas: uno
-por página, con la altura del área útil. Cada caja produce un **fragmento** por página en la que aparece.
+por página, con la altura del área útil, y uno por columna dentro de un `Multicol`
+([§5.16](#516-bloques-en-columnas)). Cada caja produce un **fragmento** por fragmentainer en el
+que aparece.
 
 **Oportunidades de corte:**
 
@@ -871,11 +893,15 @@ cortarlo a la fuerza. Lo que no se puede partir y no cabe en una página entera 
 alta que el área útil, una fila con un ítem que no puede colocar nada) es un error
 ([§5.12](#512-desbordamiento)).
 
-**Cortes forzados.** `Before: page` y `After: page` (de `Break`) fuerzan un salto. Solo se
-aplican a cajas en flujo: `Absolute` y `Fixed` no admiten `Break`. El `Before: page` del primer hijo de un bloque y el
-`After: page` del último se propagan al bloque. Un corte forzado al principio de una
-página se ignora (no deja páginas en blanco), igual que el `After: page` de la última
-caja del documento.
+**Cortes forzados.** `Before: page` y `After: page` (de `Break`) fuerzan un salto de página, y
+`Before: column` y `After: column`, dentro de un `Multicol`, un salto a la columna siguiente
+(que, en la última columna, es también de página). Solo se
+aplican a cajas en flujo: `Absolute` y `Fixed` no admiten `Break`. El `Before` del primer hijo de un bloque y el
+`After` del último se propagan al bloque; de un `Multicol` solo sale el de página. Si una caja
+tiene los dos, gana el de página. Un corte forzado al principio de una
+página (o de una columna) se ignora (no deja páginas en blanco), igual que el `After: page` de la última
+caja del documento. Un corte de página dentro de un `Multicol` deja sin llenar las columnas
+que quedan en esa página.
 
 **Márgenes en los cortes.** En un corte no forzado, los márgenes que tocan el corte se truncan
 a cero: tras el corte, el margen superior del primer hijo de la página y los que salen de él
@@ -995,7 +1021,12 @@ un error con la primera de estas situaciones:
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página;
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página
   (`TABLE_REPEAT_OVERFLOW`, [§5.15](#515-tablas)), en la línea de la `Table`. Se detecta al
-  maquetar, porque sin sitio la tabla no avanza.
+  maquetar, porque sin sitio la tabla no avanza;
+- **el contenido de un `Multicol` que no cabe en sus columnas** y no puede seguir en otra
+  página (`BOX_OVERFLOW`, [§5.16](#516-bloques-en-columnas)): en la línea de su `Height` (o
+  `Max height`, o `Aspect ratio`) si es su alto el que se acaba, o en la de su `Count` si,
+  sin página ni alto que llenar, tiene más cortes de columna que columnas. También se detecta
+  al maquetar.
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro,
 se nombra lo de dentro. Los `Relative` se comprueban en su sitio, sin el desplazamiento de
@@ -1210,6 +1241,95 @@ los atributos `RowSpan` y `ColSpan` si ocupa más de una fila o columna. La cabe
 son contenido en la primera página en que salen; donde se repiten, son *artifacts*, como los
 `Fixed`, y el texto de la tabla se lee una sola vez.
 
+### 5.16 Bloques en columnas
+
+Un `Multicol` reparte su contenido en **columnas** del mismo ancho, como en una revista: el
+contenido llena la primera columna, sigue en la segunda y, al acabar las columnas de una
+página, continúa en la primera columna de la página siguiente. Admite `Id`, `Class`, `Box`,
+`Typography` y `Break`, como un bloque, y sus propiedades ([§4.13](#413-bloques-en-columnas));
+va donde va un elemento en flujo, también dentro de otro `Multicol`.
+
+```
+Multicol:
+	Count: 2
+	Column gap: 20
+	Rule: 0.5
+	Rule color: #999999
+	Paragraph:
+		Content >>
+			Texto largo que fluye por las dos columnas…
+	Paragraph:
+		Content >>
+			…y sigue en la página siguiente.
+```
+
+**Columnas.** El número y el ancho salen de `Count` y `Column width`, sobre el ancho de la caja
+de contenido (`W`) y con `Column gap` (`g`) entre cada dos:
+
+- solo `Count: n`: `n` columnas;
+- solo `Column width: w`: tantas como quepan, `⌊(W + g) / (w + g)⌋`, y al menos una;
+- los dos: las que quepan, sin pasar de `Count`.
+
+Las columnas se reparten el ancho que dejan los huecos: miden `(W − (n − 1) · g) / n`. Sin
+`Count` ni `Column width`, es un error (`MULTICOL_COLUMNS`).
+
+**Contenido.** Dentro de las columnas los hijos se apilan en flujo de bloque
+([§5.3](#53-flujo-de-bloque)): cada columna es un contexto de formato de bloque, así que los
+márgenes de dentro no salen del `Multicol`. Admite todos los elementos en flujo; un `Absolute`
+o un `Fixed` dentro de un `Multicol`, a cualquier profundidad, es un error
+(`POSITIONED_IN_MULTICOL`). El alto de las columnas no es definido: un porcentaje vertical de
+dentro es un error (`INDEFINITE_PERCENTAGE`), aunque el `Multicol` tenga `Height`.
+
+**Alto de las columnas.** Cada columna es un *fragmentainer*
+([§5.10](#510-fragmentación)), y el contenido se parte entre columnas igual que entre páginas,
+con las mismas reglas (viudas y huérfanas, `avoid`, garantía de progreso). En cada página, las
+columnas miden lo que queda de página para el contenido del `Multicol` y, si tiene `Height`
+(o `Max height`), no pasan de lo que le queda de él:
+
+1. Se llenan **en orden**: la primera columna, desde donde se quedó el contenido; cada una de
+   las siguientes, desde donde termina la anterior. Se para al acabar el contenido, las
+   columnas o en un corte forzado de página.
+2. Si el contenido termina en esta página y `Fill` es `balance`, las columnas se
+   **equilibran**: se busca el alto mínimo con el que el contenido cabe en ellas sin cortes
+   entre columnas que incumplan más reglas que los del reparto en orden. Con `Fill: auto` se
+   quedan como en el paso 1. Las páginas en las que el contenido no termina no se equilibran.
+3. El `Multicol` mide en esa página lo que su columna más alta (con `Height`, lo de cualquier
+   caja con alto definido, [§5.10](#510-fragmentación)).
+
+Fuera de una página y sin alto definido (un `Multicol` que es un ítem de flex o de grid, o que
+está en un `Absolute`) no hay alto que llenar: las columnas se equilibran siempre, también con
+`Fill: auto`.
+
+**Cortes.** Un `Multicol` se parte entre páginas: lo que no cabe en las columnas de una página
+sigue en la primera columna de la siguiente. Si la primera columna no puede colocar nada, el
+`Multicol` entero pasa a la página siguiente, y si no puede otra columna, el resto. El corte de
+página del `Multicol` tiene la calidad del de su última columna. `Before: column` y
+`After: column` (de `Break`) fuerzan un salto a la columna siguiente; fuera de un `Multicol`
+son un error (`COLUMN_BREAK_OUTSIDE_MULTICOL`). Un `Before: page` o `After: page` de dentro
+termina las columnas de la página.
+
+**Lo que no cabe.** Si el alto propio del `Multicol` (`Height`, `Max height`) termina en una
+página y su contenido no cabe en las columnas de esa página, es un error (`BOX_OVERFLOW`); lo
+mismo si, sin página ni alto que llenar, sus cortes de columna necesitan más columnas de las
+que tiene ([§5.12](#512-desbordamiento)).
+
+**Línea entre columnas.** Con `Rule`, entre cada dos columnas **con contenido** se pinta una
+línea de ese grosor, centrada en el hueco, desde arriba de la caja de contenido y con el alto
+de la columna más alta de esa página. Su color es `Rule color` o, sin él, el `Color` del texto.
+Se pinta con el fondo del `Multicol`, debajo del contenido, y no puede ser más ancha que
+`Column gap` (`COLUMN_RULE_WIDTH`).
+
+**Tamaños intrínsecos** ([§5.9](#59-dimensionado)). Con `Count` y sin `Column width`, el
+min-content es `Count` columnas del min-content del contenido más los huecos; con
+`Column width`, una columna, porque el número de columnas se adapta al ancho. El max-content
+es `Count` columnas (o una, sin `Count`) del max-content del contenido, o de `Column width` si
+es mayor, más los huecos.
+
+**Salida.** En el volcado del [§7](#7-formato-de-resultados), las columnas no tienen
+fragmento propio: una caja partida entre dos columnas tiene dos fragmentos en la misma página.
+En el PDF etiquetado, un `Multicol` es un `Div` y su contenido cuelga de él en orden de
+lectura, de columna en columna.
+
 ---
 
 ## 6. Validación
@@ -1246,7 +1366,7 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Title` no vacío y `Language` una etiqueta BCP 47 | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` no vacío y `Language` una etiqueta BCP 47 | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -1270,6 +1390,10 @@ La validación se hace en cuatro niveles:
 | `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
 | `CELL_CONTENT` | Una `Cell` tiene texto en el valor o elementos, no las dos cosas | `Una Cell tiene texto en el valor (línea 12) o elementos, no las dos cosas: pon el texto en un Paragraph` |
 | `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
+| `MULTICOL_COLUMNS` | Un `Multicol` declara `Count`, `Column width` o los dos ([§5.16](#516-bloques-en-columnas)) | `Un Multicol necesita Count, Column width o los dos…` |
+| `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
+| `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
+| `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1284,7 +1408,7 @@ La validación se hace en cuatro niveles:
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
-| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
@@ -1315,7 +1439,9 @@ Por defecto solo se vuelcan las cajas con `Id`; las descendientes con `Id` se an
 El marcador de un `List item` con `Id` se vuelca dentro del ítem como `Marker: 3.`, con su
 `Rect` ([§5.14](#514-listas)).
 Un `Absolute` se anida dentro de su containing block, detrás de sus hijos en flujo, y no dentro
-de su padre.
+de su padre. Las columnas de un `Multicol` no tienen fragmento: sus hijos se anidan dentro del
+`Multicol`, y una caja partida entre dos columnas sale dos veces en la misma página
+([§5.16](#516-bloques-en-columnas)).
 Las cajas sin `Id` pueden incluirse para depurar.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`
@@ -1377,6 +1503,13 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Estilo de `tr`, `col` y `colgroup` | Fondo y bordes de fila y columna | `Row` solo da `Typography` y `Break` a sus celdas; sin columnas con estilo |
 | `caption` | Sí | No: un `Heading` o un `Paragraph` antes de la tabla |
 | `thead` y `tfoot` al imprimir | Se repiten según el navegador | Se repiten siempre en cada página |
+| Multicolumna (`column-count`, `column-width`) | Propiedades de cualquier bloque; `column-gap` por defecto `1em` y con porcentajes | Elemento `Multicol` con `Count` y `Column width`; `Column gap` por defecto 0 y solo en puntos ([§5.16](#516-bloques-en-columnas)) |
+| `column-span: all` | Sí | No: se parte el `Multicol` en dos |
+| `column-fill` | `balance`, `balance-all`, `auto` | `Fill: balance` o `auto`, sin `balance-all`. Sin página ni alto que llenar se equilibra siempre, y el equilibrado no incumple reglas de corte que el reparto en orden respeta |
+| `column-rule` | Grosor, estilo y color; se pinta sobre el contenido si es más ancha que el hueco | `Rule` y `Rule color`, siempre continua; más ancha que `Column gap` es un error |
+| Columnas que no caben en el alto del contenedor | Columnas de desbordamiento a un lado | Error (`BOX_OVERFLOW`) |
+| `position: absolute` o `fixed` dentro de un multicolumna | Sí | Error (`POSITIONED_IN_MULTICOL`) |
+| `break-before: column` fuera de un multicolumna | Se ignora | Error (`COLUMN_BREAK_OUTSIDE_MULTICOL`) |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |
@@ -1574,6 +1707,7 @@ Document (dev.stxt.boxes):
 | **Área útil** | Rectángulo del medio menos sus márgenes; containing block inicial. |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([§5.11](#511-recursos-y-fuentes)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([§5.2](#52-modelo-de-caja-y-containing-block)). |
+| **Columna** | Cada fragmentainer en que un `Multicol` reparte su contenido en una página ([§5.16](#516-bloques-en-columnas)). |
 | **Containing block** | Rectángulo de referencia para porcentajes, `auto` y desplazamientos. |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer`. |
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes. |
@@ -1582,7 +1716,7 @@ Document (dev.stxt.boxes):
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
-| **Fragmentainer** | Contenedor de fragmentos: cada página. |
+| **Fragmentainer** | Contenedor de fragmentos: cada página y, dentro de un `Multicol`, cada columna. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |

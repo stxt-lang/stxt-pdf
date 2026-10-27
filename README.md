@@ -13,7 +13,7 @@ Los nombres de nodos y valores de los documentos, y los identificadores del cód
 inglés; la documentación y los comentarios, en castellano.
 
 Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`,
-`Heading 1`…`Heading 6`, `Relative`, `Absolute`, `Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
+`Heading 1`…`Heading 6`, `List`, `Table`, `Multicol`, `Relative`, `Absolute`, `Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
 en `Item` y los de un `Grid`, en `Area`. Las propiedades de cada caja se agrupan en `Box` (el
 modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de página):
 
@@ -77,9 +77,8 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 14 están terminados; el
-siguiente, en
-[`docs/ROADMAP.md`](docs/ROADMAP.md).
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 15 están terminados; su
+registro está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Pieza | Estado |
 |---|---|
@@ -90,6 +89,7 @@ siguiente, en
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
 | Listas (`List`, `List item`): viñetas y numeraciones, marcador alineado con la primera línea, listas anidadas y partidas entre páginas | Hecho y probado |
 | Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`): columnas con las pistas de grid, `Span`, cabecera y pie repetidos en cada página | Hecho y probado |
+| Bloques en columnas (`Multicol`): `Count`, `Column width`, `Column gap`, línea entre columnas, equilibrado (`Fill`), cortes de columna y continuación en la página siguiente | Hecho y probado |
 | PDF etiquetado (árbol de estructura, *artifacts*, listas con `Lbl` y `LBody`, tablas con `THead`, `TBody`, `TFoot`, `TH` y `TD`) y marcadores de los encabezados | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
@@ -139,7 +139,9 @@ en `target/pdf/`.
 13. ~~**Listas.** `List` con `Marker`, `Start` y `List item` con `Number`; el marcador cuelga en la sangría, alineado con la primera línea (caso 10).~~ Hecho.
 14. ~~**Tablas.** `Table` con `Head`, `Body` y `Foot`, filas `Row` y celdas `Cell` con `Span`, maquetada como un grid; cabecera y pie repetidos en cada página (caso 11). El `Cell` de `Grid` pasa a llamarse `Area`.~~ Hecho.
 
-El siguiente hito (15: bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, está en
+15. ~~**Columnas.** `Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`; las columnas son fragmentainers dentro de la página, equilibradas al final, y `Before`/`After: column` (caso 12).~~ Hecho.
+
+Las decisiones y el registro de cada sesión de los hitos 11 a 15 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Estructura
@@ -161,6 +163,7 @@ src/main/java/dev/stxt/boxes/
     grid/       GridLayout, TrackSizing, Track, Placement, ItemContribution
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
     table/      TableLayout
+    multicol/   MulticolLayout, Columns
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure
   output/       StxtDump

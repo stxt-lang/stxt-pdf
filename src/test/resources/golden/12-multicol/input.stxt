@@ -1,0 +1,58 @@
+# Bloque en columnas (ESPECIFICACION.md §5.16). Área útil de 260 × 160 desde (20, 20).
+#
+# Dos columnas de (260 − 20) / 2 = 120, la segunda desde x = 160: caben 24 caracteres por línea
+# (5 pt cada uno) y cada línea mide 12. Los párrafos tienen 11, 7, 8, 4 y 3 líneas.
+# Página 1: title (12) y su margen de 8 dejan 140 a las columnas: 11 líneas. La primera se
+# llena con p1 (132); la segunda, con p2 (84) y 4 líneas de p3 (48), que deja 4 para la
+# página 2 (viudas y huérfanas, 2). m mide lo que la columna más alta, 132.
+# Página 2: quedan 11 líneas y se equilibran. Con 5 líneas por columna no cabe (p4 no se
+# puede partir en 1 + 3); con 6, la primera tiene p3 (4) y 2 de p4, y la segunda, 2 de p4 y p5:
+# m mide 72 y end va detrás, con el margen de 8.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: Bloque en columnas
+		Id: title
+		Box:
+			Margin: 0 0 8 0
+	Multicol:
+		Id: m
+		Count: 2
+		Column gap: 20
+		Rule: 0.5
+		Rule color: #999999
+		Box:
+			Margin: 0 0 8 0
+		Paragraph:
+			Id: p1
+			Content >>
+				El texto de un bloque en columnas llena primero la columna de la izquierda y sigue en
+				la siguiente cuando ya no le queda sitio, como en las páginas de una revista o de un
+				periódico de los de antes, que se leían de arriba abajo.
+		Paragraph:
+			Id: p2
+			Content >>
+				Cada columna es un fragmento del mismo flujo, así que las reglas de corte son las de
+				siempre: viudas, huérfanas y los cortes que se evitan.
+		Paragraph:
+			Id: p3
+			Content >>
+				Al acabar las columnas de una página, el texto continúa en la primera columna de la
+				página siguiente, y la línea entre columnas se pinta solo entre dos columnas con
+				contenido.
+		Paragraph:
+			Id: p4
+			Content >>
+				En la última página las columnas se equilibran: el motor busca el alto mínimo en que
+				todo cabe.
+		Paragraph:
+			Id: p5
+			Content >>
+				Así el bloque termina con las dos columnas casi a la misma altura.
+	Text: Fin
+		Id: end
