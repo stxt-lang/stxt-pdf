@@ -56,7 +56,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 
 | # | Tarea | Tipo | Coste | Depende de | Estado |
 |---|---|---|---|---|---|
-| 1 | [Ramas `default` silenciosas en la lectura de propiedades](#1-ramas-default-silenciosas) | QA | S | — | pendiente |
+| 1 | [Ramas `default` silenciosas en la lectura de propiedades](#1-ramas-default-silenciosas) | QA | S | — | hecho |
 | 2 | [`ConstraintSpace`: *withers* que pierden `contentHeight` y booleanos posicionales](#2-constraintspace-withers-y-booleanos) | QA · bug latente | S | — | pendiente |
 | 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | pendiente |
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | pendiente |
@@ -94,14 +94,21 @@ catálogo no detecta, porque no hay caso para lo que nadie sabe que falta.
 
 **Cómo.**
 
-- [ ] Cada propiedad con su `case` explícito y `default -> throw new IllegalStateException(
-      "Propiedad sin leer: " + name)` (es un error del motor, no del documento).
-- [ ] Test `SchemaCoverageTest`: recorre las definiciones de `DocumentSchema` y, para cada
-      propiedad de cada grupo y elemento, construye un documento mínimo que la declare y
-      comprueba que `BoxTreeBuilder` no lanza `IllegalStateException` (los errores de valor del
-      §6 sí se admiten). Así un nombre nuevo del schema sin lectura rompe un test.
+- [x] Cada propiedad con su `case` explícito y `default -> throw unread(p)`
+      (`IllegalStateException`: es un error del motor, no del documento).
+- [x] Test `SchemaCoverageTest`: recorre el schema y, para cada par (nodo, propiedad o grupo),
+      construye el árbol de un documento mínimo que la declara con un valor válido (161 pares).
+      Más estricto que lo previsto: el documento tiene que construirse sin ningún error, no solo
+      sin `IllegalStateException`. Un par nuevo del schema falla hasta que se añade su ejemplo
+      (`SAMPLES`) y, si el nodo es nuevo, su plantilla (`TEMPLATES`).
 
-**Verificación.** `mvn test`; el nuevo test falla si se comenta un `case`.
+**Verificación.** `mvn test` (549 tests); quitando el `case "orphans"`, el test falla en
+`Typography > Orphans`.
+
+**Límite conocido.** Lo que el builder lee con `child(...)` en lugar de un `switch` (los hijos
+de `Document` y de `Media`) no lanza nada si falta: ahí el test solo obliga a añadir el ejemplo.
+Los `switch` de `layout` y `position` por elemento siguen con `default`; se quitan con la
+[tarea 6](#6-enum-element).
 
 ## 2. `ConstraintSpace`: *withers* y booleanos
 
@@ -360,3 +367,4 @@ Para no hacerlo por inercia:
 | Fecha | Tareas | Resultado | Siguiente paso |
 |---|---|---|---|
 | 2026-10-27 | Revisión inicial | Esta hoja de ruta; suite en verde (388 tests) | Tarea 1 |
+| 2026-10-27 | 1 | Ramas `default` explícitas en `BoxTreeBuilder` y `SchemaCoverageTest` (161 pares); 549 tests en verde | Tarea 2 |

@@ -210,10 +210,11 @@ public final class BoxTreeBuilder {
                     rules = classRules;
                     key = name(rule, "For class");
                 }
-                default -> {
+                case "for-id" -> {
                     rules = idRules;
                     key = name(rule, "For id");
                 }
+                default -> throw unread(rule);
             }
             InlineNode previous = rules.putIfAbsent(key, rule);
             if (previous != null) {
@@ -310,7 +311,8 @@ public final class BoxTreeBuilder {
             switch (g.getCanonicalName()) {
                 case "box" -> box(inline(g), s);
                 case "typography" -> typography(inline(g), s);
-                default -> fragmentation(inline(g), s);
+                case "break" -> fragmentation(inline(g), s);
+                default -> throw unread(g);
             }
         }
     }
@@ -432,7 +434,8 @@ public final class BoxTreeBuilder {
                         case "marker" -> s.listMarker = enumValue(Style.Marker.class, p);
                         case "start" -> s.listStart = integer(p);
                         case "number" -> s.listNumber = integer(p);
-                        default -> s.isolate = bool(p);
+                        case "isolate" -> s.isolate = bool(p);
+                        default -> throw unread(p);
                     }
                 }
             }
@@ -772,7 +775,8 @@ public final class BoxTreeBuilder {
                 case "padding" -> s.padding = nonNegativeSides(p, true);
                 case "border" -> s.border = nonNegativeSides(p, false);
                 case "border-color" -> s.borderColor = color(p);
-                default -> s.background = color(p);
+                case "background" -> s.background = color(p);
+                default -> throw unread(p);
             }
         }
     }
@@ -795,7 +799,8 @@ public final class BoxTreeBuilder {
                 case "color" -> s.color = color(p);
                 case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
                 case "widows" -> s.widows = positiveInteger(p);
-                default -> s.orphans = positiveInteger(p);
+                case "orphans" -> s.orphans = positiveInteger(p);
+                default -> throw unread(p);
             }
         }
     }
@@ -809,7 +814,8 @@ public final class BoxTreeBuilder {
                 case "before" -> s.breakBefore = enumValue(Style.Break.class, p);
                 case "after" -> s.breakAfter = enumValue(Style.Break.class, p);
                 case "inside" -> s.avoidBreakInside = breakInside(p);
-                default -> s.decoration = enumValue(Style.Decoration.class, p);
+                case "decoration" -> s.decoration = enumValue(Style.Decoration.class, p);
+                default -> throw unread(p);
             }
         }
     }
@@ -823,7 +829,8 @@ public final class BoxTreeBuilder {
             case "gap" -> gap(p, s);
             case "main-axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, p);
             case "cross-axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, p);
-            default -> s.flexLines = enumValue(Style.Distribution.class, p);
+            case "lines" -> s.flexLines = enumValue(Style.Distribution.class, p);
+            default -> throw unread(p);
         }
     }
 
@@ -852,7 +859,8 @@ public final class BoxTreeBuilder {
             }
             case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
             case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
-            default -> s.gridVertical = enumValue(Style.Alignment.class, p);
+            case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, p);
+            default -> throw unread(p);
         }
     }
 
@@ -883,7 +891,8 @@ public final class BoxTreeBuilder {
                 case "basis" -> s.itemBasis = value(p, LENGTH_OR_AUTO, false);
                 case "cross-axis" -> s.itemCrossAxis = enumValue(Style.Alignment.class, p);
                 case "horizontal" -> s.itemHorizontal = enumValue(Style.Alignment.class, p);
-                default -> s.itemVertical = enumValue(Style.Alignment.class, p);
+                case "vertical" -> s.itemVertical = enumValue(Style.Alignment.class, p);
+                default -> throw unread(p);
             }
         }
     }
@@ -1389,6 +1398,15 @@ public final class BoxTreeBuilder {
         } catch (IllegalArgumentException ex) {
             throw error(line, ErrorCode.GRID_PLACEMENT, ex.getMessage());
         }
+    }
+
+    /**
+     * Un nodo que el schema admite y el builder no lee: un error del motor, no del documento.
+     * Al añadir una propiedad al schema hay que leerla aquí (lo comprueba {@code SchemaCoverageTest}).
+     */
+    private static IllegalStateException unread(Node n) {
+        return new IllegalStateException("El schema admite " + n.getName() + " (línea " + n.getLine()
+                + "), pero BoxTreeBuilder no lo lee");
     }
 
     private static InvalidModelException error(Node n, ErrorCode code, String message) {
