@@ -216,6 +216,10 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   parte sus ítems en paralelo, repitiendo su layout con `ConstraintSpace.fragmented` y el
   espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de cada
   ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso).
+- **Texto largo:** cada página maqueta el texto desde otra línea, así que la `LayoutCache` no
+  ayuda; `InlineLayout` memoriza el reparto en líneas por caja y ancho disponible (si no, el
+  coste crece con el cuadrado de las páginas; lo vigila `LongTextTest`). Se vacía en
+  `reservePageDigits`, como la caché.
 - **Numeración (`{page}`/`{pages}`):** `InlineLayout` mide los marcadores como `00` y las
   líneas los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que
   rehace solo esas líneas con los valores de cada página (`PageNumbers`).
@@ -276,6 +280,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
   (añade ahí los documentos nuevos) y que los ejemplos de la especificación se maquetan sin
   errores.
+- **Medidas de rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` (el `pom.xml`
+  excluye el grupo); se ejecutan con `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=…`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `src/test/resources/errors/errors.stxt`
   tiene un `Case` por regla, con `Code`, `Line` (contada desde la primera línea del documento
   incrustado) y el documento en un bloque `Document >>`. Se maqueta con las métricas reales.

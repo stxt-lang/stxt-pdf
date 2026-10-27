@@ -8,6 +8,7 @@ import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
+import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -16,7 +17,9 @@ import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Layout {@code inline}: texto repartido en line boxes (ESPECIFICACION.md §5.4).
@@ -32,24 +35,41 @@ import java.util.List;
  *
  * <p>{@code {page}} y {@code {pages}} se miden como un número de prueba y se sustituyen al
  * terminar la paginación con {@link #number} ({@link PageNumbers}).</p>
+ *
+ * <p>El reparto en líneas de un texto se hace una sola vez por ancho disponible y se reutiliza en
+ * cada página: cada fragmento empieza en otra línea ({@code from}), así que la caché del
+ * {@link Engine} no ayuda, y sin él un texto de N páginas se partía N veces (coste cuadrático).</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
+    /** Un texto repartido en líneas: todas, y dónde acaba cada párrafo (índice tras su última línea). */
+    private record Broken(List<String> lines, int[] paragraphEnds) {
+    }
+
+    private record BrokenKey(Box box, double available) {
+    }
+
+    private final Engine engine;
     /** Mide {@code {page}} y {@code {pages}} como el número de prueba ({@link PageNumbers}). */
     private TextMeasurer measurer;
     private final TextMeasurer real;
+    /** Reparto en líneas de cada texto por ancho disponible; depende de {@link #measurer}. */
+    private final Map<BrokenKey, Broken> broken = new HashMap<>();
 
-    public InlineLayout(TextMeasurer measurer) {
+    public InlineLayout(Engine engine, TextMeasurer measurer) {
+        this.engine = engine;
         this.real = measurer;
         reservePageDigits(PageNumbers.DIGITS);
     }
 
     /**
      * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia las medidas: hay
-     * que vaciar la caché antes de volver a maquetar ({@link dev.stxt.boxes.layout.Engine}).
+     * que vaciar la caché antes de volver a maquetar ({@link Engine}); el reparto en líneas
+     * memorizado se vacía aquí.
      */
     public void reservePageDigits(int digits) {
         this.measurer = PageNumbers.probing(real, digits);
+        broken.clear();
     }
 
     /**
@@ -85,6 +105,20 @@ public final class InlineLayout implements LayoutAlgorithm {
                 children, lines, f.first(), f.last(), f.offsetX(), f.offsetY());
     }
 
+    private Broken breakText(Box box, double available) {
+        Style s = box.style;
+        List<List<String>> paragraphs = box.hasText()
+                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.fontFace(), s.fontSize, s.textWrap)
+                : List.of();
+        List<String> texts = new ArrayList<>();
+        int[] paragraphEnds = new int[paragraphs.size()];
+        for (int p = 0; p < paragraphs.size(); p++) {
+            texts.addAll(paragraphs.get(p));
+            paragraphEnds[p] = texts.size();
+        }
+        return new Broken(List.copyOf(texts), paragraphEnds);
+    }
+
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
@@ -95,22 +129,16 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
+        BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
         Style s = box.style;
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();
         boolean first = from == null;
         int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
-        List<List<String>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(box.text, available, measurer, s.fontFace(), s.fontSize, s.textWrap)
-                : List.of();
-        List<String> texts = new ArrayList<>();
-        int[] paragraphEnds = new int[paragraphs.size()];
-        for (int p = 0; p < paragraphs.size(); p++) {
-            texts.addAll(paragraphs.get(p));
-            paragraphEnds[p] = texts.size();
-        }
+        Broken b = broken.computeIfAbsent(new BrokenKey(box, available), k -> breakText(box, available));
+        List<String> texts = b.lines();
+        int[] paragraphEnds = b.paragraphEnds();
 
         int end = texts.size();
         int appeal = BreakAppeal.PERFECT_BREAK;

@@ -66,7 +66,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | hecho |
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | hecho |
 | 10 | [Unidades de `UnitBreaker` como objetos](#10-unidades-de-unitbreaker) | ARQ · KISS | M | 4 | hecho |
-| 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | pendiente |
+| 11 | [Rendimiento del texto largo (medir antes de tocar)](#11-rendimiento-del-texto-largo) | PERF | M | 4 | hecho |
 | 12 | [PNG golden que cambian según la máquina](#12-png-golden-y-antialiasing) | QA | S | — | hecho |
 
 **Orden recomendado:** 1 → 2 → 3 → 4 en una o dos sesiones (red de seguridad barata); después
@@ -519,11 +519,29 @@ documento real lo nota.
 
 **Cómo.**
 
-- [ ] Documento de prueba de 100 páginas de texto (no en la suite normal, o con
-      `@Tag("perf")`) y medir.
-- [ ] Si se nota: memorizar el reparto en líneas por `(box, ancho disponible)` dentro de
-      `InlineLayout`, vaciado con la caché en `reservePageDigits`.
-- [ ] `InlineLayout` recibe el `Engine` (como los demás algoritmos) para usar su caché.
+- [x] `LongTextTest.measureLongText` (`@Tag("perf")`, fuera de la suite normal: el `pom.xml`
+      excluye el grupo `perf`): un solo `Text` de 25, 50 y 100 páginas, con `FixedMetrics` y
+      `PdfMetrics` y con `Text wrap` `auto` y `pretty`. Se ejecuta con
+      `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest`.
+- [x] Se nota: el coste era **cuadrático**. Con el doble de páginas, el cuádruple de mediciones
+      (sin JaCoCo, `-Djacoco.skip=true`):
+
+      | Páginas | Mediciones antes | `PdfMetrics` antes | Mediciones después | `PdfMetrics` después |
+      |---|---|---|---|---|
+      | 25 | 703 560 | 0,8 s | 29 640 | 0,07 s |
+      | 50 | 2 811 120 | 3,7 s | 59 280 | 0,11 s |
+      | 100 | 11 238 240 | 13,2 s | 118 560 | 0,16 s |
+
+      (`Text wrap: auto`; con `pretty`, 8,1 s antes y 0,08 s después a 100 páginas.) Ahora
+      `InlineLayout` memoriza el reparto en líneas por `(caja, ancho disponible)` y lo vacía en
+      `reservePageDigits`, que es cuando cambian las medidas (y `Engine` vacía su caché).
+- [x] `InlineLayout` recibe el `Engine` y calcula los intrínsecos con `engine.intrinsic`.
+- [x] `LongTextTest.measurementsGrowLinearlyWithThePages`, en la suite normal (31 ms): con el
+      doble de texto, menos de 2,5 veces las mediciones. Sin la memoria falla (3,99).
+
+**Verificación.** `mvn test` (625 tests), sin cambios en los PNG ni en los `expected.stxt`: el
+reparto es el mismo, solo se calcula una vez. El `Paginator` sigue volviendo a paginar si
+`{pages}` no cabe en las cifras reservadas; se deja así.
 
 ## 12. PNG golden y antialiasing
 
@@ -584,3 +602,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 8 | Sin ciclos de packages: colocación de grid, `FontFace`, `FontWeight` y `FontStyle` en `model`; `BreakAppeal` en `fragment`; `Paginator` en `layout`; `Areas` y `Area` se interpretan una vez, al leer; `ArchitectureTest`; 619 tests en verde | Tarea 9 (duplicaciones) o 10; revisar `Placement` |
 | 2026-10-27 | 9 | `model.Tolerance` (una sola épsilon), `LayoutResult.before`, `Sizing.align`/`sum`, `Canvas.border` por defecto con `outline`, `layout.Messages`, `Fragment.contentWidth`/`contentHeight`, `LineBreaker.place`; 623 tests en verde | Tarea 10 (`UnitBreaker`) u 11; decidir el 0.01 de `Overflow`; revisar `Placement` |
 | 2026-10-27 | 10 | `fragment.Unit` y `UnitBreaker.Units(List<Unit>, …)` con `slice`; `UnitBreaker.Arranged` común a flex, grid y tabla; `FlexLayout.Run.layOut` en pasos 6, 7 y 8; el 0.01 de `Overflow` se queda; 624 tests en verde | Tarea 11 (medir el texto largo); revisar `Placement` |
+| 2026-10-27 | 11 | Medido: el texto largo costaba de forma cuadrática (100 páginas: 11,2 M mediciones, 13 s con `PdfMetrics`). `InlineLayout` memoriza el reparto en líneas y usa `engine.intrinsic`: 118 560 mediciones y 0,16 s; `LongTextTest` (lineal en la suite, tiempos con `@Tag("perf")`); 625 tests en verde | Revisar las ramas de `Placement`; hoja de ruta terminada |
