@@ -6,6 +6,9 @@ import dev.stxt.boxes.tree.Style;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Reglas de corte (ESPECIFICACION.md §5.10): viudas y huérfanas, calidad de los cortes entre
  * cajas, cortes forzados y elección del corte. Son piezas puras; los algoritmos de layout las
@@ -17,8 +20,6 @@ import java.util.function.ToIntFunction;
  * {@code Before}/{@code After: avoid} y por último {@code Inside: avoid} (de {@code Break}).</p>
  */
 public final class BreakRules {
-
-    private static final double EPSILON = 1e-9;
 
     private BreakRules() {
     }
@@ -250,7 +251,7 @@ public final class BreakRules {
                     }
                 }
             }
-            if (!overflowing && ends[i] - origin > space + EPSILON) {
+            if (!overflowing && !fits(ends[i] - origin, space)) {
                 if (best >= 0) {
                     return new Cut(best, appeal[best]);
                 }

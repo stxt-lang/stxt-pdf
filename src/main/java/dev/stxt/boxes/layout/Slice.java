@@ -2,6 +2,9 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.model.Insets;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Parte de una caja que cae en un fragmento (ESPECIFICACION.md §5.10): su alto, su borde y su
  * relleno. Es la parte común de la fragmentación de todos los algoritmos.
@@ -28,8 +31,6 @@ import dev.stxt.boxes.model.Insets;
  *                 {@code clone}, alto de su caja de contenido
  */
 public record Slice(double height, Insets border, Insets padding, boolean finished, double consumed) {
-
-    private static final double EPSILON = 1e-9;
 
     /** Borde y relleno superiores del fragmento: con {@code slice}, solo los tiene el primero. */
     public static double top(BoxModel model, boolean first) {
@@ -73,7 +74,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
                     ? model.height().getAsDouble()
                     : Sizing.constrain(consumed + natural, model.minHeight(), model.maxHeight());
             double need = Math.max(0, total - consumed);
-            if (need > remaining + EPSILON && need > natural + EPSILON) {
+            if (!fits(need, remaining) && !fits(need, natural)) {
                 // El contenido cabe, pero el alto propio de la caja no: el resto, a la página siguiente.
                 double h = Math.max(remaining, upToContent);
                 if (h < need - EPSILON) {
@@ -103,11 +104,11 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
         if (contentFinished) {
             double total = Math.max(0, model.usedHeight(consumed + content) - decoration);
             h = Math.max(0, total - consumed);
-            if (h > available + EPSILON && h > content + EPSILON) {
+            if (!fits(h, available) && !fits(h, content)) {
                 // El contenido cabe, pero el alto propio de la caja no: el resto, a la página siguiente.
-                double fits = Math.max(available, content);
-                if (fits < h - EPSILON) {
-                    h = fits;
+                double room = Math.max(available, content);
+                if (room < h - EPSILON) {
+                    h = room;
                     finished = false;
                 }
             }

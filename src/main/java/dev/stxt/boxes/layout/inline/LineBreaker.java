@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Reparte un texto en líneas (módulo 2, ESPECIFICACION.md §5.4). Con {@code Text wrap: auto},
  * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code pretty}, con
@@ -57,7 +60,7 @@ public final class LineBreaker {
             StringBuilder current = new StringBuilder();
             for (String word : paragraph) {
                 String candidate = current.length() == 0 ? word : current + " " + word;
-                if (current.length() == 0 || measurer.width(candidate, font, fontSize) <= available + 1e-9) {
+                if (current.length() == 0 || fits(measurer.width(candidate, font, fontSize), available)) {
                     current.setLength(0);
                     current.append(candidate);
                 } else {
@@ -106,7 +109,7 @@ public final class LineBreaker {
             for (int i = j - 1; i >= 0; i--) {
                 int spaces = j - i - 1;
                 double width = prefix[j] - prefix[i] + space * spaces;
-                if (spaces > 0 && width > available + 1e-9) {
+                if (spaces > 0 && !fits(width, available)) {
                     // Con más palabras sería aún más ancha; una sola sí puede desbordar.
                     break;
                 }
@@ -127,9 +130,9 @@ public final class LineBreaker {
     /** Deméritos de una línea con este sobrante y este estiramiento posible. */
     private static double demerits(double slack, double stretch, boolean last) {
         double badness;
-        if (slack < -1e-9) {
+        if (slack < -EPSILON) {
             badness = MAX_BADNESS;
-        } else if (last || slack <= 1e-9) {
+        } else if (last || slack <= EPSILON) {
             badness = 0;
         } else if (stretch <= 0) {
             badness = MAX_BADNESS;

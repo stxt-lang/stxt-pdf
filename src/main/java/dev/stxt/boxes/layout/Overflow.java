@@ -41,7 +41,12 @@ import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
  */
 public final class Overflow {
 
-    private static final double EPSILON = 0.01;
+    /**
+     * Lo que una caja puede salirse sin que sea un error: 0,01 pt, la misma precisión con que se comparan
+     * los volcados del §7. Es una tolerancia del modelo, más ancha que la de redondeo
+     * ({@link dev.stxt.boxes.model.Tolerance#EPSILON}); ningún test depende hoy de la diferencia.
+     */
+    private static final double TOLERANCE = 0.01;
 
     private Overflow() {
     }
@@ -65,8 +70,8 @@ public final class Overflow {
         double x = ox + f.x();
         double y = oy + f.y();
         if (f.box().style.isOutOfFlow()) {
-            if (x < page.x() - EPSILON || y < page.y() - EPSILON
-                    || x + f.width() > page.right() + EPSILON || y + f.height() > page.bottom() + EPSILON) {
+            if (x < page.x() - TOLERANCE || y < page.y() - TOLERANCE
+                    || x + f.width() > page.right() + TOLERANCE || y + f.height() > page.bottom() + TOLERANCE) {
                 Style s = f.box().style;
                 throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : f.box().line,
                         ErrorCode.BOX_OVERFLOW, "La caja " + name(f.box()) + " se sale de la página: revisa su "
@@ -85,10 +90,10 @@ public final class Overflow {
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
                                 Rect page) {
         for (TextLine l : f.lines()) {
-            if (l.x() < -EPSILON || l.x() + l.width() > width + EPSILON) {
+            if (l.x() < -TOLERANCE || l.x() + l.width() > width + TOLERANCE) {
                 throw textOverflow(f.box(), l, width);
             }
-            if (l.y() + l.height() > height + EPSILON) {
+            if (l.y() + l.height() > height + TOLERANCE) {
                 throw tooTall(f, l.y() + l.height(), height, null);
             }
         }
@@ -106,10 +111,10 @@ public final class Overflow {
                 double x = c.x() - c.offsetX();
                 double y = c.y() - c.offsetY();
                 Insets margin = c.margin();
-                if (x - margin.left() < -EPSILON || x + c.width() + margin.right() > width + EPSILON) {
+                if (x - margin.left() < -TOLERANCE || x + c.width() + margin.right() > width + TOLERANCE) {
                     throw tooWide(c, cx + x, cy + y, cx, cx + width);
                 }
-                if (y + c.height() > height + EPSILON) {
+                if (y + c.height() > height + TOLERANCE) {
                     if (isPage) {
                         throw pageOverflow(c, cx + x, cy + y, cy + height, height);
                     }
@@ -130,7 +135,7 @@ public final class Overflow {
                 continue;
             }
             double room = item.x() + list.padding().left();
-            if (m.width() > room + EPSILON) {
+            if (m.width() > room + TOLERANCE) {
                 throw new InvalidModelException(item.box().line, ErrorCode.LIST_MARKER_OVERFLOW, "El marcador '"
                         + m.box().text.strip() + "' del List item " + name(item.box()) + " mide " + pt(m.width())
                         + " con su espacio, y la sangría deja " + pt(room) + ": aumenta el Padding izquierdo de "
@@ -154,7 +159,7 @@ public final class Overflow {
             double cy = y + c.border().top() + c.padding().top();
             // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
             for (TextLine l : c.lines()) {
-                if (l.x() < -EPSILON || l.x() + l.width() > contentWidth(c) + EPSILON) {
+                if (l.x() < -TOLERANCE || l.x() + l.width() > contentWidth(c) + TOLERANCE) {
                     throw textOverflow(c.box(), l, contentWidth(c));
                 }
             }
@@ -166,9 +171,9 @@ public final class Overflow {
                     continue;
                 }
                 double dx = cx + d.x() - d.offsetX();
-                boolean outside = dx < left - EPSILON || dx + d.width() > right + EPSILON;
-                boolean outsideParent = dx - d.margin().left() < cx - EPSILON
-                        || dx + d.width() + d.margin().right() > cx + contentWidth(c) + EPSILON;
+                boolean outside = dx < left - TOLERANCE || dx + d.width() > right + TOLERANCE;
+                boolean outsideParent = dx - d.margin().left() < cx - TOLERANCE
+                        || dx + d.width() + d.margin().right() > cx + contentWidth(c) + TOLERANCE;
                 if (outside && (!sized || outsideParent)) {
                     inner = d;
                     x = dx;
@@ -217,7 +222,7 @@ public final class Overflow {
             Fragment inner = null;
             for (Fragment d : c.children()) {
                 double dy = cy + d.y() - d.offsetY();
-                if (!d.box().style.isOutOfFlow() && !d.box().isMarker() && dy + d.height() > bottom + EPSILON) {
+                if (!d.box().style.isOutOfFlow() && !d.box().isMarker() && dy + d.height() > bottom + TOLERANCE) {
                     inner = d;
                     x = cx + d.x() - d.offsetX();
                     y = dy;
@@ -227,7 +232,7 @@ public final class Overflow {
             if (inner == null) {
                 Style s = c.box().style;
                 String property;
-                if (c.border().vertical() + c.padding().vertical() > pageHeight + EPSILON) {
+                if (c.border().vertical() + c.padding().vertical() > pageHeight + TOLERANCE) {
                     property = c.padding().vertical() >= c.border().vertical() ? PADDING : BORDER;
                 } else if (!c.lines().isEmpty()) {
                     property = s.isDeclared(LINE_HEIGHT) ? LINE_HEIGHT : FONT_SIZE;

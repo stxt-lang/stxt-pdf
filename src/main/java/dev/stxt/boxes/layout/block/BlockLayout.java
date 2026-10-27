@@ -22,6 +22,10 @@ import dev.stxt.boxes.tree.Box;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+import static dev.stxt.boxes.model.Tolerance.fits;
+import static dev.stxt.boxes.model.Tolerance.same;
+
 /**
  * Layout {@code block}: apila los hijos en flujo en vertical (ESPECIFICACION.md §5.3).
  *
@@ -57,8 +61,6 @@ import java.util.List;
  * layout de un hijo anterior con menos espacio para cortarlo por dentro.</p>
  */
 public final class BlockLayout implements LayoutAlgorithm {
-
-    private static final double EPSILON = 1e-9;
 
     private final Engine engine;
 
@@ -187,7 +189,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             double flowY = adjoining.collapsesThrough()
                     ? top(childTop.add(margin.bottom()))
                     : top(childTop);
-            if (fragmenting && Math.abs(flowY - y) > EPSILON) {
+            if (fragmenting && !same(flowY, y)) {
                 // Los márgenes que salen del hijo por arriba lo han bajado: lo que le queda de página cambia.
                 r = layOutChild(child, flowY, childToken);
                 if (r.breakToken() instanceof BreakToken.Before) {
@@ -234,7 +236,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                         cursor, fragments.size(), pending.size()));
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
-            if (hadProgress && flowY + f.height() > contentRemaining + EPSILON) {
+            if (hadProgress && !fits(flowY + f.height(), contentRemaining)) {
                 // El hijo no se parte y no cabe: se corta antes de él (o antes, si es mejor).
                 return broken(BreakRules.best(marks, Mark::appeal));
             }

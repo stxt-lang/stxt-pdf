@@ -19,13 +19,13 @@ import dev.stxt.boxes.tree.Element;
 
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Punto de entrada del motor y despachador de algoritmos por {@code Layout} (módulo 9).
  * Todas las llamadas recursivas de layout pasan por aquí para usar la caché.
  */
 public final class Engine {
-
-    private static final double EPSILON = 1e-9;
 
     private final LayoutCache cache = new LayoutCache();
     private final TextMeasurer measurer;
@@ -114,7 +114,7 @@ public final class Engine {
         Fragment f = r.fragment();
         double bottom = f.border().bottom() + f.padding().bottom();
         double remaining = space.fragmentainerRemaining().getAsDouble();
-        if (bottom > 0 && f.height() > remaining + EPSILON && f.height() - bottom <= remaining + EPSILON) {
+        if (bottom > 0 && !fits(f.height(), remaining) && fits(f.height() - bottom, remaining)) {
             return layoutOnce(box, space.withRemaining(remaining - bottom, space.atFragmentainerStart()), from);
         }
         return r;

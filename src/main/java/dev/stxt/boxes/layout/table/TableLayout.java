@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+
 /**
  * Layout de una {@code Table} (ESPECIFICACION.md §5.15): el de su grid, con las filas de
  * {@code Head} y {@code Foot} repetidas en cada fragmento.
@@ -33,8 +35,6 @@ import java.util.List;
  * no cabe en el sitio que dejan se parte en paralelo, como en un grid.</p>
  */
 public final class TableLayout implements LayoutAlgorithm {
-
-    private static final double EPSILON = 1e-9;
 
     private final GridLayout grid;
     private final Engine engine;

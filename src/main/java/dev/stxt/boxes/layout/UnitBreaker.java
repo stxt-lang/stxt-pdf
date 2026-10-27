@@ -10,6 +10,8 @@ import dev.stxt.boxes.tree.Box;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Fragmentación de los contenedores cuyos ítems se agrupan en <em>unidades</em>
  * (ESPECIFICACION.md §5.10): las líneas de un contenedor flex en {@code row}, los ítems de uno en
@@ -31,8 +33,6 @@ import java.util.List;
  * las unidades, enteros, y las unidades se cortan en lo que dejan.</p>
  */
 public final class UnitBreaker {
-
-    private static final double EPSILON = 1e-9;
 
     private UnitBreaker() {
     }
@@ -185,7 +185,7 @@ public final class UnitBreaker {
             if (space.fragmenting() && next < n) {
                 boolean mustPlace = space.atFragmentainerStart() && !continued;
                 int groupEnd = groupEnd(next);
-                if (mustPlace && units.splittable() && bottom(next, groupEnd) - origin > remaining + EPSILON) {
+                if (mustPlace && units.splittable() && !fits(bottom(next, groupEnd) - origin, remaining)) {
                     // No cabe ni al principio de página: sus ítems se parten en paralelo.
                     Split s = split(next, groupEnd, null, origin);
                     if (s != null && s.broken()) {

@@ -5,6 +5,9 @@ import dev.stxt.boxes.model.Value;
 import java.util.Comparator;
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+import static dev.stxt.boxes.model.Tolerance.fits;
+
 /**
  * Dimensionado de pistas (módulo 6; simplificación de Grid §12). La misma función sirve para
  * columnas y filas: solo cambian las aportaciones de los ítems.
@@ -21,8 +24,6 @@ import java.util.List;
  * <p>Simplificación: {@code fit-content} se trata como {@code auto}.</p>
  */
 public final class TrackSizing {
-
-    private static final double EPS = 1e-9;
 
     private TrackSizing() {
     }
@@ -124,14 +125,14 @@ public final class TrackSizing {
         for (int i = 0; i < n; i++) {
             active[i] = !tracks.get(i).flexible() && base[i] < limit[i];
         }
-        while (free > EPS && count(active) > 0) {
+        while (free > EPSILON && count(active) > 0) {
             double share = free / count(active);
             for (int i = 0; i < n; i++) {
                 if (active[i]) {
                     double d = Math.min(share, limit[i] - base[i]);
                     base[i] += d;
                     free -= d;
-                    if (base[i] >= limit[i] - EPS) {
+                    if (base[i] >= limit[i] - EPSILON) {
                         active[i] = false;
                     }
                 }
@@ -159,7 +160,7 @@ public final class TrackSizing {
                 boolean recompute = false;
                 for (int i = 0; i < n; i++) {
                     Track t = tracks.get(i);
-                    if (t.flexible() && !inflexible[i] && base[i] > frSize * t.fraction() + EPS) {
+                    if (t.flexible() && !inflexible[i] && !fits(base[i], frSize * t.fraction())) {
                         inflexible[i] = true;
                         recompute = true;
                     }
@@ -183,7 +184,7 @@ public final class TrackSizing {
                     autoTracks++;
                 }
             }
-            if (free > EPS && autoTracks > 0) {
+            if (free > EPSILON && autoTracks > 0) {
                 for (int i = 0; i < n; i++) {
                     if (tracks.get(i).max().isAuto()) {
                         base[i] += free / autoTracks;
@@ -263,7 +264,7 @@ public final class TrackSizing {
                     count++;
                 }
             }
-            if (excess <= EPS || count == 0) {
+            if (excess <= EPSILON || count == 0) {
                 continue;
             }
             for (int i = from; i < to; i++) {

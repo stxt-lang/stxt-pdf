@@ -2,6 +2,8 @@ package dev.stxt.boxes.layout.flex;
 
 import java.util.List;
 
+import static dev.stxt.boxes.model.Tolerance.EPSILON;
+
 /**
  * Resuelve los tamaños flexibles de una línea flex (módulo 5, paso 5; Flexbox §9.7).
  *
@@ -95,7 +97,7 @@ public final class FlexResolver {
                     continue;
                 }
                 double violation = clamped[i] - target[i];
-                boolean freeze = Math.abs(totalViolation) < 1e-9
+                boolean freeze = Math.abs(totalViolation) < EPSILON
                         || (totalViolation > 0 && violation > 0)
                         || (totalViolation < 0 && violation < 0);
                 target[i] = clamped[i];

@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import static dev.stxt.boxes.model.Tolerance.fits;
+import static dev.stxt.boxes.model.Tolerance.same;
+
 /**
  * Layout {@code flex} (ESPECIFICACION.md §5.7). Los ocho pasos:
  * <ol>
@@ -362,7 +365,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double used = 0;
             for (Item it : items) {
                 double h = it.flex.hypothetical();
-                if (!current.isEmpty() && used + mainGap + h > limit + 1e-9) {
+                if (!current.isEmpty() && !fits(used + mainGap + h, limit)) {
                     lines.add(current);
                     current = new ArrayList<>();
                     used = 0;
@@ -425,7 +428,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 target = BoxModel.constrainWidth(is, Math.max(0, lineCross - it.margin.horizontal()), contentWidth);
             }
-            if (Math.abs(target + (row ? it.margin.vertical() : it.margin.horizontal()) - it.cross) > 1e-9) {
+            if (!same(target + (row ? it.margin.vertical() : it.margin.horizontal()), it.cross)) {
                 layOutItem(it, OptionalDouble.of(target));
             }
         }
