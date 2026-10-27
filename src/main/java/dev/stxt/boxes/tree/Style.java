@@ -129,8 +129,8 @@ public final class Style {
     public Value itemBasis = Value.AUTO;
     /** {@code null} = la del contenedor. */
     public Alignment itemCrossAxis;
-    /** Texto de {@code Cell}, o {@code null} = colocación automática. */
-    public String itemCell;
+    /** Texto de {@code Area}, o {@code null} = colocación automática. */
+    public String itemArea;
     /** {@code null} = la del contenedor. */
     public Alignment itemHorizontal;
     /** {@code null} = la del contenedor. */

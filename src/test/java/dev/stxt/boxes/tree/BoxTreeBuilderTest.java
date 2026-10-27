@@ -67,18 +67,18 @@ class BoxTreeBuilderTest {
     }
 
     @Test
-    void itemAndCellPropertiesGoToTheirElement() {
+    void itemAndAreaPropertiesGoToTheirElement() {
         Box root = build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tCell: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: c")).root();
+                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).root();
         Box a = root.children.get(0).children.get(0);
         assertEquals("a", a.id);
         assertEquals(2, a.style.itemGrow, 1e-9);
         assertEquals(1, a.style.layer);
         Box b = root.children.get(1).children.get(0);
-        assertEquals("1 2", b.style.itemCell);
+        assertEquals("1 2", b.style.itemArea);
         assertEquals(Style.Alignment.CENTER, b.style.itemVertical);
-        assertEquals(14, b.style.line("item.cell"));
-        assertNull(root.children.get(1).children.get(1).style.itemCell);
+        assertEquals(14, b.style.line("item.area"));
+        assertNull(root.children.get(1).children.get(1).style.itemArea);
     }
 
     @Test
@@ -98,7 +98,7 @@ class BoxTreeBuilderTest {
     @Test
     void rulesTheSchemaCannotExpress() {
         InvalidModelException single = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tGrid:", "\t\tCell:", "\t\t\tBlock:", "\t\t\tText: a")));
+                "\tGrid:", "\t\tArea:", "\t\t\tBlock:", "\t\t\tText: a")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, single.code());
         assertEquals(9, single.line());
         InvalidModelException empty = assertThrows(InvalidModelException.class, () -> build(document(

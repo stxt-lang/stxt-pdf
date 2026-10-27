@@ -3,9 +3,9 @@ package dev.stxt.boxes.layout.grid;
 import java.util.Map;
 
 /**
- * Colocación pedida por {@code Item > Cell} (ESPECIFICACION.md §4.9).
+ * Colocación de un ítem de grid, la pedida por su {@code Area} (ESPECIFICACION.md §4.8).
  *
- * <p>Sintaxis: un nombre de área ({@code Cell: side}) o {@code fila columna [filas columnas]},
+ * <p>Sintaxis: un nombre de área ({@code Area: side}) o {@code fila columna [filas columnas]},
  * donde {@code fila} y {@code columna} pueden ser {@code auto}. Las extensiones son 1 si no se
  * indican.</p>
  *
@@ -30,12 +30,12 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
         if (t.length == 1 && !t[0].equals("auto") && !t[0].matches("\\d+")) {
             Area a = areas.get(t[0]);
             if (a == null) {
-                throw new IllegalArgumentException("Área desconocida en Cell: " + t[0]);
+                throw new IllegalArgumentException("Área desconocida en Area: " + t[0]);
             }
             return new Cell(a.row(), a.column(), a.rows(), a.columns());
         }
         if (t.length != 2 && t.length != 4) {
-            throw new IllegalArgumentException("Cell espera un área o 'fila columna [filas columnas]': " + text);
+            throw new IllegalArgumentException("Area espera un área o 'fila columna [filas columnas]': " + text);
         }
         Integer row = position(t[0], text);
         Integer column = position(t[1], text);
@@ -49,14 +49,14 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
             return null;
         }
         if (!s.matches("\\d+") || Integer.parseInt(s) < 1) {
-            throw new IllegalArgumentException("Posición no válida en Cell (se cuenta desde 1): " + original);
+            throw new IllegalArgumentException("Posición no válida en Area (se cuenta desde 1): " + original);
         }
         return Integer.parseInt(s);
     }
 
     private static int span(String s, String original) {
         if (!s.matches("\\d+") || Integer.parseInt(s) < 1) {
-            throw new IllegalArgumentException("Extensión no válida en Cell: " + original);
+            throw new IllegalArgumentException("Extensión no válida en Area: " + original);
         }
         return Integer.parseInt(s);
     }

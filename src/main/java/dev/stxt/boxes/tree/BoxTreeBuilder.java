@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
  * elemento a una caja con su {@link Style.Layout} y su {@link Style.Position}, pasa las
- * propiedades de {@code Item} y {@code Cell} al elemento que envuelven, interpreta los valores,
+ * propiedades de {@code Item} y {@code Area} al elemento que envuelven, interpreta los valores,
  * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
  * puede expresar (§6).
  *
@@ -335,13 +335,13 @@ public final class BoxTreeBuilder {
     // Elementos
     // ------------------------------------------------------------------------------------------
 
-    /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Cell} envuelven a la suya. */
+    /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */
     private void buildContent(InlineNode node, Box box) {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
             if (ELEMENTS.contains(name)) {
                 box.addChild(element(inline(h), box, null));
-            } else if (name.equals("item") || name.equals("cell")) {
+            } else if (name.equals("item") || name.equals("area")) {
                 InlineNode wrapper = inline(h);
                 List<Node> elements = wrapper.getChildren().stream()
                         .filter(e -> IN_FLOW.contains(e.getCanonicalName()))
@@ -355,7 +355,7 @@ public final class BoxTreeBuilder {
         }
     }
 
-    /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Cell}, si es un ítem. */
+    /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem. */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
         String kind = n.getCanonicalName();
         int level = Box.headingLevel(kind);
@@ -383,7 +383,7 @@ public final class BoxTreeBuilder {
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
             // Las clases ya se han aplicado con sus reglas.
-            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("cell") || name.equals("content")
+            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("area") || name.equals("content")
                     || name.equals("class")) {
                 continue;
             }
@@ -709,14 +709,14 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Propiedades de {@code Item} o {@code Cell}, que pasan al elemento que envuelven; su línea se
-     * guarda con prefijo ({@code item.grow}), salvo {@code Layer}. El valor de {@code Cell} es la
-     * colocación ({@code item.cell}, con la línea del {@code Cell}).
+     * Propiedades de {@code Item} o {@code Area}, que pasan al elemento que envuelven; su línea se
+     * guarda con prefijo ({@code item.grow}), salvo {@code Layer}. El valor de {@code Area} es la
+     * colocación ({@code item.area}, con la línea del {@code Area}).
      */
     private static void item(InlineNode w, Style s) {
-        if (w.getCanonicalName().equals("cell") && !w.getText().isBlank()) {
-            s.declared("item.cell", w.getLine());
-            s.itemCell = w.getText().trim();
+        if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
+            s.declared("item.area", w.getLine());
+            s.itemArea = w.getText().trim();
         }
         for (Node p : w.getChildren()) {
             String name = p.getCanonicalName();
@@ -749,10 +749,10 @@ public final class BoxTreeBuilder {
         boolean flexItem = wrapper != null && parentLayout == Style.Layout.FLEX;
         boolean gridItem = wrapper != null && parentLayout == Style.Layout.GRID;
 
-        if (gridItem && s.itemCell != null) {
+        if (gridItem && s.itemArea != null) {
             Map<String, Area> areas = parent.style.gridAreas == null
                     ? Map.of() : GridAreas.parse(parent.style.gridAreas);
-            placement(s.line("item.cell"), () -> Cell.parse(s.itemCell, areas));
+            placement(s.line("item.area"), () -> Cell.parse(s.itemArea, areas));
         }
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
@@ -1228,7 +1228,7 @@ public final class BoxTreeBuilder {
         }
     }
 
-    /** {@code Areas} y {@code Cell}: sus errores son de colocación. */
+    /** {@code Areas} y {@code Area}: sus errores son de colocación. */
     private static void placement(Node n, Runnable check) {
         placement(n.getLine(), check);
     }

@@ -53,27 +53,27 @@ Document (dev.stxt.boxes):
 			Before: page
 		Columns: 1fr 1fr
 		Gap: 10
-		Cell:
+		Area:
 			Block:
 				Id: g1
 				Box:
 					Height: 50
-		Cell:
+		Area:
 			Block:
 				Id: g2
 				Box:
 					Height: 50
-		Cell:
+		Area:
 			Block:
 				Id: g3
 				Box:
 					Height: 50
-		Cell:
+		Area:
 			Block:
 				Id: g4
 				Box:
 					Height: 50
-		Cell:
+		Area:
 			Block:
 				Id: g5
 				Box:

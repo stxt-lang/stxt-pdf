@@ -16,20 +16,20 @@ Document (dev.stxt.boxes):
 			head head
 			side main
 			foot foot
-		Cell: head
+		Area: head
 			Block:
 				Id: head
 				Box:
 					Height: 30
-		Cell: side
+		Area: side
 			Text: Resumen
 				Id: side
-		Cell: main
+		Area: main
 			Block:
 				Id: main
 				Box:
 					Height: 60
-		Cell: foot
+		Area: foot
 			Block:
 				Id: foot
 				Box:
@@ -40,22 +40,22 @@ Document (dev.stxt.boxes):
 			Margin: 20 0 0 0
 		Columns: repeat(3, 1fr)
 		Gap: 10
-		Cell:
+		Area:
 			Block:
 				Id: c1
 				Box:
 					Height: 40
-		Cell:
+		Area:
 			Block:
 				Id: c2
 				Box:
 					Height: 50
-		Cell:
+		Area:
 			Block:
 				Id: c3
 				Box:
 					Height: 30
-		Cell:
+		Area:
 			Block:
 				Id: c4
 				Box:

@@ -14,7 +14,7 @@ inglés; la documentación y los comentarios, en castellano.
 
 Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`,
 `Heading 1`…`Heading 6`, `Relative`, `Absolute`, `Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
-en `Item` y los de un `Grid`, en `Cell`. Las propiedades de cada caja se agrupan en `Box` (el
+en `Item` y los de un `Grid`, en `Area`. Las propiedades de cada caja se agrupan en `Box` (el
 modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de página):
 
 ```
@@ -34,9 +34,9 @@ Document (dev.stxt.boxes):
 	Grid:
 		Columns: 150 1fr
 		Gap: 20
-		Cell:
+		Area:
 			Text: Columna lateral
-		Cell:
+		Area:
 			Text:
 				Content >>
 					Texto largo, en un bloque.
@@ -84,7 +84,7 @@ siguientes, en
 | Pieza | Estado |
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
-| Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Cell`, validados con `@stxt.schema` | Hecho y probado |
+| Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Area`, validados con `@stxt.schema` | Hecho y probado |
 | Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
 | Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
@@ -131,7 +131,7 @@ en `target/pdf/`.
 6. ~~**Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales (caso 06).~~ Hecho.
 7. ~~**Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass (caso 07).~~ Hecho.
 8. ~~**Fuentes.** Carpeta de recursos, fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real.~~ Hecho.
-9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
+9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` (hoy `Area`, hito 14) en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
 10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
 11. ~~**Reglas reutilizables.** `Styles` con reglas `Element`, `For class` y `For id`; `Class` en los elementos (caso 08).~~ Hecho.
 12. ~~**Encabezados y párrafos.** `Heading 1`…`Heading 6` y `Paragraph`; PDF etiquetado y marcadores (caso 09).~~ Hecho.

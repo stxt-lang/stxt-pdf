@@ -54,14 +54,14 @@ Document (dev.stxt.boxes):
 		Id: body
 		Columns: 150 1fr
 		Gap: 20
-		Cell:
+		Area:
 			Text:
 				Id: side
 				Class: panel
 				Content >>
 					Resumen de las cifras clave
 					del trimestre.
-		Cell:
+		Area:
 			Text:
 				Id: main
 				Content >>

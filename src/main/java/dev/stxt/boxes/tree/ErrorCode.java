@@ -25,7 +25,7 @@ public enum ErrorCode {
     // --- Estructura ---------------------------------------------------------------------------
     /** Dos cajas con el mismo {@code Id}. */
     DUPLICATE_ID,
-    /** Un {@code Item} o un {@code Cell} que no contiene exactamente un elemento. */
+    /** Un {@code Item} o un {@code Area} que no contiene exactamente un elemento. */
     SINGLE_ELEMENT,
     /** Un {@code Text} sin texto, o con texto en el valor y en {@code Content}. */
     TEXT_CONTENT,
@@ -86,7 +86,7 @@ public enum ErrorCode {
     MIN_MAX_CONFLICT,
     /** Un porcentaje vertical cuya base no es un alto definido. */
     INDEFINITE_PERCENTAGE,
-    /** {@code Areas} no rectangulares o un valor de {@code Cell} no válido. */
+    /** {@code Areas} no rectangulares o un valor de {@code Area} no válido. */
     GRID_PLACEMENT,
 
     // --- Desbordamientos (al maquetar) -------------------------------------------------------

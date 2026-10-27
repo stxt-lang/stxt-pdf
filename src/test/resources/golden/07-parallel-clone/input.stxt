@@ -42,13 +42,13 @@ Document (dev.stxt.boxes):
 		Id: grid
 		Columns: 1fr 1fr
 		Gap: 10
-		Cell:
+		Area:
 			Block:
 				Id: g1
 				Box:
 					Height: 200
 					Background: #E1F0E8
-		Cell:
+		Area:
 			Block:
 				Id: g2
 				Box:

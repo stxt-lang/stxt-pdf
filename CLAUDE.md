@@ -52,7 +52,7 @@ actualízala.
 | 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
 | 7 | ~~`{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass~~ (hecho; caso 07) | `layout/Slice`, `layout/UnitBreaker`, `layout/inline/PageNumbers`, `layout/inline/LineBreaker` |
 | 8 | ~~Carpeta de recursos, fuentes TTF incrustadas, `Font weight`/`Font style`, línea base real~~ (hecho) | `resources`, `layout/inline/PdfMetrics`, `paint/PdfCanvas` |
-| 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
+| 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell` (hoy `Area`)) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
 | 11 | ~~Reglas reutilizables `Styles` (`Element`, `For class`, `For id`) y `Class`~~ (hecho; caso 08) | schema, `tree/BoxTreeBuilder` |
 | 12 | ~~Encabezados (`Heading 1`…`Heading 6`) y `Paragraph`; PDF etiquetado y marcadores~~ (hecho; caso 09) | schema, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
@@ -97,7 +97,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Elementos y schema (§2, §9):** el documento se escribe con elementos que solo admiten sus
   propiedades: `Block`, `Flex`, `Grid`, `Text` (texto en el valor o en `Content >>`),
   `Relative`, `Absolute` y `Fixed` (bloques posicionados), y los envoltorios `Item` (hijo de
-  `Flex`) y `Cell` (hijo de `Grid`, con la colocación en el valor), que contienen exactamente un
+  `Flex`) y `Area` (hijo de `Grid`, con la colocación en el valor), que contienen exactamente un
   elemento. Las propiedades de cada caja van en tres grupos (§4): `Box` (modelo de caja, no se
   hereda), `Typography` (texto, viudas y huérfanas; se hereda y se admite en `Document`) y
   `Break` (cortes de página; no en `Absolute` ni `Fixed`), con nombres cortos (`Size`,
@@ -106,7 +106,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   árbol al empezar, así que el resto del builder da la estructura por buena. `INTERNAL` da el
   nombre interno de los cortos (`Size` → `font-size`), que es el de `Style.line`.
 - **`BoxTreeBuilder`** traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen
-  del elemento; las propiedades de `Item` y `Cell` pasan al elemento que envuelven), interpreta
+  del elemento; las propiedades de `Item` y `Area` pasan al elemento que envuelven), interpreta
   valores, aplica la herencia y comprueba las reglas del §6 que el schema no puede expresar. Los
   errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
   culpable**: la de la propiedad (`Style.line("height")`, `"grid.rows"`, `"item.grow"`…), no la
@@ -266,7 +266,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   documentos de test con texto deben declararlos ellos mismos. Los documentos se escriben como
   listas de líneas con tabuladores (`"\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A",
   "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10"`); el `Id` de un ítem va en su elemento, no en el
-  `Item` o el `Cell`. Un test de layout no puede desbordar: los
+  `Item` o el `Area`. Un test de layout no puede desbordar: los
   desbordamientos van al catálogo de errores. Con
   `FixedMetrics`, cada carácter mide 5 pt con `Size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran

@@ -34,7 +34,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
 | 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
-| 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
+| 14 | Tablas, con cabecera y pie repetidos | diseño | — |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
 **Orden**, de menor a mayor impacto en el motor:
@@ -85,10 +85,12 @@ Afectan a varios hitos. Hay que resolverlas en el primero que las necesite.
 
 **Abiertas:**
 
-- **T3. Nombres que chocan.** `Item` (hijo de `Flex`), `Cell` (hijo de `Grid`) y `Columns`
-  (pistas de `Grid`) ya existen y tienen una única definición en el namespace. Las listas,
-  las tablas y las columnas tienen que usar otros nombres o compartir el significado. Se
-  decide en cada hito; ver sus decisiones abiertas.
+- **T3. Nombres que chocan.** `Item` (hijo de `Flex`), `Area` (hijo de `Grid`, antes `Cell`)
+  y `Columns` (pistas de `Grid`) ya existen y tienen una única definición en el namespace. Las
+  listas, las tablas y las columnas tienen que usar otros nombres o compartir el significado.
+  Se decide en cada hito; ver sus decisiones abiertas. Resuelto para las listas (L1: `List
+  item`) y las tablas (TB1: el `Cell` de `Grid` pasa a `Area`; `Columns` y `Gap` se
+  reutilizan). Queda el hito 15, donde `Columns` ya es la lista de pistas.
 - **T4. Texto con formato dentro de una línea.** Hoy un `Text` tiene un único estilo. Un
   encabezado o un ítem de lista con una palabra en negrita necesitaría tramos (*spans*).
   Propuesta: fuera de alcance de estos hitos; si hace falta, sería un hito propio.
@@ -423,36 +425,31 @@ List:
 **Objetivo.** Tablas al estilo HTML: filas y celdas, celdas que ocupan varias filas o
 columnas, y una cabecera y un pie que se repiten en cada página cuando la tabla se parte.
 
-**Borrador de sintaxis** (a confirmar; `Cell` y `Columns` ya existen, ver T3):
+**Sintaxis** (nombres decididos en TB1; el contenido de la celda, en TB2):
 
 ```
 Table:
 	Columns: 120 1fr 1fr
 	Head:
 		Row:
-			Data: Concepto
-			Data: T1
-			Data: T2
+			Cell: Concepto
+			Cell: T1
+			Cell: T2
 	Body:
 		Row:
-			Data: Ventas
-			Data: 100
-			Data: 120
+			Cell: Ventas
+			Cell: 100
+			Cell: 120
 	Foot:
 		Row:
-			Data: Total
+			Cell: Total
 				Span: 1 3
 ```
 
 **Decisiones abiertas:**
 
-- [ ] TB1. Nombres: `Table`, `Head`/`Body`/`Foot`, `Row`, y la celda (`Data`, `Td`,
-      `Field`…; no puede ser `Cell` salvo que se unifique con la de `Grid`).
-- [ ] TB2. Contenido de la celda: texto en el valor (`Data: Ventas`) y, además, elementos
+- [ ] TB2. Contenido de la celda: texto en el valor (`Cell: Ventas`) y, además, elementos
       (un `Block` con varios párrafos, una lista…).
-- [ ] TB3. Algoritmo de anchos: el de HTML (`table-layout: auto`, basado en el contenido) o
-      el dimensionado de pistas de grid (`Columns` con `auto`, `fr`, `minmax`…). Reutilizar
-      grid es más simple y coherente con el resto del motor.
 - [ ] TB4. Bordes: separados (cada celda con su `Box`) o colapsados (`border-collapse`).
       Bordes colapsados es lo típico en tablas editoriales, pero es un modelo nuevo.
 - [ ] TB5. Estilo por fila, por columna o para toda la tabla (filas alternas con fondo):
@@ -465,11 +462,20 @@ Table:
 - [ ] TB9. Errores: filas con distinto número de celdas, `Span` que se sale de la tabla,
       cabecera y pie que no caben en una página.
 
-**Decisiones tomadas:** *(ninguna todavía)*
+**Decisiones tomadas** (2026-10-27):
+
+- [x] TB1. Nombres: **`Table`**, **`Head`**, **`Body`** y **`Foot`** (con `Body` explícito;
+      `Header`/`Footer` quedan libres para cabeceras de página), **`Row`** y **`Cell`**.
+      Para liberar `Cell`, el envoltorio de los ítems de `Grid` pasa a llamarse **`Area`**
+      (el término de CSS, `grid-area`; mismos valores; decisión 96 de `DECISIONES.md`).
+      La extensión de una celda es **`Span: filas columnas`**, en el orden del valor de
+      `Area` y de `Gap`; no `Column span`, que sería el `column-span` del hito 15.
+- [x] TB3. Los anchos se calculan con el **dimensionado de pistas de grid**: `Columns` y
+      `Gap` de la tabla son los mismos nodos que en `Grid` (mismo significado y valores).
 
 **Diseño técnico (previsto):**
 
-- Si se reutiliza grid (TB3): `BoxTreeBuilder` traduce la tabla a un grid con colocación
+- Con grid (TB3): `BoxTreeBuilder` traduce la tabla a un grid con colocación
   explícita (fila y columna salen del orden de `Row` y `Data`, más los `Span`), y un
   `TableLayout` envuelve `GridLayout` para la repetición. `Placement` y `TrackSizing` no
   cambian.
@@ -482,7 +488,10 @@ Table:
 
 **Tareas:**
 
-- [ ] Resolver TB1–TB9.
+- [x] Resolver TB1 y TB3.
+- [x] Renombrar el `Cell` de `Grid` a `Area` (schema, builder, especificación, tests,
+      catálogo y casos golden; sin cambios en los resultados ni en los PNG).
+- [ ] Resolver TB2 y TB4–TB9.
 - [ ] Schema, `Style`, `BoxTreeBuilder` (traducción a filas y columnas, `Span`).
 - [ ] Layout y repetición de cabecera y pie al fragmentar.
 - [ ] Bordes (según TB4) en el pintado.
@@ -561,6 +570,12 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (12).** Hito 14 en diseño. Decididos TB1 (nombres: `Table`, `Head`, `Body`,
+  `Foot`, `Row`, `Cell`, `Span`) y TB3 (anchos con las pistas de grid; `Columns` y `Gap`
+  reutilizados). Para liberar `Cell`, el envoltorio de `Grid` pasa a llamarse `Area` en
+  schema, builder (`Style.itemArea`), especificación, README, `CLAUDE.md`, tests, catálogo y
+  casos golden (decisión 96). `mvn test` en verde; los PNG no cambian.
+  *Siguiente paso:* resolver TB2 y TB4–TB9 y empezar por el schema de la tabla.
 - **2026-10-27 (11).** Hito 13 terminado. Caso golden `10-lists`, que pasa con el resultado
   calculado a mano; PNG revisados (marcadores alineados a la derecha, el de una lista anidada
   en la misma línea que el del ítem, y el de un ítem partido solo en la página 1). El marcador

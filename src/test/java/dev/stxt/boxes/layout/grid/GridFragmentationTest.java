@@ -24,7 +24,7 @@ class GridFragmentationTest {
     private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumns: 1fr 1fr"};
 
     private static String[] cell(String id, String cell) {
-        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
+        return new String[]{"\t\tArea: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
                 "\t\t\t\t\tHeight: 40"};
     }
 
@@ -45,7 +45,7 @@ class GridFragmentationTest {
     }
 
     private static String[] box(String id, String height, String cell) {
-        return new String[]{"\t\tCell: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
+        return new String[]{"\t\tArea: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
                 "\t\t\t\t\tHeight: " + height};
     }
 

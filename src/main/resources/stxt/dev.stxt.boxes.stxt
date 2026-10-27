@@ -112,7 +112,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Fixed
 	Node: Grid
 		Type: GROUP
-		Description: Contenedor grid: coloca sus celdas (Cell) en una rejilla de filas y columnas.
+		Description: Contenedor grid: coloca sus ítems (Area) en una rejilla de filas y columnas.
 		Children:
 			Child: Id
 				Max: 1
@@ -138,7 +138,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Vertical
 				Max: 1
-			Child: Cell
+			Child: Area
 			Child: Absolute
 			Child: Fixed
 	Node: Text
@@ -440,9 +440,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Relative
 				Max: 1
-	Node: Cell
+	Node: Area
 		Type: INLINE
-		Description: Celda de un Grid. El valor es la colocación: un nombre de área, o 'fila columna [filas columnas]' contando desde 1; sin valor, se coloca automáticamente. Contiene exactamente un elemento.
+		Description: Ítem de un Grid: el área que ocupa. El valor es la colocación: un nombre de área, o 'fila columna [filas columnas]' contando desde 1; sin valor, se coloca automáticamente. Contiene exactamente un elemento.
 		Children:
 			Child: Horizontal
 				Max: 1
@@ -773,7 +773,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: column
 	Node: Horizontal
 		Type: ENUM
-		Description: Alineación horizontal en la celda: la de todas en Grid, la de una en Cell.
+		Description: Alineación horizontal en el área: la de todas en Grid, la de una en Area.
 		Values:
 			Value: start
 			Value: end
@@ -781,7 +781,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: stretch
 	Node: Vertical
 		Type: ENUM
-		Description: Alineación vertical en la celda: la de todas en Grid, la de una en Cell.
+		Description: Alineación vertical en el área: la de todas en Grid, la de una en Area.
 		Values:
 			Value: start
 			Value: end

@@ -393,3 +393,15 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 95. **`dash` se etiqueta con `ListNumbering: None`**, porque el PDF no tiene un valor para el
     guion; la lista sigue siendo `L` con `Lbl` y `LBody`. *Dónde:* `paint/PdfStructure`.
     *Alternativa:* `Unordered` (PDF 2.0), si se declara la versión 2.0.
+
+## Hito 14: tablas (2026-10-27)
+
+96. **El envoltorio de los ítems de `Grid` pasa a llamarse `Area`** (antes `Cell`, decisiones
+    63 y 64), para dejar `Cell` a la celda de tabla, que sí es una caja y se puede nombrar en
+    `Element`. `Area` es el término de CSS (`grid-area`) y admite los mismos valores que tenía
+    `Cell` (`Area: side`, `Area: 1 1 1 2`); el nombre casa con `Areas`, cuyas áreas nombra. No
+    cambia el layout ni ningún resultado. La clase interna `layout/grid/Cell` (la colocación
+    leída) conserva su nombre. *Dónde:* schema, `BoxTreeBuilder` (`Style.itemArea`, línea
+    `item.area`). *Alternativa:* conservar `Cell` en `Grid` y llamar `Table cell` a la de la
+    tabla, como `List item`; más largo en lo que más se repite de una tabla, y con dos
+    "celdas" distintas en el namespace.

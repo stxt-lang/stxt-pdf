@@ -61,7 +61,7 @@ public final class GridLayout implements LayoutAlgorithm {
         int explicitColumns = Math.max(s.gridColumns.size(), s.gridAreas == null ? 0 : GridAreas.columns(s.gridAreas));
         int explicitRows = Math.max(s.gridRows.size(), s.gridAreas == null ? 0 : GridAreas.rows(s.gridAreas));
         List<Box> items = box.inFlowChildren();
-        List<Cell> cells = items.stream().map(i -> Cell.parse(i.style.itemCell, named)).toList();
+        List<Cell> cells = items.stream().map(i -> Cell.parse(i.style.itemArea, named)).toList();
         List<Area> areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow);
         int columns = Math.max(1, explicitColumns);
         int rows = explicitRows;

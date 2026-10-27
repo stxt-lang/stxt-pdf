@@ -146,7 +146,7 @@ Errors:
 					Block:
 						Box:
 							Height: 10
-	Case: Cell con dos elementos
+	Case: Area con dos elementos
 		Code: SINGLE_ELEMENT
 		Line: 10
 		Document >>
@@ -155,7 +155,7 @@ Errors:
 					Width: 595
 					Height: 842
 				Grid:
-					Cell:
+					Area:
 						Block:
 							Box:
 								Height: 10
@@ -255,12 +255,12 @@ Errors:
 					Width: 595
 					Height: 842
 				Grid:
-					Cell:
+					Area:
 						Grow: 1
 						Block:
 							Box:
 								Height: 10
-	Case: Cell en un Flex
+	Case: Area en un Flex
 		Code: CHILD_NOT_DECLARED
 		Line: 6
 		Document >>
@@ -269,7 +269,7 @@ Errors:
 					Width: 595
 					Height: 842
 				Flex:
-					Cell: 1 1
+					Area: 1 1
 						Block:
 							Box:
 								Height: 10
@@ -544,7 +544,7 @@ Errors:
 						a a
 						a b
 						b b
-	Case: Área desconocida en Cell
+	Case: Área desconocida en Area
 		Code: GRID_PLACEMENT
 		Line: 7
 		Document >>
@@ -554,7 +554,7 @@ Errors:
 					Height: 842
 				Grid:
 					Areas: a b
-					Cell: c
+					Area: c
 						Block:
 							Box:
 								Height: 10
@@ -646,7 +646,7 @@ Errors:
 					Box:
 						Width: 200
 					Columns: 1fr 1fr
-					Cell: 1 1 1 2
+					Area: 1 1 1 2
 						Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 	Case: Texto más alto que su Height
 		Code: BOX_OVERFLOW
