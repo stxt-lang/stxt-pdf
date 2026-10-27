@@ -1,0 +1,71 @@
+# Hito 13: listas (ESPECIFICACION.md §5.14). Páginas de 595 × 300 con márgenes de 40: área
+# útil de 515 × 220 desde (40, 40), que acaba en y = 260. Líneas de 12 (Size 10).
+#
+# La sangría de todas las listas es su Padding izquierdo de 20, declarado en Styles. Cada
+# marcador cuelga a la izquierda de su ítem, con su espacio final: con 5 pt por carácter,
+# "9. " mide 15 y "10. " mide 20, alineados a la derecha contra el ítem.
+# El ítem n11 empieza con una lista anidada: su marcador y el de sa comparten la línea.
+# La lista long (Width 200: ítems de 180, 36 caracteres por línea y 4 palabras de 7) se parte:
+# r2 tiene 5 líneas y caben 3; su marcador solo está en el primer fragmento.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: List
+			Box:
+				Padding: 0 0 0 20
+	List:
+		Id: num
+		Marker: decimal
+		Start: 9
+		List item:
+			Id: n9
+			Text: Nueve
+		List item:
+			Id: n10
+			Text: Diez
+		List item:
+			Id: n11
+			List:
+				Id: sub
+				Marker: lower-alpha
+				List item:
+					Id: sa
+					Text: Primera
+				List item:
+					Id: sb
+					Number: 4
+					Text: Cuarta
+	Block:
+		Id: fill
+		Box:
+			Height: 100
+			Background: #F1EFE8
+	List:
+		Id: long
+		Marker: upper-roman
+		Box:
+			Width: 200
+		List item:
+			Id: r1
+			Text:
+				Content >>
+					Informe balance factura cliente
+					archivo partida importe resumen
+					detalle ingreso balance factura
+		List item:
+			Id: r2
+			Text:
+				Content >>
+					Resumen detalle ingreso balance
+					factura cliente archivo informe
+					partida importe resumen detalle
+					ingreso balance factura cliente
+					archivo informe partida importe
+	Paragraph: Fin.
+		Id: after

@@ -33,7 +33,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 |---|---|---|---|
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
-| 13 | Listas (`ul`, `ol`, `li`) | en curso | — |
+| 13 | Listas (`ul`, `ol`, `li`) | hecho | 10 |
 | 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
@@ -403,8 +403,7 @@ List:
       `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE` y `LIST_ITEM_WITHOUT_LINE` (este se
       comprueba en el árbol: bajando por el primer hijo en flujo hay que llegar a un texto),
       con sus casos en el catálogo. Tests en `tree/ListsTest` y `tree/ListMarkersTest`.
-- [x] Especificación: §2, §4 (§4.11 nueva), §5.13 (etiquetas), §5.14 nueva, §6, §7 y §9.
-      Falta §8 (diferencias con CSS).
+- [x] Especificación: §2, §4 (§4.11 nueva), §5.13 (etiquetas), §5.14 nueva, §6, §7, §8 y §9.
 - [x] `LIST_MARKER_OVERFLOW` (necesita las métricas: en `Overflow`) con su caso.
 - [x] Caja de marcador en el layout (`layout/block/MarkerLayout`, desde `BlockLayout` en el
       primer fragmento del ítem) y en el pintado: es un fragmento hijo del ítem con una línea,
@@ -412,10 +411,10 @@ List:
 - [x] PDF etiquetado: `L` (con `ListNumbering`), `LI`, `Lbl` y `LBody` (`PdfCanvasTest`).
 - [x] Volcado del §7: `Marker` dentro de los ítems con `Id` (`StxtDump`).
 - [x] Tests de layout y de fragmentación (`layout/block/ListLayoutTest`); casos de error.
-- [ ] Caso golden con listas anidadas y una lista partida entre páginas, añadido a
-      `DocumentReaderTest`; revisar su PNG.
-- [ ] §8, README, `CLAUDE.md` (tabla de hitos) y `DECISIONES.md` (L1–L8 y las de la
-      implementación) para cerrar el hito.
+- [x] Caso golden `10-lists` (numeración desde `Start`, marcadores de distinto ancho, lista
+      anidada al principio de un ítem, `Number`, y una lista romana partida entre páginas),
+      añadido a `DocumentReaderTest`; PNG revisados.
+- [x] README, `CLAUDE.md` (tabla de hitos y piezas clave) y `DECISIONES.md` (89–95).
 
 ---
 
@@ -562,6 +561,14 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (11).** Hito 13 terminado. Caso golden `10-lists`, que pasa con el resultado
+  calculado a mano; PNG revisados (marcadores alineados a la derecha, el de una lista anidada
+  en la misma línea que el del ítem, y el de un ítem partido solo en la página 1). El marcador
+  pasa a ser el primer hijo del fragmento del ítem, para que el volcado lo muestre tras su
+  `Rect`. Especificación §8, `DECISIONES.md` (89–95), README y `CLAUDE.md`. `mvn test` en
+  verde.
+  *Siguiente paso:* hito 14 (tablas), resolver TB1–TB9 (y T3 para `Cell`, `Columns` y
+  `Span`).
 - **2026-10-27 (10).** Hito 13: el marcador en el layout. `Box.marker` pasa a ser la caja
   generada del marcador; `MarkerLayout` la coloca en el primer fragmento del ítem, a la
   izquierda de su caja de borde y con la línea base de su primera línea (`TextMeasurer.vertical`

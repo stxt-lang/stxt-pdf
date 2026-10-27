@@ -1,0 +1,53 @@
+# Página 1: num desde y = 40, con contenido desde x = 60 (Padding 20). n9 (40) y n10 (52), de
+# una línea; marcadores "9. " (15, en x = 45) y "10. " (20, en x = 40). n11 (64) contiene sub,
+# cuyos ítems empiezan en x = 80: sa (64) y sb (76), con "a. " y "d. " (Number: 4) en x = 65;
+# el marcador "11. " se alinea con la primera línea de sa. num mide 48 y acaba en 88.
+# fill (100) acaba en 188 y deja 72 (6 líneas). r1 (3 líneas) acaba en 224; r2 tiene 5
+# líneas y le quedan 36 (3): cortar 3 + 2 respeta orphans y widows, y es el último corte de
+# mayor calidad. "I. " mide 15 y "II. " 20.
+# Página 2: las 2 líneas que faltan de r2, sin marcador, y after.
+Result:
+	Page: 1
+		Fragment: num
+			Rect: 40 40 515 48
+			Fragment: n9
+				Rect: 60 40 495 12
+				Marker: 9.
+					Rect: 45 40 15 12
+			Fragment: n10
+				Rect: 60 52 495 12
+				Marker: 10.
+					Rect: 40 52 20 12
+			Fragment: n11
+				Rect: 60 64 495 24
+				Marker: 11.
+					Rect: 40 64 20 12
+				Fragment: sub
+					Rect: 60 64 495 24
+					Fragment: sa
+						Rect: 80 64 475 12
+						Marker: a.
+							Rect: 65 64 15 12
+					Fragment: sb
+						Rect: 80 76 475 12
+						Marker: d.
+							Rect: 65 76 15 12
+		Fragment: fill
+			Rect: 40 88 515 100
+		Fragment: long
+			Rect: 40 188 200 72
+			Fragment: r1
+				Rect: 60 188 180 36
+				Marker: I.
+					Rect: 45 188 15 12
+			Fragment: r2
+				Rect: 60 224 180 36
+				Marker: II.
+					Rect: 40 224 20 12
+	Page: 2
+		Fragment: long
+			Rect: 40 40 200 24
+			Fragment: r2
+				Rect: 60 40 180 24
+		Fragment: after
+			Rect: 40 64 515 12

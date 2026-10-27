@@ -39,7 +39,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 12 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 13 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -56,8 +56,9 @@ actualízala.
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
 | 11 | ~~Reglas reutilizables `Styles` (`Element`, `For class`, `For id`) y `Class`~~ (hecho; caso 08) | schema, `tree/BoxTreeBuilder` |
 | 12 | ~~Encabezados (`Heading 1`…`Heading 6`) y `Paragraph`; PDF etiquetado y marcadores~~ (hecho; caso 09) | schema, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
+| 13 | ~~Listas (`List`, `List item`) con marcador y numeración~~ (hecho; caso 10) | schema, `tree/BoxTreeBuilder`, `tree/ListMarkers`, `layout/block/MarkerLayout`, `paint/PdfStructure` |
 
-Los hitos 13 a 15 (listas, tablas y bloque en columnas) se siguen en
+Los hitos 14 y 15 (tablas y bloque en columnas) se siguen en
 [`docs/ROADMAP.md`](docs/ROADMAP.md); al terminar uno, añádelo también a esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -122,6 +123,14 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   en orden del documento. `PdfStructure` construye el árbol de estructura del PDF etiquetado
   (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.
+- **Listas (§5.14):** `List` (con `Marker` obligatorio y `Start`) y `List item` (con `Number`)
+  son cajas de bloque. El builder numera los ítems y crea en `Box.marker` la caja del marcador,
+  generada y fuera de `children` (`Box.isMarker()`): texto con la tipografía del ítem y el
+  espacio final incluido (`"3. "`). `MarkerLayout` la coloca en el primer fragmento del ítem,
+  como su primer hijo, a la izquierda de su caja de borde y con la línea base de su primera
+  línea (`TextMeasurer.vertical`). Quien recorra los hijos de un fragmento debe saltar los
+  marcadores si busca contenido en flujo; `Overflow` los comprueba contra la sangría de la
+  lista (`LIST_MARKER_OVERFLOW`).
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,

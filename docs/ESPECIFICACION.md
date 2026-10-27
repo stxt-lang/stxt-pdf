@@ -1246,6 +1246,12 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `id` repetido | Se tolera | Error |
 | Posición estática de un `Absolute` en flex o grid | Como si fuera el único ítem, con la alineación del contenedor | Esquina de la caja de contenido del contenedor |
 | Pista `fit-content` en grid | Función `fit-content(límite)`: como `auto`, sin pasar del límite | Error: se usa `auto` |
+| Listas (`ul`, `ol`) | Dos elementos y `list-style-type`, que se hereda y tiene valor por defecto | Un solo `List` con `Marker` obligatorio, que no se hereda ni va en `Styles` ([§5.14](#514-listas)) |
+| Marcadores de lista | `outside` o `inside`; `::marker` con estilo propio; cualquier texto o imagen; `circle` y `square` | Solo fuera, con la tipografía del ítem; `disc`, `dash`, `none` y cinco numeraciones con sufijo `.`; sin `circle` ni `square` |
+| Marcador que no cabe en la sangría | Se sale de la lista | Error (`LIST_MARKER_OVERFLOW`) |
+| Ítem sin primera línea (empieza con un flex, un grid o un bloque vacío) | El marcador se alinea con lo que haya | Error (`LIST_ITEM_WITHOUT_LINE`) |
+| `start` y `value` en una lista con viñetas | Se ignoran | Error (`LIST_NUMBER_NOT_ALLOWED`) |
+| `reversed` | Sí | No |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |

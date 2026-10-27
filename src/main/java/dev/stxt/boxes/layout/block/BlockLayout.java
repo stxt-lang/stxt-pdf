@@ -295,7 +295,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /**
          * Los fragmentos hijos y, en el primer fragmento de un {@code List item}, su marcador
-         * detrás (§5.14): va con la primera línea, que está en este fragmento si hay alguno.
+         * delante (§5.14): va con la primera línea, que está en este fragmento si hay alguno.
          */
         List<Fragment> withMarker(List<Fragment> children, Slice slice) {
             if (box.marker == null || !first) {
@@ -304,7 +304,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             return MarkerLayout.place(box, children, slice.border(), slice.padding(), engine.measurer())
                     .map(marker -> {
                         List<Fragment> all = new ArrayList<>(children);
-                        all.add(marker);
+                        all.add(0, marker);
                         return all;
                     })
                     .orElse(children);

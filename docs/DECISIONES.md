@@ -352,3 +352,44 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 88. **Un encabezado dentro de un `Fixed` es un error** (`HEADING_IN_FIXED`): el `Fixed` se
     repite en cada página y es *artifact*, así que no tendría marcador ni etiqueta.
     *Alternativa:* permitirlo como un bloque sin significado.
+
+## Hito 13: listas (2026-10-27)
+
+89. **Un único elemento `List` con `Marker` obligatorio**, en lugar de `ul`/`ol` o de un valor
+    por defecto. `Marker`, `Start` y `Number` son propiedades del elemento: no se heredan ni
+    van en `Styles` (R6), así que cada lista anidada declara su marcador. *Dónde:* schema,
+    `BoxTreeBuilder.element`. *Alternativa:* `Marker` en `Typography` (heredable y en las
+    reglas), como `list-style-type`.
+
+90. **El marcador es texto en la fuente del ítem**, sin `circle` ni `square`, porque IBM Plex
+    Sans no tiene `◦` ni `▪` y no hay fuente de sustitución. *Dónde:* `tree/ListMarkers`.
+    *Alternativa:* dibujar `disc`, `circle` y `square` como formas, con un primitivo nuevo en
+    `Canvas`; el marcador dejaría de depender de la fuente.
+
+91. **La sangría es el `Padding` izquierdo de la `List`** y el espacio que separa el marcador
+    del contenido es el espacio final de su texto (`"1. "`), como en CSS; sin `Indent` ni
+    `Gap`. Un marcador más ancho que la sangría es un error (`LIST_MARKER_OVERFLOW`, en
+    `Overflow`), no un desbordamiento tolerado. *Alternativa:* una propiedad `Indent` con un
+    ancho de marcador fijo.
+
+92. **La primera línea se busca bajando por el primer hijo en flujo** de cada bloque hasta un
+    texto, y si no se llega (un `Flex`, un `Grid` o un bloque vacío al principio) es un error
+    (`LIST_ITEM_WITHOUT_LINE`), comprobado ya al construir el árbol. CSS mira también la línea
+    base de flex y grid y salta los bloques vacíos. *Dónde:* `BoxTreeBuilder.markerLine`,
+    `layout/block/MarkerLayout`. *Alternativa:* exportar la línea base de flex y grid, o alinear
+    el marcador con el borde superior del ítem.
+
+93. **La línea base se calcula al maquetar con `TextMeasurer.vertical`**, no al pintar: el
+    marcador es un fragmento normal (con su `Rect` en el volcado). Con `FixedMetrics` es la
+    aproximación 0,8/0,2 y con `PdfMetrics` la `hhea` de la fuente, la misma del PDF; el SVG
+    pinta siempre con la aproximación, así que un marcador de otro tamaño que su primera
+    línea puede quedar ligeramente desplazado en el SVG de un documento maquetado con las
+    métricas reales. *Alternativa:* alinear en el pintado, con las métricas del lienzo.
+
+94. **El marcador va en el primer fragmento del ítem** y nunca se repite; no se busca la
+    primera línea en los fragmentos siguientes, porque un bloque que no coloca su primera línea
+    devuelve `BEFORE` y no deja un fragmento sin ella. *Dónde:* `BlockLayout.withMarker`.
+
+95. **`dash` se etiqueta con `ListNumbering: None`**, porque el PDF no tiene un valor para el
+    guion; la lista sigue siendo `L` con `Lbl` y `LBody`. *Dónde:* `paint/PdfStructure`.
+    *Alternativa:* `Unordered` (PDF 2.0), si se declara la versión 2.0.

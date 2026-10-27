@@ -77,7 +77,7 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 12 están terminados; los
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 13 están terminados; los
 siguientes, en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -88,7 +88,8 @@ siguientes, en
 | Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
 | Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
-| PDF etiquetado (árbol de estructura, *artifacts*) y marcadores de los encabezados | Hecho y probado |
+| Listas (`List`, `List item`): viñetas y numeraciones, marcador alineado con la primera línea, listas anidadas y partidas entre páginas | Hecho y probado |
+| PDF etiquetado (árbol de estructura, *artifacts*, listas con `Lbl` y `LBody`) y marcadores de los encabezados | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
@@ -134,8 +135,9 @@ en `target/pdf/`.
 10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
 11. ~~**Reglas reutilizables.** `Styles` con reglas `Element`, `For class` y `For id`; `Class` en los elementos (caso 08).~~ Hecho.
 12. ~~**Encabezados y párrafos.** `Heading 1`…`Heading 6` y `Paragraph`; PDF etiquetado y marcadores (caso 09).~~ Hecho.
+13. ~~**Listas.** `List` con `Marker`, `Start` y `List item` con `Number`; el marcador cuelga en la sangría, alineado con la primera línea (caso 10).~~ Hecho.
 
-Los siguientes hitos (13 a 15: listas, tablas y bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, están en
+Los siguientes hitos (14 y 15: tablas y bloque en columnas), con sus decisiones abiertas, tareas y el registro de cada sesión, están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Estructura
