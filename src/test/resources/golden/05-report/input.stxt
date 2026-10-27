@@ -9,60 +9,56 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Fixed:
 		Id: header
-		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
 		Font size: 8
 		Color: #5F5E5A
 		Text: Informe trimestral
-	Box:
+	Fixed:
 		Id: footer
-		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
 		Font size: 8
-		Text align: right
 		Text: Página {page} de {pages}
-	Box:
+			Text align: right
+	Text: Resultados del trimestre
 		Id: title
 		Font weight: bold
 		Font size: 20
 		Line height: 24
 		Margin: 0 0 16 0
 		Break after: avoid
-		Text: Resultados del trimestre
-	Box:
+	Grid:
 		Id: body
-		Layout: grid
-		Grid:
-			Columns: 150 1fr
-			Gap: 20
-		Box:
-			Id: side
-			Background: #F1EFE8
-			Padding: 10
-			Break inside: avoid
-			Text >>
-				Resumen de las cifras clave
-				del trimestre.
-		Box:
-			Id: main
-			Text align: justify
-			Text >>
-				Primer párrafo del informe. Los saltos de línea simples
-				dentro del bloque equivalen a espacios.
+		Columns: 150 1fr
+		Gap: 20
+		Cell:
+			Text:
+				Id: side
+				Background: #F1EFE8
+				Padding: 10
+				Break inside: avoid
+				Content >>
+					Resumen de las cifras clave
+					del trimestre.
+		Cell:
+			Text:
+				Id: main
+				Text align: justify
+				Content >>
+					Primer párrafo del informe. Los saltos de línea simples
+					dentro del bloque equivalen a espacios.
 
-				Una línea en blanco empieza un párrafo nuevo.
-	Box:
+					Una línea en blanco empieza un párrafo nuevo.
+	Absolute:
 		Id: stamp
-		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80
 		Height: 30
 		Border: 1
 		Border color: #A32D2D
-		Text align: center
 		Layer: 1
 		Text: BORRADOR
+			Text align: center

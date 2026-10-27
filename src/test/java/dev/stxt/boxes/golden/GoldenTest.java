@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 /**
  * Tests de referencia (ESPECIFICACION.md §7): cada carpeta de {@code golden/} contiene
  * {@code input.stxt} y {@code expected.stxt}. Se comparan nombres y valores; los números de
- * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el template; el
+ * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el schema; el
  * volcado no tiene namespace y se lee sin validación.
  *
  * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/} y, en su propia

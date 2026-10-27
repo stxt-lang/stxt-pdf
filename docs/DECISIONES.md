@@ -149,7 +149,7 @@ tiene un caso por código.
     `Gap: 5%` en un flex de una línea sin alto definido no es un error.
     *Dónde:* `tree/BoxTreeBuilder.validateContainer`.
 
-59. **Sin código propio lo que ya rechaza el template:** `Main axis: stretch` y
+59. **Sin código propio lo que ya rechaza el schema** (antes, el template): `Main axis: stretch` y
     `Break inside: page` son `VALUE_NOT_ALLOWED`, y un bloque `>>` donde van hijos,
     `DOCUMENT_STRUCTURE`; con `DocumentReader` salen antes los códigos de `stxt-core`.
 
@@ -176,3 +176,82 @@ tiene un caso por código.
     (o `Max height`) del contenedor que se queda corto. Si no cabe en la página, el `Height` o
     el `Line height` de lo más interior que pasa del final.
     *Dónde:* `layout/Overflow.tooWide`, `tooTall`, `pageOverflow`, `textOverflow`.
+
+## Hito 9: elementos en lugar de `Box` (2026-10-27)
+
+El documento deja de ser un árbol de `Box` con `Layout` y `Position` y pasa a escribirse con
+elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y los envoltorios
+`Item` y `Cell`, validados con un `@stxt.schema` en lugar del `@stxt.template` (§2, §9). Se
+sustituye el formato anterior por completo. El motor no cambia: `BoxTreeBuilder` traduce cada
+elemento a una `Box` con su `Layout` y su `Position`. Desaparecen los códigos que pasan a ser
+estructura del schema (`INLINE_WITH_BOXES`, `CONTAINER_MISMATCH`, `ITEM_MISMATCH`,
+`OFFSET_ON_STATIC`, `LAYER_WITHOUT_EFFECT`, `BREAK_NOT_ALLOWED`) y las cajas anónimas, y se
+añaden `SINGLE_ELEMENT` y `TEXT_CONTENT`. Los casos golden no cambian su `expected.stxt`; sus
+imágenes solo ganan el contorno del `Text` que ahora va dentro de la cabecera, el pie y el sello.
+
+63. **`Item` y `Cell` son envoltorios, no cajas**, con exactamente un elemento en flujo dentro
+    (`SINGLE_ELEMENT`, porque el schema solo puede limitar cada tipo de elemento a uno). Las
+    dimensiones, márgenes e `Id` van en el elemento; el envoltorio solo lleva lo que depende del
+    contenedor. Así cada ítem sigue siendo una única `Box`, como ahora.
+    *Dónde:* schema; `tree/BoxTreeBuilder.buildContent` e `item`.
+    *Alternativa:* que `Cell` e `Item` sean cajas de bloque con varios hijos; añadiría una caja
+    por ítem, y un flex dentro de una celda ya no se estiraría al alto del área.
+
+64. **Todo hijo en flujo de un `Flex` es un `Item`, y de un `Grid`, un `Cell`**, aunque no
+    declare nada (`Cell:` sin valor se coloca automáticamente). La estructura es siempre la
+    misma y el schema puede comprobarla.
+    *Alternativa:* admitir elementos directamente en `Flex` y `Grid` y el envoltorio solo
+    cuando hace falta; menos líneas, pero dos formas de escribir lo mismo.
+
+65. **`Relative` es un elemento, no una propiedad**, a diferencia de lo hablado (desplazamiento
+    `relative` como propiedad de cualquier elemento). Como elemento, `Offset` y `Layer` solo
+    existen en los elementos posicionados y en `Item`/`Cell`, y el schema detecta su mal uso
+    sin reglas propias; un `Relative` sin `Offset` marca el containing block de los `Absolute`.
+    *Alternativa:* una propiedad (`Offset` en cualquier elemento en flujo); haría falta otra
+    forma de marcar el containing block sin desplazar y mantener `LAYER_WITHOUT_EFFECT`.
+
+66. **Los elementos posicionados son bloques.** Un flex o un grid posicionado se escribe
+    dentro (`Absolute` > `Flex`), con una caja más que antes.
+    *Alternativa:* que `Relative`, `Absolute` y `Fixed` sean envoltorios de un elemento, como
+    `Cell`; se leería peor en el caso habitual (un sello, una cabecera).
+
+67. **`Absolute` y `Fixed` no admiten las propiedades de fragmentación** (`Break before`,
+    `Break after`, `Break inside`, `Decoration`, `Widows`, `Orphans`), porque no se parten ni
+    están en el flujo de la página. Antes solo era un error el corte forzado
+    (`BREAK_NOT_ALLOWED`); `avoid` y `Decoration` se aceptaban sin efecto. Sus descendientes sí
+    las admiten (el schema no distingue dónde está un `Block`), aunque tampoco se parten.
+    *Dónde:* schema.
+
+68. **El texto de un `Text` va en el valor o en `Content >>`**, uno de los dos
+    (`TEXT_CONTENT`). `Content` es `BLOCK`, así que `Content: algo` es un error del schema: el
+    texto corto va en el valor. Un `Text` vacío es un error.
+    *Alternativa:* `Content` de tipo `TEXT` (en línea o en bloque); habría dos formas de
+    escribir el texto corto.
+
+69. **`Isolate` solo en `Block` y `Relative`**: en los demás no tendría efecto (`Absolute`,
+    `Fixed` y los ítems ya crean un contexto de formato de bloque; `Flex`, `Grid` y `Text` no
+    tienen hijos en flujo de bloque). Un `Block` que es ítem lo admite aunque no tenga efecto,
+    porque el schema no sabe si está en un `Item`.
+    *Dónde:* schema.
+
+70. **Un `Document` sin elementos es válido** (una página vacía). Antes el template exigía al
+    menos una `Box`, y el schema no puede exigir "al menos uno" entre varios tipos.
+    *Alternativa:* una regla del builder con su código.
+
+71. **`Fixed` se admite en cualquier contenedor**, como antes cualquier `Box` podía ser
+    `fixed`; su posición estática es la de su sitio en el documento.
+    *Alternativa:* solo como hijo de `Document`, que es donde tiene sentido una cabecera o un
+    pie.
+
+72. **El schema no tiene grupos de hijos**, así que cada elemento enumera sus ~30 propiedades
+    y el fichero es largo (unas 750 líneas). Añadir una propiedad común obliga a añadirla en
+    cada elemento.
+    *Alternativa:* generar el schema con un script a partir de los grupos del §9.
+
+73. **`BoxTreeBuilder` repite la tabla de hijos del schema** (`CHILDREN`): con el documento
+    validado nunca falla, pero un árbol construido sin validar (`STXT.rawParser()`) da
+    `DOCUMENT_STRUCTURE` en lugar de interpretar mal una propiedad fuera de su sitio (un
+    `Offset` en un `Block` lo convertiría en `static` desplazado). Hay que mantener las dos
+    tablas a la vez.
+    *Dónde:* `tree/BoxTreeBuilder.CHILDREN`, `checkChildren`.
+    *Alternativa:* validar contra el schema dentro del builder, o no comprobar nada sin validar.

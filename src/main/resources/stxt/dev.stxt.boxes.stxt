@@ -1,90 +1,749 @@
-Template (@stxt.template): dev.stxt.boxes
-	Structure >>
-		Document (dev.stxt.boxes):
-			Media: (1)
-				Type: (1) ENUM [continuous, paged]
-				Width: (1)
-				Height: (?)
-				Margin: (?)
-			Font: (?)
-			Font weight: (?) ENUM [normal, bold]
-			Font style: (?) ENUM [normal, italic]
-			Font size: (?)
-			Box: (+)
-				Id: (?)
-				Layout: (?) ENUM [block, inline, flex, grid]
-				Position: (?) ENUM [static, relative, absolute, fixed]
-				Offset: (?)
-				Layer: (?) INTEGER
-				Isolate: (?) BOOLEAN
-				Width: (?) @Width
-				Height: (?) @Height
-				Min width: (?)
-				Max width: (?)
-				Min height: (?)
-				Max height: (?)
-				Aspect ratio: (?)
-				Margin: (?) @Margin
-				Padding: (?)
-				Border: (?)
-				Background: (?)
-				Color: (?)
-				Border color: (?)
-				Font: (?) @Font
-				Font weight: (?) @Font weight
-				Font style: (?) @Font style
-				Font size: (?) @Font size
-				Line height: (?)
-				Text align: (?) ENUM [left, right, center, justify]
-				Text wrap: (?) ENUM [auto, pretty]
-				Flex: (?)
-					Direction: (?) ENUM [row, column]
-					Wrap: (?) BOOLEAN
-					Gap: (?)
-					Main axis: (?) ENUM [start, end, center, between, around, evenly]
-					Cross axis: (?) ENUM [start, end, center, stretch]
-					Lines: (?) ENUM [start, end, center, between, around, stretch]
-				Grid: (?)
-					Columns: (?)
-					Rows: (?)
-					Gap: (?) @Gap
-					Areas: (?) TEXT
-					Flow: (?) ENUM [row, column]
-					Horizontal: (?) ENUM [start, end, center, stretch]
-					Vertical: (?) ENUM [start, end, center, stretch]
-				Item: (?)
-					Grow: (?)
-					Shrink: (?)
-					Basis: (?)
-					Cross axis: (?) @Cross axis
-					Cell: (?)
-					Horizontal: (?) @Horizontal
-					Vertical: (?) @Vertical
-				Break before: (?) ENUM [auto, page, avoid]
-				Break after: (?) ENUM [auto, page, avoid]
-				Break inside: (?) ENUM [auto, avoid]
-				Widows: (?) INTEGER
-				Orphans: (?) INTEGER
-				Decoration: (?) ENUM [slice, clone]
-				Text: (?) TEXT
-				Box: (*) @Box
-	Description >>
-		Document: Documento de cajas. Referencia completa en docs/ESPECIFICACION.md.
-		Media: Medio de salida. Define el área útil, que es el containing block inicial.
-		Font size: Cuerpo de la fuente, en puntos. Obligatorio en las cajas con texto, propio o heredado (también de Document). Se hereda.
-		Box: Una caja del árbol. Puede contener Text y otras Box, en orden.
-		Layout: Cómo coloca la caja a sus hijos. Por defecto, block.
-		Position: Cómo participa la caja en el flujo de su padre. Por defecto, static.
-		Offset: Arriba, derecha, abajo, izquierda (1 a 4 valores). Solo con Position distinta de static.
-		Layer: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
-		Font: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en las cajas con texto, propia o heredada (también de Document). Se hereda.
-		Font weight: Peso: normal (por defecto) o bold. Se hereda.
-		Font style: Estilo: normal (por defecto) o italic. Se hereda.
-		Line height: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size.
-		Text wrap: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo). Se hereda.
-		Gap: Separación entre ítems: un valor, o dos (filas columnas).
-		Areas: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
-		Cell: Nombre de área, o "fila columna [filas columnas]" contando desde 1; auto para colocar automáticamente.
-		Widows: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2. Se hereda.
-		Orphans: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2. Se hereda.
-		Text: Contenido. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+# Schema del modelo de cajas (docs/ESPECIFICACION.md §9).
+# Primero los elementos y después las propiedades. Cada nombre tiene una única definición en
+# todo el namespace: el Width de Media y el de un elemento son el mismo nodo.
+Schema (@stxt.schema): dev.stxt.boxes
+	Description: Documentos del motor de cajas. Referencia completa en docs/ESPECIFICACION.md.
+
+	# Elementos
+
+	Node: Document
+		Type: GROUP
+		Description: Documento de cajas: el medio, la fuente por defecto y los elementos de primer nivel, en orden.
+		Children:
+			Child: Media
+				Min: 1
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
+	Node: Media
+		Type: GROUP
+		Description: Medio de salida. Define el área útil, que es el containing block inicial.
+		Children:
+			Child: Type
+				Min: 1
+				Max: 1
+			Child: Width
+				Min: 1
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Margin
+				Max: 1
+	Node: Block
+		Type: GROUP
+		Description: Caja que apila sus hijos en vertical (flujo de bloque).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Break before
+				Max: 1
+			Child: Break after
+				Max: 1
+			Child: Break inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+			Child: Isolate
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
+	Node: Flex
+		Type: GROUP
+		Description: Contenedor flex: coloca sus ítems (Item) a lo largo de un eje.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Break before
+				Max: 1
+			Child: Break after
+				Max: 1
+			Child: Break inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+			Child: Direction
+				Max: 1
+			Child: Wrap
+				Max: 1
+			Child: Gap
+				Max: 1
+			Child: Main axis
+				Max: 1
+			Child: Cross axis
+				Max: 1
+			Child: Lines
+				Max: 1
+			Child: Item
+			Child: Absolute
+			Child: Fixed
+	Node: Grid
+		Type: GROUP
+		Description: Contenedor grid: coloca sus celdas (Cell) en una rejilla de filas y columnas.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Break before
+				Max: 1
+			Child: Break after
+				Max: 1
+			Child: Break inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+			Child: Columns
+				Max: 1
+			Child: Rows
+				Max: 1
+			Child: Gap
+				Max: 1
+			Child: Areas
+				Max: 1
+			Child: Flow
+				Max: 1
+			Child: Horizontal
+				Max: 1
+			Child: Vertical
+				Max: 1
+			Child: Cell
+			Child: Absolute
+			Child: Fixed
+	Node: Text
+		Type: INLINE
+		Description: Caja de texto. El texto va en el valor (una línea) o en Content (un bloque).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Break before
+				Max: 1
+			Child: Break after
+				Max: 1
+			Child: Break inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+			Child: Content
+				Max: 1
+	Node: Relative
+		Type: GROUP
+		Description: Caja de bloque que se desplaza con Offset sin mover a sus hermanos. Es el containing block de sus descendientes Absolute.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Break before
+				Max: 1
+			Child: Break after
+				Max: 1
+			Child: Break inside
+				Max: 1
+			Child: Decoration
+				Max: 1
+			Child: Widows
+				Max: 1
+			Child: Orphans
+				Max: 1
+			Child: Isolate
+				Max: 1
+			Child: Offset
+				Max: 1
+			Child: Layer
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
+	Node: Absolute
+		Type: GROUP
+		Description: Caja de bloque fuera de flujo, colocada con Offset en su containing block.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Offset
+				Max: 1
+			Child: Layer
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
+	Node: Fixed
+		Type: GROUP
+		Description: Caja de bloque fuera de flujo, colocada con Offset en el área útil. En modo paginado se repite en cada página.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Min width
+				Max: 1
+			Child: Max width
+				Max: 1
+			Child: Min height
+				Max: 1
+			Child: Max height
+				Max: 1
+			Child: Aspect ratio
+				Max: 1
+			Child: Margin
+				Max: 1
+			Child: Padding
+				Max: 1
+			Child: Border
+				Max: 1
+			Child: Background
+				Max: 1
+			Child: Border color
+				Max: 1
+			Child: Color
+				Max: 1
+			Child: Font
+				Max: 1
+			Child: Font weight
+				Max: 1
+			Child: Font style
+				Max: 1
+			Child: Font size
+				Max: 1
+			Child: Line height
+				Max: 1
+			Child: Text align
+				Max: 1
+			Child: Text wrap
+				Max: 1
+			Child: Offset
+				Max: 1
+			Child: Layer
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
+	Node: Item
+		Type: GROUP
+		Description: Ítem de un Flex: cómo crece, encoge y se alinea. Contiene exactamente un elemento.
+		Children:
+			Child: Grow
+				Max: 1
+			Child: Shrink
+				Max: 1
+			Child: Basis
+				Max: 1
+			Child: Cross axis
+				Max: 1
+			Child: Layer
+				Max: 1
+			Child: Block
+				Max: 1
+			Child: Flex
+				Max: 1
+			Child: Grid
+				Max: 1
+			Child: Text
+				Max: 1
+			Child: Relative
+				Max: 1
+	Node: Cell
+		Type: INLINE
+		Description: Celda de un Grid. El valor es la colocación: un nombre de área, o 'fila columna [filas columnas]' contando desde 1; sin valor, se coloca automáticamente. Contiene exactamente un elemento.
+		Children:
+			Child: Horizontal
+				Max: 1
+			Child: Vertical
+				Max: 1
+			Child: Layer
+				Max: 1
+			Child: Block
+				Max: 1
+			Child: Flex
+				Max: 1
+			Child: Grid
+				Max: 1
+			Child: Text
+				Max: 1
+			Child: Relative
+				Max: 1
+
+	# Caja
+
+	Node: Id
+		Description: Identificador para volcados, tests y mensajes. Único en el documento.
+	Node: Width
+		Description: Ancho de la caja de borde (en Media, de la página).
+	Node: Height
+		Description: Alto de la caja de borde (en Media, de la página).
+	Node: Min width
+		Description: Ancho mínimo.
+	Node: Max width
+		Description: Ancho máximo.
+	Node: Min height
+		Description: Alto mínimo.
+	Node: Max height
+		Description: Alto máximo.
+	Node: Aspect ratio
+		Description: Proporción ancho/alto (16/9 o un número): deduce un eje auto del otro.
+	Node: Margin
+		Description: Margen: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Padding
+		Description: Relleno: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Border
+		Description: Grosor del borde: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Background
+		Description: Color de fondo, pintado en la caja de relleno.
+	Node: Border color
+		Description: Color del borde. Por defecto, el de Color.
+	Node: Isolate
+		Type: BOOLEAN
+		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
+	Node: Offset
+		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
+	Node: Layer
+		Type: INTEGER
+		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
+
+	# Texto
+
+	Node: Color
+		Description: Color del texto. Se hereda.
+	Node: Font
+		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document). Se hereda.
+	Node: Font weight
+		Type: ENUM
+		Description: Peso: normal (por defecto) o bold. Se hereda.
+		Values:
+			Value: normal
+			Value: bold
+	Node: Font style
+		Type: ENUM
+		Description: Estilo: normal (por defecto) o italic. Se hereda.
+		Values:
+			Value: normal
+			Value: italic
+	Node: Font size
+		Description: Cuerpo de la fuente, en puntos. Obligatorio en el texto, propio o heredado (también de Document). Se hereda.
+	Node: Line height
+		Description: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Font size. Se hereda.
+	Node: Text align
+		Type: ENUM
+		Description: Alineación de las líneas. Se hereda.
+		Values:
+			Value: left
+			Value: right
+			Value: center
+			Value: justify
+	Node: Text wrap
+		Type: ENUM
+		Description: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo). Se hereda.
+		Values:
+			Value: auto
+			Value: pretty
+	Node: Content
+		Type: BLOCK
+		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+
+	# Flex
+
+	Node: Direction
+		Type: ENUM
+		Description: Eje principal: row (horizontal, por defecto) o column.
+		Values:
+			Value: row
+			Value: column
+	Node: Wrap
+		Type: BOOLEAN
+		Description: Permite repartir los ítems en varias líneas.
+	Node: Gap
+		Description: Separación: un valor, o dos (filas columnas).
+	Node: Main axis
+		Type: ENUM
+		Description: Reparto del sobrante en el eje principal.
+		Values:
+			Value: start
+			Value: end
+			Value: center
+			Value: between
+			Value: around
+			Value: evenly
+	Node: Cross axis
+		Type: ENUM
+		Description: Alineación en el eje cruzado: la de todos los ítems en Flex, la de uno en Item.
+		Values:
+			Value: start
+			Value: end
+			Value: center
+			Value: stretch
+	Node: Lines
+		Type: ENUM
+		Description: Reparto de las líneas en el contenedor. Solo con Wrap: true.
+		Values:
+			Value: start
+			Value: end
+			Value: center
+			Value: between
+			Value: around
+			Value: stretch
+	Node: Grow
+		Description: Parte del espacio sobrante que recibe el ítem.
+	Node: Shrink
+		Description: Parte del déficit que cede el ítem, ponderada por Basis.
+	Node: Basis
+		Description: Tamaño de partida del ítem en el eje principal.
+
+	# Grid
+
+	Node: Columns
+		Description: Pistas de las columnas.
+	Node: Rows
+		Description: Pistas de las filas.
+	Node: Areas
+		Type: TEXT
+		Description: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
+	Node: Flow
+		Type: ENUM
+		Description: Dirección de la colocación automática.
+		Values:
+			Value: row
+			Value: column
+	Node: Horizontal
+		Type: ENUM
+		Description: Alineación horizontal en la celda: la de todas en Grid, la de una en Cell.
+		Values:
+			Value: start
+			Value: end
+			Value: center
+			Value: stretch
+	Node: Vertical
+		Type: ENUM
+		Description: Alineación vertical en la celda: la de todas en Grid, la de una en Cell.
+		Values:
+			Value: start
+			Value: end
+			Value: center
+			Value: stretch
+
+	# Fragmentación
+
+	Node: Break before
+		Type: ENUM
+		Description: Corte antes de la caja: page lo fuerza, avoid lo evita.
+		Values:
+			Value: auto
+			Value: page
+			Value: avoid
+	Node: Break after
+		Type: ENUM
+		Description: Corte después de la caja: page lo fuerza, avoid la mantiene con la siguiente.
+		Values:
+			Value: auto
+			Value: page
+			Value: avoid
+	Node: Break inside
+		Type: ENUM
+		Description: avoid intenta no partir la caja.
+		Values:
+			Value: auto
+			Value: avoid
+	Node: Decoration
+		Type: ENUM
+		Description: Borde y relleno en un corte: slice (por defecto) los corta, clone los repite en cada fragmento.
+		Values:
+			Value: slice
+			Value: clone
+	Node: Widows
+		Type: INTEGER
+		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2. Se hereda.
+	Node: Orphans
+		Type: INTEGER
+		Description: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2. Se hereda.
+
+	# Medio
+
+	Node: Type
+		Type: ENUM
+		Description: Modo: continuous (franja de alto infinito) o paged (páginas).
+		Values:
+			Value: continuous
+			Value: paged

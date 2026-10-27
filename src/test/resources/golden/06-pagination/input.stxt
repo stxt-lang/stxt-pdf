@@ -15,56 +15,55 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Fixed:
 		Id: header
-		Position: fixed
 		Offset: -15 0 auto 0
 		Height: 10
 		Font size: 8
 		Text: Cabecera
-	Box:
+	Fixed:
 		Id: footer
-		Position: fixed
 		Offset: auto 0 -15 0
 		Height: 10
 		Font size: 8
 		Text align: right
 		Text: Pie
-	Box:
+	Block:
 		Id: intro
 		Height: 100
-	Box:
+	Text: Título
 		Id: title
 		Height: 20
 		Margin: 10 0 10 0
 		Break after: avoid
-		Text: Título
-	Box:
+	Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
 		Id: text
 		Width: 30
-		Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
-	Box:
+	Grid:
 		Id: grid
-		Layout: grid
 		Break before: page
-		Grid:
-			Columns: 1fr 1fr
-			Gap: 10
-		Box:
-			Id: g1
-			Height: 50
-		Box:
-			Id: g2
-			Height: 50
-		Box:
-			Id: g3
-			Height: 50
-		Box:
-			Id: g4
-			Height: 50
-		Box:
-			Id: g5
-			Height: 50
-	Box:
+		Columns: 1fr 1fr
+		Gap: 10
+		Cell:
+			Block:
+				Id: g1
+				Height: 50
+		Cell:
+			Block:
+				Id: g2
+				Height: 50
+		Cell:
+			Block:
+				Id: g3
+				Height: 50
+		Cell:
+			Block:
+				Id: g4
+				Height: 50
+		Cell:
+			Block:
+				Id: g5
+				Height: 50
+	Block:
 		Id: end
 		Height: 10

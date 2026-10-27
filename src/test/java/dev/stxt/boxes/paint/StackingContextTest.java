@@ -50,23 +50,19 @@ class StackingContextTest {
     @Test
     void absoluteBeforeLaterRelative() {
         List<String> order = paint(
-                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 100", "\t\tBackground: #000",
-                "\t\tBox:",
-                "\t\t\tBox:", "\t\t\t\tPosition: absolute", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
-                "\t\t\t\tBackground: #111",
-                "\t\tBox:", "\t\t\tPosition: relative", "\t\t\tHeight: 10", "\t\t\tBackground: #222");
+                "\tRelative:", "\t\tHeight: 100", "\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tAbsolute:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #111",
+                "\t\tRelative:", "\t\t\tHeight: 10", "\t\t\tBackground: #222");
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
     @Test
     void equalLayerInDocumentOrder() {
         List<String> order = paint(
-                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 100", "\t\tBackground: #000",
-                "\t\tBox:",
-                "\t\t\tBox:", "\t\t\t\tPosition: absolute", "\t\t\t\tLayer: 1", "\t\t\t\tWidth: 10",
-                "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #111",
-                "\t\tBox:", "\t\t\tPosition: relative", "\t\t\tLayer: 1", "\t\t\tHeight: 10",
-                "\t\t\tBackground: #222");
+                "\tRelative:", "\t\tHeight: 100", "\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tAbsolute:", "\t\t\t\tLayer: 1", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
+                "\t\t\t\tBackground: #111",
+                "\t\tRelative:", "\t\t\tLayer: 1", "\t\t\tHeight: 10", "\t\t\tBackground: #222");
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
@@ -74,17 +70,17 @@ class StackingContextTest {
     @Test
     void fixedInDocumentOrder() {
         List<String> order = paint(
-                "\tBox:", "\t\tPosition: fixed", "\t\tWidth: 10", "\t\tHeight: 10", "\t\tBackground: #111",
-                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 10", "\t\tBackground: #222");
+                "\tFixed:", "\t\tWidth: 10", "\t\tHeight: 10", "\t\tBackground: #111",
+                "\tRelative:", "\t\tHeight: 10", "\t\tBackground: #222");
         assertEquals(List.of("#111", "#222"), order);
     }
 
     @Test
     void layerStillWins() {
         List<String> order = paint(
-                "\tBox:", "\t\tPosition: relative", "\t\tLayer: 2", "\t\tHeight: 10", "\t\tBackground: #111",
-                "\tBox:", "\t\tPosition: relative", "\t\tLayer: 1", "\t\tHeight: 10", "\t\tBackground: #222",
-                "\tBox:", "\t\tPosition: relative", "\t\tHeight: 10", "\t\tBackground: #333");
+                "\tRelative:", "\t\tLayer: 2", "\t\tHeight: 10", "\t\tBackground: #111",
+                "\tRelative:", "\t\tLayer: 1", "\t\tHeight: 10", "\t\tBackground: #222",
+                "\tRelative:", "\t\tHeight: 10", "\t\tBackground: #333");
         assertEquals(List.of("#333", "#222", "#111"), order);
     }
 }

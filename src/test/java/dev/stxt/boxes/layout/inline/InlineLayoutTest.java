@@ -16,17 +16,16 @@ class InlineLayoutTest {
     private static final String TEXT = "aaaa bbbb cccc dddd eeee";
 
     private static List<TextLine> lines(String... props) {
-        String[] doc = new String[props.length + 3];
-        doc[0] = "\tBox:";
+        String[] doc = new String[props.length + 2];
+        doc[0] = "\tText: " + TEXT;
         doc[1] = "\t\tId: T";
         System.arraycopy(props, 0, doc, 2, props.length);
-        doc[doc.length - 1] = "\t\tText: " + TEXT;
         return layOut(doc).fragment("T").lines();
     }
 
     @Test
     void linesAndHeight() {
-        LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tText: " + TEXT);
+        LayoutFixture l = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tWidth: 100");
         Fragment f = l.fragment("T");
         assertEquals(2, f.lines().size());
         assertEquals(new TextLine(0, 0, 95, 12, "aaaa bbbb cccc dddd"), f.lines().get(0));
@@ -38,9 +37,9 @@ class InlineLayoutTest {
     void textWrapPrettyIsInheritedAndUsesKnuthPlass() {
         // El ejemplo de LineBreakerTest.prettyMinimizesTheDemerits a escala 5: ancho 50.
         String text = "a bbb c ddddd e fff";
-        LayoutFixture l = layOut("\tBox:", "\t\tText wrap: pretty",
-                "\t\tBox:", "\t\t\tId: P", "\t\t\tWidth: 50", "\t\t\tText: " + text,
-                "\t\tBox:", "\t\t\tId: G", "\t\t\tWidth: 50", "\t\t\tText wrap: auto", "\t\t\tText: " + text);
+        LayoutFixture l = layOut("\tBlock:", "\t\tText wrap: pretty",
+                "\t\tText: " + text, "\t\t\tId: P", "\t\t\tWidth: 50",
+                "\t\tText: " + text, "\t\t\tId: G", "\t\t\tWidth: 50", "\t\t\tText wrap: auto");
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
                 l.fragment("P").lines().stream().map(TextLine::text).toList());
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),
@@ -50,8 +49,8 @@ class InlineLayoutTest {
     @Test
     void justifyFillsAllLinesButTheLastOfEachParagraph() {
         // Primera línea: 95 pt y 3 espacios, el sobrante (5) se reparte entre ellos.
-        LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tText align: justify",
-                "\t\tText >>", "\t\t\t" + TEXT, "", "\t\t\t" + TEXT);
+        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tWidth: 100", "\t\tText align: justify", "\t\tContent >>",
+                "\t\t\t" + TEXT, "", "\t\t\t" + TEXT);
         List<TextLine> lines = l.fragment("T").lines();
         assertEquals(4, lines.size());
         assertEquals(new TextLine(0, 0, 100, 12, "aaaa bbbb cccc dddd", 5.0 / 3), lines.get(0));
@@ -62,7 +61,7 @@ class InlineLayoutTest {
 
     @Test
     void paddingReducesTheLineWidth() {
-        LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tWidth: 100", "\t\tPadding: 10", "\t\tText: " + TEXT);
+        LayoutFixture l = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tWidth: 100", "\t\tPadding: 10");
         Fragment f = l.fragment("T");
         assertEquals(List.of("aaaa bbbb cccc", "dddd eeee"), f.lines().stream().map(TextLine::text).toList());
         assertEquals(44, f.height(), 1e-9);
@@ -87,8 +86,8 @@ class InlineLayoutTest {
 
     @Test
     void blankLineSeparatesParagraphs() {
-        LayoutFixture l = layOut("\tBox:", "\t\tId: T", "\t\tText >>",
-                "\t\t\tuna dos", "\t\t\ttres", "", "\t\t\tcuatro");
+        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tContent >>", "\t\t\tuna dos", "\t\t\ttres", "",
+                "\t\t\tcuatro");
         assertEquals(List.of("una dos tres", "cuatro"),
                 l.fragment("T").lines().stream().map(TextLine::text).toList());
     }
@@ -96,8 +95,8 @@ class InlineLayoutTest {
     @Test
     void textMixedWithBoxesGoesInAnAnonymousBox() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: P", "\t\tText: hola",
-                "\t\tBox:", "\t\t\tId: C", "\t\t\tHeight: 10");
+                "\tBlock:", "\t\tId: P",
+                "\t\tText: hola", "\t\tBlock:", "\t\t\tId: C", "\t\t\tHeight: 10");
         assertEquals(12, l.rect("C").y() - 40, 1e-9);
         assertEquals(22, l.rect("P").height(), 1e-9);
     }

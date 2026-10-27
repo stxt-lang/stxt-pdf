@@ -4,24 +4,23 @@ Document (dev.stxt.boxes):
 		Type: continuous
 		Width: 595
 		Margin: 40
-	Box:
+	Flex:
 		Id: row
-		Layout: flex
-		Flex:
-			Gap: 20
-		Box:
-			Id: A
-			Height: 50
-			Item:
-				Basis: 100
-				Grow: 1
-		Box:
-			Id: B
-			Height: 50
-			Item:
-				Basis: 150
-				Grow: 3
-		Box:
-			Id: C
-			Width: 65
-			Height: 50
+		Gap: 20
+		Item:
+			Basis: 100
+			Grow: 1
+			Block:
+				Id: A
+				Height: 50
+		Item:
+			Basis: 150
+			Grow: 3
+			Block:
+				Id: B
+				Height: 50
+		Item:
+			Block:
+				Id: C
+				Width: 65
+				Height: 50

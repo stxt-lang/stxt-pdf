@@ -3,8 +3,8 @@ package dev.stxt.boxes.stxt;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.Parser;
+import dev.stxt.schema.SchemaProviderMemory;
 import dev.stxt.schema.SchemaValidator;
-import dev.stxt.template.TemplateSchemaProviderMemory;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 
@@ -17,29 +17,31 @@ import java.util.List;
 
 /**
  * Lee un documento de cajas con la librería oficial {@code dev.stxt:stxt-core} y lo valida
- * contra el template {@code src/main/resources/stxt/dev.stxt.boxes.stxt}. Así los errores de
- * sintaxis, estructura y tipos (ENUM, INTEGER, BOOLEAN, cardinalidades) los detecta la librería
- * con sus códigos estándar ({@link dev.stxt.exceptions.ParseException}), y el motor solo tiene
- * que comprobar las reglas que el template no puede expresar (ESPECIFICACION.md §6).
+ * contra el schema {@code src/main/resources/stxt/dev.stxt.boxes.stxt} ({@code @stxt.schema}). Así
+ * los errores de sintaxis, estructura (qué hijos admite cada elemento, cardinalidades) y tipos
+ * (ENUM, INTEGER, BOOLEAN) los detecta la librería con sus códigos estándar
+ * ({@link dev.stxt.exceptions.ParseException}), y el motor solo tiene que comprobar las reglas
+ * que el schema no puede expresar (ESPECIFICACION.md §6).
  *
  * <p>La librería solo valida los nodos que tienen namespace, así que el documento debe tener un
- * único nodo raíz que declare {@code (dev.stxt.boxes)}: sin él, pasaría sin validar.</p>
+ * único nodo raíz {@code Document} que declare {@code (dev.stxt.boxes)}: sin el namespace pasaría
+ * sin validar, y el schema admite cualquier elemento como raíz.</p>
  *
  * <p>Es reutilizable y seguro entre hilos: cada lectura crea su propio {@link Parser}; el
- * template se compila una sola vez.</p>
+ * schema se compila una sola vez.</p>
  */
 public final class DocumentReader {
 
-    /** Namespace del modelo de cajas, el mismo que define el template. */
+    /** Namespace del modelo de cajas, el mismo que define el schema. */
     public static final String NAMESPACE = "dev.stxt.boxes";
 
-    private static final String TEMPLATE_RESOURCE = "/stxt/dev.stxt.boxes.stxt";
+    private static final String SCHEMA_RESOURCE = "/stxt/dev.stxt.boxes.stxt";
 
-    private final TemplateSchemaProviderMemory schemas;
+    private final SchemaProviderMemory schemas;
 
     public DocumentReader() {
-        schemas = new TemplateSchemaProviderMemory();
-        schemas.addTemplate(loadTemplate());
+        schemas = new SchemaProviderMemory();
+        schemas.addSchema(loadSchema());
     }
 
     /** Lee y valida un documento; devuelve su nodo raíz. */
@@ -65,21 +67,22 @@ public final class DocumentReader {
                     "El documento debe tener exactamente un nodo raíz y tiene " + roots.size());
         }
         Node root = roots.get(0);
-        if (!NAMESPACE.equals(root.getNamespace()) || !(root instanceof InlineNode document)) {
+        if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("document")
+                || !(root instanceof InlineNode document)) {
             throw new InvalidModelException(root.getLine(), ErrorCode.DOCUMENT_ROOT,
-                    "El nodo raíz debe ser " + root.getName() + " (" + NAMESPACE + "):");
+                    "El nodo raíz debe ser Document (" + NAMESPACE + "):");
         }
         return document;
     }
 
-    private static String loadTemplate() {
-        try (InputStream in = DocumentReader.class.getResourceAsStream(TEMPLATE_RESOURCE)) {
+    private static String loadSchema() {
+        try (InputStream in = DocumentReader.class.getResourceAsStream(SCHEMA_RESOURCE)) {
             if (in == null) {
-                throw new IllegalStateException("No se encuentra el template " + TEMPLATE_RESOURCE + " en el classpath");
+                throw new IllegalStateException("No se encuentra el schema " + SCHEMA_RESOURCE + " en el classpath");
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException("No se puede leer el template " + TEMPLATE_RESOURCE, e);
+            throw new UncheckedIOException("No se puede leer el schema " + SCHEMA_RESOURCE, e);
         }
     }
 }

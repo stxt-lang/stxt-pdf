@@ -27,7 +27,7 @@ class BlockFragmentationTest {
     @Test
     void fixedHeightIsTheTotalOfAllFragments() {
         // 250 = 100 + 100 + 50.
-        LayoutFixture l = layOutPaged(PAGE, "\tBox:", "\t\tId: A", "\t\tHeight: 250");
+        LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tId: A", "\t\tHeight: 250");
         assertEquals(3, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
         assertRect(40, 40, 515, 100, l.rect(2, "A"));
@@ -38,8 +38,8 @@ class BlockFragmentationTest {
     void boxThatDoesNotFitIsSliced() {
         // B empieza en 60: caben 40 de sus 60 pt y el resto pasa a la página 2.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 60",
-                "\tBox:", "\t\tId: B", "\t\tHeight: 60");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 60",
+                "\tBlock:", "\t\tId: B", "\t\tHeight: 60");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 60, l.rect(1, "A"));
         assertRect(40, 100, 515, 40, l.rect(1, "B"));
@@ -49,8 +49,8 @@ class BlockFragmentationTest {
     @Test
     void avoidInsideMovesTheBox() {
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 60",
-                "\tBox:", "\t\tId: B", "\t\tHeight: 60", "\t\tBreak inside: avoid");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 60",
+                "\tBlock:", "\t\tId: B", "\t\tHeight: 60", "\t\tBreak inside: avoid");
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
         assertRect(40, 40, 515, 60, l.rect(2, "B"));
@@ -60,9 +60,9 @@ class BlockFragmentationTest {
     void sliceDecorationDropsBorderAtTheBreak() {
         // Q: borde 2 y relleno 3. Primer fragmento: 5 + C1 (40) + 55 de C2 hasta el final de la página.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: Q", "\t\tBorder: 2", "\t\tPadding: 3",
-                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 40",
-                "\t\tBox:", "\t\t\tId: C2", "\t\t\tHeight: 80");
+                "\tBlock:", "\t\tId: Q", "\t\tBorder: 2", "\t\tPadding: 3",
+                "\t\tBlock:", "\t\t\tId: C1", "\t\t\tHeight: 40",
+                "\t\tBlock:", "\t\t\tId: C2", "\t\t\tHeight: 80");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "Q"));
         assertRect(45, 45, 505, 40, l.rect(1, "C1"));
@@ -83,9 +83,9 @@ class BlockFragmentationTest {
         // El contenido (40 + 55) cabe en 100, pero el relleno inferior (10) no: con 90 para el
         // contenido, C2 (avoid) pasa a la página 2 y Q termina allí con su relleno.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
-                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 40",
-                "\t\tBox:", "\t\t\tId: C2", "\t\t\tHeight: 55", "\t\t\tBreak inside: avoid");
+                "\tBlock:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
+                "\t\tBlock:", "\t\t\tId: C1", "\t\t\tHeight: 40",
+                "\t\tBlock:", "\t\t\tId: C2", "\t\t\tHeight: 55", "\t\t\tBreak inside: avoid");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 40, l.rect(1, "Q"));
         assertRect(40, 40, 515, 65, l.rect(2, "Q"));
@@ -97,8 +97,8 @@ class BlockFragmentationTest {
         // Cinco líneas de 20 caben en 100, pero el relleno inferior no. Con 90 caben cuatro, que
         // dejarían una viuda: se cortan tres y las dos últimas pasan con el relleno.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: Q", "\t\tWidth: 50", "\t\tPadding: 0 0 10 0", "\t\tLine height: 20",
-                "\t\tText: aaaaaaaa bbbbbbbb cccccccc dddddddd eeeeeeee");
+                "\tText: aaaaaaaa bbbbbbbb cccccccc dddddddd eeeeeeee", "\t\tId: Q", "\t\tWidth: 50",
+                "\t\tPadding: 0 0 10 0", "\t\tLine height: 20");
         assertEquals(2, l.pages());
         assertRect(40, 40, 50, 60, l.rect(1, "Q"));
         assertRect(40, 40, 50, 50, l.rect(2, "Q"));
@@ -108,8 +108,8 @@ class BlockFragmentationTest {
     void sliceDoesNotReserveWhenTheBoxContinues() {
         // Q se parte de todos modos: el primer fragmento llega al final de la página, sin hueco.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
-                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 150");
+                "\tBlock:", "\t\tId: Q", "\t\tPadding: 0 0 10 0",
+                "\t\tBlock:", "\t\t\tId: C1", "\t\t\tHeight: 150");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "Q"));
         assertRect(40, 40, 515, 60, l.rect(2, "Q"));
@@ -120,9 +120,9 @@ class BlockFragmentationTest {
         // Como el anterior, con clone: el contenido de cada página cabe entre 5 arriba y 5 abajo
         // (90 pt). Página 1: C1 (40) + 50 de C2. Página 2: 5 + los 30 que faltan de C2 + 5.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: Q", "\t\tBorder: 2", "\t\tPadding: 3", "\t\tDecoration: clone",
-                "\t\tBox:", "\t\t\tId: C1", "\t\t\tHeight: 40",
-                "\t\tBox:", "\t\t\tId: C2", "\t\t\tHeight: 80");
+                "\tBlock:", "\t\tId: Q", "\t\tBorder: 2", "\t\tPadding: 3", "\t\tDecoration: clone",
+                "\t\tBlock:", "\t\t\tId: C1", "\t\t\tHeight: 40",
+                "\t\tBlock:", "\t\t\tId: C2", "\t\t\tHeight: 80");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "Q"));
         assertRect(45, 85, 505, 50, l.rect(1, "C2"));
@@ -135,7 +135,7 @@ class BlockFragmentationTest {
     @Test
     void cloneFixedHeightIsTheTotalOfTheContent() {
         // Height 250 con borde 5: 240 de contenido en trozos de 90, cada uno con 10 de borde.
-        LayoutFixture l = layOutPaged(PAGE, "\tBox:", "\t\tId: A", "\t\tHeight: 250", "\t\tBorder: 5",
+        LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tId: A", "\t\tHeight: 250", "\t\tBorder: 5",
                 "\t\tDecoration: clone");
         assertEquals(3, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
@@ -146,8 +146,8 @@ class BlockFragmentationTest {
     @Test
     void cloneTextKeepsItsDecorationOnEveryPage() {
         // Relleno 10 con clone: caben 80 / 12 = 6 líneas por página; 10 líneas = 6 + 4.
-        LayoutFixture l = layOutPaged(PAGE, "\tBox:", "\t\tId: P", "\t\tWidth: 50", "\t\tPadding: 10",
-                "\t\tDecoration: clone", "\t\tText: " + String.join(" ", java.util.Collections.nCopies(10, "aaaaa")));
+        LayoutFixture l = layOutPaged(PAGE, "\tText: " + String.join(" ", java.util.Collections.nCopies(10, "aaaaa")),
+                "\t\tId: P", "\t\tWidth: 50", "\t\tPadding: 10", "\t\tDecoration: clone");
         assertEquals(2, l.pages());
         assertRect(40, 40, 50, 92, l.rect(1, "P"));
         assertRect(40, 40, 50, 68, l.rect(2, "P"));
@@ -157,16 +157,16 @@ class BlockFragmentationTest {
     @Test
     void unforcedBreakTruncatesTheMargin() {
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 95",
-                "\tBox:", "\t\tId: B", "\t\tHeight: 10", "\t\tMargin: 10 0 0 0", "\t\tBreak inside: avoid");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 95",
+                "\tBlock:", "\t\tId: B", "\t\tHeight: 10", "\t\tMargin: 10 0 0 0", "\t\tBreak inside: avoid");
         assertRect(40, 40, 515, 10, l.rect(2, "B"));
     }
 
     @Test
     void forcedBreakKeepsTheMargin() {
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: B", "\t\tHeight: 10", "\t\tMargin: 10 0 0 0", "\t\tBreak before: page");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 10",
+                "\tBlock:", "\t\tId: B", "\t\tHeight: 10", "\t\tMargin: 10 0 0 0", "\t\tBreak before: page");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 10, l.rect(1, "A"));
         assertRect(40, 50, 515, 10, l.rect(2, "B"));
@@ -176,10 +176,10 @@ class BlockFragmentationTest {
     void forcedBreakOfTheFirstChildPropagates() {
         // El corte forzado de C sale de P: P entera pasa a la página 2.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: P",
-                "\t\tBox:", "\t\t\tId: C", "\t\t\tHeight: 10", "\t\t\tBreak before: page",
-                "\tBox:", "\t\tId: D", "\t\tHeight: 10", "\t\tBreak after: page");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 10",
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tHeight: 10", "\t\t\tBreak before: page",
+                "\tBlock:", "\t\tId: D", "\t\tHeight: 10", "\t\tBreak after: page");
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "P"));
         assertRect(40, 40, 515, 10, l.rect(2, "P"));
@@ -188,7 +188,7 @@ class BlockFragmentationTest {
 
     @Test
     void forcedBreakAtTheStartOfThePageIsIgnored() {
-        LayoutFixture l = layOutPaged(PAGE, "\tBox:", "\t\tId: A", "\t\tHeight: 10", "\t\tBreak before: page");
+        LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tId: A", "\t\tHeight: 10", "\t\tBreak before: page");
         assertEquals(1, l.pages());
         assertRect(40, 40, 515, 10, l.rect(1, "A"));
     }
@@ -197,9 +197,9 @@ class BlockFragmentationTest {
     void avoidAfterKeepsTheTitleWithTheNextBox() {
         // T no puede quedar sola al final: se corta antes de T, que es un corte sin reglas incumplidas.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: X", "\t\tHeight: 50",
-                "\tBox:", "\t\tId: T", "\t\tHeight: 20", "\t\tBreak after: avoid",
-                "\tBox:", "\t\tId: P", "\t\tHeight: 60", "\t\tBreak inside: avoid");
+                "\tBlock:", "\t\tId: X", "\t\tHeight: 50",
+                "\tBlock:", "\t\tId: T", "\t\tHeight: 20", "\t\tBreak after: avoid",
+                "\tBlock:", "\t\tId: P", "\t\tHeight: 60", "\t\tBreak inside: avoid");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 50, l.rect(1, "X"));
         assertFalse(l.has(1, "T"));
@@ -211,8 +211,8 @@ class BlockFragmentationTest {
     void avoidIsRelaxedWhenThereIsNoOtherBreak() {
         // T es lo primero de la página: no hay corte mejor que el que incumple avoid.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: T", "\t\tHeight: 20", "\t\tBreak after: avoid",
-                "\tBox:", "\t\tId: P", "\t\tHeight: 90", "\t\tBreak inside: avoid");
+                "\tBlock:", "\t\tId: T", "\t\tHeight: 20", "\t\tBreak after: avoid",
+                "\tBlock:", "\t\tId: P", "\t\tHeight: 90", "\t\tBreak inside: avoid");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 20, l.rect(1, "T"));
         assertRect(40, 40, 515, 90, l.rect(2, "P"));
@@ -222,9 +222,9 @@ class BlockFragmentationTest {
     void avoidInsideIsRelaxedWhenTheBoxIsTallerThanThePage() {
         // B pasa a la página 2 y, como tampoco cabe ahí entera, se parte igualmente.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 10",
-                "\tBox:", "\t\tId: B", "\t\tHeight: 150", "\t\tBreak inside: avoid",
-                "\tBox:", "\t\tId: C", "\t\tHeight: 10");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 10",
+                "\tBlock:", "\t\tId: B", "\t\tHeight: 150", "\t\tBreak inside: avoid",
+                "\tBlock:", "\t\tId: C", "\t\tHeight: 10");
         assertEquals(3, l.pages());
         assertRect(40, 40, 515, 10, l.rect(1, "A"));
         assertRect(40, 40, 515, 100, l.rect(2, "B"));
@@ -235,11 +235,10 @@ class BlockFragmentationTest {
     @Test
     void absoluteChildFallsOnThePageOfItsPosition() {
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBox:", "\t\tId: A", "\t\tHeight: 90",
-                "\tBox:", "\t\tId: P", "\t\tPosition: relative", "\t\tBreak inside: avoid",
-                "\t\tBox:", "\t\t\tHeight: 30",
-                "\t\tBox:", "\t\t\tId: S", "\t\t\tPosition: absolute", "\t\t\tOffset: 0 0 auto auto",
-                "\t\t\tWidth: 20", "\t\t\tHeight: 20");
+                "\tBlock:", "\t\tId: A", "\t\tHeight: 90",
+                "\tRelative:", "\t\tId: P", "\t\tBreak inside: avoid",
+                "\t\tBlock:", "\t\t\tHeight: 30",
+                "\t\tAbsolute:", "\t\t\tId: S", "\t\t\tOffset: 0 0 auto auto", "\t\t\tWidth: 20", "\t\t\tHeight: 20");
         assertFalse(l.has(1, "S"));
         assertRect(535, 40, 20, 20, l.rect(2, "S"));
     }

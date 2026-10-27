@@ -7,52 +7,47 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Grid:
 		Id: page
-		Layout: grid
-		Grid:
-			Columns: 150 1fr
-			Gap: 10 20
-			Areas >>
-				head head
-				side main
-				foot foot
-		Box:
-			Id: head
-			Height: 30
-			Item:
-				Cell: head
-		Box:
-			Id: side
+		Columns: 150 1fr
+		Gap: 10 20
+		Areas >>
+			head head
+			side main
+			foot foot
+		Cell: head
+			Block:
+				Id: head
+				Height: 30
+		Cell: side
 			Text: Resumen
-			Item:
-				Cell: side
-		Box:
-			Id: main
-			Height: 60
-			Item:
-				Cell: main
-		Box:
-			Id: foot
-			Height: 20
-			Item:
-				Cell: foot
-	Box:
+				Id: side
+		Cell: main
+			Block:
+				Id: main
+				Height: 60
+		Cell: foot
+			Block:
+				Id: foot
+				Height: 20
+	Grid:
 		Id: cards
-		Layout: grid
 		Margin: 20 0 0 0
-		Grid:
-			Columns: repeat(3, 1fr)
-			Gap: 10
-		Box:
-			Id: c1
-			Height: 40
-		Box:
-			Id: c2
-			Height: 50
-		Box:
-			Id: c3
-			Height: 30
-		Box:
-			Id: c4
-			Height: 20
+		Columns: repeat(3, 1fr)
+		Gap: 10
+		Cell:
+			Block:
+				Id: c1
+				Height: 40
+		Cell:
+			Block:
+				Id: c2
+				Height: 50
+		Cell:
+			Block:
+				Id: c3
+				Height: 30
+		Cell:
+			Block:
+				Id: c4
+				Height: 20

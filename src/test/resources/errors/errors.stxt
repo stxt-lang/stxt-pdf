@@ -1,8 +1,8 @@
 # Catálogo de errores (ESPECIFICACION.md §6). Cada Case es un documento que debe fallar con
 # ese código en esa línea, que cuenta desde la primera línea del documento. Lo comprueba
 # ErrorCatalogTest, con las fuentes de resources/fonts. Los códigos son los de ErrorCode,
-# salvo los de sintaxis STXT y del template, que son de stxt-core (INVALID_VALUE…).
-# Generado con las líneas culpables marcadas; al añadir un caso, cuenta la línea a mano.
+# salvo los de sintaxis STXT y del schema, que son de stxt-core (INVALID_VALUE, CHILD_NOT_DECLARED…).
+# Al añadir un caso, cuenta la línea a mano.
 Errors:
 	Case: Raíz sin namespace
 		Code: DOCUMENT_ROOT
@@ -12,9 +12,15 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 10
-	Case: Valor fuera del ENUM del template
+	Case: Raíz que no es Document
+		Code: DOCUMENT_ROOT
+		Line: 1
+		Document >>
+			Block (dev.stxt.boxes):
+				Height: 10
+	Case: Valor fuera del ENUM del schema
 		Code: INVALID_VALUE
 		Line: 6
 		Document >>
@@ -22,8 +28,8 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Position: sticky
+				Block:
+					Text align: middle
 	Case: Paginado sin alto
 		Code: MEDIA_HEIGHT_REQUIRED
 		Line: 2
@@ -32,7 +38,7 @@ Errors:
 				Media:
 					Type: paged
 					Width: 595
-				Box:
+				Block:
 					Height: 10
 	Case: Alto del medio en continuo
 		Code: MEDIA_HEIGHT_CONTINUOUS
@@ -43,7 +49,7 @@ Errors:
 					Type: continuous
 					Width: 595
 					Height: 842
-				Box:
+				Block:
 					Height: 10
 	Case: Márgenes del medio sin área útil
 		Code: MEDIA_SIZE
@@ -54,7 +60,7 @@ Errors:
 					Type: continuous
 					Width: 595
 					Margin: 300
-				Box:
+				Block:
 					Height: 10
 	Case: Coma decimal
 		Code: VALUE_SYNTAX
@@ -64,7 +70,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 12,5
 	Case: Fracción fuera de grid
 		Code: VALUE_NOT_ALLOWED
@@ -74,7 +80,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 1fr
 	Case: Alto negativo
 		Code: VALUE_NOT_ALLOWED
@@ -84,7 +90,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: -10
 	Case: Intrínseco en Max width
 		Code: VALUE_NOT_ALLOWED
@@ -94,32 +100,28 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Max width: max-content
 	Case: Hueco con auto
 		Code: VALUE_NOT_ALLOWED
-		Line: 8
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: flex
-					Flex:
-						Gap: auto
+				Flex:
+					Gap: auto
 	Case: fit-content como pista
 		Code: FIT_CONTENT_TRACK
-		Line: 8
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Grid:
-						Columns: fit-content 1fr
+				Grid:
+					Columns: fit-content 1fr
 	Case: Id repetido
 		Code: DUPLICATE_ID
 		Line: 9
@@ -128,166 +130,186 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Id: a
 					Height: 10
-				Box:
+				Block:
 					Id: a
 					Height: 10
-	Case: Caja dentro de inline
-		Code: INLINE_WITH_BOXES
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Layout: inline
-					Box:
-						Height: 10
-	Case: Texto sin Font
-		Code: TEXT_WITHOUT_FONT
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Font size: 12
-					Text: hola
-	Case: Texto sin Font size
-		Code: TEXT_WITHOUT_FONT_SIZE
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Font: IBM Plex Sans
-				Box:
-					Text: hola
-	Case: Texto en caja anónima sin Font
-		Code: TEXT_WITHOUT_FONT
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Layout: flex
-					Text: hola
-	Case: Flex como bloque de texto
-		Code: BLOCK_FORM_NOT_ALLOWED
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Layout: flex
-					Flex >>
-						Gap: 10
-	Case: Flex sin Layout: flex
-		Code: CONTAINER_MISMATCH
+	Case: Elemento dentro de Text
+		Code: CHILD_NOT_DECLARED
 		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Flex:
-						Gap: 10
-	Case: Item fuera de flex y grid
-		Code: ITEM_MISMATCH
-		Line: 8
+				Text: hola
+					Block:
+						Height: 10
+	Case: Cell con dos elementos
+		Code: SINGLE_ELEMENT
+		Line: 9
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Box:
-						Height: 10
-						Item:
-							Grow: 1
-	Case: Grow en un ítem de grid
-		Code: ITEM_MISMATCH
-		Line: 10
+				Grid:
+					Cell:
+						Block:
+							Height: 10
+						Text: hola
+	Case: Item sin elemento
+		Code: SINGLE_ELEMENT
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Box:
-						Height: 10
-						Item:
-							Grow: 1
-	Case: Cell en un ítem de flex
-		Code: ITEM_MISMATCH
-		Line: 10
+				Flex:
+					Item:
+						Grow: 1
+	Case: Text con el texto en el valor y en Content
+		Code: TEXT_CONTENT
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: flex
-					Box:
-						Height: 10
-						Item:
-							Cell: 1 1
-	Case: Offset con static
-		Code: OFFSET_ON_STATIC
+				Text: hola
+					Content >>
+						adiós
+	Case: Text sin texto
+		Code: TEXT_CONTENT
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Text:
+					Height: 10
+	Case: Texto sin Font
+		Code: TEXT_WITHOUT_FONT
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Text: hola
+					Font size: 12
+	Case: Texto sin Font size
+		Code: TEXT_WITHOUT_FONT_SIZE
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Font: IBM Plex Sans
+				Text: hola
+	Case: Texto de un ítem sin Font
+		Code: TEXT_WITHOUT_FONT
 		Line: 7
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Flex:
+					Item:
+						Text: hola
+	Case: Text como bloque (el bloque va en Content)
+		Code: BLOCK_FORM_NOT_ALLOWED
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Text >>
+					Primer párrafo.
+	Case: Propiedad de grid en un Flex
+		Code: CHILD_NOT_DECLARED
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Flex:
+					Columns: 1fr 1fr
+	Case: Grow en una celda de grid
+		Code: CHILD_NOT_DECLARED
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Grid:
+					Cell:
+						Grow: 1
+						Block:
+							Height: 10
+	Case: Cell en un Flex
+		Code: CHILD_NOT_DECLARED
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Flex:
+					Cell: 1 1
+						Block:
+							Height: 10
+	Case: Offset en un Block
+		Code: CHILD_NOT_DECLARED
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Block:
 					Height: 10
 					Offset: 10
 	Case: Relative desde arriba y abajo
 		Code: OFFSET_CONFLICT
-		Line: 7
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Position: relative
+				Relative:
 					Offset: 5 auto 9 auto
 					Height: 10
 	Case: Relative desde izquierda y derecha
 		Code: OFFSET_CONFLICT
-		Line: 7
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Position: relative
+				Relative:
 					Offset: auto 7 auto 11
 					Height: 10
 	Case: Absolute sobre-restringida
 		Code: OVERCONSTRAINED
-		Line: 7
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Position: absolute
+				Absolute:
 					Offset: 0 10 auto 10
 					Width: 100
 					Height: 10
@@ -299,12 +321,12 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: flex
-					Box:
-						Width: 100
-						Height: 10
-						Margin: 0 auto
+				Flex:
+					Item:
+						Block:
+							Width: 100
+							Height: 10
+							Margin: 0 auto
 	Case: Margin auto vertical en bloque
 		Code: MARGIN_AUTO_WITHOUT_EFFECT
 		Line: 7
@@ -313,7 +335,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 10
 					Margin: auto 0
 	Case: Margin auto sin ancho limitado
@@ -324,60 +346,55 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 10
 					Margin: 0 auto
 	Case: Margin auto en absolute sin inicio y fin
 		Code: MARGIN_AUTO_WITHOUT_EFFECT
-		Line: 9
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Position: absolute
-					Width: 100
-					Height: 10
-					Margin: 0 auto
-	Case: Layer en una caja static
-		Code: LAYER_WITHOUT_EFFECT
-		Line: 7
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Height: 10
-					Layer: 2
-	Case: Lines sin Wrap
-		Code: LINES_WITHOUT_WRAP
 		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: flex
-					Flex:
-						Lines: center
-	Case: Grow en column sin alto
-		Code: GROW_WITHOUT_EFFECT
-		Line: 11
+				Absolute:
+					Width: 100
+					Height: 10
+					Margin: 0 auto
+	Case: Layer en un Block
+		Code: CHILD_NOT_DECLARED
+		Line: 7
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: flex
-					Flex:
-						Direction: column
-					Box:
-						Item:
-							Grow: 1
+				Block:
+					Height: 10
+					Layer: 2
+	Case: Lines sin Wrap
+		Code: LINES_WITHOUT_WRAP
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Flex:
+					Lines: center
+	Case: Grow en column sin alto
+		Code: GROW_WITHOUT_EFFECT
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Flex:
+					Direction: column
+					Item:
+						Grow: 1
+						Block:
 	Case: Aspect ratio con Width y Height
 		Code: ASPECT_RATIO_CONFLICT
 		Line: 8
@@ -386,7 +403,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 100
 					Height: 50
 					Aspect ratio: 16/9
@@ -398,7 +415,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 10
 					Max width: 100
 					Min width: 150
@@ -410,7 +427,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 60%
 					Max width: 50%
 					Height: 10
@@ -422,7 +439,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 50%
 	Case: Porcentaje de alto con el padre en auto
 		Code: INDEFINITE_PERCENTAGE
@@ -433,104 +450,91 @@ Errors:
 					Type: paged
 					Width: 595
 					Height: 842
-				Box:
-					Box:
+				Block:
+					Block:
 						Min height: min(20, 10%)
 	Case: Desplazamiento vertical en porcentaje
 		Code: INDEFINITE_PERCENTAGE
-		Line: 7
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Position: relative
+				Relative:
 					Offset: 10% auto auto auto
 					Height: 10
 	Case: Filas en porcentaje sin alto
 		Code: INDEFINITE_PERCENTAGE
-		Line: 8
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Grid:
-						Rows: 50% 50%
+				Grid:
+					Rows: 50% 50%
 	Case: Basis en porcentaje en column sin alto
 		Code: INDEFINITE_PERCENTAGE
-		Line: 11
-		Document >>
-			Document (dev.stxt.boxes):
-				Media:
-					Type: continuous
-					Width: 595
-				Box:
-					Layout: flex
-					Flex:
-						Direction: column
-					Box:
-						Item:
-							Basis: 50%
-	Case: Hueco entre filas en porcentaje sin alto
-		Code: INDEFINITE_PERCENTAGE
 		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Grid:
-						Gap: 5% 10
-	Case: Corte forzado en una absolute
-		Code: BREAK_NOT_ALLOWED
-		Line: 9
+				Flex:
+					Direction: column
+					Item:
+						Basis: 50%
+						Block:
+	Case: Hueco entre filas en porcentaje sin alto
+		Code: INDEFINITE_PERCENTAGE
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Type: continuous
+					Width: 595
+				Grid:
+					Gap: 5% 10
+	Case: Corte forzado en un Absolute
+		Code: CHILD_NOT_DECLARED
+		Line: 8
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: paged
 					Width: 595
 					Height: 842
-				Box:
-					Position: absolute
+				Absolute:
 					Height: 10
 					Break before: page
 	Case: Áreas no rectangulares
 		Code: GRID_PLACEMENT
-		Line: 8
+		Line: 6
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Grid:
-						Areas >>
-							a a
-							a b
-							b b
+				Grid:
+					Areas >>
+						a a
+						a b
+						b b
 	Case: Área desconocida en Cell
 		Code: GRID_PLACEMENT
-		Line: 12
+		Line: 7
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
-					Layout: grid
-					Grid:
-						Areas: a b
-					Box:
-						Height: 10
-						Item:
-							Cell: c
+				Grid:
+					Areas: a b
+					Cell: c
+						Block:
+							Height: 10
 	Case: Fuente desconocida, declarada en Document
 		Code: FONT_UNKNOWN
 		Line: 5
@@ -541,9 +545,8 @@ Errors:
 					Width: 595
 				Font: Helvetica
 				Font size: 10
-				Box:
-					Box:
-						Text: hola
+				Block:
+					Text: hola
 	Case: Carácter que la fuente no tiene
 		Code: GLYPH_MISSING
 		Line: 11
@@ -554,8 +557,8 @@ Errors:
 					Width: 595
 				Font: IBM Plex Sans
 				Font size: 10
-				Box:
-					Text >>
+				Text:
+					Content >>
 						Primera línea
 
 						Kanji 漢
@@ -569,9 +572,9 @@ Errors:
 					Width: 595
 				Font: IBM Plex Sans
 				Font size: 10
-				Box:
+				Text:
 					Width: 100
-					Text >>
+					Content >>
 						Una palabra muy
 						supercalifragilisticoespialidosa
 	Case: Caja más ancha que el área útil
@@ -582,7 +585,7 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 600
 					Height: 10
 	Case: Hija más ancha que su contenedor
@@ -593,14 +596,14 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Width: 100
-					Box:
+					Block:
 						Width: 150
 						Height: 10
 	Case: Columnas que no caben en el grid
 		Code: BOX_OVERFLOW
-		Line: 12
+		Line: 11
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
@@ -608,15 +611,11 @@ Errors:
 					Width: 595
 				Font: IBM Plex Sans
 				Font size: 10
-				Box:
-					Layout: grid
+				Grid:
 					Width: 200
-					Grid:
-						Columns: 1fr 1fr
-					Box:
+					Columns: 1fr 1fr
+					Cell: 1 1 1 2
 						Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-						Item:
-							Cell: 1 1 1 2
 	Case: Texto más alto que su Height
 		Code: BOX_OVERFLOW
 		Line: 9
@@ -627,10 +626,9 @@ Errors:
 					Width: 595
 				Font: IBM Plex Sans
 				Font size: 10
-				Box:
+				Text: uno dos tres cuatro cinco seis siete ocho nueve diez
 					Width: 100
 					Height: 20
-					Text: uno dos tres cuatro cinco seis siete ocho nueve diez
 	Case: Hija más alta que el Height del padre
 		Code: BOX_OVERFLOW
 		Line: 6
@@ -639,21 +637,20 @@ Errors:
 				Media:
 					Type: continuous
 					Width: 595
-				Box:
+				Block:
 					Height: 50
-					Box:
+					Block:
 						Height: 80
 	Case: Absolute fuera de la página
 		Code: BOX_OVERFLOW
-		Line: 8
+		Line: 7
 		Document >>
 			Document (dev.stxt.boxes):
 				Media:
 					Type: paged
 					Width: 595
 					Height: 842
-				Box:
-					Position: absolute
+				Absolute:
 					Offset: -100 auto auto 0
 					Width: 50
 					Height: 10
@@ -669,6 +666,5 @@ Errors:
 					Margin: 40
 				Font: IBM Plex Sans
 				Font size: 10
-				Box:
+				Text: a
 					Line height: 900
-					Text: a

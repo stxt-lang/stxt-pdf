@@ -14,12 +14,16 @@ import java.util.Map;
  * marcadas como heredables (texto y fragmentación), igual que en CSS; ver {@link #inheriting}.</p>
  *
  * <p>Los nombres de las constantes de los enums coinciden con los valores del documento en
- * mayúsculas: así los interpreta {@code BoxTreeBuilder}.</p>
+ * mayúsculas: así los interpreta {@code BoxTreeBuilder}. {@link Layout} y {@link Position} no son
+ * valores del documento: salen del elemento ({@code Text} es {@code INLINE}; {@code Absolute},
+ * un {@code BLOCK} {@code ABSOLUTE}).</p>
  */
 public final class Style {
 
+    /** Cómo coloca la caja a sus hijos: lo da el elemento. */
     public enum Layout { BLOCK, INLINE, FLEX, GRID }
 
+    /** Cómo participa la caja en el flujo de su padre: {@code Relative}, {@code Absolute} y {@code Fixed}; el resto, {@code STATIC}. */
     public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
 
     public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }

@@ -84,7 +84,7 @@ class PdfCanvasTest {
     void onePdfPagePerPage() throws Exception {
         InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: paged\n\t\tWidth: 300\n"
                 + "\t\tHeight: 200\n\t\tMargin: 20\n\tFont: IBM Plex Sans\n\tFont size: 10\n"
-                + "\tBox:\n\t\tText: Uno\n\tBox:\n\t\tBreak before: page\n\t\tText: Dos\n");
+                + "\tText: Uno\n\tText: Dos\n\t\tBreak before: page\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "two-pages"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDFTextStripper stripper = new PDFTextStripper();
@@ -97,7 +97,7 @@ class PdfCanvasTest {
     @Test
     void continuousIsOnePageAsTallAsTheContent() throws Exception {
         InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tType: continuous\n\t\tWidth: 300\n"
-                + "\t\tMargin: 20\n\tBox:\n\t\tHeight: 500\n\t\tBackground: #F1EFE8\n");
+                + "\t\tMargin: 20\n\tBlock:\n\t\tHeight: 500\n\t\tBackground: #F1EFE8\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "continuous"))) {
             assertEquals(1, pdf.getNumberOfPages());
             assertEquals(540, pdf.getPage(0).getMediaBox().getHeight(), 1e-3);

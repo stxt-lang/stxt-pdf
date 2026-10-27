@@ -1,7 +1,7 @@
 package dev.stxt.boxes.tree;
 
 /**
- * Regla del modelo incumplida que el template STXT no puede expresar (ESPECIFICACION.md §6),
+ * Regla del modelo incumplida que el schema STXT no puede expresar (ESPECIFICACION.md §6),
  * con su código y la línea del documento donde está el nodo culpable.
  */
 public class InvalidModelException extends RuntimeException {

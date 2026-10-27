@@ -21,10 +21,10 @@ class GridLayoutTest {
     void columnsAndRowsSizing() {
         // auto llega al max-content de B (45) y la fracción recibe el resto: 515 - 100 - 45.
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tColumns: 100 auto 1fr",
-                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: B", "\t\t\tText: aaaa bbbb",
-                "\t\tBox:", "\t\t\tId: C", "\t\t\tHeight: 10");
+                "\tGrid:", "\t\tColumns: 100 auto 1fr",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tText: aaaa bbbb", "\t\t\t\tId: B",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tHeight: 10");
         assertRect(40, 40, 100, 10, l.rect("A"));
         assertRect(140, 40, 45, 12, l.rect("B"));
         assertRect(185, 40, 370, 10, l.rect("C"));
@@ -33,12 +33,12 @@ class GridLayoutTest {
     @Test
     void alignmentInTheArea() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tColumns: 200 200", "\t\t\tRows: 100",
-                "\t\tBox:", "\t\t\tId: S",
-                "\t\tBox:", "\t\t\tId: E", "\t\t\tWidth: 50", "\t\t\tHeight: 20",
-                "\t\t\tItem:", "\t\t\t\tHorizontal: end", "\t\t\t\tVertical: center",
-                "\tBox:", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tColumns: 200", "\t\t\tHorizontal: start",
-                "\t\tBox:", "\t\t\tId: T", "\t\t\tText: aaa");
+                "\tGrid:", "\t\tColumns: 200 200", "\t\tRows: 100",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: S",
+                "\t\tCell:", "\t\t\tHorizontal: end", "\t\t\tVertical: center",
+                "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tWidth: 50", "\t\t\t\tHeight: 20",
+                "\tGrid:", "\t\tColumns: 200", "\t\tHorizontal: start",
+                "\t\tCell:", "\t\t\tText: aaa", "\t\t\t\tId: T");
         assertRect(40, 40, 200, 100, l.rect("S"));
         assertRect(390, 80, 50, 20, l.rect("E"));
         // Sin stretch, el ítem conserva su ajuste al contenido.
@@ -49,10 +49,10 @@ class GridLayoutTest {
     void explicitCellsAndAutoPlacement() {
         // A ocupa las columnas 2 y 3 de la fila 1; C no cabe detrás de B y pasa a la fila 2.
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tColumns: 100 100 100",
-                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10", "\t\t\tItem:", "\t\t\t\tCell: 1 2 1 2",
-                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: C", "\t\t\tHeight: 10");
+                "\tGrid:", "\t\tColumns: 100 100 100",
+                "\t\tCell: 1 2 1 2", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tHeight: 10");
         assertRect(140, 40, 200, 10, l.rect("A"));
         assertRect(40, 40, 100, 10, l.rect("B"));
         assertRect(40, 50, 100, 10, l.rect("C"));
@@ -61,11 +61,10 @@ class GridLayoutTest {
     @Test
     void flowColumn() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid",
-                "\t\tGrid:", "\t\t\tColumns: 100 100", "\t\t\tRows: 20 20", "\t\t\tFlow: column",
-                "\t\tBox:", "\t\t\tId: A",
-                "\t\tBox:", "\t\t\tId: B",
-                "\t\tBox:", "\t\t\tId: C");
+                "\tGrid:", "\t\tColumns: 100 100", "\t\tRows: 20 20", "\t\tFlow: column",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: C");
         assertRect(40, 40, 100, 20, l.rect("A"));
         assertRect(40, 60, 100, 20, l.rect("B"));
         assertRect(140, 40, 100, 20, l.rect("C"));
@@ -74,9 +73,9 @@ class GridLayoutTest {
     @Test
     void fractionRowsWithAutoHeightMeasureTheTallest() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tRows: 1fr 1fr",
-                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 30");
+                "\tGrid:", "\t\tId: G", "\t\tRows: 1fr 1fr",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tHeight: 30");
         assertRect(40, 40, 515, 60, l.rect("G"));
         assertRect(40, 40, 515, 10, l.rect("A"));
         assertRect(40, 70, 515, 30, l.rect("B"));
@@ -85,9 +84,9 @@ class GridLayoutTest {
     @Test
     void fractionRowsWithDefiniteHeight() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tHeight: 100", "\t\tGrid:", "\t\t\tRows: 1fr 3fr",
-                "\t\tBox:", "\t\t\tId: A",
-                "\t\tBox:", "\t\t\tId: B");
+                "\tGrid:", "\t\tHeight: 100", "\t\tRows: 1fr 3fr",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B");
         assertRect(40, 40, 515, 25, l.rect("A"));
         assertRect(40, 65, 515, 75, l.rect("B"));
     }
@@ -95,9 +94,9 @@ class GridLayoutTest {
     @Test
     void autoRowsStretchInADefiniteHeight() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tHeight: 100",
-                "\t\tBox:", "\t\t\tId: A",
-                "\t\tBox:", "\t\t\tId: B");
+                "\tGrid:", "\t\tHeight: 100",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B");
         assertRect(40, 40, 515, 50, l.rect("A"));
         assertRect(40, 90, 515, 50, l.rect("B"));
     }
@@ -105,9 +104,9 @@ class GridLayoutTest {
     @Test
     void percentagesUseTheArea() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tGrid:", "\t\t\tColumns: 200 300", "\t\t\tRows: 100",
-                "\t\tBox:", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: P", "\t\t\tWidth: 50%", "\t\t\tHeight: 50%");
+                "\tGrid:", "\t\tColumns: 200 300", "\t\tRows: 100",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: P", "\t\t\t\tWidth: 50%", "\t\t\t\tHeight: 50%");
         assertRect(240, 40, 150, 50, l.rect("P"));
     }
 
@@ -115,9 +114,9 @@ class GridLayoutTest {
     void percentageRowsOfADefiniteHeight() {
         // Con Height: auto en el contenedor, las filas en porcentaje son un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tHeight: 100", "\t\tGrid:", "\t\t\tRows: 50% 50%",
-                "\t\tBox:", "\t\t\tId: A", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: B", "\t\t\tHeight: 30");
+                "\tGrid:", "\t\tId: G", "\t\tHeight: 100", "\t\tRows: 50% 50%",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tHeight: 30");
         assertRect(40, 40, 515, 100, l.rect("G"));
         assertRect(40, 40, 515, 10, l.rect("A"));
         assertRect(40, 90, 515, 30, l.rect("B"));
@@ -127,10 +126,9 @@ class GridLayoutTest {
     void percentageColumnsInIntrinsicWidthsAreAuto() {
         // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto. Con
         // min-content (25) cada columna mediría 12.5 y B desbordaría: es un error.
-        String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";
+        String items = "\t\tCell:\n\t\t\tText: aa aa\n\t\tCell:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: max", "\t\tLayout: grid", "\t\tWidth: max-content",
-                "\t\tGrid:", "\t\t\tColumns: 50% 50%", items);
+                "\tGrid:", "\t\tId: max", "\t\tWidth: max-content", "\t\tColumns: 50% 50%", items);
         assertEquals(40, l.rect("max").width(), 1e-9);
     }
 
@@ -140,24 +138,21 @@ class GridLayoutTest {
     @Test
     void itemCrossingFractionsInIntrinsicWidths() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: G", "\t\tLayout: grid", "\t\tWidth: min-content",
-                "\t\tGrid:", "\t\t\tColumns: 1fr 1fr",
-                "\t\tBox:", "\t\t\tText: " + "a".repeat(60), "\t\t\tItem:", "\t\t\t\tCell: 1 1 1 2");
+                "\tGrid:", "\t\tId: G", "\t\tWidth: min-content", "\t\tColumns: 1fr 1fr",
+                "\t\tCell: 1 1 1 2", "\t\t\tText: " + "a".repeat(60));
         assertEquals(300, l.rect("G").width(), 1e-9);
     }
 
     @Test
     void intrinsicWidths() {
         // A: min 10, max 25. B: min y max 15. Hueco 10.
-        String items = "\t\tBox:\n\t\t\tText: aa aa\n\t\tBox:\n\t\t\tText: bbb";
+        String items = "\t\tCell:\n\t\t\tText: aa aa\n\t\tCell:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tId: max", "\t\tLayout: grid", "\t\tWidth: max-content",
-                "\t\tGrid:", "\t\t\tColumns: auto auto", "\t\t\tGap: 10", items,
-                "\tBox:", "\t\tId: min", "\t\tLayout: grid", "\t\tWidth: min-content",
-                "\t\tGrid:", "\t\t\tColumns: auto auto", "\t\t\tGap: 10", items,
-                "\tBox:", "\t\tId: fr", "\t\tLayout: grid", "\t\tWidth: max-content",
-                "\t\tGrid:", "\t\t\tColumns: 150 1fr",
-                "\t\tBox:", "\t\t\tHeight: 10", "\t\tBox:", "\t\t\tText: aaa");
+                "\tGrid:", "\t\tId: max", "\t\tWidth: max-content", "\t\tColumns: auto auto", "\t\tGap: 10", items,
+                "\tGrid:", "\t\tId: min", "\t\tWidth: min-content", "\t\tColumns: auto auto", "\t\tGap: 10", items,
+                "\tGrid:", "\t\tId: fr", "\t\tWidth: max-content", "\t\tColumns: 150 1fr",
+                "\t\tCell:", "\t\t\tBlock:", "\t\t\t\tHeight: 10",
+                "\t\tCell:", "\t\t\tText: aaa");
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(35, l.rect("min").width(), 1e-9);
         assertEquals(165, l.rect("fr").width(), 1e-9);
@@ -166,12 +161,13 @@ class GridLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                "\tBox:", "\t\tLayout: grid", "\t\tPosition: relative", "\t\tHeight: 50",
-                "\t\tGrid:", "\t\t\tColumns: 100 100",
-                "\t\tBox:", "\t\t\tId: R", "\t\t\tPosition: relative", "\t\t\tOffset: 3 auto auto 4",
-                "\t\tBox:", "\t\t\tId: A", "\t\t\tPosition: absolute", "\t\t\tOffset: auto 0 0 auto",
-                "\t\t\tWidth: 10", "\t\t\tHeight: 10",
-                "\t\tBox:", "\t\t\tId: B");
+                // Un grid posicionado: Relative y, dentro, el Grid con el alto.
+                "\tRelative:",
+                "\t\tGrid:", "\t\t\tHeight: 50", "\t\t\tColumns: 100 100",
+                "\t\t\tCell:", "\t\t\t\tRelative:", "\t\t\t\t\tId: R", "\t\t\t\t\tOffset: 3 auto auto 4",
+                "\t\t\tAbsolute:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tWidth: 10",
+                "\t\t\t\tHeight: 10",
+                "\t\t\tCell:", "\t\t\t\tBlock:", "\t\t\t\t\tId: B");
         assertRect(44, 43, 100, 50, l.rect("R"));
         assertRect(140, 40, 100, 50, l.rect("B"));
         assertRect(545, 80, 10, 10, l.rect("A"));

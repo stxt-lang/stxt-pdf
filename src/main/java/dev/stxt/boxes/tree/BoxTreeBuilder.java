@@ -21,11 +21,13 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Construye el árbol de cajas a partir del documento (módulos 0 y 1, ESPECIFICACION.md §5.1):
- * interpreta los valores, aplica la herencia, crea las cajas anónimas y comprueba las reglas
- * que el template no puede expresar (§6).
+ * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
+ * elemento a una caja con su {@link Style.Layout} y su {@link Style.Position}, pasa las
+ * propiedades de {@code Item} y {@code Cell} al elemento que envuelven, interpreta los valores,
+ * aplica la herencia y comprueba las reglas que el schema no puede expresar (§6).
  *
  * <p>Los errores señalan la línea del nodo culpable: la de la propiedad, no la de su caja.
  * Son errores también las combinaciones que no tendrían efecto o se contradicen: el modelo las
@@ -33,8 +35,9 @@ import java.util.stream.Collectors;
  *
  * <p>Trabaja sobre los nodos de {@code stxt-core}. Los nombres se comparan por su nombre
  * canónico ({@link Node#getCanonicalName()}: minúsculas y los espacios convertidos en guiones,
- * de modo que {@code Min width} es {@code min-width}). No es reentrante: cada llamada a
- * {@link #build} usa su propio estado.</p>
+ * de modo que {@code Min width} es {@code min-width}). Comprueba también los hijos que admite
+ * cada elemento, como el schema, para no interpretar mal un documento que no se ha validado.
+ * No es reentrante: cada llamada a {@link #build} usa su propio estado.</p>
  */
 public final class BoxTreeBuilder {
 
@@ -46,6 +49,31 @@ public final class BoxTreeBuilder {
     private static final Set<Kind> SIZE = EnumSet.of(Kind.LENGTH, Kind.AUTO, Kind.INTRINSIC);
     private static final Set<Kind> LENGTH_OR_AUTO = EnumSet.of(Kind.LENGTH, Kind.AUTO);
     private static final Set<Kind> LENGTH = EnumSet.of(Kind.LENGTH);
+
+    // --- Hijos de cada elemento, como en el schema (§9) -----------------------------------------
+    private static final Set<String> BOX = Set.of("id", "width", "height", "min-width", "max-width",
+            "min-height", "max-height", "aspect-ratio", "margin", "padding", "border", "background", "border-color");
+    private static final Set<String> INHERITED = Set.of("color", "font", "font-weight", "font-style", "font-size",
+            "line-height", "text-align", "text-wrap");
+    private static final Set<String> FRAGMENTATION = Set.of("break-before", "break-after", "break-inside",
+            "decoration", "widows", "orphans");
+    private static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
+    private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
+    /** Elementos de caja. */
+    private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "relative", "absolute", "fixed");
+    /** Elementos en flujo: los que pueden ser un ítem. */
+    private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "relative");
+    private static final Map<String, Set<String>> CHILDREN = Map.of(
+            "block", union(BOX, INHERITED, FRAGMENTATION, Set.of("isolate"), ELEMENTS),
+            "flex", union(BOX, INHERITED, FRAGMENTATION, FLEX, Set.of("item", "absolute", "fixed")),
+            "grid", union(BOX, INHERITED, FRAGMENTATION, GRID, Set.of("cell", "absolute", "fixed")),
+            "text", union(BOX, INHERITED, FRAGMENTATION, Set.of("content")),
+            "relative", union(BOX, INHERITED, FRAGMENTATION, Set.of("isolate", "offset", "layer"), ELEMENTS),
+            "absolute", union(BOX, INHERITED, Set.of("offset", "layer"), ELEMENTS),
+            "fixed", union(BOX, INHERITED, Set.of("offset", "layer"), ELEMENTS),
+            "item", union(Set.of("grow", "shrink", "basis", "cross-axis", "layer"), IN_FLOW),
+            "cell", union(Set.of("horizontal", "vertical", "layer"), IN_FLOW),
+            "document", union(Set.of("media"), Set.copyOf(Style.FONT_PROPERTIES), ELEMENTS));
 
     /** Resultado: el medio y una caja raíz anónima que representa el área útil. */
     public record Result(Media media, Box root) {
@@ -62,6 +90,7 @@ public final class BoxTreeBuilder {
         if (!is(document, "document")) {
             throw error(document, ErrorCode.DOCUMENT_ROOT, "La raíz del documento debe ser Document");
         }
+        checkChildren(document);
         InlineNode mediaNode = child(document, "media")
                 .map(BoxTreeBuilder::inline)
                 .orElseThrow(() -> error(document, ErrorCode.DOCUMENT_STRUCTURE, "Falta el nodo Media"));
@@ -79,9 +108,6 @@ public final class BoxTreeBuilder {
         // El área útil: definida en modo paginado; infinita en continuo.
         definiteHeight.put(root, media.paged());
         buildContent(document, root);
-        if (root.children.isEmpty()) {
-            throw error(document, ErrorCode.DOCUMENT_STRUCTURE, "El documento necesita al menos una Box");
-        }
         return new Result(media, root);
     }
 
@@ -122,68 +148,67 @@ public final class BoxTreeBuilder {
     }
 
     // ------------------------------------------------------------------------------------------
-    // Cajas
+    // Elementos
     // ------------------------------------------------------------------------------------------
 
-    /** Hijos {@code Box} y {@code Text} en orden; crea cajas anónimas si hace falta. */
+    /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Cell} envuelven a la suya. */
     private void buildContent(InlineNode node, Box box) {
-        List<Node> content = node.getChildren().stream()
-                .filter(h -> is(h, "box") || is(h, "text"))
-                .toList();
-        Optional<Node> firstBox = content.stream().filter(h -> is(h, "box")).findFirst();
-        Style.Layout layout = box.style.layout;
-
-        if (layout == Style.Layout.INLINE && firstBox.isPresent()) {
-            throw error(firstBox.get(), ErrorCode.INLINE_WITH_BOXES, "Una caja con Layout: inline solo puede contener "
-                    + "Text (Layout: inline en la línea " + box.style.line("layout") + ")");
-        }
-        boolean textInAnonymous = firstBox.isPresent() || layout == Style.Layout.FLEX || layout == Style.Layout.GRID;
-
-        for (Node h : content) {
-            if (is(h, "box")) {
-                box.addChild(box(inline(h), box));
-                continue;
+        for (Node h : node.getChildren()) {
+            String name = h.getCanonicalName();
+            if (ELEMENTS.contains(name)) {
+                box.addChild(element(inline(h), box, null));
+            } else if (name.equals("item") || name.equals("cell")) {
+                InlineNode wrapper = inline(h);
+                checkChildren(wrapper);
+                List<Node> elements = wrapper.getChildren().stream()
+                        .filter(e -> IN_FLOW.contains(e.getCanonicalName()))
+                        .toList();
+                if (elements.size() != 1) {
+                    throw error(elements.isEmpty() ? wrapper : elements.get(1), ErrorCode.SINGLE_ELEMENT,
+                            "Un " + h.getName() + " contiene exactamente un elemento, y este tiene " + elements.size());
+                }
+                box.addChild(element(inline(elements.get(0)), box, wrapper));
             }
-            if (box.style.font == null) {
-                throw error(h, ErrorCode.TEXT_WITHOUT_FONT,
-                        "El texto necesita Font: declárala en la caja, en una antecesora o en Document");
-            }
-            if (!box.style.isDeclared("font-size")) {
-                throw error(h, ErrorCode.TEXT_WITHOUT_FONT_SIZE,
-                        "El texto necesita Font size: decláralo en la caja, en una antecesora o en Document");
-            }
-            Box target = box;
-            if (textInAnonymous) {
-                // Texto mezclado con cajas, o dentro de flex/grid: caja anónima (módulo 1, §6).
-                Style s = Style.inheriting(box.style);
-                s.layout = Style.Layout.INLINE;
-                target = new Box(null, s, true, h.getLine());
-                box.addChild(target);
-            } else if (layout == Style.Layout.BLOCK) {
-                // Un bloque que solo contiene texto se maqueta con el algoritmo de línea.
-                box.style.layout = Style.Layout.INLINE;
-            }
-            target.text = h.getText();
-            target.textLine = h.getLine();
-            target.textBlock = h instanceof TextNode;
         }
     }
 
-    private Box box(InlineNode n, Box parent) {
+    /** Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Cell}, si es un ítem. */
+    private Box element(InlineNode n, Box parent, InlineNode wrapper) {
+        String kind = n.getCanonicalName();
+        checkChildren(n);
         Style s = Style.inheriting(parent.style);
+        s.layout = switch (kind) {
+            case "flex" -> Style.Layout.FLEX;
+            case "grid" -> Style.Layout.GRID;
+            case "text" -> Style.Layout.INLINE;
+            default -> Style.Layout.BLOCK;
+        };
+        s.position = switch (kind) {
+            case "relative" -> Style.Position.RELATIVE;
+            case "absolute" -> Style.Position.ABSOLUTE;
+            case "fixed" -> Style.Position.FIXED;
+            default -> Style.Position.STATIC;
+        };
+        if (wrapper != null) {
+            item(wrapper, s);
+        }
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            if (!name.equals("box") && !name.equals("text")) {
-                s.declared(name, p.getLine());
+            if (ELEMENTS.contains(name) || name.equals("item") || name.equals("cell") || name.equals("content")) {
+                continue;
             }
+            if (kind.equals("flex") && FLEX.contains(name)) {
+                flex(p, s);
+                continue;
+            }
+            if (kind.equals("grid") && GRID.contains(name)) {
+                grid(p, s);
+                continue;
+            }
+            s.declared(name, p.getLine());
             switch (name) {
-                case "box", "text" -> {
-                    // se procesan en buildContent
-                }
                 case "id" -> id = id(p);
-                case "layout" -> s.layout = enumValue(Style.Layout.class, p);
-                case "position" -> s.position = enumValue(Style.Position.class, p);
                 case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                 case "layer" -> s.layer = integer(p);
                 case "isolate" -> s.isolate = bool(p);
@@ -204,40 +229,71 @@ public final class BoxTreeBuilder {
                 case "line-height" -> s.lineHeight = value(p, LENGTH, false);
                 case "text-align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
                 case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
-                case "flex" -> flex(inline(p), s);
-                case "grid" -> grid(inline(p), s);
-                case "item" -> item(inline(p), s);
                 case "break-before" -> s.breakBefore = enumValue(Style.Break.class, p);
                 case "break-after" -> s.breakAfter = enumValue(Style.Break.class, p);
                 case "break-inside" -> s.avoidBreakInside = breakInside(p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
                 case "decoration" -> s.decoration = enumValue(Style.Decoration.class, p);
-                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida en Box: " + p.getName());
+                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida: " + p.getName());
             }
         }
-        validateBox(n, s, parent);
+        if (kind.equals("flex")) {
+            validateFlex(s);
+        }
+        validateBox(s, parent, wrapper);
 
         Box box = new Box(id, s, false, n.getLine());
         definiteHeight.put(box, definiteHeight(s, parent));
         validateContainer(s, box);
-        buildContent(n, box);
+        if (kind.equals("text")) {
+            text(n, box);
+        } else {
+            buildContent(n, box);
+        }
         return box;
     }
 
-    private void flex(InlineNode n, Style s) {
-        for (Node p : n.getChildren()) {
-            s.declared("flex." + p.getCanonicalName(), p.getLine());
-            switch (p.getCanonicalName()) {
-                case "direction" -> s.flexDirection = enumValue(Style.Direction.class, p);
-                case "wrap" -> s.flexWrap = bool(p);
-                case "gap" -> gap(p, s);
-                case "main-axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, p);
-                case "cross-axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, p);
-                case "lines" -> s.flexLines = enumValue(Style.Distribution.class, p);
-                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida en Flex: " + p.getName());
-            }
+    /** El texto de un {@code Text}: en su valor o en {@code Content}, uno de los dos. */
+    private static void text(InlineNode n, Box box) {
+        Optional<Node> content = child(n, "content");
+        boolean value = !n.getText().isBlank();
+        if (value && content.isPresent()) {
+            throw error(content.get(), ErrorCode.TEXT_CONTENT, "Text tiene el texto en el valor y en Content "
+                    + "(línea " + n.getLine() + "): deja solo uno");
         }
+        if (!value && content.isEmpty()) {
+            throw error(n, ErrorCode.TEXT_CONTENT,
+                    "Text necesita su texto: en el valor (Text: …) o en un bloque Content >>");
+        }
+        Node source = content.orElse(n);
+        if (box.style.font == null) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT,
+                    "El texto necesita Font: declárala en el Text, en un antecesor o en Document");
+        }
+        if (!box.style.isDeclared("font-size")) {
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE,
+                    "El texto necesita Font size: decláralo en el Text, en un antecesor o en Document");
+        }
+        box.text = source.getText();
+        box.textLine = source.getLine();
+        box.textBlock = source instanceof TextNode;
+    }
+
+    /** Propiedades de flex, hijas del elemento {@code Flex}; su línea se guarda con prefijo ({@code flex.gap}). */
+    private static void flex(Node p, Style s) {
+        s.declared("flex." + p.getCanonicalName(), p.getLine());
+        switch (p.getCanonicalName()) {
+            case "direction" -> s.flexDirection = enumValue(Style.Direction.class, p);
+            case "wrap" -> s.flexWrap = bool(p);
+            case "gap" -> gap(p, s);
+            case "main-axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, p);
+            case "cross-axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, p);
+            default -> s.flexLines = enumValue(Style.Distribution.class, p);
+        }
+    }
+
+    private static void validateFlex(Style s) {
         if (s.flexMainAxis == Style.Distribution.STRETCH) {
             throw error(s.line("flex.main-axis"), ErrorCode.VALUE_NOT_ALLOWED,
                     "Main axis no admite 'stretch'; usa Grow en los ítems");
@@ -248,108 +304,94 @@ public final class BoxTreeBuilder {
         }
     }
 
-    private void grid(InlineNode n, Style s) {
-        for (Node p : n.getChildren()) {
-            s.declared("grid." + p.getCanonicalName(), p.getLine());
-            switch (p.getCanonicalName()) {
-                case "columns" -> s.gridColumns = tracks(p);
-                case "rows" -> s.gridRows = tracks(p);
-                case "gap" -> gap(p, s);
-                case "areas" -> {
-                    s.gridAreas = p.getText();
-                    // valida rectángulos y filas de igual longitud
-                    placement(p, () -> GridAreas.parse(p.getText()));
-                }
-                case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
-                case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
-                case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, p);
-                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida en Grid: " + p.getName());
+    /** Propiedades de grid, hijas del elemento {@code Grid}; su línea se guarda con prefijo ({@code grid.rows}). */
+    private static void grid(Node p, Style s) {
+        s.declared("grid." + p.getCanonicalName(), p.getLine());
+        switch (p.getCanonicalName()) {
+            case "columns" -> s.gridColumns = tracks(p);
+            case "rows" -> s.gridRows = tracks(p);
+            case "gap" -> gap(p, s);
+            case "areas" -> {
+                s.gridAreas = p.getText();
+                // valida rectángulos y filas de igual longitud
+                placement(p, () -> GridAreas.parse(p.getText()));
             }
+            case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
+            case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
+            default -> s.gridVertical = enumValue(Style.Alignment.class, p);
         }
     }
 
-    private void item(InlineNode n, Style s) {
-        for (Node p : n.getChildren()) {
-            s.declared("item." + p.getCanonicalName(), p.getLine());
-            switch (p.getCanonicalName()) {
+    /**
+     * Propiedades de {@code Item} o {@code Cell}, que pasan al elemento que envuelven; su línea se
+     * guarda con prefijo ({@code item.grow}), salvo {@code Layer}. El valor de {@code Cell} es la
+     * colocación ({@code item.cell}, con la línea del {@code Cell}).
+     */
+    private static void item(InlineNode w, Style s) {
+        if (w.getCanonicalName().equals("cell") && !w.getText().isBlank()) {
+            s.declared("item.cell", w.getLine());
+            s.itemCell = w.getText().trim();
+        }
+        for (Node p : w.getChildren()) {
+            String name = p.getCanonicalName();
+            if (IN_FLOW.contains(name)) {
+                continue;
+            }
+            if (name.equals("layer")) {
+                s.declared("layer", p.getLine());
+                s.layer = integer(p);
+                continue;
+            }
+            s.declared("item." + name, p.getLine());
+            switch (name) {
                 case "grow" -> s.itemGrow = nonNegative(p);
                 case "shrink" -> s.itemShrink = nonNegative(p);
                 case "basis" -> s.itemBasis = value(p, LENGTH_OR_AUTO, false);
                 case "cross-axis" -> s.itemCrossAxis = enumValue(Style.Alignment.class, p);
-                case "cell" -> s.itemCell = p.getText().trim();
                 case "horizontal" -> s.itemHorizontal = enumValue(Style.Alignment.class, p);
-                case "vertical" -> s.itemVertical = enumValue(Style.Alignment.class, p);
-                default -> throw error(p, ErrorCode.DOCUMENT_STRUCTURE, "Propiedad desconocida en Item: " + p.getName());
+                default -> s.itemVertical = enumValue(Style.Alignment.class, p);
             }
         }
     }
 
     // ------------------------------------------------------------------------------------------
-    // Reglas que el template no puede expresar (§6)
+    // Reglas que el schema no puede expresar (§6)
     // ------------------------------------------------------------------------------------------
 
-    private void validateBox(InlineNode n, Style s, Box parent) {
-        Style.Layout parentLayout = parent.style.layout;
-        boolean inFlow = !s.isOutOfFlow();
-        boolean flexItem = inFlow && parentLayout == Style.Layout.FLEX;
-        boolean gridItem = inFlow && parentLayout == Style.Layout.GRID;
+    /** Los hijos que admite el elemento; con el documento validado, nunca falla. */
+    private static void checkChildren(InlineNode n) {
+        Set<String> allowed = CHILDREN.get(n.getCanonicalName());
+        for (Node c : n.getChildren()) {
+            if (!allowed.contains(c.getCanonicalName())) {
+                throw error(c, ErrorCode.DOCUMENT_STRUCTURE, n.getName() + " no admite " + c.getName());
+            }
+        }
+    }
 
-        child(n, "flex").filter(f -> s.layout != Style.Layout.FLEX).ifPresent(f -> {
-            throw error(f, ErrorCode.CONTAINER_MISMATCH, "Flex solo se aplica con Layout: flex");
-        });
-        child(n, "grid").filter(g -> s.layout != Style.Layout.GRID).ifPresent(g -> {
-            throw error(g, ErrorCode.CONTAINER_MISMATCH, "Grid solo se aplica con Layout: grid");
-        });
-        validateItem(n, s, parent, flexItem, gridItem);
+    private void validateBox(Style s, Box parent, InlineNode wrapper) {
+        Style.Layout parentLayout = parent.style.layout;
+        boolean flexItem = wrapper != null && parentLayout == Style.Layout.FLEX;
+        boolean gridItem = wrapper != null && parentLayout == Style.Layout.GRID;
+
+        if (gridItem && s.itemCell != null) {
+            Map<String, Area> areas = parent.style.gridAreas == null
+                    ? Map.of() : GridAreas.parse(parent.style.gridAreas);
+            placement(s.line("item.cell"), () -> Cell.parse(s.itemCell, areas));
+        }
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
-        if (s.isDeclared("layer") && s.position == Style.Position.STATIC && !flexItem && !gridItem) {
-            throw error(s.line("layer"), ErrorCode.LAYER_WITHOUT_EFFECT, "Layer solo tiene efecto en cajas "
-                    + "posicionadas (Position distinta de static) y en ítems de flex o grid");
-        }
         if (s.isDeclared("aspect-ratio") && !s.width.isAuto() && !s.height.isAuto()) {
             throw error(s.line("aspect-ratio"), ErrorCode.ASPECT_RATIO_CONFLICT,
                     "Aspect ratio no tiene efecto si Width y Height están declarados");
         }
         validateMinMax(s, "width", s.width, "min-width", s.minWidth, "max-width", s.maxWidth);
         validateMinMax(s, "height", s.height, "min-height", s.minHeight, "max-height", s.maxHeight);
-        if (s.isOutOfFlow()) {
-            for (String b : List.of("break-before", "break-after")) {
-                if (s.isDeclared(b) && (b.equals("break-before") ? s.breakBefore : s.breakAfter) == Style.Break.PAGE) {
-                    throw error(s.line(b), ErrorCode.BREAK_NOT_ALLOWED,
-                            "Los cortes forzados solo se aplican a cajas en flujo");
-                }
-            }
-        }
         validatePercentages(s, parent, flexItem, gridItem);
     }
 
-    private static void validateItem(InlineNode n, Style s, Box parent, boolean flexItem, boolean gridItem) {
-        child(n, "item").filter(i -> !flexItem && !gridItem).ifPresent(i -> {
-            throw error(i, ErrorCode.ITEM_MISMATCH,
-                    "Item solo tiene efecto en hijos en flujo de un contenedor flex o grid");
-        });
-        if (flexItem) {
-            for (String p : List.of("cell", "horizontal", "vertical")) {
-                if (s.isDeclared("item." + p)) {
-                    throw error(s.line("item." + p), ErrorCode.ITEM_MISMATCH,
-                            label(p) + " de Item solo tiene efecto en ítems de grid, y el padre es flex");
-                }
-            }
-        }
-        if (gridItem) {
-            for (String p : List.of("grow", "shrink", "basis", "cross-axis")) {
-                if (s.isDeclared("item." + p)) {
-                    throw error(s.line("item." + p), ErrorCode.ITEM_MISMATCH,
-                            label(p) + " de Item solo tiene efecto en ítems de flex, y el padre es grid");
-                }
-            }
-            if (s.itemCell != null) {
-                Map<String, Area> areas = parent.style.gridAreas == null
-                        ? Map.of() : GridAreas.parse(parent.style.gridAreas);
-                placement(s.line("item.cell"), () -> Cell.parse(s.itemCell, areas));
-            }
-        }
+    @SafeVarargs
+    private static Set<String> union(Set<String>... sets) {
+        return Stream.of(sets).flatMap(Set::stream).collect(Collectors.toUnmodifiableSet());
     }
 
     private static void validateOffset(Style s) {
@@ -358,21 +400,18 @@ public final class BoxTreeBuilder {
         }
         int line = s.line("offset");
         Sides<Value> o = s.offset;
-        if (s.position == Style.Position.STATIC) {
-            throw error(line, ErrorCode.OFFSET_ON_STATIC, "Offset no tiene efecto con Position: static");
-        }
         if (s.position == Style.Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Una caja relative no puede desplazarse a la vez "
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
                         + "desde arriba y desde abajo: deja uno de los dos en auto");
             }
             if (!o.left().isAuto() && !o.right().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Una caja relative no puede desplazarse a la vez "
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
                         + "desde la izquierda y desde la derecha: deja uno de los dos en auto");
             }
             return;
         }
-        // absolute y fixed: inicio + tamaño + fin no puede fijar la posición dos veces.
+        // Absolute y Fixed: inicio + tamaño + fin no puede fijar la posición dos veces.
         if (!o.left().isAuto() && !s.width.isAuto() && !o.right().isAuto()
                 && !s.margin.left().isAuto() && !s.margin.right().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
@@ -385,7 +424,7 @@ public final class BoxTreeBuilder {
         }
     }
 
-    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en las absolute, con inicio, tamaño y fin. */
+    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Absolute y Fixed, con inicio, tamaño y fin. */
     private static void validateMargins(Style s, Style.Layout parentLayout, boolean flexItem, boolean gridItem) {
         Sides<Value> m = s.margin;
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
@@ -401,12 +440,12 @@ public final class BoxTreeBuilder {
         if (s.isOutOfFlow()) {
             Sides<Value> o = s.offset;
             if (horizontalAuto && (o.left().isAuto() || s.width.isAuto() || o.right().isAuto())) {
-                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra una "
-                        + "caja " + position(s) + " con izquierda, Width y derecha declarados");
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
+                        + position(s) + " con izquierda, Width y derecha declarados");
             }
             if (verticalAuto && (o.top().isAuto() || s.height.isAuto() || o.bottom().isAuto())) {
-                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra una "
-                        + "caja " + position(s) + " con arriba, Height y abajo declarados");
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
+                        + position(s) + " con arriba, Height y abajo declarados");
             }
             return;
         }
@@ -442,8 +481,8 @@ public final class BoxTreeBuilder {
     /**
      * Porcentajes verticales de la caja: su base debe ser un alto definido (§3.6). La base de
      * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
-     * definido para las absolute y fixed) o el área (los ítems de grid); la de los desplazamientos
-     * de una relative y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
+     * definido para Absolute y Fixed) o el área (los ítems de grid); la de los desplazamientos
+     * de un Relative y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
      */
     private void validatePercentages(Style s, Box parent, boolean flexItem, boolean gridItem) {
         boolean ownBase = s.isOutOfFlow() || gridItem || definiteHeight.get(parent);
@@ -494,7 +533,7 @@ public final class BoxTreeBuilder {
     /**
      * Si el alto de la caja de contenido es definido, sin maquetar: un {@code Height} que se
      * resuelve (puntos, o porcentaje de una base definida), {@code Aspect ratio} con alto
-     * {@code auto}, una absolute o fixed estirada entre arriba y abajo, o un ítem de grid
+     * {@code auto}, un Absolute o un Fixed estirado entre arriba y abajo, o un ítem de grid
      * estirado ({@code Vertical: stretch}) en su área.
      */
     private boolean definiteHeight(Style s, Box parent) {
@@ -789,7 +828,7 @@ public final class BoxTreeBuilder {
         return t;
     }
 
-    /** {@code Font}, {@code Font weight}, {@code Font style} o {@code Font size}, en una caja o en {@code Document}. */
+    /** {@code Font}, {@code Font weight}, {@code Font style} o {@code Font size}, en un elemento o en {@code Document}. */
     private static void font(Node p, Style s) {
         switch (p.getCanonicalName()) {
             case "font" -> s.font = fontFamily(p);
@@ -813,8 +852,9 @@ public final class BoxTreeBuilder {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
+    /** Nombre del elemento posicionado: {@code Absolute} o {@code Fixed}. */
     private static String position(Style s) {
-        return s.position.name().toLowerCase(Locale.ROOT);
+        return s.position == Style.Position.FIXED ? "Fixed" : "Absolute";
     }
 
     // ------------------------------------------------------------------------------------------

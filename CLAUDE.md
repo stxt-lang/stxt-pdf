@@ -16,8 +16,8 @@ infinita, como un navegador) o **paginado** (páginas, como un PDF). Todas las m
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado e hoja de ruta:** [`README.md`](README.md)
-- **Template STXT:** [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
-  (si difiere de la copia del §9 de la especificación, manda el fichero)
+- **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
+  (si difiere del resumen del §9 de la especificación, manda el fichero)
 - **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
 
 ## Comandos
@@ -35,7 +35,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los ocho
+Los algoritmos de layout funcionan en modo continuo y paginado, con salida SVG y PDF; los nueve
 hitos están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
@@ -49,6 +49,7 @@ actualízala.
 | 6 | ~~`BreakToken` en los algoritmos, PDF con PDFBox, métricas reales~~ (hecho; caso 06) | `layout/Slice`, `layout/UnitBreaker`, `fragment/BreakRules`, `paint/PdfCanvas`, `layout/inline/PdfMetrics` |
 | 7 | ~~`{page}`/`{pages}`, `Decoration: clone`, corte en paralelo, Knuth-Plass~~ (hecho; caso 07) | `layout/Slice`, `layout/UnitBreaker`, `layout/inline/PageNumbers`, `layout/inline/LineBreaker` |
 | 8 | ~~Carpeta de recursos, fuentes TTF incrustadas, `Font weight`/`Font style`, línea base real~~ (hecho) | `resources`, `layout/inline/PdfMetrics`, `paint/PdfCanvas` |
+| 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
@@ -67,7 +68,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | Package | Contenido |
 |---|---|
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
-| `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el template y exige una única raíz con el namespace `dev.stxt.boxes` |
+| `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
 | `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker` |
@@ -81,13 +82,20 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - **Nodos de `stxt-core`:** el motor trabaja directamente con `dev.stxt.Node`, `InlineNode`
   (valor inline e hijos) y `TextNode` (bloque `>>`); `getText()` da el contenido en los dos
   casos. Los nombres se comparan por `getCanonicalName()`: minúsculas y los espacios convertidos
-  en guiones (`Min width` → `min-width`). Los errores de sintaxis y del template son
-  `ParseException` de la librería, con código (`INVALID_VALUE`, `TOO_FEW_CHILDREN`…) y línea.
-- **`BoxTreeBuilder`** interpreta valores, aplica la herencia, crea las cajas anónimas (§5.1) y
-  comprueba las reglas del §6 que el template no puede expresar. Los errores son
-  `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo culpable**: la
-  de la propiedad (`Style.line("height")`, `"grid.rows"`…), no la de su caja. La raíz que
-  devuelve es una `Box` anónima que representa el área útil.
+  en guiones (`Min width` → `min-width`). Los errores de sintaxis y del schema son
+  `ParseException` de la librería, con código (`INVALID_VALUE`, `CHILD_NOT_DECLARED`…) y línea.
+- **Elementos y schema (§2, §9):** el documento se escribe con elementos que solo admiten sus
+  propiedades: `Block`, `Flex`, `Grid`, `Text` (texto en el valor o en `Content >>`),
+  `Relative`, `Absolute` y `Fixed` (bloques posicionados), y los envoltorios `Item` (hijo de
+  `Flex`) y `Cell` (hijo de `Grid`, con la colocación en el valor), que contienen exactamente un
+  elemento. El schema no tiene grupos de hijos: cada elemento enumera todas sus propiedades, y
+  `BoxTreeBuilder.CHILDREN` repite esa tabla para no interpretar mal un documento sin validar.
+- **`BoxTreeBuilder`** traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen
+  del elemento; las propiedades de `Item` y `Cell` pasan al elemento que envuelven), interpreta
+  valores, aplica la herencia y comprueba las reglas del §6 que el schema no puede expresar. Los
+  errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
+  culpable**: la de la propiedad (`Style.line("height")`, `"grid.rows"`, `"item.grow"`…), no la
+  de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
@@ -97,7 +105,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   sin comentarlo con el usuario.
 - **Enums de `Style`:** los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas, así que **cada constante debe llamarse igual que su valor en el documento**
-  (`Position.ABSOLUTE` ↔ `absolute`). Si cambias un valor, cambia la constante y el template.
+  (`TextAlign.JUSTIFY` ↔ `justify`). Si cambias un valor, cambia la constante y el schema.
+  `Layout` y `Position` no son valores del documento: los fija el elemento.
 - **`Engine`** despacha por `Style.layout` al algoritmo correspondiente. **Toda llamada
   recursiva de layout o de tamaños intrínsecos pasa por `engine.layout(...)` /
   `engine.intrinsic(...)`**, nunca directamente al algoritmo, para usar la `LayoutCache` (sin
@@ -171,7 +180,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 ## Convenciones
 
 - **Nombres STXT:** en inglés y, cuando existe, con el término de CSS (`Margin`, `Padding`,
-  `Position: static`, `Break inside: avoid`, `Decoration: slice`). Las propiedades de varias
+  `Absolute`, `Break inside: avoid`, `Decoration: slice`). Las propiedades de varias
   palabras van separadas por espacio y con mayúscula solo la primera (`Font size`,
   `Min width`, `Border color`). En el código se comparan en forma canónica (minúsculas).
 - **Términos del dominio en castellano en la documentación** ("área útil", "caja de borde",
@@ -195,8 +204,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 - JUnit 5. Un test por pieza pura, en el mismo package que la clase (`src/test/java/dev/stxt/boxes/...`).
   Los nombres de los métodos de test están en inglés y en camelCase (`autoMarginsCenter`).
-- Los documentos de test se leen con `DocumentReader`, que valida contra el template: un test
-  de una regla del §6 comprueba así que el template no la detecta antes. Los volcados de §7
+- Los documentos de test se leen con `DocumentReader`, que valida contra el schema: un test
+  de una regla del §6 comprueba así que el schema no la detecta antes. Los volcados de §7
   (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
   `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
   (añade ahí los documentos nuevos) y que los ejemplos de la especificación se maquetan sin
@@ -218,7 +227,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (área útil de
   515 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
   declara en `Document` `Font: IBM Plex Sans` y `Font size: 10`; los demás documentos de test
-  con texto deben declararlos ellos mismos. Un test de layout no puede desbordar: los
+  con texto deben declararlos ellos mismos. Los documentos se escriben como listas de líneas
+  con tabuladores (`"\tFlex:", "\t\tItem:", "\t\t\tText: a", "\t\t\t\tId: A"`); el `Id` de un
+  ítem va en su elemento, no en el `Item` o el `Cell`. Un test de layout no puede desbordar: los
   desbordamientos van al catálogo de errores. Con
   `FixedMetrics`, cada carácter mide 5 pt con `Font size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
@@ -230,8 +241,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 1. La especificación manda: si el código y `ESPECIFICACION.md` discrepan, aclara cuál es el
    correcto antes de cambiar ninguno de los dos.
-2. Si añades o cambias una propiedad, actualiza a la vez: el template `.stxt`, la copia del §9,
-   la tabla del §4, `Style` y `BoxTreeBuilder` (y la validación del §6 si aplica).
+2. Si añades o cambias una propiedad, actualiza a la vez: el schema `.stxt` (en cada elemento
+   que la admite), el resumen del §9, la tabla del §4, `Style` y `BoxTreeBuilder` (su tabla
+   `CHILDREN` y, si aplica, la validación del §6).
    Una regla de validación nueva lleva su `ErrorCode`, su fila en la tabla del §6 y un caso en
    el catálogo de errores.
 3. Al completar un hito, actualiza la tabla de estado y la hoja de ruta del README y elimina sus

@@ -3,8 +3,8 @@ package dev.stxt.boxes.tree;
 /**
  * Código estable de cada error del modelo (ESPECIFICACION.md §6). Los tests comparan el código y
  * la línea, no el texto del mensaje, que puede mejorar sin romperlos. Los errores de sintaxis
- * STXT y del template llevan los códigos de la librería {@code stxt-core}
- * ({@code INVALID_VALUE}, {@code TOO_FEW_CHILDREN}…).
+ * STXT y del schema llevan los códigos de la librería {@code stxt-core}
+ * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}…).
  */
 public enum ErrorCode {
 
@@ -12,8 +12,9 @@ public enum ErrorCode {
     /** El documento no tiene un único nodo raíz {@code Document} con el namespace del modelo. */
     DOCUMENT_ROOT,
     /**
-     * Estructura que el template ya rechaza (falta {@code Media}, un nodo con hijos escrito como
-     * bloque {@code >>}…): solo aparece si se construye el árbol sin validar el documento.
+     * Estructura que el schema ya rechaza (falta {@code Media}, un hijo que el elemento no admite,
+     * un nodo con hijos escrito como bloque {@code >>}…): solo aparece si se construye el árbol
+     * sin validar el documento.
      */
     DOCUMENT_STRUCTURE,
     /** Con {@code Type: paged}, {@code Media} necesita {@code Height}. */
@@ -34,28 +35,22 @@ public enum ErrorCode {
     // --- Estructura ---------------------------------------------------------------------------
     /** Dos cajas con el mismo {@code Id}. */
     DUPLICATE_ID,
-    /** Una caja {@code Layout: inline} con cajas hijas. */
-    INLINE_WITH_BOXES,
+    /** Un {@code Item} o un {@code Cell} que no contiene exactamente un elemento. */
+    SINGLE_ELEMENT,
+    /** Un {@code Text} sin texto, o con texto en el valor y en {@code Content}. */
+    TEXT_CONTENT,
     /** Texto sin {@code Font}, propia o heredada. */
     TEXT_WITHOUT_FONT,
     /** Texto sin {@code Font size}, propio o heredado. */
     TEXT_WITHOUT_FONT_SIZE,
 
     // --- Combinaciones sin efecto o contradictorias --------------------------------------------
-    /** {@code Flex} sin {@code Layout: flex} o {@code Grid} sin {@code Layout: grid}. */
-    CONTAINER_MISMATCH,
-    /** {@code Item} o una de sus propiedades en una caja que no es ítem del contenedor que la usa. */
-    ITEM_MISMATCH,
-    /** {@code Offset} con {@code Position: static}. */
-    OFFSET_ON_STATIC,
-    /** Una {@code relative} con arriba y abajo, o con izquierda y derecha. */
+    /** Un {@code Relative} con arriba y abajo, o con izquierda y derecha. */
     OFFSET_CONFLICT,
-    /** Una {@code absolute} o {@code fixed} con inicio, tamaño y fin declarados y sin márgenes {@code auto}. */
+    /** Un {@code Absolute} o un {@code Fixed} con inicio, tamaño y fin declarados y sin márgenes {@code auto}. */
     OVERCONSTRAINED,
     /** Un margen {@code auto} donde no centra ni absorbe nada. */
     MARGIN_AUTO_WITHOUT_EFFECT,
-    /** {@code Layer} en una caja que no crea contexto de apilamiento. */
-    LAYER_WITHOUT_EFFECT,
     /** {@code Lines} sin {@code Wrap: true}. */
     LINES_WITHOUT_WRAP,
     /** {@code Grow} en un contenedor {@code column} sin alto definido. */
@@ -66,15 +61,13 @@ public enum ErrorCode {
     MIN_MAX_CONFLICT,
     /** Un porcentaje vertical cuya base no es un alto definido. */
     INDEFINITE_PERCENTAGE,
-    /** Un corte forzado ({@code Break before/after: page}) en una caja fuera de flujo. */
-    BREAK_NOT_ALLOWED,
-    /** {@code Areas} no rectangulares o {@code Cell} no válida. */
+    /** {@code Areas} no rectangulares o un valor de {@code Cell} no válido. */
     GRID_PLACEMENT,
 
     // --- Desbordamientos (al maquetar) -------------------------------------------------------
     /** Una palabra más ancha que su línea. */
     TEXT_OVERFLOW,
-    /** Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o una absolute que sale de la página. */
+    /** Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o un {@code Absolute} que sale de la página. */
     BOX_OVERFLOW,
     /** Algo del flujo más alto que la página que no se puede partir. */
     PAGE_OVERFLOW,

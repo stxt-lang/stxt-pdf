@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Catálogo de errores ({@code src/test/resources/errors/errors.stxt}): cada {@code Case} es un
  * documento que debe fallar con un código en una línea (ESPECIFICACION.md §6). Se lee, se
  * construye el árbol y se maqueta con las métricas reales, de modo que entran todos los errores:
- * los de sintaxis y template ({@code stxt-core}), los del modelo y los de las fuentes.
+ * los de sintaxis y schema ({@code stxt-core}), los del modelo y los de las fuentes.
  */
 class ErrorCatalogTest {
 
@@ -38,7 +38,8 @@ class ErrorCatalogTest {
 
     /** Códigos sin caso en el catálogo, con el motivo. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
-            // El template detecta antes la falta de Media, Type, Width o Box, y los bloques >> mal puestos.
+            // El schema detecta antes la falta de Media, Type o Width, los hijos que un elemento no
+            // admite y los bloques >> mal puestos.
             ErrorCode.DOCUMENT_STRUCTURE,
             // Las fuentes del repositorio tienen las cuatro variantes: lo prueba PdfMetricsTest.
             ErrorCode.FONT_VARIANT_MISSING);

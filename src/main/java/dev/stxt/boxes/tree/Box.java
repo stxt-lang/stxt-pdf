@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Una caja del árbol de cajas (módulo 0). No coincide 1:1 con los nodos {@code Box} del
- * documento: puede ser anónima y algunas cajas contienen texto directamente.
+ * Una caja del árbol de cajas (ESPECIFICACION.md §5.1): cada elemento de caja del documento
+ * ({@code Block}, {@code Flex}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
+ * {@code Text} guarda su texto directamente.
  *
  * <p>La geometría que guarda es la del <em>último layout</em> y es relativa a la caja de
  * contenido del padre (módulo 2). El resultado definitivo, por páginas, son los
@@ -125,7 +126,7 @@ public final class Box {
         if (id != null) {
             return id;
         }
-        return anonymous ? "(anónima)" : "(caja línea " + line + ")";
+        return anonymous ? "(área útil)" : "(caja línea " + line + ")";
     }
 
     @Override

@@ -6,11 +6,37 @@ infinita, como un navegador) o en **modo paginado** (páginas, como un PDF). Tod
 están en **puntos tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
-- **Template STXT del modelo:** [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
+- **Schema STXT del modelo** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
 - **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
 
 Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
 inglés; la documentación y los comentarios, en castellano.
+
+Un documento se escribe con elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`,
+`Fixed`) que solo admiten las propiedades que tienen sentido en ellos; los hijos de un `Flex` van
+en `Item` y los de un `Grid`, en `Cell`:
+
+```
+Document (dev.stxt.boxes):
+	Media:
+		Type: paged
+		Width: 595
+		Height: 842
+		Margin: 40
+	Font: IBM Plex Sans
+	Font size: 10
+	Text: Un título
+		Font size: 20
+	Grid:
+		Columns: 150 1fr
+		Gap: 20
+		Cell:
+			Text: Columna lateral
+		Cell:
+			Text:
+				Content >>
+					Texto largo, en un bloque.
+```
 
 ## Requisitos y uso
 
@@ -47,13 +73,14 @@ especificación.
 ## Estado
 
 Los algoritmos de layout funcionan en los dos modos, continuo y paginado, con salida SVG de
-depuración y PDF con las fuentes incrustadas. Los ocho hitos de la hoja de ruta están
+depuración y PDF con las fuentes incrustadas. Los nueve hitos de la hoja de ruta están
 terminados.
 
 | Pieza | Estado |
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
-| Árbol de cajas: herencia, cajas anónimas, validaciones | Hecho y probado |
+| Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Cell`, validados con `@stxt.schema` | Hecho y probado |
+| Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
@@ -63,7 +90,7 @@ terminados.
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
-| Lectura con la librería oficial `stxt-core` 1.0.3 y validación del template | Hecho y probado |
+| Lectura con la librería oficial `stxt-core` 1.0.3 y validación del schema | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Text align: justify`) | Hecho y probado |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
@@ -94,13 +121,14 @@ en `target/pdf/`.
 6. ~~**Paginación y PDF.** `BreakToken` en los algoritmos, reglas de corte, `PdfCanvas` y métricas reales (caso 06).~~ Hecho.
 7. ~~**Pulido.** `{page}`/`{pages}`, `Decoration: clone`, fragmentación en paralelo, Knuth-Plass (caso 07).~~ Hecho.
 8. ~~**Fuentes.** Carpeta de recursos, fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real.~~ Hecho.
+9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
 
 ## Estructura
 
 ```
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics
-  stxt/         DocumentReader (stxt-core + template)
+  stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ResourceException
   tree/         Box, Style, FontFace, Media, BoxTreeBuilder, InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
@@ -118,6 +146,6 @@ src/main/java/dev/stxt/boxes/
 
 ## Validación en el editor
 
-La extensión de STXT para VS Code carga los templates de la carpeta `.stxt/` del espacio de
-trabajo. Copia allí el template para tener validación y ayuda contextual mientras escribes
+La extensión de STXT para VS Code carga los schemas de la carpeta `.stxt/` del espacio de
+trabajo. Copia allí el schema para tener validación y ayuda contextual mientras escribes
 documentos.

@@ -16,38 +16,37 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Fixed:
 		Id: footer
-		Position: fixed
 		Offset: auto 0 -15 0
 		Height: 10
 		Font size: 8
 		Text align: right
 		Text: {page}/{pages}
-	Box:
+	Block:
 		Id: card
 		Border: 2
 		Padding: 3
 		Border color: #A32D2D
 		Decoration: clone
-		Box:
+		Block:
 			Id: c1
 			Height: 200
 			Background: #F1EFE8
-	Box:
+	Grid:
 		Id: grid
-		Layout: grid
-		Grid:
-			Columns: 1fr 1fr
-			Gap: 10
-		Box:
-			Id: g1
-			Height: 200
-			Background: #E1F0E8
-		Box:
-			Id: g2
-			Height: 50
-			Background: #E1E8F0
-	Box:
+		Columns: 1fr 1fr
+		Gap: 10
+		Cell:
+			Block:
+				Id: g1
+				Height: 200
+				Background: #E1F0E8
+		Cell:
+			Block:
+				Id: g2
+				Height: 50
+				Background: #E1E8F0
+	Block:
 		Id: end
 		Height: 10

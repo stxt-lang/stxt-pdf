@@ -6,39 +6,34 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Box:
+	Fixed:
 		Id: header
-		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
-	Box:
+	Fixed:
 		Id: footer
-		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
-	Box:
+	Block:
 		Id: title
 		Height: 24
 		Margin: 0 0 16 0
-	Box:
+	Relative:
 		Id: card
-		Position: relative
 		Offset: 5 auto auto 10
 		Height: 100
 		Padding: 10
 		Border: 2
-		Box:
+		Absolute:
 			Id: badge
-			Position: absolute
 			Offset: 0 0 auto auto
 			Width: 50
 			Height: 20
-	Box:
+	Block:
 		Id: next
 		Height: 30
-	Box:
+	Absolute:
 		Id: stamp
-		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80
 		Height: 30

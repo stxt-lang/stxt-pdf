@@ -17,7 +17,7 @@ cada caja. Describe el modelo completo; el estado de implementación de cada par
 6. [Validación](#6-validación)
 7. [Formato de resultados](#7-formato-de-resultados)
 8. [Diferencias con CSS](#8-diferencias-con-css)
-9. [Template completo](#9-template-completo)
+9. [Schema](#9-schema)
 10. [Ejemplo completo](#10-ejemplo-completo)
 11. [Glosario](#11-glosario)
 
@@ -27,8 +27,9 @@ cada caja. Describe el modelo completo; el estado de implementación de cada par
 
 ### 1.1 Qué es
 
-Un documento describe un **árbol de cajas**. El motor calcula la posición y el tamaño de cada
-caja dentro de un **medio**, que puede ser:
+Un documento describe un **árbol de cajas** con elementos (`Block`, `Flex`, `Grid`, `Text`…)
+que solo admiten las propiedades que tienen sentido en ellos. El motor calcula la posición y el
+tamaño de cada caja dentro de un **medio**, que puede ser:
 
 - **Continuo** (`continuous`): una franja de ancho fijo y altura infinita, como la ventana de un
   navegador.
@@ -44,8 +45,8 @@ resumen en el [§8](#8-diferencias-con-css).
 - **Todas las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada). Un A4 mide
   595 × 842 pt.
 - **Los nombres de nodos y valores están en inglés** y siguen, cuando existe, el término de CSS:
-  `Margin`, `Padding`, `Position: absolute`, `Break inside: avoid`. El contenido de `Text`
-  puede estar en cualquier idioma.
+  `Margin`, `Padding`, `Absolute`, `Break inside: avoid`. El texto de un `Text` puede estar en
+  cualquier idioma.
 - **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*; *vertical* es el de
   `Height` y *arriba/abajo*. La escritura es siempre horizontal, de izquierda a derecha.
 - **Las cuatro cajas de una caja** (ver [§5.2](#52-modelo-de-caja-y-containing-block)): de
@@ -57,10 +58,33 @@ resumen en el [§8](#8-diferencias-con-css).
 
 ## 2. Estructura de un documento
 
-Un documento tiene un nodo raíz `Document` con exactamente un `Media`, las propiedades de la
-fuente que heredan todas las cajas (`Font`, `Font weight`, `Font style` y `Font size`,
-opcionales) y una o más `Box`.
-Cada `Box` puede contener propiedades, `Text` y otras `Box`.
+Un documento se escribe con **elementos**, y cada elemento solo admite los hijos que tienen
+sentido en él: sus propiedades y, si es un contenedor, otros elementos. El schema
+([§9](#9-schema)) define qué admite cada uno, así que una propiedad fuera de su sitio (`Columns`
+en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta al leer, también
+en el editor.
+
+El nodo raíz es `Document`, con exactamente un `Media`, las propiedades de la fuente que heredan
+todas las cajas (`Font`, `Font weight`, `Font style` y `Font size`, opcionales) y los elementos
+de primer nivel.
+
+| Elemento | Qué es | Contiene |
+|---|---|---|
+| `Block` | Caja que apila sus hijos en vertical ([§5.3](#53-flujo-de-bloque)) | Elementos |
+| `Flex` | Contenedor flex ([§5.7](#57-flex)) | `Item`, `Absolute` y `Fixed` |
+| `Grid` | Contenedor grid ([§5.8](#58-grid)) | `Cell`, `Absolute` y `Fixed` |
+| `Text` | Caja de texto ([§5.4](#54-texto)) | Su texto: en el valor o en `Content` |
+| `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
+| `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
+| `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
+| `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
+| `Cell` | Celda de un `Grid`: dónde va y cómo se alinea | Exactamente un elemento en flujo |
+
+**Elementos** son los siete primeros, y **elementos en flujo**, los cinco que pueden ser un ítem
+(`Block`, `Flex`, `Grid`, `Text` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca
+son ítems. Los siete son **elementos de caja**: cada uno es una caja del árbol
+([§5.1](#51-árbol-de-cajas)). `Item` y `Cell` no son cajas: envuelven al elemento que hace de
+ítem y le añaden lo que solo tiene sentido dentro de su contenedor.
 
 ```
 Document (dev.stxt.boxes):
@@ -71,25 +95,32 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Text: Un título
 		Id: title
 		Font size: 20
-		Text: Un título
-	Box:
+	Flex:
 		Id: body
-		Padding: 10
-		Box:
-			Text >>
-				Primer párrafo.
+		Gap: 10
+		Item:
+			Grow: 1
+			Text:
+				Content >>
+					Primer párrafo.
 
-				Segundo párrafo.
+					Segundo párrafo.
+		Item:
+			Block:
+				Width: 100
+				Background: #F1EFE8
 ```
 
-**El orden importa.** STXT conserva el orden de los nodos, y el motor coloca los `Text` y las
-`Box` hijas en el orden en que aparecen. El orden de las propiedades no importa.
+**El orden importa.** STXT conserva el orden de los nodos, y el motor coloca los elementos en el
+orden en que aparecen. El orden de las propiedades, y su posición respecto a los elementos, no
+importan.
 
-**Texto inline o en bloque.** `Text: una línea` y `Text >>` con un bloque indentado son
-equivalentes; el bloque permite párrafos y texto largo sin caracteres de escape.
+**Texto en línea o en bloque.** `Text: una línea` lleva el texto en su valor; para párrafos y
+texto largo, el texto va en un bloque `Content >>`, sin caracteres de escape. Un `Text` tiene uno
+de los dos, nunca ambos.
 
 ---
 
@@ -172,10 +203,10 @@ vertical es un error si su base no es un **alto definido**, que se decide al lee
 - el área útil en modo paginado (en continuo, su alto es infinito);
 - el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
 - el de una caja con `Height: auto` y `Aspect ratio`;
-- el de una caja `absolute` o `fixed` con `Height: auto` estirada entre arriba y abajo;
+- el de un `Absolute` o un `Fixed` con `Height: auto` estirado entre arriba y abajo;
 - el de un ítem de grid con `Height: auto` estirado en su área (`Vertical: stretch`).
 
-La base de `Height`, `Min height` y `Max height` de una caja `absolute` o `fixed` es su
+La base de `Height`, `Min height` y `Max height` de un `Absolute` o un `Fixed` es su
 containing block, y la de un ítem de grid, su área: las dos son siempre definidas. Un ítem de
 flex estirado **no** da un alto definido a sus hijos: si lo necesitan, declara su `Height`.
 
@@ -184,7 +215,9 @@ flex estirado **no** da un alto definido a sus hijos: si lo necesitan, declara s
 ## 4. Referencia de propiedades
 
 En las tablas, **Hereda** indica si una caja que no declara la propiedad toma el valor de su
-padre. No hay cascada: solo se heredan las propiedades marcadas.
+padre. No hay cascada: solo se heredan las propiedades marcadas. Las propiedades son hijas
+directas de su elemento; qué elementos admite cada una lo dice cada apartado, y el detalle
+completo, el schema ([§9](#9-schema)).
 
 ### 4.1 `Media`
 
@@ -197,19 +230,18 @@ Obligatorio, exactamente uno, hijo de `Document`.
 | `Height` | número > 0 | — | Obligatorio en modo paginado. En modo continuo es un error: la franja no tiene alto. |
 | `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo puntos. |
 
-El **área útil** es el rectángulo del medio menos sus márgenes. Es el containing block de las
-cajas de primer nivel y de las cajas `fixed`. En modo continuo su altura es infinita.
+El **área útil** es el rectángulo del medio menos sus márgenes. Es el containing block de los
+elementos de primer nivel y de los `Fixed`. En modo continuo su altura es infinita.
 
-### 4.2 Tipo y posición de la caja
+### 4.2 Identificación y aislamiento
 
-| Propiedad | Valores | Por defecto | Hereda | Notas |
-|---|---|---|---|---|
-| `Id` | texto | — | No | Identificador para volcados, tests y mensajes. Único en el documento. |
-| `Layout` | `block`, `inline`, `flex`, `grid` | `block` | No | Cómo coloca la caja a **sus hijos**. Ver [§5.1](#51-árbol-de-cajas). |
-| `Position` | `static`, `relative`, `absolute`, `fixed` | `static` | No | Cómo participa la caja en el flujo de su padre. Ver [§5.5](#55-posicionamiento). |
-| `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | No | Arriba, derecha, abajo, izquierda. No se admite con `Position: static`. Ver [§5.5](#55-posicionamiento). |
-| `Layer` | entero | `auto` | No | Orden de apilamiento. Solo en cajas posicionadas y en ítems de flex o grid. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
-| `Isolate` | booleano | `false` | No | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con el padre. |
+| Propiedad | Valores | Por defecto | Hereda | Elementos | Notas |
+|---|---|---|---|---|---|
+| `Id` | texto | — | No | De caja | Identificador para volcados, tests y mensajes. Único en el documento. |
+| `Isolate` | booleano | `false` | No | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
+
+Las propiedades de dimensiones, modelo de caja, pintado y texto (§4.3 a §4.6) se admiten en todos
+los elementos de caja.
 
 ### 4.3 Dimensiones
 
@@ -225,7 +257,7 @@ cajas de primer nivel y de las cajas `fixed`. En modo continuo su altura es infi
 
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
-| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | No | Puede ser negativo. `auto` solo centra: en flujo de bloque, en horizontal y con `Width` o `Max width`; en las `absolute` y `fixed`, con inicio, tamaño y fin declarados. En cualquier otro caso es un error. |
+| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | No | Puede ser negativo. `auto` solo centra: en flujo de bloque, en horizontal y con `Width` o `Max width`; en `Absolute` y `Fixed`, con inicio, tamaño y fin declarados. En cualquier otro caso es un error. |
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | No | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | No | Grosor. El color va en `Border color`. |
 
@@ -243,22 +275,26 @@ No afectan al layout.
 
 `Font`, `Font weight`, `Font style` y `Font size` se pueden declarar también en `Document`, y
 entonces las heredan todas las cajas. Es lo habitual para la fuente del documento: cada caja
-declara solo lo que cambia.
+declara solo lo que cambia. Las propiedades heredables se pueden declarar en cualquier
+elemento de caja, también en los contenedores, para que las hereden sus descendientes.
 
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
-| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en toda caja con texto, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
+| `Font` | nombre de familia | — | **Sí** | **Obligatoria** en todo `Text`, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
 | `Font weight` | `normal`, `bold` | `normal` | **Sí** | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
 | `Font style` | `normal`, `italic` | `normal` | **Sí** | |
-| `Font size` | número > 0 | — | **Sí** | Cuerpo de la fuente. **Obligatorio** en toda caja con texto, propio o heredado (también de `Document`). |
+| `Font size` | número > 0 | — | **Sí** | Cuerpo de la fuente. **Obligatorio** en todo `Text`, propio o heredado (también de `Document`). |
 | `Line height` | número o % | `120%` | **Sí** | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
 | `Text align` | `left`, `right`, `center`, `justify` | `left` | **Sí** | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Text wrap` | `auto`, `pretty` | `auto` | **Sí** | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
-| `Text` | texto inline o bloque | — | — | Contenido. Ver [§5.4](#54-texto). |
+
+**El texto de un `Text`** va en su valor (`Text: Un título`) o en un hijo `Content >>` con un
+bloque indentado, que admite párrafos. Uno de los dos es obligatorio, y no se admiten ambos. Ver
+[§5.4](#54-texto).
 
 ### 4.7 `Flex`
 
-Solo con `Layout: flex`.
+Propiedades del elemento `Flex`. Sus hijos en flujo son `Item` ([§4.9](#49-item-y-cell)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -271,7 +307,7 @@ Solo con `Layout: flex`.
 
 ### 4.8 `Grid`
 
-Solo con `Layout: grid`.
+Propiedades del elemento `Grid`. Sus hijos en flujo son `Cell` ([§4.9](#49-item-y-cell)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -286,24 +322,54 @@ Solo con `Layout: grid`.
 Pistas válidas: número, %, `auto`, `min-content`, `max-content`, fracción, `minmax(a, b)` y
 `repeat(n, patrón)`.
 
-### 4.9 `Item`
+### 4.9 `Item` y `Cell`
 
-Solo en hijos **en flujo** de un contenedor `flex` o `grid`. Una propiedad del otro tipo de
-contenedor (`Grow` en un ítem de grid, `Cell` en uno de flex) es un error.
+Cada hijo en flujo de un `Flex` es un `Item`, y cada uno de un `Grid`, un `Cell`. Contienen
+**exactamente un elemento en flujo** (`Block`, `Flex`, `Grid`, `Text` o `Relative`), que es el
+ítem: sus dimensiones, márgenes y demás propiedades van en ese elemento. El `Item` o el `Cell`
+solo añade cómo participa en su contenedor. No son cajas y no admiten `Id`.
 
-| Propiedad | Valores | Por defecto | Aplica a | Notas |
+```
+Flex:
+	Item:
+		Grow: 1
+		Text: Crece
+	Item:
+		Block:
+			Width: 100
+Grid:
+	Columns: 1fr 1fr
+	Cell: 1 2
+		Text: Fila 1, columna 2
+	Cell:
+		Text: Se coloca automáticamente
+```
+
+| Elemento | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|---|
-| `Grow` | número ≥ 0 | `0` | flex | Parte del espacio sobrante que recibe. |
-| `Shrink` | número ≥ 0 | `1` | flex | Parte del déficit que cede, ponderada por `Basis`. |
-| `Basis` | número, %, `auto` | `auto` | flex | Tamaño de partida en el eje principal. |
-| `Cross axis` | como en `Flex` | el del contenedor | flex | Sobrescribe la alineación del contenedor. |
-| `Cell` | área o `fila columna [filas columnas]` | `auto` | grid | Contando desde 1. Ver [§5.8](#58-grid). |
-| `Horizontal` | como en `Grid` | el del contenedor | grid | |
-| `Vertical` | como en `Grid` | el del contenedor | grid | |
+| `Item` | `Grow` | número ≥ 0 | `0` | Parte del espacio sobrante que recibe. |
+| `Item` | `Shrink` | número ≥ 0 | `1` | Parte del déficit que cede, ponderada por `Basis`. |
+| `Item` | `Basis` | número, %, `auto` | `auto` | Tamaño de partida en el eje principal. |
+| `Item` | `Cross axis` | como en `Flex` | el del contenedor | Sobrescribe la alineación del contenedor. |
+| `Cell` | *(valor)* | área o `fila columna [filas columnas]` | `auto` | Dónde va, contando desde 1. Sin valor, se coloca automáticamente. Ver [§5.8](#58-grid). |
+| `Cell` | `Horizontal` | como en `Grid` | el del contenedor | |
+| `Cell` | `Vertical` | como en `Grid` | el del contenedor | |
+| Los dos | `Layer` | entero | `auto` | Orden de apilamiento del ítem. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
 
-### 4.10 Fragmentación
+### 4.10 Posicionamiento
 
-Solo tienen efecto en modo paginado.
+Propiedades de `Relative`, `Absolute` y `Fixed`, los **elementos posicionados**. Son bloques
+(apilan sus hijos como un `Block`); para posicionar un flex o un grid, se pone dentro.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
+| `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Cell`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
+
+### 4.11 Fragmentación
+
+Solo tienen efecto en modo paginado. Se admiten en todos los elementos de caja salvo `Absolute` y
+`Fixed`, que no se parten ni están en el flujo de la página.
 
 | Propiedad | Valores | Por defecto | Hereda | Notas |
 |---|---|---|---|---|
@@ -320,21 +386,23 @@ Solo tienen efecto en modo paginado.
 
 ### 5.1 Árbol de cajas
 
-El motor transforma el documento en un **árbol de cajas**, que no coincide exactamente con los
-nodos `Box`:
+El motor transforma el documento en un **árbol de cajas**: cada elemento de caja es una caja, y
+el área útil es la raíz. `Item` y `Cell` no crean caja: sus propiedades pasan al elemento que
+envuelven. No hay cajas anónimas, porque el texto va siempre en su propio `Text`.
 
-- **Cajas anónimas.** Si una caja mezcla `Text` con `Box` hijas, cada `Text` se envuelve en
-  una caja anónima con `Layout: inline`, en su posición dentro del orden. Lo mismo ocurre con un
-  `Text` dentro de un contenedor `flex` o `grid`, que se convierte en un ítem anónimo. Las
-  cajas anónimas heredan las propiedades heredables y no tienen margen, borde ni relleno.
-- **Bloque con solo texto.** Una caja `block` cuyo único contenido es `Text` se maqueta con el
-  algoritmo de línea, sin caja anónima.
-- **`Layout: inline`** solo puede contener `Text`.
+Cada elemento determina **cómo coloca a sus hijos**:
 
-**`Layout` frente a participación.** `Layout` indica cómo coloca la caja a sus hijos. Cómo
-participa la caja en su padre lo decide el padre: dentro de un `block` es un bloque apilado;
-dentro de un `flex` o un `grid`, un ítem. La excepción son las cajas `absolute` y `fixed`, que
-salen del flujo del padre.
+| Elemento | Coloca a sus hijos en flujo |
+|---|---|
+| `Document` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed` | En flujo de bloque ([§5.3](#53-flujo-de-bloque)) |
+| `Flex` | En líneas flex ([§5.7](#57-flex)) |
+| `Grid` | En una rejilla ([§5.8](#58-grid)) |
+| `Text` | No tiene hijos: reparte su texto en líneas ([§5.4](#54-texto)) |
+
+**Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque
+es un bloque apilado; dentro de un `Flex` o un `Grid` (envuelta en `Item` o `Cell`), un ítem.
+La excepción son `Absolute` y `Fixed`, que salen del flujo del padre. Un `Relative` participa
+como cualquier caja en flujo y después se desplaza.
 
 ### 5.2 Modelo de caja y containing block
 
@@ -347,15 +415,16 @@ caja con `Width: 200` ocupa 200 pt antes de los márgenes, con el relleno y el b
 El **containing block** de una caja es el rectángulo de referencia para porcentajes, `auto` y
 `Offset`:
 
-| `Position` de la caja | Containing block |
+| Caja | Containing block |
 |---|---|
-| `static`, `relative` | caja de **contenido** del padre |
-| `absolute` | caja de **relleno** del ancestro más cercano con `Position` distinta de `static`; si no hay ninguno, el área útil |
-| `fixed` | área útil del medio (de cada página, en modo paginado) |
+| En flujo (también `Relative`) | caja de **contenido** del padre |
+| `Absolute` | caja de **relleno** del elemento posicionado (`Relative`, `Absolute` o `Fixed`) más cercano entre sus ancestros; si no hay ninguno, el área útil |
+| `Fixed` | área útil del medio (de cada página, en modo paginado) |
 
 ### 5.3 Flujo de bloque
 
-Con `Layout: block`, los hijos en flujo se apilan en vertical:
+En un `Block` (y en el área útil, `Relative`, `Absolute` y `Fixed`), los hijos en flujo se
+apilan en vertical:
 
 1. **Ancho.** Con `Width: auto`, la caja ocupa el ancho del containing block menos sus márgenes
    horizontales. Con ancho conocido y los dos márgenes horizontales `auto`, el sobrante se
@@ -378,13 +447,13 @@ borde. **El ancho se propaga de padres a hijos; la altura, de hijos a padres.**
 El resultado de colapsar varios márgenes es **el mayor positivo más el más negativo**:
 `20` y `30` dan 30; `20` y `−5` dan 15; `−10` y `−4` dan −10.
 
-**Contextos de formato de bloque.** Aíslan el colapso de márgenes. Los crean: el área útil, las
-cajas `absolute` y `fixed`, los ítems de flex y grid, y las cajas con `Isolate: true`. Los
-márgenes de los ítems de flex y grid nunca colapsan.
+**Contextos de formato de bloque.** Aíslan el colapso de márgenes. Los crean: el área útil,
+`Absolute` y `Fixed`, los ítems de flex y grid, y los `Block` y `Relative` con `Isolate: true`.
+Los márgenes de los ítems de flex y grid nunca colapsan.
 
 ### 5.4 Texto
 
-El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de contenido:
+El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenido:
 
 - **Espacios.** Las secuencias de espacios y los saltos de línea simples equivalen a un espacio.
   Una **línea en blanco** separa párrafos y fuerza un salto.
@@ -412,14 +481,18 @@ El texto de una caja `inline` se reparte en **líneas** del ancho de su caja de 
 
 ### 5.5 Posicionamiento
 
-**`relative`.** La caja se coloca como si fuera `static` y después se desplaza visualmente según
-`Offset`. Su hueco original se conserva y sus hermanos no se mueven. Declarar a la vez
-arriba y abajo, o izquierda y derecha, es un error: deja uno de los dos en `auto`. Una caja
-`relative` sin desplazamiento sirve como containing block de sus descendientes `absolute`.
-Los porcentajes del `Offset` se resuelven contra el ancho o el alto del containing block; uno
-vertical necesita que el alto del containing block sea definido ([§3.6](#36-bases-de-los-porcentajes)).
+Los tres elementos posicionados son bloques: apilan a sus hijos en flujo de bloque. Para
+posicionar un flex o un grid, se pone dentro de uno de ellos.
 
-**`absolute`.** La caja sale del flujo: no ocupa espacio ni contribuye a la altura `auto` de su
+**`Relative`.** La caja se coloca como cualquier caja en flujo y después se desplaza visualmente
+según `Offset`. Su hueco original se conserva y sus hermanos no se mueven. Declarar a la vez
+arriba y abajo, o izquierda y derecha, es un error: deja uno de los dos en `auto`. Un
+`Relative` sin `Offset` no se desplaza y sirve como containing block de sus descendientes
+`Absolute`. Los porcentajes del `Offset` se resuelven contra el ancho o el alto del containing
+block; uno vertical necesita que el alto del containing block sea definido
+([§3.6](#36-bases-de-los-porcentajes)).
+
+**`Absolute`.** La caja sale del flujo: no ocupa espacio ni contribuye a la altura `auto` de su
 padre. En cada eje se cumple:
 
 ```
@@ -445,19 +518,19 @@ Un margen `auto` solo tiene sentido cuando inicio, tamaño y fin están declarad
 caja o, si solo es `auto` uno de los dos, absorbe el sobrante); en los demás casos es un error.
 El **tamaño automático** es
 el ajuste al contenido (`fit-content`) en horizontal y la altura del contenido en vertical. La
-**posición estática** es donde habría quedado la caja si fuera `static`:
+**posición estática** es donde habría quedado la caja si estuviera en flujo:
 
 - en flujo de bloque, el cursor vertical más los márgenes colapsados de las cajas anteriores,
   sin colapsar con el margen superior de la propia caja, que se suma después según la ecuación;
 - dentro de un contenedor flex o grid, la esquina superior izquierda de su caja de contenido.
 
-**`fixed`.** Como `absolute`, pero su containing block es el área útil. En modo paginado **se
+**`Fixed`.** Como `Absolute`, pero su containing block es el área útil. En modo paginado **se
 pinta en todas las páginas** (cabeceras, pies, marcas de agua). En modo continuo no hay ventana,
-y se comporta como `absolute` respecto al área útil del documento. Las cajas `fixed` no reservan
-espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlas en el margen de
-la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si una caja `fixed`
-depende de su posición estática (desplazamientos `auto`), se toma la de la primera página en la
-que aparece y se repite igual en todas.
+y se comporta como un `Absolute` respecto al área útil del documento. Los `Fixed` no reservan
+espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de
+la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de
+su posición estática (desplazamientos `auto`), se toma la de la primera página en la que
+aparece y se repite igual en todas.
 
 **Orden de cálculo.** Las cajas posicionadas fuera de flujo se resuelven cuando su containing
 block ya conoce su tamaño, después del layout en flujo. En modo continuo, cuando el containing
@@ -465,9 +538,9 @@ block es el área útil, su alto es el del flujo del documento (el área útil n
 
 ### 5.6 Apilamiento y orden de pintado
 
-El pintado se organiza en **contextos de apilamiento**. Crean uno: el área útil, las cajas
-`fixed`, las cajas posicionadas (`Position` distinta de `static`) con `Layer` declarada y los
-ítems de flex o grid con `Layer` declarada.
+El pintado se organiza en **contextos de apilamiento**. Crean uno: el área útil, los `Fixed`,
+los `Relative` y `Absolute` con `Layer` declarada y los ítems de flex o grid con `Layer`
+declarada en su `Item` o su `Cell`.
 
 Dentro de cada contexto, el orden de pintado de abajo arriba es:
 
@@ -477,16 +550,16 @@ Dentro de cada contexto, el orden de pintado de abajo arriba es:
 4. Cajas posicionadas sin `Layer` o con `Layer: 0`, en orden del árbol.
 5. Contextos hijos con `Layer` positiva, de menor a mayor.
 
-A igual `Layer`, se pinta en orden del árbol. El orden del árbol es el del documento: una caja
-`absolute` se pinta en su sitio entre sus hermanas aunque su containing block esté más arriba.
+A igual `Layer`, se pinta en orden del árbol. El orden del árbol es el del documento: un
+`Absolute` se pinta en su sitio entre sus hermanos aunque su containing block esté más arriba.
 **`Layer` solo compara dentro del mismo contexto:**
 el contenido de un contexto se pinta como un bloque al nivel de ese contexto, aunque sus hijos
 tengan `Layer` mayores.
 
 ### 5.7 Flex
 
-Con `Layout: flex`, los ítems se colocan en el **eje principal** (`Direction`) y se alinean en
-el **eje cruzado**.
+En un `Flex`, los ítems (el elemento de cada `Item`) se colocan en el **eje principal**
+(`Direction`) y se alinean en el **eje cruzado**.
 
 **Algoritmo:**
 
@@ -547,22 +620,23 @@ Un sobrante negativo después de encoger significa que los ítems no caben: es u
 
 ### 5.8 Grid
 
-Con `Layout: grid`, el motor resuelve primero **dónde** va cada ítem y después **cuánto** mide
-cada pista.
+En un `Grid`, cuyos ítems son el elemento de cada `Cell`, el motor resuelve primero **dónde** va
+cada ítem y después **cuánto** mide cada pista.
 
 **Colocación:**
 
 1. Se construye la rejilla explícita con `Columns`, `Rows` y `Areas`. Cada nombre de `Areas`
    debe formar un rectángulo y todas las filas deben tener el mismo número de celdas.
-2. Se colocan los ítems con `Cell` explícita (fila y columna, o nombre de área).
+2. Se colocan los ítems cuyo `Cell` tiene fila y columna, o nombre de área.
 3. Se colocan los demás en orden del árbol con un **cursor** que recorre la rejilla por filas
    (o por columnas, con `Flow: column`). Cada ítem va al primer hueco donde quepa. El cursor
    solo avanza, de modo que pueden quedar huecos atrás.
 4. Si un ítem cae fuera de la rejilla declarada, se crean pistas implícitas `auto`.
 
-**Sintaxis de `Cell`:** un nombre de área (`Cell: side`) o `fila columna [filas columnas]`
+**Valor de `Cell`:** un nombre de área (`Cell: side`) o `fila columna [filas columnas]`
 contando desde 1, donde fila y columna pueden ser `auto`: `Cell: 1 1 1 2` ocupa la fila 1 y
 las columnas 1 y 2; `Cell: auto auto 1 2` se coloca automáticamente ocupando dos columnas.
+`Cell:` sin valor equivale a `Cell: auto auto`.
 
 **Dimensionado de pistas.** Cada pista tiene una función mínima y una máxima: `150` es fija en
 ambas; `auto` equivale a `minmax(min-content, max-content)`; `1fr` equivale a
@@ -604,18 +678,18 @@ al dimensionar las filas, todavía sin área, cuentan como `auto`.
 
 **Tamaños intrínsecos** (anchos de la caja de margen):
 
-| `Layout` | min-content | max-content |
+| Elemento | min-content | max-content |
 |---|---|---|
-| `inline` | palabra más ancha | párrafo más largo en una línea |
-| `block` | máximo del min-content de los hijos | máximo del max-content de los hijos |
-| `flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
-| `flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
-| `flex` en `column` | máximo de los ítems | máximo de los ítems |
-| `grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
+| `Text` | palabra más ancha | párrafo más largo en una línea |
+| `Block`, `Relative`, `Absolute`, `Fixed` | máximo del min-content de los hijos | máximo del max-content de los hijos |
+| `Flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
+| `Flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
+| `Flex` en `column` | máximo de los ítems | máximo de los ítems |
+| `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
 
 Una caja con `Width` fijo tiene ese valor como min-content y max-content (el mínimo
-automático de un ítem flex mira en cambio su contenido, [§5.7](#57-flex)). Las cajas `absolute`
-y `fixed` no aportan nada a sus ancestros. En flex se usan los tamaños intrínsecos de cada ítem
+automático de un ítem flex mira en cambio su contenido, [§5.7](#57-flex)). `Absolute` y `Fixed`
+no aportan nada a sus ancestros. En flex se usan los tamaños intrínsecos de cada ítem
 tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En grid, el max-content hace que
 las fracciones lleguen al max-content de su contenido.
 
@@ -671,7 +745,7 @@ alta que el área útil, una fila con un ítem que no puede colocar nada) es un 
 ([§5.12](#512-desbordamiento)).
 
 **Cortes forzados.** `Break before: page` y `Break after: page` fuerzan un salto. Solo se
-aplican a cajas en flujo. El `Break before: page` del primer hijo de un bloque y el
+aplican a cajas en flujo: `Absolute` y `Fixed` no los admiten. El `Break before: page` del primer hijo de un bloque y el
 `Break after: page` del último se propagan al bloque. Un corte forzado al principio de una
 página se ignora (no deja páginas en blanco), igual que el `Break after: page` de la última
 caja del documento.
@@ -713,17 +787,18 @@ Al elegir el
 corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un contenedor `column`
 con `Wrap` no se parte.
 
-**Posicionadas.** Una caja `absolute` se coloca en la página donde cae su posición y no se
-parte. Si su containing block está partido, se resuelve contra el fragmento de esa página: su
-alto es el de ese fragmento, no el total. Una caja `fixed` se repite en todas las páginas.
+**Posicionadas.** Un `Absolute` se coloca en la página donde cae su posición y no se parte. Si
+su containing block está partido, se resuelve contra el fragmento de esa página: su alto es el
+de ese fragmento, no el total. Un `Fixed` se repite en todas las páginas. Un `Relative` se
+parte como cualquier bloque.
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
 ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores reales.
 Si el total de páginas tiene más cifras (100 páginas o más), antes se vuelve a paginar
 reservando tantas cifras como tenga el total, y así hasta que basten.
 Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas conservan los
-saltos y se vuelven a medir y alinear. Como las cajas `fixed` no ocupan espacio, el flujo
-principal no cambia.
+saltos y se vuelven a medir y alinear. Como los `Fixed` no ocupan espacio, el flujo principal
+no cambia.
 
 ### 5.11 Recursos y fuentes
 
@@ -784,11 +859,11 @@ un error con la primera de estas situaciones:
   `Max height` (`BOX_OVERFLOW`), en la línea de esa propiedad;
 - en modo paginado, **algo del flujo que no cabe en el área útil de una página y no se puede
   partir** (`PAGE_OVERFLOW`), en la línea de su `Height` o su `Line height` si los declara;
-- **una caja `absolute` o `fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
+- **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página.
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro,
-se nombra lo de dentro. Las cajas `relative` se comprueban en su sitio, sin el desplazamiento de
+se nombra lo de dentro. Los `Relative` se comprueban en su sitio, sin el desplazamiento de
 `Offset`, y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino
 decisiones del autor. Tampoco cuentan los márgenes verticales, que colapsan.
 
@@ -803,17 +878,19 @@ el resultado del layout es predecible: lo que se lee en el documento es lo que s
 - **Cada error tiene un código estable** y un mensaje que dice qué falla y cómo arreglarlo. Los
   mensajes pueden mejorar; los códigos no cambian.
 - **La línea es la del nodo culpable:** la de la propiedad, no la de su caja; la del carácter
-  dentro de un bloque `Text >>`; la de la `Font` declarada en una antecesora, si la familia no
+  dentro de un bloque `Content >>`; la de la `Font` declarada en una antecesora, si la familia no
   existe. Si el problema es la combinación de dos propiedades, el mensaje nombra la línea de la
   otra.
 - **Se para en el primer error.**
 
 La validación se hace en cuatro niveles:
 
-1. **Sintaxis STXT y template** ([§9](#9-template-completo)): estructura, cardinalidades, tipos
-   `ENUM`, `INTEGER`, `BOOLEAN` y `TEXT`. La realiza la librería STXT con sus propios códigos
-   (`INVALID_VALUE`, `TOO_FEW_CHILDREN`, `BLOCK_FORM_NOT_ALLOWED`…).
-2. **Modelo:** las reglas que el template no puede expresar, al construir el árbol de cajas.
+1. **Sintaxis STXT y schema** ([§9](#9-schema)): qué hijos admite cada elemento,
+   cardinalidades, valores vacíos donde no se admiten, bloques `>>` y tipos `ENUM`, `INTEGER` y
+   `BOOLEAN`. La realiza la librería STXT con sus propios códigos (`CHILD_NOT_DECLARED`,
+   `TOO_MANY_CHILDREN`, `INVALID_VALUE`…). Es donde se detecta una propiedad fuera de su
+   elemento: `Offset` en un `Block`, `Grow` en un `Cell`, `Columns` en un `Flex`.
+2. **Modelo:** las reglas que el schema no puede expresar, al construir el árbol de cajas.
 3. **Fuentes** ([§5.11](#511-recursos-y-fuentes)): con las métricas reales (la salida PDF),
    antes de maquetar, porque necesitan la carpeta de fuentes.
 4. **Desbordamientos** ([§5.12](#512-desbordamiento)): sobre el resultado, después de maquetar
@@ -821,7 +898,7 @@ La validación se hace en cuatro niveles:
 
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
-| `DOCUMENT_ROOT` | Un único nodo raíz `Document` con el namespace `dev.stxt.boxes` | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
+| `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_HEIGHT_REQUIRED` | Con `Type: paged`, `Media` necesita `Height` | `Con Type: paged, Media necesita Height` |
 | `MEDIA_HEIGHT_CONTINUOUS` | Con `Type: continuous`, `Media` no admite `Height` | `Height del medio no tiene efecto con Type: continuous…` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
@@ -829,30 +906,26 @@ La validación se hace en cuatro niveles:
 | `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Font size` > 0 | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
-| `INLINE_WITH_BOXES` | `Layout: inline` solo contiene `Text` | `Una caja con Layout: inline solo puede contener Text…` |
+| `SINGLE_ELEMENT` | `Item` y `Cell` contienen exactamente un elemento | `Un Cell contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
+| `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
 | `TEXT_WITHOUT_FONT` | El texto necesita `Font`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en la caja, en una antecesora o en Document` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Font size`, propio o heredado (también de `Document`) | `El texto necesita Font size: decláralo en la caja, en una antecesora o en Document` |
-| `CONTAINER_MISMATCH` | `Flex` solo con `Layout: flex`; `Grid` solo con `Layout: grid` | `Flex solo se aplica con Layout: flex` |
-| `ITEM_MISMATCH` | `Item` solo en hijos en flujo de flex o grid, y con las propiedades de ese contenedor | `Grow de Item solo tiene efecto en ítems de flex, y el padre es grid` |
-| `OFFSET_ON_STATIC` | `Offset` no se admite con `Position: static` | `Offset no tiene efecto con Position: static` |
-| `OFFSET_CONFLICT` | Una `relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Una caja relative no puede desplazarse a la vez desde arriba y desde abajo…` |
-| `OVERCONSTRAINED` | Una `absolute` o `fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
+| `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
+| `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([§4.4](#44-modelo-de-caja)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
-| `LAYER_WITHOUT_EFFECT` | `Layer` solo en cajas posicionadas e ítems de flex o grid | `Layer solo tiene efecto en cajas posicionadas…` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([§5.9](#59-dimensionado)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
-| `BREAK_NOT_ALLOWED` | Cortes forzados solo en cajas en flujo | `Los cortes forzados solo se aplican a cajas en flujo` |
-| `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; `Cell` válida y con áreas existentes | `Área desconocida en Cell: foot` |
+| `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Cell` válido y con áreas existentes | `Área desconocida en Cell: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Font weight` y `Font style` (línea del texto) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
-| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y las `absolute` y `fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto, y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
-| `DOCUMENT_STRUCTURE` | Lo que el template ya rechaza (falta `Media`, un bloque `>>` mal puesto…), si se construye el árbol sin validar el documento | `Falta el nodo Media` |
+| `DOCUMENT_STRUCTURE` | Lo que el schema ya rechaza (falta `Media`, un hijo que el elemento no admite, un bloque `>>` mal puesto…), si se construye el árbol sin validar el documento | `Falta el nodo Media` |
 
 Las propiedades de fragmentación (`Break before`, `Widows`…) no son errores en modo continuo:
 un mismo documento debe poder maquetarse en los dos modos.
@@ -880,8 +953,8 @@ Result:
 ```
 
 Por defecto solo se vuelcan las cajas con `Id`; las descendientes con `Id` se anidan dentro.
-Una caja `absolute` se anida dentro de su containing block, detrás de sus hijos en flujo, y no
-dentro de su padre.
+Un `Absolute` se anida dentro de su containing block, detrás de sus hijos en flujo, y no dentro
+de su padre.
 Las cajas sin `Id` pueden incluirse para depurar.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`
@@ -893,10 +966,13 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 
 | Tema | CSS | Este modelo |
 |---|---|---|
-| Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT; cada caja declara sus propiedades |
+| Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT de elementos; cada uno declara sus propiedades y solo admite las que tienen sentido en él |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
+| Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
 | Herencia | Muchas propiedades | Solo texto (`Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap`) y `Widows`/`Orphans` |
-| `display` | Combina tipo exterior e interior | `Layout` (interior); el exterior lo decide el padre. No hay `inline-block`. |
+| `display` | Combina tipo exterior e interior | El elemento (`Block`, `Flex`, `Grid`, `Text`) fija el interior; el exterior lo decide el padre. No hay `inline-block`. |
+| `position` | Propiedad de cualquier caja | Elementos `Relative`, `Absolute` y `Fixed`, que son bloques: un flex o grid posicionado va dentro de uno de ellos |
+| Propiedades de ítem (`flex-grow`, `grid-area`…) | En el propio ítem, con efecto solo si el padre es flex o grid | En el envoltorio `Item` o `Cell`, que solo existe dentro de su contenedor |
 | `box-sizing` | `content-box` por defecto; configurable | No existe: `Width` y `Height` miden siempre la caja de borde |
 | Unidades | px, em, rem, vw… | pt, %, fr |
 | `line-height` sin unidad | Multiplicador | **Un número son puntos**; el relativo se escribe con % |
@@ -920,9 +996,9 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `absolute` sobre-restringida | Se ignora `right` (o `bottom`) | Error |
 | Porcentaje de un alto indefinido | Se comporta como `auto` | Error ([§3.6](#36-bases-de-los-porcentajes)) |
 | Un mínimo mayor que el máximo | Gana el mínimo | Error si se comparan al leer; si no, gana el mínimo |
-| `z-index` sin contexto de apilamiento | Se ignora | `Layer` es un error |
+| `z-index` sin contexto de apilamiento | Se ignora | `Layer` solo existe en los elementos posicionados, `Item` y `Cell` |
 | `id` repetido | Se tolera | Error |
-| Posición estática de una `absolute` en flex o grid | Como si fuera el único ítem, con la alineación del contenedor | Esquina de la caja de contenido del contenedor |
+| Posición estática de un `Absolute` en flex o grid | Como si fuera el único ítem, con la alineación del contenedor | Esquina de la caja de contenido del contenedor |
 | Pista `fit-content` en grid | Función `fit-content(límite)`: como `auto`, sin pasar del límite | Error: se usa `auto` |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
@@ -930,88 +1006,52 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 
 ---
 
-## 9. Template completo
+## 9. Schema
 
-Fichero: [`src/main/resources/stxt/dev.stxt.boxes.stxt`](../src/main/resources/stxt/dev.stxt.boxes.stxt).
-Esta copia es informativa y omite la sección `Description`; si difieren, manda el fichero.
+Fichero: [`src/main/resources/stxt/dev.stxt.boxes.stxt`](../src/main/resources/stxt/dev.stxt.boxes.stxt),
+un schema `@stxt.schema` con el namespace `dev.stxt.boxes`. Define cada nodo una sola vez, con
+su tipo, su descripción y los hijos que admite (cada propiedad, como mucho una vez). Un
+elemento solo puede tener los hijos que declara su definición, así que el schema es lo que
+garantiza que cada propiedad está en un elemento donde tiene efecto.
 
-```
-Template (@stxt.template): dev.stxt.boxes
-	Structure >>
-		Document (dev.stxt.boxes):
-			Media: (1)
-				Type: (1) ENUM [continuous, paged]
-				Width: (1)
-				Height: (?)
-				Margin: (?)
-			Font: (?)
-			Font weight: (?) ENUM [normal, bold]
-			Font style: (?) ENUM [normal, italic]
-			Font size: (?)
-			Box: (+)
-				Id: (?)
-				Layout: (?) ENUM [block, inline, flex, grid]
-				Position: (?) ENUM [static, relative, absolute, fixed]
-				Offset: (?)
-				Layer: (?) INTEGER
-				Isolate: (?) BOOLEAN
-				Width: (?) @Width
-				Height: (?) @Height
-				Min width: (?)
-				Max width: (?)
-				Min height: (?)
-				Max height: (?)
-				Aspect ratio: (?)
-				Margin: (?) @Margin
-				Padding: (?)
-				Border: (?)
-				Background: (?)
-				Color: (?)
-				Border color: (?)
-				Font: (?) @Font
-				Font weight: (?) @Font weight
-				Font style: (?) @Font style
-				Font size: (?) @Font size
-				Line height: (?)
-				Text align: (?) ENUM [left, right, center, justify]
-				Text wrap: (?) ENUM [auto, pretty]
-				Flex: (?)
-					Direction: (?) ENUM [row, column]
-					Wrap: (?) BOOLEAN
-					Gap: (?)
-					Main axis: (?) ENUM [start, end, center, between, around, evenly]
-					Cross axis: (?) ENUM [start, end, center, stretch]
-					Lines: (?) ENUM [start, end, center, between, around, stretch]
-				Grid: (?)
-					Columns: (?)
-					Rows: (?)
-					Gap: (?) @Gap
-					Areas: (?) TEXT
-					Flow: (?) ENUM [row, column]
-					Horizontal: (?) ENUM [start, end, center, stretch]
-					Vertical: (?) ENUM [start, end, center, stretch]
-				Item: (?)
-					Grow: (?)
-					Shrink: (?)
-					Basis: (?)
-					Cross axis: (?) @Cross axis
-					Cell: (?)
-					Horizontal: (?) @Horizontal
-					Vertical: (?) @Vertical
-				Break before: (?) ENUM [auto, page, avoid]
-				Break after: (?) ENUM [auto, page, avoid]
-				Break inside: (?) ENUM [auto, avoid]
-				Widows: (?) INTEGER
-				Orphans: (?) INTEGER
-				Decoration: (?) ENUM [slice, clone]
-				Text: (?) TEXT
-				Box: (*) @Box
-```
+El schema no tiene grupos de hijos reutilizables: cada elemento enumera todos los suyos. Este
+resumen los agrupa; si difiere del fichero, manda el fichero.
 
-Las propiedades que se repiten en varios sitios (`Width`, `Height`, `Margin`, `Gap`,
-`Cross axis`, `Horizontal`, `Vertical`, `Box`) se definen una vez y se reutilizan con `@`,
-como exige STXT para los nodos locales. Por eso `Width` de `Media` y `Width` de `Box` son el
-mismo nodo con distinta cardinalidad.
+| Grupo | Propiedades |
+|---|---|
+| **Caja** | `Id`, `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Background`, `Border color` |
+| **Texto** (se heredan) | `Color`, `Font`, `Font weight`, `Font style`, `Font size`, `Line height`, `Text align`, `Text wrap` |
+| **Fragmentación** | `Break before`, `Break after`, `Break inside`, `Decoration`, `Widows`, `Orphans` |
+| **Elementos** | `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed` |
+| **Elementos en flujo** | `Block`, `Flex`, `Grid`, `Text`, `Relative` |
+
+| Nodo | Tipo | Hijos |
+|---|---|---|
+| `Document` | `GROUP` | `Media` (exactamente uno); `Font`, `Font weight`, `Font style`, `Font size`; elementos |
+| `Media` | `GROUP` | `Type` y `Width` (obligatorios), `Height`, `Margin` |
+| `Block` | `GROUP` | caja, texto, fragmentación, `Isolate`; elementos |
+| `Flex` | `GROUP` | caja, texto, fragmentación, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
+| `Grid` | `GROUP` | caja, texto, fragmentación, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
+| `Text` | `INLINE` | caja, texto, fragmentación, `Content` |
+| `Relative` | `GROUP` | caja, texto, fragmentación, `Isolate`, `Offset`, `Layer`; elementos |
+| `Absolute`, `Fixed` | `GROUP` | caja, texto, `Offset`, `Layer`; elementos |
+| `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; elementos en flujo (como mucho uno de cada) |
+| `Cell` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; elementos en flujo (como mucho uno de cada) |
+
+Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
+bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows` y `Orphans`, `INTEGER`; las de valores
+cerrados, `ENUM` con los valores del §4; el resto, `INLINE` sin hijos, y su forma la comprueba el
+motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
+
+Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
+que `Item` y `Cell` tengan exactamente un elemento (el schema solo limita cada tipo a uno), que
+un `Text` tenga su texto en un sitio y solo uno, y que la raíz sea `Document` (en un schema
+cualquier nodo puede ser raíz).
+
+Un mismo nombre es el mismo nodo en todo el namespace: el `Width` de `Media` y el de un `Block`
+comparten definición, y solo cambia la cardinalidad que fija cada padre. Por eso `Cross axis`,
+`Horizontal`, `Vertical` y `Gap` tienen los mismos valores en el contenedor y en `Item` o
+`Cell`.
 
 ---
 
@@ -1028,63 +1068,59 @@ Document (dev.stxt.boxes):
 		Margin: 40
 	Font: IBM Plex Sans
 	Font size: 10
-	Box:
+	Fixed:
 		Id: header
-		Position: fixed
 		Offset: -30 0 auto 0
 		Height: 20
 		Font size: 8
 		Color: #5F5E5A
 		Text: Informe trimestral
-	Box:
+	Fixed:
 		Id: footer
-		Position: fixed
 		Offset: auto 0 -30 0
 		Height: 20
 		Font size: 8
-		Text align: right
 		Text: Página {page} de {pages}
-	Box:
+			Text align: right
+	Text: Resultados del trimestre
 		Id: title
 		Font weight: bold
 		Font size: 20
 		Line height: 24
 		Margin: 0 0 16 0
 		Break after: avoid
-		Text: Resultados del trimestre
-	Box:
+	Grid:
 		Id: body
-		Layout: grid
-		Grid:
-			Columns: 150 1fr
-			Gap: 20
-		Box:
-			Id: side
-			Background: #F1EFE8
-			Padding: 10
-			Break inside: avoid
-			Text >>
-				Resumen de las cifras clave
-				del trimestre.
-		Box:
-			Id: main
-			Text align: justify
-			Text >>
-				Primer párrafo del informe. Los saltos de línea simples
-				dentro del bloque equivalen a espacios.
+		Columns: 150 1fr
+		Gap: 20
+		Cell:
+			Text:
+				Id: side
+				Background: #F1EFE8
+				Padding: 10
+				Break inside: avoid
+				Content >>
+					Resumen de las cifras clave
+					del trimestre.
+		Cell:
+			Text:
+				Id: main
+				Text align: justify
+				Content >>
+					Primer párrafo del informe. Los saltos de línea simples
+					dentro del bloque equivalen a espacios.
 
-				Una línea en blanco empieza un párrafo nuevo.
-	Box:
+					Una línea en blanco empieza un párrafo nuevo.
+	Absolute:
 		Id: stamp
-		Position: absolute
 		Offset: 0 0 auto auto
 		Width: 80
 		Height: 30
 		Border: 1
 		Border color: #A32D2D
-		Text align: center
 		Layer: 1
 		Text: BORRADOR
+			Text align: center
 ```
 
 **Cómo se maqueta:**
@@ -1092,21 +1128,23 @@ Document (dev.stxt.boxes):
 - **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
 - **Fuentes:** `Document` declara `Font` y `Font size`, que heredan todas las cajas. El título
-  cambia el tamaño y va en negrita.
-- **`header`** (`fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
+  cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
+  sus `Text`.
+- **`header`** (`Fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.
-- **`footer`** (`fixed`): abajo −30 con alto 20 da arriba = 762 + 30 − 20 = 772, es decir,
+- **`footer`** (`Fixed`): abajo −30 con alto 20 da arriba = 762 + 30 − 20 = 772, es decir,
   y = 40 + 772 = **812**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
   en cada página.
-- **`title`**: primera caja en flujo, en y = **40**, con una línea de 24 pt. Su margen inferior
-  deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `Break after: avoid`, nunca queda solo al
-  final de una página.
-- **`body`** (grid): 515 − 20 de hueco = 495 para pistas. La columna fija mide **150** y la
-  fracción recibe **345**. `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**.
-  `side` no se parte (`Break inside: avoid`); `main` puede partirse entre páginas
-  respetando viudas y huérfanas (2 por defecto).
-- **`stamp`** (`absolute`): no hay ancestro posicionado, así que su containing block es el área
+- **`title`**: primer elemento en flujo, en y = **40**, con una línea de 24 pt. Su margen
+  inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `Break after: avoid`, nunca queda
+  solo al final de una página.
+- **`body`** (`Grid`): 515 − 20 de hueco = 495 para pistas. La columna fija mide **150** y la
+  fracción recibe **345**. Los dos `Cell` no tienen valor y se colocan automáticamente, uno en
+  cada columna: `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**. `side` no se
+  parte (`Break inside: avoid`); `main` puede partirse entre páginas respetando viudas y
+  huérfanas (2 por defecto).
+- **`stamp`** (`Absolute`): no hay ancestro posicionado, así que su containing block es el área
   útil. Arriba 0 y derecha 0 con ancho 80 la anclan a la esquina superior derecha:
   x = 40 + 515 − 80 = **475**, y = **40**. Con `Layer: 1` se pinta por encima del título.
 
@@ -1118,12 +1156,15 @@ Document (dev.stxt.boxes):
 |---|---|
 | **Área útil** | Rectángulo del medio menos sus márgenes; containing block inicial. |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([§5.11](#511-recursos-y-fuentes)). |
-| **Caja anónima** | Caja que crea el motor para envolver texto mezclado con cajas. |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([§5.2](#52-modelo-de-caja-y-containing-block)). |
 | **Containing block** | Rectángulo de referencia para porcentajes, `auto` y desplazamientos. |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer`. |
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes. |
 | **Definido** | Tamaño conocido sin hacer el layout del contenido. |
+| **Elemento** | `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute` o `Fixed`: un nodo del documento que es una caja ([§2](#2-estructura-de-un-documento)). |
+| **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
+| **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
+| **Envoltorio** | `Item` o `Cell`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
 | **Fragmentainer** | Contenedor de fragmentos: la franja infinita o cada página. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
