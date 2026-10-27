@@ -44,6 +44,16 @@ public enum ErrorCode {
     /** Un {@code Paragraph} con líneas en blanco, que lo partirían en varios párrafos. */
     PARAGRAPH_BLANK_LINE,
 
+    // --- Listas ----------------------------------------------------------------------------------
+    /** Un {@code List item} sin ningún elemento. */
+    LIST_ITEM_EMPTY,
+    /** {@code Start} o {@code Number} en una lista que no numera ({@code disc}, {@code dash}, {@code none}). */
+    LIST_NUMBER_NOT_ALLOWED,
+    /** Un número que la numeración no puede escribir: negativo, 0 en letras o romanos, o más de 3999 en romanos. */
+    LIST_NUMBER_RANGE,
+    /** Un ítem con marcador cuyo contenido no empieza con un texto con el que alinearlo. */
+    LIST_ITEM_WITHOUT_LINE,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,

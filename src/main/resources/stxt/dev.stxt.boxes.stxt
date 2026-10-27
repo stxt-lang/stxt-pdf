@@ -34,6 +34,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 4
 			Child: Heading 5
 			Child: Heading 6
+			Child: List
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -76,6 +77,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 4
 			Child: Heading 5
 			Child: Heading 6
+			Child: List
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -255,6 +257,52 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Text
 				Min: 1
+	Node: List
+		Type: GROUP
+		Description: Lista: sus ítems (List item) apilados en vertical, cada uno con un marcador colgado en la sangría (el Padding izquierdo de la lista).
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Marker
+				Min: 1
+				Max: 1
+			Child: Start
+				Max: 1
+			Child: List item
+				Min: 1
+	Node: List item
+		Type: GROUP
+		Description: Ítem de una List: un bloque con uno o varios elementos, sin encabezados. Su marcador se alinea con su primera línea.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Number
+				Max: 1
+			Child: Block
+			Child: Flex
+			Child: Grid
+			Child: Text
+			Child: Paragraph
+			Child: List
+			Child: Relative
+			Child: Absolute
+			Child: Fixed
 	Node: Relative
 		Type: GROUP
 		Description: Caja de bloque que se desplaza con Offset sin mover a sus hermanos. Es el containing block de sus descendientes Absolute.
@@ -286,6 +334,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 4
 			Child: Heading 5
 			Child: Heading 6
+			Child: List
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -316,6 +365,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 4
 			Child: Heading 5
 			Child: Heading 6
+			Child: List
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -346,6 +396,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 4
 			Child: Heading 5
 			Child: Heading 6
+			Child: List
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -385,6 +436,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Heading 6
 				Max: 1
+			Child: List
+				Max: 1
 			Child: Relative
 				Max: 1
 	Node: Cell
@@ -418,6 +471,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 5
 				Max: 1
 			Child: Heading 6
+				Max: 1
+			Child: List
 				Max: 1
 			Child: Relative
 				Max: 1
@@ -732,3 +787,24 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: end
 			Value: center
 			Value: stretch
+
+	# List
+
+	Node: Marker
+		Type: ENUM
+		Description: Marcador de los ítems: disc (•), dash (–) o none, o una numeración (1., a., A., i., I.).
+		Values:
+			Value: disc
+			Value: dash
+			Value: none
+			Value: decimal
+			Value: lower-alpha
+			Value: upper-alpha
+			Value: lower-roman
+			Value: upper-roman
+	Node: Start
+		Type: INTEGER
+		Description: Número del primer ítem de una lista numerada. Por defecto, 1.
+	Node: Number
+		Type: INTEGER
+		Description: Número de este ítem de una lista numerada; los siguientes continúan desde él.

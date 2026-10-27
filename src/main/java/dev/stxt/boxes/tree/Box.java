@@ -39,6 +39,11 @@ public final class Box {
     public int textLine;
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
     public boolean textBlock;
+    /**
+     * Texto del marcador de un {@code List item}, con el espacio que lo separa del contenido
+     * ({@code "3. "}, {@code "• "}); {@code null} si la caja no lleva marcador.
+     */
+    public String marker;
 
     // Geometría usada (caja de borde), relativa a la caja de contenido del padre; en las cajas
     // fuera de flujo, a la de su containing block. Incluye el desplazamiento de las relative.

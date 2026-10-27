@@ -14,7 +14,8 @@ import java.util.Map;
  * marcadas como heredables (texto y fragmentación), igual que en CSS; ver {@link #inheriting}.</p>
  *
  * <p>Los nombres de las constantes de los enums coinciden con los valores del documento en
- * mayúsculas: así los interpreta {@code BoxTreeBuilder}. {@link Layout} y {@link Position} no son
+ * mayúsculas y con el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}): así los
+ * interpreta {@code BoxTreeBuilder}. {@link Layout} y {@link Position} no son
  * valores del documento: salen del elemento ({@code Text} es {@code INLINE}; {@code Absolute},
  * un {@code BLOCK} {@code ABSOLUTE}).</p>
  */
@@ -46,6 +47,16 @@ public final class Style {
     public enum Break { AUTO, PAGE, AVOID }
 
     public enum Decoration { SLICE, CLONE }
+
+    /** Marcador de los ítems de una lista: un símbolo, ninguno o una numeración. */
+    public enum Marker {
+        DISC, DASH, NONE, DECIMAL, LOWER_ALPHA, UPPER_ALPHA, LOWER_ROMAN, UPPER_ROMAN;
+
+        /** Si numera los ítems: solo entonces tienen efecto {@code Start} y {@code Number}. */
+        public boolean numbered() {
+            return compareTo(DECIMAL) >= 0;
+        }
+    }
 
     // --- Caja --------------------------------------------------------------------------------
     public Layout layout = Layout.BLOCK;
@@ -124,6 +135,14 @@ public final class Style {
     public Alignment itemHorizontal;
     /** {@code null} = la del contenedor. */
     public Alignment itemVertical;
+
+    // --- Lista ---------------------------------------------------------------------------------
+    /** Marcador de los ítems de una {@code List}; {@code null} en el resto de cajas. */
+    public Marker listMarker;
+    /** Número del primer ítem de una {@code List}. */
+    public int listStart = 1;
+    /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
+    public Integer listNumber;
 
     // --- Fragmentación ---------------------------------------------------------------------------
     public Break breakBefore = Break.AUTO;

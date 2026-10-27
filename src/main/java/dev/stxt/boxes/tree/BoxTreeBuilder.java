@@ -67,13 +67,15 @@ public final class BoxTreeBuilder {
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Elementos de caja. */
     private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "relative", "absolute", "fixed");
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "list-item", "relative",
+            "absolute", "fixed");
     /** Los elementos de caja como se escriben, para los mensajes. */
     private static final List<String> ELEMENT_NAMES = List.of("Block", "Flex", "Grid", "Text", "Paragraph",
-            "Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6", "Relative", "Absolute", "Fixed");
+            "Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6", "List", "List item",
+            "Relative", "Absolute", "Fixed");
     /** Elementos en flujo: los que pueden ser un ítem. */
     private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "relative");
+            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "relative");
     /** Elementos con el texto en el valor o en {@code Content}. */
     private static final Set<String> TEXTS = Set.of("text", "paragraph");
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
@@ -105,6 +107,8 @@ public final class BoxTreeBuilder {
     private int headingLevel;
     /** Si se está construyendo el contenido de un {@code Fixed}. */
     private boolean insideFixed;
+    /** Número de cada {@code List item} ya construido: el siguiente continúa desde él. */
+    private Map<Box, Integer> itemNumbers;
 
     /**
      * Construye el árbol de un documento, validado o no.
@@ -117,6 +121,7 @@ public final class BoxTreeBuilder {
         definiteHeight = new HashMap<>();
         headingLevel = 0;
         insideFixed = false;
+        itemNumbers = new HashMap<>();
         // Sin el namespace, el schema no validaría nada.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
@@ -406,6 +411,9 @@ public final class BoxTreeBuilder {
                         case "id" -> id = id(p);
                         case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                         case "layer" -> s.layer = integer(p);
+                        case "marker" -> s.listMarker = enumValue(Style.Marker.class, p);
+                        case "start" -> s.listStart = integer(p);
+                        case "number" -> s.listNumber = integer(p);
                         default -> s.isolate = bool(p);
                     }
                 }
@@ -414,6 +422,10 @@ public final class BoxTreeBuilder {
         if (kind.equals("flex")) {
             validateFlex(s);
         }
+        if (kind.equals("list")) {
+            validateList(s);
+        }
+        Integer number = kind.equals("list-item") ? itemNumber(n, s, parent) : null;
         validateBox(s, parent, wrapper);
         if (level > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
@@ -424,6 +436,14 @@ public final class BoxTreeBuilder {
         Box box = new Box(id, kind, s, false, n.getLine());
         definiteHeight.put(box, definiteHeight(s, parent));
         validateContainer(s, box);
+        if (number != null) {
+            itemNumbers.put(box, number);
+            box.marker = ListMarkers.text(parent.style.listMarker, number);
+            if (n.getChildren().stream().noneMatch(c -> ELEMENTS.contains(c.getCanonicalName()))) {
+                throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
+                        + "un Paragraph, un Text, un Block…");
+            }
+        }
         if (TEXTS.contains(kind)) {
             text(n, box);
         } else {
@@ -432,7 +452,78 @@ public final class BoxTreeBuilder {
             buildContent(n, box);
             insideFixed = outerFixed;
         }
+        if (box.marker != null) {
+            markerLine(box);
+        }
         return box;
+    }
+
+    /**
+     * Número de un {@code List item} (§5.14): el de su {@code Number} o el siguiente al del ítem
+     * anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
+     */
+    private int itemNumber(InlineNode n, Style s, Box list) {
+        Style.Marker marker = list.style.listMarker;
+        if (!marker.numbered()) {
+            if (s.isDeclared("number")) {
+                throw error(s.line("number"), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
+                        + "(línea " + list.line + ") tiene Marker: " + markerName(marker) + ", que no numera sus ítems");
+            }
+            return 0;
+        }
+        List<Box> previous = list.children;
+        int number = s.listNumber != null ? s.listNumber
+                : previous.isEmpty() ? list.style.listStart
+                : itemNumbers.get(previous.get(previous.size() - 1)) + 1;
+        if (!ListMarkers.inRange(marker, number)) {
+            throw error(s.listNumber != null ? s.line("number") : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
+                    "El número " + number + " no se puede escribir con Marker: " + markerName(marker)
+                            + ", que numera " + ListMarkers.range(marker));
+        }
+        return number;
+    }
+
+    /**
+     * Comprueba que el marcador de un {@code List item} tiene una línea con la que alinearse
+     * (§5.14): bajando por el primer hijo en flujo de cada bloque se llega a un texto.
+     */
+    private static void markerLine(Box item) {
+        Box b = item;
+        while (b.style.layout != Style.Layout.INLINE) {
+            String problem = null;
+            if (b.style.layout == Style.Layout.FLEX || b.style.layout == Style.Layout.GRID) {
+                problem = "empieza con un " + label(b.element);
+            } else if (b.inFlowChildren().isEmpty()) {
+                problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + label(b.element) + " vacío";
+            }
+            if (problem != null) {
+                throw error(b.line, ErrorCode.LIST_ITEM_WITHOUT_LINE, "El marcador del List item de la línea "
+                        + item.line + " se alinea con su primera línea, y el ítem " + problem
+                        + ": empieza con un texto, o usa Marker: none");
+            }
+            b = b.inFlowChildren().get(0);
+        }
+    }
+
+    /** {@code Start} solo numera, y en el rango de la numeración. */
+    private static void validateList(Style s) {
+        if (!s.isDeclared("start")) {
+            return;
+        }
+        if (!s.listMarker.numbered()) {
+            throw error(s.line("start"), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Start no tiene efecto con Marker: "
+                    + markerName(s.listMarker) + ", que no numera los ítems");
+        }
+        if (!ListMarkers.inRange(s.listMarker, s.listStart)) {
+            throw error(s.line("start"), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.listStart + " no se puede "
+                    + "escribir con Marker: " + markerName(s.listMarker) + ", que numera "
+                    + ListMarkers.range(s.listMarker));
+        }
+    }
+
+    /** Un marcador como se escribe: {@code LOWER_ALPHA} → {@code lower-alpha}. */
+    private static String markerName(Style.Marker marker) {
+        return marker.name().toLowerCase(Locale.ROOT).replace('_', '-');
     }
 
     /**
@@ -973,7 +1064,8 @@ public final class BoxTreeBuilder {
     private static <E extends Enum<E>> E enumValue(Class<E> type, Node n) {
         String text = n.getText().trim();
         try {
-            return Enum.valueOf(type, text.toUpperCase(Locale.ROOT));
+            // lower-alpha es LOWER_ALPHA: el guion no cabe en el nombre de una constante.
+            return Enum.valueOf(type, text.toUpperCase(Locale.ROOT).replace('-', '_'));
         } catch (IllegalArgumentException ex) {
             throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en " + n.getName() + ": " + text);
         }

@@ -33,7 +33,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 |---|---|---|---|
 | 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | hecho | 09 |
-| 13 | Listas (`ul`, `ol`, `li`) | pendiente | — |
+| 13 | Listas (`ul`, `ol`, `li`) | en curso | — |
 | 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
 | 15 | Bloque en columnas (multicolumna) | pendiente | — |
 
@@ -315,56 +315,94 @@ Decididas también (2026-10-27), con la propuesta aceptada salvo H9:
 **Objetivo.** Listas sin numerar y numeradas (`ul`, `ol`, `li`), anidables, con el marcador
 fuera del contenido y alineado con la primera línea del ítem.
 
-**Borrador de sintaxis** (a confirmar; el nombre del ítem no puede ser `Item`, ver T3):
+**Sintaxis** (decidida en L1–L6):
 
 ```
+Styles:
+	Element: List
+		Box:
+			Padding: 0 0 0 18
 List:
 	Marker: decimal
-	Start: 1
-	Entry:
-		Text: Primer punto
-	Entry:
-		Text: Segundo punto
+	Start: 3
+	List item:
+		Paragraph: Primer punto
+	List item:
+		Number: 10
+		Paragraph: Segundo punto
 		List:
 			Marker: disc
-			Entry:
+			List item:
 				Text: Subpunto
 ```
 
-**Decisiones abiertas:**
+**Decisiones tomadas** (2026-10-27, con la propuesta aceptada):
 
-- [ ] L1. Nombres: `List` + (`Entry` | `Point` | `Li`…). ¿Un solo `List` con `Marker`, o
-      `Bullets` y `Numbered` por separado?
-- [ ] L2. ¿El ítem contiene exactamente un elemento (como `Item`/`Cell`) o varios
-      (como un `Block`)? Un `li` de HTML admite varios párrafos.
-- [ ] L3. Tipos de marcador: `disc`, `circle`, `square`, `dash`, `none`, `decimal`,
-      `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. ¿Marcador libre (un texto
-      cualquiera, `Marker: "→"`)? ¿Sufijo (`1.` frente a `1)`)?
-- [ ] L4. Posición del marcador: solo fuera (`outside`) o también dentro (`inside`).
-- [ ] L5. Sangría: ¿propiedad propia (`Indent`) o el `Padding` del ítem? ¿Ancho del marcador
-      automático (el del marcador más ancho de la lista) o fijo?
-- [ ] L6. Numeración: `Start`, orden inverso, y si un ítem puede fijar su número (`Value`).
-- [ ] L7. Tipografía del marcador: la del ítem, o una propia (`Marker color`…).
-- [ ] L8. Errores: un ítem vacío, un marcador que no cabe en la sangría.
-
-**Decisiones tomadas:** *(ninguna todavía)*
+- [x] L1. Un único elemento **`List`** con **`Marker`** (no `Bullets` y `Numbered`: una
+      regla `Element: List` vale para todas, y el PDF etiquetado tiene un solo `L`). El ítem
+      es **`List item`**, el término de CSS (`display: list-item`), que no choca con `Item`.
+      `Marker` es **obligatorio**, sin valor por defecto (si la lista es numerada lo decide el
+      autor, T1). `Marker`, `Start` y `Number` son propiedades del elemento: no van en
+      `Styles` (R6).
+- [x] L2. `List item` es un **contenedor de bloque con varios hijos**, como un `Block`:
+      `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `List`, `Relative`, `Absolute` y
+      `Fixed`, además de `Id`, `Class`, `Box`, `Typography`, `Break` y `Number`. Sin
+      encabezados (chocarían con H9 y los marcadores del PDF) ni texto en el valor (sería una
+      caja implícita). `List` solo admite `List item` (al menos uno, lo comprueba el schema) y
+      va donde va un `Block`.
+- [x] L3. Marcadores: `disc` (`•`), `dash` (`–`), `none`, `decimal`, `lower-alpha`,
+      `upper-alpha`, `lower-roman` y `upper-roman`. El marcador es **texto** en la fuente del
+      ítem (etiqueta `Lbl`, validado por `PdfMetrics`). Sin `circle` ni `square`: IBM Plex
+      Sans no tiene `◦` ni `▪` y no hay fuente de sustitución (dibujarlos como formas
+      necesitaría un primitivo nuevo en `Canvas`). Sufijo fijo `.`; sin marcador libre.
+      Los enums leen el guion como guion bajo (`lower-alpha` ↔ `LOWER_ALPHA`); se apunta en
+      `CLAUDE.md`.
+- [x] L4. Marcador solo **fuera** (`outside`), sin propiedad.
+- [x] L5. Sin `Indent`: la sangría es el **`Padding` izquierdo de la `List`** (como en CSS),
+      normalmente en `Element: List`. El marcador es `"1. "` o `"• "`, con el espacio final
+      como separación (sin `Gap`), alineado a la derecha contra el borde izquierdo del ítem;
+      su ancho es el suyo (`9.` y `10.` quedan alineados a la derecha).
+- [x] L6. `Start` en `List` (entero, por defecto 1) y `Number` en `List item` (fija su
+      número; los siguientes continúan desde él; `Number` y no `Value` para no confundirlo
+      con el del metaschema). Sin orden inverso. Se numera en `BoxTreeBuilder`. Rangos:
+      `decimal` desde 0; alfabéticos y romanos desde 1; romanos hasta 3999; tras `z`, `aa`.
+- [x] L7. El marcador usa la **tipografía del `List item`** (propia o heredada), sin
+      propiedades propias; se cambia con `Element: List item`. Su línea base es la de la
+      primera línea que se encuentra bajando por los primeros hijos de bloque del ítem (con
+      una lista anidada al principio, los dos marcadores quedan en la misma línea).
+- [x] L8. Errores nuevos, con la línea del nodo culpable: `LIST_ITEM_EMPTY` (un `List item`
+      sin elementos; el schema no lo expresa, su `Min` es por tipo de hijo),
+      `LIST_MARKER_OVERFLOW` (el marcador no cabe en el padding izquierdo de la lista más el
+      margen izquierdo del ítem), `LIST_NUMBER_NOT_ALLOWED` (`Start` o `Number` con `disc`,
+      `dash` o `none`), `LIST_NUMBER_RANGE` y `LIST_ITEM_WITHOUT_LINE` (marcador sin primera
+      línea con la que alinearse, por ejemplo un ítem que empieza con `Flex` o `Grid`).
 
 **Diseño técnico (previsto):**
 
 - La lista es un flujo de bloque (`BlockLayout`); cada ítem, una caja de bloque con una caja
-  de marcador generada (no está en el documento) colocada en la sangría.
+  de marcador generada (no está en el documento) colgada a su izquierda, en la sangría.
 - El marcador se alinea con la línea base de la primera línea del ítem: hace falta que el
   layout de un bloque devuelva la línea base de su primera línea (hoy no la devuelve).
-- Fragmentación: el marcador va en el primer fragmento del ítem; si el ítem se parte, los
-  siguientes no lo repiten. Huérfanas: no separar el marcador de su primera línea.
+- Fragmentación: el marcador va pegado a la primera línea, así que va en su fragmento y pasa
+  de página con ella; los fragmentos siguientes no lo repiten.
 - Numeración: se resuelve al construir el árbol (`BoxTreeBuilder`), no en el layout.
-- Volcado del §7: decidir si el marcador aparece (sin `Id`, no se vuelca hoy).
+- PDF etiquetado: `List` → `L` (con `ListNumbering`: `Disc`, `Decimal`, `LowerRoman`…;
+  `None` para `dash` y `none`), `List item` → `LI`, marcador → `Lbl`, contenido → `LBody`.
+- Volcado del §7: el `Rect` del marcador se vuelca como hijo `Marker` de los ítems con `Id`.
 
 **Tareas:**
 
-- [ ] Resolver L1–L8.
+- [x] Resolver L1–L8.
+- [x] Schema: `List`, `List item`, `Marker`, `Start`, `Number`.
 - [ ] Línea base de la primera línea en el resultado del layout de bloque.
-- [ ] Schema, `Style`, `BoxTreeBuilder` (con la numeración).
+- [x] `Style`, `BoxTreeBuilder` (con la numeración y los enums con guion): `Box.marker` lleva
+      el texto del marcador; `ListMarkers` lo escribe. Errores del árbol `LIST_ITEM_EMPTY`,
+      `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE` y `LIST_ITEM_WITHOUT_LINE` (este se
+      comprueba en el árbol: bajando por el primer hijo en flujo hay que llegar a un texto),
+      con sus casos en el catálogo. Tests en `tree/ListsTest` y `tree/ListMarkersTest`.
+- [x] Especificación: §2, §4 (§4.11 nueva), §5.14 nueva, §6 y §9. Faltan §7 (`Marker` en el
+      volcado), §8 y el PDF etiquetado de §5.13/§5.14.
+- [ ] `LIST_MARKER_OVERFLOW` (necesita las métricas: al maquetar) con su caso.
 - [ ] Caja de marcador en el layout y en el pintado.
 - [ ] Tests de layout y de fragmentación; casos de error.
 - [ ] Especificación; caso golden con listas anidadas y una lista partida entre páginas.
@@ -514,6 +552,22 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (9).** Hito 13: `Style` (`Marker`, `listMarker`, `listStart`, `listNumber`),
+  `Box.marker`, `ListMarkers` (símbolos, letras, romanos y rangos) y `BoxTreeBuilder` (`List` y
+  `List item` como cajas de bloque, numeración, enums con guion como guion bajo, cuatro
+  `ErrorCode` nuevos). `CLAUDE.md` recoge la convención de los enums. Especificación §2, §4.11,
+  §5.14 y §6. `mvn test` en verde (348 tests). El layout aún no coloca ni pinta el marcador.
+  *Siguiente paso:* que el layout de bloque devuelva la línea base de su primera línea, y la
+  caja del marcador en `BlockLayout` (colgada a la izquierda del ítem, en su primer fragmento),
+  con `LIST_MARKER_OVERFLOW`.
+- **2026-10-27 (8).** Hito 13 en curso. Aceptadas las propuestas L1–L8. Hecho el schema
+  (`List`, `List item`, `Marker`, `Start`, `Number`; `List` admitido donde va un elemento) y
+  el resumen del §9. Un documento con listas valida contra el schema, pero `BoxTreeBuilder`
+  todavía no las traduce. `mvn test` en verde.
+  *Siguiente paso:* `Style` y `BoxTreeBuilder` (enums con guion, numeración, `LIST_ITEM_EMPTY`,
+  `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`) y la línea base de la primera línea en el
+  resultado del layout de bloque. Las interpretaciones de L1–L8 van a `DECISIONES.md` al
+  cerrar el hito.
 - **2026-10-27 (7).** `Title` y `Language` opcionales en `Document` (`tree/Metadata`), escritos
   en el PDF por `PdfStructure.metadata`; casos de error y tests en `PdfCanvasTest`. `mvn test`
   en verde. Especificación: §2, §4.1, §5.13, §6 y §9.

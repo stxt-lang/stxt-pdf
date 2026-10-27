@@ -928,3 +928,101 @@ Errors:
 						Primero.
 
 						Segundo.
+	Case: List item sin elementos
+		Code: LIST_ITEM_EMPTY
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: disc
+					List item:
+						Id: a
+	Case: Start en una lista que no numera
+		Code: LIST_NUMBER_NOT_ALLOWED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: disc
+					Start: 2
+					List item:
+						Text: Uno
+	Case: Number en una lista que no numera
+		Code: LIST_NUMBER_NOT_ALLOWED
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: dash
+					List item:
+						Number: 3
+						Text: Uno
+	Case: Start fuera del rango de las letras
+		Code: LIST_NUMBER_RANGE
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: lower-alpha
+					Start: 0
+					List item:
+						Text: Uno
+	Case: Número romano mayor que 3999
+		Code: LIST_NUMBER_RANGE
+		Line: 13
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: upper-roman
+					Start: 3999
+					List item:
+						Text: Uno
+					List item:
+						Text: Dos
+	Case: Ítem con marcador que empieza con un Flex
+		Code: LIST_ITEM_WITHOUT_LINE
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: disc
+					List item:
+						Flex:
+							Item:
+								Text: Uno

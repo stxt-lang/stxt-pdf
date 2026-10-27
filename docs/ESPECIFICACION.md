@@ -73,6 +73,8 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Text` | Caja de texto ([§5.4](#54-texto)) | Su texto: en el valor o en `Content` |
 | `Paragraph` | Un párrafo: un `Text` con significado ([§5.13](#513-encabezados-y-párrafos)) | Su texto: en el valor o en `Content`, sin líneas en blanco |
 | `Heading 1` … `Heading 6` | Encabezado de nivel 1 a 6 ([§5.13](#513-encabezados-y-párrafos)) | Uno o varios `Text` |
+| `List` | Lista con marcadores o numerada ([§5.14](#514-listas)) | Uno o varios `List item` |
+| `List item` | Ítem de una `List`: un bloque con su marcador | Elementos, salvo los encabezados |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
@@ -80,8 +82,8 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Cell` | Celda de un `Grid`: dónde va y cómo se alinea | Exactamente un elemento en flujo |
 
 **Elementos** son todos menos `Item` y `Cell`, y **elementos en flujo**, los que pueden ser un
-ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados y `Relative`); `Absolute` y
-`Fixed` salen del flujo y nunca son ítems. Todos son **elementos de caja**: cada uno es una caja
+ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List` y `Relative`);
+`Absolute` y `Fixed` salen del flujo y nunca son ítems. `List item` solo va dentro de una `List`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Cell` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor.
 
@@ -234,7 +236,8 @@ de una clase o con un `Id`, y el elemento los puede sobrescribir. Dentro de cada
 vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las propiedades que
 definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Cell`
-([§4.8](#48-item-y-cell)) y las de posicionamiento ([§4.9](#49-posicionamiento)).
+([§4.8](#48-item-y-cell)), las de posicionamiento ([§4.9](#49-posicionamiento)) y las de las
+listas ([§4.11](#411-listas)).
 
 ```
 Text: Resultados del trimestre
@@ -470,6 +473,17 @@ errores: así las reglas se pueden reutilizar.
 
 El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no se aplican a
 `Document`.
+
+### 4.11 Listas
+
+| Propiedad | Valores | Por defecto | Elementos | Notas |
+|---|---|---|---|---|
+| `Marker` | `disc`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — (obligatorio) | `List` | Marcador de los ítems: `•`, `–`, ninguno, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Start` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
+| `Number` | entero | — | `List item` | Número de este ítem; los siguientes continúan desde él. Solo en las numeraciones. |
+
+No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de los ítems es el
+`Padding` izquierdo de la `List` ([§5.14](#514-listas)).
 
 ---
 
@@ -1024,6 +1038,54 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
 El volcado de resultados ([§7](#7-formato-de-resultados)) no cambia: no incluye el tipo de
 elemento.
 
+### 5.14 Listas
+
+Una `List` apila sus ítems (`List item`) en vertical, como un `Block`, y cada ítem lleva un
+**marcador** generado por el motor, que no está en el documento. Las dos son cajas de bloque y
+admiten `Id`, `Class`, `Box`, `Typography` y `Break`; un ítem contiene uno o varios elementos
+(`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `List`, `Relative`, `Absolute` o `Fixed`), y
+nunca encabezados. Una `List` va donde va un elemento en flujo, también dentro de otro ítem.
+
+```
+Styles:
+	Element: List
+		Box:
+			Padding: 0 0 0 18
+List:
+	Marker: decimal
+	Start: 3
+	List item:
+		Paragraph: Primer punto
+	List item:
+		Number: 10
+		Paragraph: Segundo punto
+		List:
+			Marker: disc
+			List item:
+				Text: Subpunto
+```
+
+**Marcadores.** `Marker` es obligatorio: si la lista es numerada lo decide el autor. El marcador
+es texto en la tipografía del `List item` (propia, heredada o de `Element: List item`): `•`
+(`disc`), `–` (`dash`), ninguno (`none`), o el número del ítem con un punto: `3.`, `c.`, `C.`,
+`iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido.
+
+**Numeración.** El primer ítem lleva el número `Start` (1 si no se declara); cada uno, el
+siguiente al anterior, salvo el que fija el suyo con `Number`, desde el que continúan los
+demás. Las letras siguen tras la `z` como en CSS (`aa`, `ab`…). `decimal` escribe desde 0; las
+letras y los romanos, desde 1, y los romanos, hasta 3999 (`LIST_NUMBER_RANGE`). `Start` y
+`Number` solo tienen efecto en las numeraciones (`LIST_NUMBER_NOT_ALLOWED`). Cada lista numera
+sus ítems; una lista anidada empieza de nuevo.
+
+**Posición.** El marcador cuelga **fuera** del ítem, a su izquierda: su borde derecho (con el
+espacio final) toca el borde izquierdo de la caja de borde del ítem, así que los marcadores de
+distinto ancho quedan alineados a la derecha. La sangría que lo aloja es el `Padding` izquierdo
+de la `List`, más el margen izquierdo del ítem. Su línea base es la de la **primera línea** del
+ítem: la que se encuentra bajando por el primer hijo en flujo de cada bloque hasta un texto
+(con una lista anidada al principio, los dos marcadores quedan en la misma línea). Un ítem con
+marcador cuyo contenido no lleva así a un texto (empieza con un `Flex`, un `Grid` o un bloque
+vacío) es un error (`LIST_ITEM_WITHOUT_LINE`).
+
 ---
 
 ## 6. Validación
@@ -1075,6 +1137,10 @@ La validación se hace en cuatro niveles:
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
 | `PARAGRAPH_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content` (línea de la línea en blanco) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |
+| `LIST_ITEM_EMPTY` | Un `List item` contiene al menos un elemento ([§5.14](#514-listas)) | `Un List item necesita al menos un elemento: un Paragraph, un Text, un Block…` |
+| `LIST_NUMBER_NOT_ALLOWED` | `Start` y `Number` solo en las listas numeradas | `Start no tiene efecto con Marker: disc, que no numera los ítems` |
+| `LIST_NUMBER_RANGE` | El número cabe en la numeración: `decimal` desde 0, letras desde 1, romanos de 1 a 3999 (línea del `Start`, del `Number` o del ítem) | `El número 4000 no se puede escribir con Marker: upper-roman, que numera de 1 a 3999` |
+| `LIST_ITEM_WITHOUT_LINE` | Un ítem con marcador empieza con un texto con el que alinearlo (línea de la caja que lo impide) | `El marcador del List item de la línea 10 se alinea con su primera línea, y el ítem empieza con un Flex…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1194,6 +1260,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Grid` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Cell`, `Absolute`, `Fixed` |
 | `Text`, `Paragraph` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Content` |
 | `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Box`, `Typography`; `Text` (al menos uno, varios) |
+| `List` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
+| `List item` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
@@ -1203,15 +1271,17 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
-`Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`List`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
-bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows` y `Orphans`, `INTEGER`; las de valores
+bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start` y `Number`,
+`INTEGER`; las de valores
 cerrados, `ENUM` con los valores del §4; el resto, `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
-que `Item` y `Cell` tengan exactamente un elemento (el schema solo limita cada tipo a uno), que
+que `Item` y `Cell` tengan exactamente un elemento (el schema solo limita cada tipo a uno) y un
+`List item` al menos uno (el schema solo cuenta por tipo), que
 un `Text` tenga su texto en un sitio y solo uno, que la raíz sea `Document` (en un schema
 cualquier nodo puede ser raíz) y lo que depende de dónde está un elemento: que un `Text` de un
 encabezado no tenga `Break`, y la jerarquía y el sitio de los encabezados

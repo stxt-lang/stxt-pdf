@@ -130,8 +130,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   tienen valor por defecto y se suelen declarar en el `Typography` de `Document`. No
   generalices una regla nueva sin comentarlo con el usuario.
 - **Enums de `Style`:** los valores STXT se convierten con `Enum.valueOf` sobre el texto en
-  mayúsculas, así que **cada constante debe llamarse igual que su valor en el documento**
-  (`TextAlign.JUSTIFY` ↔ `justify`). Si cambias un valor, cambia la constante y el schema.
+  mayúsculas y con el guion como guion bajo, así que **cada constante debe llamarse igual que
+  su valor en el documento** (`TextAlign.JUSTIFY` ↔ `justify`, `Marker.LOWER_ALPHA` ↔
+  `lower-alpha`). Si cambias un valor, cambia la constante y el schema.
   `Layout` y `Position` no son valores del documento: los fija el elemento.
 - **`Engine`** despacha por `Style.layout` al algoritmo correspondiente. **Toda llamada
   recursiva de layout o de tamaños intrínsecos pasa por `engine.layout(...)` /
