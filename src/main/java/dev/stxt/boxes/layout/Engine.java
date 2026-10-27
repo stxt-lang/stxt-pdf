@@ -16,6 +16,7 @@ import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.layout.table.TableLayout;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
+import dev.stxt.boxes.tree.Element;
 
 import java.util.List;
 
@@ -144,7 +145,7 @@ public final class Engine {
             case INLINE -> inline;
             case FLEX -> flex;
             // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
-            case GRID -> "table".equals(box.element) ? table : grid;
+            case GRID -> box.element == Element.TABLE ? table : grid;
         };
     }
 

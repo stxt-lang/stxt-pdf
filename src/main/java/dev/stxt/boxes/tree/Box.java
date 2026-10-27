@@ -9,8 +9,7 @@ import java.util.stream.Collectors;
  * ({@code Block}, {@code Flex}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
  * {@code Text} guarda su texto directamente.
  *
- * <p>La geometría que guarda es la del <em>último layout</em> y es relativa a la caja de
- * contenido del padre (módulo 2). El resultado definitivo, por páginas, son los
+ * <p>No guarda geometría: el resultado del layout, por páginas, son los
  * {@link dev.stxt.boxes.fragment.Fragment}.</p>
  *
  * <p>La igualdad es por identidad: la caché de layout usa la caja como clave.</p>
@@ -19,11 +18,10 @@ public final class Box {
 
     public final String id;
     /**
-     * Elemento del que procede, en forma canónica ({@code block}, {@code paragraph},
-     * {@code heading-1}…); {@code null} en la raíz. Da el significado: reglas {@code Element},
-     * marcadores y etiquetas del PDF.
+     * Elemento del que procede; {@code null} en la raíz. Da el significado: reglas
+     * {@code Element}, marcadores y etiquetas del PDF.
      */
-    public final String element;
+    public final Element element;
     public final Style style;
     public final boolean anonymous;
     /** Línea del documento de la que procede, para mensajes de error. */
@@ -38,7 +36,7 @@ public final class Box {
     public boolean textBlock;
     /**
      * Caja del marcador de un {@code List item} (ESPECIFICACION.md §5.14), generada por el motor:
-     * una caja de texto ({@code element} {@code marker}) con la tipografía del ítem y el texto del
+     * una caja de texto ({@link Element#MARKER}) con la tipografía del ítem y el texto del
      * marcador más el espacio que lo separa del contenido ({@code "3. "}, {@code "• "}). No está
      * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
      * lleva marcador.
@@ -51,7 +49,7 @@ public final class Box {
     public int headRows;
     public int footRows;
 
-    public Box(String id, String element, Style style, boolean anonymous, int line) {
+    public Box(String id, Element element, Style style, boolean anonymous, int line) {
         this.id = id;
         this.element = element;
         this.style = style;
@@ -61,12 +59,7 @@ public final class Box {
 
     /** Nivel de un encabezado ({@code Heading 1} … {@code Heading 6}); 0 si no lo es. */
     public int headingLevel() {
-        return headingLevel(element);
-    }
-
-    /** Nivel del encabezado con ese nombre canónico ({@code heading-2} → 2); 0 si no es un encabezado. */
-    public static int headingLevel(String element) {
-        return element != null && element.startsWith("heading-") ? element.charAt(8) - '0' : 0;
+        return element == null ? 0 : element.headingLevel();
     }
 
     /** Texto de un encabezado para el índice: el de sus {@code Text}, unido y con los espacios normalizados. */
@@ -128,7 +121,7 @@ public final class Box {
 
     /** Si es la caja generada del marcador de un {@code List item}. */
     public boolean isMarker() {
-        return "marker".equals(element);
+        return element == Element.MARKER;
     }
 
     public boolean hasText() {

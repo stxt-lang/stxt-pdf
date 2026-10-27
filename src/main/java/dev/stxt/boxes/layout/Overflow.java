@@ -6,6 +6,7 @@ import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Media;
@@ -85,7 +86,7 @@ public final class Overflow {
                 fragment(c, cx, cy, page);
                 continue;
             }
-            if ("list".equals(f.box().element)) {
+            if (f.box().element == Element.LIST) {
                 marker(f, c);
             }
             if (!c.box().style.isOutOfFlow()) {

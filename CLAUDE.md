@@ -82,7 +82,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics` |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
-| `tree` | `Box`, `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `BoxTreeBuilder`, `InvalidModelException` |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `FontFace`, `Media`, `DocumentSchema` (el schema compilado), `BoxTreeBuilder`, `InvalidModelException` |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `LaidOutDocument` |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `Paginator`, `Page`, `BreakRules`, `TextLine` |
@@ -119,22 +119,23 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
   las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
   regla y se valida como si la declarara el elemento.
 - **Elementos con significado (§5.13):** `Paragraph` (un `Text` de un solo párrafo) y
-  `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element` guarda el nombre
-  canónico del elemento (`heading-2`) para las reglas, los marcadores y las etiquetas. El
-  builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su jerarquía
-  en orden del documento. `PdfStructure` construye el árbol de estructura del PDF etiquetado
+  `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element` guarda el `Element`
+  del que procede (`HEADING_2`) para las reglas, los marcadores y las etiquetas; el enum da
+  también su `Layout`, su `Position` y si puede ser un ítem, y `ElementTest` lo compara con el
+  schema. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
+  jerarquía en orden del documento. `PdfStructure` construye el árbol de estructura del PDF etiquetado
   (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.
 - **Listas (§5.14):** `List` (con `Marker` obligatorio y `Start`) y `List item` (con `Number`)
   son cajas de bloque. El builder numera los ítems y crea en `Box.marker` la caja del marcador,
-  generada y fuera de `children` (`Box.isMarker()`): texto con la tipografía del ítem y el
-  espacio final incluido (`"3. "`). `MarkerLayout` la coloca en el primer fragmento del ítem,
+  generada y fuera de `children` (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía
+  del ítem y el espacio final incluido (`"3. "`). `MarkerLayout` la coloca en el primer fragmento del ítem,
   como su primer hijo, a la izquierda de su caja de borde y con la línea base de su primera
   línea (`TextMeasurer.vertical`). Quien recorra los hijos de un fragmento debe saltar los
   marcadores si busca contenido en flujo; `Overflow` los comprueba contra la sangría de la
   lista (`LIST_MARKER_OVERFLOW`).
 - **Tablas (§5.15):** el builder traduce una `Table` a una caja `GRID` (`Box.element` =
-  `table`) cuyos ítems son sus `Cell`, con la colocación explícita en `Style.itemArea` (fila y
+  `TABLE`) cuyos ítems son sus `Cell`, con la colocación explícita en `Style.itemArea` (fila y
   columna por orden y `Span`); `Head`, `Body`, `Foot` y `Row` no son cajas. `Box.headRows` y
   `Box.footRows` dicen qué filas de la rejilla son cabecera y pie. El `Typography` de la `Row`
   se aplica a sus celdas como herencia y su `Break`, como el de las celdas. `Engine` despacha

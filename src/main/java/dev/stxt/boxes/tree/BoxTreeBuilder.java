@@ -12,6 +12,7 @@ import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,19 +66,6 @@ public final class BoxTreeBuilder {
     // --- Clases de nodos (la estructura completa está en el schema, §9) --------------------------
     private static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     private static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
-    /** Elementos de caja. */
-    private static final Set<String> ELEMENTS = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "list-item", "table", "cell",
-            "relative", "absolute", "fixed");
-    /** Los elementos de caja como se escriben, para los mensajes. */
-    private static final List<String> ELEMENT_NAMES = List.of("Block", "Flex", "Grid", "Text", "Paragraph",
-            "Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6", "List", "List item",
-            "Table", "Cell", "Relative", "Absolute", "Fixed");
-    /** Elementos en flujo: los que pueden ser un ítem. */
-    private static final Set<String> IN_FLOW = Set.of("block", "flex", "grid", "text", "paragraph", "heading-1",
-            "heading-2", "heading-3", "heading-4", "heading-5", "heading-6", "list", "table", "relative");
-    /** Elementos con el texto en el valor o en {@code Content}. */
-    private static final Set<String> TEXTS = Set.of("text", "paragraph");
     /** Grupos de filas de una {@code Table}, en el orden en que van. */
     private static final List<String> TABLE_GROUPS = List.of("head", "body", "foot");
     /**
@@ -103,8 +91,8 @@ public final class BoxTreeBuilder {
 
     /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
     private Map<String, Integer> ids;
-    /** Reglas {@code Element}, por el nombre canónico del elemento ({@code heading-1}). */
-    private Map<String, InlineNode> elementRules;
+    /** Reglas {@code Element}, por elemento. */
+    private Map<Element, InlineNode> elementRules;
     /** Reglas {@code For class}, por clase y en el orden del documento: en ese orden se aplican. */
     private Map<String, InlineNode> classRules;
     /** Reglas {@code For id}, por {@code Id}. */
@@ -185,7 +173,7 @@ public final class BoxTreeBuilder {
      * aplique a ningún elemento; lo que depende del elemento (§6), al aplicarla.
      */
     private void styles(InlineNode document) {
-        elementRules = new HashMap<>();
+        elementRules = new EnumMap<>(Element.class);
         classRules = new LinkedHashMap<>();
         idRules = new HashMap<>();
         Optional<Node> styles = child(document, "styles");
@@ -195,28 +183,18 @@ public final class BoxTreeBuilder {
         for (Node r : inline(styles.get()).getChildren()) {
             InlineNode rule = inline(r);
             String selector = rule.getText().trim();
-            Map<String, InlineNode> rules;
-            String key;
-            switch (rule.getCanonicalName()) {
+            InlineNode previous = switch (rule.getCanonicalName()) {
                 case "element" -> {
-                    rules = elementRules;
-                    key = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
-                    if (!ELEMENTS.contains(key)) {
-                        throw error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
-                                + "' no es un elemento de caja (" + String.join(", ", ELEMENT_NAMES) + ")");
-                    }
+                    Element element = Element.of(selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-"))
+                            .orElseThrow(() -> error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
+                                    + "' no es un elemento de caja (" + Element.written().stream()
+                                    .map(Element::label).collect(Collectors.joining(", ")) + ")"));
+                    yield elementRules.putIfAbsent(element, rule);
                 }
-                case "for-class" -> {
-                    rules = classRules;
-                    key = name(rule, "For class");
-                }
-                case "for-id" -> {
-                    rules = idRules;
-                    key = name(rule, "For id");
-                }
+                case "for-class" -> classRules.putIfAbsent(name(rule, "For class"), rule);
+                case "for-id" -> idRules.putIfAbsent(name(rule, "For id"), rule);
                 default -> throw unread(rule);
-            }
-            InlineNode previous = rules.putIfAbsent(key, rule);
+            };
             if (previous != null) {
                 throw error(rule, ErrorCode.STYLE_DUPLICATE, "Regla repetida: " + rule.getName() + ": " + selector
                         + " (ya está en la línea " + previous.getLine() + ")");
@@ -240,7 +218,7 @@ public final class BoxTreeBuilder {
      * las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}. Van después de la
      * herencia y antes de lo que declara el propio elemento, y se mezclan propiedad a propiedad.
      */
-    private void applyRules(InlineNode n, String kind, Style s, Box parent) {
+    private void applyRules(InlineNode n, Element kind, Style s, Box parent) {
         String noBreak = noBreak(n, kind, s, parent);
         List<InlineNode> rules = new ArrayList<>();
         Optional.ofNullable(elementRules.get(kind)).ifPresent(rules::add);
@@ -269,18 +247,18 @@ public final class BoxTreeBuilder {
      * Por qué el elemento no admite {@code Break}, para el mensaje; {@code null} si lo admite.
      * Lo que el schema no deja declarar tampoco puede llegar de una regla.
      */
-    private static String noBreak(InlineNode n, String kind, Style s, Box parent) {
+    private static String noBreak(InlineNode n, Element kind, Style s, Box parent) {
         String where = " (línea " + n.getLine() + "), ";
         if (s.isOutOfFlow()) {
             return "un " + position(s) + where + "que no se parte ni está en el flujo de la página";
         }
-        if (Box.headingLevel(kind) > 0) {
+        if (kind.headingLevel() > 0) {
             return "un " + n.getName() + where + "en el que el motor ya evita el corte";
         }
         if (parent.headingLevel() > 0) {
             return "un Text de un encabezado" + where + "en el que el motor ya evita el corte";
         }
-        if (kind.equals("cell")) {
+        if (kind == Element.CELL) {
             return "una Cell" + where + "cuyos cortes son los de su Row";
         }
         return null;
@@ -352,13 +330,11 @@ public final class BoxTreeBuilder {
     private void buildContent(InlineNode node, Box box) {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
-            if (ELEMENTS.contains(name)) {
+            if (isElement(h)) {
                 box.addChild(element(inline(h), box, null));
             } else if (name.equals("item") || name.equals("area")) {
                 InlineNode wrapper = inline(h);
-                List<Node> elements = wrapper.getChildren().stream()
-                        .filter(e -> IN_FLOW.contains(e.getCanonicalName()))
-                        .toList();
+                List<Node> elements = wrapper.getChildren().stream().filter(BoxTreeBuilder::isItemElement).toList();
                 if (elements.size() != 1) {
                     throw error(elements.isEmpty() ? wrapper : elements.get(1), ErrorCode.SINGLE_ELEMENT,
                             "Un " + h.getName() + " contiene exactamente un elemento, y este tiene " + elements.size());
@@ -373,28 +349,16 @@ public final class BoxTreeBuilder {
      * la {@code Row} de una {@code Cell}.
      */
     private Box element(InlineNode n, Box parent, InlineNode wrapper) {
-        String kind = n.getCanonicalName();
-        int level = Box.headingLevel(kind);
+        Element kind = Element.of(n.getCanonicalName()).orElseThrow();
+        int level = kind.headingLevel();
         if (level > 0) {
             heading(n, level);
         }
         Style s = Style.inheriting(parent.style);
-        s.layout = switch (kind) {
-            case "flex" -> Style.Layout.FLEX;
-            // Una tabla se maqueta como un grid con colocación explícita (§5.15).
-            case "grid", "table" -> Style.Layout.GRID;
-            case "text", "paragraph" -> Style.Layout.INLINE;
-            // Con valor, la celda es una caja de texto; sin valor, un bloque.
-            case "cell" -> n.getText().isBlank() ? Style.Layout.BLOCK : Style.Layout.INLINE;
-            default -> Style.Layout.BLOCK;
-        };
-        s.position = switch (kind) {
-            case "relative" -> Style.Position.RELATIVE;
-            case "absolute" -> Style.Position.ABSOLUTE;
-            case "fixed" -> Style.Position.FIXED;
-            default -> Style.Position.STATIC;
-        };
-        if (kind.equals("cell")) {
+        // Con valor, la celda es una caja de texto; sin valor, un bloque.
+        s.layout = kind == Element.CELL && !n.getText().isBlank() ? Style.Layout.INLINE : kind.layout();
+        s.position = kind.position();
+        if (kind == Element.CELL) {
             // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
             child(wrapper, "typography").map(BoxTreeBuilder::inline).ifPresent(t -> typography(t, s));
         } else if (wrapper != null) {
@@ -404,14 +368,14 @@ public final class BoxTreeBuilder {
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            if (ELEMENTS.contains(name) || NOT_PROPERTIES.contains(name)) {
+            if (isElement(p) || NOT_PROPERTIES.contains(name)) {
                 continue;
             }
-            if (kind.equals("flex") && FLEX.contains(name)) {
+            if (kind == Element.FLEX && FLEX.contains(name)) {
                 flex(p, s);
                 continue;
             }
-            if ((kind.equals("grid") || kind.equals("table")) && GRID.contains(name)) {
+            if ((kind == Element.GRID || kind == Element.TABLE) && GRID.contains(name)) {
                 grid(p, s);
                 continue;
             }
@@ -440,17 +404,17 @@ public final class BoxTreeBuilder {
                 }
             }
         }
-        if (kind.equals("cell")) {
+        if (kind == Element.CELL) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(BoxTreeBuilder::inline).ifPresent(b -> fragmentation(b, s));
         }
-        if (kind.equals("flex")) {
+        if (kind == Element.FLEX) {
             validateFlex(s);
         }
-        if (kind.equals("list")) {
+        if (kind == Element.LIST) {
             validateList(s);
         }
-        Integer number = kind.equals("list-item") ? itemNumber(n, s, parent) : null;
+        Integer number = kind == Element.LIST_ITEM ? itemNumber(n, s, parent) : null;
         validateBox(s, parent);
         if (level > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
@@ -463,7 +427,7 @@ public final class BoxTreeBuilder {
         validateContainer(s, box);
         if (number != null) {
             itemNumbers.put(box, number);
-            if (n.getChildren().stream().noneMatch(c -> ELEMENTS.contains(c.getCanonicalName()))) {
+            if (n.getChildren().stream().noneMatch(BoxTreeBuilder::isElement)) {
                 throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
                         + "un Paragraph, un Text, un Block…");
             }
@@ -472,14 +436,14 @@ public final class BoxTreeBuilder {
                 box.marker = marker(n, box, marker);
             }
         }
-        if (TEXTS.contains(kind)) {
+        if (kind.hasText()) {
             text(n, box);
-        } else if (kind.equals("cell") && s.layout == Style.Layout.INLINE) {
+        } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
             cellText(n, box);
         } else {
             boolean outerFixed = insideFixed;
             insideFixed |= s.position == Style.Position.FIXED;
-            if (kind.equals("table")) {
+            if (kind == Element.TABLE) {
                 table(n, box);
             } else {
                 buildContent(n, box);
@@ -532,7 +496,7 @@ public final class BoxTreeBuilder {
         }
         Style s = Style.inheriting(item.style);
         s.layout = Style.Layout.INLINE;
-        Box marker = new Box(null, "marker", s, false, n.getLine());
+        Box marker = new Box(null, Element.MARKER, s, false, n.getLine());
         marker.parent = item;
         marker.text = text;
         marker.textLine = n.getLine();
@@ -548,9 +512,9 @@ public final class BoxTreeBuilder {
         while (b.style.layout != Style.Layout.INLINE) {
             String problem = null;
             if (b.style.layout == Style.Layout.FLEX || b.style.layout == Style.Layout.GRID) {
-                problem = "empieza con un " + label(b.element);
+                problem = "empieza con un " + b.element.label();
             } else if (b.inFlowChildren().isEmpty()) {
-                problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + label(b.element) + " vacío";
+                problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + b.element.label() + " vacío";
             }
             if (problem != null) {
                 throw error(b.line, ErrorCode.LIST_ITEM_WITHOUT_LINE, "El marcador del List item de la línea "
@@ -688,7 +652,7 @@ public final class BoxTreeBuilder {
 
     /** El texto de una {@code Cell} con valor: una línea, sin elementos al lado. */
     private static void cellText(InlineNode n, Box box) {
-        n.getChildren().stream().filter(c -> ELEMENTS.contains(c.getCanonicalName())).findFirst().ifPresent(e -> {
+        n.getChildren().stream().filter(BoxTreeBuilder::isElement).findFirst().ifPresent(e -> {
             throw error(e, ErrorCode.CELL_CONTENT, "Una Cell tiene texto en el valor (línea " + n.getLine()
                     + ") o elementos, no las dos cosas: pon el texto en un Paragraph");
         });
@@ -730,7 +694,7 @@ public final class BoxTreeBuilder {
         }
         Node source = content.orElse(n);
         font(n, source, box);
-        if (n.getCanonicalName().equals("paragraph")) {
+        if (box.element == Element.PARAGRAPH) {
             // Las líneas en blanco al principio o al final no separan nada.
             String text = source.getText();
             Matcher blank = BLANK_LINE.matcher(text)
@@ -876,7 +840,7 @@ public final class BoxTreeBuilder {
         }
         for (Node p : w.getChildren()) {
             String name = p.getCanonicalName();
-            if (IN_FLOW.contains(name)) {
+            if (isItemElement(p)) {
                 continue;
             }
             if (name.equals("layer")) {
@@ -1095,6 +1059,16 @@ public final class BoxTreeBuilder {
     /** Compara con un nombre ya canónico ({@code "min-width"}). */
     private static boolean is(Node n, String canonicalName) {
         return n.getCanonicalName().equals(canonicalName);
+    }
+
+    /** Si el nodo es un elemento de caja. */
+    private static boolean isElement(Node n) {
+        return Element.of(n.getCanonicalName()).isPresent();
+    }
+
+    /** Si el nodo es el elemento de un {@code Item} o un {@code Area}. */
+    private static boolean isItemElement(Node n) {
+        return Element.of(n.getCanonicalName()).filter(Element::canBeItem).isPresent();
     }
 
     /** Primer hijo con ese nombre canónico. */

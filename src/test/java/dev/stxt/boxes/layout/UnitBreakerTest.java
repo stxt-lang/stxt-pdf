@@ -6,6 +6,7 @@ import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
@@ -28,14 +29,14 @@ class UnitBreakerTest {
     private static final int PERFECT = LayoutResult.PERFECT_BREAK;
 
     private final Engine engine = new Engine();
-    private final Box container = new Box("C", "flex", new Style(), false, 1);
+    private final Box container = new Box("C", Element.FLEX, new Style(), false, 1);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
             Style.Decoration.SLICE);
 
     private static Box item(String id, double height) {
         Style s = new Style();
         s.height = Value.pt(height);
-        return new Box(id, "block", s, false, 1);
+        return new Box(id, Element.BLOCK, s, false, 1);
     }
 
     /** Ítem ya maquetado sin fragmentar, en {@code y} de la caja de contenido del contenedor. */

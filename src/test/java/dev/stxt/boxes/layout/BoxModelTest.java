@@ -4,6 +4,7 @@ import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class BoxModelTest {
     };
 
     private final Style style = new Style();
-    private final Box box = new Box("A", "block", style, false, 1);
+    private final Box box = new Box("A", Element.BLOCK, style, false, 1);
 
     private static Value pt(double v) {
         return Value.pt(v);

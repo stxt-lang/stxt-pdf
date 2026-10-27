@@ -61,7 +61,7 @@ Prioridad = valor ÷ coste. **S** ≤ media sesión, **M** una sesión, **L** do
 | 3 | [`layOutDocument` devuelve el documento entero; fin de la doble construcción](#3-resultado-del-documento-y-fachada) | ARQ · DRY | S | — | hecho |
 | 4 | [Tests de las piezas puras sin test y cobertura con JaCoCo](#4-tests-de-piezas-puras-y-cobertura) | QA | M | — | hecho |
 | 5 | [Quitar la geometría mutable de `Box`](#5-quitar-la-geometría-mutable-de-box) | ARQ · bug latente | M | 4 | hecho |
-| 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | pendiente |
+| 6 | [`enum Element` en lugar de nombres de elemento como texto](#6-enum-element) | ARQ · DRY | M | 1 | hecho |
 | 7 | [Partir `BoxTreeBuilder`](#7-partir-boxtreebuilder) | ARQ · SRP | L | 1, 6 | pendiente |
 | 8 | [Romper los ciclos de packages y parsear la colocación de grid una vez](#8-ciclos-de-packages-y-colocación-de-grid) | ARQ | M | 7 | pendiente |
 | 9 | [Lote de duplicaciones pequeñas](#9-lote-de-duplicaciones) | DRY | S–M | — | pendiente |
@@ -108,8 +108,8 @@ catálogo no detecta, porque no hay caso para lo que nadie sabe que falta.
 
 **Límite conocido.** Lo que el builder lee con `child(...)` en lugar de un `switch` (los hijos
 de `Document` y de `Media`) no lanza nada si falta: ahí el test solo obliga a añadir el ejemplo.
-Los `switch` de `layout` y `position` por elemento siguen con `default`; se quitan con la
-[tarea 6](#6-enum-element).
+Los `switch` de `layout` y `position` por elemento, que seguían con `default`, desaparecen con
+la [tarea 6](#6-enum-element).
 
 ## 2. `ConstraintSpace`: *withers* y booleanos
 
@@ -321,11 +321,30 @@ tocar todas.
 
 **Cómo.**
 
-- [ ] `enum Element { BLOCK("Block", BLOCK, STATIC, inFlow), …, HEADING_1("Heading 1", …, level 1),
-      MARKER(…) }` con el nombre canónico, el que se escribe, el `Layout` y la `Position` por
-      defecto, si está en flujo, si lleva texto y el nivel de encabezado.
-- [ ] `Box.element` pasa a ser `Element` (la raíz, `null` o `Element.ROOT`).
-- [ ] Desaparecen las listas paralelas y los dos `switch` de `element()`.
+- [x] `tree.Element` con el nombre que se escribe (`label()`, `List item`) y el canónico
+      (`canonicalName()`, `list-item`), el `Layout` y la `Position`, si puede ser el elemento de
+      un `Item` o un `Area` (`canBeItem()`, lo que era `IN_FLOW`), si lleva el texto en el valor
+      o en `Content` (`hasText()`) y el nivel de encabezado. `Element.of(nombre canónico)` solo
+      encuentra los que se escriben: `MARKER` es generado, y `marker` es también la propiedad
+      `Marker` de `List`. La `Cell` con valor cambia su `Layout` a `INLINE` en el builder, como
+      antes.
+- [x] `Box.element` pasa a ser `Element`; la raíz sigue con `null` (`PdfStructure` la etiqueta
+      como `Document`). `Box.headingLevel(String)` y la lectura de `element.charAt(8)`
+      desaparecen.
+- [x] Desaparecen `ELEMENTS`, `ELEMENT_NAMES`, `IN_FLOW` y `TEXTS`, y los dos `switch` de
+      `element()` con su `default`. Las reglas `Element` van en un `EnumMap`. `Engine`,
+      `Overflow` y `PdfStructure` comparan con `Element.TABLE`, `LIST`…; el `switch` del tipo de
+      estructura del PDF es sobre el enum. `TABLE_GROUPS` se queda: `Head`, `Body` y `Foot` no
+      son elementos de caja.
+- [x] `ElementTest`: los elementos que se escriben son los nodos del schema que admiten `Class`, y
+      los que pueden ser ítem, los elementos que admiten `Item` y `Area`. Un elemento nuevo en el
+      schema falla aquí hasta que se añade al enum.
+
+**Verificación.** `mvn test` (613 tests), sin cambios en los PNG ni en los `expected.stxt`;
+marcando `LIST` como no apto para ítem, falla `ElementTest`.
+
+**Para el hito 15.** Añadir un elemento es una constante del enum, el schema y lo propio del
+elemento en el builder; lo demás (reglas `Element`, envoltorios, mensajes) sale del enum.
 
 ## 7. Partir `BoxTreeBuilder`
 
@@ -496,3 +515,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 5 | `Box` sin geometría; el margen usado va en `Fragment.margin`; sin `BoxModel.applyTo` ni `Fragment.complete`; 588 tests en verde | Revisar las ramas de `Overflow`; tarea 6 o 9 |
 | 2026-10-27 | Ramas de `Overflow` | Dos bugs corregidos (`Relative` en padre partido, culpable horizontal), 16 casos en el catálogo; `Overflow` al 93,8 % de ramas; 606 tests en verde | Tarea 6 o 9; revisar `Placement` |
 | 2026-10-27 | Culpable vertical de `Overflow` | `Aspect ratio`, `Rows`, `Padding`, `Border` y `Size` como culpables (§5.12); `Line height` heredado con su línea; 609 tests en verde | Tarea 6 o 9; revisar `Placement` |
+| 2026-10-27 | 6 | `enum Element` en `Box.element`; sin listas paralelas ni `switch` de `layout` y `position`; `ElementTest` contra el schema; 613 tests en verde | Tarea 7 (partir `BoxTreeBuilder`) o 9; revisar `Placement` |

@@ -4,6 +4,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Metadata;
 import dev.stxt.boxes.tree.Style;
 import org.apache.pdfbox.cos.COSArray;
@@ -97,17 +98,17 @@ final class PdfStructure {
         if (box.headingLevel() > 0) {
             headings.add(box);
         }
-        if ("list".equals(box.element)) {
+        if (box.element == Element.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();
             numbering.setListNumbering(listNumbering(box.style.listMarker));
             e.addAttribute(numbering);
         }
-        if ("table".equals(box.element)) {
+        if (box.element == Element.TABLE) {
             table(box, e);
             return;
         }
         PDStructureNode content = e;
-        if ("list-item".equals(box.element)) {
+        if (box.element == Element.LIST_ITEM) {
             // LI: el marcador (Lbl) y el contenido (LBody).
             if (box.marker != null) {
                 PDStructureElement label = new PDStructureElement("Lbl", e);
@@ -259,12 +260,12 @@ final class PdfStructure {
             return "H" + box.headingLevel();
         }
         return switch (box.element) {
-            case "paragraph" -> "P";
-            case "text" -> "Span";
-            case "list" -> "L";
-            case "list-item" -> "LI";
-            case "table" -> "Table";
-            case "cell" -> group(box) == 0 ? "TH" : "TD";
+            case PARAGRAPH -> "P";
+            case TEXT -> "Span";
+            case LIST -> "L";
+            case LIST_ITEM -> "LI";
+            case TABLE -> "Table";
+            case CELL -> group(box) == 0 ? "TH" : "TD";
             default -> "Div";
         };
     }

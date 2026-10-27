@@ -25,12 +25,12 @@ class ListsTest {
     void listAndItemsAreBlocks() {
         Box list = root("\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tParagraph: Uno",
                 "\t\tList item:", "\t\t\tText: Dos", "\t\t\tText: y más").children.get(0);
-        assertEquals("list", list.element);
+        assertEquals(Element.LIST, list.element);
         assertEquals(Style.Layout.BLOCK, list.style.layout);
         assertEquals(Style.Marker.DISC, list.style.listMarker);
         assertEquals(2, list.children.size());
         Box item = list.children.get(1);
-        assertEquals("list-item", item.element);
+        assertEquals(Element.LIST_ITEM, item.element);
         assertEquals(Style.Layout.BLOCK, item.style.layout);
         assertEquals(2, item.children.size());
         assertEquals(List.of("• ", "• "), markers(list));
@@ -97,6 +97,6 @@ class ListsTest {
     void aListCanBeAFlexItem() {
         Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: disc",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: a").children.get(0);
-        assertEquals("list", flex.children.get(0).element);
+        assertEquals(Element.LIST, flex.children.get(0).element);
     }
 }

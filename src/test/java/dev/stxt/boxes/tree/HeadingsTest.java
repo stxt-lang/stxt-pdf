@@ -18,11 +18,11 @@ class HeadingsTest {
     @Test
     void headingIsABlockOfTexts() {
         Box h = root("\tHeading 1:", "\t\tId: title", "\t\tText: Resultados", "\t\tText: del trimestre").children.get(0);
-        assertEquals("heading-1", h.element);
+        assertEquals(Element.HEADING_1, h.element);
         assertEquals(1, h.headingLevel());
         assertEquals(Style.Layout.BLOCK, h.style.layout);
         assertEquals(2, h.children.size());
-        assertEquals("text", h.children.get(0).element);
+        assertEquals(Element.TEXT, h.children.get(0).element);
         assertEquals("Resultados del trimestre", h.headingText());
     }
 
@@ -37,7 +37,7 @@ class HeadingsTest {
     @Test
     void paragraphIsATextWithMeaning() {
         Box p = root("\tParagraph: Hola.").children.get(0);
-        assertEquals("paragraph", p.element);
+        assertEquals(Element.PARAGRAPH, p.element);
         assertEquals(Style.Layout.INLINE, p.style.layout);
         assertEquals("Hola.", p.text);
         assertEquals(0, p.headingLevel());
@@ -80,7 +80,7 @@ class HeadingsTest {
     @Test
     void headingsCanBeItems() {
         Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tHeading 1:", "\t\t\t\tText: A").children.get(0);
-        assertEquals("heading-1", flex.children.get(0).element);
+        assertEquals(Element.HEADING_1, flex.children.get(0).element);
         assertEquals(1, flex.children.get(0).style.itemGrow, 1e-9);
     }
 }
