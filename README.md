@@ -76,14 +76,16 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 
 ## Estado
 
-Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las fuentes incrustadas. Los diez hitos de la hoja de ruta están
-terminados.
+Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
+fuentes incrustadas. Los hitos 1 a 11 están terminados; los siguientes, en
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Pieza | Estado |
 |---|---|
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
 | Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Cell`, validados con `@stxt.schema` | Hecho y probado |
 | Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
+| Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
 | Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
@@ -127,9 +129,10 @@ en `target/pdf/`.
 8. ~~**Fuentes.** Carpeta de recursos, fuentes TTF incrustadas, `Font weight` y `Font style`, línea base real.~~ Hecho.
 9. ~~**Elementos.** `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item` y `Cell` en lugar de `Box` con `Layout` y `Position`; `@stxt.schema` en lugar de `@stxt.template`.~~ Hecho.
 10. ~~**Grupos.** Las propiedades de cada caja en `Box`, `Typography` (se hereda) y `Break`, con nombres cortos.~~ Hecho.
+11. ~~**Reglas reutilizables.** `Styles` con reglas `Element`, `For class` y `For id`; `Class` en los elementos (caso 08).~~ Hecho.
 
-Los siguientes hitos (11 a 15: reglas reutilizables `Styles`, encabezados y párrafos, listas,
-tablas y bloque en columnas), con sus
+Los siguientes hitos (12 a 15: encabezados y párrafos, listas, tablas y bloque en columnas),
+con sus
 decisiones abiertas, tareas y el registro de cada sesión, están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 

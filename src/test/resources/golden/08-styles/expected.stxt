@@ -1,0 +1,22 @@
+# Cada Block deja 10 de margen inferior (Element: Block). b mide la mitad de 515 = 257.5.
+# t y u: una línea de 1.2 × 12 = 14.4; t no tiene margen, así que p empieza justo debajo.
+Result:
+	Page: 1
+		Fragment: a
+			Rect: 40 40 515 40
+		Fragment: b
+			Rect: 40 90 257.5 60
+		Fragment: c
+			Rect: 40 160 515 25
+		Fragment: d
+			Rect: 40 195 515 60
+		Fragment: last
+			Rect: 40 265 515 20
+		Fragment: e
+			Rect: 40 295 515 30
+		Fragment: t
+			Rect: 40 335 515 14.4
+		Fragment: p
+			Rect: 40 349.4 515 40
+			Fragment: u
+				Rect: 40 349.4 515 14.4

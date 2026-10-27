@@ -1,5 +1,6 @@
 # Informe de ejemplo (ESPECIFICACION.md §10): A4 paginado con cabecera y pie repetidos,
-# título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto.
+# título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto. El estilo
+# va en las reglas de Styles; los elementos solo declaran lo que es suyo.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -8,35 +9,46 @@ Document (dev.stxt.boxes):
 	Typography:
 		Font: IBM Plex Sans
 		Size: 10
+	Styles:
+		Element: Fixed
+			Box:
+				Height: 20
+			Typography:
+				Size: 8
+		Element: Text
+			Typography:
+				Align: justify
+		For class: panel
+			Box:
+				Background: #F1EFE8
+				Padding: 10
+			Typography:
+				Align: left
+			Break:
+				Inside: avoid
+		For id: title
+			Box:
+				Margin: 0 0 16 0
+			Typography:
+				Weight: bold
+				Size: 20
+				Line height: 24
+			Break:
+				After: avoid
 	Fixed:
 		Id: header
 		Offset: -30 0 auto 0
-		Box:
-			Height: 20
 		Typography:
-			Size: 8
 			Color: #5F5E5A
 		Text: Informe trimestral
 	Fixed:
 		Id: footer
 		Offset: auto 0 -30 0
-		Box:
-			Height: 20
-		Typography:
-			Size: 8
 		Text: Página {page} de {pages}
 			Typography:
 				Align: right
 	Text: Resultados del trimestre
 		Id: title
-		Typography:
-			Weight: bold
-			Size: 20
-			Line height: 24
-		Box:
-			Margin: 0 0 16 0
-		Break:
-			After: avoid
 	Grid:
 		Id: body
 		Columns: 150 1fr
@@ -44,19 +56,13 @@ Document (dev.stxt.boxes):
 		Cell:
 			Text:
 				Id: side
-				Box:
-					Background: #F1EFE8
-					Padding: 10
-				Break:
-					Inside: avoid
+				Class: panel
 				Content >>
 					Resumen de las cifras clave
 					del trimestre.
 		Cell:
 			Text:
 				Id: main
-				Typography:
-					Align: justify
 				Content >>
 					Primer párrafo del informe. Los saltos de línea simples
 					dentro del bloque equivalen a espacios.

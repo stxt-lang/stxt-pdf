@@ -38,8 +38,8 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 
 ## Estado
 
-Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los diez
-hitos están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
+a 11 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -54,9 +54,9 @@ actualízala.
 | 8 | ~~Carpeta de recursos, fuentes TTF incrustadas, `Font weight`/`Font style`, línea base real~~ (hecho) | `resources`, `layout/inline/PdfMetrics`, `paint/PdfCanvas` |
 | 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
+| 11 | ~~Reglas reutilizables `Styles` (`Element`, `For class`, `For id`) y `Class`~~ (hecho; caso 08) | schema, `tree/BoxTreeBuilder` |
 
-Los hitos 11 a 15 (reglas reutilizables `Styles`, encabezados y párrafos, listas, tablas y
-bloque en columnas) se siguen en
+Los hitos 12 a 15 (encabezados y párrafos, listas, tablas y bloque en columnas) se siguen en
 [`docs/ROADMAP.md`](docs/ROADMAP.md); al terminar uno, añádelo también a esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente

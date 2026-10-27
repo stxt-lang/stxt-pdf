@@ -31,7 +31,7 @@ Los hitos 1 a 10 (el motor de cajas) están terminados; ver la tabla de estado d
 
 | Hito | Elemento | Estado | Caso golden |
 |---|---|---|---|
-| 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | en curso | — |
+| 11 | Reglas reutilizables (`Styles`: por elemento, clase e id) | hecho | 08 |
 | 12 | Encabezados (`Heading 1`…`Heading 6`) y párrafos (`Paragraph`) | pendiente | — |
 | 13 | Listas (`ul`, `ol`, `li`) | pendiente | — |
 | 14 | Tablas, con cabecera y pie repetidos | pendiente | — |
@@ -216,10 +216,11 @@ Decididas también (2026-10-27), con la propuesta aceptada:
 - [x] `ErrorCode` y casos en el catálogo de errores (los cinco códigos nuevos, más una regla
       con `Margin: auto` en un ítem y un valor no válido en una regla sin usar).
 - [x] Especificación: §2, §4.2 (`Class`), §4.10 (nueva, reglas), §6, §8 y §9.
-- [ ] Especificación §10: decidir si el ejemplo completo usa `Styles` (cambiaría también
-      `report.stxt` y la copia del caso golden 05).
-- [ ] Caso golden: un documento con el estilo solo en `Styles`, añadido a `DocumentReaderTest`.
-- [ ] README (tabla de estado), `CLAUDE.md` (tabla de hitos) y `DECISIONES.md` al cerrar.
+- [x] Especificación §10: el ejemplo completo (`report.stxt` y la copia del caso golden 05)
+      lleva el estilo en `Styles`. El resultado y el PNG del caso 05 no cambian.
+- [x] Caso golden `08-styles` (prioridad, orden de clases, regla frente a herencia), añadido
+      a `DocumentReaderTest`.
+- [x] README (tabla de estado), `CLAUDE.md` (tabla de hitos) y `DECISIONES.md` (79–82).
 
 ---
 
@@ -482,6 +483,11 @@ Multicol:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-27 (4).** Hito 11 terminado. El ejemplo del §10 (`report.stxt` y la copia del
+  caso 05) usa `Styles` con el mismo resultado; caso golden `08-styles` nuevo; README,
+  `CLAUDE.md` y `DECISIONES.md` (79–82) actualizados. `mvn test` en verde.
+  *Siguiente paso:* hito 12, resolver H2, H4, H5 y P2 (en qué se diferencia `Paragraph` de
+  `Text`) y T2.
 - **2026-10-27 (3).** Hito 11: aceptadas las propuestas S1–S5. Hechos el schema,
   `BoxTreeBuilder` (lectura y aplicación de reglas con su prioridad), los cinco `ErrorCode`
   nuevos con sus casos en el catálogo, `StylesTest`, un test de layout y la especificación

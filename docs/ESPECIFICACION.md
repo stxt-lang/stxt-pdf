@@ -1147,35 +1147,46 @@ Document (dev.stxt.boxes):
 	Typography:
 		Font: IBM Plex Sans
 		Size: 10
+	Styles:
+		Element: Fixed
+			Box:
+				Height: 20
+			Typography:
+				Size: 8
+		Element: Text
+			Typography:
+				Align: justify
+		For class: panel
+			Box:
+				Background: #F1EFE8
+				Padding: 10
+			Typography:
+				Align: left
+			Break:
+				Inside: avoid
+		For id: title
+			Box:
+				Margin: 0 0 16 0
+			Typography:
+				Weight: bold
+				Size: 20
+				Line height: 24
+			Break:
+				After: avoid
 	Fixed:
 		Id: header
 		Offset: -30 0 auto 0
-		Box:
-			Height: 20
 		Typography:
-			Size: 8
 			Color: #5F5E5A
 		Text: Informe trimestral
 	Fixed:
 		Id: footer
 		Offset: auto 0 -30 0
-		Box:
-			Height: 20
-		Typography:
-			Size: 8
 		Text: Página {page} de {pages}
 			Typography:
 				Align: right
 	Text: Resultados del trimestre
 		Id: title
-		Typography:
-			Weight: bold
-			Size: 20
-			Line height: 24
-		Box:
-			Margin: 0 0 16 0
-		Break:
-			After: avoid
 	Grid:
 		Id: body
 		Columns: 150 1fr
@@ -1183,19 +1194,13 @@ Document (dev.stxt.boxes):
 		Cell:
 			Text:
 				Id: side
-				Box:
-					Background: #F1EFE8
-					Padding: 10
-				Break:
-					Inside: avoid
+				Class: panel
 				Content >>
 					Resumen de las cifras clave
 					del trimestre.
 		Cell:
 			Text:
 				Id: main
-				Typography:
-					Align: justify
 				Content >>
 					Primer párrafo del informe. Los saltos de línea simples
 					dentro del bloque equivalen a espacios.
@@ -1222,6 +1227,13 @@ Document (dev.stxt.boxes):
 - **Fuentes:** el `Typography` de `Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
+- **Reglas** ([§4.10](#410-reglas-reutilizables-styles)): `Element: Fixed` da a la cabecera y
+  al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `Element: Text` justifica todos los
+  textos; en los de una sola línea (título, cabecera) no se nota, porque la última línea de un
+  párrafo no se justifica. El pie y el sello lo sobrescriben con su propio `Align`, y la clase
+  `panel` de `side` lo devuelve a `left`: una regla `For class` gana a la de `Element`. La
+  regla `For id: title` lleva todo el estilo del título, que en el documento solo declara su
+  texto y su `Id`. El resultado es el mismo que si cada elemento declarase esas propiedades.
 - **`header`** (`Fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.

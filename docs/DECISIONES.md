@@ -294,3 +294,27 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     `fragment/Paginator`, `layout/Overflow`, `paint/SvgCanvas`, `paint/PdfCanvas`.
     *Alternativa:* conservar el modo continuo para pantalla, a costa de un caso especial en el
     paginador, en el desbordamiento y en el alto definido del área útil.
+
+## Hito 11: reglas reutilizables (2026-10-27)
+
+79. **Prioridad fija en lugar de especificidad.** De más a menos fuerte: el elemento,
+    `For id`, `For class` (entre clases, la que va después en `Styles`), `Element`, la
+    herencia y el valor por defecto. Una regla gana a la herencia, como en CSS cualquier
+    regla que se aplica al elemento gana a lo heredado. *Dónde:* `BoxTreeBuilder.applyRules`.
+    *Alternativa:* especificidad calculada y selectores compuestos, como CSS; más potente,
+    pero menos predecible y sin necesidad todavía.
+
+80. **Lo que aporta una regla se valida como si lo declarara el elemento.** Una regla por
+    tipo puede dar un error en un elemento concreto (un `Margin: auto` en un ítem de flex),
+    con la línea de la regla. Los valores de las reglas se comprueban aunque no se apliquen.
+    *Alternativa:* ignorar las reglas sin efecto cuando vienen de una regla; habría que saber
+    de dónde viene cada valor en las 11 comprobaciones que usan `Style.isDeclared`.
+
+81. **Reglas sin aplicar.** Un `Element` o un `For class` sin elementos se permiten (las
+    reglas se reutilizan); un `For id` sin su elemento, una clase de `Class` sin su regla y
+    dos reglas con el mismo selector son errores. *Alternativa:* tratarlos todos igual
+    (todos error, o ninguno).
+
+82. **Las reglas solo admiten `Box`, `Typography` y `Break`**, no las propiedades propias de
+    un elemento (`Gap`, `Columns`, `Offset`…), que el schema no podría validar porque el tipo
+    va en el valor de `Element`. *Alternativa:* admitirlas y validarlas en el builder.

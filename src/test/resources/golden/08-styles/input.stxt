@@ -1,0 +1,67 @@
+# Hito 11: reglas reutilizables (ESPECIFICACION.md §4.10). Área útil de 515 pt desde (40, 40).
+#
+# Element: Block da a cada Block 40 de alto y 10 de margen inferior.
+# a: solo la regla del tipo.
+# b: half (50 %) y tall (60), que no chocan: se suman.
+# c: short y tall declaran Height; gana short, que va después en Styles, no el orden de Class.
+# d: solo la clase tall (60), que gana a la regla del tipo.
+# last: For id: last (20) gana a la clase tall.
+# e: su propio Height (30) gana a todas las reglas.
+# t: Element: Text da Size 12, línea de 14.4. Element: Block no se aplica a un Text: sin margen.
+# p: Block con Size 20; su Text u mide 12 porque la regla gana a la herencia.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Block
+			Box:
+				Height: 40
+				Margin: 0 0 10 0
+				Background: #F1EFE8
+		Element: Text
+			Typography:
+				Size: 12
+		For class: half
+			Box:
+				Width: 50%
+		For class: tall
+			Box:
+				Height: 60
+		For class: short
+			Box:
+				Height: 25
+		For id: last
+			Box:
+				Height: 20
+	Block:
+		Id: a
+	Block:
+		Id: b
+		Class: half tall
+	Block:
+		Id: c
+		Class: short tall
+	Block:
+		Id: d
+		Class: tall
+	Block:
+		Id: last
+		Class: tall
+	Block:
+		Id: e
+		Class: tall
+		Box:
+			Height: 30
+	Text: Texto con regla
+		Id: t
+	Block:
+		Id: p
+		Typography:
+			Size: 20
+		Text: Hereda
+			Id: u
