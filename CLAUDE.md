@@ -15,7 +15,10 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 **puntos tipográficos** (1 pt = 1/72 in; A4 = 595 × 842).
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
-- **Estado e hoja de ruta:** [`README.md`](README.md)
+- **Estado:** [`README.md`](README.md)
+- **Hoja de ruta de los hitos 11 en adelante:** [`docs/ROADMAP.md`](docs/ROADMAP.md). Léela al
+  empezar una sesión (estado, decisiones abiertas y registro de sesiones) y actualízala al
+  terminar.
 - **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
   (si difiere del resumen del §9 de la especificación, manda el fichero)
 - **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
@@ -51,6 +54,9 @@ actualízala.
 | 8 | ~~Carpeta de recursos, fuentes TTF incrustadas, `Font weight`/`Font style`, línea base real~~ (hecho) | `resources`, `layout/inline/PdfMetrics`, `paint/PdfCanvas` |
 | 9 | ~~Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`, `Item`, `Cell`) en lugar de `Box`, validados con `@stxt.schema`~~ (hecho) | schema, `stxt/DocumentReader`, `tree/BoxTreeBuilder` |
 | 10 | ~~Grupos `Box`, `Typography` y `Break`, con nombres cortos~~ (hecho) | schema, `tree/BoxTreeBuilder` |
+
+Los hitos 11 a 14 (encabezados, listas, tablas y bloque en columnas) se siguen en
+[`docs/ROADMAP.md`](docs/ROADMAP.md); al terminar uno, añádelo también a esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
