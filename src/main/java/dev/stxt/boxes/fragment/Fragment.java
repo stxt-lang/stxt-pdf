@@ -52,6 +52,16 @@ public record Fragment(Box box, double x, double y, double width, double height,
         return new Fragment(box, 0, 0, 0, 0, Insets.ZERO, Insets.ZERO, Insets.ZERO, List.of(), List.of(), false, false);
     }
 
+    /** Ancho de la caja de contenido de este fragmento: la de borde menos su borde y su relleno. */
+    public double contentWidth() {
+        return width - border.horizontal() - padding.horizontal();
+    }
+
+    /** Alto de la caja de contenido de este fragmento. */
+    public double contentHeight() {
+        return height - border.vertical() - padding.vertical();
+    }
+
     public Fragment moved(double newX, double newY) {
         return moved(newX, newY, offsetX, offsetY);
     }

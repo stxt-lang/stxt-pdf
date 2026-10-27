@@ -81,7 +81,7 @@ public final class Overflow {
         }
         double cx = x + f.border().left() + f.padding().left();
         double cy = y + f.border().top() + f.padding().top();
-        content(f, cx, cy, contentWidth(f), contentHeight(f), false, page);
+        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page);
     }
 
     /**
@@ -160,8 +160,8 @@ public final class Overflow {
             double cy = y + c.border().top() + c.padding().top();
             // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
             for (TextLine l : c.lines()) {
-                if (l.x() < -TOLERANCE || l.x() + l.width() > contentWidth(c) + TOLERANCE) {
-                    throw textOverflow(c.box(), l, contentWidth(c));
+                if (l.x() < -TOLERANCE || l.x() + l.width() > c.contentWidth() + TOLERANCE) {
+                    throw textOverflow(c.box(), l, c.contentWidth());
                 }
             }
             Style s = c.box().style;
@@ -174,7 +174,7 @@ public final class Overflow {
                 double dx = cx + d.x() - d.offsetX();
                 boolean outside = dx < left - TOLERANCE || dx + d.width() > right + TOLERANCE;
                 boolean outsideParent = dx - d.margin().left() < cx - TOLERANCE
-                        || dx + d.width() + d.margin().right() > cx + contentWidth(c) + TOLERANCE;
+                        || dx + d.width() + d.margin().right() > cx + c.contentWidth() + TOLERANCE;
                 if (outside && (!sized || outsideParent)) {
                     inner = d;
                     x = dx;
@@ -258,13 +258,5 @@ public final class Overflow {
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + word + "' no cabe en "
                 + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)
                 + "; ensancha la caja o reduce el Size del texto");
-    }
-
-    private static double contentWidth(Fragment f) {
-        return f.width() - f.border().horizontal() - f.padding().horizontal();
-    }
-
-    private static double contentHeight(Fragment f) {
-        return f.height() - f.border().vertical() - f.padding().vertical();
     }
 }

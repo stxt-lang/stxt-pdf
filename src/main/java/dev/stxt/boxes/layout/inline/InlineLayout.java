@@ -68,7 +68,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         List<TextLine> lines = new ArrayList<>();
         Style s = f.box().style;
-        double available = f.width() - f.border().horizontal() - f.padding().horizontal();
+        double available = f.contentWidth();
         for (TextLine l : f.lines()) {
             if (!PageNumbers.contains(l.text())) {
                 lines.add(l);
