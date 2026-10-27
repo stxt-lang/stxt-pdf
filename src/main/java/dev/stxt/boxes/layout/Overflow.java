@@ -3,7 +3,6 @@ package dev.stxt.boxes.layout;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.TextLine;
-import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
@@ -16,7 +15,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.OptionalDouble;
 
 /**
  * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
@@ -91,10 +89,8 @@ public final class Overflow {
             }
             if (!c.box().style.isOutOfFlow()) {
                 // Las relative se comprueban en su sitio, sin el desplazamiento.
-                RelativeOffset o = RelativeOffset.of(c.box().style, width,
-                        Double.isFinite(height) ? OptionalDouble.of(height) : OptionalDouble.empty());
-                double x = c.x() - o.dx();
-                double y = c.y() - o.dy();
+                double x = c.x() - c.offsetX();
+                double y = c.y() - c.offsetY();
                 Insets margin = c.margin();
                 if (x - margin.left() < -EPSILON || x + c.width() + margin.right() > width + EPSILON) {
                     throw tooWide(c, cx + x, cy + y, cx, cx + width);
@@ -133,7 +129,11 @@ public final class Overflow {
     // Culpables
     // ------------------------------------------------------------------------------------------
 
-    /** Un hijo se sale por los lados: el culpable es lo más interior que se sale. */
+    /**
+     * Un hijo se sale por los lados: el culpable es lo más interior que se sale. Si la caja
+     * declara su ancho ({@code Width} o {@code Min width}), sus hijos que solo la llenan no son
+     * culpables: solo se baja a un hijo que se sale también de ella.
+     */
     private static InvalidModelException tooWide(Fragment c, double x, double y, double left, double right) {
         while (true) {
             double cx = x + c.border().left() + c.padding().left();
@@ -144,19 +144,25 @@ public final class Overflow {
                     throw textOverflow(c.box(), l, contentWidth(c));
                 }
             }
+            Style s = c.box().style;
+            boolean sized = s.isDeclared("width") || s.isDeclared("min-width");
             Fragment inner = null;
             for (Fragment d : c.children()) {
-                double dx = cx + d.x();
-                if (!d.box().style.isOutOfFlow() && !d.box().isMarker()
-                        && (dx < left - EPSILON || dx + d.width() > right + EPSILON)) {
+                if (d.box().style.isOutOfFlow() || d.box().isMarker()) {
+                    continue;
+                }
+                double dx = cx + d.x() - d.offsetX();
+                boolean outside = dx < left - EPSILON || dx + d.width() > right + EPSILON;
+                boolean outsideParent = dx - d.margin().left() < cx - EPSILON
+                        || dx + d.width() + d.margin().right() > cx + contentWidth(c) + EPSILON;
+                if (outside && (!sized || outsideParent)) {
                     inner = d;
                     x = dx;
-                    y = cy + d.y();
+                    y = cy + d.y() - d.offsetY();
                     break;
                 }
             }
             if (inner == null) {
-                Style s = c.box().style;
                 String property = s.isDeclared("width") ? "width" : s.isDeclared("min-width") ? "min-width" : null;
                 return new InvalidModelException(property != null ? s.line(property) : c.box().line,
                         ErrorCode.BOX_OVERFLOW, "La caja " + name(c.box()) + " no cabe a lo ancho: mide "
@@ -185,10 +191,11 @@ public final class Overflow {
             double cy = y + c.border().top() + c.padding().top();
             Fragment inner = null;
             for (Fragment d : c.children()) {
-                if (!d.box().style.isOutOfFlow() && !d.box().isMarker() && cy + d.y() + d.height() > bottom + EPSILON) {
+                double dy = cy + d.y() - d.offsetY();
+                if (!d.box().style.isOutOfFlow() && !d.box().isMarker() && dy + d.height() > bottom + EPSILON) {
                     inner = d;
-                    x = cx + d.x();
-                    y = cy + d.y();
+                    x = cx + d.x() - d.offsetX();
+                    y = dy;
                     break;
                 }
             }
@@ -207,7 +214,8 @@ public final class Overflow {
     /** Una línea más ancha que su caja: una palabra que no cabe. Señala la línea del documento de esa palabra. */
     private static InvalidModelException textOverflow(Box box, TextLine l, double width) {
         String word = Arrays.stream(l.text().split(" ")).max(Comparator.comparingInt(String::length)).orElse(l.text());
-        int index = box.text == null ? -1 : box.text.indexOf(word);
+        // No está en el texto si la ha cambiado el layout, como un número de página.
+        int index = box.text.indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine;
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + word + "' no cabe en "
                 + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)

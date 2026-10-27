@@ -456,3 +456,20 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
      contenido del padre en bloque y flex). *Dónde:* `fragment/Fragment`, `layout/Overflow`,
      `tree/Box`. *Alternativa:* que `Overflow` resuelva los márgenes con el ancho de contenido
      del padre, que no es la base de los ítems de grid.
+
+105. **`Overflow` comprueba un `Relative` en su sitio con el desplazamiento que usó el layout**,
+     guardado en `Fragment.offsetX`/`offsetY`, en lugar de volver a calcularlo. Lo recalculaba
+     con el alto del fragmento como base de los porcentajes verticales, y en un padre partido
+     entre páginas esa base no es su `Height` entero: rechazaba documentos válidos (un
+     `Offset: 10%` dentro de un bloque de 1500 pt que se parte). *Dónde:* `fragment/Fragment`,
+     `layout/UnitBreaker.Placed`, `layout/Overflow`. *Alternativa:* que `Overflow` resuelva el
+     porcentaje con el `Height` del padre, que necesita las bases de todos sus antepasados.
+
+106. **Una caja que declara su ancho (`Width` o `Min width`) es la culpable de sus hijos que
+     solo la llenan** (§5.12): al buscar el culpable más interior de un desbordamiento
+     horizontal, `Overflow` solo baja a un hijo de una caja así si ese hijo se sale también de
+     ella. Antes bajaba a cualquier hijo que pasara del contenedor original, y señalaba un
+     `Block` con ancho `auto` (o el `Text` de un `List item` con `Width`) en lugar del `Width`
+     que lo causaba. En una caja de ancho `auto` sigue bajando, porque su ancho sale de su
+     contenido. *Dónde:* `layout/Overflow.tooWide`. *Alternativa:* comparar siempre con la caja
+     del padre inmediato, que en una caja `auto` señala la caja y no lo que la ensancha.

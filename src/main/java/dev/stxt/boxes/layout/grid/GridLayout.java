@@ -189,7 +189,8 @@ public final class GridLayout implements LayoutAlgorithm {
             double py = y[a.row() - 1] + margin.top()
                     + offset(vertical, areaHeight, f.height() + margin.vertical());
             RelativeOffset relative = RelativeOffset.of(item.style, contentWidth, contentHeight);
-            placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1));
+            placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1,
+                    relative));
         }
 
         double extent = sum(rows) + rowGap * Math.max(0, rows.length - 1);

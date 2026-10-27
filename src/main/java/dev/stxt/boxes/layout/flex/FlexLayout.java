@@ -437,7 +437,8 @@ public final class FlexLayout implements LayoutAlgorithm {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
             RelativeOffset offset = RelativeOffset.of(it.box.style, contentWidth, contentHeight);
-            return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit);
+            return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit,
+                    offset);
         }
 
         /**

@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout;
 import dev.stxt.boxes.fragment.BreakRules;
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.tree.Box;
 
 import java.util.ArrayList;
@@ -38,15 +39,17 @@ public final class UnitBreaker {
     /**
      * Un ítem ya colocado en el layout sin fragmentar.
      *
-     * @param box    el ítem
-     * @param result su layout
-     * @param space  espacio de ese layout, para repetirlo con fragmentación si el ítem se parte
-     * @param x      posición de su caja de borde, relativa a la caja de contenido del contenedor
-     *               (incluye el desplazamiento de {@code relative})
-     * @param y      ídem
-     * @param unit   unidad a la que pertenece
+     * @param box      el ítem
+     * @param result   su layout
+     * @param space    espacio de ese layout, para repetirlo con fragmentación si el ítem se parte
+     * @param x        posición de su caja de borde, relativa a la caja de contenido del contenedor
+     *                 (incluye el desplazamiento de {@code relative})
+     * @param y        ídem
+     * @param unit     unidad a la que pertenece
+     * @param relative desplazamiento de {@code relative} incluido en {@code x} e {@code y}
      */
-    public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit) {
+    public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
+                         RelativeOffset relative) {
     }
 
     /**
@@ -271,7 +274,7 @@ public final class UnitBreaker {
             Fragment f = r.fragment();
             double dx = p.x() + f.border().left() + f.padding().left();
             double dy = y + f.border().top() + f.padding().top();
-            return new Piece(f.moved(p.x(), y), r.pending().stream().map(q -> q.translated(dx, dy)).toList());
+            return new Piece(f.moved(p.x(), y, p.relative().dx(), p.relative().dy()), r.pending().stream().map(q -> q.translated(dx, dy)).toList());
         }
 
         /**

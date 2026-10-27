@@ -604,6 +604,57 @@ Errors:
 					Content >>
 						Una palabra muy
 						supercalifragilisticoespialidosa
+	Case: Palabra que no cabe en un texto centrado
+		Code: TEXT_OVERFLOW
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Text:
+					Box:
+						Width: 100
+					Typography:
+						Align: center
+					Content >>
+						supercalifragilisticoespialidosa
+	Case: Palabra que no cabe en una caja que se sale
+		Code: TEXT_OVERFLOW
+		Line: 15
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Block:
+					Box:
+						Width: 100
+					Text:
+						Box:
+							Width: 150
+						Content >>
+							supercalifragilisticoespialidosamente
+	Case: Número de página que no cabe
+		Code: TEXT_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Text: {page}
+					Box:
+						Width: 5
 	Case: Caja más ancha que el área útil
 		Code: BOX_OVERFLOW
 		Line: 7
@@ -690,6 +741,166 @@ Errors:
 					Box:
 						Width: 50
 						Height: 10
+	Case: Hija con Min width más ancha que su contenedor
+		Code: BOX_OVERFLOW
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Width: 100
+					Block:
+						Box:
+							Min width: 150
+							Height: 10
+	Case: Nieta más ancha que la hija que se sale
+		Code: BOX_OVERFLOW
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Width: 100
+					Block:
+						Box:
+							Width: 150
+						Block:
+							Id: C
+							Box:
+								Width: 200
+								Height: 10
+	Case: Hija con Width que se sale y nietas que la llenan
+		Code: BOX_OVERFLOW
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Width: 100
+					Relative:
+						Box:
+							Width: 150
+						Block:
+							Box:
+								Height: 10
+						Absolute:
+							Box:
+								Width: 10
+								Height: 10
+	Case: Ítem centrado que se sale por la izquierda
+		Code: BOX_OVERFLOW
+		Line: 14
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Flex:
+					Box:
+						Width: 100
+					Main axis: center
+					Item:
+						Shrink: 0
+						Block:
+							Block:
+								Box:
+									Width: 150
+									Height: 10
+	Case: Ítem de lista más ancho que la lista
+		Code: BOX_OVERFLOW
+		Line: 15
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: decimal
+					Box:
+						Width: 100
+						Padding: 0 0 0 20
+					List item:
+						Box:
+							Width: 150
+						Text: Uno
+	Case: Hija más alta que el Max height del padre
+		Code: BOX_OVERFLOW
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Max height: 50
+					Block:
+						Box:
+							Height: 80
+	Case: Hija más alta que la fila del grid
+		Code: BOX_OVERFLOW
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Grid:
+					Rows: 20
+					Area: 1 1
+						Block:
+							Box:
+								Height: 80
+	Case: Absolute que se sale por la izquierda
+		Code: BOX_OVERFLOW
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Absolute:
+					Offset: 0 auto auto -100
+					Box:
+						Width: 50
+						Height: 10
+	Case: Absolute sin Offset más ancho que la página
+		Code: BOX_OVERFLOW
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Absolute:
+					Box:
+						Width: 700
+						Height: 10
+	Case: Fixed que se sale por abajo
+		Code: BOX_OVERFLOW
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Fixed:
+					Offset: 830 auto auto 0
+					Box:
+						Width: 50
+						Height: 20
 	Case: Línea más alta que la página
 		Code: PAGE_OVERFLOW
 		Line: 11
@@ -705,6 +916,50 @@ Errors:
 				Text: a
 					Typography:
 						Line height: 900
+	Case: Línea más alta que la página dentro de una lista
+		Code: PAGE_OVERFLOW
+		Line: 15
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: decimal
+					Box:
+						Padding: 0 0 0 20
+					List item:
+						Text: a
+							Typography:
+								Line height: 900
+	Case: Texto más alto que la página sin Line height
+		Code: PAGE_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Text: a
+					Typography:
+						Size: 900
+	Case: Relleno más alto que la página
+		Code: PAGE_OVERFLOW
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Padding: 900 0 0 0
 	Case: Regla para algo que no es un elemento de caja
 		Code: STYLE_UNKNOWN_ELEMENT
 		Line: 6

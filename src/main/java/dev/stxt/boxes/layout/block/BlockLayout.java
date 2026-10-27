@@ -216,7 +216,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             RelativeOffset offset = RelativeOffset.of(child.style, contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();
-            fragments.add(f.moved(childX, childY));
+            fragments.add(f.moved(childX, childY, offset.dx(), offset.dy()));
             double dx = childX + f.border().left() + f.padding().left();
             double dy = childY + f.border().top() + f.padding().top();
             r.pending().forEach(p -> pending.add(p.translated(dx, dy)));

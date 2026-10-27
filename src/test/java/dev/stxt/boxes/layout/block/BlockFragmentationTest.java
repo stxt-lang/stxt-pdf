@@ -273,4 +273,17 @@ class BlockFragmentationTest {
         assertFalse(l.has(1, "S"));
         assertRect(535, 40, 20, 20, l.rect(2, "S"));
     }
+
+    @Test
+    void relativePercentOffsetUsesTheWholeHeightOfAFragmentedParent() {
+        // El 10 % es del Height entero de P (30), no del fragmento de la primera página (10): R
+        // está en su sitio (80-95) dentro de la página y Overflow no puede desplazarlo con otra base.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 300",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 80",
+                "\t\tRelative:", "\t\t\tId: R", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
+                "\t\t\t\tHeight: 15");
+        assertEquals(3, l.pages());
+        assertRect(40, 150, 515, 15, l.rect(1, "R"));
+    }
 }

@@ -2,6 +2,7 @@ package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.layout.position.RelativeOffset;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
@@ -42,7 +43,8 @@ class UnitBreakerTest {
         double h = ((Value.Points) item.style.height).pt();
         LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
                 Insets.ZERO, List.of(), List.of(), true, true));
-        return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit);
+        return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit,
+                RelativeOffset.NONE);
     }
 
     /** Tres unidades de 40, con un ítem cada una. */

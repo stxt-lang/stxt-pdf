@@ -74,10 +74,10 @@ public final class TableLayout implements LayoutAlgorithm {
                 headItems.add(p);
             } else if (p.unit() < bodyEnd) {
                 body.add(new UnitBreaker.Placed(p.box(), p.result(), p.space(), p.x(), p.y() - bodyStart,
-                        p.unit() - head));
+                        p.unit() - head, p.relative()));
             } else {
                 footItems.add(new UnitBreaker.Placed(p.box(), p.result(), p.space(), p.x(), p.y() - bodyBottom,
-                        p.unit()));
+                        p.unit(), p.relative()));
             }
         }
         double[] starts = shifted(Arrays.copyOfRange(all.starts(), head, bodyEnd), bodyStart);

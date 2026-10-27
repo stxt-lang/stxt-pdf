@@ -237,6 +237,37 @@ catálogo de errores solo ejecuta dos tercios de sus ramas. Antes de poner un um
 mirar en el informe qué ramas de `Overflow` y de `Placement` son casos reales sin probar y
 cuáles son código muerto.
 
+**Revisión de las ramas de `Overflow`** (2026-10-27). Casi todas eran casos reales sin probar;
+dos escondían errores:
+
+- [x] **Bug:** un `Relative` con `Offset` vertical en porcentaje dentro de un padre que se
+      parte entre páginas daba un `BOX_OVERFLOW` falso: `Overflow` recalculaba el
+      desplazamiento con el alto del fragmento, no con el `Height` entero. Ahora el desplazamiento
+      usado va en `Fragment.offsetX`/`offsetY` (y en `UnitBreaker.Placed.relative`), como el
+      margen en la [tarea 5](#5-quitar-la-geometría-mutable-de-box). Tests en
+      `BlockFragmentationTest` y `GridFragmentationTest` (fallan con el `Overflow` anterior).
+      `DECISIONES.md` 105.
+- [x] **Bug:** el culpable de un desbordamiento horizontal bajaba a los hijos `auto` que solo
+      llenan una caja con `Width` (`Hija con Width que se sale y nietas que la llenan`, `Ítem
+      de lista más ancho que la lista`). `DECISIONES.md` 106.
+- [x] **Código muerto:** `box.text == null` en `textOverflow` (solo las cajas de texto y los
+      marcadores tienen líneas) y el alto infinito en la base del `Relative` (desaparece con
+      el primer punto).
+- [x] 16 casos nuevos en el catálogo: `Absolute` por la izquierda y sin `Offset`, `Fixed` por
+      abajo; palabra en texto centrado, dentro de una caja que se sale y número de página;
+      ítem flex centrado, nieta, `Min width`, `Max height`, fila de grid; línea dentro de una
+      lista, `Size` sin `Line height` y relleno más alto que la página.
+
+Resultado: `Overflow` pasa del 62,7 % al 93,8 % de ramas (100 % de líneas); el total, a
+95,6 % de líneas y 87,5 % de ramas. Las 7 ramas que quedan son combinaciones de condiciones que
+ya se prueban por otro lado (lado izquierdo y derecho de la misma comparación, `Absolute` o
+marcador que se salta al bajar). `Placement` sigue pendiente de revisar.
+
+**Abierto:** cuando el alto lo fija algo que no es `Height` ni `Max height` (una fila de grid
+de tamaño fijo, `Aspect ratio`), el culpable de `BOX_OVERFLOW` es la línea de la caja, no la
+de `Rows` o `Aspect ratio`; y un relleno más alto que la página con `Height` declarado señala
+el `Height`, no el `Padding`. Es lo que dice el §5.12; cambiarlo es una regla nueva.
+
 ## 5. Quitar la geometría mutable de `Box`
 
 **Problema (bug latente, el de más peso).** [`Box`](../src/main/java/dev/stxt/boxes/tree/Box.java)
@@ -461,3 +492,4 @@ Para no hacerlo por inercia:
 | 2026-10-27 | 3 | `layOutDocument` devuelve `LaidOutDocument`; fachada `PdfWriter`; sin `Engine.cache()`; 555 tests en verde | Tarea 4 |
 | 2026-10-27 | 4 | `SliceTest`, `BoxModelTest`, `LayoutCacheTest` y `UnitBreakerTest`; JaCoCo (95,1 % de líneas, 86,1 % de ramas); 587 tests en verde | Tarea 5; revisar las ramas de `Overflow` |
 | 2026-10-27 | 5 | `Box` sin geometría; el margen usado va en `Fragment.margin`; sin `BoxModel.applyTo` ni `Fragment.complete`; 588 tests en verde | Revisar las ramas de `Overflow`; tarea 6 o 9 |
+| 2026-10-27 | Ramas de `Overflow` | Dos bugs corregidos (`Relative` en padre partido, culpable horizontal), 16 casos en el catálogo; `Overflow` al 93,8 % de ramas; 606 tests en verde | Tarea 6 o 9; revisar `Placement` |
