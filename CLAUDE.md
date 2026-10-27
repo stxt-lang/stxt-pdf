@@ -16,9 +16,10 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 11 en adelante:** [`docs/ROADMAP.md`](docs/ROADMAP.md). Léela al
-  empezar una sesión (estado, decisiones abiertas y registro de sesiones) y actualízala al
-  terminar.
+- **Hoja de ruta:** ahora no hay ningún hito abierto. Las hojas de ruta terminadas se han
+  borrado del repositorio (siguen en el historial de git). Al abrir un hito nuevo, crea
+  `docs/ROADMAP.md` con su estado, sus decisiones abiertas y el registro de sesiones; léela al
+  empezar cada sesión y actualízala al terminar.
 - **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
   (si difiere del resumen del §9 de la especificación, manda el fichero)
 - **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
@@ -61,7 +62,7 @@ actualízala.
 | 14 | ~~Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`) con cabecera y pie repetidos; `Area` en lugar del `Cell` de `Grid`~~ (hecho; caso 11) | schema, `tree/BoxTreeBuilder`, `layout/table/TableLayout`, `layout/UnitBreaker`, `paint/PdfStructure` |
 | 15 | ~~Bloque en columnas (`Multicol`), equilibrado y cortes de columna~~ (hecho; caso 12) | schema, `tree/BoxTreeBuilder`, `layout/multicol/MulticolLayout`, `fragment/BreakRules`, `paint/StackingContext` |
 
-Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
+Si se abre un hito nuevo, apúntalo en `docs/ROADMAP.md` y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase

@@ -15,7 +15,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Coste de un texto largo (docs/ROADMAP-QA-ARQ.md, tarea 11): un solo {@code Text} de muchas
+ * Coste de un texto largo: un solo {@code Text} de muchas
  * páginas. {@link InlineLayout} lo parte en líneas una sola vez y no en cada página, así que el
  * trabajo crece de forma lineal con las páginas, no cuadrática. Se mide por las veces que se
  * mide el texto.

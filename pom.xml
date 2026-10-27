@@ -57,7 +57,7 @@
             </plugin>
 
             <!-- Cobertura de los tests: mvn test deja el informe en target/site/jacoco/index.html.
-                 Solo el informe, sin umbral (docs/ROADMAP-QA-ARQ.md, tarea 4). -->
+                 Solo el informe, sin umbral. -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>

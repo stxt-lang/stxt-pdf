@@ -77,8 +77,7 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 15 están terminados; su
-registro está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 15 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -141,8 +140,7 @@ en `target/pdf/`.
 
 15. ~~**Columnas.** `Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`; las columnas son fragmentainers dentro de la página, equilibradas al final, y `Before`/`After: column` (caso 12).~~ Hecho.
 
-Las decisiones y el registro de cada sesión de los hitos 11 a 15 están en
-[`docs/ROADMAP.md`](docs/ROADMAP.md).
+Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
 
 ## Estructura
 
