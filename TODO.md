@@ -71,9 +71,10 @@
   `Typography`). Queda que un texto con `Inline: markdown` no admite listas ni encabezados (van en
   un `Markdown`) y que hay que escapar el primer carácter si empieza como una (`-`, `#`, `1.`).
 - ~~**Estilo de las tablas**~~ (hito 25: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell`,
-  `Even row cell`, `For column` y `Column align`). Queda que una fila no tiene `Box` y que no se
-  puede dar estilo a una fila concreta sin tocar cada una de sus celdas (el pie de totales de la
-  factura sigue necesitando `Class: total` en las dos celdas de la fila).
+  `Even row cell`, `For column` y `Column align`). Una fila concreta se estila con `Class` en la `Row`
+  (hito 35: sus reglas `For class` se aplican a cada celda; el pie de totales de la factura lo usa).
+  Queda que una fila no tiene `Box` (un borde o un fondo de fila es el de cada celda: un `Border` se repite
+  entre celdas) ni `Id` (no se puede enlazar a una fila ni darle estilo con `For id`).
 - ~~**Aspecto de las cajas**~~ (hito 28: `Radius`, `Border color` por lado, `Background` con `linear(…)` y
   colores con opacidad). Queda: **sombras** (`Shadow`, descartadas en el hito: PDFBox no desenfoca y habría que
   aproximar con capas), degradados con paradas con posición, radiales o repetidos, y dos radios por esquina

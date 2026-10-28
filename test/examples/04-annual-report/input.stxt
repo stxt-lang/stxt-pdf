@@ -371,15 +371,12 @@ Document (dev.stxt.boxes):
 						Cell: +23,9 %
 				Foot:
 					Row:
+						Class: total
 						Cell: Resultado del ejercicio
 							Header: true
-							Class: total
 						Cell: 312
-							Class: total
 						Cell: 233
-							Class: total
 						Cell: +33,9 %
-							Class: total
 			Heading 2:
 				Text: Dónde ha ido la inversión
 			Markdown:

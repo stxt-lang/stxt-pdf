@@ -184,12 +184,11 @@ Document (dev.stxt.boxes):
 						Span: 1 4
 					Cell: 2.318,82 €
 				Row:
+					Class: total
 					Cell: Total a pagar
 						Header: true
 						Span: 1 4
-						Class: total
 					Cell: 13.360,82 €
-						Class: total
 		Grid:
 			Id: payment
 			Columns: 1fr 1fr

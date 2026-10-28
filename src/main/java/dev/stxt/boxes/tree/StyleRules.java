@@ -284,17 +284,25 @@ final class StyleRules {
                 }
             }
         }
-        Optional<Node> classNode = child(n, "class");
-        if (classNode.isPresent()) {
-            Set<String> classes = classes(classNode.get());
-            for (ClassRule rule : classRules) {
-                if (classes.contains(rule.name())) {
-                    rules.add(rule.rule());
-                }
-            }
+        // Las clases de la fila de una celda valen menos que las de la propia celda.
+        if (position != null && position.rowClass() != null) {
+            rules.addAll(classRules(position.rowClass()));
         }
+        child(n, "class").ifPresent(c -> rules.addAll(classRules(c)));
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
         applyAll(rules, noBreak, s);
+    }
+
+    /** Las reglas {@code For class} de un {@code Class}, en el orden de {@code Styles}. */
+    private List<InlineNode> classRules(Node classNode) {
+        Set<String> classes = classes(classNode);
+        List<InlineNode> rules = new ArrayList<>();
+        for (ClassRule rule : classRules) {
+            if (classes.contains(rule.name())) {
+                rules.add(rule.rule());
+            }
+        }
+        return rules;
     }
 
     private void applyAll(List<InlineNode> rules, String noBreak, Style s) {

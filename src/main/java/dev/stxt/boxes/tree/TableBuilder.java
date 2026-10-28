@@ -110,7 +110,8 @@ final class TableBuilder {
                         }
                     }
                     Style.TextAlign align = aligns.isEmpty() ? null : aligns.get(c);
-                    Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, alignLine));
+                    Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, alignLine,
+                            child(row, "class").orElse(null)));
                     box.style.declared(ITEM_AREA, cell.getLine());
                     box.style.itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
                     table.addChild(box);

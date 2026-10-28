@@ -95,7 +95,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 34 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 35 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -200,7 +200,9 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 
 34. ~~**Estilo del bloque de código.** El bloque de código de un `Markdown` es el elemento generado `Code block`, que las reglas `Element: Code block` estilan (fondo, relleno, tamaño…) sin tocar los demás `Text` (caso 27).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 34 están en
+35. ~~**Estilo de una fila de tabla.** `Class` en la `Row`: sus reglas `For class` se aplican a cada una de sus celdas, con prioridad sobre `For column`, las reglas de posición y `Column align` y por debajo de las clases de la propia celda; el pie de totales de una factura ya no repite la clase en cada celda (caso 28).~~ Hecho.
+
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 35 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).

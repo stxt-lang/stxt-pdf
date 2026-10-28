@@ -498,7 +498,7 @@ aplican por defecto a muchos elementos. Las mismas reglas pueden estar también 
 | `Element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
 | `Element` | un elemento generado por el motor: `Code block` o `Contents entry 1` … `Contents entry 6` | los bloques de código de un `Markdown` ([§5.17](#517-markdown)) o las entradas de un `Contents` ([§5.19](#519-referencias-a-otras-cajas)); no se escriben en el documento |
 | `Element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([§5.15](#515-tablas)) |
-| `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
+| `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` y las celdas de una `Row` con él en su `Class` ([§5.15](#515-tablas)) |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas ([§5.15](#515-tablas)) |
 
@@ -532,21 +532,23 @@ Text: Una nota al margen.
 2. la regla `For id` de su `Id`;
 3. las reglas `For class` de sus clases; si varias declaran la misma propiedad, gana la que va
    **después en `Styles`**, no el orden de `Class`;
-4. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
-5. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después
+4. las reglas `For class` de las clases de la `Row` de una celda, con el mismo criterio de orden;
+5. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
+6. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después
    `Odd row cell` o `Even row cell`);
-6. el `Column align` de su tabla, solo para `Align` ([§5.15](#515-tablas));
-7. la regla `Element` de su tipo (`Cell`);
-8. lo heredado del padre (solo `Typography`);
-9. el valor por defecto.
+7. el `Column align` de su tabla, solo para `Align` ([§5.15](#515-tablas));
+8. la regla `Element` de su tipo (`Cell`);
+9. lo heredado (solo `Typography`): para una celda, la de su `Row` y, si no, la de su padre;
+10. el valor por defecto.
 
-Las reglas de los puntos 4 a 6 solo se aplican a las celdas de una `Table`.
+Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table`.
 
 Una regla gana a la herencia: con `Element: Text` y `Size: 10`, un `Text` mide 10 aunque su
 padre declare `Size: 20`. Las reglas se mezclan **propiedad a propiedad**, no por grupo: si la
 regla declara `Size` y el elemento `Weight`, se aplican las dos. Lo que una regla da a un
 elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
-`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. Tampoco `Head`,
+`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Class` de una `Row`
+aplica sus reglas a cada una de sus celdas. Tampoco `Head`,
 `Body`, `Foot` y `Row`, que no se pueden nombrar en `Element` (para dar estilo a las celdas de
 cada grupo están las reglas de posición); `Table` y `Cell`, sí.
 
@@ -632,8 +634,9 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda ([§5.15](#515-tablas)). |
 | `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([§5.15](#515-tablas)): en el PDF etiquetado, `TH` con `Scope: Row`. No vale en `Head` (`TABLE_HEADER`). |
 
-Una `Row` admite `Typography`, que heredan sus celdas, y `Break`, que es el de sus celdas; no
-tiene `Box`. Las filas de la tabla no tienen propiedad de tamaño: miden lo que su celda más
+Una `Row` admite `Class`, cuyas reglas `For class` se aplican a cada una de sus celdas
+([§4.10](#410-reglas-reutilizables-styles)), `Typography`, que heredan sus celdas, y `Break`, que es el de
+sus celdas; no tiene `Box` ni `Id`. Las filas de la tabla no tienen propiedad de tamaño: miden lo que su celda más
 alta.
 
 ### 4.13 Bloques en columnas
@@ -1663,11 +1666,15 @@ Las celdas de las tablas de un `Markdown` ([§5.17](#517-markdown)) reciben esta
 `Align` sale de la fila de separación de la tabla (`:--`, `--:`), que lo declara cada celda y
 gana a todo lo demás.
 
-**Filas.** Una `Row` no es una caja: no tiene `Box` ni se nombra en `Element`, como `Head`,
-`Body` y `Foot`. Su `Typography` lo heredan sus celdas (las reglas `Styles` de la celda le
+**Filas.** Una `Row` no es una caja: no tiene `Box` ni `Id` ni se nombra en `Element`, como `Head`,
+`Body` y `Foot`. Su `Class` da a cada una de sus celdas las reglas `For class` de esas clases (el pie de
+totales de una factura: `Class: total` en la `Row`, no en cada celda), con la prioridad de
+[§4.10](#410-reglas-reutilizables-styles): ganan a `For column`, a las reglas de posición y a `Column align`,
+y pierden con las clases de la propia celda. Su `Typography` lo heredan sus celdas (las reglas `Styles` de la celda le
 ganan, como a cualquier herencia), y su `Break` es el de sus celdas: con él se fuerza o se
 evita el corte antes o después de la fila, o dentro de ella. Una celda no declara `Break`, ni
-siquiera desde una regla (`STYLE_NOT_ALLOWED`).
+siquiera desde una regla (`STYLE_NOT_ALLOWED`, también la de la clase de su `Row`: el `Break` de la fila lo
+declara la `Row`).
 
 **Cortes.** Una tabla se corta entre filas, como un grid ([§5.10](#510-fragmentación)): una fila
 que no cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus
@@ -2489,7 +2496,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Anchos de las columnas de una tabla | `table-layout: auto` (o `fixed`), con su propio algoritmo | El dimensionado de pistas de grid, con `Columns` obligatorio ([§5.15](#515-tablas)) |
 | Bordes de tabla | `border-collapse: separate` o `collapse` | Solo separados, los de cada celda |
 | Fila con menos celdas que columnas, o `rowspan` que pasa de `tbody` a `tfoot` | Se completa con huecos; el `rowspan` se recorta | Error (`TABLE_ROW_CELLS`, `TABLE_SPAN`) |
-| Estilo de `tr`, `col` y `colgroup` | Fondo y bordes de fila y columna | `Row` solo da `Typography` y `Break` a sus celdas; sin columnas con estilo |
+| Estilo de `tr`, `col` y `colgroup` | Fondo y bordes de fila y columna | `Row` da a sus celdas `Typography`, `Break` y las reglas de su `Class` (no tiene `Box`: un fondo de fila se da a cada celda); sin columnas con estilo |
 | `caption` | Sí | No: un `Heading` o un `Paragraph` antes de la tabla |
 | `thead` y `tfoot` al imprimir | Se repiten según el navegador | Se repiten siempre en cada página |
 | Multicolumna (`column-count`, `column-width`) | Propiedades de cualquier bloque; `column-gap` por defecto `1em` y con porcentajes | Elemento `Multicol` con `Count` y `Column width`; `Column gap` por defecto 0 y solo en puntos ([§5.16](#516-bloques-en-columnas)) |
@@ -2545,7 +2552,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `List item` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `GROUP` | `Row` (al menos uno, varios) |
-| `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
+| `Row` | `GROUP` | `Class`, `Typography`, `Break`; `Cell` (al menos uno, varios) |
 | `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Code font`, `Content` (obligatorio) |

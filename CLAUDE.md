@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 34 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 35 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 34 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 35 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -96,7 +96,9 @@ actualízala.
 
 | 34 | ~~Estilo del bloque de código: el bloque de código de un `Markdown` es el elemento generado `Code block`, que las reglas `Element: Code block` estilan aparte de los `Text`~~ (hecho; caso 27) | `tree/Element`, `tree/MarkdownBuilder`, `tree/BuildContext`, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
 
-Los hitos 16 a 34 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
+| 35 | ~~Estilo de una fila de tabla: `Class` en la `Row`, cuyas reglas `For class` se aplican a cada una de sus celdas~~ (hecho; caso 28) | schema, `tree/CellPosition`, `tree/TableBuilder`, `tree/StyleRules` |
+
+Los hitos 16 a 35 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
 registro. Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -171,12 +173,13 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `línea 8 de los estilos: …`); `ExamplesTest` y `GoldenTest` leen el `styles.stxt` de la carpeta si lo hay.
 - **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class`, `For id` y `For column` con
   `Box`, `Typography` y `Break`. `StyleRules.apply` las aplica entre la herencia y lo propio
-  del elemento (prioridad: elemento > id > clases en orden de `Styles` > `For column` en orden de
-  `Styles` > posición de la celda > `Column align` > tipo > herencia), con
+  del elemento (prioridad: elemento > id > clases en orden de `Styles` > clases de la `Row` de la celda
+  (en orden de `Styles`) > `For column` en orden de `Styles` > posición de la celda > `Column align` > tipo > herencia), con
   las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
   regla y se valida como si la declarara el elemento. Las reglas de las celdas dependen de dónde
   están: `TableBuilder` da a `BoxTreeBuilder.element` una `CellPosition` (grupo, fila dentro del
-  grupo, columna donde empieza y el `Column align` de su columna) y `Element: Head cell`,
+  grupo, columna donde empieza, el `Column align` de su columna y el nodo `Class` de su `Row`, que
+  `StyleRules.classRules` resuelve igual que el de la celda) y `Element: Head cell`,
   `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell` (`CellSelector`, que no son
   elementos: el de la caja sigue siendo `Cell`) y `For column: n` o `n m` las seleccionan con ella.
 - **Elementos con significado (§5.13):** `Paragraph` (un `Text` de un solo párrafo) y
@@ -206,7 +209,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `TABLE`) cuyos ítems son sus `Cell`, con la colocación explícita en `Style.itemArea` (fila y
   columna por orden y `Span`); `Head`, `Body`, `Foot` y `Row` no son cajas. `Box.headRows` y
   `Box.footRows` dicen qué filas de la rejilla son cabecera y pie. El `Typography` de la `Row`
-  se aplica a sus celdas como herencia y su `Break`, como el de las celdas. `Engine` despacha
+  se aplica a sus celdas como herencia, su `Break`, como el de las celdas, y su `Class` da a cada
+  celda las reglas `For class` de sus clases (`CellPosition.rowClass`; una `Row` no tiene `Id` ni `Box`). `Engine` despacha
   las tablas a `TableLayout`, que maqueta el grid sin fragmentar (`GridLayout.arrange`) y corta
   solo el cuerpo con `UnitBreaker`, repitiendo enteros la cabecera y el pie
   (`UnitBreaker.Repeat`). `PdfStructure` las etiqueta (`Table`, `THead`/`TBody`/`TFoot`, `TR`,

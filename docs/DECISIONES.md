@@ -1736,3 +1736,26 @@ interpretaciones que salieron al implementarlas.
      (`Translation.codeBlocks`) y `BoxTreeBuilder.element` le da el elemento; el nodo sigue validando contra el
      schema como un `Text`. *Dónde:* `tree/Element`, `tree/MarkdownBuilder`, `tree/BuildContext`,
      `tree/BoxTreeBuilder`, `paint/PdfStructure`. *Alternativa:* un `Code block` también escribible.
+
+## Hito 35: `Class` en la `Row` (2026-10-28)
+
+286. **El `Class` de una `Row` aplica sus reglas `For class` a cada una de sus celdas** (elegido por cuestionario; las
+     alternativas eran que `Row` admitiera además un `Box`, que se repetiría en cada celda —un `Border` o un
+     `Padding` de fila saldría entre celdas—, y selectores por posición de fila, `For row` o `Last row cell`, que
+     identifican la fila de totales por su sitio y no por lo que es). La fila no pasa a ser una caja: no tiene
+     `Box` ni `Id` (no se puede enlazar a una fila ni darle estilo con `For id`). *Dónde:* schema (`Row`),
+     `tree/CellPosition.rowClass`, `tree/TableBuilder`, `tree/StyleRules.classRules`. *Alternativa:* `Box` en la
+     `Row`; un fondo de fila se da a cada celda.
+
+287. **Prioridad de la clase de la fila** (decidida sin preguntar, por coherencia): por encima de `For column`, de
+     las reglas de posición y de `Column align`, y por debajo de las clases de la propia celda y de su `For id`;
+     es decir, una clase de la fila es una regla de clase, pero más débil que la de la celda, que es más
+     específica. La fila de totales gana a la cebra y a la columna; una celda suelta puede romperlo con su
+     clase. El `Typography` de la `Row` sigue siendo herencia (como antes): una regla de la clase de la propia
+     fila lo pisa, igual que `Element: Cell` lo pisa. *Alternativa:* poner la clase de la fila por debajo de
+     `For column` (como una regla de posición).
+
+288. **Una regla de la clase de una `Row` no puede dar `Break`** a sus celdas (`STYLE_NOT_ALLOWED`, igual que la
+     de la clase de una celda): los cortes de una fila son los de su `Row`, que los declara ella. Se decidió sin
+     preguntar para no abrir un segundo camino al `Break` de la fila. *Alternativa:* permitirlo y tomarlo como el
+     `Break` de la fila (sería el único caso en que una regla da `Break` a algo que no lo admite).

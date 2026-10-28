@@ -1,0 +1,13 @@
+# t 160 × 72 (filas de 12, 24, 12 y 24; ver input.stxt). Las celdas con Id son las de las filas con la clase.
+Result:
+	Page: 1
+		Fragment: t
+			Rect: 20 20 160 72
+			Fragment: c
+				Rect: 20 32 80 24
+			Fragment: d
+				Rect: 100 32 80 24
+			Fragment: g
+				Rect: 20 68 80 24
+			Fragment: h
+				Rect: 100 68 80 24

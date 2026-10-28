@@ -18,11 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ElementTest {
 
-    /** Los elementos de caja del schema son los nodos que admiten {@code Class}. */
+    /**
+     * Los elementos de caja del schema son los nodos que admiten {@code Class} e {@code Id}: una
+     * {@code Row} admite {@code Class} para sus celdas, pero no es una caja.
+     */
     @Test
     void writtenElementsAreTheBoxElementsOfTheSchema() {
         Set<String> schema = SchemaNodes.children().entrySet().stream()
-                .filter(e -> e.getValue().contains("Class"))
+                .filter(e -> e.getValue().contains("Class") && e.getValue().contains("Id"))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
         assertEquals(schema, Element.written().stream().map(Element::label).collect(Collectors.toSet()));

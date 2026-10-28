@@ -78,8 +78,9 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   factura, 01; el borne `N` del manual, 08).
 - **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la
   cabecera (también a las tablas de Markdown), `Even row cell` la cebra (ejemplo 05) y
-  `Column align` o `For column` las columnas numéricas. Queda una clase para lo que es de una sola
-  fila, como la de los totales de la factura.
+  `Column align` o `For column` las columnas numéricas. Lo que es de una sola fila, como los
+  totales de la factura (ejemplos 01, 04 y 07), va en una clase en la `Row` (`Class: total`), que
+  aplica sus reglas a todas sus celdas.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) es clicable entero,
   también el teléfono: con `Inline: markdown` se podría enlazar solo una parte (`[web](https://…)`),

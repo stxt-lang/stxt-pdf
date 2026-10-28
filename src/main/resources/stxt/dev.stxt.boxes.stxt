@@ -697,8 +697,10 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Min: 1
 	Node: Row
 		Type: GROUP
-		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja; su Typography lo heredan sus celdas.
+		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja; su Typography lo heredan sus celdas y las reglas For class de su Class se aplican a cada una de ellas.
 		Children:
+			Child: Class
+				Max: 1
 			Child: Typography
 				Max: 1
 			Child: Break
@@ -952,7 +954,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Id
 		Description: Identificador para volcados, tests, mensajes y reglas For id. Único en el documento.
 	Node: Class
-		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres.
+		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres. En una Row, a cada una de sus celdas.
 	Node: Link
 		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
 	Node: In contents

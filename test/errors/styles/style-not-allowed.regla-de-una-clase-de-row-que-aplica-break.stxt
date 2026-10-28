@@ -1,0 +1,24 @@
+# Case: Regla de una clase de Row que aplica Break a sus celdas
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For class: keep
+			Break:
+				Inside: avoid
+	Section:
+		Table:
+			Columns: 1fr
+			Body:
+				Row:
+					Class: keep
+					Cell: a

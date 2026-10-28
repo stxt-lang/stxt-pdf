@@ -53,8 +53,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | hecho | 25 |
 | 33 | Numeración de los encabezados (`Numbered`): `1`, `1.1`… delante del título y en `{number of: id}` | hecho | 26 |
 | 34 | Estilo del bloque de código: elemento generado `Code block` | hecho | 27 |
+| 35 | Estilo de una fila de tabla: `Class` en la `Row` | hecho | 28 |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 34, el 2026-10-28 (varios, en otras
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 35, el 2026-10-28 (varios, en otras
 sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -1485,11 +1486,71 @@ Styles:
 
 ---
 
+## Hito 35: estilo de una fila de tabla
+
+**Objetivo.** Poder dar estilo a una fila concreta de una tabla (el pie de totales de una factura) sin repetir la
+clase en cada celda. Es el hueco de [`TODO.md`](../TODO.md) «no se puede dar estilo a una fila concreta sin tocar cada
+una de sus celdas», que salió en el hito 25.
+
+**Sintaxis.**
+
+```
+Styles:
+	For class: total
+		Typography:
+			Weight: bold
+		Box:
+			Background: #EFE4D2
+Table:
+	Foot:
+		Row:
+			Class: total
+			Cell: Total a pagar
+			Cell: 13.360,82 €
+```
+
+**Decisiones tomadas** (2026-10-28, por cuestionario con la propuesta salvo las dos últimas, que se decidieron
+por coherencia; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 286–288):
+
+- [x] **`Class` en la `Row`, aplicada a sus celdas.** Las alternativas, descartadas: que `Row` admita también `Box`
+      (se repetiría en cada celda) y selectores por posición de fila (`For row`, `Last row cell`). Sin `Id` en la
+      fila: no es una caja.
+- [x] **Prioridad:** la clase de la fila vale más que `For column`, la posición y `Column align`, y menos que las
+      clases de la propia celda.
+- [x] **Sin `Break` desde la clase de una fila:** `STYLE_NOT_ALLOWED`, como en una celda.
+
+**Diseño técnico** (como quedó):
+
+- Schema: `Row` admite `Class`. `CellPosition` lleva el nodo `Class` de su `Row` (`rowClass`), que `TableBuilder`
+  le da, y `StyleRules.apply` añade sus reglas (`classRules`, el mismo criterio que el `Class` de la celda: una clase
+  sin regla es `CLASS_WITHOUT_RULE`, con la línea del `Class` de la fila) entre las de la columna y las de la
+  celda. No cambia nada más del layout ni del pintado.
+
+**Tareas:**
+
+- [x] Resolver las decisiones (2026-10-28).
+- [x] Schema (`Row` > `Class`), `CellPosition`, `TableBuilder` y `StyleRules`.
+- [x] Especificación (§4.10, §4.12, §5.15, §8 y §9), `DECISIONES.md` (286–288), README, `CLAUDE.md` y `TODO.md`.
+- [x] Tests: `TableStylesTest` (cuatro casos), `ElementTest` (una `Row` admite `Class` y no es una caja),
+      `SchemaCoverageTest` (ya prueba `Row > Class`), dos casos del catálogo y el caso golden `28-row-class`, calculado
+      a mano (pasó a la primera).
+- [x] Ejemplos 01, 04 y 07: la fila de totales lleva `Class: total` en la `Row`, no en cada celda; no cambia ningún PNG
+      ni volcado.
+
+---
+
 ## Registro de sesiones
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (27).** Hito 35 terminado: `Class` en la `Row` (segunda mitad de «Código y tablas» de `TODO.md`).
+  `Row` admite `Class` y sus reglas `For class` se aplican a cada celda de la fila, con prioridad entre las clases de
+  la celda y `For column`/posición; `Break` desde la clase de una fila es `STYLE_NOT_ALLOWED`. `CellPosition.rowClass`,
+  `TableBuilder` y `StyleRules.classRules`. Caso golden `28-row-class` (calculado a mano, pasó a la primera), cuatro
+  tests de `TableStylesTest`, dos casos del catálogo y los ejemplos 01, 04 y 07 con la clase en la fila (ningún PNG ni
+  volcado cambia). Decisiones 286–288. `mvn test` en verde.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md`.
 - **2026-10-28 (26).** Hito 34 terminado: estilo del bloque de código (primera mitad de «Código y tablas» de
   `TODO.md`, pedida por el usuario). Se partió del estado verde (1303 tests). Cuestionario de dos preguntas: el bloque
   de código es un elemento generado `Code block` (no escribible a mano) y, para el hito 35, `Class` en la `Row` que se

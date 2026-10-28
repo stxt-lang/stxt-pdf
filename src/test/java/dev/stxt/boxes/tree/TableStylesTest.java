@@ -187,4 +187,63 @@ class TableStylesTest {
         assertEquals("#444444", color(cell(table, "4")).toLowerCase());
         assertNull(cell(table, "2").style.background);
     }
+
+    /** §5.15: el {@code Class} de una {@code Row} aplica sus reglas {@code For class} a cada celda de la fila. */
+    @Test
+    void aRowClassGivesItsRulesToEveryCellOfTheRow() {
+        Box table = root("\tStyles:",
+                "\t\tFor class: total", "\t\t\tTypography:", "\t\t\t\tWeight: bold",
+                "\t\t\tBox:", "\t\t\t\tBackground: #EFE4D2",
+                "\tTable:", "\t\tColumns: 1fr 1fr 1fr",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
+                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tClass: total", "\t\t\t\tCell: t1", "\t\t\t\t\tSpan: 1 2",
+                "\t\t\t\tCell: t2").children.get(0);
+        for (String total : List.of("t1", "t2")) {
+            assertEquals(FontWeight.BOLD, cell(table, total).style.fontWeight, total);
+            assertEquals("#efe4d2", color(cell(table, total)).toLowerCase(), total);
+        }
+        for (String other : List.of("a", "b", "c")) {
+            assertEquals(FontWeight.NORMAL, cell(table, other).style.fontWeight, other);
+            assertNull(cell(table, other).style.background, other);
+        }
+        // La línea de lo que aporta la clase es la de su regla.
+        assertEquals(14, cell(table, "t2").style.line("font-weight"));
+    }
+
+    /** Gana a las reglas de columna y de posición y pierde con las clases de la propia celda. */
+    @Test
+    void aRowClassIsBetweenTheCellClassesAndTheColumnAndPositionRules() {
+        Box table = root("\tStyles:",
+                "\t\tElement: Odd row cell", "\t\t\tBox:", "\t\t\t\tBackground: #111111",
+                "\t\tFor column: 2", "\t\t\tBox:", "\t\t\t\tBackground: #333333",
+                "\t\tFor class: row", "\t\t\tBox:", "\t\t\t\tBackground: #444444",
+                "\t\tFor class: own", "\t\t\tBox:", "\t\t\t\tBackground: #555555",
+                "\tTable:", "\t\tColumns: 1fr 1fr",
+                "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tClass: row", "\t\t\t\tCell: a1", "\t\t\t\t\tClass: own", "\t\t\t\tCell: a2",
+                "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2").children.get(0);
+        // a1: su clase; a2: la de su fila, que gana a las impares y a la columna; b1 (fila par): nada; b2: la columna.
+        assertEquals(List.of("#555555", "#444444", "-", "#333333"),
+                background(table).stream().map(String::toLowerCase).toList());
+    }
+
+    /** Como el {@code Class} de una caja: una clase sin regla {@code For class} es un error, con la línea del {@code Class}. */
+    @Test
+    void aRowClassWithoutARuleIsAnError() {
+        InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
+                () -> root("\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tClass: nope",
+                        "\t\t\t\tCell: a"));
+        assertEquals(ErrorCode.CLASS_WITHOUT_RULE, e.code());
+        assertEquals(17, e.line());
+    }
+
+    /** Los cortes de una fila son los de su {@code Row}: una clase de fila no los da, como la clase de una celda. */
+    @Test
+    void aRowClassCannotGiveBreaksToTheCells() {
+        InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
+                () -> root("\tStyles:", "\t\tFor class: keep", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
+                        "\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tClass: keep",
+                        "\t\t\t\tCell: a"));
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.code());
+    }
 }
