@@ -83,7 +83,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 21 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 22 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -122,6 +122,8 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 21 están termin
 | Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
 | Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
 | Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Weight` y `Style`, línea base real | Hecho y probado |
+| Referencias a otras cajas en el texto: `{page of: id}` (la página donde empieza la caja, resuelta paginando hasta que converja) y `{number of: id}` (el número de un ítem de una lista numerada) | Hecho y probado |
+| Índice automático (`Contents`): una entrada por encabezado de los niveles de `Levels` (también los de un `Markdown`), con título, guía (`dots`, `rule`, `none`) y página; se estila con `Element: Contents entry 1`…`6`; `TOC` y `TOCI` en el PDF etiquetado | Hecho y probado |
 | Ejemplos de documentos completos (`test/examples/`): once documentos con una imagen por página versionada, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
@@ -162,7 +164,18 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 20. ~~**Catálogo de errores.** Un fichero STXT por caso, con el documento real, en carpetas por grupo de errores (`test/errors/<grupo>/`).~~ Hecho.
 21. ~~**Ejemplos.** Once documentos completos en `test/examples/`, con PDF e imágenes limpios; IBM Plex Serif y Mono, e imágenes generadas con `tools/ExampleImages.java`.~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 21 están en
+22. ~~**Referencias a páginas e índice.** `{page of: id}` y `{number of: id}` en el texto, paginando hasta que las páginas converjan, y el elemento `Contents`, que genera el índice con guía y páginas (caso 15).~~ Hecho.
+23. **Enlaces.** URL y destinos del documento, con anotaciones de enlace en el PDF. Pendiente.
+24. **Primera página distinta y páginas con nombre.** Pendiente.
+25. **Estilo de las tablas** (cebra, cabecera, columnas). Pendiente.
+26. **Formato dentro de la línea fuera de Markdown.** Pendiente.
+27. **Texto:** mayúsculas automáticas, interletraje y versalitas. Pendiente.
+28. **Aspecto de las cajas:** esquinas, bordes, sombras y degradados. Pendiente.
+29. **Texto preformateado y código.** Pendiente.
+30. **Rotación y orientación de la página.** Pendiente.
+31. **Imágenes vectoriales (SVG).** Pendiente.
+
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 31 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
@@ -172,13 +185,14 @@ Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](
 ```
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics, DecorationMetrics,
-                FontFace, FontWeight, FontStyle, TextFormat, TextRun, GridAreas, Area, Cell,
-                Tolerance
+                FontFace, FontWeight, FontStyle, TextFormat, TextRun, Reference, GridAreas, Area,
+                Cell, Tolerance
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ImageLibrary, ImageFile, ResourceException,
                 ImageFormatException
   tree/         Box, Element, Style, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
-                StyleRules, TableBuilder, ListBuilder, MarkdownBuilder, ModelValidator…),
+                StyleRules, TableBuilder, ListBuilder, MarkdownBuilder, ContentsBuilder,
+                ModelValidator…), References,
                 InvalidModelException
   layout/       Engine, LayoutAlgorithm, ConstraintSpace, LayoutResult, LayoutCache,
                 IntrinsicSizes, BoxModel, MarginStrut, AdjoiningMargins, Sizing, PendingAbsolute,
@@ -192,7 +206,8 @@ src/main/java/dev/stxt/boxes/
     multicol/   MulticolLayout, Columns
     image/      ImageLayout, Images, NaturalSize
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
-  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure, ImageFit, PdfWriter
+  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure, ImageFit, Leaders,
+                PdfWriter
   output/       StxtDump
 
 test/           Casos de prueba que no son código: golden/ (resultado calculado a mano), errors/

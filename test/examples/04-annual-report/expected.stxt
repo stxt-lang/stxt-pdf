@@ -10,11 +10,13 @@ Result:
 			Rect: 56 793 483 21
 	Page: 2
 		Fragment: contents
-			Rect: 56 56 483 241
+			Rect: 56 56 483 229
+			Fragment: toc
+				Rect: 56 111 483 174
 		Fragment: letter
-			Rect: 56 327 483 442.5
+			Rect: 56 315 483 442.5
 			Fragment: milestones
-				Rect: 56 701.5 483 68
+				Rect: 56 689.5 483 68
 		Fragment: footer
 			Rect: 56 793 483 21
 	Page: 3

@@ -1,8 +1,9 @@
 # Informe anual de una cooperativa de energía renovable, de siete páginas. Muestra una portada a
 # sangre (un Absolute con Layer que tapa el margen y el pie fijo), contenido, cifras clave en un
 # grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
-# cabecera y pie, y secciones que empiezan siempre en página nueva. Las páginas del contenido
-# están escritas a mano: si el texto cambia, hay que revisarlas.
+# cabecera y pie, y secciones que empiezan siempre en página nueva. El contenido es un Contents:
+# lista las secciones con su página, que el motor calcula. El título de la portada y el de la página
+# de contenido son un Text, no un encabezado, para que no salgan en el índice.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -111,10 +112,23 @@ Document (dev.stxt.boxes):
 				Align: left
 			Box:
 				Margin: 4 0 12 0
-		For class: toc
+		Element: Contents entry 1
 			Box:
-				Padding: 8 0
-				Border: 0 0 0.5 0
+				Padding: 7 0
+			Typography:
+				Size: 10.5
+				Line height: 15
+		For class: page-title
+			Typography:
+				Font: IBM Plex Serif
+				Size: 26
+				Line height: 30
+				Weight: bold
+				Color: #12315A
+			Box:
+				Margin: 0 0 14 0
+				Padding: 0 0 10 0
+				Border: 0 0 1 0
 				Border color: #C9D5E3
 		For class: th
 			Typography:
@@ -184,21 +198,23 @@ Document (dev.stxt.boxes):
 					Color: #F2A65A
 				Box:
 					Margin: 0 0 10 0
-			Heading 1:
+			Block:
+				Box:
+					Margin: 0 0 14 0
 				Text: Un año de sol
 					Typography:
+						Font: IBM Plex Serif
+						Weight: bold
 						Size: 44
 						Line height: 48
 						Color: #FFFFFF
 				Text: y de viento
 					Typography:
+						Font: IBM Plex Serif
+						Weight: bold
 						Size: 44
 						Line height: 48
 						Color: #FFFFFF
-				Box:
-					Padding: 0
-					Border: 0
-					Margin: 0 0 14 0
 			Text: Cooperativa Solvent · Energía renovable de proximidad en la Garrotxa
 				Typography:
 					Font: IBM Plex Serif
@@ -260,56 +276,11 @@ Document (dev.stxt.boxes):
 			After: page
 	Block:
 		Id: contents
-		Heading 1:
-			Text: Contenido
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Carta de la presidenta
-				Item:
-					Text: 2
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Un año en cifras
-				Item:
-					Text: 3
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Clientes y comunidad
-				Item:
-					Text: 4
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Resultados económicos
-				Item:
-					Text: 5
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Medio ambiente
-				Item:
-					Text: 6
-		Block:
-			Class: toc
-			Flex:
-				Main axis: between
-				Item:
-					Text: Gobierno y próximos pasos
-				Item:
-					Text: 7
+		Text: Contenido
+			Class: page-title
+		Contents:
+			Id: toc
+			Levels: 1 1
 	Block:
 		Id: letter
 		Box:

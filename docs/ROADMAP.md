@@ -40,7 +40,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
 | 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
 | 21 | Ejemplos de verdad: once documentos completos, con PNG limpios | hecho | `examples/` |
-| 22 | Referencias a páginas e índice automático (`Contents`) | diseño | 15 (previsto) |
+| 22 | Referencias a páginas e índice automático (`Contents`) | hecho | 15 |
 | 23 | Enlaces (URL y destinos del documento) | pendiente | 16 (previsto) |
 | 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | pendiente | 18 (previsto) |
@@ -51,7 +51,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 21, el 2026-10-28. Los hitos 22 a 31
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 22, el 2026-10-28. Los hitos 23 a 31
 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -580,10 +580,10 @@ interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.m
       `Markdown`), y su pintado con guía.
 - [x] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/references/`
       (`REFERENCE_UNSTABLE` sin caso: lo prueba `PageReferencesTest`).
-- [ ] Tests de las piezas puras y de layout (referencia hacia delante y hacia atrás, cambio de
+- [x] Tests de las piezas puras y de layout (referencia hacia delante y hacia atrás, cambio de
       dígitos, índice que ocupa páginas, encabezado en una página siguiente); caso golden
       `15-contents`.
-- [ ] Ejemplos 04, 08 y 09 reescritos con lo nuevo (ver arriba).
+- [x] Ejemplos 04, 08 y 09 reescritos con lo nuevo (ver arriba).
 
 ---
 
@@ -1077,6 +1077,16 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (7).** Hito 22 terminado, en cuatro commits: `{page of: id}` con paginación hasta
+  converger (X1–X4, X12), `{number of: id}` (X9, X11), `Contents` (X5–X8, X10) y el caso golden
+  `15-contents` con los ejemplos. Resueltas X11 y X12 con las propuestas; al implementar X11 salió
+  que los encabezados no llevan número en el modelo (solo los ítems de listas numeradas), y al
+  reescribir los ejemplos 04 y 09 que un `Contents` lista todos los encabezados, así que la
+  portada y el título del índice son un `Text` (ambas cosas, en `TODO.md`). Decisiones 151–162 de
+  `DECISIONES.md`. Ejemplo 04: el índice son seis entradas generadas (las páginas coinciden con las
+  que estaban escritas a mano); ejemplo 08: la tabla de averías usa `{page of: wiring}`; ejemplo 09:
+  una página nueva de índice de productos (ahora 5 páginas). `mvn test` en verde.
+  *Siguiente paso:* hito 23 (enlaces), que vuelve clicable el índice; resolver L1–L6 con el usuario.
 - **2026-10-28 (6).** Hito 22: resueltas X1–X10 (solo documentación, sin código). Se aceptan
   todas las propuestas salvo X3 (se pagina hasta que converja, en vez de reservar dígitos) y
   X9 (`{number of: id}` entra en el hito). Quedan X11 (qué se numera) y X12 (criterio de

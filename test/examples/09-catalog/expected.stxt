@@ -11,20 +11,27 @@ Result:
 		Fragment: footer
 			Rect: 50 798 495 20
 	Page: 2
+		Fragment: index
+			Rect: 50 54 495 331.5
+			Fragment: toc
+				Rect: 50 125 495 260.5
+		Fragment: footer
+			Rect: 50 798 495 20
+	Page: 3
 		Fragment: dining
 			Rect: 50 54 495 697
 			Fragment: grid-dining
 				Rect: 50 142 495 609
 		Fragment: footer
 			Rect: 50 798 495 20
-	Page: 3
+	Page: 4
 		Fragment: rest
 			Rect: 50 54 495 697
 			Fragment: grid-rest
 				Rect: 50 142 495 609
 		Fragment: footer
 			Rect: 50 798 495 20
-	Page: 4
+	Page: 5
 		Fragment: woods
 			Rect: 50 54 495 520.5
 			Fragment: wood-table

@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 21 (Markdown, imágenes, pruebas y ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 31 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 21 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 22 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -70,7 +70,11 @@ actualízala.
 | 20 | ~~Catálogo de errores: un fichero STXT por caso, en carpetas por grupo~~ (hecho) | `test/errors/<grupo>/`, `errors/ErrorCatalogTest` |
 | 21 | ~~Ejemplos de verdad: once documentos completos con PDF y PNG limpios; IBM Plex Serif y Mono~~ (hecho) | `test/examples/`, `examples/ExamplesTest`, `golden/ReferenceFiles`, `tools/ExampleImages.java`, `resources/images/examples/` |
 
-Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
+| 22 | ~~Referencias a páginas (`{page of: id}`, `{number of: id}`) e índice automático (`Contents`)~~ (hecho; caso 15) | `model/Reference`, `tree/References`, `tree/ContentsBuilder`, `layout/Paginator`, `layout/inline/InlineLayout`, `paint/Leaders` |
+
+Los hitos 23 a 31 (enlaces, primera página distinta, estilo de tablas, formato en línea, texto,
+aspecto de las cajas, preformateado, rotación y SVG) están pendientes en
+[`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
@@ -88,14 +92,14 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `ResourceException` e `ImageFormatException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
@@ -244,6 +248,22 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Numeración (`{page}`/`{pages}`):** `InlineLayout` mide los marcadores como `00` y las
   líneas los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que
   rehace solo esas líneas con los valores de cada página (`PageNumbers`).
+- **Referencias (§5.19):** `{page of: id}` y `{number of: id}` (`model/Reference`) **no** son
+  marcadores: `InlineLayout.runs` los sustituye por su valor antes de repartir el texto en
+  líneas, así que las líneas ya no los contienen y el texto mide lo que escribe. El número sale
+  del árbol (`Box.number`, que pone el builder a los `List item` numerados); la página es una
+  suposición que el `Paginator` repite hasta que converge: `Engine.assume` fija las páginas
+  supuestas (la primera vez, `00`), se pagina, se mira en qué página ha quedado el primer
+  fragmento de cada caja referida (`Box.key()`: su `Id` o, en un encabezado de un índice, un
+  `Box.anchor` generado) y se vuelve a paginar si alguna difiere, hasta 10 pasadas que cambien
+  algo (`REFERENCE_UNSTABLE`). `References.validate` (al construir el árbol) rechaza los `Id` que
+  no existen, las páginas de un `Fixed` y los números de lo que no tiene.
+- **Índice (§5.19):** `Contents` es un bloque cuyas entradas genera `ContentsBuilder` al final
+  de la construcción, con todos los encabezados ya conocidos (también los de un `Markdown`): una
+  caja `Flex` por encabezado (`Element.CONTENTS_ENTRY_1`…`6`, que las reglas `Element` nombran
+  aunque no se escriban: `Element.selectable()`) con el título, la guía (una caja vacía que
+  `StackingContext.paintLeader` pinta con `Leaders`, sin texto) y el número, que es un
+  `{page of: …}` del encabezado. `PdfStructure` lo etiqueta como `TOC` y `TOCI`.
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
@@ -339,9 +359,9 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`
   es un documento STXT de verdad, un fichero por caso, en la carpeta de su familia (`document`,
   `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`,
-  `images`, `styles`, `combinations`, `overflow`, `fonts`; los códigos de `stxt-core` van en
-  `schema`). Las tres primeras líneas son comentarios `# Case:` (descripción), `# Code:` y
-  `# Line:`, y la línea esperada es la del propio fichero, cabecera incluida (la primera línea
+  `images`, `references`, `contents`, `styles`, `combinations`, `overflow`, `fonts`; los códigos
+  de `stxt-core` van en `schema`). Las tres primeras líneas son comentarios `# Case:`
+  (descripción), `# Code:` y `# Line:`, y la línea esperada es la del propio fichero, cabecera incluida (la primera línea
   del documento es la 4). Se maqueta con las métricas reales. `everyCodeHasACase` exige un caso
   por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de layout prueban los casos válidos;
   los inválidos van al catálogo.

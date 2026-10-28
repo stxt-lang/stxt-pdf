@@ -1,7 +1,9 @@
-# Catálogo de producto de un taller de muebles, de cuatro páginas: portada a sangre (un Absolute
-# con Layer sobre el pie fijo), fichas en una rejilla de dos columnas con la foto recortada
+# Catálogo de producto de un taller de muebles, de cinco páginas: portada a sangre (un Absolute
+# con Layer sobre el pie fijo), un índice de productos con su página (un Contents, que el motor
+# rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
 # (Fit: cover) y una etiqueta «Novedad» superpuesta, y una página final con maderas, pedidos y
 # contacto. Las fichas son todas iguales: el estilo está en Styles y solo cambia el contenido.
+# El título de la portada y el del índice son un Text, no un encabezado, para que no salgan en él.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -52,6 +54,34 @@ Document (dev.stxt.boxes):
 			Typography:
 				Size: 7.5
 				Color: #8A7A6C
+		Element: Contents entry 1
+			Typography:
+				Font: IBM Plex Serif
+				Weight: bold
+				Size: 13
+				Line height: 18
+				Color: #3B2A1E
+			Box:
+				Margin: 14 0 4 0
+				Padding: 0 0 4 0
+				Border: 0 0 0.5 0
+				Border color: #DCCFB8
+		Element: Contents entry 2
+			Typography:
+				Size: 10
+				Line height: 15
+				Color: #2B2420
+			Box:
+				Padding: 1 0 1 14
+		For class: page-title
+			Typography:
+				Font: IBM Plex Serif
+				Size: 28
+				Line height: 32
+				Weight: bold
+				Color: #3B2A1E
+			Box:
+				Margin: 0 0 6 0
 		For class: lead
 			Typography:
 				Font: IBM Plex Serif
@@ -148,15 +178,17 @@ Document (dev.stxt.boxes):
 					Color: #F3C27C
 				Box:
 					Margin: 0 0 8 0
-			Heading 1:
-				Text: Muebles que
-				Text: envejecen bien
+			Block:
+				Box:
+					Margin: 0 0 14 0
 				Typography:
+					Font: IBM Plex Serif
+					Weight: bold
 					Size: 46
 					Line height: 50
 					Color: #FFFFFF
-				Box:
-					Margin: 0 0 14 0
+				Text: Muebles que
+				Text: envejecen bien
 			Text: Madera maciza de la comarca, ensambles de carpintería y acabados al aceite. Piezas para toda la vida, hechas en Olot desde 1987.
 				Typography:
 					Font: IBM Plex Serif
@@ -208,7 +240,18 @@ Document (dev.stxt.boxes):
 		Break:
 			After: page
 	Block:
+		Id: index
+		Text: Índice
+			Class: page-title
+		Paragraph: Cada pieza, con la página de su ficha.
+			Class: lead
+		Contents:
+			Id: toc
+			Levels: 1 2
+	Block:
 		Id: dining
+		Break:
+			Before: page
 		Heading 1:
 			Text: Comedor y salón
 		Paragraph: Sillas, mesas y estantes para la casa que se vive. Cada pieza se fabrica por encargo; el plazo habitual es de seis semanas.

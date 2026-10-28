@@ -2,7 +2,8 @@
 # una figura con números superpuestos (un Relative con sus Absolute encima) y su leyenda al
 # lado, avisos con color, pasos numerados en Markdown, un esquema de conexión, bloques de
 # terminal en monoespaciada y tablas de especificaciones y de averías. La estructura de
-# encabezados da el índice del PDF (marcadores).
+# encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
+# {page of: wiring}, la página donde está (también dentro de Markdown).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -438,7 +439,7 @@ Document (dev.stxt.boxes):
 				|---------|----------------|-----------|
 				| La pantalla no se enciende | Sin corriente o cable mal conectado | Revisa el cuadro eléctrico y los bornes L y N |
 				| Indicador en rojo | No se conecta a la red wifi | Acerca el router o repite el emparejamiento |
-				| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página 2 |
+				| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página {page of: wiring} |
 				| Temperatura errónea | Está cerca de una fuente de calor | Cámbialo de sitio, a 1,5 m del suelo |
 		Heading 2:
 			Text: Especificaciones técnicas
