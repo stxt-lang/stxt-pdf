@@ -2,6 +2,19 @@
 
 ## Accesibilidad (prioritario: es básica para lo que hacemos)
 
+- Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario
+- ~~Índice!!~~ (hito 22)
+- Float? Algo más que haga falta?
+- Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
+- Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
+- Revisar ThreadSafe
+- Revisar rendimiento
+- Como extender fácil? Valorar alternativas
+- Httpservice para probar, que se pueda ejecutar en maven, etc. 
+- Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
+- Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
+- Un docker para esto
+
 - **`Link` del PDF etiquetado con su contenido marcado** (hito 23, decisión 171 de
   `docs/DECISIONES.md`). Hoy cada enlace es un elemento `Link` hijo del elemento de la caja que
   solo contiene la anotación (`OBJR`) y un `Alt` con su texto; no envuelve el texto marcado del
@@ -15,18 +28,6 @@
 - Hacer ese repaso de accesibilidad del PDF etiquetado entero cuando se termine esto: texto
   alternativo de las figuras, orden de lectura con `Fixed` y `Absolute`, tablas con `Scope`,
   idioma por tramo, y la validación PDF/UA de los once ejemplos.
-
-- ~~Índice!!~~ (hito 22)
-- Float? Algo más que haga falta?
-- Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
-- Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
-- Revisar ThreadSafe
-- Revisar rendimiento
-- Como extender fácil? Valorar alternativas
-- Httpservice para probar, que se pueda ejecutar en maven, etc. 
-- Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
-- Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
-- Un docker para esto
 
 ## Huecos del motor detectados al escribir los ejemplos (hito 21)
 
