@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 en adelante (Markdown):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 en adelante (Markdown e imágenes):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -63,6 +63,7 @@ actualízala.
 | 15 | ~~Bloque en columnas (`Multicol`), equilibrado y cortes de columna~~ (hecho; caso 12) | schema, `tree/BoxTreeBuilder`, `layout/multicol/MulticolLayout`, `fragment/BreakRules`, `paint/StackingContext` |
 | 16 | ~~Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado)~~ (hecho; caso 13) | `model/TextRun`, `layout/inline/LineBreaker`, `fragment/TextLine`, `paint/StackingContext`, `layout/inline/PdfMetrics` |
 | 17 | ~~Elemento `Markdown`, traducido a elementos conocidos~~ (hecho; caso 13) | schema, `tree/MarkdownBuilder`, `tree/BoxTreeBuilder` |
+| 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos (en diseño) | schema, `resources`, `layout`, `paint` |
 
 Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
 
