@@ -936,7 +936,7 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      *Dónde:* `paint/PdfCanvas`, `paint/PdfDestinations`, `paint/PdfLinks`. *Alternativa:*
      destinos con nombre en el catálogo del PDF.
 
-171. **PDF etiquetado: el `Link` solo contiene su `OBJR`**, no el texto marcado: un `Link` hijo
+171. **(Sustituida por la 252.) PDF etiquetado: el `Link` solo contiene su `OBJR`**, no el texto marcado: un `Link` hijo
      del elemento de la caja con la anotación y su `Alt`, y no un elemento que envuelve el
      contenido del tramo. Para envolverlo habría que partir el contenido marcado de un `P` en
      varios `MCID` por cada tramo con enlace. El texto del enlace llega a quien lo lee por
@@ -1496,3 +1496,41 @@ interpretaciones que salieron al implementarlas.
 251. **Dependencias nuevas:** JSVG 2.2.0 (`com.github.weisj:jsvg`, sin dependencias propias) y
      `pdfbox-graphics2d` 3.0.5 (`de.rototor.pdfbox:graphics2d`, sobre el PDFBox que ya se usa). *Alternativa
      descartada:* Apache Batik, que arrastra decenas de jars.
+
+252. **El `Link` del PDF etiquetado envuelve lo que se pulsa** (sustituye a la decisión 171). Una caja con
+     `Link` tiene un `Link` hijo de su elemento que contiene su texto y los elementos de sus hijos
+     (`Span → Link → texto`, `TOCI → Link → título, número`) y recibe una `OBJR` por fragmento; una
+     imagen es la excepción y su `Link` es el padre de su `Figure`, porque una `Figure` no contiene a su
+     `Link`. Un enlace dentro del texto (Markdown, `Inline: markdown`) es un `Link` hijo del elemento del
+     texto con el contenido marcado de sus palabras: el texto se pinta en secuencias de contenido
+     marcado (`MCID`) seguidas con el mismo destino, así que el párrafo queda `P → [texto, Link, texto]`.
+     *Dónde:* `paint/PdfStructure`, `paint/StackingContext.paintText`, `paint/Canvas.beginLinkText`,
+     `paint/PdfCanvas`. *Alternativa:* dejarlo como estaba (un `Link` con solo la `OBJR`), que no cumple
+     PDF/UA.
+
+253. **Un enlace de varias líneas es un solo `Link`** por enlace y fragmento, con un `MCID` y una `OBJR`
+     por línea (las anotaciones siguen siendo una por línea, que es lo que el visor necesita para el
+     rectángulo). Un lector de pantalla anuncia un enlace, no uno por línea. Dos enlaces con el mismo
+     destino y seguidos, sin texto entre ellos, son uno. *Dónde:* `paint/StackingContext.paintText`.
+     *Alternativa:* un `Link` por línea.
+
+254. **Sin `Alt` si el `Link` contiene algo que leer.** Con `Alt`, un lector de pantalla lo leería en lugar
+     del contenido del enlace. Solo lleva `Alt` el `Link` sin texto ni figura dentro (un bloque vacío con
+     `Link` y un fondo) y el suelto de la decisión 255; el texto de la anotación (`Contents`), que PDF/UA
+     exige, se queda siempre. *Dónde:* `paint/PdfStructure.hasContent`, `emptyLinks`.
+
+255. **Los enlaces de lo que no es contenido van a un `Link` suelto del `Document`**, con su `Alt` y sin
+     contenido marcado: un `Fixed`, una imagen decorativa con `Link` y las filas repetidas de una tabla desde
+     su segunda página. La decisión 171 los dejaba sin etiquetar y la anotación incumplía PDF/UA (7.18.5-1:
+     una anotación `Link` debe estar en un `Link`). El pie de cada página con su web se anuncia en cada una
+     (es lo que una persona que ve la página también encuentra). *Dónde:* `paint/PdfStructure.outside`.
+     *Alternativa:* marcar las anotaciones como ocultas, que las quita del ratón.
+
+256. **`Tabs: S` en las páginas con anotaciones**, para que el visor recorra los enlaces en el orden de la
+     estructura (PDF/UA, 7.18.3-1). *Dónde:* `paint/PdfCanvas.write`.
+
+257. **veraPDF en los tests** (`org.verapdf:validation-model` 1.28.2, alcance `test`): `ExamplesTest`
+     valida el PDF de cada ejemplo con el perfil PDF/UA-1 y falla con cualquier regla incumplida salvo las
+     de `KNOWN_UA_FAILURES`, hoy solo la 5-1 (el XMP no lleva el identificador `pdfuaid:part`, es decir, no
+     se afirma la conformidad). Así una regresión de accesibilidad en la estructura rompe el build.
+     *Dónde:* `golden/PdfUa`, `examples/ExamplesTest`. *Alternativa:* validar a mano de vez en cuando.

@@ -21,19 +21,18 @@
 - Un manual hecho a partir de referencia :-)
 - Al final de todo volver a versionar pdf's de ejemplos, para poner enlaces en readme y que se vean en github
 
-- **`Link` del PDF etiquetado con su contenido marcado** (hito 23, decisión 171 de
-  `docs/DECISIONES.md`). Hoy cada enlace es un elemento `Link` hijo del elemento de la caja que
-  solo contiene la anotación (`OBJR`) y un `Alt` con su texto; no envuelve el texto marcado del
-  tramo. Lo completo, y lo que pide PDF/UA, es que el `Link` contenga el contenido marcado de
-  su texto además de la `OBJR`. Para ello hay que partir el contenido marcado de un `P` (o
-  `Span`, `H1`…, `TD`) en varios `MCID`, uno por cada tramo con enlace, y colgar cada trozo del
-  `Link` correspondiente. *Dónde:* `paint/StackingContext.paintText` (hoy un único
-  `beginText`/`endText` por fragmento), `paint/PdfStructure.mark` y `link`. Verificar el
-  resultado con un validador de PDF/UA (por ejemplo veraPDF) y, a ser posible, con un lector de
-  pantalla.
-- Hacer ese repaso de accesibilidad del PDF etiquetado entero cuando se termine esto: texto
-  alternativo de las figuras, orden de lectura con `Fixed` y `Absolute`, tablas con `Scope`,
-  idioma por tramo, y la validación PDF/UA de los once ejemplos.
+- ~~**`Link` del PDF etiquetado con su contenido marcado**~~ (decisiones 252–257 de `docs/DECISIONES.md`: el
+  `Link` envuelve lo que se pulsa, uno por enlace y fragmento, y lo que no es contenido tiene un `Link` suelto
+  del `Document`). Los once ejemplos pasan PDF/UA-1 con veraPDF (`ExamplesTest`) salvo la regla 5-1. Queda:
+  verificarlo con un lector de pantalla, y que el `Link` suelto de un `Fixed` (un pie con una web) se
+  anuncia al final del documento, no en su sitio de lectura.
+- **Declarar la conformidad PDF/UA** (regla 5-1 de veraPDF, la única que incumplen los ejemplos): el XMP
+  llevaría `pdfuaid:part` = 1. Es afirmar algo, así que hay que decidir cuándo se hace: con el repaso de
+  abajo hecho y los once ejemplos sin ningún fallo en `ExamplesTest.KNOWN_UA_FAILURES`.
+- Hacer el repaso de accesibilidad del PDF etiquetado entero: texto alternativo de las figuras, orden de
+  lectura con `Fixed` y `Absolute`, tablas con `Scope`, idioma por tramo, y probar con lectores de pantalla
+  (veraPDF ya no encuentra nada en los ejemplos más allá de la 5-1, pero no comprueba que el orden o los
+  textos tengan sentido).
 
 ## Huecos del motor detectados al escribir los ejemplos (hito 21)
 

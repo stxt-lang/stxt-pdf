@@ -310,9 +310,17 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Canvas.link`.
   `PdfCanvas.write` crea todas las páginas antes de pintar, `PdfLinks` crea las anotaciones
   (`URI`, o el destino que resuelve `PdfDestinations` al final: la esquina del primer fragmento
-  de la caja, la misma de los marcadores) y `PdfStructure.link` cuelga un `Link` con su `OBJR`
-  del elemento de la caja, salvo en un `Fixed` y en las filas repetidas de una tabla, que no son
-  contenido (la anotación se escribe igualmente). El SVG no pinta enlaces.
+  de la caja, la misma de los marcadores). El `Link` del PDF etiquetado envuelve lo que se pulsa:
+  `PdfStructure.build` crea el de una caja con `Link` como hijo de su elemento y padre de su contenido
+  (una `Image`, al revés: `Link → Figure`), y `PdfStructure.link` le cuelga la `OBJR` de cada
+  fragmento. Un enlace de texto es otra secuencia de contenido marcado: `StackingContext.paintText`
+  parte el texto en secuencias de tramos con el mismo destino, `Canvas.beginLinkText` abre la de un
+  enlace (`PdfStructure.markLink` crea su `Link`, hijo del elemento de la caja, con un `MCID` aunque
+  ocupe varias líneas) y las zonas de cada línea (`Canvas.link`, dentro de la secuencia) le cuelgan una
+  `OBJR` (`inlineLink`). Un `Link` con algo que leer no lleva `Alt`. Lo que no es contenido (un `Fixed`,
+  una imagen decorativa, las filas repetidas de una tabla) tiene un `Link` suelto, hijo del `Document`,
+  con el texto como `Alt` (`PdfStructure.outside`): PDF/UA exige que toda anotación esté en un `Link`.
+  Las páginas con anotaciones llevan `Tabs: S`. El SVG no pinta enlaces.
 - **Aspecto de las cajas (§5.6):** `Radius`, `Border color` (de 1 a 4 colores: `Style.borderColor` es un
   `Sides<String>`, `null` = el `Color` del texto) y `Background` (un `Paint`: `Solid` o `Linear`) solo cambian
   el pintado; el layout no los lee. Los colores siguen siendo texto (`#RRGGBBAA`, `Colors` los valida y los

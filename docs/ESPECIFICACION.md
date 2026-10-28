@@ -2036,7 +2036,7 @@ Contents:
 - **PDF etiquetado.** Un `TOC` con un `TOCI` por entrada, cada uno con dos `Span` (el título y el
   número); la guía no es contenido. Los marcadores no cambian ([§5.13](#513-encabezados-y-párrafos)).
 - **Enlace.** Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id`
-  ([§5.20](#520-enlaces)); con el `Link` etiquetado, cada `TOCI` tiene además un `Link`.
+  ([§5.20](#520-enlaces)); en el PDF etiquetado, el `Link` de cada `TOCI` envuelve el título y el número.
 - **Volcado ([§7](#7-formato-de-resultados)).** Solo sale el `Contents`, si tiene `Id`: sus
   entradas no.
 
@@ -2090,10 +2090,26 @@ Markdown:
 - **PDF.** Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la
   página, y como texto (`Contents`) lo que dice la caja o el tramo, para quien no lo ve (el texto de
   la caja y de lo que contiene, o el `Alt` de una imagen; sin texto, el propio destino).
-- **PDF etiquetado.** Cada anotación es un elemento `Link` hijo del elemento de la caja, con la
-  anotación como referencia a objeto (`OBJR`) y su texto como `Alt`. No tiene `Link` lo que no es
-  contenido: lo que hay dentro de un `Fixed`, una imagen decorativa y las filas repetidas de una
-  tabla desde su segunda página; la anotación sigue siendo clicable.
+- **PDF etiquetado.** El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como
+  referencia a objeto (`OBJR`), como pide PDF/UA:
+  - *Caja con `Link`:* el `Link` es hijo del elemento de la caja y contiene su contenido: el texto
+    de la caja y los elementos de lo que contiene (`Span → Link → texto`; `Div → Link → Span, Span`;
+    `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
+    (`Link → Figure`). Una caja partida entre páginas tiene un solo `Link` con una `OBJR` por
+    fragmento.
+  - *Enlace dentro del texto:* el `Link` es hijo del elemento del texto (`P → texto, Link, texto`) y
+    contiene el contenido marcado de las palabras del enlace. Es **uno por enlace y fragmento**, aunque
+    ocupe varias líneas: un contenido marcado y una `OBJR` por línea. Lo que va antes y después del
+    enlace es otro contenido marcado del mismo párrafo.
+  - *`Alt`:* un `Link` que contiene algo que leer (texto o una figura con su `Alt`) no lleva `Alt`,
+    porque lo leería un lector de pantalla en lugar del contenido; uno sin nada dentro lo lleva con el
+    texto del enlace.
+  - *Lo que no es contenido* (lo que hay dentro de un `Fixed`, una imagen decorativa y las filas
+    repetidas de una tabla desde su segunda página) no tiene a qué envolver: su anotación va a un
+    `Link` hijo del `Document`, sin contenido y con el texto del enlace como `Alt`. Un `Fixed` con una
+    web en el pie se anuncia así en cada página.
+  - Las páginas con anotaciones llevan `Tabs: S`, que recorre las anotaciones en el orden de la
+    estructura.
 - **Volcado ([§7](#7-formato-de-resultados)).** Los enlaces no se vuelcan.
 
 ---
