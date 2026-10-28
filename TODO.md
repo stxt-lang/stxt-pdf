@@ -4,11 +4,11 @@
 
 - ~~Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario~~ (hecho: raíz `Styles`, `Element: Document`; decisiones 226–231 de `docs/DECISIONES.md`). Queda: los errores posteriores a la construcción (fuente que no existe, desbordamientos) señalan la línea de una regla del documento aparte sin decir el fichero.
 - `Sections` o `Media Sections`, y retomar que una section no vaya al índex o algo así, cosas que habían quedado apartadas de páginas
-- Rotación de los fixed y absolutos
+- ~~Rotación de los fixed y absolutos~~ (hito 30: `Rotate` y `Rotate origin` en `Relative`, `Absolute`, `Fixed` e `Image`)
 - ~~Índice!!~~ (hito 22)
 - Float? Algo más que haga falta?
 - Referencia de cada elemento en páginas separadas + una referencia de elementos comunes de box, etc
-- Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
+- ~~Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación~~ (hito 30: `Paper` y `Orientation` en `Media`). Queda: que cada página o sección tenga su propio tamaño u orientación (una página apaisada dentro de un documento vertical).
 - Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - Revisar ThreadSafe
 - Revisar rendimiento
@@ -82,4 +82,6 @@
   entre las letras.
 - **Imágenes vectoriales (SVG)**: los gráficos de los ejemplos son PNG generados; con SVG
   quedarían nítidos a cualquier tamaño.
-- **Rotación**: nada se puede girar, ni un sello ni un texto vertical.
+- ~~**Rotación**~~ (hito 30). Queda: girar un `Text` o un `Block` directamente (hoy se gira el posicionado
+  que lo contiene), `Rotate origin` con medidas (puntos o porcentajes), que una caja girada ocupe en el
+  layout su rectángulo envolvente (hoy es solo pintado), y que un `Relative` girado se pueda partir.

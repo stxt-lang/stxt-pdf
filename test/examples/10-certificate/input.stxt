@@ -1,12 +1,14 @@
-# Certificado de un curso, en una página A4 apaisada (842 × 595). Un fondo crema y tres marcos
+# Certificado de un curso, en una página A4 apaisada (Paper y Orientation: 842 × 595). Un fondo crema y tres marcos
 # concéntricos con cuatro adornos en las esquinas, todos Fixed con Layer negativa; el contenido
 # centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
-# lados de un sello con cintas. El nombre de la escuela se escribe en minúscula y la regla de su clase
-# lo pone en mayúsculas, separadas (Transform y Letter spacing).
+# lados de un sello con cintas, ligeramente girado (Rotate). El número del certificado va en vertical
+# en el margen izquierdo: un Fixed girado −90 grados alrededor de su esquina de arriba a la izquierda.
+# El nombre de la escuela se escribe en minúscula y la regla de su clase lo pone en mayúsculas,
+# separadas (Transform y Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 842
-		Height: 595
+		Paper: A4
+		Orientation: landscape
 		Margin: 64 80 56 80
 	Title: Certificado de finalización · Cerámica a mano
 	Language: es
@@ -60,8 +62,17 @@ Document (dev.stxt.boxes):
 	Fixed:
 		Id: footer
 		Offset: auto 0 -22 0
-		Text: Certificado nº CER-2025-0412 · Verificable en escuelaceramica.example/verificar
+		Text: Verificable en escuelaceramica.example/verificar
 			Link: https://escuelaceramica.example/verificar
+	Fixed:
+		Id: serial
+		Offset: 363.5 auto auto -31
+		Rotate: -90
+		Rotate origin: top left
+		Box:
+			Width: 260
+		Text: Certificado nº cer-2025-0412
+			Class: serial
 	Text: Escuela de cerámica del Valle
 		Class: school
 	Heading 1:
@@ -102,6 +113,7 @@ Document (dev.stxt.boxes):
 			Image: examples/certificate/seal.png
 				Id: seal
 				Alt: Sello de excelencia de la escuela
+				Rotate: -8
 				Box:
 					Width: 100
 		Item:

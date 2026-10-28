@@ -1,0 +1,23 @@
+# Página 1: tag, intro y stamp, y el Fixed side. big no cabe entero en los 48 que quedan y no se parte.
+# Página 2: big con b1 y b2, la imagen badge debajo y otra vez side.
+Result:
+	Page: 1
+		Fragment: intro
+			Rect: 20 20 380 150
+		Fragment: stamp
+			Rect: 20 170 120 60
+		Fragment: tag
+			Rect: 320 40 80 20
+		Fragment: side
+			Rect: 3 249 200 14
+	Page: 2
+		Fragment: big
+			Rect: 20 20 380 90
+			Fragment: b1
+				Rect: 20 20 380 40
+			Fragment: b2
+				Rect: 20 60 380 50
+		Fragment: badge
+			Rect: 20 110 30 30
+		Fragment: side
+			Rect: 3 249 200 14

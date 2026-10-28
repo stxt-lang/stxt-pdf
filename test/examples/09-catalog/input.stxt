@@ -1,14 +1,13 @@
 # Catálogo de producto de un taller de muebles, de cinco páginas: portada a sangre (un Absolute
 # que sale al margen, con el pie fijo solo desde la segunda página), un índice de productos con su página (un Contents, que el motor
 # rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
-# (Fit: cover) y una etiqueta «Novedad» superpuesta, y una página final con maderas, pedidos y
+# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Absolute con Rotate), y una página final con maderas, pedidos y
 # contacto. Las fichas son todas iguales: el estilo está en styles.stxt y solo cambia el contenido.
 # El título de la portada y el del índice son un Text, no un encabezado, para que no salgan en él.
 # Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 54 50 64 50
 	Title: Catálogo 2026 · Taller Nogal
 	Language: es
@@ -223,8 +222,11 @@ Document (dev.stxt.boxes):
 								Height: 205
 								Radius: 5.5 5.5 0 0
 						Absolute:
-							Offset: 10 auto auto 10
+							Offset: 18 -12 auto auto
+							Rotate: 40
 							Class: new
+							Box:
+								Width: 96
 							Text: Novedad
 					Block:
 						Class: body
@@ -424,8 +426,11 @@ Document (dev.stxt.boxes):
 								Height: 205
 								Radius: 5.5 5.5 0 0
 						Absolute:
-							Offset: 10 auto auto 10
+							Offset: 18 -12 auto auto
+							Rotate: 40
 							Class: new
+							Box:
+								Width: 96
 							Text: Novedad
 					Block:
 						Class: body

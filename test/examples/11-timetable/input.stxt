@@ -1,11 +1,11 @@
-# Horario escolar semanal en una página A4 apaisada (842 × 595): una tabla con las celdas
+# Horario escolar semanal en una página A4 apaisada (Paper: A4 y Orientation: landscape, 842 × 595): una tabla con las celdas
 # separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
 # recreo y comedor que ocupan los cinco días con Span, una leyenda en un Flex con salto de línea
 # y unas notas en Markdown. Cada color es una clase de styles.stxt.
 Document (dev.stxt.boxes):
 	Media:
-		Width: 842
-		Height: 595
+		Paper: A4
+		Orientation: landscape
 		Margin: 40 46 46 46
 	Title: Horario de 2.º B · Curso 2025-26
 	Language: es

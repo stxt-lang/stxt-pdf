@@ -48,11 +48,11 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | hecho | 20 |
 | 28 | Aspecto de las cajas: esquinas, color de borde por lado, degradados y opacidad (sin sombras) | hecho | 21 |
 | 29 | Texto preformateado y código | hecho | 22 |
-| 30 | Rotación y orientación de la página | en curso | 23 (previsto) |
+| 30 | Rotación y orientación de la página | hecho | 23 |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 29, el 2026-10-28 (el 28, el 2026-10-28
-también, en otra sesión). Los hitos 30 y 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 30, el 2026-10-28 (el 28 y el 30 en otras
+sesiones del mismo día). El hito 31 está pendiente; los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -1167,9 +1167,32 @@ quitó `Text` y se pide que lo girado quepa en la página, y O3, donde entra ya 
 **Tareas:**
 
 - [x] Resolver O1–O5 (2026-10-28).
-- [ ] Schema, `Style`, `Media`, `StackingContext`, `Canvas`/`PdfCanvas`/`SvgCanvas`.
-- [ ] Especificación (§4.1, §4.9, §5.6, §8), tests y caso golden `23-rotation`.
-- [ ] Ejemplos 09, 10 y 11 (ver arriba).
+- [x] Schema, `Style`, `Media`, `StackingContext`, `Canvas`/`PdfCanvas`/`SvgCanvas`; además
+      `model/Rotation`, `Engine.layout` (un `Relative` girado no se parte), `Overflow` (lo girado, contra
+      la página) y `PdfDestinations`.
+- [x] Especificación (§4.1, §4.9, §4.15, §5.6, §5.10, §5.12, §6, §7, §8, §9 y glosario), errores (18 casos
+      nuevos o movidos en el catálogo: `MEDIA_SIZE`, `ROTATE_ORIGIN_WITHOUT_ROTATE`, `BREAK_IN_ROTATED`,
+      `VALUE_NOT_ALLOWED`, `BOX_OVERFLOW`, `PAGE_OVERFLOW` y del schema), tests (`RotationTest`,
+      `RotationLayoutTest`, `BoxTreeBuilderTest`, `StackingContextTest`, `SvgCanvasTest`, `PdfCanvasTest`) y
+      caso golden `23-rotation`, calculado a mano.
+- [x] Ejemplos 09 (etiqueta «Novedad» en diagonal), 10 (sello girado y número en vertical en el margen) y
+      11 (`Paper` y `Orientation`).
+
+**Diseño técnico** (como quedó):
+
+- **Modelo.** `model/Rotation` (grados y origen como fracción de la caja de borde; `transform`,
+  `corners` y `envelope` con `AffineTransform`, en coordenadas de la página con la y hacia abajo);
+  `Style.rotation`, leído en `BoxTreeBuilder.element` (`ValueReader.angle` y `rotateOrigin`) y validado
+  en `ModelValidator.validateRotation`. `Media.Paper` y `Media.Orientation`, en `BoxTreeBuilder.media`.
+- **Layout.** Nada cambia salvo que `Engine.layout` maqueta sin fragmentación una caja girada y devuelve
+  `BEFORE` si no cabe (`ConstraintSpace.unfragmented`).
+- **Desbordamiento.** `Overflow.fragment` compone los giros de los ancestros y comprueba el envolvente
+  de lo girado (y de los fuera de flujo de dentro de algo girado) contra la página; `pageOverflow` señala
+  el `Rotate` de un `Relative` girado que no cabe en una página.
+- **Pintado.** `Canvas.beginRotation`/`endRotation`; `StackingContext.paint` envuelve el contexto de la
+  caja girada y los dos pasos de una `Image` girada en flujo. `PdfCanvas`: `q`, `cm` y `Q`, y el giro
+  compuesto para los `QuadPoints` y el envolvente de los enlaces y el `BBox` de las figuras;
+  `PdfDestinations`, el envolvente. `SvgCanvas`: `<g transform="rotate(…)">`.
 
 ---
 
@@ -1223,6 +1246,18 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (16).** Hito 30 terminado, en tres commits (decisiones, código y documentación con el caso
+  golden y los ejemplos). Resueltas O1–O5 con un cuestionario: `Rotate` en `Relative`, `Absolute`, `Fixed` e
+  `Image` (no en `Text`), solo pintado pero lo girado debe caber en la página y un `Relative` girado no se
+  parte; cualquier ángulo de −360 a 360 sin 0; `Rotate origin` con palabras clave; `Paper` (no `Size`, que
+  ya es el tamaño de la fuente) y `Orientation` en `Media`; enlaces girados con `QuadPoints`. Dos códigos
+  nuevos (`ROTATE_ORIGIN_WITHOUT_ROTATE`, `BREAK_IN_ROTATED`) y 18 casos en el catálogo; el de «medio sin
+  alto» pasa de `TOO_FEW_CHILDREN` a `MEDIA_SIZE`. Caso golden `23-rotation` (calculado a mano, pasó a la
+  primera; solo se ensanchó el relleno de un bloque para que la etiqueta no tapara el texto). Ejemplos 09,
+  10 y 11; ningún PNG golden ni volcado de los demás ejemplos cambia. Decisiones 232–241 de
+  `DECISIONES.md`. `mvn test` en verde (1205 tests).
+  *Siguiente paso:* hito 31 (SVG), en otra sesión; resolver V1–V6 con el usuario antes de escribir código
+  (la V2, la librería, es la que más decide el coste). Lo que quedó fuera del 30 está en `TODO.md`.
 - **2026-10-28 (15).** Documento de estilos aparte (primer punto de `TODO.md`; no es un hito de esta hoja de
   ruta). Resuelto con un cuestionario: la tipografía base pasa a `Element: Document` (y `Document` ya no admite
   `Typography`), las reglas del documento aparte valen menos que las del documento en cada nivel de

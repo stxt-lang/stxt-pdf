@@ -70,3 +70,8 @@ Styles (dev.stxt.boxes):
 			Font: IBM Plex Sans
 			Size: 7.5
 			Color: #7B7D8C
+	For class: serial
+		Typography:
+			Color: #A8782F
+			Transform: uppercase
+			Letter spacing: 1.5

@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 29 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 30 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -86,7 +86,9 @@ actualízala.
 
 | 29 | ~~Texto preformateado y código: `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography` (se heredan); `Code font` en `Markdown` para el código en línea y los bloques de código~~ (hecho; caso 22) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/PreformattedText`, `layout/inline/InlineLayout`, `layout/Overflow`, `tree/MarkdownBuilder`, `model/TextFormat`, `layout/inline/PdfMetrics` |
 
-Los hitos 30 y 31 (rotación y SVG) están pendientes en
+| 30 | ~~Giro (`Rotate`, `Rotate origin`) de `Relative`, `Absolute`, `Fixed` e `Image`, solo pintado y que quepa en la página; papel con nombre (`Paper`, `Orientation`) en `Media`~~ (hecho; caso 23) | schema, `model/Rotation`, `tree/Media`, `tree/BoxTreeBuilder`, `layout/Engine`, `layout/Overflow`, `paint/StackingContext`, `paint/PdfCanvas`, `paint/SvgCanvas`, `paint/PdfDestinations` |
+
+El hito 31 (SVG) está pendiente en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -105,7 +107,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
+| `model` | Tipos puros: `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `ResourceException` e `ImageFormatException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
@@ -324,6 +326,20 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   a la caja (`gradient`), con una máscara suave de luminosidad si algún color no es opaco; la opacidad de un
   color liso, un estado gráfico `ca` (`painting`). `SvgCanvas` escribe `<path>`, `linearGradient` y
   `clipPath`, y deja `<rect>` lo liso y cuadrado.
+- **Giro (§5.6):** `Rotate` y `Rotate origin` son propiedades del elemento (`Style.rotation`, un
+  `model/Rotation`; no van en `Styles` ni se heredan) de `Relative`, `Absolute`, `Fixed` e `Image`. Solo
+  cambian el pintado: el layout, el volcado y la comprobación en su sitio son los de la caja sin girar.
+  Hay tres excepciones: `Engine.layout` no parte una caja girada (la maqueta sin fragmentación y, si no
+  cabe, `BEFORE`); `Overflow` comprueba contra la página el rectángulo que envuelve lo girado, componiendo
+  los giros de los ancestros con un `AffineTransform` (`BOX_OVERFLOW` en la línea de `Rotate`); y
+  `PdfDestinations` usa ese envolvente. `StackingContext.paint` envuelve el contexto de la caja girada en
+  `Canvas.beginRotation`/`endRotation` (una `Image` en flujo, cada uno de sus dos pasos): `PdfCanvas`
+  escribe un `cm` dentro de `q`/`Q` y guarda el giro compuesto para los `QuadPoints` de los enlaces y el
+  `BBox` de las figuras; `SvgCanvas`, un `<g transform>`. Las coordenadas de `Rotation` son las de la
+  página, con la y hacia abajo: un ángulo positivo gira en el sentido de las agujas del reloj (en el PDF,
+  con el origen abajo, el ángulo cambia de signo).
+- **Papel (§4.1):** `Media` es `Paper` (`Media.Paper`, en vertical) con `Orientation`, o `Width` y
+  `Height`; `BoxTreeBuilder.media` exige una sola de las dos formas (`MEDIA_SIZE`).
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.

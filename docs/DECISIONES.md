@@ -1350,3 +1350,70 @@ No es un hito de la hoja de ruta: sale del primer punto de `TODO.md`. Interpreta
 
 231. **Mensajes de `TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`:** dicen ahora «de un antecesor o de Styles
      (Element: Document)» en vez de «o de Document».
+
+## Hito 30: rotación y papel con nombre (2026-10-28)
+
+Las decisiones O1–O5 de la hoja de ruta se tomaron con un cuestionario; estas son las interpretaciones que
+salieron al implementarlas.
+
+232. **`Paper`, no `Size`.** La propuesta era `Size: A4`, pero `Size` ya es el tamaño de la fuente
+     (`Typography`) y cada nombre tiene una sola definición en el namespace. Los tamaños son los de ISO 216
+     redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842, A3 = 842 × 1191, A5 = 420 × 595,
+     A6 = 298 × 420, B4 = 709 × 1001, B5 = 499 × 709), y Letter y Legal, exactos. *Dónde:* `tree/Media.Paper`,
+     schema. *Alternativa:* los valores exactos con decimales (A4 = 595,28 × 841,89), que no coinciden con los
+     documentos que ya escriben 595 × 842.
+
+233. **El tamaño del medio se declara de una sola forma, y los errores son `MEDIA_SIZE`.** En el schema,
+     `Paper`, `Orientation`, `Width` y `Height` pasan a ser opcionales (como mucho uno); el motor exige `Paper` o
+     `Width` y `Height`, nunca las dos cosas, y `Orientation` solo con `Paper`. No hay código nuevo: es el
+     tamaño del medio. El caso del catálogo «medio sin alto» pasa de `TOO_FEW_CHILDREN` (del schema) a
+     `MEDIA_SIZE`, con la línea del `Width`. *Dónde:* `BoxTreeBuilder.media`. *Alternativa:* un código propio
+     (`MEDIA_PAPER`), o dejar que `Paper` sustituya a `Width` y `Height` en silencio.
+
+234. **`Rotate` es una propiedad del elemento**, como `Offset`: no va en `Styles` ni en un grupo, no se
+     hereda (aunque lo que contiene la caja gira con ella) y solo la admiten `Relative`, `Absolute`, `Fixed` e
+     `Image`. Un `Text` no gira: se gira el bloque que lo contiene (`CHILD_NOT_DECLARED`). *Dónde:* schema,
+     `BoxTreeBuilder.element`, `Style.rotation`. *Alternativa:* en `Box`, para poder darlo con una clase.
+
+235. **Ángulo:** un `NUMBER` del schema de −360 a 360 grados; `0` (que no gira nada) y lo de fuera son
+     `VALUE_NOT_ALLOWED`. 360 y −360 se admiten aunque dejen la caja como estaba. *Dónde:*
+     `ValueReader.angle`. *Alternativa:* normalizar a (−180, 180] o rechazar las vueltas enteras.
+
+236. **`Rotate origin`:** una o dos palabras clave en cualquier orden (`top left` = `left top`); el eje que
+     no se nombra es `center`, y `center center` vale. Dos del mismo eje, o algo que no es una palabra clave
+     (puntos, porcentajes), es `VALUE_NOT_ALLOWED`; sin `Rotate`, `ROTATE_ORIGIN_WITHOUT_ROTATE`. *Dónde:*
+     `model/Rotation.origin`, `ModelValidator.validateRotation`.
+
+237. **Lo girado se comprueba como se pinta.** El rectángulo que envuelve la caja de borde girada, con los
+     giros de sus ancestros compuestos, debe estar dentro de la página física (`BOX_OVERFLOW` en la línea de
+     su `Rotate`). Se usa la posición pintada, con el `Offset` de un `Relative` incluido, aunque el
+     `Relative` se compruebe en su sitio sin él: lo que importa es que lo girado se vea. Un `Absolute` o un
+     `Fixed` girado se comprueba solo así (puede salirse sin girar y caber girado); uno sin girar dentro de
+     una caja girada, también así, en la línea del elemento. Las cajas en flujo de dentro de una girada se
+     siguen comprobando contra su padre sin girar, que es lo que las contiene. *Dónde:* `layout/Overflow`.
+     *Alternativa:* comprobar solo la caja girada y no lo que cuelga de ella.
+
+238. **Un `Relative` girado no se parte.** `Engine.layout` lo maqueta sin fragmentación y, si no cabe en lo
+     que queda de página, devuelve `BEFORE` (como una imagen); al principio de una página se coloca, y si es
+     más alto que el área útil, `PAGE_OVERFLOW` en la línea de su `Rotate` (lo que impide partirlo es el
+     giro, no un hijo). Los cortes forzados (`Before: page`) de sus descendientes no tienen efecto, como
+     dentro de un `Absolute`. `Inside` y `Decoration` en él son `BREAK_IN_ROTATED`, también desde una regla.
+     *Alternativa:* partirlo y girar cada fragmento sobre su propio centro (un sello partido en dos páginas no
+     tiene sentido), o un error para los cortes forzados de dentro.
+
+239. **Pintado.** El giro envuelve todo el contexto de apilamiento de la caja girada (también sus
+     posicionados y los contextos con `Layer` de dentro, que se pintan dentro del giro); una `Image` en flujo
+     se gira en sus dos pasos (fondo y borde, y contenido). El orden de pintado no cambia. En PDF es un
+     `q … cm … Q` (el texto sigue siendo texto y el PDF etiquetado no cambia); en SVG, un
+     `<g transform="rotate(…)">`. El contorno de depuración también gira. *Dónde:* `StackingContext.paint`,
+     `Canvas.beginRotation`, `PdfCanvas`, `SvgCanvas`.
+
+240. **Enlaces, figuras y destinos.** La anotación de un enlace girado tiene como `Rect` el rectángulo que
+     envuelve la zona girada y como `QuadPoints` la zona girada, en sentido antihorario desde abajo a la
+     izquierda; el `BBox` de una `Figure` girada y el destino (marcadores y enlaces internos) de una caja
+     girada, o de dentro de una girada, son los del rectángulo que la envuelve. *Dónde:* `PdfCanvas.link`,
+     `PdfCanvas.image`, `PdfDestinations`. *Alternativa:* solo el envolvente, sin `QuadPoints`.
+
+241. **El volcado (§7) no cambia:** el `Rect` de una caja girada es el de sin girar, como el de un enlace o un
+     fondo, porque el giro no cambia el layout. Los ejemplos que pasan a `Paper` son los que lo pedía la hoja
+     de ruta (09, 10 y 11); los demás A4 siguen con `Width` y `Height`, que son equivalentes.

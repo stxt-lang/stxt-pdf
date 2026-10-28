@@ -284,9 +284,32 @@ Obligatorio, exactamente uno, hijo de `Document`.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Width` | número > 0 | — (obligatorio) | Ancho de la página. |
-| `Height` | número > 0 | — (obligatorio) | Alto de la página. |
+| `Paper` | `A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter`, `Legal` | — | Tamaño de papel con nombre, en vertical (tabla de abajo). |
+| `Orientation` | `portrait`, `landscape` | `portrait` | Solo con `Paper`: `landscape` cambia el ancho por el alto. |
+| `Width` | número > 0 | — | Ancho de la página, sin `Paper`. |
+| `Height` | número > 0 | — | Alto de la página, sin `Paper`. |
 | `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo puntos. |
+
+El tamaño de la página se declara **de una sola forma**: un `Paper` (con su `Orientation`, si
+es apaisada) o un `Width` y un `Height`. Declarar `Paper` con `Width` o `Height`, `Orientation`
+sin `Paper`, solo uno de `Width` y `Height`, o ninguna de las dos formas, es `MEDIA_SIZE`. Los
+tamaños con nombre, en puntos enteros (los de ISO 216, redondeados como se usan siempre):
+
+| `Paper` | Ancho × alto (pt) | | `Paper` | Ancho × alto (pt) |
+|---|---|---|---|---|
+| `A3` | 842 × 1191 | | `B4` | 709 × 1001 |
+| `A4` | 595 × 842 | | `B5` | 499 × 709 |
+| `A5` | 420 × 595 | | `Letter` | 612 × 792 |
+| `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
+
+```
+Media:
+	Paper: A4
+	Orientation: landscape
+	Margin: 40
+```
+
+es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
 elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
@@ -449,6 +472,11 @@ dentro.
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
 | `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Area`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | Solo en `Fixed`: las páginas en que sale. Ver [§5.5](#55-posicionamiento). |
+| `Rotate` | número de −360 a 360, sin `0` | — | Gira la caja al pintarla, en grados en el sentido de las agujas del reloj; no cambia el layout. También en `Image`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
+| `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center` | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`…). Solo con `Rotate`. |
+
+`Rotate` y `Rotate origin` son propiedades del elemento, como `Offset`: no van en `Styles` ni se
+heredan, aunque lo que contiene la caja gira con ella.
 
 ### 4.10 Reglas reutilizables (`Styles`)
 
@@ -640,6 +668,7 @@ Propiedades del elemento `Image`, hijas directas suyas ([§5.18](#518-imágenes)
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG o JPEG: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura del PDF etiquetado; sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Rotate`, `Rotate origin` | como en [§4.9](#49-posicionamiento) | — | Gira la imagen al pintarla (un sello, una etiqueta en diagonal). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -970,6 +999,29 @@ ni cambia el tamaño de una caja, y el volcado ([§7](#7-formato-de-resultados))
   en un borde de un solo color, las esquinas no se pintan dos veces.
 - **PDF etiquetado.** Fondos, bordes y degradados son *artifacts*, como hasta ahora.
 
+**Giro (`Rotate`).** Un `Relative`, un `Absolute`, un `Fixed` o una `Image` con `Rotate` se pinta
+girado tantos grados como dice, en el sentido de las agujas del reloj, alrededor de su
+`Rotate origin` (el centro de su caja de borde por defecto). Gira **todo lo que se pinta de la
+caja**: fondo, borde, texto, imagen, sus descendientes (también los `Absolute` que cuelgan de ella)
+y las zonas de sus enlaces. Un giro dentro de otro se suma al de fuera.
+
+- **No cambia el layout.** Como el `Offset` de un `Relative`, es solo pintado: la caja ocupa su
+  sitio sin girar, sus hermanos no se mueven y el volcado ([§7](#7-formato-de-resultados)) da su
+  rectángulo sin girar. Para un texto vertical en el margen se gira un `Absolute` o un `Fixed` que
+  lo contiene (`Text` no admite `Rotate`).
+- **Tiene que caber en la página.** El rectángulo que envuelve la caja de borde girada (con los
+  giros de sus ancestros) no puede salirse de la página física ([§5.12](#512-desbordamiento)), y lo
+  mismo un `Absolute` sin girar que cuelga de una caja girada.
+- **No se parte.** Un `Relative` girado no se parte entre páginas, como una `Image`
+  ([§5.10](#510-fragmentación)); `Inside` y `Decoration` no tienen efecto en él y son un error
+  (`BREAK_IN_ROTATED`).
+- **Orden de pintado.** No cambia: la caja girada se pinta en el mismo paso que sin girar.
+- **PDF.** El contenido se gira con una matriz (`cm`), así que el texto sigue siendo texto
+  seleccionable y nítido con cualquier ángulo, y el PDF etiquetado y el orden de lectura no
+  cambian. Un enlace en una caja girada es la zona girada (`QuadPoints`) dentro del rectángulo
+  que la envuelve, que es lo que pulsan los visores que no la entienden; el `BBox` de una figura
+  girada y el destino de una caja girada ([§5.20](#520-enlaces)) son los del rectángulo que la envuelve.
+
 ### 5.7 Flex
 
 En un `Flex`, los ítems (el elemento de cada `Item`) se colocan en el **eje principal**
@@ -1220,7 +1272,8 @@ columna), pasa entera a la siguiente ([§5.18](#518-imágenes)).
 **Posicionadas.** Un `Absolute` se coloca en la página donde cae su posición y no se parte. Si
 su containing block está partido, se resuelve contra el fragmento de esa página: su alto es el
 de ese fragmento, no el total. Un `Fixed` se repite en las páginas que dice su `Pages`. Un `Relative` se
-parte como cualquier bloque.
+parte como cualquier bloque, salvo si está girado: entonces, como una imagen, pasa entero a la página
+siguiente si no cabe en lo que queda de la actual ([§5.6](#56-apilamiento-y-orden-de-pintado)).
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
 ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores reales.
@@ -1301,9 +1354,15 @@ un error con la primera de estas situaciones:
   partir** (`PAGE_OVERFLOW`), en la línea de lo que impide partirlo: su `Padding` o su
   `Border` si el relleno y el borde del fragmento ya no caben en la página; si no, su
   `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no,
-  su `Height` (en una `Image` sin él, su `Width`, del que sale el alto);
+  su `Height` (en una `Image` sin él, su `Width`, del que sale el alto); en un `Relative` girado,
+  que no se parte, su `Rotate`;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página;
+- **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su
+  `Rotate`: lo que se comprueba es el rectángulo que envuelve lo que se pinta, con los giros de sus
+  ancestros ([§5.6](#56-apilamiento-y-orden-de-pintado)). Un `Absolute` o un `Fixed` girado se
+  comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro de una caja
+  girada, también, en la línea del elemento;
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página
   (`TABLE_REPEAT_OVERFLOW`, [§5.15](#515-tablas)), en la línea de la `Table`. Se detecta al
   maquetar, porque sin sitio la tabla no avanza;
@@ -1315,7 +1374,7 @@ un error con la primera de estas situaciones:
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro,
 se nombra lo de dentro. Los `Relative` se comprueban en su sitio, sin el desplazamiento de
-`Offset`, y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino
+`Offset` ni el giro de `Rotate` (lo girado se comprueba además contra la página), y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino
 decisiones del autor. Tampoco cuentan los márgenes verticales, que colapsan.
 
 ### 5.13 Encabezados y párrafos
@@ -2049,9 +2108,9 @@ La validación se hace en cuatro niveles:
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
-| `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
+| `MEDIA_SIZE` | El tamaño del medio, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` de −360 a 360 y distinto de 0; `Rotate origin` con una o dos palabras clave, como mucho una por eje | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -2100,12 +2159,14 @@ La validación se hace en cuatro niveles:
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([§5.9](#59-dimensionado)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
+| `ROTATE_ORIGIN_WITHOUT_ROTATE` | `Rotate origin` solo con `Rotate` | `Rotate origin no tiene efecto sin Rotate: declara el giro o quítalo` |
+| `BREAK_IN_ROTATED` | Un `Relative` girado no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.6](#56-apilamiento-y-orden-de-pintado)) | `Inside no tiene efecto en un Relative girado, que no se parte entre páginas: quítalo` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella (§5.8) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` de un `Markdown` (línea de `Code font` para un bloque de código, la del texto para código en línea) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
-| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute`, los `Fixed` y lo girado en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
@@ -2141,7 +2202,9 @@ de su padre. Las columnas de un `Multicol` no tienen fragmento: sus hijos se ani
 `Multicol`, y una caja partida entre dos columnas sale dos veces en la misma página
 ([§5.16](#516-bloques-en-columnas)).
 Las cajas sin `Id` pueden incluirse para depurar. Las líneas de texto y sus tramos no se
-vuelcan, ni los enlaces ([§5.20](#520-enlaces)): no cambian el layout.
+vuelcan, ni los enlaces ([§5.20](#520-enlaces)) ni el giro de `Rotate`
+([§5.6](#56-apilamiento-y-orden-de-pintado)): no cambian el layout, y el `Rect` de una caja girada es
+el de sin girar.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`
 (el volcado esperado). Los números de `Rect` se comparan con una tolerancia de 0.01 pt.
@@ -2178,7 +2241,9 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `h1` … `h6` | Tamaño, peso, márgenes y `break-after: avoid` de la hoja de estilo del navegador; cualquier contenido en línea; los niveles se pueden saltar | Sin estilo implícito (se declara en `Styles`); el motor evita siempre el corte dentro y después; solo contienen `Text`; los saltos de nivel son un error ([§5.13](#513-encabezados-y-párrafos)) |
 | `p` | Varios bloques de texto separados por elementos | `Paragraph`: un `Text` con significado, un solo párrafo |
 | Accesibilidad y marcadores | Los da el navegador al imprimir, según el caso | PDF etiquetado y marcadores de los encabezados, siempre |
-| `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
+| `float`, `sticky`, `opacity` de una caja, `transform` salvo el giro | Sí | No |
+| `transform: rotate()` | Cualquier caja, con `transform-origin` en cualquier unidad; puede salirse de la página sin aviso; una caja girada se parte entre páginas | `Rotate` solo en `Relative`, `Absolute`, `Fixed` e `Image`, alrededor de una o dos palabras clave de `Rotate origin`; lo girado que se sale de la página es un error, y un `Relative` girado no se parte ([§5.6](#56-apilamiento-y-orden-de-pintado)) |
+| `@page { size }` | `size: A4 landscape`, o dos longitudes | `Paper` y `Orientation` en `Media`, o `Width` y `Height` ([§4.1](#41-media)) |
 | Medio continuo (pantalla) | Sí | No: siempre páginas |
 | `position: fixed` en impresión | Repetido en cada página | Repetido, relativo al área útil, en las páginas que dice `Pages` (todas por defecto); no hay `@page :first` ni márgenes distintos por página |
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
@@ -2247,7 +2312,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | Nodo | Tipo | Hijos |
 |---|---|---|
 | `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language` (exactamente uno), `Styles`; elementos |
-| `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
+| `Media` | `GROUP` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` (el tamaño, con `Paper` o con `Width` y `Height`: lo comprueba el motor) |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada). Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
 | `Block` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
@@ -2264,10 +2329,10 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Multicol` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Code font`, `Content` (obligatorio) |
 | `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit` |
-| `Relative` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
-| `Absolute` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
-| `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`; elementos |
+| `Image` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Rotate`, `Rotate origin` |
+| `Relative` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Absolute` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
@@ -2279,12 +2344,12 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
-`Count`, `INTEGER`; las de valores
-cerrados (`Table columns`, `Fit`, `Leader` y `Pages` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt` y `Link` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
+`Count`, `INTEGER`; `Rotate`, `NUMBER`; las de valores
+cerrados (`Table columns`, `Fit`, `Leader`, `Pages`, `Paper` y `Orientation` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt`, `Link` y `Rotate origin` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
-que `Item` y `Area` tengan exactamente un elemento (el schema solo limita cada tipo a uno) y un
+que `Media` declare su tamaño de una sola forma, que `Item` y `Area` tengan exactamente un elemento (el schema solo limita cada tipo a uno) y un
 `List item` al menos uno (el schema solo cuenta por tipo), que
 un `Text` tenga su texto en un sitio y solo uno, que la raíz sea `Document` (en un schema
 cualquier nodo puede ser raíz) y lo que depende de dónde está un elemento: que un `Text` de un
@@ -2444,9 +2509,11 @@ Document (dev.stxt.boxes):
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
 | **Fragmentainer** | Contenedor de fragmentos: cada página y, dentro de un `Multicol`, cada columna. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
+| **Giro** (`Rotate`) | Una caja que se pinta girada alrededor de su `Rotate origin`, sin que cambie el layout; lo girado tiene que caber en la página. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
+| **Papel** (`Paper`) | Tamaño de página con nombre (`A4`, `Letter`…), en vertical o, con `Orientation: landscape`, apaisado. |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
 | **Índice** | Elemento `Contents`: una entrada por encabezado con su título, una guía y su página ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |

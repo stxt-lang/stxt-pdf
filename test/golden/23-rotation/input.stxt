@@ -1,0 +1,95 @@
+# Giro y papel con nombre (ESPECIFICACION.md §4.1, §5.6, §5.10, §5.12).
+#
+# Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
+# El giro solo cambia el pintado: los Rect son los de las cajas sin girar.
+#   tag (Absolute):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
+#                     Girado 45 grados alrededor de su centro (360, 50), lo envuelve un cuadrado de
+#                     (80 + 20) × cos 45 = 70,7: de y = 14,6 a 85,4 y de x = 324,6 a 395,4; cabe.
+#   intro:            el primer bloque del flujo, 380 × 150 en (20, 20).
+#   stamp (Relative): 120 × 60 en (20, 170), girado −8 alrededor de su centro (80, 200): lo
+#                     envuelve de x = 16,4 a 143,6 y de y = 161,9 a 238,1; cabe.
+#   big (Relative):   girado 180, mide 40 + 50 = 90 y en la página 1 quedan 278 − 230 = 48. Sin girar
+#                     se partiría entre b1 (40, que cabe) y b2; girado no se parte y pasa entero a la
+#                     página 2: (20, 20), con b1 en y = 20 y b2 en y = 60.
+#   badge (Image):    test/square.png, 30 × 30, girada 45: en flujo detrás de big, en (20, 110).
+#   side (Fixed):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
+#                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Girado −90 alrededor de su esquina
+#                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Paper: A6
+		Orientation: landscape
+		Margin: 20
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Absolute:
+		Id: tag
+		Offset: 20 0 auto auto
+		Rotate: 45
+		Box:
+			Width: 80
+			Height: 20
+			Padding: 4 0
+			Background: #C0392B
+		Text: Novedad
+			Typography:
+				Weight: bold
+				Align: center
+				Color: #FFFFFF
+	Block:
+		Id: intro
+		Box:
+			Height: 150
+			Padding: 12 110 12 12
+			Background: #F2EFE8
+		Text: Una caja girada ocupa su sitio sin girar: el sello de abajo no mueve el bloque que lo sigue.
+	Relative:
+		Id: stamp
+		Rotate: -8
+		Box:
+			Width: 120
+			Height: 60
+			Border: 2
+			Border color: #C0392B
+			Padding: 21 12
+			Radius: 4
+		Text: Aprobado
+			Typography:
+				Weight: bold
+				Align: center
+				Color: #C0392B
+				Transform: uppercase
+	Relative:
+		Id: big
+		Rotate: 180
+		Block:
+			Id: b1
+			Box:
+				Height: 40
+				Background: #D6E4F0
+			Text: Primera parte (girada 180 grados)
+		Block:
+			Id: b2
+			Box:
+				Height: 50
+				Background: #A9C6E0
+			Text: Segunda parte
+	Image: test/square.png
+		Id: badge
+		Rotate: 45
+	Fixed:
+		Id: side
+		Offset: 229 auto auto -17
+		Rotate: -90
+		Rotate origin: top left
+		Box:
+			Width: 200
+			Height: 14
+		Text: Certificado n.º 2026-0147
+			Typography:
+				Size: 8
+				Color: #7F8C8D

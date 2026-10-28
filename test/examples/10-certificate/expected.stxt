@@ -16,3 +16,5 @@ Result:
 			Rect: 34 32 774 531
 		Fragment: footer
 			Rect: 80 545 682 16
+		Fragment: serial
+			Rect: 49 427.5 260 16

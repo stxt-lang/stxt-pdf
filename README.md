@@ -94,7 +94,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 29 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 30 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -128,6 +128,8 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 29 están termin
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Align: justify`) | Hecho y probado |
 | Cajas `relative`, `absolute` y `fixed` en el layout (las `fixed`, repetidas en cada página) | Hecho y probado |
+| Giro (`Rotate`, `Rotate origin`) de `Relative`, `Absolute`, `Fixed` e `Image`: solo pintado, lo girado debe caber en la página y un `Relative` girado no se parte; enlaces girados con `QuadPoints` en el PDF | Hecho y probado |
+| Papel con nombre en `Media` (`Paper`: A3–A6, B4, B5, Letter, Legal; `Orientation: landscape`) | Hecho y probado |
 | `FlexLayout` e intrínsecos de flex | Hecho y probado |
 | `GridLayout` (con `Flow: column`) e intrínsecos de grid | Hecho y probado |
 | Fragmentación de bloque y texto: elección del corte, viudas y huérfanas, `avoid`, cortes forzados, truncado de márgenes, `Decoration: slice`, `Height` repartido entre fragmentos | Hecho y probado |
@@ -188,7 +190,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 27. ~~**Texto:** mayúsculas automáticas (`Transform`), interletraje (`Letter spacing`) y versalitas (`Small caps`), propiedades de `Typography` que se heredan; `Language` pasa a ser obligatorio en `Document` (caso 20).~~ Hecho.
 28. ~~**Aspecto de las cajas.** `Radius` (esquinas redondeadas, también el recorte de una `Image`), `Border color` con un color por lado, degradados lineales en `Background` (`linear(ángulo, color, color…)`) y colores con opacidad (`#RGBA`, `#RRGGBBAA`); sin sombras (caso 21).~~ Hecho.
 29. ~~**Texto preformateado y código.** `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography`, y `Code font` en `Markdown` para el código en línea y los bloques de código (caso 22).~~ Hecho.
-30. **Rotación y orientación de la página.** Pendiente.
+30. ~~**Rotación y orientación de la página.** `Rotate` y `Rotate origin` en `Relative`, `Absolute`, `Fixed` e `Image`; `Paper` y `Orientation` en `Media` (caso 23).~~ Hecho.
 31. **Imágenes vectoriales (SVG).** Pendiente.
 
 El plan, las decisiones y el registro de sesiones de los hitos 16 a 31 están en

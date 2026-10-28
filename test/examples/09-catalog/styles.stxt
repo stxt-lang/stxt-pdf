@@ -113,6 +113,7 @@ Styles (dev.stxt.boxes):
 		Typography:
 			Size: 7
 			Weight: bold
+			Align: center
 			Color: #FFFFFF
 			Transform: uppercase
 			Letter spacing: 0.8
