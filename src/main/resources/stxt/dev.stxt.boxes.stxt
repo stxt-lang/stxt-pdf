@@ -835,6 +835,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Border color
 				Max: 1
+			Child: Radius
+				Max: 1
 			Child: Background
 				Max: 1
 	Node: Typography
@@ -946,9 +948,11 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Border
 		Description: Grosor del borde: arriba, derecha, abajo, izquierda (1 a 4 valores).
 	Node: Border color
-		Description: Color del borde. Por defecto, el Color del texto.
+		Description: Color del borde: arriba, derecha, abajo, izquierda (1 a 4 colores). Por defecto, el Color del texto.
+	Node: Radius
+		Description: Esquinas redondeadas: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda (1 a 4 valores, número o %). Solo pintado: redondea el fondo, el borde y el recorte de una Image.
 	Node: Background
-		Description: Color de fondo, pintado en la caja de relleno.
+		Description: Fondo, pintado en la caja de relleno: un color o un degradado linear(ángulo, color, color…).
 
 	# Typography
 

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
@@ -82,7 +83,7 @@ class StylesTest {
                 "\tStyles:", "\t\tFor class: card", "\t\t\tBox:", "\t\t\t\tBackground: #F1EFE8",
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tBlock:", "\t\t\t\tClass: card")
                 .children.get(0).children.get(0);
-        assertEquals("#F1EFE8", block.style.background);
+        assertEquals(new Paint.Solid("#F1EFE8"), block.style.background);
         assertEquals(1, block.style.itemGrow, 1e-9);
     }
 

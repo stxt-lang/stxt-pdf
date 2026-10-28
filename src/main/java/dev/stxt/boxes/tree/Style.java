@@ -1,10 +1,12 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.Corners;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.GridAreas;
+import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
@@ -136,11 +138,13 @@ public final class Style {
 
     // --- Pintado (no afecta al layout) ---------------------------------------------------------
     /** {@code null} = transparente. */
-    public String background;
+    public Paint background;
     /** Heredable. */
     public String color = "#000000";
-    /** {@code null} = igual que {@link #color}. */
-    public String borderColor;
+    /** Un color por lado; {@code null} = igual que {@link #color}. */
+    public Sides<String> borderColor;
+    /** Esquinas redondeadas, de la caja de borde; solo pintado. */
+    public Corners<Value> radius = Corners.all(Value.pt(0));
 
     // --- Texto (heredables) ---------------------------------------------------------------------
     /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (§6). */

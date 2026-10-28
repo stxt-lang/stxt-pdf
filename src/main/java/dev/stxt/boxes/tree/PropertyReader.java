@@ -25,11 +25,14 @@ import static dev.stxt.boxes.tree.ValueReader.bool;
 import static dev.stxt.boxes.tree.ValueReader.breakInside;
 import static dev.stxt.boxes.tree.ValueReader.check;
 import static dev.stxt.boxes.tree.ValueReader.color;
+import static dev.stxt.boxes.tree.ValueReader.colorSides;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
 import static dev.stxt.boxes.tree.ValueReader.fontFamily;
 import static dev.stxt.boxes.tree.ValueReader.integer;
 import static dev.stxt.boxes.tree.ValueReader.nonNegative;
 import static dev.stxt.boxes.tree.ValueReader.nonNegativeSides;
+import static dev.stxt.boxes.tree.ValueReader.paint;
+import static dev.stxt.boxes.tree.ValueReader.radius;
 import static dev.stxt.boxes.tree.ValueReader.positive;
 import static dev.stxt.boxes.tree.ValueReader.signedPoints;
 import static dev.stxt.boxes.tree.ValueReader.positiveInteger;
@@ -73,8 +76,9 @@ final class PropertyReader {
                 case "margin" -> s.margin = sides(p, LENGTH_OR_AUTO, true);
                 case "padding" -> s.padding = nonNegativeSides(p, true);
                 case "border" -> s.border = nonNegativeSides(p, false);
-                case "border-color" -> s.borderColor = color(p);
-                case "background" -> s.background = color(p);
+                case "border-color" -> s.borderColor = colorSides(p);
+                case "radius" -> s.radius = radius(p);
+                case "background" -> s.background = paint(p);
                 default -> throw unread(p);
             }
         }

@@ -3,35 +3,34 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
 
 /** Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. */
 public interface Canvas {
 
-    /** Fondo de la caja de relleno (puede ser {@code null}). */
-    void background(Rect paddingBox, String color);
+    /** Un rectángulo liso de un color: fondos de las columnas, guías, rayas de texto. */
+    void background(Rect r, String color);
 
     /**
-     * Borde alrededor de la caja de borde {@code r}: un fondo por cada lado con ancho, y después
-     * el {@link #outline contorno} de depuración.
+     * El fondo de una caja (ESPECIFICACION.md §4.3, §5.6): un color o un degradado que llena
+     * {@code paddingBox} con las esquinas {@code radii}, que son las de la caja de relleno.
      */
-    default void border(Rect r, Insets w, String color) {
-        if (w.top() > 0) {
-            background(new Rect(r.x(), r.y(), r.width(), w.top()), color);
-        }
-        if (w.bottom() > 0) {
-            background(new Rect(r.x(), r.bottom() - w.bottom(), r.width(), w.bottom()), color);
-        }
-        if (w.left() > 0) {
-            background(new Rect(r.x(), r.y(), w.left(), r.height()), color);
-        }
-        if (w.right() > 0) {
-            background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
-        }
-        outline(r);
-    }
+    void fill(Rect paddingBox, Radii radii, Paint paint);
+
+    /**
+     * El borde alrededor de la caja de borde {@code r}: el anillo entre ella (con las esquinas
+     * {@code radii}) y la caja de relleno, que se reparte entre los lados con ancho en {@code w}
+     * (uno con su color, en la diagonal de cada esquina); después, el {@link #outline contorno} de
+     * depuración.
+     *
+     * @param colors el color de cada lado, ya resuelto
+     */
+    void border(Rect r, Insets w, Radii radii, Sides<String> colors);
 
     /** Contorno de depuración de una caja de borde. Por defecto no pinta nada. */
     default void outline(Rect borderBox) {
@@ -55,10 +54,10 @@ public interface Canvas {
 
     /**
      * La imagen de una {@code Image} (ESPECIFICACION.md §5.18) en su caja de contenido
-     * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja.
-     * Por defecto no pinta nada.
+     * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja con
+     * las esquinas {@code radii} (las de la caja de contenido). Por defecto no pinta nada.
      */
-    default void image(Box box, Rect content) {
+    default void image(Box box, Rect content, Radii radii) {
     }
 
     /**

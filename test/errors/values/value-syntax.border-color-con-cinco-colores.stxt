@@ -1,0 +1,11 @@
+# Case: Border color con más de cuatro colores
+# Code: VALUE_SYNTAX
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Border color: #111 #222 #333 #444 #555

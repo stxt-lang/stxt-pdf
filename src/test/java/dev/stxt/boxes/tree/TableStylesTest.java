@@ -42,8 +42,13 @@ class TableStylesTest {
         return table.children.stream().filter(c -> text.equals(c.text.trim())).findFirst().orElseThrow();
     }
 
+    /** El color liso del fondo de una celda. */
+    private static String color(Box cell) {
+        return ((dev.stxt.boxes.model.Paint.Solid) cell.style.background).color();
+    }
+
     private static List<String> background(Box table) {
-        return table.children.stream().map(c -> c.style.background == null ? "-" : c.style.background.toString())
+        return table.children.stream().map(c -> c.style.background == null ? "-" : color(c))
                 .toList();
     }
 
@@ -84,7 +89,7 @@ class TableStylesTest {
         assertNull(cell(table, "a").style.background);
         assertNull(cell(table, "b").style.background);
         // c está en la fila 2 (par); d y e, en la 3.
-        assertEquals("#222222", cell(table, "c").style.background.toString().toLowerCase());
+        assertEquals("#222222", color(cell(table, "c")).toLowerCase());
         assertNull(cell(table, "d").style.background);
     }
 
@@ -178,7 +183,7 @@ class TableStylesTest {
         assertEquals(Style.TextAlign.LEFT, cell(table, "A").style.textAlign);
         assertEquals(Style.TextAlign.LEFT, cell(table, "3").style.textAlign);
         assertEquals(Style.TextAlign.RIGHT, cell(table, "4").style.textAlign);
-        assertEquals("#444444", cell(table, "4").style.background.toString().toLowerCase());
+        assertEquals("#444444", color(cell(table, "4")).toLowerCase());
         assertNull(cell(table, "2").style.background);
     }
 }

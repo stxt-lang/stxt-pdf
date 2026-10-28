@@ -1,0 +1,11 @@
+# Case: linear sin el paréntesis de cierre
+# Code: VALUE_SYNTAX
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Background: linear(90, #FFFFFF, #000000

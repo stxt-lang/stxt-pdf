@@ -1,0 +1,11 @@
+# Case: Un color de siete dígitos no es RGBA ni RRGGBBAA
+# Code: VALUE_SYNTAX
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Background: #1234567

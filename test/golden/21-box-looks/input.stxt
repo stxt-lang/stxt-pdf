@@ -1,0 +1,128 @@
+# Hito 28: aspecto de las cajas. El cálculo de los rectángulos está en expected.stxt.
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 300
+		Height: 300
+		Margin: 20
+	Flex:
+		Id: row1
+		Gap: 10
+		Box:
+			Margin: 0 0 10 0
+		Item:
+			Block:
+				Id: round
+				Box:
+					Width: 100
+					Height: 50
+					Radius: 12
+					Border: 3
+					Border color: #12315A
+					Background: #2E6F9E
+		Item:
+			Block:
+				Id: circle
+				Box:
+					Width: 50
+					Height: 50
+					Radius: 50%
+					Background: #E9A23B
+		Item:
+			Block:
+				Id: corners
+				Box:
+					Width: 50
+					Height: 50
+					Radius: 0 20 0 20
+					Background: #B5651D
+	Flex:
+		Id: row2
+		Gap: 10
+		Box:
+			Margin: 0 0 10 0
+		Item:
+			Block:
+				Id: sides
+				Box:
+					Width: 100
+					Height: 50
+					Border: 6
+					Border color: #E9A23B #2E6F9E #12315A #B5651D
+					Background: #F1EFE8
+		Item:
+			Block:
+				Id: sidesRound
+				Box:
+					Width: 50
+					Height: 50
+					Radius: 20
+					Border: 6
+					Border color: #E9A23B #12315A
+					Background: #FFF3DC
+		Item:
+			Block:
+				Id: stripe
+				Box:
+					Width: 50
+					Height: 50
+					Border: 0 0 0 4
+					Border color: #B5651D
+					Background: #F1EFE8
+	Flex:
+		Id: row3
+		Gap: 10
+		Box:
+			Margin: 0 0 10 0
+		Item:
+			Block:
+				Id: gradient
+				Box:
+					Width: 100
+					Height: 50
+					Radius: 8
+					Background: linear(90, #12315A, #E9A23B, #B5651D)
+		Item:
+			Block:
+				Id: base
+				Box:
+					Width: 100
+					Height: 50
+					Radius: 8
+					Background: #E9A23B
+				Block:
+					Id: fade
+					Box:
+						Height: 50
+						Radius: 8
+						Background: linear(180, #12315A00, #12315A)
+	Flex:
+		Id: row4
+		Gap: 10
+		Box:
+			Margin: 0 0 10 0
+		Item:
+			Image: test/wide.png
+				Id: photo
+				Fit: cover
+				Box:
+					Width: 50
+					Height: 50
+					Radius: 50%
+		Item:
+			Image: test/wide.png
+				Id: framed
+				Fit: cover
+				Box:
+					Width: 100
+					Height: 50
+					Radius: 10
+					Border: 2
+					Border color: #12315A
+	Block:
+		Id: split
+		Box:
+			Width: 100
+			Height: 100
+			Radius: 12
+			Background: #2E6F9E

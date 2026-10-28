@@ -61,6 +61,7 @@ class SchemaCoverageTest {
             Map.entry("Padding", "Padding: 5"),
             Map.entry("Border", "Border: 1"),
             Map.entry("Border color", "Border color: #000000"),
+            Map.entry("Radius", "Radius: 4"),
             Map.entry("Background", "Background: #FFFFFF"),
             // Typography
             Map.entry("Font", "Font: IBM Plex Sans"),

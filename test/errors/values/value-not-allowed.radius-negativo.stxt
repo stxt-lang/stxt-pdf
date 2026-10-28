@@ -1,0 +1,11 @@
+# Case: Radius con un valor negativo
+# Code: VALUE_NOT_ALLOWED
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Radius: -4

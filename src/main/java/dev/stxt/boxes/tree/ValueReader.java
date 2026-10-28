@@ -1,6 +1,9 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Colors;
+import dev.stxt.boxes.model.Corners;
+import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
@@ -9,7 +12,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -21,8 +23,6 @@ import static dev.stxt.boxes.tree.Nodes.parse;
  * errores llevan la línea del nodo.
  */
 final class ValueReader {
-
-    private static final Pattern COLOR = Pattern.compile("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})");
 
     /** Clases de valor, para comprobar lo que admite cada propiedad (§3.1 y §4). */
     enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, MINMAX }
@@ -257,10 +257,79 @@ final class ValueReader {
 
     static String color(Node n) {
         String t = n.getText().trim();
-        if (!COLOR.matcher(t).matches()) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (usa #RGB o #RRGGBB): " + t);
+        if (!Colors.isValid(t)) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + t);
         }
         return t;
+    }
+
+    /** {@code Border color}: de 1 a 4 colores, arriba, derecha, abajo, izquierda. */
+    static Sides<String> colorSides(Node n) {
+        String[] parts = n.getText().trim().split("\\s+");
+        if (parts.length > 4) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " admite de 1 a 4 colores y hay " + parts.length);
+        }
+        for (String part : parts) {
+            if (!Colors.isValid(part)) {
+                throw error(n, ErrorCode.VALUE_SYNTAX,
+                        "Color no válido (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + part);
+            }
+        }
+        return Sides.shorthand(List.of(parts));
+    }
+
+    /**
+     * {@code Background}: un color o {@code linear(ángulo, color, color…)}, con el ángulo en grados
+     * (como en CSS: 0 hacia arriba, 90 hacia la derecha, 180 hacia abajo) y al menos dos colores.
+     */
+    static Paint paint(Node n) {
+        String t = n.getText().trim();
+        if (!t.startsWith("linear(")) {
+            return new Paint.Solid(color(n));
+        }
+        if (!t.endsWith(")")) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "linear( no está cerrado: " + t);
+        }
+        String[] args = t.substring("linear(".length(), t.length() - 1).split(",", -1);
+        if (args.length < 3) {
+            throw error(n, ErrorCode.VALUE_SYNTAX,
+                    "linear espera un ángulo y al menos dos colores: linear(180, #FFFFFF00, #FFFFFF)");
+        }
+        double angle;
+        try {
+            angle = Double.parseDouble(args[0].trim());
+        } catch (NumberFormatException e) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "El ángulo de linear es un número de grados: " + args[0].trim());
+        }
+        if (!Double.isFinite(angle)) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "El ángulo de linear es un número de grados: " + args[0].trim());
+        }
+        List<String> stops = new java.util.ArrayList<>();
+        for (int i = 1; i < args.length; i++) {
+            String stop = args[i].trim();
+            if (!Colors.isValid(stop)) {
+                throw error(n, ErrorCode.VALUE_SYNTAX,
+                        "Color no válido en linear (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + stop);
+            }
+            stops.add(stop);
+        }
+        return new Paint.Linear(angle, stops);
+    }
+
+    /** {@code Radius}: de 1 a 4 radios (puntos o porcentajes no negativos), arriba izquierda, arriba derecha, abajo derecha, abajo izquierda. */
+    static Corners<Value> radius(Node n) {
+        List<Value> list = parse(n, () -> ValueParser.list(n.getText()));
+        if (list.isEmpty() || list.size() > 4) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " admite de 1 a 4 valores y hay " + list.size());
+        }
+        for (Value v : list) {
+            boolean valid = (v instanceof Value.Points p && p.pt() >= 0)
+                    || (v instanceof Value.Percentage q && q.percent() >= 0);
+            if (!valid) {
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " solo admite puntos o porcentajes no negativos");
+            }
+        }
+        return parse(n, () -> Corners.shorthand(list));
     }
 
     static String fontFamily(Node n) {

@@ -4,7 +4,10 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
@@ -173,13 +176,41 @@ public final class StackingContext {
     private static void paintBackgroundAndBorder(Canvas canvas, Piece p) {
         Style s = p.f().box().style;
         Rect borderBox = p.borderBox();
+        Radii radii = radii(p);
         if (s.background != null) {
-            canvas.background(borderBox.shrink(p.f().border()), s.background);
+            canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.background);
         }
-        canvas.border(borderBox, p.f().border(), s.borderColor != null ? s.borderColor : s.color);
+        canvas.border(borderBox, p.f().border(), radii, borderColors(s));
         if (s.multicolRule > 0) {
             paintRules(canvas, p);
         }
+    }
+
+    /**
+     * Las esquinas de la caja de borde del fragmento (§5.6): {@code Radius} resuelto contra su
+     * tamaño y, en una caja partida entre páginas con {@code Decoration: slice}, solo las de
+     * arriba en el primer fragmento y las de abajo en el último.
+     */
+    private static Radii radii(Piece p) {
+        Style s = p.f().box().style;
+        Radii radii = Radii.resolve(s.radius, p.f().width(), p.f().height());
+        if (s.decoration == Style.Decoration.CLONE) {
+            return radii;
+        }
+        return radii.forFragment(p.f().first(), p.f().last());
+    }
+
+    /** El color de cada lado del borde: el suyo o, si no lo declara, el del texto. */
+    private static Sides<String> borderColors(Style s) {
+        if (s.borderColor == null) {
+            return Sides.all(s.color);
+        }
+        return new Sides<>(orText(s.borderColor.top(), s), orText(s.borderColor.right(), s),
+                orText(s.borderColor.bottom(), s), orText(s.borderColor.left(), s));
+    }
+
+    private static String orText(String color, Style s) {
+        return color != null ? color : s.color;
     }
 
     /**
@@ -205,7 +236,11 @@ public final class StackingContext {
     private static void paintContent(Canvas canvas, Piece p) {
         paintLinks(canvas, p);
         if (p.f().box().isImage()) {
-            canvas.image(p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()));
+            Insets inside = new Insets(p.f().border().top() + p.f().padding().top(),
+                    p.f().border().right() + p.f().padding().right(),
+                    p.f().border().bottom() + p.f().padding().bottom(),
+                    p.f().border().left() + p.f().padding().left());
+            canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside));
         } else if (p.f().box().element == Element.CONTENTS_LEADER) {
             paintLeader(canvas, p);
         } else {

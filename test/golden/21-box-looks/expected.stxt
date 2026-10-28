@@ -1,0 +1,52 @@
+# Hito 28: aspecto de las cajas (ESPECIFICACION.md §4.3, §5.6). Radius, Border color por lado, Background con
+# degradado y colores con opacidad solo cambian el pintado: el volcado comprueba que no mueven ninguna caja y los
+# PNG (con los contornos de depuración) se miran a ojo. Página de 300 × 300 con márgenes de 20: área útil de
+# 260 × 260 desde (20, 20). Cada fila es un Flex de 260 × 50 con huecos de 10 y 10 de margen debajo: y = 20, 80, 140
+# y 200; el último bloque empieza en 200 + 50 + 10 = 260.
+#   row1: round (100 × 50, Radius 12, borde de 3 con otro color), circle (50 × 50, Radius 50%: un círculo) y
+#         corners (Radius 0 20 0 20: solo dos esquinas, en diagonal). x = 20, 130 y 190.
+#   row2: sides (cuatro colores de borde, uniones en diagonal), sidesRound (dos colores y Radius 20) y stripe
+#         (Border 0 0 0 4: la franja de un aviso). x = 20, 130 y 190.
+#   row3: gradient (linear de tres colores a 90°: de izquierda a derecha) y base con fade encima (linear a 180°
+#         de un azul transparente a opaco: de arriba abajo, con opacidad). x = 20 y 130.
+#   row4: photo (Image con Radius 50%: recortada en círculo) y framed (Radius 10 y borde de 2: la imagen se recorta
+#         con el radio de la caja de contenido, 8). x = 20 y 80.
+#   split: 100 × 100 con Radius 12 en la caja partida: en la página 1 solo le caben 280 − 260 = 20 y en la 2 los 80
+#          restantes; con Decoration: slice, la primera parte solo tiene las esquinas de arriba y la segunda las de abajo.
+Result:
+	Page: 1
+		Fragment: row1
+			Rect: 20 20 260 50
+			Fragment: round
+				Rect: 20 20 100 50
+			Fragment: circle
+				Rect: 130 20 50 50
+			Fragment: corners
+				Rect: 190 20 50 50
+		Fragment: row2
+			Rect: 20 80 260 50
+			Fragment: sides
+				Rect: 20 80 100 50
+			Fragment: sidesRound
+				Rect: 130 80 50 50
+			Fragment: stripe
+				Rect: 190 80 50 50
+		Fragment: row3
+			Rect: 20 140 260 50
+			Fragment: gradient
+				Rect: 20 140 100 50
+			Fragment: base
+				Rect: 130 140 100 50
+				Fragment: fade
+					Rect: 130 140 100 50
+		Fragment: row4
+			Rect: 20 200 260 50
+			Fragment: photo
+				Rect: 20 200 50 50
+			Fragment: framed
+				Rect: 80 200 100 50
+		Fragment: split
+			Rect: 20 260 100 20
+	Page: 2
+		Fragment: split
+			Rect: 20 20 100 80

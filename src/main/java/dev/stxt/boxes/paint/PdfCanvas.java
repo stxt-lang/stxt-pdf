@@ -2,20 +2,38 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.LaidOutDocument;
+import dev.stxt.boxes.model.Colors;
 import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.ImageFile;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Media;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSBoolean;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDFormContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.common.function.PDFunction;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceGray;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
+import org.apache.pdfbox.pdmodel.graphics.form.PDTransparencyGroup;
+import org.apache.pdfbox.pdmodel.graphics.shading.PDShading;
+import org.apache.pdfbox.pdmodel.graphics.shading.PDShadingType2;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -70,6 +88,8 @@ public final class PdfCanvas implements Canvas {
     /** Las anotaciones de esta página, que se le ponen al terminar de pintarla. */
     private final List<PDAnnotation> annotations = new ArrayList<>();
     private final boolean debug;
+    /** Estados gráficos de opacidad de esta página, por opacidad (en milésimas). */
+    private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
                       Map<FontFace, PDFont> fonts, Map<Path, PDImageXObject> images, PdfStructure structure,
@@ -147,13 +167,303 @@ public final class PdfCanvas implements Canvas {
         try {
             // Fondos y bordes no son contenido: artifacts del PDF etiquetado.
             out.beginMarkedContent(COSName.ARTIFACT);
-            setColor(color);
-            out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
-            out.fill();
+            painting(color, () -> {
+                out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
+                out.fill();
+            });
             out.endMarkedContent();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Un color liso se rellena con su opacidad; un degradado es un sombreado axial recortado a
+     * la forma. Si algún color del degradado no es opaco, las opacidades van en una máscara
+     * suave de luminosidad con el mismo degradado en grises: PDF no tiene opacidad por color en
+     * un sombreado.</p>
+     */
+    @Override
+    public void fill(Rect r, Radii radii, Paint paint) {
+        if (r.width() <= 0 || r.height() <= 0) {
+            return;
+        }
+        try {
+            out.beginMarkedContent(COSName.ARTIFACT);
+            if (paint instanceof Paint.Solid solid) {
+                painting(solid.color(), () -> {
+                    Shapes.roundedRect(path(), r, radii);
+                    out.fill();
+                });
+            } else {
+                gradient((Paint.Linear) paint, r, radii);
+            }
+            out.endMarkedContent();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void gradient(Paint.Linear linear, Rect r, Radii radii) throws IOException {
+        double[] line = linear.line(r);
+        double[] pdfLine = {line[0], pageHeight - line[1], line[2], pageHeight - line[3]};
+        out.saveGraphicsState();
+        Shapes.roundedRect(path(), r, radii);
+        out.clip();
+        if (linear.isTranslucent()) {
+            out.setGraphicsStateParameters(opacityMask(linear, r, pdfLine));
+        }
+        out.shadingFill(axial(PDDeviceRGB.INSTANCE, pdfLine, linear.stops(), false));
+        out.restoreGraphicsState();
+    }
+
+    /** Un estado gráfico con una máscara suave de luminosidad: el degradado de las opacidades en grises. */
+    private PDExtendedGraphicsState opacityMask(Paint.Linear linear, Rect r, double[] pdfLine) throws IOException {
+        PDTransparencyGroup form = new PDTransparencyGroup(doc);
+        form.setBBox(pdfRect(r));
+        form.setResources(new PDResources());
+        COSDictionary group = new COSDictionary();
+        group.setItem(COSName.S, COSName.getPDFName("Transparency"));
+        group.setItem(COSName.getPDFName("CS"), COSName.DEVICEGRAY);
+        form.getCOSObject().setItem(COSName.getPDFName("Group"), group);
+        try (PDFormContentStream mask = new PDFormContentStream(form)) {
+            mask.shadingFill(axial(PDDeviceGray.INSTANCE, pdfLine, linear.stops(), true));
+        }
+        COSDictionary softMask = new COSDictionary();
+        softMask.setItem(COSName.TYPE, COSName.getPDFName("Mask"));
+        softMask.setItem(COSName.S, COSName.getPDFName("Luminosity"));
+        softMask.setItem(COSName.getPDFName("G"), form.getCOSObject());
+        PDExtendedGraphicsState state = new PDExtendedGraphicsState();
+        state.getCOSObject().setItem(COSName.getPDFName("SMask"), softMask);
+        return state;
+    }
+
+    /**
+     * Un sombreado axial de {@code line} ({@code x1 y1 x2 y2}, en coordenadas del PDF) con los
+     * colores repartidos a partes iguales y extendido más allá de los extremos; con
+     * {@code opacities}, en grises con la opacidad de cada color.
+     */
+    private static PDShading axial(PDColorSpace space, double[] line, java.util.List<String> stops,
+                                   boolean opacities) throws IOException {
+        PDShadingType2 shading = new PDShadingType2(new COSDictionary());
+        shading.setShadingType(PDShading.SHADING_TYPE2);
+        shading.setColorSpace(space);
+        COSArray coords = new COSArray();
+        for (double c : line) {
+            coords.add(new org.apache.pdfbox.cos.COSFloat((float) c));
+        }
+        shading.setCoords(coords);
+        COSArray extend = new COSArray();
+        extend.add(COSBoolean.TRUE);
+        extend.add(COSBoolean.TRUE);
+        shading.setExtend(extend);
+        shading.setFunction(PDFunction.create(stitched(stops, opacities)));
+        return shading;
+    }
+
+    /** Los componentes de un color en el espacio del sombreado: RGB, o su opacidad en gris. */
+    private static float[] components(String color, boolean opacity) {
+        float[] rgba = Colors.rgba(color);
+        return opacity ? new float[]{rgba[3]} : new float[]{rgba[0], rgba[1], rgba[2]};
+    }
+
+    /** Una función por tramo entre dos colores, unidas en una de tipo 3 (o la del único tramo). */
+    private static COSDictionary stitched(java.util.List<String> stops, boolean opacities) {
+        int n = stops.size();
+        COSArray domain = floats(0, 1);
+        java.util.List<COSDictionary> parts = new ArrayList<>();
+        for (int i = 0; i + 1 < n; i++) {
+            COSDictionary f = new COSDictionary();
+            f.setInt(COSName.getPDFName("FunctionType"), 2);
+            f.setItem(COSName.getPDFName("Domain"), domain);
+            f.setItem(COSName.getPDFName("C0"), floats(components(stops.get(i), opacities)));
+            f.setItem(COSName.getPDFName("C1"), floats(components(stops.get(i + 1), opacities)));
+            f.setInt(COSName.getPDFName("N"), 1);
+            parts.add(f);
+        }
+        if (parts.size() == 1) {
+            return parts.get(0);
+        }
+        COSDictionary f = new COSDictionary();
+        f.setInt(COSName.getPDFName("FunctionType"), 3);
+        f.setItem(COSName.getPDFName("Domain"), domain);
+        COSArray functions = new COSArray();
+        COSArray bounds = new COSArray();
+        COSArray encode = new COSArray();
+        for (int i = 0; i < parts.size(); i++) {
+            functions.add(parts.get(i));
+            if (i > 0) {
+                bounds.add(new org.apache.pdfbox.cos.COSFloat((float) i / parts.size()));
+            }
+            encode.add(new org.apache.pdfbox.cos.COSFloat(0));
+            encode.add(new org.apache.pdfbox.cos.COSFloat(1));
+        }
+        f.setItem(COSName.getPDFName("Functions"), functions);
+        f.setItem(COSName.getPDFName("Bounds"), bounds);
+        f.setItem(COSName.getPDFName("Encode"), encode);
+        return f;
+    }
+
+    private static COSArray floats(float... values) {
+        COSArray array = new COSArray();
+        for (float v : values) {
+            array.add(new org.apache.pdfbox.cos.COSFloat(v));
+        }
+        return array;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>El anillo entre la caja de borde y la de relleno, rellenado con regla par-impar; con
+     * colores distintos por lado, una vez por lado y recortado a su trapecio.</p>
+     */
+    @Override
+    public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
+        double[] widths = {w.top(), w.right(), w.bottom(), w.left()};
+        String[] sideColors = {colors.top(), colors.right(), colors.bottom(), colors.left()};
+        try {
+            if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
+                String uniform = null;
+                boolean same = true;
+                for (int i = 0; i < 4; i++) {
+                    if (widths[i] > 0) {
+                        uniform = uniform == null ? sideColors[i] : uniform;
+                        same &= uniform.equals(sideColors[i]);
+                    }
+                }
+                if (same && radii.isSquare() && !Colors.isTranslucent(uniform)) {
+                    squareBorder(r, w, uniform);
+                    outline(r);
+                    return;
+                }
+                out.beginMarkedContent(COSName.ARTIFACT);
+                if (same) {
+                    String color = uniform;
+                    painting(color, () -> ring(r, w, radii));
+                } else {
+                    Shapes.Side[] sides = Shapes.Side.values();
+                    for (int i = 0; i < 4; i++) {
+                        if (widths[i] > 0) {
+                            Shapes.Side side = sides[i];
+                            out.saveGraphicsState();
+                            Shapes.sidePolygon(path(), side, r, w, radii.inset(w));
+                            out.clip();
+                            painting(sideColors[i], () -> ring(r, w, radii));
+                            out.restoreGraphicsState();
+                        }
+                    }
+                }
+                out.endMarkedContent();
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        outline(r);
+    }
+
+    /**
+     * Un borde liso y opaco de esquinas cuadradas: un rectángulo por lado con ancho, los de los
+     * lados verticales encima de los otros. Los rectángulos solapados no dejan costuras en los
+     * píxeles de borde, que el anillo par-impar sí deja, y es como se pintaba antes de
+     * {@code Radius}.
+     */
+    private void squareBorder(Rect r, Insets w, String color) {
+        if (w.top() > 0) {
+            background(new Rect(r.x(), r.y(), r.width(), w.top()), color);
+        }
+        if (w.bottom() > 0) {
+            background(new Rect(r.x(), r.bottom() - w.bottom(), r.width(), w.bottom()), color);
+        }
+        if (w.left() > 0) {
+            background(new Rect(r.x(), r.y(), w.left(), r.height()), color);
+        }
+        if (w.right() > 0) {
+            background(new Rect(r.right() - w.right(), r.y(), w.right(), r.height()), color);
+        }
+    }
+
+    /** Rellena el anillo del borde: la caja de borde menos la de relleno, que si no queda nada no se resta. */
+    private void ring(Rect r, Insets w, Radii radii) throws IOException {
+        Shapes.roundedRect(path(), r, radii);
+        Rect inner = r.shrink(w);
+        if (inner.width() > 0 && inner.height() > 0) {
+            Shapes.roundedRect(path(), inner, radii.inset(w));
+        }
+        out.fillEvenOdd();
+    }
+
+    /** Un camino que se escribe en el contenido de la página, con el origen abajo. */
+    private Shapes.Path path() {
+        return new Shapes.Path() {
+            @Override
+            public void moveTo(double x, double y) {
+                run(() -> out.moveTo((float) x, (float) (pageHeight - y)));
+            }
+
+            @Override
+            public void lineTo(double x, double y) {
+                run(() -> out.lineTo((float) x, (float) (pageHeight - y)));
+            }
+
+            @Override
+            public void curveTo(double x1, double y1, double x2, double y2, double x3, double y3) {
+                run(() -> out.curveTo((float) x1, (float) (pageHeight - y1), (float) x2, (float) (pageHeight - y2),
+                        (float) x3, (float) (pageHeight - y3)));
+            }
+
+            @Override
+            public void close() {
+                run(out::closePath);
+            }
+
+            @Override
+            public void rect(double x, double y, double width, double height) {
+                run(() -> out.addRect((float) x, (float) (pageHeight - y - height), (float) width, (float) height));
+            }
+        };
+    }
+
+    /** Una operación del PDF que puede fallar al escribir. */
+    @FunctionalInterface
+    private interface Operation {
+        void run() throws IOException;
+    }
+
+    private static void run(Operation operation) {
+        try {
+            operation.run();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /**
+     * Pinta con el color {@code color} lo que haga {@code body}; si el color no es opaco, dentro de
+     * un estado gráfico propio con su opacidad.
+     */
+    private void painting(String color, Operation body) throws IOException {
+        float[] rgba = Colors.rgba(color);
+        boolean translucent = rgba[3] < 1f;
+        if (translucent) {
+            out.saveGraphicsState();
+            out.setGraphicsStateParameters(opacity(rgba[3]));
+        }
+        out.setNonStrokingColor(rgba[0], rgba[1], rgba[2]);
+        body.run();
+        if (translucent) {
+            out.restoreGraphicsState();
+        }
+    }
+
+    private PDExtendedGraphicsState opacity(float alpha) {
+        return opacities.computeIfAbsent(Math.round(alpha * 1000), key -> {
+            PDExtendedGraphicsState state = new PDExtendedGraphicsState();
+            state.setNonStrokingAlphaConstant(alpha);
+            return state;
+        });
     }
 
     @Override
@@ -177,7 +487,7 @@ public final class PdfCanvas implements Canvas {
      * <em>artifact</em> ({@link PdfStructure}).</p>
      */
     @Override
-    public void image(Box box, Rect content) {
+    public void image(Box box, Rect content, Radii radii) {
         if (content.width() <= 0 || content.height() <= 0) {
             return;
         }
@@ -197,8 +507,7 @@ public final class PdfCanvas implements Canvas {
                 structure.figureBox(box, pdfRect(content));
             }
             out.saveGraphicsState();
-            out.addRect((float) content.x(), (float) (pageHeight - content.bottom()), (float) content.width(),
-                    (float) content.height());
+            Shapes.roundedRect(path(), content, radii);
             out.clip();
             out.drawImage(image, (float) target.x(), (float) (pageHeight - target.bottom()), (float) target.width(),
                     (float) target.height());
@@ -256,16 +565,17 @@ public final class PdfCanvas implements Canvas {
     public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                      double wordSpacing, double letterSpacing) {
         try {
-            out.beginText();
-            out.setFont(pdfFont(font), (float) fontSize);
-            setColor(color);
-            out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
-            if (wordSpacing == 0 && letterSpacing == 0) {
-                out.showText(text);
-            } else {
-                out.showTextWithPositioning(spaced(text, wordSpacing, letterSpacing, fontSize));
-            }
-            out.endText();
+            painting(color, () -> {
+                out.beginText();
+                out.setFont(pdfFont(font), (float) fontSize);
+                out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
+                if (wordSpacing == 0 && letterSpacing == 0) {
+                    out.showText(text);
+                } else {
+                    out.showTextWithPositioning(spaced(text, wordSpacing, letterSpacing, fontSize));
+                }
+                out.endText();
+            });
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -330,18 +640,9 @@ public final class PdfCanvas implements Canvas {
         return parts.toArray();
     }
 
-    private void setColor(String color) throws IOException {
-        float[] rgb = rgb(color);
-        out.setNonStrokingColor(rgb[0], rgb[1], rgb[2]);
-    }
-
-    /** {@code #RGB} o {@code #RRGGBB} (ya validado al construir el árbol) en componentes de 0 a 1. */
+    /** {@code #RGB}, {@code #RGBA}, {@code #RRGGBB} o {@code #RRGGBBAA} (ya validado) en componentes de 0 a 1. */
     static float[] rgb(String color) {
-        String hex = color.substring(1);
-        if (hex.length() == 3) {
-            hex = "" + hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
-        }
-        int v = Integer.parseInt(hex, 16);
-        return new float[]{((v >> 16) & 0xFF) / 255f, ((v >> 8) & 0xFF) / 255f, (v & 0xFF) / 255f};
+        float[] rgba = Colors.rgba(color);
+        return new float[]{rgba[0], rgba[1], rgba[2]};
     }
 }
