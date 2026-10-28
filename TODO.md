@@ -3,7 +3,7 @@
 ## Accesibilidad (prioritario: es básica para lo que hacemos)
 
 - Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario
-- `Sections` o `Media Sections`
+- `Sections` o `Media Sections`, y retomar que una section no vaya al índex o algo así, cosas que habían quedado apartadas de páginas
 - ~~Índice!!~~ (hito 22)
 - Float? Algo más que haga falta?
 - Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
