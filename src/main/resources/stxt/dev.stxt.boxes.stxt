@@ -10,7 +10,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio, el título y el idioma, la tipografía por defecto, las reglas reutilizables y los elementos de primer nivel, en orden.
+		Description: Documento de cajas: el medio, el título y el idioma, las reglas reutilizables (también la tipografía base, con Element: Document) y los elementos de primer nivel, en orden.
 		Children:
 			Child: Media
 				Min: 1
@@ -19,8 +19,6 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Language
 				Min: 1
-				Max: 1
-			Child: Typography
 				Max: 1
 			Child: Styles
 				Max: 1
@@ -760,7 +758,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Styles
 		Type: GROUP
-		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, de una clase o con un Id.
+		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, de una clase o con un Id. Es hijo de Document o la raíz de un documento de estilos aparte, que se pasa junto al documento y vale menos que él.
 		Children:
 			Child: Element
 			Child: For class
@@ -768,7 +766,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: For column
 	Node: Element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…) o una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell).
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
 		Children:
 			Child: Box
 				Max: 1

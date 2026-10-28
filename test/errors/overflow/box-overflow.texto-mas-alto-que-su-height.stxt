@@ -1,14 +1,16 @@
 # Case: Texto más alto que su Height
 # Code: BOX_OVERFLOW
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Text: uno dos tres cuatro cinco seis siete ocho nueve diez
 		Box:
 			Width: 100

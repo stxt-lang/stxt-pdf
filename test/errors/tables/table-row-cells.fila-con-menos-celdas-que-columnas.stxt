@@ -1,14 +1,16 @@
 # Case: Fila con menos celdas que columnas
 # Code: TABLE_ROW_CELLS
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Table:
 		Columns: 1fr 1fr
 		Body:

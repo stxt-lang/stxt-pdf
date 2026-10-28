@@ -1,14 +1,16 @@
 # Case: Número romano mayor que 3999
 # Code: LIST_NUMBER_RANGE
-# Line: 17
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	List:
 		Marker: upper-roman
 		Start: 3999

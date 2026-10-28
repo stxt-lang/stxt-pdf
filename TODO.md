@@ -2,7 +2,7 @@
 
 ## Accesibilidad (prioritario: es básica para lo que hacemos)
 
-- Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario
+- ~~Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario~~ (hecho: raíz `Styles`, `Element: Document`; decisiones 226–231 de `docs/DECISIONES.md`). Queda: los errores posteriores a la construcción (fuente que no existe, desbordamientos) señalan la línea de una regla del documento aparte sin decir el fichero.
 - `Sections` o `Media Sections`, y retomar que una section no vaya al índex o algo así, cosas que habían quedado apartadas de páginas
 - Rotación de los fixed y absolutos
 - ~~Índice!!~~ (hito 22)

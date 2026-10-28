@@ -84,11 +84,11 @@ final class ContentsBuilder {
         Style s = contents.style;
         if (s.font == null) {
             throw error(contents.line, ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
-                    + "Typography del Contents, de un antecesor o de Document");
+                    + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
         if (!s.isDeclared(PropertyKey.FONT_SIZE)) {
             throw error(contents.line, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
-                    + "Typography del Contents, de un antecesor o de Document");
+                    + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
         List<Box> listed = headings.stream()
                 .filter(h -> h.headingLevel() >= s.contentsFrom && h.headingLevel() <= s.contentsTo).toList();

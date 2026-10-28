@@ -1,14 +1,16 @@
 # Case: Pages con un valor que no es de la lista
 # Code: INVALID_VALUE
-# Line: 14
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Fixed:
 		Offset: 0 auto auto 0
 		Pages: second

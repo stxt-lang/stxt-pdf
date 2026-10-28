@@ -86,6 +86,15 @@ public final class Engine {
     }
 
     /**
+     * Como {@link #layOutDocument(InlineNode)}, con un documento de estilos aparte
+     * ({@link dev.stxt.boxes.stxt.DocumentReader#readStyles}), cuyas reglas valen menos que las del
+     * propio documento (§4.10). {@code styles} puede ser {@code null}.
+     */
+    public LaidOutDocument layOutDocument(InlineNode document, InlineNode styles) {
+        return layOutDocument(new BoxTreeBuilder().build(document, styles));
+    }
+
+    /**
      * Como {@link #layOutDocument(InlineNode)}, con el árbol ya construido. Sirve para retocar el
      * árbol antes de maquetarlo (los tests ponen así tramos con formato en un texto, §5.4); el
      * árbol no se puede cambiar después.

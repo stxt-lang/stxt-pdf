@@ -1,15 +1,16 @@
 # Case: Regla For column repetida
 # Code: STYLE_DUPLICATE
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
 	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 		For column: 2
 			Typography:
 				Align: right

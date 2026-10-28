@@ -1,6 +1,6 @@
 # Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
 # una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
-# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido. Un texto lleva
+# fijo. El estilo está todo en styles.stxt: los elementos solo llevan su contenido. Un texto lleva
 # Inline: markdown para poner una negrita dentro de la frase, y los datos para el pago son un Markdown con
 # Code font: el IBAN y el BIC, en la fuente monoespaciada. Los rótulos se escriben como una frase
 # normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
@@ -11,62 +11,6 @@ Document (dev.stxt.boxes):
 		Margin: 44 44 60 44
 	Title: Factura 2025-0147
 	Language: es
-	Typography:
-		Font: IBM Plex Sans
-		Size: 9
-		Line height: 13
-		Color: #2B2420
-	Styles:
-		For class: label
-			Typography:
-				Size: 7
-				Weight: bold
-				Color: #B5651D
-				Transform: uppercase
-				Letter spacing: 0.6
-			Box:
-				Margin: 0 0 3 0
-		For class: party
-			Box:
-				Padding: 12 14
-				Radius: 0 6 6 0
-				Border: 0 0 0 2.5
-				Border color: #B5651D
-				Background: #F8F3EA
-		For class: strong
-			Typography:
-				Weight: bold
-				Size: 10.5
-		Element: Head cell
-			Typography:
-				Weight: bold
-				Size: 8
-				Color: #FFFFFF
-			Box:
-				Background: #3B2A1E
-				Padding: 7 8
-		For class: total
-			Typography:
-				Weight: bold
-				Size: 11
-				Color: #3B2A1E
-				Transform: uppercase
-			Box:
-				Background: #EFE4D2
-				Border: 1.5 0 0 0
-				Border color: #3B2A1E
-		Element: Foot cell
-			Typography:
-				Align: right
-		Element: Cell
-			Box:
-				Padding: 7 8
-				Border: 0 0 0.5 0
-				Border color: #DCCFB8
-		Element: Fixed
-			Typography:
-				Size: 7.5
-				Color: #7A6A5C
 	Fixed:
 		Id: footer
 		Offset: auto 0 -34 0

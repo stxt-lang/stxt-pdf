@@ -30,7 +30,7 @@ class SvgCanvasTest {
     void letterSpacingIsAnAttributeOfTheText() {
         LaidOutDocument spaced = new Engine().layOutDocument(new DocumentReader().read(
                 "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tText: Hola\n\t\tTypography:\n\t\t\tLetter spacing: 1.5\n"
                 + "\tText: Adiós\n"));
         String svg = SvgCanvas.page(spaced.pages().get(0), spaced.media(), false);

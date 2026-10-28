@@ -158,7 +158,7 @@ class BoxTreeBuilderTest {
         assertEquals(7, e.line());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
         assertEquals("línea 7: El texto necesita Font: declárala en el Typography del Text, de un antecesor "
-                + "o de Document", e.getMessage());
+                + "o de Styles (Element: Document)", e.getMessage());
         // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
@@ -179,7 +179,7 @@ class BoxTreeBuilderTest {
     @Test
     void fontPropertiesOfTheDocumentAreInherited() {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 12\n\t\tColor: #333\n\t\tLine height: 20\n"
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n\t\t\t\tColor: #333\n\t\t\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).root().children.get(0).children.get(0);
         assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style.fontFace());
@@ -188,7 +188,7 @@ class BoxTreeBuilderTest {
         assertEquals("#333", text.style.color);
         assertEquals(20, text.style.usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
-        assertEquals(7, text.style.line("font"));
+        assertEquals(9, text.style.line("font"));
     }
 
     @Test

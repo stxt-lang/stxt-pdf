@@ -1,15 +1,17 @@
 # Case: Un texto con Inline: markdown con la línea de su segundo párrafo
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 17
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
-		Inline: markdown
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Inline: markdown
 	Text:
 		Content >>
 			Primer párrafo con **negrita**.

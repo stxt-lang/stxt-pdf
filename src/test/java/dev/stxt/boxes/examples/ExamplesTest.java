@@ -30,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  * documento como los que escribiría un autor, maquetado con las fuentes y las imágenes reales de
  * {@code resources/} y sin contornos de depuración.
  *
- * <p>Cada carpeta tiene {@code input.stxt}, que debe validar y maquetarse sin errores; el volcado
+ * <p>Cada carpeta tiene {@code input.stxt}, que debe validar y maquetarse sin errores, y puede
+ * tener {@code styles.stxt}, el documento de estilos aparte que se pasa junto a él (ESPECIFICACION.md
+ * §4.10); el volcado
  * de las cajas con {@code Id} ({@code expected.stxt}, §7), que se compara con tolerancia de
  * 0.01 pt; el PDF ({@code output.pdf}, ignorado por git, se regenera en cada ejecución) y una
  * imagen por página ({@code page-N.png}, versionadas, que solo se reescriben si cambian sus
@@ -60,8 +62,10 @@ class ExamplesTest {
 
     private void check(Path dir) throws IOException {
         InlineNode input = reader.read(dir.resolve("input.stxt"));
+        Path stylesFile = dir.resolve("styles.stxt");
+        InlineNode styles = Files.exists(stylesFile) ? reader.readStyles(stylesFile) : null;
         Resources resources = new Resources();
-        LaidOutDocument document = new Engine(new PdfMetrics(resources), resources).layOutDocument(input);
+        LaidOutDocument document = new Engine(new PdfMetrics(resources), resources).layOutDocument(input, styles);
         String dump = StxtDump.dump(document.pages(), document.media().pageArea(), false);
 
         Path expectedFile = dir.resolve("expected.stxt");

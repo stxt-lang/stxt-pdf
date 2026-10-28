@@ -125,7 +125,7 @@ class PageReferencesTest {
             }
         };
         StringBuilder doc = new StringBuilder("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
-                + PAGE + "\n\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n");
+                + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
         for (int i = 0; i < 6; i++) {
             doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 100\n");
         }
@@ -135,7 +135,7 @@ class PageReferencesTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(doc.toString())));
         assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.code());
-        // Cabecera (8 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
-        assertEquals(9 + 6 * 3 + 3 + 1, e.line());
+        // Cabecera (10 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
+        assertEquals(11 + 6 * 3 + 3 + 1, e.line());
     }
 }

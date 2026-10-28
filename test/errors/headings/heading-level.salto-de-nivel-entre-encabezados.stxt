@@ -1,14 +1,16 @@
 # Case: Salto de nivel entre encabezados
 # Code: HEADING_LEVEL
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Heading 1:
 		Text: Uno
 	Block:

@@ -201,7 +201,7 @@ class BoxLooksPaintTest {
 
     @Test
     void translucentTextIsPaintedWithItsOpacity() throws Exception {
-        String text = HEAD + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 40\n\t\tColor: #00000080\n"
+        String text = HEAD + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 40\n\t\t\t\tColor: #00000080\n"
                 + "\tText: MMM\n";
         BufferedImage page = render(text);
         boolean gray = false;

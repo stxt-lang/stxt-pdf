@@ -7,10 +7,11 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
 	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 		Element: Fixed
 			Box:
 				Height: 20

@@ -20,10 +20,12 @@ Document (dev.stxt.boxes):
 		Width: 200
 		Height: 200
 		Margin: 20
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
-		Inline: markdown
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Inline: markdown
 	Text: **aaaa** **bbbb** **cccc** **dddd**
 		Id: lit
 		Typography:

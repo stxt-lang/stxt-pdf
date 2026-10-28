@@ -1,14 +1,16 @@
 # Case: Ítem con marcador que empieza con un Flex
 # Code: LIST_ITEM_WITHOUT_LINE
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	List:
 		Marker: disc
 		List item:

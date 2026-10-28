@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +16,11 @@ class TextCaseTest {
 
     private static String header(String language) {
         return "Document (dev.stxt.boxes):\n\tLanguage: " + language + "\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
     }
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(header("es") + String.join("\n", lines))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(header("es") + String.join("\n", lines)))).root();
     }
 
     @Test
@@ -38,19 +39,19 @@ class TextCaseTest {
         assertEquals(Style.Transform.CAPITALIZE, text.style.transform);
         assertEquals(-0.5, text.style.letterSpacing, 1e-9);
         assertTrue(text.style.smallCaps);
-        assertEquals(11, block.style.line("transform"));
-        assertEquals(12, block.style.line("letter-spacing"));
-        assertEquals(13, block.style.line("small-caps"));
+        assertEquals(13, block.style.line("transform"));
+        assertEquals(14, block.style.line("letter-spacing"));
+        assertEquals(15, block.style.line("small-caps"));
     }
 
     @Test
     void theyCanBeSetInTheDocumentAndInStylesRules() {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n\t\tLetter spacing: 1\n"
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\t\t\t\tLetter spacing: 1\n"
                 + "\tStyles:\n\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tTransform: uppercase\n"
                 + "\t\t\t\tSmall caps: true\n"
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
-        Box root = new BoxTreeBuilder().build(new DocumentReader().read(doc)).root();
+        Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
         Style heading = root.children.get(0).children.get(0).style;
         assertEquals(Style.Transform.UPPERCASE, heading.transform);
         assertTrue(heading.smallCaps);
@@ -73,6 +74,6 @@ class TextCaseTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> build("\tText: Hola", "\t\tTypography:", "\t\t\tLetter spacing: 10%"));
         assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.code());
-        assertEquals(11, e.line());
+        assertEquals(13, e.line());
     }
 }

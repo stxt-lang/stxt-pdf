@@ -1,14 +1,16 @@
 # Case: Code font con una familia que no existe, en código en línea
 # Code: FONT_UNKNOWN
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Markdown:
 		Code font: Courier
 		Content >>

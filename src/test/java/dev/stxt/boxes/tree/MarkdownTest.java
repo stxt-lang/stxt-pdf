@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -15,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MarkdownTest {
 
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-            + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+            + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(HEADER + String.join("\n", lines))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(HEADER + String.join("\n", lines)))).root();
     }
 
     @Test
@@ -60,7 +61,7 @@ class MarkdownTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tHeading 1:",
                 "\t\tText: Uno", "\tMarkdown:", "\t\tContent >>", "\t\t\t### Salto"));
         assertEquals(ErrorCode.HEADING_LEVEL, e.code());
-        assertEquals(13, e.line());
+        assertEquals(15, e.line());
     }
 
     @Test
@@ -81,7 +82,7 @@ class MarkdownTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tFixed:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
         assertEquals(ErrorCode.HEADING_IN_FIXED, e.code());
-        assertEquals(12, e.line());
+        assertEquals(14, e.line());
         assertDoesNotThrow(() -> build("\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }
 

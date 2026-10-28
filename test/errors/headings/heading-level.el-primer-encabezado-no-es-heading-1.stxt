@@ -1,13 +1,15 @@
 # Case: El primer encabezado no es Heading 1
 # Code: HEADING_LEVEL
-# Line: 12
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Heading 2:
 		Text: Título

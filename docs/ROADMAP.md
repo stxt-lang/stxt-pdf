@@ -1212,6 +1212,17 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (15).** Documento de estilos aparte (primer punto de `TODO.md`; no es un hito de esta hoja de
+  ruta). Resuelto con un cuestionario: la tipografía base pasa a `Element: Document` (y `Document` ya no admite
+  `Typography`), las reglas del documento aparte valen menos que las del documento en cada nivel de
+  prioridad, y las reglas `For id` sin elemento se permiten solo en el documento aparte. `DocumentReader.readStyles`,
+  `BoxTreeBuilder.build(documento, estilos)`, `Engine.layOutDocument(documento, estilos)` y
+  `PdfWriter.write(documento, estilos, …)`; `StyleRules` lee los dos orígenes; los errores del documento aparte dicen
+  `de los estilos`. Migrados todos los documentos de test, los once ejemplos (cada uno con su `styles.stxt`; los PNG y
+  los volcados no cambian), la especificación (§4.10, nueva subsección) y el README. `StylesFileTest`, dos casos más
+  en el catálogo. Decisiones 226–231 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 30 (rotación y orientación de la página) o 31 (SVG), en otra sesión; resolver sus
+  decisiones con el usuario antes de escribir código.
 - **2026-10-28 (14).** Hito 28 terminado. Resueltas A1–A6 con un cuestionario (A1, A2 y A4 con la propuesta;
   A3, sin sombras; A5 y A6 por defecto). `Radius` (1 a 4 valores, número o %), `Border color` de 1 a 4
   colores con las uniones en diagonal, `Background` con `linear(ángulo, color…)` y colores con opacidad

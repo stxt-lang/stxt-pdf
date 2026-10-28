@@ -20,9 +20,11 @@ Document (dev.stxt.boxes):
 		Width: 200
 		Height: 300
 		Margin: 20
-	Typography:
-		Font: IBM Plex Mono
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Mono
+				Size: 10
 	Text:
 		Id: term
 		Typography:

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -17,8 +18,8 @@ class TablesTest {
 
     private static Box root(String... lines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n" + String.join("\n", lines);
-        return new BoxTreeBuilder().build(new DocumentReader().read(doc)).root();
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
 
     /** Colocación de cada celda como {@code fila columna filas columnas}. */
@@ -103,7 +104,7 @@ class TablesTest {
         for (Box cell : table.children.subList(2, 4)) {
             assertEquals(Style.Break.PAGE, cell.style.breakBefore);
             assertTrue(cell.style.avoidBreakInside);
-            assertEquals(17, cell.style.line("break-before"));
+            assertEquals(19, cell.style.line("break-before"));
         }
         assertFalse(table.children.get(0).style.avoidBreakInside);
     }

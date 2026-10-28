@@ -1,14 +1,16 @@
 # Case: Levels pide niveles que no tiene ningún encabezado
 # Code: CONTENTS_EMPTY
-# Line: 14
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Heading 1:
 		Text: Uno
 	Contents:

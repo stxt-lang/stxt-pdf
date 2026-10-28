@@ -18,9 +18,11 @@ Document (dev.stxt.boxes):
 		Width: 200
 		Height: 200
 		Margin: 20
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Flex:
 		Id: row
 		Item:

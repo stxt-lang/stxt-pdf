@@ -40,10 +40,38 @@ public final class DocumentReader {
         return root(parser().parseFile(file.toFile()));
     }
 
+    /**
+     * Lee y valida un documento de estilos aparte (raíz {@code Styles}, ESPECIFICACION.md §4.10), que se
+     * pasa junto al documento al maquetarlo; devuelve su nodo raíz.
+     */
+    public InlineNode readStyles(String content) {
+        return styles(parser().parse(content));
+    }
+
+    /** Lee y valida un documento de estilos aparte desde un fichero UTF-8; devuelve su nodo raíz. */
+    public InlineNode readStyles(Path file) {
+        return styles(parser().parseFile(file.toFile()));
+    }
+
     private static Parser parser() {
         Parser parser = new Parser();
         parser.registerValidator(new SchemaValidator(DocumentSchema.provider()));
         return parser;
+    }
+
+    private static InlineNode styles(List<Node> roots) {
+        if (roots.size() != 1) {
+            int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
+            throw new InvalidModelException(line, ErrorCode.DOCUMENT_ROOT, "El documento de estilos debe tener "
+                    + "exactamente un nodo raíz y tiene " + roots.size(), "los estilos");
+        }
+        Node root = roots.get(0);
+        if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("styles")
+                || !(root instanceof InlineNode styles)) {
+            throw new InvalidModelException(root.getLine(), ErrorCode.DOCUMENT_ROOT,
+                    "El nodo raíz del documento de estilos debe ser Styles (" + NAMESPACE + "):", "los estilos");
+        }
+        return styles;
     }
 
     private static InlineNode root(List<Node> roots) {

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +17,8 @@ class MulticolTest {
 
     private static Box root(String... lines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n" + String.join("\n", lines);
-        return new BoxTreeBuilder().build(new DocumentReader().read(doc)).root();
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
 
     @Test
@@ -72,6 +73,6 @@ class MulticolTest {
                 "\tMulticol:", "\t\tCount: 2", "\t\tParagraph: Dentro",
                 "\tParagraph: Fuera"));
         assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, ex.code());
-        assertEquals(12, ex.line());
+        assertEquals(13, ex.line());
     }
 }

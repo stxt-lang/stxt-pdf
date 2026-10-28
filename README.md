@@ -25,9 +25,11 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Text: Un título
 		Box:
 			Margin: 0 0 10 0
@@ -61,6 +63,14 @@ try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
 }
 ```
 
+Las reglas de `Styles` pueden estar en un documento aparte (raíz `Styles`), que se pasa junto al
+documento y vale menos que el suyo; es opcional y el documento no dice dónde está:
+
+```java
+InlineNode styles = new DocumentReader().readStyles(Path.of("styles.stxt"));
+PdfWriter.write(doc, styles, out);   // o Engine.layOutDocument(doc, styles)
+```
+
 ## Recursos y fuentes
 
 Las fuentes y las imágenes están en una carpeta de recursos, por defecto `resources/` en el
@@ -77,8 +87,8 @@ por la familia, el peso y el estilo que declara. `Font` y `Size` (de `Typography
 obligatorios en el texto y no tienen valor por defecto. El repositorio incluye
 [IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/), [Serif](resources/fonts/IBM%20Plex%20Serif/)
 y [Mono](resources/fonts/IBM%20Plex%20Mono/) (normal, negrita, cursiva y negrita cursiva de cada
-familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar en el
-`Typography` de `Document`, de donde los heredan todas las cajas. Los detalles están en el
+familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar en la regla
+`Element: Document` de `Styles`, de donde los heredan todas las cajas. Los detalles están en el
 §5.11 de la especificación.
 
 ## Estado
@@ -91,7 +101,8 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 29 están termin
 | Valores, abreviados, `minmax`, `clamp`, `repeat` | Hecho y probado |
 | Elementos (`Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute`, `Fixed`) y envoltorios `Item` y `Area`, validados con `@stxt.schema` | Hecho y probado |
 | Grupos de propiedades: `Box`, `Typography` (se hereda) y `Break` | Hecho y probado |
-| Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija | Hecho y probado |
+| Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija; la tipografía base va en `Element: Document` | Hecho y probado |
+| Documento de estilos aparte (raíz `Styles`): se lee con `DocumentReader.readStyles` y se pasa al maquetar; sus reglas valen menos que las del documento; opcional, sin búsqueda de ficheros | Hecho y probado |
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
 | Listas (`List`, `List item`): viñetas y numeraciones, marcador alineado con la primera línea, listas anidadas y partidas entre páginas | Hecho y probado |
 | Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`): columnas con las pistas de grid, `Span`, cabecera y pie repetidos en cada página | Hecho y probado |

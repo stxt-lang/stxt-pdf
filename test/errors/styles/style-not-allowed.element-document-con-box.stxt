@@ -1,0 +1,16 @@
+# Case: Element: Document con Box
+# Code: STYLE_NOT_ALLOWED
+# Line: 14
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+			Box:
+				Padding: 5
+	Text: Hola

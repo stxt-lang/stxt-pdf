@@ -61,9 +61,10 @@ en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta a
 en el editor.
 
 El nodo raíz es `Document`, con exactamente un `Media` y un `Language` (el idioma del documento,
-[§4.1](#41-media)), un `Title` opcional (el título), un `Typography` opcional que heredan
-todas las cajas (la fuente del documento), un `Styles` opcional con las reglas reutilizables
-([§4.10](#410-reglas-reutilizables-styles)) y los elementos de primer nivel.
+[§4.1](#41-media)), un `Title` opcional (el título), un `Styles` opcional con las reglas reutilizables
+([§4.10](#410-reglas-reutilizables-styles); también la tipografía base que heredan todas las cajas,
+con `Element: Document`) y los elementos de primer nivel. Las reglas pueden estar además en un
+documento de estilos aparte, que se pasa junto al documento al maquetar (§4.10).
 
 | Elemento | Qué es | Contiene |
 |---|---|---|
@@ -108,9 +109,11 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Text: Un título
 		Id: title
 		Typography:
@@ -248,7 +251,7 @@ Casi todas las propiedades van en uno de tres **grupos**, hijos de cada elemento
 | Grupo | Contenido | Se hereda | Elementos |
 |---|---|---|---|
 | `Box` ([§4.3](#43-box)) | El modelo de caja: tamaño, márgenes, relleno, borde y fondo | No | Todos los de caja |
-| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación, color, mayúsculas e interletraje del texto, viudas y huérfanas | **Sí** | Todos los de caja salvo `Image`, y `Document` |
+| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación, color, mayúsculas e interletraje del texto, viudas y huérfanas | **Sí** | Todos los de caja salvo `Image`; la base que hereda todo el documento, en la regla `Element: Document` ([§4.10](#410-reglas-reutilizables-styles)) |
 | `Break` ([§4.5](#45-break)) | Cortes de página y decoración en los cortes | No | Todos los de caja salvo `Absolute` y `Fixed` |
 
 Lo que hay en `Typography` lo hereda toda la descendencia; lo de `Box` y `Break` es solo de la
@@ -332,10 +335,10 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Font` | nombre de familia | — | **Obligatoria** en todo `Text`, propia o heredada (también de `Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
+| `Font` | nombre de familia | — | **Obligatoria** en todo `Text`, propia o heredada (también de `Element: Document`). Es la familia que declara el fichero TTF de la carpeta de fuentes. Ver [§5.11](#511-recursos-y-fuentes). |
 | `Weight` | `normal`, `bold` | `normal` | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
 | `Style` | `normal`, `italic` | `normal` | |
-| `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo `Text`, propio o heredado (también de `Document`). |
+| `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo `Text`, propio o heredado (también de `Element: Document`). |
 | `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo, usa porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto. |
@@ -450,10 +453,12 @@ dentro.
 ### 4.10 Reglas reutilizables (`Styles`)
 
 `Styles`, hijo opcional de `Document` (como mucho uno), declara una vez propiedades que se
-aplican por defecto a muchos elementos. Contiene reglas de cuatro clases:
+aplican por defecto a muchos elementos. Las mismas reglas pueden estar también en un
+[documento de estilos aparte](#documento-de-estilos-aparte). Contiene reglas de cuatro clases:
 
 | Regla | Valor | Se aplica a |
 |---|---|---|
+| `Element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `Element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
 | `Element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([§5.15](#515-tablas)) |
 | `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
@@ -519,8 +524,56 @@ encabezado, un `Text` de un encabezado o una celda, también con una regla de po
 `Element`, un `For class` o un `For column` que no se aplican a ningún elemento no son errores: así
 las reglas se pueden reutilizar.
 
-El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no se aplican a
-`Document`.
+**La tipografía base.** `Document` no admite `Typography`: lo que hereda toda la descendencia (por
+lo general `Font` y `Size`, que no tienen valor por defecto) se declara en la regla
+`Element: Document`, que solo admite `Typography`:
+
+```
+Styles:
+	Element: Document
+		Typography:
+			Font: IBM Plex Sans
+			Size: 10
+```
+
+Es la base de la herencia: la regla `Element` de un tipo o lo que declara una caja la cambian para
+esa caja y sus descendientes.
+
+#### Documento de estilos aparte
+
+Las reglas pueden escribirse en un documento aparte, de raíz `Styles` con el namespace
+`dev.stxt.boxes`, para quitarlas del documento principal o compartirlas entre varios:
+
+```
+Styles (dev.stxt.boxes):
+	Element: Document
+		Typography:
+			Font: IBM Plex Sans
+			Size: 10
+	For class: panel
+		Box:
+			Padding: 10
+```
+
+- **Se pasa al maquetar, nunca se busca.** El documento no dice dónde está su documento de estilos
+  y el motor no busca ficheros ni carpetas: quien llama lo lee
+  (`DocumentReader.readStyles`) y lo pasa junto al documento (`Engine.layOutDocument(documento,
+  estilos)`, `PdfWriter.write(documento, estilos, …)`). Es opcional: sin él, todo vale como antes.
+- **Vale menos que el documento.** Se admiten las mismas reglas que en el `Styles` del
+  documento. En cada nivel de la prioridad de arriba (el de `For id`, el
+  de `For class`, el de `Element`…), las reglas del documento de estilos aparte van **antes** y las
+  del documento **después**, así que gana el documento, propiedad a propiedad. La prioridad entre
+  niveles no cambia: un `For class` del documento aparte sigue ganando a un `Element` del
+  documento. Con esto, sacar el `Styles` de un documento a un fichero aparte no cambia el
+  resultado.
+- **Cada origen es estricto por separado.** Dos reglas con el mismo selector son un error dentro
+  de un origen (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Las reglas de
+  `For id` del documento de estilos no necesitan que el documento tenga ese `Id` (sirve para
+  varios documentos), a diferencia de las del propio documento (`STYLE_UNKNOWN_ID`); una clase de
+  `Class` puede tener su `For class` en cualquiera de los dos.
+- **Errores.** Una regla del documento de estilos se valida como una del documento, y su error
+  lleva la línea **de ese fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es
+  `Styles` es `DOCUMENT_ROOT`.
 
 ### 4.11 Listas
 
@@ -730,7 +783,7 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   carácter especial se escribe con una barra delante, como en CommonMark (`\*`, `\_`, `\[`, `\\`).
   Como `Content` admite varios párrafos, cada uno separado por una línea en blanco es un
   párrafo; el salto de línea simple vale un espacio, igual que sin `Inline`. `Inline` es una
-  propiedad de `Typography`: **se hereda**, así que se declara una vez en `Document` o en una regla
+  propiedad de `Typography`: **se hereda**, así que se declara una vez en `Element: Document` o en una regla
   de `Styles` (`Element: Paragraph`), y un texto concreto vuelve al literal con `Inline: none`.
   Solo admite lo que cabe en una línea: un encabezado (`#`), una lista (`-`, `1.`), una tabla, una
   cita, código, una imagen o HTML dentro de un texto con `Inline: markdown` es un error
@@ -1601,10 +1654,11 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
 	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 		Element: Heading 1
 			Typography:
 				Size: 18
@@ -1995,7 +2049,7 @@ La validación se hace en cuatro niveles:
 
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
-| `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
+| `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
 | `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
@@ -2003,12 +2057,12 @@ La validación se hace en cuatro niveles:
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
-| `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
-| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document` |
+| `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
+| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
-| `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
-| `STYLE_DUPLICATE` | Dos reglas no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_UNKNOWN_ID` | Un `For id` del documento tiene un elemento con ese `Id` (en el documento de estilos aparte no hace falta) | `Ningún elemento tiene el Id summary de esta regla For id` |
+| `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
+| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -2104,6 +2158,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Reglas de estilo | Selectores compuestos, combinadores, especificidad calculada, `!important` | Selectores simples (`Element`, que también nombra la posición de una celda de tabla, `For class`, `For id` y `For column`) con prioridad fija, solo con `Box`, `Typography` y `Break` ([§4.10](#410-reglas-reutilizables-styles)) |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
+| Hojas de estilo externas | `<link rel="stylesheet">` en el documento; el navegador las busca | El documento de estilos se pasa al maquetar y vale menos que el documento; el documento no lo nombra y el motor no busca ficheros ([§4.10](#410-reglas-reutilizables-styles)) |
 | Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, formato en línea, viudas y huérfanas) |
 | `display` | Combina tipo exterior e interior | El elemento (`Block`, `Flex`, `Grid`, `Text`) fija el interior; el exterior lo decide el padre. No hay `inline-block`. |
 | `position` | Propiedad de cualquier caja | Elementos `Relative`, `Absolute` y `Fixed`, que son bloques: un flex o grid posicionado va dentro de uno de ellos |
@@ -2193,9 +2248,9 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language` (exactamente uno), `Typography`, `Styles`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language` (exactamente uno), `Styles`; elementos |
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
-| `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada) |
+| `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada). Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
 | `Block` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
 | `Flex` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
@@ -2260,10 +2315,11 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
 	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 		Element: Fixed
 			Box:
 				Height: 20
@@ -2340,7 +2396,7 @@ Document (dev.stxt.boxes):
 
 - **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
-- **Fuentes:** el `Typography` de `Document` declara `Font` y `Size`, que heredan todas las cajas. El título
+- **Fuentes:** la regla `Element: Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
 - **Reglas** ([§4.10](#410-reglas-reutilizables-styles)): `Element: Fixed` da a la cabecera y

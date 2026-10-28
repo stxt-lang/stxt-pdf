@@ -1,0 +1,12 @@
+# Case: Typography directamente en el Document: va en Styles, en Element: Document
+# Code: CHILD_NOT_DECLARED
+# Line: 9
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: Hola

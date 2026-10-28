@@ -51,11 +51,11 @@ final class ListBuilder {
     static Box marker(InlineNode n, Box item, String text) {
         if (item.style.font == null) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
-                    + "el Typography del List item, de un antecesor o de Document");
+                    + "el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
         if (!item.style.isDeclared(FONT_SIZE)) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: decláralo "
-                    + "en el Typography del List item, de un antecesor o de Document");
+                    + "en el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
         Style s = Style.inheriting(item.style);
         s.layout = Style.Layout.INLINE;

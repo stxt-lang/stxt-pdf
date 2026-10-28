@@ -1,0 +1,136 @@
+# Estilos del ejemplo «catalog»: las reglas reutilizables y la tipografía base. Se pasan junto a
+# input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
+Styles (dev.stxt.boxes):
+	Element: Document
+		Typography:
+			Font: IBM Plex Sans
+			Size: 9
+			Line height: 13.5
+			Color: #2B2420
+	Element: Heading 1
+		Typography:
+			Font: IBM Plex Serif
+			Size: 28
+			Line height: 32
+			Weight: bold
+			Color: #3B2A1E
+		Box:
+			Margin: 0 0 6 0
+	Element: Heading 2
+		Typography:
+			Font: IBM Plex Serif
+			Size: 17
+			Line height: 22
+			Weight: bold
+			Color: #3B2A1E
+		Box:
+			Margin: 0 0 4 0
+	Element: Heading 3
+		Typography:
+			Font: IBM Plex Serif
+			Size: 13
+			Line height: 17
+			Weight: bold
+			Color: #3B2A1E
+	Element: Paragraph
+		Box:
+			Margin: 0 0 6 0
+	Element: Cell
+		Box:
+			Padding: 6 8
+			Border: 0 0 0.5 0
+			Border color: #DCCFB8
+	Element: Fixed
+		Typography:
+			Size: 7.5
+			Color: #8A7A6C
+	Element: Contents entry 1
+		Typography:
+			Font: IBM Plex Serif
+			Weight: bold
+			Size: 13
+			Line height: 18
+			Color: #3B2A1E
+		Box:
+			Margin: 14 0 4 0
+			Padding: 0 0 4 0
+			Border: 0 0 0.5 0
+			Border color: #DCCFB8
+	Element: Contents entry 2
+		Typography:
+			Size: 10
+			Line height: 15
+			Color: #2B2420
+		Box:
+			Padding: 1 0 1 14
+	For class: page-title
+		Typography:
+			Font: IBM Plex Serif
+			Size: 28
+			Line height: 32
+			Weight: bold
+			Color: #3B2A1E
+		Box:
+			Margin: 0 0 6 0
+	For class: lead
+		Typography:
+			Font: IBM Plex Serif
+			Style: italic
+			Size: 11.5
+			Line height: 17
+			Color: #6B5B4E
+		Box:
+			Margin: 0 0 16 0
+	For class: card
+		Box:
+			Radius: 6
+			Background: #FBF8F3
+			Border: 0.5
+			Border color: #E6DAC6
+	For class: body
+		Box:
+			Padding: 10 12 12 12
+	For class: product
+		Typography:
+			Size: 13
+			Line height: 17
+	For class: ref
+		Typography:
+			Font: IBM Plex Mono
+			Size: 7.5
+			Color: #8A7A6C
+	For class: dims
+		Typography:
+			Size: 7.5
+			Color: #6B5B4E
+	For class: price
+		Typography:
+			Font: IBM Plex Serif
+			Size: 14
+			Weight: bold
+			Color: #B5651D
+	For class: new
+		Typography:
+			Size: 7
+			Weight: bold
+			Color: #FFFFFF
+			Transform: uppercase
+			Letter spacing: 0.8
+		Box:
+			Radius: 3
+			Background: #B5651D
+			Padding: 3 7
+	Element: Head cell
+		Typography:
+			Weight: bold
+			Size: 8
+			Color: #FFFFFF
+		Box:
+			Background: #3B2A1E
+	For class: step-number
+		Typography:
+			Font: IBM Plex Serif
+			Size: 30
+			Line height: 32
+			Weight: bold
+			Color: #B5651D

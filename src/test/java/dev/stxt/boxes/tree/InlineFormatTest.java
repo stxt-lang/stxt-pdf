@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -15,16 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class InlineFormatTest {
 
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-            + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+            + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(HEADER + String.join("\n", lines))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(HEADER + String.join("\n", lines)))).root();
     }
 
     /** Como {@link #build}, con {@code Inline: markdown} en el {@code Typography} del documento. */
     private static Box buildInline(String... lines) {
         return new BoxTreeBuilder().build(new DocumentReader()
-                .read(HEADER + "\t\tInline: markdown\n" + String.join("\n", lines))).root();
+                .read(Docs.mergeStyles(HEADER + "\t\t\t\tInline: markdown\n" + String.join("\n", lines)))).root();
     }
 
     @Test
@@ -116,17 +117,17 @@ class InlineFormatTest {
     void errorsPointToTheLineOfTheBlock() {
         InvalidModelException list = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Uno", "\tText: - lista"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, list.code());
-        assertEquals(11, list.line());
+        assertEquals(13, list.line());
         InvalidModelException second = assertThrows(InvalidModelException.class, () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\t# Dos"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.code());
-        assertEquals(14, second.line());
+        assertEquals(16, second.line());
     }
 
     @Test
     void anInternalLinkToAnIdThatDoesNotExistIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Ver [aquí](#nada)"));
         assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
-        assertEquals(10, e.line());
+        assertEquals(12, e.line());
     }
 
     @Test

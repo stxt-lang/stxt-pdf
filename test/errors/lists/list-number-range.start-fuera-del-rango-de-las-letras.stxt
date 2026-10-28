@@ -1,14 +1,16 @@
 # Case: Start fuera del rango de las letras
 # Code: LIST_NUMBER_RANGE
-# Line: 14
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	List:
 		Marker: lower-alpha
 		Start: 0

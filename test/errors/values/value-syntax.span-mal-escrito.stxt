@@ -1,14 +1,16 @@
 # Case: Span mal escrito
 # Code: VALUE_SYNTAX
-# Line: 17
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Table:
 		Columns: 1fr 1fr
 		Body:

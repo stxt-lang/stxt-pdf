@@ -14,10 +14,11 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Title: Índice
 	Language: es
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
 	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 		Element: Contents entry 2
 			Box:
 				Padding: 0 0 0 10

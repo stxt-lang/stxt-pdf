@@ -1,14 +1,16 @@
 # Case: Levels con el último nivel menor que el primero
 # Code: VALUE_NOT_ALLOWED
-# Line: 15
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Heading 1:
 		Text: Uno
 	Contents:

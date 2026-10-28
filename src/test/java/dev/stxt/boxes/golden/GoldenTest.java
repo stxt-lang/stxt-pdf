@@ -56,10 +56,12 @@ class GoldenTest {
                 String name = dir.getFileName().toString();
                 assumeTrue(!PENDING.containsKey(name), () -> name + ": " + PENDING.get(name));
                 InlineNode input = reader.read(dir.resolve("input.stxt"));
+                Path stylesFile = dir.resolve("styles.stxt");
+                InlineNode styles = Files.exists(stylesFile) ? reader.readStyles(stylesFile) : null;
                 Node expected = STXT.rawParser().parseFile(dir.resolve("expected.stxt").toFile()).get(0);
-                LaidOutDocument document = new Engine().layOutDocument(input);
+                LaidOutDocument document = new Engine().layOutDocument(input, styles);
                 writeSvg(name, document);
-                writePdfAndImages(SOURCE_DIR.resolve(name), input);
+                writePdfAndImages(SOURCE_DIR.resolve(name), input, styles);
                 String dump = StxtDump.dump(document.pages(), document.media().pageArea(), false);
                 ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
             }));
@@ -82,12 +84,12 @@ class GoldenTest {
      * que se incrustan ({@link PdfWriter#write(InlineNode, Resources, java.io.OutputStream, boolean)}),
      * no con las de la comparación.
      */
-    private static void writePdfAndImages(Path dir, InlineNode input) throws IOException {
+    private static void writePdfAndImages(Path dir, InlineNode input, InlineNode styles) throws IOException {
         if (!Files.isDirectory(dir)) {
             return;
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(input, new Resources(), out, true);
+        PdfWriter.write(input, styles, new Resources(), out, true);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
     }

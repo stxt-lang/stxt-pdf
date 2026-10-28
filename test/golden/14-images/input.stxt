@@ -20,9 +20,11 @@ Document (dev.stxt.boxes):
 		Margin: 20
 	Title: Imágenes
 	Language: es
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Fixed:
 		Offset: -16 0 auto auto
 		Image: test/square.png

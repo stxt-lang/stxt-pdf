@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Rect;
@@ -24,7 +25,7 @@ import java.util.Map;
 public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String FONT = "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+    private static final String FONT = "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
     private static final String A4 = "\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n";
     /** Sufijo de la clave del marcador de un ítem. */
     private static final String MARKER = "#marker";
@@ -78,7 +79,7 @@ public final class LayoutFixture {
 
     private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
-        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages());
+        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.mergeStyles(doc)), runs)).pages());
     }
 
     public int pages() {

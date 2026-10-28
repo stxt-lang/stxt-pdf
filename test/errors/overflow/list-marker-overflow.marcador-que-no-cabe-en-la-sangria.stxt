@@ -1,14 +1,16 @@
 # Case: Marcador que no cabe en la sangría
 # Code: LIST_MARKER_OVERFLOW
-# Line: 16
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	List:
 		Marker: decimal
 		Box:

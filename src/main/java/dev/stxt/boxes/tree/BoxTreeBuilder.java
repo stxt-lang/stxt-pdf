@@ -108,20 +108,39 @@ public final class BoxTreeBuilder {
      * @throws InvalidModelException si incumple una regla del modelo (§6)
      */
     public Result build(InlineNode document) {
+        return build(document, null);
+    }
+
+    /**
+     * Como {@link #build(InlineNode)}, con un documento de estilos aparte (raíz {@code Styles}, §4.10)
+     * cuyas reglas valen menos que las del propio documento. {@code styles} puede ser {@code null}.
+     *
+     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (§9)
+     * @throws InvalidModelException si incumple una regla del modelo (§6); la línea de un error de
+     *         las reglas del documento de estilos es la suya, y el mensaje lo dice
+     */
+    public Result build(InlineNode document, InlineNode styles) {
         // Sin el namespace, el schema no validaría nada.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
                     "El nodo raíz debe ser Document (" + DocumentSchema.NAMESPACE + "):");
         }
         DocumentSchema.validate(document);
+        if (styles != null) {
+            if (!is(styles, "styles") || !DocumentSchema.NAMESPACE.equals(styles.getNamespace())) {
+                throw error(styles, ErrorCode.DOCUMENT_ROOT, "El nodo raíz del documento de estilos debe ser Styles ("
+                        + DocumentSchema.NAMESPACE + "):").inSource(StyleRules.EXTERNAL);
+            }
+            DocumentSchema.validate(styles);
+        }
         Media media = media(inline(child(document, "media").orElseThrow()));
         Metadata metadata = metadata(document);
-        BuildContext ctx = new BuildContext(new StyleRules(document));
+        BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
-        // El Typography de Document lo heredan todas las cajas.
+        // La tipografía de Element: Document la heredan todas las cajas.
         Style rootStyle = new Style();
         rootStyle.locale = Locale.forLanguageTag(metadata.language());
-        child(document, "typography").map(Nodes::inline).ifPresent(t -> typography(t, rootStyle));
+        ctx.rules.applyDocument(rootStyle);
         Box root = new Box(null, null, rootStyle, true, document.getLine());
         // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
         ctx.definiteHeight.put(root, true);

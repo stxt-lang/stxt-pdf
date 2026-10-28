@@ -10,56 +10,6 @@ Document (dev.stxt.boxes):
 		Margin: 50 54 52 54
 	Title: Carta · Restaurante La Cala
 	Language: es
-	Typography:
-		Font: IBM Plex Serif
-		Size: 9.5
-		Line height: 13
-		Color: #2B2B2B
-	Styles:
-		Element: Heading 1
-			Typography:
-				Size: 22
-				Line height: 26
-				Weight: bold
-				Align: center
-				Color: #14365C
-			Box:
-				Margin: 0
-		Element: Heading 2
-			Typography:
-				Font: IBM Plex Sans
-				Size: 8
-				Weight: bold
-				Color: #A8782F
-				Align: center
-				Transform: uppercase
-				Letter spacing: 2
-			Box:
-				Margin: 16 0 9 0
-		Element: Fixed
-			Typography:
-				Color: #8A8174
-		For class: name
-			Typography:
-				Weight: bold
-				Size: 10.5
-		For class: desc
-			Typography:
-				Style: italic
-				Size: 8.5
-				Color: #6E675C
-			Box:
-				Margin: 1 0 0 0
-		For class: price
-			Typography:
-				Font: IBM Plex Sans
-				Weight: bold
-				Size: 9.5
-				Color: #14365C
-				Align: right
-		For class: dish
-			Box:
-				Margin: 0 0 7 0
 	Fixed:
 		Id: paper
 		Offset: -50 -54 -52 -54

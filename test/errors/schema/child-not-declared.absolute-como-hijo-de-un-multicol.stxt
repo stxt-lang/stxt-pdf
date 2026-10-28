@@ -1,14 +1,16 @@
 # Case: Absolute como hijo de un Multicol
 # Code: CHILD_NOT_DECLARED
-# Line: 14
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 595
 		Height: 842
-	Typography:
-		Font: IBM Plex Sans
-		Size: 10
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
 	Multicol:
 		Count: 2
 		Absolute:

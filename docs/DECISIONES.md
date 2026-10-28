@@ -1303,3 +1303,49 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      (10): adornos de las esquinas circulares. El marco doble de la carta y los tres del certificado siguen
      siendo cajas distintas (una caja solo tiene un borde): lo que ganan es el radio. Las fichas del catálogo
      no tienen sombra (decisión 219). *Alternativa:* quitar los `Fixed` de los marcos y dejar uno solo.
+
+## Documento de estilos aparte (2026-10-28)
+
+No es un hito de la hoja de ruta: sale del primer punto de `TODO.md`. Interpretaciones y simplificaciones:
+
+226. **La tipografía base va en `Element: Document`**, una regla más de `Styles` que solo admite
+     `Typography` (con `Box` o `Break` es `STYLE_NOT_ALLOWED`), y `Document` deja de admitir `Typography`
+     (un `Typography` suelto es `CHILD_NOT_DECLARED`, sin compatibilidad hacia atrás: todos los documentos de
+     test, los ejemplos y los de la especificación se han migrado). Así la base de la herencia está en el
+     mismo sitio que todo el estilo y se puede mover al documento de estilos aparte. *Dónde:*
+     `tree/StyleRules.element` y `applyDocument`, schema. *Alternativa:* un `Typography:` propio de
+     `Styles`, sin selector.
+
+227. **La prioridad entre los dos orígenes es por nivel**: el orden de siempre (`For id` > `For class` >
+     `For column` > posición de la celda > `Element`) no cambia, y dentro de cada nivel van antes las reglas
+     del documento de estilos aparte y después las del documento, así que gana el documento. Sacar el
+     `Styles` de un documento a un fichero no cambia ningún resultado (los PNG y los volcados de los once
+     ejemplos son los mismos). En las reglas de posición de una celda el orden es: las del documento aparte
+     (por posición) y luego las del documento (por posición). *Dónde:* `tree/StyleRules.apply`.
+     *Alternativa:* todas las reglas del fichero valen menos que cualquiera del documento, aunque sea de un
+     nivel inferior.
+
+228. **Cada origen es estricto por separado, con una excepción.** Dos reglas con el mismo selector son
+     `STYLE_DUPLICATE` dentro de un origen, no entre los dos; una clase de `Class` puede tener su `For class`
+     en cualquiera de los dos. Una regla `For id` del documento de estilos aparte **no** necesita que el
+     documento tenga ese `Id` (un fichero de estilos sirve para varios documentos); la del propio documento,
+     sí (`STYLE_UNKNOWN_ID`, como antes). *Alternativa:* exigirlo también al fichero, lo que obliga a un
+     fichero de estilos por documento.
+
+229. **Los errores de una regla del documento aparte llevan su línea y lo dicen** (`línea 8 de los estilos:
+     …`), con el mismo código. Lo que se detecta después de construir el árbol (una fuente que no existe, un
+     desbordamiento) señala la línea de la propiedad como siempre, sin decir en qué fichero está, porque
+     `Style.line` solo guarda un número. *Dónde:* `InvalidModelException.inSource`, `StyleRules.located`.
+     *Alternativa:* guardar el origen de cada línea en `Style` y el nombre del fichero (que el motor no
+     conoce: recibe el árbol, no la ruta).
+
+230. **El documento no nombra su documento de estilos ni el motor lo busca**: lo lee quien llama
+     (`DocumentReader.readStyles`, de raíz `Styles` con el namespace; otra raíz es `DOCUMENT_ROOT`) y lo
+     pasa al maquetar (`BoxTreeBuilder.build(documento, estilos)`, `Engine.layOutDocument(documento,
+     estilos)`, `PdfWriter.write(documento, estilos, …)`; `null` si no hay). Los tests de ejemplos y de
+     casos golden usan el `styles.stxt` de la carpeta si existe. El mismo nodo `Styles` del schema sirve de
+     hijo de `Document` y de raíz, porque un schema acepta cualquier nodo como raíz.
+     *Alternativa:* una propiedad `Styles file` en `Document`.
+
+231. **Mensajes de `TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`:** dicen ahora «de un antecesor o de Styles
+     (Element: Document)» en vez de «o de Document».

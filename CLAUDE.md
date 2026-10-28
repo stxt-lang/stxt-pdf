@@ -131,7 +131,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `Relative`, `Absolute` y `Fixed` (bloques posicionados), y los envoltorios `Item` (hijo de
   `Flex`) y `Area` (hijo de `Grid`, con la colocación en el valor), que contienen exactamente un
   elemento. Las propiedades de cada caja van en tres grupos (§4): `Box` (modelo de caja, no se
-  hereda), `Typography` (texto, viudas y huérfanas; se hereda y se admite en `Document`) y
+  hereda), `Typography` (texto, viudas y huérfanas; se hereda; la base del documento va en `Styles`, con `Element: Document`) y
   `Break` (cortes de página; no en `Absolute` ni `Fixed`), con nombres cortos (`Size`,
   `Weight`, `Align`, `Before`…). La estructura solo está en el schema: `DocumentSchema` lo
   compila una vez, `DocumentReader` valida con él al leer y `BoxTreeBuilder` vuelve a validar el
@@ -149,6 +149,16 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   las propiedades de `Flex`, `Grid` e `Item`, `PropertyReader`; las reglas de `Styles`,
   `StyleRules`; tablas y listas, `TableBuilder` y `ListBuilder`; y las reglas del §6 que miran
   la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
+- **Documento de estilos aparte (§4.10):** las reglas de `Styles` pueden estar también en un documento de
+  raíz `Styles` (`DocumentReader.readStyles`) que se pasa al maquetar (`BoxTreeBuilder.build(documento,
+  estilos)`, `Engine.layOutDocument(documento, estilos)`, `PdfWriter.write(documento, estilos, …)`); es
+  opcional, puede ser `null` y el documento no lo nombra: el motor no busca ficheros. `StyleRules` lee los
+  dos orígenes por separado (un duplicado es un error dentro de un origen, no entre los dos; el `For id`
+  sin elemento solo lo exige el documento) y en cada nivel de prioridad aplica antes las reglas del
+  documento aparte, así que el documento gana. `Element: Document` es la regla de la raíz: solo admite
+  `Typography`, que hereda todo (`StyleRules.applyDocument`), y `Document` ya no admite `Typography`. Un
+  error de una regla del documento aparte lleva su línea y lo dice (`InvalidModelException.inSource`:
+  `línea 8 de los estilos: …`); `ExamplesTest` y `GoldenTest` leen el `styles.stxt` de la carpeta si lo hay.
 - **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class`, `For id` y `For column` con
   `Box`, `Typography` y `Break`. `StyleRules.apply` las aplica entre la herencia y lo propio
   del elemento (prioridad: elemento > id > clases en orden de `Styles` > `For column` en orden de
@@ -201,7 +211,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
   `ModelValidator.definiteHeight`). Los desbordamientos (§5.12) son errores: `Overflow` los
   busca en el resultado ya paginado y señala al culpable más interior. `Font` y `Size` no
-  tienen valor por defecto y se suelen declarar en el `Typography` de `Document`. No
+  tienen valor por defecto y se suelen declarar en la regla `Element: Document` de `Styles`. No
   generalices una regla nueva sin comentarlo con el usuario.
 - **Enums de `Style`** (y `FontWeight` y `FontStyle`, que están en `model`): los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas y con el guion como guion bajo, así que **cada constante debe llamarse igual que
@@ -474,7 +484,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   ficheros de terceros); si necesitas una, añádela al generador en vez de subir un binario.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área útil de
   515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
-  declara en el `Typography` de `Document` `Font: IBM Plex Sans` y `Size: 10`; los demás
+  declara en `Element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese); los demás
   documentos de test con texto deben declararlos ellos mismos. Los documentos se escriben como
   listas de líneas con tabuladores (`"\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A",
   "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10"`); el `Id` de un ítem va en su elemento, no en el

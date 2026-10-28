@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
@@ -16,8 +17,8 @@ class StylesTest {
 
     private static Box root(String... lines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n" + String.join("\n", lines);
-        return new BoxTreeBuilder().build(new DocumentReader().read(doc)).root();
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
 
     private static double padding(Box b) {
@@ -34,7 +35,7 @@ class StylesTest {
         assertEquals(5, padding(outer.children.get(0)), 1e-9);
         assertEquals(Sides.all(Value.pt(0)), root.children.get(1).style.padding);
         // La línea es la de la regla: los errores la señalan.
-        assertEquals(12, outer.style.line("padding"));
+        assertEquals(13, outer.style.line("padding"));
     }
 
     @Test
@@ -44,8 +45,8 @@ class StylesTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 14").children.get(0);
         assertEquals(14, text.style.fontSize, 1e-9);
         assertEquals(FontWeight.BOLD, text.style.fontWeight);
-        assertEquals(16, text.style.line("font-size"));
-        assertEquals(13, text.style.line("font-weight"));
+        assertEquals(17, text.style.line("font-size"));
+        assertEquals(14, text.style.line("font-weight"));
     }
 
     @Test

@@ -5,10 +5,12 @@ import dev.stxt.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,67 +30,148 @@ import static dev.stxt.boxes.tree.PropertyReader.typography;
 
 /**
  * Las reglas reutilizables de {@code Styles} (ESPECIFICACION.md §4.10): {@code Element} (de un
- * tipo de elemento o de una posición en una tabla), {@code For class}, {@code For id} y
- * {@code For column}, leídas una vez por documento.
+ * tipo de elemento, de una posición en una tabla o {@code Document}), {@code For class},
+ * {@code For id} y {@code For column}, leídas una vez por llamada.
+ *
+ * <p>Pueden venir de dos sitios: del {@code Styles} del propio documento y de un documento de
+ * estilos aparte (raíz {@code Styles}, §4.10). En cada nivel de prioridad van antes las reglas del
+ * documento aparte y después las del documento, así que si las dos declaran la misma propiedad
+ * gana el documento. Cada origen se lee por separado: una regla repetida es un error dentro de un
+ * origen, no entre los dos.</p>
  */
 final class StyleRules {
 
-    /** Reglas {@code Element}, por elemento. */
-    private final Map<Element, InlineNode> elementRules = new EnumMap<>(Element.class);
-    /** Reglas {@code For class}, por clase y en el orden del documento: en ese orden se aplican. */
-    private final Map<String, InlineNode> classRules = new LinkedHashMap<>();
-    /** Reglas {@code For id}, por {@code Id}. */
-    private final Map<String, InlineNode> idRules = new HashMap<>();
+    /** Cómo se llama el documento de estilos aparte en los mensajes de error. */
+    static final String EXTERNAL = "los estilos";
+
+    /** Reglas {@code Element}, por elemento y en el orden en que se aplican. */
+    private final Map<Element, List<InlineNode>> elementRules = new EnumMap<>(Element.class);
+    /** Reglas {@code Element: Document}, en el orden en que se aplican. */
+    private final List<InlineNode> documentRules = new ArrayList<>();
+    /** Reglas {@code For class}, en el orden en que se aplican: primero las del documento aparte. */
+    private final List<ClassRule> classRules = new ArrayList<>();
+    /** Las clases que tienen alguna regla. */
+    private final Set<String> classNames = new HashSet<>();
+    /** Reglas {@code For id}, por {@code Id}, en el orden en que se aplican. */
+    private final Map<String, List<InlineNode>> idRules = new HashMap<>();
+    /** La primera regla {@code For id} del propio documento, por {@code Id}: la única que exige un elemento. */
+    private final Map<String, InlineNode> ownIdRules = new HashMap<>();
     /** Reglas {@code Element} de una posición en una tabla ({@code Head cell}, {@code Even row cell}…). */
-    private final Map<CellSelector, InlineNode> cellRules = new EnumMap<>(CellSelector.class);
-    /** Reglas {@code For column}, por rango y en el orden del documento: en ese orden se aplican. */
-    private final Map<String, ColumnRule> columnRules = new LinkedHashMap<>();
+    private final List<CellRule> cellRules = new ArrayList<>();
+    /** Reglas {@code For column}, en el orden en que se aplican. */
+    private final List<ColumnRule> columnRules = new ArrayList<>();
+    /** Las reglas que vienen del documento de estilos aparte: sus errores lo dicen. */
+    private final Set<InlineNode> external = Collections.newSetFromMap(new IdentityHashMap<>());
+
+    /** Una regla {@code For class}. */
+    private record ClassRule(String name, InlineNode rule) {
+    }
+
+    /** Una regla de posición en una tabla; {@code external} la sitúa antes de las del documento. */
+    private record CellRule(CellSelector selector, InlineNode rule, boolean external) {
+    }
 
     /** Una regla {@code For column}: las columnas {@code from} a {@code to}, ambas incluidas. */
     private record ColumnRule(int from, int to, InlineNode rule) {
+        String key() {
+            return from + " " + to;
+        }
     }
 
     /**
-     * Lee las reglas de {@code Styles} del documento. Sus valores se comprueban aquí, aunque la
-     * regla no se aplique a ningún elemento; lo que depende del elemento (§6), al aplicarla.
+     * Lee las reglas de {@code Styles} del documento y, si lo hay, del documento de estilos
+     * aparte ({@code styles}, de raíz {@code Styles}; {@code null} si no hay). Sus valores se
+     * comprueban aquí, aunque la regla no se aplique a ningún elemento; lo que depende del
+     * elemento (§6), al aplicarla.
      */
-    StyleRules(InlineNode document) {
-        Optional<Node> styles = child(document, "styles");
-        if (styles.isEmpty()) {
-            return;
+    StyleRules(InlineNode document, InlineNode styles) {
+        if (styles != null) {
+            load(styles, true);
         }
-        for (Node r : inline(styles.get()).getChildren()) {
+        child(document, "styles").map(Nodes::inline).ifPresent(own -> load(own, false));
+    }
+
+    /** Las reglas de un origen; una regla repetida es un error dentro de él. */
+    private void load(InlineNode styles, boolean fromFile) {
+        Map<String, InlineNode> seen = new HashMap<>();
+        for (Node r : styles.getChildren()) {
             InlineNode rule = inline(r);
             String selector = rule.getText().trim();
-            InlineNode previous = switch (rule.getCanonicalName()) {
-                case "element" -> {
-                    String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
-                    Optional<CellSelector> cell = CellSelector.of(canonical);
-                    if (cell.isPresent()) {
-                        yield cellRules.putIfAbsent(cell.get(), rule);
-                    }
-                    Element element = Element.of(canonical)
-                            .orElseThrow(() -> error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
-                                    + "' no es un elemento de caja ni una posición en una tabla ("
-                                    + Stream.concat(Element.selectable().stream().map(Element::label),
-                                            Arrays.stream(CellSelector.values()).map(CellSelector::label))
-                                    .collect(Collectors.joining(", ")) + ")"));
-                    yield elementRules.putIfAbsent(element, rule);
-                }
-                case "for-column" -> {
-                    ColumnRule column = columns(rule);
-                    ColumnRule other = columnRules.putIfAbsent(column.from() + " " + column.to(), column);
-                    yield other == null ? null : other.rule();
-                }
-                case "for-class" -> classRules.putIfAbsent(name(rule, "For class"), rule);
-                case "for-id" -> idRules.putIfAbsent(name(rule, "For id"), rule);
-                default -> throw unread(rule);
-            };
+            String key = rule.getCanonicalName() + ": " + selector;
+            if (rule.getCanonicalName().equals("element")) {
+                key = "element: " + selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+            } else if (rule.getCanonicalName().equals("for-column")) {
+                key = "for-column: " + columns(rule, fromFile).key();
+            }
+            InlineNode previous = seen.putIfAbsent(key, rule);
             if (previous != null) {
-                throw error(rule, ErrorCode.STYLE_DUPLICATE, "Regla repetida: " + rule.getName() + ": " + selector
-                        + " (ya está en la línea " + previous.getLine() + ")");
+                throw located(error(rule, ErrorCode.STYLE_DUPLICATE, "Regla repetida: " + rule.getName() + ": "
+                        + selector + " (ya está en la línea " + previous.getLine() + ")"), fromFile);
+            }
+            if (fromFile) {
+                external.add(rule);
+            }
+            switch (rule.getCanonicalName()) {
+                case "element" -> element(rule, selector, fromFile);
+                case "for-column" -> columnRules.add(columns(rule, fromFile));
+                case "for-class" -> {
+                    String name = name(rule, "For class", fromFile);
+                    classRules.add(new ClassRule(name, rule));
+                    classNames.add(name);
+                }
+                case "for-id" -> {
+                    String id = name(rule, "For id", fromFile);
+                    idRules.computeIfAbsent(id, k -> new ArrayList<>()).add(rule);
+                    if (!fromFile) {
+                        ownIdRules.put(id, rule);
+                    }
+                }
+                default -> throw unread(rule);
             }
             read(rule, new Style());
+        }
+    }
+
+    /** Una regla {@code Element}: de un tipo de elemento, de una posición en una tabla o {@code Document}. */
+    private void element(InlineNode rule, String selector, boolean fromFile) {
+        String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
+        if (canonical.equals("document")) {
+            for (String group : List.of("box", "break")) {
+                child(rule, group).ifPresent(g -> {
+                    throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "Element: Document solo admite Typography, "
+                            + "que heredan todas las cajas: el documento no tiene " + g.getName()), fromFile);
+                });
+            }
+            documentRules.add(rule);
+            return;
+        }
+        Optional<CellSelector> cell = CellSelector.of(canonical);
+        if (cell.isPresent()) {
+            cellRules.add(new CellRule(cell.get(), rule, fromFile));
+            return;
+        }
+        Element element = Element.of(canonical)
+                .orElseThrow(() -> located(error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
+                        + "' no es un elemento de caja ni una posición en una tabla ("
+                        + Stream.concat(Stream.concat(Stream.of("Document"),
+                                Element.selectable().stream().map(Element::label)),
+                                Arrays.stream(CellSelector.values()).map(CellSelector::label))
+                        .collect(Collectors.joining(", ")) + ")"), fromFile));
+        elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(rule);
+    }
+
+    /** Un error de una regla; si viene del documento de estilos aparte, lo dice. */
+    private static InvalidModelException located(InvalidModelException e, boolean fromFile) {
+        return fromFile ? e.inSource(EXTERNAL) : e;
+    }
+
+    /**
+     * Aplica al texto de la raíz las reglas {@code Element: Document}: la tipografía que heredan
+     * todas las cajas.
+     */
+    void applyDocument(Style root) {
+        for (InlineNode rule : documentRules) {
+            read(rule, root);
         }
     }
 
@@ -97,15 +180,17 @@ final class StyleRules {
      * la hay: no tiene nodo, así que no hay clases ni {@code Id} que mirar.
      */
     void apply(Element kind, Style s) {
-        InlineNode rule = elementRules.get(kind);
-        if (rule != null) {
+        for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {
             read(rule, s);
         }
     }
 
-    /** Cada regla {@code For id} tiene su elemento: {@code ids} son los del documento ya construido. */
+    /**
+     * Cada regla {@code For id} del documento tiene su elemento: {@code ids} son los del documento ya
+     * construido. Las del documento de estilos aparte no lo exigen: sirve para varios documentos.
+     */
     void checkIds(Set<String> ids) {
-        for (Map.Entry<String, InlineNode> rule : idRules.entrySet()) {
+        for (Map.Entry<String, InlineNode> rule : ownIdRules.entrySet()) {
             if (!ids.contains(rule.getKey())) {
                 throw error(rule.getValue(), ErrorCode.STYLE_UNKNOWN_ID,
                         "Ningún elemento tiene el Id " + rule.getKey() + " de esta regla For id");
@@ -114,27 +199,28 @@ final class StyleRules {
     }
 
     /** El rango de una regla {@code For column}: {@code n} o {@code n m}, enteros positivos con {@code n <= m}. */
-    private static ColumnRule columns(InlineNode rule) {
+    private static ColumnRule columns(InlineNode rule, boolean fromFile) {
         String text = rule.getText().trim();
         String[] t = text.split("\\s+");
         if (t.length > 2 || !t[0].matches("[1-9]\\d*") || (t.length == 2 && !t[1].matches("[1-9]\\d*"))) {
-            throw error(rule, ErrorCode.VALUE_SYNTAX, "For column espera una columna o un rango 'desde hasta', "
-                    + "enteros positivos: '" + text + "'");
+            throw located(error(rule, ErrorCode.VALUE_SYNTAX, "For column espera una columna o un rango 'desde hasta', "
+                    + "enteros positivos: '" + text + "'"), fromFile);
         }
         int from = Integer.parseInt(t[0]);
         int to = t.length == 2 ? Integer.parseInt(t[1]) : from;
         if (to < from) {
-            throw error(rule, ErrorCode.VALUE_NOT_ALLOWED, "For column: el rango va de menor a mayor: '" + text + "'");
+            throw located(error(rule, ErrorCode.VALUE_NOT_ALLOWED,
+                    "For column: el rango va de menor a mayor: '" + text + "'"), fromFile);
         }
         return new ColumnRule(from, to, rule);
     }
 
     /** El nombre de una clase o de un {@code Id} en una regla: una sola palabra. */
-    private static String name(InlineNode rule, String what) {
+    private static String name(InlineNode rule, String what, boolean fromFile) {
         String name = rule.getText().trim();
         if (name.isEmpty() || name.chars().anyMatch(Character::isWhitespace)) {
-            throw error(rule, ErrorCode.VALUE_NOT_ALLOWED, what + " necesita un solo nombre, sin espacios: '"
-                    + name + "'");
+            throw located(error(rule, ErrorCode.VALUE_NOT_ALLOWED, what + " necesita un solo nombre, sin espacios: '"
+                    + name + "'"), fromFile);
         }
         return name;
     }
@@ -159,8 +245,7 @@ final class StyleRules {
      */
     void apply(InlineNode n, Element kind, Style s, Box parent, CellPosition position) {
         String noBreak = noBreak(n, kind, s, parent);
-        List<InlineNode> rules = new ArrayList<>();
-        Optional.ofNullable(elementRules.get(kind)).ifPresent(rules::add);
+        List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(kind, List.of()));
         applyAll(rules, noBreak, s);
         rules.clear();
         if (position != null) {
@@ -169,12 +254,12 @@ final class StyleRules {
                 s.textAlign = position.columnAlign();
                 s.declared(PropertyKey.internal("align"), position.columnAlignLine());
             }
-            for (CellSelector selector : CellSelector.values()) {
-                if (selector.matches(position)) {
-                    Optional.ofNullable(cellRules.get(selector)).ifPresent(rules::add);
-                }
-            }
-            for (ColumnRule column : columnRules.values()) {
+            // Dentro de este nivel van antes las del documento de estilos aparte, y en cada origen, por posición.
+            cellRules.stream().filter(c -> c.selector().matches(position))
+                    .sorted(Comparator.comparing((CellRule c) -> !c.external())
+                            .thenComparing(c -> c.selector().ordinal()))
+                    .forEach(c -> rules.add(c.rule()));
+            for (ColumnRule column : columnRules) {
                 if (position.column() >= column.from() && position.column() <= column.to()) {
                     rules.add(column.rule());
                 }
@@ -183,22 +268,22 @@ final class StyleRules {
         Optional<Node> classNode = child(n, "class");
         if (classNode.isPresent()) {
             Set<String> classes = classes(classNode.get());
-            classRules.forEach((name, rule) -> {
-                if (classes.contains(name)) {
-                    rules.add(rule);
+            for (ClassRule rule : classRules) {
+                if (classes.contains(rule.name())) {
+                    rules.add(rule.rule());
                 }
-            });
+            }
         }
-        child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::add);
+        child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
         applyAll(rules, noBreak, s);
     }
 
-    private static void applyAll(List<InlineNode> rules, String noBreak, Style s) {
+    private void applyAll(List<InlineNode> rules, String noBreak, Style s) {
         for (InlineNode rule : rules) {
             if (noBreak != null) {
                 child(rule, "break").ifPresent(b -> {
-                    throw error(b, ErrorCode.STYLE_NOT_ALLOWED, "La regla " + rule.getName() + ": "
-                            + rule.getText().trim() + " aplica Break a " + noBreak);
+                    throw located(error(b, ErrorCode.STYLE_NOT_ALLOWED, "La regla " + rule.getName() + ": "
+                            + rule.getText().trim() + " aplica Break a " + noBreak), external.contains(rule));
                 });
             }
             read(rule, s);
@@ -237,7 +322,7 @@ final class StyleRules {
             if (!classes.add(name)) {
                 throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Clase repetida en Class: " + name);
             }
-            if (!classRules.containsKey(name)) {
+            if (!classNames.contains(name)) {
                 throw error(n, ErrorCode.CLASS_WITHOUT_RULE, "La clase " + name + " no tiene regla: añade "
                         + "'For class: " + name + "' en Styles");
             }
@@ -245,15 +330,22 @@ final class StyleRules {
         return classes;
     }
 
-    /** Los grupos de una regla, con la misma lectura que en un elemento: cada valor con su línea. */
-    private static void read(InlineNode rule, Style s) {
-        for (Node g : rule.getChildren()) {
-            switch (g.getCanonicalName()) {
-                case "box" -> box(inline(g), s);
-                case "typography" -> typography(inline(g), s);
-                case "break" -> fragmentation(inline(g), s);
-                default -> throw unread(g);
+    /**
+     * Los grupos de una regla, con la misma lectura que en un elemento: cada valor con su línea. Un
+     * error de una regla del documento de estilos aparte lo dice.
+     */
+    private void read(InlineNode rule, Style s) {
+        try {
+            for (Node g : rule.getChildren()) {
+                switch (g.getCanonicalName()) {
+                    case "box" -> box(inline(g), s);
+                    case "typography" -> typography(inline(g), s);
+                    case "break" -> fragmentation(inline(g), s);
+                    default -> throw unread(g);
+                }
             }
+        } catch (InvalidModelException e) {
+            throw located(e, external.contains(rule));
         }
     }
 }
