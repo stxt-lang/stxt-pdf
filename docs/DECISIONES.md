@@ -1577,3 +1577,23 @@ interpretaciones que salieron al implementarlas.
      llevan (`Title: Prueba` o `Informe` tras `Language`; en el catálogo, la línea esperada se desplazó una
      cuando el error cae después). *Dónde:* schema (`Min: 1`), `tree/Metadata`, `paint/PdfStructure`.
      *Alternativa:* dejarlo opcional y no declarar PDF/UA sin él.
+
+263. **`Header: true` en una `Cell`**: la celda es la cabecera de su fila (el concepto de una factura, la hora de
+     un horario), `TH` con `Scope: Row` en el PDF etiquetado, para que un lector de pantalla la anuncie con cada
+     celda de la fila. Se escribe en cada celda, no en la tabla, que es lo más flexible (la etiqueta de un pie de
+     totales, o la tercera columna de una agenda) a costa de repetirlo; es del elemento y no va en `Styles`
+     (como `Span` y `Link`). Vale en `Body` y `Foot`; en `Head` es un error (`TABLE_HEADER`, línea del `Header`)
+     porque no tendría efecto: sus celdas ya son `TH` con `Scope: Column`. Las tablas de `Markdown` no tienen
+     cabeceras de fila (GFM no las tiene). Los ejemplos 01, 04, 05, 07, 08, 09 y 11 la usan. *Dónde:* schema,
+     `tree/Style.header`, `tree/BoxTreeBuilder`, `paint/PdfStructure`. *Alternativa:* `Header columns: N` en la
+     `Table`, que no repite pero solo sirve para columnas enteras.
+
+264. **`In contents: false` en un encabezado** lo deja fuera de los índices (`Contents`) sin dejar de ser un
+     encabezado: sigue siendo `H1`…`H6`, marcador, parte de la jerarquía (la comprueba en orden del documento) y
+     destino de `#id`. Es una propiedad del elemento (`Heading 1`…`6`), no de `Styles`, por defecto `true` y no
+     se hereda. El nombre no puede ser `Contents` (ya es un elemento y cada nombre del namespace tiene una sola
+     definición). Los títulos de la portada y del índice de los ejemplos 04 y 09 pasan de `Text` a `Heading 1`
+     con `In contents: false`, sin cambiar un píxel; la regla `For class: page-title`, que solo repetía
+     `Element: Heading 1`, se quita. *Dónde:* schema, `tree/Style.inContents`, `tree/BoxTreeBuilder`,
+     `tree/ContentsBuilder.collect`. *Alternativa:* `Levels` por encabezado, que no sirve cuando la portada y los
+     capítulos son del mismo nivel.

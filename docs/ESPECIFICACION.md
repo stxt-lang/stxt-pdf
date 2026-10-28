@@ -329,6 +329,7 @@ contenido, y el visor muestra el título en lugar del nombre del fichero (PDF/UA
 |---|---|---|---|---|
 | `Id` | texto | — | De caja | Identificador para volcados, tests, mensajes y reglas `For id`. Único en el documento. |
 | `Class` | nombres separados por espacios | — | De caja | Clases del elemento: le aplican las reglas `For class` con esos nombres ([§4.10](#410-reglas-reutilizables-styles)). Cada clase necesita su regla y no se repite. |
+| `In contents` | `true`, `false` | `true` | `Heading 1` … `Heading 6` | Si el encabezado tiene entrada en los índices ([§5.19](#519-referencias-a-otras-cajas)). Con `false` sigue siendo un encabezado (estructura, marcador, jerarquía) pero no se lista: el título de la portada o el del propio índice. No se hereda. |
 | `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Todos los elementos de caja salvo `Markdown` y `Contents` | Hace clicable la caja entera: lleva a una URL o a la caja con ese `Id` ([§5.20](#520-enlaces)). No se hereda y no cambia el aspecto. |
 | `Isolate` | booleano | `false` | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
 
@@ -622,6 +623,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna ([§5.15](#515-tablas)). Tantas como `Columns`. |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda ([§5.15](#515-tablas)). |
+| `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([§5.15](#515-tablas)): en el PDF etiquetado, `TH` con `Scope: Row`. No vale en `Head` (`TABLE_HEADER`). |
 
 Una `Row` admite `Typography`, que heredan sus celdas, y `Break`, que es el de sus celdas; no
 tiene `Box`. Las filas de la tabla no tienen propiedad de tamaño: miden lo que su celda más
@@ -1617,7 +1619,9 @@ partir desborda la página (`PAGE_OVERFLOW`, [§5.12](#512-desbordamiento)). Las
 la tabla.
 
 **Salida PDF.** Una `Table` es `Table`; `Head`, `Body` y `Foot` son `THead`, `TBody` y `TFoot`;
-cada fila, `TR`, y cada celda, `TH` en `Head` (con `Scope: Column`) y `TD` en el resto, con
+cada fila, `TR`, y cada celda, `TH` en `Head` (con `Scope: Column`), `TH` con `Scope: Row` si
+declara `Header: true` en `Body` o `Foot` (la cabecera de su fila: un lector de pantalla la
+anuncia con cada celda de la fila) y `TD` en el resto, con
 los atributos `RowSpan` y `ColSpan` si ocupa más de una fila o columna. La cabecera y el pie
 son contenido en la primera página en que salen; donde se repiten, son *artifacts*, como los
 `Fixed`, y el texto de la tabla se lee una sola vez.
@@ -2026,7 +2030,9 @@ List:
 
 **Índice.** Un `Contents` es un bloque en flujo, sin hijos, que genera una **entrada por
 encabezado** de los niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los
-de un `Markdown` y los que están después del propio índice. Se admite donde va un `Markdown`:
+de un `Markdown` y los que están después del propio índice, salvo los que declaran
+`In contents: false`: el título de la portada o el del propio índice son encabezados reales (`H1`,
+marcador, jerarquía) que el índice no lista. Se admite donde va un `Markdown`:
 
 ```
 Contents:
@@ -2190,6 +2196,7 @@ La validación se hace en cuatro niveles:
 | `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Columns`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): añade una Cell, vacía si hace falta, o usa Span` |
 | `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
 | `TABLE_COLUMN_ALIGN` | `Column align` da una alineación por columna de `Columns` (línea del `Column align`) | `Column align da 2 alineaciones y la tabla tiene 3 columnas (Columns): escribe una por columna` |
+| `TABLE_HEADER` | `Header: true` no se declara en una celda de `Head`, cuyas celdas ya son cabeceras de columna (línea del `Header`) | `Header no tiene efecto en una celda de Head: las celdas de la cabecera ya son cabeceras de columna` |
 | `CELL_CONTENT` | Una `Cell` tiene texto en el valor o elementos, no las dos cosas | `Una Cell tiene texto en el valor (línea 12) o elementos, no las dos cosas: pon el texto en un Paragraph` |
 | `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
 | `MULTICOL_COLUMNS` | Un `Multicol` declara `Count`, `Column width` o los dos ([§5.16](#516-bloques-en-columnas)) | `Un Multicol necesita Count, Column width o los dos…` |
@@ -2377,13 +2384,13 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Flex` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
 | `Text`, `Paragraph` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content` |
-| `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`; `Text` (al menos uno, varios) |
+| `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Link`, `In contents`, `Box`, `Typography`; `Text` (al menos uno, varios) |
 | `List` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
 | `List item` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `GROUP` | `Row` (al menos uno, varios) |
 | `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
-| `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
+| `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Code font`, `Content` (obligatorio) |
 | `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
@@ -2401,7 +2408,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
-bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
+bloque); `Isolate`, `Wrap`, `Header` e `In contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de valores
 cerrados (`Table columns`, `Fit`, `Leader`, `Pages`, `Paper` y `Orientation` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt`, `Link` y `Rotate origin` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.

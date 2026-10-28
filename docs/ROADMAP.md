@@ -1266,6 +1266,17 @@ implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (20).** Continúa el repaso de accesibilidad con los dos huecos de contenido que quedaron, y `Title`
+  obligatorio (pedido por el usuario: `Min: 1`, `Max: 1`; con la declaración de PDF/UA-1 en todo PDF, un
+  documento sin título no podría afirmarla). Todos los documentos de tests, golden, catálogo de errores y ejemplos
+  de la documentación llevan `Title`; los tests que miran líneas se corrigieron con un script que sube una línea
+  donde el error cae después (y el `# Line:` del catálogo). `Header: true` en una `Cell` (`TH` con `Scope: Row`; en
+  `Head` es el error `TABLE_HEADER`) y `In contents: false` en un encabezado, por cuestionario (la alternativa
+  `Header columns: N` en la `Table` y `Listed: false` se descartaron). Ejemplos 01, 04, 05, 07, 08, 09 y 11 con
+  cabeceras de fila; en el 04 y el 09 la portada y el título del índice son `Heading 1` fuera del índice, sin cambiar
+  un píxel. Decisiones 262–264 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md` (queda de accesibilidad el `Alt` obligatorio, el idioma por
+  tramo, el contraste y probar con lectores de pantalla reales).
 - **2026-10-28 (19).** Repaso de accesibilidad del PDF etiquetado (primer punto de «Accesibilidad» de
   `TODO.md`; no es un hito). Se leyeron los once PDF como un lector de pantalla (estructura más el texto de cada
   contenido marcado, y veraPDF con PDF/UA-1, PDF/UA-2 y WTPDF). Resuelto con un cuestionario: `Text` de bloque como

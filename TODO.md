@@ -29,12 +29,7 @@
 - ~~Repaso de accesibilidad del PDF etiquetado~~ (decisiones 258–260: `Text` como `P`, `Language` por caja con
   su `Lang` y un espacio al final de las líneas partidas; leído con un lector de pantalla simulado sobre los
   once ejemplos) y declaración de PDF/UA-1 (`pdfuaid:part`, decisión 261) en los documentos con `Title`: los once
-  ejemplos pasan veraPDF sin ninguna regla conocida. Queda lo que se descartó o no se hizo:
-  - **Cabeceras de fila en tablas:** solo la cabecera (`Head`) es `TH` con `Scope: Column`. Las horas del
-    horario (ejemplo 11) o los conceptos de la factura son `TD`. Haría falta una propiedad en `Table` (por
-    ejemplo `Header columns: 1`) que dé `TH` con `Scope: Row` a las celdas de esas columnas.
-  - **Títulos reales para la portada y el índice:** ver «Excluir un encabezado del índice» más abajo; sin
-    ello los ejemplos 04 y 09 no tienen un `H1` de título.
+  ejemplos pasan veraPDF sin ninguna regla conocida. Cabeceras de fila (`Header: true` en la `Cell`, decisión 263) y títulos reales de portada e índice (`In contents: false`, decisión 264) están hechos. Queda lo que se descartó o no se hizo:
   - **`Alt` de las imágenes:** hoy una `Image` sin `Alt` es decorativa en silencio (decisión 136, hito 18).
     Se ha decidido dejarlo; si un olvido del autor resulta ser un problema, hacer `Alt` obligatorio con `Alt:`
     vacío para las decorativas.
@@ -57,10 +52,8 @@
   en línea usa la altura de línea de la caja, no la de su fuente.
 - ~~**Referencias a páginas e índice automático**~~ (hito 22: `{page of: id}`, `{number of: id}`
   y `Contents`).
-- **Excluir un encabezado del índice**: un `Contents` lista todos los encabezados de sus niveles,
-  así que la portada y el título del propio índice (ejemplos 04 y 09) son un `Text` en vez de un
-  `Heading 1`, y pierden su marcador en el PDF. Algo como una propiedad `Contents: false` en el
-  encabezado, o una clase de exclusión.
+- ~~**Excluir un encabezado del índice**~~ (`In contents: false`, decisión 264: la portada y el título del índice de
+  los ejemplos 04 y 09 son ya `Heading 1`).
 - **Numerar los encabezados** (`1`, `1.1`…): hoy `{number of: id}` solo da el número de un ítem de
   una lista numerada, así que «la sección 4.2» no se puede escribir de un encabezado.
 - ~~**Primera página distinta / páginas con nombre**~~ (hito 24: `Pages` en `Fixed`). Queda: un

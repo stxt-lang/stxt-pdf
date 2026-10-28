@@ -198,7 +198,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   las tablas a `TableLayout`, que maqueta el grid sin fragmentar (`GridLayout.arrange`) y corta
   solo el cuerpo con `UnitBreaker`, repitiendo enteros la cabecera y el pie
   (`UnitBreaker.Repeat`). `PdfStructure` las etiqueta (`Table`, `THead`/`TBody`/`TFoot`, `TR`,
-  `TH`/`TD`); las filas repetidas son contenido solo en su primera página.
+  `TH`/`TD`; una `Cell` con `Header: true` en `Body` o `Foot` es una `TH` con `Scope: Row`, y en `Head` es el error
+  `TABLE_HEADER`); las filas repetidas son contenido solo en su primera página.
 - **Columnas (§5.16):** el builder mete el contenido de un `Multicol` en el **flujo de
   columnas**, una caja de bloque generada (`Element.COLUMNS`, fuera del documento como el
   marcador) que es su único hijo: crea un contexto de formato de bloque y su alto no es
@@ -295,7 +296,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   algo (`REFERENCE_UNSTABLE`). `References.validate` (al construir el árbol) rechaza los `Id` que
   no existen, las páginas de un `Fixed` y los números de lo que no tiene.
 - **Índice (§5.19):** `Contents` es un bloque cuyas entradas genera `ContentsBuilder` al final
-  de la construcción, con todos los encabezados ya conocidos (también los de un `Markdown`): una
+  de la construcción, con todos los encabezados ya conocidos (también los de un `Markdown`; salvo los que
+  declaran `In contents: false`, que siguen siendo encabezados pero no se listan): una
   caja `Flex` por encabezado (`Element.CONTENTS_ENTRY_1`…`6`, que las reglas `Element` nombran
   aunque no se escriban: `Element.selectable()`) con el título, la guía (una caja vacía que
   `StackingContext.paintLeader` pinta con `Leaders`, sin texto) y el número, que es un
