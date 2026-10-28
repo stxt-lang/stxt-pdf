@@ -1,0 +1,15 @@
+# Case: Element: Document con Language, que ya es el de Document
+# Code: STYLE_NOT_ALLOWED
+# Line: 14
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Language: en
+	Text: Hola

@@ -140,6 +140,11 @@ final class StyleRules {
                             + "que heredan todas las cajas: el documento no tiene " + g.getName()), fromFile);
                 });
             }
+            child(rule, "typography").ifPresent(t -> inline(t).getChildren().stream()
+                    .filter(c -> c.getCanonicalName().equals("language")).findFirst().ifPresent(l -> {
+                        throw located(error(l, ErrorCode.STYLE_NOT_ALLOWED, "Element: Document no admite Language: "
+                                + "el idioma del documento es el Language de Document"), fromFile);
+                    }));
             documentRules.add(rule);
             return;
         }

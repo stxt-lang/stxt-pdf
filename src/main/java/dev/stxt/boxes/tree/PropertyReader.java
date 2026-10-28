@@ -10,6 +10,7 @@ import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -29,6 +30,7 @@ import static dev.stxt.boxes.tree.ValueReader.colorSides;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
 import static dev.stxt.boxes.tree.ValueReader.fontFamily;
 import static dev.stxt.boxes.tree.ValueReader.integer;
+import static dev.stxt.boxes.tree.ValueReader.language;
 import static dev.stxt.boxes.tree.ValueReader.nonNegative;
 import static dev.stxt.boxes.tree.ValueReader.nonNegativeSides;
 import static dev.stxt.boxes.tree.ValueReader.paint;
@@ -109,6 +111,7 @@ final class PropertyReader {
                 case "tab-size" -> s.tabSize = positiveInteger(p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
+                case "language" -> s.locale = Locale.forLanguageTag(language(p));
                 default -> throw unread(p);
             }
         }

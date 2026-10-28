@@ -54,12 +54,10 @@ class ExamplesTest {
 
     /**
      * Reglas de PDF/UA-1 que los ejemplos todavía incumplen y no son de lo que se comprueba aquí; el resto
-     * (enlaces etiquetados, orden de tabulación, tablas, figuras…) debe cumplirse. Se quitan de aquí al
-     * arreglarlas (accesibilidad, {@code TODO.md}).
+     * debe cumplirse. Ahora ninguna: cada ejemplo, que declara PDF/UA-1 (tiene {@code Title}), lo cumple
+     * según veraPDF. Se añade aquí una regla solo con un motivo apuntado en {@code TODO.md}.
      */
-    private static final Set<String> KNOWN_UA_FAILURES = Set.of(
-            "5-1" // El XMP no declara el identificador pdfuaid:part: no se afirma la conformidad.
-    );
+    private static final Set<String> KNOWN_UA_FAILURES = Set.of();
 
     private final DocumentReader reader = new DocumentReader();
 

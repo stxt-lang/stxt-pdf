@@ -62,6 +62,9 @@ import java.util.Set;
  * bordes, las imágenes sin {@code Alt} (decorativas) y los {@code Fixed} (repetidos en cada
  * página) son <em>artifacts</em>: no forman parte del contenido.</p>
  *
+ * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, §4.4) es el
+ * {@code Lang} de su elemento, que heredan los de dentro.</p>
+ *
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
@@ -133,6 +136,10 @@ final class PdfStructure {
         PDStructureElement e = new PDStructureElement(type(box), owner);
         owner.appendKid(e);
         elements.put(box, e);
+        if (box.parent != null && !box.style.locale.equals(box.parent.style.locale)) {
+            // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
+            e.setLanguage(box.style.locale.toLanguageTag());
+        }
         if (box.headingLevel() > 0) {
             headings.add(box);
         }
@@ -315,7 +322,11 @@ final class PdfStructure {
         catalog.setMetadata(xmp);
     }
 
-    /** Paquete XMP mínimo con el título. */
+    /**
+     * Paquete XMP mínimo con el título y la declaración de PDF/UA-1 ({@code pdfuaid:part}). Solo se
+     * escribe con {@code Title}: sin título el PDF no cumple PDF/UA (el visor no puede mostrarlo en lugar
+     * del nombre del fichero) y no puede afirmarlo.
+     */
     static String xmp(String title) {
         String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
         return "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -323,6 +334,9 @@ final class PdfStructure {
                 + "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
                 + "<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n"
                 + "<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">" + escaped + "</rdf:li></rdf:Alt></dc:title>\n"
+                + "</rdf:Description>\n"
+                + "<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n"
+                + "<pdfuaid:part>1</pdfuaid:part>\n"
                 + "</rdf:Description>\n"
                 + "</rdf:RDF>\n"
                 + "</x:xmpmeta>\n"

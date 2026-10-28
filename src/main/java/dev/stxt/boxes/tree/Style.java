@@ -172,8 +172,8 @@ public final class Style {
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
     public int tabSize = 4;
     /**
-     * Configuración regional del texto: la de {@code Language} de {@code Document} (§4.1). No es una
-     * propiedad de la caja: la fija el constructor del árbol en la raíz y se hereda.
+     * Idioma y configuración regional del texto: el de {@code Language} de {@code Document} (§4.1) en
+     * la raíz y, si una caja declara {@code Language} en {@code Typography} (§4.4), el suyo. Se hereda.
      */
     public Locale locale = Locale.ROOT;
 

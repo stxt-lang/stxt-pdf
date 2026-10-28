@@ -86,7 +86,6 @@ import static dev.stxt.boxes.tree.ValueReader.sides;
 public final class BoxTreeBuilder {
 
     /** Etiqueta de idioma BCP 47: la lengua (2 o 3 letras) y subetiquetas de 1 a 8 letras o cifras. */
-    private static final Pattern LANGUAGE = Pattern.compile("[a-zA-Z]{2,3}(-[a-zA-Z0-9]{1,8})*");
 
     /**
      * Hijos de un elemento que no son propiedades suyas: los envoltorios y el texto, las clases
@@ -162,14 +161,7 @@ public final class BoxTreeBuilder {
             }
             return t;
         }).orElse(null);
-        String language = child(document, "language").map(n -> {
-            String l = n.getText().trim();
-            if (!LANGUAGE.matcher(l).matches()) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Language espera una etiqueta de idioma BCP 47 "
-                        + "(es, en-US, ca…): '" + l + "'");
-            }
-            return l;
-        }).orElse(null);
+        String language = child(document, "language").map(ValueReader::language).orElse(null);
         return new Metadata(title, language);
     }
 

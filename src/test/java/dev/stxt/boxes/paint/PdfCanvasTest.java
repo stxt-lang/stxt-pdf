@@ -209,6 +209,38 @@ class PdfCanvasTest {
         }
     }
 
+    /**
+     * Una caja que declara otro idioma lleva su {@code Lang}, que heredan los elementos de dentro; las demás no
+     * lo repiten (§4.4, §5.13).
+     */
+    @Test
+    void aBoxInAnotherLanguageHasLang() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tParagraph: Hola\n"
+                + "\tBlock:\n\t\tTypography:\n\t\t\tLanguage: en-GB\n\t\tParagraph: Hello\n\t\tText: World\n"
+                + "\tParagraph: Adiós\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "lang"))) {
+            assertEquals("es", pdf.getDocumentCatalog().getLanguage());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("P", "Div", "P"), types(document));
+            PDStructureElement english = (PDStructureElement) document.getKids().get(1);
+            assertEquals("en-GB", english.getLanguage());
+            // Lang se hereda por el árbol de estructura: los de dentro no lo repiten.
+            english.getKids().forEach(k -> assertNull(((PDStructureElement) k).getLanguage()));
+            assertNull(((PDStructureElement) document.getKids().get(0)).getLanguage());
+            assertNull(((PDStructureElement) document.getKids().get(2)).getLanguage());
+        }
+    }
+
+    /** Sin {@code Title} el PDF no cumple PDF/UA-1 (7.1) y no lo declara: no lleva metadatos XMP. */
+    @Test
+    void withoutATitleThePdfDoesNotClaimPdfUa() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(LINKS + "\tParagraph: Hola\n"), "no-title"))) {
+            assertNull(pdf.getDocumentCatalog().getMetadata());
+        }
+    }
+
     @Test
     void titleAndLanguage() throws Exception {
         InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
@@ -221,6 +253,8 @@ class PdfCanvasTest {
             assertTrue(catalog.getViewerPreferences().displayDocTitle());
             String xmp = new String(catalog.getMetadata().toByteArray(), StandardCharsets.UTF_8);
             assertTrue(xmp.contains("<rdf:li xml:lang=\"x-default\">Informe &lt;trimestral&gt; &amp; resumen</rdf:li>"), xmp);
+            // Con título, el PDF declara que es PDF/UA-1.
+            assertTrue(xmp.contains("<pdfuaid:part>1</pdfuaid:part>"), xmp);
         }
     }
 

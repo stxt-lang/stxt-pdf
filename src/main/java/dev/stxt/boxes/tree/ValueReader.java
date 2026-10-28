@@ -203,6 +203,20 @@ final class ValueReader {
         }
     }
 
+    /** Etiqueta de idioma BCP 47 (forma simple): {@code es}, {@code en-US}, {@code ca}… */
+    private static final java.util.regex.Pattern LANGUAGE = java.util.regex.Pattern
+            .compile("[a-zA-Z]{2,3}(-[a-zA-Z0-9]{1,8})*");
+
+    /** El valor de {@code Language}: una etiqueta de idioma BCP 47. */
+    static String language(Node n) {
+        String tag = n.getText().trim();
+        if (!LANGUAGE.matcher(tag).matches()) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Language espera una etiqueta de idioma BCP 47 "
+                    + "(es, en-US, ca…): '" + tag + "'");
+        }
+        return tag;
+    }
+
     static int positiveInteger(Node n) {
         int v = integer(n);
         if (v < 1) {
