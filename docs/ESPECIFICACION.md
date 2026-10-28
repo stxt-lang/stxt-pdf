@@ -1610,13 +1610,19 @@ más.
 ### 5.19 Referencias a otras cajas
 
 Un texto puede escribir un dato de otra caja del documento: `{page of: id}` es el número de la
-página donde empieza la caja con ese `Id`. Se escribe en el texto de un `Text`, un `Paragraph` o
-una `Cell` con valor, como `{page}` y `{pages}`, y se puede mezclar con ellos:
+página donde empieza la caja con ese `Id`, y `{number of: id}`, su número en el documento. Se
+escriben en el texto de un `Text`, un `Paragraph` o una `Cell` con valor, como `{page}` y
+`{pages}`, y se pueden mezclar con ellos:
 
 ```
-Text: El esquema de conexión está en la página {page of: wiring}.
+Text: El esquema de conexión está en la página {page of: wiring}; véase la cláusula {number of: pago}.
 Block:
 	Id: wiring
+List:
+	Marker: decimal
+	List item:
+		Id: pago
+		Paragraph: …
 ```
 
 - **Qué página es.** La de la **primera** caja que sale de la caja referida: si está partida entre
@@ -1640,6 +1646,14 @@ Block:
   referencia cambia de ancho con su página y mueve la caja de página en las dos direcciones. No
   pasa con documentos normales, porque un número solo cambia de ancho al cambiar de cifras
   (9 → 10, 99 → 100).
+- **Número.** Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador
+  sin el sufijo: `3`, `c`, `IV` (`decimal`, `lower-alpha`, `upper-roman`…), con el `Start` y el
+  `Number` que haya. Cada ítem da solo su propio número: para escribir «4.2», se escriben
+  los dos, `{number of: clausula}.{number of: apartado}`. Un `List item` de una lista con viñetas
+  o sin marcador, o cualquier otra caja (los encabezados no se numeran), no tiene número
+  (`REFERENCE_NOT_NUMBERED`). El número no depende de la paginación: se sustituye igual desde la
+  primera pasada. No se puede referir a un ítem escrito en un `Markdown`, porque lo generado no
+  lleva `Id`.
 - **Accesibilidad.** El texto es contenido de su elemento (`P`, `Span`…), como cualquier número.
 
 ---
@@ -1714,7 +1728,7 @@ La validación se hace en cuatro niveles:
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
 | `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
-| `REFERENCE_NOT_NUMBERED` | El número de una caja, que lo tiene | `{number of: nota}: nota no tiene número…` |
+| `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada (línea de la referencia) | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada)` |
 | `REFERENCE_UNSTABLE` | La página de las cajas referidas se estabiliza en 10 pasadas de paginación (línea de la referencia) | `La página de x no se estabiliza: tras 10 pasadas sigue cambiando…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
@@ -1844,6 +1858,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Imagen más ancha que su contenedor | Desborda (se suele evitar con `max-width: 100%`) | Error (`BOX_OVERFLOW`): se declara `Width` |
 | Imagen en un ítem estirado de flex o grid | Se estira en los dos ejes y se deforma | Su alto sale de la proporción y no se estira; su ancho, sí |
 | `alt=""` | Imagen decorativa | Sin `Alt`; un `Alt` vacío es un error |
+| Número de un ítem de lista referido desde otro sitio | `counter()` y `target-counter()` con contadores propios | `{number of: id}`: el número de su marcador, sin contadores propios ([§5.19](#519-referencias-a-otras-cajas)) |
 | Número de la página de otro elemento | Contadores (`target-counter`, solo en impresión paginada y con poco soporte) | `{page of: id}` en el texto, resuelto paginando hasta que converja ([§5.19](#519-referencias-a-otras-cajas)) |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
@@ -2060,7 +2075,7 @@ Document (dev.stxt.boxes):
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
-| **Referencia** | `{page of: id}` en un texto: la página donde empieza la caja con ese `Id` ([§5.19](#519-referencias-a-otras-cajas)). |
+| **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado) ([§5.4](#54-texto)). |

@@ -93,7 +93,7 @@ public final class References {
                     if (target.number == null) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_NUMBERED, text
                                 + ": " + r.id() + " no tiene número (solo lo tienen los ítems de una lista "
-                                + "numerada y los encabezados)");
+                                + "numerada)");
                     }
                 }
             }

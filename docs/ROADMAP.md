@@ -530,19 +530,7 @@ Contents:
 Text: El esquema de conexión está en la página {page of: wiring}.
 ```
 
-**Decisiones abiertas:**
-
-- [ ] **X11. Qué se numera con `{number of: id}`** (consecuencia de X9). *Propuesta:* no hay
-      contadores genéricos; se numera lo que ya tiene número en el documento: el ítem de una
-      lista numerada (`List item` con `Number`) y los encabezados, con su numeración
-      jerárquica («4», «4.2») si el encabezado la lleva. *Alternativa:* una propiedad `Counter`
-      en cualquier caja, más general (figuras, cláusulas, anexos) pero más pesada. Resolver
-      con el usuario al empezar esa parte del hito.
-- [ ] **X12. Convergencia (consecuencia de X3).** *Propuesta:* se pagina de nuevo mientras algún
-      texto con referencia cambie de ancho (con la medida de cada pasada como estimación de la
-      siguiente), hasta un máximo de pasadas; si no converge, error (`REFERENCE_UNSTABLE`, con
-      la línea del texto que oscila). *Alternativa:* un máximo fijo sin error, quedándose con la
-      última pasada.
+**Decisiones abiertas:** *(ninguna)*
 
 **Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada salvo X3 y X9; las
 interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
@@ -572,18 +560,26 @@ interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.m
       porque el contrato (ejemplo 07) cita «el Anexo I» y «la cláusula 4». Qué se numera, en X11.
 - [x] X10. **PDF etiquetado:** `TOC` con un `TOCI` por entrada; los marcadores no cambian. El
       enlace al destino llega con el hito 23.
+- [x] X11. **Qué se numera** (aceptada con la propuesta; al implementarla salió que los
+      encabezados no llevan número en el modelo): los ítems de las listas numeradas, con el
+      número que escribe su marcador sin sufijo (`3`, `c`, `IV`). Los encabezados no tienen
+      número; «4.2» se escribe con dos referencias (decisión 156 de `DECISIONES.md`).
+- [x] X12. **Convergencia:** se repagina mientras alguna página supuesta difiera de la real, con
+      un máximo de 10 pasadas que cambian alguna página; si no, `REFERENCE_UNSTABLE` con la línea
+      de la referencia que sigue cambiando.
 
 **Tareas:**
 
 - [x] Resolver X1–X10 (2026-10-28).
-- [ ] Resolver X11 y X12 (al empezar la parte que toca a cada una).
+- [x] Resolver X11 y X12 (2026-10-28).
 - [ ] Schema (`Contents`, `Levels`, `Leader`) y `Element`; especificación (§2, §4, §5 —
       nueva sección—, §6, §7, §8, §9, glosario y un ejemplo).
-- [ ] `{page of: id}` y `{number of: id}`: lectura en el texto; paginar de nuevo hasta que
+- [x] `{page of: id}` y `{number of: id}`: lectura en el texto; paginar de nuevo hasta que
       converjan (X3, X12); página de la primera aparición de cada `Id` en el `Paginator`.
 - [ ] `Contents`: entradas generadas en el builder, con los encabezados (también los de
       `Markdown`), y su pintado con guía.
-- [ ] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/`.
+- [x] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/references/`
+      (`REFERENCE_UNSTABLE` sin caso: lo prueba `PageReferencesTest`).
 - [ ] Tests de las piezas puras y de layout (referencia hacia delante y hacia atrás, cambio de
       dígitos, índice que ocupa páginas, encabezado en una página siguiente); caso golden
       `15-contents`.

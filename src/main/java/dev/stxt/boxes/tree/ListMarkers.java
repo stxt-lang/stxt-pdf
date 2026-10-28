@@ -25,13 +25,25 @@ final class ListMarkers {
             case NONE -> null;
             case DISC -> "•";
             case DASH -> "–";
-            case DECIMAL -> number + ".";
-            case LOWER_ALPHA -> alpha(number) + ".";
-            case UPPER_ALPHA -> alpha(number).toUpperCase() + ".";
-            case LOWER_ROMAN -> roman(number) + ".";
-            case UPPER_ROMAN -> roman(number).toUpperCase() + ".";
+            default -> number(marker, number) + ".";
         };
         return label == null ? null : label + " ";
+    }
+
+    /**
+     * El número de un ítem tal como lo escribe su numeración, sin el sufijo ({@code 3}, {@code c},
+     * {@code III}), que es lo que da {@code {number of: id}} (§5.19); {@code null} si el marcador
+     * no numera.
+     */
+    static String number(Style.Marker marker, int number) {
+        return switch (marker) {
+            case DECIMAL -> Integer.toString(number);
+            case LOWER_ALPHA -> alpha(number);
+            case UPPER_ALPHA -> alpha(number).toUpperCase();
+            case LOWER_ROMAN -> roman(number);
+            case UPPER_ROMAN -> roman(number).toUpperCase();
+            default -> null;
+        };
     }
 
     /** Si la numeración puede escribir el número: {@code decimal} desde 0, letras desde 1, romanos de 1 a 3999. */

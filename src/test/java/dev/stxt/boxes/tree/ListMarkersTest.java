@@ -40,6 +40,17 @@ class ListMarkersTest {
     }
 
     @Test
+    void theNumberHasNoSuffixAndOnlyNumberingsHaveOne() {
+        assertEquals("12", ListMarkers.number(Style.Marker.DECIMAL, 12));
+        assertEquals("c", ListMarkers.number(Style.Marker.LOWER_ALPHA, 3));
+        assertEquals("AA", ListMarkers.number(Style.Marker.UPPER_ALPHA, 27));
+        assertEquals("iv", ListMarkers.number(Style.Marker.LOWER_ROMAN, 4));
+        assertEquals("XIV", ListMarkers.number(Style.Marker.UPPER_ROMAN, 14));
+        assertNull(ListMarkers.number(Style.Marker.DISC, 1));
+        assertNull(ListMarkers.number(Style.Marker.NONE, 1));
+    }
+
+    @Test
     void ranges() {
         assertTrue(ListMarkers.inRange(Style.Marker.DECIMAL, 0));
         assertFalse(ListMarkers.inRange(Style.Marker.DECIMAL, -1));

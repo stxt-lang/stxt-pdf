@@ -834,3 +834,16 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
 155. **Las referencias se validan como cifras en las métricas reales**: un texto con
      `{page of: id}` necesita en su fuente las cifras, no las letras del marcador. *Dónde:*
      `layout/inline/PdfMetrics.check`.
+
+156. **Solo se numeran los ítems de las listas numeradas**, y el número es el del marcador sin su
+     sufijo (`3`, `c`, `IV`). Los encabezados no llevan número en el modelo, así que no hay nada
+     que referir; un `{number of: id}` de otra caja es `REFERENCE_NOT_NUMBERED`. Un número
+     jerárquico («4.2») se escribe con dos referencias. La propuesta del hito hablaba de
+     encabezados «si el encabezado lleva» número: hoy ninguno lo lleva. *Dónde:*
+     `tree/ListMarkers.number`, `Box.number`, `tree/References.validate`. *Alternativa:*
+     numerar los encabezados (una propiedad nueva) o añadir contadores genéricos.
+
+157. **`{number of: id}` no usa la paginación**: el número sale del árbol, así que se sustituye
+     desde la primera pasada, igual que las páginas supuestas. No se puede referir a un ítem de
+     un `Markdown`, porque lo generado no lleva `Id`. *Dónde:* `layout/Paginator.numbers`.
+     *Alternativa:* dar `Id` a lo generado.
