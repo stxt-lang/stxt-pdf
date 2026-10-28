@@ -24,8 +24,9 @@ public final class Resources {
     private static final Pattern DRIVE = Pattern.compile("^[A-Za-z]:");
 
     private final Path root;
-    private FontLibrary fonts;
-    private ImageLibrary images;
+    /** Se crean la primera vez que se piden y se leen sin cerrojo (comprobación doble). */
+    private volatile FontLibrary fonts;
+    private volatile ImageLibrary images;
 
     /** Recursos en {@link #DEFAULT_ROOT}. */
     public Resources() {
@@ -55,19 +56,33 @@ public final class Resources {
      *
      * @throws ResourceException si la carpeta no existe o alguna fuente no es válida
      */
-    public synchronized FontLibrary fonts() {
-        if (fonts == null) {
-            fonts = FontLibrary.scan(this);
+    public FontLibrary fonts() {
+        FontLibrary library = fonts;
+        if (library == null) {
+            synchronized (this) {
+                library = fonts;
+                if (library == null) {
+                    library = FontLibrary.scan(this);
+                    fonts = library;
+                }
+            }
         }
-        return fonts;
+        return library;
     }
 
     /** Imágenes de {@code images/}, que se leen la primera vez que se piden. */
-    public synchronized ImageLibrary images() {
-        if (images == null) {
-            images = new ImageLibrary(this);
+    public ImageLibrary images() {
+        ImageLibrary library = images;
+        if (library == null) {
+            synchronized (this) {
+                library = images;
+                if (library == null) {
+                    library = new ImageLibrary(this);
+                    images = library;
+                }
+            }
         }
-        return images;
+        return library;
     }
 
     /**

@@ -1,5 +1,6 @@
 // Sonda de QA (ROADMAP-QA-ARQ.md, TS-02): convierte los ejemplos en secuencial y con 8 hilos y compara
-// los PDF (sin fechas ni ID). Mide también la contención de un Resources compartido frente a uno por hilo.
+// los PDF (sin fechas ni ID). Mide también la contención de un Resources compartido frente a uno por hilo
+// (cuatro fases alternadas, para que el calentamiento de la JVM no favorezca a ninguno).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.paint.PdfWriter;
@@ -49,7 +50,7 @@ public class ConcurrencyProbe {
         // determinismo
         for (In in : ins) if (!Arrays.equals(base.get(in.name), norm(convert(in, shared)))) System.out.println("NO DETERMINISTA " + in.name);
 
-        for (boolean sharedRes : new boolean[]{true, false}) {
+        for (boolean sharedRes : new boolean[]{false, true, false, true}) {
             int threads = 8, rounds = 10;
             ExecutorService ex = Executors.newFixedThreadPool(threads);
             List<Future<String>> fs = new ArrayList<>();
