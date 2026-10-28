@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 32 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 33 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 32 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 33 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -92,7 +92,9 @@ actualízala.
 
 | 32 | ~~Secciones: `Section` con su `Media` (heredado por grupos), sus `Fixed` y su numeración de páginas (`Page numbering`, `Inherit fixed`); todo el contenido va dentro de una sección~~ (hecho; caso 25) | schema, `tree/Section`, `tree/BoxTreeBuilder`, `tree/StyleRules.applySection`, `layout/Paginator`, `layout/Overflow`, `fragment/Page`, `paint/PdfCanvas`, `paint/PdfStructure`, `paint/PdfDestinations`, `output/StxtDump` |
 
-Los hitos 16 a 32 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
+| 33 | ~~Numeración de los encabezados: `Numbered` en `Typography` (se hereda); `1`, `1.1`, `1.1.1` delante del título, en `{number of: id}`, el índice y los marcadores; `Numbered: false` deja un encabezado fuera~~ (hecho; caso 26) | schema, `tree/Style`, `tree/PropertyReader`, `tree/HeadingNumbers`, `tree/BoxTreeBuilder`, `tree/References` |
+
+Los hitos 16 a 33 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
 registro. Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -114,7 +116,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `SvgInspector` (lee un SVG y comprueba el subconjunto), `ResourceException` e `ImageFormatException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
@@ -180,7 +182,13 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   del que procede (`HEADING_2`) para las reglas, los marcadores y las etiquetas; el enum da
   también su `Layout`, su `Position` y si puede ser un ítem, y `ElementTest` lo compara con el
   schema. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
-  jerarquía en orden del documento. En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
+  jerarquía en orden del documento. **Numeración:** `Numbered` (`Style.numbered`, de `Typography`, así que
+  se hereda y vale en `Styles`) numera los encabezados: `HeadingNumbers` (en `BuildContext`) lleva un contador
+  por nivel en orden del documento, a través de secciones y `Markdown`, y `BoxTreeBuilder.element` escribe el
+  número delante del primer `Text` del encabezado cuando ya están leídos sus textos (`HeadingNumbers.prefix`:
+  `text` y, si los hay, un tramo `PLAIN` al principio de `runs`), de modo que lo miden el layout y lo ven el
+  índice (`headingText`), los marcadores y el PDF etiquetado sin tratarlo aparte. `Box.number` guarda el número
+  completo (`4.2`) para `{number of: id}`. Un numerado bajo un encabezado sin numerar es `HEADING_NUMBER_PARENT`. En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
   encabezado) y una caja que declara otro `Language` lleva su `Lang`. `PdfStructure` construye el árbol de estructura del PDF etiquetado
   (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.

@@ -51,8 +51,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 30 | Rotación y orientación de la página | hecho | 23 |
 | 31 | Imágenes vectoriales (SVG) | hecho | 24 |
 | 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | hecho | 25 |
+| 33 | Numeración de los encabezados (`Numbered`): `1`, `1.1`… delante del título y en `{number of: id}` | hecho | 26 |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 32, el 2026-10-28 (varios, en otras
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 33, el 2026-10-28 (varios, en otras
 sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -1363,11 +1364,101 @@ Document (dev.stxt.boxes):
 
 ---
 
+## Hito 33: numeración de los encabezados
+
+**Objetivo.** Poder escribir «la sección 4.2»: que los encabezados lleven número (`1`, `1.1`, `1.1.1`…),
+escrito delante del título, y que `{number of: id}` lo dé de un encabezado con `Id`. Es el hueco de
+[`TODO.md`](../TODO.md) «Numerar los encabezados», que salió al escribir el ejemplo 07 (contrato).
+
+**Sintaxis.**
+
+```
+Styles:
+	Element: Document
+		Typography:
+			Font: IBM Plex Sans
+			Size: 10
+			Numbered: true            # todos los niveles
+	Element: Heading 3
+		Typography:
+			Numbered: false           # …menos el tercero
+Section:
+	Heading 1:
+		Text: Portada
+		Typography:
+			Numbered: false          # este no cuenta ni lleva número
+	Heading 1:
+		Text: Resultados             # «1 Resultados»
+	Heading 2:
+		Id: ventas
+		Text: Ventas                 # «1.1 Ventas»
+	Paragraph: Véase la sección {number of: ventas}.
+```
+
+**Decisiones tomadas** (2026-10-28, por cuestionario con las propuestas; las interpretaciones, en
+[`DECISIONES.md`](DECISIONES.md), 280–284):
+
+- [x] **Qué hace:** escribe el número delante del título, lo da `{number of: id}` y lo llevan las entradas
+      del índice y los marcadores del PDF (la alternativa, solo referencia, se descartó).
+- [x] **Activación:** una propiedad en las reglas de `Styles`, no implícita ni una única del `Document`.
+      *Cambio de nombre:* el usuario eligió `Numbering`, pero ese nombre ya es de `Markdown` (marcadores de las
+      listas numeradas) y cada nombre tiene una sola definición, así que es **`Numbered`**, booleana y en
+      `Typography` (única de las tres agrupaciones de las reglas que se hereda, con lo que `Element: Document`
+      numera todo y `Numbered: false` en un encabezado lo deja fuera).
+- [x] **Formato:** solo decimal con puntos (`4.2`); los formatos por nivel, para otro hito.
+- [x] **Excepciones y secciones:** `Numbered: false` en un encabezado no lo numera ni cuenta; la cuenta sigue
+      a través de las `Section` y los `Markdown`.
+- [x] **Decidida al implementar** (sin cuestionario; a revisar): un encabezado numerado debajo de uno que no lo
+      está es un error, `HEADING_NUMBER_PARENT` (decisión 282).
+
+**Diseño técnico** (como quedó):
+
+- **Schema.** `Numbered` (BOOLEAN) en `Typography`. `Style.numbered` se hereda; `PropertyReader` la lee.
+- **Cuenta.** `tree/HeadingNumbers` (uno por documento, en `BuildContext`): contador por nivel y si el último
+  encabezado de cada nivel está numerado. `BoxTreeBuilder.element` lo llama al terminar un encabezado, con
+  los `Text` ya leídos, y en orden del documento.
+- **Texto.** `HeadingNumbers.prefix` escribe el número y un espacio delante del primer `Text` (`text` y, con
+  `Inline: markdown`, un tramo `PLAIN` al principio de `runs`) y deja el número completo en `Box.number`.
+  Así no cambia nada en layout, índice, marcadores ni PDF etiquetado.
+- **Referencias.** `References.validate` ya aceptaba cualquier caja con `Box.number`: solo cambia el mensaje de
+  `REFERENCE_NOT_NUMBERED`.
+
+**Tareas:**
+
+- [x] Resolver las decisiones (2026-10-28).
+- [x] Schema (`Numbered` en `Typography`) y especificación (§4.4, §5.13, §5.19, §6, §8 y §9).
+- [x] `Style`, `PropertyReader`, `HeadingNumbers` y su enganche en el builder.
+- [x] Error nuevo `HEADING_NUMBER_PARENT` con su fila en el §6 y su caso en `test/errors/headings/`
+      (y un caso más de `REFERENCE_NOT_NUMBERED` con un encabezado sin numerar).
+- [x] Tests: `HeadingNumbersTest` (árbol), `HeadingNumberingTest` (layout: título, `{number of: id}` e índice),
+      un test de marcadores y entrada del índice en el PDF (`PdfCanvasTest`) y `SchemaCoverageTest`.
+- [x] Caso golden `26-heading-numbers`, calculado a mano (un encabezado de ancho fijo que solo se parte en dos
+      líneas con el número delante).
+- [x] README, `CLAUDE.md`, `DECISIONES.md` (280–284), `TODO.md` y este documento.
+- [ ] No se han reescrito los ejemplos: ninguno numera hoy sus encabezados. Si se quiere, el 07 (contrato) y el
+      04 (informe) son los candidatos naturales; cambiarían PNG y volcados.
+
+---
+
 ## Registro de sesiones
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (22).** Hito 33 terminado: numeración de los encabezados, pedida por el usuario («numeremos los
+  encabezados para poder escribir "la sección 4.2"»). Se partió del estado verde (1281 tests). Cuestionario de cuatro
+  preguntas (qué hace, cómo se activa, formato, excepciones y secciones), todas con la propuesta: número delante
+  del título, en `{number of: id}`, el índice y los marcadores; propiedad en `Styles`; solo decimal con puntos;
+  `Numbered: false` y cuenta única a través de las secciones. Al ir a escribirla salió que el nombre elegido,
+  `Numbering`, ya existía en `Markdown` y que las reglas solo admiten `Box`, `Typography` y `Break`: pasó a ser
+  **`Numbered`**, booleana, en `Typography` (se hereda, así que sirve en `Element: Document`, por nivel, por clase
+  y en un solo encabezado). Decidido sin preguntar: un numerado bajo un padre sin numerar es
+  `HEADING_NUMBER_PARENT` (decisión 282; a revisar). `HeadingNumbers` cuenta en orden del documento y escribe el
+  número como parte del texto del primer `Text`, sin tocar el layout, el índice ni el PDF. Tests nuevos
+  (`HeadingNumbersTest`, `HeadingNumberingTest`, un test de PDF, dos casos del catálogo) y caso golden
+  `26-heading-numbers` (calculado a mano, pasó a la primera). Decisiones 280–284. No se reescribió ningún ejemplo.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md`; de este hito queda, si se quiere, formatos por nivel y
+  prefijos propios, el número colgado a la izquierda y numerar algún ejemplo.
 - **2026-10-28 (21).** Hito 32 terminado, en cuatro commits (decisiones; `Section`, `Media` por página y migración de
   los documentos; tests, PDF y caso golden; ejemplos y documentación). Resueltas S1–S10 con una discusión previa y
   «todas con la propuesta»: `Section` obligatoria (nada de contenido suelto en `Document`), `Id` como hijo, `Media`

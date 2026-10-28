@@ -90,6 +90,7 @@ class SchemaCoverageTest {
             Map.entry("Code font", "Code font: IBM Plex Mono"),
             Map.entry("White space", "White space: pre-wrap"),
             Map.entry("Tab size", "Tab size: 8"),
+            Map.entry("Numbered", "Numbered: true"),
             Map.entry("Widows", "Widows: 3"),
             Map.entry("Orphans", "Orphans: 3"),
             // Break

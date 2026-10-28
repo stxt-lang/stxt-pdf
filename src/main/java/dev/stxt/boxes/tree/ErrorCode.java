@@ -41,6 +41,8 @@ public enum ErrorCode {
     // --- Encabezados y párrafos ----------------------------------------------------------------
     /** Un salto en la jerarquía de encabezados: el primero no es {@code Heading 1}, o uno sube más de un nivel. */
     HEADING_LEVEL,
+    /** Un encabezado numerado ({@code Numbered}) cuyo encabezado padre no lo está: su número empieza por el del padre. */
+    HEADING_NUMBER_PARENT,
     /** Un encabezado dentro de un {@code Fixed}. */
     HEADING_IN_FIXED,
     /** Un {@code Text} de un encabezado con {@code Break}: el motor ya evita el corte. */

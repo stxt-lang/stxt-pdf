@@ -28,6 +28,8 @@ final class BuildContext {
     final Map<Box, Integer> itemNumbers = new HashMap<>();
     /** Nivel del último encabezado, en orden del documento; 0 antes del primero. */
     int headingLevel;
+    /** Los contadores de la numeración de los encabezados ({@code Numbered}, §5.13). */
+    final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Si se está construyendo el contenido de un {@code Fixed}. */
     boolean insideFixed;
     /** Si se está construyendo el contenido de un {@code Multicol}. */

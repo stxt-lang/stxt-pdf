@@ -374,6 +374,26 @@ class PdfCanvasTest {
         }
     }
 
+    /** El número de un encabezado numerado es parte de su título: también de su marcador y de su entrada del índice (§5.13). */
+    @Test
+    void theNumberOfAHeadingIsPartOfItsBookmarkAndItsContentsEntry() throws Exception {
+        InlineNode doc = reader.read(Docs.mergeStyles(LINKS
+                + "\tStyles:\n\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
+                + "\t\tElement: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
+                + "\tHeading 1:\n\t\tIn contents: false\n\t\tText: Portada\n\t\tTypography:\n\t\t\tNumbered: false\n"
+                + "\tContents:\n\t\tLevels: 1 2\n"
+                + "\tHeading 1:\n\t\tText: Uno\n"
+                + "\tHeading 2:\n\t\tText: Dos\n"));
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "numbered-headings"))) {
+            PDOutlineItem first = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild();
+            assertEquals("Portada", first.getTitle());
+            // La portada no se numera ni cuenta: Uno es el 1, y Dos, el 1.1, anidado en él.
+            PDOutlineItem one = first.getNextSibling();
+            assertEquals("1 Uno", one.getTitle());
+            assertEquals("1.1 Dos", one.getFirstChild().getTitle());
+        }
+    }
+
     /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {

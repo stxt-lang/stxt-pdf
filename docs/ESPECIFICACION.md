@@ -378,6 +378,7 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Small caps` | `true`, `false` | `false` | Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto). |
 | `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Tratamiento del espacio en blanco: con `pre` y `pre-wrap` el texto conserva sus espacios y sus saltos de línea (código, terminales, columnas alineadas). Ver [§5.4](#54-texto). |
 | `Tab size` | entero ≥ 1 | `4` | Con `White space: pre` o `pre-wrap`, las columnas de una tabulación. Ver [§5.4](#54-texto). |
+| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número (`1`, `1.1`, `1.1.1`…): se escribe delante del título y lo dan `{number of: id}`, los índices y los marcadores del PDF. Ver [§5.13](#513-encabezados-y-párrafos). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 | `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`…) | el de `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento. Ver [§5.4](#54-texto). |
@@ -1467,6 +1468,46 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
   los niveles que se quiera.
 - **Dónde:** donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de
   un `Fixed` (`HEADING_IN_FIXED`), que se repite en cada página y no forma parte del contenido.
+- **Numeración (`Numbered`).** Con `Numbered: true` el encabezado lleva número: `1`, `1.1`,
+  `1.1.1`… Como ningún estilo es implícito, se declara; es una propiedad de `Typography`, así que **se
+  hereda** y se escribe donde convenga: en `Element: Document` numera todos los niveles, en una regla
+  `Element: Heading 1` solo los de ese nivel, en una regla `For class` los de una clase, y en la
+  `Typography` de un encabezado, solo en él (`Numbered: false` lo deja sin número).
+
+  ```
+  Styles:
+  	Element: Document
+  		Typography:
+  			Numbered: true
+  Heading 1:
+  	Id: portada
+  	Text: Informe del trimestre
+  	Typography:
+  		Numbered: false
+  Heading 1:
+  	Text: Resultados            # «1 Resultados»
+  Heading 2:
+  	Id: ventas
+  	Text: Ventas                # «1.1 Ventas»
+  Paragraph: Los datos de la sección {number of: ventas} lo confirman.
+  ```
+
+  - **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus
+    encabezados `#`, `##`… se numeran como los demás), con un contador por nivel: sube con cada
+    encabezado numerado de ese nivel y vuelve a 0 con cualquier encabezado de un nivel superior,
+    esté numerado o no. El número es el de los niveles 1 a N unidos por puntos, en decimal. Un
+    encabezado sin numerar no cuenta ni lleva número.
+  - **Su padre también.** Como el número de un `Heading 2` empieza por el de su `Heading 1`, un
+    encabezado numerado debajo de uno que no lo está es un error (`HEADING_NUMBER_PARENT`), con la
+    línea del hijo: si la portada (un `Heading 1` sin número) tiene `Heading 2` debajo, o se numera
+    la portada o se dejan sin número.
+  - **Se escribe delante del título.** El número y un espacio van delante del primer `Text` del
+    encabezado, como si el autor los hubiera escrito: miden lo que escriben, el texto puede pasar a
+    una línea más y lo ven el índice (`Contents`, [§5.19](#519-referencias-a-otras-cajas)), los
+    marcadores y el PDF etiquetado. Un `Transform` no los cambia (son dígitos).
+  - **Se puede referir.** `{number of: id}` de un encabezado con `Id` y numerado da su número
+    completo (`1.1`): «la sección {number of: ventas}» escribe «la sección 1.1»
+    ([§5.19](#519-referencias-a-otras-cajas)).
 
 **Salida PDF.** El PDF va **etiquetado** (*tagged PDF*, para accesibilidad) y lleva
 **marcadores** (*outline*):
@@ -2047,12 +2088,14 @@ List:
   (9 → 10, 99 → 100).
 - **Número.** Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador
   sin el sufijo: `3`, `c`, `IV` (`decimal`, `lower-alpha`, `upper-roman`…), con el `Start` y el
-  `Number` que haya. Cada ítem da solo su propio número: para escribir «4.2», se escriben
-  los dos, `{number of: clausula}.{number of: apartado}`. Un `List item` de una lista con viñetas
-  o sin marcador, o cualquier otra caja (los encabezados no se numeran), no tiene número
+  `Number` que haya. Cada ítem da solo su propio número: para escribir «4.2» de una lista anidada, se escriben
+  los dos, `{number of: clausula}.{number of: apartado}`. También lo tienen los encabezados con
+  `Numbered: true` ([§5.13](#513-encabezados-y-párrafos)), y su número es el completo (`4.2`: sus
+  niveles unidos por puntos). Un `List item` de una lista con viñetas o sin marcador, un
+  encabezado sin numerar o cualquier otra caja no tiene número
   (`REFERENCE_NOT_NUMBERED`). El número no depende de la paginación: se sustituye igual desde la
-  primera pasada. No se puede referir a un ítem escrito en un `Markdown`, porque lo generado no
-  lleva `Id`.
+  primera pasada. No se puede referir a un ítem ni a un encabezado escrito en un `Markdown`,
+  porque lo generado no lleva `Id`.
 - **Accesibilidad.** El texto es contenido de su elemento (`P`, `Span`…), como cualquier número.
 
 **Índice.** Un `Contents` es un bloque en flujo, sin hijos, que genera una **entrada por
@@ -2068,7 +2111,7 @@ Contents:
 ```
 
 - **Cada entrada** es una caja `Flex` generada, en una fila, con tres cajas: el **título**, que
-  es el texto del encabezado (sus `Text` unidos por un espacio y sin formato en línea); la
+  es el texto del encabezado, con su número si lo lleva ([§5.13](#513-encabezados-y-párrafos)), sus `Text` unidos por un espacio y sin formato en línea; la
   **guía**, que crece hasta llenar el hueco, con 4 pt a cada lado; y el **número de página**, que
   es un `{page of: …}` del encabezado, y se resuelve igual que el de cualquier otra referencia
   (paginando hasta que converja). Un encabezado sin `Id` se refiere con un nombre generado.
@@ -2288,6 +2331,7 @@ La validación se hace en cuatro niveles:
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
 | `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
+| `HEADING_NUMBER_PARENT` | Un encabezado numerado (`Numbered: true`) tiene el encabezado de su nivel superior numerado, porque su número empieza por el de él ([§5.13](#513-encabezados-y-párrafos)) | `Un Heading 2 numerado necesita que su encabezado padre (Heading 1) también lo esté…` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
 | `PARAGRAPH_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content` (línea de la línea en blanco) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |
@@ -2316,7 +2360,7 @@ La validación se hace en cuatro niveles:
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
 | `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
 | `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno ni en una página sin número (`Page numbering: none`) | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
-| `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada (línea de la referencia) | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada)` |
+| `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada o un encabezado con `Numbered: true` (línea de la referencia) | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada y los encabezados con Numbered: true)` |
 | `REFERENCE_UNSTABLE` | La página de las cajas referidas se estabiliza en 10 pasadas de paginación (línea de la referencia) | `La página de x no se estabiliza: tras 10 pasadas sigue cambiando…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
@@ -2462,6 +2506,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Tabla de contenido | La genera un script o una librería a partir del HTML; con CSS paginado, `target-counter()` para los números | `Contents`: una entrada por encabezado, con guía y páginas, generada por el motor ([§5.19](#519-referencias-a-otras-cajas)) |
 | Número de un ítem de lista referido desde otro sitio | `counter()` y `target-counter()` con contadores propios | `{number of: id}`: el número de su marcador, sin contadores propios ([§5.19](#519-referencias-a-otras-cajas)) |
 | Enlaces | `<a href>` en línea, con cualquier URL (también relativas, `javascript:`, `tel:`…), con aspecto propio del navegador | Propiedad `Link` de una caja, que la hace clicable entera, o `[texto](destino)` de Markdown, que subraya el tramo; solo `https://`, `http://`, `mailto:` y `#id`; sin aspecto por defecto en una caja ([§5.20](#520-enlaces)) |
+| Encabezados numerados (`1`, `1.1`…) | Contadores con `counter-increment`, `counter-reset` y `::before { content: counters(…) }` por nivel | `Numbered` en `Typography` (se hereda), con un contador por nivel que el motor lleva solo, el número escrito delante del título y en `{number of: id}`, el índice y los marcadores; solo decimal con puntos ([§5.13](#513-encabezados-y-párrafos)) |
 | Número de la página de otro elemento | Contadores (`target-counter`, solo en impresión paginada y con poco soporte) | `{page of: id}` en el texto, resuelto paginando hasta que converja ([§5.19](#519-referencias-a-otras-cajas)) |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
@@ -2508,7 +2553,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Numbered`, `Widows`, `Orphans`, `Language` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* (los de dentro de una `Section`) son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,

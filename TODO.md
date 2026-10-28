@@ -54,8 +54,9 @@
   y `Contents`).
 - ~~**Excluir un encabezado del índice**~~ (`In contents: false`, decisión 264: la portada y el título del índice de
   los ejemplos 04 y 09 son ya `Heading 1`).
-- **Numerar los encabezados** (`1`, `1.1`…): hoy `{number of: id}` solo da el número de un ítem de
-  una lista numerada, así que «la sección 4.2» no se puede escribir de un encabezado.
+- ~~**Numerar los encabezados** (`1`, `1.1`…)~~ (hito 33: `Numbered` en `Typography`, decisiones 280–284). Queda: formatos por nivel
+  (romanos, letras para los anexos), prefijos y sufijos propios (`Anexo A.`), número colgado a la izquierda
+  (hoy va dentro del texto) y referir los encabezados de un `Markdown`.
 - ~~**Primera página distinta / páginas con nombre**~~ (hito 24: `Pages` en `Fixed`; hito 32: `Section`, que
   da la portada con otro margen, la numeración que no la cuenta y el tamaño o la orientación por sección).
   Queda: empezar un `Section` en página impar con una página en blanco para imprimir a doble cara

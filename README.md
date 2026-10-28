@@ -95,7 +95,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 32 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 33 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -105,6 +105,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 32 están termin
 | Reglas reutilizables (`Styles`): por tipo de elemento (`Element`), clase (`For class`) e id (`For id`), con prioridad fija; la tipografía base va en `Element: Document` | Hecho y probado |
 | Documento de estilos aparte (raíz `Styles`): se lee con `DocumentReader.readStyles` y se pasa al maquetar; sus reglas valen menos que las del documento; opcional, sin búsqueda de ficheros | Hecho y probado |
 | Encabezados (`Heading 1`…`Heading 6`, con jerarquía validada y corte evitado) y párrafos (`Paragraph`) | Hecho y probado |
+| Numeración de los encabezados (`Numbered` en `Typography`, se hereda): `1`, `1.1`, `1.1.1` escrito delante del título y en `{number of: id}`, el índice y los marcadores | Hecho y probado |
 | Listas (`List`, `List item`): viñetas y numeraciones, marcador alineado con la primera línea, listas anidadas y partidas entre páginas | Hecho y probado |
 | Tablas (`Table`, `Head`, `Body`, `Foot`, `Row`, `Cell`): columnas con las pistas de grid, `Span`, cabecera y pie repetidos en cada página | Hecho y probado |
 | Bloques en columnas (`Multicol`): `Count`, `Column width`, `Column gap`, línea entre columnas, equilibrado (`Fill`), cortes de columna y continuación en la página siguiente | Hecho y probado |
@@ -195,8 +196,9 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 30. ~~**Rotación y orientación de la página.** `Rotate` y `Rotate origin` en `Relative`, `Absolute`, `Fixed` e `Image`; `Paper` y `Orientation` en `Media` (caso 23).~~ Hecho.
 31. ~~**Imágenes vectoriales (SVG).** `Image` admite SVG (formas, rutas, grupos, degradados, recortes, trazos y texto con las fuentes de `fonts/`), dibujado con JSVG y `pdfbox-graphics2d` como vectores del PDF; ninguna referencia externa (caso 24).~~ Hecho.
 32. ~~**Secciones.** `Section`: partes independientes del documento, cada una con su `Media` (heredado por grupos del del documento), sus `Fixed` y su numeración de páginas (`Page numbering`: `continue`, `restart`, `none`); los `Fixed` del documento salen en todas las secciones que los heredan (`Inherit fixed`). La portada a sangre, sin número y sin pie es una sección (caso 25).~~ Hecho.
+33. ~~**Numeración de los encabezados.** Propiedad `Numbered` en `Typography` (se hereda): `1`, `1.1`, `1.1.1` escrito delante del título, que también dan `{number of: id}` («la sección 4.2»), el índice y los marcadores del PDF; con `Numbered: false` un encabezado (la portada) no se numera ni cuenta (caso 26).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 32 están en
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 33 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).

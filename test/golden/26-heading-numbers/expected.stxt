@@ -1,0 +1,20 @@
+# Página 1: cover en 20; toc en 32, de 4 entradas de 12; intro en 32 + 48 + 8 = 88; method, data, fine y
+# ref cada 12 desde 100; results en 148, de 2 líneas por el número que lleva delante.
+Result:
+	Page: 1
+		Fragment: cover
+			Rect: 20 20 260 12
+		Fragment: toc
+			Rect: 20 32 260 48
+		Fragment: intro
+			Rect: 20 88 260 12
+		Fragment: method
+			Rect: 20 100 260 12
+		Fragment: data
+			Rect: 20 112 260 12
+		Fragment: fine
+			Rect: 20 124 260 12
+		Fragment: ref
+			Rect: 20 136 260 12
+		Fragment: results
+			Rect: 20 148 95 24

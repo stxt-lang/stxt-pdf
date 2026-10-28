@@ -171,6 +171,8 @@ public final class Style {
     public WhiteSpace whiteSpace = WhiteSpace.NORMAL;
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
     public int tabSize = 4;
+    /** {@code Numbered}: si los encabezados se numeran (§5.13). Se hereda: la lee el encabezado. */
+    public boolean numbered;
     /**
      * Idioma y configuración regional del texto: el de {@code Language} de {@code Document} (§4.1) en
      * la raíz y, si una caja declara {@code Language} en {@code Typography} (§4.4), el suyo. Se hereda.
@@ -307,6 +309,7 @@ public final class Style {
             s.smallCaps = parent.smallCaps;
             s.whiteSpace = parent.whiteSpace;
             s.tabSize = parent.tabSize;
+            s.numbered = parent.numbered;
             s.locale = parent.locale;
             s.widows = parent.widows;
             s.orphans = parent.orphans;

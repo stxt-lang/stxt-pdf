@@ -1,0 +1,22 @@
+# Case: Encabezado numerado bajo uno que no lo está
+# Code: HEADING_NUMBER_PARENT
+# Line: 21
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Numbered: true
+	Section:
+		Heading 1:
+			Text: Portada
+			Typography:
+				Numbered: false
+		Heading 2:
+			Text: Sección

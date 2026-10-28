@@ -109,6 +109,7 @@ final class PropertyReader {
                 case "small-caps" -> s.smallCaps = bool(p);
                 case "white-space" -> s.whiteSpace = enumValue(Style.WhiteSpace.class, p);
                 case "tab-size" -> s.tabSize = positiveInteger(p);
+                case "numbered" -> s.numbered = bool(p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
                 case "language" -> s.locale = Locale.forLanguageTag(language(p));

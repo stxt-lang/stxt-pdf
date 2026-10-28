@@ -1685,3 +1685,37 @@ interpretaciones que salieron al implementarlas.
      `Absolute` (lo que era el propio `Absolute`). Los volcados solo pierden el `cover-spacer`; los PNG de la
      portada no cambian y los de las páginas interiores dicen «Página 1 de 6» y el índice, los números impresos. El
      ejemplo 07 (contrato) no cambia: no tiene portada y su `Pages: not-first` sigue valiendo.
+
+280. **`Numbered` es una propiedad de `Typography`, booleana y heredable** (hito 33). Una propiedad propia del
+     encabezado no se podría escribir en una regla `Element: Heading 2`, porque las reglas solo admiten `Box`,
+     `Typography` y `Break`; y de `Typography` sale gratis la herencia: `Element: Document` numera todo, una regla
+     por nivel o por clase numera lo que nombre, y `Numbered: false` en el `Typography` de un encabezado lo deja
+     fuera (la portada, el título del índice). Se llama `Numbered` y no `Numbering`, que ya es de `Markdown`
+     (marcadores de las listas numeradas): cada nombre tiene una sola definición en el namespace. Un `Text` o un
+     `Block` que hereda `Numbered: true` no hace nada: solo lo lee un encabezado. *Dónde:* schema, `tree/Style`,
+     `tree/PropertyReader`. *Alternativa:* `Numbering: decimal` en cada regla, con formato por nivel.
+
+281. **Solo decimal con puntos (`1`, `1.1`, `1.1.1`).** Un contador por nivel que sube con cada encabezado numerado
+     de ese nivel y vuelve a 0 con cualquier encabezado de un nivel superior, numerado o no. Cuenta a través de las
+     `Section` y de los `Markdown` (el documento es uno, decisión 274). Quedan fuera los formatos por nivel
+     (romanos, letras para los anexos) y los prefijos y sufijos propios (`Anexo A.`, `§ 4.2`).
+     *Dónde:* `tree/HeadingNumbers`. *Alternativa:* un formato por nivel con los valores de `Marker`.
+
+282. **Un encabezado numerado debajo de uno que no lo está es un error** (`HEADING_NUMBER_PARENT`, con la línea del
+     hijo). El número de un `Heading 2` empieza por el de su `Heading 1`: si el padre no tiene, no hay un
+     número que sea «correcto» (`0.1`, `.1` o `1` a secas serían inventos). Se dice al autor que numere el padre o
+     deje sin numerar el hijo. Un nivel 1 sin numerar no se ve afectado (no tiene padre). *Dónde:*
+     `tree/HeadingNumbers.next`. *Alternativa:* omitir en silencio los niveles sin número.
+
+283. **El número es parte del texto del primer `Text` del encabezado**, escrito delante con un espacio, no una caja
+     generada como el marcador de una lista. Así lo miden el layout y el reparto en líneas, lo ven el índice, los
+     marcadores y el PDF etiquetado sin tocar nada, y un encabezado largo envuelve bajo el número (no hay sangría
+     francesa). Consecuencias asumidas: el espacio es normal y puede cortar la línea justo después del número;
+     `Transform` no lo cambia (son dígitos), `Letter spacing` y `Small caps` sí lo afectan; `ActualText` del PDF
+     etiquetado lo incluye. *Dónde:* `tree/HeadingNumbers.prefix`. *Alternativa:* una caja `HEADING_NUMBER`
+     colgada a la izquierda, como `MarkerLayout`, que alinearía los títulos pero obligaría a un hueco fijo.
+
+284. **`{number of: id}` de un encabezado da su número completo (`4.2`)**, el mismo que lleva escrito, y no el de su
+     último nivel como el de un `List item`. Es el uso que pidió el usuario («la sección 4.2»). Un encabezado sin
+     numerar sigue siendo `REFERENCE_NOT_NUMBERED`. Los encabezados de un `Markdown` se numeran pero no se pueden
+     referir (no llevan `Id`). *Dónde:* `tree/References.validate`, `Box.number`.

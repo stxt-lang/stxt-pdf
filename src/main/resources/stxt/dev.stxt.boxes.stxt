@@ -889,7 +889,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Fuente, tamaño, interlineado, alineación, color e idioma del texto, y viudas y huérfanas. Se hereda.
+		Description: Fuente, tamaño, interlineado, alineación, color e idioma del texto, numeración de los encabezados, y viudas y huérfanas. Se hereda.
 		Children:
 			Child: Font
 				Max: 1
@@ -924,6 +924,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Orphans
 				Max: 1
 			Child: Language
+				Max: 1
+			Child: Numbered
 				Max: 1
 	Node: Break
 		Type: GROUP
@@ -1105,6 +1107,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Tab size
 		Type: INTEGER
 		Description: Con White space pre o pre-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
+	Node: Numbered
+		Type: BOOLEAN
+		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: Element: Document lo activa en todos, una regla Element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
 	Node: Widows
 		Type: INTEGER
 		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.
