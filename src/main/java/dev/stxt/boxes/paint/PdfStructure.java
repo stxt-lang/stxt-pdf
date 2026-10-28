@@ -104,8 +104,8 @@ final class PdfStructure {
             box.children.forEach(child -> build(child, parent));
             return;
         }
-        if (box.isImage() && box.style.alt == null) {
-            // Decorativa: no tiene elemento y se pinta como artifact.
+        if (box.isImage() && box.style.alt == null || box.element == Element.CONTENTS_LEADER) {
+            // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
             return;
         }
         PDStructureElement e = new PDStructureElement(type(box), parent);
@@ -282,6 +282,10 @@ final class PdfStructure {
             case TABLE -> "Table";
             case CELL -> group(box) == 0 ? "TH" : "TD";
             case IMAGE -> "Figure";
+            case CONTENTS -> "TOC";
+            case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,
+                 CONTENTS_ENTRY_6 -> "TOCI";
+            case CONTENTS_TITLE, CONTENTS_PAGE -> "Span";
             default -> "Div";
         };
     }

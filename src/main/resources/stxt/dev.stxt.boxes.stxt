@@ -36,6 +36,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -83,6 +84,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -309,6 +311,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Paragraph
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -354,6 +357,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -391,6 +395,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -426,6 +431,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -461,6 +467,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -506,6 +513,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: List
 			Child: Markdown
 				Max: 1
+			Child: Contents
+				Max: 1
 			Child: Image
 				Max: 1
 			Child: Table
@@ -548,6 +557,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: List
 			Child: Markdown
+				Max: 1
+			Child: Contents
 				Max: 1
 			Child: Image
 				Max: 1
@@ -632,6 +643,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Paragraph
 			Child: List
 			Child: Markdown
+			Child: Contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -661,6 +673,24 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Content
 				Min: 1
+				Max: 1
+	Node: Contents
+		Type: GROUP
+		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas Element 'Contents entry 1' a 'Contents entry 6'.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Levels
+				Max: 1
+			Child: Leader
 				Max: 1
 	Node: Image
 		Type: INLINE
@@ -1062,3 +1092,15 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Values:
 			Value: equal
 			Value: auto
+
+	# Contents
+
+	Node: Levels
+		Description: Niveles de encabezado que lista un Contents: el primero y el último, de 1 a 6 (por defecto, 1 3).
+	Node: Leader
+		Type: ENUM
+		Description: Guía entre el título y la página de las entradas de un Contents: dots (puntos, por defecto), rule (una línea) o none.
+		Values:
+			Value: dots
+			Value: rule
+			Value: none

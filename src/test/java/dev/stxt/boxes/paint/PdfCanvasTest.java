@@ -382,6 +382,32 @@ class PdfCanvasTest {
     }
 
     /**
+     * Un índice (§5.19) es un {@code TOC} con un {@code TOCI} por entrada (título y número, dos
+     * {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada
+     * encabezado, también la de un encabezado de un Markdown.
+     */
+    @Test
+    void contentsIsATocWithOneTociPerEntry() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tContents:\n\t\tLevels: 1 2\n"
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\t# Uno\n\n\t\t\tTexto.\n"
+                + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 250\n"
+                + "\tHeading 1:\n\t\tText: Dos\n\tHeading 2:\n\t\tText: Dos punto uno\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "contents"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));
+            PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
+            assertEquals(List.of("TOCI", "TOCI", "TOCI"), types(toc));
+            assertEquals(List.of("Span", "Span"), types((PDStructureElement) toc.getKids().get(0)));
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("Uno"), text);
+            assertTrue(text.matches("(?s).*Dos punto uno\\s*2.*"), text);
+        }
+    }
+
+    /**
      * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox};
      * sin él, y en un {@code Fixed}, es un artifact (§5.18). Cada fichero se incrusta una vez.
      */

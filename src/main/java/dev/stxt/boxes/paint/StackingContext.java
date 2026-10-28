@@ -7,6 +7,7 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -204,8 +205,23 @@ public final class StackingContext {
     private static void paintContent(Canvas canvas, Piece p) {
         if (p.f().box().isImage()) {
             canvas.image(p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()));
+        } else if (p.f().box().element == Element.CONTENTS_LEADER) {
+            paintLeader(canvas, p);
         } else {
             paintText(canvas, p);
+        }
+    }
+
+    /**
+     * La guía de una entrada de índice (§5.19): puntos o una línea sobre la línea base del texto
+     * de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
+     */
+    private static void paintLeader(Canvas canvas, Piece p) {
+        Style s = p.f().box().style;
+        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        double baseline = canvas.vertical(s.fontFace()).baseline(content.y(), s.usedLineHeight(), s.fontSize);
+        for (Rect shape : Leaders.shapes(s.contentsLeader, content, baseline, s.fontSize)) {
+            canvas.background(shape, s.color);
         }
     }
 

@@ -28,12 +28,12 @@ final class Nodes {
 
     /** Si el nodo es un elemento de caja. */
     static boolean isElement(Node n) {
-        return Element.of(n.getCanonicalName()).isPresent();
+        return Element.of(n.getCanonicalName()).filter(Element::isWritten).isPresent();
     }
 
     /** Si el nodo es el elemento de un {@code Item} o un {@code Area}. */
     static boolean isItemElement(Node n) {
-        return Element.of(n.getCanonicalName()).filter(Element::canBeItem).isPresent();
+        return Element.of(n.getCanonicalName()).filter(Element::isWritten).filter(Element::canBeItem).isPresent();
     }
 
     /** Primer hijo con ese nombre canónico. */

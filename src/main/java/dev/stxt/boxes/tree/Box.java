@@ -43,6 +43,11 @@ public final class Box {
      */
     public String image;
     /**
+     * Nombre con que se refiere a la caja un índice (§5.19) cuando no tiene {@code Id}: el de un
+     * encabezado que lista un {@code Contents}. {@code null} en el resto.
+     */
+    public String anchor;
+    /**
      * Número de la caja en el documento, tal como lo da {@code {number of: id}}
      * (ESPECIFICACION.md §5.19); {@code null} si no tiene.
      */
@@ -72,6 +77,11 @@ public final class Box {
         this.style = style;
         this.anonymous = anonymous;
         this.line = line;
+    }
+
+    /** Cómo la nombra una referencia (§5.19): su {@code Id} o, si no tiene, su {@link #anchor}; puede ser {@code null}. */
+    public String key() {
+        return id != null ? id : anchor;
     }
 
     /** Nivel de un encabezado ({@code Heading 1} … {@code Heading 6}); 0 si no lo es. */

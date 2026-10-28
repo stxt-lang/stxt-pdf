@@ -43,7 +43,7 @@ public final class References {
         box.children.forEach(child -> collect(child, sites));
     }
 
-    /** Las cajas con {@code Id} de un árbol, por su {@code Id}. */
+    /** Las cajas que se pueden referir (con {@code Id}, o encabezados de un índice) de un árbol, por su {@link Box#key}. */
     public static Map<String, Box> byId(Box root) {
         Map<String, Box> boxes = new LinkedHashMap<>();
         index(root, boxes);
@@ -51,8 +51,8 @@ public final class References {
     }
 
     private static void index(Box box, Map<String, Box> boxes) {
-        if (box.id != null) {
-            boxes.put(box.id, box);
+        if (box.key() != null) {
+            boxes.put(box.key(), box);
         }
         box.children.forEach(child -> index(child, boxes));
     }

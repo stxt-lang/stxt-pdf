@@ -82,6 +82,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
 | `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)) | Su texto en `Content` |
 | `Image` | Imagen PNG o JPEG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
+| `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
@@ -90,7 +91,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 
 **Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
 flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
-encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Image` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
+encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
 ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Area` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor. `Head`, `Body`, `Foot` y
@@ -247,8 +248,8 @@ definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-d
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Area`
 ([§4.8](#48-item-y-area)), las de posicionamiento ([§4.9](#49-posicionamiento)), las de las
 listas ([§4.11](#411-listas)), las de las tablas ([§4.12](#412-tablas)), las de los bloques en
-columnas ([§4.13](#413-bloques-en-columnas)), las de `Markdown` ([§4.14](#414-markdown)) y las de las
-imágenes ([§4.15](#415-imágenes)).
+columnas ([§4.13](#413-bloques-en-columnas)), las de `Markdown` ([§4.14](#414-markdown)), las de las
+imágenes ([§4.15](#415-imágenes)) y las del índice ([§4.16](#416-índice)).
 
 ```
 Text: Resultados del trimestre
@@ -550,6 +551,22 @@ Propiedades del elemento `Image`, hijas directas suyas ([§5.18](#518-imágenes)
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG o JPEG: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura del PDF etiquetado; sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+
+No van en las reglas de `Styles`, que solo admiten los grupos.
+
+### 4.16 Índice
+
+Propiedades del elemento `Contents`, hijas directas suyas ([§5.19](#519-referencias-a-otras-cajas)).
+Admite además `Id`, `Class`, `Box`, `Typography` y `Break`, como un `Block`, y no tiene hijos:
+sus entradas las genera el motor.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. |
+| `Leader` | `dots`, `rule`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, nada o una línea. |
+
+Las entradas se estilan con reglas `Element: Contents entry 1` … `Contents entry 6`, una por nivel
+de encabezado ([§4.10](#410-reglas-reutilizables-styles)).
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -1656,6 +1673,40 @@ List:
   lleva `Id`.
 - **Accesibilidad.** El texto es contenido de su elemento (`P`, `Span`…), como cualquier número.
 
+**Índice.** Un `Contents` es un bloque en flujo, sin hijos, que genera una **entrada por
+encabezado** de los niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los
+de un `Markdown` y los que están después del propio índice. Se admite donde va un `Markdown`:
+
+```
+Contents:
+	Levels: 1 2
+	Leader: dots
+```
+
+- **Cada entrada** es una caja `Flex` generada, en una fila, con tres cajas: el **título**, que
+  es el texto del encabezado (sus `Text` unidos por un espacio y sin formato en línea); la
+  **guía**, que crece hasta llenar el hueco, con 4 pt a cada lado; y el **número de página**, que
+  es un `{page of: …}` del encabezado, y se resuelve igual que el de cualquier otra referencia
+  (paginando hasta que converja). Un encabezado sin `Id` se refiere con un nombre generado.
+  Sin guía (`Leader: none`), el título llena el hueco. Si el título no cabe en una línea, se
+  parte, y el número queda en la primera línea.
+- **Guía.** Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al
+  número; con `rule`, una línea de 0,05 veces el cuerpo, de un lado al otro del hueco. Se pintan
+  sobre la línea base de la entrada y con el color del texto, como fondos (*artifacts*).
+- **Estilo.** La entrada hereda la tipografía del `Contents`; sus cajas, la de la entrada. Las
+  reglas `Element: Contents entry 1` … `Contents entry 6` dan `Box`, `Typography` y `Break` a las
+  entradas de un nivel: la sangría de cada nivel es su `Padding` izquierdo, y el espacio entre
+  entradas, su `Margin` o su `Padding` vertical. Las propias entradas no llevan `Id` ni `Class`.
+- **Errores.** Un `Contents` sin ningún encabezado en sus niveles (`CONTENTS_EMPTY`, con la línea del
+  `Contents`); un `Levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`); un
+  `Contents` sin `Font` o sin `Size` propios o heredados (`TEXT_WITHOUT_FONT` y
+  `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Contents`).
+- **PDF etiquetado.** Un `TOC` con un `TOCI` por entrada, cada uno con dos `Span` (el título y el
+  número); la guía no es contenido. Los marcadores no cambian ([§5.13](#513-encabezados-y-párrafos)).
+  El enlace de cada entrada a su destino llega con los enlaces.
+- **Volcado ([§7](#7-formato-de-resultados)).** Solo sale el `Contents`, si tiene `Id`: sus
+  entradas no.
+
 ---
 
 ## 6. Validación
@@ -1693,12 +1744,12 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
-| `TEXT_WITHOUT_FONT` | El texto necesita `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
+| `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Document` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Document` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
@@ -1726,6 +1777,7 @@ La validación se hace en cuatro niveles:
 | `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
+| `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
 | `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
 | `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
 | `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada (línea de la referencia) | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada)` |
@@ -1858,6 +1910,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Imagen más ancha que su contenedor | Desborda (se suele evitar con `max-width: 100%`) | Error (`BOX_OVERFLOW`): se declara `Width` |
 | Imagen en un ítem estirado de flex o grid | Se estira en los dos ejes y se deforma | Su alto sale de la proporción y no se estira; su ancho, sí |
 | `alt=""` | Imagen decorativa | Sin `Alt`; un `Alt` vacío es un error |
+| Tabla de contenido | La genera un script o una librería a partir del HTML; con CSS paginado, `target-counter()` para los números | `Contents`: una entrada por encabezado, con guía y páginas, generada por el motor ([§5.19](#519-referencias-a-otras-cajas)) |
 | Número de un ítem de lista referido desde otro sitio | `counter()` y `target-counter()` con contadores propios | `{number of: id}`: el número de su marcador, sin contadores propios ([§5.19](#519-referencias-a-otras-cajas)) |
 | Número de la página de otro elemento | Contadores (`target-counter`, solo en impresión paginada y con poco soporte) | `{page of: id}` en el texto, resuelto paginando hasta que converja ([§5.19](#519-referencias-a-otras-cajas)) |
 | Grid `dense` | Sí | No |
@@ -1896,6 +1949,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Cell` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
+| `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `INLINE` | `Id`, `Class`, `Box`, `Break`, `Alt`, `Fit` |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
@@ -1906,12 +1960,12 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
-`List`, `Table`, `Multicol`, `Markdown`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; las de valores
-cerrados (`Table columns` y `Fit` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering` y `Alt` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
+cerrados (`Table columns`, `Fit` y `Leader` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels` y `Alt` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
@@ -2075,6 +2129,7 @@ Document (dev.stxt.boxes):
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
+| **Índice** | Elemento `Contents`: una entrada por encabezado con su título, una guía y su página ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |

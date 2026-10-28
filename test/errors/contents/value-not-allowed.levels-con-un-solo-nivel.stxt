@@ -1,0 +1,14 @@
+# Case: Levels con un solo número
+# Code: VALUE_NOT_ALLOWED
+# Line: 14
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Heading 1:
+		Text: Uno
+	Contents:
+		Levels: 2

@@ -3,6 +3,7 @@ package dev.stxt.boxes.tree;
 import dev.stxt.Node;
 import dev.stxt.boxes.model.TextRun;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -31,6 +32,8 @@ final class BuildContext {
     boolean insideFixed;
     /** Si se está construyendo el contenido de un {@code Multicol}. */
     boolean insideMulticol;
+    /** Los {@code Contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
+    final List<Box> contents = new ArrayList<>();
     /** Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo (§5.4). */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
 

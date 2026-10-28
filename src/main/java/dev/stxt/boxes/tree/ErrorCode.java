@@ -100,6 +100,10 @@ public enum ErrorCode {
     /** Las páginas a las que se refiere el texto no se estabilizan: cada pasada de paginación las cambia. */
     REFERENCE_UNSTABLE,
 
+    // --- Índice -------------------------------------------------------------------------------
+    /** Un {@code Contents} sin ningún encabezado en los niveles de {@code Levels}. */
+    CONTENTS_EMPTY,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,

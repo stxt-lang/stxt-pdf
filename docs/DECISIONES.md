@@ -847,3 +847,34 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      desde la primera pasada, igual que las páginas supuestas. No se puede referir a un ítem de
      un `Markdown`, porque lo generado no lleva `Id`. *Dónde:* `layout/Paginator.numbers`.
      *Alternativa:* dar `Id` a lo generado.
+
+158. **Las entradas del índice son cajas generadas al final de la construcción**, cuando se
+     conocen todos los encabezados (también los de un `Markdown` y los posteriores al índice).
+     Cada una es un `Flex` con tres cajas (título, guía, número) que cuelgan del `Contents`;
+     el número es un `{page of: …}` como el que escribiría el autor, así que no hay un mecanismo
+     aparte para las páginas del índice. Un encabezado sin `Id` recibe un nombre generado
+     (`Box.anchor`, `(heading 3)`), que solo existe para las referencias. *Dónde:*
+     `tree/ContentsBuilder`, `Box.key`. *Alternativa:* dar `Id` a lo generado, que saldría en
+     los volcados.
+
+159. **Las entradas se nombran en `Styles` con `Element: Contents entry N` aunque no se
+     escriban**: un `Element` generado y «solo para selector» (`Element.selectable()`), que el
+     schema no tiene. El schema solo define el `Contents`; los títulos, las guías y los números
+     son cajas de la entrada y heredan de ella. *Dónde:* `tree/Element`, `StyleRules.apply`.
+     *Alternativa:* una regla por parte (`Contents title`…), más fina y más larga de escribir.
+
+160. **La guía se pinta con rectángulos rellenos, sin texto**: puntos de 0,09 veces el cuerpo
+     cada medio cuerpo, pegados al número, o una línea de 0,05; sobre la línea base de la
+     entrada. Así llena exactamente el hueco, sin caracteres seleccionables ni conteo de puntos
+     en el texto del PDF, y es un *artifact*. Los puntos de una guía de texto serían la letra
+     «.» repetida, con un ancho que habría que calcular al maquetar. *Dónde:*
+     `paint/Leaders`, `StackingContext.paintLeader`. *Alternativa:* guía de texto.
+
+161. **Un `Contents` sin ningún encabezado de sus niveles es un error** (`CONTENTS_EMPTY`), en la
+     línea de política del §6: un índice sin entradas no tiene efecto. `Levels` son siempre dos
+     niveles (no se admite uno solo) para no dudar entre «hasta el 2» y «solo el 2». *Dónde:*
+     `tree/ContentsBuilder`. *Alternativa:* un índice vacío, o `Levels: 2` como «hasta el 2».
+
+162. **Con título largo, el número queda en la primera línea**: la entrada es un flex sin
+     alineación por línea base, y el título se parte. *Alternativa:* alinear el número con la
+     última línea, que pediría una alineación `baseline` que no existe todavía.

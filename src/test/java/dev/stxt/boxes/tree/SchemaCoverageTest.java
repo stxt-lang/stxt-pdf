@@ -108,6 +108,9 @@ class SchemaCoverageTest {
             Map.entry("Bullet", "Bullet: disc dash"),
             Map.entry("Numbering", "Numbering: decimal lower-alpha"),
             Map.entry("Table columns", "Table columns: auto"),
+            // Contents
+            Map.entry("Levels", "Levels: 1 2"),
+            Map.entry("Leader", "Leader: rule"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
             Map.entry("Fit", "Fit: cover"));
@@ -160,6 +163,8 @@ class SchemaCoverageTest {
                 + "\t\tText: Hola", Set.of("Count", "Column gap")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
+        // Un índice necesita algún encabezado que listar.
+        t.put("Contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tContents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));

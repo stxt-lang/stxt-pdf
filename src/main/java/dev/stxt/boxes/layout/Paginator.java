@@ -151,7 +151,7 @@ public final class Paginator {
     }
 
     private static void firstPages(Fragment f, String page, Set<String> targets, Map<String, String> pages) {
-        String id = f.box().id;
+        String id = f.box().key();
         if (id != null && targets.contains(id)) {
             pages.putIfAbsent(id, page);
         }

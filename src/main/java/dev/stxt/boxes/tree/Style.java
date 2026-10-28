@@ -53,6 +53,9 @@ public final class Style {
     /** Reparto entre las columnas de un {@code Multicol}: equilibrado o en orden. */
     public enum Fill { BALANCE, AUTO }
 
+    /** Guía entre el título y el número de página de las entradas de un {@code Contents} (§5.19). */
+    public enum Leader { DOTS, RULE, NONE }
+
     /** Cómo llena una imagen su caja si tienen proporciones distintas (§5.18). */
     public enum Fit { CONTAIN, COVER, FILL }
 
@@ -159,6 +162,13 @@ public final class Style {
     /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
     public String alt;
     public Fit fit = Fit.CONTAIN;
+
+    // --- Contents --------------------------------------------------------------------------------
+    /** Primer y último nivel de encabezado que lista un {@code Contents} ({@code Levels}). */
+    public int contentsFrom = 1;
+    public int contentsTo = 3;
+    /** {@code Leader} de un {@code Contents}; también lo lleva la guía generada de cada entrada. */
+    public Leader contentsLeader = Leader.DOTS;
 
     // --- Multicol --------------------------------------------------------------------------------
     /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */

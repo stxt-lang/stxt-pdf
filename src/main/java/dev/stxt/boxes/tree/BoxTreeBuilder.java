@@ -122,6 +122,7 @@ public final class BoxTreeBuilder {
         // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
         ctx.definiteHeight.put(root, true);
         buildContent(ctx, document, root);
+        ContentsBuilder.build(ctx, root);
         ctx.rules.checkIds(ctx.ids.keySet());
         References.validate(root);
         return new Result(media, root, metadata);
@@ -253,6 +254,8 @@ public final class BoxTreeBuilder {
                         case "isolate" -> s.isolate = bool(p);
                         case "alt" -> s.alt = alt(p);
                         case "fit" -> s.fit = enumValue(Style.Fit.class, p);
+                        case "levels" -> ContentsBuilder.levels(p, s);
+                        case "leader" -> s.contentsLeader = enumValue(Style.Leader.class, p);
                         default -> throw unread(p);
                     }
                 }
@@ -321,6 +324,9 @@ public final class BoxTreeBuilder {
         }
         if (box.marker != null) {
             markerLine(box);
+        }
+        if (kind == Element.CONTENTS) {
+            ctx.contents.add(box);
         }
         return box;
     }

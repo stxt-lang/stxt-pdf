@@ -48,6 +48,11 @@ public enum Element {
     MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
     /** Imagen de la carpeta de recursos (§5.18): una caja sin hijos con la ruta en {@link Box#image}. */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
+    /**
+     * Índice automático (§5.19): un bloque cuyos hijos, generados al construir el árbol, son una
+     * entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
+     */
+    CONTENTS("Contents", Layout.BLOCK, Position.STATIC, true, false, 0),
     RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
     ABSOLUTE("Absolute", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
     FIXED("Fixed", Layout.BLOCK, Position.FIXED, false, false, 0),
@@ -57,9 +62,26 @@ public enum Element {
      * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos
      * del {@code Multicol}, que es su único hijo. Cada columna es un fragmento suyo (§5.16).
      */
-    COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0);
+    COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
+    /**
+     * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado
+     * con el título, la guía y el número de página. No se escriben en el documento, pero las
+     * reglas {@code Element} las nombran ({@code Contents entry 2}) para darles estilo (§5.19).
+     */
+    CONTENTS_ENTRY_1("Contents entry 1", Layout.FLEX),
+    CONTENTS_ENTRY_2("Contents entry 2", Layout.FLEX),
+    CONTENTS_ENTRY_3("Contents entry 3", Layout.FLEX),
+    CONTENTS_ENTRY_4("Contents entry 4", Layout.FLEX),
+    CONTENTS_ENTRY_5("Contents entry 5", Layout.FLEX),
+    CONTENTS_ENTRY_6("Contents entry 6", Layout.FLEX),
+    /** El título de una entrada del índice: el texto del encabezado. */
+    CONTENTS_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
+    /** La guía (puntos o línea) entre el título y el número de una entrada: una caja vacía que se pinta. */
+    CONTENTS_LEADER(null, Layout.BLOCK, Position.STATIC, false, false, 0),
+    /** El número de página de una entrada del índice: {@code {page of: …}} del encabezado. */
+    CONTENTS_PAGE(null, Layout.INLINE, Position.STATIC, false, false, 0);
 
-    /** Los elementos que se escriben en el documento, por su nombre canónico ({@code list-item}). */
+    /** Los elementos que se nombran, por su nombre canónico ({@code list-item}): los escritos y las entradas del índice. */
     private static final Map<String, Element> BY_NAME = Arrays.stream(values())
             .filter(e -> e.label != null)
             .collect(Collectors.toUnmodifiableMap(Element::canonicalName, Function.identity()));
@@ -70,14 +92,27 @@ public enum Element {
     private final boolean item;
     private final boolean text;
     private final int headingLevel;
+    /** Generado por el motor, pero con nombre para las reglas {@code Element}. */
+    private final boolean selectorOnly;
 
     Element(String label, Layout layout, Position position, boolean item, boolean text, int headingLevel) {
+        this(label, layout, position, item, text, headingLevel, false);
+    }
+
+    /** Un elemento generado que las reglas {@code Element} pueden nombrar. */
+    Element(String label, Layout layout) {
+        this(label, layout, Position.STATIC, false, false, 0, true);
+    }
+
+    private Element(String label, Layout layout, Position position, boolean item, boolean text, int headingLevel,
+                    boolean selectorOnly) {
         this.label = label;
         this.layout = layout;
         this.position = position;
         this.item = item;
         this.text = text;
         this.headingLevel = headingLevel;
+        this.selectorOnly = selectorOnly;
     }
 
     /** El elemento con ese nombre canónico ({@code heading-2}); vacío si no es un elemento de caja. */
@@ -87,7 +122,22 @@ public enum Element {
 
     /** Los elementos que se escriben en el documento, en el orden de la especificación. */
     public static List<Element> written() {
+        return Arrays.stream(values()).filter(Element::isWritten).toList();
+    }
+
+    /** Los elementos que una regla {@code Element} puede nombrar: los escritos y las entradas del índice. */
+    public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
+    }
+
+    /** Si se escribe en el documento (no es generado). */
+    public boolean isWritten() {
+        return label != null && !selectorOnly;
+    }
+
+    /** La entrada de un {@link #CONTENTS} para los encabezados de ese nivel (1 a 6). */
+    public static Element contentsEntry(int level) {
+        return values()[CONTENTS_ENTRY_1.ordinal() + level - 1];
     }
 
     /** El nombre como se escribe ({@code List item}); {@code null} en las cajas generadas. */

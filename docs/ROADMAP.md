@@ -572,11 +572,11 @@ interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.m
 
 - [x] Resolver X1–X10 (2026-10-28).
 - [x] Resolver X11 y X12 (2026-10-28).
-- [ ] Schema (`Contents`, `Levels`, `Leader`) y `Element`; especificación (§2, §4, §5 —
-      nueva sección—, §6, §7, §8, §9, glosario y un ejemplo).
+- [x] Schema (`Contents`, `Levels`, `Leader`) y `Element`; especificación (§2, §4.16, §5.19,
+      §6, §8, §9 y glosario; el ejemplo, con el caso golden).
 - [x] `{page of: id}` y `{number of: id}`: lectura en el texto; paginar de nuevo hasta que
       converjan (X3, X12); página de la primera aparición de cada `Id` en el `Paginator`.
-- [ ] `Contents`: entradas generadas en el builder, con los encabezados (también los de
+- [x] `Contents`: entradas generadas en el builder, con los encabezados (también los de
       `Markdown`), y su pintado con guía.
 - [x] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/references/`
       (`REFERENCE_UNSTABLE` sin caso: lo prueba `PageReferencesTest`).

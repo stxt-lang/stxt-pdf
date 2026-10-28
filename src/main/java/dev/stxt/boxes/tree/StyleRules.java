@@ -53,7 +53,7 @@ final class StyleRules {
                 case "element" -> {
                     Element element = Element.of(selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-"))
                             .orElseThrow(() -> error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
-                                    + "' no es un elemento de caja (" + Element.written().stream()
+                                    + "' no es un elemento de caja (" + Element.selectable().stream()
                                     .map(Element::label).collect(Collectors.joining(", ")) + ")"));
                     yield elementRules.putIfAbsent(element, rule);
                 }
@@ -66,6 +66,17 @@ final class StyleRules {
                         + " (ya está en la línea " + previous.getLine() + ")");
             }
             read(rule, new Style());
+        }
+    }
+
+    /**
+     * Aplica la regla {@code Element} de un elemento generado (una entrada del índice, §5.19), si
+     * la hay: no tiene nodo, así que no hay clases ni {@code Id} que mirar.
+     */
+    void apply(Element kind, Style s) {
+        InlineNode rule = elementRules.get(kind);
+        if (rule != null) {
+            read(rule, s);
         }
     }
 
