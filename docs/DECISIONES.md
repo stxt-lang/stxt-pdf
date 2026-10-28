@@ -1701,11 +1701,14 @@ interpretaciones que salieron al implementarlas.
      (romanos, letras para los anexos) y los prefijos y sufijos propios (`Anexo A.`, `§ 4.2`).
      *Dónde:* `tree/HeadingNumbers`. *Alternativa:* un formato por nivel con los valores de `Marker`.
 
-282. **Un encabezado numerado debajo de uno que no lo está es un error** (`HEADING_NUMBER_PARENT`, con la línea del
-     hijo). El número de un `Heading 2` empieza por el de su `Heading 1`: si el padre no tiene, no hay un
-     número que sea «correcto» (`0.1`, `.1` o `1` a secas serían inventos). Se dice al autor que numere el padre o
-     deje sin numerar el hijo. Un nivel 1 sin numerar no se ve afectado (no tiene padre). *Dónde:*
-     `tree/HeadingNumbers.next`. *Alternativa:* omitir en silencio los niveles sin número.
+282. **Los encabezados sin numerar no aportan nivel al número de los de debajo.** El título de un documento es un
+     `Heading 1` sin número y sus secciones, `Heading 2` numerados: son `1`, `2`, `3` (y los `Heading 3`, `2.1`),
+     no un error ni `0.1`. El número de un encabezado de nivel N son los contadores de los niveles 1 a N que
+     están numerados; un nuevo encabezado de un nivel superior, numerado o no, reinicia los contadores de debajo.
+     *Revisada el mismo día:* la primera versión era un error (`HEADING_NUMBER_PARENT`, un numerado necesita que
+     su padre lo esté), pero el ejemplo 07 (un título y sus secciones) es el caso normal y chocaba con ella.
+     *Dónde:* `tree/HeadingNumbers.next`. *Alternativa:* el error, que obliga a numerar el título o a quitarlo de los
+     encabezados.
 
 283. **El número es parte del texto del primer `Text` del encabezado**, escrito delante con un espacio, no una caja
      generada como el marcador de una lista. Así lo miden el layout y el reparto en líneas, lo ven el índice, los

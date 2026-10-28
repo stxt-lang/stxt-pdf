@@ -188,7 +188,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   número delante del primer `Text` del encabezado cuando ya están leídos sus textos (`HeadingNumbers.prefix`:
   `text` y, si los hay, un tramo `PLAIN` al principio de `runs`), de modo que lo miden el layout y lo ven el
   índice (`headingText`), los marcadores y el PDF etiquetado sin tratarlo aparte. `Box.number` guarda el número
-  completo (`4.2`) para `{number of: id}`. Un numerado bajo un encabezado sin numerar es `HEADING_NUMBER_PARENT`. En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
+  completo (`4.2`) para `{number of: id}`. Los niveles sin numerar no aportan al número (un título `Heading 1` sin número deja a los `Heading 2` como `1`, `2`…). En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
   encabezado) y una caja que declara otro `Language` lleva su `Lang`. `PdfStructure` construye el árbol de estructura del PDF etiquetado
   (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.

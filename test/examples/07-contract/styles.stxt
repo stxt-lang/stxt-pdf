@@ -7,6 +7,7 @@ Styles (dev.stxt.boxes):
 			Size: 10
 			Line height: 15
 			Color: #1E1D2B
+			Numbered: true
 	Element: Heading 1
 		Typography:
 			Size: 15

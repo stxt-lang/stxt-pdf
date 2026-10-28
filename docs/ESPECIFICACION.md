@@ -1495,12 +1495,12 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
   - **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus
     encabezados `#`, `##`… se numeran como los demás), con un contador por nivel: sube con cada
     encabezado numerado de ese nivel y vuelve a 0 con cualquier encabezado de un nivel superior,
-    esté numerado o no. El número es el de los niveles 1 a N unidos por puntos, en decimal. Un
-    encabezado sin numerar no cuenta ni lleva número.
-  - **Su padre también.** Como el número de un `Heading 2` empieza por el de su `Heading 1`, un
-    encabezado numerado debajo de uno que no lo está es un error (`HEADING_NUMBER_PARENT`), con la
-    línea del hijo: si la portada (un `Heading 1` sin número) tiene `Heading 2` debajo, o se numera
-    la portada o se dejan sin número.
+    esté numerado o no. El número es el de los niveles 1 a N unidos por puntos, en decimal, **sin
+    los niveles que no tienen número**. Un encabezado sin numerar no cuenta ni lleva número.
+  - **Un título sin número.** Lo normal: el título del documento es un `Heading 1` con
+    `Numbered: false` y las secciones, `Heading 2` numerados, que son `1`, `2`, `3` (y sus `Heading 3`,
+    `2.1`…) porque el título no aporta nivel. Un nuevo `Heading 1` sin número (otra parte, un anexo) hace
+    que los contadores de debajo vuelvan a empezar.
   - **Se escribe delante del título.** El número y un espacio van delante del primer `Text` del
     encabezado, como si el autor los hubiera escrito: miden lo que escriben, el texto puede pasar a
     una línea más y lo ven el índice (`Contents`, [§5.19](#519-referencias-a-otras-cajas)), los
@@ -2331,7 +2331,6 @@ La validación se hace en cuatro niveles:
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
 | `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
-| `HEADING_NUMBER_PARENT` | Un encabezado numerado (`Numbered: true`) tiene el encabezado de su nivel superior numerado, porque su número empieza por el de él ([§5.13](#513-encabezados-y-párrafos)) | `Un Heading 2 numerado necesita que su encabezado padre (Heading 1) también lo esté…` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
 | `PARAGRAPH_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content` (línea de la línea en blanco) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |

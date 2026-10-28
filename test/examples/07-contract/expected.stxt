@@ -2,6 +2,8 @@ Result:
 	Page: 1
 		Fragment: parties
 			Rect: 70 169.5 455 132
+		Fragment: terms
+			Rect: 70 498 455 16.5
 		Fragment: clauses
 			Rect: 70 520.5 455 214
 		Fragment: footer

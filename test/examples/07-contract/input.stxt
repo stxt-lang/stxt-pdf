@@ -4,7 +4,10 @@
 # exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de tres niveles de
 # numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
 # bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
-# de styles.stxt los ponen en mayúsculas (Transform).
+# de styles.stxt los ponen en mayúsculas (Transform). Los apartados (Reunidos, Exponen, Cláusulas) son
+# Heading 2 numerados (Numbered: true en styles.stxt); el título del contrato y el anexo, que ya tiene
+# su nombre («Anexo I»), declaran Numbered: false, y el considerando III remite al apartado de las
+# cláusulas con {number of: terms}.
 Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
@@ -55,6 +58,8 @@ Document (dev.stxt.boxes):
 					Text: Página {page} de {pages}
 		Heading 1:
 			Text: Contrato de prestación de servicios de diseño
+			Typography:
+				Numbered: false
 		Text: En Olot, a 3 de noviembre de 2025
 			Typography:
 				Align: center
@@ -90,8 +95,9 @@ Document (dev.stxt.boxes):
 			List item:
 				Paragraph: Que el Estudio se dedica profesionalmente al diseño gráfico y digital y dispone de los medios y la experiencia necesarios para realizar el encargo.
 			List item:
-				Paragraph: Que ambas partes desean fijar las condiciones del encargo, y por ello acuerdan formalizar este contrato con arreglo a las siguientes
+				Paragraph: Que ambas partes desean fijar las condiciones del encargo, y por ello acuerdan formalizar este contrato con arreglo a las cláusulas del apartado {number of: terms}, que siguen
 		Heading 2:
+			Id: terms
 			Text: Cláusulas
 		Markdown:
 			Id: clauses
@@ -135,6 +141,8 @@ Document (dev.stxt.boxes):
 				Before: page
 			Heading 2:
 				Text: Anexo I · Calendario y honorarios
+				Typography:
+					Numbered: false
 			Table:
 				Id: fees
 				Columns: 36 1fr 84 74

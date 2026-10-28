@@ -458,7 +458,7 @@ public final class BoxTreeBuilder {
         }
         if (level > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
-            String headingNumber = ctx.headingNumbers.next(n, level, s.numbered);
+            String headingNumber = ctx.headingNumbers.next(level, s.numbered);
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, headingNumber);
             }

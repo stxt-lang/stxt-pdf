@@ -1408,8 +1408,9 @@ Section:
 - [x] **Formato:** solo decimal con puntos (`4.2`); los formatos por nivel, para otro hito.
 - [x] **Excepciones y secciones:** `Numbered: false` en un encabezado no lo numera ni cuenta; la cuenta sigue
       a través de las `Section` y los `Markdown`.
-- [x] **Decidida al implementar** (sin cuestionario; a revisar): un encabezado numerado debajo de uno que no lo
-      está es un error, `HEADING_NUMBER_PARENT` (decisión 282).
+- [x] **Encabezados sin numerar encima** (decisión 282, revisada al numerar el ejemplo 07): un título `Heading 1` sin
+      número deja a los `Heading 2` numerados como `1`, `2`… Una primera versión lo prohibía con
+      `HEADING_NUMBER_PARENT`, que se quitó por chocar con el caso normal de un documento con título.
 
 **Diseño técnico** (como quedó):
 
@@ -1428,15 +1429,15 @@ Section:
 - [x] Resolver las decisiones (2026-10-28).
 - [x] Schema (`Numbered` en `Typography`) y especificación (§4.4, §5.13, §5.19, §6, §8 y §9).
 - [x] `Style`, `PropertyReader`, `HeadingNumbers` y su enganche en el builder.
-- [x] Error nuevo `HEADING_NUMBER_PARENT` con su fila en el §6 y su caso en `test/errors/headings/`
-      (y un caso más de `REFERENCE_NOT_NUMBERED` con un encabezado sin numerar).
+- [x] Un caso más de `REFERENCE_NOT_NUMBERED` en el catálogo, con un encabezado sin numerar (el hito no añade
+      ningún código de error).
 - [x] Tests: `HeadingNumbersTest` (árbol), `HeadingNumberingTest` (layout: título, `{number of: id}` e índice),
       un test de marcadores y entrada del índice en el PDF (`PdfCanvasTest`) y `SchemaCoverageTest`.
 - [x] Caso golden `26-heading-numbers`, calculado a mano (un encabezado de ancho fijo que solo se parte en dos
       líneas con el número delante).
 - [x] README, `CLAUDE.md`, `DECISIONES.md` (280–284), `TODO.md` y este documento.
-- [ ] No se han reescrito los ejemplos: ninguno numera hoy sus encabezados. Si se quiere, el 07 (contrato) y el
-      04 (informe) son los candidatos naturales; cambiarían PNG y volcados.
+- [x] Ejemplo 07 (contrato) con sus secciones numeradas (ver el registro de sesiones). El 04 (informe) sigue
+      sin numerar.
 
 ---
 
@@ -1445,6 +1446,15 @@ Section:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (23).** Ejemplo 07 (contrato) con encabezados numerados, pedido por el usuario. Al numerarlo salió que
+  la regla `HEADING_NUMBER_PARENT` (decisión 282, la única del hito que se decidió sin preguntar) chocaba con el caso
+  normal: un título `Heading 1` sin número con sus secciones `Heading 2` numeradas debajo. Consultado: se relajó, y
+  los niveles sin numerar ya no aportan al número (los `Heading 2` bajo el título son `1`, `2`, `3`). Se quitaron el
+  código de error, su caso del catálogo y su fila del §6, y se añadieron tres tests de la nueva cuenta. Ejemplo 07:
+  `Numbered: true` en su `styles.stxt`; el título y el anexo con `Numbered: false`; el considerando III remite al
+  apartado de las cláusulas con `{number of: terms}`. Solo cambia la página 1 del contrato (y el volcado, que gana
+  `terms`). `mvn test` en verde.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md` (el 04, informe anual, es el otro candidato a numerar).
 - **2026-10-28 (22).** Hito 33 terminado: numeración de los encabezados, pedida por el usuario («numeremos los
   encabezados para poder escribir "la sección 4.2"»). Se partió del estado verde (1281 tests). Cuestionario de cuatro
   preguntas (qué hace, cómo se activa, formato, excepciones y secciones), todas con la propuesta: número delante
@@ -1453,7 +1463,7 @@ siguiente paso concreto.
   `Numbering`, ya existía en `Markdown` y que las reglas solo admiten `Box`, `Typography` y `Break`: pasó a ser
   **`Numbered`**, booleana, en `Typography` (se hereda, así que sirve en `Element: Document`, por nivel, por clase
   y en un solo encabezado). Decidido sin preguntar: un numerado bajo un padre sin numerar es
-  `HEADING_NUMBER_PARENT` (decisión 282; a revisar). `HeadingNumbers` cuenta en orden del documento y escribe el
+  `HEADING_NUMBER_PARENT` (decisión 282; revisada en la sesión siguiente, que lo quitó). `HeadingNumbers` cuenta en orden del documento y escribe el
   número como parte del texto del primer `Text`, sin tocar el layout, el índice ni el PDF. Tests nuevos
   (`HeadingNumbersTest`, `HeadingNumberingTest`, un test de PDF, dos casos del catálogo) y caso golden
   `26-heading-numbers` (calculado a mano, pasó a la primera). Decisiones 280–284. No se reescribió ningún ejemplo.

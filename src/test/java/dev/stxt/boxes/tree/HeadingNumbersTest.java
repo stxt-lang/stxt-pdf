@@ -160,24 +160,41 @@ class HeadingNumbersTest {
     }
 
     @Test
-    void aNumberedHeadingNeedsItsParentToBeNumbered() {
-        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("",
-                "\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n"
-                        + "\t\tElement: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n",
-                "\tHeading 1:", "\t\tText: Uno",
-                "\tHeading 2:", "\t\tText: Dos"));
-        assertEquals(ErrorCode.HEADING_NUMBER_PARENT, e.code());
+    void numberedHeadingsUnderAnUnnumberedTitleCountFromOne() {
+        // El caso normal: un título (Heading 1) sin número y las secciones debajo, numeradas.
+        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+                "\tHeading 1:", "\t\tText: Contrato", "\t\tTypography:", "\t\t\tNumbered: false",
+                "\tHeading 2:", "\t\tText: Reunidos",
+                "\tHeading 2:", "\t\tText: Cláusulas",
+                "\tHeading 3:", "\t\tText: Objeto",
+                "\tHeading 2:", "\t\tText: Firmas");
+        assertEquals(java.util.Arrays.asList(null, "1", "2", "2.1", "3"), numbers(tree));
+        assertEquals(List.of("Contrato", "1 Reunidos", "2 Cláusulas", "2.1 Objeto", "3 Firmas"), titles(tree));
     }
 
     @Test
-    void numberedFalseOnTheParentIsEnoughToRejectItsNumberedChildren() {
-        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(NUMBERED, "",
-                "\tHeading 1:", "\t\tText: Portada", "\t\tTypography:", "\t\t\tNumbered: false",
-                "\tHeading 2:", "\t\tText: Sección"));
-        assertEquals(ErrorCode.HEADING_NUMBER_PARENT, e.code());
-        // El culpable es el encabezado hijo, el último del documento.
-        assertTrue(e.getMessage().contains("Heading 2"), e.getMessage());
-        assertTrue(e.line() > 0);
+    void anUnnumberedLevelInTheMiddleDoesNotAddToTheNumber() {
+        BoxTreeBuilder.Result tree = build(NUMBERED,
+                "\t\tFor class: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+                "\tHeading 1:", "\t\tText: A",
+                "\tHeading 2:", "\t\tClass: plain", "\t\tText: B",
+                "\tHeading 3:", "\t\tText: C",
+                "\tHeading 3:", "\t\tText: D",
+                "\tHeading 2:", "\t\tClass: plain", "\t\tText: E",
+                "\tHeading 3:", "\t\tText: F");
+        // El Heading 3 cuenta dentro de su Heading 2, aunque este no tenga número, y empieza otra vez en cada uno.
+        assertEquals(java.util.Arrays.asList("1", null, "1.1", "1.2", null, "1.1"), numbers(tree));
+    }
+
+    @Test
+    void aNewUnnumberedTitleRestartsTheCountBelow() {
+        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+                "\tHeading 1:", "\t\tText: Parte uno", "\t\tTypography:", "\t\t\tNumbered: false",
+                "\tHeading 2:", "\t\tText: A",
+                "\tHeading 2:", "\t\tText: B",
+                "\tHeading 1:", "\t\tText: Parte dos", "\t\tTypography:", "\t\t\tNumbered: false",
+                "\tHeading 2:", "\t\tText: C");
+        assertEquals(java.util.Arrays.asList(null, "1", "2", null, "1"), numbers(tree));
     }
 
     @Test
