@@ -4,9 +4,11 @@
 # en un grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
 # cabecera y pie, y capítulos que empiezan siempre en página nueva. El contenido es un Contents:
 # lista los capítulos con su página impresa, que el motor calcula. El título de la portada y el de la
-# página de contenido son un Heading 1 con In contents: false, para que no salgan en el índice. Los
-# rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de interletraje
-# (Transform).
+# página de contenido son un Heading 1 con In contents: false, para que no salgan en el índice, y con
+# Numbered: false, para que no cuenten. Los capítulos son Heading 1 numerados (Numbered: true en
+# styles.stxt: 1 a 6) y sus apartados, Heading 2 (1.1, 2.1…); el índice y los marcadores del PDF llevan el
+# número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
+# interletraje (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
@@ -68,6 +70,8 @@ Document (dev.stxt.boxes):
 						Margin: 0 0 14 0
 						Padding: 0
 						Border: 0
+					Typography:
+						Numbered: false
 					Text: Un año de sol
 						Typography:
 							Font: IBM Plex Serif
@@ -142,6 +146,8 @@ Document (dev.stxt.boxes):
 			Heading 1:
 				In contents: false
 				Text: Contenido
+				Typography:
+					Numbered: false
 			Contents:
 				Id: toc
 				Levels: 1 1

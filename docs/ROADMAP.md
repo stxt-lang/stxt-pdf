@@ -1436,8 +1436,7 @@ Section:
 - [x] Caso golden `26-heading-numbers`, calculado a mano (un encabezado de ancho fijo que solo se parte en dos
       líneas con el número delante).
 - [x] README, `CLAUDE.md`, `DECISIONES.md` (280–284), `TODO.md` y este documento.
-- [x] Ejemplo 07 (contrato) con sus secciones numeradas (ver el registro de sesiones). El 04 (informe) sigue
-      sin numerar.
+- [x] Ejemplos 07 (contrato) y 04 (informe anual) con sus encabezados numerados (ver el registro de sesiones).
 
 ---
 
@@ -1446,6 +1445,12 @@ Section:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (24).** Ejemplo 04 (informe anual) con encabezados numerados, pedido por el usuario. `Numbered: true` en
+  su `styles.stxt`; la portada y «Contenido» (los dos `Heading 1` con `In contents: false`) declaran `Numbered: false`,
+  así que los seis capítulos son 1 a 6 y sus apartados, 1.1, 2.1, 4.1…; el índice y los marcadores llevan el número.
+  No cambia el volcado ni la portada, solo las páginas 2 a 7 (el número delante de cada título y las entradas del
+  índice). Sin cambios de código. `mvn test` en verde.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md`.
 - **2026-10-28 (23).** Ejemplo 07 (contrato) con encabezados numerados, pedido por el usuario. Al numerarlo salió que
   la regla `HEADING_NUMBER_PARENT` (decisión 282, la única del hito que se decidió sin preguntar) chocaba con el caso
   normal: un título `Heading 1` sin número con sus secciones `Heading 2` numeradas debajo. Consultado: se relajó, y
