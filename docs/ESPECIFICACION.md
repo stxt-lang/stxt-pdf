@@ -191,9 +191,20 @@ equivale a `150 1fr 1fr 1fr minmax(100, 2fr)`.
 | `10 20 5` | 10 | 20 | 5 | 20 |
 | `10 20 5 0` | 10 | 20 | 5 | 0 |
 
+`Border color` admite también de 1 a 4 colores con este orden. `Radius` admite de 1 a 4 valores con el
+mismo convenio, pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la derecha
+y abajo a la izquierda (`Radius: 0 20` redondea solo la esquina de arriba a la derecha y la de abajo a la
+izquierda).
+
 ### 3.4 Colores
 
-`#RGB` o `#RRGGBB` en hexadecimal: `#000`, `#A32D2D`.
+`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA` en hexadecimal: `#000`, `#A32D2D`, `#12315A80`. El último dígito o
+par es la **opacidad** (`FF` o `F`, opaco; `00`, transparente) y, si falta, el color es opaco. Vale en todas
+las propiedades de color (`Color`, `Border color`, `Background`, `Rule color`).
+
+El fondo también admite un **degradado lineal**: `linear(ángulo, color, color…)`, con el ángulo en grados
+como en CSS (`0` va hacia arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores,
+repartidos a partes iguales: `linear(180, #12315A00, #12315A)`.
 
 ### 3.5 Booleanos y enteros
 
@@ -309,8 +320,9 @@ El modelo de caja. No se hereda.
 | `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra: en flujo de bloque, en horizontal y con `Width` o `Max width`; en `Absolute` y `Fixed`, con inicio, tamaño y fin declarados. En cualquier otro caso es un error. |
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
-| `Border color` | color | el `Color` del texto | No afecta al layout. |
-| `Background` | color | transparente | Se pinta en la caja de relleno. No afecta al layout. |
+| `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([§3.3](#33-abreviados-de-cuatro-lados)). No afecta al layout. |
+| `Radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda. Un % horizontal es del ancho de la caja y uno vertical, de su alto: `50%` hace un círculo en una caja cuadrada y una elipse en las demás. No afecta al layout ([§5.6](#56-apilamiento-y-orden-de-pintado)). |
+| `Background` | color o `linear(…)` | transparente | Se pinta en la caja de relleno. No afecta al layout ([§3.4](#34-colores), [§5.6](#56-apilamiento-y-orden-de-pintado)). |
 
 ### 4.4 `Typography`
 
@@ -882,6 +894,29 @@ A igual `Layer`, se pinta en orden del árbol. El orden del árbol es el del doc
 **`Layer` solo compara dentro del mismo contexto:**
 el contenido de un contexto se pinta como un bloque al nivel de ese contexto, aunque sus hijos
 tengan `Layer` mayores.
+
+**Fondo, borde y esquinas.** `Background`, `Border color` y `Radius` solo cambian el pintado: ninguno mueve
+ni cambia el tamaño de una caja, y el volcado ([§7](#7-formato-de-resultados)) no los refleja.
+
+- **Esquinas.** `Radius` redondea la caja de borde con un cuarto de elipse por esquina. Si dos radios
+  seguidos de un lado suman más que el lado, todos se reducen por el mismo factor hasta que caben (como
+  en CSS). El fondo, que va en la caja de relleno, tiene los radios de la caja de borde menos el grosor
+  del borde de cada lado, y una esquina que se queda sin radio es cuadrada. Una `Image` se recorta con los
+  radios de su caja de contenido (la de borde menos el borde y el relleno).
+- **Cajas partidas.** Con `Decoration: slice`, solo el primer fragmento de una caja tiene las esquinas de
+  arriba y solo el último, las de abajo; con `clone`, todos las tienen todas. Los radios en % se resuelven
+  sobre el tamaño del fragmento, no sobre el de la caja entera.
+- **Borde.** Es el anillo entre la caja de borde y la de relleno. Con un solo color se pinta de una vez; con
+  colores distintos, cada lado con su color, y dos lados seguidos se encuentran en la **diagonal** que une
+  la esquina de la caja de borde con la de la de relleno, como en CSS. Un lado sin grosor no tiene color:
+  `Border: 0 0 0 3` con `Border color: #B5651D` es una franja a la izquierda.
+- **Degradado.** `linear(ángulo, …)` pasa por el centro de la caja de relleno y mide lo que hace falta para
+  que las esquinas tengan el primer y el último color (como en CSS); más allá de los extremos se repite el
+  color del extremo. Cada color se pinta con su opacidad: un degradado hacia un color transparente deja ver
+  lo que hay debajo.
+- **Opacidad.** El color de un fondo, de un borde o de un texto con opacidad deja ver lo que hay debajo;
+  en un borde de un solo color, las esquinas no se pintan dos veces.
+- **PDF etiquetado.** Fondos, bordes y degradados son *artifacts*, como hasta ahora.
 
 ### 5.7 Flex
 
@@ -1962,7 +1997,7 @@ La validación se hace en cuatro niveles:
 |---|---|---|
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
-| `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
+| `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
 | `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
@@ -2083,6 +2118,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color. Se escriben con Markdown en línea, solo donde se pide con `Inline: markdown`; sin ello el texto es literal ([§5.4](#54-texto)) |
 | `text-transform`, `letter-spacing`, `font-variant: small-caps` | `text-transform` también con `full-width`; el interletraje en cualquier unidad, también tras el último carácter; las versalitas con la característica `smcp` de la fuente | `Transform` con `none`, `uppercase`, `lowercase` y `capitalize`, y las reglas del idioma de `Language` (obligatorio); `Letter spacing` solo en puntos y sin interletraje tras el último carácter de la línea; `Small caps` sintetizadas con mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto) |
 | `white-space`, `tab-size` | `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line` y `break-spaces`; `tab-size` también como longitud | `White space` con `normal`, `pre` y `pre-wrap`; `pre` no parte las líneas y una más ancha que la caja es un error (`TEXT_OVERFLOW`); las líneas preformateadas no se justifican; los espacios del corte de `pre-wrap` se pierden; las tabulaciones, a la siguiente columna múltiplo de `Tab size` (por defecto 4, no 8). Ver [§5.4](#54-texto) |
+| `border-radius`, `border-color`, `background` | Dos radios por esquina (`10px / 20px`), un estilo y un color por lado, degradados con paradas, ángulos o direcciones (`to right`), radiales y repetidos, varias capas, sombras (`box-shadow`) | `Radius` con un solo radio por esquina (un % da la elipse), `Border color` con un color por lado y `Background` con un color o `linear(ángulo, color, color…)`, con los colores repartidos a partes iguales; no hay estilos de borde, ni degradados radiales ni cónicos, ni varias capas, ni sombras. Los colores admiten `#RGBA` y `#RRGGBBAA`; no hay `rgba()`, ni nombres, ni `Opacity` |
 | `text-decoration` | Estilos (`wavy`, `dotted`…), color, grosor y desplazamiento propios; el subrayado se interrumpe en los descendentes (`text-decoration-skip-ink`) | Una raya continua del color del texto, con la posición y el grosor de la fuente |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
@@ -2181,7 +2217,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
-| `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
+| `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
 | `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
@@ -2346,6 +2382,7 @@ Document (dev.stxt.boxes):
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer`. |
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes. |
 | **Definido** | Tamaño conocido sin hacer el layout del contenido. |
+| **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color…)` ([§3.4](#34-colores), [§5.6](#56-apilamiento-y-orden-de-pintado)). |
 | **Elemento** | `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute` o `Fixed`: un nodo del documento que es una caja ([§2](#2-estructura-de-un-documento)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |

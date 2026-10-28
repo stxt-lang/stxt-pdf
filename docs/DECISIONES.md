@@ -1235,3 +1235,71 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      terminal (de 89 a 98 pt: la línea en blanco bajo el título mide 13 pt y el margen de antes, 4). Los
      valores de la tabla de especificaciones del manual siguen con `Class: mono`: una tabla de
      Markdown no admite columnas de ancho fijo.
+
+216. **`Radius` es un radio por esquina, de 1 a 4 valores** (arriba izquierda, arriba derecha, abajo
+     derecha, abajo izquierda, el abreviado de CSS). Un % horizontal es del ancho de la caja de borde y
+     uno vertical, de su alto, así que `50%` da un círculo o una elipse; si los radios de un lado suman
+     más que el lado, todos se reducen por el mismo factor (CSS). No hay dos radios por esquina
+     (`10px / 20px`): la elipse se pide con %. *Dónde:* `model/Corners`, `model/Radii`,
+     `tree/ValueReader.radius`. *Alternativa:* un solo valor, o la sintaxis `rx / ry` de CSS.
+
+217. **Los radios dentro de la caja pierden el grosor del borde.** El fondo (en la caja de relleno) tiene
+     los radios de la caja de borde menos el borde de cada lado, y una `Image` los de su caja de contenido
+     (menos borde y relleno); una esquina que se queda sin radio es cuadrada (`Radii.inset`). Los radios de
+     una caja partida con `Decoration: slice` solo están en las esquinas de su primer fragmento (arriba) y
+     de su último (abajo), y los porcentajes se resuelven sobre el tamaño **del fragmento**, no el de la caja
+     entera: un fragmento muy bajo reduce sus radios. *Dónde:* `paint/StackingContext.radii`.
+     *Alternativa:* resolver los % contra la caja entera, que el layout no conoce al pintar.
+
+218. **`Border color` admite de 1 a 4 colores** (arriba, derecha, abajo, izquierda), sin propiedades por
+     lado. Los lados se encuentran en la diagonal de la esquina como en CSS; con esquinas redondeadas la
+     diagonal sigue hacia dentro más allá de la esquina de relleno (dos veces el radio de dentro), para
+     cubrir el trozo de anillo que entra en la caja de relleno (`Shapes.sidePolygon`). *Alternativa:*
+     `Border top color`… (cuatro nombres más en el schema).
+
+219. **Sin sombras** (`Shadow`). Se descartaron en el hito 28: eran lo más caro (PDFBox no desenfoca, habría
+     que aproximar con capas semitransparentes) y lo que menos aporta. Las fichas con sombra del catálogo
+     (09) siguen con su borde. *Alternativa:* `Shadow: x y desenfoque color`, exterior y única, con capas.
+
+220. **`Background` admite `linear(ángulo, color, color…)`**, con el ángulo en grados como en CSS (0 hacia
+     arriba, 90 hacia la derecha, 180 hacia abajo) y los colores repartidos a partes iguales; no hay paradas
+     con posición, ni radiales, ni repetidos. La línea pasa por el centro y mide `|w·sen| + |h·cos|`, como
+     en CSS. Es un sombreado axial de PDF (función de tipo 2, o de tipo 3 con más de dos colores) recortado
+     a la caja; si algún color no es opaco, las opacidades van en una máscara suave de luminosidad con el
+     mismo degradado en grises, porque un sombreado de PDF no tiene opacidad por color. *Dónde:*
+     `model/Paint`, `paint/PdfCanvas.gradient`. *Alternativa:* solo dos colores, o paradas con posición.
+
+221. **Los colores admiten opacidad** (`#RGBA`, `#RRGGBBAA`) en todas las propiedades de color, también en
+     `Color` (texto) y `Rule color`, con un estado gráfico de PDF por opacidad (`ca`); sin propiedad
+     `Opacity`. Un color liso con opacidad se pinta dentro de un `q`/`Q` propio. *Dónde:* `model/Colors`,
+     `paint/PdfCanvas.painting`. *Alternativa:* `Opacity` por caja (que afectaría también a lo de dentro).
+
+222. **Salida SVG de depuración:** las cajas redondeadas son `<path>`, el degradado un `linearGradient` en
+     coordenadas de la página con `stop-opacity`, y el borde de un solo color un anillo (`evenodd`) o, con
+     colores distintos, uno por lado con un `clipPath` (como en el PDF); la imagen redondeada, un `clipPath`
+     alrededor de su `<svg>`. Una caja lisa y cuadrada sigue siendo un `<rect>`. *Alternativa:* `rx` y
+     `ry` de `<rect>`, que no sirve para radios distintos por esquina.
+
+223. **En el PDF, un borde liso, opaco y de esquinas cuadradas se pinta como antes** (un rectángulo por
+     lado, los verticales encima), no como anillo: así no cambia ningún píxel de los PNG de los casos y los
+     ejemplos, porque el anillo par-impar deja un antialiasing distinto en el borde de la caja. El anillo
+     se usa con esquinas redondas, con opacidad y con colores distintos. *Dónde:*
+     `paint/PdfCanvas.squareBorder`. *Alternativa:* el anillo siempre (cambian los PNG existentes).
+
+224. **`Canvas` cambia:** `border(Rect, Insets, Radii, Sides<String>)` (un color por lado, ya resuelto)
+     sustituye al de un color, `fill(Rect, Radii, Paint)` pinta el fondo de una caja (`background(Rect,
+     String)` queda para los rectángulos lisos: guías, líneas entre columnas y rayas de texto) e
+     `image(Box, Rect, Radii)` recibe las esquinas con que recortar. `Style.background` pasa a ser un
+     `Paint` y `Style.borderColor` un `Sides<String>`. *Alternativa:* conservar las firmas y añadir
+     métodos nuevos con implementaciones por defecto.
+
+225. **Ejemplos** (hito 28): ocho documentos usan lo nuevo, y solo cambia un volcado: el del informe anual (04),
+     por la caja `cover-fade` (un `Absolute` de 595 × 90 con `linear(180, #12315A00, #12315A)` sobre el pie de
+     la foto de la portada, que funde el horizonte con el panel azul; el título sigue debajo de la foto, así
+     que no hace falta el contraste que pedía la hoja de ruta). Currículum (03): foto circular y barras de
+     nivel redondeadas; manual (08): insignias circulares y avisos con las esquinas de la derecha
+     redondeadas; factura (01): igual en las tarjetas; horario (11): celdas redondeadas; catálogo (09): fichas,
+     etiqueta «Novedad» y esquinas de arriba de la foto; carta (06): marcos y recuadro con esquinas; certificado
+     (10): adornos de las esquinas circulares. El marco doble de la carta y los tres del certificado siguen
+     siendo cajas distintas (una caja solo tiene un borde): lo que ganan es el radio. Las fichas del catálogo
+     no tienen sombra (decisión 219). *Alternativa:* quitar los `Fixed` de los marcos y dejar uno solo.
