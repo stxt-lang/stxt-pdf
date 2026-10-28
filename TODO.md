@@ -19,6 +19,7 @@
 - Quizá necesitamos un Preformated o Code Block para el código monoespaciado
 - Un docker para esto
 - Un manual hecho a partir de referencia :-)
+- Al final de todo volver a versionar pdf's de ejemplos, para poner enlaces en readme y que se vean en github
 
 - **`Link` del PDF etiquetado con su contenido marcado** (hito 23, decisión 171 de
   `docs/DECISIONES.md`). Hoy cada enlace es un elemento `Link` hijo del elemento de la caja que
