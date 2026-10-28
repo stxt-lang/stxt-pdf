@@ -1,0 +1,108 @@
+# Secciones (ESPECIFICACION.md §5.21). Páginas de 300 × 200 con márgenes de 20 (área útil de 260 × 160 desde (20, 20)).
+#
+# Tres secciones, cinco páginas, cada una con su Media:
+#   cover (1 página):  Margin 0, área útil de 300 × 200 desde (0, 0), sin números ni los Fixed del documento.
+#                      cover-box llena la página (0, 0, 300 × 200); stamp (Fixed de la sección) sale en (10, 10), 40 × 20.
+#   body (2 páginas):  el Media del documento. b1 (20, 20) y b2 (20, 80) caben en la página 2 (física); b3, no (60 + 60 + 60 > 160)
+#                      (con Inside: avoid, que no se parte) y pasa a la 3, en (20, 20). head (Pages: first, de la sección) sale solo en la primera página
+#                      de la sección: la 2 física, en (20, 20), 260 × 12. foot (Fixed del documento) sale en las dos,
+#                      abajo: y = 20 + 160 - 12 = 168.
+#   wide (2 páginas):  Width 400, Height 150, Margin 10: área útil de 380 × 130 desde (10, 10). w1 (10, 10, 380 × 50);
+#                      w2 (100, sin partirse) no cabe debajo (50 + 100 > 130) y pasa a la 5. foot: y = 10 + 130 - 12 = 128, 380 de ancho.
+# Los números impresos: la portada no tiene; body es la 1 y la 2 («Página 1 de 2»); wide reinicia, 1 y 2.
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Fixed:
+		Id: foot
+		Offset: auto 0 0 0
+		Box:
+			Height: 12
+			Background: #E3E8EE
+		Text: Página {page} de {pages}
+			Typography:
+				Align: center
+	Section:
+		Id: cover
+		Page numbering: none
+		Inherit fixed: false
+		Media:
+			Margin: 0
+		Block:
+			Id: cover-box
+			Box:
+				Height: 200
+				Padding: 20
+				Background: #1F3A5F
+			Typography:
+				Color: #FFFFFF
+				Size: 20
+			Text: Portada
+		Fixed:
+			Id: stamp
+			Offset: 10 auto auto 10
+			Box:
+				Width: 40
+				Height: 20
+				Background: #F2C94C
+			Text: Sello
+	Section:
+		Id: body
+		Fixed:
+			Id: head
+			Pages: first
+			Offset: 0 0 auto 0
+			Box:
+				Height: 12
+				Background: #C9D6E2
+			Text: Cuerpo
+		Block:
+			Id: b1
+			Box:
+				Height: 60
+				Background: #DCEBDD
+			Text: Uno
+		Block:
+			Id: b2
+			Box:
+				Height: 60
+				Background: #EFE6CF
+			Text: Dos
+		Block:
+			Id: b3
+			Break:
+				Inside: avoid
+			Box:
+				Height: 60
+				Background: #DCEBDD
+			Text: Tres
+	Section:
+		Id: wide
+		Page numbering: restart
+		Media:
+			Width: 400
+			Height: 150
+			Margin: 10
+		Block:
+			Id: w1
+			Box:
+				Height: 50
+				Background: #EFE6CF
+			Text: Ancha uno
+		Block:
+			Id: w2
+			Break:
+				Inside: avoid
+			Box:
+				Height: 100
+				Background: #DCEBDD
+			Text: Ancha dos

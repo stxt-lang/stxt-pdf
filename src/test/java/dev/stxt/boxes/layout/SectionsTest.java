@@ -1,0 +1,236 @@
+package dev.stxt.boxes.layout;
+
+import dev.stxt.boxes.fragment.Fragment;
+import dev.stxt.boxes.fragment.Page;
+import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.ErrorCode;
+import dev.stxt.boxes.tree.InvalidModelException;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Las secciones (ESPECIFICACION.md §5.21): páginas de 300 × 200 con márgenes de 20 (área útil de
+ * 260 × 160). Con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt.
+ */
+class SectionsTest {
+
+    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n"
+            + "\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n\t\tMargin: 20\n"
+            + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
+
+    private static LaidOutDocument lay(Object... lines) {
+        return layWith(HEADER, lines);
+    }
+
+    /** Las líneas del documento: cada parte es una línea ({@code String}) o varias ({@code String[]}). */
+    private static LaidOutDocument layWith(String header, Object... parts) {
+        String body = java.util.Arrays.stream(parts)
+                .flatMap(p -> p instanceof String[] many ? java.util.Arrays.stream(many) : java.util.stream.Stream.of((String) p))
+                .collect(Collectors.joining("\n"));
+        return new Engine().layOutDocument(new DocumentReader().read(header + body));
+    }
+
+    /** Una página entera: una caja de 160 pt, el alto del área útil. */
+    private static String[] fullPage(String id) {
+        return new String[] {"\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:", "\t\t\t\tHeight: 160"};
+    }
+
+    private static String[] join(String[]... parts) {
+        return java.util.Arrays.stream(parts).flatMap(java.util.Arrays::stream).toArray(String[]::new);
+    }
+
+    private static Fragment find(Fragment f, String id) {
+        if (id.equals(f.box().id)) {
+            return f;
+        }
+        for (Fragment child : f.children()) {
+            Fragment found = find(child, id);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    /** El fragmento con ese {@code Id} en el flujo o en los {@code Fixed} de la página; {@code null} si no sale. */
+    private static Fragment on(Page page, String id) {
+        Fragment found = find(page.content(), id);
+        for (Fragment fixed : page.fixed()) {
+            found = found != null ? found : find(fixed, id);
+        }
+        return found;
+    }
+
+    private static List<String> fixedIds(Page page) {
+        return page.fixed().stream().map(f -> f.box().id).collect(Collectors.toList());
+    }
+
+    /** El texto de la caja con ese {@code Id}, o el de sus descendientes si ella no tiene líneas. */
+    private static String text(Page page, String id) {
+        return text(on(page, id));
+    }
+
+    private static String text(Fragment f) {
+        String own = f.lines().stream().map(l -> l.text()).collect(Collectors.joining("|"));
+        return own + f.children().stream().map(SectionsTest::text).collect(Collectors.joining("|"));
+    }
+
+    @Test
+    void eachSectionStartsANewPageWithItsOwnMedia() {
+        LaidOutDocument d = layWith("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n"
+                + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n",
+                "\tSection:", "\t\tBlock:", "\t\t\tId: a",
+                "\tSection:", "\t\tMedia:", "\t\t\tOrientation: landscape", "\t\tBlock:", "\t\t\tId: b",
+                "\tSection:", "\t\tMedia:", "\t\t\tMargin: 10", "\t\tBlock:", "\t\t\tId: c",
+                "\tSection:", "\t\tMedia:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
+        assertEquals(4, d.pages().size());
+        // Sin Media propio, el del documento.
+        assertEquals(595, d.pages().get(0).media().width(), 1e-9);
+        assertEquals(842, d.pages().get(0).media().height(), 1e-9);
+        // Solo Orientation: el papel del documento girado, con sus márgenes.
+        assertEquals(842, d.pages().get(1).media().width(), 1e-9);
+        assertEquals(595, d.pages().get(1).media().height(), 1e-9);
+        assertEquals(40, d.pages().get(1).media().margin().left(), 1e-9);
+        // Solo Margin: el tamaño del documento.
+        assertEquals(595, d.pages().get(2).media().width(), 1e-9);
+        assertEquals(10, d.pages().get(2).media().margin().top(), 1e-9);
+        // Un tamaño propio y un margen propio.
+        assertEquals(612, d.pages().get(3).media().width(), 1e-9);
+        assertEquals(0, d.pages().get(3).media().margin().left(), 1e-9);
+        // El área útil de cada página es la de su medio: el ancho de la caja de la sección.
+        assertEquals(515, d.pages().get(0).content().width(), 1e-9);
+        assertEquals(762, d.pages().get(1).content().width(), 1e-9);
+        assertEquals(575, d.pages().get(2).content().width(), 1e-9);
+        assertEquals(612, d.pages().get(3).content().width(), 1e-9);
+        assertEquals(List.of(0, 1, 2, 3), d.pages().stream().map(Page::section).toList());
+        assertEquals(List.of(1, 2, 3, 4), d.pages().stream().map(Page::number).toList());
+    }
+
+    @Test
+    void aSectionAlwaysStartsANewPage() {
+        LaidOutDocument d = lay("\tSection:", "\t\tBlock:", "\t\t\tId: a", "\t\t\tBox:", "\t\t\t\tHeight: 10",
+                "\tSection:", "\t\tBlock:", "\t\t\tId: b", "\t\t\tBox:", "\t\t\t\tHeight: 10");
+        assertEquals(2, d.pages().size());
+        assertNotNull(on(d.pages().get(0), "a"));
+        assertNull(on(d.pages().get(0), "b"));
+        assertNotNull(on(d.pages().get(1), "b"));
+    }
+
+    @Test
+    void fixedBoxesOfTheDocumentGoEverywhereAndThoseOfASectionOnlyInIt() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: foot", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 10",
+                join(new String[] {"\tSection:", "\t\tFixed:", "\t\t\tId: head-a", "\t\t\tPages: first",
+                        "\t\t\tBox:", "\t\t\t\tHeight: 10"}, fullPage("a1"), fullPage("a2")),
+                new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tFixed:", "\t\t\tId: head-b", "\t\t\tBox:",
+                        "\t\t\t\tHeight: 10", "\t\tBlock:", "\t\t\tId: b"},
+                new String[] {"\tSection:", "\t\tBlock:", "\t\t\tId: c"});
+        assertEquals(4, d.pages().size());
+        // Pages: first cuenta dentro de la sección: solo su primera página.
+        assertEquals(List.of("foot", "head-a"), fixedIds(d.pages().get(0)));
+        assertEquals(List.of("foot"), fixedIds(d.pages().get(1)));
+        // Inherit fixed: false deja la sección sin los del documento.
+        assertEquals(List.of("head-b"), fixedIds(d.pages().get(2)));
+        assertEquals(List.of("foot"), fixedIds(d.pages().get(3)));
+    }
+
+    @Test
+    void pagesOfAFixedOfTheDocumentCountTheWholeDocument() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: not-first", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tFixed:", "\t\tId: last", "\t\tPages: last", "\t\tBox:", "\t\t\tHeight: 10",
+                join(new String[] {"\tSection:"}, fullPage("a")),
+                join(new String[] {"\tSection:"}, fullPage("b1"), fullPage("b2")));
+        assertEquals(3, d.pages().size());
+        assertEquals(List.of(), fixedIds(d.pages().get(0)));
+        assertEquals(List.of("not-first"), fixedIds(d.pages().get(1)));
+        assertEquals(List.of("not-first", "last"), fixedIds(d.pages().get(2)));
+    }
+
+    @Test
+    void anUnnumberedCoverDoesNotCountAndTheNumberingCanRestart() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tPages: not-first", "\t\tText: Página {page} de {pages}",
+                join(new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tPage numbering: none"}, fullPage("cover")),
+                join(new String[] {"\tSection:", "\t\tInherit fixed: true"}, fullPage("b1"), fullPage("b2")),
+                join(new String[] {"\tSection:", "\t\tPage numbering: restart"}, fullPage("annex")));
+        assertEquals(4, d.pages().size());
+        assertEquals(List.of(0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
+        assertFalse(d.pages().get(0).numbered());
+        assertEquals(List.of(), fixedIds(d.pages().get(0)));
+        // La primera página interior es la 1 de 2, aunque sea la segunda del documento; el anexo
+        // reinicia el contador, así que es la 1 de 1 y no cuenta para el total del cuerpo.
+        assertEquals("Página 1 de 2", text(d.pages().get(1), "num"));
+        assertEquals("Página 2 de 2", text(d.pages().get(2), "num"));
+        assertEquals("Página 1 de 1", text(d.pages().get(3), "num"));
+    }
+
+    @Test
+    void aSectionThatContinuesFollowsTheCounterOfTheOnesBefore() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: num", "\t\tText: {page}/{pages}",
+                join(new String[] {"\tSection:"}, fullPage("a")),
+                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tInherit fixed: false"}, fullPage("hole")),
+                join(new String[] {"\tSection:", "\t\tInherit fixed: false"}, fullPage("b")));
+        assertEquals(List.of(1, 0, 2), d.pages().stream().map(Page::printed).toList());
+    }
+
+    @Test
+    void thePageOfABoxIsItsPrintedNumberAndASectionCanBeReferenced() {
+        LaidOutDocument d = lay(
+                join(new String[] {"\tSection:", "\t\tPage numbering: none"}, fullPage("cover")),
+                join(new String[] {"\tSection:", "\t\tText: Mira la página {page of: target} y la {page of: second}.",
+                        "\t\t\tId: ref"}, fullPage("b1")),
+                join(new String[] {"\tSection:", "\t\tId: second"}, new String[] {"\t\tBlock:", "\t\t\tId: target",
+                        "\t\t\tBox:", "\t\t\t\tHeight: 10"}));
+        // cover = física 1 (sin número), cuerpo = física 2 (la 1) y 3 (la 2), segunda sección = física 4 (la 3).
+        assertEquals(4, d.pages().size());
+        assertEquals("Mira la página 3 y la 3.", text(d.pages().get(1), "ref"));
+    }
+
+    @Test
+    void pagesCountsOnlyTheNumberedPagesOfTheRun() {
+        // {pages} cuenta las páginas numeradas de la tanda, no las del documento.
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: n", "\t\tPages: last", "\t\tText: {pages}",
+                join(new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tPage numbering: none"}, fullPage("c1"), fullPage("c2")),
+                join(new String[] {"\tSection:"}, fullPage("b")));
+        assertEquals(3, d.pages().size());
+        assertEquals("1", text(d.pages().get(2), "n"));
+    }
+
+    @Test
+    void theClassOfASectionGivesItsContentATypography() {
+        LaidOutDocument d = layWith(HEADER + "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tSize: 20\n",
+                "\tSection:", "\t\tText: ab", "\t\t\tId: normal",
+                "\tSection:", "\t\tClass: annex", "\t\tText: ab", "\t\t\tId: big");
+        // Cada carácter mide la mitad del tamaño: 5 pt con Size 10 y 10 pt con Size 20.
+        assertEquals(5, on(d.pages().get(0), "normal").lines().get(0).width() / 2, 1e-9);
+        assertEquals(10, on(d.pages().get(1), "big").lines().get(0).width() / 2, 1e-9);
+    }
+
+    @Test
+    void theIdOfASectionIsAUniqueId() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> lay("\tSection:", "\t\tId: a", "\t\tBlock:", "\t\t\tId: b", "\tSection:", "\t\tId: b", "\t\tBlock:"));
+        assertEquals(ErrorCode.DUPLICATE_ID, e.code());
+    }
+
+    @Test
+    void headingsAndContentsGoAcrossSections() {
+        LaidOutDocument d = lay(
+                "\tSection:", "\t\tHeading 1:", "\t\t\tId: h1", "\t\t\tText: Uno",
+                join(new String[] {"\tSection:", "\t\tHeading 1:", "\t\t\tId: h2", "\t\t\tText: Dos", "\t\tContents:", "\t\t\tId: toc"}));
+        assertEquals(2, d.pages().size());
+        assertTrue(on(d.pages().get(1), "toc").children().size() >= 2);
+    }
+}

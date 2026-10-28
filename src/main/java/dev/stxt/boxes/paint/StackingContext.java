@@ -151,6 +151,11 @@ public final class StackingContext {
         while (i < pathA.size() && i < pathB.size() && pathA.get(i) == pathB.get(i)) {
             i++;
         }
+        if (i == 0) {
+            // Raíces distintas: un Fixed del documento y uno de una sección, que es la raíz de su layout (§5.21).
+            // Los del documento van antes.
+            return Boolean.compare(pathA.get(0).element != null, pathB.get(0).element != null);
+        }
         if (i == pathA.size() || i == pathB.size()) {
             return Integer.compare(pathA.size(), pathB.size());
         }

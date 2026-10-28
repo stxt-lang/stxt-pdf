@@ -21,6 +21,8 @@ import org.apache.pdfbox.cos.COSBoolean;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
+import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDFormContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -158,11 +160,40 @@ public final class PdfCanvas implements Canvas {
                     page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
             }
+            labels(doc, pages);
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations);
             structure.finish(doc, destinations);
             doc.save(target);
         }
+    }
+
+    /**
+     * Las etiquetas de las páginas (§5.21): el visor muestra el número impreso de cada una, y ninguno en las
+     * que no se numeran. Solo se escriben si alguna página no es su número físico; si no, no añaden nada.
+     * Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
+     */
+    private static void labels(PDDocument doc, List<Page> pages) {
+        if (pages.stream().allMatch(p -> p.printed() == p.number())) {
+            return;
+        }
+        PDPageLabels labels = new PDPageLabels(doc);
+        Page previous = null;
+        for (int i = 0; i < pages.size(); i++) {
+            Page p = pages.get(i);
+            boolean follows = previous != null
+                    && (p.numbered() ? previous.numbered() && p.printed() == previous.printed() + 1 : !previous.numbered());
+            if (!follows) {
+                PDPageLabelRange range = new PDPageLabelRange();
+                if (p.numbered()) {
+                    range.setStyle(PDPageLabelRange.STYLE_DECIMAL);
+                    range.setStart(p.printed());
+                }
+                labels.setLabelItem(i, range);
+            }
+            previous = p;
+        }
+        doc.getDocumentCatalog().setPageLabels(labels);
     }
 
     @Override

@@ -926,6 +926,46 @@ class PdfCanvasTest {
         }
     }
 
+    private static final String SECTIONS_HEAD = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n"
+            + "\t\tHeight: 200\n\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
+            + "\t\t\t\tSize: 10\n\t\tFor class: english\n\t\t\tTypography:\n\t\t\t\tLanguage: en\n";
+
+    /** Las etiquetas de página del PDF son el número impreso (§5.21): ninguno en la portada, y el anexo reinicia. */
+    @Test
+    void pageLabelsAreThePrintedNumbers() throws Exception {
+        InlineNode doc = reader.read(SECTIONS_HEAD
+                + "\tSection:\n\t\tPage numbering: none\n\t\tText: Portada\n"
+                + "\tSection:\n\t\tText: Uno\n\t\tText: Dos\n\t\t\tBreak:\n\t\t\t\tBefore: page\n"
+                + "\tSection:\n\t\tPage numbering: restart\n\t\tText: Anexo\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "page-labels"))) {
+            assertEquals(4, pdf.getNumberOfPages());
+            assertArrayEquals(new String[] {"", "1", "2", "1"},
+                    pdf.getDocumentCatalog().getPageLabels().getLabelsByPageIndices());
+        }
+        // Sin nada que cambiar, ninguna etiqueta: el número impreso es el de la página.
+        InlineNode plain = reader.read(SECTIONS_HEAD + "\tSection:\n\t\tText: Uno\n\t\tText: Dos\n\t\t\tBreak:\n\t\t\t\tBefore: page\n");
+        try (PDDocument pdf = Loader.loadPDF(render(plain, "page-labels-plain"))) {
+            assertNull(pdf.getDocumentCatalog().getPageLabels());
+        }
+    }
+
+    /** Cada página del PDF mide lo que su sección, y cada sección es un {@code Sect} con su idioma. */
+    @Test
+    void eachSectionIsASectWithItsOwnPageSizeAndLanguage() throws Exception {
+        InlineNode doc = reader.read(SECTIONS_HEAD
+                + "\tSection:\n\t\tText: Uno\n"
+                + "\tSection:\n\t\tClass: english\n\t\tMedia:\n\t\t\tOrientation: landscape\n\t\t\tPaper: A4\n\t\tText: Two\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "sections-structure"))) {
+            assertEquals(300, pdf.getPage(0).getMediaBox().getWidth(), 1e-3);
+            assertEquals(842, pdf.getPage(1).getMediaBox().getWidth(), 1e-3);
+            assertEquals(595, pdf.getPage(1).getMediaBox().getHeight(), 1e-3);
+            PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot().getKids().get(0);
+            assertEquals(List.of("Sect", "Sect"), types(outer));
+            assertNull(((PDStructureElement) outer.getKids().get(0)).getLanguage());
+            assertEquals("en", ((PDStructureElement) outer.getKids().get(1)).getLanguage());
+        }
+    }
+
     /** La primera {@code Sect} de un documento etiquetado (§5.21): lo que cuelga de ella es el contenido. */
     private static PDStructureElement firstSection(PDStructureElement document) {
         assertEquals("Document", document.getStructureType());

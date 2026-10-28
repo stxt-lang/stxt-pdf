@@ -1,0 +1,31 @@
+# Los fragmentos del flujo y, después, los Fixed del documento y los de la sección (§5.21). La sección no se vuelca.
+Result:
+	Page: 1
+		Fragment: cover-box
+			Rect: 0 0 300 200
+		Fragment: stamp
+			Rect: 10 10 40 20
+	Page: 2
+		Fragment: b1
+			Rect: 20 20 260 60
+		Fragment: b2
+			Rect: 20 80 260 60
+		Fragment: foot
+			Rect: 20 168 260 12
+		Fragment: head
+			Rect: 20 20 260 12
+	Page: 3
+		Fragment: b3
+			Rect: 20 20 260 60
+		Fragment: foot
+			Rect: 20 168 260 12
+	Page: 4
+		Fragment: w1
+			Rect: 10 10 380 50
+		Fragment: foot
+			Rect: 10 128 380 12
+	Page: 5
+		Fragment: w2
+			Rect: 10 10 380 100
+		Fragment: foot
+			Rect: 10 128 380 12
