@@ -1,0 +1,21 @@
+# Página 1: toc en 20, de 4 entradas de 12; intro en 20 + 48 + 8 = 76; ref en 88.
+# Página 2: method en 20; data en 32 y fine en 44, de 12 cada uno.
+# Página 3: results en 20.
+Result:
+	Page: 1
+		Fragment: toc
+			Rect: 20 20 260 48
+		Fragment: intro
+			Rect: 20 76 260 12
+		Fragment: ref
+			Rect: 20 88 260 12
+	Page: 2
+		Fragment: method
+			Rect: 20 20 260 12
+		Fragment: data
+			Rect: 20 32 260 12
+		Fragment: fine
+			Rect: 20 44 260 12
+	Page: 3
+		Fragment: results
+			Rect: 20 20 260 12

@@ -1,0 +1,51 @@
+# Referencias a páginas e índice (ESPECIFICACION.md §5.19). Área útil de 260 × 260 desde (20, 20);
+# con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
+#
+# toc lista los encabezados de los niveles 1 y 2 (Levels: 1 2): Introducción, Método, Datos y
+# Resultados, cuatro entradas de 12 pt, y no Fino, que es de nivel 3. Mide 4 × 12 = 48 y deja un
+# margen de 8: intro empieza en 20 + 48 + 8 = 76, y ref, que escribe la página de results, justo
+# debajo, en 88 (con el 3 ya escrito: «Véase la página 3.» son 18 caracteres, 90 pt, una línea).
+# Cada encabezado grande va en un bloque con Break: Before: page. Página 2: method en 20, data
+# (Heading 2) en 32 y fine (Heading 3) en 44. Página 3: results en 20.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 300
+		Height: 300
+		Margin: 20
+	Title: Índice
+	Language: es
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Contents entry 2
+			Box:
+				Padding: 0 0 0 10
+	Contents:
+		Id: toc
+		Levels: 1 2
+		Box:
+			Margin: 0 0 8 0
+	Heading 1:
+		Id: intro
+		Text: Introducción
+	Text: Véase la página {page of: results}.
+		Id: ref
+	Block:
+		Break:
+			Before: page
+		Heading 1:
+			Id: method
+			Text: Método
+		Heading 2:
+			Id: data
+			Text: Datos
+		Heading 3:
+			Id: fine
+			Text: Fino
+	Block:
+		Break:
+			Before: page
+		Heading 1:
+			Id: results
+			Text: Resultados
