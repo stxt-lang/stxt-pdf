@@ -241,4 +241,44 @@ class ImageLayoutTest {
         assertFalse(f.has(1, "T"));
         assertRect(42, 40, 30, 30, f.rect(2, "T"));
     }
+
+    @Test
+    void anImageInATableCell() {
+        LayoutFixture f = layOut(
+                "\tTable:",
+                "\t\tColumns: 100 1fr",
+                "\t\tBody:",
+                "\t\t\tRow:",
+                "\t\t\t\tCell:",
+                "\t\t\t\t\tId: C",
+                "\t\t\t\t\tImage: test/square.png",
+                "\t\t\t\t\t\tId: S",
+                "\t\t\t\tCell: Texto");
+        // En la celda, un bloque, la imagen mide su tamaño natural.
+        assertRect(40, 40, 30, 30, f.rect("S"));
+        assertRect(40, 40, 100, 30, f.rect("C"));
+    }
+
+    @Test
+    void anImageThatDoesNotFitInAColumnMovesToTheNext() {
+        LayoutFixture f = layOut(
+                "\tMulticol:",
+                "\t\tId: M",
+                "\t\tCount: 2",
+                "\t\tFill: auto",
+                "\t\tBox:",
+                "\t\t\tHeight: 100",
+                "\t\tImage: test/wide.png",
+                "\t\t\tId: A",
+                "\t\t\tBox:",
+                "\t\t\t\tWidth: 120",
+                "\t\tImage: test/wide.png",
+                "\t\t\tId: B",
+                "\t\t\tBox:",
+                "\t\t\t\tWidth: 120");
+        // Columnas de 257,5: A (120 × 60) llena la primera y B pasa entera a la segunda.
+        assertRect(40, 40, 120, 60, f.rect("A"));
+        assertRect(297.5, 40, 120, 60, f.rect("B"));
+    }
 }
+

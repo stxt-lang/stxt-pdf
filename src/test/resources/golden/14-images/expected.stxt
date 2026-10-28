@@ -1,0 +1,31 @@
+# Página 1: title en 20; hero en 40, de 260 × 130; row en 40 + 130 + 8 = 178, de 60; portrait de
+#   45 × 60 y caption desde x = 20 + 45 + 10. logo en x = 20 + 260 − 12 e y = 20 − 16.
+# Página 2: moved en 20, de 60 × 80; fits en 20 + 80 + 8 = 108, de 50; md en 108 + 50 + 8 = 166,
+#   de 42.
+Result:
+	Page: 1
+		Fragment: title
+			Rect: 20 20 260 12
+		Fragment: hero
+			Rect: 20 40 260 130
+		Fragment: row
+			Rect: 20 178 260 60
+			Fragment: portrait
+				Rect: 20 178 45 60
+			Fragment: caption
+				Rect: 75 178 205 60
+		Fragment: logo
+			Rect: 268 4 12 12
+	Page: 2
+		Fragment: moved
+			Rect: 20 20 60 80
+		Fragment: fits
+			Rect: 20 108 260 50
+			Fragment: contain
+				Rect: 20 108 125 50
+			Fragment: cover
+				Rect: 155 108 125 50
+		Fragment: md
+			Rect: 20 166 260 42
+		Fragment: logo
+			Rect: 268 4 12 12

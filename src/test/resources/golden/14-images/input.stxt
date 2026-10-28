@@ -1,0 +1,85 @@
+# Imágenes (ESPECIFICACION.md §5.18). Área útil de 260 × 260 desde (20, 20). Las imágenes de
+# resources/images/test: wide.png de 200 × 100 píxeles (150 × 75 pt, proporción 2), tall.jpg de
+# 120 × 160 (90 × 120 pt, proporción 0,75) y square.png de 40 × 40 (30 × 30 pt).
+#
+# Página 1: title (12) y su margen de 8. hero, con Width: 100%, mide 260 × 130 (la proporción da
+# el alto) y deja otro margen de 8: el flex empieza en 178. portrait tiene Height: 60, así que su
+# ancho intrínseco es 45; caption crece hasta 260 − 45 − 10 = 205 (41 caracteres por línea: dos
+# líneas) y se estira al alto de la fila, 60. moved (60 × 80 con Width: 60) no cabe en lo que
+# queda (280 − 246 = 34) y pasa entera a la página 2.
+# Página 2: moved en 20, con su margen de 8. El grid tiene dos columnas de (260 − 10) / 2 = 125 y
+# sus imágenes declaran Height: 50, así que no se estiran en vertical: la fila mide 50 (con 80,
+# su ancho mínimo sería 160 y las columnas no cabrían). contain dibuja la imagen de 100 × 50
+# centrada en su caja, sobre su fondo; cover la dibuja de 125 × 62,5 y la recorta. El Markdown traduce la imagen sola en su párrafo a una Image de su tamaño
+# natural (30 × 30) y el párrafo va debajo: md mide 30 + 12.
+# logo: un Fixed en la esquina de arriba a la derecha, en el margen de la página, en las dos.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 300
+		Height: 300
+		Margin: 20
+	Title: Imágenes
+	Language: es
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Fixed:
+		Offset: -16 0 auto auto
+		Image: test/square.png
+			Id: logo
+			Box:
+				Width: 12
+	Text: Imágenes
+		Id: title
+		Box:
+			Margin: 0 0 8 0
+	Image: test/wide.png
+		Id: hero
+		Alt: Un paisaje con montañas y un sol
+		Box:
+			Width: 100%
+			Margin: 0 0 8 0
+	Flex:
+		Id: row
+		Gap: 10
+		Box:
+			Margin: 0 0 8 0
+		Item:
+			Image: test/tall.jpg
+				Id: portrait
+				Alt: Un retrato
+				Box:
+					Height: 60
+		Item:
+			Grow: 1
+			Text: Una foto en un flex: su ancho sale de su alto y de la proporción del fichero.
+				Id: caption
+	Image: test/tall.jpg
+		Id: moved
+		Box:
+			Width: 60
+			Margin: 0 0 8 0
+	Grid:
+		Id: fits
+		Columns: 1fr 1fr
+		Gap: 10
+		Box:
+			Margin: 0 0 8 0
+		Area:
+			Image: test/wide.png
+				Id: contain
+				Box:
+					Height: 50
+					Background: #E6E6E6
+		Area:
+			Image: test/wide.png
+				Id: cover
+				Fit: cover
+				Box:
+					Height: 50
+	Markdown:
+		Id: md
+		Content >>
+			![Logotipo](test/square.png)
+
+			Texto después de la imagen.
