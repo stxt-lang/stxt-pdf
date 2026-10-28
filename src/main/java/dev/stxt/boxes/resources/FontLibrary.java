@@ -91,7 +91,9 @@ public final class FontLibrary {
      *
      * @throws ResourceException si no hay ninguna fuente de esa familia o no tiene esa variante
      */
-    public FontFile find(FontFace face) {
+    public FontFile find(FontFace requested) {
+        // Un fichero sirve con y sin ligaduras: se identifica sin esa opción.
+        FontFace face = requested.base();
         FontFile file = faces.get(face);
         if (file != null) {
             return file;

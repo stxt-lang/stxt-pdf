@@ -49,7 +49,7 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
             return base;
         }
         return new FontFace(family != null ? family : base.family(), bold ? FontWeight.BOLD : base.weight(),
-                italic ? FontStyle.ITALIC : base.style());
+                italic ? FontStyle.ITALIC : base.style(), base.ligatures());
     }
 
     /** Si lleva subrayado o tachado, que se pintan aparte del texto. */

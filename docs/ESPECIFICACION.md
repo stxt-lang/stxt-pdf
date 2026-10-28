@@ -376,6 +376,7 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Transform` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas del texto al pintarlo; `capitalize` pone en mayúscula la primera letra de cada palabra. Las reglas de cada letra son las del idioma de `Language` ([§4.1](#41-media)). Ver [§5.4](#54-texto). |
 | `Letter spacing` | número (puntos) | `0` | Separación entre letras, que se suma al avance de cada carácter; puede ser negativa. Ver [§5.4](#54-texto). |
 | `Small caps` | `true`, `false` | `false` | Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto). |
+| `Ligatures` | `true`, `false` | `false` | Si el texto se mide y se pinta con las ligaduras de la fuente (`fi`, `fl`, `ffi`…); por defecto, un glifo por carácter. Con `Letter spacing` distinto de 0 no hay ligaduras. Ver [§5.4](#54-texto). |
 | `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Tratamiento del espacio en blanco: con `pre` y `pre-wrap` el texto conserva sus espacios y sus saltos de línea (código, terminales, columnas alineadas). Ver [§5.4](#54-texto). |
 | `Tab size` | entero ≥ 1 | `4` | Con `White space: pre` o `pre-wrap`, las columnas de una tabulación. Ver [§5.4](#54-texto). |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número (`1`, `1.1`, `1.1.1`…): se escribe delante del título y lo dan `{number of: id}`, los índices y los marcadores del PDF. Ver [§5.13](#513-encabezados-y-párrafos). |
@@ -876,6 +877,17 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   ajustes de `TJ` entre los caracteres (las fuentes son Type 0 Identity-H, donde `Tw` y `Tc` no
   sirven), así que el texto sigue siendo seleccionable, aunque un lector puede interpretar una
   separación grande como un espacio; en el SVG, con `letter-spacing`.
+- **Ligaduras (`Ligatures`).** Por defecto el texto se pinta con **un glifo por carácter**: `fi` son
+  dos glifos, la `f` y la `i`. Con `Ligatures: true` se aplica la tabla de sustitución de glifos
+  (`GSUB`) de la fuente, que junta algunos pares en un glifo de otro ancho (en IBM Plex Sans y Serif, `fi`,
+  `fl`, `ffi`, `ffl`; IBM Plex Mono no tiene ninguna). Es una propiedad de `Typography`: **se hereda** y vale
+  en `Styles`, así que se activa en `Element: Document` o solo en un elemento, y no cambia lo que se escribe
+  (la estructura del PDF etiquetado y el texto que se copia son los mismos). **Lo que se mide es lo que se
+  pinta** en los dos casos: con la opción activa, cada palabra (lo que hay entre dos espacios en blanco) se
+  mide con los glifos que quedan tras aplicar `GSUB`, que son los que se escriben en el PDF; una ligadura no
+  cruza un espacio ni el límite entre dos tramos con formato distinto. Con `Letter spacing` distinto de 0 no
+  hay ligaduras, como en CSS. El kerning no se aplica nunca ([§5.11](#511-recursos-y-fuentes)).
+  El SVG de depuración no distingue las dos formas.
 - **Texto preformateado (`White space`).** Por defecto el espacio en blanco se colapsa (arriba).
   Con `White space: pre` o `pre-wrap` el texto **conserva sus espacios y sus saltos de línea**,
   como un `<pre>`: cada línea del texto es una línea de la caja, también las vacías (una línea en
@@ -1367,8 +1379,8 @@ Cada fichero se identifica por lo que declara su interior, no por su nombre:
 - **estilo:** el bit de cursiva de `fsSelection` (`OS/2`).
 
 Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El
-kerning y las ligaduras no se aplican: el ancho de un texto es la suma de los avances de sus
-glifos.
+kerning no se aplica; las ligaduras, solo con `Ligatures: true` ([§5.4](#54-texto)): el ancho de un
+texto es la suma de los avances de sus glifos, y con ligaduras, de los que quedan tras aplicar `GSUB`.
 
 **Comprobaciones.** Con las métricas reales, antes de maquetar se comprueba que cada caja con
 texto tiene su fuente (familia, peso y estilo) en `fonts/` y que la fuente tiene todos los
@@ -2455,7 +2467,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Altura de línea | Calculada por fuente, *half-leading* y *baseline* | Cada línea mide `Line height`; la línea base se coloca con el *half-leading* de su fuente |
 | Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
 | `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Weight: normal` o `bold` y `Style: normal` o `italic`, sin síntesis: el fichero debe existir |
-| Kerning y ligaduras | Sí | No |
+| Kerning y ligaduras | Sí | Kerning, no; ligaduras, solo con `Ligatures: true` (por defecto no) |
 | Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color. Se escriben con Markdown en línea, solo donde se pide con `Inline: markdown`; sin ello el texto es literal ([§5.4](#54-texto)) |
 | `text-transform`, `letter-spacing`, `font-variant: small-caps` | `text-transform` también con `full-width`; el interletraje en cualquier unidad, también tras el último carácter; las versalitas con la característica `smcp` de la fuente | `Transform` con `none`, `uppercase`, `lowercase` y `capitalize`, y las reglas del idioma de `Language` (obligatorio); `Letter spacing` solo en puntos y sin interletraje tras el último carácter de la línea; `Small caps` sintetizadas con mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto) |
 | `white-space`, `tab-size` | `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line` y `break-spaces`; `tab-size` también como longitud | `White space` con `normal`, `pre` y `pre-wrap`; `pre` no parte las líneas y una más ancha que la caja es un error (`TEXT_OVERFLOW`); las líneas preformateadas no se justifican; los espacios del corte de `pre-wrap` se pierden; las tabulaciones, a la siguiente columna múltiplo de `Tab size` (por defecto 4, no 8). Ver [§5.4](#54-texto) |
@@ -2564,7 +2576,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Numbered`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Widows`, `Orphans`, `Language` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* (los de dentro de una `Section`) son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,

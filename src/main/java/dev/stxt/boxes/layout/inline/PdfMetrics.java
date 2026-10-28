@@ -49,7 +49,7 @@ public final class PdfMetrics implements TextMeasurer {
 
     @Override
     public double width(String text, FontFace font, double fontSize) {
-        return resources.fonts().find(font).width(text, fontSize);
+        return resources.fonts().find(font).width(text, fontSize, font.ligatures());
     }
 
     /** Las de la tabla {@code hhea} de la fuente, las mismas con que pinta {@link dev.stxt.boxes.paint.PdfCanvas}. */

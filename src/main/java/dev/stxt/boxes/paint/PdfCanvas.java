@@ -16,10 +16,13 @@ import dev.stxt.boxes.resources.ImageFile;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Media;
+import org.apache.fontbox.ttf.TTFParser;
+import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBoolean;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
@@ -47,6 +50,7 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -707,7 +711,11 @@ public final class PdfCanvas implements Canvas {
     private PDFont pdfFont(FontFace font) throws IOException {
         PDFont f = fonts.get(font);
         if (f == null) {
-            f = PDType0Font.load(doc, resources.fonts().find(font).path().toFile());
+            // Sin ligaduras se quita la tabla GSUB: PDFBox escribe un glifo por carácter, que es lo que se midió.
+            TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(
+                    Files.readAllBytes(resources.fonts().find(font).path())));
+            ttf.setEnableGsub(font.ligatures());
+            f = PDType0Font.load(doc, ttf, true);
             fonts.put(font, f);
         }
         return f;

@@ -168,6 +168,8 @@ public final class Style {
     /** Separación entre letras, en puntos; puede ser negativa. */
     public double letterSpacing;
     public boolean smallCaps;
+    /** {@code Ligatures}: si el texto se mide y se pinta con las ligaduras de la fuente (§4.4). Se hereda. */
+    public boolean ligatures;
     public WhiteSpace whiteSpace = WhiteSpace.NORMAL;
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
     public int tabSize = 4;
@@ -307,6 +309,7 @@ public final class Style {
             s.transform = parent.transform;
             s.letterSpacing = parent.letterSpacing;
             s.smallCaps = parent.smallCaps;
+            s.ligatures = parent.ligatures;
             s.whiteSpace = parent.whiteSpace;
             s.tabSize = parent.tabSize;
             s.numbered = parent.numbered;
@@ -340,9 +343,13 @@ public final class Style {
         return line;
     }
 
-    /** Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (§6). */
+    /**
+     * Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (§6). Las ligaduras se
+     * desactivan con {@code Letter spacing} distinto de 0, como en CSS: separar las letras y unir dos en un
+     * glifo se contradicen.
+     */
     public FontFace fontFace() {
-        return new FontFace(font, fontWeight, fontStyle);
+        return new FontFace(font, fontWeight, fontStyle, ligatures && letterSpacing == 0);
     }
 
     /** Altura de línea usada, en puntos. */

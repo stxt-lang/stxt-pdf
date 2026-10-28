@@ -917,6 +917,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Small caps
 				Max: 1
+			Child: Ligatures
+				Max: 1
 			Child: White space
 				Max: 1
 			Child: Tab size
@@ -1099,6 +1101,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Small caps
 		Type: BOOLEAN
 		Description: Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Por defecto, false.
+	Node: Ligatures
+		Type: BOOLEAN
+		Description: Si el texto se mide y se pinta con las ligaduras de la fuente (fi, fl, ffi…). Por defecto, false: un glifo por carácter. Se hereda. Con Letter spacing distinto de 0 no hay ligaduras. Solo importa en las fuentes que las tienen (IBM Plex Sans y Serif; Plex Mono no).
 	Node: White space
 		Type: ENUM
 		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio, y una línea en blanco separa párrafos), pre (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o pre-wrap (como pre, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.

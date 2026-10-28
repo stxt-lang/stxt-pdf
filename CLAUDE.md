@@ -410,6 +410,12 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
   `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
   SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.
+  **Ligaduras:** `Ligatures` (`Style.ligatures`, de `Typography`, se hereda; `false` por defecto) va en `FontFace.ligatures`
+  (`Style.fontFace()` lo apaga con `Letter spacing` distinto de 0). `FontLibrary.find` identifica el fichero con
+  `FontFace.base()`; `FontFile.width(texto, tamaño, ligaturas)` mide cada palabra con el `GsubWorker` de fontbox, el mismo que
+  PDFBox aplica al pintar, y `PdfCanvas.pdfFont` incrusta una fuente por combinación con
+  `TrueTypeFont.setEnableGsub(font.ligatures())`: sin la opción PDFBox no aplica `GSUB` (un glifo por carácter,
+  17 a 30 veces más rápido) y lo medido es lo pintado.
 - **Tramos (§5.4):** `Box.text` es siempre el texto entero y `Box.runs` (`null` sin formato) lo
   parte en `TextRun` con un `TextFormat` (negrita, cursiva, subrayado, tachado, que se suman a
   la fuente de la caja con `TextFormat.face`); usa `Box.runs()`, que da un único tramo si no

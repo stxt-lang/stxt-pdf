@@ -5,18 +5,25 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
 import org.apache.fontbox.ttf.CmapLookup;
 import org.apache.fontbox.ttf.TrueTypeFont;
+import org.apache.fontbox.ttf.gsub.GsubWorker;
+import org.apache.fontbox.ttf.gsub.GsubWorkerFactory;
+import org.apache.fontbox.ttf.model.GsubData;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (ESPECIFICACION.md §5.11).
  *
  * <p>Los anchos son los que escribe PDFBox en el PDF al incrustar la fuente (el avance de cada
  * glifo en milésimas del cuerpo, redondeado): así el texto mide al maquetar lo mismo que al
- * pintarlo. No se aplica el kerning.</p>
+ * pintarlo. No se aplica el kerning. Con ligaduras (ver {@link #width(String, double, boolean)}) el texto
+ * se mide con los mismos glifos que PDFBox escribe, porque se aplica la misma tabla GSUB.</p>
  *
  * <p>Es seguro entre hilos y no usa cerrojos al medir: al abrir la fuente se calcula el avance de
  * cada glifo y el de cada carácter se memoriza al pedirlo en una tabla de enteros, cuyas escrituras
@@ -27,6 +34,8 @@ public final class FontFile {
 
     /** Los caracteres del plano básico, que tienen su tabla de avances. */
     private static final int BMP = 0x10000;
+    /** Palabras que se memorizan como mucho con ligaduras; al pasar de aquí se vacía la memoria. */
+    private static final int MAX_LIGATURE_WORDS = 50_000;
     /** Avance aún sin calcular en {@link #bmpAdvance}. */
     private static final int UNKNOWN = -1;
 
@@ -41,6 +50,11 @@ public final class FontFile {
     private final int[] glyphAdvance;
     /** Avance de cada carácter del plano básico, o {@link #UNKNOWN}. */
     private final int[] bmpAdvance = new int[BMP];
+    /** Las palabras que ya se han medido con ligaduras, con su ancho en milésimas: aplicar GSUB es caro. */
+    private final ConcurrentHashMap<String, Integer> ligatureWords = new ConcurrentHashMap<>();
+    /** Lo mismo que aplica PDFBox al pintar; {@code null} hasta que se pide y si la fuente no tiene GSUB. */
+    private volatile GsubWorker gsub;
+    private volatile boolean gsubRead;
 
     FontFile(Path path, FontFace face, TrueTypeFont ttf) throws IOException {
         this.path = path;
@@ -84,15 +98,90 @@ public final class FontFile {
         return cmap.getGlyphId(codePoint) != 0;
     }
 
-    /** Ancho del texto en puntos. Los caracteres sin glifo miden lo que el glifo {@code .notdef}. */
+    /** Ancho del texto en puntos, sin ligaduras. Los caracteres sin glifo miden lo que el glifo {@code .notdef}. */
     public double width(String text, double fontSize) {
+        return width(text, fontSize, false);
+    }
+
+    /**
+     * Ancho del texto en puntos. Con {@code ligatures}, cada palabra (lo que hay entre dos espacios en blanco)
+     * se mide con los glifos que quedan después de aplicar la tabla GSUB de la fuente, que son los que
+     * PDFBox escribe al pintar: {@code fi} puede ser un solo glifo, de otro ancho. Una fuente sin GSUB, o
+     * una palabra con algún carácter sin glifo, se mide como siempre.
+     */
+    public double width(String text, double fontSize, boolean ligatures) {
+        GsubWorker worker = ligatures ? ligatureWorker() : null;
         long thousandths = 0;
         for (int i = 0; i < text.length(); ) {
+            if (worker != null && !isSpace(text.charAt(i))) {
+                int end = i;
+                while (end < text.length() && !isSpace(text.charAt(end))) {
+                    end++;
+                }
+                thousandths += ligatureWord(worker, text.substring(i, end));
+                i = end;
+                continue;
+            }
             int cp = text.codePointAt(i);
             thousandths += advance(cp);
             i += Character.charCount(cp);
         }
         return thousandths / 1000.0 * fontSize;
+    }
+
+    /** Lo que PDFBox toma por espacio al partir el texto en palabras antes de aplicar GSUB ({@code \s}). */
+    private static boolean isSpace(char c) {
+        return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r';
+    }
+
+    /** El ancho de una palabra con las ligaduras de la fuente, en milésimas del cuerpo. */
+    private int ligatureWord(GsubWorker worker, String word) {
+        Integer known = ligatureWords.get(word);
+        if (known != null) {
+            return known;
+        }
+        int[] codePoints = word.codePoints().toArray();
+        List<Integer> glyphs = new ArrayList<>(codePoints.length);
+        boolean complete = true;
+        for (int cp : codePoints) {
+            int glyph = cmap.getGlyphId(cp);
+            complete &= glyph > 0;
+            glyphs.add(glyph);
+        }
+        int thousandths = 0;
+        if (complete) {
+            for (int glyph : worker.applyTransforms(glyphs)) {
+                thousandths += glyphAdvance(glyph);
+            }
+        } else {
+            for (int cp : codePoints) {
+                thousandths += advance(cp);
+            }
+        }
+        if (ligatureWords.size() > MAX_LIGATURE_WORDS) {
+            ligatureWords.clear();
+        }
+        ligatureWords.put(word, thousandths);
+        return thousandths;
+    }
+
+    /** El aplicador de GSUB de la fuente, o {@code null} si no tiene tabla GSUB. */
+    private GsubWorker ligatureWorker() {
+        if (!gsubRead) {
+            synchronized (this) {
+                if (!gsubRead) {
+                    try {
+                        GsubData data = ttf.getGsubData();
+                        gsub = data == GsubData.NO_DATA_FOUND ? null
+                                : new GsubWorkerFactory().getGsubWorker(cmap, data);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    gsubRead = true;
+                }
+            }
+        }
+        return gsub;
     }
 
     /** Avance de un carácter, en milésimas del cuerpo. */

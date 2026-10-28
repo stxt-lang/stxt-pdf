@@ -1759,3 +1759,36 @@ interpretaciones que salieron al implementarlas.
      de la clase de una celda): los cortes de una fila son los de su `Row`, que los declara ella. Se decidió sin
      preguntar para no abrir un segundo camino al `Break` de la fila. *Alternativa:* permitirlo y tomarlo como el
      `Break` de la fila (sería el único caso en que una regla da `Break` a algo que no lo admite).
+
+## Ligaduras (2026-10-28, ROADMAP-QA-ARQ.md, QA-03 y PF-01)
+
+289. **`Ligatures` en `Typography`, heredable, `false` por defecto** (decidido con el usuario: con y sin
+     ligaduras, y sin por defecto). Antes PDFBox aplicaba la tabla `GSUB` al pintar mientras el motor medía un
+     glifo por carácter (decisión 48): en IBM Plex Sans y Serif cambiaban `fi`, `fl`, `ffi` y `ffl` y el texto
+     no medía lo que se pintaba. Ahora, sin la opción, se desactiva `GSUB` al incrustar la fuente
+     (`TrueTypeFont.setEnableGsub(false)`, API pública de fontbox) y el pintado de texto es entre 17 y 30 veces
+     más rápido; con ella, el texto se mide con los mismos glifos que se escriben. Cambia el aspecto de los
+     documentos existentes (las `fi` de Plex Serif dejan de ser ligadura): se regeneraron los PNG afectados,
+     revisados a ojo. *Dónde:* schema, `tree/Style.ligatures`, `tree/PropertyReader`, `model/FontFace`,
+     `resources/FontFile`, `paint/PdfCanvas.pdfFont`. *Alternativa:* medir siempre con ligaduras, o quitarlas
+     siempre sin opción.
+
+290. **La opción viaja en `FontFace`** (`ligatures`, cuarto componente; `base()` es la fuente sin ella): así la
+     usan sin cambios las firmas de `TextMeasurer`, `Canvas.text` y la caché de fuentes del PDF, y un fichero TTF
+     se identifica igual con y sin ligaduras (`FontLibrary.find` normaliza). `PdfCanvas` incrusta una fuente
+     distinta por cada combinación usada. *Alternativa:* un parámetro más en `TextMeasurer.width` y en `Canvas.text`.
+
+291. **Con `Letter spacing` distinto de 0 no hay ligaduras** (como en CSS), aunque `Ligatures` sea `true`:
+     `Style.fontFace()` lo resuelve. Además el pintado ya partía el texto carácter a carácter para el interletraje,
+     de modo que PDFBox no tenía dónde ligar. *Alternativa:* medir con ligaduras y pintar sin ellas (descuadra).
+
+292. **Se mide por palabras, como PDFBox aplica `GSUB`** (parte el texto en los espacios en blanco `\s`): una
+     ligadura no cruza un espacio ni un cambio de tramo, que se miden y se pintan por separado. Se aplica el
+     mismo `GsubWorker` de fontbox (`ccmp`, `liga` y `clig` para escritura latina) para que lo medido sea lo
+     escrito, y se memoriza el ancho de cada palabra. Una palabra con un carácter sin glifo se mide como siempre
+     (el error de glifo ausente ya lo da `PdfMetrics.validate`). *Alternativa:* leer solo la característica
+     `liga` de la tabla, con otro algoritmo que el de PDFBox.
+
+293. **El SVG de depuración no distingue `Ligatures`**: el navegador aplica las ligaduras de la fuente como
+     quiera. Solo es el lienzo de los tests; el PDF es la salida de verdad. *Alternativa:* `font-variant-ligatures`
+     en el texto del SVG.
