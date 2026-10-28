@@ -1,0 +1,70 @@
+# Integración continua (docs/ROADMAP-QA-ARQ.md, QA-09).
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests (JDK ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: Tests
+        run: mvn -B test
+      # Los tests no deben modificar nada versionado (ROADMAP-QA-ARQ.md, QA-07): un PNG de referencia
+      # reescrito es un cambio de resultado.
+      - name: El árbol sigue limpio
+        run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
+      - name: Informes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informes-jdk${{ matrix.java }}
+          path: |
+            target/surefire-reports
+            target/site/jacoco
+          if-no-files-found: ignore
+
+  # El resultado no debe depender del idioma de la JVM (QA-01, QA-02). Mientras QA-02 siga abierta, el
+  # texto de un SVG cambia en turco y reescribe PNG: esta ejecución no comprueba el árbol.
+  locale:
+    name: Tests con la JVM en turco
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+      - name: Tests
+        run: mvn -B test -DargLine="-Duser.language=tr -Duser.country=TR"
+
+  # Medidas de rendimiento (@Tag("perf")), a diario y a mano; no bloquean los cambios.
+  perf:
+    name: Rendimiento
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+      - run: mvn -B test -Dgroups=perf -DexcludedGroups=none
