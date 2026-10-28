@@ -28,14 +28,15 @@ final class PdfDestinations {
     }
 
     /**
-     * El destino de cada caja que lo tiene, en orden del documento. {@code area} es el área útil
-     * de la página y {@code pdfPages}, sus páginas del PDF, en el mismo orden que {@code pages}.
+     * El destino de cada caja que lo tiene, en orden del documento. {@code pdfPages} son sus
+     * páginas del PDF, en el mismo orden que {@code pages}; cada una tiene el medio de su sección.
      */
-    static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages, Rect area,
-                                               double pageHeight) {
+    static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
         for (int i = 0; i < pages.size(); i++) {
-            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), pageHeight, targets);
+            Rect area = pages.get(i).media().pageArea();
+            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i),
+                    pages.get(i).media().height(), targets);
         }
         return targets;
     }

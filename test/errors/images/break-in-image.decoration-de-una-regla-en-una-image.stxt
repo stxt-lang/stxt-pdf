@@ -11,7 +11,8 @@ Document (dev.stxt.boxes):
 		For class: photo
 			Break:
 				Decoration: clone
-	Block:
-		Class: photo
-	Image: test/wide.png
-		Class: photo
+	Section:
+		Block:
+			Class: photo
+		Image: test/wide.png
+			Class: photo

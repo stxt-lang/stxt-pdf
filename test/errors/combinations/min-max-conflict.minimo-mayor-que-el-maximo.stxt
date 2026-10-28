@@ -1,14 +1,15 @@
 # Case: Mínimo mayor que el máximo
 # Code: MIN_MAX_CONFLICT
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Height: 10
-			Max width: 100
-			Min width: 150
+	Section:
+		Block:
+			Box:
+				Height: 10
+				Max width: 100
+				Min width: 150

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
@@ -39,7 +40,7 @@ class PdfMetricsTest {
     private void validate(String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tSize: 10\n" + String.join("\n", boxLines);
-        metrics.validate(new BoxTreeBuilder().build(new DocumentReader().read(doc)).root());
+        metrics.validate(new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).root());
     }
 
     @Test
@@ -64,7 +65,7 @@ class PdfMetricsTest {
                 () -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: ibm plex sans",
                         "\t\tText: Hola"));
         assertEquals(ErrorCode.FONT_UNKNOWN, e.code());
-        assertEquals(13, e.line());
+        assertEquals(14, e.line());
         assertTrue(e.getMessage().contains("Fuente desconocida: ibm plex sans. ¿Querías decir 'IBM Plex Sans'?"),
                 e.getMessage());
     }
@@ -78,10 +79,10 @@ class PdfMetricsTest {
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: Hola";
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> regularOnly.validate(new BoxTreeBuilder().build(new DocumentReader().read(doc)).root()));
+                () -> regularOnly.validate(new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.code());
-        assertEquals(15, e.line());
-        assertTrue(e.getMessage().endsWith("(Font en la línea 10, Weight en la línea 14)"), e.getMessage());
+        assertEquals(16, e.line());
+        assertTrue(e.getMessage().endsWith("(Font en la línea 10, Weight en la línea 15)"), e.getMessage());
     }
 
     @Test
@@ -91,8 +92,8 @@ class PdfMetricsTest {
                         "\t\tText:", "\t\t\tTypography:", "\t\t\t\tWeight: bold", "\t\t\tContent >>",
                         "\t\t\t\tPrimera línea", "", "\t\t\t\tKanji 漢"));
         assertEquals(ErrorCode.GLYPH_MISSING, e.code());
-        assertEquals(20, e.line());
-        assertEquals("línea 20: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
+        assertEquals(21, e.line());
+        assertEquals("línea 21: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
 
     @Test
@@ -104,10 +105,10 @@ class PdfMetricsTest {
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tText:\n\t\tId: T\n\t\tContent >>\n\t\t\tPrimera línea\n\t\t\tsegunda línea";
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> regularOnly.validate(TextRuns.build(new DocumentReader().read(doc),
+                () -> regularOnly.validate(TextRuns.build(new DocumentReader().read(Docs.sectioned(doc)),
                         Map.of("T", List.of(run("Primera línea\nsegunda "), run("línea", "bi")))).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.code());
-        assertEquals(16, e.line());
+        assertEquals(17, e.line());
         assertTrue(e.getMessage().endsWith("(texto con formato bold italic)"), e.getMessage());
     }
 
@@ -117,10 +118,10 @@ class PdfMetricsTest {
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tText:\n\t\tId: T\n\t\tContent >>\n\t\t\tPrimera línea\n\t\t\tKanji 漢";
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> metrics.validate(TextRuns.build(new DocumentReader().read(doc),
+                () -> metrics.validate(TextRuns.build(new DocumentReader().read(Docs.sectioned(doc)),
                         Map.of("T", List.of(run("Primera "), run("línea\nKanji 漢", "i")))).root()));
         assertEquals(ErrorCode.GLYPH_MISSING, e.code());
-        assertEquals("línea 16: La fuente IBM Plex Sans italic no tiene el carácter '漢' (U+6F22)", e.getMessage());
+        assertEquals("línea 17: La fuente IBM Plex Sans italic no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
 
     @Test
@@ -137,11 +138,11 @@ class PdfMetricsTest {
         InvalidModelException block = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
                 "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
         assertEquals(ErrorCode.FONT_UNKNOWN, block.code());
-        assertEquals(14, block.line());
+        assertEquals(15, block.line());
         InvalidModelException inline = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
                 "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\tUsa `mvn`."));
         assertEquals(ErrorCode.FONT_UNKNOWN, inline.code());
-        assertEquals(16, inline.line());
+        assertEquals(17, inline.line());
         assertTrue(inline.getMessage().contains("Code font"), inline.getMessage());
     }
 }

@@ -1,17 +1,18 @@
 # Case: Id repetido
 # Code: DUPLICATE_ID
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Id: a
-		Box:
-			Height: 10
-	Block:
-		Id: a
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Id: a
+			Box:
+				Height: 10
+		Block:
+			Id: a
+			Box:
+				Height: 10

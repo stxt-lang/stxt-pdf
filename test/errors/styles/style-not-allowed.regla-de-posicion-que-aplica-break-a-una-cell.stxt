@@ -15,11 +15,12 @@ Document (dev.stxt.boxes):
 		Element: Head cell
 			Break:
 				After: avoid
-	Table:
-		Columns: 1fr
-		Head:
-			Row:
-				Cell: a
-		Body:
-			Row:
-				Cell: b
+	Section:
+		Table:
+			Columns: 1fr
+			Head:
+				Row:
+					Cell: a
+			Body:
+				Row:
+					Cell: b

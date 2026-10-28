@@ -1,6 +1,6 @@
 # Case: Página de una caja que está en un Fixed
 # Code: REFERENCE_NOT_PLACEABLE
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Ver la página {page of: pie}
-	Fixed:
-		Text: Pie
-			Id: pie
+	Section:
+		Text: Ver la página {page of: pie}
+		Fixed:
+			Text: Pie
+				Id: pie

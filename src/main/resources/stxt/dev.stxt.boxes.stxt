@@ -10,7 +10,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio, el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con Element: Document) y los elementos de primer nivel, en orden.
+		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con Element: Document), los Fixed de todas las secciones y una o más Section con el contenido, en orden.
 		Children:
 			Child: Media
 				Min: 1
@@ -22,6 +22,37 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Min: 1
 				Max: 1
 			Child: Styles
+				Max: 1
+			Child: Fixed
+			Child: Section
+				Min: 1
+	Node: Media
+		Type: GROUP
+		Description: Medio de salida: el tamaño de las páginas, con Paper (y Orientation) o con Width y Height. Define el área útil, que es el containing block inicial.
+		Children:
+			Child: Paper
+				Max: 1
+			Child: Orientation
+				Max: 1
+			Child: Width
+				Max: 1
+			Child: Height
+				Max: 1
+			Child: Margin
+				Max: 1
+	Node: Section
+		Type: GROUP
+		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Media (que hereda del documento por grupos), sus propios Fixed y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Media
+				Max: 1
+			Child: Page numbering
+				Max: 1
+			Child: Inherit fixed
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -43,20 +74,6 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
-	Node: Media
-		Type: GROUP
-		Description: Medio de salida: el tamaño de las páginas, con Paper (y Orientation) o con Width y Height. Define el área útil, que es el containing block inicial.
-		Children:
-			Child: Paper
-				Max: 1
-			Child: Orientation
-				Max: 1
-			Child: Width
-				Max: 1
-			Child: Height
-				Max: 1
-			Child: Margin
-				Max: 1
 	Node: Block
 		Type: GROUP
 		Description: Caja que apila sus hijos en vertical (flujo de bloque).
@@ -949,7 +966,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 	Node: Pages
 		Type: ENUM
-		Description: Páginas en que sale un Fixed, contando desde la 1 en el orden físico del documento: all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
+		Description: Páginas en que sale un Fixed, contando desde la 1 dentro de su alcance (las del documento si es un Fixed de Document, las de la sección si es de una Section): all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
 		Values:
 			Value: all
 			Value: first
@@ -957,6 +974,16 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Value: odd
 			Value: even
 			Value: last
+	Node: Page numbering
+		Type: ENUM
+		Description: Cómo numera una Section sus páginas con {page} y {pages}: continue (por defecto) sigue el contador del documento, restart vuelve a 1 y none no las numera ni avanza el contador (una portada). {pages} es el último número de la tanda, la que empieza en cada restart.
+		Values:
+			Value: continue
+			Value: restart
+			Value: none
+	Node: Inherit fixed
+		Type: BOOLEAN
+		Description: Si la Section lleva los Fixed del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
 	Node: Rotate
 		Type: NUMBER
 		Description: Giro de la caja al pintarla, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0), alrededor de Rotate origin. No cambia el layout: la caja ocupa su sitio sin girar; lo girado debe caber en la página.

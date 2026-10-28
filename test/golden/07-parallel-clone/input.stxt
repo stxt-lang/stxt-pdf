@@ -20,45 +20,46 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
-		Id: footer
-		Offset: auto 0 -15 0
-		Box:
-			Height: 10
-		Typography:
-			Size: 8
-			Align: right
-		Text: {page}/{pages}
-	Block:
-		Id: card
-		Box:
-			Border: 2
-			Padding: 3
-			Border color: #A32D2D
-		Break:
-			Decoration: clone
-		Block:
-			Id: c1
+	Section:
+		Fixed:
+			Id: footer
+			Offset: auto 0 -15 0
 			Box:
-				Height: 200
-				Background: #F1EFE8
-	Grid:
-		Id: grid
-		Columns: 1fr 1fr
-		Gap: 10
-		Area:
+				Height: 10
+			Typography:
+				Size: 8
+				Align: right
+			Text: {page}/{pages}
+		Block:
+			Id: card
+			Box:
+				Border: 2
+				Padding: 3
+				Border color: #A32D2D
+			Break:
+				Decoration: clone
 			Block:
-				Id: g1
+				Id: c1
 				Box:
 					Height: 200
-					Background: #E1F0E8
-		Area:
-			Block:
-				Id: g2
-				Box:
-					Height: 50
-					Background: #E1E8F0
-	Block:
-		Id: end
-		Box:
-			Height: 10
+					Background: #F1EFE8
+		Grid:
+			Id: grid
+			Columns: 1fr 1fr
+			Gap: 10
+			Area:
+				Block:
+					Id: g1
+					Box:
+						Height: 200
+						Background: #E1F0E8
+			Area:
+				Block:
+					Id: g2
+					Box:
+						Height: 50
+						Background: #E1E8F0
+		Block:
+			Id: end
+			Box:
+				Height: 10

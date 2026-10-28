@@ -1,11 +1,12 @@
 # Case: Image que no existe
 # Code: IMAGE_UNKNOWN
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Image: test/no-existe.png
+	Section:
+		Block:
+			Image: test/no-existe.png

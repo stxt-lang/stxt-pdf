@@ -216,6 +216,35 @@ final class StyleRules {
     }
 
     /**
+     * Aplica a una {@code Section} (§5.21) las reglas que le llegan: {@code Element: Section}, las de sus
+     * clases y la de su {@code Id}. Solo pueden dar {@code Typography}, que hereda todo su contenido;
+     * con {@code Box} o {@code Break} son un error (una sección es el área útil de sus páginas, no una caja).
+     */
+    void applySection(InlineNode n, Style s) {
+        List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(Element.SECTION, List.of()));
+        child(n, "class").ifPresent(c -> {
+            Set<String> classes = classes(c);
+            for (ClassRule rule : classRules) {
+                if (classes.contains(rule.name())) {
+                    rules.add(rule.rule());
+                }
+            }
+        });
+        child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
+        for (InlineNode rule : rules) {
+            for (String group : List.of("box", "break")) {
+                child(rule, group).ifPresent(g -> {
+                    throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "La regla " + rule.getName() + ": "
+                            + rule.getText().trim() + " se aplica a una Section (línea " + n.getLine()
+                            + "), que solo admite Typography: es el área útil de sus páginas, no una caja"),
+                            external.contains(rule));
+                });
+            }
+            read(rule, s);
+        }
+    }
+
+    /**
      * Aplica las reglas que corresponden a un elemento que no es una celda de tabla.
      *
      * @see #apply(InlineNode, Element, Style, Box, CellPosition)

@@ -1,6 +1,6 @@
 # Case: Encabezado de Markdown que salta de nivel
 # Code: HEADING_LEVEL
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Content >>
-			# Uno
+	Section:
+		Markdown:
+			Content >>
+				# Uno
 
-			### Tres
+				### Tres

@@ -37,27 +37,28 @@ Document (dev.stxt.boxes):
 		Element: Paragraph
 			Box:
 				Margin: 0 0 6 0
-	Heading 1:
-		Id: h1
-		Text: Resultados
-		Text: del trimestre
-	Paragraph:
-		Id: p1
-		Content >>
-			Primer párrafo.
-	Heading 2:
-		Id: h2a
-		Text: Ventas
-	Heading 3:
-		Id: h3
-		Text: Detalle
-	Block:
-		Id: fill
-		Box:
-			Height: 80
-			Background: #F1EFE8
-	Heading 2:
-		Id: h2b
-		Text: Costes
-	Paragraph: Segundo párrafo.
-		Id: p2
+	Section:
+		Heading 1:
+			Id: h1
+			Text: Resultados
+			Text: del trimestre
+		Paragraph:
+			Id: p1
+			Content >>
+				Primer párrafo.
+		Heading 2:
+			Id: h2a
+			Text: Ventas
+		Heading 3:
+			Id: h3
+			Text: Detalle
+		Block:
+			Id: fill
+			Box:
+				Height: 80
+				Background: #F1EFE8
+		Heading 2:
+			Id: h2b
+			Text: Costes
+		Paragraph: Segundo párrafo.
+			Id: p2

@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
  */
 public enum Element {
 
+    /**
+     * Una sección del documento (§5.21): un bloque que es la raíz de su propio layout, con su
+     * {@code Media}. Solo es hijo de la raíz del documento.
+     */
+    SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
     BLOCK("Block", Layout.BLOCK, Position.STATIC, true, false, 0),
     FLEX("Flex", Layout.FLEX, Position.STATIC, true, false, 0),
     GRID("Grid", Layout.GRID, Position.STATIC, true, false, 0),

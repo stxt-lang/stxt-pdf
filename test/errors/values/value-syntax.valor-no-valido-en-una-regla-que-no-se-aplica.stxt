@@ -11,3 +11,5 @@ Document (dev.stxt.boxes):
 		Element: Grid
 			Box:
 				Background: rojo
+	Section:
+		Text: Hola

@@ -11,6 +11,7 @@ import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -98,8 +99,12 @@ public final class BoxTreeBuilder {
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
-    /** Resultado: el medio, una caja raíz anónima que representa el área útil, y el título y el idioma. */
-    public record Result(Media media, Box root, Metadata metadata) {
+    /**
+     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus
+     * secciones (§5.21), las secciones en orden y el título y el idioma. Cada sección es la raíz de
+     * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
+     */
+    public record Result(Media media, Box root, List<Section> sections, Metadata metadata) {
     }
 
     /**
@@ -134,7 +139,8 @@ public final class BoxTreeBuilder {
             }
             DocumentSchema.validate(styles);
         }
-        Media media = media(inline(child(document, "media").orElseThrow()));
+        MediaSpec documentMedia = media(inline(child(document, "media").orElseThrow()), null);
+        Media media = documentMedia.media();
         Metadata metadata = metadata(document);
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
@@ -143,13 +149,59 @@ public final class BoxTreeBuilder {
         rootStyle.locale = Locale.forLanguageTag(metadata.language());
         ctx.rules.applyDocument(rootStyle);
         Box root = new Box(null, null, rootStyle, true, document.getLine());
-        // El área útil tiene el alto de la página, menos los márgenes: siempre definido.
         ctx.definiteHeight.put(root, true);
-        buildContent(ctx, document, root);
+        List<Section> sections = new ArrayList<>();
+        for (Node h : document.getChildren()) {
+            if (h.getCanonicalName().equals("fixed")) {
+                root.addChild(element(ctx, inline(h), root, null, null));
+            } else if (h.getCanonicalName().equals("section")) {
+                Section section = section(ctx, inline(h), root, documentMedia);
+                sections.add(section);
+                // Cuelga de la raíz sin ser su hija (sin padre): cada sección es la raíz de su layout.
+                root.children.add(section.box());
+            }
+        }
         ContentsBuilder.build(ctx, root);
         References.validate(root);
         LinkTargets.validate(root);
-        return new Result(media, root, metadata);
+        return new Result(media, root, List.copyOf(sections), metadata);
+    }
+
+    /**
+     * Una {@code Section} (§5.21): su caja, que es la raíz de su layout y tiene el alto de la página
+     * menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
+     */
+    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaSpec documentMedia) {
+        Style s = Style.inheriting(documentRoot.style);
+        s.layout = Style.Layout.BLOCK;
+        s.position = Style.Position.STATIC;
+        ctx.rules.applySection(n, s);
+        String id = null;
+        MediaSpec media = documentMedia;
+        Section.PageNumbering numbering = Section.PageNumbering.CONTINUE;
+        boolean inheritFixed = true;
+        for (Node p : n.getChildren()) {
+            switch (p.getCanonicalName()) {
+                case "id" -> id = ctx.id(p);
+                case "media" -> media = media(inline(p), documentMedia);
+                case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
+                case "inherit-fixed" -> inheritFixed = bool(p);
+                default -> {
+                }
+            }
+        }
+        Box box = new Box(id, Element.SECTION, s, false, n.getLine());
+        ctx.definiteHeight.put(box, true);
+        buildContent(ctx, n, box);
+        if (box.children.stream().allMatch(c -> c.style.position == Style.Position.FIXED)) {
+            throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
+                    + "cuentan, no ocupan sitio) no tiene ninguna página");
+        }
+        return new Section(box, media.media(), numbering, inheritFixed);
+    }
+
+    /** Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo (§5.21). */
+    private record MediaSpec(Media media, Media.Paper paper) {
     }
 
     /** {@code Title} y {@code Language} de {@code Document}: un título no vacío y una etiqueta BCP 47. */
@@ -169,24 +221,39 @@ public final class BoxTreeBuilder {
      * El medio (§4.1): su tamaño es un {@code Paper} con su {@code Orientation} o un {@code Width}
      * y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez.
      */
-    private static Media media(InlineNode n) {
+    private static MediaSpec media(InlineNode n, MediaSpec base) {
         Optional<Node> paper = child(n, "paper");
         Optional<Node> orientation = child(n, "orientation");
         Optional<Node> widthNode = child(n, "width");
         Optional<Node> heightNode = child(n, "height");
         double width;
         double height;
+        Media.Paper named = null;
         if (paper.isPresent()) {
             Optional<Node> both = widthNode.isPresent() ? widthNode : heightNode;
             if (both.isPresent()) {
                 throw error(both.get(), ErrorCode.MEDIA_SIZE, "El medio declara Paper y " + both.get().getName()
                         + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
             }
-            Media.Paper p = enumValue(Media.Paper.class, paper.get());
+            named = enumValue(Media.Paper.class, paper.get());
+        } else if (base != null && orientation.isPresent() && widthNode.isEmpty() && heightNode.isEmpty()) {
+            // Una sección que solo gira el papel del documento.
+            if (base.paper() == null) {
+                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
+                        + "documento no lo declara (da Width y Height): declara Paper en la sección o en el documento");
+            }
+            named = base.paper();
+        }
+        if (named != null) {
             boolean landscape = orientation.map(o -> enumValue(Media.Orientation.class, o))
                     .orElse(Media.Orientation.PORTRAIT) == Media.Orientation.LANDSCAPE;
-            width = landscape ? p.height : p.width;
-            height = landscape ? p.width : p.height;
+            width = landscape ? named.height : named.width;
+            height = landscape ? named.width : named.height;
+        } else if (base != null && widthNode.isEmpty() && heightNode.isEmpty() && orientation.isEmpty()) {
+            // El tamaño es el del documento.
+            width = base.media().width();
+            height = base.media().height();
+            named = base.paper();
         } else {
             if (orientation.isPresent()) {
                 throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
@@ -200,12 +267,13 @@ public final class BoxTreeBuilder {
             height = points(heightNode.get());
         }
         Optional<Node> marginNode = child(n, "margin");
-        Insets margin = marginNode.map(BoxTreeBuilder::mediaMargin).orElse(Insets.ZERO);
+        Insets margin = marginNode.map(BoxTreeBuilder::mediaMargin)
+                .orElse(base != null ? base.media().margin() : Insets.ZERO);
         Media media = new Media(width, height, margin);
         if (media.pageArea().width() <= 0 || media.pageArea().height() <= 0) {
             throw error(marginNode.orElse(n), ErrorCode.MEDIA_SIZE, "Los márgenes del medio no dejan área útil");
         }
-        return media;
+        return new MediaSpec(media, named);
     }
 
     private static Insets mediaMargin(Node n) {

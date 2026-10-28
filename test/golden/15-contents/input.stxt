@@ -22,31 +22,32 @@ Document (dev.stxt.boxes):
 		Element: Contents entry 2
 			Box:
 				Padding: 0 0 0 10
-	Contents:
-		Id: toc
-		Levels: 1 2
-		Box:
-			Margin: 0 0 8 0
-	Heading 1:
-		Id: intro
-		Text: Introducción
-	Text: Véase la página {page of: results}.
-		Id: ref
-	Block:
-		Break:
-			Before: page
+	Section:
+		Contents:
+			Id: toc
+			Levels: 1 2
+			Box:
+				Margin: 0 0 8 0
 		Heading 1:
-			Id: method
-			Text: Método
-		Heading 2:
-			Id: data
-			Text: Datos
-		Heading 3:
-			Id: fine
-			Text: Fino
-	Block:
-		Break:
-			Before: page
-		Heading 1:
-			Id: results
-			Text: Resultados
+			Id: intro
+			Text: Introducción
+		Text: Véase la página {page of: results}.
+			Id: ref
+		Block:
+			Break:
+				Before: page
+			Heading 1:
+				Id: method
+				Text: Método
+			Heading 2:
+				Id: data
+				Text: Datos
+			Heading 3:
+				Id: fine
+				Text: Fino
+		Block:
+			Break:
+				Before: page
+			Heading 1:
+				Id: results
+				Text: Resultados

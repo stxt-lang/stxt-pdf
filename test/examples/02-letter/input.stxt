@@ -7,98 +7,99 @@ Document (dev.stxt.boxes):
 		Margin: 44 72 64 72
 	Title: Propuesta de mobiliario para el Mirador del Valle
 	Language: es
-	Fixed:
-		Id: footer
-		Offset: auto 0 -42 0
-		Text: Taller Nogal S.L. · CIF B-17482930 · Carrer de la Farga, 14 · 17800 Olot · tallernogal.example
-			Link: https://tallernogal.example
-	Flex:
-		Id: letterhead
-		Main axis: between
-		Cross axis: end
-		Box:
-			Margin: 0 0 24 0
-			Padding: 0 0 12 0
-			Border: 0 0 1.5 0
-			Border color: #3B2A1E
-		Item:
-			Image: examples/brand/nogal.svg
-				Alt: Nogal, taller de mobiliario
-				Box:
-					Width: 150
-		Item:
-			Block:
-				Text: Carrer de la Farga, 14 · 17800 Olot
-					Class: small
-					Typography:
-						Align: right
-				Text: 972 00 11 22 · tallernogal.example
-					Link: https://tallernogal.example
-					Class: small
-					Typography:
-						Align: right
-	Text: Olot, 20 de octubre de 2025
-		Id: date
-		Typography:
-			Align: right
-		Box:
-			Margin: 0 0 16 0
-	Block:
-		Id: recipient
-		Box:
-			Margin: 0 0 16 0
-		Text: Sr. Ramon Puig Casals
+	Section:
+		Fixed:
+			Id: footer
+			Offset: auto 0 -42 0
+			Text: Taller Nogal S.L. · CIF B-17482930 · Carrer de la Farga, 14 · 17800 Olot · tallernogal.example
+				Link: https://tallernogal.example
+		Flex:
+			Id: letterhead
+			Main axis: between
+			Cross axis: end
+			Box:
+				Margin: 0 0 24 0
+				Padding: 0 0 12 0
+				Border: 0 0 1.5 0
+				Border color: #3B2A1E
+			Item:
+				Image: examples/brand/nogal.svg
+					Alt: Nogal, taller de mobiliario
+					Box:
+						Width: 150
+			Item:
+				Block:
+					Text: Carrer de la Farga, 14 · 17800 Olot
+						Class: small
+						Typography:
+							Align: right
+					Text: 972 00 11 22 · tallernogal.example
+						Link: https://tallernogal.example
+						Class: small
+						Typography:
+							Align: right
+		Text: Olot, 20 de octubre de 2025
+			Id: date
+			Typography:
+				Align: right
+			Box:
+				Margin: 0 0 16 0
+		Block:
+			Id: recipient
+			Box:
+				Margin: 0 0 16 0
+			Text: Sr. Ramon Puig Casals
+				Typography:
+					Weight: bold
+			Text: Dirección del Hotel Mirador del Valle
+			Text: Camí del Mirador, s/n
+			Text: 17850 Besalú (Girona)
+		Text: Asunto: propuesta de renovación del mobiliario · Ref. P-2025-118
+			Id: subject
+			Class: subject
+		Markdown:
+			Id: body
+			Bullet: dash
+			Typography:
+				Align: justify
+				Text wrap: pretty
+			Content >>
+				Estimado Sr. Puig:
+
+				Gracias por recibirnos el jueves pasado en el Mirador del Valle. Después de recorrer las dieciocho habitaciones y la sala de desayunos, le adjuntamos nuestra propuesta para renovar el mobiliario antes de la temporada de primavera.
+
+				Nuestra idea parte de una premisa sencilla: que **cada pieza envejezca bien**. Trabajamos nogal y roble macizos de bosques gestionados de la comarca, con ensambles de carpintería tradicional y acabados al aceite que se pueden reparar sin lijar la pieza entera. Para su hotel proponemos:
+
+				- un escritorio y una silla de roble para cada habitación, con acabado natural;
+				- una *mesa de comedor* de 180 cm para la sala de desayunos, con ++seis sillas++ a juego;
+				- estanterías de pared y espejos de nogal para los pasillos de las dos plantas.
+
+				El plazo de fabricación es de **diez semanas** desde la aceptación del presupuesto. Si nos confirma antes del 15 de noviembre, podemos entregar e instalar todo entre el 2 y el 6 de febrero, con el hotel cerrado por vacaciones y sin molestias para sus clientes.
+
+				Nos encantaría que visitara el taller para ver las maderas y probar las sillas. Estamos abiertos de lunes a viernes, y Joan, nuestro maestro ebanista, le explicará cada ensamble.
+
+				Reciba un cordial saludo,
+		Image: examples/letter/signature.svg
+			Id: signature
+			Box:
+				Width: 128
+				Margin: 4 0 2 0
+		Text: Laia Soler Vidal
+			Id: name
 			Typography:
 				Weight: bold
-		Text: Dirección del Hotel Mirador del Valle
-		Text: Camí del Mirador, s/n
-		Text: 17850 Besalú (Girona)
-	Text: Asunto: propuesta de renovación del mobiliario · Ref. P-2025-118
-		Id: subject
-		Class: subject
-	Markdown:
-		Id: body
-		Bullet: dash
-		Typography:
-			Align: justify
-			Text wrap: pretty
-		Content >>
-			Estimado Sr. Puig:
-
-			Gracias por recibirnos el jueves pasado en el Mirador del Valle. Después de recorrer las dieciocho habitaciones y la sala de desayunos, le adjuntamos nuestra propuesta para renovar el mobiliario antes de la temporada de primavera.
-
-			Nuestra idea parte de una premisa sencilla: que **cada pieza envejezca bien**. Trabajamos nogal y roble macizos de bosques gestionados de la comarca, con ensambles de carpintería tradicional y acabados al aceite que se pueden reparar sin lijar la pieza entera. Para su hotel proponemos:
-
-			- un escritorio y una silla de roble para cada habitación, con acabado natural;
-			- una *mesa de comedor* de 180 cm para la sala de desayunos, con ++seis sillas++ a juego;
-			- estanterías de pared y espejos de nogal para los pasillos de las dos plantas.
-
-			El plazo de fabricación es de **diez semanas** desde la aceptación del presupuesto. Si nos confirma antes del 15 de noviembre, podemos entregar e instalar todo entre el 2 y el 6 de febrero, con el hotel cerrado por vacaciones y sin molestias para sus clientes.
-
-			Nos encantaría que visitara el taller para ver las maderas y probar las sillas. Estamos abiertos de lunes a viernes, y Joan, nuestro maestro ebanista, le explicará cada ensamble.
-
-			Reciba un cordial saludo,
-	Image: examples/letter/signature.svg
-		Id: signature
-		Box:
-			Width: 128
-			Margin: 4 0 2 0
-	Text: Laia Soler Vidal
-		Id: name
-		Typography:
-			Weight: bold
-	Text: Directora comercial · Taller Nogal
-		Class: small
-		Typography:
-			Font: IBM Plex Serif
-			Style: italic
-			Size: 9.5
-	Paragraph: P. D. Le adjuntamos el catálogo de acabados con muestras de las dos maderas; si lo prefiere, se las llevamos al hotel.
-		Id: postscript
-		Class: small
-		Typography:
-			Font: IBM Plex Serif
-			Style: italic
-			Size: 9.5
-		Box:
-			Margin: 14 0 0 0
+		Text: Directora comercial · Taller Nogal
+			Class: small
+			Typography:
+				Font: IBM Plex Serif
+				Style: italic
+				Size: 9.5
+		Paragraph: P. D. Le adjuntamos el catálogo de acabados con muestras de las dos maderas; si lo prefiere, se las llevamos al hotel.
+			Id: postscript
+			Class: small
+			Typography:
+				Font: IBM Plex Serif
+				Style: italic
+				Size: 9.5
+			Box:
+				Margin: 14 0 0 0

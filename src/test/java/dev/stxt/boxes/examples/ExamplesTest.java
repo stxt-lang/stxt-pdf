@@ -78,7 +78,7 @@ class ExamplesTest {
         InlineNode styles = Files.exists(stylesFile) ? reader.readStyles(stylesFile) : null;
         Resources resources = new Resources();
         LaidOutDocument document = new Engine(new PdfMetrics(resources), resources).layOutDocument(input, styles);
-        String dump = StxtDump.dump(document.pages(), document.media().pageArea(), false);
+        String dump = StxtDump.dump(document.pages(), false);
 
         Path expectedFile = dir.resolve("expected.stxt");
         if (Boolean.getBoolean("examples.update")) {

@@ -1,6 +1,6 @@
 # Case: Salto de nivel entre encabezados
 # Code: HEADING_LEVEL
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Heading 1:
-		Text: Uno
-	Block:
-		Heading 3:
-			Text: Tres
+	Section:
+		Heading 1:
+			Text: Uno
+		Block:
+			Heading 3:
+				Text: Tres

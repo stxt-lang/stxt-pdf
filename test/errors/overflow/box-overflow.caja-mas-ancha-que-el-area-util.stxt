@@ -1,13 +1,14 @@
 # Case: Caja más ancha que el área útil
 # Code: BOX_OVERFLOW
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 600
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Width: 600
+				Height: 10

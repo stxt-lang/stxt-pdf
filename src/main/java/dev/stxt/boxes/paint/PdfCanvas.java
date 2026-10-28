@@ -125,23 +125,25 @@ public final class PdfCanvas implements Canvas {
     public static void write(LaidOutDocument document, Resources resources, OutputStream target, boolean debug)
             throws IOException {
         List<Page> pages = document.pages();
-        Media media = document.media();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
             PdfImages images = new PdfImages(doc, resources);
-            PdfStructure structure = new PdfStructure(doc, root(pages));
+            PdfStructure structure = new PdfStructure(doc, document.root());
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata());
-            Rect area = media.pageArea();
             // Todas las páginas existen antes de pintar ninguna: un enlace puede ir hacia delante.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {
+                Media media = pages.get(i).media();
                 PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) media.height()));
                 doc.addPage(page);
                 pdfPages.add(page);
             }
             for (int i = 0; i < pages.size(); i++) {
                 Page p = pages.get(i);
+                // Cada página tiene el medio de su sección (§5.21).
+                Media media = p.media();
+                Rect area = media.pageArea();
                 PDPage page = pdfPages.get(i);
                 structure.startPage(page);
                 PdfCanvas canvas;
@@ -156,21 +158,11 @@ public final class PdfCanvas implements Canvas {
                     page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
             }
-            Map<Box, PDPageXYZDestination> destinations =
-                    PdfDestinations.find(pages, pdfPages, area, media.height());
+            Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations);
             structure.finish(doc, destinations);
             doc.save(target);
         }
-    }
-
-    /** La raíz del árbol de cajas: la caja del fragmento raíz de cualquier página. */
-    private static Box root(List<Page> pages) {
-        Box b = pages.get(0).content().box();
-        while (b.parent != null) {
-            b = b.parent;
-        }
-        return b;
     }
 
     @Override

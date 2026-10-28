@@ -1,6 +1,6 @@
 # Case: Línea entre columnas sin hueco
 # Code: COLUMN_RULE_WIDTH
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Count: 2
-		Rule: 0.5
-		Text: Hola
+	Section:
+		Multicol:
+			Count: 2
+			Rule: 0.5
+			Text: Hola

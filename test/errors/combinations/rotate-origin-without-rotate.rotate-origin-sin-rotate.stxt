@@ -1,11 +1,12 @@
 # Case: Rotate origin sin Rotate
 # Code: ROTATE_ORIGIN_WITHOUT_ROTATE
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Image: test/square.png
-		Rotate origin: top left
+	Section:
+		Image: test/square.png
+			Rotate origin: top left

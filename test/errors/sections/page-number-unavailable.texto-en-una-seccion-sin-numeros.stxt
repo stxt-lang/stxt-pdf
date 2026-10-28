@@ -1,0 +1,17 @@
+# Case: Texto con {pages} en una sección sin números
+# Code: PAGE_NUMBER_UNAVAILABLE
+# Line: 17
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page numbering: none
+		Text: Hay {pages} páginas

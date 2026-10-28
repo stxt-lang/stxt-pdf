@@ -1,16 +1,17 @@
 # Case: Margin auto en un ítem de flex
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Flex:
-		Item:
-			Block:
-				Box:
-					Width: 100
-					Height: 10
-					Margin: 0 auto
+	Section:
+		Flex:
+			Item:
+				Block:
+					Box:
+						Width: 100
+						Height: 10
+						Margin: 0 auto

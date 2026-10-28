@@ -1,6 +1,6 @@
 # Case: Start en una lista que no numera
 # Code: LIST_NUMBER_NOT_ALLOWED
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	List:
-		Marker: disc
-		Start: 2
-		List item:
-			Text: Uno
+	Section:
+		List:
+			Marker: disc
+			Start: 2
+			List item:
+				Text: Uno

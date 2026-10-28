@@ -1,6 +1,6 @@
 # Case: Imagen de Markdown con título
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Content >>
-			![Acme](test/square.png "El logotipo")
+	Section:
+		Markdown:
+			Content >>
+				![Acme](test/square.png "El logotipo")

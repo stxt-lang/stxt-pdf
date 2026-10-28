@@ -1,6 +1,6 @@
 # Case: Absolute sin girar dentro de un Relative girado que lo saca de la página
 # Code: BOX_OVERFLOW
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -8,12 +8,13 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Relative:
-		Rotate: 180
-		Box:
-			Height: 100
-		Absolute:
-			Offset: 0 auto auto 0
+	Section:
+		Relative:
+			Rotate: 180
 			Box:
-				Width: 20
-				Height: 150
+				Height: 100
+			Absolute:
+				Offset: 0 auto auto 0
+				Box:
+					Width: 20
+					Height: 150

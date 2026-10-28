@@ -1,13 +1,14 @@
 # Case: Relative desde izquierda y derecha
 # Code: OFFSET_CONFLICT
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Relative:
-		Offset: auto 7 auto 11
-		Box:
-			Height: 10
+	Section:
+		Relative:
+			Offset: auto 7 auto 11
+			Box:
+				Height: 10

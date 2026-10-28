@@ -1,6 +1,6 @@
 # Case: Un enlace de Markdown a un fichero local
 # Code: LINK_SCHEME
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Content >>
-			Mira [mis claves](file:///etc/passwd).
+	Section:
+		Markdown:
+			Content >>
+				Mira [mis claves](file:///etc/passwd).

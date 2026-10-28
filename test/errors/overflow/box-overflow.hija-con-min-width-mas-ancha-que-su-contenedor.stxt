@@ -1,16 +1,17 @@
 # Case: Hija con Min width más ancha que su contenedor
 # Code: BOX_OVERFLOW
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 100
+	Section:
 		Block:
 			Box:
-				Min width: 150
-				Height: 10
+				Width: 100
+			Block:
+				Box:
+					Min width: 150
+					Height: 10

@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
@@ -32,9 +33,9 @@ class StylesFileTest {
 
     /** El documento (cabecera y estas líneas) con el documento de estilos aparte, o sin él si es {@code null}. */
     private static Box root(String styles, String... lines) {
-        InlineNode document = READER.read(HEADER + String.join("\n", lines));
+        InlineNode document = READER.read(Docs.sectioned(HEADER + String.join("\n", lines)));
         InlineNode external = styles == null ? null : READER.readStyles(styles);
-        return new BoxTreeBuilder().build(document, external).root();
+        return new BoxTreeBuilder().build(document, external).sections().get(0).box();
     }
 
     private static InvalidModelException error(String styles, String... lines) {
@@ -177,18 +178,18 @@ class StylesFileTest {
 
     @Test
     void theDocumentNoLongerTakesATypography() {
-        ParseException e = assertThrows(ParseException.class, () -> READER.read(HEADER + "\tTypography:\n\t\tSize: 10\n\tText: a"));
+        ParseException e = assertThrows(ParseException.class, () -> READER.read(Docs.sectioned(HEADER + "\tTypography:\n\t\tSize: 10\n\tText: a")));
         assertEquals("CHILD_NOT_DECLARED", e.getCode());
     }
 
     @Test
     void theRootOfTheStylesDocumentMustBeStyles() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> READER.readStyles(HEADER + "\tText: a"));
+                () -> READER.readStyles(HEADER + "\tSection:\n\t\tText: a"));
         assertEquals(ErrorCode.DOCUMENT_ROOT, e.code());
         assertThrows(InvalidModelException.class, () -> READER.readStyles(BASE + "Styles (dev.stxt.boxes):\n"));
         // Y no se pasa un Document como estilos.
-        InlineNode document = READER.read(HEADER + "\tText: a");
+        InlineNode document = READER.read(Docs.sectioned(HEADER + "\tText: a"));
         assertThrows(InvalidModelException.class, () -> new BoxTreeBuilder().build(document, document));
     }
 
@@ -221,7 +222,7 @@ class StylesFileTest {
 
     @Test
     void thePdfCanBeWrittenWithTheStylesDocument() throws IOException {
-        InlineNode document = READER.read(HEADER + "\tText: Hola");
+        InlineNode document = READER.read(Docs.sectioned(HEADER + "\tText: Hola"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter.write(document, READER.readStyles(BASE), new Resources(), out, false);
         assertTrue(out.size() > 1000);

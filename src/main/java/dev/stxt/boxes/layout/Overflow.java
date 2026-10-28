@@ -61,12 +61,14 @@ public final class Overflow {
     }
 
     /** @throws InvalidModelException con el primer desbordamiento que encuentra */
-    public static void check(List<Page> pages, Media media) {
-        Rect area = media.pageArea();
-        Insets m = media.margin();
-        // La página física, en coordenadas del área útil.
-        Rect page = new Rect(-m.left(), -m.top(), media.width(), media.height());
+    public static void check(List<Page> pages) {
         for (Page p : pages) {
+            // Cada página tiene el medio de su sección (§5.21).
+            Media media = p.media();
+            Rect area = media.pageArea();
+            Insets m = media.margin();
+            // La página física, en coordenadas del área útil.
+            Rect page = new Rect(-m.left(), -m.top(), media.width(), media.height());
             content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
             for (Fragment f : p.fixed()) {
                 fragment(f, 0, 0, page, NONE);

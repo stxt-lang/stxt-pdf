@@ -25,87 +25,88 @@ Document (dev.stxt.boxes):
 		For class: rule
 			Box:
 				Border: 0 0 1 0
-	Block:
-		Id: intro
-		Box:
-			Height: 40
-	Table:
-		Id: t
-		Columns: 100 1fr
-		Gap: 0 10
-		Head:
-			Row:
-				Typography:
-					Weight: bold
-				Cell: Concepto
-					Id: h1
-					Class: rule
-				Cell: Valor
-					Class: rule
-		Body:
-			Row:
-				Cell: Fila 1
-					Id: b1
-				Cell: 1
-			Row:
-				Cell: Fila 2
-					Id: b2
-				Cell: 2
-			Row:
-				Cell: Fila 3
-					Id: b3
-				Cell: 3
-			Row:
-				Cell: Fila 4
-					Id: b4
-				Cell: 4
-			Row:
-				Cell: Fila 5
-					Id: b5
-				Cell: 5
-			Row:
-				Cell: Fila 6
-					Id: b6
-				Cell: 6
-			Row:
-				Cell: Fila 7
-					Id: b7
-				Cell: 7
-			Row:
-				Cell: aaaa bbbb cccc dddd
-					Id: b8
-				Cell: 8
-					Id: b8v
-			Row:
-				Cell: Fila 9
-					Id: b9
-				Cell: 9
-			Row:
-				Cell: Fila 10
-					Id: b10
-				Cell: 10
-			Row:
-				Cell: Fila 11
-					Id: b11
-				Cell: 11
-			Row:
-				Cell: Fila 12
-					Id: b12
-				Cell: 12
-			Row:
-				Cell: Fila 13
-					Id: b13
-				Cell: 13
-			Row:
-				Cell: Fila 14
-					Id: b14
-				Cell: 14
-		Foot:
-			Row:
-				Typography:
-					Weight: bold
-				Cell: Total
-					Id: f
-					Span: 1 2
-	Paragraph: Fin
-		Id: end
+	Section:
+		Block:
+			Id: intro
+			Box:
+				Height: 40
+		Table:
+			Id: t
+			Columns: 100 1fr
+			Gap: 0 10
+			Head:
+				Row:
+					Typography:
+						Weight: bold
+					Cell: Concepto
+						Id: h1
+						Class: rule
+					Cell: Valor
+						Class: rule
+			Body:
+				Row:
+					Cell: Fila 1
+						Id: b1
+					Cell: 1
+				Row:
+					Cell: Fila 2
+						Id: b2
+					Cell: 2
+				Row:
+					Cell: Fila 3
+						Id: b3
+					Cell: 3
+				Row:
+					Cell: Fila 4
+						Id: b4
+					Cell: 4
+				Row:
+					Cell: Fila 5
+						Id: b5
+					Cell: 5
+				Row:
+					Cell: Fila 6
+						Id: b6
+					Cell: 6
+				Row:
+					Cell: Fila 7
+						Id: b7
+					Cell: 7
+				Row:
+					Cell: aaaa bbbb cccc dddd
+						Id: b8
+					Cell: 8
+						Id: b8v
+				Row:
+					Cell: Fila 9
+						Id: b9
+					Cell: 9
+				Row:
+					Cell: Fila 10
+						Id: b10
+					Cell: 10
+				Row:
+					Cell: Fila 11
+						Id: b11
+					Cell: 11
+				Row:
+					Cell: Fila 12
+						Id: b12
+					Cell: 12
+				Row:
+					Cell: Fila 13
+						Id: b13
+					Cell: 13
+				Row:
+					Cell: Fila 14
+						Id: b14
+					Cell: 14
+			Foot:
+				Row:
+					Typography:
+						Weight: bold
+					Cell: Total
+						Id: f
+						Span: 1 2
+		Paragraph: Fin
+			Id: end

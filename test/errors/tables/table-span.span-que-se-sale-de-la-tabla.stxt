@@ -1,6 +1,6 @@
 # Case: Span que se sale de la tabla
 # Code: TABLE_SPAN
-# Line: 20
+# Line: 21
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,9 +12,10 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Body:
-			Row:
-				Cell: a
-					Span: 1 3
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Body:
+				Row:
+					Cell: a
+						Span: 1 3

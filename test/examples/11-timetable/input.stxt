@@ -9,280 +9,281 @@ Document (dev.stxt.boxes):
 		Margin: 40 46 46 46
 	Title: Horario de 2.º B · Curso 2025-26
 	Language: es
-	Fixed:
-		Id: footer
-		Offset: auto 0 -30 0
+	Section:
+		Fixed:
+			Id: footer
+			Offset: auto 0 -30 0
+			Flex:
+				Main axis: between
+				Item:
+					Text: CEIP Pla de les Eres · Olot
+				Item:
+					Text: Horario válido del 8 de septiembre de 2025 al 19 de junio de 2026
 		Flex:
-			Main axis: between
+			Id: masthead
+			Cross axis: center
+			Gap: 14
+			Box:
+				Margin: 0 0 16 0
 			Item:
-				Text: CEIP Pla de les Eres · Olot
+				Image: examples/planner/icon.png
+					Alt: Icono de un calendario
+					Box:
+						Width: 50
 			Item:
-				Text: Horario válido del 8 de septiembre de 2025 al 19 de junio de 2026
-	Flex:
-		Id: masthead
-		Cross axis: center
-		Gap: 14
-		Box:
-			Margin: 0 0 16 0
-		Item:
-			Image: examples/planner/icon.png
-				Alt: Icono de un calendario
-				Box:
-					Width: 50
-		Item:
-			Grow: 1
-			Block:
-				Heading 1:
-					Text: Horario de 2.º B
-				Text: Curso 2025–26 · Tutora: Marta Ferrer
-					Typography:
-						Size: 11
-						Color: #55655D
-		Item:
-			Block:
-				Text: Entrada 9:00 · Salida 16:00
-					Typography:
-						Weight: bold
-						Align: right
-				Text: Recreo de 11:00 a 11:30
-					Typography:
-						Size: 8.5
-						Align: right
-						Color: #55655D
-	Table:
-		Id: timetable
-		Columns: 92 repeat(5, 1fr)
-		Gap: 3
-		Box:
-			Margin: 0 0 14 0
-		Head:
-			Row:
-				Cell:
-				Cell: Lunes
-				Cell: Martes
-				Cell: Miércoles
-				Cell: Jueves
-				Cell: Viernes
-		Body:
-			Row:
-				Cell: 9:00 – 10:00
-					Header: true
-					Class: hour
-				Cell: Matemáticas
-					Class: slot math
-				Cell: Lengua
-					Class: slot lang
-				Cell: Inglés
-					Class: slot eng
-				Cell: Matemáticas
-					Class: slot math
-				Cell: Ciencias
-					Class: slot sci
-			Row:
-				Cell: 10:00 – 11:00
-					Header: true
-					Class: hour
-				Cell: Lengua
-					Class: slot lang
-				Cell: Matemáticas
-					Class: slot math
-				Cell: Ciencias
-					Class: slot sci
-				Cell: Lengua
-					Class: slot lang
-				Cell: Inglés
-					Class: slot eng
-			Row:
-				Cell:
-					Header: true
-					Class: hour
-				Cell: Recreo · 11:00 – 11:30
-					Span: 1 5
-					Class: break
-			Row:
-				Cell: 11:30 – 12:30
-					Header: true
-					Class: hour
-				Cell: Ciencias
-					Class: slot sci
-				Cell: Música
-					Class: slot music
-				Cell: Matemáticas
-					Class: slot math
-				Cell: Plástica
-					Class: slot art
-				Cell: Lengua
-					Class: slot lang
-			Row:
-				Cell: 12:30 – 13:30
-					Header: true
-					Class: hour
-				Cell: Educación física
-					Class: slot pe
-				Cell: Inglés
-					Class: slot eng
-				Cell: Lengua
-					Class: slot lang
-				Cell: Ciencias
-					Class: slot sci
-				Cell: Matemáticas
-					Class: slot math
-			Row:
-				Cell:
-					Header: true
-					Class: hour
-				Cell: Comedor y patio · 13:30 – 15:00
-					Span: 1 5
-					Class: break
-			Row:
-				Cell: 15:00 – 16:00
-					Header: true
-					Class: hour
-				Cell: Taller
-					Class: slot lab
-				Cell: Educación física
-					Class: slot pe
-				Cell: Tutoría
-					Class: slot tutor
-				Cell: Taller
-					Class: slot lab
-				Cell: Proyecto
-					Class: slot proj
-	Flex:
-		Id: legend
-		Wrap: true
-		Gap: 6 16
-		Box:
-			Margin: 0 0 12 0
-			Padding: 8 0
-			Border: 0.5 0 0 0
-			Border color: #CAD3CD
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+				Grow: 1
+				Block:
+					Heading 1:
+						Text: Horario de 2.º B
+					Text: Curso 2025–26 · Tutora: Marta Ferrer
+						Typography:
+							Size: 11
+							Color: #55655D
+			Item:
+				Block:
+					Text: Entrada 9:00 · Salida 16:00
+						Typography:
+							Weight: bold
+							Align: right
+					Text: Recreo de 11:00 a 11:30
+						Typography:
+							Size: 8.5
+							Align: right
+							Color: #55655D
+		Table:
+			Id: timetable
+			Columns: 92 repeat(5, 1fr)
+			Gap: 3
+			Box:
+				Margin: 0 0 14 0
+			Head:
+				Row:
+					Cell:
+					Cell: Lunes
+					Cell: Martes
+					Cell: Miércoles
+					Cell: Jueves
+					Cell: Viernes
+			Body:
+				Row:
+					Cell: 9:00 – 10:00
+						Header: true
+						Class: hour
+					Cell: Matemáticas
 						Class: slot math
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Matemáticas
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Lengua
 						Class: slot lang
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Lengua
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Inglés
 						Class: slot eng
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Inglés
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Matemáticas
+						Class: slot math
+					Cell: Ciencias
 						Class: slot sci
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Ciencias
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+				Row:
+					Cell: 10:00 – 11:00
+						Header: true
+						Class: hour
+					Cell: Lengua
+						Class: slot lang
+					Cell: Matemáticas
+						Class: slot math
+					Cell: Ciencias
+						Class: slot sci
+					Cell: Lengua
+						Class: slot lang
+					Cell: Inglés
+						Class: slot eng
+				Row:
+					Cell:
+						Header: true
+						Class: hour
+					Cell: Recreo · 11:00 – 11:30
+						Span: 1 5
+						Class: break
+				Row:
+					Cell: 11:30 – 12:30
+						Header: true
+						Class: hour
+					Cell: Ciencias
+						Class: slot sci
+					Cell: Música
 						Class: slot music
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Música
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Matemáticas
+						Class: slot math
+					Cell: Plástica
 						Class: slot art
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Plástica
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Lengua
+						Class: slot lang
+				Row:
+					Cell: 12:30 – 13:30
+						Header: true
+						Class: hour
+					Cell: Educación física
 						Class: slot pe
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Educación física
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Inglés
+						Class: slot eng
+					Cell: Lengua
+						Class: slot lang
+					Cell: Ciencias
+						Class: slot sci
+					Cell: Matemáticas
+						Class: slot math
+				Row:
+					Cell:
+						Header: true
+						Class: hour
+					Cell: Comedor y patio · 13:30 – 15:00
+						Span: 1 5
+						Class: break
+				Row:
+					Cell: 15:00 – 16:00
+						Header: true
+						Class: hour
+					Cell: Taller
 						Class: slot lab
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Taller
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Educación física
+						Class: slot pe
+					Cell: Tutoría
 						Class: slot tutor
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Tutoría
-		Item:
-			Flex:
-				Gap: 5
-				Cross axis: center
-				Item:
-					Block:
+					Cell: Taller
+						Class: slot lab
+					Cell: Proyecto
 						Class: slot proj
-						Box:
-							Width: 11
-							Height: 11
-				Item:
-					Text: Proyecto
-	Markdown:
-		Id: notes
-		Bullet: disc
-		Typography:
-			Size: 8.5
-		Content >>
-			- Los días con **Educación física**, el alumnado trae ropa deportiva y una botella de agua.
-			- Los **talleres** de la tarde se reparten por trimestres: cerámica, huerto y robótica.
-			- El **recreo** y el **comedor** los cuida el personal del centro; las familias pueden recoger a sus hijos e hijas a partir de las 15:00.
+		Flex:
+			Id: legend
+			Wrap: true
+			Gap: 6 16
+			Box:
+				Margin: 0 0 12 0
+				Padding: 8 0
+				Border: 0.5 0 0 0
+				Border color: #CAD3CD
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot math
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Matemáticas
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot lang
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Lengua
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot eng
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Inglés
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot sci
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Ciencias
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot music
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Música
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot art
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Plástica
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot pe
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Educación física
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot lab
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Taller
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot tutor
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Tutoría
+			Item:
+				Flex:
+					Gap: 5
+					Cross axis: center
+					Item:
+						Block:
+							Class: slot proj
+							Box:
+								Width: 11
+								Height: 11
+					Item:
+						Text: Proyecto
+		Markdown:
+			Id: notes
+			Bullet: disc
+			Typography:
+				Size: 8.5
+			Content >>
+				- Los días con **Educación física**, el alumnado trae ropa deportiva y una botella de agua.
+				- Los **talleres** de la tarde se reparten por trimestres: cerámica, huerto y robótica.
+				- El **recreo** y el **comedor** los cuida el personal del centro; las familias pueden recoger a sus hijos e hijas a partir de las 15:00.

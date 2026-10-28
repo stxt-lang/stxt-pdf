@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.model.FontFace;
@@ -57,7 +58,7 @@ class LayoutCacheTest {
 
     private static int measurements(int depth) {
         CountingMetrics metrics = new CountingMetrics();
-        new Engine(metrics).layOutDocument(READER.read(nested(depth)));
+        new Engine(metrics).layOutDocument(READER.read(Docs.sectioned(nested(depth))));
         return metrics.calls;
     }
 

@@ -1,6 +1,6 @@
 # Case: Pages en un Block
 # Code: CHILD_NOT_DECLARED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Block:
-		Pages: first
-		Text: Hola
+	Section:
+		Block:
+			Pages: first
+			Text: Hola

@@ -27,29 +27,30 @@ Document (dev.stxt.boxes):
 				Font: IBM Plex Sans
 				Size: 10
 				Inline: markdown
-	Text: **aaaa** **bbbb** **cccc** **dddd**
-		Id: lit
-		Typography:
-			Inline: none
-	Text: **aaaa** **bbbb** **cccc** **dddd**
-		Id: fmt
-	Text: \*\*aaaa\*\* \*\*bbbb\*\* \*\*cccc\*\* \*\*dddd\*\*
-		Id: escaped
-	Text:
-		Id: blocks
-		Content >>
-			Uno *dos* ++tres++
-			cuatro.
+	Section:
+		Text: **aaaa** **bbbb** **cccc** **dddd**
+			Id: lit
+			Typography:
+				Inline: none
+		Text: **aaaa** **bbbb** **cccc** **dddd**
+			Id: fmt
+		Text: \*\*aaaa\*\* \*\*bbbb\*\* \*\*cccc\*\* \*\*dddd\*\*
+			Id: escaped
+		Text:
+			Id: blocks
+			Content >>
+				Uno *dos* ++tres++
+				cuatro.
 
-			Cinco ~~seis~~.
-	Table:
-		Id: tab
-		Columns: 80 80
-		Body:
-			Row:
-				Cell: **aaaa** **bbbb**
-				Cell: [web](https://a.example)
-	Markdown:
-		Id: md
-		Content >>
-			\*\*aaaa\*\* \*\*bbbb\*\* \*\*cccc\*\* \*\*dddd\*\*
+				Cinco ~~seis~~.
+		Table:
+			Id: tab
+			Columns: 80 80
+			Body:
+				Row:
+					Cell: **aaaa** **bbbb**
+					Cell: [web](https://a.example)
+		Markdown:
+			Id: md
+			Content >>
+				\*\*aaaa\*\* \*\*bbbb\*\* \*\*cccc\*\* \*\*dddd\*\*

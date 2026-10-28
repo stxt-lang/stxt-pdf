@@ -27,9 +27,11 @@ public final class StxtDump {
     private StxtDump() {
     }
 
-    public static String dump(List<Page> pages, Rect pageArea, boolean includeWithoutId) {
+    public static String dump(List<Page> pages, boolean includeWithoutId) {
         StringBuilder sb = new StringBuilder("Result:\n");
         for (Page p : pages) {
+            // Las coordenadas son las de la página, con el área útil del medio de su sección (§5.21).
+            Rect pageArea = p.media().pageArea();
             sb.append("\tPage: ").append(p.number()).append('\n');
             dumpChildren(sb, p.content(), pageArea.x(), pageArea.y(), 2, includeWithoutId);
             for (Fragment fixed : p.fixed()) {

@@ -13,4 +13,5 @@ Document (dev.stxt.boxes):
 				Font: IBM Plex Sans
 				Size: 10
 				Language: en
-	Text: Hola
+	Section:
+		Text: Hola

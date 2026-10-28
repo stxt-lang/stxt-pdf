@@ -19,13 +19,13 @@ class InlineFormatTest {
             + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(HEADER + String.join("\n", lines)))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(HEADER + String.join("\n", lines))))).sections().get(0).box();
     }
 
     /** Como {@link #build}, con {@code Inline: markdown} en el {@code Typography} del documento. */
     private static Box buildInline(String... lines) {
         return new BoxTreeBuilder().build(new DocumentReader()
-                .read(Docs.mergeStyles(HEADER + "\t\t\t\tInline: markdown\n" + String.join("\n", lines)))).root();
+                .read(Docs.sectioned(Docs.mergeStyles(HEADER + "\t\t\t\tInline: markdown\n" + String.join("\n", lines))))).sections().get(0).box();
     }
 
     @Test
@@ -117,17 +117,17 @@ class InlineFormatTest {
     void errorsPointToTheLineOfTheBlock() {
         InvalidModelException list = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Uno", "\tText: - lista"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, list.code());
-        assertEquals(14, list.line());
+        assertEquals(15, list.line());
         InvalidModelException second = assertThrows(InvalidModelException.class, () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\t# Dos"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.code());
-        assertEquals(17, second.line());
+        assertEquals(18, second.line());
     }
 
     @Test
     void anInternalLinkToAnIdThatDoesNotExistIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Ver [aquí](#nada)"));
         assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
-        assertEquals(13, e.line());
+        assertEquals(14, e.line());
     }
 
     @Test

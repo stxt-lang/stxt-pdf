@@ -1,14 +1,15 @@
 # Case: Cortes en un Absolute
 # Code: CHILD_NOT_DECLARED
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Absolute:
-		Box:
-			Height: 10
-		Break:
-			Before: page
+	Section:
+		Absolute:
+			Box:
+				Height: 10
+			Break:
+				Before: page

@@ -1,16 +1,17 @@
 # Case: Hija más alta que el Aspect ratio del padre
 # Code: BOX_OVERFLOW
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 100
-			Aspect ratio: 2
+	Section:
 		Block:
 			Box:
-				Height: 80
+				Width: 100
+				Aspect ratio: 2
+			Block:
+				Box:
+					Height: 80

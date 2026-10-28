@@ -20,43 +20,44 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Bloque en columnas
-		Id: title
-		Box:
-			Margin: 0 0 8 0
-	Multicol:
-		Id: m
-		Count: 2
-		Column gap: 20
-		Rule: 0.5
-		Rule color: #999999
-		Box:
-			Margin: 0 0 8 0
-		Paragraph:
-			Id: p1
-			Content >>
-				El texto de un bloque en columnas llena primero la columna de la izquierda y sigue en
-				la siguiente cuando ya no le queda sitio, como en las páginas de una revista o de un
-				periódico de los de antes, que se leían de arriba abajo.
-		Paragraph:
-			Id: p2
-			Content >>
-				Cada columna es un fragmento del mismo flujo, así que las reglas de corte son las de
-				siempre: viudas, huérfanas y los cortes que se evitan.
-		Paragraph:
-			Id: p3
-			Content >>
-				Al acabar las columnas de una página, el texto continúa en la primera columna de la
-				página siguiente, y la línea entre columnas se pinta solo entre dos columnas con
-				contenido.
-		Paragraph:
-			Id: p4
-			Content >>
-				En la última página las columnas se equilibran: el motor busca el alto mínimo en que
-				todo cabe.
-		Paragraph:
-			Id: p5
-			Content >>
-				Así el bloque termina con las dos columnas casi a la misma altura.
-	Text: Fin
-		Id: end
+	Section:
+		Text: Bloque en columnas
+			Id: title
+			Box:
+				Margin: 0 0 8 0
+		Multicol:
+			Id: m
+			Count: 2
+			Column gap: 20
+			Rule: 0.5
+			Rule color: #999999
+			Box:
+				Margin: 0 0 8 0
+			Paragraph:
+				Id: p1
+				Content >>
+					El texto de un bloque en columnas llena primero la columna de la izquierda y sigue en
+					la siguiente cuando ya no le queda sitio, como en las páginas de una revista o de un
+					periódico de los de antes, que se leían de arriba abajo.
+			Paragraph:
+				Id: p2
+				Content >>
+					Cada columna es un fragmento del mismo flujo, así que las reglas de corte son las de
+					siempre: viudas, huérfanas y los cortes que se evitan.
+			Paragraph:
+				Id: p3
+				Content >>
+					Al acabar las columnas de una página, el texto continúa en la primera columna de la
+					página siguiente, y la línea entre columnas se pinta solo entre dos columnas con
+					contenido.
+			Paragraph:
+				Id: p4
+				Content >>
+					En la última página las columnas se equilibran: el motor busca el alto mínimo en que
+					todo cabe.
+			Paragraph:
+				Id: p5
+				Content >>
+					Así el bloque termina con las dos columnas casi a la misma altura.
+		Text: Fin
+			Id: end

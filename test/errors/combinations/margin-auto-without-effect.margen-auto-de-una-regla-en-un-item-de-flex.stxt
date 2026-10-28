@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Box:
 				Margin: auto
 				Width: 100
-	Flex:
-		Item:
-			Block:
-				Box:
-					Height: 10
+	Section:
+		Flex:
+			Item:
+				Block:
+					Box:
+						Height: 10

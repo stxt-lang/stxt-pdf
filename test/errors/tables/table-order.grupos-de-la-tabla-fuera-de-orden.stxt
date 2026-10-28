@@ -1,6 +1,6 @@
 # Case: Grupos de la tabla fuera de orden
 # Code: TABLE_ORDER
-# Line: 21
+# Line: 22
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,13 +12,14 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Foot:
-			Row:
-				Cell: a
-				Cell: b
-		Body:
-			Row:
-				Cell: c
-				Cell: d
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Foot:
+				Row:
+					Cell: a
+					Cell: b
+			Body:
+				Row:
+					Cell: c
+					Cell: d

@@ -1639,9 +1639,10 @@ interpretaciones que salieron al implementarlas.
      `Language`), como `Element: Document` pero por sección; con `Box` o `Break` es `STYLE_NOT_ALLOWED`. Sin
      `Background` de página ni `Start`. *Dónde:* `tree/StyleRules`.
 
-272. **Una sección sin contenido en flujo es `SECTION_EMPTY`** (línea de la sección): no tiene ninguna página, y
-     una página en blanco que nadie escribió es un valor por defecto silencioso. *Alternativa:* una página en
-     blanco.
+272. **Una sección sin contenido es `SECTION_EMPTY`** (línea de la sección): sin elementos, o solo con `Fixed`
+     (que no ocupan sitio), no tiene ninguna página, y una página en blanco que nadie escribió es un valor por
+     defecto silencioso. Un `Absolute` sí cuenta: una portada hecha solo de cajas posicionadas es una sección
+     válida con su página. *Alternativa:* una página en blanco.
 
 273. **Una sección no se vuelca como caja** (§7) aunque tenga `Id`: es la página, no una caja; se vuelcan sus
      cajas con `Id` con las coordenadas de la página de su sección. Su `Id` sí es un destino de `Link` y de

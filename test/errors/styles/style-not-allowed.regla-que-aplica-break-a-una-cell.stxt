@@ -15,8 +15,9 @@ Document (dev.stxt.boxes):
 		Element: Cell
 			Break:
 				Inside: avoid
-	Table:
-		Columns: 1fr
-		Body:
-			Row:
-				Cell: a
+	Section:
+		Table:
+			Columns: 1fr
+			Body:
+				Row:
+					Cell: a

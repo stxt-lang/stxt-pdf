@@ -8,208 +8,209 @@ Document (dev.stxt.boxes):
 		Paper: A4
 	Title: Marta Ferrer Soler · Diseñadora de producto
 	Language: es
-	Grid:
-		Id: page
-		Columns: 190 1fr
-		Rows: 1fr
-		Box:
-			Height: 100%
-		Area:
-			Block:
-				Id: sidebar
-				Class: side
-				Image: examples/resume/photo.jpg
-					Alt: Retrato de Marta Ferrer
+	Section:
+		Grid:
+			Id: page
+			Columns: 190 1fr
+			Rows: 1fr
+			Box:
+				Height: 100%
+			Area:
+				Block:
+					Id: sidebar
+					Class: side
+					Image: examples/resume/photo.jpg
+						Alt: Retrato de Marta Ferrer
+						Box:
+							Width: 100%
+							Radius: 50%
+							Margin: 0 0 4 0
+					Text: Contacto
+						Class: side-title
+					Text: marta.ferrer@correo.example
+						Link: mailto:marta.ferrer@correo.example
+					Text: +34 600 112 233
+					Text: Girona, España
+					Text: martaferrer.example
+						Link: https://martaferrer.example
+					Text: Herramientas
+						Class: side-title
+					Text: Figma
+					Block:
+						Class: track
+						Block:
+							Class: fill
+							Box:
+								Width: 95%
+					Text: Investigación con usuarios
+					Block:
+						Class: track
+						Block:
+							Class: fill
+							Box:
+								Width: 90%
+					Text: Sistemas de diseño
+					Block:
+						Class: track
+						Block:
+							Class: fill
+							Box:
+								Width: 92%
+					Text: Accesibilidad (WCAG)
+					Block:
+						Class: track
+						Block:
+							Class: fill
+							Box:
+								Width: 85%
+					Text: HTML y CSS
+					Block:
+						Class: track
+						Block:
+							Class: fill
+							Box:
+								Width: 72%
+					Text: Idiomas
+						Class: side-title
+					Text: Catalán y castellano · nativo
+					Text: Inglés · C1
+					Text: Francés · B1
+					Text: Intereses
+						Class: side-title
+					Paragraph: Cerámica, carreras de montaña, ilustración botánica y cocina de temporada.
+			Area:
+				Block:
+					Id: main
 					Box:
-						Width: 100%
-						Radius: 50%
-						Margin: 0 0 4 0
-				Text: Contacto
-					Class: side-title
-				Text: marta.ferrer@correo.example
-					Link: mailto:marta.ferrer@correo.example
-				Text: +34 600 112 233
-				Text: Girona, España
-				Text: martaferrer.example
-					Link: https://martaferrer.example
-				Text: Herramientas
-					Class: side-title
-				Text: Figma
-				Block:
-					Class: track
-					Block:
-						Class: fill
+						Padding: 40 36 36 34
+					Heading 1:
+						Text: Marta Ferrer Soler
+					Text: Diseñadora de producto · UX/UI
+						Typography:
+							Size: 12.5
+							Color: #1F7A7A
 						Box:
-							Width: 95%
-				Text: Investigación con usuarios
-				Block:
-					Class: track
-					Block:
-						Class: fill
+							Margin: 2 0 14 0
+					Paragraph: Diseño productos digitales que la gente entiende a la primera. Ocho años entre estudio, cooperativa y producto propio, siempre cerca de quien usa lo que se construye: investigo, prototipo, pruebo y entrego con el equipo de desarrollo, no después de él.
+						Typography:
+							Align: justify
+					Flex:
+						Id: figures
+						Gap: 10
 						Box:
-							Width: 90%
-				Text: Sistemas de diseño
-				Block:
-					Class: track
-					Block:
-						Class: fill
-						Box:
-							Width: 92%
-				Text: Accesibilidad (WCAG)
-				Block:
-					Class: track
-					Block:
-						Class: fill
-						Box:
-							Width: 85%
-				Text: HTML y CSS
-				Block:
-					Class: track
-					Block:
-						Class: fill
-						Box:
-							Width: 72%
-				Text: Idiomas
-					Class: side-title
-				Text: Catalán y castellano · nativo
-				Text: Inglés · C1
-				Text: Francés · B1
-				Text: Intereses
-					Class: side-title
-				Paragraph: Cerámica, carreras de montaña, ilustración botánica y cocina de temporada.
-		Area:
-			Block:
-				Id: main
-				Box:
-					Padding: 40 36 36 34
-				Heading 1:
-					Text: Marta Ferrer Soler
-				Text: Diseñadora de producto · UX/UI
-					Typography:
-						Size: 12.5
-						Color: #1F7A7A
-					Box:
-						Margin: 2 0 14 0
-				Paragraph: Diseño productos digitales que la gente entiende a la primera. Ocho años entre estudio, cooperativa y producto propio, siempre cerca de quien usa lo que se construye: investigo, prototipo, pruebo y entrego con el equipo de desarrollo, no después de él.
-					Typography:
-						Align: justify
-				Flex:
-					Id: figures
-					Gap: 10
-					Box:
-						Margin: 14 0 0 0
-						Padding: 10 0
-						Border: 0.5 0 0.5 0
-						Border color: #BFD9D7
-					Item:
-						Grow: 1
-						Block:
-							Text: +40
-								Class: figure
-							Text: proyectos entregados
-								Class: caption
-					Item:
-						Grow: 1
-						Block:
-							Text: 71 %
-								Class: figure
-							Text: conversión en el alta de clientes
-								Class: caption
-					Item:
-						Grow: 1
-						Block:
-							Text: 6
-								Class: figure
-							Text: equipos con un mismo sistema de diseño
-								Class: caption
-					Item:
-						Grow: 1
-						Block:
-							Text: 4
-								Class: figure
-							Text: diseñadoras mentoradas
-								Class: caption
-				Heading 2:
-					Text: Experiencia
-				Grid:
-					Id: jobs
-					Columns: 70 1fr
-					Gap: 14 12
-					Area:
-						Text: 2022 – hoy
-							Class: dates
-					Area:
-						Block:
-							Text: Diseñadora de producto sénior
-								Class: role
-							Text: Cobalto · tecnología financiera · Barcelona
-								Class: place
-							List:
-								Marker: disc
-								Box:
-									Margin: 0
-								List item:
-									Text: Dirijo el sistema de diseño que usan seis equipos y cuatro aplicaciones.
-								List item:
-									Text: Rediseño del alta de clientes: la conversión pasa del 54 % al 71 %.
-								List item:
-									Text: Mentora de cuatro diseñadoras junior.
-					Area:
-						Text: 2018 – 2022
-							Class: dates
-					Area:
-						Block:
-							Text: Diseñadora UX
-								Class: role
-							Text: Estudio Pimienta · Girona
-								Class: place
-							List:
-								Marker: disc
-								List item:
-									Text: Proyectos para museos, ayuntamientos y comercio local.
-								List item:
-									Text: Taller semanal de investigación con usuarios, abierto a los clientes.
-								List item:
-									Text: **Premio Sol Digital 2021** al mejor diseño de interacción.
-										Typography:
-											Inline: markdown
-					Area:
-						Text: 2016 – 2018
-							Class: dates
-					Area:
-						Block:
-							Text: Diseñadora gráfica
-								Class: role
-							Text: Cooperativa La Fàbrica · Olot
-								Class: place
-							List:
-								Marker: disc
-								List item:
-									Text: Identidad, cartelería y web para pequeñas cooperativas.
-				Heading 2:
-					Text: Formación
-				Grid:
-					Id: education
-					Columns: 70 1fr
-					Gap: 8 12
-					Area:
-						Text: 2016
-							Class: dates
-					Area:
-						Block:
-							Text: Máster en Diseño de Interacción
-								Class: role
-							Text: Escola Superior de Disseny d'Olot
-								Class: place
-					Area:
-						Text: 2014
-							Class: dates
-					Area:
-						Block:
-							Text: Grado en Diseño y Desarrollo de Producto
-								Class: role
-							Text: Escola Superior de Disseny d'Olot
-								Class: place
-				Heading 2:
-					Text: Charlas y publicaciones
-				Paragraph: «*Diseñar para quien tiene prisa*», Barcelona UX Days (2024) · «*Accesibilidad sin florituras*», artículo en la revista *Interfaz* (2023) · Jurado de los Premios Sol Digital (2024).
+							Margin: 14 0 0 0
+							Padding: 10 0
+							Border: 0.5 0 0.5 0
+							Border color: #BFD9D7
+						Item:
+							Grow: 1
+							Block:
+								Text: +40
+									Class: figure
+								Text: proyectos entregados
+									Class: caption
+						Item:
+							Grow: 1
+							Block:
+								Text: 71 %
+									Class: figure
+								Text: conversión en el alta de clientes
+									Class: caption
+						Item:
+							Grow: 1
+							Block:
+								Text: 6
+									Class: figure
+								Text: equipos con un mismo sistema de diseño
+									Class: caption
+						Item:
+							Grow: 1
+							Block:
+								Text: 4
+									Class: figure
+								Text: diseñadoras mentoradas
+									Class: caption
+					Heading 2:
+						Text: Experiencia
+					Grid:
+						Id: jobs
+						Columns: 70 1fr
+						Gap: 14 12
+						Area:
+							Text: 2022 – hoy
+								Class: dates
+						Area:
+							Block:
+								Text: Diseñadora de producto sénior
+									Class: role
+								Text: Cobalto · tecnología financiera · Barcelona
+									Class: place
+								List:
+									Marker: disc
+									Box:
+										Margin: 0
+									List item:
+										Text: Dirijo el sistema de diseño que usan seis equipos y cuatro aplicaciones.
+									List item:
+										Text: Rediseño del alta de clientes: la conversión pasa del 54 % al 71 %.
+									List item:
+										Text: Mentora de cuatro diseñadoras junior.
+						Area:
+							Text: 2018 – 2022
+								Class: dates
+						Area:
+							Block:
+								Text: Diseñadora UX
+									Class: role
+								Text: Estudio Pimienta · Girona
+									Class: place
+								List:
+									Marker: disc
+									List item:
+										Text: Proyectos para museos, ayuntamientos y comercio local.
+									List item:
+										Text: Taller semanal de investigación con usuarios, abierto a los clientes.
+									List item:
+										Text: **Premio Sol Digital 2021** al mejor diseño de interacción.
+											Typography:
+												Inline: markdown
+						Area:
+							Text: 2016 – 2018
+								Class: dates
+						Area:
+							Block:
+								Text: Diseñadora gráfica
+									Class: role
+								Text: Cooperativa La Fàbrica · Olot
+									Class: place
+								List:
+									Marker: disc
+									List item:
+										Text: Identidad, cartelería y web para pequeñas cooperativas.
+					Heading 2:
+						Text: Formación
+					Grid:
+						Id: education
+						Columns: 70 1fr
+						Gap: 8 12
+						Area:
+							Text: 2016
+								Class: dates
+						Area:
+							Block:
+								Text: Máster en Diseño de Interacción
+									Class: role
+								Text: Escola Superior de Disseny d'Olot
+									Class: place
+						Area:
+							Text: 2014
+								Class: dates
+						Area:
+							Block:
+								Text: Grado en Diseño y Desarrollo de Producto
+									Class: role
+								Text: Escola Superior de Disseny d'Olot
+									Class: place
+					Heading 2:
+						Text: Charlas y publicaciones
+					Paragraph: «*Diseñar para quien tiene prisa*», Barcelona UX Days (2024) · «*Accesibilidad sin florituras*», artículo en la revista *Interfaz* (2023) · Jurado de los Premios Sol Digital (2024).

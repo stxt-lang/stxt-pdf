@@ -11,9 +11,10 @@ Document (dev.stxt.boxes):
 		For class: stamp
 			Break:
 				Decoration: clone
-	Relative:
-		Class: stamp
-		Rotate: -8
-		Block:
-			Box:
-				Height: 10
+	Section:
+		Relative:
+			Class: stamp
+			Rotate: -8
+			Block:
+				Box:
+					Height: 10

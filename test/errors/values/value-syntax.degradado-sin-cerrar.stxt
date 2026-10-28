@@ -1,12 +1,13 @@
 # Case: linear sin el paréntesis de cierre
 # Code: VALUE_SYNTAX
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Background: linear(90, #FFFFFF, #000000
+	Section:
+		Block:
+			Box:
+				Background: linear(90, #FFFFFF, #000000

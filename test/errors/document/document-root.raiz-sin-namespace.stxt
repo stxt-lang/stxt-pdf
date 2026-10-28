@@ -5,6 +5,7 @@ Document:
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Height: 10

@@ -8,6 +8,7 @@ Document (dev.stxt.boxes):
 		Width: 842
 		Height: 595
 		Orientation: landscape
-	Block:
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Height: 10

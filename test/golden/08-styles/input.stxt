@@ -41,30 +41,31 @@ Document (dev.stxt.boxes):
 		For id: last
 			Box:
 				Height: 20
-	Block:
-		Id: a
-	Block:
-		Id: b
-		Class: half tall
-	Block:
-		Id: c
-		Class: short tall
-	Block:
-		Id: d
-		Class: tall
-	Block:
-		Id: last
-		Class: tall
-	Block:
-		Id: e
-		Class: tall
-		Box:
-			Height: 30
-	Text: Texto con regla
-		Id: t
-	Block:
-		Id: p
-		Typography:
-			Size: 20
-		Text: Hereda
-			Id: u
+	Section:
+		Block:
+			Id: a
+		Block:
+			Id: b
+			Class: half tall
+		Block:
+			Id: c
+			Class: short tall
+		Block:
+			Id: d
+			Class: tall
+		Block:
+			Id: last
+			Class: tall
+		Block:
+			Id: e
+			Class: tall
+			Box:
+				Height: 30
+		Text: Texto con regla
+			Id: t
+		Block:
+			Id: p
+			Typography:
+				Size: 20
+			Text: Hereda
+				Id: u

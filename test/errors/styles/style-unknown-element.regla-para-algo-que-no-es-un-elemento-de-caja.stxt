@@ -11,3 +11,5 @@ Document (dev.stxt.boxes):
 		Element: Item
 			Box:
 				Padding: 4
+	Section:
+		Text: Hola

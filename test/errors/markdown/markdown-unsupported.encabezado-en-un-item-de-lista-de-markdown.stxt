@@ -1,6 +1,6 @@
 # Case: Encabezado en un ítem de lista de Markdown
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Bullet: disc
-		Content >>
-			- Uno
-			- # Dos
+	Section:
+		Markdown:
+			Bullet: disc
+			Content >>
+				- Uno
+				- # Dos

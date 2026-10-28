@@ -1,6 +1,6 @@
 # Case: Absolute como hijo de un Multicol
 # Code: CHILD_NOT_DECLARED
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Count: 2
-		Absolute:
-			Text: Nota
+	Section:
+		Multicol:
+			Count: 2
+			Absolute:
+				Text: Nota

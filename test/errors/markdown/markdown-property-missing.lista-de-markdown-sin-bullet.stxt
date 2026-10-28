@@ -1,6 +1,6 @@
 # Case: Lista de Markdown sin Bullet
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Content >>
-			Párrafo.
+	Section:
+		Markdown:
+			Content >>
+				Párrafo.
 
-			- uno
+				- uno

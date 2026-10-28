@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
@@ -44,7 +45,7 @@ class BoxLooksPaintTest {
 
     private static byte[] pdf(String document) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(new DocumentReader().read(document), out);
+        PdfWriter.write(new DocumentReader().read(Docs.sectioned(document)), out);
         Files.createDirectories(Path.of("target", "pdf"));
         Files.write(Path.of("target", "pdf", "box-looks.pdf"), out.toByteArray());
         return out.toByteArray();
@@ -283,14 +284,14 @@ class BoxLooksPaintTest {
     @Test
     void svgClipsARoundedImage() {
         String image = HEAD + "\tImage: test/wide.png\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tRadius: 50%\n";
-        LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(image));
+        LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(image)));
         String svg = SvgCanvas.page(document.pages().get(0), document.media(), false, new Resources());
         assertTrue(svg.contains("<clipPath id=\"c0\">"), svg);
         assertTrue(svg.contains("<g clip-path=\"url(#c0)\"><svg x=\"20.00\""), svg);
     }
 
     private static String svg(String document) {
-        InlineNode input = new DocumentReader().read(document);
+        InlineNode input = new DocumentReader().read(Docs.sectioned(document));
         LaidOutDocument laidOut = new Engine().layOutDocument(input);
         return SvgCanvas.page(laidOut.pages().get(0), laidOut.media(), false);
     }

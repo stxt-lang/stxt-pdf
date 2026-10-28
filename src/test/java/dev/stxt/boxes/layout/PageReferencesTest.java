@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.model.FontFace;
@@ -133,9 +134,9 @@ class PageReferencesTest {
                 .append("\tText: Ver página {page of: x}\n\t\tBox:\n\t\t\tWidth: 62\n")
                 .append("\tBlock:\n\t\tId: x\n\t\tBox:\n\t\t\tHeight: 10\n");
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(doc.toString())));
+                () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(Docs.sectioned(doc.toString()))));
         assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.code());
         // Cabecera (11 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
-        assertEquals(12 + 6 * 3 + 3 + 1, e.line());
+        assertEquals(13 + 6 * 3 + 3 + 1, e.line());
     }
 }

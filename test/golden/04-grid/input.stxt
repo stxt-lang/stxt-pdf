@@ -12,55 +12,56 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Grid:
-		Id: page
-		Columns: 150 1fr
-		Gap: 10 20
-		Areas >>
-			head head
-			side main
-			foot foot
-		Area: head
-			Block:
-				Id: head
-				Box:
-					Height: 30
-		Area: side
-			Text: Resumen
-				Id: side
-		Area: main
-			Block:
-				Id: main
-				Box:
-					Height: 60
-		Area: foot
-			Block:
-				Id: foot
-				Box:
-					Height: 20
-	Grid:
-		Id: cards
-		Box:
-			Margin: 20 0 0 0
-		Columns: repeat(3, 1fr)
-		Gap: 10
-		Area:
-			Block:
-				Id: c1
-				Box:
-					Height: 40
-		Area:
-			Block:
-				Id: c2
-				Box:
-					Height: 50
-		Area:
-			Block:
-				Id: c3
-				Box:
-					Height: 30
-		Area:
-			Block:
-				Id: c4
-				Box:
-					Height: 20
+	Section:
+		Grid:
+			Id: page
+			Columns: 150 1fr
+			Gap: 10 20
+			Areas >>
+				head head
+				side main
+				foot foot
+			Area: head
+				Block:
+					Id: head
+					Box:
+						Height: 30
+			Area: side
+				Text: Resumen
+					Id: side
+			Area: main
+				Block:
+					Id: main
+					Box:
+						Height: 60
+			Area: foot
+				Block:
+					Id: foot
+					Box:
+						Height: 20
+		Grid:
+			Id: cards
+			Box:
+				Margin: 20 0 0 0
+			Columns: repeat(3, 1fr)
+			Gap: 10
+			Area:
+				Block:
+					Id: c1
+					Box:
+						Height: 40
+			Area:
+				Block:
+					Id: c2
+					Box:
+						Height: 50
+			Area:
+				Block:
+					Id: c3
+					Box:
+						Height: 30
+			Area:
+				Block:
+					Id: c4
+					Box:
+						Height: 20

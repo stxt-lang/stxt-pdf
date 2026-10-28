@@ -1,6 +1,6 @@
 # Case: Column align con un valor que no es una alineación
 # Code: VALUE_NOT_ALLOWED
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,10 +12,11 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Column align: left top
-		Body:
-			Row:
-				Cell: a
-				Cell: b
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Column align: left top
+			Body:
+				Row:
+					Cell: a
+					Cell: b

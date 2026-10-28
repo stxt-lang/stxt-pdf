@@ -8,6 +8,7 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 300
-	Block:
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Height: 10

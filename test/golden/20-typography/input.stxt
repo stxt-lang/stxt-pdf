@@ -24,39 +24,40 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Flex:
-		Id: row
-		Item:
-			Text: abcd
-				Id: spaced
-				Typography:
-					Letter spacing: 2
-		Item:
-			Text: Ab
-				Id: small
-				Typography:
-					Small caps: true
-		Item:
-			Text: straße
-				Id: upper
-				Typography:
-					Transform: uppercase
-		Item:
-			Text: abcd
-				Id: plain
-	Text: aaaa bbbb cccc dddd eeee ffff
-		Id: tight
-	Text: aaaa bbbb cccc dddd eeee ffff
-		Id: loose
-		Typography:
-			Letter spacing: 2
-	Text: informe anual
-		Id: title
-		Typography:
-			Transform: uppercase
-			Letter spacing: 3
-	Text: Pequeñas Mayúsculas
-		Id: caps
-		Typography:
-			Small caps: true
-			Letter spacing: 1
+	Section:
+		Flex:
+			Id: row
+			Item:
+				Text: abcd
+					Id: spaced
+					Typography:
+						Letter spacing: 2
+			Item:
+				Text: Ab
+					Id: small
+					Typography:
+						Small caps: true
+			Item:
+				Text: straße
+					Id: upper
+					Typography:
+						Transform: uppercase
+			Item:
+				Text: abcd
+					Id: plain
+		Text: aaaa bbbb cccc dddd eeee ffff
+			Id: tight
+		Text: aaaa bbbb cccc dddd eeee ffff
+			Id: loose
+			Typography:
+				Letter spacing: 2
+		Text: informe anual
+			Id: title
+			Typography:
+				Transform: uppercase
+				Letter spacing: 3
+		Text: Pequeñas Mayúsculas
+			Id: caps
+			Typography:
+				Small caps: true
+				Letter spacing: 1

@@ -1,6 +1,6 @@
 # Case: Fila con menos celdas que columnas
 # Code: TABLE_ROW_CELLS
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Body:
-			Row:
-				Cell: a
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Body:
+				Row:
+					Cell: a

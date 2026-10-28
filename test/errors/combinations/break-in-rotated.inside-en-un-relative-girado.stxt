@@ -1,16 +1,17 @@
 # Case: Inside en un Relative girado, que no se parte
 # Code: BREAK_IN_ROTATED
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Relative:
-		Rotate: 5
-		Break:
-			Inside: avoid
-		Block:
-			Box:
-				Height: 10
+	Section:
+		Relative:
+			Rotate: 5
+			Break:
+				Inside: avoid
+			Block:
+				Box:
+					Height: 10

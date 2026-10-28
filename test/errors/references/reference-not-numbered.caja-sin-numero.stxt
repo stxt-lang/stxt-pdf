@@ -1,6 +1,6 @@
 # Case: Número de una caja que no tiene
 # Code: REFERENCE_NOT_NUMBERED
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Véase la cláusula {number of: nota}
-	Block:
-		Id: nota
-		Box:
-			Height: 10
+	Section:
+		Text: Véase la cláusula {number of: nota}
+		Block:
+			Id: nota
+			Box:
+				Height: 10

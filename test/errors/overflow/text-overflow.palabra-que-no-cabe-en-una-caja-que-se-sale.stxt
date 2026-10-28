@@ -1,6 +1,6 @@
 # Case: Palabra que no cabe en una caja que se sale
 # Code: TEXT_OVERFLOW
-# Line: 22
+# Line: 23
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,11 +12,12 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Block:
-		Box:
-			Width: 100
-		Text:
+	Section:
+		Block:
 			Box:
-				Width: 150
-			Content >>
-				supercalifragilisticoespialidosamente
+				Width: 100
+			Text:
+				Box:
+					Width: 150
+				Content >>
+					supercalifragilisticoespialidosamente

@@ -1,6 +1,6 @@
 # Case: Code font con una familia que no existe, en un bloque de código
 # Code: FONT_UNKNOWN
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,9 +12,10 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Code font: Courier
-		Content >>
-			```
-			int x = 1;
-			```
+	Section:
+		Markdown:
+			Code font: Courier
+			Content >>
+				```
+				int x = 1;
+				```

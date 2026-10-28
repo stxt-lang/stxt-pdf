@@ -1,6 +1,6 @@
 # Case: Span que se solapa con otra celda
 # Code: TABLE_SPAN
-# Line: 24
+# Line: 25
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,13 +12,14 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Body:
-			Row:
-				Cell: a
-				Cell: b
-					Span: 2 1
-			Row:
-				Cell: c
-					Span: 1 2
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Body:
+				Row:
+					Cell: a
+					Cell: b
+						Span: 2 1
+				Row:
+					Cell: c
+						Span: 1 2

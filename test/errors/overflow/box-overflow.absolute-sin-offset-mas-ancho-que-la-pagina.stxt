@@ -1,13 +1,14 @@
 # Case: Absolute sin Offset más ancho que la página
 # Code: BOX_OVERFLOW
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Absolute:
-		Box:
-			Width: 700
-			Height: 10
+	Section:
+		Absolute:
+			Box:
+				Width: 700
+				Height: 10

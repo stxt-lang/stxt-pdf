@@ -1325,7 +1325,8 @@ Document (dev.stxt.boxes):
 - [x] S7. **Qué admite una `Section`:** `Id`, `Class` (las reglas `For class` y `For id` que le llegan solo
       pueden ser `Typography`, que hereda todo su contenido), `Media`, `Page numbering`, `Inherit fixed` y su
       contenido. No hay `Background` de página ni `Start` (ver `TODO.md`).
-- [x] S8. **Sección vacía:** `SECTION_EMPTY` (una sección sin contenido en flujo no tiene ninguna página).
+- [x] S8. **Sección vacía:** `SECTION_EMPTY` (sin elementos, o solo con `Fixed`, no tiene ninguna página; un
+      `Absolute` sí cuenta).
 - [x] S9. **Volcado (§7):** una sección con `Id` no se vuelca como caja; sí sus cajas con `Id`, con las
       coordenadas de la página de su sección.
 - [x] S10. **El documento sigue siendo uno** para la jerarquía de encabezados, los índices (`Contents`) y el

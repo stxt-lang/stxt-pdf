@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -34,6 +35,9 @@ class SchemaCoverageTest {
             // Document
             Map.entry("Title", "Title: Informe"),
             Map.entry("Language", "Language: es"),
+            // Section
+            Map.entry("Page numbering", "Page numbering: restart"),
+            Map.entry("Inherit fixed", "Inherit fixed: false"),
             // Elementos
             Map.entry("Id", "Id: x"),
             Map.entry("Class", "Class: c"),
@@ -154,13 +158,17 @@ class SchemaCoverageTest {
 
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
-        t.put("Document", new Template(HEADER + "\t{}", Set.of("Title", "Language")));
+        t.put("Document", new Template(HEADER + "\t{}\n\tSection:\n\t\tBlock:", Set.of("Title", "Language")));
+        // Una sección: lo que admite además de su contenido.
+        t.put("Section", new Template(HEADER + "\tSection:\n\t\t{}\n\t\tBlock:"));
         // Paper excluye Width y Height, que leen todos los documentos (la cabecera).
-        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n\t\t{}",
+        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n\t\t{}\n\tSection:\n\t\tBlock:",
                 Set.of("Paper", "Width", "Height")));
-        for (String element : List.of("Block", "Relative", "Absolute", "Fixed")) {
+        for (String element : List.of("Block", "Relative", "Absolute")) {
             t.put(element, new Template(HEADER + "\t" + element + ":\n\t\t{}"));
         }
+        // Una sección con solo Fixed no tiene contenido.
+        t.put("Fixed", new Template(HEADER + "\tBlock:\n\tFixed:\n\t\t{}"));
         // Lines necesita Wrap.
         t.put("Flex", new Template(HEADER + "\tFlex:\n\t\tWrap: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap")));
         t.put("Grid", new Template(HEADER + "\tGrid:\n\t\t{}\n\t\tArea:\n\t\t\tBlock:"));
@@ -192,10 +200,10 @@ class SchemaCoverageTest {
         t.put("Row", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
         t.put("Cell", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
         // Las reglas van dentro del Styles de la cabecera.
-        t.put("Element", new Template(HEADER + "\t\tElement: Block\n\t\t\t{}"));
-        t.put("For class", new Template(HEADER + "\t\tFor class: d\n\t\t\t{}"));
+        t.put("Element", new Template(HEADER + "\t\tElement: Block\n\t\t\t{}\n\tBlock:"));
+        t.put("For class", new Template(HEADER + "\t\tFor class: d\n\t\t\t{}\n\tBlock:"));
         t.put("For id", new Template(HEADER + "\t\tFor id: r\n\t\t\t{}\n\tBlock:\n\t\tId: r"));
-        t.put("For column", new Template(HEADER + "\t\tFor column: 1\n\t\t\t{}"));
+        t.put("For column", new Template(HEADER + "\t\tFor column: 1\n\t\t\t{}\n\tBlock:"));
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
@@ -211,7 +219,7 @@ class SchemaCoverageTest {
             String sample = SAMPLES.get(pair.child());
             assertNotNull(sample, () -> "Añade a SchemaCoverageTest un valor de ejemplo de " + pair.child());
             String document = document(template, pair.child(), sample);
-            assertDoesNotThrow(() -> new BoxTreeBuilder().build(reader.read(document)),
+            assertDoesNotThrow(() -> new BoxTreeBuilder().build(reader.read(Docs.sectioned(document))),
                     () -> pair.parent() + " > " + pair.child() + " en:\n" + document);
         }));
     }

@@ -1,14 +1,15 @@
 # Case: Grow en column sin alto
 # Code: GROW_WITHOUT_EFFECT
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Flex:
-		Direction: column
-		Item:
-			Grow: 1
-			Block:
+	Section:
+		Flex:
+			Direction: column
+			Item:
+				Grow: 1
+				Block:

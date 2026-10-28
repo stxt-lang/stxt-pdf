@@ -1,6 +1,6 @@
 # Case: Más cortes de columna que columnas fuera de una página
 # Code: BOX_OVERFLOW
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,14 +12,15 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Flex:
-		Item:
-			Multicol:
-				Count: 2
-				Text: A
-				Text: B
-					Break:
-						Before: column
-				Text: C
-					Break:
-						Before: column
+	Section:
+		Flex:
+			Item:
+				Multicol:
+					Count: 2
+					Text: A
+					Text: B
+						Break:
+							Before: column
+					Text: C
+						Break:
+							Before: column

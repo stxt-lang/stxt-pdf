@@ -8,12 +8,16 @@ import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.BoxTreeBuilder;
+import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Media;
 import dev.stxt.boxes.tree.References;
+import dev.stxt.boxes.tree.Section;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -51,9 +55,18 @@ public final class Paginator {
         this.engine = engine;
     }
 
-    public List<Page> paginate(Box root, Media media) {
-        // Cada caja fixed una sola vez, con la posición estática de la página donde aparece.
-        Map<Box, PendingAbsolute> fixed = new LinkedHashMap<>();
+    /**
+     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus
+     * {@code Fixed} y los del documento (§5.21). Las referencias convergen para todo el documento a la vez.
+     */
+    public List<Page> paginate(BoxTreeBuilder.Result tree) {
+        Box root = tree.root();
+        List<Section> sections = tree.sections();
+        // Los Fixed del documento: los hijos de la raíz que no son una sección.
+        List<Box> documentFixed = root.children.stream().filter(b -> b.element != Element.SECTION).toList();
+        // Cada caja fixed de una sección una sola vez, con la posición estática de la página donde aparece.
+        List<Map<Box, PendingAbsolute>> fixed = new ArrayList<>();
+        sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
         boolean numbered = hasPageNumbers(root);
         List<References.Site> sites = References.sites(root);
         Set<String> targets = new LinkedHashSet<>();
@@ -72,17 +85,19 @@ public final class Paginator {
         // las páginas referidas, que cambian el ancho de los textos que las escriben.
         int digits = PageNumbers.DIGITS;
         int changes = 0;
-        List<LayoutResult> results;
+        List<List<LayoutResult>> results;
+        Numbering numbering;
         while (true) {
-            fixed.clear();
-            results = flow(root, media, fixed);
+            fixed.forEach(Map::clear);
+            results = flow(sections, fixed);
+            numbering = Numbering.of(sections, results);
             boolean again = false;
-            if (numbered && PageNumbers.digits(results.size()) > digits) {
-                digits = PageNumbers.digits(results.size());
+            if (numbered && PageNumbers.digits(numbering.pages()) > digits) {
+                digits = PageNumbers.digits(numbering.pages());
                 engine.reservePageDigits(digits);
                 again = true;
             }
-            Map<String, String> actual = pagesOf(results, targets);
+            Map<String, String> actual = pagesOf(results, numbering, targets, sites);
             if (!actual.equals(assumed)) {
                 if (++changes > MAX_REFERENCE_PASSES) {
                     throw unstable(sites, assumed, actual);
@@ -97,27 +112,123 @@ public final class Paginator {
         }
 
         // Segunda fase de la numeración: ya se sabe cuántas páginas hay.
-        int total = results.size();
-        Rect area = media.pageArea();
+        int total = numbering.pages();
         List<Page> pages = new ArrayList<>();
-        for (LayoutResult r : results) {
-            int number = pages.size() + 1;
-            List<Fragment> fixedFragments = new ArrayList<>();
-            // Una fixed dentro de otra sale en su resultado y se coloca después; solo salen las
-            // que Pages incluye en esta página (§5.5), y no ocupan sitio donde no salen.
-            List<PendingAbsolute> queue = new ArrayList<>(fixed.values());
-            for (int i = 0; i < queue.size(); i++) {
-                if (!queue.get(i).box().style.pages.includes(number, total)) {
-                    continue;
+        for (int k = 0; k < sections.size(); k++) {
+            Section section = sections.get(k);
+            Rect area = section.media().pageArea();
+            List<LayoutResult> own = results.get(k);
+            for (int i = 0; i < own.size(); i++) {
+                int number = pages.size() + 1;
+                int printed = numbering.printed(number);
+                int tanda = numbering.total(number);
+                // Una fixed dentro de otra sale en su resultado y se coloca después; solo salen las
+                // que Pages incluye en esta página (§5.5), y no ocupan sitio donde no salen. Pages
+                // cuenta dentro del alcance donde se declara: el documento o la sección (§5.21).
+                List<Queued> queue = new ArrayList<>();
+                if (section.inheritFixed()) {
+                    documentFixed.forEach(b -> queue.add(new Queued(new PendingAbsolute(b, 0, 0), number, total)));
                 }
-                LayoutResult f = engine.absolute().layOut(queue.get(i), area.width(), area.height(), Insets.ZERO);
-                fixedFragments.add(numbered ? engine.number(f.fragment(), number, total) : f.fragment());
-                queue.addAll(f.pending());
+                for (PendingAbsolute p : fixed.get(k).values()) {
+                    queue.add(new Queued(p, i + 1, own.size()));
+                }
+                List<Fragment> fixedFragments = new ArrayList<>();
+                for (int q = 0; q < queue.size(); q++) {
+                    Queued item = queue.get(q);
+                    if (!item.pending().box().style.pages.includes(item.number(), item.total())) {
+                        continue;
+                    }
+                    if (numbered && printed == 0) {
+                        unavailable(item.pending().box());
+                    }
+                    LayoutResult f = engine.absolute().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
+                    fixedFragments.add(numbered ? engine.number(f.fragment(), printed, tanda) : f.fragment());
+                    f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
+                }
+                if (numbered && printed == 0) {
+                    unavailable(section.box());
+                }
+                Fragment content = numbered && printed > 0
+                        ? engine.number(own.get(i).fragment(), printed, tanda) : own.get(i).fragment();
+                pages.add(new Page(number, content, fixedFragments, section.media(), k, printed));
             }
-            Fragment content = numbered ? engine.number(r.fragment(), number, total) : r.fragment();
-            pages.add(new Page(number, content, fixedFragments));
         }
         return pages;
+    }
+
+    /** Una caja fixed por colocar y las páginas de su alcance: el documento o su sección. */
+    private record Queued(PendingAbsolute pending, int number, int total) {
+    }
+
+    /**
+     * El número impreso de cada página física y el último de su tanda (§5.21): las páginas desde el último
+     * {@code Page numbering: restart}; {@code none} no numera ni avanza el contador.
+     */
+    private record Numbering(int[] printed, int[] totals) {
+
+        static Numbering of(List<Section> sections, List<List<LayoutResult>> results) {
+            int pages = results.stream().mapToInt(List::size).sum();
+            int[] printed = new int[pages];
+            int[] totals = new int[pages];
+            int counter = 0;
+            int tandaFirst = 0;
+            int i = 0;
+            for (int k = 0; k < sections.size(); k++) {
+                Section.PageNumbering mode = sections.get(k).numbering();
+                if (mode == Section.PageNumbering.RESTART) {
+                    Arrays.fill(totals, tandaFirst, i, counter);
+                    counter = 0;
+                    tandaFirst = i;
+                }
+                for (int j = 0; j < results.get(k).size(); j++) {
+                    printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
+                }
+            }
+            Arrays.fill(totals, tandaFirst, i, counter);
+            return new Numbering(printed, totals);
+        }
+
+        int pages() {
+            return printed.length;
+        }
+
+        /** Número impreso de la página física {@code number} (desde 1); 0 si no se numera. */
+        int printed(int number) {
+            return printed[number - 1];
+        }
+
+        /** Último número de la tanda de la página física {@code number}. */
+        int total(int number) {
+            return totals[number - 1];
+        }
+    }
+
+    /**
+     * Un texto con {@code {page}} o {@code {pages}} en una página sin número: no hay qué escribir y no se
+     * deja en blanco (§5.21).
+     */
+    private static void unavailable(Box box) {
+        Box found = withPageNumbers(box);
+        if (found != null) {
+            throw new InvalidModelException(found.line, ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
+                    + (found.id != null ? found.id : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
+                    + "sin número (Page numbering: none): quita el marcador, o pon la sección con Inherit fixed: false "
+                    + "o el Fixed en las secciones que numeran");
+        }
+    }
+
+    /** La primera caja, ella o sus descendientes, con {@code {page}} o {@code {pages}}; {@code null} si no hay. */
+    private static Box withPageNumbers(Box box) {
+        if (PageNumbers.contains(box.text)) {
+            return box;
+        }
+        for (Box child : box.children) {
+            Box found = withPageNumbers(child);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
     }
 
     /** El número de cada caja referida con {@code {number of: id}}; ya validado por el builder. */
@@ -133,17 +244,24 @@ public final class Paginator {
     }
 
     /**
-     * La página en que empieza cada caja referida: la de su primer fragmento (§5.19). Una caja
-     * que no sale en ninguna página (no debería pasar: las cajas con {@code Fixed} se rechazan al
-     * construir el árbol) es un error.
+     * La página en que empieza cada caja referida: la de su primer fragmento (§5.19), con su número
+     * impreso (§5.21). Una caja que no sale en ninguna página (no debería pasar: las cajas con {@code Fixed}
+     * se rechazan al construir el árbol) o que está en una página sin número es un error.
      */
-    private static Map<String, String> pagesOf(List<LayoutResult> results, Set<String> targets) {
+    private static Map<String, String> pagesOf(List<List<LayoutResult>> results, Numbering numbering,
+                                               Set<String> targets, List<References.Site> sites) {
         Map<String, String> pages = new LinkedHashMap<>();
         if (targets.isEmpty()) {
             return pages;
         }
-        for (int i = 0; i < results.size() && pages.size() < targets.size(); i++) {
-            firstPages(results.get(i).fragment(), Integer.toString(i + 1), targets, pages);
+        int number = 0;
+        for (List<LayoutResult> section : results) {
+            for (LayoutResult r : section) {
+                number++;
+                if (pages.size() < targets.size()) {
+                    firstPages(r.fragment(), number, targets, pages, numbering, sites);
+                }
+            }
         }
         for (String id : targets) {
             if (!pages.containsKey(id)) {
@@ -154,12 +272,19 @@ public final class Paginator {
         return pages;
     }
 
-    private static void firstPages(Fragment f, String page, Set<String> targets, Map<String, String> pages) {
+    private static void firstPages(Fragment f, int number, Set<String> targets, Map<String, String> pages,
+                                   Numbering numbering, List<References.Site> sites) {
         String id = f.box().key();
-        if (id != null && targets.contains(id)) {
-            pages.putIfAbsent(id, page);
+        if (id != null && targets.contains(id) && !pages.containsKey(id)) {
+            if (numbering.printed(number) == 0) {
+                int line = sites.stream().filter(s -> id.equals(s.reference().id())).mapToInt(References.Site::line)
+                        .findFirst().orElse(0);
+                throw new InvalidModelException(line, ErrorCode.REFERENCE_NOT_PLACEABLE, "La caja " + id
+                        + " está en una sección sin números de página (Page numbering: none): no tiene página que dar");
+            }
+            pages.put(id, Integer.toString(numbering.printed(number)));
         }
-        f.children().forEach(child -> firstPages(child, page, targets, pages));
+        f.children().forEach(child -> firstPages(child, number, targets, pages, numbering, sites));
     }
 
     private static InvalidModelException unstable(List<References.Site> sites, Map<String, String> assumed,
@@ -173,26 +298,37 @@ public final class Paginator {
                 + "ancho con la página y mueve la caja de página");
     }
 
-    /** Pagina el flujo: un resultado por página. Apunta en {@code fixed} las cajas {@code fixed}. */
-    private List<LayoutResult> flow(Box root, Media media, Map<Box, PendingAbsolute> fixed) {
-        List<LayoutResult> results = new ArrayList<>();
-        BreakToken token = null;
-        do {
-            ConstraintSpace space = ConstraintSpace.forPage(media);
-            LayoutResult r = engine.layout(root, space, token);
-            BreakToken next = perPage(r.breakToken());
-            if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
-                throw new IllegalStateException("Sin progreso en la página " + (results.size() + 1)
-                        + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
-            }
-            results.add(r);
-            r.pending().forEach(p -> fixed.putIfAbsent(p.box(), p));
-            token = next;
-            if (results.size() > MAX_PAGES) {
-                throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
-            }
-        } while (token != null);
-        return results;
+    /**
+     * Pagina el flujo de cada sección: un resultado por página y sección. Apunta en {@code fixed}, por
+     * sección, las cajas {@code fixed}.
+     */
+    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingAbsolute>> fixed) {
+        List<List<LayoutResult>> all = new ArrayList<>();
+        int pages = 0;
+        for (int k = 0; k < sections.size(); k++) {
+            Section section = sections.get(k);
+            List<LayoutResult> results = new ArrayList<>();
+            BreakToken token = null;
+            do {
+                ConstraintSpace space = ConstraintSpace.forPage(section.media());
+                LayoutResult r = engine.layout(section.box(), space, token);
+                BreakToken next = perPage(r.breakToken());
+                if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
+                    throw new IllegalStateException("Sin progreso en la página " + (pages + results.size() + 1)
+                            + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
+                }
+                results.add(r);
+                int section0 = k;
+                r.pending().forEach(p -> fixed.get(section0).putIfAbsent(p.box(), p));
+                token = next;
+                if (pages + results.size() > MAX_PAGES) {
+                    throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
+                }
+            } while (token != null);
+            pages += results.size();
+            all.add(results);
+        }
+        return all;
     }
 
     /** Algún texto del documento contiene {@code {page}} o {@code {pages}}. */

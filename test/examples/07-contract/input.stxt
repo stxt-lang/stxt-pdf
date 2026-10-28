@@ -11,217 +11,218 @@ Document (dev.stxt.boxes):
 		Margin: 92 70 80 70
 	Title: Contrato de prestación de servicios de diseño · LUM-2025-044
 	Language: es
-	Fixed:
-		Id: header
-		Pages: not-first
-		Offset: -60 0 auto 0
-		Box:
-			Padding: 0 0 6 0
-			Border: 0 0 0.75 0
-			Border color: #3F3D8F
-		Flex:
-			Main axis: between
-			Cross axis: end
-			Item:
-				Image: examples/contract/lumen.svg
-					Alt: Lumen, estudio de diseño
-					Box:
-						Width: 78
-			Item:
-				Text: Contrato de prestación de servicios de diseño · Ref. LUM-2025-044
-	Fixed:
-		Id: footer
-		Offset: auto 0 -48 0
-		Box:
-			Padding: 6 0 0 0
-			Border: 0.5 0 0 0
-			Border color: #B9B8D9
-		Flex:
-			Main axis: between
-			Cross axis: end
-			Item:
-				Flex:
-					Cross axis: end
-					Item:
-						Text: Rúbricas:
-					Item:
-						Block:
-							Class: initials
-					Item:
-						Block:
-							Class: initials
-			Item:
-				Text: Página {page} de {pages}
-	Heading 1:
-		Text: Contrato de prestación de servicios de diseño
-	Text: En Olot, a 3 de noviembre de 2025
-		Typography:
-			Align: center
-			Style: italic
-			Color: #6C6B8A
-		Box:
-			Margin: 0 0 14 0
-	Heading 2:
-		Text: Reunidos
-	Block:
-		Id: parties
-		Box:
-			Margin: 0 0 8 0
-		Block:
-			Class: party
+	Section:
+		Fixed:
+			Id: header
+			Pages: not-first
+			Offset: -60 0 auto 0
 			Box:
-				Margin: 0 0 8 0
-			Paragraph:
-				Content >>
-					De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora (en adelante, «el Estudio»).
-		Block:
-			Class: party
-			Paragraph:
-				Content >>
-					De otra, **Cooperativa Solvent, S. Coop. Ltda.**, con CIF F-17482211 y domicilio en el polígono de la Canya, nave 6, de Olot (Girona), representada por doña Carme Vidal i Roca, presidenta de su Consejo Rector (en adelante, «la Cliente»).
-	Paragraph: Ambas partes se reconocen mutuamente la capacidad legal necesaria para obligarse y, a tal efecto,
-	Heading 2:
-		Text: Exponen
-	List:
-		Marker: upper-roman
-		List item:
-			Paragraph: Que la Cliente es una cooperativa de energía renovable que desea renovar su identidad visual y su sitio web corporativo con motivo de su décimo aniversario.
-		List item:
-			Paragraph: Que el Estudio se dedica profesionalmente al diseño gráfico y digital y dispone de los medios y la experiencia necesarios para realizar el encargo.
-		List item:
-			Paragraph: Que ambas partes desean fijar las condiciones del encargo, y por ello acuerdan formalizar este contrato con arreglo a las siguientes
-	Heading 2:
-		Text: Cláusulas
-	Markdown:
-		Id: clauses
-		Numbering: decimal lower-alpha lower-roman
-		Typography:
-			Text wrap: pretty
-		Content >>
-			1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo I.
-
-			2. **Alcance de los servicios.** Los servicios comprenden:
-
-			   1. la investigación y el diagnóstico de la identidad actual, con entrevistas a diez socias y socios;
-			   2. el diseño del logotipo, la paleta, la tipografía y el manual de marca, que incluirá:
-			      1. las versiones del logotipo para fondos claros y oscuros;
-			      2. las reglas de uso en papel, pantalla y rotulación;
-			   3. el diseño y la maquetación del sitio web en cinco plantillas; y
-			   4. la entrega de los ficheros fuente en formatos abiertos.
-
-			3. **Plazos.** El Estudio entregará la identidad visual en un plazo de seis semanas desde la firma y el sitio web, en otras ocho semanas desde la aprobación de la identidad. Los plazos se suspenderán mientras la Cliente no facilite los materiales o las aprobaciones que le correspondan.
-
-			4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable, que se abonarán según el calendario del Anexo I mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
-
-			5. **Obligaciones del Estudio.** El Estudio ejecutará el encargo con la diligencia profesional debida, designará a una persona responsable de la relación con la Cliente e informará con regularidad del avance de los trabajos.
-
-			6. **Obligaciones de la Cliente.** La Cliente facilitará los textos, imágenes y datos necesarios, designará un interlocutor con capacidad de decisión y comunicará su conformidad o sus observaciones en un plazo máximo de diez días hábiles desde cada entrega.
-
-			7. **Propiedad intelectual.** Con el pago íntegro de los honorarios, el Estudio cede a la Cliente, en exclusiva y para todo el mundo, los derechos de explotación sobre el logotipo y los demás elementos de la identidad. El Estudio podrá mencionar el trabajo en su portafolio, salvo petición expresa en contrario.
-
-			8. **Confidencialidad.** Cada parte mantendrá en secreto la información confidencial de la otra a la que acceda con motivo del contrato y no la utilizará para otro fin, durante su vigencia y durante los cinco años siguientes.
-
-			9. **Modificaciones y trabajos adicionales.** Cualquier modificación del alcance, los plazos o los honorarios deberá constar por escrito y estar firmada por ambas partes. Los trabajos que no estén comprendidos en el Anexo I se presupuestarán aparte.
-
-			10. **Duración y resolución.** El contrato estará vigente hasta la entrega y aceptación del último de los trabajos. Cualquiera de las partes podrá resolverlo por incumplimiento grave de la otra, previo aviso escrito y quince días para subsanarlo.
-
-			11. **Protección de datos.** Cada parte tratará los datos personales a los que acceda conforme a la normativa vigente y solo para ejecutar este contrato. Si el Estudio accediera a datos de socias y socios, lo hará como encargado del tratamiento, con el contrato correspondiente.
-
-			12. **Ley aplicable y jurisdicción.** Este contrato se rige por la ley española. Las partes se someten, para cualquier controversia, a los juzgados y tribunales de Olot, con renuncia a cualquier otro fuero que pudiera corresponderles.
-	Block:
-		Id: annex
-		Break:
-			Before: page
-		Heading 2:
-			Text: Anexo I · Calendario y honorarios
-		Table:
-			Id: fees
-			Columns: 36 1fr 84 74
-			Column align: left left right right
+				Padding: 0 0 6 0
+				Border: 0 0 0.75 0
+				Border color: #3F3D8F
+			Flex:
+				Main axis: between
+				Cross axis: end
+				Item:
+					Image: examples/contract/lumen.svg
+						Alt: Lumen, estudio de diseño
+						Box:
+							Width: 78
+				Item:
+					Text: Contrato de prestación de servicios de diseño · Ref. LUM-2025-044
+		Fixed:
+			Id: footer
+			Offset: auto 0 -48 0
+			Box:
+				Padding: 6 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #B9B8D9
+			Flex:
+				Main axis: between
+				Cross axis: end
+				Item:
+					Flex:
+						Cross axis: end
+						Item:
+							Text: Rúbricas:
+						Item:
+							Block:
+								Class: initials
+						Item:
+							Block:
+								Class: initials
+				Item:
+					Text: Página {page} de {pages}
+		Heading 1:
+			Text: Contrato de prestación de servicios de diseño
+		Text: En Olot, a 3 de noviembre de 2025
+			Typography:
+				Align: center
+				Style: italic
+				Color: #6C6B8A
 			Box:
 				Margin: 0 0 14 0
-			Head:
-				Row:
-					Cell: Nº
-					Cell: Hito y entregable
-					Cell: Fecha prevista
-					Cell: Importe
-			Body:
-				Row:
-					Cell: 1
-					Cell: Firma del contrato y arranque (40 %)
-						Header: true
-					Cell: 3 nov. 2025
-					Cell: 7.360 €
-				Row:
-					Cell: 2
-					Cell: Entrega de la identidad visual y el manual de marca (30 %)
-						Header: true
-					Cell: 15 dic. 2025
-					Cell: 5.520 €
-				Row:
-					Cell: 3
-					Cell: Puesta en marcha del sitio web y entrega de los ficheros (30 %)
-						Header: true
-					Cell: 9 feb. 2026
-					Cell: 5.520 €
-			Foot:
-				Row:
-					Cell: Total sin IVA
-						Header: true
-						Span: 1 3
-						Class: total
-					Cell: 18.400 €
-						Class: total
-	Block:
-		Id: signatures
-		Break:
-			Inside: avoid
-		Paragraph: Y en prueba de conformidad, las partes firman este contrato por duplicado y a un solo efecto, en el lugar y la fecha indicados al principio.
-		Grid:
-			Columns: 1fr 1fr
-			Gap: 30
+		Heading 2:
+			Text: Reunidos
+		Block:
+			Id: parties
 			Box:
-				Margin: 10 0 0 0
-			Area:
-				Block:
-					Class: sign
-					Text: Por el estudio
-						Typography:
-							Weight: bold
-							Color: #3F3D8F
-							Transform: uppercase
-							Letter spacing: 0.6
-					Image: examples/certificate/signature-director.svg
-						Alt: Firma de Irene Calvo Mas
-						Box:
-							Width: 130
-							Margin: 4 0 0 0
+				Margin: 0 0 8 0
+			Block:
+				Class: party
+				Box:
+					Margin: 0 0 8 0
+				Paragraph:
+					Content >>
+						De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora (en adelante, «el Estudio»).
+			Block:
+				Class: party
+				Paragraph:
+					Content >>
+						De otra, **Cooperativa Solvent, S. Coop. Ltda.**, con CIF F-17482211 y domicilio en el polígono de la Canya, nave 6, de Olot (Girona), representada por doña Carme Vidal i Roca, presidenta de su Consejo Rector (en adelante, «la Cliente»).
+		Paragraph: Ambas partes se reconocen mutuamente la capacidad legal necesaria para obligarse y, a tal efecto,
+		Heading 2:
+			Text: Exponen
+		List:
+			Marker: upper-roman
+			List item:
+				Paragraph: Que la Cliente es una cooperativa de energía renovable que desea renovar su identidad visual y su sitio web corporativo con motivo de su décimo aniversario.
+			List item:
+				Paragraph: Que el Estudio se dedica profesionalmente al diseño gráfico y digital y dispone de los medios y la experiencia necesarios para realizar el encargo.
+			List item:
+				Paragraph: Que ambas partes desean fijar las condiciones del encargo, y por ello acuerdan formalizar este contrato con arreglo a las siguientes
+		Heading 2:
+			Text: Cláusulas
+		Markdown:
+			Id: clauses
+			Numbering: decimal lower-alpha lower-roman
+			Typography:
+				Text wrap: pretty
+			Content >>
+				1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo I.
+
+				2. **Alcance de los servicios.** Los servicios comprenden:
+
+				   1. la investigación y el diagnóstico de la identidad actual, con entrevistas a diez socias y socios;
+				   2. el diseño del logotipo, la paleta, la tipografía y el manual de marca, que incluirá:
+				      1. las versiones del logotipo para fondos claros y oscuros;
+				      2. las reglas de uso en papel, pantalla y rotulación;
+				   3. el diseño y la maquetación del sitio web en cinco plantillas; y
+				   4. la entrega de los ficheros fuente en formatos abiertos.
+
+				3. **Plazos.** El Estudio entregará la identidad visual en un plazo de seis semanas desde la firma y el sitio web, en otras ocho semanas desde la aprobación de la identidad. Los plazos se suspenderán mientras la Cliente no facilite los materiales o las aprobaciones que le correspondan.
+
+				4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable, que se abonarán según el calendario del Anexo I mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
+
+				5. **Obligaciones del Estudio.** El Estudio ejecutará el encargo con la diligencia profesional debida, designará a una persona responsable de la relación con la Cliente e informará con regularidad del avance de los trabajos.
+
+				6. **Obligaciones de la Cliente.** La Cliente facilitará los textos, imágenes y datos necesarios, designará un interlocutor con capacidad de decisión y comunicará su conformidad o sus observaciones en un plazo máximo de diez días hábiles desde cada entrega.
+
+				7. **Propiedad intelectual.** Con el pago íntegro de los honorarios, el Estudio cede a la Cliente, en exclusiva y para todo el mundo, los derechos de explotación sobre el logotipo y los demás elementos de la identidad. El Estudio podrá mencionar el trabajo en su portafolio, salvo petición expresa en contrario.
+
+				8. **Confidencialidad.** Cada parte mantendrá en secreto la información confidencial de la otra a la que acceda con motivo del contrato y no la utilizará para otro fin, durante su vigencia y durante los cinco años siguientes.
+
+				9. **Modificaciones y trabajos adicionales.** Cualquier modificación del alcance, los plazos o los honorarios deberá constar por escrito y estar firmada por ambas partes. Los trabajos que no estén comprendidos en el Anexo I se presupuestarán aparte.
+
+				10. **Duración y resolución.** El contrato estará vigente hasta la entrega y aceptación del último de los trabajos. Cualquiera de las partes podrá resolverlo por incumplimiento grave de la otra, previo aviso escrito y quince días para subsanarlo.
+
+				11. **Protección de datos.** Cada parte tratará los datos personales a los que acceda conforme a la normativa vigente y solo para ejecutar este contrato. Si el Estudio accediera a datos de socias y socios, lo hará como encargado del tratamiento, con el contrato correspondiente.
+
+				12. **Ley aplicable y jurisdicción.** Este contrato se rige por la ley española. Las partes se someten, para cualquier controversia, a los juzgados y tribunales de Olot, con renuncia a cualquier otro fuero que pudiera corresponderles.
+		Block:
+			Id: annex
+			Break:
+				Before: page
+			Heading 2:
+				Text: Anexo I · Calendario y honorarios
+			Table:
+				Id: fees
+				Columns: 36 1fr 84 74
+				Column align: left left right right
+				Box:
+					Margin: 0 0 14 0
+				Head:
+					Row:
+						Cell: Nº
+						Cell: Hito y entregable
+						Cell: Fecha prevista
+						Cell: Importe
+				Body:
+					Row:
+						Cell: 1
+						Cell: Firma del contrato y arranque (40 %)
+							Header: true
+						Cell: 3 nov. 2025
+						Cell: 7.360 €
+					Row:
+						Cell: 2
+						Cell: Entrega de la identidad visual y el manual de marca (30 %)
+							Header: true
+						Cell: 15 dic. 2025
+						Cell: 5.520 €
+					Row:
+						Cell: 3
+						Cell: Puesta en marcha del sitio web y entrega de los ficheros (30 %)
+							Header: true
+						Cell: 9 feb. 2026
+						Cell: 5.520 €
+				Foot:
+					Row:
+						Cell: Total sin IVA
+							Header: true
+							Span: 1 3
+							Class: total
+						Cell: 18.400 €
+							Class: total
+		Block:
+			Id: signatures
+			Break:
+				Inside: avoid
+			Paragraph: Y en prueba de conformidad, las partes firman este contrato por duplicado y a un solo efecto, en el lugar y la fecha indicados al principio.
+			Grid:
+				Columns: 1fr 1fr
+				Gap: 30
+				Box:
+					Margin: 10 0 0 0
+				Area:
 					Block:
-						Box:
-							Border: 0.5 0 0 0
-							Border color: #1E1D2B
-							Padding: 4 0 0 0
-						Text: Irene Calvo Mas
-						Text: Administradora, Lumen Estudio de Diseño, S.L.P.
-			Area:
-				Block:
-					Class: sign
-					Text: Por la cliente
-						Typography:
-							Weight: bold
-							Color: #3F3D8F
-							Transform: uppercase
-							Letter spacing: 0.6
-					Image: examples/letter/signature.svg
-						Alt: Firma de Carme Vidal i Roca
-						Box:
-							Width: 130
-							Margin: 4 0 0 0
+						Class: sign
+						Text: Por el estudio
+							Typography:
+								Weight: bold
+								Color: #3F3D8F
+								Transform: uppercase
+								Letter spacing: 0.6
+						Image: examples/certificate/signature-director.svg
+							Alt: Firma de Irene Calvo Mas
+							Box:
+								Width: 130
+								Margin: 4 0 0 0
+						Block:
+							Box:
+								Border: 0.5 0 0 0
+								Border color: #1E1D2B
+								Padding: 4 0 0 0
+							Text: Irene Calvo Mas
+							Text: Administradora, Lumen Estudio de Diseño, S.L.P.
+				Area:
 					Block:
-						Box:
-							Border: 0.5 0 0 0
-							Border color: #1E1D2B
-							Padding: 4 0 0 0
-						Text: Carme Vidal i Roca
-						Text: Presidenta del Consejo Rector, Cooperativa Solvent
+						Class: sign
+						Text: Por la cliente
+							Typography:
+								Weight: bold
+								Color: #3F3D8F
+								Transform: uppercase
+								Letter spacing: 0.6
+						Image: examples/letter/signature.svg
+							Alt: Firma de Carme Vidal i Roca
+							Box:
+								Width: 130
+								Margin: 4 0 0 0
+						Block:
+							Box:
+								Border: 0.5 0 0 0
+								Border color: #1E1D2B
+								Padding: 4 0 0 0
+							Text: Carme Vidal i Roca
+							Text: Presidenta del Consejo Rector, Cooperativa Solvent

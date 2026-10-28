@@ -1,6 +1,6 @@
 # Case: Encabezado sin Text
 # Code: TOO_FEW_CHILDREN
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,5 +12,6 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Heading 1:
-		Id: vacío
+	Section:
+		Heading 1:
+			Id: vacío

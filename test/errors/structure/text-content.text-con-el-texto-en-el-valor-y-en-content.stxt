@@ -1,12 +1,13 @@
 # Case: Text con el texto en el valor y en Content
 # Code: TEXT_CONTENT
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Text: hola
-		Content >>
-			adiós
+	Section:
+		Text: hola
+			Content >>
+				adiós

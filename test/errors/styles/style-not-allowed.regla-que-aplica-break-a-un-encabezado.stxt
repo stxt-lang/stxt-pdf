@@ -15,5 +15,6 @@ Document (dev.stxt.boxes):
 		Element: Heading 1
 			Break:
 				After: page
-	Heading 1:
-		Text: Título
+	Section:
+		Heading 1:
+			Text: Título

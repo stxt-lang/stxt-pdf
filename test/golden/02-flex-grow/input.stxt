@@ -6,26 +6,27 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 		Margin: 40
-	Flex:
-		Id: row
-		Gap: 20
-		Item:
-			Basis: 100
-			Grow: 1
-			Block:
-				Id: A
-				Box:
-					Height: 50
-		Item:
-			Basis: 150
-			Grow: 3
-			Block:
-				Id: B
-				Box:
-					Height: 50
-		Item:
-			Block:
-				Id: C
-				Box:
-					Width: 65
-					Height: 50
+	Section:
+		Flex:
+			Id: row
+			Gap: 20
+			Item:
+				Basis: 100
+				Grow: 1
+				Block:
+					Id: A
+					Box:
+						Height: 50
+			Item:
+				Basis: 150
+				Grow: 3
+				Block:
+					Id: B
+					Box:
+						Height: 50
+			Item:
+				Block:
+					Id: C
+					Box:
+						Width: 65
+						Height: 50

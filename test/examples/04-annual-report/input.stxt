@@ -11,553 +11,554 @@ Document (dev.stxt.boxes):
 		Margin: 56 56 70 56
 	Title: Informe anual 2025 · Cooperativa Solvent
 	Language: es
-	Fixed:
-		Id: footer
-		Pages: not-first
-		Offset: auto 0 -42 0
-		Box:
-			Padding: 6 0 0 0
-			Border: 0.5 0 0 0
-			Border color: #C9D5E3
-		Flex:
-			Main axis: between
-			Item:
-				Text: Cooperativa Solvent · Informe anual 2025
-			Item:
-				Text: Página {page} de {pages}
-	Absolute:
-		Id: cover
-		Offset: -56 auto auto -56
-		Box:
-			Width: 595
-			Height: 842
-			Background: #12315A
-		Typography:
-			Color: #FFFFFF
-		Image: examples/report/cover.jpg
-			Id: cover-photo
+	Section:
+		Fixed:
+			Id: footer
+			Pages: not-first
+			Offset: auto 0 -42 0
 			Box:
-				Width: 100%
+				Padding: 6 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #C9D5E3
+			Flex:
+				Main axis: between
+				Item:
+					Text: Cooperativa Solvent · Informe anual 2025
+				Item:
+					Text: Página {page} de {pages}
 		Absolute:
-			Id: cover-fade
-			Offset: 250 0 auto 0
+			Id: cover
+			Offset: -56 auto auto -56
 			Box:
-				Height: 90
-				Background: linear(180, #12315A00, #12315A)
-		Block:
-			Box:
-				Padding: 36 56 0 56
-			Text: Informe anual · Ejercicio 2025
-				Typography:
-					Size: 9
-					Weight: bold
-					Color: #F2A65A
-					Transform: uppercase
-					Letter spacing: 2
+				Width: 595
+				Height: 842
+				Background: #12315A
+			Typography:
+				Color: #FFFFFF
+			Image: examples/report/cover.jpg
+				Id: cover-photo
 				Box:
-					Margin: 0 0 10 0
+					Width: 100%
+			Absolute:
+				Id: cover-fade
+				Offset: 250 0 auto 0
+				Box:
+					Height: 90
+					Background: linear(180, #12315A00, #12315A)
+			Block:
+				Box:
+					Padding: 36 56 0 56
+				Text: Informe anual · Ejercicio 2025
+					Typography:
+						Size: 9
+						Weight: bold
+						Color: #F2A65A
+						Transform: uppercase
+						Letter spacing: 2
+					Box:
+						Margin: 0 0 10 0
+				Heading 1:
+					In contents: false
+					Box:
+						Margin: 0 0 14 0
+						Padding: 0
+						Border: 0
+					Text: Un año de sol
+						Typography:
+							Font: IBM Plex Serif
+							Weight: bold
+							Size: 44
+							Line height: 48
+							Color: #FFFFFF
+					Text: y de viento
+						Typography:
+							Font: IBM Plex Serif
+							Weight: bold
+							Size: 44
+							Line height: 48
+							Color: #FFFFFF
+				Text: Cooperativa Solvent · Energía renovable de proximidad en la Garrotxa
+					Typography:
+						Font: IBM Plex Serif
+						Style: italic
+						Size: 14
+						Line height: 20
+						Color: #C9D5E3
+					Box:
+						Margin: 0 0 90 0
+				Flex:
+					Gap: 30
+					Item:
+						Grow: 1
+						Block:
+							Text: 2.384 MWh
+								Typography:
+									Font: IBM Plex Serif
+									Size: 22
+									Weight: bold
+							Text: de energía limpia producida
+								Typography:
+									Size: 8.5
+									Color: #C9D5E3
+					Item:
+						Grow: 1
+						Block:
+							Text: 8.412
+								Typography:
+									Font: IBM Plex Serif
+									Size: 22
+									Weight: bold
+							Text: clientes abastecidos
+								Typography:
+									Size: 8.5
+									Color: #C9D5E3
+					Item:
+						Grow: 1
+						Block:
+							Text: 312 k€
+								Typography:
+									Font: IBM Plex Serif
+									Size: 22
+									Weight: bold
+							Text: de resultado del ejercicio
+								Typography:
+									Size: 8.5
+									Color: #C9D5E3
+			Text: Aprobado por la Asamblea General de socias y socios el 21 de marzo de 2026.
+				Typography:
+					Size: 8
+					Color: #8FA4BF
+				Box:
+					Margin: 120 56 0 56
+		Block:
+			Id: cover-spacer
+			Box:
+				Height: 1
+			Break:
+				After: page
+		Block:
+			Id: contents
 			Heading 1:
 				In contents: false
-				Box:
-					Margin: 0 0 14 0
-					Padding: 0
-					Border: 0
-				Text: Un año de sol
-					Typography:
-						Font: IBM Plex Serif
-						Weight: bold
-						Size: 44
-						Line height: 48
-						Color: #FFFFFF
-				Text: y de viento
-					Typography:
-						Font: IBM Plex Serif
-						Weight: bold
-						Size: 44
-						Line height: 48
-						Color: #FFFFFF
-			Text: Cooperativa Solvent · Energía renovable de proximidad en la Garrotxa
+				Text: Contenido
+			Contents:
+				Id: toc
+				Levels: 1 1
+		Block:
+			Id: letter
+			Box:
+				Margin: 30 0 0 0
+			Heading 1:
+				Text: Carta de la presidenta
+			Paragraph: Cuando fundamos Solvent, hace once años, teníamos tres tejados, un molino de viento prestado y más ganas que dinero. Hoy producimos energía para más de ocho mil hogares, comercios y empresas de la comarca, y lo hacemos sin salir de ella: lo que generamos aquí se consume aquí.
+				Class: lead
+			Paragraph: El 2025 ha sido el año de la **consolidación**. Hemos puesto en marcha el parque solar de Les Preses, ampliado el de Sant Joan y renovado los tres aerogeneradores más antiguos. Hemos producido un 11 % más que el año anterior y hemos cerrado el ejercicio con un resultado positivo por quinto año consecutivo.
+			Paragraph: Nada de esto es obra de una persona. Es el resultado del trabajo de las veintitrés personas de la plantilla, de las más de mil doscientas socias y socios que deciden en la asamblea y de una red de proveedores locales que han montado, cada kilovatio, con las manos y con criterio.
+			Paragraph: Este informe cuenta lo que hemos conseguido, también lo que nos ha costado y lo que nos queda por hacer. Les invitamos a leerlo con ojo crítico: una cooperativa se mejora preguntando.
+			Paragraph: Con afecto y con ganas de seguir,
+			Text: Carme Vidal i Roca
 				Typography:
 					Font: IBM Plex Serif
-					Style: italic
-					Size: 14
-					Line height: 20
-					Color: #C9D5E3
+					Weight: bold
+					Size: 11
 				Box:
-					Margin: 0 0 90 0
-			Flex:
-				Gap: 30
-				Item:
-					Grow: 1
+					Margin: 14 0 0 0
+			Text: Presidenta del Consejo Rector
+				Typography:
+					Size: 8.5
+					Color: #5B6B7C
+			Heading 2:
+				Text: Hitos del año
+			Grid:
+				Id: milestones
+				Columns: repeat(4, 1fr)
+				Gap: 14
+				Area:
 					Block:
-						Text: 2.384 MWh
-							Typography:
-								Font: IBM Plex Serif
-								Size: 22
-								Weight: bold
-						Text: de energía limpia producida
-							Typography:
-								Size: 8.5
-								Color: #C9D5E3
-				Item:
-					Grow: 1
+						Class: milestone
+						Text: Marzo
+							Class: kicker
+						Text: La asamblea aprueba las cuentas de 2024 con el 94 % de los votos.
+				Area:
 					Block:
-						Text: 8.412
-							Typography:
-								Font: IBM Plex Serif
-								Size: 22
-								Weight: bold
-						Text: clientes abastecidos
-							Typography:
-								Size: 8.5
-								Color: #C9D5E3
-				Item:
-					Grow: 1
+						Class: milestone
+						Text: Junio
+							Class: kicker
+						Text: Se conecta el parque solar de Les Preses, de 1,6 MWp.
+				Area:
 					Block:
-						Text: 312 k€
-							Typography:
-								Font: IBM Plex Serif
-								Size: 22
-								Weight: bold
-						Text: de resultado del ejercicio
-							Typography:
-								Size: 8.5
-								Color: #C9D5E3
-		Text: Aprobado por la Asamblea General de socias y socios el 21 de marzo de 2026.
-			Typography:
-				Size: 8
-				Color: #8FA4BF
-			Box:
-				Margin: 120 56 0 56
-	Block:
-		Id: cover-spacer
-		Box:
-			Height: 1
-		Break:
-			After: page
-	Block:
-		Id: contents
-		Heading 1:
-			In contents: false
-			Text: Contenido
-		Contents:
-			Id: toc
-			Levels: 1 1
-	Block:
-		Id: letter
-		Box:
-			Margin: 30 0 0 0
-		Heading 1:
-			Text: Carta de la presidenta
-		Paragraph: Cuando fundamos Solvent, hace once años, teníamos tres tejados, un molino de viento prestado y más ganas que dinero. Hoy producimos energía para más de ocho mil hogares, comercios y empresas de la comarca, y lo hacemos sin salir de ella: lo que generamos aquí se consume aquí.
-			Class: lead
-		Paragraph: El 2025 ha sido el año de la **consolidación**. Hemos puesto en marcha el parque solar de Les Preses, ampliado el de Sant Joan y renovado los tres aerogeneradores más antiguos. Hemos producido un 11 % más que el año anterior y hemos cerrado el ejercicio con un resultado positivo por quinto año consecutivo.
-		Paragraph: Nada de esto es obra de una persona. Es el resultado del trabajo de las veintitrés personas de la plantilla, de las más de mil doscientas socias y socios que deciden en la asamblea y de una red de proveedores locales que han montado, cada kilovatio, con las manos y con criterio.
-		Paragraph: Este informe cuenta lo que hemos conseguido, también lo que nos ha costado y lo que nos queda por hacer. Les invitamos a leerlo con ojo crítico: una cooperativa se mejora preguntando.
-		Paragraph: Con afecto y con ganas de seguir,
-		Text: Carme Vidal i Roca
-			Typography:
-				Font: IBM Plex Serif
-				Weight: bold
-				Size: 11
-			Box:
-				Margin: 14 0 0 0
-		Text: Presidenta del Consejo Rector
-			Typography:
-				Size: 8.5
-				Color: #5B6B7C
-		Heading 2:
-			Text: Hitos del año
-		Grid:
-			Id: milestones
-			Columns: repeat(4, 1fr)
-			Gap: 14
-			Area:
-				Block:
-					Class: milestone
-					Text: Marzo
-						Class: kicker
-					Text: La asamblea aprueba las cuentas de 2024 con el 94 % de los votos.
-			Area:
-				Block:
-					Class: milestone
-					Text: Junio
-						Class: kicker
-					Text: Se conecta el parque solar de Les Preses, de 1,6 MWp.
-			Area:
-				Block:
-					Class: milestone
-					Text: Septiembre
-						Class: kicker
-					Text: Terminan las obras de renovación de los tres aerogeneradores.
-			Area:
-				Block:
-					Class: milestone
-					Text: Noviembre
-						Class: kicker
-					Text: Llegamos al cliente número 8.000, una panadería de Sant Feliu.
-	Block:
-		Id: figures
-		Class: section
-		Heading 1:
-			Text: Un año en cifras
-		Grid:
-			Id: tiles
-			Columns: repeat(3, 1fr)
-			Gap: 12
-			Box:
-				Margin: 0 0 18 0
-			Area:
-				Block:
-					Class: tile
-					Text: 2.384 MWh
-						Class: figure
-					Text: de producción renovable, un 11 % más que en 2024
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-			Area:
-				Block:
-					Class: tile
-					Text: 8.412
-						Class: figure
-					Text: clientes abastecidos entre hogares, comercios, industria y administración
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-			Area:
-				Block:
-					Class: tile
-					Text: 15.900 t
-						Class: figure
-					Text: de CO₂ evitadas desde 2019, el año de la primera instalación
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-			Area:
-				Block:
-					Class: tile
-					Text: 1.204
-						Class: figure
-					Text: socias y socios, ochenta y siete más que el año anterior
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-			Area:
-				Block:
-					Class: tile
-					Text: 23
-						Class: figure
-					Text: personas en la plantilla, con un 48 % de mujeres
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-			Area:
-				Block:
-					Class: tile
-					Text: 1,35 M€
-						Class: figure
-					Text: invertidos en nueva generación y almacenamiento
-						Class: caption
-						Box:
-							Margin: 2 0 0 0
-		Heading 2:
-			Text: Producción mensual
-		Image: examples/report/chart-production.svg
-			Id: chart-production
-			Alt: Gráfico de barras con la producción mensual de 2025, en MWh: de 98 en diciembre a 306 en julio
-			Box:
-				Width: 100%
-		Text: Producción mensual de energía renovable en 2025, en MWh. El máximo, en julio, con 306 MWh.
-			Class: caption
-		Paragraph: La producción sigue la curva del sol: de noviembre a enero cae por debajo de los 125 MWh y entre mayo y agosto supera los 250. El viento compensa en parte el invierno, y por eso la incorporación del cuarto aerogenerador, prevista para 2026, es una de nuestras prioridades.
-	Block:
-		Id: customers
-		Class: section
-		Heading 1:
-			Text: Clientes y comunidad
-		Paragraph: Una cooperativa existe para quien la usa. Este año hemos atendido a 8.412 clientes, el 46 % de ellos hogares.
-			Class: lead
-		Multicol:
-			Id: community
-			Count: 2
-			Column gap: 26
-			Rule: 0.5
-			Rule color: #C9D5E3
-			Box:
-				Margin: 0 0 14 0
-			Markdown:
-				Bullet: disc
-				Content >>
-					## Hogares
-
-					Hemos sumado 412 hogares, la mayoría de pueblos de la Garrotxa que no tenían una oferta de proximidad. La tarifa de **precio estable** se ha mantenido todo el año, también en los meses de invierno.
-
-					## Comercios y empresas
-
-					Un tercio de nuestros clientes no domésticos son panaderías, talleres y pequeñas industrias que cubren una parte de su consumo con la instalación solar que les montamos en la cubierta.
-
-					## Comunidades energéticas
-
-					Hemos acompañado la creación de **cinco comunidades energéticas** locales, en las que los vecinos comparten la producción de una misma cubierta. Cada una ha recibido formación y asesoramiento jurídico gratuito.
-
-					## Fondo solidario
-
-					El uno por ciento de la facturación va a un fondo que paga las facturas de las familias en situación de vulnerabilidad: este año, 61 hogares.
-		Image: examples/report/chart-mix.svg
-			Id: chart-mix
-			Alt: Gráfico en anillo con los clientes por tipo: hogares 46 %, comercios 27 %, industria 19 % y administración 8 %
-			Box:
-				Width: 100%
-		Text: Distribución de los 8.412 clientes por tipo de cliente.
-			Class: caption
-	Block:
-		Id: results
-		Class: section
-		Heading 1:
-			Text: Resultados económicos
-		Paragraph: Las cuentas del ejercicio, en miles de euros. Los ingresos crecen un 11,5 % y el resultado, un 33,9 %, después de absorber el aumento de las amortizaciones de las nuevas instalaciones.
-			Class: lead
-		Table:
-			Id: accounts
-			Columns: 1fr 80 80 80
-			Column align: left right right right
-			Box:
-				Margin: 0 0 18 0
-			Head:
-				Row:
-					Cell: Concepto
-					Cell: 2025
-					Cell: 2024
-					Cell: Variación
-			Body:
-				Row:
-					Cell: Venta de energía
-						Header: true
-					Cell: 4.128
-					Cell: 3.774
-					Cell: +9,4 %
-				Row:
-					Cell: Servicios y mantenimiento
-						Header: true
-					Cell: 792
-					Cell: 640
-					Cell: +23,8 %
-				Row:
-					Cell: Gastos de explotación
-						Header: true
-					Cell: −3.980
-					Cell: −3.612
-					Cell: +10,2 %
-				Row:
-					Cell: Amortizaciones
-						Header: true
-					Cell: −540
-					Cell: −498
-					Cell: +8,4 %
-				Row:
-					Cell: Resultado financiero
-						Header: true
-					Cell: −88
-					Cell: −71
-					Cell: +23,9 %
-			Foot:
-				Row:
-					Cell: Resultado del ejercicio
-						Header: true
-						Class: total
-					Cell: 312
-						Class: total
-					Cell: 233
-						Class: total
-					Cell: +33,9 %
-						Class: total
-		Heading 2:
-			Text: Dónde ha ido la inversión
-		Markdown:
-			Numbering: decimal
-			Table columns: auto
-			Content >>
-				| Proyecto | Inversión (k€) | Potencia |
-				|----------|---------------:|---------:|
-				| Parque solar de Les Preses | 780 | 1,6 MWp |
-				| Ampliación de Sant Joan | 310 | 0,6 MWp |
-				| Renovación de aerogeneradores | 190 | 0,9 MW |
-				| Baterías de la nave comunitaria | 70 | 0,2 MWh |
-		Text: El 100 % de la inversión se ha financiado con aportaciones de socias y socios, sin deuda con entidades financieras.
-			Class: caption
-			Box:
-				Margin: 8 0 0 0
-	Block:
-		Id: environment
-		Class: section
-		Heading 1:
-			Text: Medio ambiente
-		Image: examples/report/chart-savings.svg
-			Id: chart-savings
-			Alt: Gráfico de líneas con las toneladas de CO₂ evitadas de forma acumulada: de 0 en 2019 a 15.900 en 2025
-			Box:
-				Width: 100%
-		Text: Toneladas de CO₂ evitadas de forma acumulada desde 2019, en miles.
-			Class: caption
+						Class: milestone
+						Text: Septiembre
+							Class: kicker
+						Text: Terminan las obras de renovación de los tres aerogeneradores.
+				Area:
+					Block:
+						Class: milestone
+						Text: Noviembre
+							Class: kicker
+						Text: Llegamos al cliente número 8.000, una panadería de Sant Feliu.
 		Block:
-			Class: quote
-			Text: Cada kilovatio hora que producimos aquí es uno que no hace falta traer de lejos, ni quemar.
-		Heading 2:
-			Text: Compromisos para 2026
-		List:
-			Marker: decimal
-			List item:
-				Paragraph: Superar los 2.700 MWh de producción con el cuarto aerogenerador y la ampliación de Les Preses.
-			List item:
-				Paragraph: Reducir a cero las emisiones de la flota de vehículos de mantenimiento, hoy con dos furgonetas de gasóleo.
-			List item:
-				Paragraph: Publicar la huella de carbono de toda la cadena de proveedores, con la ayuda de la universidad.
-			List item:
-				Paragraph: Plantar cuatro mil árboles autóctonos en terrenos cedidos por los ayuntamientos de la comarca.
-		Heading 2:
-			Text: Indicadores ambientales
-		Table:
-			Id: indicators
-			Columns: 1fr 70 70 70
-			Column align: left right right right
-			Head:
-				Row:
-					Cell: Indicador
-					Cell: 2023
-					Cell: 2024
-					Cell: 2025
-			Body:
-				Row:
-					Cell: Producción renovable (MWh)
-						Header: true
-					Cell: 1.930
-					Cell: 2.148
-					Cell: 2.384
-				Row:
-					Cell: CO₂ evitado en el año (t)
-						Header: true
-					Cell: 2.800
-					Cell: 3.600
-					Cell: 4.300
-				Row:
-					Cell: Residuos valorizados (%)
-						Header: true
-					Cell: 82
-					Cell: 87
-					Cell: 91
-				Row:
-					Cell: Agua usada en las plantas (m³)
-						Header: true
-					Cell: 640
-					Cell: 590
-					Cell: 540
-	Block:
-		Id: governance
-		Class: section
-		Heading 1:
-			Text: Gobierno y próximos pasos
-		Paragraph: El Consejo Rector se elige cada cuatro años en asamblea. Está formado por siete personas, de las cuales cuatro son socias de trabajo y tres socias de consumo.
-			Class: lead
-		Table:
-			Id: board
-			Columns: 1fr 1fr 104
-			Column align: left left right
-			Box:
-				Margin: 0 0 18 0
-			Head:
-				Row:
-					Cell: Nombre
-					Cell: Cargo
-					Cell: En el cargo desde
-			Body:
-				Row:
-					Cell: Carme Vidal i Roca
-						Header: true
-					Cell: Presidenta
-					Cell: 2019
-				Row:
-					Cell: Oriol Pagès Vila
-						Header: true
-					Cell: Vicepresidente
-					Cell: 2019
-				Row:
-					Cell: Núria Serra Comas
-						Header: true
-					Cell: Secretaria
-					Cell: 2023
-				Row:
-					Cell: Jordi Casas Font
-						Header: true
-					Cell: Tesorero
-					Cell: 2023
-				Row:
-					Cell: Anna Bosch Puig
-						Header: true
-					Cell: Vocal de consumo
-					Cell: 2023
-		Heading 2:
-			Text: Qué viene ahora
-		Markdown:
-			Bullet: dash
-			Numbering: lower-alpha
-			Content >>
-				La **Asamblea General** del 21 de marzo aprobó estas líneas de trabajo para el próximo ejercicio:
+			Id: figures
+			Class: section
+			Heading 1:
+				Text: Un año en cifras
+			Grid:
+				Id: tiles
+				Columns: repeat(3, 1fr)
+				Gap: 12
+				Box:
+					Margin: 0 0 18 0
+				Area:
+					Block:
+						Class: tile
+						Text: 2.384 MWh
+							Class: figure
+						Text: de producción renovable, un 11 % más que en 2024
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+				Area:
+					Block:
+						Class: tile
+						Text: 8.412
+							Class: figure
+						Text: clientes abastecidos entre hogares, comercios, industria y administración
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+				Area:
+					Block:
+						Class: tile
+						Text: 15.900 t
+							Class: figure
+						Text: de CO₂ evitadas desde 2019, el año de la primera instalación
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+				Area:
+					Block:
+						Class: tile
+						Text: 1.204
+							Class: figure
+						Text: socias y socios, ochenta y siete más que el año anterior
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+				Area:
+					Block:
+						Class: tile
+						Text: 23
+							Class: figure
+						Text: personas en la plantilla, con un 48 % de mujeres
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+				Area:
+					Block:
+						Class: tile
+						Text: 1,35 M€
+							Class: figure
+						Text: invertidos en nueva generación y almacenamiento
+							Class: caption
+							Box:
+								Margin: 2 0 0 0
+			Heading 2:
+				Text: Producción mensual
+			Image: examples/report/chart-production.svg
+				Id: chart-production
+				Alt: Gráfico de barras con la producción mensual de 2025, en MWh: de 98 en diciembre a 306 en julio
+				Box:
+					Width: 100%
+			Text: Producción mensual de energía renovable en 2025, en MWh. El máximo, en julio, con 306 MWh.
+				Class: caption
+			Paragraph: La producción sigue la curva del sol: de noviembre a enero cae por debajo de los 125 MWh y entre mayo y agosto supera los 250. El viento compensa en parte el invierno, y por eso la incorporación del cuarto aerogenerador, prevista para 2026, es una de nuestras prioridades.
+		Block:
+			Id: customers
+			Class: section
+			Heading 1:
+				Text: Clientes y comunidad
+			Paragraph: Una cooperativa existe para quien la usa. Este año hemos atendido a 8.412 clientes, el 46 % de ellos hogares.
+				Class: lead
+			Multicol:
+				Id: community
+				Count: 2
+				Column gap: 26
+				Rule: 0.5
+				Rule color: #C9D5E3
+				Box:
+					Margin: 0 0 14 0
+				Markdown:
+					Bullet: disc
+					Content >>
+						## Hogares
 
-				1. Abrir una oficina de atención en Olot, con horario de tarde.
-				2. Lanzar la tarifa horaria para clientes con coche eléctrico.
-				3. Duplicar la capacidad de almacenamiento de la nave comunitaria.
+						Hemos sumado 412 hogares, la mayoría de pueblos de la Garrotxa que no tenían una oferta de proximidad. La tarifa de **precio estable** se ha mantenido todo el año, también en los meses de invierno.
 
-				Las socias y los socios pueden proponer puntos para el orden del día con un mes de antelación.
-		Heading 2:
-			Text: Calendario 2026
-		Table:
-			Id: calendar
-			Columns: 170 1fr 1fr 1fr 1fr
-			Column align: left right right right right
-			Box:
-				Margin: 0 0 6 0
-			Head:
-				Row:
-					Cell: Actividad
-					Cell: 1.er trim.
-					Cell: 2.º trim.
-					Cell: 3.er trim.
-					Cell: 4.º trim.
-			Body:
-				Row:
-					Cell: Oficina de atención en Olot
-						Header: true
-					Cell: Obras y apertura
-						Span: 1 2
-						Class: bar
-					Cell:
-					Cell:
-				Row:
-					Cell: Tarifa horaria
-						Header: true
-					Cell:
-					Cell: Diseño y pruebas
-						Span: 1 2
-						Class: bar
-					Cell:
-				Row:
-					Cell: Almacenamiento de la nave
-						Header: true
-					Cell:
-					Cell:
-					Cell: Ampliación
-						Span: 1 2
-						Class: bar
-				Row:
-					Cell: Cuarto aerogenerador
-						Header: true
-					Cell: Tramitación, obra y puesta en marcha
-						Span: 1 3
-						Class: bar
-					Cell:
-		Text: Cooperativa Solvent, S. Coop. Ltda. · Polígono de la Canya, nave 6 · 17800 Olot · solvent.example
-			Link: https://solvent.example
-			Class: caption
-			Box:
-				Margin: 22 0 0 0
+						## Comercios y empresas
+
+						Un tercio de nuestros clientes no domésticos son panaderías, talleres y pequeñas industrias que cubren una parte de su consumo con la instalación solar que les montamos en la cubierta.
+
+						## Comunidades energéticas
+
+						Hemos acompañado la creación de **cinco comunidades energéticas** locales, en las que los vecinos comparten la producción de una misma cubierta. Cada una ha recibido formación y asesoramiento jurídico gratuito.
+
+						## Fondo solidario
+
+						El uno por ciento de la facturación va a un fondo que paga las facturas de las familias en situación de vulnerabilidad: este año, 61 hogares.
+			Image: examples/report/chart-mix.svg
+				Id: chart-mix
+				Alt: Gráfico en anillo con los clientes por tipo: hogares 46 %, comercios 27 %, industria 19 % y administración 8 %
+				Box:
+					Width: 100%
+			Text: Distribución de los 8.412 clientes por tipo de cliente.
+				Class: caption
+		Block:
+			Id: results
+			Class: section
+			Heading 1:
+				Text: Resultados económicos
+			Paragraph: Las cuentas del ejercicio, en miles de euros. Los ingresos crecen un 11,5 % y el resultado, un 33,9 %, después de absorber el aumento de las amortizaciones de las nuevas instalaciones.
+				Class: lead
+			Table:
+				Id: accounts
+				Columns: 1fr 80 80 80
+				Column align: left right right right
+				Box:
+					Margin: 0 0 18 0
+				Head:
+					Row:
+						Cell: Concepto
+						Cell: 2025
+						Cell: 2024
+						Cell: Variación
+				Body:
+					Row:
+						Cell: Venta de energía
+							Header: true
+						Cell: 4.128
+						Cell: 3.774
+						Cell: +9,4 %
+					Row:
+						Cell: Servicios y mantenimiento
+							Header: true
+						Cell: 792
+						Cell: 640
+						Cell: +23,8 %
+					Row:
+						Cell: Gastos de explotación
+							Header: true
+						Cell: −3.980
+						Cell: −3.612
+						Cell: +10,2 %
+					Row:
+						Cell: Amortizaciones
+							Header: true
+						Cell: −540
+						Cell: −498
+						Cell: +8,4 %
+					Row:
+						Cell: Resultado financiero
+							Header: true
+						Cell: −88
+						Cell: −71
+						Cell: +23,9 %
+				Foot:
+					Row:
+						Cell: Resultado del ejercicio
+							Header: true
+							Class: total
+						Cell: 312
+							Class: total
+						Cell: 233
+							Class: total
+						Cell: +33,9 %
+							Class: total
+			Heading 2:
+				Text: Dónde ha ido la inversión
+			Markdown:
+				Numbering: decimal
+				Table columns: auto
+				Content >>
+					| Proyecto | Inversión (k€) | Potencia |
+					|----------|---------------:|---------:|
+					| Parque solar de Les Preses | 780 | 1,6 MWp |
+					| Ampliación de Sant Joan | 310 | 0,6 MWp |
+					| Renovación de aerogeneradores | 190 | 0,9 MW |
+					| Baterías de la nave comunitaria | 70 | 0,2 MWh |
+			Text: El 100 % de la inversión se ha financiado con aportaciones de socias y socios, sin deuda con entidades financieras.
+				Class: caption
+				Box:
+					Margin: 8 0 0 0
+		Block:
+			Id: environment
+			Class: section
+			Heading 1:
+				Text: Medio ambiente
+			Image: examples/report/chart-savings.svg
+				Id: chart-savings
+				Alt: Gráfico de líneas con las toneladas de CO₂ evitadas de forma acumulada: de 0 en 2019 a 15.900 en 2025
+				Box:
+					Width: 100%
+			Text: Toneladas de CO₂ evitadas de forma acumulada desde 2019, en miles.
+				Class: caption
+			Block:
+				Class: quote
+				Text: Cada kilovatio hora que producimos aquí es uno que no hace falta traer de lejos, ni quemar.
+			Heading 2:
+				Text: Compromisos para 2026
+			List:
+				Marker: decimal
+				List item:
+					Paragraph: Superar los 2.700 MWh de producción con el cuarto aerogenerador y la ampliación de Les Preses.
+				List item:
+					Paragraph: Reducir a cero las emisiones de la flota de vehículos de mantenimiento, hoy con dos furgonetas de gasóleo.
+				List item:
+					Paragraph: Publicar la huella de carbono de toda la cadena de proveedores, con la ayuda de la universidad.
+				List item:
+					Paragraph: Plantar cuatro mil árboles autóctonos en terrenos cedidos por los ayuntamientos de la comarca.
+			Heading 2:
+				Text: Indicadores ambientales
+			Table:
+				Id: indicators
+				Columns: 1fr 70 70 70
+				Column align: left right right right
+				Head:
+					Row:
+						Cell: Indicador
+						Cell: 2023
+						Cell: 2024
+						Cell: 2025
+				Body:
+					Row:
+						Cell: Producción renovable (MWh)
+							Header: true
+						Cell: 1.930
+						Cell: 2.148
+						Cell: 2.384
+					Row:
+						Cell: CO₂ evitado en el año (t)
+							Header: true
+						Cell: 2.800
+						Cell: 3.600
+						Cell: 4.300
+					Row:
+						Cell: Residuos valorizados (%)
+							Header: true
+						Cell: 82
+						Cell: 87
+						Cell: 91
+					Row:
+						Cell: Agua usada en las plantas (m³)
+							Header: true
+						Cell: 640
+						Cell: 590
+						Cell: 540
+		Block:
+			Id: governance
+			Class: section
+			Heading 1:
+				Text: Gobierno y próximos pasos
+			Paragraph: El Consejo Rector se elige cada cuatro años en asamblea. Está formado por siete personas, de las cuales cuatro son socias de trabajo y tres socias de consumo.
+				Class: lead
+			Table:
+				Id: board
+				Columns: 1fr 1fr 104
+				Column align: left left right
+				Box:
+					Margin: 0 0 18 0
+				Head:
+					Row:
+						Cell: Nombre
+						Cell: Cargo
+						Cell: En el cargo desde
+				Body:
+					Row:
+						Cell: Carme Vidal i Roca
+							Header: true
+						Cell: Presidenta
+						Cell: 2019
+					Row:
+						Cell: Oriol Pagès Vila
+							Header: true
+						Cell: Vicepresidente
+						Cell: 2019
+					Row:
+						Cell: Núria Serra Comas
+							Header: true
+						Cell: Secretaria
+						Cell: 2023
+					Row:
+						Cell: Jordi Casas Font
+							Header: true
+						Cell: Tesorero
+						Cell: 2023
+					Row:
+						Cell: Anna Bosch Puig
+							Header: true
+						Cell: Vocal de consumo
+						Cell: 2023
+			Heading 2:
+				Text: Qué viene ahora
+			Markdown:
+				Bullet: dash
+				Numbering: lower-alpha
+				Content >>
+					La **Asamblea General** del 21 de marzo aprobó estas líneas de trabajo para el próximo ejercicio:
+
+					1. Abrir una oficina de atención en Olot, con horario de tarde.
+					2. Lanzar la tarifa horaria para clientes con coche eléctrico.
+					3. Duplicar la capacidad de almacenamiento de la nave comunitaria.
+
+					Las socias y los socios pueden proponer puntos para el orden del día con un mes de antelación.
+			Heading 2:
+				Text: Calendario 2026
+			Table:
+				Id: calendar
+				Columns: 170 1fr 1fr 1fr 1fr
+				Column align: left right right right right
+				Box:
+					Margin: 0 0 6 0
+				Head:
+					Row:
+						Cell: Actividad
+						Cell: 1.er trim.
+						Cell: 2.º trim.
+						Cell: 3.er trim.
+						Cell: 4.º trim.
+				Body:
+					Row:
+						Cell: Oficina de atención en Olot
+							Header: true
+						Cell: Obras y apertura
+							Span: 1 2
+							Class: bar
+						Cell:
+						Cell:
+					Row:
+						Cell: Tarifa horaria
+							Header: true
+						Cell:
+						Cell: Diseño y pruebas
+							Span: 1 2
+							Class: bar
+						Cell:
+					Row:
+						Cell: Almacenamiento de la nave
+							Header: true
+						Cell:
+						Cell:
+						Cell: Ampliación
+							Span: 1 2
+							Class: bar
+					Row:
+						Cell: Cuarto aerogenerador
+							Header: true
+						Cell: Tramitación, obra y puesta en marcha
+							Span: 1 3
+							Class: bar
+						Cell:
+			Text: Cooperativa Solvent, S. Coop. Ltda. · Polígono de la Canya, nave 6 · 17800 Olot · solvent.example
+				Link: https://solvent.example
+				Class: caption
+				Box:
+					Margin: 22 0 0 0

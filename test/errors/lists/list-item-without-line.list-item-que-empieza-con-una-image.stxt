@@ -1,6 +1,6 @@
 # Case: List item que empieza con una Image
 # Code: LIST_ITEM_WITHOUT_LINE
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	List:
-		Marker: disc
-		List item:
-			Image: test/square.png
+	Section:
+		List:
+			Marker: disc
+			List item:
+				Image: test/square.png

@@ -30,20 +30,21 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Un título
-		Box:
-			Margin: 0 0 10 0
-		Typography:
-			Size: 20
-	Grid:
-		Columns: 150 1fr
-		Gap: 20
-		Area:
-			Text: Columna lateral
-		Area:
-			Text:
-				Content >>
-					Texto largo, en un bloque.
+	Section:
+		Text: Un título
+			Box:
+				Margin: 0 0 10 0
+			Typography:
+				Size: 20
+		Grid:
+			Columns: 150 1fr
+			Gap: 20
+			Area:
+				Text: Columna lateral
+			Area:
+				Text:
+					Content >>
+						Texto largo, en un bloque.
 ```
 
 ## Requisitos y uso

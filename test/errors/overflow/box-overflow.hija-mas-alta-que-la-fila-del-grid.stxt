@@ -1,15 +1,16 @@
 # Case: Hija más alta que la fila del grid
 # Code: BOX_OVERFLOW
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Grid:
-		Rows: 20
-		Area: 1 1
-			Block:
-				Box:
-					Height: 80
+	Section:
+		Grid:
+			Rows: 20
+			Area: 1 1
+				Block:
+					Box:
+						Height: 80

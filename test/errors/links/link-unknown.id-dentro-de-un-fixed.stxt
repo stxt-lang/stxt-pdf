@@ -1,6 +1,6 @@
 # Case: Un Link a una caja de un Fixed, que se repite en todas las páginas
 # Code: LINK_UNKNOWN
-# Line: 20
+# Line: 21
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,9 +12,10 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
-		Offset: 0 0 auto auto
-		Text: Cabecera
-			Id: cabecera
-	Text: Pulsa aquí
-		Link: #cabecera
+	Section:
+		Fixed:
+			Offset: 0 0 auto auto
+			Text: Cabecera
+				Id: cabecera
+		Text: Pulsa aquí
+			Link: #cabecera

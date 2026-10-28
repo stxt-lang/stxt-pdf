@@ -1,6 +1,6 @@
 # Case: Número de página que no cabe
 # Code: TEXT_OVERFLOW
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: {page}
-		Box:
-			Width: 5
+	Section:
+		Text: {page}
+			Box:
+				Width: 5

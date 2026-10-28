@@ -1,6 +1,6 @@
 # Case: Count menor que 1
 # Code: VALUE_NOT_ALLOWED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Count: 0
-		Text: Hola
+	Section:
+		Multicol:
+			Count: 0
+			Text: Hola

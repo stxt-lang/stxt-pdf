@@ -1,6 +1,6 @@
 # Case: Una imagen en un texto con Inline: markdown
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -13,4 +13,5 @@ Document (dev.stxt.boxes):
 				Font: IBM Plex Sans
 				Size: 10
 				Inline: markdown
-	Text: Mira ![logo](a.png) aquí
+	Section:
+		Text: Mira ![logo](a.png) aquí

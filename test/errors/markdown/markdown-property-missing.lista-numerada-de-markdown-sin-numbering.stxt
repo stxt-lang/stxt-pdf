@@ -1,6 +1,6 @@
 # Case: Lista numerada de Markdown sin Numbering
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Bullet: disc
-		Content >>
-			1. uno
+	Section:
+		Markdown:
+			Bullet: disc
+			Content >>
+				1. uno

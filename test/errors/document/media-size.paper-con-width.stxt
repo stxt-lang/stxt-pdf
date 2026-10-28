@@ -7,6 +7,7 @@ Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
 		Width: 595
-	Block:
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Height: 10

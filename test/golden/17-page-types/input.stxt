@@ -22,71 +22,72 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Block:
-		Id: c1
-		Break:
-			After: page
-		Box:
-			Height: 60
-	Block:
-		Id: c2
-		Break:
-			After: page
-		Box:
-			Height: 60
-	Block:
-		Id: c3
-		Break:
-			After: page
-		Box:
-			Height: 60
-	Block:
-		Id: c4
-		Box:
-			Height: 60
-	Fixed:
-		Id: cover
-		Pages: first
-		Offset: 0 auto auto 0
-		Box:
-			Width: 100
-			Height: 40
-	Fixed:
-		Id: head
-		Pages: not-first
-		Offset: 0 0 auto 0
-		Box:
-			Height: 12
+	Section:
+		Block:
+			Id: c1
+			Break:
+				After: page
+			Box:
+				Height: 60
+		Block:
+			Id: c2
+			Break:
+				After: page
+			Box:
+				Height: 60
+		Block:
+			Id: c3
+			Break:
+				After: page
+			Box:
+				Height: 60
+		Block:
+			Id: c4
+			Box:
+				Height: 60
 		Fixed:
-			Id: inner
+			Id: cover
 			Pages: first
 			Offset: 0 auto auto 0
 			Box:
-				Width: 10
+				Width: 100
+				Height: 40
+		Fixed:
+			Id: head
+			Pages: not-first
+			Offset: 0 0 auto 0
+			Box:
+				Height: 12
+			Fixed:
+				Id: inner
+				Pages: first
+				Offset: 0 auto auto 0
+				Box:
+					Width: 10
+					Height: 10
+		Fixed:
+			Id: foot
+			Offset: auto 0 0 0
+			Box:
 				Height: 10
-	Fixed:
-		Id: foot
-		Offset: auto 0 0 0
-		Box:
-			Height: 10
-	Fixed:
-		Id: odd
-		Pages: odd
-		Offset: 30 auto auto 0
-		Box:
-			Width: 20
-			Height: 8
-	Fixed:
-		Id: even
-		Pages: even
-		Offset: 60 0 auto auto
-		Box:
-			Width: 20
-			Height: 8
-	Fixed:
-		Id: end
-		Pages: last
-		Offset: auto 0 0 auto
-		Box:
-			Width: 30
-			Height: 10
+		Fixed:
+			Id: odd
+			Pages: odd
+			Offset: 30 auto auto 0
+			Box:
+				Width: 20
+				Height: 8
+		Fixed:
+			Id: even
+			Pages: even
+			Offset: 60 0 auto auto
+			Box:
+				Width: 20
+				Height: 8
+		Fixed:
+			Id: end
+			Pages: last
+			Offset: auto 0 0 auto
+			Box:
+				Width: 30
+				Height: 10

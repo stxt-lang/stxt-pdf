@@ -26,42 +26,43 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Mono
 				Size: 10
-	Text:
-		Id: term
-		Typography:
-			White space: pre
-		Content >>
-			> Ajustes > Bornes
-			L   230 V   [ OK ]
-			N     0 V   [ OK ]
+	Section:
+		Text:
+			Id: term
+			Typography:
+				White space: pre
+			Content >>
+				> Ajustes > Bornes
+				L   230 V   [ OK ]
+				N     0 V   [ OK ]
 
-			PE	tierra
-	Text:
-		Id: tabs
-		Typography:
-			White space: pre
-			Tab size: 8
-		Content >>
-			a	b
-			abcdefgh	x
-	Text:
-		Id: wrapped
-		Typography:
-			White space: pre-wrap
-		Content >>
-			  aaaa bbbb cccc dddd eeee ffff gggg hhhh
-			corta
-	Text: a   b    c
-		Id: plain
-	Markdown:
-		Id: md
-		Code font: IBM Plex Mono
-		Typography:
-			Font: IBM Plex Sans
-		Content >>
-			Usa `ls  -l` aquí.
+				PE	tierra
+		Text:
+			Id: tabs
+			Typography:
+				White space: pre
+				Tab size: 8
+			Content >>
+				a	b
+				abcdefgh	x
+		Text:
+			Id: wrapped
+			Typography:
+				White space: pre-wrap
+			Content >>
+				  aaaa bbbb cccc dddd eeee ffff gggg hhhh
+				corta
+		Text: a   b    c
+			Id: plain
+		Markdown:
+			Id: md
+			Code font: IBM Plex Mono
+			Typography:
+				Font: IBM Plex Sans
+			Content >>
+				Usa `ls  -l` aquí.
 
-			```
-			a  b
-			  c
-			```
+				```
+				a  b
+				  c
+				```

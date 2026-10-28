@@ -10,207 +10,208 @@ Document (dev.stxt.boxes):
 		Margin: 44 44 60 44
 	Title: Factura 2025-0147
 	Language: es
-	Fixed:
-		Id: footer
-		Offset: auto 0 -34 0
-		Box:
-			Padding: 6 0 0 0
-			Border: 0.5 0 0 0
-			Border color: #DCCFB8
+	Section:
+		Fixed:
+			Id: footer
+			Offset: auto 0 -34 0
+			Box:
+				Padding: 6 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #DCCFB8
+			Flex:
+				Main axis: between
+				Item:
+					Text: Taller Nogal S.L. · Inscrita en el Registro Mercantil de Girona, tomo 2217, folio 88
+				Item:
+					Text: Página {page} de {pages}
 		Flex:
+			Id: masthead
 			Main axis: between
+			Cross axis: center
+			Box:
+				Margin: 0 0 30 0
 			Item:
-				Text: Taller Nogal S.L. · Inscrita en el Registro Mercantil de Girona, tomo 2217, folio 88
+				Image: examples/brand/nogal.svg
+					Alt: Nogal, taller de mobiliario
+					Box:
+						Width: 172
 			Item:
-				Text: Página {page} de {pages}
-	Flex:
-		Id: masthead
-		Main axis: between
-		Cross axis: center
-		Box:
-			Margin: 0 0 30 0
-		Item:
-			Image: examples/brand/nogal.svg
-				Alt: Nogal, taller de mobiliario
-				Box:
-					Width: 172
-		Item:
-			Block:
-				Text: Factura
-					Typography:
-						Size: 28
-						Weight: bold
-						Color: #3B2A1E
-						Align: right
-						Line height: 30
-						Transform: uppercase
-						Letter spacing: 2
-				Text: Nº 2025-0147
-					Typography:
-						Size: 12
-						Color: #B5651D
-						Align: right
-	Grid:
-		Id: parties
-		Columns: 1fr 1fr
-		Gap: 18
-		Box:
-			Margin: 0 0 18 0
-		Area:
-			Block:
-				Class: party
-				Text: Emisor
-					Class: label
-				Text: Taller Nogal S.L.
-					Class: strong
-				Text: CIF B-17482930
-				Text: Carrer de la Farga, 14 · Polígono Les Torres
-				Text: 17800 Olot (Girona)
-				Text: administracion@tallernogal.example
-					Link: mailto:administracion@tallernogal.example
-		Area:
-			Block:
-				Class: party
-				Text: Cliente
-					Class: label
-				Text: Hotel Mirador del Valle, S.A.
-					Class: strong
-				Text: CIF A-08827416
-				Text: Camí del Mirador, s/n
-				Text: 17850 Besalú (Girona)
-				Text: compras@miradordelvalle.example
-					Link: mailto:compras@miradordelvalle.example
-	Grid:
-		Id: strip
-		Columns: repeat(4, 1fr)
-		Box:
-			Margin: 0 0 22 0
-			Padding: 9 14
-			Border: 0.5 0 0.5 0
-			Border color: #B5651D
-		Area:
-			Block:
-				Text: Fecha de emisión
-					Class: label
-				Text: 14 de octubre de 2025
-		Area:
-			Block:
-				Text: Vencimiento
-					Class: label
-				Text: 13 de noviembre de 2025
-		Area:
-			Block:
-				Text: Forma de pago
-					Class: label
-				Text: Transferencia a 30 días
-		Area:
-			Block:
-				Text: Pedido
-					Class: label
-				Text: PO-2025-311
-	Table:
-		Id: lines
-		Columns: 54 1fr 38 64 94
-		Column align: left left right right right
-		Box:
-			Margin: 0 0 24 0
-		Head:
-			Row:
-				Cell: Ref.
-				Cell: Descripción
-				Cell: Uds.
-				Cell: Precio
-				Cell: Importe
-		Body:
-			Row:
-				Cell: MN-014
-				Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
-					Header: true
-				Cell: 6
-				Cell: 640,00 €
-				Cell: 3.840,00 €
-			Row:
-				Cell: MN-022
-				Cell: Silla de roble con asiento de anea
-					Header: true
-				Cell: 24
-				Cell: 118,00 €
-				Cell: 2.832,00 €
-			Row:
-				Cell: MN-031
-				Cell: Estantería modular de pared, cinco baldas
-					Header: true
-				Cell: 8
-				Cell: 215,00 €
-				Cell: 1.720,00 €
-			Row:
-				Cell: MN-040
-				Cell: Banco tapizado para recibidor
-					Header: true
-				Cell: 4
-				Cell: 189,50 €
-				Cell: 758,00 €
-			Row:
-				Cell: MN-057
-				Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
-					Header: true
-				Cell: 12
-				Cell: 96,00 €
-				Cell: 1.152,00 €
-			Row:
-				Cell: SV-001
-				Cell: Transporte y montaje en obra (dos operarios, una jornada)
-					Header: true
-				Cell: 1
-				Cell: 480,00 €
-				Cell: 480,00 €
-			Row:
-				Cell: SV-004
-				Cell: Acabado con aceite natural y cera de abeja
-					Header: true
-				Cell: 1
-				Cell: 260,00 €
-				Cell: 260,00 €
-		Foot:
-			Row:
-				Cell: Base imponible
-					Header: true
-					Span: 1 4
-				Cell: 11.042,00 €
-			Row:
-				Cell: IVA (21 %)
-					Header: true
-					Span: 1 4
-				Cell: 2.318,82 €
-			Row:
-				Cell: Total a pagar
-					Header: true
-					Span: 1 4
-					Class: total
-				Cell: 13.360,82 €
-					Class: total
-	Grid:
-		Id: payment
-		Columns: 1fr 1fr
-		Gap: 18
-		Area:
-			Block:
-				Text: Datos para el pago
-					Class: label
-				Markdown:
-					Code font: IBM Plex Mono
-					Content >>
-						**`ES91 2100 0418 4502 0005 1332`**
+				Block:
+					Text: Factura
+						Typography:
+							Size: 28
+							Weight: bold
+							Color: #3B2A1E
+							Align: right
+							Line height: 30
+							Transform: uppercase
+							Letter spacing: 2
+					Text: Nº 2025-0147
+						Typography:
+							Size: 12
+							Color: #B5651D
+							Align: right
+		Grid:
+			Id: parties
+			Columns: 1fr 1fr
+			Gap: 18
+			Box:
+				Margin: 0 0 18 0
+			Area:
+				Block:
+					Class: party
+					Text: Emisor
+						Class: label
+					Text: Taller Nogal S.L.
+						Class: strong
+					Text: CIF B-17482930
+					Text: Carrer de la Farga, 14 · Polígono Les Torres
+					Text: 17800 Olot (Girona)
+					Text: administracion@tallernogal.example
+						Link: mailto:administracion@tallernogal.example
+			Area:
+				Block:
+					Class: party
+					Text: Cliente
+						Class: label
+					Text: Hotel Mirador del Valle, S.A.
+						Class: strong
+					Text: CIF A-08827416
+					Text: Camí del Mirador, s/n
+					Text: 17850 Besalú (Girona)
+					Text: compras@miradordelvalle.example
+						Link: mailto:compras@miradordelvalle.example
+		Grid:
+			Id: strip
+			Columns: repeat(4, 1fr)
+			Box:
+				Margin: 0 0 22 0
+				Padding: 9 14
+				Border: 0.5 0 0.5 0
+				Border color: #B5651D
+			Area:
+				Block:
+					Text: Fecha de emisión
+						Class: label
+					Text: 14 de octubre de 2025
+			Area:
+				Block:
+					Text: Vencimiento
+						Class: label
+					Text: 13 de noviembre de 2025
+			Area:
+				Block:
+					Text: Forma de pago
+						Class: label
+					Text: Transferencia a 30 días
+			Area:
+				Block:
+					Text: Pedido
+						Class: label
+					Text: PO-2025-311
+		Table:
+			Id: lines
+			Columns: 54 1fr 38 64 94
+			Column align: left left right right right
+			Box:
+				Margin: 0 0 24 0
+			Head:
+				Row:
+					Cell: Ref.
+					Cell: Descripción
+					Cell: Uds.
+					Cell: Precio
+					Cell: Importe
+			Body:
+				Row:
+					Cell: MN-014
+					Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
+						Header: true
+					Cell: 6
+					Cell: 640,00 €
+					Cell: 3.840,00 €
+				Row:
+					Cell: MN-022
+					Cell: Silla de roble con asiento de anea
+						Header: true
+					Cell: 24
+					Cell: 118,00 €
+					Cell: 2.832,00 €
+				Row:
+					Cell: MN-031
+					Cell: Estantería modular de pared, cinco baldas
+						Header: true
+					Cell: 8
+					Cell: 215,00 €
+					Cell: 1.720,00 €
+				Row:
+					Cell: MN-040
+					Cell: Banco tapizado para recibidor
+						Header: true
+					Cell: 4
+					Cell: 189,50 €
+					Cell: 758,00 €
+				Row:
+					Cell: MN-057
+					Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
+						Header: true
+					Cell: 12
+					Cell: 96,00 €
+					Cell: 1.152,00 €
+				Row:
+					Cell: SV-001
+					Cell: Transporte y montaje en obra (dos operarios, una jornada)
+						Header: true
+					Cell: 1
+					Cell: 480,00 €
+					Cell: 480,00 €
+				Row:
+					Cell: SV-004
+					Cell: Acabado con aceite natural y cera de abeja
+						Header: true
+					Cell: 1
+					Cell: 260,00 €
+					Cell: 260,00 €
+			Foot:
+				Row:
+					Cell: Base imponible
+						Header: true
+						Span: 1 4
+					Cell: 11.042,00 €
+				Row:
+					Cell: IVA (21 %)
+						Header: true
+						Span: 1 4
+					Cell: 2.318,82 €
+				Row:
+					Cell: Total a pagar
+						Header: true
+						Span: 1 4
+						Class: total
+					Cell: 13.360,82 €
+						Class: total
+		Grid:
+			Id: payment
+			Columns: 1fr 1fr
+			Gap: 18
+			Area:
+				Block:
+					Text: Datos para el pago
+						Class: label
+					Markdown:
+						Code font: IBM Plex Mono
+						Content >>
+							**`ES91 2100 0418 4502 0005 1332`**
 
-						Caixa Girona · BIC `CAIXESBBXXX`
+							Caixa Girona · BIC `CAIXESBBXXX`
 
-						Indica el **número de factura** en el concepto.
-		Area:
-			Block:
-				Text: Condiciones
-					Class: label
-				Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de **cinco años** sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
-					Typography:
-						Size: 8
-						Color: #5C4E43
-						Inline: markdown
+							Indica el **número de factura** en el concepto.
+			Area:
+				Block:
+					Text: Condiciones
+						Class: label
+					Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de **cinco años** sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
+						Typography:
+							Size: 8
+							Color: #5C4E43
+							Inline: markdown

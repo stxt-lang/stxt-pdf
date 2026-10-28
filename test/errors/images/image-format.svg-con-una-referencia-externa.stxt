@@ -1,10 +1,11 @@
 # Case: SVG con una referencia externa
 # Code: IMAGE_FORMAT
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Image: test/bad-external.svg
+	Section:
+		Image: test/bad-external.svg

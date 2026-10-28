@@ -1,6 +1,6 @@
 # Case: Code font con una familia que no existe, en código en línea
 # Code: FONT_UNKNOWN
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Code font: Courier
-		Content >>
-			Usa `mvn test` para probar.
+	Section:
+		Markdown:
+			Code font: Courier
+			Content >>
+				Usa `mvn test` para probar.

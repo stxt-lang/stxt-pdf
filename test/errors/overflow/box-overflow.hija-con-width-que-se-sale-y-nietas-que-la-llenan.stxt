@@ -1,22 +1,23 @@
 # Case: Hija con Width que se sale y nietas que la llenan
 # Code: BOX_OVERFLOW
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 100
-		Relative:
+	Section:
+		Block:
 			Box:
-				Width: 150
-			Block:
+				Width: 100
+			Relative:
 				Box:
-					Height: 10
-			Absolute:
-				Box:
-					Width: 10
-					Height: 10
+					Width: 150
+				Block:
+					Box:
+						Height: 10
+				Absolute:
+					Box:
+						Width: 10
+						Height: 10

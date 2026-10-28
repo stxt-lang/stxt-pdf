@@ -7,3 +7,5 @@ Document (dev.stxt.boxes):
 		Width: 595
 		Height: 842
 	Title:
+	Section:
+		Text: Hola

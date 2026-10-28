@@ -1,6 +1,6 @@
 # Case: Código de Markdown sin Code font
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Content >>
-			Usa `mvn test` para probar.
+	Section:
+		Markdown:
+			Content >>
+				Usa `mvn test` para probar.

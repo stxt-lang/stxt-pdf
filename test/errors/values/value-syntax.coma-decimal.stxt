@@ -1,12 +1,13 @@
 # Case: Coma decimal
 # Code: VALUE_SYNTAX
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 12,5
+	Section:
+		Block:
+			Box:
+				Width: 12,5

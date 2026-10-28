@@ -1,6 +1,6 @@
 # Case: Start fuera del rango de las letras
 # Code: LIST_NUMBER_RANGE
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	List:
-		Marker: lower-alpha
-		Start: 0
-		List item:
-			Text: Uno
+	Section:
+		List:
+			Marker: lower-alpha
+			Start: 0
+			List item:
+				Text: Uno

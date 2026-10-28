@@ -1,6 +1,6 @@
 # Case: Bullet con una numeración
 # Code: VALUE_NOT_ALLOWED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,8 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Markdown:
-		Bullet: disc decimal
-		Content >>
-			- uno
+	Section:
+		Markdown:
+			Bullet: disc decimal
+			Content >>
+				- uno

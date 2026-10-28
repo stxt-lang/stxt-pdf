@@ -24,52 +24,53 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
-		Offset: -16 0 auto auto
-		Image: test/shapes.svg
-			Id: logo
-			Box:
-				Width: 12
-	Text: Imágenes vectoriales
-		Id: title
-		Box:
-			Margin: 0 0 8 0
-	Image: test/shapes.svg
-		Id: art
-		Alt: Un paisaje con montañas y un sol
-		Box:
-			Margin: 0 0 8 0
-	Image: test/shapes.svg
-		Id: scaled
-		Alt: El mismo paisaje a todo el ancho
-		Box:
-			Width: 100%
-			Margin: 0 0 8 0
-	Image: test/label.svg
-		Id: label
-		Alt: Rótulo del taller
-		Box:
-			Margin: 0 0 8 0
-	Flex:
-		Id: row
-		Gap: 10
-		Box:
-			Margin: 0 0 8 0
-		Item:
+	Section:
+		Fixed:
+			Offset: -16 0 auto auto
 			Image: test/shapes.svg
-				Id: mini
+				Id: logo
 				Box:
-					Height: 30
-		Item:
-			Grow: 1
-			Image: test/label.svg
-				Id: banner
-				Fit: cover
-				Box:
-					Height: 30
-	Markdown:
-		Id: md
-		Content >>
-			![Paisaje](test/shapes.svg)
+					Width: 12
+		Text: Imágenes vectoriales
+			Id: title
+			Box:
+				Margin: 0 0 8 0
+		Image: test/shapes.svg
+			Id: art
+			Alt: Un paisaje con montañas y un sol
+			Box:
+				Margin: 0 0 8 0
+		Image: test/shapes.svg
+			Id: scaled
+			Alt: El mismo paisaje a todo el ancho
+			Box:
+				Width: 100%
+				Margin: 0 0 8 0
+		Image: test/label.svg
+			Id: label
+			Alt: Rótulo del taller
+			Box:
+				Margin: 0 0 8 0
+		Flex:
+			Id: row
+			Gap: 10
+			Box:
+				Margin: 0 0 8 0
+			Item:
+				Image: test/shapes.svg
+					Id: mini
+					Box:
+						Height: 30
+			Item:
+				Grow: 1
+				Image: test/label.svg
+					Id: banner
+					Fit: cover
+					Box:
+						Height: 30
+		Markdown:
+			Id: md
+			Content >>
+				![Paisaje](test/shapes.svg)
 
-			Texto después del dibujo.
+				Texto después del dibujo.

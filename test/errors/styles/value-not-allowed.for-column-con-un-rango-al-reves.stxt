@@ -15,3 +15,5 @@ Document (dev.stxt.boxes):
 		For column: 3 2
 			Typography:
 				Align: right
+	Section:
+		Text: Hola

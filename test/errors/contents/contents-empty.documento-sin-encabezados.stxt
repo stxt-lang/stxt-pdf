@@ -1,6 +1,6 @@
 # Case: Un índice en un documento sin encabezados
 # Code: CONTENTS_EMPTY
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,4 +12,5 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Contents:
+	Section:
+		Contents:

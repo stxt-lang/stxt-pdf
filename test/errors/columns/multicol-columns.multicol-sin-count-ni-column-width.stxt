@@ -1,6 +1,6 @@
 # Case: Multicol sin Count ni Column width
 # Code: MULTICOL_COLUMNS
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Column gap: 12
-		Text: Hola
+	Section:
+		Multicol:
+			Column gap: 12
+			Text: Hola

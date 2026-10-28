@@ -1,6 +1,6 @@
 # Case: Ítem de lista más ancho que la lista
 # Code: BOX_OVERFLOW
-# Line: 22
+# Line: 23
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,12 +12,13 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	List:
-		Marker: decimal
-		Box:
-			Width: 100
-			Padding: 0 0 0 20
-		List item:
+	Section:
+		List:
+			Marker: decimal
 			Box:
-				Width: 150
-			Text: Uno
+				Width: 100
+				Padding: 0 0 0 20
+			List item:
+				Box:
+					Width: 150
+				Text: Uno

@@ -13,6 +13,10 @@ public enum ErrorCode {
     DOCUMENT_ROOT,
     /** Un tamaño o un margen del medio no válido, o márgenes que no dejan área útil. */
     MEDIA_SIZE,
+    /** Una {@code Section} sin contenido (solo {@code Fixed}, que no ocupan sitio): no tendría ninguna página. */
+    SECTION_EMPTY,
+    /** Un texto con {@code {page}} o {@code {pages}} en una página que no tiene número ({@code Page numbering: none}). */
+    PAGE_NUMBER_UNAVAILABLE,
 
     // --- Valores ------------------------------------------------------------------------------
     /** Sintaxis de un valor (§3): número, porcentaje, función, lista… */

@@ -1,14 +1,16 @@
 # Case: Fixed que se sale por abajo
 # Code: BOX_OVERFLOW
-# Line: 11
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Fixed:
-		Offset: 830 auto auto 0
-		Box:
-			Width: 50
-			Height: 20
+	Section:
+		Block:
+		Fixed:
+			Offset: 830 auto auto 0
+			Box:
+				Width: 50
+				Height: 20

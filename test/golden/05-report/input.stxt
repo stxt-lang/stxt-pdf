@@ -39,48 +39,49 @@ Document (dev.stxt.boxes):
 				Line height: 24
 			Break:
 				After: avoid
-	Fixed:
-		Id: header
-		Offset: -30 0 auto 0
-		Typography:
-			Color: #5F5E5A
-		Text: Informe trimestral
-	Fixed:
-		Id: footer
-		Offset: auto 0 -30 0
-		Text: Página {page} de {pages}
+	Section:
+		Fixed:
+			Id: header
+			Offset: -30 0 auto 0
 			Typography:
-				Align: right
-	Text: Resultados del trimestre
-		Id: title
-	Grid:
-		Id: body
-		Columns: 150 1fr
-		Gap: 20
-		Area:
-			Text:
-				Id: side
-				Class: panel
-				Content >>
-					Resumen de las cifras clave
-					del trimestre.
-		Area:
-			Text:
-				Id: main
-				Content >>
-					Primer párrafo del informe. Los saltos de línea simples
-					dentro del bloque equivalen a espacios.
+				Color: #5F5E5A
+			Text: Informe trimestral
+		Fixed:
+			Id: footer
+			Offset: auto 0 -30 0
+			Text: Página {page} de {pages}
+				Typography:
+					Align: right
+		Text: Resultados del trimestre
+			Id: title
+		Grid:
+			Id: body
+			Columns: 150 1fr
+			Gap: 20
+			Area:
+				Text:
+					Id: side
+					Class: panel
+					Content >>
+						Resumen de las cifras clave
+						del trimestre.
+			Area:
+				Text:
+					Id: main
+					Content >>
+						Primer párrafo del informe. Los saltos de línea simples
+						dentro del bloque equivalen a espacios.
 
-					Una línea en blanco empieza un párrafo nuevo.
-	Absolute:
-		Id: stamp
-		Offset: 0 0 auto auto
-		Box:
-			Width: 80
-			Height: 30
-			Border: 1
-			Border color: #A32D2D
-		Layer: 1
-		Text: BORRADOR
-			Typography:
-				Align: center
+						Una línea en blanco empieza un párrafo nuevo.
+		Absolute:
+			Id: stamp
+			Offset: 0 0 auto auto
+			Box:
+				Width: 80
+				Height: 30
+				Border: 1
+				Border color: #A32D2D
+			Layer: 1
+			Text: BORRADOR
+				Typography:
+					Align: center

@@ -1,6 +1,6 @@
 # Case: Clase sin regla
 # Code: CLASS_WITHOUT_RULE
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -11,5 +11,6 @@ Document (dev.stxt.boxes):
 		For class: note
 			Box:
 				Padding: 4
-	Block:
-		Class: note aside
+	Section:
+		Block:
+			Class: note aside

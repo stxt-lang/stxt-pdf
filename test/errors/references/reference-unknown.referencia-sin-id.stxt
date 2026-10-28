@@ -1,6 +1,6 @@
 # Case: Referencia sin Id
 # Code: REFERENCE_UNKNOWN
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,4 +12,5 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Ver la página {page of: }
+	Section:
+		Text: Ver la página {page of: }

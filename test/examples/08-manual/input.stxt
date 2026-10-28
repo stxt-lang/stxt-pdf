@@ -13,411 +13,412 @@ Document (dev.stxt.boxes):
 		Margin: 64 54 66 54
 	Title: Guía rápida del termostato Aire+ T2
 	Language: es
-	Fixed:
-		Id: header
-		Offset: -34 0 auto 0
-		Flex:
-			Main axis: between
-			Item:
-				Text: Aire+ T2 · Guía rápida
-			Item:
-				Text: Versión 2.1 · Octubre de 2025
-	Fixed:
-		Id: footer
-		Offset: auto 0 -40 0
-		Box:
-			Padding: 5 0 0 0
-			Border: 0.5 0 0 0
-			Border color: #BFD9D7
-		Flex:
-			Main axis: between
-			Item:
-				Text: ¿Necesitas ayuda? Escríbenos a soporte@airemas.example
-					Link: mailto:soporte@airemas.example
-			Item:
-				Text: Página {page} de {pages}
-	Block:
-		Id: banner
-		Class: banner
-		Box:
-			Margin: 0 0 18 0
-		Text: Guía rápida
-			Typography:
-				Size: 8
-				Weight: bold
-				Color: #8FD1CC
-				Transform: uppercase
-				Letter spacing: 1.2
-		Heading 1:
-			Text: Termostato Aire+ T2
+	Section:
+		Fixed:
+			Id: header
+			Offset: -34 0 auto 0
+			Flex:
+				Main axis: between
+				Item:
+					Text: Aire+ T2 · Guía rápida
+				Item:
+					Text: Versión 2.1 · Octubre de 2025
+		Fixed:
+			Id: footer
+			Offset: auto 0 -40 0
 			Box:
-				Padding: 0
-				Border: 0
-				Margin: 0
-			Typography:
-				Color: #FFFFFF
-		Text: Instálalo, conéctalo a la aplicación y programa tu casa en menos de media hora.
-			Typography:
-				Size: 11
-				Color: #C7E4E1
-			Box:
-				Margin: 4 0 0 0
-	Flex:
-		Id: overview
-		Gap: 26
-		Box:
-			Margin: 0 0 6 0
-		Item:
-			Relative:
-				Id: device
-				Box:
-					Width: 250
-					Height: 250
-				Image: examples/manual/thermostat.svg
-					Alt: El termostato visto de frente, con el anillo de temperatura y el indicador luminoso
-					Box:
-						Width: 100%
-				Absolute:
-					Offset: 30 auto auto 184
-					Class: badge
-					Text: 1
-				Absolute:
-					Offset: 76 auto auto 124
-					Class: badge
-					Text: 2
-				Absolute:
-					Offset: 170 auto auto 70
-					Class: badge
-					Text: 3
-				Absolute:
-					Offset: 120 auto auto 190
-					Class: badge
-					Text: 4
-		Item:
-			Grow: 1
-			Block:
-				Heading 2:
-					Text: Conoce tu termostato
-					Box:
-						Margin: 0 0 8 0
-				List:
-					Marker: decimal
-					List item:
-						Paragraph: **Indicador de estado.** Verde fijo cuando está conectado a la red; parpadea mientras se empareja.
-					List item:
-						Paragraph: **Temperatura actual** de la estancia, en grados centígrados.
-					List item:
-						Paragraph: **Temperatura objetivo.** El punto naranja marca la que has elegido.
-					List item:
-						Paragraph: **Corona.** Gírala para subir o bajar la temperatura y púlsala para cambiar de modo.
-	Heading 2:
-		Text: En la caja
-	Grid:
-		Id: contents
-		Columns: repeat(3, 1fr)
-		Gap: 10
-		Box:
-			Margin: 0 0 4 0
-		Area:
-			Block:
-				Class: tip
-				Box:
-					Margin: 0
-				Text: 1 termostato Aire+ T2
-					Typography:
-						Weight: bold
-				Text: con su base de pared
-		Area:
-			Block:
-				Class: tip
-				Box:
-					Margin: 0
-				Text: 2 tornillos y 2 tacos
-					Typography:
-						Weight: bold
-				Text: de 3,5 × 30 mm
-		Area:
-			Block:
-				Class: tip
-				Box:
-					Margin: 0
-				Text: 1 guía rápida
-					Typography:
-						Weight: bold
-				Text: la que estás leyendo
-	Block:
-		Id: warning-power
-		Class: notice
-		Text: Atención
-			Class: label
-		Text: La instalación debe hacerla una persona cualificada. Antes de tocar ningún cable, corta la corriente desde el cuadro eléctrico y comprueba con un buscapolos que no hay tensión.
-	Block:
-		Id: installation
-		Heading 2:
-			Text: 1 · Instalación
-			Box:
-				Margin: 0 0 8 0
-		Markdown:
-			Numbering: decimal
-			Content >>
-				1. Retira el termostato anterior y anota a qué borne va cada cable.
-				2. Separa la base de pared del termostato, haciendo palanca suavemente por la parte inferior.
-				3. Atornilla la base a la pared, a **1,5 m** del suelo y lejos de corrientes de aire y de fuentes de calor.
-				4. Conecta los cables a los bornes según el esquema de abajo y aprieta bien los tornillos.
-				5. Encaja el termostato en la base y restablece la corriente: se encenderá solo.
-		Image: examples/manual/wiring.svg
-			Id: wiring
-			Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
-			Box:
-				Width: 100%
-				Margin: 6 0 0 0
-		Text: Esquema de conexión de los cuatro bornes.
-			Typography:
-				Size: 8
-				Color: #5E7479
-			Box:
-				Margin: 3 0 10 0
-		Heading 3:
-			Text: Si tu instalación no tiene neutro
-		Markdown:
-			Code font: IBM Plex Mono
-			Content >>
-				El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
-		Heading 3:
-			Text: Comprueba la conexión
-		Paragraph: Una vez instalado, en la pantalla deben aparecer la hora y la temperatura. Puedes comprobar el estado de los bornes desde el menú de ajustes, con la siguiente secuencia:
+				Padding: 5 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #BFD9D7
+			Flex:
+				Main axis: between
+				Item:
+					Text: ¿Necesitas ayuda? Escríbenos a soporte@airemas.example
+						Link: mailto:soporte@airemas.example
+				Item:
+					Text: Página {page} de {pages}
 		Block:
-			Id: terminal
-			Class: code
-			Text:
-				Typography:
-					White space: pre
-				Content >>
-					> Ajustes > Servicio > Bornes
-
-					L     230 V      [ OK ]
-					N     0 V        [ OK ]
-					C     cerrado    [ OK ]
-					NO    abierto    [ OK ]
-		Block:
-			Class: tip
-			Text: Consejo
-				Class: label
-				Typography:
-					Color: #134E4A
-			Text: Si algún borne aparece en rojo, revisa el cable y repite la comprobación antes de cerrar la tapa.
-		Heading 3:
-			Text: Referencia de los bornes
-		Table:
-			Id: terminals
-			Columns: 56 1fr 100
-			Head:
-				Row:
-					Cell: Borne
-					Cell: Función
-					Cell: Cable habitual
-			Body:
-				Row:
-					Cell: L
-						Header: true
-						Class: mono
-					Cell: Alimentación, fase
-					Cell: Marrón
-				Row:
-					Cell: N
-						Header: true
-						Class: mono
-					Cell: Alimentación, neutro
-					Cell: Azul
-				Row:
-					Cell: C
-						Header: true
-						Class: mono
-					Cell: Común del contacto de la caldera
-					Cell: Gris
-				Row:
-					Cell: NO
-						Header: true
-						Class: mono
-					Cell: Contacto normalmente abierto
-					Cell: Amarillo
-	Block:
-		Id: app
-		Break:
-			Before: page
-		Heading 2:
-			Text: 2 · Conecta la aplicación
+			Id: banner
+			Class: banner
 			Box:
-				Margin: 0 0 8 0
+				Margin: 0 0 18 0
+			Text: Guía rápida
+				Typography:
+					Size: 8
+					Weight: bold
+					Color: #8FD1CC
+					Transform: uppercase
+					Letter spacing: 1.2
+			Heading 1:
+				Text: Termostato Aire+ T2
+				Box:
+					Padding: 0
+					Border: 0
+					Margin: 0
+				Typography:
+					Color: #FFFFFF
+			Text: Instálalo, conéctalo a la aplicación y programa tu casa en menos de media hora.
+				Typography:
+					Size: 11
+					Color: #C7E4E1
+				Box:
+					Margin: 4 0 0 0
 		Flex:
-			Gap: 24
+			Id: overview
+			Gap: 26
 			Box:
-				Margin: 0 0 8 0
+				Margin: 0 0 6 0
 			Item:
-				Image: examples/manual/app.png
-					Id: app-screen
-					Alt: La pantalla principal de la aplicación, con la temperatura del salón y los botones más y menos
+				Relative:
+					Id: device
 					Box:
-						Width: 112
+						Width: 250
+						Height: 250
+					Image: examples/manual/thermostat.svg
+						Alt: El termostato visto de frente, con el anillo de temperatura y el indicador luminoso
+						Box:
+							Width: 100%
+					Absolute:
+						Offset: 30 auto auto 184
+						Class: badge
+						Text: 1
+					Absolute:
+						Offset: 76 auto auto 124
+						Class: badge
+						Text: 2
+					Absolute:
+						Offset: 170 auto auto 70
+						Class: badge
+						Text: 3
+					Absolute:
+						Offset: 120 auto auto 190
+						Class: badge
+						Text: 4
 			Item:
 				Grow: 1
-				Markdown:
-					Numbering: decimal
-					Content >>
-						1. Descarga la aplicación **Aire+** desde la tienda de tu móvil.
-						2. Crea una cuenta o entra con la que ya tengas.
-						3. Pulsa **Añadir termostato** y mantén pulsada la corona del termostato durante cinco segundos.
-						4. Cuando el indicador parpadee en verde, elige tu red wifi y escribe la contraseña.
-						5. Dale un nombre a la estancia, por ejemplo «Salón». ¡Ya está!
-
-						Si el emparejamiento falla, acerca el móvil al termostato y comprueba que usas una red de **2,4 GHz**: la de 5 GHz no es compatible.
+				Block:
+					Heading 2:
+						Text: Conoce tu termostato
+						Box:
+							Margin: 0 0 8 0
+					List:
+						Marker: decimal
+						List item:
+							Paragraph: **Indicador de estado.** Verde fijo cuando está conectado a la red; parpadea mientras se empareja.
+						List item:
+							Paragraph: **Temperatura actual** de la estancia, en grados centígrados.
+						List item:
+							Paragraph: **Temperatura objetivo.** El punto naranja marca la que has elegido.
+						List item:
+							Paragraph: **Corona.** Gírala para subir o bajar la temperatura y púlsala para cambiar de modo.
 		Heading 2:
-			Text: 3 · Programa la semana
-		Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica:
-		Table:
-			Id: schedule
-			Columns: 1fr 1fr 1fr
-			Box:
-				Margin: 0 0 12 0
-			Head:
-				Row:
-					Cell: Franja
-					Cell: De lunes a viernes
-					Cell: Fin de semana
-			Body:
-				Row:
-					Cell: Mañana · 06:30–08:30
-						Header: true
-					Cell: 21 °C
-					Cell: 18 °C
-				Row:
-					Cell: Día · 08:30–17:00
-						Header: true
-					Cell: 17 °C
-					Cell: 20 °C
-				Row:
-					Cell: Tarde · 17:00–23:00
-						Header: true
-					Cell: 21,5 °C
-					Cell: 21,5 °C
-				Row:
-					Cell: Noche · 23:00–06:30
-						Header: true
-					Cell: 16 °C
-					Cell: 16 °C
-		Heading 2:
-			Text: Solución de problemas
-		Markdown:
-			Table columns: auto
-			Content >>
-				| Síntoma | Causa probable | Qué hacer |
-				|---------|----------------|-----------|
-				| La pantalla no se enciende | Sin corriente o cable mal conectado | Revisa el cuadro eléctrico y los bornes L y N |
-				| Indicador en rojo | No se conecta a la red wifi | Acerca el router o repite el emparejamiento |
-				| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página {page of: wiring} |
-				| Temperatura errónea | Está cerca de una fuente de calor | Cámbialo de sitio, a 1,5 m del suelo |
-		Heading 2:
-			Text: Especificaciones técnicas
-		Table:
-			Id: specs
-			Columns: 150 1fr
-			Body:
-				Row:
-					Cell: Alimentación
-						Header: true
-					Cell: 230 V c. a., 50 Hz, o 2 pilas AA
-						Class: mono
-				Row:
-					Cell: Contacto de salida
-						Header: true
-					Cell: 6 A / 250 V, libre de potencial
-						Class: mono
-				Row:
-					Cell: Rango de temperatura
-						Header: true
-					Cell: de 5 a 30 °C, pasos de 0,5 °C
-						Class: mono
-				Row:
-					Cell: Conectividad
-						Header: true
-					Cell: Wifi 2,4 GHz (IEEE 802.11 b/g/n)
-						Class: mono
-				Row:
-					Cell: Dimensiones
-						Header: true
-					Cell: 86 × 86 × 24 mm
-						Class: mono
-	Block:
-		Id: support
-		Heading 2:
-			Text: Garantía y soporte
-		Multicol:
-			Count: 2
-			Column gap: 26
-			Rule: 0.5
-			Rule color: #BFD9D7
-			Box:
-				Margin: 0 0 12 0
-			Markdown:
-				Content >>
-					### Garantía
-
-					El Aire+ T2 tiene una garantía de **tres años** desde la fecha de compra, que cubre cualquier defecto de fabricación. No cubre los daños por una instalación incorrecta ni los causados por humedad o golpes. Conserva la factura: te la pediremos para tramitar la garantía.
-
-					### Reciclaje
-
-					Cuando termine su vida útil, no tires el termostato a la basura doméstica. Llévalo a un punto limpio o entrégalo en cualquier tienda al comprar uno nuevo. Las pilas se reciclan por separado.
+			Text: En la caja
 		Grid:
-			Id: contact
+			Id: contents
 			Columns: repeat(3, 1fr)
 			Gap: 10
+			Box:
+				Margin: 0 0 4 0
 			Area:
 				Block:
 					Class: tip
 					Box:
 						Margin: 0
-					Text: Teléfono
-						Class: label
-						Typography:
-							Color: #134E4A
-					Text: 900 100 200
+					Text: 1 termostato Aire+ T2
 						Typography:
 							Weight: bold
-							Size: 11
-					Text: De lunes a viernes, de 9 a 18 h
-						Typography:
-							Size: 8
+					Text: con su base de pared
 			Area:
 				Block:
 					Class: tip
 					Box:
 						Margin: 0
-					Text: Correo
-						Class: label
-						Typography:
-							Color: #134E4A
-					Text: soporte@airemas.example
-						Link: mailto:soporte@airemas.example
+					Text: 2 tornillos y 2 tacos
 						Typography:
 							Weight: bold
-							Size: 11
-					Text: Respondemos en menos de 24 horas
-						Typography:
-							Size: 8
+					Text: de 3,5 × 30 mm
 			Area:
 				Block:
 					Class: tip
 					Box:
 						Margin: 0
-					Text: Web
-						Class: label
-						Typography:
-							Color: #134E4A
-					Text: airemas.example/ayuda
-						Link: https://airemas.example/ayuda
+					Text: 1 guía rápida
 						Typography:
 							Weight: bold
-							Size: 11
-					Text: Vídeos, preguntas frecuentes y foro
-						Typography:
-							Size: 8
+					Text: la que estás leyendo
+		Block:
+			Id: warning-power
+			Class: notice
+			Text: Atención
+				Class: label
+			Text: La instalación debe hacerla una persona cualificada. Antes de tocar ningún cable, corta la corriente desde el cuadro eléctrico y comprueba con un buscapolos que no hay tensión.
+		Block:
+			Id: installation
+			Heading 2:
+				Text: 1 · Instalación
+				Box:
+					Margin: 0 0 8 0
+			Markdown:
+				Numbering: decimal
+				Content >>
+					1. Retira el termostato anterior y anota a qué borne va cada cable.
+					2. Separa la base de pared del termostato, haciendo palanca suavemente por la parte inferior.
+					3. Atornilla la base a la pared, a **1,5 m** del suelo y lejos de corrientes de aire y de fuentes de calor.
+					4. Conecta los cables a los bornes según el esquema de abajo y aprieta bien los tornillos.
+					5. Encaja el termostato en la base y restablece la corriente: se encenderá solo.
+			Image: examples/manual/wiring.svg
+				Id: wiring
+				Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
+				Box:
+					Width: 100%
+					Margin: 6 0 0 0
+			Text: Esquema de conexión de los cuatro bornes.
+				Typography:
+					Size: 8
+					Color: #5E7479
+				Box:
+					Margin: 3 0 10 0
+			Heading 3:
+				Text: Si tu instalación no tiene neutro
+			Markdown:
+				Code font: IBM Plex Mono
+				Content >>
+					El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
+			Heading 3:
+				Text: Comprueba la conexión
+			Paragraph: Una vez instalado, en la pantalla deben aparecer la hora y la temperatura. Puedes comprobar el estado de los bornes desde el menú de ajustes, con la siguiente secuencia:
+			Block:
+				Id: terminal
+				Class: code
+				Text:
+					Typography:
+						White space: pre
+					Content >>
+						> Ajustes > Servicio > Bornes
+
+						L     230 V      [ OK ]
+						N     0 V        [ OK ]
+						C     cerrado    [ OK ]
+						NO    abierto    [ OK ]
+			Block:
+				Class: tip
+				Text: Consejo
+					Class: label
+					Typography:
+						Color: #134E4A
+				Text: Si algún borne aparece en rojo, revisa el cable y repite la comprobación antes de cerrar la tapa.
+			Heading 3:
+				Text: Referencia de los bornes
+			Table:
+				Id: terminals
+				Columns: 56 1fr 100
+				Head:
+					Row:
+						Cell: Borne
+						Cell: Función
+						Cell: Cable habitual
+				Body:
+					Row:
+						Cell: L
+							Header: true
+							Class: mono
+						Cell: Alimentación, fase
+						Cell: Marrón
+					Row:
+						Cell: N
+							Header: true
+							Class: mono
+						Cell: Alimentación, neutro
+						Cell: Azul
+					Row:
+						Cell: C
+							Header: true
+							Class: mono
+						Cell: Común del contacto de la caldera
+						Cell: Gris
+					Row:
+						Cell: NO
+							Header: true
+							Class: mono
+						Cell: Contacto normalmente abierto
+						Cell: Amarillo
+		Block:
+			Id: app
+			Break:
+				Before: page
+			Heading 2:
+				Text: 2 · Conecta la aplicación
+				Box:
+					Margin: 0 0 8 0
+			Flex:
+				Gap: 24
+				Box:
+					Margin: 0 0 8 0
+				Item:
+					Image: examples/manual/app.png
+						Id: app-screen
+						Alt: La pantalla principal de la aplicación, con la temperatura del salón y los botones más y menos
+						Box:
+							Width: 112
+				Item:
+					Grow: 1
+					Markdown:
+						Numbering: decimal
+						Content >>
+							1. Descarga la aplicación **Aire+** desde la tienda de tu móvil.
+							2. Crea una cuenta o entra con la que ya tengas.
+							3. Pulsa **Añadir termostato** y mantén pulsada la corona del termostato durante cinco segundos.
+							4. Cuando el indicador parpadee en verde, elige tu red wifi y escribe la contraseña.
+							5. Dale un nombre a la estancia, por ejemplo «Salón». ¡Ya está!
+
+							Si el emparejamiento falla, acerca el móvil al termostato y comprueba que usas una red de **2,4 GHz**: la de 5 GHz no es compatible.
+			Heading 2:
+				Text: 3 · Programa la semana
+			Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica:
+			Table:
+				Id: schedule
+				Columns: 1fr 1fr 1fr
+				Box:
+					Margin: 0 0 12 0
+				Head:
+					Row:
+						Cell: Franja
+						Cell: De lunes a viernes
+						Cell: Fin de semana
+				Body:
+					Row:
+						Cell: Mañana · 06:30–08:30
+							Header: true
+						Cell: 21 °C
+						Cell: 18 °C
+					Row:
+						Cell: Día · 08:30–17:00
+							Header: true
+						Cell: 17 °C
+						Cell: 20 °C
+					Row:
+						Cell: Tarde · 17:00–23:00
+							Header: true
+						Cell: 21,5 °C
+						Cell: 21,5 °C
+					Row:
+						Cell: Noche · 23:00–06:30
+							Header: true
+						Cell: 16 °C
+						Cell: 16 °C
+			Heading 2:
+				Text: Solución de problemas
+			Markdown:
+				Table columns: auto
+				Content >>
+					| Síntoma | Causa probable | Qué hacer |
+					|---------|----------------|-----------|
+					| La pantalla no se enciende | Sin corriente o cable mal conectado | Revisa el cuadro eléctrico y los bornes L y N |
+					| Indicador en rojo | No se conecta a la red wifi | Acerca el router o repite el emparejamiento |
+					| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página {page of: wiring} |
+					| Temperatura errónea | Está cerca de una fuente de calor | Cámbialo de sitio, a 1,5 m del suelo |
+			Heading 2:
+				Text: Especificaciones técnicas
+			Table:
+				Id: specs
+				Columns: 150 1fr
+				Body:
+					Row:
+						Cell: Alimentación
+							Header: true
+						Cell: 230 V c. a., 50 Hz, o 2 pilas AA
+							Class: mono
+					Row:
+						Cell: Contacto de salida
+							Header: true
+						Cell: 6 A / 250 V, libre de potencial
+							Class: mono
+					Row:
+						Cell: Rango de temperatura
+							Header: true
+						Cell: de 5 a 30 °C, pasos de 0,5 °C
+							Class: mono
+					Row:
+						Cell: Conectividad
+							Header: true
+						Cell: Wifi 2,4 GHz (IEEE 802.11 b/g/n)
+							Class: mono
+					Row:
+						Cell: Dimensiones
+							Header: true
+						Cell: 86 × 86 × 24 mm
+							Class: mono
+		Block:
+			Id: support
+			Heading 2:
+				Text: Garantía y soporte
+			Multicol:
+				Count: 2
+				Column gap: 26
+				Rule: 0.5
+				Rule color: #BFD9D7
+				Box:
+					Margin: 0 0 12 0
+				Markdown:
+					Content >>
+						### Garantía
+
+						El Aire+ T2 tiene una garantía de **tres años** desde la fecha de compra, que cubre cualquier defecto de fabricación. No cubre los daños por una instalación incorrecta ni los causados por humedad o golpes. Conserva la factura: te la pediremos para tramitar la garantía.
+
+						### Reciclaje
+
+						Cuando termine su vida útil, no tires el termostato a la basura doméstica. Llévalo a un punto limpio o entrégalo en cualquier tienda al comprar uno nuevo. Las pilas se reciclan por separado.
+			Grid:
+				Id: contact
+				Columns: repeat(3, 1fr)
+				Gap: 10
+				Area:
+					Block:
+						Class: tip
+						Box:
+							Margin: 0
+						Text: Teléfono
+							Class: label
+							Typography:
+								Color: #134E4A
+						Text: 900 100 200
+							Typography:
+								Weight: bold
+								Size: 11
+						Text: De lunes a viernes, de 9 a 18 h
+							Typography:
+								Size: 8
+				Area:
+					Block:
+						Class: tip
+						Box:
+							Margin: 0
+						Text: Correo
+							Class: label
+							Typography:
+								Color: #134E4A
+						Text: soporte@airemas.example
+							Link: mailto:soporte@airemas.example
+							Typography:
+								Weight: bold
+								Size: 11
+						Text: Respondemos en menos de 24 horas
+							Typography:
+								Size: 8
+				Area:
+					Block:
+						Class: tip
+						Box:
+							Margin: 0
+						Text: Web
+							Class: label
+							Typography:
+								Color: #134E4A
+						Text: airemas.example/ayuda
+							Link: https://airemas.example/ayuda
+							Typography:
+								Weight: bold
+								Size: 11
+						Text: Vídeos, preguntas frecuentes y foro
+							Typography:
+								Size: 8

@@ -1,6 +1,6 @@
 # Case: Fixed dentro de un Multicol
 # Code: POSITIONED_IN_MULTICOL
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Count: 2
-		Block:
-			Fixed:
-				Text: Nota
+	Section:
+		Multicol:
+			Count: 2
+			Block:
+				Fixed:
+					Text: Nota

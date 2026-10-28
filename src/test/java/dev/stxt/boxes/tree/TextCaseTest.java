@@ -20,7 +20,7 @@ class TextCaseTest {
     }
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(header("es") + String.join("\n", lines)))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(header("es") + String.join("\n", lines))))).sections().get(0).box();
     }
 
     @Test
@@ -39,9 +39,9 @@ class TextCaseTest {
         assertEquals(Style.Transform.CAPITALIZE, text.style.transform);
         assertEquals(-0.5, text.style.letterSpacing, 1e-9);
         assertTrue(text.style.smallCaps);
-        assertEquals(14, block.style.line("transform"));
-        assertEquals(15, block.style.line("letter-spacing"));
-        assertEquals(16, block.style.line("small-caps"));
+        assertEquals(15, block.style.line("transform"));
+        assertEquals(16, block.style.line("letter-spacing"));
+        assertEquals(17, block.style.line("small-caps"));
     }
 
     @Test
@@ -51,7 +51,7 @@ class TextCaseTest {
                 + "\tStyles:\n\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tTransform: uppercase\n"
                 + "\t\t\t\tSmall caps: true\n"
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
-        Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
+        Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
         Style heading = root.children.get(0).children.get(0).style;
         assertEquals(Style.Transform.UPPERCASE, heading.transform);
         assertTrue(heading.smallCaps);
@@ -63,7 +63,7 @@ class TextCaseTest {
     @Test
     void theLocaleIsTheOneOfLanguageAndIsInherited() {
         Box root = new BoxTreeBuilder().build(new DocumentReader()
-                .read(header("tr") + "\tBlock:\n\t\tText: iğne\n")).root();
+                .read(Docs.sectioned(header("tr") + "\tBlock:\n\t\tText: iğne\n"))).sections().get(0).box();
         assertEquals(Locale.forLanguageTag("tr"), root.children.get(0).children.get(0).style.locale);
         Box es = build("\tText: Hola");
         assertEquals(Locale.forLanguageTag("es"), es.children.get(0).style.locale);
@@ -77,7 +77,7 @@ class TextCaseTest {
         assertEquals(Locale.forLanguageTag("tr"), turkish.style.locale);
         assertEquals(Locale.forLanguageTag("tr"), turkish.children.get(0).style.locale);
         assertEquals(Locale.forLanguageTag("es"), root.children.get(1).style.locale);
-        assertEquals(14, turkish.style.line("language"));
+        assertEquals(15, turkish.style.line("language"));
     }
 
     /** También en una regla de {@code Styles}: una clase para las palabras de otro idioma. */
@@ -94,7 +94,7 @@ class TextCaseTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> build("\tText: Hola", "\t\tTypography:", "\t\t\tLanguage: español"));
         assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.code());
-        assertEquals(14, e.line());
+        assertEquals(15, e.line());
     }
 
     /** El idioma del documento es el {@code Language} de {@code Document}; la regla {@code Element: Document} no lo cambia. */
@@ -104,7 +104,7 @@ class TextCaseTest {
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\t\t\t\tLanguage: en\n\tText: Hola\n";
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> new BoxTreeBuilder().build(new DocumentReader().read(doc)));
+                () -> new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))));
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.code());
         assertEquals(12, e.line());
     }
@@ -114,6 +114,6 @@ class TextCaseTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> build("\tText: Hola", "\t\tTypography:", "\t\t\tLetter spacing: 10%"));
         assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.code());
-        assertEquals(14, e.line());
+        assertEquals(15, e.line());
     }
 }

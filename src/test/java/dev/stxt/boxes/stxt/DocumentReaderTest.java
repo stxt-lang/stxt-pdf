@@ -1,5 +1,6 @@
 package dev.stxt.boxes.stxt;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
@@ -32,7 +33,7 @@ class DocumentReaderTest {
         for (String l : boxLines) {
             sb.append('\n').append(l);
         }
-        return sb.toString();
+        return Docs.sectioned(sb.toString());
     }
 
     @Test
@@ -85,14 +86,15 @@ class DocumentReaderTest {
         InlineNode root = reader.read(doc(
                 "\tText:", "\t\tId: main", "\t\tContent >>", "\t\t\tPrimera línea: con dos puntos", "", "\t\t\t\tSangrada"));
         assertEquals("dev.stxt.boxes", root.getNamespace());
-        InlineNode text = assertInstanceOf(InlineNode.class, root.getChild("Text"));
+        InlineNode section = assertInstanceOf(InlineNode.class, root.getChild("Section"));
+        InlineNode text = assertInstanceOf(InlineNode.class, section.getChild("Text"));
         assertEquals("dev.stxt.boxes", text.getNamespace());
         assertEquals("", text.getValue());
         assertEquals("main", text.getChild("Id").getText());
         Node content = text.getChild("Content");
         assertInstanceOf(TextNode.class, content);
         assertEquals("Primera línea: con dos puntos\n\n\tSangrada", content.getText());
-        assertEquals(9, content.getLine());
+        assertEquals(10, content.getLine());
     }
 
     @Test
@@ -100,24 +102,24 @@ class DocumentReaderTest {
         ParseException e = assertThrows(ParseException.class,
                 () -> reader.read(doc("\tText: a", "\t\tTypography:", "\t\t\tAlign: middle")));
         assertEquals("INVALID_VALUE", e.getCode());
-        assertEquals(9, e.getLine());
+        assertEquals(10, e.getLine());
 
         ParseException noMedia = assertThrows(ParseException.class,
-                () -> reader.read("Document (dev.stxt.boxes):\n\tBlock:\n\t\tId: a"));
+                () -> reader.read("Document (dev.stxt.boxes):\n\tSection:\n\t\tBlock:\n\t\t\tId: a"));
         assertEquals("TOO_FEW_CHILDREN", noMedia.getCode());
 
         ParseException unknown = assertThrows(ParseException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tColour: #fff")));
-        assertEquals(8, unknown.getLine());
+        assertEquals(9, unknown.getLine());
 
         // Una propiedad fuera de su elemento es un error de estructura.
         ParseException misplaced = assertThrows(ParseException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tOffset: 10")));
         assertEquals("CHILD_NOT_DECLARED", misplaced.getCode());
-        assertEquals(8, misplaced.getLine());
+        assertEquals(9, misplaced.getLine());
         ParseException value = assertThrows(ParseException.class,
                 () -> reader.read(doc("\tBlock: hola")));
-        assertEquals(7, value.getLine());
+        assertEquals(8, value.getLine());
     }
 
     @Test
@@ -131,7 +133,7 @@ class DocumentReaderTest {
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3",
                 "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 4"));
         Node cell = root;
-        for (String name : new String[] {"Table", "Foot", "Row", "Cell"}) {
+        for (String name : new String[] {"Section", "Table", "Foot", "Row", "Cell"}) {
             cell = assertInstanceOf(InlineNode.class, cell).getChild(name);
         }
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
@@ -144,7 +146,7 @@ class DocumentReaderTest {
         ParseException row = assertThrows(ParseException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tColumns: 1fr", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
         assertEquals("CHILD_NOT_DECLARED", row.getCode());
-        assertEquals(9, row.getLine());
+        assertEquals(10, row.getLine());
         assertEquals("CHILD_NOT_DECLARED", assertThrows(ParseException.class, () -> reader.read(doc(
                 "\tGrid:", "\t\tArea:", "\t\t\tSpan: 1 2", "\t\t\tBlock:"))).getCode());
     }
@@ -162,7 +164,7 @@ class DocumentReaderTest {
         assertEquals(1, e.line());
         InvalidModelException twoRoots = assertThrows(InvalidModelException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tId: a") + "\nOther:"));
-        assertEquals(9, twoRoots.line());
+        assertEquals(10, twoRoots.line());
         // El schema admite cualquier elemento como raíz; el motor, solo Document.
         InvalidModelException block = assertThrows(InvalidModelException.class,
                 () -> reader.read("Block (dev.stxt.boxes):\n\tId: a"));

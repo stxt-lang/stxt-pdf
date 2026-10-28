@@ -1,6 +1,6 @@
 # Case: Column width en porcentaje
 # Code: VALUE_NOT_ALLOWED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Multicol:
-		Column width: 30%
-		Text: Hola
+	Section:
+		Multicol:
+			Column width: 30%
+			Text: Hola

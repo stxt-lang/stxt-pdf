@@ -1,0 +1,18 @@
+# Case: Una sección gira un medio que no tiene papel
+# Code: MEDIA_SIZE
+# Line: 17
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Media:
+			Orientation: landscape
+		Text: Hola

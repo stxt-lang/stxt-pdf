@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
@@ -133,9 +134,9 @@ class PdfCanvasTest {
 
     @Test
     void onePdfPagePerPage() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n"
                 + "\t\tHeight: 200\n\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tText: Uno\n\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n");
+                + "\tText: Uno\n\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "two-pages"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDFTextStripper stripper = new PDFTextStripper();
@@ -147,8 +148,8 @@ class PdfCanvasTest {
 
     @Test
     void pageHasTheSizeOfTheMedia() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 842\n"
-                + "\t\tMargin: 20\n\tBlock:\n\t\tBox:\n\t\t\tHeight: 500\n\t\t\tBackground: #F1EFE8\n");
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 842\n"
+                + "\t\tMargin: 20\n\tBlock:\n\t\tBox:\n\t\t\tHeight: 500\n\t\t\tBackground: #F1EFE8\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "media-size"))) {
             assertEquals(1, pdf.getNumberOfPages());
             assertEquals(300, pdf.getPage(0).getMediaBox().getWidth(), 1e-3);
@@ -167,7 +168,7 @@ class PdfCanvasTest {
 
     @Test
     void headingsBecomeNestedBookmarks() throws Exception {
-        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(Docs.sectioned(HEADINGS)), "headings"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDDocumentOutline outline = pdf.getDocumentCatalog().getDocumentOutline();
             PDOutlineItem one = outline.getFirstChild();
@@ -188,11 +189,12 @@ class PdfCanvasTest {
 
     @Test
     void theDocumentIsTagged() throws Exception {
-        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
+        try (PDDocument pdf = Loader.loadPDF(render(reader.read(Docs.sectioned(HEADINGS)), "headings"))) {
             assertTrue(pdf.getDocumentCatalog().getMarkInfo().isMarked());
             PDStructureTreeRoot treeRoot = pdf.getDocumentCatalog().getStructureTreeRoot();
-            PDStructureElement document = (PDStructureElement) treeRoot.getKids().get(0);
-            assertEquals("Document", document.getStructureType());
+            PDStructureElement document = firstSection((PDStructureElement) treeRoot.getKids().get(0));
+            assertEquals("Sect", document.getStructureType());
+            assertEquals("Document", ((PDStructureElement) treeRoot.getKids().get(0)).getStructureType());
             // El Fixed es un artifact: no está en el árbol. El orden es el del documento.
             assertEquals(List.of("H1", "P", "H2", "P", "H1"), types(document));
             PDStructureElement h2 = (PDStructureElement) document.getKids().get(2);
@@ -215,14 +217,14 @@ class PdfCanvasTest {
      */
     @Test
     void aBoxInAnotherLanguageHasLang() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tParagraph: Hola\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tLanguage: en-GB\n\t\tParagraph: Hello\n\t\tText: World\n"
-                + "\tParagraph: Adiós\n");
+                + "\tParagraph: Adiós\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "lang"))) {
             assertEquals("es", pdf.getDocumentCatalog().getLanguage());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("P", "Div", "P"), types(document));
             PDStructureElement english = (PDStructureElement) document.getKids().get(1);
             assertEquals("en-GB", english.getLanguage());
@@ -235,9 +237,9 @@ class PdfCanvasTest {
 
     @Test
     void titleAndLanguage() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\tTitle: Informe <trimestral> & resumen\n\tLanguage: es-ES\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tText: Hola\n");
+                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tText: Hola\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "title-language"))) {
             PDDocumentCatalog catalog = pdf.getDocumentCatalog();
             assertEquals("es-ES", catalog.getLanguage());
@@ -252,16 +254,16 @@ class PdfCanvasTest {
 
     @Test
     void listsAreTaggedWithLabelAndBody() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tList:\n\t\tMarker: decimal\n\t\tBox:\n\t\t\tPadding: 0 0 0 20\n"
                 + "\t\tList item:\n\t\t\tText: Uno\n"
                 + "\t\tList item:\n\t\t\tText: Dos\n"
                 + "\t\t\tList:\n\t\t\t\tMarker: disc\n\t\t\t\tBox:\n\t\t\t\t\tPadding: 0 0 0 20\n"
-                + "\t\t\t\tList item:\n\t\t\t\t\tText: Dentro\n");
+                + "\t\t\t\tList item:\n\t\t\t\t\tText: Dentro\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "lists"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement list = (PDStructureElement) document.getKids().get(0);
             assertEquals("L", list.getStructureType());
             assertEquals(PDListAttributeObject.LIST_NUMBERING_DECIMAL,
@@ -285,16 +287,16 @@ class PdfCanvasTest {
             body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
         }
         // Área útil de 160: la cabecera y el pie (12 cada uno) dejan 136, once filas por página.
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tTable:\n\t\tColumns: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Valor\n"
                 + "\t\tBody:\n" + body
-                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tSpan: 1 2\n");
+                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tSpan: 1 2\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "tables"))) {
             assertEquals(2, pdf.getNumberOfPages());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement table = (PDStructureElement) document.getKids().get(0);
             assertEquals("Table", table.getStructureType());
             assertEquals(List.of("THead", "TBody", "TFoot"), types(table));
@@ -330,14 +332,14 @@ class PdfCanvasTest {
      */
     @Test
     void headerCellsAreRowHeaders() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tTable:\n\t\tColumns: 100 100\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Importe\n"
                 + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"
-                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n");
+                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "row-headers"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement table = (PDStructureElement) document.getKids().get(0);
             PDStructureElement bodyRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(1)).getKids().get(0);
             assertEquals(List.of("TH", "TD"), types(bodyRow));
@@ -356,13 +358,13 @@ class PdfCanvasTest {
     /** Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador (§5.13, §5.19). */
     @Test
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tHeading 1:\n\t\tIn contents: false\n\t\tText: Portada\n"
                 + "\tContents:\n\t\tLevels: 1 1\n"
-                + "\tHeading 1:\n\t\tText: Uno\n");
+                + "\tHeading 1:\n\t\tText: Uno\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "out-of-contents"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("H1", "TOC", "H1"), types(document));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(1);
             assertEquals(1, types(toc).size());
@@ -375,13 +377,13 @@ class PdfCanvasTest {
     /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 0.5\n"
-                + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n");
+                + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "multicol"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement multicol = (PDStructureElement) document.getKids().get(0);
             assertEquals("Div", multicol.getStructureType());
             assertEquals(List.of("P", "P"), types(multicol));
@@ -410,11 +412,11 @@ class PdfCanvasTest {
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tText: Escribe a soporte\n\t\tLink: mailto:soporte@airemas.example\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Logotipo\n\t\tLink: https://stxt.dev\n"
                 + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
-                + "\tMarkdown:\n\t\tContent >>\n\t\t\tVisita [la web](https://web.example) hoy.\n");
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\tVisita [la web](https://web.example) hoy.\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "links"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
             // Un Fixed se pinta el último, encima de todo.
@@ -437,8 +439,11 @@ class PdfCanvasTest {
             assertEquals("S", pdf.getPage(0).getCOSObject().getNameAsString("Tabs"));
 
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
-            PDStructureElement document = (PDStructureElement) tree.getKids().get(0);
-            assertEquals(List.of("P", "Link", "Div", "Link"), types(document));
+            PDStructureElement outer = (PDStructureElement) tree.getKids().get(0);
+            PDStructureElement document = firstSection(outer);
+            // El Link del Fixed no es contenido: cuelga suelto del Document, no de la sección.
+            assertEquals(List.of("Sect", "Link"), types(outer));
+            assertEquals(List.of("P", "Link", "Div"), types(document));
             // La caja con Link: P → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
             PDStructureElement span = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(span));
@@ -461,7 +466,7 @@ class PdfCanvasTest {
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
             assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
             // El Fixed: un Link suelto del Document, con el texto como Alt y la OBJR.
-            PDStructureElement fixed = (PDStructureElement) document.getKids().get(3);
+            PDStructureElement fixed = (PDStructureElement) outer.getKids().get(1);
             assertEquals(List.of("OBJR"), shape(fixed));
             assertEquals("pie", fixed.getAlternateDescription());
             assertEquals(fixed.getCOSObject(), ((COSObjectable) tree.getParentTree()
@@ -477,13 +482,13 @@ class PdfCanvasTest {
      */
     @Test
     void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
-        InlineNode doc = reader.read(LINKS.replace("Width: 300", "Width: 100")
-                + "\tMarkdown:\n\t\tContent >>\n\t\t\tAntes [un enlace que ocupa bastantes líneas de texto](https://a.example) después.\n");
+        InlineNode doc = reader.read(Docs.sectioned(LINKS.replace("Width: 300", "Width: 100")
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\tAntes [un enlace que ocupa bastantes líneas de texto](https://a.example) después.\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "link-lines"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
             assertTrue(links.size() >= 3, "" + links.size());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(0))
                     .getKids().get(0);
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
@@ -500,12 +505,12 @@ class PdfCanvasTest {
      */
     @Test
     void aBoxLinkWrapsItsChildren() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tBlock:\n\t\tLink: https://a.example\n\t\tText: Uno\n\t\tText: Dos\n"
-                + "\tBlock:\n\t\tLink: https://b.example\n\t\tBox:\n\t\t\tHeight: 10\n\t\t\tBackground: #CCC\n");
+                + "\tBlock:\n\t\tLink: https://b.example\n\t\tBox:\n\t\t\tHeight: 10\n\t\t\tBackground: #CCC\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "box-link"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("Div", "Div"), types(document));
             PDStructureElement full = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(full));
@@ -526,11 +531,11 @@ class PdfCanvasTest {
     @Test
     void internalLinksGoToThePageOfTheirBox() throws Exception {
         // Área útil de 160: el texto (12) y el bloque (140) llenan la primera página; el resto, la segunda.
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tText: Ir al final\n\t\tId: inicio\n\t\tLink: #fin\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 140\n"
                 + "\tText: Final\n\t\tId: fin\n"
-                + "\tText: Volver\n\t\tLink: #inicio\n");
+                + "\tText: Volver\n\t\tLink: #inicio\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "internal-links"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDPageXYZDestination forward = (PDPageXYZDestination) links(pdf, 0).get(0).getDestination();
@@ -547,11 +552,11 @@ class PdfCanvasTest {
     /** Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link} (§5.19, §5.20). */
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
-        InlineNode doc = reader.read(LINKS
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tContents:\n\t\tLevels: 1 1\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tBlock:\n\t\tBreak:\n\t\t\tAfter: page\n"
-                + "\tHeading 1:\n\t\tText: Dos\n");
+                + "\tHeading 1:\n\t\tText: Dos\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "contents-links"))) {
             assertEquals(2, pdf.getNumberOfPages());
             List<PDAnnotationLink> links = links(pdf, 0);
@@ -565,8 +570,8 @@ class PdfCanvasTest {
             }).toList());
             // El texto de la entrada, sin su número de página.
             assertEquals(List.of("Uno", "Dos"), links.stream().map(PDAnnotation::getContents).toList());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
             toc.getKids().forEach(k -> assertTrue(types((PDStructureElement) k).contains("Link")));
         }
@@ -583,17 +588,18 @@ class PdfCanvasTest {
         for (int i = 1; i <= 15; i++) {
             body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
         }
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tTable:\n\t\tColumns: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\t\tLink: https://c.example\n\t\t\t\tCell: Valor\n"
-                + "\t\tBody:\n" + body);
+                + "\t\tBody:\n" + body));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "table-links"))) {
             assertEquals(2, pdf.getNumberOfPages());
             assertEquals(List.of("https://c.example"), links(pdf, 0).stream().map(PdfCanvasTest::uri).toList());
             assertEquals(List.of("https://c.example"), links(pdf, 1).stream().map(PdfCanvasTest::uri).toList());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+            PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0);
+            PDStructureElement document = firstSection(outer);
             PDStructureElement table = (PDStructureElement) document.getKids().get(0);
             PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
             PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
@@ -604,7 +610,7 @@ class PdfCanvasTest {
             assertEquals(pdf.getPage(0), ((PDObjectReference) cellLink.getKids().get(1)).getPage());
             // La de la segunda es un Link suelto del Document.
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
-            PDStructureElement repeated = (PDStructureElement) document.getKids().get(1);
+            PDStructureElement repeated = (PDStructureElement) outer.getKids().get(1);
             assertEquals("Link", repeated.getStructureType());
             assertEquals("Concepto", repeated.getAlternateDescription());
             assertEquals(repeated.getCOSObject(), ((COSObjectable) tree.getParentTree()
@@ -647,9 +653,9 @@ class PdfCanvasTest {
      */
     @Test
     void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n"
-                + "\t\t\t\tAlign: justify\n\tParagraph: " + RUNS + "\n\t\tId: P\n");
+                + "\t\t\t\tAlign: justify\n\tParagraph: " + RUNS + "\n\t\tId: P\n"));
         List<TextRun> runs = List.of(run("Uno "), run("negrita", "b"), run(", "), run("cursiva", "i"), run(", "),
                 run("las dos", "bi"), run(", "), run("subrayado", "u"), run(" y "), run("tachado", "s"),
                 run(". Una palabra en "), run("neg", "b"), run("rita a medias y un "),
@@ -668,8 +674,8 @@ class PdfCanvasTest {
             assertTrue(text.contains("Uno negrita, cursiva, las dos, subrayado y tachado."), text);
             assertTrue(text.contains("negrita a medias"), text);
             // Un solo P con un solo contenido marcado: los tramos no tienen elemento propio.
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("P"), types(document));
             PDStructureElement p = (PDStructureElement) document.getKids().get(0);
             assertEquals(1, p.getKids().size());
@@ -681,15 +687,15 @@ class PdfCanvasTest {
     /** Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor (§5.17). */
     @Test
     void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\t\tElement: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 15\n"
                 + "\tMarkdown:\n\t\tBullet: disc\n\t\tTable columns: equal\n\t\tContent >>\n"
                 + "\t\t\t# Informe\n\n\t\t\tCon **negrita** y ++subrayado++.\n\n\t\t\t## Datos\n\n"
-                + "\t\t\t- uno\n\t\t\t- dos\n\n\t\t\t| A | B |\n\t\t\t|---|---|\n\t\t\t| 1 | 2 |\n");
+                + "\t\t\t- uno\n\t\t\t- dos\n\n\t\t\t| A | B |\n\t\t\t|---|---|\n\t\t\t| 1 | 2 |\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "markdown"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("Div"), types(document));
             PDStructureElement md = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("H1", "P", "H2", "L", "Table"), types(md));
@@ -708,16 +714,16 @@ class PdfCanvasTest {
      */
     @Test
     void capsAreOnlyPaintedAndTheStructureKeepsTheWrittenText() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tParagraph: Emisor y destinatario\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
                 + "\t\t\tLetter spacing: 1\n"
                 + "\tParagraph: Año nuevo\n\t\tTypography:\n\t\t\tSmall caps: true\n"
                 + "\tParagraph: Hoja {page}\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
-                + "\tParagraph: Sin cambios\n");
+                + "\tParagraph: Sin cambios\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "caps"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             List<String> actual = new ArrayList<>();
             for (Object kid : document.getKids()) {
                 actual.add(((PDStructureElement) kid).getActualText());
@@ -738,15 +744,15 @@ class PdfCanvasTest {
      */
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tContents:\n\t\tLevels: 1 2\n"
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\t# Uno\n\n\t\t\tTexto.\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 250\n"
-                + "\tHeading 1:\n\t\tText: Dos\n\tHeading 2:\n\t\tText: Dos punto uno\n");
+                + "\tHeading 1:\n\t\tText: Dos\n\tHeading 2:\n\t\tText: Dos punto uno\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "contents"))) {
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("TOCI", "TOCI", "TOCI"), types(toc));
@@ -766,17 +772,17 @@ class PdfCanvasTest {
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tFixed:\n\t\tOffset: -30 -30 auto auto\n\t\tImage: test/square.png\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n"
                 + "\tImage: test/tall.jpg\n\t\tBox:\n\t\t\tHeight: 60\n"
                 + "\tParagraph: Fin.\n"
-                + "\tImage: test/wide.png\n\t\tBreak:\n\t\t\tBefore: page\n");
+                + "\tImage: test/wide.png\n\t\tBreak:\n\t\t\tBefore: page\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "images"))) {
             assertEquals(2, pdf.getNumberOfPages());
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             assertEquals(List.of("Figure", "P"), types(document));
             PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
             assertEquals("Paisaje", figure.getAlternateDescription());
@@ -810,11 +816,11 @@ class PdfCanvasTest {
      */
     @Test
     void svgIsDrawnAsOneVectorFormAndScaledToItsBox() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 400\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 400\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tImage: test/shapes.svg\n\t\tAlt: Un paisaje\n\t\tBox:\n\t\t\tWidth: 300\n"
                 + "\tImage: test/label.svg\n\t\tBox:\n\t\t\tMargin: 10 0 0 0\n"
-                + "\tImage: test/shapes.svg\n\t\tBreak:\n\t\t\tBefore: page\n");
+                + "\tImage: test/shapes.svg\n\t\tBreak:\n\t\t\tBefore: page\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "svg"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDResources first = pdf.getPage(0).getResources();
@@ -874,12 +880,12 @@ class PdfCanvasTest {
      */
     @Test
     void rotatedBoxesTurnTheirContentLinksAndFigures() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n\t\tRotate: 90\n"
                 + "\tText: Ir al sello\n\t\tLink: #sello\n"
                 + "\tAbsolute:\n\t\tId: sello\n\t\tOffset: 60 auto auto 60\n\t\tRotate: 90\n\t\tLink: https://stxt.dev\n"
-                + "\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 20\n\t\tText: Sello\n");
+                + "\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 20\n\t\tText: Sello\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "rotation"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
             PDAnnotationLink stamp = links.stream().filter(l -> l.getAction() != null).findFirst().orElseThrow();
@@ -903,8 +909,8 @@ class PdfCanvasTest {
             assertEquals(240, target.getTop());
 
             // La imagen, de 150 × 75 en (40, 40), girada alrededor de (115, 77.5): de (77.5, 2.5) a (152.5, 152.5).
-            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
-                    .getKids().get(0);
+            PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0));
             PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
             assertEquals("Figure", figure.getStructureType());
             PDRectangle box = ((PDLayoutAttributeObject) figure.getAttributes().getObject(0)).getBBox();
@@ -918,5 +924,13 @@ class PdfCanvasTest {
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Sello"), text);
         }
+    }
+
+    /** La primera {@code Sect} de un documento etiquetado (§5.21): lo que cuelga de ella es el contenido. */
+    private static PDStructureElement firstSection(PDStructureElement document) {
+        assertEquals("Document", document.getStructureType());
+        PDStructureElement section = (PDStructureElement) document.getKids().get(0);
+        assertEquals("Sect", section.getStructureType());
+        return section;
     }
 }

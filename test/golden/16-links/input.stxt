@@ -20,35 +20,36 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Escribe a soporte@airemas.example
-		Id: mail
-		Link: mailto:soporte@airemas.example
-		Box:
-			Margin: 0 0 8 0
-	Markdown:
-		Id: md
-		Box:
-			Margin: 0 0 8 0
-		Content >>
-			Visita [la web](https://stxt.dev) o vuelve al [inicio](#mail).
-	Image: test/wide.png
-		Id: logo
-		Alt: Logotipo
-		Link: #end
-		Box:
-			Margin: 0 0 8 0
-	Block:
-		Id: card
-		Link: #end
-		Box:
-			Padding: 4
-		Text: Primera línea
-		Text: Segunda línea
-	Block:
-		Break:
-			Before: page
-		Text: Destino de los enlaces
-			Id: end
-		Text: Volver al principio
-			Id: back
-			Link: #mail
+	Section:
+		Text: Escribe a soporte@airemas.example
+			Id: mail
+			Link: mailto:soporte@airemas.example
+			Box:
+				Margin: 0 0 8 0
+		Markdown:
+			Id: md
+			Box:
+				Margin: 0 0 8 0
+			Content >>
+				Visita [la web](https://stxt.dev) o vuelve al [inicio](#mail).
+		Image: test/wide.png
+			Id: logo
+			Alt: Logotipo
+			Link: #end
+			Box:
+				Margin: 0 0 8 0
+		Block:
+			Id: card
+			Link: #end
+			Box:
+				Padding: 4
+			Text: Primera línea
+			Text: Segunda línea
+		Block:
+			Break:
+				Before: page
+			Text: Destino de los enlaces
+				Id: end
+			Text: Volver al principio
+				Id: back
+				Link: #mail

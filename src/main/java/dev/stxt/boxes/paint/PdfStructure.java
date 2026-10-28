@@ -105,10 +105,14 @@ final class PdfStructure {
     /** El elemento {@code Document}, raíz del árbol de estructura. */
     private final PDStructureElement document;
 
+    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (§5.21). */
+    private final Box root;
+
     private PDPage page;
     private COSArray pageParents;
 
     PdfStructure(PDDocument doc, Box root) {
+        this.root = root;
         PDDocumentCatalog catalog = doc.getDocumentCatalog();
         catalog.setStructureTreeRoot(treeRoot);
         PDMarkInfo markInfo = new PDMarkInfo();
@@ -136,7 +140,8 @@ final class PdfStructure {
         PDStructureElement e = new PDStructureElement(type(box), owner);
         owner.appendKid(e);
         elements.put(box, e);
-        if (box.parent != null && !box.style.locale.equals(box.parent.style.locale)) {
+        Box outer = box.element == Element.SECTION ? root : box.parent;
+        if (outer != null && !box.style.locale.equals(outer.style.locale)) {
             // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
             e.setLanguage(box.style.locale.toLanguageTag());
         }
@@ -349,6 +354,9 @@ final class PdfStructure {
     static String type(Box box) {
         if (box.element == null) {
             return "Document";
+        }
+        if (box.element == Element.SECTION) {
+            return "Sect";
         }
         if (box.headingLevel() > 0) {
             return "H" + box.headingLevel();

@@ -43,46 +43,47 @@ Document (dev.stxt.boxes):
 		For column: 3
 			Box:
 				Padding: 2 4 2 24
-	Table:
-		Id: t
-		Columns: 100 100 60
-		Column align: left left right
-		Head:
-			Row:
-				Cell: Concepto
-					Id: h1
-				Cell: Detalle
-				Cell: Total
-					Id: h3
-		Body:
-			Row:
-				Cell: Uno
-					Id: b1
-				Cell: dos
-				Cell: 1.234
-					Id: b3
-			Row:
-				Cell: Cuatro
-					Id: b4
-				Cell: cinco
-				Cell: 56
-					Id: b6
-			Row:
-				Cell: Siete
-					Id: b7
-				Cell: ocho
-				Cell: abc def
-					Id: b9
-			Row:
-				Cell: Diez
-					Id: b10
-				Cell: once
-				Cell: 1.112
-					Id: b12
-		Foot:
-			Row:
-				Cell: Total
-					Id: f1
-					Span: 1 2
-				Cell: 99
-					Id: f3
+	Section:
+		Table:
+			Id: t
+			Columns: 100 100 60
+			Column align: left left right
+			Head:
+				Row:
+					Cell: Concepto
+						Id: h1
+					Cell: Detalle
+					Cell: Total
+						Id: h3
+			Body:
+				Row:
+					Cell: Uno
+						Id: b1
+					Cell: dos
+					Cell: 1.234
+						Id: b3
+				Row:
+					Cell: Cuatro
+						Id: b4
+					Cell: cinco
+					Cell: 56
+						Id: b6
+				Row:
+					Cell: Siete
+						Id: b7
+					Cell: ocho
+					Cell: abc def
+						Id: b9
+				Row:
+					Cell: Diez
+						Id: b10
+					Cell: once
+					Cell: 1.112
+						Id: b12
+			Foot:
+				Row:
+					Cell: Total
+						Id: f1
+						Span: 1 2
+					Cell: 99
+						Id: f3

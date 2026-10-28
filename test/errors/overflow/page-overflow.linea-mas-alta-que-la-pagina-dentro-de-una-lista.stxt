@@ -1,6 +1,6 @@
 # Case: Línea más alta que la página dentro de una lista
 # Code: PAGE_OVERFLOW
-# Line: 22
+# Line: 23
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,11 +12,12 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	List:
-		Marker: decimal
-		Box:
-			Padding: 0 0 0 20
-		List item:
-			Text: a
-				Typography:
-					Line height: 900
+	Section:
+		List:
+			Marker: decimal
+			Box:
+				Padding: 0 0 0 20
+			List item:
+				Text: a
+					Typography:
+						Line height: 900

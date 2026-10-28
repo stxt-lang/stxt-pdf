@@ -114,25 +114,26 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Un título
-		Id: title
-		Typography:
-			Size: 20
-	Flex:
-		Id: body
-		Gap: 10
-		Item:
-			Grow: 1
-			Text:
-				Content >>
-					Primer párrafo.
+	Section:
+		Text: Un título
+			Id: title
+			Typography:
+				Size: 20
+		Flex:
+			Id: body
+			Gap: 10
+			Item:
+				Grow: 1
+				Text:
+					Content >>
+						Primer párrafo.
 
-					Segundo párrafo.
-		Item:
-			Block:
-				Box:
-					Width: 100
-					Background: #F1EFE8
+						Segundo párrafo.
+			Item:
+				Block:
+					Box:
+						Width: 100
+						Background: #F1EFE8
 ```
 
 **El orden importa.** STXT conserva el orden de los nodos, y el motor coloca los elementos en el
@@ -1743,29 +1744,30 @@ Document (dev.stxt.boxes):
 		Element: List
 			Box:
 				Padding: 0 0 0 20
-	Markdown:
-		Bullet: disc dash
-		Numbering: decimal
-		Table columns: equal
-		Code font: IBM Plex Mono
-		Content >>
-			# Resultados
+	Section:
+		Markdown:
+			Bullet: disc dash
+			Numbering: decimal
+			Table columns: equal
+			Code font: IBM Plex Mono
+			Content >>
+				# Resultados
 
-			Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
-			con ~~pérdidas~~ beneficios. El informe sale de `mvn test`.
+				Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
+				con ~~pérdidas~~ beneficios. El informe sale de `mvn test`.
 
-			- Ventas en alza
-			- Costes:
-			  - personal
-			  - material
+				- Ventas en alza
+				- Costes:
+				  - personal
+				  - material
 
-			1. Revisar
-			2. Aprobar
+				1. Revisar
+				2. Aprobar
 
-			| Región | Ventas |
-			|--------|-------:|
-			| Norte  | 120    |
-			| Sur    | **95** |
+				| Región | Ventas |
+				|--------|-------:|
+				| Norte  | 120    |
+				| Sur    | **95** |
 ```
 
 **El subconjunto.** El Markdown es [CommonMark](https://commonmark.org) con las tablas y el
@@ -1864,29 +1866,30 @@ Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
 		Margin: 40
-	Fixed:
-		Offset: -30 0 auto auto
-		Image: test/square.png
+	Section:
+		Fixed:
+			Offset: -30 0 auto auto
+			Image: test/square.png
+				Box:
+					Width: 20
+		Image: test/wide.png
+			Alt: Un paisaje con montañas y un sol
 			Box:
-				Width: 20
-	Image: test/wide.png
-		Alt: Un paisaje con montañas y un sol
-		Box:
-			Width: 100%
-			Margin: 0 0 10 0
-	Flex:
-		Gap: 10
-		Item:
-			Image: test/tall.jpg
-				Alt: Un retrato
-				Box:
-					Height: 60
-		Item:
-			Grow: 1
-			Image: test/wide.png
-				Fit: cover
-				Box:
-					Height: 60
+				Width: 100%
+				Margin: 0 0 10 0
+		Flex:
+			Gap: 10
+			Item:
+				Image: test/tall.jpg
+					Alt: Un retrato
+					Box:
+						Height: 60
+			Item:
+				Grow: 1
+				Image: test/wide.png
+					Fit: cover
+					Box:
+						Height: 60
 ```
 
 (El ejemplo usa las imágenes de prueba del repositorio, en `resources/images/test/`: un logotipo
@@ -2473,51 +2476,52 @@ Document (dev.stxt.boxes):
 				Line height: 24
 			Break:
 				After: avoid
-	Fixed:
-		Id: header
-		Offset: -30 0 auto 0
-		Typography:
-			Color: #5F5E5A
-		Text: Informe trimestral
-	Fixed:
-		Id: footer
-		Offset: auto 0 -30 0
-		Text: Página {page} de {pages}
+	Section:
+		Fixed:
+			Id: header
+			Offset: -30 0 auto 0
 			Typography:
-				Align: right
-	Text: Resultados del trimestre
-		Id: title
-	Grid:
-		Id: body
-		Columns: 150 1fr
-		Gap: 20
-		Area:
-			Text:
-				Id: side
-				Class: panel
-				Content >>
-					Resumen de las cifras clave
-					del trimestre.
-		Area:
-			Text:
-				Id: main
-				Content >>
-					Primer párrafo del informe. Los saltos de línea simples
-					dentro del bloque equivalen a espacios.
+				Color: #5F5E5A
+			Text: Informe trimestral
+		Fixed:
+			Id: footer
+			Offset: auto 0 -30 0
+			Text: Página {page} de {pages}
+				Typography:
+					Align: right
+		Text: Resultados del trimestre
+			Id: title
+		Grid:
+			Id: body
+			Columns: 150 1fr
+			Gap: 20
+			Area:
+				Text:
+					Id: side
+					Class: panel
+					Content >>
+						Resumen de las cifras clave
+						del trimestre.
+			Area:
+				Text:
+					Id: main
+					Content >>
+						Primer párrafo del informe. Los saltos de línea simples
+						dentro del bloque equivalen a espacios.
 
-					Una línea en blanco empieza un párrafo nuevo.
-	Absolute:
-		Id: stamp
-		Offset: 0 0 auto auto
-		Box:
-			Width: 80
-			Height: 30
-			Border: 1
-			Border color: #A32D2D
-		Layer: 1
-		Text: BORRADOR
-			Typography:
-				Align: center
+						Una línea en blanco empieza un párrafo nuevo.
+		Absolute:
+			Id: stamp
+			Offset: 0 0 auto auto
+			Box:
+				Width: 80
+				Height: 30
+				Border: 1
+				Border color: #A32D2D
+			Layer: 1
+			Text: BORRADOR
+				Typography:
+					Align: center
 ```
 
 **Cómo se maqueta:**

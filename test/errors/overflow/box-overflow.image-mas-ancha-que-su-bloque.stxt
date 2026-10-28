@@ -1,13 +1,14 @@
 # Case: Image más ancha que su bloque
 # Code: BOX_OVERFLOW
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Width: 100
-		Image: test/wide.png
+	Section:
+		Block:
+			Box:
+				Width: 100
+			Image: test/wide.png

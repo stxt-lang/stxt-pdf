@@ -1,13 +1,14 @@
 # Case: Margin auto sin ancho limitado
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Height: 10
-			Margin: 0 auto
+	Section:
+		Block:
+			Box:
+				Height: 10
+				Margin: 0 auto

@@ -13,5 +13,6 @@ Document (dev.stxt.boxes):
 				Height: 10
 			Break:
 				Before: page
-	Absolute:
-		Class: page
+	Section:
+		Absolute:
+			Class: page

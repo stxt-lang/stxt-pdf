@@ -1,6 +1,6 @@
 # Case: Cabecera y pie que no dejan sitio al cuerpo
 # Code: TABLE_REPEAT_OVERFLOW
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,18 +12,19 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr
-		Head:
-			Row:
-				Cell:
-					Box:
-						Height: 600
-		Body:
-			Row:
-				Cell: a
-		Foot:
-			Row:
-				Cell:
-					Box:
-						Height: 300
+	Section:
+		Table:
+			Columns: 1fr
+			Head:
+				Row:
+					Cell:
+						Box:
+							Height: 600
+			Body:
+				Row:
+					Cell: a
+			Foot:
+				Row:
+					Cell:
+						Box:
+							Height: 300

@@ -19,7 +19,7 @@ class MarkdownTest {
             + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static Box build(String... lines) {
-        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(HEADER + String.join("\n", lines)))).root();
+        return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(HEADER + String.join("\n", lines))))).sections().get(0).box();
     }
 
     @Test
@@ -61,7 +61,7 @@ class MarkdownTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tHeading 1:",
                 "\t\tText: Uno", "\tMarkdown:", "\t\tContent >>", "\t\t\t### Salto"));
         assertEquals(ErrorCode.HEADING_LEVEL, e.code());
-        assertEquals(16, e.line());
+        assertEquals(17, e.line());
     }
 
     @Test
@@ -79,11 +79,11 @@ class MarkdownTest {
 
     @Test
     void headingsCannotGoInAFixed() {
-        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tFixed:",
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tBlock:", "\tFixed:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
         assertEquals(ErrorCode.HEADING_IN_FIXED, e.code());
-        assertEquals(15, e.line());
-        assertDoesNotThrow(() -> build("\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
+        assertEquals(17, e.line());
+        assertDoesNotThrow(() -> build("\tBlock:", "\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }
 
     @Test

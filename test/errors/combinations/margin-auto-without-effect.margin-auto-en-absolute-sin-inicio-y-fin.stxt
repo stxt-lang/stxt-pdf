@@ -1,14 +1,15 @@
 # Case: Margin auto en absolute sin inicio y fin
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Absolute:
-		Box:
-			Width: 100
-			Height: 10
-			Margin: 0 auto
+	Section:
+		Absolute:
+			Box:
+				Width: 100
+				Height: 10
+				Margin: 0 auto

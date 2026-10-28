@@ -1,11 +1,12 @@
 # Case: Hueco entre filas en porcentaje sin alto
 # Code: INDEFINITE_PERCENTAGE
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Grid:
-		Gap: 5% 10
+	Section:
+		Grid:
+			Gap: 5% 10

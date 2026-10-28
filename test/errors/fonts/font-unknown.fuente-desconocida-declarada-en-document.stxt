@@ -12,5 +12,6 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: Helvetica
 				Size: 10
-	Block:
-		Text: hola
+	Section:
+		Block:
+			Text: hola

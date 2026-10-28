@@ -1,12 +1,13 @@
 # Case: Letter spacing en Box en lugar de en Typography
 # Code: CHILD_NOT_DECLARED
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Letter spacing: 1
+	Section:
+		Block:
+			Box:
+				Letter spacing: 1

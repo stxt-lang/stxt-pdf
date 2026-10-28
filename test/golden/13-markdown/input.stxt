@@ -29,51 +29,52 @@ Document (dev.stxt.boxes):
 		Element: List
 			Box:
 				Padding: 0 0 0 20
-	Fixed:
-		Id: foot
-		Offset: auto 0 -30 0
+	Section:
+		Fixed:
+			Id: foot
+			Offset: auto 0 -30 0
+			Markdown:
+				Content >>
+					Página **{page}** de {pages}
 		Markdown:
+			Id: intro
 			Content >>
-				Página **{page}** de {pages}
-	Markdown:
-		Id: intro
-		Content >>
-			# Informe trimestral
+				# Informe trimestral
 
-			Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
-			con ~~pérdidas~~ beneficios.
-	Markdown:
-		Id: points
-		Bullet: disc dash
-		Numbering: decimal
-		Content >>
-			## Puntos clave
+				Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
+				con ~~pérdidas~~ beneficios.
+		Markdown:
+			Id: points
+			Bullet: disc dash
+			Numbering: decimal
+			Content >>
+				## Puntos clave
 
-			- Ventas en alza
-			- Costes:
-			  - personal
-			  - material
+				- Ventas en alza
+				- Costes:
+				  - personal
+				  - material
 
-			1. Revisar
-			2. Aprobar
-	Markdown:
-		Id: table
-		Table columns: equal
-		Content >>
-			| Región | Ventas |
-			|--------|-------:|
-			| Norte  | 120    |
-			| Sur    | **95** |
-			| Este   | ~~80~~ 85 |
-	Markdown:
-		Id: long
-		Content >>
-			**informe** balance *factura* cliente ++archivo++ partida ~~importe~~ resumen detalle ingreso
-			informe balance factura cliente archivo partida importe resumen detalle ingreso
-			informe balance factura cliente archivo partida importe resumen detalle ingreso
-			informe balance factura cliente archivo partida importe resumen detalle ingreso
-			informe balance factura cliente archivo partida importe resumen detalle ingreso
-			informe balance factura cliente archivo partida importe resumen detalle ingreso
-			**informe**
-	Paragraph: Fin.
-		Id: after
+				1. Revisar
+				2. Aprobar
+		Markdown:
+			Id: table
+			Table columns: equal
+			Content >>
+				| Región | Ventas |
+				|--------|-------:|
+				| Norte  | 120    |
+				| Sur    | **95** |
+				| Este   | ~~80~~ 85 |
+		Markdown:
+			Id: long
+			Content >>
+				**informe** balance *factura* cliente ++archivo++ partida ~~importe~~ resumen detalle ingreso
+				informe balance factura cliente archivo partida importe resumen detalle ingreso
+				informe balance factura cliente archivo partida importe resumen detalle ingreso
+				informe balance factura cliente archivo partida importe resumen detalle ingreso
+				informe balance factura cliente archivo partida importe resumen detalle ingreso
+				informe balance factura cliente archivo partida importe resumen detalle ingreso
+				**informe**
+		Paragraph: Fin.
+			Id: after

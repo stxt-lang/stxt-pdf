@@ -1,12 +1,13 @@
 # Case: Texto de un ítem sin Font
 # Code: TEXT_WITHOUT_FONT
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Flex:
-		Item:
-			Text: hola
+	Section:
+		Flex:
+			Item:
+				Text: hola

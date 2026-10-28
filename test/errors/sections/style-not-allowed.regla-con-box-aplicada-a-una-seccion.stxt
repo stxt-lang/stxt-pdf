@@ -1,0 +1,20 @@
+# Case: Regla con Box aplicada a una Section
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For class: anexo
+			Box:
+				Padding: 5
+	Section:
+		Class: anexo
+		Text: Hola

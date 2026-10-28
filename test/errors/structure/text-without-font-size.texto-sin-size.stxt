@@ -1,6 +1,6 @@
 # Case: Texto sin Size
 # Code: TEXT_WITHOUT_FONT_SIZE
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -11,4 +11,5 @@ Document (dev.stxt.boxes):
 		Element: Document
 			Typography:
 				Font: IBM Plex Sans
-	Text: hola
+	Section:
+		Text: hola

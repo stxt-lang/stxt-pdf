@@ -19,70 +19,71 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
-		Id: header
-		Offset: -15 0 auto 0
-		Box:
-			Height: 10
-		Typography:
-			Size: 8
-		Text: Cabecera
-	Fixed:
-		Id: footer
-		Offset: auto 0 -15 0
-		Box:
-			Height: 10
-		Typography:
-			Size: 8
-			Align: right
-		Text: Pie
-	Block:
-		Id: intro
-		Box:
-			Height: 100
-	Text: Título
-		Id: title
-		Box:
-			Height: 20
-			Margin: 10 0 10 0
-		Break:
-			After: avoid
-	Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
-		Id: text
-		Box:
-			Width: 30
-	Grid:
-		Id: grid
-		Break:
-			Before: page
-		Columns: 1fr 1fr
-		Gap: 10
-		Area:
-			Block:
-				Id: g1
-				Box:
-					Height: 50
-		Area:
-			Block:
-				Id: g2
-				Box:
-					Height: 50
-		Area:
-			Block:
-				Id: g3
-				Box:
-					Height: 50
-		Area:
-			Block:
-				Id: g4
-				Box:
-					Height: 50
-		Area:
-			Block:
-				Id: g5
-				Box:
-					Height: 50
-	Block:
-		Id: end
-		Box:
-			Height: 10
+	Section:
+		Fixed:
+			Id: header
+			Offset: -15 0 auto 0
+			Box:
+				Height: 10
+			Typography:
+				Size: 8
+			Text: Cabecera
+		Fixed:
+			Id: footer
+			Offset: auto 0 -15 0
+			Box:
+				Height: 10
+			Typography:
+				Size: 8
+				Align: right
+			Text: Pie
+		Block:
+			Id: intro
+			Box:
+				Height: 100
+		Text: Título
+			Id: title
+			Box:
+				Height: 20
+				Margin: 10 0 10 0
+			Break:
+				After: avoid
+		Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
+			Id: text
+			Box:
+				Width: 30
+		Grid:
+			Id: grid
+			Break:
+				Before: page
+			Columns: 1fr 1fr
+			Gap: 10
+			Area:
+				Block:
+					Id: g1
+					Box:
+						Height: 50
+			Area:
+				Block:
+					Id: g2
+					Box:
+						Height: 50
+			Area:
+				Block:
+					Id: g3
+					Box:
+						Height: 50
+			Area:
+				Block:
+					Id: g4
+					Box:
+						Height: 50
+			Area:
+				Block:
+					Id: g5
+					Box:
+						Height: 50
+		Block:
+			Id: end
+			Box:
+				Height: 10

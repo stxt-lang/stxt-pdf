@@ -1,6 +1,6 @@
 # Case: Cell con texto en el valor y elementos
 # Code: CELL_CONTENT
-# Line: 20
+# Line: 21
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,10 +12,11 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Body:
-			Row:
-				Cell: a
-					Paragraph: b
-				Cell: c
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Body:
+				Row:
+					Cell: a
+						Paragraph: b
+					Cell: c

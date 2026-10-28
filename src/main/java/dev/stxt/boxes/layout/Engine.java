@@ -103,9 +103,9 @@ public final class Engine {
         measurer.validate(tree.root());
         images.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
-        List<Page> pages = new Paginator(this).paginate(tree.root(), tree.media());
-        Overflow.check(pages, tree.media());
-        return new LaidOutDocument(tree.media(), tree.metadata(), pages);
+        List<Page> pages = new Paginator(this).paginate(tree);
+        Overflow.check(pages);
+        return new LaidOutDocument(tree.media(), tree.metadata(), tree.root(), pages);
     }
 
     /**

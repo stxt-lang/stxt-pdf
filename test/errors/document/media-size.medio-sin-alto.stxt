@@ -6,6 +6,7 @@ Document (dev.stxt.boxes):
 	Title: Prueba
 	Media:
 		Width: 595
-	Block:
-		Box:
-			Height: 10
+	Section:
+		Block:
+			Box:
+				Height: 10

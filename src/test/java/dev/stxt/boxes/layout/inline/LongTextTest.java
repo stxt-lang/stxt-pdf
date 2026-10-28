@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.model.FontFace;
@@ -65,7 +66,7 @@ class LongTextTest {
     }
 
     private static Run run(TextMeasurer metrics, int paragraphs, String wrap) {
-        var doc = READER.read(document(paragraphs, wrap));
+        var doc = READER.read(Docs.sectioned(document(paragraphs, wrap)));
         Counting counting = new Counting(metrics);
         long start = System.nanoTime();
         LaidOutDocument laidOut = new Engine(counting).layOutDocument(doc);

@@ -27,70 +27,71 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Absolute:
-		Id: tag
-		Offset: 20 0 auto auto
-		Rotate: 45
-		Box:
-			Width: 80
-			Height: 20
-			Padding: 4 0
-			Background: #C0392B
-		Text: Novedad
-			Typography:
-				Weight: bold
-				Align: center
-				Color: #FFFFFF
-	Block:
-		Id: intro
-		Box:
-			Height: 150
-			Padding: 12 110 12 12
-			Background: #F2EFE8
-		Text: Una caja girada ocupa su sitio sin girar: el sello de abajo no mueve el bloque que lo sigue.
-	Relative:
-		Id: stamp
-		Rotate: -8
-		Box:
-			Width: 120
-			Height: 60
-			Border: 2
-			Border color: #C0392B
-			Padding: 21 12
-			Radius: 4
-		Text: Aprobado
-			Typography:
-				Weight: bold
-				Align: center
-				Color: #C0392B
-				Transform: uppercase
-	Relative:
-		Id: big
-		Rotate: 180
-		Block:
-			Id: b1
+	Section:
+		Absolute:
+			Id: tag
+			Offset: 20 0 auto auto
+			Rotate: 45
 			Box:
-				Height: 40
-				Background: #D6E4F0
-			Text: Primera parte (girada 180 grados)
+				Width: 80
+				Height: 20
+				Padding: 4 0
+				Background: #C0392B
+			Text: Novedad
+				Typography:
+					Weight: bold
+					Align: center
+					Color: #FFFFFF
 		Block:
-			Id: b2
+			Id: intro
 			Box:
-				Height: 50
-				Background: #A9C6E0
-			Text: Segunda parte
-	Image: test/square.png
-		Id: badge
-		Rotate: 45
-	Fixed:
-		Id: side
-		Offset: 229 auto auto -17
-		Rotate: -90
-		Rotate origin: top left
-		Box:
-			Width: 200
-			Height: 14
-		Text: Certificado n.º 2026-0147
-			Typography:
-				Size: 8
-				Color: #7F8C8D
+				Height: 150
+				Padding: 12 110 12 12
+				Background: #F2EFE8
+			Text: Una caja girada ocupa su sitio sin girar: el sello de abajo no mueve el bloque que lo sigue.
+		Relative:
+			Id: stamp
+			Rotate: -8
+			Box:
+				Width: 120
+				Height: 60
+				Border: 2
+				Border color: #C0392B
+				Padding: 21 12
+				Radius: 4
+			Text: Aprobado
+				Typography:
+					Weight: bold
+					Align: center
+					Color: #C0392B
+					Transform: uppercase
+		Relative:
+			Id: big
+			Rotate: 180
+			Block:
+				Id: b1
+				Box:
+					Height: 40
+					Background: #D6E4F0
+				Text: Primera parte (girada 180 grados)
+			Block:
+				Id: b2
+				Box:
+					Height: 50
+					Background: #A9C6E0
+				Text: Segunda parte
+		Image: test/square.png
+			Id: badge
+			Rotate: 45
+		Fixed:
+			Id: side
+			Offset: 229 auto auto -17
+			Rotate: -90
+			Rotate origin: top left
+			Box:
+				Width: 200
+				Height: 14
+			Text: Certificado n.º 2026-0147
+				Typography:
+					Size: 8
+					Color: #7F8C8D

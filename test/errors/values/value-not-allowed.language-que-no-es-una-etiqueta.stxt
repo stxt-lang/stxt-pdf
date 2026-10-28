@@ -1,6 +1,6 @@
 # Case: Language de Typography que no es una etiqueta de idioma BCP 47
 # Code: VALUE_NOT_ALLOWED
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Hola
-		Typography:
-			Language: español
+	Section:
+		Text: Hola
+			Typography:
+				Language: español

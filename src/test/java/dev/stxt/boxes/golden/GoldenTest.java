@@ -62,7 +62,7 @@ class GoldenTest {
                 LaidOutDocument document = new Engine().layOutDocument(input, styles);
                 writeSvg(name, document);
                 writePdfAndImages(SOURCE_DIR.resolve(name), input, styles);
-                String dump = StxtDump.dump(document.pages(), document.media().pageArea(), false);
+                String dump = StxtDump.dump(document.pages(), false);
                 ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
             }));
         }

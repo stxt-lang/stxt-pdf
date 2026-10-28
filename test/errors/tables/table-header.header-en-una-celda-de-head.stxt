@@ -1,6 +1,6 @@
 # Case: Header en una celda de Head, que ya es cabecera de columna
 # Code: TABLE_HEADER
-# Line: 20
+# Line: 21
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,14 +12,15 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 100 100
-		Head:
-			Row:
-				Cell: Concepto
-					Header: true
-				Cell: Importe
-		Body:
-			Row:
-				Cell: Mesa
-				Cell: 120
+	Section:
+		Table:
+			Columns: 100 100
+			Head:
+				Row:
+					Cell: Concepto
+						Header: true
+					Cell: Importe
+			Body:
+				Row:
+					Cell: Mesa
+					Cell: 120

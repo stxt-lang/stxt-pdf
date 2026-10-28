@@ -1,0 +1,14 @@
+# Case: Documento sin ninguna sección
+# Code: TOO_FEW_CHILDREN
+# Line: 4
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10

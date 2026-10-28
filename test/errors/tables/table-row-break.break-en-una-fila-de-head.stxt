@@ -1,6 +1,6 @@
 # Case: Break en una fila de Head
 # Code: TABLE_ROW_BREAK
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,15 +12,16 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Table:
-		Columns: 1fr 1fr
-		Head:
-			Row:
-				Break:
-					After: avoid
-				Cell: a
-				Cell: b
-		Body:
-			Row:
-				Cell: c
-				Cell: d
+	Section:
+		Table:
+			Columns: 1fr 1fr
+			Head:
+				Row:
+					Break:
+						After: avoid
+					Cell: a
+					Cell: b
+			Body:
+				Row:
+					Cell: c
+					Cell: d

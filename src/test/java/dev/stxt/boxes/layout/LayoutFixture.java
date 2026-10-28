@@ -79,7 +79,7 @@ public final class LayoutFixture {
 
     private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
-        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.mergeStyles(doc)), runs)).pages());
+        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)).pages());
     }
 
     public int pages() {

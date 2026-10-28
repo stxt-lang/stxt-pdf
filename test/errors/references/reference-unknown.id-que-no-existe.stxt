@@ -1,6 +1,6 @@
 # Case: Referencia a un Id que no existe
 # Code: REFERENCE_UNKNOWN
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
@@ -12,8 +12,9 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Text: Ver la página {page of: nada}
-	Block:
-		Id: algo
-		Box:
-			Height: 10
+	Section:
+		Text: Ver la página {page of: nada}
+		Block:
+			Id: algo
+			Box:
+				Height: 10

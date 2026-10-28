@@ -1,24 +1,25 @@
 # Case: Columna fija sin hueco con Flow column
 # Code: GRID_PLACEMENT
-# Line: 21
+# Line: 22
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Grid:
-		Flow: column
-		Rows: 10 10
-		Area: 1 1
-			Block:
-				Box:
-					Height: 10
-		Area: 2 1
-			Block:
-				Box:
-					Height: 10
-		Area: auto 1
-			Block:
-				Box:
-					Height: 10
+	Section:
+		Grid:
+			Flow: column
+			Rows: 10 10
+			Area: 1 1
+				Block:
+					Box:
+						Height: 10
+			Area: 2 1
+				Block:
+					Box:
+						Height: 10
+			Area: auto 1
+				Block:
+					Box:
+						Height: 10

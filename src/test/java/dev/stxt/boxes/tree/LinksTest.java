@@ -24,7 +24,7 @@ class LinksTest {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tLanguage: es", "\tTitle: Prueba", "\tMedia:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
         lines.addAll(List.of(body));
-        return new BoxTreeBuilder().build(READER.read(Docs.mergeStyles(String.join("\n", lines)))).root();
+        return new BoxTreeBuilder().build(READER.read(Docs.sectioned(Docs.mergeStyles(String.join("\n", lines))))).sections().get(0).box();
     }
 
     private static InvalidModelException error(String... body) {
@@ -37,7 +37,7 @@ class LinksTest {
                 "\t\t\tLink: mailto:a@b.c");
         Box block = root.children.get(0);
         assertEquals("https://stxt.dev", block.style.link);
-        assertEquals(13, block.style.line("link"));
+        assertEquals(14, block.style.line("link"));
         // Lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva enlace propio.
         assertNull(block.children.get(0).style.link);
         assertEquals("mailto:a@b.c", block.children.get(1).style.link);
@@ -68,7 +68,7 @@ class LinksTest {
     void linkCanBeNeitherEmptyNorOutsideTheAllowedSchemes() {
         InvalidModelException scheme = error("\tText: a", "\t\tLink: javascript:alert(1)");
         assertEquals(ErrorCode.LINK_SCHEME, scheme.code());
-        assertEquals(13, scheme.line());
+        assertEquals(14, scheme.line());
         assertEquals(ErrorCode.LINK_SCHEME, error("\tText: a", "\t\tLink: docs/a.pdf").code());
         assertEquals(ErrorCode.LINK_SCHEME, error("\tText: a", "\t\tLink: #").code());
     }
@@ -78,7 +78,7 @@ class LinksTest {
         InvalidModelException unknown = error("\tText: a", "\t\tLink: #nada");
         assertEquals(ErrorCode.LINK_UNKNOWN, unknown.code());
         // La línea del Link, no la de su caja.
-        assertEquals(13, unknown.line());
+        assertEquals(14, unknown.line());
         InvalidModelException fixed = error("\tFixed:", "\t\tText: cabecera", "\t\t\tId: cabecera",
                 "\tText: a", "\t\tLink: #cabecera");
         assertEquals(ErrorCode.LINK_UNKNOWN, fixed.code());
@@ -96,14 +96,14 @@ class LinksTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LinkTargets.validate(root));
         assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
         // Sin una línea propia para el tramo, la del texto.
-        assertEquals(12, e.line());
+        assertEquals(13, e.line());
     }
 
     @Test
     void markdownLinksAreCheckedWithTheLineOfTheirBlock() {
         InvalidModelException e = error("\tMarkdown:", "\t\tContent >>", "\t\t\tUn párrafo.", "", "\t\t\tVéase [el anexo](#anexo).");
         assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
-        assertEquals(16, e.line());
+        assertEquals(17, e.line());
     }
 
     @Test

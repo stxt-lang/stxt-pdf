@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.model.FontFace;
@@ -125,7 +126,7 @@ class StackingContextTest {
     private static Recorder recordSmallPage(int index, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
                 + String.join("\n", boxLines);
-        Page page = new Engine().layOutDocument(READER.read(doc)).pages().get(index);
+        Page page = new Engine().layOutDocument(READER.read(Docs.sectioned(doc))).pages().get(index);
         Recorder canvas = new Recorder();
         StackingContext.build(page.content(), page.fixed(), 10, 10).paint(canvas);
         return canvas;
@@ -142,7 +143,7 @@ class StackingContextTest {
     private static Recorder record(Map<String, List<dev.stxt.boxes.model.TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
-        Page page = new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages().get(0);
+        Page page = new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(doc)), runs)).pages().get(0);
         Recorder canvas = new Recorder();
         StackingContext.build(page.content(), page.fixed(), 40, 40).paint(canvas);
         return canvas;

@@ -25,63 +25,64 @@ Document (dev.stxt.boxes):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
-		Offset: -16 0 auto auto
-		Image: test/square.png
-			Id: logo
+	Section:
+		Fixed:
+			Offset: -16 0 auto auto
+			Image: test/square.png
+				Id: logo
+				Box:
+					Width: 12
+		Text: Imágenes
+			Id: title
 			Box:
-				Width: 12
-	Text: Imágenes
-		Id: title
-		Box:
-			Margin: 0 0 8 0
-	Image: test/wide.png
-		Id: hero
-		Alt: Un paisaje con montañas y un sol
-		Box:
-			Width: 100%
-			Margin: 0 0 8 0
-	Flex:
-		Id: row
-		Gap: 10
-		Box:
-			Margin: 0 0 8 0
-		Item:
-			Image: test/tall.jpg
-				Id: portrait
-				Alt: Un retrato
-				Box:
-					Height: 60
-		Item:
-			Grow: 1
-			Text: Una foto en un flex: su ancho sale de su alto y de la proporción del fichero.
-				Id: caption
-	Image: test/tall.jpg
-		Id: moved
-		Box:
-			Width: 60
-			Margin: 0 0 8 0
-	Grid:
-		Id: fits
-		Columns: 1fr 1fr
-		Gap: 10
-		Box:
-			Margin: 0 0 8 0
-		Area:
-			Image: test/wide.png
-				Id: contain
-				Box:
-					Height: 50
-					Background: #E6E6E6
-		Area:
-			Image: test/wide.png
-				Id: cover
-				Fit: cover
-				Box:
-					Height: 50
-	Markdown:
-		Id: md
-		Content >>
-			![Logotipo](test/square.png)
+				Margin: 0 0 8 0
+		Image: test/wide.png
+			Id: hero
+			Alt: Un paisaje con montañas y un sol
+			Box:
+				Width: 100%
+				Margin: 0 0 8 0
+		Flex:
+			Id: row
+			Gap: 10
+			Box:
+				Margin: 0 0 8 0
+			Item:
+				Image: test/tall.jpg
+					Id: portrait
+					Alt: Un retrato
+					Box:
+						Height: 60
+			Item:
+				Grow: 1
+				Text: Una foto en un flex: su ancho sale de su alto y de la proporción del fichero.
+					Id: caption
+		Image: test/tall.jpg
+			Id: moved
+			Box:
+				Width: 60
+				Margin: 0 0 8 0
+		Grid:
+			Id: fits
+			Columns: 1fr 1fr
+			Gap: 10
+			Box:
+				Margin: 0 0 8 0
+			Area:
+				Image: test/wide.png
+					Id: contain
+					Box:
+						Height: 50
+						Background: #E6E6E6
+			Area:
+				Image: test/wide.png
+					Id: cover
+					Fit: cover
+					Box:
+						Height: 50
+		Markdown:
+			Id: md
+			Content >>
+				![Logotipo](test/square.png)
 
-			Texto después de la imagen.
+				Texto después de la imagen.

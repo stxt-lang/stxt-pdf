@@ -1,12 +1,13 @@
 # Case: Transform con un valor que no existe
 # Code: INVALID_VALUE
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Typography:
-			Transform: shout
+	Section:
+		Block:
+			Typography:
+				Transform: shout

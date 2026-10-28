@@ -1,12 +1,13 @@
 # Case: Radius no admite auto
 # Code: VALUE_NOT_ALLOWED
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
 	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
-	Block:
-		Box:
-			Radius: auto
+	Section:
+		Block:
+			Box:
+				Radius: auto
