@@ -351,7 +351,12 @@ public final class StackingContext {
         paintDecorations(canvas, p, content, metrics, true);
         boolean open = false;
         String current = null;
-        for (TextLine l : p.f().lines()) {
+        List<TextLine> lines = p.f().lines();
+        for (int n = 0; n < lines.size(); n++) {
+            TextLine l = lines.get(n);
+            // El corte de línea se come el espacio: se escribe invisible tras la última palabra, para que quien
+            // une el texto de las líneas (lector de pantalla, extracción, búsqueda) no pegue las palabras.
+            boolean spaceAfter = n < lines.size() - 1 && s.whiteSpace == Style.WhiteSpace.NORMAL;
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {
@@ -372,7 +377,8 @@ public final class StackingContext {
                 if (link != null && (i == 0 || !link.equals(runs.get(i - 1).format().link()))) {
                     paintLinkZone(canvas, box, content, l, i, link);
                 }
-                canvas.text(content.x() + l.x() + r.x(), baseline, r.text(), r.format().face(font),
+                String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
+                canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
                         s.fontSize * r.format().scale(), s.color, l.wordSpacing(), s.letterSpacing);
             }
         }

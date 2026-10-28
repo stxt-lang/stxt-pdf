@@ -278,7 +278,31 @@ class StackingContextTest {
                 "https://a.example " + new Rect(40, 64, 20, 12) + " cccc",
                 "https://a.example " + new Rect(40, 76, 20, 12) + " dddd"), r.links);
         // Pero es un solo contenido: una secuencia de enlace para las cuatro líneas.
-        assertEquals(List.of("[enlace", "'aaaa'", "'bbbb'", "'cccc'", "'dddd'", "]"), r.sequences);
+        assertEquals(List.of("[enlace", "'aaaa '", "'bbbb '", "'cccc '", "'dddd'", "]"), r.sequences);
+    }
+
+    /**
+     * Las líneas que no son la última del fragmento llevan un espacio invisible tras la última palabra (el corte
+     * se lo come), para que el texto de las líneas unido no pegue palabras; la última y el texto preformateado,
+     * no (§5.4).
+     */
+    @Test
+    void aWrappedLineEndsWithASpaceExceptTheLastAndPreformatted() {
+        String[] head = {"\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
+                "\t\t\t\tSize: 10", "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30"};
+        Recorder normal = record(concat(head, "\t\tText: aaaa bbbb cccc"));
+        assertEquals(List.of("[texto", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
+        Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tWhite space: pre-wrap"));
+        assertEquals(List.of("[texto", "'aaaa'", "]"), pre.sequences);
+        Recorder preWrapped = record(concat(head, "\t\tText: aaaa bbbb", "\t\t\tTypography:",
+                "\t\t\t\tWhite space: pre-wrap"));
+        assertEquals(List.of("[texto", "'aaaa'", "'bbbb'", "]"), preWrapped.sequences);
+    }
+
+    private static String[] concat(String[] a, String... b) {
+        String[] out = java.util.Arrays.copyOf(a, a.length + b.length);
+        System.arraycopy(b, 0, out, a.length, b.length);
+        return out;
     }
 
     /** El texto propio de una caja con {@code Link} va antes que su zona (el {@code Link} lo envuelve). */

@@ -51,8 +51,8 @@ import java.util.Set;
  *
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
  * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P}
- * para {@code Paragraph}, {@code Span} para {@code Text}, {@code L} y {@code LI} para las listas
- * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
+ * para {@code Paragraph} y para {@code Text} ({@code Span} si es parte del texto de un encabezado),
+ * {@code L} y {@code LI} para las listas y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
  * {@code Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y
  * {@code TD} para las tablas (§5.15), {@code Figure} para las imágenes con {@code Alt} (con su
  * texto alternativo y su {@code BBox}, §5.18) y {@code Div} para el resto, también un {@code Multicol}
@@ -339,7 +339,8 @@ final class PdfStructure {
         }
         return switch (box.element) {
             case PARAGRAPH -> "P";
-            case TEXT -> "Span";
+            // Un Text es un bloque de texto, un párrafo; dentro de un encabezado es parte de su texto.
+            case TEXT -> box.parent != null && box.parent.headingLevel() > 0 ? "Span" : "P";
             case LIST -> "L";
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";

@@ -253,7 +253,7 @@ class PdfCanvasTest {
             PDStructureElement second = (PDStructureElement) list.getKids().get(1);
             assertEquals(List.of("Lbl", "LBody"), types(second));
             PDStructureElement body = (PDStructureElement) second.getKids().get(1);
-            assertEquals(List.of("Span", "L"), types(body));
+            assertEquals(List.of("P", "L"), types(body));
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("1."), text);
             assertTrue(text.contains("2."), text);
@@ -373,8 +373,8 @@ class PdfCanvasTest {
 
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
             PDStructureElement document = (PDStructureElement) tree.getKids().get(0);
-            assertEquals(List.of("Span", "Link", "Div", "Link"), types(document));
-            // La caja con Link: Span → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
+            assertEquals(List.of("P", "Link", "Div", "Link"), types(document));
+            // La caja con Link: P → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
             PDStructureElement span = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(span));
             PDStructureElement link = (PDStructureElement) span.getKids().get(0);
@@ -430,7 +430,7 @@ class PdfCanvasTest {
 
     /**
      * Una caja con {@code Link} que contiene otras (un bloque con dos textos) las envuelve en su
-     * {@code Link}: {@code Div → Link → [Span, Span, OBJR]}; sin nada que leer dentro, el {@code Link}
+     * {@code Link}: {@code Div → Link → [P, P, OBJR]}; sin nada que leer dentro, el {@code Link}
      * lleva su texto como {@code Alt}.
      */
     @Test
@@ -445,7 +445,7 @@ class PdfCanvasTest {
             PDStructureElement full = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(full));
             PDStructureElement link = (PDStructureElement) full.getKids().get(0);
-            assertEquals(List.of("Span", "Span", "OBJR"), shape(link));
+            assertEquals(List.of("P", "P", "OBJR"), shape(link));
             assertNull(link.getAlternateDescription());
             PDStructureElement empty = (PDStructureElement) document.getKids().get(1);
             PDStructureElement emptyLink = (PDStructureElement) empty.getKids().get(0);
