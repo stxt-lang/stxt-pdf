@@ -18,13 +18,13 @@ Result:
 			Rect: 54 796 487 20
 	Page: 2
 		Fragment: installation
-			Rect: 54 64 487 645.3
+			Rect: 54 64 487 654.3
 			Fragment: wiring
 				Rect: 54 64 487 194.8
 			Fragment: terminal
-				Rect: 54 403.3 487 89
+				Rect: 54 403.3 487 98
 			Fragment: terminals
-				Rect: 54 584.3 487 125
+				Rect: 54 593.3 487 125
 		Fragment: header
 			Rect: 54 30 487 14.5
 		Fragment: footer

@@ -35,9 +35,13 @@
 
 ## Huecos del motor detectados al escribir los ejemplos (hito 21)
 
-- **Texto preformateado**: los espacios se colapsan y Markdown no admite código, así que un
-  bloque de terminal con columnas alineadas (ejemplo 08) usa un grid. Un `Text` con
-  `White space: pre` (o un `Preformatted`) en monoespaciada lo resolvería.
+- ~~**Texto preformateado**~~ (hito 29: `White space: pre` y `pre-wrap`, `Tab size`, y `Code font` en
+  `Markdown`). Queda que un bloque de código de Markdown no se puede estilar aparte (es un `Text`, que
+  alcanza `Element: Text` pero también el `Text` de cada encabezado): haría falta un elemento
+  generado que las reglas `Element` nombren (`Code block`), como las entradas de un `Contents`; que el
+  código en línea no está en un texto con `Inline: markdown` (no hay `Code font` fuera de `Markdown`, y
+  podría ser una propiedad de `Typography`); que `justify` no se aplica a `pre-wrap`; y que el código
+  en línea usa la altura de línea de la caja, no la de su fuente.
 - ~~**Referencias a páginas e índice automático**~~ (hito 22: `{page of: id}`, `{number of: id}`
   y `Contents`).
 - **Excluir un encabezado del índice**: un `Contents` lista todos los encabezados de sus niveles,

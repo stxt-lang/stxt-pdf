@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 27 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 27 y el 29 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -82,8 +82,10 @@ actualízala.
 
 | 27 | ~~Mayúsculas, interletraje y versalitas: `Transform`, `Letter spacing` y `Small caps` en `Typography` (se heredan); `Language` obligatorio~~ (hecho; caso 20) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/TextTransform`, `layout/inline/LineBreaker`, `model/TextFormat`, `paint/PdfCanvas`, `paint/PdfStructure` |
 
-Los hitos 28 a 31 (aspecto
-de las cajas, preformateado, rotación y SVG) están pendientes en
+| 29 | ~~Texto preformateado y código: `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography` (se heredan); `Code font` en `Markdown` para el código en línea y los bloques de código~~ (hecho; caso 22) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/PreformattedText`, `layout/inline/InlineLayout`, `layout/Overflow`, `tree/MarkdownBuilder`, `model/TextFormat`, `layout/inline/PdfMetrics` |
+
+Los hitos 28, 30 y 31 (aspecto
+de las cajas, rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -347,6 +349,15 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `Canvas.text`; `PdfCanvas.spaced` lo escribe con ajustes de `TJ`. `PdfStructure` da `ActualText`
   (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva
   `{page}` ni referencias.
+- **Texto preformateado (§4.4, §5.4):** `White space` (`Style.WhiteSpace`: `normal`, `pre`, `pre-wrap`) y
+  `Tab size` (columnas de una tabulación, 4 por defecto) son propiedades de `Typography` (se heredan y
+  valen en `Styles`). Con `pre` o `pre-wrap`, `InlineLayout` no usa `LineBreaker.breakParagraphs` sino
+  `PreformattedText`: cada línea del texto (con las tabulaciones ya llevadas a la siguiente columna
+  múltiplo de `Tab size`) es una línea de la caja, también las vacías; **todo el texto es un solo
+  párrafo** (las viudas y huérfanas cuentan sobre el bloque) y las líneas **no se justifican**.
+  `pre` no parte las líneas (`Overflow` da `TEXT_OVERFLOW` con un mensaje propio) y `pre-wrap` las parte
+  entre palabras, perdiendo los espacios del corte. Los tamaños intrínsecos también los da
+  `PreformattedText`. Una línea vacía no tiene tramos (`LineBreaker.place` no le resta interletraje).
 - **Markdown (§5.17):** `MarkdownBuilder` parsea el `Content` con commonmark-java y lo traduce
   a nodos STXT (`InlineNode` con la línea de su bloque: `Heading N` con un `Text`, `Paragraph`,
   `List` con `Marker` de `Bullet`/`Numbering`, `Table` con `Columns` de `Table columns`), que
@@ -355,7 +366,11 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   con `element(...)` como hijos de la caja del `Markdown` (un bloque, `Element.MARKDOWN`), y el
   texto de cada uno recibe sus tramos. Lo que no está en el subconjunto es
   `MARKDOWN_UNSUPPORTED`: amplíalo solo traduciendo a elementos que ya existen. Una imagen
-  sola en su párrafo (`![Alt](ruta)`) es una `Image`.
+  sola en su párrafo (`![Alt](ruta)`) es una `Image`. El código necesita `Code font` en el `Markdown`
+  (`MARKDOWN_PROPERTY_MISSING` si falta): el código en línea es un tramo con `TextFormat.family` (la
+  familia de la caja si es `null`) y un bloque de código, un `Text` con `White space: pre`, la
+  fuente de `Code font` y el código en un `Content` (sin `Id` ni `Class`: solo lo alcanza `Element: Text`).
+  Un texto con `Inline: markdown` no tiene `Code font`, así que su código sigue sin admitirse.
 - **Imágenes (§5.18):** `Image` es una caja sin hijos (`Element.IMAGE`, `Layout.IMAGE`) con la
   ruta, relativa a `images/`, en `Box.image`, y `Alt` y `Fit` en `Style`. `tree` no lee
   ficheros: `Engine` tiene las imágenes de una carpeta de recursos (`layout/image/Images`, la

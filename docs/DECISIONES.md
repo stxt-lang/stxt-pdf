@@ -1227,3 +1227,11 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
 214. **La etiqueta de lenguaje de las vallas es un error** (```` ```java ````): no hay resaltado y no
      tendría efecto, como el título de un enlace o de una imagen. *Dónde:* `MarkdownBuilder.codeBlock`
      (`MARKDOWN_UNSUPPORTED`). *Alternativa:* ignorarla.
+
+215. **Ejemplos** (hito 29): el IBAN y el BIC de la factura (01) son código en línea de un `Markdown` con
+     `Code font` (el IBAN, en negrita: `**`…`**`), y el terminal del manual (08) es un solo `Text` con
+     `White space: pre` en lugar de un `Grid` de doce `Area`; el borne `N` de un párrafo del manual es
+     código en línea. El volcado de la factura no cambia y el del manual solo cambia en el alto del
+     terminal (de 89 a 98 pt: la línea en blanco bajo el título mide 13 pt y el margen de antes, 4). Los
+     valores de la tabla de especificaciones del manual siguen con `Class: mono`: una tabla de
+     Markdown no admite columnas de ancho fijo.

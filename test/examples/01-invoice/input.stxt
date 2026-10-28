@@ -1,7 +1,8 @@
 # Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
 # una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
-# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido. Dos textos llevan
-# Inline: markdown para poner una negrita dentro de la frase. Los rótulos se escriben como una frase
+# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido. Un texto lleva
+# Inline: markdown para poner una negrita dentro de la frase, y los datos para el pago son un Markdown con
+# Code font: el IBAN y el BIC, en la fuente monoespaciada. Los rótulos se escriben como una frase
 # normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
@@ -242,15 +243,14 @@ Document (dev.stxt.boxes):
 			Block:
 				Text: Datos para el pago
 					Class: label
-				Text: ES91 2100 0418 4502 0005 1332
-					Typography:
-						Font: IBM Plex Mono
-						Size: 9.5
-						Weight: bold
-				Text: Caixa Girona · BIC CAIXESBBXXX
-				Text: Indica el **número de factura** en el concepto.
-					Typography:
-						Inline: markdown
+				Markdown:
+					Code font: IBM Plex Mono
+					Content >>
+						**`ES91 2100 0418 4502 0005 1332`**
+
+						Caixa Girona · BIC `CAIXESBBXXX`
+
+						Indica el **número de factura** en el concepto.
 		Area:
 			Block:
 				Text: Condiciones

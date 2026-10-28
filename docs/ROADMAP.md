@@ -47,12 +47,12 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 26 | Formato dentro de la línea fuera de Markdown | hecho | 19 |
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | hecho | 20 |
 | 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
-| 29 | Texto preformateado y código | pendiente | 22 (previsto) |
+| 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 27, el 2026-10-28. Los hitos
-28 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 27 y el 29, el 2026-10-28. Los hitos
+28, 30 y 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -1029,7 +1029,9 @@ Box:
   las columnas porque los espacios se colapsan; hoy es un `Grid` de doce `Area`.
 - **Ejemplo 01 (factura):** el IBAN en monoespaciada, que en Markdown sería `` `ES91 …` ``
   (hoy `MARKDOWN_UNSUPPORTED`).
-- **Ejemplo 08:** los valores de las especificaciones técnicas en monoespaciada.
+- **Ejemplo 08:** los valores de las especificaciones técnicas en monoespaciada. *No cambian:* ya
+  lo están con `Class: mono` en cada celda de una `Table` normal, y la tabla de Markdown no puede
+  tener las columnas de ancho fijo (`Table columns` solo admite `equal` y `auto`).
 
 **Sintaxis (propuesta).**
 
@@ -1043,28 +1045,51 @@ Text:
 		L   230 V     [ OK ]
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **W1. Forma.** *Propuesta:* `White space: normal | pre | pre-wrap` en `Typography` (se
-      hereda). *Alternativa:* un elemento `Preformatted`, que no admitiría un `Cell` con
-      valor.
-- [ ] **W2. Líneas más anchas que la caja.** *Propuesta:* con `pre`, sigue siendo
-      `TEXT_OVERFLOW`, como una palabra muy ancha; con `pre-wrap`, se parte. *Alternativa:*
-      recortar.
-- [ ] **W3. Tabuladores.** *Propuesta:* ocho espacios. *Alternativa:* error.
-- [ ] **W4. Markdown.** *Propuesta:* el código en línea es un tramo con la fuente de una
-      propiedad `Code font` de `Markdown` (como `Bullet`), y un bloque de código, un `Text` con
-      `pre` y esa fuente. *Alternativa:* seguir sin código.
-- [ ] **W5. Cortes.** *Propuesta:* un bloque preformateado se parte entre líneas, con viudas y
-      huérfanas como cualquier texto.
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada salvo W3, que el usuario
+amplió; las interpretaciones que salieron al implementarlas, en [`DECISIONES.md`](DECISIONES.md),
+203–214):
+
+- [x] W1. **Forma:** `White space: normal | pre | pre-wrap` en `Typography` (se hereda y vale en
+      `Styles`), no un elemento `Preformatted`.
+- [x] W2. **Líneas más anchas que la caja:** con `pre`, `TEXT_OVERFLOW` (con un mensaje que
+      sugiere `pre-wrap`); con `pre-wrap`, se parten entre palabras.
+- [x] W3. **Tabuladores:** *no* ocho espacios ni un error: una propiedad `Tab size`, en
+      `Typography`, con las columnas de una tabulación y **4 por defecto** (el valor de los ficheros
+      STXT). Interpretación: cada tabulación va a la siguiente columna múltiplo de `Tab size`
+      (decisión 208).
+- [x] W4. **Markdown:** una propiedad `Code font` en `Markdown` (como `Bullet`, obligatoria solo si hay
+      código): el código en línea es un tramo con esa fuente y un bloque de código, un `Text` con
+      `pre` y esa fuente.
+- [x] W5. **Cortes:** un bloque preformateado se parte entre líneas, con viudas y huérfanas como
+      cualquier texto (todo el texto es un solo párrafo).
+
+**Diseño técnico** (como quedó):
+
+- **Propiedades.** `Style.WhiteSpace` y `Style.tabSize`, leídas en `PropertyReader.typography` y heredadas.
+- **Reparto.** `layout/inline/PreformattedText`: las líneas de origen con las tabulaciones expandidas
+  (`sourceLines`), cada una como una línea de la caja (`pre`) o partida voraz entre palabras
+  (`pre-wrap`), y los tamaños intrínsecos. `InlineLayout` lo usa en lugar de `LineBreaker.breakParagraphs`
+  y no justifica. `LineBreaker.place` admite una línea sin tramos.
+- **Errores.** Ninguno nuevo: el mensaje de `TEXT_OVERFLOW` de `pre` es propio (`Overflow`); un `Tab size`
+  menor que 1 es `VALUE_NOT_ALLOWED`. `SvgCanvas` conserva los espacios con `xml:space`.
+- **Código en Markdown.** `TextFormat.family` (familia del tramo, `null` = la de la caja), que
+  `PdfMetrics` comprueba (`FONT_UNKNOWN`); `MarkdownBuilder.codeBlock` y el tramo de `Code`.
 
 **Tareas:**
 
-- [ ] Resolver W1–W5.
-- [ ] Schema, `Style`, `LineBreaker`/`InlineLayout` (líneas de origen) y `MarkdownBuilder`.
-- [ ] Especificación (§4.4, §5.4, §5.17, §6), errores, tests y caso golden
-      `22-preformatted`.
-- [ ] Ejemplos 01 y 08 (ver arriba).
+- [x] Resolver W1–W5.
+- [x] Schema (`White space`, `Tab size`, `Code font`), `Style`, `PropertyReader` y `BoxTreeBuilder`.
+- [x] `PreformattedText`, `InlineLayout`, `Overflow`, `SvgCanvas`.
+- [x] `TextFormat.family`, `MarkdownBuilder` (código en línea y bloques) y `PdfMetrics`.
+- [x] Especificación (§4.4, §4.14, §5.4, §5.12, §5.17, §6, §8, §9 y glosario), errores (4 casos para
+      `White space` y `Tab size`, 4 para el código), tests (`PreformattedTextTest`, `TextFormatTest`,
+      `MarkdownBuilderTest`, `MarkdownTest`, `PdfMetricsTest`, `SchemaCoverageTest`) y caso golden
+      `22-preformatted`, calculado a mano.
+- [x] Ejemplos 01 (el IBAN y el BIC, en un `Markdown` con `Code font`) y 08 (el terminal es un `Text`
+      con `White space: pre` en lugar de un `Grid` de doce `Area`, y el borne `N` en código en línea).
+- [x] README, `CLAUDE.md`, `DECISIONES.md` (203–214) y este documento.
 
 ---
 
@@ -1168,6 +1193,20 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (13).** Hito 29 terminado, en tres commits. Resueltas W1–W5 con un cuestionario (todas las
+  propuestas, y W3 ampliada por el usuario: una propiedad `Tab size` con 4 por defecto, que se tradujo en
+  tabuladores de columna). `White space` (`normal`, `pre`, `pre-wrap`) y `Tab size` en `Typography`:
+  `PreformattedText` reparte el texto en las líneas escritas, sin justificar y con todo el texto como un
+  solo párrafo para las viudas y huérfanas; `pre` desborda con `TEXT_OVERFLOW` y `pre-wrap` parte entre
+  palabras. `Code font` en `Markdown`: el código en línea es un tramo con otra familia
+  (`TextFormat.family`) y un bloque de código, un `Text` con `pre`. Ocho casos nuevos en el catálogo,
+  `PreformattedTextTest` y el caso golden `22-preformatted` (calculado a mano, pasó a la primera).
+  Ejemplos 01 (IBAN y BIC en código) y 08 (terminal preformateado). Decisiones 203–214 de
+  `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 28 (aspecto de las cajas, el más caro y el que más se nota), 30 (rotación) o 31
+  (SVG), en otra sesión; resolver sus decisiones con el usuario antes de escribir código. Lo que quedó
+  fuera del 29 (un elemento `Code block` para dar estilo aparte al código, `Code font` fuera de
+  `Markdown`) está en `TODO.md`.
 - **2026-10-28 (12).** Hito 27 terminado. Resueltas Y1–Y4 con un cuestionario (todas las propuestas,
   con una condición en Y4: si el idioma es una característica de accesibilidad, que sea obligatorio en el
   schema; lo es, así que `Language` pasó a ser obligatorio en `Document` en un commit aparte, con

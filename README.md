@@ -84,7 +84,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 27 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 27 y el 29 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -105,7 +105,8 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 27 están termin
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |
 | Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; se escriben con `Markdown` o con `Inline: markdown` |
 | Formato dentro de la línea en un `Text`, un `Paragraph` o una `Cell` (`Inline: markdown`, propiedad de `Typography`, se hereda): la misma sintaxis en línea y los enlaces de `Markdown`, con escapes de CommonMark; sin ella el texto es literal | Hecho y probado |
-| Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM, imágenes solas en su párrafo y formato dentro de la línea, traducidos a los elementos de siempre; el resto, error | Hecho y probado |
+| Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM, bloques de código, imágenes solas en su párrafo y formato dentro de la línea (también `código`, con `Code font`), traducidos a los elementos de siempre; el resto, error | Hecho y probado |
+| Texto preformateado (`White space: pre` y `pre-wrap`, `Tab size`; propiedades de `Typography`, se heredan): espacios y saltos de línea conservados, tabulaciones a la siguiente columna, `pre` no parte las líneas y `pre-wrap` las parte entre palabras, sin justificar | Hecho y probado |
 | Reparto flex con congelación | Hecho y probado |
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
@@ -174,7 +175,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 26. ~~**Formato dentro de la línea fuera de Markdown.** Propiedad `Inline: markdown` en `Typography` (se hereda): negrita, cursiva, subrayado, tachado y enlaces dentro de un `Text`, un `Paragraph` o una `Cell`, con los escapes de CommonMark (caso 19).~~ Hecho.
 27. ~~**Texto:** mayúsculas automáticas (`Transform`), interletraje (`Letter spacing`) y versalitas (`Small caps`), propiedades de `Typography` que se heredan; `Language` pasa a ser obligatorio en `Document` (caso 20).~~ Hecho.
 28. **Aspecto de las cajas:** esquinas, bordes, sombras y degradados. Pendiente.
-29. **Texto preformateado y código.** Pendiente.
+29. ~~**Texto preformateado y código.** `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography`, y `Code font` en `Markdown` para el código en línea y los bloques de código (caso 22).~~ Hecho.
 30. **Rotación y orientación de la página.** Pendiente.
 31. **Imágenes vectoriales (SVG).** Pendiente.
 

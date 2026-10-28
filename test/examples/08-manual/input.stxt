@@ -2,7 +2,8 @@
 # una figura con números superpuestos (un Relative con sus Absolute encima) y su leyenda al
 # lado (una List de Paragraph con la negrita escrita con Inline: markdown, que la regla de
 # Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
-# bloques de terminal en monoespaciada y tablas de especificaciones y de averías. La estructura
+# un bloque de terminal con las columnas alineadas (un Text con White space: pre, en monoespaciada), un
+# código en línea y tablas de especificaciones y de averías. La estructura
 # de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
 # {page of: wiring}, la página donde está (también dentro de Markdown). Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
@@ -303,43 +304,25 @@ Document (dev.stxt.boxes):
 		Heading 3:
 			Text: Si tu instalación no tiene neutro
 		Markdown:
+			Code font: IBM Plex Mono
 			Content >>
-				El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne N y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
+				El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
 		Heading 3:
 			Text: Comprueba la conexión
 		Paragraph: Una vez instalado, en la pantalla deben aparecer la hora y la temperatura. Puedes comprobar el estado de los bornes desde el menú de ajustes, con la siguiente secuencia:
 		Block:
 			Id: terminal
 			Class: code
-			Text: > Ajustes > Servicio > Bornes
-			Grid:
-				Columns: 34 90 1fr
-				Box:
-					Margin: 4 0 0 0
-				Area:
-					Text: L
-				Area:
-					Text: 230 V
-				Area:
-					Text: [ OK ]
-				Area:
-					Text: N
-				Area:
-					Text: 0 V
-				Area:
-					Text: [ OK ]
-				Area:
-					Text: C
-				Area:
-					Text: cerrado
-				Area:
-					Text: [ OK ]
-				Area:
-					Text: NO
-				Area:
-					Text: abierto
-				Area:
-					Text: [ OK ]
+			Text:
+				Typography:
+					White space: pre
+				Content >>
+					> Ajustes > Servicio > Bornes
+
+					L     230 V      [ OK ]
+					N     0 V        [ OK ]
+					C     cerrado    [ OK ]
+					NO    abierto    [ OK ]
 		Block:
 			Class: tip
 			Text: Consejo
