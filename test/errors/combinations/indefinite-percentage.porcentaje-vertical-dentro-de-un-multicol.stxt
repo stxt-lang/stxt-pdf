@@ -1,7 +1,8 @@
 # Case: Porcentaje vertical dentro de un Multicol
 # Code: INDEFINITE_PERCENTAGE
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

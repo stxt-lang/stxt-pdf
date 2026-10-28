@@ -1,7 +1,8 @@
 # Case: Levels pide niveles que no tiene ningún encabezado
 # Code: CONTENTS_EMPTY
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

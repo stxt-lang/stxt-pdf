@@ -8,6 +8,7 @@
 # La lista long (Width 200: ítems de 180, 36 caracteres por línea y 4 palabras de 7) se parte:
 # r2 tiene 5 líneas y caben 3; su marcador solo está en el primer fragmento.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 300

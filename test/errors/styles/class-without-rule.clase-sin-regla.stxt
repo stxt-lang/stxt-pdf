@@ -1,7 +1,8 @@
 # Case: Clase sin regla
 # Code: CLASS_WITHOUT_RULE
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

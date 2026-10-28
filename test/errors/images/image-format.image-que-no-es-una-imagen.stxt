@@ -1,7 +1,8 @@
 # Case: Image que no es una imagen
 # Code: IMAGE_FORMAT
-# Line: 8
+# Line: 9
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

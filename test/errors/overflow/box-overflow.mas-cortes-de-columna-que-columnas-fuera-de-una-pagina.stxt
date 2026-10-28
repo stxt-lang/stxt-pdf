@@ -1,7 +1,8 @@
 # Case: Más cortes de columna que columnas fuera de una página
 # Code: BOX_OVERFLOW
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

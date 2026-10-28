@@ -27,7 +27,7 @@ class MarkdownBuilderTest {
 
     /** Un {@code Markdown} con estas propiedades y este contenido, traducido. */
     private static MarkdownBuilder.Translation translate(List<String> properties, String... content) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tMedia:", "\t\tWidth: 595",
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tLanguage: es", "\tMedia:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10", "\tMarkdown:"));
         properties.forEach(p -> lines.add("\t\t" + p));
         lines.add("\t\tContent >>");
@@ -61,9 +61,9 @@ class MarkdownBuilderTest {
     void headingsAndParagraphsWithTheirRuns() {
         MarkdownBuilder.Translation t = translate("# Título **grande**", "", "Uno *dos*", "tres ~sin~ tachar");
         assertEquals(2, t.elements().size());
-        assertEquals(List.of("Heading 1 @10", "  Text: Título grande @10"), outline(t.elements().get(0)));
+        assertEquals(List.of("Heading 1 @11", "  Text: Título grande @11"), outline(t.elements().get(0)));
         // Un salto de línea simple es un espacio; una tilde sola no tacha.
-        assertEquals(List.of("Paragraph: Uno dos tres ~sin~ tachar @12"), outline(t.elements().get(1)));
+        assertEquals(List.of("Paragraph: Uno dos tres ~sin~ tachar @13"), outline(t.elements().get(1)));
         Node text = ((InlineNode) t.elements().get(0)).getChildren().get(0);
         assertEquals(List.of(run("Título "), run("grande", "b")), t.runs().get(text));
         assertEquals(List.of(run("Uno "), run("dos", "i"), run(" tres ~sin~ tachar")),
@@ -82,9 +82,9 @@ class MarkdownBuilderTest {
         MarkdownBuilder.Translation t = translate("![Un *paisaje*](test/wide.png)", "", "![](logos/acme.png)",
                 "", "Texto.");
         // El texto alternativo pierde su formato; sin él, la imagen es decorativa.
-        assertEquals(List.of("Image: test/wide.png @10", "  Alt: Un paisaje @10"), outline(t.elements().get(0)));
-        assertEquals(List.of("Image: logos/acme.png @12"), outline(t.elements().get(1)));
-        assertEquals(List.of("Paragraph: Texto. @14"), outline(t.elements().get(2)));
+        assertEquals(List.of("Image: test/wide.png @11", "  Alt: Un paisaje @11"), outline(t.elements().get(0)));
+        assertEquals(List.of("Image: logos/acme.png @13"), outline(t.elements().get(1)));
+        assertEquals(List.of("Paragraph: Texto. @15"), outline(t.elements().get(2)));
     }
 
     @Test
@@ -97,52 +97,52 @@ class MarkdownBuilderTest {
     void listsTakeTheirMarkerFromTheLevel() {
         MarkdownBuilder.Translation t = translate(List.of("Bullet: disc dash", "Numbering: lower-roman"),
                 "- a", "  - b", "    - c", "", "3. x");
-        assertEquals(List.of("List @12",
-                "  Marker: disc @9",
-                "  List item @12",
-                "    Paragraph: a @12",
-                "    List @13",
-                "      Marker: dash @9",
-                "      List item @13",
-                "        Paragraph: b @13",
-                "        List @14",
+        assertEquals(List.of("List @13",
+                "  Marker: disc @10",
+                "  List item @13",
+                "    Paragraph: a @13",
+                "    List @14",
+                "      Marker: dash @10",
+                "      List item @14",
+                "        Paragraph: b @14",
+                "        List @15",
                 // El último marcador sirve para los niveles más profundos.
-                "          Marker: dash @9",
-                "          List item @14",
-                "            Paragraph: c @14"), outline(t.elements().get(0)));
-        assertEquals(List.of("List @16", "  Marker: lower-roman @10", "  Start: 3 @16", "  List item @16",
-                "    Paragraph: x @16"), outline(t.elements().get(1)));
+                "          Marker: dash @10",
+                "          List item @15",
+                "            Paragraph: c @15"), outline(t.elements().get(0)));
+        assertEquals(List.of("List @17", "  Marker: lower-roman @11", "  Start: 3 @17", "  List item @17",
+                "    Paragraph: x @17"), outline(t.elements().get(1)));
     }
 
     @Test
     void anItemCanHaveSeveralParagraphs() {
         MarkdownBuilder.Translation t = translate(List.of("Numbering: decimal"), "1. uno", "", "   sigue");
-        assertEquals(List.of("List @11", "  Marker: decimal @9", "  List item @11", "    Paragraph: uno @11",
-                "    Paragraph: sigue @13"), outline(t.elements().get(0)));
+        assertEquals(List.of("List @12", "  Marker: decimal @10", "  List item @12", "    Paragraph: uno @12",
+                "    Paragraph: sigue @14"), outline(t.elements().get(0)));
     }
 
     @Test
     void tablesWithHeadAlignmentAndEmptyCells() {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: equal"),
                 "| Mes | Total |", "|-----|------:|", "| Ene | **120** |", "| Feb |");
-        assertEquals(List.of("Table @11",
-                "  Columns: repeat(2, 1fr) @9",
-                "  Head @11",
-                "    Row @11",
-                "      Cell: Mes @11",
-                "      Cell: Total @11",
-                "        Typography @11",
-                "          Align: right @11",
-                "  Body @13",
-                "    Row @13",
-                "      Cell: Ene @13",
-                "      Cell: 120 @13",
-                "        Typography @13",
-                "          Align: right @13",
+        assertEquals(List.of("Table @12",
+                "  Columns: repeat(2, 1fr) @10",
+                "  Head @12",
+                "    Row @12",
+                "      Cell: Mes @12",
+                "      Cell: Total @12",
+                "        Typography @12",
+                "          Align: right @12",
+                "  Body @14",
                 "    Row @14",
-                "      Cell: Feb @14",
+                "      Cell: Ene @14",
+                "      Cell: 120 @14",
+                "        Typography @14",
+                "          Align: right @14",
+                "    Row @15",
+                "      Cell: Feb @15",
                 // GFM completa la fila con una celda vacía.
-                "      Cell @14"), outline(t.elements().get(0)));
+                "      Cell @15"), outline(t.elements().get(0)));
         InlineNode body = (InlineNode) ((InlineNode) t.elements().get(0)).getChild("body");
         Node cell = ((InlineNode) body.getChildren().get(0)).getChildren().get(1);
         assertEquals(List.of(run("120", "b")), t.runs().get(cell));
@@ -203,11 +203,11 @@ class MarkdownBuilderTest {
         InvalidModelException title = assertThrows(InvalidModelException.class,
                 () -> translate("Un [enlace](https://stxt.dev \"web\")."));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.code());
-        assertEquals(10, title.line());
+        assertEquals(11, title.line());
         InvalidModelException scheme = assertThrows(InvalidModelException.class,
                 () -> translate("", "Un [enlace](javascript:alert(1))."));
         assertEquals(ErrorCode.LINK_SCHEME, scheme.code());
-        assertEquals(11, scheme.line());
+        assertEquals(12, scheme.line());
     }
 
     @Test

@@ -1,7 +1,8 @@
 # Case: Valor no válido en una regla que no se aplica
 # Code: VALUE_SYNTAX
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

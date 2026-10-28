@@ -1,7 +1,8 @@
 # Case: Columna fija sin hueco con Flow column
 # Code: GRID_PLACEMENT
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

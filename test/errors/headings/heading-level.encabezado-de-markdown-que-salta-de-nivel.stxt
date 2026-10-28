@@ -1,7 +1,8 @@
 # Case: Encabezado de Markdown que salta de nivel
 # Code: HEADING_LEVEL
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

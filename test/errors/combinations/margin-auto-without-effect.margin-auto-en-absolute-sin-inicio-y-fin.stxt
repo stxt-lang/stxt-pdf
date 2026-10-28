@@ -1,7 +1,8 @@
 # Case: Margin auto en absolute sin inicio y fin
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

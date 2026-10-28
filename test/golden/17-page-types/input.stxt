@@ -11,6 +11,7 @@
 #   inner (first):     dentro de head, que no sale en la página 1: tampoco sale (not-first y first
 #                      no coinciden en ninguna página).
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 300
 		Height: 200

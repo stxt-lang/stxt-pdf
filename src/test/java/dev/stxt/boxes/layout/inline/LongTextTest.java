@@ -49,7 +49,7 @@ class LongTextTest {
 
     /** Un {@code Text} con {@code paragraphs} párrafos de cuatro frases. */
     private static String document(int paragraphs, String wrap) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tMedia:", "\t\tWidth: 595",
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tLanguage: es", "\tMedia:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10",
                 "\t\tText wrap: " + wrap, "\tText:", "\t\tContent >>"));
         for (int p = 0; p < paragraphs; p++) {

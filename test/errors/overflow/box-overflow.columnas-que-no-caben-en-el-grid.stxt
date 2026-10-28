@@ -1,7 +1,8 @@
 # Case: Columnas que no caben en el grid
 # Code: BOX_OVERFLOW
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

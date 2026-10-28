@@ -1,7 +1,8 @@
 # Case: Coma decimal
 # Code: VALUE_SYNTAX
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

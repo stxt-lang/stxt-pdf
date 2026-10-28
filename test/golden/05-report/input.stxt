@@ -3,6 +3,7 @@
 # título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto. El estilo
 # va en las reglas de Styles; los elementos solo declaran lo que es suyo.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

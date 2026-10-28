@@ -1,7 +1,8 @@
 # Case: Hija con Min width más ancha que su contenedor
 # Code: BOX_OVERFLOW
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

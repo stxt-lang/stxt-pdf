@@ -7,6 +7,7 @@
 # 20 con 8 de margen inferior, Heading 2 de 15, la sangría de las listas). Los tramos (negrita,
 # cursiva, subrayado y tachado) no cambian las medidas con 5 pt por carácter; se ven en los PNG.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 300

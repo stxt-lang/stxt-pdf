@@ -1,7 +1,8 @@
 # Case: Texto más alto que su Height
 # Code: BOX_OVERFLOW
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

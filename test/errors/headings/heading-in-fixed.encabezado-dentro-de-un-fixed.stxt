@@ -1,7 +1,8 @@
 # Case: Encabezado dentro de un Fixed
 # Code: HEADING_IN_FIXED
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

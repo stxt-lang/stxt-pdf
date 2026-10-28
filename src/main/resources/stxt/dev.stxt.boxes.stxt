@@ -18,6 +18,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Title
 				Max: 1
 			Child: Language
+				Min: 1
 				Max: 1
 			Child: Typography
 				Max: 1

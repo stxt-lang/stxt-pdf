@@ -1,6 +1,7 @@
 # Posicionamiento (ESPECIFICACION.md §5.5): relative, absolute en su containing block y
 # fixed en el margen de la página.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

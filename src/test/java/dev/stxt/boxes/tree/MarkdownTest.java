@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /** El {@code Markdown} en el árbol de cajas (ESPECIFICACION.md §5.17). */
 class MarkdownTest {
 
-    private static final String HEADER = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
             + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
 
     private static Box build(String... lines) {
@@ -60,7 +60,7 @@ class MarkdownTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tHeading 1:",
                 "\t\tText: Uno", "\tMarkdown:", "\t\tContent >>", "\t\t\t### Salto"));
         assertEquals(ErrorCode.HEADING_LEVEL, e.code());
-        assertEquals(12, e.line());
+        assertEquals(13, e.line());
     }
 
     @Test
@@ -81,7 +81,7 @@ class MarkdownTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tFixed:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
         assertEquals(ErrorCode.HEADING_IN_FIXED, e.code());
-        assertEquals(11, e.line());
+        assertEquals(12, e.line());
         assertDoesNotThrow(() -> build("\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }
 }

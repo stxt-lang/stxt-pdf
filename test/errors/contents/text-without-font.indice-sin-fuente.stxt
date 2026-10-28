@@ -1,7 +1,8 @@
 # Case: Un índice sin Font en el documento
 # Code: TEXT_WITHOUT_FONT
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

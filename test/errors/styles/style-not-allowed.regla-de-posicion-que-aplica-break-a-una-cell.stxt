@@ -1,7 +1,8 @@
 # Case: Regla Head cell que aplica Break a una Cell
 # Code: STYLE_NOT_ALLOWED
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

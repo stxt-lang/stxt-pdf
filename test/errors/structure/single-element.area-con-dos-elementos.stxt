@@ -1,7 +1,8 @@
 # Case: Area con dos elementos
 # Code: SINGLE_ELEMENT
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

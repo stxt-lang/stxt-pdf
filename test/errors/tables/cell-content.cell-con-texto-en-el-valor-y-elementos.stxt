@@ -1,7 +1,8 @@
 # Case: Cell con texto en el valor y elementos
 # Code: CELL_CONTENT
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

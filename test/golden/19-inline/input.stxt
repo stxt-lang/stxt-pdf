@@ -15,6 +15,7 @@
 #   md:      un Markdown no se interpreta dos veces: "\*\*aaaa\*\* …" da 35 caracteres literales
 #            (Inline: markdown lo hereda, pero no actúa dentro): 2 líneas, 24. y = 116.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 200
 		Height: 200

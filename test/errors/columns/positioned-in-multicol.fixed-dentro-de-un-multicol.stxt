@@ -1,7 +1,8 @@
 # Case: Fixed dentro de un Multicol
 # Code: POSITIONED_IN_MULTICOL
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

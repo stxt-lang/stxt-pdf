@@ -1,7 +1,8 @@
 # Case: Cita en Markdown
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

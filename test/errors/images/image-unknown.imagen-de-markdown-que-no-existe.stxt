@@ -1,7 +1,8 @@
 # Case: Imagen de Markdown que no existe
 # Code: IMAGE_UNKNOWN
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

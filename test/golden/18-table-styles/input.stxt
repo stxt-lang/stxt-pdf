@@ -10,6 +10,7 @@
 # Filas: b1 (37..53, impar), b4 (53..73, par), b7 (73..101, impar: dos líneas en b9) y
 #   b10 (101..121, par); el pie, en 121..138. La tabla mide 118.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 300
 		Height: 200

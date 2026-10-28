@@ -1,7 +1,8 @@
 # Case: Break en una fila de Head
 # Code: TABLE_ROW_BREAK
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -66,7 +66,7 @@ class StackingContextTest {
     }
 
     private static Recorder record(Map<String, List<dev.stxt.boxes.model.TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages().get(0);
         Recorder canvas = new Recorder();

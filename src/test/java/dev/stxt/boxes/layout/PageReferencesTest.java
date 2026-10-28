@@ -124,7 +124,7 @@ class PageReferencesTest {
                 return text.contains("7") ? 100 : new FixedMetrics().width(text, font, fontSize);
             }
         };
-        StringBuilder doc = new StringBuilder("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
+        StringBuilder doc = new StringBuilder("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
                 + PAGE + "\n\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n");
         for (int i = 0; i < 6; i++) {
             doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 100\n");
@@ -136,6 +136,6 @@ class PageReferencesTest {
                 () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(doc.toString())));
         assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.code());
         // Cabecera (8 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
-        assertEquals(8 + 6 * 3 + 3 + 1, e.line());
+        assertEquals(9 + 6 * 3 + 3 + 1, e.line());
     }
 }

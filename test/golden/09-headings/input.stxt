@@ -7,6 +7,7 @@
 # h2b cabría al final de la página 1, pero p2 no: el motor evita el corte después de un
 # encabezado, así que h2b pasa a la página 2 con p2. Su margen superior se trunca en el corte.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 300

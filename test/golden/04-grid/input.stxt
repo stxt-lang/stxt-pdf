@@ -1,6 +1,7 @@
 # Grid (ESPECIFICACION.md §5.8): áreas con nombre, pistas fijas y en fracción, y colocación
 # automática con filas implícitas.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -1,7 +1,8 @@
 # Case: Regla For id sin elemento
 # Code: STYLE_UNKNOWN_ID
-# Line: 9
+# Line: 10
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

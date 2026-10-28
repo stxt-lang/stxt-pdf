@@ -77,7 +77,7 @@ public final class LayoutFixture {
     }
 
     private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
         return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages());
     }
 

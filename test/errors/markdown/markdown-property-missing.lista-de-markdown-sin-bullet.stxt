@@ -1,7 +1,8 @@
 # Case: Lista de Markdown sin Bullet
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

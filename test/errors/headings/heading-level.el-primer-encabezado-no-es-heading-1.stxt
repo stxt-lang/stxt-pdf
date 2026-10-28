@@ -1,7 +1,8 @@
 # Case: El primer encabezado no es Heading 1
 # Code: HEADING_LEVEL
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

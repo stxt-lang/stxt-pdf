@@ -1,7 +1,8 @@
 # Case: List item sin elementos
 # Code: LIST_ITEM_EMPTY
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

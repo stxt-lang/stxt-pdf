@@ -1,7 +1,8 @@
 # Case: Línea entre columnas más ancha que el hueco
 # Code: COLUMN_RULE_WIDTH
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

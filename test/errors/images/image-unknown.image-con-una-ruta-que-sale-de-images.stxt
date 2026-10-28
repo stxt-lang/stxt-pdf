@@ -1,7 +1,8 @@
 # Case: Image con una ruta que sale de images
 # Code: IMAGE_UNKNOWN
-# Line: 8
+# Line: 9
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

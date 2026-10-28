@@ -1,7 +1,8 @@
 # Case: Ancho mayor que el máximo
 # Code: MIN_MAX_CONFLICT
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

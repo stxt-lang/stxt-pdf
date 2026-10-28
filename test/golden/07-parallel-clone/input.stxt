@@ -9,6 +9,7 @@
 # Página 4: sigue g1 desde arriba (40) y end va detrás.
 # El pie muestra "{page}/{pages}" con los valores de cada página.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 300
 		Height: 200

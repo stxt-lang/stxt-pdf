@@ -1,7 +1,8 @@
 # Case: Título vacío
 # Code: VALUE_NOT_ALLOWED
-# Line: 8
+# Line: 9
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -1,7 +1,8 @@
 # Case: Encabezado sin Text
 # Code: TOO_FEW_CHILDREN
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

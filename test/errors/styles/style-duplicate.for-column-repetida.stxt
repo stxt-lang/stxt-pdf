@@ -1,7 +1,8 @@
 # Case: Regla For column repetida
 # Code: STYLE_DUPLICATE
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

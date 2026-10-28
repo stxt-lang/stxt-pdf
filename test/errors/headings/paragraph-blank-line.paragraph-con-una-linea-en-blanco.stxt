@@ -1,7 +1,8 @@
 # Case: Paragraph con una línea en blanco
 # Code: PARAGRAPH_BLANK_LINE
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -1,7 +1,8 @@
 # Case: Number en una lista que no numera
 # Code: LIST_NUMBER_NOT_ALLOWED
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

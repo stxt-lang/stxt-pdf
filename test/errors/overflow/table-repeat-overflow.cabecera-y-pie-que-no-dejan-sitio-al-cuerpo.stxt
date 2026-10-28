@@ -1,7 +1,8 @@
 # Case: Cabecera y pie que no dejan sitio al cuerpo
 # Code: TABLE_REPEAT_OVERFLOW
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

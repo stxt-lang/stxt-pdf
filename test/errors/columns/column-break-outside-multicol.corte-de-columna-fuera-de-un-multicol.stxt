@@ -1,7 +1,8 @@
 # Case: Corte de columna fuera de un Multicol
 # Code: COLUMN_BREAK_OUTSIDE_MULTICOL
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -36,7 +36,7 @@ class LayoutCacheTest {
 
     /** {@code Flex} y {@code Grid} alternos, {@code depth} niveles, cada uno con un texto al lado. */
     private static String nested(int depth) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tMedia:", "\t\tWidth: 595",
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.boxes):", "\tLanguage: es", "\tMedia:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10"));
         String indent = "\t";
         for (int level = depth; level > 0; level--) {

@@ -1,7 +1,8 @@
 # Case: Carácter que la fuente no tiene
 # Code: GLYPH_MISSING
-# Line: 15
+# Line: 16
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

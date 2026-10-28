@@ -8,6 +8,7 @@
 # Página 2: 127 para el cuerpo: b6…b12 (16 × 6 + 28 = 124); b13 ya no cabe.
 # Página 3: b13 y b14, el pie detrás, y end.
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 300
 		Height: 200

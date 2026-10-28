@@ -1,7 +1,8 @@
 # Case: Span mal escrito
 # Code: VALUE_SYNTAX
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

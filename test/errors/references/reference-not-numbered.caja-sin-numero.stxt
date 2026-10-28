@@ -1,7 +1,8 @@
 # Case: Número de una caja que no tiene
 # Code: REFERENCE_NOT_NUMBERED
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

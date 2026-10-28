@@ -1,7 +1,8 @@
 # Case: Línea más alta que la página dentro de una lista
 # Code: PAGE_OVERFLOW
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

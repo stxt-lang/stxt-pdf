@@ -1,7 +1,8 @@
 # Case: Palabra que no cabe en un texto centrado
 # Code: TEXT_OVERFLOW
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

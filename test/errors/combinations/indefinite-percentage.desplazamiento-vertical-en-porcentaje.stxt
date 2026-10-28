@@ -1,7 +1,8 @@
 # Case: Desplazamiento vertical en porcentaje
 # Code: INDEFINITE_PERCENTAGE
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

@@ -1,7 +1,8 @@
 # Case: Porcentaje en una función con el padre en auto
 # Code: INDEFINITE_PERCENTAGE
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

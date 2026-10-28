@@ -902,27 +902,29 @@ Typography:
 	Small caps: true
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **Y1. Transformación.** *Propuesta:* `Transform: none | uppercase | lowercase |
-      capitalize` en `Typography` (se hereda); el texto del documento y el del PDF etiquetado
-      siguen siendo los escritos. *Alternativa:* solo `uppercase`.
-- [ ] **Y2. Interletraje.** *Propuesta:* `Letter spacing` en puntos (como las demás medidas)
-      que se suma al avance de cada carácter, en el reparto en líneas (la palabra mide más), en
-      Knuth-Plass y en `justify`; el último carácter de la línea no lo lleva. *Alternativa:*
-      una fracción del `Size`.
-- [ ] **Y3. Versalitas.** *Propuesta:* sintetizadas (mayúsculas al 80 % del tamaño); las
-      fuentes del repositorio no tienen la característica `smcp`. *Alternativa:* usarla si la
-      fuente la tiene, con un error si no.
-- [ ] **Y4. Mayúsculas y caracteres especiales.** *Propuesta:* las reglas de `String` de Java
-      con la configuración regional del documento (`Language`): la «ß» o la «i» turca.
-      *Alternativa:* siempre `Locale.ROOT`.
-- [ ] **Y5. PDF.** *Propuesta:* `Tc` por carácter o ajuste de `TJ`, para que el texto
-      seleccionable no se parta en letras.
+**Decisiones tomadas** (2026-10-28, con un cuestionario al usuario; las interpretaciones, en
+[`DECISIONES.md`](DECISIONES.md)):
+
+- [x] Y1. **Transformación.** `Transform: none | uppercase | lowercase | capitalize` en `Typography`
+      (se hereda); el texto del documento y el del PDF etiquetado siguen siendo los escritos.
+- [x] Y2. **Interletraje.** `Letter spacing` en puntos, sumado al avance de cada carácter, en el reparto
+      en líneas (la palabra mide más), en Knuth-Plass y en `justify`; el último carácter de la línea no
+      lo lleva.
+- [x] Y3. **Versalitas.** Sintetizadas: las minúsculas pasan a mayúsculas al 80 % del tamaño (las
+      fuentes del repositorio no tienen `smcp`).
+- [x] Y4. **Idioma.** Las reglas de `String` de Java con la configuración regional de `Language`. El
+      usuario añadió: si el idioma es una característica de accesibilidad, que sea **obligatorio en el
+      schema**. Lo es (PDF/UA exige el `Lang`), así que `Language` pasó a ser obligatorio en `Document`
+      antes de empezar el hito (`DECISIONES.md`, 193).
+- [x] Y5. **PDF** *(detalle técnico, sin consultar)*. Ajustes de `TJ` entre glifos, como `justify`
+      (las fuentes son Type 0 Identity-H), para que el texto seleccionable no se parta en letras.
 
 **Tareas:**
 
-- [ ] Resolver Y1–Y5.
+- [x] Resolver Y1–Y5 (2026-10-28).
+- [x] `Language` obligatorio en `Document`, con todos los documentos de prueba y de ejemplo (Y4).
 - [ ] Schema, `Style`, `LineBreaker`, `InlineLayout`, `PdfMetrics` y `PdfCanvas`.
 - [ ] Especificación (§4.4, §5.4, §8), tests y caso golden `20-typography`.
 - [ ] Ejemplos con rótulos en minúscula y la transformación en una regla de `Styles`.

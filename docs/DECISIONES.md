@@ -1086,3 +1086,12 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      `Inline: markdown`, sin cambiar un píxel; la factura (01), el currículum (03) y la carta del
      restaurante (06) ganan una negrita o una cursiva dentro de una frase. Los pasos numerados
      del manual y las cláusulas del contrato siguen siendo `Markdown` porque son listas.
+
+193. **`Language` obligatorio en `Document`** (hito 27, Y4; revisa la 87). El idioma es una
+     característica de accesibilidad (PDF/UA exige el `Lang` del catálogo, y un lector de pantalla
+     lo necesita para leer el contenido), así que deja de ser opcional: un `Document` sin
+     `Language` es `TOO_FEW_CHILDREN` (lo detecta el schema, con la línea del `Document`). Además
+     es la configuración regional que usará `Transform`. Todos los documentos de prueba, los
+     ejemplos y los de la especificación declaran `Language: es`. `Title` sigue siendo opcional.
+     *Dónde:* schema, `docs/ESPECIFICACION.md` §2 y §4.1. *Alternativa:* dejarlo opcional y
+     usar `Locale.ROOT` si falta.

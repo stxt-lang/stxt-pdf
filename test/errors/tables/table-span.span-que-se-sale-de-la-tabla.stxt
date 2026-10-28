@@ -1,7 +1,8 @@
 # Case: Span que se sale de la tabla
 # Code: TABLE_SPAN
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

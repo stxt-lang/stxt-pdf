@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Las imágenes en la salida SVG (ESPECIFICACION.md §5.18). */
 class SvgCanvasTest {
 
-    private static final String DOC = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+    private static final String DOC = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
             + "\t\tMargin: 20\n\tImage: test/wide.png\n\t\tFit: cover\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
 
     private final LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(DOC));

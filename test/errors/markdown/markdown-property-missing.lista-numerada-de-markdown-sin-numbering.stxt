@@ -1,7 +1,8 @@
 # Case: Lista numerada de Markdown sin Numbering
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

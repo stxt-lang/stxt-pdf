@@ -1,7 +1,8 @@
 # Case: Grow en column sin alto
 # Code: GROW_WITHOUT_EFFECT
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842

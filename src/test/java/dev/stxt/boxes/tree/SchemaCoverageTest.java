@@ -120,7 +120,7 @@ class SchemaCoverageTest {
             Map.entry("Fit", "Fit: cover"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
-    private static final String HEADER = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
             + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
             + "\tStyles:\n\t\tFor class: c\n\t\t\tTypography:\n\t\t\t\tColor: #000000\n";
 
@@ -140,8 +140,8 @@ class SchemaCoverageTest {
 
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
-        t.put("Document", new Template(HEADER + "\t{}", Set.of("Typography")));
-        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\t{}",
+        t.put("Document", new Template(HEADER + "\t{}", Set.of("Typography", "Language")));
+        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\t{}",
                 Set.of("Width", "Height")));
         for (String element : List.of("Block", "Relative", "Absolute", "Fixed")) {
             t.put(element, new Template(HEADER + "\t" + element + ":\n\t\t{}"));

@@ -60,8 +60,8 @@ sentido en él: sus propiedades y, si es un contenedor, otros elementos. El sche
 en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta al leer, también
 en el editor.
 
-El nodo raíz es `Document`, con exactamente un `Media`, un `Title` y un `Language` opcionales
-(el título y el idioma del documento, [§4.1](#41-media)), un `Typography` opcional que heredan
+El nodo raíz es `Document`, con exactamente un `Media` y un `Language` (el idioma del documento,
+[§4.1](#41-media)), un `Title` opcional (el título), un `Typography` opcional que heredan
 todas las cajas (la fuente del documento), un `Styles` opcional con las reglas reutilizables
 ([§4.10](#410-reglas-reutilizables-styles)) y los elementos de primer nivel.
 
@@ -103,6 +103,7 @@ página).
 
 ```
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842
@@ -276,11 +277,13 @@ Obligatorio, exactamente uno, hijo de `Document`.
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
 elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
-**Título e idioma.** `Document` admite también, como mucho uno de cada, `Title` (un texto no
-vacío) y `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no, `VALUE_NOT_ALLOWED`). No
-afectan al layout: van al PDF ([§5.13](#513-encabezados-y-párrafos)) como título del documento
-(información, metadatos XMP y el que muestra el visor) e idioma del contenido etiquetado. Son
-opcionales; sin ellos, el PDF no los declara.
+**Título e idioma.** `Document` admite también `Title` (un texto no vacío, opcional, como mucho
+uno) y exige exactamente un `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no,
+`VALUE_NOT_ALLOWED`; si falta, `TOO_FEW_CHILDREN`). No afectan al layout: van al PDF
+([§5.13](#513-encabezados-y-párrafos)) como título del documento (información, metadatos XMP y el
+que muestra el visor) e idioma del contenido etiquetado. El idioma es obligatorio porque es una
+característica de accesibilidad: un lector de pantalla y PDF/UA lo necesitan para leer el
+contenido; sin `Title`, el PDF no lo declara.
 
 ### 4.2 Propiedades del elemento
 
@@ -1234,7 +1237,7 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
   muestra al abrir el documento.
 - **Título e idioma:** `Title` va a la información del documento y a los metadatos XMP, y el
   visor lo muestra en lugar del nombre del fichero; `Language` es el idioma de todo el
-  contenido ([§4.1](#41-media)). Sin ellos, el PDF no los declara.
+  contenido ([§4.1](#41-media)), siempre declarado. Sin `Title`, el PDF no lo declara.
 
 El volcado de resultados ([§7](#7-formato-de-resultados)) no cambia: no incluye el tipo de
 elemento.
@@ -1498,6 +1501,7 @@ suyos, y lo generado hereda su `Typography`.
 
 ```
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842
@@ -1610,6 +1614,7 @@ imagen: se coloca, se dimensiona, se corta entre páginas y se pinta como cualqu
 
 ```
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842
@@ -2072,7 +2077,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language`, `Typography`, `Styles`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language` (exactamente uno), `Typography`, `Styles`; elementos |
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada) |
 | `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
@@ -2134,6 +2139,7 @@ Fichero: [`test/spec/report.stxt`](../test/spec/report.stxt).
 
 ```
 Document (dev.stxt.boxes):
+	Language: es
 	Media:
 		Width: 595
 		Height: 842
