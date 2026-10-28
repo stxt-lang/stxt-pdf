@@ -16,6 +16,7 @@
 - Httpservice para probar, que se pueda ejecutar en maven, etc. 
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
+- Quizá necesitamos un Preformated o Code Block para el código monoespaciado
 - Un docker para esto
 - Un manual hecho a partir de referencia :-)
 
