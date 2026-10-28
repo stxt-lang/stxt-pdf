@@ -1104,8 +1104,10 @@ siguiente paso concreto.
   `DECISIONES.md`. Caso golden `16-links`; ejemplos 01–05, 08, 09 y 10 con enlaces (los volcados no
   cambian: el único PNG que cambia es la página 2 del manual, con su enlace de Markdown
   subrayado). `mvn test` en verde.
-  *Siguiente paso:* hito 24 (primera página distinta y páginas con nombre) o el 25 (estilo de las
-  tablas, de esfuerzo bajo); resolver N1–N5 o B1–B5 con el usuario.
+  *Siguiente paso:* hito 25 (estilo de las tablas, de esfuerzo bajo), en otra sesión; resolver
+  B1–B5 con el usuario antes de escribir código. *Deuda anotada:* el `Link` del PDF etiquetado no
+  envuelve el contenido marcado de su texto (decisión 171); la accesibilidad es básica, así que está
+  en la sección «Accesibilidad» de [`TODO.md`](../TODO.md) para no perderla.
 - **2026-10-28 (7).** Hito 22 terminado, en cuatro commits: `{page of: id}` con paginación hasta
   converger (X1–X4, X12), `{number of: id}` (X9, X11), `Contents` (X5–X8, X10) y el caso golden
   `15-contents` con los ejemplos. Resueltas X11 y X12 con las propuestas; al implementar X11 salió

@@ -1,5 +1,21 @@
 # Ideas varias
 
+## Accesibilidad (prioritario: es básica para lo que hacemos)
+
+- **`Link` del PDF etiquetado con su contenido marcado** (hito 23, decisión 171 de
+  `docs/DECISIONES.md`). Hoy cada enlace es un elemento `Link` hijo del elemento de la caja que
+  solo contiene la anotación (`OBJR`) y un `Alt` con su texto; no envuelve el texto marcado del
+  tramo. Lo completo, y lo que pide PDF/UA, es que el `Link` contenga el contenido marcado de
+  su texto además de la `OBJR`. Para ello hay que partir el contenido marcado de un `P` (o
+  `Span`, `H1`…, `TD`) en varios `MCID`, uno por cada tramo con enlace, y colgar cada trozo del
+  `Link` correspondiente. *Dónde:* `paint/StackingContext.paintText` (hoy un único
+  `beginText`/`endText` por fragmento), `paint/PdfStructure.mark` y `link`. Verificar el
+  resultado con un validador de PDF/UA (por ejemplo veraPDF) y, a ser posible, con un lector de
+  pantalla.
+- Hacer ese repaso de accesibilidad del PDF etiquetado entero cuando se termine esto: texto
+  alternativo de las figuras, orden de lectura con `Fixed` y `Absolute`, tablas con `Scope`,
+  idioma por tramo, y la validación PDF/UA de los once ejemplos.
+
 - ~~Índice!!~~ (hito 22)
 - Float? Algo más que haga falta?
 - Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación

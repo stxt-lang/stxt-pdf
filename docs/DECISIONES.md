@@ -944,6 +944,8 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      imagen decorativa y las filas repetidas de una tabla desde su segunda página) no tiene
      `Link`, pero sí anotación. *Dónde:* `paint/PdfStructure.link`. *Alternativa:* el `Link` con
      el contenido marcado del tramo dentro, que es lo más completo para la accesibilidad.
+     **Deuda pendiente, anotada en la sección «Accesibilidad» de `TODO.md`:** hay que hacerlo,
+     porque la accesibilidad es básica en este proyecto.
 
 172. **Solo se admiten `https`, `http`, `mailto` y `#id`**: ni `tel:`, ni `ftp:`, ni rutas
      relativas, ni `javascript:` ni `file:` (L6). El motor no abre nada y un PDF no debería
