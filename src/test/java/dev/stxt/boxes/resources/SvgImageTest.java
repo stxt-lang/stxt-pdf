@@ -184,6 +184,10 @@ class SvgImageTest {
                 + "font-weight=\"bold\">Hola</text></svg>");
         String glyph = error(head + "<text font-family=\"IBM Plex Sans\">Hola 中</text></svg>");
         assertTrue(glyph.contains("'中' (U+4E2D)"), glyph);
+        assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-weight=\"300\">Hola</text></svg>")
+                .contains("font-weight 300: solo se admiten normal (400) y bold (700)"));
+        assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-style=\"oblique\">Hola</text></svg>")
+                .contains("font-style oblique: solo se admiten normal e italic"));
         // Un tspan de otra fuente que no existe.
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\">Hola <tspan font-family=\"Nope\">x</tspan></text></svg>")
                 .contains("Fuente desconocida: Nope"));

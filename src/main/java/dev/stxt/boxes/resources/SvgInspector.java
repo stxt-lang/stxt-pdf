@@ -252,9 +252,21 @@ final class SvgInspector {
         }
 
         private void flushText() {
-            if (textFont != null && text.toString().strip().length() > 0) {
-                texts.add(new TextUse(textLine, textFont.family(), textFont.weight().equals("bold")
-                        || textFont.weight().equals("700"), textFont.style().equals("italic"), text.toString()));
+            if (textFont != null && !text.toString().isBlank()) {
+                String weight = textFont.weight();
+                if (!Set.of("normal", "400", "bold", "700").contains(weight)) {
+                    throw new ImageFormatException("El texto \"" + text.toString().strip() + "\" del SVG " + name
+                            + " (línea " + textLine + ") tiene font-weight " + weight
+                            + ": solo se admiten normal (400) y bold (700)");
+                }
+                String style = textFont.style();
+                if (!Set.of("normal", "italic").contains(style)) {
+                    throw new ImageFormatException("El texto \"" + text.toString().strip() + "\" del SVG " + name
+                            + " (línea " + textLine + ") tiene font-style " + style
+                            + ": solo se admiten normal e italic");
+                }
+                texts.add(new TextUse(textLine, textFont.family(), weight.equals("bold") || weight.equals("700"),
+                        style.equals("italic"), text.toString()));
             }
             text.setLength(0);
         }
