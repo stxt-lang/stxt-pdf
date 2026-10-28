@@ -1,0 +1,592 @@
+# Hoja de ruta: revisión de QA y arquitectura (SOLID, DRY, KISS), hilos y rendimiento
+
+Resultado de la revisión del código de 2026-10-28 (sesión 0, ver el [registro](#registro-de-sesiones)) y plan para
+corregirlo en varias sesiones separadas. Es independiente de [`ROADMAP.md`](ROADMAP.md) (hitos de funcionalidad,
+terminados): aquí no se añade comportamiento nuevo, salvo las decisiones que se marcan como abiertas.
+
+Todo lo que dice este documento como **medido** o **verificado** se ha ejecutado de verdad; lo que no, está marcado
+como *no verificado*. Los programas con que se midió están en [`tools/qa/`](../tools/qa/README.md) para repetirlo.
+
+## Cómo usar este documento
+
+**Al empezar una sesión:**
+
+1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
+2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
+   evidencia, propuesta y criterio de aceptación.
+3. Ejecuta `mvn test` para partir de verde (1314 tests el 2026-10-28) y comprueba que `git status` queda limpio.
+
+**Al terminar una sesión:**
+
+1. Marca las tareas hechas (`[x]`) y actualiza la columna *Estado* de la tabla.
+2. Si una tarea cambia una decisión de interpretación o una diferencia con la especificación, apúntala en
+   [`DECISIONES.md`](DECISIONES.md).
+3. Repite la medición que corresponda (`tools/qa/`) y cambia la línea base si ha cambiado.
+4. Añade una entrada al [registro de sesiones](#registro-de-sesiones): fecha, qué se hizo, en qué se quedó y el
+   siguiente paso concreto.
+
+**Reglas para todas las sesiones:** ningún cambio de este documento puede modificar un PNG ni un `expected.stxt`
+de `test/` (son refactorizaciones o correcciones sin cambio visible, salvo la tarea que lo diga); un cambio de
+comportamiento de la especificación se habla antes con el usuario; cada corrección de un fallo lleva su test, que
+falla sin ella.
+
+**Estados:** `pendiente` · `decidir` (hay una decisión abierta para el usuario) · `en curso` · `hecho`.
+**Prioridad:** `Alta` (fallo o riesgo real hoy), `Media` (deuda que frena o riesgo condicionado), `Baja` (limpieza).
+**Esfuerzo:** `S` (menos de una hora), `M` (una sesión corta), `L` (una sesión entera o más).
+
+## Resumen
+
+El código está en muy buen estado: 1314 tests en verde, cobertura de instrucciones del 93 al 100 % por package,
+dependencias entre packages en un solo sentido (`model` ← `tree` ← `fragment` ← `layout` ← `paint`; verificado
+con los `import`: `tree` no importa nada de `layout`, `fragment` ni `paint`, y `layout` no importa `paint`),
+casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layout. Lo que se ha encontrado:
+
+- **Un fallo real**: la numeración en mayúsculas de las listas depende del idioma de la JVM (QA-01); con
+  `-Duser.language=tr` fallan 5 tests y el número romano `IV` sale como `İV`.
+- **Un problema de coherencia y de rendimiento a la vez**: PDFBox aplica las ligaduras de la fuente (GSUB) al
+  pintar y el motor mide sin ellas (QA-03). Es además el 70-75 % del tiempo en documentos de texto largo.
+- **Hilos**: la conversión es segura entre hilos **si cada conversión tiene su `Engine`**, que es lo que hace
+  `PdfWriter`; ocho hilos convirtiendo 880 documentos dieron los mismos bytes que en secuencial. Pero `Engine` es
+  público, mutable y no es seguro, nada lo dice, y hay un estado global de JVM (`registerFont`) y dos cerrojos en la
+  ruta caliente que cuestan un 20 % de rendimiento (TS-01…TS-04).
+- **Arquitectura**: dos clases dios (`Style` con 70 campos públicos mutables y `BoxTreeBuilder.element` de 162
+  líneas y complejidad ≈ 67), la interfaz `Canvas` con 11 métodos por defecto que son del PDF, y los algoritmos
+  atados a la clase concreta `Engine`. Nada de esto es un fallo; frena cambiar cosas con seguridad.
+- **Falta de red de seguridad fuera de los tests unitarios**: no hay integración continua (no existe `.github/`),
+  ni prueba de hilos, ni de idiomas, ni de límites.
+
+## Estado
+
+| ID | Tarea | Prio | Esf. | Estado |
+|---|---|---|---|---|
+| QA-01 | `ListMarkers`: mayúsculas con el `Locale` de la JVM | Alta | S | pendiente |
+| QA-02 | El texto de un SVG cambia con el idioma de la JVM | Media | M | pendiente |
+| QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | decidir |
+| QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | pendiente |
+| QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | pendiente |
+| QA-06 | Límites y entradas hostiles | Media | M | pendiente |
+| QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
+| QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
+| QA-09 | Integración continua | Alta | S | pendiente |
+| TS-01 | Contrato de hilos documentado y comprobable | Alta | S | pendiente |
+| TS-02 | Test de conversión concurrente | Alta | S | pendiente |
+| TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
+| TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | pendiente |
+| TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | pendiente |
+| PF-01 | Coste del GSUB de PDFBox | Alta | M | decidir (con QA-03) |
+| PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | pendiente |
+| PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | pendiente |
+| PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | pendiente |
+| PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
+| AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
+| AR-02 | `Style`: 70 campos públicos mutables | Alta | L | pendiente |
+| AR-03 | `Box` mutable y con campos públicos | Media | M | pendiente |
+| AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | pendiente |
+| AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | pendiente |
+| AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | pendiente |
+| AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | pendiente |
+| AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | pendiente |
+| AR-09 | Modelo de errores sin tipo común | Media | M | pendiente |
+| AR-10 | Dos tolerancias | Baja | S | pendiente |
+| AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | pendiente |
+| AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | pendiente |
+| AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | pendiente |
+
+## Línea base medida
+
+Máquina de la sesión 0: 4 núcleos, 16 GB, OpenJDK 17, `-Djava.awt.headless=true`. Los tiempos varían de una máquina
+a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
+
+| Medida | Resultado |
+|---|---|
+| `mvn test` | 1314 tests, 0 fallos. Cobertura de instrucciones por package: del 93,2 % (`layout.multicol`) al 100 % (`output`); de ramas, del 75 % (`stxt`) al 98 % (`fragment`) |
+| Los 11 ejemplos, secuencial | 1.ª ronda en frío 2654 ms; en caliente 633 a 955 ms (≈ 58 ms por documento) |
+| 8 hilos × 10 rondas × 11 ejemplos (880 conversiones, 4 núcleos) | `Resources` compartido **16 217 ms**; uno por hilo **13 417 ms**; 0 diferencias de bytes con la secuencial en los dos casos |
+| Texto largo (`Paragraph` de 330 caracteres), 153 páginas | leer 66 ms, layout 923 ms, pintar 2413 ms |
+| Ídem, 1483 páginas (25 600 párrafos) | layout ≈ 6,5 s, pintar 15 a 21 s; cabe en `-Xmx256m` |
+| 2000 páginas casi vacías (salto de página forzado) | 528 ms en total |
+| `Contents` + `{page of: …}` con 1600 capítulos (1626 páginas) | 1549 ms |
+| `showText` de PDFBox, 2400 líneas | con GSUB **855 a 1508 ms**; sin GSUB **48 a 126 ms** (17 a 30 veces); mismo tamaño de PDF |
+| Perfil (JFR) del texto largo | ≈ 1/3 de las muestras en `fontbox.ttf.gsub` (expresiones regulares por llamada); `FontFile.width` 13 % |
+| Reparto de tiempo con `{page}` en un `Fixed` | al pasar de 99 a 100 páginas el layout se hace dos veces (PF-03): 23 → 46 fallos de caché por página |
+| Entradas hostiles | anidado > 100 niveles y línea > 10 000 caracteres: `LimitException` de `stxt-core` (bien); `Columns: repeat(100000, 1fr)`: 182 ms; 2000 páginas: 0,5 s |
+
+## QA
+
+### QA-01 · `ListMarkers` usa `toUpperCase()` con el idioma de la JVM · Alta · S
+
+**Evidencia (verificada).** `tree/ListMarkers.java:42` y `:44` llaman a `alpha(number).toUpperCase()` y
+`roman(number).toUpperCase()` sin `Locale`. En una JVM turca, `"i".toUpperCase()` es `İ` (U+0130). Con
+`mvn test -DargLine="-Duser.language=tr -Duser.country=TR"` fallan 5 tests por esta única causa:
+`ListMarkersTest.romanNumerals` (`MCMXC?V`), `ListMarkersTest.theNumberHasNoSuffix…`, `ListsTest.markersWithAHyphen`,
+`NumberReferencesTest.anItemNumberIsWrittenAsItsMarkerDoes` y el golden `10-lists` (`I.` sale `İ.`). En producción,
+un servidor turco daría además `GLYPH_MISSING` si la fuente no tiene `İ`.
+
+**Propuesta.** `toUpperCase(Locale.ROOT)` en las dos líneas. Buscar el resto de llamadas sin `Locale`:
+`grep -rnE "to(Upper|Lower)Case\(\)" src/main` (solo hay estas dos; el resto usa `Locale.ROOT` o el `Language` del
+documento). `ImageFile.java:140` usa `String.format("%04X")` sin `Locale`: ponerle también `Locale.ROOT`.
+
+**Aceptación.** Los 5 tests pasan con `-Duser.language=tr`; un test de `ListMarkersTest` fija `Locale.setDefault`
+a turco en un `@BeforeEach`/`@AfterEach` (o usa el `@DefaultLocale` equivalente) para que lo guarde sin CI;
+QA-09 añade la matriz de idiomas.
+
+### QA-02 · Un SVG con texto sale distinto según el idioma de la JVM · Media · M
+
+**Evidencia (verificada).** Con `-Duser.language=tr -Duser.country=TR`, `ExamplesTest` pasa (los volcados coinciden)
+pero **12 PNG versionados se reescriben** (`01-invoice/page-1`, `02-letter/page-1`, `04-annual-report/page-3,4,6`,
+`06-menu/page-1`, `07-contract/page-1..3`, `08-manual/page-1,2`, `10-certificate/page-1`). Comparando los streams del
+PDF de `01-invoice` en `en` y en `tr`, solo cambia el formulario del SVG del logotipo (`nogal.svg`, 15 122 bytes
+frente a 10 160: otra forma de dibujar el texto) y la tabla de glifos de las fuentes del subconjunto. La causa no
+está aislada: la hipótesis es que JSVG o AWT buscan la familia por el nombre en minúsculas con el `Locale` por defecto
+(`IBM Plex Serif` → `ıbm plex serıf`) y no encuentran la fuente que `PdfImages.registerFonts` acaba de dar de alta;
+el motor, en cambio, promete «sin sustitución de fuentes» (§5.11).
+
+**Propuesta.** (1) Reproducir con un SVG mínimo con texto y `-Duser.language=tr`, mirando qué fuente elige JSVG.
+(2) Si es AWT/JSVG: dibujar el texto del SVG con un `Font` creado por el motor desde el TTF (no por nombre de
+familia), o convertir el texto en contornos al leer el SVG (`ImageFile`), o fijar el `Locale` solo durante el dibujo
+(`Locale.setDefault` es global y NO es una opción en un servidor). (3) Si no hay arreglo limpio: documentar en
+§5.18 que el SVG con texto necesita una JVM con un idioma sin la `i` turca, y hacer que el motor **falle** (no
+sustituya) cuando detecte que la fuente elegida no es la pedida.
+
+**Aceptación.** `ExamplesTest` con `-Duser.language=tr` deja `git status` limpio, o el motor rechaza el SVG con
+un error claro.
+
+### QA-03 · PDFBox aplica GSUB y el motor mide sin ligaduras · Alta · M · decidir
+
+**Evidencia (verificada con `GsubGlyphsProbe`).** `PdfCanvas.text` llama a `PDPageContentStream.showText`, que en
+PDFBox 3.0.8 aplica la tabla GSUB de la fuente (`PDAbstractContentStream.encodeForGsub`). Las fuentes que incluye el
+repositorio tienen la característica `liga`: con IBM Plex Sans cambian al pintar `fi`, `ffi` y `office`; con IBM Plex
+Serif, `fi`, `fl`, `ffi`, `ffl`, `office` y `affluent`; con Plex Mono no cambia nada. Pero `FontFile.width` suma el
+avance de cada carácter por separado y su javadoc lo dice («No se aplican el kerning ni las ligaduras»). Es decir: **lo
+que se pinta no es lo que se midió** en esos pares. Si el avance del glifo de la ligadura difiere de la suma de los dos,
+las líneas justificadas, centradas o alineadas a la derecha quedan descuadradas una fracción de punto, y las guías de
+`Contents` y los subrayados (que se miden por tramo) no coinciden con los glifos.
+
+Además PDFBox lanza `IllegalStateException: could not find the glyphId…` si recibe un carácter que la fuente no
+tiene mientras GSUB está activo (caso `ǅ`); hoy no se llega porque `PdfMetrics.validate` lo rechaza antes con
+`GLYPH_MISSING`, pero un `Engine` con `FixedMetrics` pintado con `PdfCanvas` sí podría.
+
+**Decisión abierta (con el usuario).**
+
+- **A (recomendada). Sin ligaduras en el PDF**: quitar la tabla GSUB al incrustar. Mide = pinta, el pintado del texto
+  pasa a ser 17 a 30 veces más rápido (PF-01) y es coherente con «el texto se mide por carácter». Pierde `fi` como
+  ligadura. Cómo: `PDType0Font.load(doc, ttf, true)` con un `TrueTypeFont` que devuelva `NO_DATA_FOUND` en
+  `getGsubData()` (probado quitando `"GSUB"` de `getTableMap()`, que es un truco sobre una estructura interna de
+  fontbox: investigar una subclase de `TTFParser`/`TrueTypeFont` o una opción pública antes de dejarlo así).
+- **B. Medir con ligaduras**: aplicar la tabla `liga` en `FontFile.width` (y en el reparto en líneas, porque una
+  ligadura es un glifo que no se parte). Fiel a la tipografía, pero es mucho trabajo y hay que decidir qué hacer con
+  `Letter spacing` (se desactivan las ligaduras en CSS cuando es distinto de 0) y con `justify`.
+
+**Aceptación (A).** Un test que pinta `fi` con Plex Sans y comprueba que el contenido del PDF tiene 2 glifos y que
+su ancho es el medido; `GsubCostProbe` muestra el cambio; PNG de ejemplos sin cambios (si cambian por el avance,
+revisarlos uno a uno y anotarlo en `DECISIONES.md`).
+
+### QA-04 · `Rotation.CENTER` es mutable · Baja · S
+
+`model/Rotation.java:23`: `public static final double[] CENTER = {0.5, 0.5}`. Cualquier llamador puede escribir en
+él y cambiar el centro de giro de todos los documentos de la JVM (hoy `BoxTreeBuilder.element` solo lo lee, pero es
+público). **Propuesta:** dos constantes `double` (`CENTER_X`, `CENTER_Y`) o un `record Origin(double x, double y)
+{ static final Origin CENTER }`; de paso, `ValueReader.rotateOrigin` devuelve `double[]` y pasaría a devolver el
+record. **Aceptación:** compila sin ningún `double[]` público ni `static final` de array en `src/main`
+(`grep -rnE "static final [a-zA-Z]+\[\]" src/main`: hoy quedan `ImageFile.PNG`/`JPEG`, `ListMarkers.ROMAN_*` y
+`PdfStructure.TABLE_GROUPS`, privados y de solo lectura por convención; valen).
+
+### QA-05 · El mensaje de «la palabra no cabe» no se acota · Baja · S
+
+Una palabra de 1000 caracteres produce un error de línea 13 que **contiene los 1000 caracteres** (medido con
+`HostileInputsProbe`). **Propuesta:** acotar a ≈ 40 caracteres con `…` y la longitud total («la palabra de 1000
+caracteres 'xxxxxxxx…' no cabe…»), en `Messages`. **Aceptación:** el caso del catálogo de errores correspondiente
+sigue pasando y un test comprueba que el mensaje no crece con la palabra.
+
+### QA-06 · Límites y entradas hostiles · Media · M
+
+**Lo verificado** (`HostileInputsProbe`): anidar más de 100 niveles y las líneas de más de 10 000 caracteres los
+rechaza `stxt-core` con `LimitException` (no con `StackOverflowError`); `repeat(100000, 1fr)` se resuelve en 182 ms;
+2000 páginas en 0,5 s.
+
+**Lo que falta o no está verificado.**
+
+1. `Paginator.MAX_PAGES = 10_000` lanza `IllegalStateException` genérica: no tiene `ErrorCode`, ni línea, ni se puede
+   distinguir de un fallo interno (ver AR-09). Debe ser un error del documento (`LimitExceededException`).
+2. **No verificado:** un PNG o JPEG pequeño en bytes pero enorme en píxeles (*decompression bomb*). `PdfImages.bitmap`
+   usa `PDImageXObject.createFromFileByContent`, que decodifica a `BufferedImage`. Comprobar el tamaño con la cabecera
+   (lo hace `ImageFile` para el tamaño natural) y fijar un máximo de píxeles configurable.
+3. **No verificado:** SVG con muchos elementos o con `<use>` anidados (JSVG los dibuja); límite de elementos y de
+   profundidad en `SvgInspector` (es SAX, así que el recuento es barato).
+4. No hay límite de tamaño de documento ni de tiempo. Para el servicio HTTP de `TODO.md` hace falta una
+   `Limits` (páginas, píxeles por imagen, elementos de SVG, tamaño del documento) pasada en las opciones (AR-08).
+
+**Aceptación.** `Limits` con valores por defecto razonables; un caso del catálogo de errores por cada límite;
+`HostileInputsProbe` ampliada con la bomba de píxeles y el SVG enorme.
+
+### QA-07 · Los tests de referencia ensucian el árbol · Media · M · decidir
+
+**Evidencia (verificada).** `GoldenTest` y `ExamplesTest` escriben `output.pdf` y los `page-N.png` **dentro de
+`test/`** (versionado): un test que pasa deja `git status` sucio si cambian los píxeles (pasó con `tr`, QA-02). La
+política actual es deliberada («si aparece modificado en git, el resultado ha cambiado; míralo», `CLAUDE.md`), pero
+depende de que alguien mire: en integración continua, un PNG que cambia **no hace fallar nada**. Además los tests
+dependen del directorio de trabajo (`resources/`, `test/`) y no se pueden ejecutar en paralelo ni con el árbol de
+solo lectura.
+
+**Propuesta (a decidir).** Escribir siempre en `target/` y comparar con el versionado: igual dentro de
+`PIXEL_TOLERANCE` → pasa; distinto → **falla** con la ruta de los dos PNG, salvo `-Dexamples.update=true` /
+`-Dgolden.update=true` (ya existe el primero para `expected.stxt`). Así el CI vigila los PNG y el árbol queda limpio.
+**Aceptación:** `mvn test` no modifica ningún fichero versionado; un cambio de layout hace fallar el test con un
+mensaje que dice cómo aceptarlo.
+
+### QA-08 · Tests que faltan · Media · M
+
+La cobertura de líneas es muy alta (el informe de JaCoCo no es el problema); lo que no se prueba es lo que la
+cobertura no ve:
+
+1. **Hilos** → TS-02.
+2. **Idioma** → QA-01, QA-02 y QA-09.
+3. **Determinismo**: el mismo documento dos veces da los mismos bytes (quitando `CreationDate`, `ModDate` y `ID`;
+   medido con `ConcurrencyProbe`: determinista).
+4. **Propiedades/*fuzzing*** de las piezas puras con más ramas sin cubrir: `ValueReader` (83 % de instrucciones),
+   `ValueParser` (87 %), `AbsoluteEquation` (89 %), `ImageFile` (89 %), `MulticolLayout.Run` (92 %). Por ejemplo:
+   `ValueParser.list(texto)` nunca lanza nada que no sea `IllegalArgumentException`; el reparto en líneas nunca pierde
+   ni duplica caracteres; la suma de alturas de los fragmentos de una caja es su alto; el layout paginado de un
+   documento es idempotente.
+5. **Mutación** (PIT, `pitest-maven`) sobre `layout.*` y `fragment`: con el 96 % de cobertura, solo dirá si los
+   asserts miden algo. Una pasada puntual, no en CI.
+6. **Documentos de la especificación**: `DocumentReaderTest` ya maqueta los ejemplos del §10; falta que lo haga con
+   `PdfMetrics` y PDF/UA (los once ejemplos ya pasan veraPDF; los de la especificación no).
+
+### QA-09 · Integración continua · Alta · S
+
+No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
+segunda ejecución con `-DargLine="-Duser.language=tr -Duser.country=TR"` (QA-01/02); fallar si `git status --porcelain`
+no está vacío tras los tests (QA-07); subir `target/site/jacoco` y `target/surefire-reports` como artefactos;
+trabajo nocturno aparte con `-Dgroups=perf -DexcludedGroups=none` y con `tools/qa/`. Nota de entorno: dentro de esta
+sesión, `mvn` solo funcionó con red (el plugin de JaCoCo no estaba en la caché local; `-o` falla).
+**Aceptación:** el commit siguiente al cambio muestra el workflow en verde.
+
+## Hilos (ThreadSafe de la conversión)
+
+### Qué es seguro y qué no
+
+Verificado leyendo el código y con `ConcurrencyProbe` (8 hilos, 10 rondas, los 11 ejemplos, comparando con la
+conversión secuencial: 0 diferencias, con `Resources` compartido y con uno por hilo):
+
+| Pieza | Compartible entre hilos | Por qué |
+|---|---|---|
+| `DocumentSchema` (estático) | Sí | Se carga una vez en una constante; el uso concurrente de `SchemaValidator` sobre el mismo `SchemaProviderMemory` de `stxt-core` funcionó en las 880 conversiones, pero **es un contrato de otra librería** que el repositorio solo da por cierto (TS-01) |
+| `DocumentReader` | Sí | Crea un `Parser` por lectura |
+| `Resources`, `FontLibrary`, `ImageLibrary` | Sí | Carga perezosa con `synchronized`; `FontLibrary` es inmutable; `ImageLibrary.find` es `synchronized` |
+| `FontFile` | Sí, con cerrojo | `width` es `synchronized` porque `TrueTypeFont` de PDFBox no es seguro entre hilos (TS-04) |
+| `Box`, `Style`, `LaidOutDocument` | Solo lectura | Campos públicos y mutables: es seguro mientras nadie escriba después de construir (AR-02/AR-03) |
+| **`Engine`** | **No** | `LayoutCache` (`HashMap`/`IdentityHashMap` sin sincronizar), `InlineLayout` (`broken`, `measurer`, `pages`, `numbers` reasignados sin `volatile`) y contadores; `layOutDocument`, `assume` y `reservePageDigits` mutan estado compartido |
+| `Paginator`, `BuildContext`, `PdfCanvas`, `PdfImages`, `PdfStructure`, `PdfLinks` | No (uno por conversión) | Estado de la conversión; los crea `PdfCanvas.write` |
+| `PdfImages.REGISTERED` + `GraphicsEnvironment.registerFont` | Sincronizado, pero **global** | Ver TS-03 |
+
+`PdfWriter.write` crea un `Engine` y un `PdfCanvas` nuevos en cada llamada, así que **la ruta recomendada es
+segura**. El riesgo está en que `Engine` es `public final class` con constructores públicos, sin una palabra sobre
+hilos, y que `reservePageDigits` y `assume` (el protocolo interno del `Paginator`) también son públicos. Quien
+comparta un `Engine` entre hilos (por ejemplo, para «no reconstruir» los algoritmos) corrompe un `HashMap` sin
+excepción clara. Además, un `Engine` reutilizado en secuencia conserva la caché del último documento hasta la
+siguiente llamada (`reservePageDigits` la vacía al empezar): retiene todo el árbol de cajas.
+
+### TS-01 · Contrato de hilos documentado · Alta · S
+
+Escribir en el javadoc de `Engine`, `PdfCanvas`, `PdfWriter`, `Resources`, `DocumentReader`, `LaidOutDocument`,
+`Box` y `Style` qué se puede compartir, y en el `README.md` un apartado «Uso desde varios hilos»: *un `Engine` por
+conversión; `Resources` y `DocumentReader` se comparten; un `LaidOutDocument` debería poder pintarse desde varios hilos
+mientras nadie modifique las cajas (*no verificado*: lo comprueba TS-02); la JVM debe ir con `-Djava.awt.headless=true` si hay SVG con texto*.
+Hacer package-private (o mover a un objeto de sesión) `Engine.reservePageDigits`, `assume`, `number` y `absolute`,
+que solo usa el `Paginator` (mismo package). Vaciar la caché al terminar `layOutDocument`. Fijar la versión de
+`stxt-core` que se ha probado concurrentemente (hoy `1.0.3`) y escribir a quien la mantiene el contrato que se
+asume (seguridad del `SchemaValidator` compartido) o proteger el uso con una copia por hilo si no lo da.
+**Aceptación:** javadoc y README; `Engine` sin métodos públicos de protocolo interno; sin cambio visible.
+
+### TS-02 · Test de conversión concurrente · Alta · S
+
+Pasar `tools/qa/ConcurrencyProbe.java` a un test JUnit (`concurrency/ConcurrentConversionTest`): N hilos (4 por
+defecto, `@Timeout`), cada uno convierte todos los ejemplos con su `Engine` y compara el PDF normalizado con el de la
+conversión secuencial; una variante con `Resources` compartido y otra con uno por hilo; otra que paginan el mismo
+`LaidOutDocument` a PDF desde varios hilos (comprueba que el árbol de cajas se lee sin escribir). Etiquetarlo `@Tag("slow")`
+si pasa de unos segundos y ejecutarlo en CI (QA-09). **Aceptación:** pasa; falla si se introduce a propósito un
+`static` mutable en la ruta (probarlo una vez a mano).
+
+### TS-03 · `GraphicsEnvironment.registerFont` es global a la JVM · Media · M
+
+`PdfImages.registerFonts` da de alta en AWT las fuentes de `fonts/` (JSVG busca por familia). Es un efecto de toda la
+JVM: dos `Resources` con carpetas distintas pero la **misma familia** (dos clientes con su propia «IBM Plex Sans»)
+comparten el registro y AWT se queda con el primero; el SVG del segundo se dibuja con la fuente del primero, sin
+error. `registerFont` devuelve `false` si ya hay una fuente con ese nombre y el código no mira el resultado. Es
+el mismo origen que QA-02 (el SVG con texto es el único punto donde el motor deja de controlar la fuente).
+**Propuesta:** no usar AWT por nombre: convertir el texto del SVG en contornos con el `FontFile` del motor al
+validar, o pasar a JSVG un `FontResolver`/`Font` propio por `Resources` (comprobar si JSVG 2.2.0 lo permite), de modo
+que no haya ningún estado de JVM. **Aceptación:** dos `Resources` con la misma familia y ficheros distintos dibujan
+cada uno el suyo (test); `PdfImages.REGISTERED` desaparece.
+
+### TS-04 · Cerrojos en la ruta caliente · Media · S
+
+`FontFile.width` es `synchronized` y `Resources.fonts()` también, y se llaman para **cada palabra medida** (varias
+veces: mínimo y máximo intrínseco, reparto en líneas, `place`). Medido: 880 conversiones en 4 núcleos con `Resources`
+compartido tardan un **20 % más** (16,2 s frente a 13,4 s) que con uno por hilo. **Propuesta:** (1) al abrir la
+fuente, precomputar los avances por glifo en un `int[]` inmutable (ver PF-02) y quitar el cerrojo de `width`;
+(2) `Resources.fonts()` y `images()` con un campo `volatile` y doble comprobación, o una carga garantizada en el
+constructor; (3) `ImageLibrary` con `ConcurrentHashMap.computeIfAbsent`. **Aceptación:** `ConcurrencyProbe` muestra
+que compartir `Resources` ya no es más lento que no compartirlo.
+
+### TS-05 · Fachada reutilizable y segura entre hilos · Media · M
+
+Ver AR-08: un `Converter` inmutable (con `Resources`, estilos opcionales y límites) cuyo `convert(...)` crea su
+`Engine` y es seguro entre hilos por construcción; sustituye a «hay que saber que no se comparte el `Engine`». Es
+la base del servicio HTTP de `TODO.md`.
+
+## Rendimiento
+
+El tiempo se va en el **pintado** (70-75 % en documentos de texto largo), no en el layout, y dentro del pintado en
+GSUB. El layout escala bien (casi lineal; el salto al pasar de 99 páginas es PF-03).
+
+### PF-01 · Coste del GSUB de PDFBox · Alta · M · decidir con QA-03
+
+Medido con `GsubCostProbe`: 2400 `showText` tardan **855 a 1508 ms con GSUB y 48 a 126 ms sin él**, con un PDF del
+mismo tamaño; en el perfil, ≈ 1/3 de las muestras están en `org.apache.fontbox.ttf.gsub.*`
+(`CompoundCharacterTokenizer`, `GlyphArraySplitterRegexImpl`: compilan expresiones regulares en cada llamada). La
+opción A de QA-03 lo resuelve de golpe; si el usuario elige B (ligaduras), hay que aplicar la tabla una vez por
+cadena y cachear el resultado por `(fuente, texto)`. **Aceptación:** `ScaleProbe` con 3200 párrafos: pintar baja de
+≈ 2,4 s a < 0,6 s.
+
+### PF-02 · `FontFile.width` · Media · S
+
+Cada carácter hace `cmap.getGlyphId` (búsqueda en `CmapSubtable`) y `ttf.getAdvanceWidth` (que busca la tabla `hmtx` en un
+`HashMap` cada vez: `TrueTypeFont.getTable`), dentro de un `synchronized`. `FontFile.width` es el 13 % de las muestras
+propias. **Propuesta:** al abrir la fuente, leer `hmtx` a un `short[]`/`int[]` por glifo ya redondeado como hoy
+(`Math.round(avance × 1000 / unitsPerEm)`) y un `char → avance` perezoso para el plano básico (`int[65536]` es 256 KB
+por fuente: mejor por bloques de 256 o un `HashMap<Character,Integer>`); quita el cerrojo (TS-04). **Aceptación:** los
+anchos son idénticos bit a bit (test que recorre todos los glifos de las 12 fuentes contra la implementación anterior
+una vez); `ScaleProbe`: layout −15 % o mejor.
+
+### PF-03 · Vaciar toda la caché al subir las cifras o las referencias · Media · M
+
+`Paginator.paginate` repite el layout del documento entero cuando (a) el total de páginas necesita más cifras de las
+reservadas (`PageNumbers.DIGITS = 2`: a partir de la página 100) o (b) cambia una página supuesta de `{page of: id}`;
+y `Engine.reservePageDigits` y `Engine.assume` hacen `cache.clear()`. Medido: con `{page}` en un `Fixed`,
+77 páginas → 23 fallos de caché por página; 153 páginas → 46 (el doble), y el layout pasa de 273 ms a 923 ms. Es
+trabajo tirado: solo cambia el ancho de los textos que contienen esos marcadores o referencias (un pie de página),
+y el cuerpo del documento da el mismo resultado. **Propuesta:** (1) invalidar solo las entradas de la caché de las
+cajas cuyo texto (o el de un descendiente) contiene `{page}`, `{pages}` o una `Reference`; la información sale del
+árbol (`References.sites`, `Paginator.hasPageNumbers`, que se calculan una vez al construir: PF-04). (2) Las
+cajas con marcadores suelen ser `Fixed`, que ya se colocan fuera del flujo: puede bastar con repetir solo esa parte.
+**Aceptación:** `ScaleProbe` con `{page}` y 153 páginas: los fallos de caché por página no se duplican al cruzar la
+página 100; los golden de los hitos 7, 22 y 32 no cambian.
+
+### PF-04 · Cálculos que se repiten · Baja · S
+
+`Box.inFlowChildren()` crea una lista nueva con un `stream` en cada llamada (`BlockLayout`, `FlexLayout`,
+`GridLayout`, dos veces en `BreakRules`); `Paginator.hasPageNumbers` y `withPageNumbers` recorren el árbol entero;
+`pagesOf`/`firstPages` recorren todos los fragmentos de todas las páginas en cada pasada. **Propuesta:** calcular
+`inFlowChildren` al terminar de construir (AR-03) y las marcas del documento (`hasPageNumbers`, destinos de
+referencia) en `BoxTreeBuilder.Result`. Es una mejora pequeña: medirla antes con JFR para no optimizar a ciegas.
+
+### PF-05 · Fuentes leídas dos veces y arranque en frío · Baja · S
+
+`FontLibrary` parsea cada TTF una vez (para las métricas) y `PdfCanvas.pdfFont` vuelve a leerlo con
+`PDType0Font.load(doc, file)` en **cada** conversión. Guardar los bytes del fichero en `FontFile` y pasarlos a
+PDFBox (`PDType0Font.load(doc, InputStream, true)`) ahorra la lectura de disco, no el análisis. El arranque en frío
+de los 11 ejemplos es 2,6 s (frente a 0,6 s en caliente): JIT, escaneo de `fonts/`, AWT para los SVG. Para un servicio,
+calentar al arrancar con un documento mínimo. **No verificado** cuánto aporta cada parte.
+
+## Arquitectura
+
+### Lo que está bien (no tocar)
+
+- **Capas**: `model` ← `tree` ← `fragment` ← `layout` ← `paint`, sin ciclos y sin saltos (verificado con los `import`).
+- **Algoritmos puros y probados** (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`,
+  `AbsoluteEquation`, `BreakRules`), cada uno con su test; entradas y salidas del layout inmutables.
+- <a id="dry"></a>**DRY**: una búsqueda de trozos repetidos de 7 líneas normalizadas en `src/main` da **0 coincidencias**;
+  con 4 líneas, 5 (todas en `PdfCanvas` y `PropertyReader`). No hay trabajo de DRY a nivel de texto; los puntos de
+  DRY que quedan son conceptuales (AR-07, AR-10).
+- Errores con código, línea y catálogo (un fichero por caso, y `everyCodeHasACase`).
+
+### AR-01 · `BoxTreeBuilder.element` · Alta · L
+
+**Evidencia (medida).** `element(...)` tiene 162 líneas y una complejidad ciclomática ≈ 67 (la siguiente es 31); la
+clase, 607 líneas. Hace, en un solo método: comprobar la posición en `Multicol`, la jerarquía de encabezados, heredar,
+aplicar reglas, leer propiedades con un `switch` de 20 casos (más tres `if` previos por tipo: `FLEX`, `GRID`/`TABLE`,
+`MULTICOL`), siete validaciones por `kind == Element.X`, crear la caja, el marcador de lista, y despachar el
+contenido por tipo (texto, imagen, celda, tabla, `Multicol`, `Markdown`, genérico). Añadir un elemento obliga a
+tocarlo en cuatro sitios. Rompe SRP (hace de todo), OCP (cada elemento nuevo lo modifica) y KISS.
+
+**Propuesta.** Sin cambiar ninguna regla ni mensaje: (1) una interfaz `ElementReader` por familia
+(`TextElement`, `ImageElement`, `TableElement`, `MulticolElement`, `MarkdownElement`, `ContainerElement`) elegida
+desde `Element` (un campo o un `EnumMap<Element, ElementReader>`); cada una lee sus propiedades propias, valida y
+rellena el contenido. (2) El `switch (name)` de propiedades sueltas pasa a una tabla
+`Map<String, PropertyHandler>` en `PropertyReader`, que ya agrupa `typography`, `box`, `flex`, `grid`…
+(3) `element` queda como el orden: validar posición → herencia → reglas → propiedades → caja → contenido. (4) Quitar las
+variables locales `id`, `rotate`, `rotateOrigin` que se arrastran por el método: un pequeño `ElementProps` mutable
+y privado del builder. **Hacer por pasos**, un commit por cada familia de elemento, con `mvn test` en verde y
+**ningún PNG ni volcado cambiado** en cada uno. **Aceptación:** ningún método de `tree` con más de 60 líneas ni
+complejidad > 20; `BoxTreeBuilder` < 350 líneas.
+
+### AR-02 · `Style` · Alta · L
+
+**Evidencia (medida).** 363 líneas, **70 campos `public` no `final`** de todas las familias (caja, tipografía, flex, grid,
+ítem, lista, enlace, imagen, índice, `Multicol`), todos mutables, más un `Map` de líneas por propiedad. Cualquier
+clase puede escribir cualquier campo en cualquier momento (el layout no lo hace hoy, pero nada lo impide) y ningún
+algoritmo ve qué usa: `FlexLayout` recibe un `Style` con 70 propiedades y lee 12. Es la causa de que `Box` y `Style`
+no se puedan compartir con garantías entre hilos (TS-01) y de que `tree`, `layout` y `paint` se acoplen a una clase
+enorme. Rompe SRP e ISP.
+
+**Propuesta (por etapas, cada una verde).**
+1. *Accesores sin cambio de forma*: añadir métodos de lectura (`style.fontSize()`) y migrar los `layout`/`paint` a
+   ellos con un refactor mecánico; los campos siguen existiendo.
+2. *Esconder los campos* (`private`/package-private) y que solo `tree` pueda escribir (un `StyleBuilder` o los
+   métodos `set…` en el package `tree`).
+3. *Partir por familias* en registros inmutables: `TypographyStyle` (el único heredable: `Style.inheriting` copia
+   solo esto), `BoxStyle`, `FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ContentsStyle`, `MulticolStyle`,
+   `ImageStyle`; `Style` es el agregado inmutable. Los enums que hoy viven en `Style` (`Layout`, `Position`, `TextAlign`,
+   `Marker`…) se mueven al package `model` donde los usan `tree` y `layout`; si no, `model` no puede nombrarlos y
+   `Style` seguirá siendo un cajón de sastre.
+4. *Congelar*: tras construir el árbol, `Box`/`Style` ya no cambian (AR-03).
+**Aceptación:** ningún campo público no `final` en `Style`; `FlexLayout` depende de `FlexStyle` y `BoxStyle`, no
+del agregado; volcados y PNG sin cambios.
+
+### AR-03 · `Box` · Media · M
+
+`Box` (180 líneas) tiene `text`, `runs`, `image`, `anchor`, `number`, `marker`, `headRows`, `footRows`, `textLine`,
+`textBlock` y `parent` públicos y no finales, y `children` es una `ArrayList` pública. La documentación dice que «`Box`
+es mutable solo mientras `BoxTreeBuilder` construye el árbol; el layout no la escribe nunca»: es una convención, no
+una garantía, y `LaidOutDocument.root()` la entrega a cualquier cliente. **Propuesta:** campos privados con
+accesores; los mutadores package-private en `tree`; `children()` devuelve una vista no modificable; `inFlowChildren`
+se calcula una vez al cerrar el árbol (PF-04); `BoxTreeBuilder.Result` marca el árbol como cerrado. Se hace junto con AR-02.
+
+### AR-04 · `Engine` y los algoritmos · Media · M
+
+**Evidencia.** 8 algoritmos (`layout/*/…Layout`) importan la clase concreta `Engine` (para `engine.layout`,
+`engine.intrinsic`, `engine.measurer()`, `engine.natural`) y `Engine` construye los 8 en su constructor: dependencias
+circulares entre clase concreta y detalle (DIP), un `switch` por `Style.Layout` más una excepción a mano
+(`box.element == Element.TABLE ? table : grid`) cada vez que se añade un algoritmo (OCP), y un `Engine` que a la vez
+despacha, valida (`measurer.validate`, `images.validate`), numera páginas, guarda las páginas supuestas y vacía
+cachés (SRP). Para probar un algoritmo hay que construir el motor entero (los tests lo hacen con `LayoutFixture`).
+
+**Propuesta.** (1) Interfaz `LayoutContext` (`layout`, `intrinsic`, `contentIntrinsic`, `measurer`, `natural`) que
+implementa `Engine`; los algoritmos dependen de ella y se pueden probar con un doble. (2) El despacho en un
+`EnumMap<Style.Layout, LayoutAlgorithm>` y la tabla a un algoritmo propio registrado (`TableLayout` envuelve a
+`GridLayout`, ya lo hace), sin el `if` por `Element`. (3) Sacar de `Engine` lo que es de la paginación
+(`reservePageDigits`, `assume`, `number`, `absolute`) a un `PaginationSession`/package-private (TS-01). (4) `Engine`
+conserva solo `layOutDocument` y el despacho. **Aceptación:** ningún `…Layout` importa `Engine`; `ArchitectureTest`
+(AR-12) lo comprueba.
+
+### AR-05 · `Canvas` · Media · M
+
+La interfaz mezcla dos cosas: primitivas de dibujo (`background`, `fill`, `border`, `text`, `vertical`) y, con
+**11 métodos `default` que no hacen nada**, las del PDF etiquetado y los enlaces (`beginText(Box)`, `beginLinkText`,
+`image`, `link`, `beginRotation`, `endRotation`, `endText`…) que `SvgCanvas` ignora. `StackingContext` las llama todas
+sin saber si el lienzo las entiende: un tercer lienzo (por ejemplo un PNG) heredaría 11 métodos vacíos sin darse
+cuenta de que debería implementar alguno. ISP. **Propuesta:** `Canvas` con el dibujo; `TaggedCanvas`/`LinkCanvas`
+(o un solo `Annotating`) como interfaces opcionales que `StackingContext` obtiene con `canvas instanceof`/un método
+`Optional<…> tagging()`. **Aceptación:** `SvgCanvas` no tiene métodos vacíos heredados; golden SVG sin cambios.
+
+### AR-06 · `PdfCanvas` · Media · M
+
+760 líneas y cuatro responsabilidades: (1) orquestar el documento (`write` estático: páginas, etiquetas de página
+`labels`, destinos, estructura, guardado); (2) las primitivas del lienzo; (3) sombreados y máscaras suaves
+(`gradient`, `opacityMask`, `axial`, `stitched`, ≈ 130 líneas de diccionarios COS); (4) fuentes (`pdfFont`) y el texto
+con `TJ` (`spaced`, `justified`). Y **12 bloques idénticos** `try { … } catch (IOException e) { throw new
+UncheckedIOException(e); }`. **Propuesta:** `PdfDocumentWriter` (1), `PdfGradients` (3), `PdfFonts` (4: caché de
+`PDFont` y carga, que también resuelve PF-05) y `PdfCanvas` (2); un único punto de conversión de
+`IOException` (un `interface Io { void run() throws IOException; }` con `io(() -> …)`) o que los métodos de
+`Canvas` declaren `throws IOException`, que es lo honesto. **Aceptación:** `PdfCanvas` < 350 líneas; PDF byte a byte
+igual (normalizado) en los 11 ejemplos antes y después, con `ConcurrencyProbe`.
+
+### AR-07 · Conocimiento de `Element` fuera de `tree` · Media · M
+
+Hay 12 comparaciones `x.element == Element.Y` en `layout` y `paint` (`Engine`, `Overflow`, `StackingContext`,
+`PdfStructure` ×8). `PdfStructure.build` (59 líneas, complejidad 22) y `type(Box)` son una cadena de `if` por tipo
+de elemento; añadir un elemento obliga a tocar `PdfStructure`, `Element` y, a menudo, `StackingContext`. DRY
+conceptual y OCP. **Propuesta:** que `Element` (que ya da `layout()`, `position()`, `hasText()`, `headingLevel()`) lo
+describa todo: `pdfRole()` (etiqueta y si es contenedor), `structural()`, `decorative()`; `PdfStructure` consulta, no
+compara. **Aceptación:** ninguna comparación con una constante de `Element` en `paint` ni `layout`, salvo el despacho.
+
+### AR-08 · Superficie pública · Media · M
+
+`PdfWriter.write` tiene **4 sobrecargas** (con y sin estilos, con y sin `Resources`, con `boolean debug`);
+`Engine.layOutDocument` 3; `SvgCanvas.page` 2; los estilos aparte son un parámetro que puede ser `null`. No hay un
+objeto que represente «una configuración de conversión». **Propuesta:** `StxtPdf` (fachada) con `Options`
+(`Resources`, `Limits` de QA-06, `debug`, estilos) y un `Converter` inmutable y seguro entre hilos (TS-05):
+`Converter.convert(String|Path documento, OutputStream)`, `layOut(...)` (para pintar a PDF y a SVG a la vez) y la
+lectura del `Styles` aparte. Las clases actuales quedan como la capa de bajo nivel documentada, y las sobrecargas
+de `PdfWriter`, delegando en `Converter` y marcadas `@Deprecated`. Es la base de la API HTTP y de «cómo extender fácil»
+de `TODO.md`.
+
+### AR-09 · Modelo de errores · Media · M
+
+Un cliente que convierte un documento debe poder distinguir «el documento es inválido» (4xx) de «el servidor falla»
+(5xx), y hoy las excepciones no tienen un tipo común: `dev.stxt.exceptions.ParseException`/`ValidationException`
+(de `stxt-core`), `InvalidModelException`, `ResourceException`/`ImageFormatException` (todas `RuntimeException`
+sin padre común), `IllegalStateException` (9 usos: «sin progreso» y «máximo de páginas» del `Paginator`, enlaces sin
+destino…), `UncheckedIOException` (12 en `PdfCanvas`), `IOException` y `java.awt.FontFormatException` convertidas
+(`PdfImages`). **Propuesta:** `StxtPdfException` (runtime) con `kind()` (`INVALID_DOCUMENT`, `RESOURCE`, `LIMIT`,
+`INTERNAL`), `line()` y `code()`; `InvalidModelException` y `ResourceException` la extienden; `DocumentReader` envuelve
+las excepciones de `stxt-core` (conservando la causa); los `IllegalStateException` que son fallos del documento pasan
+a `LIMIT`, y los que son errores de programación, a `INTERNAL`. **Aceptación:** una sola `catch (StxtPdfException)` basta
+en un servicio; el catálogo de errores sigue verde; la tabla de §6 de la especificación incluye el nuevo `kind`.
+
+### AR-10 · Dos tolerancias · Baja · S
+
+`Overflow.TOLERANCE = 0.01` frente a `Tolerance.EPSILON` del resto del motor; el comentario admite que «ningún test
+depende hoy de la diferencia». `CLAUDE.md` pide usar `Tolerance` y dice que `Overflow` es la excepción. Unificar
+(probar con `EPSILON` y ver si algún golden/ejemplo cambia) o dar nombre a las dos en `Tolerance`
+(`LAYOUT`, `OVERFLOW`) con su razón. DRY.
+
+### AR-11 · `Paginator.paginate` · Baja · S
+
+96 líneas, complejidad 21, con tres fases (convergencia, segunda fase de numeración, colocación de los `Fixed`)
+y los registros privados `Queued` y `Numbering`. Extraer `converge(...)`, `placeFixed(...)` y `Numbering` a su
+fichero. Antes de tocarlo, PF-03 (que lo modifica). Sin cambio de comportamiento.
+
+### AR-12 · `ArchitectureTest` solo detecta ciclos · Baja · S
+
+Hoy comprueba que no hay ciclos entre packages de primer nivel. Añadir **reglas de dirección** (hoy se cumplen):
+`model` no importa nada; `tree` solo `model` (y `stxt-core`); `fragment` solo `model` y `tree`; `layout` no importa
+`paint`; `paint` no importa `stxt`; dentro de `layout`, los subpackages de algoritmos no se importan entre sí salvo
+los dos casos actuales (`block` → `inline`/`position`; `table` → `grid`; `flex`/`grid` → `position`); y, tras AR-04,
+ningún `…Layout` importa `Engine`. Las reglas se escriben como datos en el test (tabla de permitidos).
+
+### AR-13 · Limpieza · Baja · S
+
+- 14 javadoc nombran un «módulo N» de un documento que no está en el repositorio (`CLAUDE.md` pide no usarlos):
+  `grep -rn "módulo [0-9]" src/main`. Sustituir por la sección de la especificación o quitar.
+- `Placement.NoRoom` (`extends RuntimeException`) se usa como control de flujo en `GridLayout.arrange` (`catch` en
+  `GridLayout.java:73`): valorar devolver un resultado (`Optional`/valor) en vez de lanzar.
+- `Box.describe()` y `Box.toString()` duplican la forma de nombrar una caja (`StxtDump`, mensajes): una función.
+
+## Plan de sesiones
+
+Cada sesión deja `mvn test` en verde, `git status` limpio y un commit por tarea. Orden pensado para que lo barato y de
+más riesgo vaya primero y el refactor grande se haga con red de seguridad.
+
+| Sesión | Tareas | Resultado |
+|---|---|---|
+| **1. Correcciones y red de seguridad** | QA-01, QA-04, QA-05, QA-09, TS-02 | Fallo del idioma corregido; CI con matriz de idiomas; test de hilos |
+| **2. Decisión de ligaduras y rendimiento del pintado** | QA-03 + PF-01 (tras decidir A o B), PF-02, TS-04 | Mide = pinta; pintar 4 a 20 veces más rápido; sin cerrojos calientes |
+| **3. Contrato público** | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
+| **4. SVG y el estado global** | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
+| **5. Caché de la paginación** | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
+| **6. Tests de referencia** | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
+| **7. Encapsulación del modelo** | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
+| **8. Constructor del árbol** | AR-01 | `BoxTreeBuilder.element` partido por familias |
+| **9. Algoritmos y lienzos** | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
+| **10. Partir `Style`** | AR-02 (etapas 3 y 4), AR-13 | Registros inmutables por familia; árbol congelado |
+
+Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una sesión entera y conviene hacerlas con
+`ConcurrencyProbe` (comparación del PDF) y los PNG como red.
+
+## Decisiones abiertas
+
+1. **Ligaduras (QA-03/PF-01):** ¿se pintan sin ligaduras (A, recomendado: mide = pinta y es mucho más rápido) o se
+   miden con ellas (B)? Bloquea la sesión 2.
+2. **Política de los PNG de referencia (QA-07):** ¿falla el test cuando cambia un PNG, salvo con `-D…update=true`?
+   Hoy es una convención humana.
+3. **Fachada (AR-08):** ¿se mantiene `PdfWriter.write` como API estable (solo se desaconseja) o se depreca?
+4. **SVG con texto (QA-02/TS-03):** ¿contornos hechos por el motor (sin AWT) o seguir con JSVG y documentar sus límites?
+
+## Registro de sesiones
+
+| Fecha | Sesión | Qué se hizo | Siguiente paso |
+|---|---|---|---|
+| 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |

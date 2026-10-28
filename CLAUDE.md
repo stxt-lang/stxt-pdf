@@ -20,6 +20,9 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
+- **Revisión de QA y arquitectura (SOLID, DRY, KISS), hilos y rendimiento:** [`docs/ROADMAP-QA-ARQ.md`](docs/ROADMAP-QA-ARQ.md).
+  Tareas con evidencia medida, propuesta y criterio de aceptación, y un plan de sesiones; las sondas con que se
+  midió están en [`tools/qa/`](tools/qa/README.md). Léela al empezar una sesión de calidad y actualízala al terminar.
 - **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
   (si difiere del resumen del §9 de la especificación, manda el fichero)
 - **Ejemplos de documentos completos:** [`test/examples/`](test/examples) (índice en su `README.md`)
