@@ -653,7 +653,8 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
 - **Tamaños intrínsecos.** min-content = la palabra más ancha; max-content = el párrafo más
   largo en una sola línea.
 - **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
-  página y el total de páginas. Ver [§5.10](#510-fragmentación).
+  página y el total de páginas. Ver [§5.10](#510-fragmentación). `{page of: id}` da la página de
+  otra caja ([§5.19](#519-referencias-a-otras-cajas)).
 - **Tramos.** El texto puede tener partes con formato dentro de una misma línea: **negrita**,
   *cursiva*, subrayado y tachado, combinables. Cada tramo mide y se pinta con su variante de la
   fuente; la negrita y la cursiva se suman a las de la caja (una palabra en negrita de un texto
@@ -1007,6 +1008,10 @@ Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas con
 saltos y se vuelven a medir y alinear. Como los `Fixed` no ocupan espacio, el flujo principal
 no cambia.
 
+`{page of: id}`, en cambio, se resuelve paginando hasta que el valor supuesto coincida con el
+real ([§5.19](#519-referencias-a-otras-cajas)): el texto se mide ya con la página escrita, así
+que puede cambiar el reparto en líneas y en páginas.
+
 ### 5.11 Recursos y fuentes
 
 **Carpeta de recursos.** Los ficheros que usa un documento están en una única carpeta, por
@@ -1047,8 +1052,8 @@ glifos.
 
 **Comprobaciones.** Con las métricas reales, antes de maquetar se comprueba que cada caja con
 texto tiene su fuente (familia, peso y estilo) en `fonts/` y que la fuente tiene todos los
-caracteres de su texto (los espacios en blanco se pintan como espacios; `{page}` y `{pages}`,
-como cifras). Un texto con tramos ([§5.4](#54-texto)) necesita además la variante de cada
+caracteres de su texto (los espacios en blanco se pintan como espacios; `{page}`, `{pages}` y las
+referencias a otras cajas, como cifras). Un texto con tramos ([§5.4](#54-texto)) necesita además la variante de cada
 tramo (`Weight: normal` con un tramo en negrita necesita la negrita), y cada tramo, sus
 caracteres en ella. Una fuente desconocida, una variante que falta o un carácter que la fuente
 no tiene son errores con la línea de la caja, o la del tramo si es la variante de un tramo
@@ -1602,6 +1607,41 @@ resolución del fichero: el JPEG tal cual y el PNG sin pérdida y con su transpa
 depuración la incrusta como `data:`. En el volcado del [§7](#7-formato-de-resultados) es una caja
 más.
 
+### 5.19 Referencias a otras cajas
+
+Un texto puede escribir un dato de otra caja del documento: `{page of: id}` es el número de la
+página donde empieza la caja con ese `Id`. Se escribe en el texto de un `Text`, un `Paragraph` o
+una `Cell` con valor, como `{page}` y `{pages}`, y se puede mezclar con ellos:
+
+```
+Text: El esquema de conexión está en la página {page of: wiring}.
+Block:
+	Id: wiring
+```
+
+- **Qué página es.** La de la **primera** caja que sale de la caja referida: si está partida entre
+  varias páginas, la página donde empieza. Si la caja es una fila repetida de una tabla (cabecera
+  o pie), la primera de sus páginas.
+- **Dónde se puede referir.** Cualquier caja con `Id` que no sea un `Fixed` ni esté dentro de uno,
+  que se repiten en todas las páginas (`REFERENCE_NOT_PLACEABLE`). La referencia puede ir antes o
+  después de la caja, y también en un `Fixed` (que escribe lo mismo en todas las páginas).
+- **El `Id` es el de la caja**, igual que en `For id`: el de un `Item` o un `Area` va en su
+  elemento. Un `Id` que no existe, o una referencia sin `Id` (`{page of: }`), es un error
+  (`REFERENCE_UNKNOWN`) con la línea del texto, o la del carácter si el texto es un bloque
+  `Content >>`.
+- **El texto mide lo que se escribe.** La referencia se sustituye antes de repartir el texto en
+  líneas, así que `página 9` y `página 10` miden distinto y el texto puede pasar a una línea más.
+  Eso mueve el contenido y puede cambiar la página de la caja referida; por eso la página se
+  resuelve **paginando hasta que converja**: la primera pasada supone un número de prueba de dos
+  cifras (como `{page}`), cada pasada comprueba en qué página ha quedado cada caja referida, y si
+  no coincide con la supuesta, se vuelve a paginar con la que ha salido. Termina cuando coinciden.
+  Si tras 10 pasadas que cambian alguna página no han coincidido, es un error
+  (`REFERENCE_UNSTABLE`, con la línea de la referencia que sigue cambiando): el texto de una
+  referencia cambia de ancho con su página y mueve la caja de página en las dos direcciones. No
+  pasa con documentos normales, porque un número solo cambia de ancho al cambiar de cifras
+  (9 → 10, 99 → 100).
+- **Accesibilidad.** El texto es contenido de su elemento (`P`, `Span`…), como cualquier número.
+
 ---
 
 ## 6. Validación
@@ -1672,6 +1712,10 @@ La validación se hace en cuatro niveles:
 | `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
+| `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
+| `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
+| `REFERENCE_NOT_NUMBERED` | El número de una caja, que lo tiene | `{number of: nota}: nota no tiene número…` |
+| `REFERENCE_UNSTABLE` | La página de las cajas referidas se estabiliza en 10 pasadas de paginación (línea de la referencia) | `La página de x no se estabiliza: tras 10 pasadas sigue cambiando…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
@@ -1800,6 +1844,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Imagen más ancha que su contenedor | Desborda (se suele evitar con `max-width: 100%`) | Error (`BOX_OVERFLOW`): se declara `Width` |
 | Imagen en un ítem estirado de flex o grid | Se estira en los dos ejes y se deforma | Su alto sale de la proporción y no se estira; su ancho, sí |
 | `alt=""` | Imagen decorativa | Sin `Alt`; un `Alt` vacío es un error |
+| Número de la página de otro elemento | Contadores (`target-counter`, solo en impresión paginada y con poco soporte) | `{page of: id}` en el texto, resuelto paginando hasta que converja ([§5.19](#519-referencias-a-otras-cajas)) |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |
@@ -2015,6 +2060,7 @@ Document (dev.stxt.boxes):
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
+| **Referencia** | `{page of: id}` en un texto: la página donde empieza la caja con ese `Id` ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado) ([§5.4](#54-texto)). |

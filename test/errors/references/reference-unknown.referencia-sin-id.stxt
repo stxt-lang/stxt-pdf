@@ -1,0 +1,11 @@
+# Case: Referencia sin Id
+# Code: REFERENCE_UNKNOWN
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: Ver la página {page of: }

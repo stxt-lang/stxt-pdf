@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.FontFile;
@@ -93,6 +94,15 @@ public final class PdfMetrics implements TextMeasurer {
                         requireGlyph(box, font, d, start + i);
                     }
                     i += marker.length();
+                    continue;
+                }
+                Reference reference = Reference.at(text, i);
+                if (reference != null) {
+                    // Una página o un número, que se pintan con cifras (o letras, en las listas).
+                    for (char d : DIGITS.toCharArray()) {
+                        requireGlyph(box, font, d, start + i);
+                    }
+                    i = reference.end();
                     continue;
                 }
                 int cp = text.codePointAt(i);

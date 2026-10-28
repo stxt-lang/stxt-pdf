@@ -90,6 +90,16 @@ public enum ErrorCode {
     /** {@code Inside} o {@code Decoration} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,
 
+    // --- Referencias --------------------------------------------------------------------------
+    /** Una referencia ({@code {page of: id}}) sin {@code Id}, o con un {@code Id} que no tiene ninguna caja. */
+    REFERENCE_UNKNOWN,
+    /** Una referencia a la página de una caja que no tiene una única página: la de un {@code Fixed} o una de sus cajas. */
+    REFERENCE_NOT_PLACEABLE,
+    /** Una referencia a una caja que no tiene número: ni es un ítem de una lista numerada ni un encabezado. */
+    REFERENCE_NOT_NUMBERED,
+    /** Las páginas a las que se refiere el texto no se estabilizan: cada pasada de paginación las cambia. */
+    REFERENCE_UNSTABLE,
+
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,

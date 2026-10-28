@@ -13,6 +13,7 @@ import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.Slice;
+import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
@@ -56,6 +57,10 @@ public final class InlineLayout implements LayoutAlgorithm {
     private final TextMeasurer real;
     /** Reparto en líneas de cada texto por ancho disponible; depende de {@link #measurer}. */
     private final Map<BrokenKey, Broken> broken = new HashMap<>();
+    /** Página que se supone a cada caja referida con {@code {page of: id}} (§5.19); ver {@link #assume}. */
+    private Map<String, String> pages = Map.of();
+    /** Número de cada caja referida con {@code {number of: id}}. */
+    private Map<String, String> numbers = Map.of();
 
     public InlineLayout(Engine engine, TextMeasurer measurer) {
         this.engine = engine;
@@ -71,6 +76,32 @@ public final class InlineLayout implements LayoutAlgorithm {
     public void reservePageDigits(int digits) {
         this.measurer = PageNumbers.probing(real, digits);
         broken.clear();
+    }
+
+    /**
+     * Lo que valen las referencias a otras cajas del texto ({@code {page of: id}} y
+     * {@code {number of: id}}, §5.19): se sustituyen antes de repartir el texto en líneas, así
+     * que el texto mide lo que va a pintarse. Las páginas son una suposición que el
+     * {@link dev.stxt.boxes.layout.Paginator} repite hasta que se cumple. Vacía el reparto
+     * memorizado; la caché del {@link Engine} se vacía allí.
+     */
+    public void assume(Map<String, String> pages, Map<String, String> numbers) {
+        this.pages = Map.copyOf(pages);
+        this.numbers = Map.copyOf(numbers);
+        broken.clear();
+    }
+
+    /** Los tramos del texto de la caja, con sus referencias a otras cajas ya sustituidas. */
+    private List<TextRun> runs(Box box) {
+        List<TextRun> runs = box.runs();
+        if (!Reference.contains(box.text)) {
+            return runs;
+        }
+        return runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format())).toList();
+    }
+
+    private String referenced(Reference.Kind kind, String id) {
+        return kind == Reference.Kind.PAGE ? pages.get(id) : numbers.get(id);
     }
 
     /**
@@ -110,7 +141,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     private Broken breakText(Box box, double available) {
         Style s = box.style;
         List<List<LineBreaker.Line>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(box.runs(), available, measurer, s.fontFace(), s.fontSize, s.textWrap)
+                ? LineBreaker.breakParagraphs(runs(box), available, measurer, s.fontFace(), s.fontSize, s.textWrap)
                 : List.of();
         List<LineBreaker.Line> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
@@ -124,7 +155,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
-                ? LineBreaker.intrinsics(box.runs(), measurer, box.style.fontFace(), box.style.fontSize)
+                ? LineBreaker.intrinsics(runs(box), measurer, box.style.fontFace(), box.style.fontSize)
                 : IntrinsicSizes.ZERO;
         return content;
     }

@@ -123,6 +123,7 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(root, true);
         buildContent(ctx, document, root);
         ctx.rules.checkIds(ctx.ids.keySet());
+        References.validate(root);
         return new Result(media, root, metadata);
     }
 

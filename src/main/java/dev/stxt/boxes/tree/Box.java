@@ -42,6 +42,11 @@ public final class Box {
      * {@code images/} de los recursos; {@code null} en el resto de cajas.
      */
     public String image;
+    /**
+     * Número de la caja en el documento, tal como lo da {@code {number of: id}}
+     * (ESPECIFICACION.md §5.19); {@code null} si no tiene.
+     */
+    public String number;
     /** Línea del nodo {@code Text}. */
     public int textLine;
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */

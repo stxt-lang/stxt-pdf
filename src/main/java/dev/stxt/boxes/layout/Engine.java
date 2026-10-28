@@ -23,6 +23,7 @@ import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
 
 import java.util.List;
+import java.util.Map;
 
 import static dev.stxt.boxes.model.Tolerance.fits;
 
@@ -104,6 +105,16 @@ public final class Engine {
      */
     public void reservePageDigits(int digits) {
         inline.reservePageDigits(digits);
+        cache.clear();
+    }
+
+    /**
+     * Lo que valen las referencias a otras cajas en los textos (§5.19): la página de cada caja
+     * referida con {@code {page of: id}}, que el {@link Paginator} supone y comprueba, y su número
+     * con {@code {number of: id}}. Vacía la caché, porque cambian las medidas del texto.
+     */
+    public void assume(Map<String, String> pages, Map<String, String> numbers) {
+        inline.assume(pages, numbers);
         cache.clear();
     }
 

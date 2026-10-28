@@ -47,7 +47,10 @@ class ErrorCatalogTest {
     /** Códigos sin caso en el catálogo, con el motivo. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
             // Las fuentes del repositorio tienen las cuatro variantes: lo prueba PdfMetricsTest.
-            ErrorCode.FONT_VARIANT_MISSING);
+            ErrorCode.FONT_VARIANT_MISSING,
+            // Con las mismas métricas para cualquier cifra la paginación siempre converge: es una red
+            // de seguridad que prueba PageReferencesTest con un medidor que la fuerza.
+            ErrorCode.REFERENCE_UNSTABLE);
 
     private final DocumentReader reader = new DocumentReader();
 

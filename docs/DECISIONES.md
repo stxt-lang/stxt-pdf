@@ -794,3 +794,43 @@ párrafo de Markdown y tres errores nuevos. Las interpretaciones que salieron al
      (ejemplo 04): el motor no tiene referencias a páginas. Si el texto cambia, hay que
      revisarlos. *Alternativa:* un nodo de referencia que se resuelva al terminar de paginar,
      como `{page}` y `{pages}`.
+
+## Hito 22: referencias a páginas e índice (2026-10-28)
+
+Decisiones X1–X12 de la hoja de ruta: `{page of: id}` y `{number of: id}`, resueltas paginando
+hasta que converjan (X3), un elemento `Contents` que genera el índice, y un `Padding` por nivel
+en sus entradas. Las interpretaciones que salieron al implementarlas:
+
+151. **La referencia se sustituye antes de repartir el texto en líneas, no después**, a
+     diferencia de `{page}` y `{pages}`. El marcador `{page of: id}` tiene espacios, y el
+     reparto en líneas lo partiría en tres palabras. Con convergencia (X3) tampoco hace falta un
+     segundo paso: el texto con el valor supuesto se mide, se reparte y se pinta tal cual. Las
+     líneas ya no contienen la referencia. *Dónde:* `layout/inline/InlineLayout.runs`,
+     `model/Reference`. *Alternativa:* un marcador sin espacios, resuelto en dos fases como
+     `{page}`.
+
+152. **La página de una caja es la de su primer fragmento**, también en las filas repetidas de
+     una tabla (la primera de sus páginas). Se busca en los fragmentos del resultado, en orden de
+     página y de documento. *Dónde:* `layout/Paginator.pagesOf`. *Alternativa:* la del último
+     fragmento.
+
+153. **El número de prueba de la primera pasada tiene las cifras de `{page}`** (`00`), así que
+     siempre hay al menos una segunda pasada si hay referencias a páginas, aunque la página real
+     tenga dos cifras: se compara el texto supuesto con el real. El máximo es de 10 pasadas que
+     cambian alguna página; las pasadas por crecer las cifras de `{pages}` no cuentan, porque solo
+     crecen. Como un número solo cambia de ancho al cambiar de cifras, la paginación converge
+     siempre salvo con un medidor de texto que dé anchos distintos a cifras de la misma longitud
+     (`REFERENCE_UNSTABLE` es una red de seguridad, sin caso en el catálogo; la prueba
+     `PageReferencesTest` la fuerza con un medidor de pega). *Dónde:* `layout/Paginator.paginate`.
+     *Alternativa:* quedarse con la última pasada sin avisar.
+
+154. **Dos errores se detectan al construir el árbol**, no al maquetar: un `Id` que no existe o
+     una referencia sin `Id` (`REFERENCE_UNKNOWN`) y la página de una caja de un `Fixed`
+     (`REFERENCE_NOT_PLACEABLE`), porque dependen solo de la estructura del documento. Se
+     comprueban todas las referencias del árbol, también las de un `Fixed`, un `Markdown` o una
+     `Cell`. *Dónde:* `tree/References.validate`. *Alternativa:* comprobarlo al paginar, con
+     la línea del texto igualmente.
+
+155. **Las referencias se validan como cifras en las métricas reales**: un texto con
+     `{page of: id}` necesita en su fuente las cifras, no las letras del marcador. *Dónde:*
+     `layout/inline/PdfMetrics.check`.
