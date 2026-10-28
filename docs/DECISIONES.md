@@ -1344,7 +1344,8 @@ No es un hito de la hoja de ruta: sale del primer punto de `TODO.md`. Interpreta
 230. **El documento no nombra su documento de estilos ni el motor lo busca**: lo lee quien llama
      (`DocumentReader.readStyles`, de raíz `Styles` con el namespace; otra raíz es `DOCUMENT_ROOT`) y lo
      pasa al maquetar (`BoxTreeBuilder.build(documento, estilos)`, `Engine.layOutDocument(documento,
-     estilos)`, `PdfWriter.write(documento, estilos, …)`; `null` si no hay). Los tests de ejemplos y de
+     estilos)`, y `Converter.builder().styles(estilos)` desde la decisión 294, donde antes era `PdfWriter.write`; `null` si no hay en
+     las dos primeras). Los tests de ejemplos y de
      casos golden usan el `styles.stxt` de la carpeta si existe. El mismo nodo `Styles` del schema sirve de
      hijo de `Document` y de raíz, porque un schema acepta cualquier nodo como raíz.
      *Alternativa:* una propiedad `Styles file` en `Document`.
@@ -1792,3 +1793,15 @@ interpretaciones que salieron al implementarlas.
 293. **El SVG de depuración no distingue `Ligatures`**: el navegador aplica las ligaduras de la fuente como
      quiera. Solo es el lienzo de los tests; el PDF es la salida de verdad. *Alternativa:* `font-variant-ligatures`
      en el texto del SVG.
+
+294. **`Converter` sustituye a `PdfWriter.write`** (ROADMAP-QA-ARQ.md, AR-08 y TS-05; decidido con el usuario: sin
+     código fuera del repositorio, así que se hace el refactor completo y no se deja nada obsoleto).
+     `PdfWriter` tenía cuatro sobrecargas de `write` cuyos parámetros (estilos que podían ser `null`, `Resources`,
+     un `boolean debug` suelto) se multiplicaban con cada opción nueva, solo producía PDF y no decía nada de
+     hilos. Ahora la configuración es un objeto inmutable (`Converter.builder()`: `resources`, `styles`, `debug`),
+     seguro entre hilos porque cada conversión crea su propio `Engine`, con `layOut`, `toPdf` (de un documento o
+     de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si no hay, no se llama a `styles`. Vive en un
+     package nuevo, `convert`, encima de todos los demás y del que no depende nadie (`ArchitectureTest`).
+     `PdfCanvas.write` y `Engine` siguen siendo públicos como capa de bajo nivel. *Dónde:*
+     `convert/Converter`; se eliminó `paint/PdfWriter`. *Alternativa:* conservar `PdfWriter.write` como atajo
+     o marcarlo `@Deprecated`.

@@ -3,7 +3,7 @@
 // (cuatro fases alternadas, para que el calentamiento de la JVM no favorezca a ninguno).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
-import dev.stxt.boxes.paint.PdfWriter;
+import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import java.io.*;
@@ -16,7 +16,9 @@ public class ConcurrencyProbe {
 
     static byte[] convert(In in, Resources r) throws Exception {
         ByteArrayOutputStream o = new ByteArrayOutputStream();
-        PdfWriter.write(in.doc, in.styles, r, o, false);
+        Converter.Builder b = Converter.builder().resources(r);
+        if (in.styles != null) b.styles(in.styles);
+        b.build().toPdf(in.doc, o);
         return o.toByteArray();
     }
 

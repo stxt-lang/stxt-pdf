@@ -599,7 +599,7 @@ Styles (dev.stxt.boxes):
 - **Se pasa al maquetar, nunca se busca.** El documento no dice dónde está su documento de estilos
   y el motor no busca ficheros ni carpetas: quien llama lo lee
   (`DocumentReader.readStyles`) y lo pasa junto al documento (`Engine.layOutDocument(documento,
-  estilos)`, `PdfWriter.write(documento, estilos, …)`). Es opcional: sin él, todo vale como antes.
+  estilos)`, `Converter.builder().styles(estilos)`). Es opcional: sin él, todo vale como antes.
 - **Vale menos que el documento.** Se admiten las mismas reglas que en el `Styles` del
   documento. En cada nivel de la prioridad de arriba (el de `For id`, el
   de `For class`, el de `Element`…), las reglas del documento de estilos aparte van **antes** y las

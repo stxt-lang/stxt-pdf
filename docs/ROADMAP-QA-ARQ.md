@@ -72,7 +72,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
 | TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
 | TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | hecho |
-| TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | pendiente |
+| TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | hecho |
 | PF-01 | Coste del GSUB de PDFBox | Alta | M | hecho |
 | PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | hecho |
 | PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | pendiente |
@@ -85,7 +85,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | pendiente |
 | AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | pendiente |
 | AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | pendiente |
-| AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | pendiente |
+| AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | hecho |
 | AR-09 | Modelo de errores sin tipo común | Media | M | pendiente |
 | AR-10 | Dos tolerancias | Baja | S | pendiente |
 | AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | pendiente |
@@ -352,11 +352,13 @@ constructor; (3) `ImageLibrary` con `ConcurrentHashMap.computeIfAbsent`. **Hecho
 **Aceptación:** `ConcurrencyProbe` muestra
 que compartir `Resources` ya no es más lento que no compartirlo.
 
-### TS-05 · Fachada reutilizable y segura entre hilos · Media · M
+### TS-05 · Fachada reutilizable y segura entre hilos · Media · M · hecho
 
 Ver AR-08: un `Converter` inmutable (con `Resources`, estilos opcionales y límites) cuyo `convert(...)` crea su
 `Engine` y es seguro entre hilos por construcción; sustituye a «hay que saber que no se comparte el `Engine`». Es
-la base del servicio HTTP de `TODO.md`.
+la base del servicio HTTP de `TODO.md`. **Hecho (sesión 3)** junto con AR-08: `convert/Converter` (decisión 294 de
+`DECISIONES.md`). `ConcurrentConversionTest.threadsSharingTheConvertersGetTheSamePdf` comparte un mismo `Converter`
+por ejemplo entre 4 hilos. Los `Limits` de QA-06 se añadirán al `Builder` cuando se hagan.
 
 ## Rendimiento
 
@@ -528,7 +530,7 @@ conceptual y OCP. **Propuesta:** que `Element` (que ya da `layout()`, `position(
 describa todo: `pdfRole()` (etiqueta y si es contenedor), `structural()`, `decorative()`; `PdfStructure` consulta, no
 compara. **Aceptación:** ninguna comparación con una constante de `Element` en `paint` ni `layout`, salvo el despacho.
 
-### AR-08 · Superficie pública · Media · M
+### AR-08 · Superficie pública · Media · M · hecho
 
 `PdfWriter.write` tiene **4 sobrecargas** (con y sin estilos, con y sin `Resources`, con `boolean debug`);
 `Engine.layOutDocument` 3; `SvgCanvas.page` 2; los estilos aparte son un parámetro que puede ser `null`. No hay un
@@ -538,6 +540,16 @@ objeto que represente «una configuración de conversión». **Propuesta:** `Stx
 lectura del `Styles` aparte. Las clases actuales quedan como la capa de bajo nivel documentada, y las sobrecargas
 de `PdfWriter`, delegando en `Converter` y marcadas `@Deprecated`. Es la base de la API HTTP y de «cómo extender fácil»
 de `TODO.md`.
+
+**Hecho (sesión 3), con la decisión del usuario: refactor completo, sin `@Deprecated`.** No hay código fuera del
+repositorio que use `PdfWriter`, así que se eliminó (`git rm`) en vez de dejarlo delegando. `convert/Converter`
+(`create()` o `builder()` con `resources`, `styles` —de un nodo, un texto o un fichero; nunca `null`— y `debug`) da
+`layOut(InlineNode)`, `toPdf(InlineNode | LaidOutDocument, OutputStream)` y `toSvg(LaidOutDocument)`. Package nuevo
+`convert`, la capa de arriba (`ArchitectureTest` exige que nada dependa de él). Migrados GoldenTest, StylesFileTest,
+PdfCanvasTest, BoxLooksPaintTest, ConcurrentConversionTest y `tools/qa/ConcurrencyProbe`; `PdfBytes` (helper de test)
+compartido. README, `CLAUDE.md` y especificación al día. Sin cambio en ningún PNG ni volcado. Quedan **sin hacer** de
+esta tarea: `StxtPdf` como nombre de fachada (se usó `Converter`), `Limits` (QA-06) y `layOut(String|Path)` (quien
+lee usa `DocumentReader`, que ya es público y seguro entre hilos).
 
 ### AR-09 · Modelo de errores · Media · M
 
@@ -608,7 +620,8 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
    ligaduras por defecto.
 2. **Política de los PNG de referencia (QA-07):** ¿falla el test cuando cambia un PNG, salvo con `-D…update=true`?
    Hoy es una convención humana.
-3. **Fachada (AR-08):** ¿se mantiene `PdfWriter.write` como API estable (solo se desaconseja) o se depreca?
+3. ~~**Fachada (AR-08)**~~ **Resuelta (sesión 3):** `PdfWriter` se eliminó y lo sustituye `Converter` (sin código externo
+   que migrar, no se dejó nada obsoleto).
 4. **SVG con texto (QA-02/TS-03):** ¿contornos hechos por el motor (sin AWT) o seguir con JSVG y documentar sus límites?
 
 ## Registro de sesiones
@@ -618,3 +631,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |
 | 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). CI en verde en GitHub (JDK 17, 21 y turco). | Sesión 2 (decidir ligaduras: QA-03) |
 | 2026-10-28 | 2 · Ligaduras y rendimiento del pintado | `Ligatures` en `Typography` (heredable, `false` por defecto; schema, §4.4/§5.4/§9, decisiones 289 a 293), medida con ligaduras con el `GsubWorker` de fontbox y pintado con `setEnableGsub`; PF-02 y TS-04 (`FontFile` sin cerrojos con avances precalculados; `Resources`/`ImageLibrary` sin `synchronized` calientes). 22 PNG regenerados (revisados: solo `fi`/`fl`). Suite verde. Medido: pintar ≈ 9,5× más rápido, layout ≈ 2× más rápido. | Sesión 3 (TS-01, AR-09, AR-08 + TS-05, QA-06) |
+| 2026-10-28 | 3 · Contrato público (en curso) | AR-08 y TS-05: `Converter` (inmutable, seguro entre hilos, `layOut`/`toPdf`/`toSvg`) en el package `convert`; `PdfWriter` eliminado y sus llamadores migrados; decisión 294. Nuevos `ConverterTest` (9) y un test de `Converter` compartido entre hilos. | Resto de la sesión 3: TS-01 (contrato de hilos en javadoc/README y `Engine` sin protocolo público), AR-09 (`StxtPdfException`), QA-06 (`Limits` en el `Builder`) |

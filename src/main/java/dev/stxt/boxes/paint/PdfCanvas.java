@@ -126,7 +126,7 @@ public final class PdfCanvas implements Canvas {
     /**
      * Pinta un documento maquetado con {@code new PdfMetrics(resources)}, con el título y el
      * idioma de sus metadatos, y escribe el PDF en {@code target}, que no se cierra. Para maquetar
-     * y pintar en una llamada está {@link PdfWriter}.
+     * y pintar en una llamada está {@link dev.stxt.boxes.convert.Converter}.
      */
     public static void write(LaidOutDocument document, Resources resources, OutputStream target, boolean debug)
             throws IOException {

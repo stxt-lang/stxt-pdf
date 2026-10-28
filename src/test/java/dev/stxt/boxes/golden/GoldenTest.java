@@ -6,7 +6,7 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.output.StxtDump;
-import dev.stxt.boxes.paint.PdfWriter;
+import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -81,7 +81,7 @@ class GoldenTest {
      * y un {@code page-N.png} por página (versionados): así un cambio en el resultado se ve en el
      * diff ({@link ReferenceFiles#writePageImages}). El PDF lleva los contornos de depuración de
      * las cajas y se maqueta con las métricas reales de las fuentes de {@code resources/fonts},
-     * que se incrustan ({@link PdfWriter#write(InlineNode, Resources, java.io.OutputStream, boolean)}),
+     * que se incrustan ({@link Converter}),
      * no con las de la comparación.
      */
     private static void writePdfAndImages(Path dir, InlineNode input, InlineNode styles) throws IOException {
@@ -89,7 +89,11 @@ class GoldenTest {
             return;
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(input, styles, new Resources(), out, true);
+        Converter.Builder converter = Converter.builder().debug(true);
+        if (styles != null) {
+            converter.styles(styles);
+        }
+        converter.build().toPdf(input, out);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
     }

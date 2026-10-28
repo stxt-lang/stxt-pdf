@@ -127,8 +127,9 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
+| `convert` | `Converter`: la entrada del motor. Reúne la carpeta de recursos, los estilos aparte y la depuración en un objeto inmutable y seguro entre hilos (`builder()`), y da `layOut`, `toPdf` y `toSvg`; cada conversión crea su propio `Engine`. Es la capa de arriba: nada del motor depende de ella (`ArchitectureTest`) |
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
 de `model`, y no hay ciclos (`ArchitectureTest`, que cuenta cada package con sus subpackages).
@@ -166,7 +167,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
 - **Documento de estilos aparte (§4.10):** las reglas de `Styles` pueden estar también en un documento de
   raíz `Styles` (`DocumentReader.readStyles`) que se pasa al maquetar (`BoxTreeBuilder.build(documento,
-  estilos)`, `Engine.layOutDocument(documento, estilos)`, `PdfWriter.write(documento, estilos, …)`); es
+  estilos)`, `Engine.layOutDocument(documento, estilos)`, `Converter.builder().styles(estilos)`); es
   opcional, puede ser `null` y el documento no lo nombra: el motor no busca ficheros. `StyleRules` lee los
   dos orígenes por separado (un duplicado es un error dentro de un origen, no entre los dos; una regla
   `For id` sin elemento nunca es un error, porque las plantillas pueden rellenarlo después) y en cada nivel de prioridad aplica antes las reglas del
@@ -398,7 +399,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   de `Relative` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo existe en los fragmentos: `Box` no guarda posición ni tamaño.
 - **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
   el de todos los tests de layout, y no necesita fuentes; `PdfMetrics` da las métricas reales de
-  las fuentes TTF de `Resources` y es el que usa `PdfWriter.write(document, out)`.
+  las fuentes TTF de `Resources` y es el que usa `Converter`.
   `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics` comprueba que
   existen las fuentes y tienen todos los caracteres (errores con línea).
 - **Recursos (§5.11):** carpeta fija, por defecto `resources/` del directorio de trabajo, con

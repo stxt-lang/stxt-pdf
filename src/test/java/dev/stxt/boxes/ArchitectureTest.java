@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -57,7 +58,7 @@ class ArchitectureTest {
 
     @Test
     void readsEveryPackage() {
-        assertEquals(Set.of("fragment", "layout", "model", "output", "paint", "resources", "stxt", "tree"),
+        assertEquals(Set.of("convert", "fragment", "layout", "model", "output", "paint", "resources", "stxt", "tree"),
                 dependencies().keySet());
     }
 
@@ -100,5 +101,12 @@ class ArchitectureTest {
     @Test
     void treeDependsOnlyOnModel() {
         assertEquals(Set.of("model"), dependencies().get("tree"));
+    }
+
+    /** {@code convert} es la fachada: la usan los clientes y las pruebas, ninguna otra pieza del motor. */
+    @Test
+    void nothingInTheEngineDependsOnTheFacade() {
+        dependencies().forEach((from, to) ->
+                assertFalse(to.contains("convert"), () -> from + " depende de convert"));
     }
 }

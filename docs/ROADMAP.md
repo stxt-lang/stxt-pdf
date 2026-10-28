@@ -1681,7 +1681,7 @@ siguiente paso concreto.
   `Typography`), las reglas del documento aparte valen menos que las del documento en cada nivel de
   prioridad, y las reglas `For id` sin elemento no son nunca un error (se quitó `STYLE_UNKNOWN_ID`: las plantillas pueden rellenar el elemento después). `DocumentReader.readStyles`,
   `BoxTreeBuilder.build(documento, estilos)`, `Engine.layOutDocument(documento, estilos)` y
-  `PdfWriter.write(documento, estilos, …)`; `StyleRules` lee los dos orígenes; los errores del documento aparte dicen
+  `Converter.builder().styles(estilos)` (antes `PdfWriter.write`); `StyleRules` lee los dos orígenes; los errores del documento aparte dicen
   `de los estilos`. Migrados todos los documentos de test, los once ejemplos (cada uno con su `styles.stxt`; los PNG y
   los volcados no cambian), la especificación (§4.10, nueva subsección) y el README. `StylesFileTest`, dos casos más
   en el catálogo. Decisiones 226–231 de `DECISIONES.md`. `mvn test` en verde.

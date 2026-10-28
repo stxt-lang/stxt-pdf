@@ -2,6 +2,7 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
+import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.resources.Resources;
@@ -45,7 +46,7 @@ class BoxLooksPaintTest {
 
     private static byte[] pdf(String document) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(new DocumentReader().read(Docs.sectioned(document)), out);
+        Converter.create().toPdf(new DocumentReader().read(Docs.sectioned(document)), out);
         Files.createDirectories(Path.of("target", "pdf"));
         Files.write(Path.of("target", "pdf", "box-looks.pdf"), out.toByteArray());
         return out.toByteArray();

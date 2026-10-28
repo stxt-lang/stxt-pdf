@@ -60,8 +60,18 @@ Para obtener un PDF, el layout debe usar las métricas reales de las fuentes:
 ```java
 InlineNode doc = new DocumentReader().read(Path.of("report.stxt"));
 try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
-    PdfWriter.write(doc, out);   // maqueta con new Engine(new PdfMetrics()) y pinta
+    Converter.create().toPdf(doc, out);   // maqueta con las métricas reales de las fuentes y pinta
 }
+```
+
+`Converter` reúne la configuración de una conversión (carpeta de recursos, documento de estilos aparte y
+contornos de depuración) y es inmutable y seguro entre hilos: se crea una vez y se comparte. Para usar las
+páginas antes de pintarlas, o pintarlas a PDF y a SVG a la vez:
+
+```java
+LaidOutDocument laidOut = converter.layOut(doc);
+converter.toPdf(laidOut, out);
+List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 ```
 
 Las reglas de `Styles` pueden estar en un documento aparte (raíz `Styles`), que se pasa junto al
@@ -69,14 +79,15 @@ documento y vale menos que el suyo; es opcional y el documento no dice dónde es
 
 ```java
 InlineNode styles = new DocumentReader().readStyles(Path.of("styles.stxt"));
-PdfWriter.write(doc, styles, out);   // o Engine.layOutDocument(doc, styles)
+Converter converter = Converter.builder().styles(styles).build();   // también styles(Path) y styles(String)
+converter.toPdf(doc, out);
 ```
 
 ## Recursos y fuentes
 
 Las fuentes y las imágenes están en una carpeta de recursos, por defecto `resources/` en el
 directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
-`PdfWriter.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
+`Converter.builder().resources(new Resources(Path.of("otra"))).build()`. Los recursos solo se buscan
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
 Las imágenes (`Image: logos/acme.png`) son PNG, JPEG o SVG de `images/`, con la ruta relativa a esa
@@ -234,7 +245,8 @@ src/main/java/dev/stxt/boxes/
     image/      ImageLayout, Images, NaturalSize
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfImages, PdfStructure, ImageFit,
-                Leaders, PdfWriter
+                Leaders
+  convert/      Converter
   output/       StxtDump
 
 test/           Casos de prueba que no son código: golden/ (resultado calculado a mano), errors/

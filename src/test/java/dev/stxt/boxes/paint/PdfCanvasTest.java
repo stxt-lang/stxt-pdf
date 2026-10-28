@@ -2,6 +2,7 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
+import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.model.TextRun;
@@ -62,7 +63,7 @@ class PdfCanvasTest {
 
     private static byte[] render(InlineNode document, String name) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(document, out);
+        Converter.create().toPdf(document, out);
         Files.createDirectories(PDF_DIR);
         Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
         return out.toByteArray();

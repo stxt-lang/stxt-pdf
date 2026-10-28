@@ -5,8 +5,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.paint.PdfWriter;
-import dev.stxt.boxes.resources.Resources;
+import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.exceptions.ParseException;
 import org.junit.jupiter.api.Test;
@@ -224,11 +223,11 @@ class StylesFileTest {
     void thePdfCanBeWrittenWithTheStylesDocument() throws IOException {
         InlineNode document = READER.read(Docs.sectioned(HEADER + "\tText: Hola"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter.write(document, READER.readStyles(BASE), new Resources(), out, false);
+        Converter.builder().styles(BASE).build().toPdf(document, out);
         assertTrue(out.size() > 1000);
         // Sin la fuente base no hay texto que maquetar: el documento solo no basta.
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> PdfWriter.write(document, null, new Resources(), new ByteArrayOutputStream(), false));
+                () -> Converter.create().toPdf(document, new ByteArrayOutputStream()));
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
     }
 }
