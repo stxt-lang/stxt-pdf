@@ -49,7 +49,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 28 | Aspecto de las cajas: esquinas, color de borde por lado, degradados y opacidad (sin sombras) | hecho | 21 |
 | 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | hecho | 23 |
-| 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
+| 31 | Imágenes vectoriales (SVG) | en curso | 24 (previsto) |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 30, el 2026-10-28 (el 28 y el 30 en otras
 sesiones del mismo día). El hito 31 está pendiente; los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
@@ -1211,29 +1211,30 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
   conexión.
 - **`tools/ExampleImages.java`** generaría SVG en vez de dibujar píxeles.
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **V1. Cómo se incrusta.** *Propuesta:* convertir el SVG a gráficos vectoriales del PDF
-      (rutas y rellenos), con una librería pequeña que dibuje a `Graphics2D` y un adaptador a
-      PDFBox. *Alternativa:* rasterizar a la resolución del fichero al incrustar (más sencillo,
-      pero no es vectorial) o pasar por Apache Batik (completa pero enorme).
-- [ ] **V2. Librería.** *Propuesta:* una dependencia nueva, la más pequeña que cubra el
-      subconjunto de V3; es lo que más decide el coste del hito. *Alternativa:* escribir un
-      intérprete del subconjunto.
-- [ ] **V3. Subconjunto.** *Propuesta:* formas básicas, rutas, grupos, transformaciones, rellenos
-      sólidos y degradados, trazos y `viewBox`; sin scripts, sin animación, sin filtros.
-      *Alternativa:* lo que dé la librería.
-- [ ] **V4. Texto dentro del SVG.** *Propuesta:* solo con las fuentes de `resources/fonts/`
-      (misma política que el resto: sin sustitución), o error. *Alternativa:* convertirlo a
-      rutas al exportar.
-- [ ] **V5. Tamaño natural.** *Propuesta:* el de `width` y `height` (o el `viewBox`) a 96 ppp,
-      como los PNG (§5.18). *Alternativa:* exigirlos.
-- [ ] **V6. Seguridad.** *Propuesta:* ninguna referencia externa (`href` a ficheros o URL,
-      `<image>` externas, entidades): son un error (`IMAGE_FORMAT`).
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada; las interpretaciones que salgan al
+implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
+
+- [x] V1. **Cómo se incrusta:** vectorial. Un SVG se dibuja en un `Graphics2D` y un adaptador lo convierte
+      en rutas y rellenos del PDF; en el SVG de salida se puede incrustar el original.
+- [x] V2. **Librería:** JSVG (`com.github.weisj:jsvg`, pequeña y sin dependencias) para leer y dibujar el SVG
+      y `pdfbox-graphics2d` (`de.rototor.pdfbox:graphics2d`) como adaptador de `Graphics2D` a PDFBox.
+      Dos dependencias nuevas en el `pom.xml`.
+- [x] V3. **Subconjunto:** formas básicas, `path`, `g`, `transform`, rellenos sólidos y degradados, trazos,
+      `viewBox`, recorte y opacidad; sin scripts, animación ni filtros. Lo que queda fuera del
+      subconjunto es un error (`IMAGE_FORMAT`), no se ignora en silencio.
+- [x] V4. **Texto dentro del SVG:** solo con las fuentes de `resources/fonts/` (misma política que el
+      resto: sin sustitución); si la fuente no existe, error. Con el adaptador, el texto queda como texto
+      del PDF, seleccionable.
+- [x] V5. **Tamaño natural:** el de `width` y `height` absolutos o, si faltan, el del `viewBox`, a 96 ppp
+      como los PNG (§5.18). Sin ninguno de los dos, `IMAGE_FORMAT`.
+- [x] V6. **Seguridad:** ninguna referencia externa (`href` a ficheros o URL, `<image>` externas,
+      entidades DTD): es `IMAGE_FORMAT`.
 
 **Tareas:**
 
-- [ ] Resolver V1–V6.
+- [x] Resolver V1–V6 (2026-10-28).
 - [ ] `ImageLibrary` e `ImageFile` con el formato SVG, tamaño natural y validación.
 - [ ] `PdfCanvas` y `SvgCanvas`; `PdfStructure`, igual que las demás imágenes.
 - [ ] Especificación (§5.18, §6, §8), errores, tests y caso golden `24-svg`.
@@ -1246,6 +1247,14 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (17).** Hito 31 en curso. Resueltas V1–V6 con un cuestionario (todas las propuestas): SVG
+  vectorial con JSVG y `pdfbox-graphics2d`, subconjunto cerrado (formas, rutas, grupos, degradados, trazos;
+  lo demás es `IMAGE_FORMAT`), texto solo con las fuentes de `resources/fonts/`, tamaño natural de
+  `width`/`height` o `viewBox` a 96 ppp y ninguna referencia externa. `mvn test` en verde (1205 tests) al
+  empezar. Central dio un 429 al comprobar las versiones de las librerías: hay que confirmarlas al
+  añadir las dependencias.
+  *Siguiente paso:* dependencias en el `pom.xml`, `ImageLibrary`/`ImageFile` con el formato SVG y su
+  validación.
 - **2026-10-28 (16).** Hito 30 terminado, en tres commits (decisiones, código y documentación con el caso
   golden y los ejemplos). Resueltas O1–O5 con un cuestionario: `Rotate` en `Relative`, `Absolute`, `Fixed` e
   `Image` (no en `Text`), solo pintado pero lo girado debe caber en la página y un `Relative` girado no se
