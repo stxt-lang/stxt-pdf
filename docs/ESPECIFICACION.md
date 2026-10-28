@@ -373,6 +373,7 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Tab size` | entero ≥ 1 | `4` | Con `White space: pre` o `pre-wrap`, las columnas de una tabulación. Ver [§5.4](#54-texto). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
+| `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`…) | el de `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento. Ver [§5.4](#54-texto). |
 
 `Text wrap` conserva el nombre largo porque `Wrap` ya es una propiedad de `Flex`, y un nombre
 es el mismo nodo en todo el schema.
@@ -829,7 +830,7 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   contienen el texto ya transformado; el texto de la caja no cambia, y el de la estructura del PDF
   etiquetado (`ActualText`) es el escrito, salvo en un texto con `{page}`, `{pages}` o una
   referencia, que cambia con la página. `uppercase` y `lowercase` usan las reglas de
-  `String` de Java con la configuración regional de `Language` (en turco, `i` pasa a `İ`); `capitalize`
+  `String` de Java con la configuración regional de `Language` de la caja (en turco, `i` pasa a `İ`); `capitalize`
   solo cambia la primera letra de cada palabra (palabra: lo que sigue a un espacio o un salto de
   línea, también entre dos tramos) y deja el resto como está. Los marcadores `{page}` y `{pages}`
   no se transforman. `Small caps` pinta cada minúscula, ya pasada a mayúscula, al 80 % del
@@ -880,6 +881,20 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   tachado, medidos desde la línea base hasta la parte de arriba de la raya. El subrayado se
   pinta antes que el texto y el tachado después. En el PDF etiquetado, los tramos son contenido
   de su elemento (`P`, `Span`, `H1`…) sin elemento propio, y las rayas son *artifacts*.
+
+- **Idioma (`Language`).** Una caja cuyo texto no está en el idioma del documento declara el suyo
+  en `Typography` (`Language: en-GB`), también desde una regla de `Styles` (`For class: english`).
+  Se hereda, y lo que hay dentro lo usa para las reglas de las letras de `Transform`. En el PDF
+  etiquetado es el atributo `Lang` del elemento de la caja, solo donde el idioma cambia respecto
+  al de fuera (los elementos de dentro lo heredan), para que un lector de pantalla cambie de voz.
+  Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `Element: Document` no la admite
+  (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de `Document`. No hay idioma por
+  tramo dentro de una línea.
+- **Espacio al final de la línea.** Una línea de texto normal que no es la última de su caja (o
+  de su fragmento) acaba, en el contenido del PDF, con un espacio invisible tras la última
+  palabra: el corte de línea se come el espacio, y sin él quien une el texto de las líneas
+  (un lector de pantalla, la extracción, la búsqueda) pegaría las palabras. No cambia el
+  layout. El texto de `White space: pre` y `pre-wrap` no lo lleva: sus líneas son líneas.
 
 ### 5.5 Posicionamiento
 
@@ -1431,8 +1446,8 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
 **marcadores** (*outline*):
 
 - **Árbol de estructura:** un elemento por caja, en orden del documento, que es el orden de
-  lectura: `Document` (la raíz), `H1` … `H6` (los encabezados), `P` (`Paragraph`), `Span`
-  (`Text`), `L` y `LI` (las listas, [§5.14](#514-listas)), `Figure` (las `Image` con `Alt`, con su
+  lectura: `Document` (la raíz), `H1` … `H6` (los encabezados), `P` (`Paragraph` y `Text`; el
+  `Text` de un encabezado es un `Span` de su texto), `L` y `LI` (las listas, [§5.14](#514-listas)), `Figure` (las `Image` con `Alt`, con su
   texto alternativo y su `BBox`, [§5.18](#518-imágenes)) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
   caja partida entre páginas tiene contenido en varias.
 - ***Artifacts*:** los fondos, los bordes, las imágenes sin `Alt` y todo lo que hay dentro de un
@@ -2093,7 +2108,7 @@ Markdown:
 - **PDF etiquetado.** El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como
   referencia a objeto (`OBJR`), como pide PDF/UA:
   - *Caja con `Link`:* el `Link` es hijo del elemento de la caja y contiene su contenido: el texto
-    de la caja y los elementos de lo que contiene (`Span → Link → texto`; `Div → Link → Span, Span`;
+    de la caja y los elementos de lo que contiene (`P → Link → texto`; `Div → Link → P, P`;
     `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
     (`Link → Figure`). Una caja partida entre páginas tiene un solo `Link` con una `OBJR` por
     fragmento.
@@ -2158,7 +2173,7 @@ La validación se hace en cuatro niveles:
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -2375,7 +2390,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans`, `Language` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,

@@ -1266,6 +1266,16 @@ implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (19).** Repaso de accesibilidad del PDF etiquetado (primer punto de «Accesibilidad» de
+  `TODO.md`; no es un hito). Se leyeron los once PDF como un lector de pantalla (estructura más el texto de cada
+  contenido marcado, y veraPDF con PDF/UA-1, PDF/UA-2 y WTPDF). Resuelto con un cuestionario: `Text` de bloque como
+  `P`, `Language` en `Typography` con su `Lang`, espacio al final de las líneas partidas (las palabras salían
+  pegadas, «vientoprestado») y declarar PDF/UA-1 al final. Se descartaron por ahora las cabeceras de fila en
+  tablas y los títulos reales de portada e índice (apuntados en `TODO.md`) y el `Alt` obligatorio. Dos casos
+  nuevos de error (`Language` mal escrito y `Language` en `Element: Document`). Decisiones 258–261 de
+  `DECISIONES.md`. Ningún PNG ni volcado cambia. `mvn test` en verde.
+  *Siguiente paso:* cabeceras de fila en tablas y títulos reales de portada e índice (los dos huecos de
+  contenido que quedan), o elegir otro trabajo de las ideas.
 - **2026-10-28 (18).** `Link` del PDF etiquetado con su contenido marcado (deuda de la decisión 171, primer
   punto de «Accesibilidad» de `TODO.md`; no es un hito de esta hoja de ruta). Resuelto con un cuestionario
   (todas las propuestas, y veraPDF como test del proyecto): un `Link` por enlace y fragmento aunque ocupe

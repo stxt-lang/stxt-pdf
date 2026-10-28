@@ -26,13 +26,25 @@
   del `Document`). Los once ejemplos pasan PDF/UA-1 con veraPDF (`ExamplesTest`) salvo la regla 5-1. Queda:
   verificarlo con un lector de pantalla, y que el `Link` suelto de un `Fixed` (un pie con una web) se
   anuncia al final del documento, no en su sitio de lectura.
-- **Declarar la conformidad PDF/UA** (regla 5-1 de veraPDF, la única que incumplen los ejemplos): el XMP
-  llevaría `pdfuaid:part` = 1. Es afirmar algo, así que hay que decidir cuándo se hace: con el repaso de
-  abajo hecho y los once ejemplos sin ningún fallo en `ExamplesTest.KNOWN_UA_FAILURES`.
-- Hacer el repaso de accesibilidad del PDF etiquetado entero: texto alternativo de las figuras, orden de
-  lectura con `Fixed` y `Absolute`, tablas con `Scope`, idioma por tramo, y probar con lectores de pantalla
-  (veraPDF ya no encuentra nada en los ejemplos más allá de la 5-1, pero no comprueba que el orden o los
-  textos tengan sentido).
+- ~~Repaso de accesibilidad del PDF etiquetado~~ (decisiones 258–260: `Text` como `P`, `Language` por caja con
+  su `Lang` y un espacio al final de las líneas partidas; leído con un lector de pantalla simulado sobre los
+  once ejemplos) y declaración de PDF/UA-1 (`pdfuaid:part`, decisión 261) en los documentos con `Title`: los once
+  ejemplos pasan veraPDF sin ninguna regla conocida. Queda lo que se descartó o no se hizo:
+  - **Cabeceras de fila en tablas:** solo la cabecera (`Head`) es `TH` con `Scope: Column`. Las horas del
+    horario (ejemplo 11) o los conceptos de la factura son `TD`. Haría falta una propiedad en `Table` (por
+    ejemplo `Header columns: 1`) que dé `TH` con `Scope: Row` a las celdas de esas columnas.
+  - **Títulos reales para la portada y el índice:** ver «Excluir un encabezado del índice» más abajo; sin
+    ello los ejemplos 04 y 09 no tienen un `H1` de título.
+  - **`Alt` de las imágenes:** hoy una `Image` sin `Alt` es decorativa en silencio (decisión 136, hito 18).
+    Se ha decidido dejarlo; si un olvido del autor resulta ser un problema, hacer `Alt` obligatorio con `Alt:`
+    vacío para las decorativas.
+  - **Idioma por tramo** dentro de una línea (una palabra en inglés dentro de un párrafo español): hoy el
+    idioma es de la caja.
+  - **Contraste** de color entre el texto y su fondo (WCAG): el motor conoce el `Color` y el `Background`
+    de las cajas, pero no lo que hay detrás de una imagen.
+  - **PDF/UA-2 y PDF 2.0:** `TOCI` con `Reference` y `Ref`, destinos de estructura, `ListNumbering` distinto
+    de `None` en las listas con guion, espacio de nombres de PDF 2.0. Ninguno es PDF/UA-1.
+  - Probar con lectores de pantalla reales (NVDA, JAWS, VoiceOver).
 
 ## Huecos del motor detectados al escribir los ejemplos (hito 21)
 

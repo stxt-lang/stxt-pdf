@@ -1534,3 +1534,38 @@ interpretaciones que salieron al implementarlas.
      de `KNOWN_UA_FAILURES`, hoy solo la 5-1 (el XMP no lleva el identificador `pdfuaid:part`, es decir, no
      se afirma la conformidad). Así una regresión de accesibilidad en la estructura rompe el build.
      *Dónde:* `golden/PdfUa`, `examples/ExamplesTest`. *Alternativa:* validar a mano de vez en cuando.
+
+258. **Un `Text` de bloque es un `P` en el PDF etiquetado**, no un `Span`: un `Span` es texto en línea, un lector
+     de pantalla no distingue dónde acaba y PDF/UA-2 no admite un `Span` directo bajo `Document` o `Div`.
+     Solo es un `Span` el `Text` hijo de un encabezado (parte del texto del `H1`…`H6`) y las dos piezas de una
+     entrada de índice, que ya lo eran. Un `Text` con varios párrafos (línea en blanco) es un solo `P`: el
+     contenido marcado no se parte por párrafos. Solo cambia la etiqueta: ningún volcado ni PNG. *Dónde:*
+     `paint/PdfStructure.type`. *Alternativa:* dejar `Span` y que lo decida una propiedad del `Text`.
+
+259. **`Language` también en `Typography`**: el idioma de una caja que no está en el del documento (se hereda y
+     vale en `Styles`). Reutiliza el nombre y la definición de `Language` de `Document` (misma etiqueta BCP 47,
+     mismo `VALUE_NOT_ALLOWED`) y fija `Style.locale`, así que también cambia las reglas de las letras de
+     `Transform` de lo que contiene. En el PDF etiquetado es el `Lang` del elemento de la caja, solo donde
+     difiere del de la caja de fuera (el árbol de estructura lo hereda). `Element: Document` no lo admite
+     (`STYLE_NOT_ALLOWED`): el idioma del documento es uno solo y es el de `Document`. No hay idioma por tramo
+     dentro de una línea ni en Markdown. *Dónde:* schema, `tree/PropertyReader.typography`, `tree/StyleRules`,
+     `paint/PdfStructure.build`. *Alternativa:* `Language` por tramo (`TextFormat`), que parte el contenido
+     marcado.
+
+260. **Espacio invisible al final de las líneas partidas.** El corte de línea se come el espacio entre la última
+     palabra y la primera de la línea siguiente, y en el contenido del PDF las líneas son textos separados: un
+     lector que los une (lector de pantalla, extracción, búsqueda) pegaba las palabras («vientoprestado»,
+     «elde»). `StackingContext.paintText` añade un espacio al último tramo de cada línea que no es la última de
+     su fragmento, si `White space` es `normal`; no cambia el ancho de la línea (el espacio sale del borde
+     derecho, invisible), el layout ni los PNG. En `pre` y `pre-wrap` no, que no se come espacios y sus líneas
+     son líneas. *Dónde:* `paint/StackingContext.paintText`. *Alternativa:* dejarlo a la geometría, como
+     PDFTextStripper.
+
+261. **El PDF declara PDF/UA-1 si tiene `Title`.** El XMP lleva `pdfuaid:part` = 1 (regla 5-1 de veraPDF) en los
+     documentos con `Title`; sin él no se declara nada (ni siquiera hay XMP), porque sin título no se cumple la
+     7.1 y no se puede afirmar. Es una afirmación que veraPDF solo comprueba en parte (no el orden de lectura
+     ni el sentido de los textos), así que se apoya en el repaso a mano de las decisiones 252–260 y en los
+     huecos que quedan apuntados en `TODO.md` (cabeceras de fila, títulos reales de portada e índice, idioma
+     por tramo): un documento puede ser PDF/UA-1 según veraPDF y mejorable para un lector de pantalla.
+     `ExamplesTest.KNOWN_UA_FAILURES` queda vacío. *Dónde:* `paint/PdfStructure.xmp`. *Alternativa:* no
+     declararlo.

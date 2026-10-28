@@ -178,7 +178,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   del que procede (`HEADING_2`) para las reglas, los marcadores y las etiquetas; el enum da
   también su `Layout`, su `Position` y si puede ser un ítem, y `ElementTest` lo compara con el
   schema. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
-  jerarquía en orden del documento. `PdfStructure` construye el árbol de estructura del PDF etiquetado
+  jerarquía en orden del documento. En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
+  encabezado) y una caja que declara otro `Language` lleva su `Lang`. `PdfStructure` construye el árbol de estructura del PDF etiquetado
   (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.
 - **Listas (§5.14):** `List` (con `Marker` obligatorio y `Start`) y `List item` (con `Number`)
@@ -390,7 +391,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Mayúsculas e interletraje (§4.4, §5.4):** `Transform`, `Letter spacing` y `Small caps` son
   propiedades de `Typography` (se heredan y valen en `Styles`). `Document` exige un `Language`
   (accesibilidad): el builder lo pone en `Style.locale` de la raíz y se hereda, y es la
-  configuración regional de `Transform`. `InlineLayout.runs` aplica `TextTransform` a los tramos
+  configuración regional de `Transform`; una caja puede declarar el suyo (`Language` en `Typography`, que
+  `PdfStructure` escribe como `Lang`; `Element: Document` no). `InlineLayout.runs` aplica `TextTransform` a los tramos
   **antes** de repartirlos en líneas (cambia lo que miden: `ß` → `SS`) y después de sustituir las
   referencias; `Box.text` no cambia y las líneas (`TextLine`) llevan el texto ya transformado. Los
   marcadores `{page}`/`{pages}` no se transforman (`PageNumbers` los sustituye al final). Las
@@ -398,8 +400,10 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   tamaño): `LineBreaker.advance` mide cada tramo con `fontSize × format.scale()` más el
   interletraje de cada carácter, y el ancho de una línea resta el del último
   (`LineBreaker.width`). `StackingContext` pasa el tamaño del tramo y `Style.letterSpacing` a
-  `Canvas.text`; `PdfCanvas.spaced` lo escribe con ajustes de `TJ`. `PdfStructure` da `ActualText`
-  (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva
+  `Canvas.text`; `PdfCanvas.spaced` lo escribe con ajustes de `TJ`. `StackingContext.paintText` añade un
+  espacio invisible a la última palabra de cada línea que no es la última del fragmento (salvo con `pre` y
+  `pre-wrap`), porque el corte se come el espacio y quien une las líneas pegaría las palabras.
+  `PdfStructure` da `ActualText` (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva
   `{page}` ni referencias.
 - **Texto preformateado (§4.4, §5.4):** `White space` (`Style.WhiteSpace`: `normal`, `pre`, `pre-wrap`) y
   `Tab size` (columnas de una tabulación, 4 por defecto) son propiedades de `Typography` (se heredan y
