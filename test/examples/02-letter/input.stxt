@@ -22,7 +22,7 @@ Document (dev.stxt.boxes):
 			Border: 0 0 1.5 0
 			Border color: #3B2A1E
 		Item:
-			Image: examples/brand/nogal.png
+			Image: examples/brand/nogal.svg
 				Alt: Nogal, taller de mobiliario
 				Box:
 					Width: 150
@@ -78,7 +78,7 @@ Document (dev.stxt.boxes):
 			Nos encantaría que visitara el taller para ver las maderas y probar las sillas. Estamos abiertos de lunes a viernes, y Joan, nuestro maestro ebanista, le explicará cada ensamble.
 
 			Reciba un cordial saludo,
-	Image: examples/letter/signature.png
+	Image: examples/letter/signature.svg
 		Id: signature
 		Box:
 			Width: 128

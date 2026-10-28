@@ -23,7 +23,7 @@ Document (dev.stxt.boxes):
 			Main axis: between
 			Cross axis: end
 			Item:
-				Image: examples/contract/lumen.png
+				Image: examples/contract/lumen.svg
 					Alt: Lumen, estudio de diseño
 					Box:
 						Width: 78
@@ -188,7 +188,7 @@ Document (dev.stxt.boxes):
 							Color: #3F3D8F
 							Transform: uppercase
 							Letter spacing: 0.6
-					Image: examples/certificate/signature-director.png
+					Image: examples/certificate/signature-director.svg
 						Alt: Firma de Irene Calvo Mas
 						Box:
 							Width: 130
@@ -209,7 +209,7 @@ Document (dev.stxt.boxes):
 							Color: #3F3D8F
 							Transform: uppercase
 							Letter spacing: 0.6
-					Image: examples/letter/signature.png
+					Image: examples/letter/signature.svg
 						Alt: Firma de Carme Vidal i Roca
 						Box:
 							Width: 130

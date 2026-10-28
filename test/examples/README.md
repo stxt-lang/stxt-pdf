@@ -29,7 +29,9 @@ mvn test -Dtest=ExamplesTest -Dexamples.update=true            # regenera los ex
 
 Las imágenes están en [`resources/images/examples/`](../../resources/images/examples) y las
 genera [`tools/ExampleImages.java`](../../tools/ExampleImages.java) con Java2D, sin ficheros de
-terceros (`java tools/ExampleImages.java`). Las fuentes son IBM Plex Sans, Serif y Mono (SIL
+terceros (`java tools/ExampleImages.java`): las fotos y la pantalla del móvil son PNG o JPEG; los
+logotipos, las firmas, el sello, los gráficos, el emblema, el adorno, el termostato y el esquema de
+conexión son SVG. Las fuentes son IBM Plex Sans, Serif y Mono (SIL
 Open Font License). Los nombres, las empresas y los datos de los documentos son inventados.
 
 ## Los once documentos
@@ -97,6 +99,13 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   el de esa esquina y la caja sube desde ella. Como el giro no cambia el layout, el sello girado del
   certificado no mueve las firmas; lo que hay que vigilar es que lo girado quepa en la página, porque
   si no es un error.
+- **Lo vectorial es SVG** (hito 31): los logotipos (01, 02, 07, 09), las firmas (02, 07, 10), el sello
+  (10), los tres gráficos del informe (04), el emblema y el adorno de la carta (06) y el termostato y el
+  esquema de conexión del manual (08) son `Image` con un `.svg` de `images/`: se ven nítidos a cualquier
+  tamaño y el PDF los lleva como rutas y degradados, no como píxeles. Tienen el mismo tamaño natural que
+  tenían los PNG, así que ningún volcado cambia. Su texto usa las fuentes IBM Plex de `fonts/` (el motor
+  no sustituye ninguna), pero se dibuja como contornos: no se puede seleccionar. Las fotos y la pantalla
+  del móvil (08) siguen siendo PNG o JPEG.
 - **El papel tiene nombre**: los A4 dicen `Paper: A4` (y los apaisados, 10 y 11, además
   `Orientation: landscape`) en vez de escribir 595 × 842. La carta del restaurante (06) es la única con
   un tamaño propio (420 × 700), que se sigue escribiendo con `Width` y `Height`.

@@ -43,7 +43,7 @@ Document (dev.stxt.boxes):
 		Text: Cadaqués · La Cala · {page} / {pages}
 	Block:
 		Id: front
-		Image: examples/menu/emblem.png
+		Image: examples/menu/emblem.svg
 			Id: emblem
 			Alt: Emblema del restaurante La Cala, con el sol y las olas
 			Box:
@@ -59,7 +59,7 @@ Document (dev.stxt.boxes):
 				Color: #14365C
 			Box:
 				Margin: 0 0 8 0
-		Image: examples/menu/ornament.png
+		Image: examples/menu/ornament.svg
 			Box:
 				Width: 100%
 				Margin: 0 0 2 0
@@ -259,7 +259,7 @@ Document (dev.stxt.boxes):
 			Item:
 				Text: 8
 					Class: price
-		Image: examples/menu/ornament.png
+		Image: examples/menu/ornament.svg
 			Box:
 				Width: 100%
 				Margin: 10 0 0 0

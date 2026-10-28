@@ -30,7 +30,7 @@ Document (dev.stxt.boxes):
 		Box:
 			Margin: 0 0 30 0
 		Item:
-			Image: examples/brand/nogal.png
+			Image: examples/brand/nogal.svg
 				Alt: Nogal, taller de mobiliario
 				Box:
 					Width: 172

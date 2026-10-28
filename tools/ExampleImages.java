@@ -81,6 +81,149 @@ public class ExampleImages {
         }
     }
 
+    /**
+     * Un dibujo SVG que se escribe a medida que se dibuja: lo justo de Java2D (relleno, trazo, degradado y
+     * texto) para las ilustraciones vectoriales de los ejemplos. Los textos son {@code <text>} con las
+     * familias de {@code resources/fonts/}, que es lo único que admite el motor (ESPECIFICACION.md §5.18).
+     */
+    static final class Svg {
+        final int w;
+        final int h;
+        private final StringBuilder defs = new StringBuilder();
+        private final StringBuilder body = new StringBuilder();
+        private int gradients;
+
+        Svg(int w, int h) {
+            this.w = w;
+            this.h = h;
+        }
+
+        static String num(double v) {
+            String s = String.format(Locale.ROOT, "%.2f", v);
+            if (s.indexOf('.') >= 0) {
+                s = s.replaceAll("0+$", "").replaceAll("\\.$", "");
+            }
+            return s.equals("-0") ? "0" : s;
+        }
+
+        static String hex(Color c) {
+            return String.format(Locale.ROOT, "#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
+        }
+
+        /** {@code fill="#RRGGBB"} y, si no es opaco, su {@code fill-opacity}. */
+        private static String paint(String property, Color c) {
+            String out = " " + property + "=\"" + hex(c) + "\"";
+            return c.getAlpha() == 255 ? out : out + " " + property + "-opacity=\"" + num(c.getAlpha() / 255.0) + "\"";
+        }
+
+        private static String shape(Shape sh) {
+            if (sh instanceof Ellipse2D e) {
+                return "<ellipse cx=\"" + num(e.getCenterX()) + "\" cy=\"" + num(e.getCenterY()) + "\" rx=\""
+                        + num(e.getWidth() / 2) + "\" ry=\"" + num(e.getHeight() / 2) + "\"";
+            }
+            if (sh instanceof RoundRectangle2D r) {
+                return "<rect x=\"" + num(r.getX()) + "\" y=\"" + num(r.getY()) + "\" width=\"" + num(r.getWidth())
+                        + "\" height=\"" + num(r.getHeight()) + "\" rx=\"" + num(r.getArcWidth() / 2) + "\" ry=\""
+                        + num(r.getArcHeight() / 2) + "\"";
+            }
+            if (sh instanceof Rectangle2D r) {
+                return "<rect x=\"" + num(r.getX()) + "\" y=\"" + num(r.getY()) + "\" width=\"" + num(r.getWidth())
+                        + "\" height=\"" + num(r.getHeight()) + "\"";
+            }
+            if (sh instanceof java.awt.geom.Line2D l) {
+                return "<line x1=\"" + num(l.getX1()) + "\" y1=\"" + num(l.getY1()) + "\" x2=\"" + num(l.getX2())
+                        + "\" y2=\"" + num(l.getY2()) + "\"";
+            }
+            StringBuilder d = new StringBuilder();
+            double[] c = new double[6];
+            for (java.awt.geom.PathIterator it = sh.getPathIterator(null); !it.isDone(); it.next()) {
+                switch (it.currentSegment(c)) {
+                    case java.awt.geom.PathIterator.SEG_MOVETO -> d.append('M').append(num(c[0])).append(' ').append(num(c[1]));
+                    case java.awt.geom.PathIterator.SEG_LINETO -> d.append('L').append(num(c[0])).append(' ').append(num(c[1]));
+                    case java.awt.geom.PathIterator.SEG_QUADTO -> d.append('Q').append(num(c[0])).append(' ').append(num(c[1]))
+                            .append(' ').append(num(c[2])).append(' ').append(num(c[3]));
+                    case java.awt.geom.PathIterator.SEG_CUBICTO -> d.append('C').append(num(c[0])).append(' ').append(num(c[1]))
+                            .append(' ').append(num(c[2])).append(' ').append(num(c[3])).append(' ').append(num(c[4]))
+                            .append(' ').append(num(c[5]));
+                    default -> d.append('Z');
+                }
+            }
+            return "<path d=\"" + d + "\"";
+        }
+
+        void fill(Color c, Shape sh) {
+            body.append(shape(sh)).append(paint("fill", c)).append("/>\n");
+        }
+
+        void stroke(Color c, float width, Shape sh) {
+            body.append(shape(sh)).append(" fill=\"none\"").append(paint("stroke", c)).append(" stroke-width=\"")
+                    .append(num(width)).append("\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n");
+        }
+
+        /** Rellena con un degradado lineal entre dos colores (que pueden llevar opacidad). */
+        void gradient(Shape sh, GradientPaint p) {
+            String id = "g" + ++gradients;
+            Point2D a = p.getPoint1();
+            Point2D b = p.getPoint2();
+            defs.append("<linearGradient id=\"").append(id).append("\" gradientUnits=\"userSpaceOnUse\" x1=\"")
+                    .append(num(a.getX())).append("\" y1=\"").append(num(a.getY())).append("\" x2=\"")
+                    .append(num(b.getX())).append("\" y2=\"").append(num(b.getY())).append("\">")
+                    .append(stop(0, p.getColor1())).append(stop(1, p.getColor2())).append("</linearGradient>\n");
+            body.append(shape(sh)).append(" fill=\"url(#").append(id).append(")\"/>\n");
+        }
+
+        private static String stop(int offset, Color c) {
+            return "<stop offset=\"" + offset + "\"" + paint("stop-color", c).replace("stop-color-opacity", "stop-opacity")
+                    + "/>";
+        }
+
+        void text(String s, Font f, Color c, float x, float y) {
+            String name = f.getFontName();
+            String weight = name.contains("Bold") ? " font-weight=\"bold\"" : "";
+            String style = name.contains("Italic") ? " font-style=\"italic\"" : "";
+            body.append("<text x=\"").append(num(x)).append("\" y=\"").append(num(y)).append("\" font-family=\"")
+                    .append(f.getFamily()).append("\"").append(weight).append(style).append(" font-size=\"")
+                    .append(num(f.getSize2D())).append("\"").append(paint("fill", c)).append(">")
+                    .append(s.replace("&", "&amp;").replace("<", "&lt;")).append("</text>\n");
+        }
+
+        void save(String relative) throws IOException {
+            Path file = OUT.resolve(relative);
+            Files.createDirectories(file.getParent());
+            String text = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + w + "\" height=\"" + h
+                    + "\" viewBox=\"0 0 " + w + " " + h + "\">\n"
+                    + (defs.length() == 0 ? "" : "<defs>\n" + defs + "</defs>\n") + body + "</svg>\n";
+            Files.writeString(file, text, java.nio.charset.StandardCharsets.UTF_8);
+        }
+    }
+
+    static Svg svg(int w, int h) {
+        return new Svg(w, h);
+    }
+
+    /** Para medir textos: las métricas de una fuente no dependen de dónde se dibuje. */
+    private static final Graphics2D SCRATCH = graphics(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+
+    static void fill(Svg g, Color c, Shape s) {
+        g.fill(c, s);
+    }
+
+    static void stroke(Svg g, Color c, float w, Shape s) {
+        g.stroke(c, w, s);
+    }
+
+    static void text(Svg g, String s, Font f, Color c, float x, float y) {
+        g.text(s, f, c, x, y);
+    }
+
+    static void centered(Svg g, String s, Font f, Color c, float cx, float y) {
+        g.text(s, f, c, cx - width(SCRATCH, s, f) / 2, y);
+    }
+
+    static void rightAligned(Svg g, String s, Font f, Color c, float right, float y) {
+        g.text(s, f, c, right - width(SCRATCH, s, f), y);
+    }
+
     static BufferedImage image(int w, int h, boolean alpha) {
         return new BufferedImage(w, h, alpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
     }
@@ -159,11 +302,10 @@ public class ExampleImages {
     }
 
     /** Una firma a mano: trazo cursivo con lazos que se apaga hacia el final, y un subrayado. */
-    static void signature(BufferedImage img, Color ink, long seed) {
-        Graphics2D g = graphics(img);
+    static void signature(Svg g, Color ink, long seed) {
         Random r = new Random(seed);
-        int w = img.getWidth();
-        int h = img.getHeight();
+        int w = g.w;
+        int h = g.h;
         double loops = 3 + r.nextInt(5) + r.nextDouble();
         double loop = h * (0.11 + r.nextDouble() * 0.04);
         double lean = 0.2 + r.nextDouble() * 0.9;
@@ -182,15 +324,11 @@ public class ExampleImages {
                 p.lineTo(x, y);
             }
         }
-        g.setColor(ink);
-        g.setStroke(new BasicStroke(h * 0.028f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g.draw(p);
+        stroke(g, ink, h * 0.028f, p);
         Path2D.Float underline = new Path2D.Float();
         underline.moveTo(w * 0.16, h * 0.86);
         underline.curveTo(w * 0.4, h * 0.78, w * 0.66, h * 0.9, w * 0.9, h * 0.74);
-        g.setStroke(new BasicStroke(h * 0.02f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g.draw(underline);
-        g.dispose();
+        stroke(g, ink, h * 0.02f, underline);
     }
 
     /** Una estrella de cinco puntas, dibujada porque la fuente no tiene el carácter. */
@@ -216,7 +354,7 @@ public class ExampleImages {
     // =========================================================================================
 
     /** El anagrama: los anillos de un tronco de nogal. */
-    static void ringsMark(Graphics2D g, float cx, float cy, float r, Color main, Color accent) {
+    static void ringsMark(Svg g, float cx, float cy, float r, Color main, Color accent) {
         for (int i = 0; i < 5; i++) {
             float rr = r * (1 - i * 0.19f);
             float wobble = 1 + (i % 2 == 0 ? 0.04f : -0.03f);
@@ -228,20 +366,16 @@ public class ExampleImages {
 
     static void brand() throws IOException {
         // Anagrama y nombre, en horizontal.
-        BufferedImage img = image(1200, 360, true);
-        Graphics2D g = graphics(img);
+        Svg g = svg(1200, 360);
         ringsMark(g, 170, 180, 150, WALNUT, AMBER);
         text(g, "Nogal", font("Serif", "Bold", 190), WALNUT, 360, 218);
         text(g, "TALLER DE MOBILIARIO", font("Sans", "Regular", 44), AMBER, 366, 290);
-        g.dispose();
-        save(img, "brand/nogal.png");
+        g.save("brand/nogal.svg");
 
         // Solo el anagrama, en blanco, para fondos oscuros.
-        BufferedImage mark = image(400, 400, true);
-        g = graphics(mark);
-        ringsMark(g, 200, 200, 180, Color.WHITE, new Color(0xF3C27C));
-        g.dispose();
-        save(mark, "brand/nogal-mark-white.png");
+        Svg mark = svg(400, 400);
+        ringsMark(mark, 200, 200, 180, Color.WHITE, new Color(0xF3C27C));
+        mark.save("brand/nogal-mark-white.svg");
     }
 
     // =========================================================================================
@@ -249,9 +383,9 @@ public class ExampleImages {
     // =========================================================================================
 
     static void letter() throws IOException {
-        BufferedImage img = image(800, 300, true);
-        signature(img, new Color(0x1B2A6B), 11);
-        save(img, "letter/signature.png");
+        Svg g = svg(800, 300);
+        signature(g, new Color(0x1B2A6B), 11);
+        g.save("letter/signature.svg");
     }
 
     // =========================================================================================
@@ -359,8 +493,7 @@ public class ExampleImages {
         // Producción mensual: barras.
         double[] mwh = {112, 128, 171, 208, 251, 287, 306, 291, 232, 176, 124, 98};
         String[] months = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
-        BufferedImage bars = image(1400, 640, true);
-        g = graphics(bars);
+        Svg bars = svg(1400, 640);
         float left = 90;
         float right = 1370;
         float top = 40;
@@ -368,48 +501,44 @@ public class ExampleImages {
         Font small = font("Sans", "Regular", 26);
         for (int v = 0; v <= 300; v += 100) {
             float y = bottom - (bottom - top) * v / 320f;
-            stroke(g, new Color(0xD9DDE3), 2, new java.awt.geom.Line2D.Float(left, y, right, y));
-            rightAligned(g, String.valueOf(v), small, GREY, left - 14, y + 9);
+            stroke(bars, new Color(0xD9DDE3), 2, new java.awt.geom.Line2D.Float(left, y, right, y));
+            rightAligned(bars, String.valueOf(v), small, GREY, left - 14, y + 9);
         }
         float slot = (right - left) / 12;
         for (int i = 0; i < 12; i++) {
             float bh = (float) ((bottom - top) * mwh[i] / 320);
             Color c = mwh[i] == 306 ? new Color(0xE07B1F) : new Color(0x1B6E8C);
-            fill(g, c, new RoundRectangle2D.Float(left + slot * i + slot * 0.18f, bottom - bh, slot * 0.64f, bh, 8, 8));
-            centered(g, months[i], small, GREY, left + slot * (i + 0.5f), bottom + 40);
+            fill(bars, c, new RoundRectangle2D.Float(left + slot * i + slot * 0.18f, bottom - bh, slot * 0.64f, bh, 8, 8));
+            centered(bars, months[i], small, GREY, left + slot * (i + 0.5f), bottom + 40);
         }
-        g.dispose();
-        save(bars, "report/chart-production.png");
+        bars.save("report/chart-production.svg");
 
         // Mezcla de clientes: anillo con leyenda.
-        BufferedImage ring = image(1400, 640, true);
-        g = graphics(ring);
+        Svg ring = svg(1400, 640);
         String[] names = {"Hogares", "Comercios", "Industria", "Administración"};
         double[] parts = {46, 27, 19, 8};
         Color[] colors = {new Color(0x1B6E8C), new Color(0xE07B1F), new Color(0x4C8C4A), new Color(0x8A6FB3)};
         double angle = 90;
         for (int i = 0; i < parts.length; i++) {
             double sweep = -360 * parts[i] / 100;
-            fill(g, colors[i], new Arc2D.Double(60, 40, 560, 560, angle, sweep - 0.01, Arc2D.PIE));
+            java.awt.geom.Area slice = new java.awt.geom.Area(
+                    new Arc2D.Double(60, 40, 560, 560, angle, sweep - 0.01, Arc2D.PIE));
+            slice.subtract(new java.awt.geom.Area(new Ellipse2D.Float(180, 160, 320, 320)));
+            fill(ring, colors[i], slice);
             angle += sweep;
         }
-        g.setComposite(AlphaComposite.Clear);
-        g.fill(new Ellipse2D.Float(180, 160, 320, 320));
-        g.setComposite(AlphaComposite.SrcOver);
-        centered(g, "8.412", font("Sans", "Bold", 64), INK, 340, 335);
-        centered(g, "clientes", font("Sans", "Regular", 32), GREY, 340, 382);
+        centered(ring, "8.412", font("Sans", "Bold", 64), INK, 340, 335);
+        centered(ring, "clientes", font("Sans", "Regular", 32), GREY, 340, 382);
         for (int i = 0; i < parts.length; i++) {
             float y = 150 + i * 110;
-            fill(g, colors[i], new RoundRectangle2D.Float(720, y - 34, 44, 44, 10, 10));
-            text(g, names[i], font("Sans", "Regular", 42), INK, 790, y);
-            text(g, (int) parts[i] + " %", font("Sans", "Bold", 42), colors[i], 1170, y);
+            fill(ring, colors[i], new RoundRectangle2D.Float(720, y - 34, 44, 44, 10, 10));
+            text(ring, names[i], font("Sans", "Regular", 42), INK, 790, y);
+            text(ring, (int) parts[i] + " %", font("Sans", "Bold", 42), colors[i], 1170, y);
         }
-        g.dispose();
-        save(ring, "report/chart-mix.png");
+        ring.save("report/chart-mix.svg");
 
         // Ahorro de emisiones acumulado: línea con área.
-        BufferedImage line = image(1400, 640, true);
-        g = graphics(line);
+        Svg line = svg(1400, 640);
         double[] t = {0, 1.4, 3.1, 5.2, 8.0, 11.6, 15.9};
         String[] years = {"2019", "2020", "2021", "2022", "2023", "2024", "2025"};
         float lx = 100;
@@ -418,8 +547,8 @@ public class ExampleImages {
         float by = 540;
         for (int v = 0; v <= 15; v += 5) {
             float y = by - (by - ty) * v / 17f;
-            stroke(g, new Color(0xD9DDE3), 2, new java.awt.geom.Line2D.Float(lx, y, rx, y));
-            rightAligned(g, String.valueOf(v), small, GREY, lx - 14, y + 9);
+            stroke(line, new Color(0xD9DDE3), 2, new java.awt.geom.Line2D.Float(lx, y, rx, y));
+            rightAligned(line, String.valueOf(v), small, GREY, lx - 14, y + 9);
         }
         Path2D.Float area = new Path2D.Float();
         Path2D.Float curve = new Path2D.Float();
@@ -434,21 +563,19 @@ public class ExampleImages {
                 area.lineTo(x, y);
                 curve.lineTo(x, y);
             }
-            centered(g, years[i], small, GREY, x, by + 44);
+            centered(line, years[i], small, GREY, x, by + 44);
         }
         area.lineTo(rx, by);
         area.closePath();
-        g.setPaint(new GradientPaint(0, ty, alpha(new Color(0x4C8C4A), 150), 0, by, alpha(new Color(0x4C8C4A), 10)));
-        g.fill(area);
-        stroke(g, new Color(0x2F6B2E), 7, curve);
+        line.gradient(area, new GradientPaint(0, ty, alpha(new Color(0x4C8C4A), 150), 0, by, alpha(new Color(0x4C8C4A), 10)));
+        stroke(line, new Color(0x2F6B2E), 7, curve);
         for (int i = 0; i < t.length; i++) {
             float x = lx + (rx - lx) * i / (t.length - 1);
             float y = (float) (by - (by - ty) * t[i] / 17);
-            fill(g, Color.WHITE, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
-            stroke(g, new Color(0x2F6B2E), 5, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
+            fill(line, Color.WHITE, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
+            stroke(line, new Color(0x2F6B2E), 5, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
         }
-        g.dispose();
-        save(line, "report/chart-savings.png");
+        line.save("report/chart-savings.svg");
     }
 
     // =========================================================================================
@@ -552,8 +679,7 @@ public class ExampleImages {
     // =========================================================================================
 
     static void menu() throws IOException {
-        BufferedImage e = image(500, 500, true);
-        Graphics2D g = graphics(e);
+        Svg g = svg(500, 500);
         Color navy = new Color(0x14365C);
         stroke(g, navy, 8, new Ellipse2D.Float(20, 20, 460, 460));
         stroke(g, navy, 3, new Ellipse2D.Float(40, 40, 420, 420));
@@ -573,15 +699,13 @@ public class ExampleImages {
                     250 + Math.cos(a) * 74, 160 + Math.sin(a) * 74));
         }
         centered(g, "LA CALA", font("Serif", "Bold", 54), navy, 250, 262);
-        g.dispose();
-        save(e, "menu/emblem.png");
+        g.save("menu/emblem.svg");
 
         // Adorno: filete con hojas.
-        BufferedImage o = image(1200, 80, true);
-        g = graphics(o);
+        Svg o = svg(1200, 80);
         Color gold = new Color(0xA8782F);
-        stroke(g, gold, 3, new java.awt.geom.Line2D.Float(40, 40, 520, 40));
-        stroke(g, gold, 3, new java.awt.geom.Line2D.Float(680, 40, 1160, 40));
+        stroke(o, gold, 3, new java.awt.geom.Line2D.Float(40, 40, 520, 40));
+        stroke(o, gold, 3, new java.awt.geom.Line2D.Float(680, 40, 1160, 40));
         for (int side = 0; side < 2; side++) {
             for (int k = 0; k < 3; k++) {
                 float cx = 600 + (side == 0 ? -1 : 1) * (36 + k * 38);
@@ -589,12 +713,11 @@ public class ExampleImages {
                 leaf.moveTo(cx, 40);
                 leaf.curveTo(cx + (side == 0 ? -14 : 14), 10, cx + (side == 0 ? -34 : 34), 14, cx + (side == 0 ? -30 : 30), 40);
                 leaf.curveTo(cx + (side == 0 ? -34 : 34), 66, cx + (side == 0 ? -14 : 14), 70, cx, 40);
-                fill(g, gold, leaf);
+                fill(o, gold, leaf);
             }
         }
-        fill(g, gold, new Ellipse2D.Float(584, 24, 32, 32));
-        g.dispose();
-        save(o, "menu/ornament.png");
+        fill(o, gold, new Ellipse2D.Float(584, 24, 32, 32));
+        o.save("menu/ornament.svg");
     }
 
     // =========================================================================================
@@ -602,8 +725,7 @@ public class ExampleImages {
     // =========================================================================================
 
     static void contract() throws IOException {
-        BufferedImage img = image(900, 240, true);
-        Graphics2D g = graphics(img);
+        Svg g = svg(900, 240);
         Color violet = new Color(0x3F3D8F);
         fill(g, violet, new Ellipse2D.Float(30, 30, 180, 180));
         fill(g, new Color(0xFFD166), new Ellipse2D.Float(78, 78, 84, 84));
@@ -614,8 +736,7 @@ public class ExampleImages {
         }
         text(g, "Lumen", font("Sans", "Bold", 118), violet, 250, 148);
         text(g, "ESTUDIO DE DISEÑO", font("Sans", "Regular", 36), GREY, 254, 204);
-        g.dispose();
-        save(img, "contract/lumen.png");
+        g.save("contract/lumen.svg");
     }
 
     // =========================================================================================
@@ -624,25 +745,23 @@ public class ExampleImages {
 
     static void manual() throws IOException {
         // Termostato visto de frente.
-        BufferedImage d = image(900, 900, true);
-        Graphics2D g = graphics(d);
-        fill(g, alpha(Color.BLACK, 30), new RoundRectangle2D.Float(110, 130, 700, 700, 120, 120));
-        fill(g, new Color(0xF4F4F1), new RoundRectangle2D.Float(90, 100, 700, 700, 120, 120));
-        stroke(g, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(90, 100, 700, 700, 120, 120));
-        fill(g, new Color(0x222831), new Ellipse2D.Float(190, 200, 500, 500));
-        stroke(g, new Color(0x5CC8C0), 18, new Arc2D.Float(215, 225, 450, 450, 225, -240, Arc2D.OPEN));
-        stroke(g, new Color(0x2E3A46), 18, new Arc2D.Float(215, 225, 450, 450, -15, -30, Arc2D.OPEN));
-        centered(g, "21,5°", font("Sans", "Bold", 130), Color.WHITE, 440, 470);
-        centered(g, "Modo Confort", font("Sans", "Regular", 36), new Color(0x9FB3C2), 440, 535);
-        fill(g, new Color(0xE9A23B), new Ellipse2D.Float(418, 580, 44, 44));
-        centered(g, "Objetivo 22°", font("Sans", "Regular", 32), new Color(0x9FB3C2), 440, 660);
-        fill(g, new Color(0x4C8C4A), new Ellipse2D.Float(660, 135, 26, 26));
-        g.dispose();
-        save(d, "manual/thermostat.png");
+        Svg d = svg(900, 900);
+        fill(d, alpha(Color.BLACK, 30), new RoundRectangle2D.Float(110, 130, 700, 700, 120, 120));
+        fill(d, new Color(0xF4F4F1), new RoundRectangle2D.Float(90, 100, 700, 700, 120, 120));
+        stroke(d, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(90, 100, 700, 700, 120, 120));
+        fill(d, new Color(0x222831), new Ellipse2D.Float(190, 200, 500, 500));
+        stroke(d, new Color(0x5CC8C0), 18, new Arc2D.Float(215, 225, 450, 450, 225, -240, Arc2D.OPEN));
+        stroke(d, new Color(0x2E3A46), 18, new Arc2D.Float(215, 225, 450, 450, -15, -30, Arc2D.OPEN));
+        centered(d, "21,5°", font("Sans", "Bold", 130), Color.WHITE, 440, 470);
+        centered(d, "Modo Confort", font("Sans", "Regular", 36), new Color(0x9FB3C2), 440, 535);
+        fill(d, new Color(0xE9A23B), new Ellipse2D.Float(418, 580, 44, 44));
+        centered(d, "Objetivo 22°", font("Sans", "Regular", 32), new Color(0x9FB3C2), 440, 660);
+        fill(d, new Color(0x4C8C4A), new Ellipse2D.Float(660, 135, 26, 26));
+        d.save("manual/thermostat.svg");
 
         // Pantalla de la aplicación.
         BufferedImage s = image(560, 1000, true);
-        g = graphics(s);
+        Graphics2D g = graphics(s);
         fill(g, new Color(0x1A1D23), new RoundRectangle2D.Float(10, 10, 540, 980, 70, 70));
         fill(g, new Color(0xF5F7FA), new RoundRectangle2D.Float(28, 28, 504, 944, 56, 56));
         fill(g, new Color(0x1F7A7A), new Rectangle2D.Float(28, 28, 504, 140));
@@ -670,24 +789,22 @@ public class ExampleImages {
         save(s, "manual/app.png");
 
         // Esquema de conexión: regleta de bornes.
-        BufferedImage w = image(1400, 560, true);
-        g = graphics(w);
-        fill(g, new Color(0xF4F4F1), new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
-        stroke(g, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
-        text(g, "Termostato", font("Sans", "Bold", 40), INK, 80, 110);
+        Svg w = svg(1400, 560);
+        fill(w, new Color(0xF4F4F1), new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
+        stroke(w, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
+        text(w, "Termostato", font("Sans", "Bold", 40), INK, 80, 110);
         String[] term = {"L", "N", "C", "NO"};
         Color[] wire = {new Color(0x8B4A2B), new Color(0x2F6DB5), new Color(0x777777), new Color(0xD9A400)};
         String[] label = {"Fase (marrón)", "Neutro (azul)", "Común de la caldera", "Caldera: contacto NO"};
         for (int i = 0; i < 4; i++) {
             float y = 160 + i * 88;
-            fill(g, new Color(0x2E3A46), new RoundRectangle2D.Float(440, y, 120, 60, 12, 12));
-            centered(g, term[i], font("Mono", "Bold", 34), Color.WHITE, 500, y + 42);
-            stroke(g, wire[i], 12, new java.awt.geom.Line2D.Float(560, y + 30, 900, y + 30));
-            fill(g, wire[i], new Ellipse2D.Float(890, y + 18, 24, 24));
-            text(g, label[i], font("Sans", "Regular", 38), INK, 940, y + 43);
+            fill(w, new Color(0x2E3A46), new RoundRectangle2D.Float(440, y, 120, 60, 12, 12));
+            centered(w, term[i], font("Mono", "Bold", 34), Color.WHITE, 500, y + 42);
+            stroke(w, wire[i], 12, new java.awt.geom.Line2D.Float(560, y + 30, 900, y + 30));
+            fill(w, wire[i], new Ellipse2D.Float(890, y + 18, 24, 24));
+            text(w, label[i], font("Sans", "Regular", 38), INK, 940, y + 43);
         }
-        g.dispose();
-        save(w, "manual/wiring.png");
+        w.save("manual/wiring.svg");
     }
 
     // =========================================================================================
@@ -818,8 +935,7 @@ public class ExampleImages {
     // =========================================================================================
 
     static void certificate() throws IOException {
-        BufferedImage img = image(600, 760, true);
-        Graphics2D g = graphics(img);
+        Svg g = svg(600, 760);
         Color gold = new Color(0xC9A24A);
         Color goldDark = new Color(0x8C6D23);
         Path2D.Float ribbonL = new Path2D.Float();
@@ -852,23 +968,21 @@ public class ExampleImages {
             }
         }
         scallop.closePath();
-        g.setPaint(new GradientPaint(40, 40, new Color(0xE9CB7A), 560, 560, goldDark));
-        g.fill(scallop);
+        g.gradient(scallop, new GradientPaint(40, 40, new Color(0xE9CB7A), 560, 560, goldDark));
         fill(g, gold, new Ellipse2D.Float(70, 70, 460, 460));
         stroke(g, goldDark, 6, new Ellipse2D.Float(90, 90, 420, 420));
         stroke(g, new Color(0xF3E2A8), 3, new Ellipse2D.Float(110, 110, 380, 380));
         fill(g, goldDark, star(300, 240, 105, 44));
         centered(g, "CERTIFICADO", font("Serif", "Bold", 40), new Color(0x4F3B0F), 300, 400);
         centered(g, "DE EXCELENCIA", font("Serif", "Bold", 32), new Color(0x4F3B0F), 300, 446);
-        g.dispose();
-        save(img, "certificate/seal.png");
+        g.save("certificate/seal.svg");
 
-        BufferedImage s1 = image(700, 240, true);
+        Svg s1 = svg(700, 240);
         signature(s1, new Color(0x14305E), 21);
-        save(s1, "certificate/signature-director.png");
-        BufferedImage s2 = image(700, 240, true);
+        s1.save("certificate/signature-director.svg");
+        Svg s2 = svg(700, 240);
         signature(s2, new Color(0x3A1F4D), 34);
-        save(s2, "certificate/signature-teacher.png");
+        s2.save("certificate/signature-teacher.svg");
     }
 
     // =========================================================================================
