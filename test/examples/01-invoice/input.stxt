@@ -115,6 +115,7 @@ Document (dev.stxt.boxes):
 				Text: Carrer de la Farga, 14 · Polígono Les Torres
 				Text: 17800 Olot (Girona)
 				Text: administracion@tallernogal.example
+					Link: mailto:administracion@tallernogal.example
 		Area:
 			Block:
 				Class: party
@@ -126,6 +127,7 @@ Document (dev.stxt.boxes):
 				Text: Camí del Mirador, s/n
 				Text: 17850 Besalú (Girona)
 				Text: compras@miradordelvalle.example
+					Link: mailto:compras@miradordelvalle.example
 	Grid:
 		Id: strip
 		Columns: repeat(4, 1fr)

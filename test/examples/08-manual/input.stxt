@@ -150,6 +150,7 @@ Document (dev.stxt.boxes):
 			Main axis: between
 			Item:
 				Text: ¿Necesitas ayuda? Escríbenos a soporte@airemas.example
+					Link: mailto:soporte@airemas.example
 			Item:
 				Text: Página {page} de {pages}
 	Block:
@@ -290,7 +291,9 @@ Document (dev.stxt.boxes):
 				Margin: 3 0 10 0
 		Heading 3:
 			Text: Si tu instalación no tiene neutro
-		Paragraph: El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne N y consulta la sección de especificaciones para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
+		Markdown:
+			Content >>
+				El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne N y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
 		Heading 3:
 			Text: Comprueba la conexión
 		Paragraph: Una vez instalado, en la pantalla deben aparecer la hora y la temperatura. Puedes comprobar el estado de los bornes desde el menú de ajustes, con la siguiente secuencia:
@@ -517,6 +520,7 @@ Document (dev.stxt.boxes):
 						Typography:
 							Color: #134E4A
 					Text: soporte@airemas.example
+						Link: mailto:soporte@airemas.example
 						Typography:
 							Weight: bold
 							Size: 11
@@ -533,6 +537,7 @@ Document (dev.stxt.boxes):
 						Typography:
 							Color: #134E4A
 					Text: airemas.example/ayuda
+						Link: https://airemas.example/ayuda
 						Typography:
 							Weight: bold
 							Size: 11

@@ -49,6 +49,7 @@ Document (dev.stxt.boxes):
 		Id: footer
 		Offset: auto 0 -42 0
 		Text: Taller Nogal S.L. · CIF B-17482930 · Carrer de la Farga, 14 · 17800 Olot · tallernogal.example
+			Link: https://tallernogal.example
 	Flex:
 		Id: letterhead
 		Main axis: between
@@ -70,6 +71,7 @@ Document (dev.stxt.boxes):
 					Typography:
 						Align: right
 				Text: 972 00 11 22 · tallernogal.example
+					Link: https://tallernogal.example
 					Class: small
 					Typography:
 						Align: right

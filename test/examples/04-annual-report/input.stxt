@@ -726,6 +726,7 @@ Document (dev.stxt.boxes):
 						Class: bar
 					Cell:
 		Text: Cooperativa Solvent, S. Coop. Ltda. · Polígono de la Canya, nave 6 · 17800 Olot · solvent.example
+			Link: https://solvent.example
 			Class: caption
 			Box:
 				Margin: 22 0 0 0

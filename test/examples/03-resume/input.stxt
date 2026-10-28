@@ -99,9 +99,11 @@ Document (dev.stxt.boxes):
 				Text: CONTACTO
 					Class: side-title
 				Text: marta.ferrer@correo.example
+					Link: mailto:marta.ferrer@correo.example
 				Text: +34 600 112 233
 				Text: Girona, España
 				Text: martaferrer.example
+					Link: https://martaferrer.example
 				Text: HERRAMIENTAS
 					Class: side-title
 				Text: Figma

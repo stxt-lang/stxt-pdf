@@ -110,6 +110,7 @@ Document (dev.stxt.boxes):
 			Main axis: between
 			Item:
 				Text: Gaceta del Valle · Octubre de 2025 · Nº 87
+					Link: https://gacetadelvalle.example
 			Item:
 				Text: {page} / {pages}
 	Block:

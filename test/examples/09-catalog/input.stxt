@@ -151,6 +151,7 @@ Document (dev.stxt.boxes):
 			Main axis: between
 			Item:
 				Text: Taller Nogal · Catálogo 2026 · tallernogal.example
+					Link: https://tallernogal.example
 			Item:
 				Text: Página {page} de {pages}
 	Absolute:
@@ -679,5 +680,6 @@ Document (dev.stxt.boxes):
 							Box:
 								Margin: 3 0 0 0
 						Text: De lunes a viernes, de 8 a 18 h · 972 00 11 22 · pedidos@tallernogal.example
+							Link: mailto:pedidos@tallernogal.example
 							Typography:
 								Color: #D8C7B0
