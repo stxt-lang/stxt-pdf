@@ -63,15 +63,6 @@ Styles (dev.stxt.boxes):
 			Color: #2B2420
 		Box:
 			Padding: 1 0 1 14
-	For class: page-title
-		Typography:
-			Font: IBM Plex Serif
-			Size: 28
-			Line height: 32
-			Weight: bold
-			Color: #3B2A1E
-		Box:
-			Margin: 0 0 6 0
 	For class: lead
 		Typography:
 			Font: IBM Plex Serif

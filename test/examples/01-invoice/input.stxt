@@ -125,56 +125,66 @@ Document (dev.stxt.boxes):
 			Row:
 				Cell: MN-014
 				Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
+					Header: true
 				Cell: 6
 				Cell: 640,00 €
 				Cell: 3.840,00 €
 			Row:
 				Cell: MN-022
 				Cell: Silla de roble con asiento de anea
+					Header: true
 				Cell: 24
 				Cell: 118,00 €
 				Cell: 2.832,00 €
 			Row:
 				Cell: MN-031
 				Cell: Estantería modular de pared, cinco baldas
+					Header: true
 				Cell: 8
 				Cell: 215,00 €
 				Cell: 1.720,00 €
 			Row:
 				Cell: MN-040
 				Cell: Banco tapizado para recibidor
+					Header: true
 				Cell: 4
 				Cell: 189,50 €
 				Cell: 758,00 €
 			Row:
 				Cell: MN-057
 				Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
+					Header: true
 				Cell: 12
 				Cell: 96,00 €
 				Cell: 1.152,00 €
 			Row:
 				Cell: SV-001
 				Cell: Transporte y montaje en obra (dos operarios, una jornada)
+					Header: true
 				Cell: 1
 				Cell: 480,00 €
 				Cell: 480,00 €
 			Row:
 				Cell: SV-004
 				Cell: Acabado con aceite natural y cera de abeja
+					Header: true
 				Cell: 1
 				Cell: 260,00 €
 				Cell: 260,00 €
 		Foot:
 			Row:
 				Cell: Base imponible
+					Header: true
 					Span: 1 4
 				Cell: 11.042,00 €
 			Row:
 				Cell: IVA (21 %)
+					Header: true
 					Span: 1 4
 				Cell: 2.318,82 €
 			Row:
 				Cell: Total a pagar
+					Header: true
 					Span: 1 4
 					Class: total
 				Cell: 13.360,82 €

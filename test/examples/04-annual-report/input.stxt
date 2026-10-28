@@ -56,9 +56,12 @@ Document (dev.stxt.boxes):
 					Letter spacing: 2
 				Box:
 					Margin: 0 0 10 0
-			Block:
+			Heading 1:
+				In contents: false
 				Box:
 					Margin: 0 0 14 0
+					Padding: 0
+					Border: 0
 				Text: Un año de sol
 					Typography:
 						Font: IBM Plex Serif
@@ -134,8 +137,9 @@ Document (dev.stxt.boxes):
 			After: page
 	Block:
 		Id: contents
-		Text: Contenido
-			Class: page-title
+		Heading 1:
+			In contents: false
+			Text: Contenido
 		Contents:
 			Id: toc
 			Levels: 1 1
@@ -329,32 +333,38 @@ Document (dev.stxt.boxes):
 			Body:
 				Row:
 					Cell: Venta de energía
+						Header: true
 					Cell: 4.128
 					Cell: 3.774
 					Cell: +9,4 %
 				Row:
 					Cell: Servicios y mantenimiento
+						Header: true
 					Cell: 792
 					Cell: 640
 					Cell: +23,8 %
 				Row:
 					Cell: Gastos de explotación
+						Header: true
 					Cell: −3.980
 					Cell: −3.612
 					Cell: +10,2 %
 				Row:
 					Cell: Amortizaciones
+						Header: true
 					Cell: −540
 					Cell: −498
 					Cell: +8,4 %
 				Row:
 					Cell: Resultado financiero
+						Header: true
 					Cell: −88
 					Cell: −71
 					Cell: +23,9 %
 			Foot:
 				Row:
 					Cell: Resultado del ejercicio
+						Header: true
 						Class: total
 					Cell: 312
 						Class: total
@@ -420,21 +430,25 @@ Document (dev.stxt.boxes):
 			Body:
 				Row:
 					Cell: Producción renovable (MWh)
+						Header: true
 					Cell: 1.930
 					Cell: 2.148
 					Cell: 2.384
 				Row:
 					Cell: CO₂ evitado en el año (t)
+						Header: true
 					Cell: 2.800
 					Cell: 3.600
 					Cell: 4.300
 				Row:
 					Cell: Residuos valorizados (%)
+						Header: true
 					Cell: 82
 					Cell: 87
 					Cell: 91
 				Row:
 					Cell: Agua usada en las plantas (m³)
+						Header: true
 					Cell: 640
 					Cell: 590
 					Cell: 540
@@ -459,22 +473,27 @@ Document (dev.stxt.boxes):
 			Body:
 				Row:
 					Cell: Carme Vidal i Roca
+						Header: true
 					Cell: Presidenta
 					Cell: 2019
 				Row:
 					Cell: Oriol Pagès Vila
+						Header: true
 					Cell: Vicepresidente
 					Cell: 2019
 				Row:
 					Cell: Núria Serra Comas
+						Header: true
 					Cell: Secretaria
 					Cell: 2023
 				Row:
 					Cell: Jordi Casas Font
+						Header: true
 					Cell: Tesorero
 					Cell: 2023
 				Row:
 					Cell: Anna Bosch Puig
+						Header: true
 					Cell: Vocal de consumo
 					Cell: 2023
 		Heading 2:
@@ -508,6 +527,7 @@ Document (dev.stxt.boxes):
 			Body:
 				Row:
 					Cell: Oficina de atención en Olot
+						Header: true
 					Cell: Obras y apertura
 						Span: 1 2
 						Class: bar
@@ -515,6 +535,7 @@ Document (dev.stxt.boxes):
 					Cell:
 				Row:
 					Cell: Tarifa horaria
+						Header: true
 					Cell:
 					Cell: Diseño y pruebas
 						Span: 1 2
@@ -522,6 +543,7 @@ Document (dev.stxt.boxes):
 					Cell:
 				Row:
 					Cell: Almacenamiento de la nave
+						Header: true
 					Cell:
 					Cell:
 					Cell: Ampliación
@@ -529,6 +551,7 @@ Document (dev.stxt.boxes):
 						Class: bar
 				Row:
 					Cell: Cuarto aerogenerador
+						Header: true
 					Cell: Tramitación, obra y puesta en marcha
 						Span: 1 3
 						Class: bar

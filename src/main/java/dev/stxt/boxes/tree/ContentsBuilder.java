@@ -72,9 +72,9 @@ final class ContentsBuilder {
         }
     }
 
-    /** Los encabezados del árbol, en orden del documento. */
+    /** Los encabezados del árbol con entrada en los índices ({@code In contents}), en orden del documento. */
     private static void collect(Box box, List<Box> headings) {
-        if (box.headingLevel() > 0) {
+        if (box.headingLevel() > 0 && box.style.inContents) {
             headings.add(box);
         }
         box.children.forEach(child -> collect(child, headings));

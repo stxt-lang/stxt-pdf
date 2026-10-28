@@ -240,10 +240,12 @@ final class PdfStructure {
             PDStructureElement c = new PDStructureElement(type(cell), row);
             row.appendKid(c);
             elements.put(cell, c);
-            if (group == 0 || p.rows() > 1 || p.columns() > 1) {
+            if (group == 0 || cell.style.header || p.rows() > 1 || p.columns() > 1) {
                 PDTableAttributeObject attributes = new PDTableAttributeObject();
                 if (group == 0) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_COLUMN);
+                } else if (cell.style.header) {
+                    attributes.setScope(PDTableAttributeObject.SCOPE_ROW);
                 }
                 if (p.rows() > 1) {
                     attributes.setRowSpan(p.rows());
@@ -358,7 +360,7 @@ final class PdfStructure {
             case LIST -> "L";
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
-            case CELL -> group(box) == 0 ? "TH" : "TD";
+            case CELL -> group(box) == 0 || box.style.header ? "TH" : "TD";
             case IMAGE -> "Figure";
             case CONTENTS -> "TOC";
             case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,

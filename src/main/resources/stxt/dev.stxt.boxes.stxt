@@ -205,6 +205,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Link
 				Max: 1
+			Child: In contents
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -220,6 +222,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Class
 				Max: 1
 			Child: Link
+				Max: 1
+			Child: In contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -237,6 +241,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Link
 				Max: 1
+			Child: In contents
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -252,6 +258,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Class
 				Max: 1
 			Child: Link
+				Max: 1
+			Child: In contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -269,6 +277,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Link
 				Max: 1
+			Child: In contents
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -284,6 +294,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Class
 				Max: 1
 			Child: Link
+				Max: 1
+			Child: In contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -692,6 +704,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Span
 				Max: 1
+			Child: Header
+				Max: 1
 			Child: Block
 			Child: Flex
 			Child: Grid
@@ -922,6 +936,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres.
 	Node: Link
 		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
+	Node: In contents
+		Type: BOOLEAN
+		Description: Si el encabezado tiene entrada en los índices (Contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
 	Node: Isolate
 		Type: BOOLEAN
 		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
@@ -1204,6 +1221,9 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Span
 		Description: Filas y columnas que ocupa la celda, en ese orden (1 1 por defecto): 1 3 ocupa tres columnas de su fila.
+	Node: Header
+		Type: BOOLEAN
+		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Head, cuyas celdas ya son cabeceras de columna.
 
 	# Multicol
 

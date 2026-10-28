@@ -306,6 +306,8 @@ public final class BoxTreeBuilder {
                         case "number" -> s.listNumber = integer(p);
                         case "isolate" -> s.isolate = bool(p);
                         case "link" -> s.link = link(p);
+                        case "header" -> s.header = bool(p);
+                        case "in-contents" -> s.inContents = bool(p);
                         case "alt" -> s.alt = alt(p);
                         case "fit" -> s.fit = enumValue(Style.Fit.class, p);
                         case "levels" -> ContentsBuilder.levels(p, s);
@@ -318,6 +320,10 @@ public final class BoxTreeBuilder {
         if (kind == Element.CELL) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
+        }
+        if (kind == Element.CELL && s.header && position != null && position.group() == CellPosition.HEAD) {
+            throw error(s.line("header"), ErrorCode.TABLE_HEADER, "Header no tiene efecto en una celda de Head: "
+                    + "las celdas de la cabecera ya son cabeceras de columna");
         }
         if (kind == Element.FLEX) {
             validateFlex(s);

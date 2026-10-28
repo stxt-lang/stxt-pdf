@@ -228,6 +228,10 @@ public final class Style {
      * pero no lleva enlace propio.
      */
     public String link;
+    /** {@code Header} de una {@code Cell}: es la cabecera de su fila (§5.15). No se hereda. */
+    public boolean header;
+    /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
+    public boolean inContents = true;
 
     // --- Imagen ----------------------------------------------------------------------------------
     /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */

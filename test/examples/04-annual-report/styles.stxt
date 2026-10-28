@@ -111,18 +111,6 @@ Styles (dev.stxt.boxes):
 		Typography:
 			Size: 10.5
 			Line height: 15
-	For class: page-title
-		Typography:
-			Font: IBM Plex Serif
-			Size: 26
-			Line height: 30
-			Weight: bold
-			Color: #12315A
-		Box:
-			Margin: 0 0 14 0
-			Padding: 0 0 10 0
-			Border: 0 0 1 0
-			Border color: #C9D5E3
 	Element: Head cell
 		Typography:
 			Weight: bold

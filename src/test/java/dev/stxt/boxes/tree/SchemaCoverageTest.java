@@ -38,6 +38,7 @@ class SchemaCoverageTest {
             Map.entry("Id", "Id: x"),
             Map.entry("Class", "Class: c"),
             Map.entry("Link", "Link: https://example.com/a"),
+            Map.entry("In contents", "In contents: false"),
             Map.entry("Isolate", "Isolate: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
@@ -49,6 +50,7 @@ class SchemaCoverageTest {
             Map.entry("Orientation", "Orientation: landscape"),
             Map.entry("Content", "Content >>\n\tHola"),
             Map.entry("Span", "Span: 1 1"),
+            Map.entry("Header", "Header: true"),
             // Grupos
             Map.entry("Box", "Box:\n\tPadding: 1"),
             Map.entry("Typography", "Typography:\n\tColor: #333333"),

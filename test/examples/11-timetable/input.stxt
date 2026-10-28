@@ -66,6 +66,7 @@ Document (dev.stxt.boxes):
 		Body:
 			Row:
 				Cell: 9:00 – 10:00
+					Header: true
 					Class: hour
 				Cell: Matemáticas
 					Class: slot math
@@ -79,6 +80,7 @@ Document (dev.stxt.boxes):
 					Class: slot sci
 			Row:
 				Cell: 10:00 – 11:00
+					Header: true
 					Class: hour
 				Cell: Lengua
 					Class: slot lang
@@ -92,12 +94,14 @@ Document (dev.stxt.boxes):
 					Class: slot eng
 			Row:
 				Cell:
+					Header: true
 					Class: hour
 				Cell: Recreo · 11:00 – 11:30
 					Span: 1 5
 					Class: break
 			Row:
 				Cell: 11:30 – 12:30
+					Header: true
 					Class: hour
 				Cell: Ciencias
 					Class: slot sci
@@ -111,6 +115,7 @@ Document (dev.stxt.boxes):
 					Class: slot lang
 			Row:
 				Cell: 12:30 – 13:30
+					Header: true
 					Class: hour
 				Cell: Educación física
 					Class: slot pe
@@ -124,12 +129,14 @@ Document (dev.stxt.boxes):
 					Class: slot math
 			Row:
 				Cell:
+					Header: true
 					Class: hour
 				Cell: Comedor y patio · 13:30 – 15:00
 					Span: 1 5
 					Class: break
 			Row:
 				Cell: 15:00 – 16:00
+					Header: true
 					Class: hour
 				Cell: Taller
 					Class: slot lab

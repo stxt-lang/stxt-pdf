@@ -39,6 +39,19 @@ class ContentsTest {
         return f.lines().stream().map(x -> x.text()).reduce((a, b) -> a + "|" + b).orElse("");
     }
 
+    /**
+     * Un encabezado con {@code In contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y las
+     * páginas no cambian) pero no tiene entrada (§5.19).
+     */
+    @Test
+    void aHeadingWithInContentsFalseHasNoEntry() {
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
+                "\tHeading 1:", "\t\tIn contents: false", "\t\tText: Portada"));
+        List<Fragment> entries = entries(l);
+        assertEquals(3, entries.size());
+        assertEquals(List.of("Intro", "Detalle", "Final"), entries.stream().map(e -> text(e.children().get(0))).toList());
+    }
+
     @Test
     void oneEntryPerHeadingWithItsTitleALeaderAndItsPage() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2"));

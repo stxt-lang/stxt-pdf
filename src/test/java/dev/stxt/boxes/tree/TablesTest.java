@@ -49,6 +49,27 @@ class TablesTest {
         assertEquals("Ventas", cell.text.trim());
     }
 
+    /** {@code Header} es de la celda, no se hereda y por defecto es falso (§5.15). */
+    @Test
+    void headerMarksTheRowHeaderCells() {
+        Box table = root("\tTable:", "\t\tColumns: 100 100",
+                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: Importe",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120",
+                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120").children.get(0);
+        assertEquals(List.of(false, false, true, false, true, false),
+                table.children.stream().map(c -> c.style.header).toList());
+        assertEquals(21, table.children.get(2).style.line("header"));
+    }
+
+    @Test
+    void headerInAHeadCellIsAnError() {
+        InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
+                () -> root("\tTable:", "\t\tColumns: 100", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
+                        "\t\t\t\t\tHeader: true", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa"));
+        assertEquals(ErrorCode.TABLE_HEADER, e.code());
+        assertEquals(17, e.line());
+    }
+
     @Test
     void spansFromAboveTakeTheirColumns() {
         Box table = root("\tTable:", "\t\tColumns: 1fr 1fr 1fr", "\t\tBody:",

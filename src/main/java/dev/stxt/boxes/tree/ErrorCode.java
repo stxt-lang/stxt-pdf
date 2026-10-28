@@ -67,6 +67,8 @@ public enum ErrorCode {
     TABLE_ROW_BREAK,
     /** Un {@code Column align} con distinto número de alineaciones que columnas tiene la tabla. */
     TABLE_COLUMN_ALIGN,
+    /** {@code Header} en una celda de {@code Head}, cuyas celdas ya son cabeceras de columna. */
+    TABLE_HEADER,
 
     // --- Columnas ------------------------------------------------------------------------------
     /** Un {@code Multicol} sin {@code Count} ni {@code Column width}. */

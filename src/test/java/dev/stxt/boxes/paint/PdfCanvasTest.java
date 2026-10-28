@@ -324,6 +324,54 @@ class PdfCanvasTest {
         }
     }
 
+    /**
+     * Una celda con {@code Header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la cabecera
+     * siguen siendo {@code Scope: Column} y las demás, {@code TD} (§5.15).
+     */
+    @Test
+    void headerCellsAreRowHeaders() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tTable:\n\t\tColumns: 100 100\n"
+                + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Importe\n"
+                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"
+                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "row-headers"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement table = (PDStructureElement) document.getKids().get(0);
+            PDStructureElement bodyRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(1)).getKids().get(0);
+            assertEquals(List.of("TH", "TD"), types(bodyRow));
+            assertEquals(PDTableAttributeObject.SCOPE_ROW,
+                    ((PDTableAttributeObject) ((PDStructureElement) bodyRow.getKids().get(0)).getAttributes().getObject(0)).getScope());
+            assertEquals(0, ((PDStructureElement) bodyRow.getKids().get(1)).getAttributes().size());
+            PDStructureElement footRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(2)).getKids().get(0);
+            assertEquals(List.of("TH", "TD"), types(footRow));
+            PDStructureElement head = (PDStructureElement) ((PDStructureElement) ((PDStructureElement) table.getKids().get(0))
+                    .getKids().get(0)).getKids().get(0);
+            assertEquals(PDTableAttributeObject.SCOPE_COLUMN,
+                    ((PDTableAttributeObject) head.getAttributes().getObject(0)).getScope());
+        }
+    }
+
+    /** Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador (§5.13, §5.19). */
+    @Test
+    void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tHeading 1:\n\t\tIn contents: false\n\t\tText: Portada\n"
+                + "\tContents:\n\t\tLevels: 1 1\n"
+                + "\tHeading 1:\n\t\tText: Uno\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "out-of-contents"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("H1", "TOC", "H1"), types(document));
+            PDStructureElement toc = (PDStructureElement) document.getKids().get(1);
+            assertEquals(1, types(toc).size());
+            List<String> bookmarks = new ArrayList<>();
+            pdf.getDocumentCatalog().getDocumentOutline().children().forEach(i -> bookmarks.add(i.getTitle()));
+            assertEquals(List.of("Portada", "Uno"), bookmarks);
+        }
+    }
+
     /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {

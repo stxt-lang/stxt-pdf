@@ -52,7 +52,8 @@ Document (dev.stxt.boxes):
 					Letter spacing: 4
 				Box:
 					Margin: 0 0 8 0
-			Block:
+			Heading 1:
+				In contents: false
 				Box:
 					Margin: 0 0 14 0
 				Typography:
@@ -115,8 +116,9 @@ Document (dev.stxt.boxes):
 			After: page
 	Block:
 		Id: index
-		Text: Índice
-			Class: page-title
+		Heading 1:
+			In contents: false
+			Text: Índice
 		Paragraph: Cada pieza, con la página de su ficha.
 			Class: lead
 		Contents:
@@ -478,6 +480,7 @@ Document (dev.stxt.boxes):
 			Body:
 				Row:
 					Cell: Nogal
+						Header: true
 						Typography:
 							Weight: bold
 					Cell: Oscura, de veta marcada y cálida
@@ -485,6 +488,7 @@ Document (dev.stxt.boxes):
 					Cell: Aceite natural, cera de abeja, teñido nogal oscuro
 				Row:
 					Cell: Roble
+						Header: true
 						Typography:
 							Weight: bold
 					Cell: Clara, de veta fina y muy resistente
@@ -492,6 +496,7 @@ Document (dev.stxt.boxes):
 					Cell: Aceite blanco o natural, jabón
 				Row:
 					Cell: Cerezo
+						Header: true
 						Typography:
 							Weight: bold
 					Cell: Rojiza, que se oscurece con la luz
@@ -499,6 +504,7 @@ Document (dev.stxt.boxes):
 					Cell: Aceite natural
 				Row:
 					Cell: Fresno
+						Header: true
 						Typography:
 							Weight: bold
 					Cell: Clara y elástica, ideal para piezas curvas

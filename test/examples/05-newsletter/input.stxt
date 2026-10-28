@@ -190,26 +190,31 @@ Document (dev.stxt.boxes):
 					Cell: Sáb. 25 oct.
 					Cell: 19:00
 					Cell: Concierto del coro del valle
+						Header: true
 					Cell: Iglesia de Sant Roc
 				Row:
 					Cell: Dom. 26 oct.
 					Cell: 10:00
 					Cell: Salida micológica con guía
+						Header: true
 					Cell: Plaza Mayor
 				Row:
 					Cell: Sáb. 1 nov.
 					Cell: 11:00
 					Cell: Mercado y castañada popular
+						Header: true
 					Cell: Plaza Mayor
 				Row:
 					Cell: Vie. 7 nov.
 					Cell: 20:30
 					Cell: Cine al aire libre: «El hayedo»
+						Header: true
 					Cell: Polideportivo
 				Row:
 					Cell: Sáb. 22 nov.
 					Cell: 21:00
 					Cell: Cena del club de lectura
+						Header: true
 					Cell: Centro cívico
 		Heading 2:
 			Text: Anuncios por palabras
