@@ -87,7 +87,7 @@ public enum ErrorCode {
     // --- Imágenes -------------------------------------------------------------------------------
     /** Una {@code Image} sin ruta, con una ruta que sale de la carpeta o que no existe. */
     IMAGE_UNKNOWN,
-    /** Una {@code Image} que no es PNG ni JPEG, o que no se puede leer. */
+    /** Una {@code Image} que no es PNG, JPEG ni un SVG admitido, o que no se puede leer. */
     IMAGE_FORMAT,
     /** {@code Inside} o {@code Decoration} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,

@@ -114,6 +114,14 @@ public final class FontLibrary {
                 + ". Variantes en " + folder + ": " + (variants.isEmpty() ? "ninguna" : variants));
     }
 
+    /** Todas las fuentes que se pueden usar, en orden de familia y variante. */
+    public List<FontFile> all() {
+        return faces.values().stream()
+                .sorted(java.util.Comparator.comparing((FontFile f) -> f.face().family())
+                        .thenComparing(f -> f.face().variant()))
+                .toList();
+    }
+
     /** Familias encontradas, en orden alfabético. */
     public Set<String> families() {
         return new TreeSet<>(families);

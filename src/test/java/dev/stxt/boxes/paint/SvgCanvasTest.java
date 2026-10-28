@@ -27,6 +27,16 @@ class SvgCanvasTest {
     }
 
     @Test
+    void svgImagesAreEmbeddedAsSvg() {
+        LaidOutDocument vector = new Engine().layOutDocument(new DocumentReader().read(
+                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 20\n\tImage: test/shapes.svg\n"));
+        String svg = SvgCanvas.page(vector.pages().get(0), vector.media(), false, new Resources());
+        assertTrue(svg.contains("<image x=\"0.00\" y=\"0.00\" width=\"150.00\" height=\"75.00\" "
+                + "preserveAspectRatio=\"none\" href=\"data:image/svg+xml;base64,"), svg);
+    }
+
+    @Test
     void letterSpacingIsAnAttributeOfTheText() {
         LaidOutDocument spaced = new Engine().layOutDocument(new DocumentReader().read(
                 "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"

@@ -12,7 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * Dimensionado y colocación de {@code Image} (ESPECIFICACION.md §5.18), con las imágenes de
  * {@code resources/images/test/}: {@code wide.png} de 200 × 100 píxeles (150 × 75 pt, proporción
- * 2), {@code tall.jpg} de 120 × 160 (90 × 120 pt) y {@code square.png} de 40 × 40 (30 × 30 pt).
+ * 2), {@code tall.jpg} de 120 × 160 (90 × 120 pt) y {@code square.png} de 40 × 40 (30 × 30 pt), y los SVG
+ * {@code shapes.svg} (200 × 100 px: 150 × 75 pt) y {@code label.svg}, sin {@code width} ni {@code height}
+ * y con {@code viewBox="0 0 160 48"} (120 × 36 pt).
  */
 class ImageLayoutTest {
 
@@ -30,6 +32,23 @@ class ImageLayoutTest {
         // No se estira al ancho del área útil, como un <img>.
         assertRect(40, 40, 150, 75, f.rect("I"));
         assertRect(40, 115, 90, 120, f.rect("T"));
+    }
+
+    /** Un SVG se dimensiona como un PNG: su tamaño natural a 96 ppp, sea de {@code width} y {@code height} o del {@code viewBox}. */
+    @Test
+    void svgHasItsNaturalSizeAndItsRatio() {
+        LayoutFixture f = layOut(
+                "\tImage: test/shapes.svg",
+                "\t\tId: S",
+                "\tImage: test/label.svg",
+                "\t\tId: L",
+                "\tImage: test/label.svg",
+                "\t\tId: H",
+                "\t\tBox:",
+                "\t\t\tHeight: 18");
+        assertRect(40, 40, 150, 75, f.rect("S"));
+        assertRect(40, 115, 120, 36, f.rect("L"));
+        assertRect(40, 151, 60, 18, f.rect("H"));
     }
 
     @Test

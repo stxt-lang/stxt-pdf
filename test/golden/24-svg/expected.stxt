@@ -1,0 +1,27 @@
+# Página 1: title en 20; art en 40, de 150 × 75; scaled en 40 + 75 + 8 = 123, de 260 × 130.
+#   logo en x = 20 + 260 − 12 e y = 20 − 16, de 12 × 6.
+# Página 2: label en 20, de 120 × 36; row en 20 + 36 + 8 = 64, de 30, con mini de 60 × 30 y
+#   banner desde x = 20 + 60 + 10 = 90, de 190 × 30; md en 64 + 30 + 8 = 102, de 75 + 12 = 87.
+Result:
+	Page: 1
+		Fragment: title
+			Rect: 20 20 260 12
+		Fragment: art
+			Rect: 20 40 150 75
+		Fragment: scaled
+			Rect: 20 123 260 130
+		Fragment: logo
+			Rect: 268 4 12 6
+	Page: 2
+		Fragment: label
+			Rect: 20 20 120 36
+		Fragment: row
+			Rect: 20 64 260 30
+			Fragment: mini
+				Rect: 20 64 60 30
+			Fragment: banner
+				Rect: 90 64 190 30
+		Fragment: md
+			Rect: 20 102 260 87
+		Fragment: logo
+			Rect: 268 4 12 6

@@ -22,6 +22,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
@@ -31,9 +32,11 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -641,6 +644,61 @@ class PdfCanvasTest {
 
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.contains("/Figure <</MCID 0>> BDC"), content);
+        }
+    }
+
+    /**
+     * Un SVG (§5.18) es un dibujo vectorial: un formulario del PDF, no una imagen, que se incrusta una
+     * vez aunque se use en dos páginas y se escala a su caja; con {@code Alt} es un {@code Figure}.
+     * El texto del SVG se dibuja con la fuente de {@code fonts/}: los píxeles de las letras están donde
+     * toca (blancos sobre el fondo oscuro).
+     */
+    @Test
+    void svgIsDrawnAsOneVectorFormAndScaledToItsBox() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 400\n\t\tHeight: 300\n"
+                + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+                + "\tImage: test/shapes.svg\n\t\tAlt: Un paisaje\n\t\tBox:\n\t\t\tWidth: 300\n"
+                + "\tImage: test/label.svg\n\t\tBox:\n\t\t\tMargin: 10 0 0 0\n"
+                + "\tImage: test/shapes.svg\n\t\tBreak:\n\t\t\tBefore: page\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "svg"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDResources first = pdf.getPage(0).getResources();
+            List<PDFormXObject> forms = new ArrayList<>();
+            for (COSName name : first.getXObjectNames()) {
+                assertInstanceOf(PDFormXObject.class, first.getXObject(name), "Un SVG no es una imagen de píxeles");
+                forms.add((PDFormXObject) first.getXObject(name));
+            }
+            assertEquals(2, forms.size());
+            PDResources second = pdf.getPage(1).getResources();
+            PDFormXObject shapes = forms.stream().filter(f -> f.getBBox().getWidth() == 150).findFirst().orElseThrow();
+            assertTrue(second.getXObjectNames().iterator().hasNext());
+            assertEquals(shapes.getCOSObject(), second.getXObject(second.getXObjectNames().iterator().next())
+                    .getCOSObject(), "El mismo SVG en dos páginas se incrusta una vez");
+            assertEquals(75, shapes.getBBox().getHeight(), 1e-3);
+
+            // 300 pt de ancho para 150 de natural: se escala por dos, desde la esquina de abajo de la caja.
+            String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.matches("(?s).*\\b2 0 0 2 40 \\S+ cm\\b.*"), content);
+            assertTrue(content.contains("/Figure <</MCID 0>> BDC"), content);
+            // El formulario hereda el estado gráfico (como los guiones del modo debug): se parte de cero.
+            assertTrue(content.contains("[] 0 d"), content);
+
+            // Lo vectorial lleva rutas, no una imagen; y el texto de label.svg se ve (letras blancas sobre #3b2a1e).
+            String shapesContent = new String(shapes.getContentStream().createInputStream().readAllBytes(),
+                    StandardCharsets.ISO_8859_1);
+            assertTrue(shapesContent.contains(" c\n") || shapesContent.contains(" l\n"), shapesContent);
+            BufferedImage image = new PDFRenderer(pdf).renderImageWithDPI(0, 72);
+            int label = 40 + 150 + 10;
+            int whites = 0;
+            for (int y = label; y < label + 36; y++) {
+                for (int x = 40; x < 40 + 120; x++) {
+                    int rgb = image.getRGB(x, y) & 0xFFFFFF;
+                    if ((rgb >> 16 & 0xFF) > 230 && (rgb >> 8 & 0xFF) > 230 && (rgb & 0xFF) > 230) {
+                        whites++;
+                    }
+                }
+            }
+            assertTrue(whites > 30, "Las letras de label.svg deben verse: " + whites);
         }
     }
 

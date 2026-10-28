@@ -19,13 +19,13 @@ public final class ImageLibrary {
     /**
      * La imagen de esa ruta, relativa a {@code images/}.
      *
-     * @throws ImageFormatException si no es PNG ni JPEG, o no se puede leer
+     * @throws ImageFormatException si no es PNG, JPEG ni un SVG admitido, o no se puede leer
      * @throws ResourceException    si la ruta sale de la carpeta o no existe
      */
     public synchronized ImageFile find(String path) {
         ImageFile file = files.get(path);
         if (file == null) {
-            file = ImageFile.read(resources.resolve("images", path), path);
+            file = ImageFile.read(resources.resolve("images", path), path, resources);
             files.put(path, file);
         }
         return file;

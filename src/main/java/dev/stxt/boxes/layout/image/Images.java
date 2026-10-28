@@ -12,7 +12,7 @@ import dev.stxt.boxes.tree.InvalidModelException;
  * Las imágenes del documento en la carpeta de recursos (ESPECIFICACION.md §5.18): el fichero y
  * el tamaño natural de cada {@code Image}. Los errores del fichero son del documento y llevan la
  * línea de la {@code Image}: {@code IMAGE_UNKNOWN} si la ruta no existe o sale de la carpeta, e
- * {@code IMAGE_FORMAT} si no es PNG ni JPEG.
+ * {@code IMAGE_FORMAT} si no es PNG, JPEG ni un SVG admitido.
  */
 public final class Images {
 

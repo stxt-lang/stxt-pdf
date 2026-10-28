@@ -1,0 +1,9 @@
+# Case: SVG con una referencia externa
+# Code: IMAGE_FORMAT
+# Line: 9
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Image: test/bad-external.svg

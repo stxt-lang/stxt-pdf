@@ -50,9 +50,9 @@ class ImageLibraryTest {
     @Test
     void recognizesTheFormatByContent() {
         ImageFormatException gif = assertThrows(ImageFormatException.class, () -> images.find("test/drawing.gif"));
-        assertTrue(gif.getMessage().contains("no es PNG ni JPEG (es GIF)"), gif.getMessage());
+        assertTrue(gif.getMessage().contains("no es PNG, JPEG ni SVG (es GIF)"), gif.getMessage());
         ImageFormatException text = assertThrows(ImageFormatException.class, () -> images.find("test/broken.png"));
-        assertTrue(text.getMessage().contains("test/broken.png no es PNG ni JPEG"), text.getMessage());
+        assertTrue(text.getMessage().contains("test/broken.png no es PNG, JPEG ni SVG"), text.getMessage());
     }
 
     @Test

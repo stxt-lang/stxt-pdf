@@ -258,7 +258,11 @@ public final class SvgCanvas implements Canvas {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        String mime = file.format() == ImageFile.Format.PNG ? "image/png" : "image/jpeg";
+        String mime = switch (file.format()) {
+            case PNG -> "image/png";
+            case JPEG -> "image/jpeg";
+            case SVG -> "image/svg+xml";
+        };
         boolean rounded = !radii.isSquare();
         if (rounded) {
             String id = "c" + ids++;

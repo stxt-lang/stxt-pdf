@@ -36,7 +36,6 @@ import org.apache.pdfbox.pdmodel.graphics.shading.PDShading;
 import org.apache.pdfbox.pdmodel.graphics.shading.PDShadingType2;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
@@ -68,7 +67,8 @@ import java.util.Map;
  * {@code TJ}.</p>
  *
  * <p>Cada imagen (ESPECIFICACION.md §5.18) se incrusta una sola vez aunque se use en varias
- * páginas, sin remuestrear: el JPEG tal cual y el PNG sin pérdida, con su transparencia.</p>
+ * páginas, sin remuestrear: el JPEG tal cual y el PNG sin pérdida, con su transparencia; el SVG,
+ * como dibujo vectorial ({@link PdfImages}).</p>
  *
  * <p>El PDF va etiquetado (árbol de estructura y contenido marcado) y lleva los marcadores de
  * los encabezados: ver {@link PdfStructure}.</p>
@@ -85,7 +85,7 @@ public final class PdfCanvas implements Canvas {
     /** Fuentes incrustadas en el documento, compartidas por todas sus páginas. */
     private final Map<FontFace, PDFont> fonts;
     /** Imágenes incrustadas en el documento, por fichero, compartidas por todas sus páginas. */
-    private final Map<Path, PDImageXObject> images;
+    private final PdfImages images;
     /** Árbol de estructura del documento, compartido por todas sus páginas. */
     private final PdfStructure structure;
     /** Anotaciones de enlace del documento, compartidas por todas sus páginas. */
@@ -104,7 +104,7 @@ public final class PdfCanvas implements Canvas {
     private final Deque<AffineTransform> turns = new ArrayDeque<>();
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
-                      Map<FontFace, PDFont> fonts, Map<Path, PDImageXObject> images, PdfStructure structure,
+                      Map<FontFace, PDFont> fonts, PdfImages images, PdfStructure structure,
                       PdfLinks links, boolean debug) {
         this.doc = doc;
         this.out = out;
@@ -128,7 +128,7 @@ public final class PdfCanvas implements Canvas {
         Media media = document.media();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
-            Map<Path, PDImageXObject> images = new HashMap<>();
+            PdfImages images = new PdfImages(doc, resources);
             PdfStructure structure = new PdfStructure(doc, root(pages));
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata());
@@ -505,11 +505,6 @@ public final class PdfCanvas implements Canvas {
         }
         try {
             ImageFile file = resources.images().find(box.image);
-            PDImageXObject image = images.get(file.path());
-            if (image == null) {
-                image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
-                images.put(file.path(), image);
-            }
             Rect target = ImageFit.place(box.style.fit, content, file.width(), file.height());
             int mcid = structure.mark(box);
             if (mcid < 0) {
@@ -521,8 +516,18 @@ public final class PdfCanvas implements Canvas {
             out.saveGraphicsState();
             Shapes.roundedRect(path(), content, radii);
             out.clip();
-            out.drawImage(image, (float) target.x(), (float) (pageHeight - target.bottom()), (float) target.width(),
-                    (float) target.height());
+            if (file.isVector()) {
+                // El dibujo mide lo que el SVG: se escala a donde va (Fit) y vuelve a ser vectorial.
+                out.transform(new Matrix((float) (target.width() / file.width()), 0, 0,
+                        (float) (target.height() / file.height()), (float) target.x(),
+                        (float) (pageHeight - target.bottom())));
+                // Un formulario hereda el estado gráfico y el dibujo no fija los guiones: sin guiones.
+                out.setLineDashPattern(new float[0], 0);
+                out.drawForm(images.drawing(file));
+            } else {
+                out.drawImage(images.bitmap(file), (float) target.x(), (float) (pageHeight - target.bottom()),
+                        (float) target.width(), (float) target.height());
+            }
             out.restoreGraphicsState();
             out.endMarkedContent();
         } catch (IOException e) {
