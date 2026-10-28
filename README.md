@@ -7,7 +7,7 @@ tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Schema STXT del modelo** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
-- **Ejemplos:** [`test/examples/`](test/examples): once documentos completos (factura, carta, currículum, informe anual, boletín, carta de restaurante, contrato, manual, catálogo, certificado y horario), con su PDF y una imagen por página
+- **Ejemplos:** [`test/examples/`](test/examples): once documentos completos (factura, carta, currículum, informe anual, boletín, carta de restaurante, contrato, manual, catálogo, certificado y horario), con una imagen por página y su PDF (que se genera al ejecutar los tests)
 - **Documento de la especificación:** [`test/spec/report.stxt`](test/spec/report.stxt)
 
 Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
@@ -122,7 +122,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 21 están termin
 | Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
 | Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
 | Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Weight` y `Style`, línea base real | Hecho y probado |
-| Ejemplos de documentos completos (`test/examples/`): once documentos con PDF e imágenes versionados, comprobados por `ExamplesTest` | Hecho y probado |
+| Ejemplos de documentos completos (`test/examples/`): once documentos con una imagen por página versionada, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
@@ -133,8 +133,8 @@ aún pueden variar detalles del suavizado con otra versión de Java. `PdfCanvasT
 en `target/pdf/`.
 
 Los [ejemplos](test/examples) (`ExamplesTest`) funcionan igual, pero son documentos completos
-maquetados con las fuentes y las imágenes reales y sin contornos, y su PDF (`output.pdf`) sí se
-versiona: solo se reescribe si cambian los píxeles de alguna página.
+maquetados con las fuentes y las imágenes reales y sin contornos. Dejan el PDF (`output.pdf`,
+ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carpeta.
 
 ## Hoja de ruta
 

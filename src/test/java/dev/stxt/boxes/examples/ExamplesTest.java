@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  * <p>Cada carpeta tiene {@code input.stxt}, que debe validar y maquetarse sin errores; el volcado
  * de las cajas con {@code Id} ({@code expected.stxt}, §7), que se compara con tolerancia de
- * 0.01 pt; el PDF ({@code output.pdf}) y una imagen por página ({@code page-N.png}). El PDF y las
- * imágenes se versionan, y solo se reescriben si cambian los píxeles de alguna página (el PDF
- * lleva fechas e identificadores que cambian en cada ejecución).</p>
+ * 0.01 pt; el PDF ({@code output.pdf}, ignorado por git, se regenera en cada ejecución) y una
+ * imagen por página ({@code page-N.png}, versionadas, que solo se reescriben si cambian sus
+ * píxeles).</p>
  *
  * <p>El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que el
  * autor revisa mirando las imágenes. Se regenera con {@code -Dexamples.update=true}, y se puede
@@ -76,14 +76,10 @@ class ExamplesTest {
         writePdfAndImages(dir, document, resources);
     }
 
-    /** El PDF solo se reescribe si no existe o si cambian las imágenes: así git no ve ruido. */
     private static void writePdfAndImages(Path dir, LaidOutDocument document, Resources resources) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfCanvas.write(document, resources, out, false);
-        boolean changed = ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
-        Path pdf = dir.resolve("output.pdf");
-        if (changed || !Files.exists(pdf)) {
-            Files.write(pdf, out.toByteArray());
-        }
+        Files.write(dir.resolve("output.pdf"), out.toByteArray());
+        ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
     }
 }

@@ -767,12 +767,14 @@ párrafo de Markdown y tres errores nuevos. Las interpretaciones que salieron al
      `ExamplesTest`. *Alternativa:* comparar solo las imágenes, que no detecta cambios de un
      punto.
 
-147. **El PDF y las imágenes de los ejemplos se versionan**, a diferencia de los de los golden,
-     porque son lo que se quiere enseñar al navegar por el repositorio. Las imágenes son a
-     110 ppp, sin contornos, y no se reescriben si los píxeles cambian menos de la tolerancia
-     del antialiasing (16 por canal); el PDF, que lleva fechas e identificadores distintos en
-     cada ejecución, solo se reescribe si no existe o cambia alguna imagen. *Dónde:*
-     `golden/ReferenceFiles`, `ExamplesTest`. *Alternativa:* ignorar el PDF en git.
+147. **Las imágenes de los ejemplos se versionan y el PDF no**, como en los golden: el PDF se
+     regenera en cada ejecución y está en `.gitignore` (`test/examples/**/*.pdf`); las
+     `page-N.png`, a 110 ppp y sin contornos, se versionan para que un cambio se vea en el diff
+     y no se reescriben si los píxeles cambian menos de la tolerancia del antialiasing (16 por
+     canal). Primero se versionaban también los PDF, para poder abrirlos al navegar por el
+     repositorio; se descartó porque cambian en cada ejecución (fechas e identificadores).
+     *Dónde:* `golden/ReferenceFiles`, `ExamplesTest`, `.gitignore`. *Alternativa:* versionar el
+     PDF y reescribirlo solo si cambian las imágenes.
 
 148. **Se añaden IBM Plex Serif y Mono** (los TTF de IBM/plex, con su licencia OFL, en
      `resources/fonts/`) a Plex Sans, para poder escribir documentos con serif y con

@@ -356,14 +356,14 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   máquinas (`ReferenceFiles.PIXEL_TOLERANCE`, 16 por canal): si aparece modificado en git, el
   resultado ha cambiado; míralo antes de dar el cambio por bueno.
 - **Ejemplos** (`examples/ExamplesTest`): cada carpeta de `test/examples/NN-nombre/` es un
-  documento completo (`input.stxt`) con su `output.pdf`, un `page-N.png` por página (sin
-  contornos de depuración, a 110 ppp) y un `expected.stxt` con el volcado de las cajas con `Id`.
+  documento completo (`input.stxt`) con su `output.pdf` (ignorado por git, como el de los
+  golden), un `page-N.png` por página (versionados, sin contornos de depuración, a 110 ppp) y un
+  `expected.stxt` con el volcado de las cajas con `Id`.
   Se maquetan con las **métricas reales** y la carpeta `resources/` (no con `FixedMetrics`). El
   volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true` y
   se revisa mirando las imágenes; sin esa opción, un `expected.stxt` que falta es un error. Con
-  `-Dexamples.only=NN-nombre` se prueba un solo ejemplo. El PDF y los PNG solo se reescriben si
-  cambian los píxeles de alguna página (`golden/ReferenceFiles`, que comparten con `GoldenTest`),
-  y los dos se versionan. Un ejemplo nuevo se escribe como un documento real, con sentido, y se
+  `-Dexamples.only=NN-nombre` se prueba un solo ejemplo. Un PNG solo se reescribe si cambian
+  sus píxeles (`golden/ReferenceFiles`, que comparten con `GoldenTest`). Un ejemplo nuevo se escribe como un documento real, con sentido, y se
   añade con su índice en `test/examples/README.md`. Las imágenes de los ejemplos están en
   `resources/images/examples/` y las genera `java tools/ExampleImages.java` (Java2D, sin
   ficheros de terceros); si necesitas una, añádela al generador en vez de subir un binario.

@@ -399,8 +399,9 @@ Decisiones tomadas (2026-10-28, todas con la propuesta aceptada):
       principio del fichero, y la línea es la del propio fichero.
 - [x] **P3. Ejemplos.** Cada carpeta de `test/examples/` lleva `input.stxt`, `expected.stxt`
       (volcado de las cajas con `Id`), `output.pdf` y un `page-N.png` sin contornos. El test
-      compara el volcado y los PNG con tolerancia, como el golden. El PDF se versiona, pero solo
-      se reescribe si cambia algún PNG (PDFBox mete fechas e identificadores).
+      compara el volcado con tolerancia, como el golden. Los PNG se versionan y el PDF no (se
+      ignora en git y se regenera en cada ejecución, como el de los golden; corregido el
+      2026-10-28, ver el registro).
 - [x] **P4. Material.** IBM Plex Serif y Plex Mono (OFL) además de Plex Sans, e imágenes
       generadas por código (logotipos, fotos sintéticas, gráficos), sin derechos de terceros.
 
@@ -424,8 +425,9 @@ está en [`test/examples/README.md`](../test/examples/README.md).
 - **`ExamplesTest`** recorre `test/examples/*/`, lee y maqueta `input.stxt` con las métricas
   reales (`PdfMetrics`) y la carpeta `resources/`, compara el volcado con `expected.stxt` y deja
   el PDF y una imagen por página (110 ppp, sin contornos). El volcado es una instantánea: se
-  genera con `-Dexamples.update=true`. El PDF solo se reescribe si cambian los píxeles de alguna
-  página (PDFBox mete fechas e identificadores). `-Dexamples.only=NN-nombre` prueba uno solo.
+  genera con `-Dexamples.update=true`. El PDF se escribe siempre y no se versiona
+  (`.gitignore`); los PNG sí, y solo se reescriben si cambian sus píxeles.
+  `-Dexamples.only=NN-nombre` prueba uno solo.
 - **`golden/ReferenceFiles`** reúne lo que comparten `GoldenTest` y `ExamplesTest`: comparar
   volcados (`compare`) y escribir las imágenes de un PDF sin ruido (`writePageImages`).
 - **Material.** IBM Plex Serif y Mono (los TTF de [IBM/plex](https://github.com/IBM/plex), con su
@@ -450,6 +452,9 @@ está en [`test/examples/README.md`](../test/examples/README.md).
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (4).** Los PDF de los ejemplos dejan de versionarse (`git rm --cached`,
+  `.gitignore`: `test/examples/**/*.pdf`) y `ExamplesTest` los escribe siempre; los PNG siguen
+  versionados. Decisión 147 corregida.
 - **2026-10-28 (3).** Se abren los hitos 19 a 21 (P1–P4 aceptadas) y se terminan los tres.
   Hito 19: `test/` sustituye a `src/test/resources`. Hito 20: los 148 casos de `errors.stxt` son
   148 ficheros en 14 carpetas por grupo, con cabecera `# Case/# Code/# Line` (la línea es la del
