@@ -1691,8 +1691,9 @@ La validación se hace en cuatro niveles:
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 
-**Catálogo de errores.** [`test/errors/errors.stxt`](../test/errors/errors.stxt)
-tiene un documento de ejemplo por regla, con el código y la línea que debe dar.
+**Catálogo de errores.** [`test/errors/`](../test/errors) tiene un documento de ejemplo por
+regla (a veces varios), en un fichero cada uno y agrupados en carpetas por familia de errores,
+con el código y la línea que debe dar.
 
 ---
 

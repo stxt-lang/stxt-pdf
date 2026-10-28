@@ -1,0 +1,15 @@
+# Case: Imagen de Markdown que no existe
+# Code: IMAGE_UNKNOWN
+# Line: 15
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Párrafo.
+
+			![Acme](logos/acme.png)

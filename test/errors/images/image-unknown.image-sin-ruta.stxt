@@ -1,0 +1,9 @@
+# Case: Image sin ruta
+# Code: IMAGE_UNKNOWN
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Image:
+		Id: logo

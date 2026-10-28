@@ -1,0 +1,10 @@
+# Case: Item sin elemento
+# Code: SINGLE_ELEMENT
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Item:
+			Grow: 1

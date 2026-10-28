@@ -1,0 +1,9 @@
+# Case: Lines sin Wrap
+# Code: LINES_WITHOUT_WRAP
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Lines: center

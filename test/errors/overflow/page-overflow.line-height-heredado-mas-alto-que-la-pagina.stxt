@@ -1,0 +1,14 @@
+# Case: Line height heredado más alto que la página
+# Code: PAGE_OVERFLOW
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Block:
+		Typography:
+			Line height: 900
+		Text: a

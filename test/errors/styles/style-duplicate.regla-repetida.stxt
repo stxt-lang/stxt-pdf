@@ -1,0 +1,14 @@
+# Case: Regla repetida
+# Code: STYLE_DUPLICATE
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Block
+			Box:
+				Padding: 4
+		Element: block
+			Box:
+				Margin: 4

@@ -1,0 +1,11 @@
+# Case: Márgenes del medio sin área útil
+# Code: MEDIA_SIZE
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 300
+	Block:
+		Box:
+			Height: 10

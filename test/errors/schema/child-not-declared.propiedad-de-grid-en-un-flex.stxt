@@ -1,0 +1,9 @@
+# Case: Propiedad de grid en un Flex
+# Code: CHILD_NOT_DECLARED
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Columns: 1fr 1fr

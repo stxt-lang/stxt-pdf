@@ -1,0 +1,12 @@
+# Case: Fuente desconocida, declarada en Document
+# Code: FONT_UNKNOWN
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: Helvetica
+		Size: 10
+	Block:
+		Text: hola

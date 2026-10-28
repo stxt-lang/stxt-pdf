@@ -1,0 +1,10 @@
+# Case: Text sin texto
+# Code: TEXT_CONTENT
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Text:
+		Box:
+			Height: 10

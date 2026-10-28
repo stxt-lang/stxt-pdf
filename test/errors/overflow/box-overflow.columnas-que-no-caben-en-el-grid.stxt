@@ -1,0 +1,16 @@
+# Case: Columnas que no caben en el grid
+# Code: BOX_OVERFLOW
+# Line: 16
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Grid:
+		Box:
+			Width: 200
+		Columns: 1fr 1fr
+		Area: 1 1 1 2
+			Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

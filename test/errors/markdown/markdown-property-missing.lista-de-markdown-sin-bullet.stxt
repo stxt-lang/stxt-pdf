@@ -1,0 +1,15 @@
+# Case: Lista de Markdown sin Bullet
+# Code: MARKDOWN_PROPERTY_MISSING
+# Line: 15
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Párrafo.
+
+			- uno

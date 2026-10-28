@@ -1,0 +1,17 @@
+# Case: Margen auto de una regla en un ítem de flex
+# Code: MARGIN_AUTO_WITHOUT_EFFECT
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Block
+			Box:
+				Margin: auto
+				Width: 100
+	Flex:
+		Item:
+			Block:
+				Box:
+					Height: 10

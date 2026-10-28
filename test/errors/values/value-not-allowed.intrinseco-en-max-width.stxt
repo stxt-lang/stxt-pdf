@@ -1,0 +1,10 @@
+# Case: Intrínseco en Max width
+# Code: VALUE_NOT_ALLOWED
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Max width: max-content

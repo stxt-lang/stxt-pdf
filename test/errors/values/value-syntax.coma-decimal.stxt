@@ -1,0 +1,10 @@
+# Case: Coma decimal
+# Code: VALUE_SYNTAX
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Width: 12,5

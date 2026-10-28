@@ -1,0 +1,8 @@
+# Case: Image en GIF
+# Code: IMAGE_FORMAT
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Image: test/drawing.gif

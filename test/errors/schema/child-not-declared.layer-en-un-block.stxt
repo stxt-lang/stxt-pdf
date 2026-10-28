@@ -1,0 +1,11 @@
+# Case: Layer en un Block
+# Code: CHILD_NOT_DECLARED
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Height: 10
+		Layer: 2

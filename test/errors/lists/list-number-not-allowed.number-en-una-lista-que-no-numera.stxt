@@ -1,0 +1,15 @@
+# Case: Number en una lista que no numera
+# Code: LIST_NUMBER_NOT_ALLOWED
+# Line: 14
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	List:
+		Marker: dash
+		List item:
+			Number: 3
+			Text: Uno

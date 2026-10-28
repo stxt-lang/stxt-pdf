@@ -1,0 +1,15 @@
+# Case: Carácter que la fuente no tiene
+# Code: GLYPH_MISSING
+# Line: 15
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text:
+		Content >>
+			Primera línea
+
+			Kanji 漢

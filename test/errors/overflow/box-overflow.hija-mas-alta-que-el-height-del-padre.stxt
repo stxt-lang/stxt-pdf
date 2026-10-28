@@ -1,0 +1,13 @@
+# Case: Hija más alta que el Height del padre
+# Code: BOX_OVERFLOW
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Height: 50
+		Block:
+			Box:
+				Height: 80

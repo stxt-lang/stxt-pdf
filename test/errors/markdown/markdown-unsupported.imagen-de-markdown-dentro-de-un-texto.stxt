@@ -1,0 +1,13 @@
+# Case: Imagen de Markdown dentro de un texto
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Un logotipo ![Acme](test/square.png) en la línea.

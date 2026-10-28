@@ -1,0 +1,10 @@
+# Case: Inside en una Image
+# Code: BREAK_IN_IMAGE
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Image: test/wide.png
+		Break:
+			Inside: avoid

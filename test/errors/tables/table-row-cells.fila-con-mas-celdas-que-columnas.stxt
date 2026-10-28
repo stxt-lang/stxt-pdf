@@ -1,0 +1,17 @@
+# Case: Fila con más celdas que columnas
+# Code: TABLE_ROW_CELLS
+# Line: 17
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Table:
+		Columns: 1fr 1fr
+		Body:
+			Row:
+				Cell: a
+				Cell: b
+				Cell: c

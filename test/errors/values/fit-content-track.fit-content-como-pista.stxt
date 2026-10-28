@@ -1,0 +1,9 @@
+# Case: fit-content como pista
+# Code: FIT_CONTENT_TRACK
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Columns: fit-content 1fr

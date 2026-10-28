@@ -1,0 +1,11 @@
+# Case: Porcentaje de alto con el padre en auto
+# Code: INDEFINITE_PERCENTAGE
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Block:
+			Box:
+				Height: 50%

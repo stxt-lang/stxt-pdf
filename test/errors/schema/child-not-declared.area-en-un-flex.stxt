@@ -1,0 +1,12 @@
+# Case: Area en un Flex
+# Code: CHILD_NOT_DECLARED
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Area: 1 1
+			Block:
+				Box:
+					Height: 10

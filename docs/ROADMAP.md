@@ -37,7 +37,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 17 | Elemento `Markdown`, traducido a elementos conocidos | hecho | 13 |
 | 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | hecho | 14 |
 | 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
-| 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | pendiente | — |
+| 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
 | 21 | Ejemplos de verdad: diez documentos completos, con PDF y PNG limpios | pendiente | `examples/` |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y el 18, el 2026-10-28.
@@ -59,7 +59,7 @@ comportamiento" de [`CLAUDE.md`](../CLAUDE.md):
       (resumen del schema) y, si aplica, §10 (ejemplo).
 - [ ] `Style`, el builder (lectura y validación del §6) y, si hay layout nuevo, su algoritmo.
 - [ ] Cada regla de validación nueva: su `ErrorCode`, su fila en el §6 y su caso en
-      [`errors.stxt`](../test/errors/errors.stxt).
+      [`test/errors/`](../test/errors).
 - [ ] Tests unitarios de las piezas puras y tests de layout con `LayoutFixture`, incluidos los
       de fragmentación si el hito toca el corte.
 - [ ] Un caso golden nuevo en `test/golden/NN-nombre/`, con el resultado
@@ -421,8 +421,10 @@ Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se
 siguiente paso concreto.
 
 - **2026-10-28 (3).** Se abren los hitos 19 a 21 (P1–P4 aceptadas). Hito 19 hecho: `test/`
-  sustituye a `src/test/resources`; `mvn test` en verde (798 tests).
-  *Siguiente paso:* hito 20, partir `errors.stxt` en un fichero por caso.
+  sustituye a `src/test/resources`. Hito 20 hecho: los 148 casos de `errors.stxt` son 148
+  ficheros en 14 carpetas por grupo, con cabecera `# Case/# Code/# Line` (la línea es la del
+  fichero); `ErrorCatalogTest` recorre `test/errors`. `mvn test` en verde (798 tests).
+  *Siguiente paso:* hito 21, los diez ejemplos (empezar por las fuentes Plex Serif y Mono).
 - **2026-10-28 (2).** Hito 18 terminado. Aceptadas I1–I10. Schema (`Image`, `Alt`, `Fit`);
   `ImageLibrary` e `ImageFile`; dimensionado de elemento reemplazado en `BoxModel` e
   `ImageLayout`; pintado en PDF (una copia por fichero, `Figure` con `Alt` y `BBox`) y SVG;

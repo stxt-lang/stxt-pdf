@@ -1,0 +1,12 @@
+# Case: Absolute sobre-restringida
+# Code: OVERCONSTRAINED
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Absolute:
+		Offset: 0 10 auto 10
+		Box:
+			Width: 100
+			Height: 10

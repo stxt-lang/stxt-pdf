@@ -1,0 +1,11 @@
+# Case: Valor no válido en una regla que no se aplica
+# Code: VALUE_SYNTAX
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Grid
+			Box:
+				Background: rojo

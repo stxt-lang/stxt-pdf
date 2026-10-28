@@ -1,0 +1,13 @@
+# Case: Encabezado dentro de un Fixed
+# Code: HEADING_IN_FIXED
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Fixed:
+		Heading 1:
+			Text: Cabecera

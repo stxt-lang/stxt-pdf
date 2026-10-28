@@ -1,0 +1,11 @@
+# Case: Image más alta que la página
+# Code: PAGE_OVERFLOW
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 200
+		Margin: 40
+	Image: test/tall.jpg
+		Box:
+			Width: 200

@@ -1,0 +1,15 @@
+# Case: Tabla de Markdown sin Table columns
+# Code: MARKDOWN_PROPERTY_MISSING
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			| A | B |
+			|---|---|
+			| 1 | 2 |

@@ -1,0 +1,13 @@
+# Case: Regla For id sin elemento
+# Code: STYLE_UNKNOWN_ID
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		For id: summary
+			Box:
+				Padding: 4
+	Block:
+		Id: other

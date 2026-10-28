@@ -1,0 +1,9 @@
+# Case: Filas en porcentaje sin alto
+# Code: INDEFINITE_PERCENTAGE
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Rows: 50% 50%

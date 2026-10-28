@@ -1,0 +1,12 @@
+# Case: Absolute fuera de la página
+# Code: BOX_OVERFLOW
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Absolute:
+		Offset: -100 auto auto 0
+		Box:
+			Width: 50
+			Height: 10

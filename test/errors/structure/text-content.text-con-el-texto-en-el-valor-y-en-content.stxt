@@ -1,0 +1,10 @@
+# Case: Text con el texto en el valor y en Content
+# Code: TEXT_CONTENT
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Text: hola
+		Content >>
+			adiós

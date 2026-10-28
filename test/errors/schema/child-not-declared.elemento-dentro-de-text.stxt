@@ -1,0 +1,11 @@
+# Case: Elemento dentro de Text
+# Code: CHILD_NOT_DECLARED
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Text: hola
+		Block:
+			Box:
+				Height: 10

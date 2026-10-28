@@ -1,0 +1,12 @@
+# Case: Ancho mayor que el máximo
+# Code: MIN_MAX_CONFLICT
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Width: 60%
+			Max width: 50%
+			Height: 10

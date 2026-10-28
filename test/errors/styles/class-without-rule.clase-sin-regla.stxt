@@ -1,0 +1,13 @@
+# Case: Clase sin regla
+# Code: CLASS_WITHOUT_RULE
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		For class: note
+			Box:
+				Padding: 4
+	Block:
+		Class: note aside

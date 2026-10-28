@@ -1,0 +1,11 @@
+# Case: Regla para algo que no es un elemento de caja
+# Code: STYLE_UNKNOWN_ELEMENT
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Item
+			Box:
+				Padding: 4

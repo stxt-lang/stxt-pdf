@@ -1,0 +1,9 @@
+# Case: Alt vacío
+# Code: VALUE_NOT_ALLOWED
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Image: test/wide.png
+		Alt:

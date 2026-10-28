@@ -1,0 +1,13 @@
+# Case: Grow en una celda de grid
+# Code: CHILD_NOT_DECLARED
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Area:
+			Grow: 1
+			Block:
+				Box:
+					Height: 10

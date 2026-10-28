@@ -1,0 +1,17 @@
+# Case: Porcentaje vertical dentro de un Multicol
+# Code: INDEFINITE_PERCENTAGE
+# Line: 17
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Multicol:
+		Box:
+			Height: 200
+		Count: 2
+		Block:
+			Box:
+				Height: 50%

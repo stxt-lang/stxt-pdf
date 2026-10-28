@@ -1,0 +1,12 @@
+# Case: Encabezado sin Text
+# Code: TOO_FEW_CHILDREN
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Heading 1:
+		Id: vacío

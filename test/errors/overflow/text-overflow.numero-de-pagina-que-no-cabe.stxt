@@ -1,0 +1,13 @@
+# Case: Número de página que no cabe
+# Code: TEXT_OVERFLOW
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: {page}
+		Box:
+			Width: 5

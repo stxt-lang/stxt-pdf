@@ -331,11 +331,15 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   errores.
 - **Medidas de rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` (el `pom.xml`
   excluye el grupo); se ejecutan con `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=…`.
-- **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/errors.stxt`
-  tiene un `Case` por regla, con `Code`, `Line` (contada desde la primera línea del documento
-  incrustado) y el documento en un bloque `Document >>`. Se maqueta con las métricas reales.
-  `everyCodeHasACase` exige un caso por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de
-  layout prueban los casos válidos; los inválidos van al catálogo.
+- **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`
+  es un documento STXT de verdad, un fichero por caso, en la carpeta de su familia (`document`,
+  `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`,
+  `images`, `styles`, `combinations`, `overflow`, `fonts`; los códigos de `stxt-core` van en
+  `schema`). Las tres primeras líneas son comentarios `# Case:` (descripción), `# Code:` y
+  `# Line:`, y la línea esperada es la del propio fichero, cabecera incluida (la primera línea
+  del documento es la 4). Se maqueta con las métricas reales. `everyCodeHasACase` exige un caso
+  por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de layout prueban los casos válidos;
+  los inválidos van al catálogo.
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
   `test/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.

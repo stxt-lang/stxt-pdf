@@ -101,7 +101,7 @@ Decisiones nuevas:
 ## Política de errores
 
 Errores con código estable (`ErrorCode`) y la línea del nodo culpable; las combinaciones sin
-efecto o contradictorias son errores (§6). El catálogo `test/errors/errors.stxt`
+efecto o contradictorias son errores (§6). El catálogo `test/errors/`
 tiene un caso por código.
 
 51. **El alto definido se decide al leer el documento**, con una regla fija (§3.6), no al

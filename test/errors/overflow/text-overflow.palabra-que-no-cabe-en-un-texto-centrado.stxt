@@ -1,0 +1,17 @@
+# Case: Palabra que no cabe en un texto centrado
+# Code: TEXT_OVERFLOW
+# Line: 17
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text:
+		Box:
+			Width: 100
+		Typography:
+			Align: center
+		Content >>
+			supercalifragilisticoespialidosa

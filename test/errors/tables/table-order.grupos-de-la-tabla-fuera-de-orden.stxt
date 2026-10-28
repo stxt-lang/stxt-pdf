@@ -1,0 +1,20 @@
+# Case: Grupos de la tabla fuera de orden
+# Code: TABLE_ORDER
+# Line: 17
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Table:
+		Columns: 1fr 1fr
+		Foot:
+			Row:
+				Cell: a
+				Cell: b
+		Body:
+			Row:
+				Cell: c
+				Cell: d

@@ -1,0 +1,8 @@
+# Case: Image con una ruta que sale de images
+# Code: IMAGE_UNKNOWN
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Image: ../fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf

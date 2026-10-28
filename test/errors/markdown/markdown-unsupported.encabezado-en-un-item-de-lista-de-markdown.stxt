@@ -1,0 +1,15 @@
+# Case: Encabezado en un ítem de lista de Markdown
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 15
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Bullet: disc
+		Content >>
+			- Uno
+			- # Dos

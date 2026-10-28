@@ -1,0 +1,10 @@
+# Case: Borde más alto que la página
+# Code: PAGE_OVERFLOW
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Border: 900 0 0 0

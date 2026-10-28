@@ -1,0 +1,10 @@
+# Case: Texto sin Font
+# Code: TEXT_WITHOUT_FONT
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Text: hola
+		Typography:
+			Size: 12

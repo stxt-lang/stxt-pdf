@@ -1,0 +1,29 @@
+# Case: Contenido que no cabe en las columnas del alto de un Multicol
+# Code: BOX_OVERFLOW
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Multicol:
+		Box:
+			Height: 50
+		Count: 2
+		Block:
+			Box:
+				Height: 40
+			Break:
+				Inside: avoid
+		Block:
+			Box:
+				Height: 40
+			Break:
+				Inside: avoid
+		Block:
+			Box:
+				Height: 40
+			Break:
+				Inside: avoid

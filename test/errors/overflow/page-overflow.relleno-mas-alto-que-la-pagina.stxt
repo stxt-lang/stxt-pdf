@@ -1,0 +1,11 @@
+# Case: Relleno más alto que la página
+# Code: PAGE_OVERFLOW
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Height: 950
+			Padding: 900 0 0 0

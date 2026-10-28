@@ -1,0 +1,12 @@
+# Case: Áreas no rectangulares
+# Code: GRID_PLACEMENT
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Areas >>
+			a a
+			a b
+			b b

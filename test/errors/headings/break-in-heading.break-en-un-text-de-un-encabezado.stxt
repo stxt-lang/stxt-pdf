@@ -1,0 +1,14 @@
+# Case: Break en un Text de un encabezado
+# Code: BREAK_IN_HEADING
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Heading 1:
+		Text: Título
+			Break:
+				Before: page

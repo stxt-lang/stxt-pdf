@@ -1,0 +1,12 @@
+# Case: Basis en porcentaje en column sin alto
+# Code: INDEFINITE_PERCENTAGE
+# Line: 11
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Direction: column
+		Item:
+			Basis: 50%
+			Block:

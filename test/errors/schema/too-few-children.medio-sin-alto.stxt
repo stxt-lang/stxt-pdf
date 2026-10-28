@@ -1,0 +1,9 @@
+# Case: Medio sin alto
+# Code: TOO_FEW_CHILDREN
+# Line: 5
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+	Block:
+		Box:
+			Height: 10

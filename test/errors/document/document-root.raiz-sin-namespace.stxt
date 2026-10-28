@@ -1,0 +1,10 @@
+# Case: Raíz sin namespace
+# Code: DOCUMENT_ROOT
+# Line: 4
+Document:
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Height: 10

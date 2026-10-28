@@ -1,0 +1,15 @@
+# Case: Encabezado de Markdown vacío
+# Code: TEXT_CONTENT
+# Line: 15
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Párrafo.
+
+			#

@@ -1,0 +1,13 @@
+# Case: Count menor que 1
+# Code: VALUE_NOT_ALLOWED
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Multicol:
+		Count: 0
+		Text: Hola

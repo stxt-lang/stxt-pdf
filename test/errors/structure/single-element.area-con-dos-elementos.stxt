@@ -1,0 +1,13 @@
+# Case: Area con dos elementos
+# Code: SINGLE_ELEMENT
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Area:
+			Block:
+				Box:
+					Height: 10
+			Text: hola

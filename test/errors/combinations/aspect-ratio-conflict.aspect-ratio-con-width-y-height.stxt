@@ -1,0 +1,12 @@
+# Case: Aspect ratio con Width y Height
+# Code: ASPECT_RATIO_CONFLICT
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Width: 100
+			Height: 50
+			Aspect ratio: 16/9

@@ -1,0 +1,15 @@
+# Case: Paragraph con una línea en blanco
+# Code: PARAGRAPH_BLANK_LINE
+# Line: 14
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Paragraph:
+		Content >>
+			Primero.
+
+			Segundo.

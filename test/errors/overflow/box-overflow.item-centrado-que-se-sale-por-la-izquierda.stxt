@@ -1,0 +1,18 @@
+# Case: Ítem centrado que se sale por la izquierda
+# Code: BOX_OVERFLOW
+# Line: 17
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Flex:
+		Box:
+			Width: 100
+		Main axis: center
+		Item:
+			Shrink: 0
+			Block:
+				Block:
+					Box:
+						Width: 150
+						Height: 10

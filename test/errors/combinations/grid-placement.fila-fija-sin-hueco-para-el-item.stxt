@@ -1,0 +1,21 @@
+# Case: Fila fija sin hueco para el ítem
+# Code: GRID_PLACEMENT
+# Line: 18
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Columns: 100 100
+		Area: 1 1
+			Block:
+				Box:
+					Height: 10
+		Area: 1 2
+			Block:
+				Box:
+					Height: 10
+		Area: 1 auto
+			Block:
+				Box:
+					Height: 10

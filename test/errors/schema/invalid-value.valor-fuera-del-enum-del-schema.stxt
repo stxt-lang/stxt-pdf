@@ -1,0 +1,10 @@
+# Case: Valor fuera del ENUM del schema
+# Code: INVALID_VALUE
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Typography:
+			Align: middle

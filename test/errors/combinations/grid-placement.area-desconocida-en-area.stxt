@@ -1,0 +1,13 @@
+# Case: Área desconocida en Area
+# Code: GRID_PLACEMENT
+# Line: 10
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Grid:
+		Areas: a b
+		Area: c
+			Block:
+				Box:
+					Height: 10

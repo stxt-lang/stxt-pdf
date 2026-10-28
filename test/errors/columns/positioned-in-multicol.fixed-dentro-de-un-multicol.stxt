@@ -1,0 +1,15 @@
+# Case: Fixed dentro de un Multicol
+# Code: POSITIONED_IN_MULTICOL
+# Line: 14
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Multicol:
+		Count: 2
+		Block:
+			Fixed:
+				Text: Nota

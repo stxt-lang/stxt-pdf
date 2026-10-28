@@ -1,0 +1,11 @@
+# Case: Relative desde izquierda y derecha
+# Code: OFFSET_CONFLICT
+# Line: 9
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Relative:
+		Offset: auto 7 auto 11
+		Box:
+			Height: 10

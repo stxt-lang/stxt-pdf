@@ -1,0 +1,18 @@
+# Case: Palabra que no cabe en una caja que se sale
+# Code: TEXT_OVERFLOW
+# Line: 18
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Block:
+		Box:
+			Width: 100
+		Text:
+			Box:
+				Width: 150
+			Content >>
+				supercalifragilisticoespialidosamente

@@ -1,0 +1,8 @@
+# Case: Título vacío
+# Code: VALUE_NOT_ALLOWED
+# Line: 8
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Title:
