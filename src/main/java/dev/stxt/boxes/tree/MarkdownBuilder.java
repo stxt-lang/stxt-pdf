@@ -51,7 +51,8 @@ import static dev.stxt.boxes.tree.Nodes.error;
 /**
  * Traduce un {@code Markdown} (ESPECIFICACION.md §5.17) a los nodos STXT de los elementos que ya
  * existen: encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a
- * {@code Paragraph}, listas a {@code List} y {@code List item}, y tablas GFM a {@code Table}.
+ * {@code Paragraph}, listas a {@code List} y {@code List item}, tablas GFM a {@code Table} e
+ * imágenes solas en su párrafo a {@code Image} (§5.18).
  * {@link BoxTreeBuilder} construye después esos nodos como cualquier otro elemento, así que el
  * schema, las reglas de {@code Styles}, la validación del §6, el PDF etiquetado y los marcadores
  * los tratan igual.
@@ -74,8 +75,8 @@ final class MarkdownBuilder {
             .includeSourceSpans(IncludeSourceSpans.BLOCKS)
             .build();
 
-    private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas y, dentro de la "
-            + "línea, **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~";
+    private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, imágenes solas en "
+            + "su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~";
 
     /**
      * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
@@ -144,6 +145,9 @@ final class MarkdownBuilder {
                 return heading;
             }
             if (b instanceof Paragraph p) {
+                if (p.getFirstChild() instanceof Image i && i.getNext() == null) {
+                    return image(i, line);
+                }
                 return text("Paragraph", p, line, "Un párrafo de Markdown necesita texto");
             }
             if (b instanceof ListBlock l) {
@@ -153,6 +157,24 @@ final class MarkdownBuilder {
                 return table(t, line);
             }
             throw unsupported(b, line);
+        }
+
+        /**
+         * Una imagen sola en su párrafo: una {@code Image} con la ruta y, si lo tiene, su texto
+         * alternativo (sin formato) en {@code Alt}; sin él, es decorativa. El título
+         * ({@code "…"}) no tendría efecto y es un error.
+         */
+        private InlineNode image(Image i, int line) {
+            if (i.getTitle() != null && !i.getTitle().isEmpty()) {
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de una imagen "
+                        + "(\"" + i.getTitle() + "\"): describe la imagen en su texto alternativo, ![…]");
+            }
+            InlineNode image = node("Image", i.getDestination(), line);
+            String alt = TextRun.text(inline(i, line)).strip();
+            if (!alt.isEmpty()) {
+                image.addChild(node("Alt", alt, line));
+            }
+            return image;
         }
 
         private InlineNode list(ListBlock l, int line) {
@@ -324,7 +346,7 @@ final class MarkdownBuilder {
             if (n instanceof Link) {
                 what = "enlaces";
             } else if (n instanceof Image) {
-                what = "imágenes";
+                what = "imágenes dentro de un texto (una imagen va sola en su párrafo)";
             } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
                 what = "código";
             } else if (n instanceof BlockQuote) {

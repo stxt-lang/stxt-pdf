@@ -20,6 +20,8 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -378,5 +380,55 @@ class PdfCanvasTest {
             assertTrue(text.contains("Con negrita y subrayado."), text);
         }
     }
-}
 
+    /**
+     * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox};
+     * sin él, y en un {@code Fixed}, es un artifact (§5.18). Cada fichero se incrusta una vez.
+     */
+    @Test
+    void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 40\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tFixed:\n\t\tOffset: -30 -30 auto auto\n\t\tImage: test/square.png\n"
+                + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n"
+                + "\tImage: test/tall.jpg\n\t\tBox:\n\t\t\tHeight: 60\n"
+                + "\tParagraph: Fin.\n"
+                + "\tImage: test/wide.png\n\t\tBreak:\n\t\t\tBefore: page\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "images"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("Figure", "P"), types(document));
+            PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
+            assertEquals("Paisaje", figure.getAlternateDescription());
+            PDLayoutAttributeObject layout = (PDLayoutAttributeObject) figure.getAttributes().getObject(0);
+            PDRectangle box = layout.getBBox();
+            // La caja de contenido de la imagen: 150 × 75 en (40, 40), con el origen abajo.
+            assertEquals(40, box.getLowerLeftX(), 0.01);
+            assertEquals(300 - 40 - 75, box.getLowerLeftY(), 0.01);
+            assertEquals(150, box.getWidth(), 0.01);
+
+            List<PDImageXObject> first = images(pdf, 0);
+            assertEquals(3, first.size());
+            PDImageXObject wide = first.stream().filter(i -> i.getWidth() == 200).findFirst().orElseThrow();
+            // El PNG conserva su transparencia; el JPEG va tal cual.
+            assertTrue(wide.getSoftMask() != null);
+            assertTrue(first.stream().anyMatch(i -> i.getHeight() == 160 && "jpg".equals(i.getSuffix())));
+            List<PDImageXObject> second = images(pdf, 1);
+            assertTrue(second.stream().anyMatch(i -> i.getCOSObject() == wide.getCOSObject()),
+                    "La misma imagen en dos páginas se incrusta una vez");
+
+            String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.contains("/Figure <</MCID 0>> BDC"), content);
+        }
+    }
+
+    private static List<PDImageXObject> images(PDDocument pdf, int page) throws Exception {
+        PDResources resources = pdf.getPage(page).getResources();
+        List<PDImageXObject> images = new ArrayList<>();
+        for (COSName name : resources.getXObjectNames()) {
+            images.add((PDImageXObject) resources.getXObject(name));
+        }
+        return images;
+    }
+}

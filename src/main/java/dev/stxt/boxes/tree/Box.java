@@ -37,6 +37,11 @@ public final class Box {
      * {@link #text}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
      */
     public List<TextRun> runs;
+    /**
+     * Ruta de la imagen de una {@code Image} (ESPECIFICACION.md §5.18), relativa a la carpeta
+     * {@code images/} de los recursos; {@code null} en el resto de cajas.
+     */
+    public String image;
     /** Línea del nodo {@code Text}. */
     public int textLine;
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
@@ -124,6 +129,11 @@ public final class Box {
             }
         }
         return line;
+    }
+
+    /** Si es una {@code Image}. */
+    public boolean isImage() {
+        return element == Element.IMAGE;
     }
 
     /** Si es la caja generada del marcador de un {@code List item}. */

@@ -77,6 +77,16 @@ class MarkdownBuilderTest {
     }
 
     @Test
+    void anImageAloneInItsParagraphIsAnImage() {
+        MarkdownBuilder.Translation t = translate("![Un *paisaje*](test/wide.png)", "", "![](logos/acme.png)",
+                "", "Texto.");
+        // El texto alternativo pierde su formato; sin él, la imagen es decorativa.
+        assertEquals(List.of("Image: test/wide.png @10", "  Alt: Un paisaje @10"), outline(t.elements().get(0)));
+        assertEquals(List.of("Image: logos/acme.png @12"), outline(t.elements().get(1)));
+        assertEquals(List.of("Paragraph: Texto. @14"), outline(t.elements().get(2)));
+    }
+
+    @Test
     void plainTextHasNoRuns() {
         MarkdownBuilder.Translation t = translate("Sin formato.");
         assertTrue(t.runs().isEmpty());

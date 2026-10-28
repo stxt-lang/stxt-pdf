@@ -23,7 +23,8 @@ import java.util.List;
  *   <li>Fondo y borde de la caja que crea el contexto (y, en un {@code Multicol}, la línea entre
  *       columnas).</li>
  *   <li>Contextos hijos con {@code Layer} negativa, de menor a mayor.</li>
- *   <li>Cajas en flujo en orden del árbol: primero fondos y bordes, después el texto.</li>
+ *   <li>Cajas en flujo en orden del árbol: primero fondos y bordes, después el texto y las
+ *       imágenes.</li>
  *   <li>Posicionadas sin {@code Layer} (o con 0), en orden del árbol.</li>
  *   <li>Contextos hijos con {@code Layer} positiva, de menor a mayor.</li>
  * </ol>
@@ -162,8 +163,8 @@ public final class StackingContext {
         paintBackgroundAndBorder(canvas, root);
         negative.forEach(s -> s.paint(canvas));
         inFlow.forEach(p -> paintBackgroundAndBorder(canvas, p));
-        paintText(canvas, root);
-        inFlow.forEach(p -> paintText(canvas, p));
+        paintContent(canvas, root);
+        inFlow.forEach(p -> paintContent(canvas, p));
         positionedZero.forEach(s -> s.paint(canvas));
         positive.forEach(s -> s.paint(canvas));
     }
@@ -196,6 +197,15 @@ public final class StackingContext {
             double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
             canvas.background(new Rect(content.x() + middle - s.multicolRule / 2, content.y(), s.multicolRule, height),
                     color);
+        }
+    }
+
+    /** El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen (§5.18). */
+    private static void paintContent(Canvas canvas, Piece p) {
+        if (p.f().box().isImage()) {
+            canvas.image(p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()));
+        } else {
+            paintText(canvas, p);
         }
     }
 

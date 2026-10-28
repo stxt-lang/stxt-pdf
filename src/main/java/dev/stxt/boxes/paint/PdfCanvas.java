@@ -6,6 +6,7 @@ import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.VerticalMetrics;
+import dev.stxt.boxes.resources.ImageFile;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Media;
@@ -16,10 +17,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +41,9 @@ import java.util.Map;
  * con Identity-H cada carácter ocupa dos: el espacio extra se añade tras cada espacio con
  * {@code TJ}.</p>
  *
+ * <p>Cada imagen (ESPECIFICACION.md §5.18) se incrusta una sola vez aunque se use en varias
+ * páginas, sin remuestrear: el JPEG tal cual y el PNG sin pérdida, con su transparencia.</p>
+ *
  * <p>El PDF va etiquetado (árbol de estructura y contenido marcado) y lleva los marcadores de
  * los encabezados: ver {@link PdfStructure}.</p>
  *
@@ -52,17 +58,21 @@ public final class PdfCanvas implements Canvas {
     private final Resources resources;
     /** Fuentes incrustadas en el documento, compartidas por todas sus páginas. */
     private final Map<FontFace, PDFont> fonts;
+    /** Imágenes incrustadas en el documento, por fichero, compartidas por todas sus páginas. */
+    private final Map<Path, PDImageXObject> images;
     /** Árbol de estructura del documento, compartido por todas sus páginas. */
     private final PdfStructure structure;
     private final boolean debug;
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
-                      Map<FontFace, PDFont> fonts, PdfStructure structure, boolean debug) {
+                      Map<FontFace, PDFont> fonts, Map<Path, PDImageXObject> images, PdfStructure structure,
+                      boolean debug) {
         this.doc = doc;
         this.out = out;
         this.pageHeight = pageHeight;
         this.resources = resources;
         this.fonts = fonts;
+        this.images = images;
         this.structure = structure;
         this.debug = debug;
     }
@@ -78,6 +88,7 @@ public final class PdfCanvas implements Canvas {
         Media media = document.media();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
+            Map<Path, PDImageXObject> images = new HashMap<>();
             PdfStructure structure = new PdfStructure(doc, root(pages));
             PdfStructure.metadata(doc, document.metadata());
             Rect area = media.pageArea();
@@ -89,7 +100,7 @@ public final class PdfCanvas implements Canvas {
                 structure.startPage(page);
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                     StackingContext.build(p.content(), p.fixed(), area.x(), area.y())
-                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, structure, debug));
+                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, images, structure, debug));
                 }
             }
             structure.finish(doc, pages, pdfPages, area, media.height());
@@ -135,6 +146,50 @@ public final class PdfCanvas implements Canvas {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Con {@code Alt}, la imagen es el contenido de su {@code Figure}; sin él, un
+     * <em>artifact</em> ({@link PdfStructure}).</p>
+     */
+    @Override
+    public void image(Box box, Rect content) {
+        if (content.width() <= 0 || content.height() <= 0) {
+            return;
+        }
+        try {
+            ImageFile file = resources.images().find(box.image);
+            PDImageXObject image = images.get(file.path());
+            if (image == null) {
+                image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
+                images.put(file.path(), image);
+            }
+            Rect target = ImageFit.place(box.style.fit, content, file.width(), file.height());
+            int mcid = structure.mark(box);
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
+                structure.figureBox(box, pdfRect(content));
+            }
+            out.saveGraphicsState();
+            out.addRect((float) content.x(), (float) (pageHeight - content.bottom()), (float) content.width(),
+                    (float) content.height());
+            out.clip();
+            out.drawImage(image, (float) target.x(), (float) (pageHeight - target.bottom()), (float) target.width(),
+                    (float) target.height());
+            out.restoreGraphicsState();
+            out.endMarkedContent();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /** Un rectángulo en coordenadas del PDF, con el origen abajo. */
+    private PDRectangle pdfRect(Rect r) {
+        return new PDRectangle((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
     }
 
     @Override

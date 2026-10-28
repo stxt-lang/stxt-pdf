@@ -25,6 +25,7 @@ public final class Resources {
 
     private final Path root;
     private FontLibrary fonts;
+    private ImageLibrary images;
 
     /** Recursos en {@link #DEFAULT_ROOT}. */
     public Resources() {
@@ -61,6 +62,14 @@ public final class Resources {
         return fonts;
     }
 
+    /** Imágenes de {@code images/}, que se leen la primera vez que se piden. */
+    public synchronized ImageLibrary images() {
+        if (images == null) {
+            images = new ImageLibrary(this);
+        }
+        return images;
+    }
+
     /**
      * Fichero existente de la carpeta de recursos, a partir de una ruta relativa a ella
      * ({@code images/logo.png}). Admite {@code /} y {@code \} como separadores.
@@ -69,6 +78,18 @@ public final class Resources {
      *                           por un enlace o no existe
      */
     public Path resolve(String relative) {
+        return resolve("", relative);
+    }
+
+    /**
+     * Fichero existente de una subcarpeta de los recursos ({@code images}), a partir de una ruta
+     * relativa a ella ({@code logos/acme.png}), con las mismas comprobaciones que
+     * {@link #resolve(String)}: la ruta no puede salir de la subcarpeta.
+     *
+     * @throws ResourceException si la ruta es absoluta, contiene {@code ..}, sale de la
+     *                           subcarpeta (también por un enlace) o no existe
+     */
+    public Path resolve(String folder, String relative) {
         if (relative.isBlank()) {
             throw new ResourceException("Ruta de recurso vacía");
         }
@@ -83,14 +104,15 @@ public final class Resources {
                         + " (no se admite '..')");
             }
         }
-        Path path = root.resolve(relative.replace('\\', '/')).normalize();
-        if (!path.startsWith(root)) {
-            throw new ResourceException("La ruta " + relative + " sale de la carpeta de recursos");
+        Path base = root.resolve(folder).normalize();
+        Path path = base.resolve(relative.replace('\\', '/')).normalize();
+        if (!path.startsWith(base)) {
+            throw new ResourceException("La ruta " + relative + " sale de la carpeta " + base);
         }
         if (!Files.exists(path)) {
-            throw new ResourceException("No existe el recurso " + relative + " en " + root);
+            throw new ResourceException("No existe el recurso " + relative + " en " + base);
         }
-        return checkInside(path);
+        return checkInside(path, base);
     }
 
     /**
@@ -100,10 +122,16 @@ public final class Resources {
      * @throws ResourceException si es un enlace que sale de la carpeta
      */
     Path checkInside(Path path) {
+        return checkInside(path, root);
+    }
+
+    /** Como {@link #checkInside(Path)}, dentro de una subcarpeta de los recursos. */
+    private Path checkInside(Path path, Path base) {
         try {
-            if (!path.toRealPath().startsWith(root.toRealPath())) {
+            if (!path.toRealPath().startsWith(base.toRealPath())) {
                 throw new ResourceException("El recurso " + root.relativize(path)
-                        + " es un enlace que sale de la carpeta de recursos (" + root + ")");
+                        + " es un enlace que sale de la carpeta " + (base.equals(root) ? "de recursos" : base.getFileName())
+                        + " (" + base + ")");
             }
             return path;
         } catch (IOException e) {

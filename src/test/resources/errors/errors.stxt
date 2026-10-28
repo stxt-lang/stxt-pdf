@@ -1964,3 +1964,170 @@ Errors:
 						Párrafo.
 
 						#
+	Case: Image sin ruta
+		Code: IMAGE_UNKNOWN
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image:
+					Id: logo
+	Case: Image que no existe
+		Code: IMAGE_UNKNOWN
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Image: test/no-existe.png
+	Case: Image con una ruta que sale de images
+		Code: IMAGE_UNKNOWN
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image: ../fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf
+	Case: Image en GIF
+		Code: IMAGE_FORMAT
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image: test/drawing.gif
+	Case: Image que no es una imagen
+		Code: IMAGE_FORMAT
+		Line: 5
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image: test/broken.png
+	Case: Inside en una Image
+		Code: BREAK_IN_IMAGE
+		Line: 7
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image: test/wide.png
+					Break:
+						Inside: avoid
+	Case: Decoration de una regla en una Image
+		Code: BREAK_IN_IMAGE
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Styles:
+					For class: photo
+						Break:
+							Decoration: clone
+				Block:
+					Class: photo
+				Image: test/wide.png
+					Class: photo
+	Case: Alt vacío
+		Code: VALUE_NOT_ALLOWED
+		Line: 6
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Image: test/wide.png
+					Alt:
+	Case: Image más ancha que su bloque
+		Code: BOX_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Block:
+					Box:
+						Width: 100
+					Image: test/wide.png
+	Case: Image más alta que la página
+		Code: PAGE_OVERFLOW
+		Line: 8
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 200
+					Margin: 40
+				Image: test/tall.jpg
+					Box:
+						Width: 200
+	Case: List item que empieza con una Image
+		Code: LIST_ITEM_WITHOUT_LINE
+		Line: 11
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				List:
+					Marker: disc
+					List item:
+						Image: test/square.png
+	Case: Imagen de Markdown dentro de un texto
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Un logotipo ![Acme](test/square.png) en la línea.
+	Case: Imagen de Markdown con título
+		Code: MARKDOWN_UNSUPPORTED
+		Line: 10
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						![Acme](test/square.png "El logotipo")
+	Case: Imagen de Markdown que no existe
+		Code: IMAGE_UNKNOWN
+		Line: 12
+		Document >>
+			Document (dev.stxt.boxes):
+				Media:
+					Width: 595
+					Height: 842
+				Typography:
+					Font: IBM Plex Sans
+					Size: 10
+				Markdown:
+					Content >>
+						Párrafo.
+
+						![Acme](logos/acme.png)

@@ -26,8 +26,8 @@ import java.util.Map;
  */
 public final class Style {
 
-    /** Cómo coloca la caja a sus hijos: lo da el elemento. */
-    public enum Layout { BLOCK, INLINE, FLEX, GRID, MULTICOL }
+    /** Cómo coloca la caja a sus hijos: lo da el elemento. Una {@code IMAGE} no tiene hijos. */
+    public enum Layout { BLOCK, INLINE, FLEX, GRID, MULTICOL, IMAGE }
 
     /** Cómo participa la caja en el flujo de su padre: {@code Relative}, {@code Absolute} y {@code Fixed}; el resto, {@code STATIC}. */
     public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
@@ -52,6 +52,9 @@ public final class Style {
 
     /** Reparto entre las columnas de un {@code Multicol}: equilibrado o en orden. */
     public enum Fill { BALANCE, AUTO }
+
+    /** Cómo llena una imagen su caja si tienen proporciones distintas (§5.18). */
+    public enum Fit { CONTAIN, COVER, FILL }
 
     /** Marcador de los ítems de una lista: un símbolo, ninguno o una numeración. */
     public enum Marker {
@@ -151,6 +154,11 @@ public final class Style {
     public int listStart = 1;
     /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
     public Integer listNumber;
+
+    // --- Imagen ----------------------------------------------------------------------------------
+    /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
+    public String alt;
+    public Fit fit = Fit.CONTAIN;
 
     // --- Multicol --------------------------------------------------------------------------------
     /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */

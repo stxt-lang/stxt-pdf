@@ -7,6 +7,9 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.block.BlockLayout;
 import dev.stxt.boxes.layout.flex.FlexLayout;
 import dev.stxt.boxes.layout.grid.GridLayout;
+import dev.stxt.boxes.layout.image.ImageLayout;
+import dev.stxt.boxes.layout.image.Images;
+import dev.stxt.boxes.layout.image.NaturalSize;
 import dev.stxt.boxes.layout.inline.FixedMetrics;
 import dev.stxt.boxes.layout.inline.InlineLayout;
 import dev.stxt.boxes.layout.inline.PageNumbers;
@@ -14,6 +17,7 @@ import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.layout.multicol.MulticolLayout;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.layout.table.TableLayout;
+import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
@@ -30,6 +34,7 @@ public final class Engine {
 
     private final LayoutCache cache = new LayoutCache();
     private final TextMeasurer measurer;
+    private final Images images;
     private final BlockLayout block;
     private final InlineLayout inline;
     private final FlexLayout flex;
@@ -37,18 +42,27 @@ public final class Engine {
     private final TableLayout table;
     private final MulticolLayout multicol;
     private final AbsoluteLayout absolute;
+    private final ImageLayout image;
 
     /**
      * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
-     * calculables a mano. No necesita la carpeta de fuentes. El PDF se maqueta con
-     * {@code new Engine(new PdfMetrics(resources))}.
+     * calculables a mano. No necesita la carpeta de fuentes; las imágenes, si las hay, son las
+     * de la carpeta de recursos por defecto. El PDF se maqueta con
+     * {@code new Engine(new PdfMetrics(resources), resources)}.
      */
     public Engine() {
         this(new FixedMetrics());
     }
 
+    /** Motor con esas métricas del texto y las imágenes de la carpeta de recursos por defecto. */
     public Engine(TextMeasurer measurer) {
+        this(measurer, new Resources());
+    }
+
+    /** Motor con esas métricas del texto y las imágenes de {@code resources} (§5.18). */
+    public Engine(TextMeasurer measurer, Resources resources) {
         this.measurer = measurer;
+        this.images = new Images(resources);
         this.block = new BlockLayout(this);
         this.inline = new InlineLayout(this, measurer);
         this.flex = new FlexLayout(this);
@@ -56,14 +70,15 @@ public final class Engine {
         this.table = new TableLayout(this, grid);
         this.multicol = new MulticolLayout(this);
         this.absolute = new AbsoluteLayout(this);
+        this.image = new ImageLayout(this);
     }
 
     /**
      * Documento STXT → páginas, con el medio y los metadatos. Lo normal es leerlo con
      * {@link dev.stxt.boxes.stxt.DocumentReader}; si no está validado, {@link BoxTreeBuilder} lo
      * valida contra el schema. Antes de maquetar comprueba con el {@link TextMeasurer} que se
-     * puede medir todo el texto (las fuentes, en la salida PDF), y después que nada desborda
-     * ({@link Overflow}).
+     * puede medir todo el texto (las fuentes, en la salida PDF) y que existen todas las imágenes,
+     * y después que nada desborda ({@link Overflow}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
         return layOutDocument(new BoxTreeBuilder().build(document));
@@ -76,6 +91,7 @@ public final class Engine {
      */
     public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
         measurer.validate(tree.root());
+        images.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
         List<Page> pages = new Paginator(this).paginate(tree.root(), tree.media());
         Overflow.check(pages, tree.media());
@@ -94,6 +110,11 @@ public final class Engine {
     /** Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (§5.14). */
     public TextMeasurer measurer() {
         return measurer;
+    }
+
+    /** Tamaño natural de una {@code Image}, de su fichero (§5.18). */
+    public NaturalSize natural(Box box) {
+        return images.natural(box);
     }
 
     /** min-content y max-content de la caja de margen (§5.9). */
@@ -157,6 +178,7 @@ public final class Engine {
             // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
             case GRID -> box.element == Element.TABLE ? table : grid;
             case MULTICOL -> multicol;
+            case IMAGE -> image;
         };
     }
 

@@ -23,6 +23,7 @@ import static dev.stxt.boxes.tree.ModelValidator.font;
 import static dev.stxt.boxes.tree.ModelValidator.validateBox;
 import static dev.stxt.boxes.tree.ModelValidator.validateContainer;
 import static dev.stxt.boxes.tree.ModelValidator.validateFlex;
+import static dev.stxt.boxes.tree.ModelValidator.validateImage;
 import static dev.stxt.boxes.tree.ModelValidator.validateMulticol;
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -249,6 +250,8 @@ public final class BoxTreeBuilder {
                         case "start" -> s.listStart = integer(p);
                         case "number" -> s.listNumber = integer(p);
                         case "isolate" -> s.isolate = bool(p);
+                        case "alt" -> s.alt = alt(p);
+                        case "fit" -> s.fit = enumValue(Style.Fit.class, p);
                         default -> throw unread(p);
                     }
                 }
@@ -266,6 +269,9 @@ public final class BoxTreeBuilder {
         }
         if (kind == Element.MULTICOL) {
             validateMulticol(s, n.getLine());
+        }
+        if (kind == Element.IMAGE) {
+            validateImage(s);
         }
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
@@ -292,6 +298,8 @@ public final class BoxTreeBuilder {
         if (kind.hasText()) {
             text(n, box);
             box.runs = ctx.runs.get(n);
+        } else if (kind == Element.IMAGE) {
+            image(n, box);
         } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
             cellText(n, box);
             box.runs = ctx.runs.get(n);
@@ -362,6 +370,29 @@ public final class BoxTreeBuilder {
                             + "; como mucho, Heading " + (ctx.headingLevel + 1));
         }
         ctx.headingLevel = level;
+    }
+
+    /**
+     * La ruta de una {@code Image} (§5.18), relativa a {@code images/}. Que el fichero exista y
+     * sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
+     */
+    private static void image(InlineNode n, Box box) {
+        String path = n.getText().trim();
+        if (path.isEmpty()) {
+            throw error(n, ErrorCode.IMAGE_UNKNOWN, "Image necesita la ruta de la imagen, relativa a la carpeta "
+                    + "images/ de los recursos: Image: logos/acme.png");
+        }
+        box.image = path;
+    }
+
+    /** El texto alternativo de una {@code Image}: no vacío; para una imagen decorativa, no se declara. */
+    private static String alt(Node p) {
+        String alt = p.getText().trim();
+        if (alt.isEmpty()) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto; si la imagen es decorativa, "
+                    + "quita Alt");
+        }
+        return alt;
     }
 
     /** El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos. */

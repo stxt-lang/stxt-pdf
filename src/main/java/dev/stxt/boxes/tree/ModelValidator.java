@@ -14,6 +14,8 @@ import static dev.stxt.boxes.tree.Nodes.position;
 import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.boxes.tree.PropertyKey.BREAK_AFTER;
 import static dev.stxt.boxes.tree.PropertyKey.BREAK_BEFORE;
+import static dev.stxt.boxes.tree.PropertyKey.BREAK_INSIDE;
+import static dev.stxt.boxes.tree.PropertyKey.DECORATION;
 import static dev.stxt.boxes.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.boxes.tree.PropertyKey.RULE;
 import static dev.stxt.boxes.tree.PropertyKey.FLEX_GAP;
@@ -72,6 +74,19 @@ final class ModelValidator {
                     : "Column gap, que sin declarar es 0";
             throw error(s.line(RULE), ErrorCode.COLUMN_RULE_WIDTH, "Rule es más ancha que " + gap
                     + ": la línea se pintaría sobre las columnas; ensancha Column gap o adelgaza Rule");
+        }
+    }
+
+    /**
+     * Una {@code Image} no se parte (§5.18): {@code Inside} y {@code Decoration}, que solo
+     * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
+     */
+    static void validateImage(Style s) {
+        for (String p : List.of(BREAK_INSIDE, DECORATION)) {
+            if (s.isDeclared(p)) {
+                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
+                        + " no tiene efecto en una Image, que no se parte entre páginas: quítalo");
+            }
         }
     }
 
@@ -169,7 +184,8 @@ final class ModelValidator {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
                         "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
             }
-            if (s.width.isAuto() && s.maxWidth == null) {
+            // Una imagen con Width auto mide su ancho natural, no todo el ancho: se puede centrar.
+            if (s.width.isAuto() && s.maxWidth == null && s.layout != Style.Layout.IMAGE) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }

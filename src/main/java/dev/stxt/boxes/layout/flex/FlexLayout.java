@@ -96,7 +96,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
+        BoxModel model = BoxModel.resolve(box, space, engine);
         return new Run(box, model, space).layOut(from);
     }
 
@@ -292,8 +292,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style;
             Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
             double margins = it.margin.horizontal();
-            BoxModel probe = BoxModel.resolve(b, probeSpace(),
-                    () -> engine.intrinsic(b));
+            BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
             double extra = probe.border().horizontal() + probe.padding().horizontal();
             IntrinsicSizes intrinsic = engine.intrinsic(b);
 
@@ -321,8 +320,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style;
             Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
             double margins = it.margin.vertical();
-            BoxModel probe = BoxModel.resolve(b, probeSpace(),
-                    () -> engine.intrinsic(b));
+            BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
 
             // Ancho con el que se mide: el declarado, el del contenedor (stretch) o el ajuste al contenido.
             double width;
@@ -336,7 +334,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             it.crossWidth = BoxModel.constrainWidth(is, width, contentWidth);
 
             ConstraintSpace measure = itemSpace(it.crossWidth, OptionalDouble.empty());
-            BoxModel sized = BoxModel.resolve(b, measure, () -> engine.intrinsic(b));
+            BoxModel sized = BoxModel.resolve(b, measure, engine);
             double contentSize = engine.layout(b, measure, null).fragment().height();
 
             OptionalDouble basis = declaredBasis(is);
@@ -434,8 +432,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double target;
             if (row) {
                 Fragment f = it.result.fragment();
-                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()),
-                        () -> engine.intrinsic(it.box));
+                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()), engine);
                 if (m.height().isPresent()) {
                     return;
                 }

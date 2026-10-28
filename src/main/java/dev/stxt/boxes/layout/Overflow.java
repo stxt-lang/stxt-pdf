@@ -213,7 +213,7 @@ public final class Overflow {
      * Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior
      * que pasa del final, y en él, lo que no se puede partir: su borde y su relleno si ya no caben
      * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
-     * o su {@code Height}.
+     * o su {@code Height} (en una imagen sin él, su {@code Width}).
      */
     private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom,
                                                       double pageHeight) {
@@ -237,6 +237,9 @@ public final class Overflow {
                     property = c.padding().vertical() >= c.border().vertical() ? PADDING : BORDER;
                 } else if (!c.lines().isEmpty()) {
                     property = s.isDeclared(LINE_HEIGHT) ? LINE_HEIGHT : FONT_SIZE;
+                } else if (c.box().isImage() && !s.isDeclared(HEIGHT)) {
+                    // El alto de una imagen sale de su ancho.
+                    property = WIDTH;
                 } else {
                     property = HEIGHT;
                 }

@@ -14,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PageMode;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
@@ -22,6 +23,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDParentTr
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
@@ -51,12 +53,13 @@ import java.util.Set;
  * para {@code Paragraph}, {@code Span} para {@code Text}, {@code L} y {@code LI} para las listas
  * y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
  * {@code Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y
- * {@code TD} para las tablas (§5.15) y {@code Div} para el resto, también un {@code Multicol}
+ * {@code TD} para las tablas (§5.15), {@code Figure} para las imágenes con {@code Alt} (con su
+ * texto alternativo y su {@code BBox}, §5.18) y {@code Div} para el resto, también un {@code Multicol}
  * (§5.16), cuyas columnas no tienen elemento propio. El texto de
  * cada fragmento es contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del
  * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
- * bordes y los {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte
- * del contenido.</p>
+ * bordes, las imágenes sin {@code Alt} (decorativas) y los {@code Fixed} (repetidos en cada
+ * página) son <em>artifacts</em>: no forman parte del contenido.</p>
  *
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
@@ -101,11 +104,18 @@ final class PdfStructure {
             box.children.forEach(child -> build(child, parent));
             return;
         }
+        if (box.isImage() && box.style.alt == null) {
+            // Decorativa: no tiene elemento y se pinta como artifact.
+            return;
+        }
         PDStructureElement e = new PDStructureElement(type(box), parent);
         parent.appendKid(e);
         elements.put(box, e);
         if (box.headingLevel() > 0) {
             headings.add(box);
+        }
+        if (box.isImage()) {
+            e.setAlternateDescription(box.style.alt);
         }
         if (box.element == Element.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();
@@ -271,6 +281,7 @@ final class PdfStructure {
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
             case CELL -> group(box) == 0 ? "TH" : "TD";
+            case IMAGE -> "Figure";
             default -> "Div";
         };
     }
@@ -307,6 +318,20 @@ final class PdfStructure {
         ref.setPage(page);
         e.appendKid(ref);
         return mcid;
+    }
+
+    /**
+     * El {@code BBox} del {@code Figure} de una imagen: su caja de contenido en la página, en
+     * coordenadas del PDF. Una imagen no se parte, así que solo está en una página.
+     */
+    void figureBox(Box box, PDRectangle r) {
+        PDStructureElement e = elements.get(box);
+        if (e == null) {
+            return;
+        }
+        PDLayoutAttributeObject layout = new PDLayoutAttributeObject();
+        layout.setBBox(r);
+        e.addAttribute(layout);
     }
 
     /** Termina: el árbol de padres y los marcadores de los encabezados. */

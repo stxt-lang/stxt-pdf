@@ -83,7 +83,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
+        BoxModel model = BoxModel.resolve(box, space, engine);
         return new Run(box, model, space, (BreakToken.Block) from).layOut();
     }
 

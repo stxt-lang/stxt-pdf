@@ -51,6 +51,14 @@ public interface Canvas {
     default void beginText(Box box) {
     }
 
+    /**
+     * La imagen de una {@code Image} (ESPECIFICACION.md §5.18) en su caja de contenido
+     * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja.
+     * Por defecto no pinta nada.
+     */
+    default void image(Box box, Rect content) {
+    }
+
     /** Termina el texto empezado con {@link #beginText(Box)}. */
     default void endText() {
     }

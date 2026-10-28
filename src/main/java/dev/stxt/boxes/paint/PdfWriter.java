@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Documento STXT → PDF en una llamada: maqueta con las métricas reales de las fuentes
- * ({@code new Engine(new PdfMetrics(resources))}) y pinta con {@link PdfCanvas}. Para usar
+ * Documento STXT → PDF en una llamada: maqueta con las métricas reales de las fuentes y las
+ * imágenes de la carpeta de recursos ({@code new Engine(new PdfMetrics(resources), resources)})
+ * y pinta con {@link PdfCanvas}. Para usar
  * las páginas antes de pintarlas, se maqueta con {@link Engine#layOutDocument} y se escribe con
  * {@link PdfCanvas#write(dev.stxt.boxes.layout.LaidOutDocument, Resources, OutputStream, boolean)}.
  */
@@ -34,6 +35,7 @@ public final class PdfWriter {
      */
     public static void write(InlineNode document, Resources resources, OutputStream target, boolean debug)
             throws IOException {
-        PdfCanvas.write(new Engine(new PdfMetrics(resources)).layOutDocument(document), resources, target, debug);
+        PdfCanvas.write(new Engine(new PdfMetrics(resources), resources).layOutDocument(document), resources, target,
+                debug);
     }
 }

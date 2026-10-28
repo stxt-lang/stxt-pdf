@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.layout.image.NaturalSize;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
@@ -32,18 +33,46 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                        Style.Decoration decoration) {
 
     /**
-     * Resuelve el modelo de caja de una caja en flujo de bloque.
+     * Resuelve el modelo de caja de una caja con los tamaños intrínsecos del motor y, si es una
+     * {@code Image}, su tamaño natural.
+     */
+    public static BoxModel resolve(Box box, ConstraintSpace space, Engine engine) {
+        return resolve(box, space, () -> engine.intrinsic(box), box.isImage() ? engine.natural(box) : null);
+    }
+
+    /**
+     * Resuelve el modelo de caja de una caja que no es una {@code Image}.
      *
      * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: min-content} y
      *                  similares; solo se calculan si hacen falta
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic) {
+        return resolve(box, space, intrinsic, null);
+    }
+
+    /**
+     * Resuelve el modelo de caja de una caja.
+     *
+     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: min-content} y
+     *                  similares; solo se calculan si hacen falta
+     * @param natural   tamaño natural de una {@code Image}, que se dimensiona como un elemento
+     *                  reemplazado ({@link #replaced}); {@code null} en el resto de cajas
+     */
+    public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
+                                   NaturalSize natural) {
         Style s = box.style;
         double baseWidth = space.percentBaseWidth();
         OptionalDouble baseHeight = space.percentBaseHeight();
         Insets margin = Insets.resolve(s.margin, baseWidth);
         Insets border = Insets.resolve(s.border, baseWidth);
         Insets padding = Insets.resolve(s.padding, baseWidth);
+
+        double minHeight = s.minHeight.resolve(baseHeight).orElse(0);
+        OptionalDouble maxHeight = s.maxHeight == null
+                ? OptionalDouble.empty() : s.maxHeight.resolve(baseHeight);
+        if (natural != null) {
+            return replaced(s, space, intrinsic, natural, margin, border, padding, minHeight, maxHeight);
+        }
 
         double width;
         if (space.fixedWidth()) {
@@ -52,9 +81,6 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             width = constrainWidth(s, specifiedWidth(s, space, margin, intrinsic), baseWidth);
         }
 
-        double minHeight = s.minHeight.resolve(baseHeight).orElse(0);
-        OptionalDouble maxHeight = s.maxHeight == null
-                ? OptionalDouble.empty() : s.maxHeight.resolve(baseHeight);
         OptionalDouble height;
         if (space.fixedHeight()) {
             height = space.availableHeight();
@@ -71,6 +97,60 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             }
         }
         return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.decoration);
+    }
+
+    /**
+     * Una {@code Image} (§5.18), como un elemento reemplazado de CSS: su caja de contenido tiene
+     * la proporción del fichero (o la de {@code Aspect ratio}, que la sustituye). Con
+     * {@code Width: auto} mide su ancho natural, también en flujo de bloque, o el que sale de un
+     * alto declarado; el alto {@code auto} sale siempre del ancho, así que es definido. Si los
+     * dos son {@code auto} y el alto choca con su mínimo o su máximo, el ancho se vuelve a
+     * deducir del alto limitado. Con {@code measuringContentHeight}, el alto es también el de la
+     * proporción.
+     */
+    private static BoxModel replaced(Style s, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
+                                     NaturalSize natural, Insets margin, Insets border, Insets padding,
+                                     double minHeight, OptionalDouble maxHeight) {
+        double ratio = s.aspectRatio != null ? s.aspectRatio : natural.ratio();
+        double extraWidth = border.horizontal() + padding.horizontal();
+        double extraHeight = border.vertical() + padding.vertical();
+        OptionalDouble declaredHeight;
+        if (space.fixedHeight()) {
+            declaredHeight = space.availableHeight();
+        } else if (space.contentHeight()) {
+            declaredHeight = OptionalDouble.empty();
+        } else {
+            declaredHeight = s.height.resolve(space.percentBaseHeight());
+            if (declaredHeight.isPresent()) {
+                declaredHeight = OptionalDouble.of(Sizing.constrain(declaredHeight.getAsDouble(), minHeight, maxHeight));
+            }
+        }
+
+        double baseWidth = space.percentBaseWidth();
+        boolean autoWidth = !space.fixedWidth() && s.width.isAuto();
+        double width;
+        if (space.fixedWidth()) {
+            width = space.availableWidth();
+        } else if (autoWidth) {
+            double content = declaredHeight.isPresent()
+                    ? Math.max(0, declaredHeight.getAsDouble() - extraHeight) * ratio : natural.width();
+            width = constrainWidth(s, content + extraWidth, baseWidth);
+        } else {
+            width = constrainWidth(s, specifiedWidth(s, space, margin, intrinsic), baseWidth);
+        }
+
+        double height;
+        if (declaredHeight.isPresent()) {
+            height = declaredHeight.getAsDouble();
+        } else {
+            double proportional = Math.max(0, width - extraWidth) / ratio + extraHeight;
+            height = Sizing.constrain(proportional, minHeight, maxHeight);
+            if (autoWidth && height != proportional) {
+                width = constrainWidth(s, Math.max(0, height - extraHeight) * ratio + extraWidth, baseWidth);
+            }
+        }
+        return new BoxModel(margin, border, padding, width, OptionalDouble.of(height), minHeight, maxHeight,
+                s.decoration);
     }
 
     /**

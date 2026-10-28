@@ -77,10 +77,18 @@ public enum ErrorCode {
     POSITIONED_IN_MULTICOL,
 
     // --- Markdown ------------------------------------------------------------------------------
-    /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes, código, citas, HTML… */
+    /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes dentro de un texto, código, citas, HTML… */
     MARKDOWN_UNSUPPORTED,
     /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet}, {@code Numbering} o {@code Table columns}. */
     MARKDOWN_PROPERTY_MISSING,
+
+    // --- Imágenes -------------------------------------------------------------------------------
+    /** Una {@code Image} sin ruta, con una ruta que sale de la carpeta o que no existe. */
+    IMAGE_UNKNOWN,
+    /** Una {@code Image} que no es PNG ni JPEG, o que no se puede leer. */
+    IMAGE_FORMAT,
+    /** {@code Inside} o {@code Decoration} en una {@code Image}, que no se parte. */
+    BREAK_IN_IMAGE,
 
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */

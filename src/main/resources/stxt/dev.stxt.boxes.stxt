@@ -36,6 +36,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -82,6 +83,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -307,6 +309,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Paragraph
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -351,6 +354,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -387,6 +391,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -421,6 +426,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -455,6 +461,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Heading 6
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -499,6 +506,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: List
 			Child: Markdown
 				Max: 1
+			Child: Image
+				Max: 1
 			Child: Table
 				Max: 1
 			Child: Multicol
@@ -539,6 +548,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: List
 			Child: Markdown
+				Max: 1
+			Child: Image
 				Max: 1
 			Child: Table
 				Max: 1
@@ -621,6 +632,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Paragraph
 			Child: List
 			Child: Markdown
+			Child: Image
 			Child: Table
 			Child: Multicol
 			Child: Relative
@@ -649,6 +661,22 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Content
 				Min: 1
+				Max: 1
+	Node: Image
+		Type: INLINE
+		Description: Imagen PNG o JPEG de la carpeta images/ de los recursos; el valor es su ruta, relativa a images/ (logos/acme.png). Una caja sin hijos con el tamaño y la proporción del fichero; no se parte entre páginas.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Class
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Alt
+				Max: 1
+			Child: Fit
 				Max: 1
 
 	# Reglas reutilizables
@@ -1009,6 +1037,18 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Values:
 			Value: balance
 			Value: auto
+
+	# Image
+
+	Node: Alt
+		Description: Texto alternativo de una Image: con él, la imagen es una figura (Figure) del PDF etiquetado; sin él, es decorativa.
+	Node: Fit
+		Type: ENUM
+		Description: Cómo llena una Image su caja si tienen proporciones distintas: contain (por defecto) cabe entera y centrada; cover llena la caja, centrada y recortada; fill se deforma.
+		Values:
+			Value: contain
+			Value: cover
+			Value: fill
 
 	# Markdown
 

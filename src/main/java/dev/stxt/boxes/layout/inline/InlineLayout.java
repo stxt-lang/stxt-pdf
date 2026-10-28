@@ -131,7 +131,7 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
+        BoxModel model = BoxModel.resolve(box, space, engine);
         Style s = box.style;
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();

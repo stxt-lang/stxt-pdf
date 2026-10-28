@@ -45,7 +45,8 @@ class SchemaCoverageTest {
             // Grupos
             Map.entry("Box", "Box:\n\tPadding: 1"),
             Map.entry("Typography", "Typography:\n\tColor: #333333"),
-            Map.entry("Break", "Break:\n\tInside: avoid"),
+            // Inside no se admite en una Image, que no se parte.
+            Map.entry("Break", "Break:\n\tAfter: avoid"),
             // Box
             Map.entry("Width", "Width: 100"),
             Map.entry("Height", "Height: 100"),
@@ -106,7 +107,10 @@ class SchemaCoverageTest {
             // Markdown
             Map.entry("Bullet", "Bullet: disc dash"),
             Map.entry("Numbering", "Numbering: decimal lower-alpha"),
-            Map.entry("Table columns", "Table columns: auto"));
+            Map.entry("Table columns", "Table columns: auto"),
+            // Image
+            Map.entry("Alt", "Alt: Logotipo"),
+            Map.entry("Fit", "Fit: cover"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -156,6 +160,7 @@ class SchemaCoverageTest {
                 + "\t\tText: Hola", Set.of("Count", "Column gap")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
+        t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
         String table = HEADER + "\tTable:\n\t\tColumns: 100\n";

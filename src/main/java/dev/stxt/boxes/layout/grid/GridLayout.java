@@ -137,7 +137,7 @@ public final class GridLayout implements LayoutAlgorithm {
      * tabla lo usa para cortar solo su cuerpo.
      */
     public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
-        BoxModel model = BoxModel.resolve(box, space, () -> engine.intrinsic(box));
+        BoxModel model = BoxModel.resolve(box, space, engine);
         Style s = box.style;
         double contentWidth = model.contentWidth();
         OptionalDouble contentHeight = model.contentHeight();
@@ -251,7 +251,7 @@ public final class GridLayout implements LayoutAlgorithm {
     private double itemWidth(Box item, double areaWidth, Insets margin, Style.Alignment horizontal, boolean atStart) {
         Style is = item.style;
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
-        BoxModel probe = BoxModel.resolve(item, free, () -> engine.intrinsic(item));
+        BoxModel probe = BoxModel.resolve(item, free, engine);
         if (!is.width.isAuto()) {
             return probe.width();
         }
@@ -274,7 +274,7 @@ public final class GridLayout implements LayoutAlgorithm {
         OptionalDouble fixedHeight = OptionalDouble.empty();
         if (vertical == Style.Alignment.STRETCH) {
             ConstraintSpace probe = ConstraintSpace.fixed(width, OptionalDouble.empty(), areaWidth, base, atStart);
-            BoxModel m = BoxModel.resolve(item, probe, () -> engine.intrinsic(item));
+            BoxModel m = BoxModel.resolve(item, probe, engine);
             if (m.height().isEmpty()) {
                 fixedHeight = OptionalDouble.of(Sizing.constrain(
                         Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));

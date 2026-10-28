@@ -48,6 +48,8 @@ public final class PropertyKey {
     // Break
     public static final String BREAK_BEFORE = "break-before";
     public static final String BREAK_AFTER = "break-after";
+    public static final String BREAK_INSIDE = "break-inside";
+    public static final String DECORATION = "decoration";
 
     // Flex, Grid e Item
     public static final String FLEX_MAIN_AXIS = "flex.main-axis";
@@ -66,7 +68,7 @@ public final class PropertyKey {
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "weight", FONT_WEIGHT, "style", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
-            "before", BREAK_BEFORE, "after", BREAK_AFTER, "inside", "break-inside");
+            "before", BREAK_BEFORE, "after", BREAK_AFTER, "inside", BREAK_INSIDE);
 
     private PropertyKey() {
     }

@@ -76,6 +76,8 @@ final class ListBuilder {
             String problem = null;
             if (b.style.layout == Style.Layout.FLEX || b.style.layout == Style.Layout.GRID) {
                 problem = "empieza con un " + b.element.label();
+            } else if (b.isImage()) {
+                problem = "empieza con una Image";
             } else if (b.inFlowChildren().isEmpty()) {
                 problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + b.element.label() + " vacío";
             }
