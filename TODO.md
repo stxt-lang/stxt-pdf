@@ -6,6 +6,7 @@
 - `Sections` o `Media Sections`, y retomar que una section no vaya al índex o algo así, cosas que habían quedado apartadas de páginas
 - ~~Índice!!~~ (hito 22)
 - Float? Algo más que haga falta?
+- Referencia de cada elemento en páginas separadas + una referencia de elementos comunes de box, etc
 - Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
 - Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - Revisar ThreadSafe
@@ -15,6 +16,7 @@
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
 - Un docker para esto
+- Un manual hecho a partir de referencia :-)
 
 - **`Link` del PDF etiquetado con su contenido marcado** (hito 23, decisión 171 de
   `docs/DECISIONES.md`). Hoy cada enlace es un elemento `Link` hijo del elemento de la caja que
