@@ -1436,7 +1436,7 @@ Section:
 - [x] Caso golden `26-heading-numbers`, calculado a mano (un encabezado de ancho fijo que solo se parte en dos
       líneas con el número delante).
 - [x] README, `CLAUDE.md`, `DECISIONES.md` (280–284), `TODO.md` y este documento.
-- [x] Ejemplos 07 (contrato) y 04 (informe anual) con sus encabezados numerados (ver el registro de sesiones).
+- [x] Ejemplos 07 (contrato), 04 (informe anual) y 08 (manual) con sus encabezados numerados (ver el registro de sesiones).
 
 ---
 
@@ -1445,6 +1445,14 @@ Section:
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (25).** Ejemplo 08 (manual) con encabezados numerados, pedido por el usuario. `Numbered: true` en su
+  `styles.stxt`; el título del producto (`Heading 1`) declara `Numbered: false`. Los ocho `Heading 2` salen como 1 a 8
+  y sus `Heading 3`, 3.1 a 3.3 y 8.1 y 8.2 (estos dos, escritos con `###` dentro de un `Markdown`). Tres títulos
+  llevaban el número a mano («1 · Instalación»…): se quitaron y ahora es el motor quien lo escribe. El enlace de
+  Markdown a las especificaciones dice «la sección {number of: specs-heading}» (da «la sección 7», también dentro
+  de un `Markdown` y de un enlace), y para eso el encabezado gana un `Id`, que es lo único que cambia en el volcado.
+  `mvn test` en verde.
+  *Siguiente paso:* elegir otro trabajo de `TODO.md`.
 - **2026-10-28 (24).** Ejemplo 04 (informe anual) con encabezados numerados, pedido por el usuario. `Numbered: true` en
   su `styles.stxt`; la portada y «Contenido» (los dos `Heading 1` con `In contents: false`) declaran `Numbered: false`,
   así que los seis capítulos son 1 a 6 y sus apartados, 1.1, 2.1, 4.1…; el índice y los marcadores llevan el número.

@@ -43,6 +43,8 @@ Result:
 	Page: 4
 		Fragment: app
 			Rect: 54 64 487 158
+			Fragment: specs-heading
+				Rect: 54 64 487 25
 			Fragment: specs
 				Rect: 54 97 487 125
 		Fragment: support

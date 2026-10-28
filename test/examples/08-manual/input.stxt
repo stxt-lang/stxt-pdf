@@ -5,7 +5,10 @@
 # un bloque de terminal con las columnas alineadas (un Text con White space: pre, en monoespaciada), un
 # código en línea y tablas de especificaciones y de averías. La estructura
 # de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
-# {page of: wiring}, la página donde está (también dentro de Markdown). Los rótulos se escriben en
+# {page of: wiring}, la página donde está (también dentro de Markdown). Los apartados son Heading 2
+# numerados (Numbered: true en styles.stxt: 1 a 8) y sus subapartados, Heading 3 (3.1, 8.1…, también
+# los de un Markdown); el título del producto declara Numbered: false. Un enlace de Markdown remite al
+# apartado de las especificaciones con {number of: specs-heading}. Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
 Document (dev.stxt.boxes):
 	Media:
@@ -57,6 +60,7 @@ Document (dev.stxt.boxes):
 					Margin: 0
 				Typography:
 					Color: #FFFFFF
+					Numbered: false
 			Text: Instálalo, conéctalo a la aplicación y programa tu casa en menos de media hora.
 				Typography:
 					Size: 11
@@ -155,7 +159,7 @@ Document (dev.stxt.boxes):
 		Block:
 			Id: installation
 			Heading 2:
-				Text: 1 · Instalación
+				Text: Instalación
 				Box:
 					Margin: 0 0 8 0
 			Markdown:
@@ -183,7 +187,7 @@ Document (dev.stxt.boxes):
 			Markdown:
 				Code font: IBM Plex Mono
 				Content >>
-					El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección de especificaciones](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
+					El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección {number of: specs-heading}](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
 			Heading 3:
 				Text: Comprueba la conexión
 			Paragraph: Una vez instalado, en la pantalla deben aparecer la hora y la temperatura. Puedes comprobar el estado de los bornes desde el menú de ajustes, con la siguiente secuencia:
@@ -247,7 +251,7 @@ Document (dev.stxt.boxes):
 			Break:
 				Before: page
 			Heading 2:
-				Text: 2 · Conecta la aplicación
+				Text: Conecta la aplicación
 				Box:
 					Margin: 0 0 8 0
 			Flex:
@@ -273,7 +277,7 @@ Document (dev.stxt.boxes):
 
 							Si el emparejamiento falla, acerca el móvil al termostato y comprueba que usas una red de **2,4 GHz**: la de 5 GHz no es compatible.
 			Heading 2:
-				Text: 3 · Programa la semana
+				Text: Programa la semana
 			Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica:
 			Table:
 				Id: schedule
@@ -318,6 +322,7 @@ Document (dev.stxt.boxes):
 					| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página {page of: wiring} |
 					| Temperatura errónea | Está cerca de una fuente de calor | Cámbialo de sitio, a 1,5 m del suelo |
 			Heading 2:
+				Id: specs-heading
 				Text: Especificaciones técnicas
 			Table:
 				Id: specs
