@@ -332,7 +332,7 @@ public final class BoxTreeBuilder {
         ctx.rules.apply(n, kind, s, parent, position);
         String id = null;
         Double rotate = null;
-        double[] rotateOrigin = Rotation.CENTER;
+        double[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
             if (isElement(p) || NOT_PROPERTIES.contains(name)) {

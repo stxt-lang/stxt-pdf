@@ -19,8 +19,8 @@ import java.util.Locale;
  */
 public record Rotation(double degrees, double originX, double originY) {
 
-    /** El origen por defecto: el centro de la caja de borde. */
-    public static final double[] CENTER = {0.5, 0.5};
+    /** La fracción del origen por defecto, en los dos ejes: el centro de la caja de borde. */
+    public static final double CENTER = 0.5;
 
     /**
      * Interpreta {@code Rotate origin}: una o dos palabras clave de {@code top}, {@code bottom},
