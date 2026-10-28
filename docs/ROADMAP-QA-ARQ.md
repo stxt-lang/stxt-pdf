@@ -67,7 +67,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-06 | Límites y entradas hostiles | Media | M | pendiente |
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
 | QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
-| QA-09 | Integración continua | Alta | S | hecho (falta ver el primer resultado en GitHub) |
+| QA-09 | Integración continua | Alta | S | hecho |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | pendiente |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
 | TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
@@ -265,7 +265,7 @@ segunda ejecución con `-DargLine="-Duser.language=tr -Duser.country=TR"` (QA-01
 no está vacío tras los tests (QA-07); subir `target/site/jacoco` y `target/surefire-reports` como artefactos;
 trabajo nocturno aparte con `-Dgroups=perf -DexcludedGroups=none` y con `tools/qa/`. Nota de entorno: dentro de esta
 sesión, `mvn` solo funcionó con red (el plugin de JaCoCo no estaba en la caché local; `-o` falla).
-**Hecho (sesión 1):** `.github/workflows/ci.yml` con tres trabajos: `test` (JDK 17 y 21, `mvn -B test`, comprueba que el árbol versionado queda limpio y sube los informes), `locale` (la suite con la JVM en turco; **no** comprueba el árbol hasta QA-02) y `perf` (`@Tag("perf")`, solo programado y a mano). No se ha podido ejecutar en GitHub desde la sesión: **comprobar el primer resultado** y ajustar (en especial, si el antialiasing de la máquina de GitHub reescribe algún PNG y el paso del árbol limpio falla, ver QA-07).
+**Hecho (sesión 1):** `.github/workflows/ci.yml` con tres trabajos: `test` (JDK 17 y 21, `mvn -B test`, comprueba que el árbol versionado queda limpio y sube los informes), `locale` (la suite con la JVM en turco; **no** comprueba el árbol hasta QA-02) y `perf` (`@Tag("perf")`, solo programado y a mano). Primera ejecución en GitHub (commit `9d544cc`): los tres trabajos en verde, también el del árbol limpio (el antialiasing de la máquina de GitHub no reescribe ningún PNG).
 
 **Aceptación:** el commit siguiente al cambio muestra el workflow en verde.
 
@@ -599,4 +599,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | Fecha | Sesión | Qué se hizo | Siguiente paso |
 |---|---|---|---|
 | 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |
-| 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). No se ha ejecutado el workflow en GitHub. | Ver el primer resultado de CI; luego la sesión 2 (decidir ligaduras: QA-03) |
+| 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). CI en verde en GitHub (JDK 17, 21 y turco). | Sesión 2 (decidir ligaduras: QA-03) |
