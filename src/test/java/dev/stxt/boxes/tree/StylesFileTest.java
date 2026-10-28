@@ -105,14 +105,13 @@ class StylesFileTest {
     }
 
     @Test
-    void rulesOfTheStylesDocumentWithoutAnElementAreAllowed() {
-        // Un documento de estilos sirve para varios documentos: no exige que cada regla tenga elemento.
+    void rulesWithoutAnElementAreNeverAnError() {
+        // Un documento de estilos sirve para varios documentos, y un elemento puede llegar después, de una plantilla.
         String styles = BASE + "\tFor id: nobody\n\t\tBox:\n\t\t\tPadding: 4\n\tFor class: unused\n\t\tBox:\n\t\t\tPadding: 1\n";
         assertNotNull(root(styles, "\tText: hola"));
-        // Las del propio documento, en cambio, sí.
-        InvalidModelException e = error(BASE, "\tStyles:", "\t\tFor id: nobody", "\t\t\tBox:", "\t\t\t\tPadding: 4",
-                "\tText: hola");
-        assertEquals(ErrorCode.STYLE_UNKNOWN_ID, e.code());
+        // Tampoco las del propio documento.
+        assertNotNull(root(BASE, "\tStyles:", "\t\tFor id: nobody", "\t\t\tBox:", "\t\t\t\tPadding: 4",
+                "\tText: hola"));
     }
 
     @Test

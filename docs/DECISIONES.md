@@ -310,9 +310,9 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
     *Alternativa:* ignorar las reglas sin efecto cuando vienen de una regla; habría que saber
     de dónde viene cada valor en las 11 comprobaciones que usan `Style.isDeclared`.
 
-81. **Reglas sin aplicar.** Un `Element` o un `For class` sin elementos se permiten (las
-    reglas se reutilizan); un `For id` sin su elemento, una clase de `Class` sin su regla y
-    dos reglas con el mismo selector son errores. *Alternativa:* tratarlos todos igual
+81. **Reglas sin aplicar.** Un `Element`, un `For class` o un `For id` sin elementos se permiten
+    (las reglas se reutilizan; el `For id` dejó de ser error, ver 228); una clase de `Class` sin su
+    regla y dos reglas con el mismo selector son errores. *Alternativa:* tratarlos todos igual
     (todos error, o ninguno).
 
 82. **Las reglas solo admiten `Box`, `Typography` y `Break`**, no las propiedades propias de
@@ -1325,12 +1325,13 @@ No es un hito de la hoja de ruta: sale del primer punto de `TODO.md`. Interpreta
      *Alternativa:* todas las reglas del fichero valen menos que cualquiera del documento, aunque sea de un
      nivel inferior.
 
-228. **Cada origen es estricto por separado, con una excepción.** Dos reglas con el mismo selector son
-     `STYLE_DUPLICATE` dentro de un origen, no entre los dos; una clase de `Class` puede tener su `For class`
-     en cualquiera de los dos. Una regla `For id` del documento de estilos aparte **no** necesita que el
-     documento tenga ese `Id` (un fichero de estilos sirve para varios documentos); la del propio documento,
-     sí (`STYLE_UNKNOWN_ID`, como antes). *Alternativa:* exigirlo también al fichero, lo que obliga a un
-     fichero de estilos por documento.
+228. **Cada origen es estricto por separado.** Dos reglas con el mismo selector son `STYLE_DUPLICATE`
+     dentro de un origen, no entre los dos; una clase de `Class` puede tener su `For class` en cualquiera de
+     los dos. Un `For id` sin elemento **no es nunca un error**, ni en el documento aparte (sirve para varios
+     documentos) ni en el propio (el elemento puede llegar después, de una plantilla: se seguirá
+     https://stxt.dev/stxt-transform-ref#s4). Se quitó `STYLE_UNKNOWN_ID` y su caso del catálogo; antes del
+     cambio, el documento sí lo exigía. *Alternativa:* exigirlo, lo que obliga a un fichero de estilos por
+     documento y impide estilar elementos que rellenará una plantilla.
 
 229. **Los errores de una regla del documento aparte llevan su línea y lo dicen** (`línea 8 de los estilos:
      …`), con el mismo código. Lo que se detecta después de construir el árbol (una fuente que no existe, un

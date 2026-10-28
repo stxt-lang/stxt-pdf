@@ -153,8 +153,8 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   raíz `Styles` (`DocumentReader.readStyles`) que se pasa al maquetar (`BoxTreeBuilder.build(documento,
   estilos)`, `Engine.layOutDocument(documento, estilos)`, `PdfWriter.write(documento, estilos, …)`); es
   opcional, puede ser `null` y el documento no lo nombra: el motor no busca ficheros. `StyleRules` lee los
-  dos orígenes por separado (un duplicado es un error dentro de un origen, no entre los dos; el `For id`
-  sin elemento solo lo exige el documento) y en cada nivel de prioridad aplica antes las reglas del
+  dos orígenes por separado (un duplicado es un error dentro de un origen, no entre los dos; una regla
+  `For id` sin elemento nunca es un error, porque las plantillas pueden rellenarlo después) y en cada nivel de prioridad aplica antes las reglas del
   documento aparte, así que el documento gana. `Element: Document` es la regla de la raíz: solo admite
   `Typography`, que hereda todo (`StyleRules.applyDocument`), y `Document` ya no admite `Typography`. Un
   error de una regla del documento aparte lleva su línea y lo dice (`InvalidModelException.inSource`:

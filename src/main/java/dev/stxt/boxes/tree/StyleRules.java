@@ -52,10 +52,11 @@ final class StyleRules {
     private final List<ClassRule> classRules = new ArrayList<>();
     /** Las clases que tienen alguna regla. */
     private final Set<String> classNames = new HashSet<>();
-    /** Reglas {@code For id}, por {@code Id}, en el orden en que se aplican. */
+    /**
+     * Reglas {@code For id}, por {@code Id}, en el orden en que se aplican. Que ningún elemento tenga ese
+     * {@code Id} no es un error: el elemento puede llegar después, de una plantilla.
+     */
     private final Map<String, List<InlineNode>> idRules = new HashMap<>();
-    /** La primera regla {@code For id} del propio documento, por {@code Id}: la única que exige un elemento. */
-    private final Map<String, InlineNode> ownIdRules = new HashMap<>();
     /** Reglas {@code Element} de una posición en una tabla ({@code Head cell}, {@code Even row cell}…). */
     private final List<CellRule> cellRules = new ArrayList<>();
     /** Reglas {@code For column}, en el orden en que se aplican. */
@@ -122,9 +123,6 @@ final class StyleRules {
                 case "for-id" -> {
                     String id = name(rule, "For id", fromFile);
                     idRules.computeIfAbsent(id, k -> new ArrayList<>()).add(rule);
-                    if (!fromFile) {
-                        ownIdRules.put(id, rule);
-                    }
                 }
                 default -> throw unread(rule);
             }
@@ -182,19 +180,6 @@ final class StyleRules {
     void apply(Element kind, Style s) {
         for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {
             read(rule, s);
-        }
-    }
-
-    /**
-     * Cada regla {@code For id} del documento tiene su elemento: {@code ids} son los del documento ya
-     * construido. Las del documento de estilos aparte no lo exigen: sirve para varios documentos.
-     */
-    void checkIds(Set<String> ids) {
-        for (Map.Entry<String, InlineNode> rule : ownIdRules.entrySet()) {
-            if (!ids.contains(rule.getKey())) {
-                throw error(rule.getValue(), ErrorCode.STYLE_UNKNOWN_ID,
-                        "Ningún elemento tiene el Id " + rule.getKey() + " de esta regla For id");
-            }
         }
     }
 

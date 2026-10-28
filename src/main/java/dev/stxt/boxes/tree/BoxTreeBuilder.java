@@ -146,7 +146,6 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(root, true);
         buildContent(ctx, document, root);
         ContentsBuilder.build(ctx, root);
-        ctx.rules.checkIds(ctx.ids.keySet());
         References.validate(root);
         LinkTargets.validate(root);
         return new Result(media, root, metadata);

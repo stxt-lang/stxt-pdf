@@ -516,13 +516,14 @@ cada grupo están las reglas de posición); `Table` y `Cell`, sí.
 **Validación.** Lo que aporta una regla se valida igual que si lo declarara el elemento
 ([§6](#6-validación)), y el error señala la línea de la propiedad dentro de la regla. Los valores
 de una regla se comprueban aunque no se aplique a ningún elemento. Son errores: un `Element` que
-no nombra un elemento de caja ni una posición en una tabla, un `For id` sin elemento con ese `Id`,
+no nombra un elemento de caja ni una posición en una tabla,
 un `For column` que no es una columna o un rango de menor a mayor, dos reglas con el mismo
 selector (también dos `For column` con el mismo rango), una regla que da `Break` a un elemento que no lo admite (`Absolute`, `Fixed`, un
 encabezado, un `Text` de un encabezado o una celda, también con una regla de posición o de columna,
 [§5.13](#513-encabezados-y-párrafos)), y una clase de `Class` sin su regla `For class`. Un
-`Element`, un `For class` o un `For column` que no se aplican a ningún elemento no son errores: así
-las reglas se pueden reutilizar.
+`Element`, un `For class`, un `For id` o un `For column` que no se aplican a ningún elemento no son
+errores: así las reglas se pueden reutilizar, y un elemento con ese `Id` o esa clase puede llegar después
+(de una plantilla, por ejemplo).
 
 **La tipografía base.** `Document` no admite `Typography`: lo que hereda toda la descendencia (por
 lo general `Font` y `Size`, que no tienen valor por defecto) se declara en la regla
@@ -567,10 +568,8 @@ Styles (dev.stxt.boxes):
   documento. Con esto, sacar el `Styles` de un documento a un fichero aparte no cambia el
   resultado.
 - **Cada origen es estricto por separado.** Dos reglas con el mismo selector son un error dentro
-  de un origen (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Las reglas de
-  `For id` del documento de estilos no necesitan que el documento tenga ese `Id` (sirve para
-  varios documentos), a diferencia de las del propio documento (`STYLE_UNKNOWN_ID`); una clase de
-  `Class` puede tener su `For class` en cualquiera de los dos.
+  de un origen (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Una clase de `Class` puede
+  tener su `For class` en cualquiera de los dos.
 - **Errores.** Una regla del documento de estilos se valida como una del documento, y su error
   lleva la línea **de ese fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es
   `Styles` es `DOCUMENT_ROOT`.
@@ -2060,7 +2059,6 @@ La validación se hace en cuatro niveles:
 | `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada (también de `Document`) | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
-| `STYLE_UNKNOWN_ID` | Un `For id` del documento tiene un elemento con ese `Id` (en el documento de estilos aparte no hace falta) | `Ningún elemento tiene el Id summary de esta regla For id` |
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
 | `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |

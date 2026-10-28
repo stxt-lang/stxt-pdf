@@ -115,8 +115,6 @@ public enum ErrorCode {
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code Element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,
-    /** {@code For id} con un {@code Id} que no tiene ningún elemento. */
-    STYLE_UNKNOWN_ID,
     /** Dos reglas con el mismo selector. */
     STYLE_DUPLICATE,
     /**

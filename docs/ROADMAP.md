@@ -1215,7 +1215,7 @@ siguiente paso concreto.
 - **2026-10-28 (15).** Documento de estilos aparte (primer punto de `TODO.md`; no es un hito de esta hoja de
   ruta). Resuelto con un cuestionario: la tipografía base pasa a `Element: Document` (y `Document` ya no admite
   `Typography`), las reglas del documento aparte valen menos que las del documento en cada nivel de
-  prioridad, y las reglas `For id` sin elemento se permiten solo en el documento aparte. `DocumentReader.readStyles`,
+  prioridad, y las reglas `For id` sin elemento no son nunca un error (se quitó `STYLE_UNKNOWN_ID`: las plantillas pueden rellenar el elemento después). `DocumentReader.readStyles`,
   `BoxTreeBuilder.build(documento, estilos)`, `Engine.layOutDocument(documento, estilos)` y
   `PdfWriter.write(documento, estilos, …)`; `StyleRules` lee los dos orígenes; los errores del documento aparte dicen
   `de los estilos`. Migrados todos los documentos de test, los once ejemplos (cada uno con su `styles.stxt`; los PNG y
