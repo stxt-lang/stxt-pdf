@@ -23,5 +23,7 @@ Result:
 				Rect: 44 503 507 141
 			Fragment: classifieds
 				Rect: 44 674 507 92.5
+		Fragment: running
+			Rect: 44 14 507 13
 		Fragment: footer
 			Rect: 44 801.5 507 18.5

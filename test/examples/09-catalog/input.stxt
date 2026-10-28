@@ -1,5 +1,5 @@
 # Catálogo de producto de un taller de muebles, de cinco páginas: portada a sangre (un Absolute
-# con Layer sobre el pie fijo), un índice de productos con su página (un Contents, que el motor
+# que sale al margen, con el pie fijo solo desde la segunda página), un índice de productos con su página (un Contents, que el motor
 # rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
 # (Fit: cover) y una etiqueta «Novedad» superpuesta, y una página final con maderas, pedidos y
 # contacto. Las fichas son todas iguales: el estilo está en Styles y solo cambia el contenido.
@@ -142,6 +142,7 @@ Document (dev.stxt.boxes):
 				Color: #B5651D
 	Fixed:
 		Id: footer
+		Pages: not-first
 		Offset: auto 0 -40 0
 		Box:
 			Padding: 6 0 0 0
@@ -157,7 +158,6 @@ Document (dev.stxt.boxes):
 	Absolute:
 		Id: cover
 		Offset: -54 auto auto -50
-		Layer: 5
 		Box:
 			Width: 595
 			Height: 842

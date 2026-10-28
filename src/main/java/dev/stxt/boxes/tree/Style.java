@@ -56,6 +56,23 @@ public final class Style {
     /** Guía entre el título y el número de página de las entradas de un {@code Contents} (§5.19). */
     public enum Leader { DOTS, RULE, NONE }
 
+    /** Las páginas en que sale un {@code Fixed} (§5.5); la página 1 es la primera del documento. */
+    public enum Pages {
+        ALL, FIRST, NOT_FIRST, ODD, EVEN, LAST;
+
+        /** Si un {@code Fixed} con este valor sale en la página {@code page} de un documento de {@code total}. */
+        public boolean includes(int page, int total) {
+            return switch (this) {
+                case ALL -> true;
+                case FIRST -> page == 1;
+                case NOT_FIRST -> page != 1;
+                case ODD -> page % 2 == 1;
+                case EVEN -> page % 2 == 0;
+                case LAST -> page == total;
+            };
+        }
+    }
+
     /** Cómo llena una imagen su caja si tienen proporciones distintas (§5.18). */
     public enum Fit { CONTAIN, COVER, FILL }
 
@@ -75,6 +92,8 @@ public final class Style {
     public Sides<Value> offset = Sides.all(Value.AUTO);
     /** {@code null} = auto. */
     public Integer layer;
+    /** Solo en un {@code Fixed}: las páginas en que sale. */
+    public Pages pages = Pages.ALL;
     public boolean isolate;
 
     // --- Dimensiones ---------------------------------------------------------------------------

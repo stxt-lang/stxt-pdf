@@ -1,7 +1,8 @@
 # Contrato de servicios de diseño entre un estudio y una cooperativa, de varias páginas: cabecera
-# y pie fijos con rúbricas, reunidos y exponen, doce cláusulas numeradas con subapartados escritas
-# en Markdown (listas de tres niveles de numeración), un anexo con la tabla de honorarios (con
-# cabecera y pie) y el bloque de firmas, que no se parte entre páginas.
+# fija con el logotipo desde la segunda hoja (la primera lleva el título) y pie fijo con rúbricas,
+# reunidos y exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de
+# tres niveles de numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
+# bloque de firmas, que no se parte entre páginas.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -93,6 +94,7 @@ Document (dev.stxt.boxes):
 				Border color: #6C6B8A
 	Fixed:
 		Id: header
+		Pages: not-first
 		Offset: -60 0 auto 0
 		Box:
 			Padding: 0 0 6 0

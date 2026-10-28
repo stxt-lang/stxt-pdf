@@ -1005,3 +1005,37 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      estilo de `Head cell`, y la celda vacía de la esquina del horario (ejemplo 11), que antes
      no llevaba clase, también: la barra de cabecera queda entera. El ejemplo 05 estrena la
      cebra con `Even row cell`.
+
+180. **`Pages` en `Fixed`, no páginas con nombre** (N1, hito 24): una propiedad con `all` (por
+     defecto), `first`, `not-first`, `odd`, `even` y `last`, solo en `Fixed` (no en `Styles`, como
+     `Offset` y `Layer`). Cuenta las páginas desde la 1 en el orden físico, y `odd`/`even` son las
+     impares y pares de ese número. En un documento de una sola página, `first` y `last` coinciden.
+     *Dónde:* schema, `tree/Style.Pages`, `tree/BoxTreeBuilder`, `layout/Paginator`.
+     *Alternativa:* páginas con nombre como `@page :first` de CSS, más general y más pesado.
+
+181. **Sin margen distinto en la primera página** (N2): no hay `First margin`. El `Paginator` sigue
+     maquetando todas las páginas con el mismo área útil, y la portada a sangre sigue siendo un
+     `Absolute` con `Offset` negativo y el bloque de 1 pt con `Break: After: page` que fuerza el
+     salto (un `Absolute` no ocupa sitio). Lo que desaparece del truco es el `Layer` que tapaba el
+     pie. La primera hoja del contrato (07) deja el mismo hueco que las demás donde va la
+     cabecera. *Alternativa:* `First margin` en `Media`, con áreas útiles distintas por página.
+
+182. **`{page}` y `{pages}` siguen siendo la página física** (N3): la portada cuenta, y la primera
+     hoja interior de un informe con portada es «Página 2 de 7». No hay `Start` en `Media`.
+     *Alternativa:* una numeración que empiece donde se diga.
+
+183. **Un `Fixed` con `Pages` no reserva sitio donde sale ni donde no** (N4): el flujo es el mismo
+     con él o sin él, como hoy. El `Paginator` lo filtra al colocarlo en cada página; un `Fixed`
+     que no sale en ninguna (`not-first` en un documento de una sola página) es válido y no se
+     comprueba, y su `BOX_OVERFLOW` solo se mira en las páginas donde sale. Un `Fixed` dentro de
+     otro sale solo donde salen los dos, cada uno con su `Pages`. *Dónde:* `layout/Paginator`.
+     *Alternativa:* que empuje el flujo, que rompe el modelo de `Fixed` como caja fuera de flujo.
+
+184. **Sin páginas en blanco para doble cara** (N5): `Break: Before: odd-page` queda fuera del
+     hito y anotado en `TODO.md`. *Alternativa:* `odd-page` y `even-page` en `Before` y `After`.
+
+185. **Ejemplos con `Pages`** (hito 24): el pie de 04, 06 y 09 y el logotipo de la cabecera de 07
+     pasan a `Pages: not-first`; las portadas de 04 y 09 pierden el `Layer: 5` (el pie ya no sale
+     debajo, así que sus PNG no cambian); el boletín (05) gana un titulillo corrido desde la
+     segunda página. La carta (02) es de una sola página y no cambia: su membrete ya es un bloque
+     de la primera y no hay segunda hoja que enseñar.

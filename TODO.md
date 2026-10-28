@@ -42,9 +42,12 @@
   encabezado, o una clase de exclusión.
 - **Numerar los encabezados** (`1`, `1.1`…): hoy `{number of: id}` solo da el número de un ítem de
   una lista numerada, así que «la sección 4.2» no se puede escribir de un encabezado.
-- **Primera página distinta / páginas con nombre**: una portada sin cabecera ni pie se hace con
-  un `Absolute` de `Layer` alta que tapa los `Fixed` (ejemplos 04 y 09). Falta una forma de
-  decir en qué páginas va un `Fixed`.
+- ~~**Primera página distinta / páginas con nombre**~~ (hito 24: `Pages` en `Fixed`). Queda: un
+  margen distinto en la primera página (`First margin`: la portada a sangre sigue siendo un
+  `Absolute` con `Offset` negativo y la primera hoja del contrato deja el mismo hueco de la
+  cabecera), una numeración que no cuente la portada (`{page}` es la página física), páginas con
+  nombre al estilo de `@page`, y forzar que una sección empiece en página impar con una página en
+  blanco para imprimir a doble cara (`Break: Before: odd-page`).
 - ~~**Enlaces** (a una URL o a un `Id` del documento) y anotaciones del PDF.~~ (hito 23: `Link` y
   `[texto](destino)` en Markdown). Queda: el `Link` del PDF etiquetado no envuelve el contenido
   marcado del tramo (decisión 171), y un encabezado de un `Markdown` no se puede enlazar a mano

@@ -8,8 +8,6 @@ Result:
 				Rect: 56 64 74 74
 			Fragment: cover-products
 				Rect: 56 412.5 483 108
-		Fragment: footer
-			Rect: 50 798 495 20
 	Page: 2
 		Fragment: index
 			Rect: 50 54 495 331.5

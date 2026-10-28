@@ -250,6 +250,7 @@ public final class BoxTreeBuilder {
                         case "id" -> id = ctx.id(p);
                         case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                         case "layer" -> s.layer = integer(p);
+                        case "pages" -> s.pages = enumValue(Style.Pages.class, p);
                         case "marker" -> s.listMarker = enumValue(Style.Marker.class, p);
                         case "start" -> s.listStart = integer(p);
                         case "number" -> s.listNumber = integer(p);

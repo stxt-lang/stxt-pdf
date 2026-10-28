@@ -10,8 +10,6 @@ Result:
 			Rect: 20 20 380 660
 		Fragment: frame-inner
 			Rect: 26 26 368 648
-		Fragment: footer
-			Rect: 54 654 312 13
 	Page: 2
 		Fragment: back
 			Rect: 54 50 312 514.2

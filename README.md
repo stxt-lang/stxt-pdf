@@ -167,7 +167,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 
 22. ~~**Referencias a páginas e índice.** `{page of: id}` y `{number of: id}` en el texto, paginando hasta que las páginas converjan, y el elemento `Contents`, que genera el índice con guía y páginas (caso 15).~~ Hecho.
 23. ~~**Enlaces.** Propiedad `Link` en las cajas y enlaces de Markdown, a una URL o a otra caja del documento, con anotaciones de enlace en el PDF; las entradas del índice llevan a su encabezado (caso 16).~~ Hecho.
-24. **Primera página distinta y páginas con nombre.** Pendiente.
+24. ~~**Primera página distinta.** Propiedad `Pages` en `Fixed` (`first`, `not-first`, `odd`, `even`, `last`): una cabecera, un pie o un logotipo solo en las páginas que se quiera (caso 17). Sin margen distinto en la primera página ni numeración que no cuente la portada.~~ Hecho.
 25. ~~**Estilo de las tablas.** Reglas `Element` por posición (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` en `Styles` y `Column align` en la `Table`, sin repetir una clase en cada celda; también en las tablas de Markdown (caso 18).~~ Hecho.
 26. **Formato dentro de la línea fuera de Markdown.** Pendiente.
 27. **Texto:** mayúsculas automáticas, interletraje y versalitas. Pendiente.

@@ -85,7 +85,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
-| `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
+| `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en las páginas que dice `Pages` (todas por defecto) | Elementos |
 | `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Area` | Ítem de un `Grid`: el área que ocupa y cómo se alinea en ella | Exactamente un elemento en flujo |
 
@@ -423,6 +423,7 @@ dentro.
 |---|---|---|---|
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
 | `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Area`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
+| `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | Solo en `Fixed`: las páginas en que sale. Ver [§5.5](#55-posicionamiento). |
 
 ### 4.10 Reglas reutilizables (`Styles`)
 
@@ -750,11 +751,30 @@ el ajuste al contenido (`fit-content`) en horizontal y la altura del contenido e
 - dentro de un contenedor flex o grid, la esquina superior izquierda de su caja de contenido.
 
 **`Fixed`.** Como `Absolute`, pero su containing block es el área útil, y **se pinta en
-todas las páginas** (cabeceras, pies, marcas de agua). Los `Fixed` no reservan
-espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de
+las páginas que dice `Pages`**, todas por defecto (cabeceras, pies, marcas de agua). Los `Fixed` no
+reservan espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de
 la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de
 su posición estática (desplazamientos `auto`), se toma la de la primera página en la que
-aparece y se repite igual en todas.
+aparece el flujo que lo contiene y se repite igual en todas en las que sale.
+
+**`Pages`.** Propiedad solo del `Fixed` (en otro elemento es un error del schema, y un valor que no
+está en la lista, también). Cuenta las páginas desde la 1 en el **orden físico** del documento, con
+el mismo número que `{page}` ([§5.4](#54-texto)):
+
+| Valor | Páginas |
+|---|---|
+| `all` | todas (por defecto) |
+| `first` | solo la primera |
+| `not-first` | todas menos la primera |
+| `odd` / `even` | las impares / las pares |
+| `last` | solo la última |
+
+Es una condición de pintado, no de espacio: un `Fixed` no reserva sitio ni donde sale ni donde no,
+así que el flujo es el mismo con él o sin él. La primera página con otro margen, o una numeración
+que no cuente la portada, no existen: una portada a sangre sigue siendo un `Absolute` y la
+numeración, la física. Un `Fixed` que no sale en ninguna página (`not-first` en un documento de una
+sola) es válido y no se comprueba (`BOX_OVERFLOW` solo mira los que salen). Si un `Fixed` contiene
+otro, el de dentro sale solo donde salen los dos, cada uno con su `Pages`.
 
 **Orden de cálculo.** Las cajas posicionadas fuera de flujo se resuelven cuando su containing
 block ya conoce su tamaño, después del layout en flujo.
@@ -1028,7 +1048,7 @@ columna), pasa entera a la siguiente ([§5.18](#518-imágenes)).
 
 **Posicionadas.** Un `Absolute` se coloca en la página donde cae su posición y no se parte. Si
 su containing block está partido, se resuelve contra el fragmento de esa página: su alto es el
-de ese fragmento, no el total. Un `Fixed` se repite en todas las páginas. Un `Relative` se
+de ese fragmento, no el total. Un `Fixed` se repite en las páginas que dice su `Pages`. Un `Relative` se
 parte como cualquier bloque.
 
 **Numeración.** `{page}` y `{pages}` se resuelven en dos fases: se pagina reservando el
@@ -1963,7 +1983,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Accesibilidad y marcadores | Los da el navegador al imprimir, según el caso | PDF etiquetado y marcadores de los encabezados, siempre |
 | `float`, tablas, `sticky`, `transform`, `opacity` | Sí | No |
 | Medio continuo (pantalla) | Sí | No: siempre páginas |
-| `position: fixed` en impresión | Repetido en cada página | Igual: repetido, relativo al área útil |
+| `position: fixed` en impresión | Repetido en cada página | Repetido, relativo al área útil, en las páginas que dice `Pages` (todas por defecto); no hay `@page :first` ni márgenes distintos por página |
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
 | `z-index` | Propiedad `z-index` | `Layer` |
 | `box-decoration-break` | `slice`, `clone` | `Decoration: slice`, `clone` |
@@ -2049,7 +2069,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit` |
 | `Relative` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
-| `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
+| `Absolute` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
+| `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
@@ -2062,7 +2083,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; las de valores
-cerrados (`Table columns`, `Fit` y `Leader` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt` y `Link` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
+cerrados (`Table columns`, `Fit`, `Leader` y `Pages` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt` y `Link` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):

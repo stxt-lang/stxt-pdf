@@ -472,7 +472,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Fixed
 	Node: Fixed
 		Type: GROUP
-		Description: Caja de bloque fuera de flujo, colocada con Offset en el área útil. En modo paginado se repite en cada página.
+		Description: Caja de bloque fuera de flujo, colocada con Offset en el área útil. En modo paginado se repite en las páginas que dice Pages (todas por defecto).
 		Children:
 			Child: Id
 				Max: 1
@@ -487,6 +487,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Offset
 				Max: 1
 			Child: Layer
+				Max: 1
+			Child: Pages
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -892,6 +894,16 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Layer
 		Type: INTEGER
 		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
+	Node: Pages
+		Type: ENUM
+		Description: Páginas en que sale un Fixed, contando desde la 1 en el orden físico del documento: all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
+		Values:
+			Value: all
+			Value: first
+			Value: not-first
+			Value: odd
+			Value: even
+			Value: last
 	Node: Content
 		Type: BLOCK
 		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.

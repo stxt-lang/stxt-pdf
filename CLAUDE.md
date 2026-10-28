@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 23 y el 25 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 25 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -74,9 +74,11 @@ actualízala.
 
 | 23 | ~~Enlaces: `Link` en las cajas y `[texto](destino)` en Markdown, a una URL o a otra caja~~ (hecho; caso 16) | `model/Links`, `model/TextFormat`, `tree/LinkTargets`, `tree/MarkdownBuilder`, `paint/StackingContext`, `paint/PdfLinks`, `paint/PdfDestinations`, `paint/PdfStructure` |
 
+| 24 | ~~Primera página distinta: `Pages` en `Fixed` (`all`, `first`, `not-first`, `odd`, `even`, `last`)~~ (hecho; caso 17) | schema, `tree/Style.Pages`, `tree/BoxTreeBuilder`, `layout/Paginator` |
+
 | 25 | ~~Estilo de las tablas: `Element` por posición de la celda (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` y `Column align`~~ (hecho; caso 18) | schema, `tree/StyleRules`, `tree/CellPosition`, `tree/CellSelector`, `tree/TableBuilder`, `tree/BoxTreeBuilder` |
 
-Los hitos 24 y 26 a 31 (primera página distinta, formato en línea, texto,
+Los hitos 26 a 31 (formato en línea, texto,
 aspecto de las cajas, preformateado, rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
@@ -231,7 +233,10 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   desplazan con `RelativeOffset` después de colocarlos. `Engine.layout` resuelve con
   `AbsoluteLayout` las `absolute` cuyo containing block es la caja recién maquetada (sus
   fragmentos cuelgan del de esa caja); las `fixed` suben hasta la raíz y el `Paginator` las
-  coloca en `Page.fixed` de cada página.
+  coloca en `Page.fixed` de cada página, solo en las que incluye su `Style.pages`
+  (`Style.Pages.includes(página, total)`: `Pages` en el documento, `all` por defecto; la página es
+  la física, la misma de `{page}`). Lo filtra el `Paginator` al colocarlas: el resto del motor
+  (`Overflow`, `StxtDump`, el pintado y el PDF) recorre lo que hay en `Page.fixed`.
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya
   consumido por la caja (un `Height` definido es el total de todos los fragmentos), y `BEFORE`:
   "no cabe nada, corta antes de mí", que nunca se pasa como `from`. El `Paginator` detecta la

@@ -42,7 +42,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 21 | Ejemplos de verdad: once documentos completos, con PNG limpios | hecho | `examples/` |
 | 22 | Referencias a páginas e índice automático (`Contents`) | hecho | 15 |
 | 23 | Enlaces (URL y destinos del documento) | hecho | 16 |
-| 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
+| 24 | Primera página distinta (`Pages` en `Fixed`) | hecho | 17 |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | hecho | 18 |
 | 26 | Formato dentro de la línea fuera de Markdown | pendiente | 19 (previsto) |
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | pendiente | 20 (previsto) |
@@ -51,8 +51,8 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 23 y el 25, el 2026-10-28. Los hitos
-24 y 26 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 25, el 2026-10-28. Los hitos
+26 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -667,7 +667,9 @@ salieron al implementarlas, en [`DECISIONES.md`](DECISIONES.md), 163–173):
 ## Hito 24: primera página distinta y páginas con nombre
 
 **Objetivo.** Decir en qué páginas va un `Fixed` y poder tener una primera página con otro
-margen, para portadas y membretes sin trucos.
+margen, para portadas y membretes sin trucos. *Resultado: se hizo lo primero; el margen de la primera
+página y la numeración sin portada se dejaron fuera (N2 y N3, abajo), así que las portadas a sangre
+siguen siendo un `Absolute` y «Página 1 de 6» en la primera interior no se puede escribir.*
 
 **Qué se echó en falta.**
 
@@ -700,31 +702,41 @@ Media:
 	First margin: 0
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **N1. Qué páginas.** *Propuesta:* una propiedad `Pages` en `Fixed` con `all` (por
-      defecto), `first`, `not-first`, `odd`, `even` y `last`. *Alternativa:* páginas con
-      nombre como en CSS (`@page :first`), más general pero más pesado.
-- [ ] **N2. Margen de la primera página.** *Propuesta:* `First margin` en `Media`, para una
-      portada a sangre o un membrete alto; el flujo se maqueta con el área útil de esa página.
-      *Alternativa:* no tocarlo y que la portada sea un `Absolute`, como hoy. Es lo más caro
-      del hito: el `Paginator` maqueta hoy todas las páginas con el mismo ancho.
-- [ ] **N3. Numeración.** *Propuesta:* `Start` en `Media` (o `Count from`) que fija desde qué
-      página se numera: `{page}` y `{pages}` no cuentan la portada. *Alternativa:* `{page}`
-      sigue siendo la página física.
-- [ ] **N4. Lo que va debajo.** *Propuesta:* un `Fixed` con `Pages` distinto no reserva
-      espacio, como hoy; el autor sigue dejando sitio con el margen.
-- [ ] **N5. Página en blanco para imprimir a doble cara.** *Propuesta:* fuera del hito.
-      *Alternativa:* incluirla (`Break: Before: odd-page`).
+**Decisiones tomadas** (2026-10-28, con la propuesta aceptada salvo N2 y N3, donde se eligió la
+opción barata; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 180–185):
+
+- [x] N1. **Qué páginas:** una propiedad `Pages` en `Fixed` con `all` (por defecto), `first`, `not-first`,
+      `odd`, `even` y `last`.
+- [x] N2. **Margen de la primera página:** *no se toca.* Sin `First margin`: la portada a sangre sigue
+      siendo un `Absolute`. Se pierde el hueco de la cabecera en la primera hoja de un contrato.
+- [x] N3. **Numeración:** *la página física.* Sin `Start` en `Media`; `{page}` y `{pages}` cuentan la
+      portada.
+- [x] N4. **Lo que va debajo:** un `Fixed` con `Pages` limitado no reserva espacio, como hoy.
+- [x] N5. **Página en blanco para doble cara:** fuera del hito (`TODO.md`).
+
+Como se renunció a N2 y a N3, el objetivo del hito se redujo a decir en qué páginas va un `Fixed`; el
+título conserva «páginas con nombre» solo en la tabla de impacto de más arriba.
+
+**Diseño técnico** (como quedó):
+
+- **Modelo.** `Style.pages` (`Style.Pages`, con `includes(página, total)`), leído como `Layer` en el
+  elemento (`BoxTreeBuilder`); el schema lo admite solo en `Fixed`.
+- **Paginación.** El `Paginator` ya colocaba cada `Fixed` en cada página al terminar de paginar el
+  flujo; ahora salta los que `Pages` no incluye en esa página (y los que cuelgan de ellos). Nada más
+  cambia: `Page.fixed` solo tiene lo que sale, y el volcado, el pintado y el PDF lo recorren como siempre.
+- **Errores.** Ninguno nuevo: un valor que no es de la lista es `INVALID_VALUE` del schema y `Pages` fuera
+  de un `Fixed`, `CHILD_NOT_DECLARED` (dos casos en `test/errors/schema/`).
 
 **Tareas:**
 
-- [ ] Resolver N1–N5.
-- [ ] Schema (`Pages`, y `First margin` y `Start` si se aceptan), `Style`, `Media`.
-- [ ] `Paginator`: qué `Fixed` pintar en cada página; margen de la primera página si se
-      acepta.
-- [ ] Especificación, errores, tests y caso golden `17-page-types`.
-- [ ] Ejemplos 02, 04, 05, 06, 07 y 09 sin el truco (ver arriba).
+- [x] Resolver N1–N5 (2026-10-28).
+- [x] Schema (`Pages`), `Style` y `BoxTreeBuilder`; `Paginator`.
+- [x] Especificación (§2, §4.9, §5.5, §5.10, §8 y §9), errores (dos casos), tests (`FixedPagesTest`,
+      `SchemaCoverageTest`) y caso golden `17-page-types`, calculado a mano.
+- [x] Ejemplos 04, 05, 06, 07 y 09 con `Pages` en vez del truco o la excepción (el 02 es de una página y no
+      cambia; ver `DECISIONES.md`, 185).
 
 ---
 
@@ -1113,6 +1125,16 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (10).** Hito 24 terminado. Resueltas N1–N5: `Pages` en `Fixed` y nada más (sin
+  `First margin`, numeración física, sin reservar espacio, sin página en blanco). `Style.Pages`, el filtro
+  del `Paginator`, dos casos de schema, `FixedPagesTest` y el caso golden `17-page-types`
+  (calculado a mano, pasó a la primera). Ejemplos 04, 06, 07 y 09 con el pie o el logotipo en
+  `not-first` (y sin el `Layer` de las portadas) y el boletín con un titulillo corrido; los
+  volcados solo pierden o ganan las entradas de esos `Fixed` y los PNG de 04 y 09 no cambian.
+  Decisiones 180–185 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 26 (formato en línea fuera de Markdown, esfuerzo bajo-medio), en otra
+  sesión; resolver sus decisiones con el usuario antes de escribir código. Lo que quedó fuera
+  del 24 (margen de la primera página, numeración sin portada, doble cara) está en `TODO.md`.
 - **2026-10-28 (9).** Hito 25 terminado, antes que el 24: era el siguiente paso del registro (el de menor
   esfuerzo). Resueltas B1–B5, con una ampliación en B2 (`Align` por columna además de
   `For column`, como `Column align` en la tabla). Reglas `Element` por posición, `For column` y

@@ -41,6 +41,7 @@ class SchemaCoverageTest {
             Map.entry("Isolate", "Isolate: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
+            Map.entry("Pages", "Pages: not-first"),
             Map.entry("Content", "Content >>\n\tHola"),
             Map.entry("Span", "Span: 1 1"),
             // Grupos

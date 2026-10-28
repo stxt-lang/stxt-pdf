@@ -38,7 +38,7 @@ Open Font License). Los nombres, las empresas y los datos de los documentos son 
 | [![](01-invoice/page-1.png)](01-invoice) | **[01 · Factura](01-invoice)**<br>Una página A4 | Logotipo y datos de las partes en un grid, tira de condiciones, tabla con cabecera, cuerpo y **pie de totales**, pie de página fijo con `{page}` y `{pages}`, **correos clicables** (`Link: mailto:…`). Todo el estilo en `Styles`. |
 | [![](02-letter/page-1.png)](02-letter) | **[02 · Carta comercial](02-letter)**<br>Una página A4 | Membrete con logotipo, cuerpo en **Markdown** justificado con **Knuth-Plass** (`Text wrap: pretty`), negrita, cursiva y subrayado dentro de la línea, firma escaneada, web del taller en el pie y en el membrete con `Link`. |
 | [![](03-resume/page-1.png)](03-resume) | **[03 · Currículum](03-resume)**<br>Una página A4, sin márgenes | Grid de dos columnas a **página completa**, foto, barras de nivel con anchos en porcentaje, línea de tiempo en un grid y cifras en un `Flex`; correo y web clicables. |
-| [![](04-annual-report/page-1.png)](04-annual-report) | **[04 · Informe anual](04-annual-report)**<br>7 páginas A4 | **Portada a sangre** (un `Absolute` con `Layer` que tapa el margen y el pie), **índice automático** (`Contents`, con puntos guía, las páginas calculadas por el motor y cada entrada clicable), cifras clave, **gráficos** como imágenes, texto en **dos columnas** con filete, tabla financiera con cabecera y pie, calendario con celdas de varias columnas (`Span`) y secciones que empiezan en página nueva. |
+| [![](04-annual-report/page-1.png)](04-annual-report) | **[04 · Informe anual](04-annual-report)**<br>7 páginas A4 | **Portada a sangre** (un `Absolute` que sale al margen, con el pie fijo solo desde la segunda página: `Pages: not-first`), **índice automático** (`Contents`, con puntos guía, las páginas calculadas por el motor y cada entrada clicable), cifras clave, **gráficos** como imágenes, texto en **dos columnas** con filete, tabla financiera con cabecera y pie, calendario con celdas de varias columnas (`Span`) y secciones que empiezan en página nueva. |
 | [![](05-newsletter/page-1.png)](05-newsletter) | **[05 · Boletín](05-newsletter)**<br>2 páginas A4 | Aire de periódico: cabecera de portada, foto recortada con `Fit: cover`, artículos a **tres columnas** con cortes equilibrados, foto al lado del texto, agenda en tabla y anuncios en una rejilla, y la web de la gaceta en el pie. |
 | [![](06-menu/page-1.png)](06-menu) | **[06 · Carta de restaurante](06-menu)**<br>2 páginas, 420 × 700 | **Tamaño de página propio**, fondo y marco doble con `Fixed` de **`Layer` negativa** (detrás del contenido en todas las páginas), platos con precio en un `Flex`, adornos e imagen centrada. |
 | [![](07-contract/page-1.png)](07-contract) | **[07 · Contrato](07-contract)**<br>3 páginas A4 | Cabecera y pie fijos con rúbricas, `Reunidos` y `Exponen` con numeración romana, doce **cláusulas con tres niveles de numeración** escritas en Markdown, anexo con tabla de honorarios y **bloque de firmas que no se parte**. |
@@ -51,8 +51,13 @@ Open Font License). Los nombres, las empresas y los datos de los documentos son 
 
 Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TODO.md`](../../TODO.md)):
 
-- **Una portada sin cabecera ni pie** se hace con un `Absolute` de `Layer` alta y del tamaño de la
-  página, que tapa lo que repiten los `Fixed`. Funciona, pero es un truco.
+- **Una portada sin cabecera ni pie**: el `Fixed` del pie lleva `Pages: not-first`, y la portada es
+  un `Absolute` del tamaño de la página que ya no necesita `Layer` para tapar nada (ejemplos 04 y
+  09). Lo que sigue siendo un truco es el bloque de 1 pt con `Break: After: page` que fuerza el
+  salto detrás de ella, porque un `Absolute` no ocupa sitio, y que el margen es el de todas las
+  páginas: una portada a sangre sale al margen con un `Offset` negativo. `Pages` también quita el
+  logotipo de la primera hoja del contrato (07), el pie de la primera página de la carta (06) y
+  pone un titulillo corrido desde la segunda página del boletín (05).
 - **El texto con formato** solo se escribe en `Markdown`; en `Text` y `Paragraph` los asteriscos
   son literales. Los ejemplos mezclan los dos según lo que necesitan.
 - **Los espacios se colapsan**: no hay texto preformateado, así que un bloque de terminal con

@@ -4,8 +4,6 @@ Result:
 			Rect: 70 169.5 455 132
 		Fragment: clauses
 			Rect: 70 520.5 455 214
-		Fragment: header
-			Rect: 70 32 455 27.55
 		Fragment: footer
 			Rect: 70 788.5 455 21.5
 	Page: 2

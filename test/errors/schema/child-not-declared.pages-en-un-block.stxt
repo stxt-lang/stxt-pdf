@@ -1,0 +1,13 @@
+# Case: Pages en un Block
+# Code: CHILD_NOT_DECLARED
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Block:
+		Pages: first
+		Text: Hola

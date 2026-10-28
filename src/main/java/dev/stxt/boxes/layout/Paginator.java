@@ -25,8 +25,8 @@ import java.util.Set;
  * {@link BreakToken} de la anterior, hasta que vuelve como {@code null}.
  *
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
- * y se repiten en todas las páginas (ESPECIFICACION.md §5.5). Su containing block es el área
- * útil.</p>
+ * y se repiten en las páginas que dice su {@code Pages}, todas por defecto (ESPECIFICACION.md
+ * §5.5). Su containing block es el área útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
  * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
@@ -103,9 +103,13 @@ public final class Paginator {
         for (LayoutResult r : results) {
             int number = pages.size() + 1;
             List<Fragment> fixedFragments = new ArrayList<>();
-            // Una fixed dentro de otra sale en su resultado y se coloca después.
+            // Una fixed dentro de otra sale en su resultado y se coloca después; solo salen las
+            // que Pages incluye en esta página (§5.5), y no ocupan sitio donde no salen.
             List<PendingAbsolute> queue = new ArrayList<>(fixed.values());
             for (int i = 0; i < queue.size(); i++) {
+                if (!queue.get(i).box().style.pages.includes(number, total)) {
+                    continue;
+                }
                 LayoutResult f = engine.absolute().layOut(queue.get(i), area.width(), area.height(), Insets.ZERO);
                 fixedFragments.add(numbered ? engine.number(f.fragment(), number, total) : f.fragment());
                 queue.addAll(f.pending());
