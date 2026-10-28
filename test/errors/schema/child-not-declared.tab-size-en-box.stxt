@@ -1,0 +1,11 @@
+# Case: Tab size en Box en lugar de en Typography
+# Code: CHILD_NOT_DECLARED
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Tab size: 4

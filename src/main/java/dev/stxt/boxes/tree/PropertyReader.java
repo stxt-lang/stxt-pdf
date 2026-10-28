@@ -101,6 +101,8 @@ final class PropertyReader {
                 case "transform" -> s.transform = enumValue(Style.Transform.class, p);
                 case "letter-spacing" -> s.letterSpacing = signedPoints(p);
                 case "small-caps" -> s.smallCaps = bool(p);
+                case "white-space" -> s.whiteSpace = enumValue(Style.WhiteSpace.class, p);
+                case "tab-size" -> s.tabSize = positiveInteger(p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
                 default -> throw unread(p);

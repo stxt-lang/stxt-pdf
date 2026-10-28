@@ -282,8 +282,10 @@ public final class LineBreaker {
             widths[i] = advance(r.text(), r.format(), measurer, font, s.fontSize, s.letterSpacing);
             natural += widths[i];
         }
-        // El último carácter de la línea no lleva interletraje.
-        natural -= s.letterSpacing;
+        // El último carácter de la línea no lleva interletraje (una línea vacía, de un texto preformateado, no tiene).
+        if (!runs.isEmpty()) {
+            natural -= s.letterSpacing;
+        }
         String text = TextRun.text(runs);
         double x = offset(natural, available, s.textAlign);
         double spacing = wordSpacing(text, natural, available, s.textAlign, !justify);
@@ -360,7 +362,7 @@ public final class LineBreaker {
     }
 
     /** Recorre los tramos hacia delante: las posiciones que se le piden nunca retroceden. */
-    private static final class RunCursor {
+    static final class RunCursor {
         private final List<TextRun> runs;
         private final int[] starts;
         private int run;

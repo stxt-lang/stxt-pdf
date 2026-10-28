@@ -44,6 +44,20 @@ public final class Style {
     /** Transformación de las mayúsculas del texto (§4.4): {@code none}, {@code uppercase}, {@code lowercase} o {@code capitalize}. */
     public enum Transform { NONE, UPPERCASE, LOWERCASE, CAPITALIZE }
 
+    /**
+     * Tratamiento del espacio en blanco (§4.4, §5.4): {@code normal} lo colapsa; {@code pre} conserva
+     * los espacios y los saltos de línea y no parte las líneas; {@code pre-wrap} también, pero parte
+     * las líneas demasiado anchas entre palabras.
+     */
+    public enum WhiteSpace {
+        NORMAL, PRE, PRE_WRAP;
+
+        /** Si conserva los espacios y los saltos de línea del texto. */
+        public boolean preformatted() {
+            return this != NORMAL;
+        }
+    }
+
     public enum Direction { ROW, COLUMN }
 
     /** Reparto en un eje: {@code Main axis} y {@code Lines}. */
@@ -144,6 +158,9 @@ public final class Style {
     /** Separación entre letras, en puntos; puede ser negativa. */
     public double letterSpacing;
     public boolean smallCaps;
+    public WhiteSpace whiteSpace = WhiteSpace.NORMAL;
+    /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
+    public int tabSize = 4;
     /**
      * Configuración regional del texto: la de {@code Language} de {@code Document} (§4.1). No es una
      * propiedad de la caja: la fija el constructor del árbol en la raíz y se hereda.
@@ -274,6 +291,8 @@ public final class Style {
             s.transform = parent.transform;
             s.letterSpacing = parent.letterSpacing;
             s.smallCaps = parent.smallCaps;
+            s.whiteSpace = parent.whiteSpace;
+            s.tabSize = parent.tabSize;
             s.locale = parent.locale;
             s.widows = parent.widows;
             s.orphans = parent.orphans;

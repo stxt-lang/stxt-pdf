@@ -863,6 +863,10 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Small caps
 				Max: 1
+			Child: White space
+				Max: 1
+			Child: Tab size
+				Max: 1
 			Child: Widows
 				Max: 1
 			Child: Orphans
@@ -999,6 +1003,16 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: Small caps
 		Type: BOOLEAN
 		Description: Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Por defecto, false.
+	Node: White space
+		Type: ENUM
+		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio, y una línea en blanco separa párrafos), pre (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o pre-wrap (como pre, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
+		Values:
+			Value: normal
+			Value: pre
+			Value: pre-wrap
+	Node: Tab size
+		Type: INTEGER
+		Description: Con White space pre o pre-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
 	Node: Widows
 		Type: INTEGER
 		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.

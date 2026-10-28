@@ -1,0 +1,18 @@
+# Case: Una línea de un texto con White space: pre más ancha que su caja
+# Code: TEXT_OVERFLOW
+# Line: 18
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Mono
+		Size: 10
+		White space: pre
+	Text:
+		Box:
+			Width: 100
+		Content >>
+			corta
+			una línea que no cabe en cien puntos de ancho

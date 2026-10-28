@@ -1154,3 +1154,50 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      Ningún volcado cambia (el interletraje no cambia el alto de las líneas) y los PNG solo se
      diferencian en los rótulos. «CIF B-…», «Nº» y las siglas se quedan escritos como están. Los
      marcadores del PDF de los encabezados ahora dicen «Experiencia» y no «EXPERIENCIA».
+
+203. **Texto preformateado con una propiedad `White space`** (hito 29, W1): `normal`, `pre` y
+     `pre-wrap` en `Typography`, que se hereda y vale en `Styles`, y actúa en cualquier texto
+     (`Text`, `Paragraph`, `Cell` con valor). Solo esos tres valores de los seis de CSS (sin
+     `nowrap`, `pre-line` ni `break-spaces`). *Dónde:* schema, `tree/Style.WhiteSpace`,
+     `layout/inline/PreformattedText`. *Alternativa:* un elemento `Preformatted`, que no cabría
+     en una `Cell` con valor y no se heredaría.
+
+204. **Todo el texto preformateado es un solo párrafo** (W5): las líneas en blanco son líneas y no
+     separan párrafos, así que las viudas y huérfanas se cuentan sobre el bloque entero y un
+     bloque largo se parte entre líneas como cualquier texto. En CSS no hay párrafos en un `<pre>`
+     y las viudas y huérfanas cuentan líneas del bloque, igual. *Dónde:* `InlineLayout.breakText`.
+     *Alternativa:* un párrafo por línea de origen (no se podría cortar sin violar las viudas).
+
+205. **`pre` no parte y desborda** (W2): una línea más ancha que la caja es `TEXT_OVERFLOW`, con el
+     mensaje de `pre` (sugiere `pre-wrap`); `pre-wrap` parte entre palabras y una palabra más
+     ancha que la caja sigue desbordando, como en el texto normal (en CSS tampoco se parte sin
+     `overflow-wrap`). *Dónde:* `layout/Overflow.textOverflow`. *Alternativa:* recortar, contra la
+     política del §6.
+
+206. **Los espacios del corte de `pre-wrap` se pierden** (CSS los deja colgando): no se ven y así
+     una línea no desborda por culpa de sus espacios finales. La sangría de antes de la primera
+     palabra sí se conserva, y los espacios de dentro de una línea, también. El parser de
+     `stxt-core` ya quita los espacios al final de cada línea de un `Content >>`. *Dónde:*
+     `PreformattedText.wrap`. *Alternativa:* dejarlos colgando (medirlos pero no contarlos).
+
+207. **Las líneas preformateadas no se justifican**: `justify` se trata como `left` en vez de ser
+     un error, porque `Align` se hereda y es normal declararlo en `Document`; un bloque de código
+     heredaría el error. En CSS, `justify` sí justifica un `pre-wrap` (menos la última línea de
+     cada línea de origen). *Dónde:* `InlineLayout.layout`. *Alternativa:* justificar las líneas
+     partidas de `pre-wrap`; error en los dos modos.
+
+208. **`Tab size` es un entero de columnas con tabuladores de columna** (W3, ampliada por el
+     usuario: «una propiedad que diga cuántos espacios, 4 por defecto»): cada tabulación lleva a la
+     siguiente columna múltiplo de `Tab size`, contando caracteres desde el principio de la línea,
+     como `tab-size` de CSS con un entero y como los editores; así `a⇥b` y `abcd⇥e` alinean en una
+     fuente monoespaciada. Por defecto 4 (el de los ficheros STXT) y no 8 (el de CSS). Un valor
+     menor que 1 es `VALUE_NOT_ALLOWED`. *Dónde:* `PreformattedText.sourceLines`. *Alternativa:*
+     sustituir cada tabulación por exactamente `Tab size` espacios.
+
+209. **Un salto de línea final no añade una línea vacía**, y el `\r` se ignora. Un `Content >>` no
+     termina en salto de línea (el parser lo quita), pero el texto de un `Inline: markdown` o el
+     de un `Text` generado sí podría. *Dónde:* `PreformattedText.sourceLines`.
+
+210. **`SvgCanvas` conserva los espacios con `xml:space="preserve"`** cuando un texto tiene dos
+     espacios seguidos o empieza o acaba en espacio; el SVG es de depuración, y los textos
+     normales no cambian. *Dónde:* `paint/SvgCanvas.text`.

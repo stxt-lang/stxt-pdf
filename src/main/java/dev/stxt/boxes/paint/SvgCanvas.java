@@ -77,6 +77,10 @@ public final class SvgCanvas implements Canvas {
                      double wordSpacing, double letterSpacing) {
         String spacing = (wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing))
                 + (letterSpacing == 0 ? "" : String.format(Locale.ROOT, " letter-spacing=\"%.2f\"", letterSpacing));
+        // Un SVG colapsa los espacios: el texto preformateado necesita conservarlos.
+        if (text.contains("  ") || text.startsWith(" ") || text.endsWith(" ")) {
+            spacing += " xml:space=\"preserve\"";
+        }
         String weight = font.weight() == FontWeight.BOLD ? " font-weight=\"bold\"" : "";
         String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,

@@ -1,0 +1,11 @@
+# term 160 × 60 (cinco líneas), tabs 24, wrapped 36 (tres líneas) y plain 12 (ver input.stxt).
+Result:
+	Page: 1
+		Fragment: term
+			Rect: 20 20 160 60
+		Fragment: tabs
+			Rect: 20 80 160 24
+		Fragment: wrapped
+			Rect: 20 104 160 36
+		Fragment: plain
+			Rect: 20 140 160 12

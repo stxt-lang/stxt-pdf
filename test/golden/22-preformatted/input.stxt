@@ -1,0 +1,48 @@
+# Hito 29: texto preformateado (ESPECIFICACION.md §4.4, §5.4). Página de 200 × 200 con márgenes de 20:
+# área útil de 160 × 160 desde (20, 20). Líneas de 12 (Size 10); con las métricas de prueba cada
+# carácter mide 5 pt.
+#   term:    White space pre, cinco líneas del bloque, la cuarta vacía (una línea en blanco es una línea,
+#            no separa párrafos), y una tabulación tras «PE» que lleva a la columna 4. La más larga mide
+#            18 caracteres, 90 pt: cabe y no se parte. 5 × 12 = 60. y = 20.
+#   tabs:    Tab size 8: «a» + tabulación son 8 columnas y «abcdefgh» + tabulación, 16; dos líneas: 24. y = 80.
+#   wrapped: pre-wrap. La primera línea del texto, «  aaaa bbbb cccc dddd eeee ffff gggg hhhh» (42
+#            caracteres), se parte tras «ffff»: la sangría se conserva y las palabras hasta «ffff» son 31
+#            caracteres, 155 pt (con « gggg» serían 36 caracteres, 180). Quedan «gggg hhhh» y la segunda
+#            línea del texto, «corta»: 3 líneas, 36. y = 104.
+#   plain:   sin White space, los espacios se colapsan: una línea de 12. y = 140.
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 200
+		Height: 200
+		Margin: 20
+	Typography:
+		Font: IBM Plex Mono
+		Size: 10
+	Text:
+		Id: term
+		Typography:
+			White space: pre
+		Content >>
+			> Ajustes > Bornes
+			L   230 V   [ OK ]
+			N     0 V   [ OK ]
+
+			PE	tierra
+	Text:
+		Id: tabs
+		Typography:
+			White space: pre
+			Tab size: 8
+		Content >>
+			a	b
+			abcdefgh	x
+	Text:
+		Id: wrapped
+		Typography:
+			White space: pre-wrap
+		Content >>
+			  aaaa bbbb cccc dddd eeee ffff gggg hhhh
+			corta
+	Text: a   b    c
+		Id: plain

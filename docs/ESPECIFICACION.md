@@ -332,6 +332,8 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Transform` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas del texto al pintarlo; `capitalize` pone en mayúscula la primera letra de cada palabra. Las reglas de cada letra son las del idioma de `Language` ([§4.1](#41-media)). Ver [§5.4](#54-texto). |
 | `Letter spacing` | número (puntos) | `0` | Separación entre letras, que se suma al avance de cada carácter; puede ser negativa. Ver [§5.4](#54-texto). |
 | `Small caps` | `true`, `false` | `false` | Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto). |
+| `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Tratamiento del espacio en blanco: con `pre` y `pre-wrap` el texto conserva sus espacios y sus saltos de línea (código, terminales, columnas alineadas). Ver [§5.4](#54-texto). |
+| `Tab size` | entero ≥ 1 | `4` | Con `White space: pre` o `pre-wrap`, las columnas de una tabulación. Ver [§5.4](#54-texto). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 
@@ -671,7 +673,8 @@ Los márgenes de los ítems de flex y grid nunca colapsan.
 El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenido:
 
 - **Espacios.** Las secuencias de espacios y los saltos de línea simples equivalen a un espacio.
-  Una **línea en blanco** separa párrafos y fuerza un salto.
+  Una **línea en blanco** separa párrafos y fuerza un salto. Con `White space: pre` o `pre-wrap`
+  se conservan (más abajo).
 - **Reparto.** Con `Text wrap: auto`, algoritmo voraz: las palabras se añaden a la línea
   mientras quepan. Con `Text wrap: pretty`, **Knuth-Plass**: se eligen los saltos del párrafo
   que minimizan la suma de los deméritos de sus líneas, de modo que las líneas quedan más
@@ -750,6 +753,32 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   ajustes de `TJ` entre los caracteres (las fuentes son Type 0 Identity-H, donde `Tw` y `Tc` no
   sirven), así que el texto sigue siendo seleccionable, aunque un lector puede interpretar una
   separación grande como un espacio; en el SVG, con `letter-spacing`.
+- **Texto preformateado (`White space`).** Por defecto el espacio en blanco se colapsa (arriba).
+  Con `White space: pre` o `pre-wrap` el texto **conserva sus espacios y sus saltos de línea**,
+  como un `<pre>`: cada línea del texto es una línea de la caja, también las vacías (una línea en
+  blanco **no** separa párrafos), y el texto entero cuenta como un solo párrafo para las viudas y
+  huérfanas ([§5.10](#510-fragmentación)), así que un bloque largo se parte entre líneas como
+  cualquier texto. Es una propiedad de `Typography`: **se hereda** y vale en `Styles`, y actúa en
+  un `Text`, un `Paragraph` y una `Cell` con texto; lo normal es dar al bloque una fuente
+  monoespaciada y escribirlo en un `Content >>`, que conserva la sangría relativa de sus líneas
+  (no los espacios al final de una línea ni las líneas en blanco al final del bloque, que el parser
+  quita). Un salto de línea al final del texto no añade una línea vacía.
+  - **`pre`** no parte las líneas: una más ancha que la caja de contenido es un error
+    (`TEXT_OVERFLOW`, con la línea del documento donde está, y el mensaje sugiere `pre-wrap`).
+  - **`pre-wrap`** parte las líneas demasiado anchas **entre palabras**, con el algoritmo voraz de
+    siempre; los espacios de antes de la primera palabra (la sangría) se conservan y los del corte
+    se pierden, porque no se ven. Una palabra más ancha que la caja sigue siendo un error.
+  - **Tabulaciones (`Tab size`).** Cada tabulación se sustituye por los espacios que llevan hasta
+    la siguiente columna múltiplo de `Tab size`, contando los caracteres desde el principio de la
+    línea (con `Tab size: 4`, `a⇥b` es `a   b` y `abcd⇥e`, `abcd    e`), de modo que las columnas
+    alinean con una fuente monoespaciada. Un tramo con formato no cambia la cuenta.
+  - **Alineación.** Las líneas preformateadas **no se justifican** (`justify` se trata como
+    `left`: el espaciado es el del texto); `right` y `center` alinean cada línea por separado.
+  - **Tamaños intrínsecos.** Con `pre`, min-content y max-content son la línea más ancha; con
+    `pre-wrap`, min-content es la palabra más ancha y max-content, la línea más ancha.
+  - `Transform`, `Letter spacing`, los tramos, `{page}` y las referencias funcionan como siempre.
+    Con `Inline: markdown` el texto se interpreta primero (los saltos de línea simples de un
+    párrafo valen un espacio, así que las líneas que se conservan son las de los párrafos).
 - **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
   espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
   los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
@@ -1170,7 +1199,7 @@ variable o dos ficheros con la misma familia, peso y estilo.
 **Nada puede desbordar.** Después de maquetar y paginar, el motor comprueba el resultado y da
 un error con la primera de estas situaciones:
 
-- **una palabra más ancha que su línea** (`TEXT_OVERFLOW`), en la línea del documento donde
+- **una palabra más ancha que su línea, o una línea de un texto con `White space: pre` más ancha que su caja** (`TEXT_OVERFLOW`), en la línea del documento donde
   está la palabra;
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus
   márgenes horizontales (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo
@@ -1914,7 +1943,7 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -1968,7 +1997,7 @@ La validación se hace en cuatro niveles:
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
-| `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
+| `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute` y `Fixed` en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
@@ -2033,6 +2062,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Kerning y ligaduras | Sí | No |
 | Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color. Se escriben con Markdown en línea, solo donde se pide con `Inline: markdown`; sin ello el texto es literal ([§5.4](#54-texto)) |
 | `text-transform`, `letter-spacing`, `font-variant: small-caps` | `text-transform` también con `full-width`; el interletraje en cualquier unidad, también tras el último carácter; las versalitas con la característica `smcp` de la fuente | `Transform` con `none`, `uppercase`, `lowercase` y `capitalize`, y las reglas del idioma de `Language` (obligatorio); `Letter spacing` solo en puntos y sin interletraje tras el último carácter de la línea; `Small caps` sintetizadas con mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto) |
+| `white-space`, `tab-size` | `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line` y `break-spaces`; `tab-size` también como longitud | `White space` con `normal`, `pre` y `pre-wrap`; `pre` no parte las líneas y una más ancha que la caja es un error (`TEXT_OVERFLOW`); las líneas preformateadas no se justifican; los espacios del corte de `pre-wrap` se pierden; las tabulaciones, a la siguiente columna múltiplo de `Tab size` (por defecto 4, no 8). Ver [§5.4](#54-texto) |
 | `text-decoration` | Estilos (`wavy`, `dotted`…), color, grosor y desplazamiento propios; el subrayado se interrumpe en los descendentes (`text-decoration-skip-ink`) | Una raya continua del color del texto, con la posición y el grosor de la fuente |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
@@ -2132,7 +2162,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Widows`, `Orphans` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
@@ -2313,5 +2343,6 @@ Document (dev.stxt.boxes):
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado y enlace) ([§5.4](#54-texto)). |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([§5.4](#54-texto)). |
+| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`, [§5.4](#54-texto)). |
 | **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`, [§5.4](#54-texto)). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

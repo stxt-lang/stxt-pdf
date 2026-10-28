@@ -144,10 +144,17 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     private Broken breakText(Box box, double available) {
         Style s = box.style;
-        List<List<LineBreaker.Line>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(runs(box), available, measurer, s.fontFace(), s.fontSize, s.letterSpacing,
-                        s.textWrap)
-                : List.of();
+        List<List<LineBreaker.Line>> paragraphs;
+        if (!box.hasText()) {
+            paragraphs = List.of();
+        } else if (s.whiteSpace.preformatted()) {
+            // Todo el texto es un solo párrafo: las líneas en blanco no lo separan.
+            paragraphs = List.of(PreformattedText.lines(runs(box), s.tabSize, s.whiteSpace == Style.WhiteSpace.PRE_WRAP,
+                    available, measurer, s.fontFace(), s.fontSize, s.letterSpacing));
+        } else {
+            paragraphs = LineBreaker.breakParagraphs(runs(box), available, measurer, s.fontFace(), s.fontSize,
+                    s.letterSpacing, s.textWrap);
+        }
         List<LineBreaker.Line> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
         for (int p = 0; p < paragraphs.size(); p++) {
@@ -159,11 +166,15 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        IntrinsicSizes content = box.hasText()
-                ? LineBreaker.intrinsics(runs(box), measurer, box.style.fontFace(), box.style.fontSize,
-                        box.style.letterSpacing)
-                : IntrinsicSizes.ZERO;
-        return content;
+        Style s = box.style;
+        if (!box.hasText()) {
+            return IntrinsicSizes.ZERO;
+        }
+        if (s.whiteSpace.preformatted()) {
+            return PreformattedText.intrinsics(runs(box), s.tabSize, s.whiteSpace == Style.WhiteSpace.PRE_WRAP,
+                    measurer, s.fontFace(), s.fontSize, s.letterSpacing);
+        }
+        return LineBreaker.intrinsics(runs(box), measurer, s.fontFace(), s.fontSize, s.letterSpacing);
     }
 
     @Override
@@ -198,7 +209,8 @@ public final class InlineLayout implements LayoutAlgorithm {
             while (paragraphEnds[paragraph] <= j) {
                 paragraph++;
             }
-            boolean justify = j != paragraphEnds[paragraph] - 1;
+            // Las líneas preformateadas no se justifican.
+            boolean justify = !s.whiteSpace.preformatted() && j != paragraphEnds[paragraph] - 1;
             lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, available, justify, lines.size() * lineHeight,
                     lineHeight));
         }
