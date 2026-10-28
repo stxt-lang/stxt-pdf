@@ -1,27 +1,13 @@
 # Ideas varias
 
-- H1,.., H6
 - Mover src/test/resources a test/, con una carpeta por documento, y muchos casos de prueba con documentos completos
-- Columnas para texto en línea
-- Estilos separados para tener algo así:
-   Style:
-   		Elem: h1
-   			Typography
-   			...
-   		Id: xxxx
-   			Typography
-   			Box
-   			
-- Que pasa con tablas? Que tengan header y footer, etc.
-- ~~Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...~~ Hecho: elemento `Image` (hito 18).
 - Cambiar de src/test/resources a test
 - Muchos más ejemplos y pruebas de uso
-- Httpservice para probar, que se pueda ejecutar en maven, etc. 
-- Un docker para esto
-- Refactor de código
+- Float? Algo más que haga falta?
+- Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - Revisar ThreadSafe
 - Revisar rendimiento
-- ~~Falta nodo con markdown. Qué estrategia hacer, etc.~~ Hecho: elemento `Markdown` (hitos 16 y 17).
+- Httpservice para probar, que se pueda ejecutar en maven, etc. 
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
-- ...
+- Un docker para esto
