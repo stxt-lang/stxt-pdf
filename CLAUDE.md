@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 27 y el 29 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 29 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -82,10 +82,11 @@ actualízala.
 
 | 27 | ~~Mayúsculas, interletraje y versalitas: `Transform`, `Letter spacing` y `Small caps` en `Typography` (se heredan); `Language` obligatorio~~ (hecho; caso 20) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/TextTransform`, `layout/inline/LineBreaker`, `model/TextFormat`, `paint/PdfCanvas`, `paint/PdfStructure` |
 
+| 28 | ~~Aspecto de las cajas: `Radius` (esquinas redondeadas, 1 a 4 valores), `Border color` de 1 a 4 colores, `Background` con `linear(ángulo, color…)` y colores con opacidad (`#RGBA`, `#RRGGBBAA`); sin sombras~~ (hecho; caso 21) | schema, `model/Colors`, `model/Corners`, `model/Radii`, `model/Paint`, `tree/Style`, `tree/ValueReader`, `paint/Shapes`, `paint/StackingContext`, `paint/PdfCanvas`, `paint/SvgCanvas` |
+
 | 29 | ~~Texto preformateado y código: `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography` (se heredan); `Code font` en `Markdown` para el código en línea y los bloques de código~~ (hecho; caso 22) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/PreformattedText`, `layout/inline/InlineLayout`, `layout/Overflow`, `tree/MarkdownBuilder`, `model/TextFormat`, `layout/inline/PdfMetrics` |
 
-Los hitos 28, 30 y 31 (aspecto
-de las cajas, rotación y SVG) están pendientes en
+Los hitos 30 y 31 (rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -104,14 +105,14 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
+| `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `ResourceException` e `ImageFormatException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
@@ -298,6 +299,21 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   de la caja, la misma de los marcadores) y `PdfStructure.link` cuelga un `Link` con su `OBJR`
   del elemento de la caja, salvo en un `Fixed` y en las filas repetidas de una tabla, que no son
   contenido (la anotación se escribe igualmente). El SVG no pinta enlaces.
+- **Aspecto de las cajas (§5.6):** `Radius`, `Border color` (de 1 a 4 colores: `Style.borderColor` es un
+  `Sides<String>`, `null` = el `Color` del texto) y `Background` (un `Paint`: `Solid` o `Linear`) solo cambian
+  el pintado; el layout no los lee. Los colores siguen siendo texto (`#RRGGBBAA`, `Colors` los valida y los
+  pasa a componentes). `StackingContext` resuelve los radios de cada fragmento (`Radii.resolve` sobre su
+  caja de borde; con `Decoration: slice`, `forFragment(first, last)` deja solo las esquinas de su lado) y
+  llama a `Canvas.fill` (el fondo, con `radii.inset(borde)`), `Canvas.border` (un color por lado, ya
+  resuelto) e `image` (con los radios de la caja de contenido); `Canvas.background(Rect, String)` queda para
+  los rectángulos lisos (guías, líneas entre columnas, rayas del texto). `Shapes` da el camino de una caja
+  redondeada (cuartos de elipse como Bézier) y el trapecio de cada lado del borde, cuyas diagonales siguen
+  hacia dentro cuando la curva de dentro es redonda. `PdfCanvas`: un borde liso, opaco y de esquinas
+  cuadradas son cuatro rectángulos (como antes de `Radius`; no cambia ningún PNG); si no, un anillo
+  par-impar, recortado a cada trapecio con colores distintos. El degradado es un sombreado axial recortado
+  a la caja (`gradient`), con una máscara suave de luminosidad si algún color no es opaco; la opacidad de un
+  color liso, un estado gráfico `ca` (`painting`). `SvgCanvas` escribe `<path>`, `linearGradient` y
+  `clipPath`, y deja `<rect>` lo liso y cuadrado.
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.

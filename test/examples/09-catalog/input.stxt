@@ -94,6 +94,7 @@ Document (dev.stxt.boxes):
 				Margin: 0 0 16 0
 		For class: card
 			Box:
+				Radius: 6
 				Background: #FBF8F3
 				Border: 0.5
 				Border color: #E6DAC6
@@ -127,6 +128,7 @@ Document (dev.stxt.boxes):
 				Transform: uppercase
 				Letter spacing: 0.8
 			Box:
+				Radius: 3
 				Background: #B5651D
 				Padding: 3 7
 		Element: Head cell
@@ -278,6 +280,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -314,6 +317,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -350,6 +354,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 						Absolute:
 							Offset: 10 auto auto 10
 							Class: new
@@ -390,6 +395,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -438,6 +444,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -474,6 +481,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -510,6 +518,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 					Block:
 						Class: body
 						Flex:
@@ -546,6 +555,7 @@ Document (dev.stxt.boxes):
 							Box:
 								Width: 100%
 								Height: 205
+								Radius: 5.5 5.5 0 0
 						Absolute:
 							Offset: 10 auto auto 10
 							Class: new

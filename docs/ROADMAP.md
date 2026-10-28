@@ -46,13 +46,13 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | hecho | 18 |
 | 26 | Formato dentro de la línea fuera de Markdown | hecho | 19 |
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | hecho | 20 |
-| 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
+| 28 | Aspecto de las cajas: esquinas, color de borde por lado, degradados y opacidad (sin sombras) | hecho | 21 |
 | 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 27 y el 29, el 2026-10-28. Los hitos
-28, 30 y 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 29, el 2026-10-28 (el 28, el 2026-10-28
+también, en otra sesión). Los hitos 30 y 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -955,11 +955,11 @@ Typography:
 
 ---
 
-## Hito 28: aspecto de las cajas — esquinas, bordes, sombras y degradados
+## Hito 28: aspecto de las cajas — esquinas, bordes, degradados y opacidad
 
 **Objetivo.** Lo que hace que un documento deje de parecer «de rectángulos»: esquinas
-redondeadas, un color de borde por lado, sombras y degradados. Es el hito más caro, porque
-toca el pintado en PDF.
+redondeadas, un color de borde por lado y degradados. Es el hito más caro, porque toca el
+pintado en PDF. *Resultado: se hizo todo menos las sombras (A3).*
 
 **Qué se echó en falta.**
 
@@ -978,44 +978,63 @@ toca el pintado en PDF.
 - **Ejemplos 01, 04, 07 y 08:** un borde de un solo lado con **otro color** que el resto (la
   franja de color a la izquierda de un aviso) hoy solo se consigue con `Border: 0 0 0 3`.
 
-**Sintaxis (propuesta).**
+**Sintaxis.**
 
 ```
 Box:
 	Radius: 8
 	Border: 0 0 0 3
 	Border color: #E9A23B #E9A23B #E9A23B #B5651D
-	Shadow: 0 2 6 #00000033
 	Background: linear(180, #12315A00, #12315A)
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **A1. `Radius`.** *Propuesta:* en `Box`, de 1 a 4 valores (número o `%`; `50%` hace un
-      círculo o una elipse), que redondea el fondo, el borde y el recorte de lo que lleva
-      dentro (una `Image`). Es solo pintado: no cambia el layout. *Alternativa:* un solo
-      valor.
-- [ ] **A2. Color de borde por lado.** *Propuesta:* `Border color` admite de 1 a 4 colores,
-      como `Border`. *Alternativa:* propiedades `Border top color`….
-- [ ] **A3. Sombras.** *Propuesta:* `Shadow: x y desenfoque color`, una sola y solo exterior,
-      como aproximación con capas semitransparentes en PDF (PDFBox no tiene desenfoque).
-      *Alternativa:* no hacerlas; son lo más caro y lo que menos aporta.
-- [ ] **A4. Degradados.** *Propuesta:* `Background` admite `linear(ángulo, color, color…)`
-      (sombreado axial de PDF) y nada más; sin radiales ni repetidos. *Alternativa:* solo
-      dos colores.
-- [ ] **A5. Transparencia.** *Propuesta:* los colores admiten `#RRGGBBAA` (hoy no), que hace
-      falta para las sombras y el degradado hacia transparente. *Alternativa:* una propiedad
-      `Opacity`.
-- [ ] **A6. SVG de depuración.** *Propuesta:* lo mismo, con `rx` y `linearGradient`;
-      las sombras, con un filtro.
+**Decisiones tomadas** (2026-10-28, con un cuestionario; A1, A2 y A4 con la propuesta, A3 con la
+alternativa y A5 y A6 por defecto; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md),
+216–225):
+
+- [x] A1. **`Radius`** en `Box`, de 1 a 4 valores (número o %; `50%` hace un círculo o una elipse), que
+      redondea el fondo, el borde y el recorte de una `Image`. Solo pintado.
+- [x] A2. **Color de borde por lado:** `Border color` admite de 1 a 4 colores, como `Border`.
+- [x] A3. **Sombras:** *no se hacen* (la alternativa): son lo más caro y lo que menos aporta. Quedan en
+      `TODO.md`.
+- [x] A4. **Degradados:** `Background` admite `linear(ángulo, color, color…)` (sombreado axial de PDF) y
+      nada más; sin radiales ni repetidos.
+- [x] A5. **Transparencia:** los colores admiten `#RGBA` y `#RRGGBBAA`, que hacen falta para el degradado
+      hacia transparente (y valen también para el texto).
+- [x] A6. **SVG de depuración:** lo mismo, con `<path>`, `linearGradient` y `clipPath`.
+
+**Diseño técnico** (como quedó):
+
+- **Modelo.** `model/Colors` (colores y su opacidad), `model/Corners` y `model/Radii` (el abreviado por
+  esquina y los radios resueltos: porcentajes, reducción si no caben, `inset` hacia dentro y
+  `forFragment` para cajas partidas) y `model/Paint` (`Solid` o `Linear`, con la línea del degradado).
+  `Style.background` es un `Paint`, `Style.borderColor` un `Sides<String>` y `Style.radius` un `Corners<Value>`.
+- **Lectura.** `ValueReader.paint`, `radius` y `colorSides`; el schema tiene `Radius` en `Box`.
+  Sin códigos de error nuevos: todo es `VALUE_SYNTAX` o `VALUE_NOT_ALLOWED`, con nueve casos en
+  `test/errors/values/`.
+- **Pintado.** `StackingContext` resuelve los radios del fragmento y llama a `Canvas.fill`, `border` e
+  `image`, que reciben los radios. `paint/Shapes` da los caminos (cuartos de elipse como Bézier y el
+  trapecio de cada lado del borde, con las diagonales hacia dentro cuando la curva de dentro es redonda).
+  `PdfCanvas` rellena el anillo del borde con la regla par-impar (recortado a cada trapecio con colores
+  distintos), el degradado es un sombreado axial recortado (con una máscara suave de luminosidad si hay
+  opacidad) y la opacidad de un color, un estado gráfico `ca`. `SvgCanvas` escribe lo mismo con `<path>`,
+  `linearGradient` y `clipPath`.
+- **Sin cambios en los PNG existentes.** Un borde liso, opaco y cuadrado se pinta como antes, con cuatro
+  rectángulos (decisión 223).
 
 **Tareas:**
 
-- [ ] Resolver A1–A6.
-- [ ] Schema, `Style`, `Canvas`, `StackingContext`, `PdfCanvas` y `SvgCanvas`.
-- [ ] Especificación (§4.3, §5.6, §8), tests (incluido el PNG de un caso golden) y caso
-      golden `21-box-looks`.
-- [ ] Ejemplos 01, 03, 04, 06, 08, 09, 10 y 11 con lo nuevo (ver arriba).
+- [x] Resolver A1–A6 (2026-10-28).
+- [x] Schema (`Radius`, descripciones de `Border color` y `Background`), `Style`, `ValueReader`.
+- [x] `Canvas`, `StackingContext`, `Shapes`, `PdfCanvas` y `SvgCanvas`.
+- [x] Especificación (§3.3, §3.4, §4.3, §5.6, §6, §8, §9 y glosario), `DECISIONES.md` (216–225).
+- [x] Tests: `ColorsTest`, `RadiiTest`, `PaintTest`, `BoxLooksTest`, `ShapesTest`, `StackingContextTest`,
+      `BoxLooksPaintTest` (píxeles del PDF renderizado y texto del SVG), nueve casos de error y el caso
+      golden `21-box-looks` (calculado a mano; pasó a la primera).
+- [x] Ejemplos 01, 03, 04, 06, 08, 09, 10 y 11 con lo nuevo (decisión 225); `test/examples/README.md`,
+      `TODO.md`, README y `CLAUDE.md`.
 
 ---
 
@@ -1193,6 +1212,21 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (14).** Hito 28 terminado. Resueltas A1–A6 con un cuestionario (A1, A2 y A4 con la propuesta;
+  A3, sin sombras; A5 y A6 por defecto). `Radius` (1 a 4 valores, número o %), `Border color` de 1 a 4
+  colores con las uniones en diagonal, `Background` con `linear(ángulo, color…)` y colores con opacidad
+  (`#RGBA`, `#RRGGBBAA`, también en el texto). `PdfCanvas`: curvas de Bézier, anillo par-impar, sombreado
+  axial y máscara suave de luminosidad para el degradado con transparencia; `SvgCanvas` con `<path>`,
+  `linearGradient` y `clipPath`. Al mirar el PNG del caso golden salió un fallo: con el borde de colores
+  distintos y la curva de dentro redonda quedaba una cuña en blanco en cada esquina (los trapecios llegaban
+  solo a la esquina de relleno); las diagonales siguen ahora hacia dentro y un test de píxeles lo vigila.
+  El borde liso, opaco y cuadrado se pinta como antes para no mover ningún PNG existente. Nueve casos en el
+  catálogo, siete clases de tests nuevas y el caso golden `21-box-looks`. Ocho ejemplos reescritos (solo
+  cambia el volcado del 04, por la caja `cover-fade`). Decisiones 216–225 de `DECISIONES.md`.
+  `mvn test` en verde.
+  *Siguiente paso:* hito 30 (rotación y orientación de la página) o 31 (SVG), en otra sesión; resolver sus
+  decisiones con el usuario antes de escribir código. Quedó fuera del 28: las sombras, los degradados con
+  paradas, radiales o repetidos y los dos radios por esquina (`TODO.md`).
 - **2026-10-28 (13).** Hito 29 terminado, en tres commits. Resueltas W1–W5 con un cuestionario (todas las
   propuestas, y W3 ampliada por el usuario: una propiedad `Tab size` con 4 por defecto, que se tradujo en
   tabuladores de columna). `White space` (`normal`, `pre`, `pre-wrap`) y `Tab size` en `Typography`:

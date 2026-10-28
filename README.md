@@ -84,7 +84,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 27 y el 29 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 29 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -128,6 +128,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 27 y el 29 está
 | Referencias a otras cajas en el texto: `{page of: id}` (la página donde empieza la caja, resuelta paginando hasta que converja) y `{number of: id}` (el número de un ítem de una lista numerada) | Hecho y probado |
 | Índice automático (`Contents`): una entrada por encabezado de los niveles de `Levels` (también los de un `Markdown`), con título, guía (`dots`, `rule`, `none`) y página; se estila con `Element: Contents entry 1`…`6`; `TOC` y `TOCI` en el PDF etiquetado | Hecho y probado |
 | Enlaces: `Link` en una caja (URL `https`, `http` o `mailto`, o `#id` de otra caja) y `[texto](destino)` en Markdown; anotaciones del PDF y `Link` en el PDF etiquetado; las entradas de un índice llevan a su encabezado | Hecho y probado |
+| Aspecto de las cajas: esquinas redondeadas (`Radius`, de 1 a 4 valores, número o %), un color de borde por lado con las uniones en diagonal, degradados lineales en `Background` y colores con opacidad; el PDF usa curvas, sombreados axiales y máscaras suaves | Hecho y probado |
 | Ejemplos de documentos completos (`test/examples/`): once documentos con una imagen por página versionada, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
@@ -174,7 +175,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 25. ~~**Estilo de las tablas.** Reglas `Element` por posición (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` en `Styles` y `Column align` en la `Table`, sin repetir una clase en cada celda; también en las tablas de Markdown (caso 18).~~ Hecho.
 26. ~~**Formato dentro de la línea fuera de Markdown.** Propiedad `Inline: markdown` en `Typography` (se hereda): negrita, cursiva, subrayado, tachado y enlaces dentro de un `Text`, un `Paragraph` o una `Cell`, con los escapes de CommonMark (caso 19).~~ Hecho.
 27. ~~**Texto:** mayúsculas automáticas (`Transform`), interletraje (`Letter spacing`) y versalitas (`Small caps`), propiedades de `Typography` que se heredan; `Language` pasa a ser obligatorio en `Document` (caso 20).~~ Hecho.
-28. **Aspecto de las cajas:** esquinas, bordes, sombras y degradados. Pendiente.
+28. ~~**Aspecto de las cajas.** `Radius` (esquinas redondeadas, también el recorte de una `Image`), `Border color` con un color por lado, degradados lineales en `Background` (`linear(ángulo, color, color…)`) y colores con opacidad (`#RGBA`, `#RRGGBBAA`); sin sombras (caso 21).~~ Hecho.
 29. ~~**Texto preformateado y código.** `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography`, y `Code font` en `Markdown` para el código en línea y los bloques de código (caso 22).~~ Hecho.
 30. **Rotación y orientación de la página.** Pendiente.
 31. **Imágenes vectoriales (SVG).** Pendiente.
@@ -190,7 +191,7 @@ Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics, DecorationMetrics,
                 FontFace, FontWeight, FontStyle, TextFormat, TextRun, Reference, GridAreas, Area,
-                Cell, Tolerance
+                Cell, Tolerance, Colors, Corners, Radii, Paint
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ImageLibrary, ImageFile, ResourceException,
                 ImageFormatException

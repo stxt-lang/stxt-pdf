@@ -64,6 +64,7 @@ Document (dev.stxt.boxes):
 			Box:
 				Width: 14
 				Height: 14
+				Radius: 50%
 				Background: #A8782F
 		For class: line
 			Box:

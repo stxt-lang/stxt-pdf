@@ -189,6 +189,12 @@ Document (dev.stxt.boxes):
 			Id: cover-photo
 			Box:
 				Width: 100%
+		Absolute:
+			Id: cover-fade
+			Offset: 250 0 auto 0
+			Box:
+				Height: 90
+				Background: linear(180, #12315A00, #12315A)
 		Block:
 			Box:
 				Padding: 36 56 0 56

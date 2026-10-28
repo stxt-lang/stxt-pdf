@@ -27,6 +27,7 @@ Document (dev.stxt.boxes):
 		Element: Cell
 			Box:
 				Padding: 14 6
+				Radius: 5
 			Typography:
 				Align: center
 		Element: Fixed

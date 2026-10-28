@@ -71,6 +71,7 @@ Document (dev.stxt.boxes):
 		Offset: -30 -34 -32 -34
 		Layer: -1
 		Box:
+			Radius: 10
 			Border: 1.2
 			Border color: #14365C
 	Fixed:
@@ -78,6 +79,7 @@ Document (dev.stxt.boxes):
 		Offset: -24 -28 -26 -28
 		Layer: -1
 		Box:
+			Radius: 4
 			Border: 0.5
 			Border color: #A8782F
 	Fixed:
@@ -370,6 +372,7 @@ Document (dev.stxt.boxes):
 			Box:
 				Margin: 18 0 12 0
 				Padding: 14 16
+				Radius: 6
 				Border: 1.2
 				Border color: #14365C
 				Background: #FFFFFF

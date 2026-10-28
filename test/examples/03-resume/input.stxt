@@ -60,11 +60,13 @@ Document (dev.stxt.boxes):
 		For class: track
 			Box:
 				Height: 3
+				Radius: 1.5
 				Background: #2F7370
 				Margin: 3 0 9 0
 		For class: fill
 			Box:
 				Height: 3
+				Radius: 1.5
 				Background: #FFFFFF
 		For class: dates
 			Typography:
@@ -103,6 +105,7 @@ Document (dev.stxt.boxes):
 					Alt: Retrato de Marta Ferrer
 					Box:
 						Width: 100%
+						Radius: 50%
 						Margin: 0 0 4 0
 				Text: Contacto
 					Class: side-title

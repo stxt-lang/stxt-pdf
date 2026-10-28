@@ -68,8 +68,13 @@
   `Even row cell`, `For column` y `Column align`). Queda que una fila no tiene `Box` y que no se
   puede dar estilo a una fila concreta sin tocar cada una de sus celdas (el pie de totales de la
   factura sigue necesitando `Class: total` en las dos celdas de la fila).
-- **Aspecto de las cajas**: no hay esquinas redondeadas, sombras, degradados, ni un `Border color`
-  distinto por lado. Los ejemplos se arreglan con rectángulos, filetes y fondos planos.
+- ~~**Aspecto de las cajas**~~ (hito 28: `Radius`, `Border color` por lado, `Background` con `linear(…)` y
+  colores con opacidad). Queda: **sombras** (`Shadow`, descartadas en el hito: PDFBox no desenfoca y habría que
+  aproximar con capas), degradados con paradas con posición, radiales o repetidos, y dos radios por esquina
+  (`10 / 20`: la elipse se pide con %). Un recorte con `Radius` no se aplica a los hijos que no son una
+  `Image` (no hay `overflow`: un hijo con fondo en la esquina de una caja redondeada se sale de la curva, y
+  hay que redondear también al hijo, como las fotos de las fichas del catálogo). Los radios en % de una caja
+  partida se calculan sobre cada fragmento.
 - ~~**Texto**: interletraje, versalitas y `text-transform`~~ (hito 27: `Transform`, `Letter spacing` y
   `Small caps`). Queda que las versalitas son sintetizadas (mayúsculas al 80 %, no la característica
   `smcp` de la fuente) y que el texto con interletraje grande puede extraerse del PDF con espacios

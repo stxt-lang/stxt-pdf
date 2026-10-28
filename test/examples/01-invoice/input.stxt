@@ -29,6 +29,7 @@ Document (dev.stxt.boxes):
 		For class: party
 			Box:
 				Padding: 12 14
+				Radius: 0 6 6 0
 				Border: 0 0 0 2.5
 				Border color: #B5651D
 				Background: #F8F3EA

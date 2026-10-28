@@ -6,6 +6,8 @@ Result:
 			Rect: 0 0 595 842
 			Fragment: cover-photo
 				Rect: 0 0 595 340
+			Fragment: cover-fade
+				Rect: 0 250 595 90
 	Page: 2
 		Fragment: contents
 			Rect: 56 56 483 229
