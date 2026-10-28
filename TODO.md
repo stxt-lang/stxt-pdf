@@ -1,8 +1,5 @@
 # Ideas varias
 
-- Mover src/test/resources a test/, con una carpeta por documento, y muchos casos de prueba con documentos completos
-- Cambiar de src/test/resources a test
-- Muchos más ejemplos y pruebas de uso
 - Float? Algo más que haga falta?
 - Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - Revisar ThreadSafe

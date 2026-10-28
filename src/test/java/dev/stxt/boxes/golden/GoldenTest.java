@@ -22,7 +22,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +41,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * volcado no tiene namespace y se lee sin validación.
  *
  * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/} y, en su propia
- * carpeta de {@code src/test/resources/golden/}, el PDF y una imagen por página (ver
+ * carpeta de {@code test/golden/}, el PDF y una imagen por página (ver
  * {@link #writePdfAndImages}).</p>
  */
 class GoldenTest {
@@ -50,7 +49,7 @@ class GoldenTest {
     private static final double TOLERANCE = 0.01;
     private static final Path SVG_DIR = Path.of("target", "golden-svg");
     /** Carpeta de los casos en el código fuente, donde se escriben el PDF y sus imágenes. */
-    private static final Path SOURCE_DIR = Path.of("src", "test", "resources", "golden");
+    private static final Path SOURCE_DIR = Path.of("test", "golden");
     private static final float IMAGE_DPI = 100;
     private static final Pattern PAGE_IMAGE = Pattern.compile("page-(\\d+)\\.png");
     /**
@@ -67,8 +66,8 @@ class GoldenTest {
     private final DocumentReader reader = new DocumentReader();
 
     @TestFactory
-    Stream<DynamicTest> cases() throws IOException, URISyntaxException {
-        Path root = Path.of(getClass().getResource("/golden").toURI());
+    Stream<DynamicTest> cases() throws IOException {
+        Path root = Path.of("test", "golden");
         try (Stream<Path> dirs = Files.list(root)) {
             List<Path> cases = dirs.filter(Files::isDirectory).sorted().toList();
             return cases.stream().map(dir -> DynamicTest.dynamicTest(dir.getFileName().toString(), () -> {

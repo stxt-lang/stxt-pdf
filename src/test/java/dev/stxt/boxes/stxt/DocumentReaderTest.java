@@ -38,21 +38,21 @@ class DocumentReaderTest {
     @Test
     void examplesValidateAgainstTheSchema() {
         for (String file : new String[] {
-                "src/test/resources/examples/report.stxt",
-                "src/test/resources/golden/01-block-flow/input.stxt",
-                "src/test/resources/golden/02-flex-grow/input.stxt",
-                "src/test/resources/golden/03-positioning/input.stxt",
-                "src/test/resources/golden/04-grid/input.stxt",
-                "src/test/resources/golden/05-report/input.stxt",
-                "src/test/resources/golden/06-pagination/input.stxt",
-                "src/test/resources/golden/07-parallel-clone/input.stxt",
-                "src/test/resources/golden/08-styles/input.stxt",
-                "src/test/resources/golden/09-headings/input.stxt",
-                "src/test/resources/golden/10-lists/input.stxt",
-                "src/test/resources/golden/11-tables/input.stxt",
-                "src/test/resources/golden/12-multicol/input.stxt",
-                "src/test/resources/golden/13-markdown/input.stxt",
-                "src/test/resources/golden/14-images/input.stxt"}) {
+                "test/examples/report.stxt",
+                "test/golden/01-block-flow/input.stxt",
+                "test/golden/02-flex-grow/input.stxt",
+                "test/golden/03-positioning/input.stxt",
+                "test/golden/04-grid/input.stxt",
+                "test/golden/05-report/input.stxt",
+                "test/golden/06-pagination/input.stxt",
+                "test/golden/07-parallel-clone/input.stxt",
+                "test/golden/08-styles/input.stxt",
+                "test/golden/09-headings/input.stxt",
+                "test/golden/10-lists/input.stxt",
+                "test/golden/11-tables/input.stxt",
+                "test/golden/12-multicol/input.stxt",
+                "test/golden/13-markdown/input.stxt",
+                "test/golden/14-images/input.stxt"}) {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }

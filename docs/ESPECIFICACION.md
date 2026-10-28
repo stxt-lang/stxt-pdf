@@ -1691,7 +1691,7 @@ La validación se hace en cuatro niveles:
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
 
-**Catálogo de errores.** [`src/test/resources/errors/errors.stxt`](../src/test/resources/errors/errors.stxt)
+**Catálogo de errores.** [`test/errors/errors.stxt`](../test/errors/errors.stxt)
 tiene un documento de ejemplo por regla, con el código y la línea que debe dar.
 
 ---
@@ -1874,7 +1874,7 @@ acorta a `Wrap`, que ya es de `Flex`.
 
 ## 10. Ejemplo completo
 
-Fichero: [`src/test/resources/examples/report.stxt`](../src/test/resources/examples/report.stxt).
+Fichero: [`test/examples/report.stxt`](../test/examples/report.stxt).
 
 ```
 Document (dev.stxt.boxes):

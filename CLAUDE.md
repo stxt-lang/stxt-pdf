@@ -22,7 +22,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
   terminadas y solo quedan en el historial de git.
 - **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
   (si difiere del resumen del §9 de la especificación, manda el fichero)
-- **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
+- **Documento de ejemplo:** [`test/examples/report.stxt`](test/examples/report.stxt)
 
 ## Comandos
 
@@ -331,13 +331,13 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   errores.
 - **Medidas de rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` (el `pom.xml`
   excluye el grupo); se ejecutan con `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=…`.
-- **Catálogo de errores** (`errors/ErrorCatalogTest`): `src/test/resources/errors/errors.stxt`
+- **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/errors.stxt`
   tiene un `Case` por regla, con `Code`, `Line` (contada desde la primera línea del documento
   incrustado) y el documento en un bloque `Document >>`. Se maqueta con las métricas reales.
   `everyCodeHasACase` exige un caso por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de
   layout prueban los casos válidos; los inválidos van al catálogo.
 - **Tests de referencia** (`golden/GoldenTest`): cada carpeta de
-  `src/test/resources/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
+  `test/golden/NN-nombre/` tiene `input.stxt` y `expected.stxt` (volcado de
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
   Los casos que necesitan un hito pendiente están en `GoldenTest.PENDING` y se saltan con el
   motivo: al completar el hito, quítalos de ahí. Cada caso escribe un SVG de depuración en

@@ -13,8 +13,8 @@ import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -193,11 +193,9 @@ class BoxTreeBuilderTest {
 
     @Test
     void theSpecificationExampleIsValid() throws IOException {
-        try (InputStream in = getClass().getResourceAsStream("/examples/report.stxt")) {
-            String doc = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            BoxTreeBuilder.Result r = build(doc);
-            assertEquals(515, r.media().pageArea().width(), 1e-9);
-            assertEquals(762, r.media().pageArea().height(), 1e-9);
-        }
+        String doc = Files.readString(Path.of("test", "examples", "report.stxt"));
+        BoxTreeBuilder.Result r = build(doc);
+        assertEquals(515, r.media().pageArea().width(), 1e-9);
+        assertEquals(762, r.media().pageArea().height(), 1e-9);
     }
 }

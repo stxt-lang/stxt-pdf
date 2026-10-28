@@ -73,7 +73,7 @@ class PdfCanvasTest {
 
     @Test
     void reportExample() throws Exception {
-        InlineNode doc = reader.read(Path.of(getClass().getResource("/examples/report.stxt").toURI()));
+        InlineNode doc = reader.read(Path.of("test", "examples", "report.stxt"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "report"))) {
             assertEquals(1, pdf.getNumberOfPages());
             PDRectangle box = pdf.getPage(0).getMediaBox();
@@ -90,7 +90,7 @@ class PdfCanvasTest {
 
     @Test
     void embedsTheFontsAsSubsets() throws Exception {
-        InlineNode doc = reader.read(Path.of(getClass().getResource("/examples/report.stxt").toURI()));
+        InlineNode doc = reader.read(Path.of("test", "examples", "report.stxt"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "report"))) {
             PDResources resources = pdf.getPage(0).getResources();
             List<String> names = new ArrayList<>();

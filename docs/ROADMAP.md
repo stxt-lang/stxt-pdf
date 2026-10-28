@@ -1,4 +1,4 @@
-# Hoja de ruta: Markdown e imágenes
+# Hoja de ruta: Markdown, imágenes, pruebas y ejemplos
 
 Plan de trabajo para escribir el contenido de un documento en Markdown (un subconjunto cerrado
 que se traduce a los elementos que el motor ya conoce) y para poner imágenes en él. Es el punto
@@ -36,6 +36,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | hecho | 13 (con el 17) |
 | 17 | Elemento `Markdown`, traducido a elementos conocidos | hecho | 13 |
 | 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | hecho | 14 |
+| 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
+| 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | pendiente | — |
+| 21 | Ejemplos de verdad: diez documentos completos, con PDF y PNG limpios | pendiente | `examples/` |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y el 18, el 2026-10-28.
 
@@ -56,10 +59,10 @@ comportamiento" de [`CLAUDE.md`](../CLAUDE.md):
       (resumen del schema) y, si aplica, §10 (ejemplo).
 - [ ] `Style`, el builder (lectura y validación del §6) y, si hay layout nuevo, su algoritmo.
 - [ ] Cada regla de validación nueva: su `ErrorCode`, su fila en el §6 y su caso en
-      [`errors.stxt`](../src/test/resources/errors/errors.stxt).
+      [`errors.stxt`](../test/errors/errors.stxt).
 - [ ] Tests unitarios de las piezas puras y tests de layout con `LayoutFixture`, incluidos los
       de fragmentación si el hito toca el corte.
-- [ ] Un caso golden nuevo en `src/test/resources/golden/NN-nombre/`, con el resultado
+- [ ] Un caso golden nuevo en `test/golden/NN-nombre/`, con el resultado
       calculado a mano.
 - [ ] `DocumentReaderTest` valida los documentos nuevos.
 - [ ] Salida SVG y PDF revisada a ojo (PNG del caso golden).
@@ -382,11 +385,44 @@ salieron al implementarlas, en [`DECISIONES.md`](DECISIONES.md), 135–143):
 
 ---
 
+## Hitos 19 a 21: pruebas y ejemplos
+
+Decisiones tomadas (2026-10-28, todas con la propuesta aceptada):
+
+- [x] **P1. Estructura.** `test/{golden,errors,examples}` en la raíz del repositorio. Los tests
+      Java siguen en `src/test/java` y `resources/` (fuentes e imágenes) se queda donde está.
+      Los tests leen de disco (`Path.of("test", …)`), no del classpath; `src/test/resources`
+      desaparece, y con él la entrada de `.classpath` y de `.settings`.
+- [x] **P2. Errores.** Un fichero por caso con el documento real, en `test/errors/<grupo>/`, un
+      grupo por familia de `ErrorCode`. El código y la línea esperados van en comentarios al
+      principio del fichero, y la línea es la del propio fichero.
+- [x] **P3. Ejemplos.** Cada carpeta de `test/examples/` lleva `input.stxt`, `expected.stxt`
+      (volcado de las cajas con `Id`), `output.pdf` y un `page-N.png` sin contornos. El test
+      compara el volcado y los PNG con tolerancia, como el golden. El PDF se versiona, pero solo
+      se reescribe si cambia algún PNG (PDFBox mete fechas e identificadores).
+- [x] **P4. Material.** IBM Plex Serif y Plex Mono (OFL) además de Plex Sans, e imágenes
+      generadas por código (logotipos, fotos sintéticas, gráficos), sin derechos de terceros.
+
+**Hito 19.** Mover los ficheros (`git mv`, con el historial), cambiar los tests, `.gitignore`,
+Eclipse y los enlaces de la documentación.
+
+**Hito 20.** Convertir `errors.stxt` en un fichero por caso y adaptar `ErrorCatalogTest`
+(`everyCodeHasACase` sigue exigiendo un caso por código).
+
+**Hito 21.** Diez documentos completos que cubran necesidades documentales distintas. Lo que
+falte en el motor para hacerlos bien (por ejemplo, índices o enlaces) se apunta como idea en
+`TODO.md`, no se implementa dentro del hito.
+
+---
+
 ## Registro de sesiones
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (3).** Se abren los hitos 19 a 21 (P1–P4 aceptadas). Hito 19 hecho: `test/`
+  sustituye a `src/test/resources`; `mvn test` en verde (798 tests).
+  *Siguiente paso:* hito 20, partir `errors.stxt` en un fichero por caso.
 - **2026-10-28 (2).** Hito 18 terminado. Aceptadas I1–I10. Schema (`Image`, `Alt`, `Fit`);
   `ImageLibrary` e `ImageFile`; dimensionado de elemento reemplazado en `BoxModel` e
   `ImageLayout`; pintado en PDF (una copia por fichero, `Figure` con `Alt` y `BBox`) y SVG;

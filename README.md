@@ -7,7 +7,7 @@ tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Schema STXT del modelo** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
-- **Documento de ejemplo:** [`src/test/resources/examples/report.stxt`](src/test/resources/examples/report.stxt)
+- **Documento de ejemplo:** [`test/examples/report.stxt`](test/examples/report.stxt)
 
 Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
 inglés; la documentación y los comentarios, en castellano.
@@ -95,7 +95,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 18 están termin
 | Bloques en columnas (`Multicol`): `Count`, `Column width`, `Column gap`, línea entre columnas, equilibrado (`Fill`), cortes de columna y continuación en la página siguiente | Hecho y probado |
 | PDF etiquetado (árbol de estructura, *artifacts*, listas con `Lbl` y `LBody`, tablas con `THead`, `TBody`, `TFoot`, `TH` y `TD`) y marcadores de los encabezados | Hecho y probado |
 | Árbol de cajas: herencia, validaciones | Hecho y probado |
-| Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`src/test/resources/errors`) | Hecho y probado |
+| Validación estricta: códigos de error, línea del nodo culpable y catálogo de errores (`test/errors`) | Hecho y probado |
 | Desbordamientos como error (texto, cajas, alto fijado, página) | Hecho y probado |
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
@@ -123,7 +123,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 18 están termin
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
-`src/test/resources/golden/`, el PDF (`output.pdf`, ignorado por git) y una imagen por página
+`test/golden/`, el PDF (`output.pdf`, ignorado por git) y una imagen por página
 (`page-N.png`, versionada): si un cambio altera el resultado, la imagen aparece modificada en
 git. Como las fuentes van incrustadas, las imágenes no dependen de las fuentes del sistema;
 aún pueden variar detalles del suavizado con otra versión de Java. `PdfCanvasTest` deja sus PDF

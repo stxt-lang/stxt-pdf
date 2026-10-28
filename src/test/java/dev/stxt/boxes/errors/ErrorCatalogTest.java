@@ -27,14 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Catálogo de errores ({@code src/test/resources/errors/errors.stxt}): cada {@code Case} es un
+ * Catálogo de errores ({@code test/errors/errors.stxt}): cada {@code Case} es un
  * documento que debe fallar con un código en una línea (ESPECIFICACION.md §6). Se lee, se
  * construye el árbol y se maqueta con las métricas reales, de modo que entran todos los errores:
  * los de sintaxis y schema ({@code stxt-core}), los del modelo y los de las fuentes.
  */
 class ErrorCatalogTest {
 
-    private static final File CATALOG = new File("src/test/resources/errors/errors.stxt");
+    private static final File CATALOG = new File("test/errors/errors.stxt");
 
     /** Códigos sin caso en el catálogo, con el motivo. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
