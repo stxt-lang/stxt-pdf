@@ -1,8 +1,9 @@
 # Case: For column que no es un número
 # Code: VALUE_SYNTAX
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

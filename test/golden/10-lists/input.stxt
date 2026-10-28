@@ -9,6 +9,7 @@
 # r2 tiene 5 líneas y caben 3; su marcador solo está en el primer fragmento.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 300

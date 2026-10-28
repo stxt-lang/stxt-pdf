@@ -1,8 +1,9 @@
 # Case: Orientation sin Paper
 # Code: MEDIA_SIZE
-# Line: 9
+# Line: 10
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 842
 		Height: 595

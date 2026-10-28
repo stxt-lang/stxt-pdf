@@ -1,8 +1,9 @@
 # Case: Pages con un valor que no es de la lista
 # Code: INVALID_VALUE
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

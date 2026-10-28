@@ -1,8 +1,9 @@
 # Case: Un texto con Inline: markdown con la línea de su segundo párrafo
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

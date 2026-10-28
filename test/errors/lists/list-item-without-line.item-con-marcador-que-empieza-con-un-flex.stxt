@@ -1,8 +1,9 @@
 # Case: Ítem con marcador que empieza con un Flex
 # Code: LIST_ITEM_WITHOUT_LINE
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

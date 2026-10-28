@@ -11,6 +11,7 @@
 #   b10 (101..121, par); el pie, en 121..138. La tabla mide 118.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 300
 		Height: 200

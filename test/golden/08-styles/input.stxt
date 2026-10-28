@@ -11,6 +11,7 @@
 # p: Block con Size 20; su Text u mide 12 porque la regla gana a la herencia.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

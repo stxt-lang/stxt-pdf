@@ -1,8 +1,9 @@
 # Case: Un Link a una caja de un Fixed, que se repite en todas las páginas
 # Code: LINK_UNKNOWN
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

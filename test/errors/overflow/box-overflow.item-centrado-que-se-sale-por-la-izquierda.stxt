@@ -1,8 +1,9 @@
 # Case: Ítem centrado que se sale por la izquierda
 # Code: BOX_OVERFLOW
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

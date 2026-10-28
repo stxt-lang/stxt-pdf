@@ -1,8 +1,9 @@
 # Case: Start fuera del rango de las letras
 # Code: LIST_NUMBER_RANGE
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

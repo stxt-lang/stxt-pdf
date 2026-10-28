@@ -30,7 +30,7 @@ class BoxTreeBuilderTest {
     }
 
     private static String document(String... boxes) {
-        return "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
+        return "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxes);
     }
 
@@ -65,7 +65,7 @@ class BoxTreeBuilderTest {
         Box b = build(document("\tText:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\t\tContent >>", "\t\t\tuno", "\t\t\tdos")).root().children.get(0);
         assertEquals("uno\ndos", b.text);
-        assertEquals(11, b.textLine);
+        assertEquals(12, b.textLine);
         assertTrue(b.textBlock);
     }
 
@@ -80,7 +80,7 @@ class BoxTreeBuilderTest {
         Box b = root.children.get(1).children.get(0);
         assertEquals(new Cell(1, 2, 1, 1), b.style.itemArea);
         assertEquals(Style.Alignment.CENTER, b.style.itemVertical);
-        assertEquals(15, b.style.line("item.area"));
+        assertEquals(16, b.style.line("item.area"));
         assertEquals(Cell.AUTO, root.children.get(1).children.get(1).style.itemArea);
     }
 
@@ -103,18 +103,18 @@ class BoxTreeBuilderTest {
         InvalidModelException single = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tGrid:", "\t\tArea:", "\t\t\tBlock:", "\t\t\tText: a")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, single.code());
-        assertEquals(10, single.line());
+        assertEquals(11, single.line());
         InvalidModelException empty = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, empty.code());
-        assertEquals(8, empty.line());
+        assertEquals(9, empty.line());
         InvalidModelException noText = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText:", "\t\tTypography:", "\t\t\tSize: 10")));
         assertEquals(ErrorCode.TEXT_CONTENT, noText.code());
         InvalidModelException twice = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tContent >>", "\t\t\tb")));
         assertEquals(ErrorCode.TEXT_CONTENT, twice.code());
-        assertEquals(8, twice.line());
+        assertEquals(9, twice.line());
         assertThrows(InvalidModelException.class, () -> build(document(
                 "\tGrid:", "\t\tAreas >>", "\t\t\ta a", "\t\t\ta b", "\t\t\tb b")));
         assertThrows(InvalidModelException.class, () -> build(document(
@@ -122,7 +122,7 @@ class BoxTreeBuilderTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tBlock:", "\t\tBox:", "\t\t\tWidth: 12,5")));
         // La línea es la de la propiedad, dentro del grupo, no la del grupo.
-        assertEquals(9, e.line());
+        assertEquals(10, e.line());
     }
 
     /** Sin pasar por DocumentReader, el builder valida contra el schema y da sus mismos errores. */
@@ -132,7 +132,7 @@ class BoxTreeBuilderTest {
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\tOffset: 5")).get(0);
         ParseException e = assertThrows(ParseException.class, () -> new BoxTreeBuilder().build(misplaced));
         assertEquals("CHILD_NOT_DECLARED", e.getCode());
-        assertEquals(10, e.getLine());
+        assertEquals(11, e.getLine());
 
         InlineNode noMedia = (InlineNode) STXT.rawParser().parse(
                 "Document (dev.stxt.boxes):\n\tBlock:\n\t\tId: a").get(0);
@@ -155,15 +155,15 @@ class BoxTreeBuilderTest {
     void textNeedsAFont() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 12")));
-        assertEquals(7, e.line());
+        assertEquals(8, e.line());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
-        assertEquals("línea 7: El texto necesita Font: declárala en el Typography del Text, de un antecesor "
+        assertEquals("línea 8: El texto necesita Font: declárala en el Typography del Text, de un antecesor "
                 + "o de Styles (Element: Document)", e.getMessage());
         // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\t\tItem:", "\t\t\tText: b")));
-        assertEquals(13, item.line());
+        assertEquals(14, item.line());
         // Un elemento sin texto no la necesita.
         build(document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 10"));
     }
@@ -173,12 +173,12 @@ class BoxTreeBuilderTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans")));
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT_SIZE, e.code());
-        assertEquals(7, e.line());
+        assertEquals(8, e.line());
     }
 
     @Test
     void fontPropertiesOfTheDocumentAreInherited() {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n\t\t\t\tColor: #333\n\t\t\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).root().children.get(0).children.get(0);
@@ -188,7 +188,7 @@ class BoxTreeBuilderTest {
         assertEquals("#333", text.style.color);
         assertEquals(20, text.style.usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
-        assertEquals(9, text.style.line("font"));
+        assertEquals(10, text.style.line("font"));
     }
 
     @Test
@@ -202,7 +202,7 @@ class BoxTreeBuilderTest {
     /** {@code Paper} y {@code Orientation} (§4.1): el tamaño en vertical, girado con {@code landscape}. */
     @Test
     void namedPaperSizes() {
-        String head = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n";
+        String head = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n";
         Media a4 = build(head + "\t\tPaper: A4\n\t\tMargin: 40\n").media();
         assertEquals(new Media(595, 842, new dev.stxt.boxes.model.Insets(40, 40, 40, 40)), a4);
         Media landscape = build(head + "\t\tPaper: A4\n\t\tOrientation: landscape\n").media();
@@ -222,9 +222,9 @@ class BoxTreeBuilderTest {
     @Test
     void paperExcludesWidthAndHeight() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(
-                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tHeight: 842\n\t\tPaper: A4\n"));
+                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tHeight: 842\n\t\tPaper: A4\n"));
         assertEquals(ErrorCode.MEDIA_SIZE, e.code());
-        assertEquals(4, e.line());
+        assertEquals(5, e.line());
     }
 
     /** {@code Rotate} y {@code Rotate origin} (§4.2): el giro y la fracción de la caja; sin origen, el centro. */

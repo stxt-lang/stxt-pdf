@@ -1,8 +1,9 @@
 # Case: Fila con menos celdas que columnas
 # Code: TABLE_ROW_CELLS
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

@@ -1,8 +1,9 @@
 # Case: Text con el texto en el valor y en Content
 # Code: TEXT_CONTENT
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

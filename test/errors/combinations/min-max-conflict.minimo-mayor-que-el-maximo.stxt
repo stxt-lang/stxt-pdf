@@ -1,8 +1,9 @@
 # Case: Mínimo mayor que el máximo
 # Code: MIN_MAX_CONFLICT
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

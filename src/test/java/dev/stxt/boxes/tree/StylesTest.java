@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StylesTest {
 
     private static Box root(String... lines) {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
@@ -35,7 +35,7 @@ class StylesTest {
         assertEquals(5, padding(outer.children.get(0)), 1e-9);
         assertEquals(Sides.all(Value.pt(0)), root.children.get(1).style.padding);
         // La línea es la de la regla: los errores la señalan.
-        assertEquals(13, outer.style.line("padding"));
+        assertEquals(14, outer.style.line("padding"));
     }
 
     @Test
@@ -45,8 +45,8 @@ class StylesTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 14").children.get(0);
         assertEquals(14, text.style.fontSize, 1e-9);
         assertEquals(FontWeight.BOLD, text.style.fontWeight);
-        assertEquals(17, text.style.line("font-size"));
-        assertEquals(14, text.style.line("font-weight"));
+        assertEquals(18, text.style.line("font-size"));
+        assertEquals(15, text.style.line("font-weight"));
     }
 
     @Test

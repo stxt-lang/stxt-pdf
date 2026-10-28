@@ -1,8 +1,9 @@
 # Case: Break en un Text de un encabezado
 # Code: BREAK_IN_HEADING
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

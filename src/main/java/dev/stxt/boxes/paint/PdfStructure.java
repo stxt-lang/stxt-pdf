@@ -323,9 +323,9 @@ final class PdfStructure {
     }
 
     /**
-     * Paquete XMP mínimo con el título y la declaración de PDF/UA-1 ({@code pdfuaid:part}). Solo se
-     * escribe con {@code Title}: sin título el PDF no cumple PDF/UA (el visor no puede mostrarlo en lugar
-     * del nombre del fichero) y no puede afirmarlo.
+     * Paquete XMP mínimo con el título y la declaración de PDF/UA-1 ({@code pdfuaid:part}). Un
+     * documento siempre tiene {@code Title} (obligatorio): sin título el PDF no cumpliría PDF/UA (7.1) y
+     * no podría afirmarlo.
      */
     static String xmp(String title) {
         String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");

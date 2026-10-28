@@ -1,8 +1,9 @@
 # Case: Lines sin Wrap
 # Code: LINES_WITHOUT_WRAP
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

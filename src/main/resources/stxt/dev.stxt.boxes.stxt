@@ -10,12 +10,13 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio, el título y el idioma, las reglas reutilizables (también la tipografía base, con Element: Document) y los elementos de primer nivel, en orden.
+		Description: Documento de cajas: el medio, el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con Element: Document) y los elementos de primer nivel, en orden.
 		Children:
 			Child: Media
 				Min: 1
 				Max: 1
 			Child: Title
+				Min: 1
 				Max: 1
 			Child: Language
 				Min: 1
@@ -909,7 +910,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 	# Document
 
 	Node: Title
-		Description: Título del documento: el que muestra el visor del PDF.
+		Description: Título del documento: el que muestra el visor del PDF. Obligatorio.
 	Node: Language
 		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Transform. No vale en Element: Document, que usa el de Document.
 

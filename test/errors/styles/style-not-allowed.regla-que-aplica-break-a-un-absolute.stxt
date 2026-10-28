@@ -1,8 +1,9 @@
 # Case: Regla que aplica Break a un Absolute
 # Code: STYLE_NOT_ALLOWED
-# Line: 13
+# Line: 14
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

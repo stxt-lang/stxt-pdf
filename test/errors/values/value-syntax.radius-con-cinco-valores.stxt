@@ -1,8 +1,9 @@
 # Case: Radius con más de cuatro valores
 # Code: VALUE_SYNTAX
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

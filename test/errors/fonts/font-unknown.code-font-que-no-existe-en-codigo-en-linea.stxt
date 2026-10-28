@@ -1,8 +1,9 @@
 # Case: Code font con una familia que no existe, en código en línea
 # Code: FONT_UNKNOWN
-# Line: 17
+# Line: 18
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

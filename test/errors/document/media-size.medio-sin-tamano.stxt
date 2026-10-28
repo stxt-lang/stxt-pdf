@@ -1,8 +1,9 @@
 # Case: Medio sin tamaño: ni Paper ni Width y Height
 # Code: MEDIA_SIZE
-# Line: 6
+# Line: 7
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Margin: 40
 	Block:

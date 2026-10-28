@@ -133,7 +133,7 @@ class PdfCanvasTest {
 
     @Test
     void onePdfPagePerPage() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n"
                 + "\t\tHeight: 200\n\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tText: Uno\n\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "two-pages"))) {
@@ -147,7 +147,7 @@ class PdfCanvasTest {
 
     @Test
     void pageHasTheSizeOfTheMedia() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 842\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 842\n"
                 + "\t\tMargin: 20\n\tBlock:\n\t\tBox:\n\t\t\tHeight: 500\n\t\t\tBackground: #F1EFE8\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "media-size"))) {
             assertEquals(1, pdf.getNumberOfPages());
@@ -156,7 +156,7 @@ class PdfCanvasTest {
         }
     }
 
-    private static final String HEADINGS = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 400\n"
+    private static final String HEADINGS = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 400\n"
             + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
             + "\tFixed:\n\t\tOffset: auto 0 -30 0\n\t\tText: Pie\n"
             + "\tHeading 1:\n\t\tText: Uno\n"
@@ -233,14 +233,6 @@ class PdfCanvasTest {
         }
     }
 
-    /** Sin {@code Title} el PDF no cumple PDF/UA-1 (7.1) y no lo declara: no lleva metadatos XMP. */
-    @Test
-    void withoutATitleThePdfDoesNotClaimPdfUa() throws Exception {
-        try (PDDocument pdf = Loader.loadPDF(render(reader.read(LINKS + "\tParagraph: Hola\n"), "no-title"))) {
-            assertNull(pdf.getDocumentCatalog().getMetadata());
-        }
-    }
-
     @Test
     void titleAndLanguage() throws Exception {
         InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
@@ -259,17 +251,8 @@ class PdfCanvasTest {
     }
 
     @Test
-    void withoutTitleItIsNotWritten() throws Exception {
-        try (PDDocument pdf = Loader.loadPDF(render(reader.read(HEADINGS), "headings"))) {
-            assertEquals("es", pdf.getDocumentCatalog().getLanguage());
-            assertNull(pdf.getDocumentInformation().getTitle());
-            assertNull(pdf.getDocumentCatalog().getMetadata());
-        }
-    }
-
-    @Test
     void listsAreTaggedWithLabelAndBody() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tList:\n\t\tMarker: decimal\n\t\tBox:\n\t\t\tPadding: 0 0 0 20\n"
                 + "\t\tList item:\n\t\t\tText: Uno\n"
@@ -302,7 +285,7 @@ class PdfCanvasTest {
             body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
         }
         // Área útil de 160: la cabecera y el pie (12 cada uno) dejan 136, once filas por página.
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tTable:\n\t\tColumns: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Valor\n"
@@ -344,7 +327,7 @@ class PdfCanvasTest {
     /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 0.5\n"
                 + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n");
@@ -359,7 +342,7 @@ class PdfCanvasTest {
         }
     }
 
-    private static final String LINKS = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+    private static final String LINKS = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
             + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static List<PDAnnotationLink> links(PDDocument pdf, int page) throws Exception {
@@ -552,7 +535,7 @@ class PdfCanvasTest {
         for (int i = 1; i <= 15; i++) {
             body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
         }
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tTable:\n\t\tColumns: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\t\tLink: https://c.example\n\t\t\t\tCell: Valor\n"
@@ -616,7 +599,7 @@ class PdfCanvasTest {
      */
     @Test
     void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n"
                 + "\t\t\t\tAlign: justify\n\tParagraph: " + RUNS + "\n\t\tId: P\n");
         List<TextRun> runs = List.of(run("Uno "), run("negrita", "b"), run(", "), run("cursiva", "i"), run(", "),
@@ -650,7 +633,7 @@ class PdfCanvasTest {
     /** Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor (§5.17). */
     @Test
     void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\t\tElement: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 15\n"
                 + "\tMarkdown:\n\t\tBullet: disc\n\t\tTable columns: equal\n\t\tContent >>\n"
@@ -677,7 +660,7 @@ class PdfCanvasTest {
      */
     @Test
     void capsAreOnlyPaintedAndTheStructureKeepsTheWrittenText() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tParagraph: Emisor y destinatario\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
                 + "\t\t\tLetter spacing: 1\n"
@@ -707,7 +690,7 @@ class PdfCanvasTest {
      */
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tContents:\n\t\tLevels: 1 2\n"
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\t# Uno\n\n\t\t\tTexto.\n"
@@ -735,7 +718,7 @@ class PdfCanvasTest {
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tFixed:\n\t\tOffset: -30 -30 auto auto\n\t\tImage: test/square.png\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n"
@@ -779,7 +762,7 @@ class PdfCanvasTest {
      */
     @Test
     void svgIsDrawnAsOneVectorFormAndScaledToItsBox() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 400\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 400\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tImage: test/shapes.svg\n\t\tAlt: Un paisaje\n\t\tBox:\n\t\t\tWidth: 300\n"
                 + "\tImage: test/label.svg\n\t\tBox:\n\t\t\tMargin: 10 0 0 0\n"
@@ -843,7 +826,7 @@ class PdfCanvasTest {
      */
     @Test
     void rotatedBoxesTurnTheirContentLinksAndFigures() throws Exception {
-        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n\t\tRotate: 90\n"
                 + "\tText: Ir al sello\n\t\tLink: #sello\n"

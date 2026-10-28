@@ -9,6 +9,7 @@
 # Página 3: b13 y b14, el pie detrás, y end.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 300
 		Height: 200

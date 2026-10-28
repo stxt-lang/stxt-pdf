@@ -1,8 +1,9 @@
 # Case: Página de una caja que está en un Fixed
 # Code: REFERENCE_NOT_PLACEABLE
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

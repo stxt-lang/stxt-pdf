@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MulticolTest {
 
     private static Box root(String... lines) {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
@@ -73,6 +73,6 @@ class MulticolTest {
                 "\tMulticol:", "\t\tCount: 2", "\t\tParagraph: Dentro",
                 "\tParagraph: Fuera"));
         assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, ex.code());
-        assertEquals(13, ex.line());
+        assertEquals(14, ex.line());
     }
 }

@@ -14,6 +14,7 @@
 #   caps:    Small caps con Letter spacing 1, una línea: 12. y = 80.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 200
 		Height: 200

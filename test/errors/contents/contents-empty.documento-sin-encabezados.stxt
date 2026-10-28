@@ -1,8 +1,9 @@
 # Case: Un índice en un documento sin encabezados
 # Code: CONTENTS_EMPTY
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

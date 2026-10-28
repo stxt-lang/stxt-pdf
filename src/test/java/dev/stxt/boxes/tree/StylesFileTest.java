@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class StylesFileTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n";
+    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n";
     private static final String BASE = "Styles (dev.stxt.boxes):\n\tElement: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
             + "\t\t\tSize: 10\n";
 
@@ -65,7 +65,7 @@ class StylesFileTest {
         // Lo que el documento no declara lo pone el documento de estilos.
         assertEquals(FontWeight.BOLD, text.style.fontWeight);
         // Cada propiedad guarda la línea de su regla, también en el documento aparte.
-        assertEquals(9, text.style.line("font-size"));
+        assertEquals(10, text.style.line("font-size"));
         assertEquals(9, text.style.line("font-weight"));
     }
 
@@ -140,7 +140,7 @@ class StylesFileTest {
     void aBadValueInTheDocumentDoesNotMentionTheStylesDocument() {
         InvalidModelException e = error(BASE, "\tStyles:", "\t\tElement: Text", "\t\t\tBox:", "\t\t\t\tPadding: mucho",
                 "\tText: hola");
-        assertTrue(e.getMessage().startsWith("línea 9: "), e.getMessage());
+        assertTrue(e.getMessage().startsWith("línea 10: "), e.getMessage());
     }
 
     @Test
@@ -171,7 +171,7 @@ class StylesFileTest {
         InvalidModelException inDocument = error(null, "\tStyles:", "\t\tElement: Document", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, inDocument.code());
-        assertEquals(8, inDocument.line());
+        assertEquals(9, inDocument.line());
         assertTrue(!inDocument.getMessage().contains("de los estilos"), inDocument.getMessage());
     }
 

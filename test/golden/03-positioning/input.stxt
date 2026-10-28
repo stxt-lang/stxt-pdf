@@ -2,6 +2,7 @@
 # fixed en el margen de la página.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

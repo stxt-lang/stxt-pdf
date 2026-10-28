@@ -1,0 +1,11 @@
+# Case: Documento sin título
+# Code: TOO_FEW_CHILDREN
+# Line: 4
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Box:
+			Height: 10

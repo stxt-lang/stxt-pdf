@@ -1,8 +1,9 @@
 # Case: Letter spacing en porcentaje
 # Code: VALUE_NOT_ALLOWED
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

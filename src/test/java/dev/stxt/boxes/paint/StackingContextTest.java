@@ -123,7 +123,7 @@ class StackingContextTest {
 
     /** Lo que se pinta en la página {@code index} de un documento de 100 × 100 con márgenes de 10 (área útil de 80). */
     private static Recorder recordSmallPage(int index, String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(READER.read(doc)).pages().get(index);
         Recorder canvas = new Recorder();
@@ -140,7 +140,7 @@ class StackingContextTest {
     }
 
     private static Recorder record(Map<String, List<dev.stxt.boxes.model.TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(TextRuns.build(READER.read(doc), runs)).pages().get(0);
         Recorder canvas = new Recorder();

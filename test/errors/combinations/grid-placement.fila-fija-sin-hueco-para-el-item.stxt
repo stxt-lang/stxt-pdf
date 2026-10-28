@@ -1,8 +1,9 @@
 # Case: Fila fija sin hueco para el ítem
 # Code: GRID_PLACEMENT
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

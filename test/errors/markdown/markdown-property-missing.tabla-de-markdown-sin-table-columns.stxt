@@ -1,8 +1,9 @@
 # Case: Tabla de Markdown sin Table columns
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

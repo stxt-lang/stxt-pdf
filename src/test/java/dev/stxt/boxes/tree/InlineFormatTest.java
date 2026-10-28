@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /** {@code Inline: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell} (§5.4). */
 class InlineFormatTest {
 
-    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+    private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
             + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static Box build(String... lines) {
@@ -117,17 +117,17 @@ class InlineFormatTest {
     void errorsPointToTheLineOfTheBlock() {
         InvalidModelException list = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Uno", "\tText: - lista"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, list.code());
-        assertEquals(13, list.line());
+        assertEquals(14, list.line());
         InvalidModelException second = assertThrows(InvalidModelException.class, () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\t# Dos"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.code());
-        assertEquals(16, second.line());
+        assertEquals(17, second.line());
     }
 
     @Test
     void anInternalLinkToAnIdThatDoesNotExistIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Ver [aquí](#nada)"));
         assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
-        assertEquals(12, e.line());
+        assertEquals(13, e.line());
     }
 
     @Test

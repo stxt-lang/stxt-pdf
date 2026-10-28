@@ -1569,3 +1569,11 @@ interpretaciones que salieron al implementarlas.
      por tramo): un documento puede ser PDF/UA-1 según veraPDF y mejorable para un lector de pantalla.
      `ExamplesTest.KNOWN_UA_FAILURES` queda vacío. *Dónde:* `paint/PdfStructure.xmp`. *Alternativa:* no
      declararlo.
+
+262. **`Title` es obligatorio en `Document`** (exactamente uno, como `Language` y `Media`). El visor muestra el
+     título en lugar del nombre del fichero y PDF/UA-1 (7.1) lo exige; con la decisión 261 todo PDF declara
+     PDF/UA-1, y un documento sin título no podría afirmarlo. Falta de `Title` es `TOO_FEW_CHILDREN` (línea de
+     `Document`). Todos los documentos de tests, golden, catálogo de errores y ejemplos de la documentación lo
+     llevan (`Title: Prueba` o `Informe` tras `Language`; en el catálogo, la línea esperada se desplazó una
+     cuando el error cae después). *Dónde:* schema (`Min: 1`), `tree/Metadata`, `paint/PdfStructure`.
+     *Alternativa:* dejarlo opcional y no declarar PDF/UA sin él.

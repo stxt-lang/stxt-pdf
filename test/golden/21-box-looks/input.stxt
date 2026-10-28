@@ -1,6 +1,7 @@
 # Hito 28: aspecto de las cajas. El cálculo de los rectángulos está en expected.stxt.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 300
 		Height: 300

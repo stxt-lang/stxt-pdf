@@ -1,8 +1,9 @@
 # Case: Medio sin alto
 # Code: MEDIA_SIZE
-# Line: 7
+# Line: 8
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 	Block:

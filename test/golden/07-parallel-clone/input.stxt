@@ -10,6 +10,7 @@
 # El pie muestra "{page}/{pages}" con los valores de cada página.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 300
 		Height: 200

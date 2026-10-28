@@ -2,6 +2,7 @@
 # Code: TOO_FEW_CHILDREN
 # Line: 4
 Document (dev.stxt.boxes):
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

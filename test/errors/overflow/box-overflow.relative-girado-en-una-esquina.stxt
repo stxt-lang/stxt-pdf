@@ -1,8 +1,9 @@
 # Case: Relative girado alrededor de su esquina que se sale por arriba
 # Code: BOX_OVERFLOW
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Paper: A5
 		Margin: 20

@@ -1,8 +1,9 @@
 # Case: Referencia a un Id que no existe
 # Code: REFERENCE_UNKNOWN
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

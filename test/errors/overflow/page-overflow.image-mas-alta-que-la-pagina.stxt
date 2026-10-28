@@ -1,8 +1,9 @@
 # Case: Image más alta que la página
 # Code: PAGE_OVERFLOW
-# Line: 12
+# Line: 13
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 200

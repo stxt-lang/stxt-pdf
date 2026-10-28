@@ -1,8 +1,9 @@
 # Case: Área desconocida en Area
 # Code: GRID_PLACEMENT
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

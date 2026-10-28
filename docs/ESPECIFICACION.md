@@ -60,8 +60,8 @@ sentido en él: sus propiedades y, si es un contenedor, otros elementos. El sche
 en un `Flex`, `Offset` en un `Block`) es un error de estructura que se detecta al leer, también
 en el editor.
 
-El nodo raíz es `Document`, con exactamente un `Media` y un `Language` (el idioma del documento,
-[§4.1](#41-media)), un `Title` opcional (el título), un `Styles` opcional con las reglas reutilizables
+El nodo raíz es `Document`, con exactamente un `Media`, un `Title` (el título) y un `Language` (el idioma
+del documento, [§4.1](#41-media)), un `Styles` opcional con las reglas reutilizables
 ([§4.10](#410-reglas-reutilizables-styles); también la tipografía base que heredan todas las cajas,
 con `Element: Document`) y los elementos de primer nivel. Las reglas pueden estar además en un
 documento de estilos aparte, que se pasa junto al documento al maquetar (§4.10).
@@ -105,6 +105,7 @@ página).
 ```
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Informe
 	Media:
 		Paper: A4
 		Margin: 40
@@ -313,14 +314,14 @@ es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
 elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
-**Título e idioma.** `Document` admite también `Title` (un texto no vacío, opcional, como mucho
-uno) y exige exactamente un `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no,
-`VALUE_NOT_ALLOWED`; si falta, `TOO_FEW_CHILDREN`). No afectan al layout, salvo que `Language` da
-las reglas de las mayúsculas de `Transform` ([§4.4](#44-typography)). Van al PDF
+**Título e idioma.** `Document` exige exactamente un `Title` (un texto no vacío; si no,
+`VALUE_NOT_ALLOWED`) y exactamente un `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no,
+`VALUE_NOT_ALLOWED`); si falta cualquiera de los dos, `TOO_FEW_CHILDREN`. No afectan al layout, salvo que
+`Language` da las reglas de las mayúsculas de `Transform` ([§4.4](#44-typography)). Van al PDF
 ([§5.13](#513-encabezados-y-párrafos)) como título del documento (información, metadatos XMP y el
-que muestra el visor) e idioma del contenido etiquetado. El idioma es obligatorio porque es una
-característica de accesibilidad: un lector de pantalla y PDF/UA lo necesitan para leer el
-contenido; sin `Title`, el PDF no lo declara.
+que muestra el visor) e idioma del contenido etiquetado. Los dos son obligatorios porque son
+características de accesibilidad: un lector de pantalla y PDF/UA necesitan el idioma para leer el
+contenido, y el visor muestra el título en lugar del nombre del fichero (PDF/UA-1, 7.1).
 
 ### 4.2 Propiedades del elemento
 
@@ -1457,7 +1458,8 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
   muestra al abrir el documento.
 - **Título e idioma:** `Title` va a la información del documento y a los metadatos XMP, y el
   visor lo muestra en lugar del nombre del fichero; `Language` es el idioma de todo el
-  contenido ([§4.1](#41-media)), siempre declarado. Sin `Title`, el PDF no lo declara.
+  contenido ([§4.1](#41-media)). Los dos son obligatorios, así que todo PDF declara que es PDF/UA-1
+  (`pdfuaid:part`) en sus metadatos XMP.
 
 El volcado de resultados ([§7](#7-formato-de-resultados)) no cambia: no incluye el tipo de
 elemento.
@@ -1722,6 +1724,7 @@ suyos, y lo generado hereda su `Typography`.
 ```
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Informe
 	Media:
 		Paper: A4
 		Margin: 40
@@ -1853,6 +1856,7 @@ imagen: se coloca, se dimensiona, se corta entre páginas y se pinta como cualqu
 ```
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Informe
 	Media:
 		Paper: A4
 		Margin: 40
@@ -2365,7 +2369,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language` (exactamente uno), `Styles`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Title` (exactamente uno), `Language` (exactamente uno), `Styles`; elementos |
 | `Media` | `GROUP` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` (el tamaño, con `Paper` o con `Width` y `Height`: lo comprueba el motor) |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada). Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
@@ -2428,6 +2432,7 @@ Fichero: [`test/spec/report.stxt`](../test/spec/report.stxt).
 ```
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Informe
 	Media:
 		Paper: A4
 		Margin: 40

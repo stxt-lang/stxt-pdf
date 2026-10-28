@@ -1,8 +1,9 @@
 # Case: Un enlace de Markdown a un Id que no existe
 # Code: LINK_UNKNOWN
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

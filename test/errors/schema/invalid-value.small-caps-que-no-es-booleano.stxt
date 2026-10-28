@@ -1,8 +1,9 @@
 # Case: Small caps que no es true ni false
 # Code: INVALID_VALUE
-# Line: 11
+# Line: 12
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

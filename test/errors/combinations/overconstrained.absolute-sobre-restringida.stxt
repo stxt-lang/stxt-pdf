@@ -1,8 +1,9 @@
 # Case: Absolute sobre-restringida
 # Code: OVERCONSTRAINED
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

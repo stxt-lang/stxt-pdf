@@ -1,8 +1,9 @@
 # Case: Grupos de la tabla fuera de orden
 # Code: TABLE_ORDER
-# Line: 20
+# Line: 21
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TablesTest {
 
     private static Box root(String... lines) {
-        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+        String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.mergeStyles(doc))).root();
     }
@@ -104,7 +104,7 @@ class TablesTest {
         for (Box cell : table.children.subList(2, 4)) {
             assertEquals(Style.Break.PAGE, cell.style.breakBefore);
             assertTrue(cell.style.avoidBreakInside);
-            assertEquals(19, cell.style.line("break-before"));
+            assertEquals(20, cell.style.line("break-before"));
         }
         assertFalse(table.children.get(0).style.avoidBreakInside);
     }

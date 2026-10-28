@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BoxLooksPaintTest {
 
-    private static final String HEAD = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 200\n\t\tHeight: 400\n"
+    private static final String HEAD = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 200\n\t\tHeight: 400\n"
             + "\t\tMargin: 20\n";
 
     /** Los bloques de 100 × 40 en x = 20 e y = 20, 70, 120… (10 de hueco), con las propiedades de cada uno. */

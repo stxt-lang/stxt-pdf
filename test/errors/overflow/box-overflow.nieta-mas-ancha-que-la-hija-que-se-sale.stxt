@@ -1,8 +1,9 @@
 # Case: Nieta más ancha que la hija que se sale
 # Code: BOX_OVERFLOW
-# Line: 18
+# Line: 19
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

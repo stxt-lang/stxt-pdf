@@ -17,6 +17,7 @@
 #                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Paper: A6
 		Orientation: landscape

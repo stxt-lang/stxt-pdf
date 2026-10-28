@@ -1,8 +1,9 @@
 # Case: El primer encabezado no es Heading 1
 # Code: HEADING_LEVEL
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

@@ -1,8 +1,9 @@
 # Case: Absolute como hijo de un Multicol
 # Code: CHILD_NOT_DECLARED
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

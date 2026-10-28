@@ -1,8 +1,9 @@
 # Case: Span que se solapa con otra celda
 # Code: TABLE_SPAN
-# Line: 23
+# Line: 24
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

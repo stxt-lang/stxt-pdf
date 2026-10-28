@@ -1,8 +1,9 @@
 # Case: Absolute sin girar dentro de un Relative girado que lo saca de la página
 # Code: BOX_OVERFLOW
-# Line: 14
+# Line: 15
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

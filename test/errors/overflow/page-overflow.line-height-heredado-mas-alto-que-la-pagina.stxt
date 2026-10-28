@@ -1,8 +1,9 @@
 # Case: Line height heredado más alto que la página
 # Code: PAGE_OVERFLOW
-# Line: 16
+# Line: 17
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

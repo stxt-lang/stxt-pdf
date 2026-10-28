@@ -1,8 +1,9 @@
 # Case: Relative girado más alto que el área útil: no se parte
 # Code: PAGE_OVERFLOW
-# Line: 10
+# Line: 11
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Paper: A6
 		Margin: 20

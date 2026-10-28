@@ -16,6 +16,7 @@
 #            Los dos van seguidos y sin márgenes: 36. y = 152.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 200
 		Height: 300

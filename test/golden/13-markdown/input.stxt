@@ -8,6 +8,7 @@
 # cursiva, subrayado y tachado) no cambian las medidas con 5 pt por carácter; se ven en los PNG.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 300

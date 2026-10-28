@@ -4,6 +4,7 @@
 # va en las reglas de Styles; los elementos solo declaran lo que es suyo.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

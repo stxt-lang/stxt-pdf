@@ -1,8 +1,9 @@
 # Case: Número romano mayor que 3999
 # Code: LIST_NUMBER_RANGE
-# Line: 19
+# Line: 20
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842

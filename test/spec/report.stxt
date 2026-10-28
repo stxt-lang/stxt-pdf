@@ -3,6 +3,7 @@
 # va en las reglas de Styles; los elementos solo declaran lo que es suyo.
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Paper: A4
 		Margin: 40

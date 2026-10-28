@@ -1,8 +1,9 @@
 # Case: Palabra que no cabe en una caja que se sale
 # Code: TEXT_OVERFLOW
-# Line: 21
+# Line: 22
 Document (dev.stxt.boxes):
 	Language: es
+	Title: Prueba
 	Media:
 		Width: 595
 		Height: 842
