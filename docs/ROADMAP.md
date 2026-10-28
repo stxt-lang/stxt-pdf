@@ -48,7 +48,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | hecho | 20 |
 | 28 | Aspecto de las cajas: esquinas, color de borde por lado, degradados y opacidad (sin sombras) | hecho | 21 |
 | 29 | Texto preformateado y código | hecho | 22 |
-| 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
+| 30 | Rotación y orientación de la página | en curso | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 29, el 2026-10-28 (el 28, el 2026-10-28
@@ -1124,38 +1124,49 @@ de `TODO.md` «tamaños de página estilo A4, Letter + rotación».
   en el margen con el número de certificado.
 - **Ejemplo 09 (catálogo):** la etiqueta «Novedad» en diagonal en la esquina de la foto.
 - **Ejemplos 10 y 11 (apaisados):** hoy `Width: 842` y `Height: 595`; con el hito,
-  `Size: A4 landscape`.
+  `Paper: A4` y `Orientation: landscape`.
 
 **Sintaxis (propuesta).**
 
 ```
 Image: examples/certificate/seal.png
 	Rotate: -8
+	Rotate origin: bottom right
 
 Media:
-	Size: A4
+	Paper: A4
 	Orientation: landscape
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **O1. Qué se gira.** *Propuesta:* `Rotate` (grados, en el sentido de las agujas del
-      reloj) en `Relative`, `Absolute`, `Fixed`, `Image` y `Text`, alrededor del centro de su
-      caja de borde; es solo pintado, como `Relative`: el hueco no cambia, y lo que se sale de
-      su sitio sigue la política de desbordamientos. *Alternativa:* también cambiar el layout
-      (la caja girada ocupa su rectángulo envolvente).
-- [ ] **O2. Ángulos.** *Propuesta:* cualquier número entre −360 y 360; con 90, 180 y 270 el
-      texto es nítido en el PDF. *Alternativa:* solo múltiplos de 90.
-- [ ] **O3. Origen.** *Propuesta:* el centro; una propiedad `Rotate origin` si hace falta.
-- [ ] **O4. Páginas con nombre.** *Propuesta:* `Size` con `A3`, `A4`, `A5`, `Letter`, `Legal`…
-      y `Orientation: portrait | landscape` en `Media`; `Width` y `Height` siguen
-      valiendo, y declarar las dos cosas es un error. *Alternativa:* dejarlo fuera del hito.
-- [ ] **O5. Accesibilidad.** *Propuesta:* el texto girado se etiqueta igual; la rotación no
-      cambia el orden de lectura.
+**Decisiones tomadas** (2026-10-28, con un cuestionario; con la propuesta salvo O1, donde se
+quitó `Text` y se pide que lo girado quepa en la página, y O3, donde entra ya `Rotate origin`):
+
+- [x] **O1. Qué se gira.** `Rotate` (grados, en el sentido de las agujas del reloj) es una
+      propiedad del elemento, como `Offset`, en `Relative`, `Absolute`, `Fixed` e `Image` (no en
+      `Text`: un texto girado va dentro de uno de ellos; ni en `Styles`). Es solo pintado: la caja
+      ocupa su sitio sin girar y los hermanos no se mueven, **pero lo girado tiene que caber en la
+      página**: el rectángulo que envuelve la caja de borde girada (con los giros de sus
+      ancestros) que se sale de la página es un `BOX_OVERFLOW`. Un `Relative` girado no se parte
+      entre páginas (como una `Image`); `Inside` y `Decoration` en él son un error.
+- [x] **O2. Ángulos.** Cualquier número entre −360 y 360 (con decimales); fuera, o `0`, que no
+      tendría efecto, `VALUE_NOT_ALLOWED`. El texto sigue siendo texto en el PDF.
+- [x] **O3. Origen.** El centro de la caja de borde por defecto, y una propiedad
+      `Rotate origin` con una o dos palabras clave (`top`, `bottom`, `left`, `right`, `center`:
+      `top left`, `bottom`…). Sin `Rotate`, es un error (no tiene efecto).
+- [x] **O4. Páginas con nombre.** `Size` ya es el tamaño de la fuente y un nombre tiene una
+      sola definición, así que se llama **`Paper`**: `A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter`
+      y `Legal`, con `Orientation: portrait | landscape` (por defecto `portrait`) en `Media`.
+      `Width` y `Height` siguen valiendo; declarar las dos cosas, o `Orientation` sin `Paper`, es
+      un error.
+- [x] **O5. Accesibilidad y enlaces.** El texto girado se etiqueta igual y la rotación no cambia
+      el orden de lectura. Un enlace en una caja girada se anota con el polígono girado
+      (`QuadPoints`) y su rectángulo envolvente para los visores que no lo entienden.
 
 **Tareas:**
 
-- [ ] Resolver O1–O5.
+- [x] Resolver O1–O5 (2026-10-28).
 - [ ] Schema, `Style`, `Media`, `StackingContext`, `Canvas`/`PdfCanvas`/`SvgCanvas`.
 - [ ] Especificación (§4.1, §4.9, §5.6, §8), tests y caso golden `23-rotation`.
 - [ ] Ejemplos 09, 10 y 11 (ver arriba).
