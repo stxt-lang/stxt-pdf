@@ -40,7 +40,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
 | 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
 | 21 | Ejemplos de verdad: once documentos completos, con PNG limpios | hecho | `examples/` |
-| 22 | Referencias a páginas e índice automático (`Contents`) | pendiente | 15 (previsto) |
+| 22 | Referencias a páginas e índice automático (`Contents`) | diseño | 15 (previsto) |
 | 23 | Enlaces (URL y destinos del documento) | pendiente | 16 (previsto) |
 | 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | pendiente | 18 (previsto) |
@@ -530,51 +530,57 @@ Contents:
 Text: El esquema de conexión está en la página {page of: wiring}.
 ```
 
-**Decisiones abiertas** (resolver con el usuario antes de escribir código):
+**Decisiones abiertas:**
 
-- [ ] **X1. Sintaxis de la referencia.** *Propuesta:* `{page of: id}` dentro del texto de un
-      `Text`, `Paragraph` o `Cell`, como `{page}` y `{pages}`, con el `Id` de una caja.
-      *Alternativa:* un elemento `Reference` propio.
-- [ ] **X2. Qué página es la de una caja partida.** *Propuesta:* la de su primer fragmento (donde
-      empieza). *Alternativa:* la del último.
-- [ ] **X3. Cómo se resuelve.** *Propuesta:* como `{pages}`: se mide con los dígitos
-      reservados (`reservePageDigits`) y, al terminar de paginar, `Engine.number` rehace solo
-      esas líneas con el número real. El alto de una línea no depende del número, así que el
-      índice no cambia el reparto en páginas. *Alternativa:* paginar dos veces hasta que
-      converja, que admitiría texto de longitud variable («página 12 de este manual»).
-- [ ] **X4. Errores nuevos.** *Propuesta:* `REFERENCE_UNKNOWN` (el `Id` no existe; línea del
-      texto) y `REFERENCE_NOT_PLACEABLE` (la caja está en un `Fixed` o es generada y no tiene
-      una única página). *Alternativa:* resolver lo que se pueda y dejar el resto en blanco
-      (descartado: contra la política de errores del §6).
-- [ ] **X5. Índice automático.** *Propuesta:* un elemento `Contents` en flujo, sin hijos, que
-      genera una entrada por encabezado de los niveles de `Levels` (por defecto `1 3`), en
-      orden del documento, **también los de un `Markdown`**. Cada entrada es una caja generada
-      (como el marcador de una lista o el flujo de un `Multicol`): un `Flex` con el texto del
-      encabezado, la guía y el número. *Alternativa:* no tener `Contents` y que el autor
-      escriba el índice con las referencias del X1.
-- [ ] **X6. Estilo de las entradas.** *Propuesta:* reglas `Element: Contents entry 1` …
-      `Contents entry 6`, una por nivel como los encabezados, con `Box` y `Typography`; la
-      sangría de cada nivel es su `Padding` izquierdo. *Alternativa:* una sola regla y la
-      sangría automática.
-- [ ] **X7. Puntos guía.** *Propuesta:* `Leader: dots | rule | none` en `Contents`, dibujados
-      entre el título y el número con el color del texto. *Alternativa:* sin guía (solo el
-      número a la derecha).
-- [ ] **X8. Qué texto lleva la entrada.** *Propuesta:* el del encabezado, con sus `Text`
-      unidos por un espacio y sin formato en línea. *Alternativa:* poder dar otro título con
-      una propiedad `Short title` del encabezado.
-- [ ] **X9. Otros números (cláusula 4, figura 2).** *Propuesta:* fuera de este hito; se apunta
-      como idea (`{number of: id}`) si hace falta. *Alternativa:* incluirlo aquí, porque el
-      contrato (ejemplo 07) cita «el Anexo I» y «la cláusula 4».
-- [ ] **X10. PDF etiquetado.** *Propuesta:* `TOC` con un `TOCI` por entrada; los marcadores no
-      cambian. El enlace al destino llega con el hito 23.
+- [ ] **X11. Qué se numera con `{number of: id}`** (consecuencia de X9). *Propuesta:* no hay
+      contadores genéricos; se numera lo que ya tiene número en el documento: el ítem de una
+      lista numerada (`List item` con `Number`) y los encabezados, con su numeración
+      jerárquica («4», «4.2») si el encabezado la lleva. *Alternativa:* una propiedad `Counter`
+      en cualquier caja, más general (figuras, cláusulas, anexos) pero más pesada. Resolver
+      con el usuario al empezar esa parte del hito.
+- [ ] **X12. Convergencia (consecuencia de X3).** *Propuesta:* se pagina de nuevo mientras algún
+      texto con referencia cambie de ancho (con la medida de cada pasada como estimación de la
+      siguiente), hasta un máximo de pasadas; si no converge, error (`REFERENCE_UNSTABLE`, con
+      la línea del texto que oscila). *Alternativa:* un máximo fijo sin error, quedándose con la
+      última pasada.
+
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada salvo X3 y X9; las
+interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
+
+- [x] X1. **Sintaxis de la referencia:** `{page of: id}` dentro del texto de un `Text`,
+      `Paragraph` o `Cell`, como `{page}` y `{pages}`, con el `Id` de una caja.
+- [x] X2. **Página de una caja partida:** la de su primer fragmento (donde empieza).
+- [x] X3. **Cómo se resuelve: paginando hasta que converja** (*alternativa elegida*, en lugar de
+      reservar dígitos y rehacer las líneas como `{pages}`). Así el texto de una referencia
+      puede tener longitud variable («página 12 de este manual») y cambiar el reparto en
+      líneas y en páginas. Ver X12 para el criterio de parada.
+- [x] X4. **Errores nuevos:** `REFERENCE_UNKNOWN` (el `Id` no existe; línea del texto) y
+      `REFERENCE_NOT_PLACEABLE` (la caja está en un `Fixed` o es generada y no tiene una única
+      página). Nada de dejar referencias en blanco (contra el §6).
+- [x] X5. **Índice automático:** elemento `Contents` en flujo, sin hijos, con una entrada por
+      encabezado de los niveles de `Levels` (por defecto `1 3`), en orden del documento,
+      también los de un `Markdown`. Cada entrada es una caja generada (como el marcador de una
+      lista): un `Flex` con el texto del encabezado, la guía y el número.
+- [x] X6. **Estilo de las entradas:** reglas `Element: Contents entry 1` … `Contents entry 6`,
+      una por nivel, con `Box` y `Typography`; la sangría de cada nivel es su `Padding`
+      izquierdo.
+- [x] X7. **Puntos guía:** `Leader: dots | rule | none` en `Contents`, entre el título y el
+      número, con el color del texto.
+- [x] X8. **Texto de la entrada:** el del encabezado, con sus `Text` unidos por un espacio y sin
+      formato en línea.
+- [x] X9. **Otros números (cláusula 4, figura 2): se incluyen en este hito** (`{number of: id}`),
+      porque el contrato (ejemplo 07) cita «el Anexo I» y «la cláusula 4». Qué se numera, en X11.
+- [x] X10. **PDF etiquetado:** `TOC` con un `TOCI` por entrada; los marcadores no cambian. El
+      enlace al destino llega con el hito 23.
 
 **Tareas:**
 
-- [ ] Resolver X1–X10.
+- [x] Resolver X1–X10 (2026-10-28).
+- [ ] Resolver X11 y X12 (al empezar la parte que toca a cada una).
 - [ ] Schema (`Contents`, `Levels`, `Leader`) y `Element`; especificación (§2, §4, §5 —
       nueva sección—, §6, §7, §8, §9, glosario y un ejemplo).
-- [ ] `{page of: id}`: lectura en el texto, `PageNumbers` y `Engine.number`; página de la
-      primera aparición de cada `Id` en el `Paginator`.
+- [ ] `{page of: id}` y `{number of: id}`: lectura en el texto; paginar de nuevo hasta que
+      converjan (X3, X12); página de la primera aparición de cada `Id` en el `Paginator`.
 - [ ] `Contents`: entradas generadas en el builder, con los encabezados (también los de
       `Markdown`), y su pintado con guía.
 - [ ] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/`.
@@ -1075,6 +1081,13 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (6).** Hito 22: resueltas X1–X10 (solo documentación, sin código). Se aceptan
+  todas las propuestas salvo X3 (se pagina hasta que converja, en vez de reservar dígitos) y
+  X9 (`{number of: id}` entra en el hito). Quedan X11 (qué se numera) y X12 (criterio de
+  convergencia y error si oscila), que salen de esos dos cambios. `mvn test` en verde (809
+  tests).
+  *Siguiente paso:* hito 22, empezar por `{page of: id}` con paginación hasta converger (X1–X4,
+  X12).
 - **2026-10-28 (5).** Se abren los hitos 22 a 31 (solo la hoja de ruta, sin código): el 22 es el
   índice, pedido por el usuario, y los nueve siguientes son los huecos que salieron al escribir
   los ejemplos, ordenados por impacto, con el ejemplo donde se echó en falta cada uno. Las
