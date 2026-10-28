@@ -80,7 +80,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
-| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)) | Su texto en `Content` |
+| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas e imágenes, con enlaces en sus textos ([§5.17](#517-markdown)) | Su texto en `Content` |
 | `Image` | Imagen PNG o JPEG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
 | `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
@@ -288,6 +288,7 @@ opcionales; sin ellos, el PDF no los declara.
 |---|---|---|---|---|
 | `Id` | texto | — | De caja | Identificador para volcados, tests, mensajes y reglas `For id`. Único en el documento. |
 | `Class` | nombres separados por espacios | — | De caja | Clases del elemento: le aplican las reglas `For class` con esos nombres ([§4.10](#410-reglas-reutilizables-styles)). Cada clase necesita su regla y no se repite. |
+| `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Todos los elementos de caja salvo `Markdown` y `Contents` | Hace clicable la caja entera: lleva a una URL o a la caja con ese `Id` ([§5.20](#520-enlaces)). No se hereda y no cambia el aspecto. |
 | `Isolate` | booleano | `false` | `Block`, `Relative` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Los demás elementos ya lo crean o no tienen hijos en flujo de bloque. |
 
 ### 4.3 `Box`
@@ -681,7 +682,8 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   partes; el espacio entre dos palabras tiene el formato del tramo en que está su primer espacio
   en blanco. Con `justify`, el espacio extra de cada espacio pertenece a su tramo. Un texto sin
   formato es un único tramo. Un `Text` no tiene sintaxis para escribirlos: los genera el
-  elemento `Markdown` ([§5.17](#517-markdown)).
+  elemento `Markdown` ([§5.17](#517-markdown)). Un tramo puede llevar además el destino de un
+  enlace ([§5.20](#520-enlaces)), que no cambia cómo se mide ni cómo se pinta.
 - **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
   espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
   los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
@@ -1475,11 +1477,13 @@ tachado de GFM y el subrayado `++…++`. Se traduce así:
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
+| `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([§5.20](#520-enlaces)) |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`; con `![](ruta)`, decorativa ([§5.18](#518-imágenes)) |
 
-Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces, imágenes dentro de un texto o con
-título (`![Alt](ruta "título")`), código (en línea o en bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
-de la línea) y definiciones de enlaces. Un encabezado tampoco puede ir dentro de un ítem de
+Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`),
+imágenes dentro de un texto (también dentro de un enlace) o con título (`![Alt](ruta "título")`),
+código (en línea o en bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
+de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se escribe en el propio enlace). Un encabezado tampoco puede ir dentro de un ítem de
 lista, como en un `List item`, ni una tabla quedarse sin filas debajo de la cabecera.
 
 **Texto.** Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Text`. El
@@ -1703,9 +1707,66 @@ Contents:
   `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Contents`).
 - **PDF etiquetado.** Un `TOC` con un `TOCI` por entrada, cada uno con dos `Span` (el título y el
   número); la guía no es contenido. Los marcadores no cambian ([§5.13](#513-encabezados-y-párrafos)).
-  El enlace de cada entrada a su destino llega con los enlaces.
+- **Enlace.** Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id`
+  ([§5.20](#520-enlaces)); con el `Link` etiquetado, cada `TOCI` tiene además un `Link`.
 - **Volcado ([§7](#7-formato-de-resultados)).** Solo sale el `Contents`, si tiene `Id`: sus
   entradas no.
+
+### 5.20 Enlaces
+
+Un enlace lleva a quien lo pulsa a una URL de fuera del documento o a otra caja de él. Se escribe
+de dos maneras, que producen lo mismo en el PDF: la propiedad `Link` de una caja, que hace
+clicable la caja entera, y el enlace de Markdown (`[texto](destino)`), que hace clicable una parte
+de una línea.
+
+```
+Text: Escribe a soporte@airemas.example
+	Link: mailto:soporte@airemas.example
+
+Image: examples/brand/nogal.png
+	Link: https://tallernogal.example
+
+Markdown:
+	Content >>
+		Consulta [las especificaciones](#specs) o [la web](https://airemas.example).
+```
+
+- **Destino.** Una URL `https://…`, `http://…` o `mailto:…` (con servidor o destinatario), o `#id`:
+  el `Id` de una caja del documento. Cualquier otra cosa es un error (`LINK_SCHEME`, con la línea
+  del `Link` o, en Markdown, la del bloque): un destino vacío, mal escrito, sin servidor, con otro
+  esquema (`javascript:`, `file:`, `tel:`…) o una ruta relativa. El motor no abre nada: solo escribe
+  la anotación, y un visor no se encuentra con esquemas que ejecuten o lean nada.
+- **Destinos del documento.** `#id` debe ser el `Id` de una caja (`LINK_UNKNOWN` si no existe, con
+  la línea del `Link`), que puede estar antes o después del enlace, y que no esté en un `Fixed` ni
+  dentro de uno, que se repite en todas las páginas y no tiene un único sitio (`LINK_UNKNOWN`).
+  En el PDF lleva a la página y a la esquina superior izquierda del primer fragmento de la
+  caja, como un marcador. Un encabezado de un `Markdown` no tiene `Id`, así que no se puede
+  enlazar con `#id`; lo enlaza el índice que lo lista ([§5.19](#519-referencias-a-otras-cajas)).
+- **Dónde se admite `Link`.** En todos los elementos de caja salvo `Markdown` (su contenido lleva sus
+  propios enlaces) y `Contents` (sus entradas ya llevan el suyo): `Block`, `Flex`, `Grid`,
+  `Text`, `Paragraph`, los encabezados, `List`, `List item`, `Table`, `Cell`, `Multicol`, `Image`,
+  `Relative`, `Absolute` y `Fixed`. No es una propiedad de `Box`, `Typography` ni `Break` y no va
+  en las reglas de `Styles`: es del elemento, como `Id`. No se hereda: lo que hay dentro de una
+  caja con enlace es clicable por ella, pero no lleva enlace propio. Si lo lleva, las dos zonas se
+  solapan y el visor decide cuál se activa.
+- **Aspecto.** Un enlace no cambia el aspecto de lo que enlaza: el color y el subrayado los da el
+  autor con su estilo. La excepción es el enlace de Markdown, que sale **subrayado**, porque no
+  hay otra manera de darle estilo a una parte de una línea. El subrayado es el de un tramo
+  ([§5.4](#54-texto)) y se puede combinar con negrita y cursiva (`[la **web**](…)`).
+- **Zonas.** La zona clicable de una caja con `Link` es su **caja de borde**, una por fragmento: una
+  caja partida entre páginas es clicable en cada página. La de un enlace de Markdown es el
+  rectángulo de cada tramo de cada línea, del alto de la línea: un enlace que ocupa dos líneas
+  tiene dos zonas, y los tramos seguidos con el mismo destino (una parte en negrita dentro del
+  enlace) son una. Un `Fixed` con `Link` es clicable en todas las páginas; las filas repetidas de
+  una tabla, también.
+- **PDF.** Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la
+  página, y como texto (`Contents`) lo que dice la caja o el tramo, para quien no lo ve (el texto de
+  la caja y de lo que contiene, o el `Alt` de una imagen; sin texto, el propio destino).
+- **PDF etiquetado.** Cada anotación es un elemento `Link` hijo del elemento de la caja, con la
+  anotación como referencia a objeto (`OBJR`) y su texto como `Alt`. No tiene `Link` lo que no es
+  contenido: lo que hay dentro de un `Fixed`, una imagen decorativa y las filas repetidas de una
+  tabla desde su segunda página; la anotación sigue siendo clicable.
+- **Volcado ([§7](#7-formato-de-resultados)).** Los enlaces no se vuelcan.
 
 ---
 
@@ -1772,7 +1833,9 @@ La validación se hace en cuatro niveles:
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
-| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite enlaces: solo admite encabezados, párrafos, listas, tablas y…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces con título, ni definiciones de enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas y…` |
+| `LINK_SCHEME` | El destino de un enlace (`Link` o enlace de Markdown, [§5.20](#520-enlaces)) es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito (línea del `Link`, o la del bloque en Markdown) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
+| `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno (línea del `Link`, o la del bloque en Markdown) | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
 | `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
@@ -1832,7 +1895,7 @@ de su padre. Las columnas de un `Multicol` no tienen fragmento: sus hijos se ani
 `Multicol`, y una caja partida entre dos columnas sale dos veces en la misma página
 ([§5.16](#516-bloques-en-columnas)).
 Las cajas sin `Id` pueden incluirse para depurar. Las líneas de texto y sus tramos no se
-vuelcan.
+vuelcan, ni los enlaces ([§5.20](#520-enlaces)): no cambian el layout.
 
 Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expected.stxt`
 (el volcado esperado). Los números de `Rect` se comparan con una tolerancia de 0.01 pt.
@@ -1912,6 +1975,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `alt=""` | Imagen decorativa | Sin `Alt`; un `Alt` vacío es un error |
 | Tabla de contenido | La genera un script o una librería a partir del HTML; con CSS paginado, `target-counter()` para los números | `Contents`: una entrada por encabezado, con guía y páginas, generada por el motor ([§5.19](#519-referencias-a-otras-cajas)) |
 | Número de un ítem de lista referido desde otro sitio | `counter()` y `target-counter()` con contadores propios | `{number of: id}`: el número de su marcador, sin contadores propios ([§5.19](#519-referencias-a-otras-cajas)) |
+| Enlaces | `<a href>` en línea, con cualquier URL (también relativas, `javascript:`, `tel:`…), con aspecto propio del navegador | Propiedad `Link` de una caja, que la hace clicable entera, o `[texto](destino)` de Markdown, que subraya el tramo; solo `https://`, `http://`, `mailto:` y `#id`; sin aspecto por defecto en una caja ([§5.20](#520-enlaces)) |
 | Número de la página de otro elemento | Contadores (`target-counter`, solo en impresión paginada y con poco soporte) | `{page of: id}` en el texto, resuelto paginando hasta que converja ([§5.19](#519-referencias-a-otras-cajas)) |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
@@ -1936,23 +2000,23 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id` (varios de cada) |
 | `Element`, `For class`, `For id` | `INLINE` | `Box`, `Typography`, `Break` |
-| `Block` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
-| `Flex` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
-| `Grid` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
-| `Text`, `Paragraph` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Content` |
-| `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Box`, `Typography`; `Text` (al menos uno, varios) |
-| `List` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
-| `List item` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Gap`; `Head`, `Body` (obligatorio), `Foot` |
+| `Block` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
+| `Flex` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
+| `Grid` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
+| `Text`, `Paragraph` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content` |
+| `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`; `Text` (al menos uno, varios) |
+| `List` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
+| `List item` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
+| `Table` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `GROUP` | `Row` (al menos uno, varios) |
 | `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
-| `Cell` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
-| `Multicol` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
+| `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
+| `Multicol` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
 | `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `INLINE` | `Id`, `Class`, `Box`, `Break`, `Alt`, `Fit` |
-| `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
-| `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
+| `Image` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit` |
+| `Relative` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
+| `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
@@ -1965,7 +2029,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; las de valores
-cerrados (`Table columns`, `Fit` y `Leader` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels` y `Alt` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
+cerrados (`Table columns`, `Fit` y `Leader` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering`, `Levels`, `Alt` y `Link` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
@@ -2122,6 +2186,7 @@ Document (dev.stxt.boxes):
 | **Elemento** | `Block`, `Flex`, `Grid`, `Text`, `Relative`, `Absolute` o `Fixed`: un nodo del documento que es una caja ([§2](#2-estructura-de-un-documento)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
+| **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([§5.20](#520-enlaces)). |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
 | **Fragmentainer** | Contenedor de fragmentos: cada página y, dentro de un `Multicol`, cada columna. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
@@ -2133,5 +2198,5 @@ Document (dev.stxt.boxes):
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
-| **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado) ([§5.4](#54-texto)). |
+| **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado y enlace) ([§5.4](#54-texto)). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

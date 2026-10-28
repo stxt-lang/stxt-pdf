@@ -83,7 +83,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 22 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 23 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -124,6 +124,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 22 están termin
 | Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Weight` y `Style`, línea base real | Hecho y probado |
 | Referencias a otras cajas en el texto: `{page of: id}` (la página donde empieza la caja, resuelta paginando hasta que converja) y `{number of: id}` (el número de un ítem de una lista numerada) | Hecho y probado |
 | Índice automático (`Contents`): una entrada por encabezado de los niveles de `Levels` (también los de un `Markdown`), con título, guía (`dots`, `rule`, `none`) y página; se estila con `Element: Contents entry 1`…`6`; `TOC` y `TOCI` en el PDF etiquetado | Hecho y probado |
+| Enlaces: `Link` en una caja (URL `https`, `http` o `mailto`, o `#id` de otra caja) y `[texto](destino)` en Markdown; anotaciones del PDF y `Link` en el PDF etiquetado; las entradas de un índice llevan a su encabezado | Hecho y probado |
 | Ejemplos de documentos completos (`test/examples/`): once documentos con una imagen por página versionada, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
@@ -165,7 +166,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 21. ~~**Ejemplos.** Once documentos completos en `test/examples/`, con PDF e imágenes limpios; IBM Plex Serif y Mono, e imágenes generadas con `tools/ExampleImages.java`.~~ Hecho.
 
 22. ~~**Referencias a páginas e índice.** `{page of: id}` y `{number of: id}` en el texto, paginando hasta que las páginas converjan, y el elemento `Contents`, que genera el índice con guía y páginas (caso 15).~~ Hecho.
-23. **Enlaces.** URL y destinos del documento, con anotaciones de enlace en el PDF. Pendiente.
+23. ~~**Enlaces.** Propiedad `Link` en las cajas y enlaces de Markdown, a una URL o a otra caja del documento, con anotaciones de enlace en el PDF; las entradas del índice llevan a su encabezado (caso 16).~~ Hecho.
 24. **Primera página distinta y páginas con nombre.** Pendiente.
 25. **Estilo de las tablas** (cebra, cabecera, columnas). Pendiente.
 26. **Formato dentro de la línea fuera de Markdown.** Pendiente.

@@ -878,3 +878,80 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
 162. **Con título largo, el número queda en la primera línea**: la entrada es un flex sin
      alineación por línea base, y el título se parte. *Alternativa:* alinear el número con la
      última línea, que pediría una alineación `baseline` que no existe todavía.
+
+## Hito 23: enlaces
+
+163. **El enlace de una caja es una propiedad del elemento, no de un grupo** (`Link`, como `Id`):
+     no va en `Box`, `Typography` ni `Break`, no se hereda y no se puede poner en las reglas de
+     `Styles`. Un enlace por regla de clase haría que todas las cajas con esa clase llevaran al
+     mismo sitio, que casi nunca se quiere, y heredado, un `Typography` con `Link` en `Document`
+     enlazaría todo el documento. Se admite en todos los elementos de caja salvo `Markdown`
+     (sus enlaces van en su contenido) y `Contents` (sus entradas ya llevan el suyo). *Dónde:*
+     schema, `Style.link`, `tree/BoxTreeBuilder.link`. *Alternativa:* una propiedad de
+     `Typography`, o solo en `Text`, `Paragraph`, `Cell` e `Image`.
+
+164. **Un enlace no tiene aspecto por defecto**, salvo en Markdown, donde el tramo sale subrayado
+     (L3): una caja con `Link` se ve igual que sin él, y el autor le da color y subrayado con su
+     estilo. En Markdown no hay otra manera de dar estilo a una parte de una línea, así que se
+     subraya, sin color (el color es el del texto). *Dónde:* `tree/MarkdownBuilder.link`.
+     *Alternativa:* azul y subrayado siempre, o una regla `Element: Link`.
+
+165. **`#id` solo lleva a cajas con `Id` y a los encabezados de un índice**, y no a las de un
+     `Fixed` (que están en todas las páginas): `LINK_UNKNOWN` para las dos cosas, con mensajes
+     distintos, en lugar de un código más. Un encabezado de un `Markdown` no tiene `Id`, así que
+     solo lo enlaza su entrada del índice (la entrada usa el mismo nombre generado que las
+     referencias, decisión 158). *Dónde:* `tree/LinkTargets`. *Alternativa:* un código propio
+     para el `Fixed` (`LINK_NOT_PLACEABLE`), como `REFERENCE_NOT_PLACEABLE`.
+
+166. **`LINK_SCHEME` cubre también el destino mal escrito**: vacío, `https://` sin servidor,
+     `mailto:` sin destinatario, con espacios o una ruta relativa. Un código solo para «no es una
+     URL» no añadía nada: la corrección es la misma. El mensaje dice cuál es el problema. *Dónde:*
+     `model/Links.problem`. *Alternativa:* `LINK_INVALID` aparte.
+
+167. **Los enlaces de Markdown son `[texto](destino)` y `<destino>`; con título o con una
+     definición aparte (`[x][ref]` más `[ref]: destino`) son `MARKDOWN_UNSUPPORTED`**, como el
+     título de una imagen (decisión 140). El destino se escribe en el propio enlace. Una imagen
+     dentro de un enlace (`[![a](b.png)](url)`) sigue siendo error: una imagen va sola en su
+     párrafo; para una imagen clicable está `Image` con `Link`. *Dónde:*
+     `tree/MarkdownBuilder`. *Alternativa:* admitir las definiciones (commonmark-java ya las
+     resuelve).
+
+168. **Un enlace de Markdown es un `TextFormat` más** (`TextFormat.link`): dos enlaces con
+     destinos distintos no se unen en un tramo aunque el resto del formato sea igual, y un
+     destino igual en dos tramos seguidos sí (una parte en negrita dentro de un enlace es una
+     sola zona). No cambia cómo se miden las palabras ni las líneas. *Dónde:* `model/TextFormat`,
+     `layout/inline/LineBreaker`. *Alternativa:* una lista de enlaces aparte del texto.
+
+169. **La zona de un enlace se calcula al pintar, no al maquetar**: `StackingContext.paintLinks`
+     recorre los fragmentos y sus líneas, y llama a `Canvas.link`. Una caja con `Link` es clicable
+     en su caja de borde (una zona por fragmento, también el `Fixed` y las filas repetidas de una
+     tabla); un tramo, en el alto de la línea y el ancho del tramo (una zona por línea). El layout
+     no sabe nada de los enlaces, y el SVG de depuración los ignora. *Dónde:*
+     `paint/StackingContext`, `paint/Canvas`. *Alternativa:* guardar las zonas en el fragmento.
+
+170. **Los destinos internos se resuelven después de pintar todas las páginas**: un enlace puede
+     ir hacia delante. `PdfCanvas.write` crea todas las páginas antes de pintar ninguna,
+     `PdfDestinations` busca la esquina del primer fragmento de cada caja con nombre (la misma
+     que usan los marcadores, que antes buscaban solo los encabezados) y `PdfLinks` los asigna.
+     *Dónde:* `paint/PdfCanvas`, `paint/PdfDestinations`, `paint/PdfLinks`. *Alternativa:*
+     destinos con nombre en el catálogo del PDF.
+
+171. **PDF etiquetado: el `Link` solo contiene su `OBJR`**, no el texto marcado: un `Link` hijo
+     del elemento de la caja con la anotación y su `Alt`, y no un elemento que envuelve el
+     contenido del tramo. Para envolverlo habría que partir el contenido marcado de un `P` en
+     varios `MCID` por cada tramo con enlace. El texto del enlace llega a quien lo lee por
+     el `Alt` del `Link` y el `Contents` de la anotación. Lo que no es contenido (un `Fixed`, una
+     imagen decorativa y las filas repetidas de una tabla desde su segunda página) no tiene
+     `Link`, pero sí anotación. *Dónde:* `paint/PdfStructure.link`. *Alternativa:* el `Link` con
+     el contenido marcado del tramo dentro, que es lo más completo para la accesibilidad.
+
+172. **Solo se admiten `https`, `http`, `mailto` y `#id`**: ni `tel:`, ni `ftp:`, ni rutas
+     relativas, ni `javascript:` ni `file:` (L6). El motor no abre nada y un PDF no debería
+     llevar un enlace que ejecute o lea algo en quien lo abre. *Dónde:* `model/Links`.
+     *Alternativa:* cualquier URI, con una lista de esquemas prohibidos.
+
+173. **El `Alt` y el `Contents` de un enlace es el texto de la caja** (o el `Alt` de la imagen):
+     si es un `Block` con varios textos, los une con un espacio; el número de página de una
+     entrada de índice no cuenta. Sin texto (un `Block` solo con fondo), el propio destino.
+     Las referencias (`{page of: …}`) y marcadores (`{page}`) del texto salen sin sustituir.
+     *Dónde:* `paint/StackingContext.describe`. *Alternativa:* un `Alt` propio en `Link`.

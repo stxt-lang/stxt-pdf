@@ -28,7 +28,10 @@
 - **Primera página distinta / páginas con nombre**: una portada sin cabecera ni pie se hace con
   un `Absolute` de `Layer` alta que tapa los `Fixed` (ejemplos 04 y 09). Falta una forma de
   decir en qué páginas va un `Fixed`.
-- **Enlaces** (a una URL o a un `Id` del documento) y anotaciones del PDF.
+- ~~**Enlaces** (a una URL o a un `Id` del documento) y anotaciones del PDF.~~ (hito 23: `Link` y
+  `[texto](destino)` en Markdown). Queda: el `Link` del PDF etiquetado no envuelve el contenido
+  marcado del tramo (decisión 171), y un encabezado de un `Markdown` no se puede enlazar a mano
+  porque no tiene `Id`.
 - **Formato dentro de la línea fuera de Markdown**: en `Text`, `Paragraph` y `Cell` los
   asteriscos son literales, así que una negrita suelta en un texto corto obliga a usar `Markdown`.
 - **Estilo de las tablas**: una fila no tiene `Box`, así que un fondo alternado (cebra) exige una

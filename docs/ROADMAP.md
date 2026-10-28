@@ -41,7 +41,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
 | 21 | Ejemplos de verdad: once documentos completos, con PNG limpios | hecho | `examples/` |
 | 22 | Referencias a páginas e índice automático (`Contents`) | hecho | 15 |
-| 23 | Enlaces (URL y destinos del documento) | pendiente | 16 (previsto) |
+| 23 | Enlaces (URL y destinos del documento) | hecho | 16 |
 | 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | pendiente | 18 (previsto) |
 | 26 | Formato dentro de la línea fuera de Markdown | pendiente | 19 (previsto) |
@@ -51,7 +51,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 22, el 2026-10-28. Los hitos 23 a 31
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 23, el 2026-10-28. Los hitos 24 a 31
 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -590,8 +590,8 @@ interpretaciones que salgan al implementarlas, en [`DECISIONES.md`](DECISIONES.m
 ## Hito 23: enlaces
 
 **Objetivo.** Que un texto, una imagen o una caja entera lleve a una URL o a otro sitio del
-documento, con anotaciones de enlace en el PDF. Hoy un enlace de Markdown es
-`MARKDOWN_UNSUPPORTED` y los correos y las webs de los ejemplos son texto plano.
+documento, con anotaciones de enlace en el PDF. Antes del hito, un enlace de Markdown era
+`MARKDOWN_UNSUPPORTED` y los correos y las webs de los ejemplos eran texto plano.
 
 **Qué se echó en falta.**
 
@@ -613,36 +613,54 @@ Image: examples/brand/nogal.png
 Markdown: ... [la web](https://tallernogal.example) ...
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **L1. Dónde se declara.** *Propuesta:* una propiedad `Link` en cualquier caja con
-      contenido (`Text`, `Paragraph`, `Cell`, `Image`, `Block`…) que hace clicable toda la caja,
-      y el enlace de Markdown, que se traduce a un tramo con enlace (`TextFormat` ampliado).
-      *Alternativa:* solo en Markdown, o solo en cajas.
-- [ ] **L2. Destinos.** *Propuesta:* `https://…`, `http://…` y `mailto:…` hacia fuera, y
-      `#id` hacia una caja del documento (se resuelve al terminar de paginar, como las
-      referencias del hito 22). Cualquier otro esquema es un error (`LINK_SCHEME`) y un `#id`
-      que no existe, `LINK_UNKNOWN`. *Alternativa:* admitir cualquier URI.
-- [ ] **L3. Aspecto.** *Propuesta:* un enlace no cambia el aspecto por sí mismo; el autor
-      le da color y subrayado con su estilo, salvo en Markdown, donde el tramo sale subrayado.
-      *Alternativa:* un aspecto por defecto (azul y subrayado) o una regla `Element: Link`.
-- [ ] **L4. Cajas partidas.** *Propuesta:* una anotación por fragmento. *Alternativa:* solo
-      en el primero.
-- [ ] **L5. PDF etiquetado.** *Propuesta:* un elemento `Link` con su `OBJR` por enlace; en un
-      `Fixed` o en las filas repetidas de una tabla, el enlace no es contenido, igual que el
-      resto. *Alternativa:* no etiquetarlos.
-- [ ] **L6. Seguridad.** *Propuesta:* ni `javascript:` ni `file:` ni rutas relativas; el
-      motor no abre nada, solo escribe la anotación.
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada; las interpretaciones que
+salieron al implementarlas, en [`DECISIONES.md`](DECISIONES.md), 163–173):
+
+- [x] L1. **Dónde se declara.** Una propiedad `Link` en cada elemento de caja con contenido (todos
+      salvo `Markdown` y `Contents`), que hace clicable la caja entera, y el enlace de Markdown
+      (`[texto](destino)`), que se traduce a un tramo con enlace (`TextFormat.link`).
+- [x] L2. **Destinos.** `https://…`, `http://…` y `mailto:…` hacia fuera y `#id` hacia una caja del
+      documento (se resuelve al terminar de paginar). Otro esquema o un destino mal escrito es
+      `LINK_SCHEME` (decisión 166) y un `#id` que no existe, `LINK_UNKNOWN`.
+- [x] L3. **Aspecto.** Un enlace no cambia el aspecto por sí mismo; en Markdown, el tramo sale
+      subrayado.
+- [x] L4. **Cajas partidas.** Una anotación por fragmento.
+- [x] L5. **PDF etiquetado.** Un `Link` con su `OBJR` por enlace; en un `Fixed` o en las filas
+      repetidas de una tabla desde la segunda página, el enlace no es contenido (decisión 171).
+- [x] L6. **Seguridad.** Ni `javascript:` ni `file:` ni rutas relativas; el motor solo escribe la
+      anotación.
+
+**Diseño técnico** (como quedó):
+
+- **Modelo.** `model/Links` (qué destino es válido) y `TextFormat.link`, que no cambia cómo se
+  mide ni cómo se pinta el texto. `Style.link` (propiedad del elemento, no se hereda) y
+  `ErrorCode.LINK_SCHEME` y `LINK_UNKNOWN`.
+- **Construcción.** `BoxTreeBuilder.link` lee y valida el destino; `LinkTargets` comprueba al final
+  que cada `#id` existe (también los de los tramos); `MarkdownBuilder` traduce `[texto](destino)` y
+  `<destino>`; `ContentsBuilder` pone `Link` a cada entrada, hacia su encabezado.
+- **Pintado.** `StackingContext.paintLinks` calcula las zonas (la caja de borde de cada fragmento con
+  `Link`; el rectángulo de cada tramo con enlace de cada línea) y llama a `Canvas.link`, que el SVG
+  ignora.
+- **PDF.** `PdfCanvas.write` crea todas las páginas antes de pintar; `PdfLinks` crea las
+  anotaciones (acción `URI` o destino), `PdfDestinations` da la esquina del primer fragmento de cada
+  caja con nombre (la misma de los marcadores, que antes solo buscaba encabezados) y
+  `PdfStructure.link` cuelga el `Link` con su `OBJR`.
 
 **Tareas:**
 
-- [ ] Resolver L1–L6.
-- [ ] Schema (`Link`) y `Style`; Markdown (`[texto](url)` deja de ser `MARKDOWN_UNSUPPORTED`).
-- [ ] Rectángulos de enlace por fragmento en el layout; `PdfCanvas` escribe
-      `PDAnnotationLink` (URI y destino con página y posición); el índice del hito 22 usa los
-      destinos.
-- [ ] Especificación, errores, tests y caso golden `16-links`.
-- [ ] Ejemplos 01, 02, 03, 04, 05, 08, 09 y 10 con enlaces (ver arriba).
+- [x] Resolver L1–L6 (2026-10-28).
+- [x] Schema (`Link`) y `Style`; Markdown (`[texto](url)` deja de ser `MARKDOWN_UNSUPPORTED`; con
+      título o con definición aparte, lo sigue siendo).
+- [x] Zonas de enlace por fragmento al pintar; `PdfCanvas` escribe `PDAnnotationLink` (URI y destino con
+      página y posición); el índice del hito 22 usa los destinos.
+- [x] Especificación (§4.2, §5.4, §5.17, §5.19, §5.20 nueva, §6, §7, §8, §9 y glosario), errores (6
+      casos en `test/errors/links/` y uno en `markdown/` que sustituye al del enlace), tests
+      (`LinksTest` en `model` y en `tree`, `TextFormatTest`, `MarkdownBuilderTest`,
+      `StackingContextTest`, `PdfCanvasTest`) y caso golden `16-links`.
+- [x] Ejemplos 01, 02, 03, 04, 05, 08, 09 y 10 con enlaces (en el 04, el 08 y el 09, las entradas
+      del índice; en el 08, un enlace de Markdown a la tabla de especificaciones).
 
 ---
 
@@ -1077,6 +1095,17 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (8).** Hito 23 terminado. Resueltas L1–L6 con las propuestas. `Link` en las cajas y
+  `[texto](destino)` en Markdown, a una URL (`https`, `http`, `mailto`) o a otra caja (`#id`), con
+  anotaciones del PDF (una por fragmento o por tramo y línea), destinos con página y posición, y
+  `Link` con `OBJR` en el PDF etiquetado; las entradas de los índices llevan a sus encabezados.
+  `LINK_SCHEME` y `LINK_UNKNOWN`, con seis casos en `test/errors/links/`; el caso del enlace de
+  Markdown del catálogo pasa a ser el del título de un enlace. Decisiones 163–173 de
+  `DECISIONES.md`. Caso golden `16-links`; ejemplos 01–05, 08, 09 y 10 con enlaces (los volcados no
+  cambian: el único PNG que cambia es la página 2 del manual, con su enlace de Markdown
+  subrayado). `mvn test` en verde.
+  *Siguiente paso:* hito 24 (primera página distinta y páginas con nombre) o el 25 (estilo de las
+  tablas, de esfuerzo bajo); resolver N1–N5 o B1–B5 con el usuario.
 - **2026-10-28 (7).** Hito 22 terminado, en cuatro commits: `{page of: id}` con paginación hasta
   converger (X1–X4, X12), `{number of: id}` (X9, X11), `Contents` (X5–X8, X10) y el caso golden
   `15-contents` con los ejemplos. Resueltas X11 y X12 con las propuestas; al implementar X11 salió
