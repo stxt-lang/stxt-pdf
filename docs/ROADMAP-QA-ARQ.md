@@ -14,7 +14,7 @@ como *no verificado*. Los programas con que se midió están en [`tools/qa/`](..
 1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
 2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
    evidencia, propuesta y criterio de aceptación.
-3. Ejecuta `mvn test` para partir de verde (1314 tests el 2026-10-28) y comprueba que `git status` queda limpio.
+3. Ejecuta `mvn test` para partir de verde (1321 tests tras la sesión 1) y comprueba que `git status` queda limpio.
 
 **Al terminar una sesión:**
 
@@ -59,17 +59,17 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 
 | ID | Tarea | Prio | Esf. | Estado |
 |---|---|---|---|---|
-| QA-01 | `ListMarkers`: mayúsculas con el `Locale` de la JVM | Alta | S | pendiente |
+| QA-01 | `ListMarkers`: mayúsculas con el `Locale` de la JVM | Alta | S | hecho |
 | QA-02 | El texto de un SVG cambia con el idioma de la JVM | Media | M | pendiente |
 | QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | decidir |
-| QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | pendiente |
-| QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | pendiente |
+| QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | hecho |
+| QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
 | QA-06 | Límites y entradas hostiles | Media | M | pendiente |
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
 | QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
-| QA-09 | Integración continua | Alta | S | pendiente |
+| QA-09 | Integración continua | Alta | S | hecho (falta ver el primer resultado en GitHub) |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | pendiente |
-| TS-02 | Test de conversión concurrente | Alta | S | pendiente |
+| TS-02 | Test de conversión concurrente | Alta | S | hecho |
 | TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
 | TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | pendiente |
 | TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | pendiente |
@@ -126,6 +126,8 @@ un servidor turco daría además `GLYPH_MISSING` si la fuente no tiene `İ`.
 `grep -rnE "to(Upper|Lower)Case\(\)" src/main` (solo hay estas dos; el resto usa `Locale.ROOT` o el `Language` del
 documento). `ImageFile.java:140` usa `String.format("%04X")` sin `Locale`: ponerle también `Locale.ROOT`.
 
+**Hecho (sesión 1).** `toUpperCase(Locale.ROOT)` en `ListMarkers` y `Locale.ROOT` en `ImageFile`; `ListMarkersTest` pone la JVM en turco en cada test (sin la corrección falla, comprobado). La suite entera pasa con `-Duser.language=tr` (1321 tests).
+
 **Aceptación.** Los 5 tests pasan con `-Duser.language=tr`; un test de `ListMarkersTest` fija `Locale.setDefault`
 a turco en un `@BeforeEach`/`@AfterEach` (o usa el `@DefaultLocale` equivalente) para que lo guarde sin CI;
 QA-09 añade la matriz de idiomas.
@@ -133,7 +135,7 @@ QA-09 añade la matriz de idiomas.
 ### QA-02 · Un SVG con texto sale distinto según el idioma de la JVM · Media · M
 
 **Evidencia (verificada).** Con `-Duser.language=tr -Duser.country=TR`, `ExamplesTest` pasa (los volcados coinciden)
-pero **12 PNG versionados se reescriben** (`01-invoice/page-1`, `02-letter/page-1`, `04-annual-report/page-3,4,6`,
+pero **12 PNG versionados se reescriben** (en la sesión 1 también `golden/24-svg/page-2`; el conjunto exacto varía de una ejecución a otra: `01-invoice/page-1`, `02-letter/page-1`, `04-annual-report/page-3,4,6`,
 `06-menu/page-1`, `07-contract/page-1..3`, `08-manual/page-1,2`, `10-certificate/page-1`). Comparando los streams del
 PDF de `01-invoice` en `en` y en `tr`, solo cambia el formulario del SVG del logotipo (`nogal.svg`, 15 122 bytes
 frente a 10 160: otra forma de dibujar el texto) y la tabla de glifos de las fuentes del subconjunto. La causa no
@@ -185,9 +187,10 @@ revisarlos uno a uno y anotarlo en `DECISIONES.md`).
 
 `model/Rotation.java:23`: `public static final double[] CENTER = {0.5, 0.5}`. Cualquier llamador puede escribir en
 él y cambiar el centro de giro de todos los documentos de la JVM (hoy `BoxTreeBuilder.element` solo lo lee, pero es
-público). **Propuesta:** dos constantes `double` (`CENTER_X`, `CENTER_Y`) o un `record Origin(double x, double y)
-{ static final Origin CENTER }`; de paso, `ValueReader.rotateOrigin` devuelve `double[]` y pasaría a devolver el
-record. **Aceptación:** compila sin ningún `double[]` público ni `static final` de array en `src/main`
+público). **Hecho (sesión 1):** `Rotation.CENTER` es ahora un `double` (0,5, el mismo en los dos ejes). Queda, si se quiere, que `Rotation.origin` y `ValueReader.rotateOrigin` devuelvan un `record Origin(double x, double y)` en vez de un `double[]` (son arrays nuevos en cada llamada, sin riesgo).
+
+**Propuesta original:** dos constantes `double` (`CENTER_X`, `CENTER_Y`) o un `record Origin(double x, double y)
+{ static final Origin CENTER }`. **Aceptación:** compila sin ningún `double[]` público ni `static final` de array en `src/main`
 (`grep -rnE "static final [a-zA-Z]+\[\]" src/main`: hoy quedan `ImageFile.PNG`/`JPEG`, `ListMarkers.ROMAN_*` y
 `PdfStructure.TABLE_GROUPS`, privados y de solo lectura por convención; valen).
 
@@ -195,7 +198,9 @@ record. **Aceptación:** compila sin ningún `double[]` público ni `static fina
 
 Una palabra de 1000 caracteres produce un error de línea 13 que **contiene los 1000 caracteres** (medido con
 `HostileInputsProbe`). **Propuesta:** acotar a ≈ 40 caracteres con `…` y la longitud total («la palabra de 1000
-caracteres 'xxxxxxxx…' no cabe…»), en `Messages`. **Aceptación:** el caso del catálogo de errores correspondiente
+caracteres 'xxxxxxxx…' no cabe…»), en `Messages`. **Hecho (sesión 1):** `Messages.excerpt` (40 caracteres Unicode como mucho, y la longitud total); lo usan los dos mensajes de `Overflow.textOverflow`. `MessagesTest` comprueba que el mensaje de una palabra de 1000 y otra de 2000 caracteres mide lo mismo salvo las cifras.
+
+**Aceptación:** el caso del catálogo de errores correspondiente
 sigue pasando y un test comprueba que el mensaje no crece con la palabra.
 
 ### QA-06 · Límites y entradas hostiles · Media · M
@@ -260,6 +265,8 @@ segunda ejecución con `-DargLine="-Duser.language=tr -Duser.country=TR"` (QA-01
 no está vacío tras los tests (QA-07); subir `target/site/jacoco` y `target/surefire-reports` como artefactos;
 trabajo nocturno aparte con `-Dgroups=perf -DexcludedGroups=none` y con `tools/qa/`. Nota de entorno: dentro de esta
 sesión, `mvn` solo funcionó con red (el plugin de JaCoCo no estaba en la caché local; `-o` falla).
+**Hecho (sesión 1):** `.github/workflows/ci.yml` con tres trabajos: `test` (JDK 17 y 21, `mvn -B test`, comprueba que el árbol versionado queda limpio y sube los informes), `locale` (la suite con la JVM en turco; **no** comprueba el árbol hasta QA-02) y `perf` (`@Tag("perf")`, solo programado y a mano). No se ha podido ejecutar en GitHub desde la sesión: **comprobar el primer resultado** y ajustar (en especial, si el antialiasing de la máquina de GitHub reescribe algún PNG y el paso del árbol limpio falla, ver QA-07).
+
 **Aceptación:** el commit siguiente al cambio muestra el workflow en verde.
 
 ## Hilos (ThreadSafe de la conversión)
@@ -305,7 +312,9 @@ Pasar `tools/qa/ConcurrencyProbe.java` a un test JUnit (`concurrency/ConcurrentC
 defecto, `@Timeout`), cada uno convierte todos los ejemplos con su `Engine` y compara el PDF normalizado con el de la
 conversión secuencial; una variante con `Resources` compartido y otra con uno por hilo; otra que paginan el mismo
 `LaidOutDocument` a PDF desde varios hilos (comprueba que el árbol de cajas se lee sin escribir). Etiquetarlo `@Tag("slow")`
-si pasa de unos segundos y ejecutarlo en CI (QA-09). **Aceptación:** pasa; falla si se introduce a propósito un
+si pasa de unos segundos y ejecutarlo en CI (QA-09). **Hecho (sesión 1):** `concurrency/ConcurrentConversionTest` (4 hilos × 3 rondas × los 11 ejemplos, ≈ 14 s): un `Resources` por hilo, uno compartido y un mismo `LaidOutDocument` pintado desde varios hilos (esto último confirma que el árbol se lee sin escribir), más un test de determinismo. Probado con sabotaje: con `pages`/`numbers` de `InlineLayout` convertidos en `static` fallan los dos primeros. Un `static` en `LayoutCache` **no** lo detecta (las cajas son distintas en cada conversión): el test cubre estado compartido que cambia el resultado, no un `HashMap` compartido; para eso sirve TS-01 (que `Engine` no sea compartible).
+
+**Aceptación:** pasa; falla si se introduce a propósito un
 `static` mutable en la ruta (probarlo una vez a mano).
 
 ### TS-03 · `GraphicsEnvironment.registerFont` es global a la JVM · Media · M
@@ -590,3 +599,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | Fecha | Sesión | Qué se hizo | Siguiente paso |
 |---|---|---|---|
 | 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |
+| 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). No se ha ejecutado el workflow en GitHub. | Ver el primer resultado de CI; luego la sesión 2 (decidir ligaduras: QA-03) |
