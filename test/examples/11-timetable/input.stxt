@@ -1,0 +1,386 @@
+# Horario escolar semanal en una página A4 apaisada (842 × 595): una tabla con las celdas
+# separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
+# recreo y comedor que ocupan los cinco días con Span, una leyenda en un Flex con salto de línea
+# y unas notas en Markdown. Cada color es una clase de Styles.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 842
+		Height: 595
+		Margin: 40 46 46 46
+	Title: Horario de 2.º B · Curso 2025-26
+	Language: es
+	Typography:
+		Font: IBM Plex Sans
+		Size: 9.5
+		Line height: 13
+		Color: #1F2B24
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 24
+				Line height: 28
+				Weight: bold
+				Color: #1B4332
+		Element: List
+			Box:
+				Padding: 0 0 0 14
+		Element: Cell
+			Box:
+				Padding: 14 6
+			Typography:
+				Align: center
+		Element: Fixed
+			Typography:
+				Size: 7.5
+				Color: #6B7A72
+		For class: th
+			Typography:
+				Weight: bold
+				Size: 9
+				Color: #FFFFFF
+			Box:
+				Background: #2D6A4F
+		For class: hour
+			Typography:
+				Weight: bold
+				Size: 8.5
+				Color: #2D6A4F
+				Align: right
+			Box:
+				Padding: 14 8 14 0
+		For class: break
+			Typography:
+				Size: 8.5
+				Style: italic
+				Color: #55655D
+			Box:
+				Background: #EEF1EF
+				Padding: 4 6
+		For class: slot
+			Typography:
+				Weight: bold
+		For class: math
+			Box:
+				Background: #D6E4F7
+			Typography:
+				Color: #1D3B6B
+		For class: lang
+			Box:
+				Background: #F8D9D6
+			Typography:
+				Color: #6B2218
+		For class: eng
+			Box:
+				Background: #E5DAF3
+			Typography:
+				Color: #432468
+		For class: sci
+			Box:
+				Background: #D5ECD9
+			Typography:
+				Color: #1B4D2A
+		For class: music
+			Box:
+				Background: #FBE8B8
+			Typography:
+				Color: #6B4A05
+		For class: art
+			Box:
+				Background: #F9D8EA
+			Typography:
+				Color: #6B1D46
+		For class: pe
+			Box:
+				Background: #FBDCC3
+			Typography:
+				Color: #6B3207
+		For class: lab
+			Box:
+				Background: #CDEBEA
+			Typography:
+				Color: #12504D
+		For class: tutor
+			Box:
+				Background: #E3E3E3
+			Typography:
+				Color: #333333
+		For class: proj
+			Box:
+				Background: #E6EBC3
+			Typography:
+				Color: #475010
+	Fixed:
+		Id: footer
+		Offset: auto 0 -30 0
+		Flex:
+			Main axis: between
+			Item:
+				Text: CEIP Pla de les Eres · Olot
+			Item:
+				Text: Horario válido del 8 de septiembre de 2025 al 19 de junio de 2026
+	Flex:
+		Id: masthead
+		Cross axis: center
+		Gap: 14
+		Box:
+			Margin: 0 0 16 0
+		Item:
+			Image: examples/planner/icon.png
+				Alt: Icono de un calendario
+				Box:
+					Width: 50
+		Item:
+			Grow: 1
+			Block:
+				Heading 1:
+					Text: Horario de 2.º B
+				Text: Curso 2025–26 · Tutora: Marta Ferrer
+					Typography:
+						Size: 11
+						Color: #55655D
+		Item:
+			Block:
+				Text: Entrada 9:00 · Salida 16:00
+					Typography:
+						Weight: bold
+						Align: right
+				Text: Recreo de 11:00 a 11:30
+					Typography:
+						Size: 8.5
+						Align: right
+						Color: #55655D
+	Table:
+		Id: timetable
+		Columns: 92 repeat(5, 1fr)
+		Gap: 3
+		Box:
+			Margin: 0 0 14 0
+		Head:
+			Row:
+				Cell:
+				Cell: Lunes
+					Class: th
+				Cell: Martes
+					Class: th
+				Cell: Miércoles
+					Class: th
+				Cell: Jueves
+					Class: th
+				Cell: Viernes
+					Class: th
+		Body:
+			Row:
+				Cell: 9:00 – 10:00
+					Class: hour
+				Cell: Matemáticas
+					Class: slot math
+				Cell: Lengua
+					Class: slot lang
+				Cell: Inglés
+					Class: slot eng
+				Cell: Matemáticas
+					Class: slot math
+				Cell: Ciencias
+					Class: slot sci
+			Row:
+				Cell: 10:00 – 11:00
+					Class: hour
+				Cell: Lengua
+					Class: slot lang
+				Cell: Matemáticas
+					Class: slot math
+				Cell: Ciencias
+					Class: slot sci
+				Cell: Lengua
+					Class: slot lang
+				Cell: Inglés
+					Class: slot eng
+			Row:
+				Cell:
+					Class: hour
+				Cell: Recreo · 11:00 – 11:30
+					Span: 1 5
+					Class: break
+			Row:
+				Cell: 11:30 – 12:30
+					Class: hour
+				Cell: Ciencias
+					Class: slot sci
+				Cell: Música
+					Class: slot music
+				Cell: Matemáticas
+					Class: slot math
+				Cell: Plástica
+					Class: slot art
+				Cell: Lengua
+					Class: slot lang
+			Row:
+				Cell: 12:30 – 13:30
+					Class: hour
+				Cell: Educación física
+					Class: slot pe
+				Cell: Inglés
+					Class: slot eng
+				Cell: Lengua
+					Class: slot lang
+				Cell: Ciencias
+					Class: slot sci
+				Cell: Matemáticas
+					Class: slot math
+			Row:
+				Cell:
+					Class: hour
+				Cell: Comedor y patio · 13:30 – 15:00
+					Span: 1 5
+					Class: break
+			Row:
+				Cell: 15:00 – 16:00
+					Class: hour
+				Cell: Taller
+					Class: slot lab
+				Cell: Educación física
+					Class: slot pe
+				Cell: Tutoría
+					Class: slot tutor
+				Cell: Taller
+					Class: slot lab
+				Cell: Proyecto
+					Class: slot proj
+	Flex:
+		Id: legend
+		Wrap: true
+		Gap: 6 16
+		Box:
+			Margin: 0 0 12 0
+			Padding: 8 0
+			Border: 0.5 0 0 0
+			Border color: #CAD3CD
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot math
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Matemáticas
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot lang
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Lengua
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot eng
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Inglés
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot sci
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Ciencias
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot music
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Música
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot art
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Plástica
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot pe
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Educación física
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot lab
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Taller
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot tutor
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Tutoría
+		Item:
+			Flex:
+				Gap: 5
+				Cross axis: center
+				Item:
+					Block:
+						Class: slot proj
+						Box:
+							Width: 11
+							Height: 11
+				Item:
+					Text: Proyecto
+	Markdown:
+		Id: notes
+		Bullet: disc
+		Typography:
+			Size: 8.5
+		Content >>
+			- Los días con **Educación física**, el alumnado trae ropa deportiva y una botella de agua.
+			- Los **talleres** de la tarde se reparten por trimestres: cerámica, huerto y robótica.
+			- El **recreo** y el **comedor** los cuida el personal del centro; las familias pueden recoger a sus hijos e hijas a partir de las 15:00.

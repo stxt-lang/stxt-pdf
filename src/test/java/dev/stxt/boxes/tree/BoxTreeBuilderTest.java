@@ -193,7 +193,7 @@ class BoxTreeBuilderTest {
 
     @Test
     void theSpecificationExampleIsValid() throws IOException {
-        String doc = Files.readString(Path.of("test", "examples", "report.stxt"));
+        String doc = Files.readString(Path.of("test", "spec", "report.stxt"));
         BoxTreeBuilder.Result r = build(doc);
         assertEquals(515, r.media().pageArea().width(), 1e-9);
         assertEquals(762, r.media().pageArea().height(), 1e-9);

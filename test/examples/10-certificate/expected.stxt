@@ -1,0 +1,18 @@
+Result:
+	Page: 1
+		Fragment: recipient
+			Rect: 186 168 470 51
+		Fragment: signatures
+			Rect: 80 334 682 126.67
+			Fragment: seal
+				Rect: 371 334 100 126.67
+		Fragment: paper
+			Rect: 0 0 842 595
+		Fragment: frame-outer
+			Rect: 18 16 806 563
+		Fragment: frame-middle
+			Rect: 28 26 786 543
+		Fragment: frame-inner
+			Rect: 34 32 774 531
+		Fragment: footer
+			Rect: 80 545 682 16

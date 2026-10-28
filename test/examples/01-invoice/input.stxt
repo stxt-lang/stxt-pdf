@@ -1,0 +1,279 @@
+# Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
+# una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
+# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 44 44 60 44
+	Title: Factura 2025-0147
+	Language: es
+	Typography:
+		Font: IBM Plex Sans
+		Size: 9
+		Line height: 13
+		Color: #2B2420
+	Styles:
+		For class: label
+			Typography:
+				Size: 7
+				Weight: bold
+				Color: #B5651D
+			Box:
+				Margin: 0 0 3 0
+		For class: party
+			Box:
+				Padding: 12 14
+				Border: 0 0 0 2.5
+				Border color: #B5651D
+				Background: #F8F3EA
+		For class: strong
+			Typography:
+				Weight: bold
+				Size: 10.5
+		For class: num
+			Typography:
+				Align: right
+		For class: th
+			Typography:
+				Weight: bold
+				Size: 8
+				Color: #FFFFFF
+			Box:
+				Background: #3B2A1E
+				Padding: 7 8
+		For class: total
+			Typography:
+				Weight: bold
+				Size: 11
+				Color: #3B2A1E
+			Box:
+				Background: #EFE4D2
+				Border: 1.5 0 0 0
+				Border color: #3B2A1E
+		Element: Cell
+			Box:
+				Padding: 7 8
+				Border: 0 0 0.5 0
+				Border color: #DCCFB8
+		Element: Fixed
+			Typography:
+				Size: 7.5
+				Color: #7A6A5C
+	Fixed:
+		Id: footer
+		Offset: auto 0 -34 0
+		Box:
+			Padding: 6 0 0 0
+			Border: 0.5 0 0 0
+			Border color: #DCCFB8
+		Flex:
+			Main axis: between
+			Item:
+				Text: Taller Nogal S.L. · Inscrita en el Registro Mercantil de Girona, tomo 2217, folio 88
+			Item:
+				Text: Página {page} de {pages}
+	Flex:
+		Id: masthead
+		Main axis: between
+		Cross axis: center
+		Box:
+			Margin: 0 0 30 0
+		Item:
+			Image: examples/brand/nogal.png
+				Alt: Nogal, taller de mobiliario
+				Box:
+					Width: 172
+		Item:
+			Block:
+				Text: FACTURA
+					Typography:
+						Size: 28
+						Weight: bold
+						Color: #3B2A1E
+						Align: right
+						Line height: 30
+				Text: Nº 2025-0147
+					Typography:
+						Size: 12
+						Color: #B5651D
+						Align: right
+	Grid:
+		Id: parties
+		Columns: 1fr 1fr
+		Gap: 18
+		Box:
+			Margin: 0 0 18 0
+		Area:
+			Block:
+				Class: party
+				Text: EMISOR
+					Class: label
+				Text: Taller Nogal S.L.
+					Class: strong
+				Text: CIF B-17482930
+				Text: Carrer de la Farga, 14 · Polígono Les Torres
+				Text: 17800 Olot (Girona)
+				Text: administracion@tallernogal.example
+		Area:
+			Block:
+				Class: party
+				Text: CLIENTE
+					Class: label
+				Text: Hotel Mirador del Valle, S.A.
+					Class: strong
+				Text: CIF A-08827416
+				Text: Camí del Mirador, s/n
+				Text: 17850 Besalú (Girona)
+				Text: compras@miradordelvalle.example
+	Grid:
+		Id: strip
+		Columns: repeat(4, 1fr)
+		Box:
+			Margin: 0 0 22 0
+			Padding: 9 14
+			Border: 0.5 0 0.5 0
+			Border color: #B5651D
+		Area:
+			Block:
+				Text: FECHA DE EMISIÓN
+					Class: label
+				Text: 14 de octubre de 2025
+		Area:
+			Block:
+				Text: VENCIMIENTO
+					Class: label
+				Text: 13 de noviembre de 2025
+		Area:
+			Block:
+				Text: FORMA DE PAGO
+					Class: label
+				Text: Transferencia a 30 días
+		Area:
+			Block:
+				Text: PEDIDO
+					Class: label
+				Text: PO-2025-311
+	Table:
+		Id: lines
+		Columns: 54 1fr 38 64 94
+		Box:
+			Margin: 0 0 24 0
+		Head:
+			Row:
+				Cell: Ref.
+					Class: th
+				Cell: Descripción
+					Class: th
+				Cell: Uds.
+					Class: th num
+				Cell: Precio
+					Class: th num
+				Cell: Importe
+					Class: th num
+		Body:
+			Row:
+				Cell: MN-014
+				Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
+				Cell: 6
+					Class: num
+				Cell: 640,00 €
+					Class: num
+				Cell: 3.840,00 €
+					Class: num
+			Row:
+				Cell: MN-022
+				Cell: Silla de roble con asiento de anea
+				Cell: 24
+					Class: num
+				Cell: 118,00 €
+					Class: num
+				Cell: 2.832,00 €
+					Class: num
+			Row:
+				Cell: MN-031
+				Cell: Estantería modular de pared, cinco baldas
+				Cell: 8
+					Class: num
+				Cell: 215,00 €
+					Class: num
+				Cell: 1.720,00 €
+					Class: num
+			Row:
+				Cell: MN-040
+				Cell: Banco tapizado para recibidor
+				Cell: 4
+					Class: num
+				Cell: 189,50 €
+					Class: num
+				Cell: 758,00 €
+					Class: num
+			Row:
+				Cell: MN-057
+				Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
+				Cell: 12
+					Class: num
+				Cell: 96,00 €
+					Class: num
+				Cell: 1.152,00 €
+					Class: num
+			Row:
+				Cell: SV-001
+				Cell: Transporte y montaje en obra (dos operarios, una jornada)
+				Cell: 1
+					Class: num
+				Cell: 480,00 €
+					Class: num
+				Cell: 480,00 €
+					Class: num
+			Row:
+				Cell: SV-004
+				Cell: Acabado con aceite natural y cera de abeja
+				Cell: 1
+					Class: num
+				Cell: 260,00 €
+					Class: num
+				Cell: 260,00 €
+					Class: num
+		Foot:
+			Row:
+				Cell: Base imponible
+					Span: 1 4
+					Class: num
+				Cell: 11.042,00 €
+					Class: num
+			Row:
+				Cell: IVA (21 %)
+					Span: 1 4
+					Class: num
+				Cell: 2.318,82 €
+					Class: num
+			Row:
+				Cell: TOTAL A PAGAR
+					Span: 1 4
+					Class: num total
+				Cell: 13.360,82 €
+					Class: num total
+	Grid:
+		Id: payment
+		Columns: 1fr 1fr
+		Gap: 18
+		Area:
+			Block:
+				Text: DATOS PARA EL PAGO
+					Class: label
+				Text: ES91 2100 0418 4502 0005 1332
+					Typography:
+						Font: IBM Plex Mono
+						Size: 9.5
+						Weight: bold
+				Text: Caixa Girona · BIC CAIXESBBXXX
+				Text: Indica el número de factura en el concepto.
+		Area:
+			Block:
+				Text: CONDICIONES
+					Class: label
+				Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de cinco años sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
+					Typography:
+						Size: 8
+						Color: #5C4E43

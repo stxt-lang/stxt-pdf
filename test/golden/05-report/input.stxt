@@ -1,4 +1,4 @@
-# Copia de examples/report.stxt (ESPECIFICACION.md §10). Si cambia el ejemplo, cambia esta copia.
+# Copia de spec/report.stxt (ESPECIFICACION.md §10). Si cambia el ejemplo, cambia esta copia.
 # Informe de ejemplo (ESPECIFICACION.md §10): A4 paginado con cabecera y pie repetidos,
 # título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto. El estilo
 # va en las reglas de Styles; los elementos solo declaran lo que es suyo.

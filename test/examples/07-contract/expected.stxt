@@ -1,0 +1,28 @@
+Result:
+	Page: 1
+		Fragment: parties
+			Rect: 70 169.5 455 132
+		Fragment: clauses
+			Rect: 70 520.5 455 214
+		Fragment: header
+			Rect: 70 32 455 27.55
+		Fragment: footer
+			Rect: 70 788.5 455 21.5
+	Page: 2
+		Fragment: clauses
+			Rect: 70 92 455 558
+		Fragment: header
+			Rect: 70 32 455 27.55
+		Fragment: footer
+			Rect: 70 788.5 455 21.5
+	Page: 3
+		Fragment: annex
+			Rect: 70 108 455 190.7
+			Fragment: fees
+				Rect: 70 130.5 455 168.2
+		Fragment: signatures
+			Rect: 70 312.7 455 142.25
+		Fragment: header
+			Rect: 70 32 455 27.55
+		Fragment: footer
+			Rect: 70 788.5 455 21.5

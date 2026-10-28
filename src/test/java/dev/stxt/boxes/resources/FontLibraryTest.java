@@ -9,9 +9,11 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,7 +41,7 @@ class FontLibraryTest {
     @Test
     void indexByFamilyWeightAndStyle() {
         FontLibrary fonts = new Resources().fonts();
-        assertEquals(Set.of("IBM Plex Sans"), fonts.families());
+        assertEquals(Set.of("IBM Plex Sans", "IBM Plex Serif", "IBM Plex Mono"), fonts.families());
         assertEquals("IBMPlexSans-Regular.ttf",
                 fonts.find(plex(FontWeight.NORMAL, FontStyle.NORMAL)).path().getFileName().toString());
         assertEquals("IBMPlexSans-Bold.ttf",
@@ -48,6 +50,13 @@ class FontLibraryTest {
                 fonts.find(plex(FontWeight.NORMAL, FontStyle.ITALIC)).path().getFileName().toString());
         assertEquals("IBMPlexSans-BoldItalic.ttf",
                 fonts.find(plex(FontWeight.BOLD, FontStyle.ITALIC)).path().getFileName().toString());
+        for (String family : List.of("IBM Plex Serif", "IBM Plex Mono")) {
+            for (FontWeight weight : FontWeight.values()) {
+                for (FontStyle style : FontStyle.values()) {
+                    assertNotNull(fonts.find(new FontFace(family, weight, style)), family + " " + weight + " " + style);
+                }
+            }
+        }
     }
 
     @Test

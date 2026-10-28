@@ -742,3 +742,53 @@ párrafo de Markdown y tres errores nuevos. Las interpretaciones que salieron al
      (`resources/images/test/`), junto a la fuente, porque los tests de layout, el catálogo de
      errores y los casos golden usan la carpeta por defecto. Las genera Java2D y no tienen
      licencia de terceros. *Alternativa:* una carpeta de recursos solo para los tests.
+
+144. **Los casos de prueba están en `test/`, en la raíz del repositorio**, no en
+     `src/test/resources`: `golden/`, `errors/`, `examples/` y `spec/` (el ejemplo del §10, que
+     antes era `examples/report.stxt`). Los tests los leen por ruta de disco
+     (`Path.of("test", …)`) y no del classpath, así que no hay que reconfigurar Maven ni
+     Eclipse. Los tests Java siguen en `src/test/java` y los recursos (fuentes e imágenes), en
+     `resources/`. *Dónde:* `GoldenTest`, `ErrorCatalogTest`, `ExamplesTest`. *Alternativa:*
+     también mover los tests Java a `test/java`, que obliga a cambiar `testSourceDirectory`.
+
+145. **El catálogo de errores tiene un fichero por caso**, un documento STXT de verdad, en
+     `test/errors/<grupo>/<código>.<descripción>.stxt`, con un grupo por familia de `ErrorCode`
+     (los códigos de `stxt-core`, en `schema`). Las tres primeras líneas son comentarios
+     (`# Case:`, `# Code:`, `# Line:`) y la línea esperada es la del propio fichero, cabecera
+     incluida (la primera del documento es la 4), así que se puede abrir y validar en el editor
+     y no hay que contar desde un bloque incrustado. *Dónde:* `ErrorCatalogTest`. *Alternativa:*
+     un fichero por grupo con los documentos incrustados en `Document >>`, como antes.
+
+146. **Los ejemplos se maquetan con las métricas reales** (`PdfMetrics`) y la carpeta
+     `resources/`, no con `FixedMetrics` como los golden, y su `expected.stxt` es una
+     **instantánea** que genera el motor (`-Dexamples.update=true`) y se revisa mirando las
+     imágenes, no un resultado calculado a mano: con texto real y fuentes reales, calcularlo a
+     mano no tiene sentido. Un `expected.stxt` que falta es un error del test. *Dónde:*
+     `ExamplesTest`. *Alternativa:* comparar solo las imágenes, que no detecta cambios de un
+     punto.
+
+147. **El PDF y las imágenes de los ejemplos se versionan**, a diferencia de los de los golden,
+     porque son lo que se quiere enseñar al navegar por el repositorio. Las imágenes son a
+     110 ppp, sin contornos, y no se reescriben si los píxeles cambian menos de la tolerancia
+     del antialiasing (16 por canal); el PDF, que lleva fechas e identificadores distintos en
+     cada ejecución, solo se reescribe si no existe o cambia alguna imagen. *Dónde:*
+     `golden/ReferenceFiles`, `ExamplesTest`. *Alternativa:* ignorar el PDF en git.
+
+148. **Se añaden IBM Plex Serif y Mono** (los TTF de IBM/plex, con su licencia OFL, en
+     `resources/fonts/`) a Plex Sans, para poder escribir documentos con serif y con
+     monoespaciada, y **las imágenes de los ejemplos las genera un programa**
+     (`tools/ExampleImages.java`, con Java2D y las mismas fuentes) y se versionan en
+     `resources/images/examples/`: no hay ficheros de terceros ni derechos que respetar, y el
+     autor puede cambiarlas retocando el programa. *Alternativa:* imágenes de bancos libres, que
+     habría que citar y que no se pueden regenerar.
+
+149. **Una portada sin cabecera ni pie, y un fondo detrás de todo, se hacen con lo que hay**: un
+     `Absolute` con `Layer` alta y del tamaño de la página tapa lo que repiten los `Fixed`, y un
+     `Fixed` con `Layer` negativa queda detrás del contenido en todas las páginas. No hay
+     páginas con contenido propio (primera página distinta, páginas con nombre). *Dónde:*
+     ejemplos 04, 06, 09 y 10. *Alternativa:* añadir al motor una forma de declararlo.
+
+150. **Los números de página del índice del informe anual están escritos a mano**
+     (ejemplo 04): el motor no tiene referencias a páginas. Si el texto cambia, hay que
+     revisarlos. *Alternativa:* un nodo de referencia que se resuelva al terminar de paginar,
+     como `{page}` y `{pages}`.

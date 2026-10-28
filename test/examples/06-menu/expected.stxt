@@ -1,0 +1,27 @@
+Result:
+	Page: 1
+		Fragment: front
+			Rect: 54 50 312 582.8
+			Fragment: emblem
+				Rect: 171 50 78 78
+		Fragment: paper
+			Rect: 0 0 420 700
+		Fragment: frame-outer
+			Rect: 20 20 380 660
+		Fragment: frame-inner
+			Rect: 26 26 368 648
+		Fragment: footer
+			Rect: 54 654 312 13
+	Page: 2
+		Fragment: back
+			Rect: 54 50 312 514.2
+			Fragment: tasting
+				Rect: 54 416.8 312 109.4
+		Fragment: paper
+			Rect: 0 0 420 700
+		Fragment: frame-outer
+			Rect: 20 20 380 660
+		Fragment: frame-inner
+			Rect: 26 26 368 648
+		Fragment: footer
+			Rect: 54 654 312 13

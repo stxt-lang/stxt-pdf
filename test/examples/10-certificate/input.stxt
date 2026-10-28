@@ -1,0 +1,185 @@
+# Certificado de un curso, en una página A4 apaisada (842 × 595). Un fondo crema y tres marcos
+# concéntricos con cuatro adornos en las esquinas, todos Fixed con Layer negativa; el contenido
+# centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
+# lados de un sello con cintas.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 842
+		Height: 595
+		Margin: 64 80 56 80
+	Title: Certificado de finalización · Cerámica a mano
+	Language: es
+	Typography:
+		Font: IBM Plex Serif
+		Size: 11
+		Line height: 16
+		Color: #2A2D3A
+		Align: center
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 42
+				Line height: 48
+				Weight: bold
+				Color: #14305E
+			Box:
+				Margin: 0 0 14 0
+		Element: Heading 2
+			Typography:
+				Size: 21
+				Line height: 27
+				Weight: bold
+				Color: #14305E
+			Box:
+				Margin: 6 0 8 0
+		For class: school
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Weight: bold
+				Color: #A8782F
+			Box:
+				Margin: 0 0 8 0
+		For class: aside
+			Typography:
+				Style: italic
+				Size: 13
+				Color: #5E6070
+		For class: name
+			Typography:
+				Size: 40
+				Line height: 46
+				Style: italic
+				Color: #14305E
+			Box:
+				Width: 470
+				Margin: 2 auto 8 auto
+				Padding: 0 0 4 0
+				Border: 0 0 1 0
+				Border color: #A8782F
+		For class: corner
+			Box:
+				Width: 14
+				Height: 14
+				Background: #A8782F
+		For class: line
+			Box:
+				Padding: 5 0 0 0
+				Border: 0.75 0 0 0
+				Border color: #2A2D3A
+			Typography:
+				Size: 10
+				Line height: 14
+		Element: Fixed
+			Typography:
+				Font: IBM Plex Sans
+				Size: 7.5
+				Color: #7B7D8C
+	Fixed:
+		Id: paper
+		Offset: -64 -80 -56 -80
+		Layer: -3
+		Box:
+			Background: #FBF7EC
+	Fixed:
+		Id: frame-outer
+		Offset: -48 -62 -40 -62
+		Layer: -2
+		Box:
+			Border: 5
+			Border color: #14305E
+	Fixed:
+		Id: frame-middle
+		Offset: -38 -52 -30 -52
+		Layer: -2
+		Box:
+			Border: 1.5
+			Border color: #A8782F
+	Fixed:
+		Id: frame-inner
+		Offset: -32 -46 -24 -46
+		Layer: -2
+		Box:
+			Border: 0.5
+			Border color: #14305E
+	Fixed:
+		Offset: -45 auto auto -59
+		Layer: -1
+		Block:
+			Class: corner
+	Fixed:
+		Offset: -45 -59 auto auto
+		Layer: -1
+		Block:
+			Class: corner
+	Fixed:
+		Offset: auto auto -37 -59
+		Layer: -1
+		Block:
+			Class: corner
+	Fixed:
+		Offset: auto -59 -37 auto
+		Layer: -1
+		Block:
+			Class: corner
+	Fixed:
+		Id: footer
+		Offset: auto 0 -22 0
+		Text: Certificado nº CER-2025-0412 · Verificable en escuelaceramica.example/verificar
+	Text: ESCUELA DE CERÁMICA DEL VALLE
+		Class: school
+	Heading 1:
+		Text: Certificado de finalización
+	Text: Se otorga a
+		Class: aside
+	Text: Elena Ruiz Navarro
+		Id: recipient
+		Class: name
+	Text: por haber completado con aprovechamiento el curso
+		Class: aside
+	Heading 2:
+		Text: Cerámica a mano: del barro a la pieza
+	Text: Curso de 40 horas lectivas, impartido en Olot del 8 de septiembre al 24 de octubre de 2025, con una calificación final de sobresaliente.
+		Box:
+			Width: 500
+			Margin: 0 auto 18 auto
+	Flex:
+		Id: signatures
+		Main axis: between
+		Cross axis: end
+		Item:
+			Block:
+				Box:
+					Width: 220
+				Image: examples/certificate/signature-director.png
+					Alt: Firma de la directora de la escuela
+					Box:
+						Width: 140
+						Margin: 0 auto
+				Block:
+					Class: line
+					Text: Montserrat Puig Vila
+						Typography:
+							Weight: bold
+					Text: Directora de la Escuela
+		Item:
+			Image: examples/certificate/seal.png
+				Id: seal
+				Alt: Sello de excelencia de la escuela
+				Box:
+					Width: 100
+		Item:
+			Block:
+				Box:
+					Width: 220
+				Image: examples/certificate/signature-teacher.png
+					Alt: Firma del profesor del curso
+					Box:
+						Width: 140
+						Margin: 0 auto
+				Block:
+					Class: line
+					Text: Martí Roca Font
+						Typography:
+							Weight: bold
+					Text: Profesor del curso

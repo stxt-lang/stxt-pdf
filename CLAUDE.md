@@ -16,13 +16,14 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 18 (Markdown e imágenes):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 21 (Markdown, imágenes, pruebas y ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
 - **Schema STXT** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
   (si difiere del resumen del §9 de la especificación, manda el fichero)
-- **Documento de ejemplo:** [`test/examples/report.stxt`](test/examples/report.stxt)
+- **Ejemplos de documentos completos:** [`test/examples/`](test/examples) (índice en su `README.md`)
+- **Documento de la especificación (§10):** [`test/spec/report.stxt`](test/spec/report.stxt)
 
 ## Comandos
 
@@ -41,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 18 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 21 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -64,6 +65,10 @@ actualízala.
 | 16 | ~~Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado)~~ (hecho; caso 13) | `model/TextRun`, `layout/inline/LineBreaker`, `fragment/TextLine`, `paint/StackingContext`, `layout/inline/PdfMetrics` |
 | 17 | ~~Elemento `Markdown`, traducido a elementos conocidos~~ (hecho; caso 13) | schema, `tree/MarkdownBuilder`, `tree/BoxTreeBuilder` |
 | 18 | ~~Imágenes (`Image`): PNG y JPEG de la carpeta de recursos~~ (hecho; caso 14) | schema, `resources/ImageLibrary`, `layout/image/ImageLayout`, `layout/BoxModel`, `paint/PdfCanvas`, `paint/PdfStructure`, `tree/MarkdownBuilder` |
+
+| 19 | ~~Los casos de prueba pasan de `src/test/resources` a `test/`~~ (hecho) | `test/{golden,errors,examples,spec}`, `.gitignore`, `.classpath` |
+| 20 | ~~Catálogo de errores: un fichero STXT por caso, en carpetas por grupo~~ (hecho) | `test/errors/<grupo>/`, `errors/ErrorCatalogTest` |
+| 21 | ~~Ejemplos de verdad: once documentos completos con PDF y PNG limpios; IBM Plex Serif y Mono~~ (hecho) | `test/examples/`, `examples/ExamplesTest`, `golden/ReferenceFiles`, `tools/ExampleImages.java`, `resources/images/examples/` |
 
 Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
 
@@ -254,7 +259,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `Resources.resolve`, que **nunca va hacia atrás** (rechaza absolutas, `..` y enlaces que
   salen). Las fuentes se identifican por familia, peso (400/700) y estilo leídos del TTF
   (`FontLibrary`); no hay fuente por defecto ni de sustitución: `Font` es obligatoria en el
-  texto. El repositorio incluye IBM Plex Sans (OFL).
+  texto. El repositorio incluye IBM Plex Sans, Serif y Mono (OFL).
 - **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
   `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
   SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.
@@ -328,7 +333,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
   `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
   (añade ahí los documentos nuevos) y que los ejemplos de la especificación se maquetan sin
-  errores.
+  errores; los de `test/examples/` los lee y los maqueta `ExamplesTest`.
 - **Medidas de rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` (el `pom.xml`
   excluye el grupo); se ejecutan con `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=…`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`
@@ -348,8 +353,20 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `target/golden-svg/` y, en su carpeta del código fuente, `output.pdf` (ignorado por git) y
   `page-N.png` por página (versionados, con los contornos de las cajas y las métricas reales).
   Un PNG solo se reescribe si cambian sus píxeles más allá del antialiasing, que varía entre
-  máquinas (`GoldenTest.PIXEL_TOLERANCE`, 16 por canal): si aparece modificado en git, el
+  máquinas (`ReferenceFiles.PIXEL_TOLERANCE`, 16 por canal): si aparece modificado en git, el
   resultado ha cambiado; míralo antes de dar el cambio por bueno.
+- **Ejemplos** (`examples/ExamplesTest`): cada carpeta de `test/examples/NN-nombre/` es un
+  documento completo (`input.stxt`) con su `output.pdf`, un `page-N.png` por página (sin
+  contornos de depuración, a 110 ppp) y un `expected.stxt` con el volcado de las cajas con `Id`.
+  Se maquetan con las **métricas reales** y la carpeta `resources/` (no con `FixedMetrics`). El
+  volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true` y
+  se revisa mirando las imágenes; sin esa opción, un `expected.stxt` que falta es un error. Con
+  `-Dexamples.only=NN-nombre` se prueba un solo ejemplo. El PDF y los PNG solo se reescriben si
+  cambian los píxeles de alguna página (`golden/ReferenceFiles`, que comparten con `GoldenTest`),
+  y los dos se versionan. Un ejemplo nuevo se escribe como un documento real, con sentido, y se
+  añade con su índice en `test/examples/README.md`. Las imágenes de los ejemplos están en
+  `resources/images/examples/` y las genera `java tools/ExampleImages.java` (Java2D, sin
+  ficheros de terceros); si necesitas una, añádela al generador en vez de subir un binario.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área útil de
   515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
   declara en el `Typography` de `Document` `Font: IBM Plex Sans` y `Size: 10`; los demás

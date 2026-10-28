@@ -1,7 +1,8 @@
 # Hoja de ruta: Markdown, imágenes, pruebas y ejemplos
 
 Plan de trabajo para escribir el contenido de un documento en Markdown (un subconjunto cerrado
-que se traduce a los elementos que el motor ya conoce) y para poner imágenes en él. Es el punto
+que se traduce a los elementos que el motor ya conoce), para poner imágenes en él y para
+ordenar las pruebas y hacer ejemplos de documentos completos. Es el punto
 de partida de cada sesión: el estado, las decisiones tomadas y lo que queda por hacer están
 aquí, no en la memoria de la conversación.
 
@@ -38,7 +39,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | hecho | 14 |
 | 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
 | 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
-| 21 | Ejemplos de verdad: diez documentos completos, con PDF y PNG limpios | pendiente | `examples/` |
+| 21 | Ejemplos de verdad: once documentos completos, con PDF y PNG limpios | hecho | `examples/` |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y el 18, el 2026-10-28.
 
@@ -409,9 +410,38 @@ Eclipse y los enlaces de la documentación.
 **Hito 20.** Convertir `errors.stxt` en un fichero por caso y adaptar `ErrorCatalogTest`
 (`everyCodeHasACase` sigue exigiendo un caso por código).
 
-**Hito 21.** Diez documentos completos que cubran necesidades documentales distintas. Lo que
-falte en el motor para hacerlos bien (por ejemplo, índices o enlaces) se apunta como idea en
-`TODO.md`, no se implementa dentro del hito.
+**Hito 21.** Diez documentos completos como mínimo (salieron once) que cubran necesidades
+documentales distintas. Lo que falte en el motor para hacerlos bien (por ejemplo, índices o
+enlaces) se apunta como idea en `TODO.md`, no se implementa dentro del hito.
+
+**Los ejemplos:** factura, carta comercial, currículum, informe anual (7 páginas), boletín,
+carta de restaurante (tamaño propio), contrato, manual, catálogo, certificado (apaisado) y horario
+(apaisado). Cada uno enseña algo distinto; el índice, con miniaturas y lo que muestra cada uno,
+está en [`test/examples/README.md`](../test/examples/README.md).
+
+**Diseño técnico** (como quedó):
+
+- **`ExamplesTest`** recorre `test/examples/*/`, lee y maqueta `input.stxt` con las métricas
+  reales (`PdfMetrics`) y la carpeta `resources/`, compara el volcado con `expected.stxt` y deja
+  el PDF y una imagen por página (110 ppp, sin contornos). El volcado es una instantánea: se
+  genera con `-Dexamples.update=true`. El PDF solo se reescribe si cambian los píxeles de alguna
+  página (PDFBox mete fechas e identificadores). `-Dexamples.only=NN-nombre` prueba uno solo.
+- **`golden/ReferenceFiles`** reúne lo que comparten `GoldenTest` y `ExamplesTest`: comparar
+  volcados (`compare`) y escribir las imágenes de un PDF sin ruido (`writePageImages`).
+- **Material.** IBM Plex Serif y Mono (los TTF de [IBM/plex](https://github.com/IBM/plex), con su
+  licencia OFL) junto a Plex Sans, e imágenes en `resources/images/examples/`, generadas por
+  `tools/ExampleImages.java` con Java2D (logotipos, retrato, fotos, gráficos, productos, sello y
+  firmas), sin ficheros de terceros. `FontLibraryTest` comprueba las tres familias.
+- **`test/spec/report.stxt`**: el ejemplo del §10 de la especificación, que antes era
+  `examples/report.stxt` y no es un ejemplo de los nuevos.
+
+**Tareas:**
+
+- [x] `ExamplesTest`, `ReferenceFiles` y el movimiento de `report.stxt` a `test/spec/`.
+- [x] Fuentes IBM Plex Serif y Mono, y el generador de imágenes (`tools/ExampleImages.java`).
+- [x] Los once documentos, revisados a ojo en sus PNG, cada uno con su `expected.stxt`.
+- [x] `test/examples/README.md`, README, `CLAUDE.md`, `DECISIONES.md` (144–150) y `TODO.md`
+      (huecos del motor que salieron al escribirlos).
 
 ---
 
@@ -420,11 +450,15 @@ falte en el motor para hacerlos bien (por ejemplo, índices o enlaces) se apunta
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
-- **2026-10-28 (3).** Se abren los hitos 19 a 21 (P1–P4 aceptadas). Hito 19 hecho: `test/`
-  sustituye a `src/test/resources`. Hito 20 hecho: los 148 casos de `errors.stxt` son 148
-  ficheros en 14 carpetas por grupo, con cabecera `# Case/# Code/# Line` (la línea es la del
-  fichero); `ErrorCatalogTest` recorre `test/errors`. `mvn test` en verde (798 tests).
-  *Siguiente paso:* hito 21, los diez ejemplos (empezar por las fuentes Plex Serif y Mono).
+- **2026-10-28 (3).** Se abren los hitos 19 a 21 (P1–P4 aceptadas) y se terminan los tres.
+  Hito 19: `test/` sustituye a `src/test/resources`. Hito 20: los 148 casos de `errors.stxt` son
+  148 ficheros en 14 carpetas por grupo, con cabecera `# Case/# Code/# Line` (la línea es la del
+  fichero); `ErrorCatalogTest` recorre `test/errors`. Hito 21: `ExamplesTest`, Plex Serif y Mono,
+  el generador de imágenes y once documentos completos (el de más de una página con cabecera
+  repetida, columnas, portada a sangre, tablas con `Span`…). El motor no necesitó ningún
+  cambio: lo que se echó en falta está en `TODO.md`. `mvn test` en verde (809 tests).
+  *Siguiente paso:* repasar las decisiones de `DECISIONES.md` y elegir el siguiente trabajo
+  (ideas en `TODO.md`, empezando por las que salieron de los ejemplos).
 - **2026-10-28 (2).** Hito 18 terminado. Aceptadas I1–I10. Schema (`Image`, `Alt`, `Fit`);
   `ImageLibrary` e `ImageFile`; dimensionado de elemento reemplazado en `BoxModel` e
   `ImageLayout`; pintado en PDF (una copia por fichero, `Figure` con `Alt` y `BBox`) y SVG;

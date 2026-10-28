@@ -38,7 +38,7 @@ class DocumentReaderTest {
     @Test
     void examplesValidateAgainstTheSchema() {
         for (String file : new String[] {
-                "test/examples/report.stxt",
+                "test/spec/report.stxt",
                 "test/golden/01-block-flow/input.stxt",
                 "test/golden/02-flex-grow/input.stxt",
                 "test/golden/03-positioning/input.stxt",

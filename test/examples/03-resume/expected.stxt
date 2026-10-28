@@ -1,0 +1,14 @@
+Result:
+	Page: 1
+		Fragment: page
+			Rect: 0 0 595 842
+			Fragment: sidebar
+				Rect: 0 0 190 842
+			Fragment: main
+				Rect: 190 0 405 842
+				Fragment: figures
+					Rect: 224 171.5 335 76
+				Fragment: jobs
+					Rect: 224 295.5 335 256
+				Fragment: education
+					Rect: 224 599.5 335 70

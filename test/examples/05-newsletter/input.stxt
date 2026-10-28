@@ -1,0 +1,311 @@
+# Boletín mensual de unos pueblos, de dos páginas con aire de periódico: cabecera de portada,
+# noticia principal con una foto recortada (Fit: cover), artículos a tres columnas con filete y
+# cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
+# una rejilla. El cuerpo es Markdown dentro de Multicol.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 38 44 58 44
+	Title: Gaceta del Valle · Octubre de 2025
+	Language: es
+	Typography:
+		Font: IBM Plex Serif
+		Size: 9
+		Line height: 13
+		Color: #1C1A19
+	Styles:
+		Element: Heading 1
+			Typography:
+				Size: 27
+				Line height: 30
+				Weight: bold
+			Box:
+				Margin: 2 0 8 0
+		Element: Heading 2
+			Typography:
+				Size: 10.5
+				Line height: 13
+				Weight: bold
+				Color: #A4301F
+			Box:
+				Margin: 8 0 3 0
+		Element: Paragraph
+			Typography:
+				Align: justify
+			Box:
+				Margin: 0 0 6 0
+		Element: List
+			Box:
+				Padding: 0 0 0 12
+				Margin: 0 0 6 0
+		Element: Cell
+			Box:
+				Padding: 5 6
+				Border: 0 0 0.5 0
+				Border color: #CFC8C0
+		Element: Fixed
+			Typography:
+				Font: IBM Plex Sans
+				Size: 7.5
+				Color: #7A726B
+		For class: kicker
+			Typography:
+				Font: IBM Plex Sans
+				Size: 7.5
+				Weight: bold
+				Color: #A4301F
+		For class: caption
+			Typography:
+				Font: IBM Plex Sans
+				Size: 7.5
+				Style: italic
+				Color: #6B635C
+			Box:
+				Margin: 3 0 10 0
+		For class: quote
+			Typography:
+				Size: 15
+				Line height: 19
+				Style: italic
+				Color: #A4301F
+				Align: center
+			Box:
+				Margin: 10 0 12 0
+				Padding: 10 30
+				Border: 1 0 1 0
+				Border color: #A4301F
+		For class: th
+			Typography:
+				Font: IBM Plex Sans
+				Weight: bold
+				Size: 7.5
+				Color: #FFFFFF
+			Box:
+				Background: #1C1A19
+		For class: ad
+			Box:
+				Padding: 8 10
+				Border: 0.75
+				Border color: #CFC8C0
+			Typography:
+				Size: 8.5
+				Line height: 12
+		For class: ad-title
+			Typography:
+				Font: IBM Plex Sans
+				Weight: bold
+				Size: 7
+				Color: #A4301F
+			Box:
+				Margin: 0 0 3 0
+	Fixed:
+		Id: footer
+		Offset: auto 0 -36 0
+		Box:
+			Padding: 5 0 0 0
+			Border: 0.5 0 0 0
+			Border color: #CFC8C0
+		Flex:
+			Main axis: between
+			Item:
+				Text: Gaceta del Valle · Octubre de 2025 · Nº 87
+			Item:
+				Text: {page} / {pages}
+	Block:
+		Id: masthead
+		Box:
+			Padding: 6 0 6 0
+			Border: 3 0 1 0
+			Border color: #1C1A19
+			Margin: 0 0 14 0
+		Text: Gaceta del Valle
+			Typography:
+				Size: 52
+				Line height: 56
+				Weight: bold
+				Align: center
+		Flex:
+			Main axis: between
+			Box:
+				Padding: 4 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #1C1A19
+			Typography:
+				Font: IBM Plex Sans
+				Size: 7.5
+				Weight: bold
+			Item:
+				Text: BOLETÍN MENSUAL DE LOS PUEBLOS DE LA GARROTXA
+			Item:
+				Text: OCTUBRE DE 2025 · Nº 87 · GRATUITO
+	Block:
+		Id: lead
+		Text: SOCIEDAD
+			Class: kicker
+		Heading 1:
+			Text: La castañada llega con el mercado más grande de la década
+		Image: examples/newsletter/market.jpg
+			Id: lead-photo
+			Alt: Puestos de un mercado con toldos de colores
+			Fit: cover
+			Box:
+				Width: 100%
+				Height: 214
+		Text: Los puestos del mercado de otoño, durante el montaje del jueves en la plaza Mayor. Foto: archivo del Ayuntamiento.
+			Class: caption
+		Multicol:
+			Id: lead-text
+			Count: 3
+			Column gap: 16
+			Rule: 0.5
+			Rule color: #CFC8C0
+			Box:
+				Margin: 0 0 6 0
+			Markdown:
+				Content >>
+					Más de cincuenta puestos llenarán la plaza Mayor y las calles contiguas el próximo 1 de noviembre, en la edición más grande que se recuerda del mercado de la castañada. Cuarenta productores de la comarca, entre ellos once panaderías, siete queserías y tres cooperativas de miel, venderán directamente al público.
+
+					La organización calcula que pasarán por el mercado unas cinco mil personas a lo largo de la jornada, el doble que hace cinco años. «Hemos tenido que pedir prestado el aparcamiento del instituto», bromea Anna Bosch, presidenta de la asociación de comerciantes.
+
+					Además de los puestos, habrá música en directo desde las once de la mañana, un taller de pan de castañas para niños y niñas a cargo de la panadería Cal Forn, y una **gran castañada popular** en la plaza, a las cinco de la tarde.
+
+					El Ayuntamiento cerrará al tráfico el centro del pueblo de las siete de la mañana a las nueve de la noche. Los vecinos podrán acceder a sus garajes por la calle del Molí, con un control a cargo de la Policía Local.
+
+					Quien quiera colaborar como voluntario o voluntaria puede apuntarse en la oficina de turismo hasta el 28 de octubre. Se necesitan manos para el montaje, la información y la recogida de residuos, y a quienes participen se les invitará a la comida de las organizadoras.
+		Text: «Lo que se vende aquí lo hemos visto crecer: desde el queso hasta la miel».
+			Class: quote
+	Block:
+		Id: trails
+		Break:
+			Before: page
+		Text: NATURALEZA
+			Class: kicker
+		Heading 1:
+			Text: Tres caminos para no perderse el hayedo
+		Flex:
+			Id: trail-story
+			Gap: 16
+			Box:
+				Margin: 0 0 14 0
+			Item:
+				Block:
+					Box:
+						Width: 200
+					Image: examples/newsletter/trail.jpg
+						Id: trail-photo
+						Alt: Un sendero entre prados con montañas al fondo
+						Box:
+							Width: 100%
+					Text: El sendero del Pla de les Eres, un domingo de octubre. Foto: Joan Casas.
+						Class: caption
+			Item:
+				Grow: 1
+				Markdown:
+					Bullet: dash
+					Content >>
+						Octubre es el mes del hayedo. Estas son tres salidas para disfrutarlo sin multitudes, de la más corta a la más exigente:
+
+						- **El camino del Molí** (1 h 30 min, 4 km, apto para niños): sale del aparcamiento de la fábrica y sigue el río hasta una cascada pequeña.
+						- **La vuelta al Pla de les Eres** (3 h, 9 km): praderas, masías y un mirador sobre toda la comarca.
+						- **La cresta de Sant Roc** (5 h, 14 km): solo con buen tiempo y calzado de montaña; ++recomendable salir antes de las ocho++.
+
+						Recuerden llevar agua, no salirse de los senderos señalizados y llevarse de vuelta cualquier residuo que generen.
+		Multicol:
+			Id: briefs
+			Count: 2
+			Column gap: 22
+			Rule: 0.5
+			Rule color: #CFC8C0
+			Box:
+				Margin: 0 0 14 0
+			Markdown:
+				Content >>
+					## Nuevo horario de la biblioteca
+
+					A partir de noviembre, la biblioteca municipal abrirá también los sábados por la mañana, de diez a una. El cambio es posible gracias a dos nuevas plazas de personal y a un grupo de voluntarias que ya está preparando las actividades infantiles.
+
+					## Obras en la carretera de Olot
+
+					Las obras de mejora de la carretera comenzarán el 10 de noviembre y durarán unas seis semanas. El tráfico se regulará con semáforos y habrá un autobús lanzadera entre los dos pueblos en las horas punta.
+
+					## El club de lectura cumple diez años
+
+					Lo celebrará con una cena el 22 de noviembre en el centro cívico. Quien quiera apuntarse debe avisar con una semana de antelación y llevar un libro para el intercambio.
+
+					## Recogida de ropa
+
+					Cáritas organiza una recogida de ropa de abrigo del 3 al 14 de noviembre. Los puntos de entrega son la parroquia, el centro cívico y el polideportivo.
+		Heading 2:
+			Text: AGENDA DE OCTUBRE Y NOVIEMBRE
+		Table:
+			Id: agenda
+			Columns: 70 52 1fr 120
+			Box:
+				Margin: 0 0 14 0
+			Head:
+				Row:
+					Cell: Fecha
+						Class: th
+					Cell: Hora
+						Class: th
+					Cell: Acto
+						Class: th
+					Cell: Lugar
+						Class: th
+			Body:
+				Row:
+					Cell: Sáb. 25 oct.
+					Cell: 19:00
+					Cell: Concierto del coro del valle
+					Cell: Iglesia de Sant Roc
+				Row:
+					Cell: Dom. 26 oct.
+					Cell: 10:00
+					Cell: Salida micológica con guía
+					Cell: Plaza Mayor
+				Row:
+					Cell: Sáb. 1 nov.
+					Cell: 11:00
+					Cell: Mercado y castañada popular
+					Cell: Plaza Mayor
+				Row:
+					Cell: Vie. 7 nov.
+					Cell: 20:30
+					Cell: Cine al aire libre: «El hayedo»
+					Cell: Polideportivo
+				Row:
+					Cell: Sáb. 22 nov.
+					Cell: 21:00
+					Cell: Cena del club de lectura
+					Cell: Centro cívico
+		Heading 2:
+			Text: ANUNCIOS POR PALABRAS
+		Grid:
+			Id: classifieds
+			Columns: repeat(4, 1fr)
+			Gap: 10
+			Area:
+				Block:
+					Class: ad
+					Text: SE VENDE
+						Class: ad-title
+					Text: Estufa de leña en buen estado, con tubos y sombrero. 180 €. Llamar por las tardes al 600 11 22 33.
+			Area:
+				Block:
+					Class: ad
+					Text: SE BUSCA
+						Class: ad-title
+					Text: Persona de confianza para cuidar a dos niños de 4 y 7 años de lunes a viernes, de 4 a 8.
+			Area:
+				Block:
+					Class: ad
+					Text: SE OFRECE
+						Class: ad-title
+					Text: Clases de refuerzo de matemáticas y física para ESO y Bachillerato. Primera clase gratuita.
+			Area:
+				Block:
+					Class: ad
+					Text: PERDIDO
+						Class: ad-title
+					Text: Perro mestizo marrón, con collar azul, cerca del campo de fútbol. Se gratifica.

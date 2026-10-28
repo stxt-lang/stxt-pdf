@@ -1031,7 +1031,7 @@ puede:
 **Fuentes.** Solo se usan las fuentes TTF de `fonts/`; no hay fuentes del sistema, ni las 14
 estándar de PDF, ni fuentes de sustitución. La salida PDF las incrusta (solo los glifos usados),
 de modo que el documento se ve igual en cualquier máquina; por eso deben tener una licencia que
-permita incrustarlas, como la SIL Open Font License. El repositorio incluye IBM Plex Sans.
+permita incrustarlas, como la SIL Open Font License. El repositorio incluye IBM Plex Sans, IBM Plex Serif e IBM Plex Mono.
 
 Cada fichero se identifica por lo que declara su interior, no por su nombre:
 
@@ -1682,7 +1682,7 @@ La validación se hace en cuatro niveles:
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([§5.9](#59-dimensionado)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella (§5.8) | `Área desconocida en Area: foot` |
-| `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Sans` |
+| `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
@@ -1875,7 +1875,7 @@ acorta a `Wrap`, que ya es de `Flex`.
 
 ## 10. Ejemplo completo
 
-Fichero: [`test/examples/report.stxt`](../test/examples/report.stxt).
+Fichero: [`test/spec/report.stxt`](../test/spec/report.stxt).
 
 ```
 Document (dev.stxt.boxes):

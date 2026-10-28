@@ -7,7 +7,8 @@ tipográficos**.
 
 - **Especificación y referencia de uso:** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Schema STXT del modelo** (`@stxt.schema`): [`src/main/resources/stxt/dev.stxt.boxes.stxt`](src/main/resources/stxt/dev.stxt.boxes.stxt)
-- **Documento de ejemplo:** [`test/examples/report.stxt`](test/examples/report.stxt)
+- **Ejemplos:** [`test/examples/`](test/examples): once documentos completos (factura, carta, currículum, informe anual, boletín, carta de restaurante, contrato, manual, catálogo, certificado y horario), con su PDF y una imagen por página
+- **Documento de la especificación:** [`test/spec/report.stxt`](test/spec/report.stxt)
 
 Los nombres de nodos y valores de los documentos, y los identificadores del código, están en
 inglés; la documentación y los comentarios, en castellano.
@@ -73,15 +74,16 @@ especificación.
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
 por la familia, el peso y el estilo que declara. `Font` y `Size` (de `Typography`) son
 obligatorios en el texto y no tienen valor por defecto. El repositorio incluye
-[IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/) (normal, negrita, cursiva y negrita
-cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar en el
+[IBM Plex Sans](resources/fonts/IBM%20Plex%20Sans/), [Serif](resources/fonts/IBM%20Plex%20Serif/)
+y [Mono](resources/fonts/IBM%20Plex%20Mono/) (normal, negrita, cursiva y negrita cursiva de cada
+familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar en el
 `Typography` de `Document`, de donde los heredan todas las cajas. Los detalles están en el
 §5.11 de la especificación.
 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 18 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 21 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -120,6 +122,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 18 están termin
 | Numeración de páginas (`{page}`/`{pages}`) y `Decoration: clone` | Hecho y probado |
 | Reparto de líneas con Knuth-Plass (`Text wrap: pretty`) | Hecho y probado |
 | Carpeta de recursos (`Resources`), fuentes TTF incrustadas, `Weight` y `Style`, línea base real | Hecho y probado |
+| Ejemplos de documentos completos (`test/examples/`): once documentos con PDF e imágenes versionados, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
 caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
@@ -128,6 +131,10 @@ caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta 
 git. Como las fuentes van incrustadas, las imágenes no dependen de las fuentes del sistema;
 aún pueden variar detalles del suavizado con otra versión de Java. `PdfCanvasTest` deja sus PDF
 en `target/pdf/`.
+
+Los [ejemplos](test/examples) (`ExamplesTest`) funcionan igual, pero son documentos completos
+maquetados con las fuentes y las imágenes reales y sin contornos, y su PDF (`output.pdf`) sí se
+versiona: solo se reescribe si cambian los píxeles de alguna página.
 
 ## Hoja de ruta
 
@@ -151,7 +158,11 @@ en `target/pdf/`.
 17. ~~**Markdown.** Elemento `Markdown` con un subconjunto cerrado (formato dentro de la línea, encabezados, listas y tablas) que se traduce a los elementos que ya existen (caso 13).~~ Hecho.
 18. ~~**Imágenes.** Elemento `Image` con PNG y JPEG de `images/`, dimensionado como un elemento reemplazado, `Alt` y `Fit`, sin cortes; imágenes en Markdown (caso 14).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 18 están en
+19. ~~**Pruebas en `test/`.** Los casos de prueba pasan de `src/test/resources` a `test/` (`golden/`, `errors/`, `examples/`, `spec/`).~~ Hecho.
+20. ~~**Catálogo de errores.** Un fichero STXT por caso, con el documento real, en carpetas por grupo de errores (`test/errors/<grupo>/`).~~ Hecho.
+21. ~~**Ejemplos.** Once documentos completos en `test/examples/`, con PDF e imágenes limpios; IBM Plex Serif y Mono, e imágenes generadas con `tools/ExampleImages.java`.~~ Hecho.
+
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 21 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
@@ -183,6 +194,12 @@ src/main/java/dev/stxt/boxes/
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
   paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure, ImageFit, PdfWriter
   output/       StxtDump
+
+test/           Casos de prueba que no son código: golden/ (resultado calculado a mano), errors/
+                (un documento por error, en carpetas por grupo), examples/ (documentos
+                completos con PDF e imágenes) y spec/ (el ejemplo de la especificación)
+resources/      Carpeta de recursos: fonts/ (IBM Plex Sans, Serif y Mono) e images/
+tools/          ExampleImages.java, que genera las imágenes de los ejemplos
 ```
 
 ## Validación en el editor
