@@ -73,6 +73,7 @@ class StackingContextTest {
         public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                          double wordSpacing, double letterSpacing) {
             events.add("text '" + text + "' " + font.variant());
+            sequences.add("'" + text + "'");
             drawn.add("'" + text + "' " + fontSize + "/" + letterSpacing);
         }
 
@@ -83,6 +84,24 @@ class StackingContextTest {
         public void link(Box box, Rect area, String destination, String description) {
             links.add(destination + " " + round(area) + " " + description);
             events.add("link " + destination);
+        }
+
+        /** Las secuencias de texto: {@code [texto} o {@code [enlace}, los tramos que pinta y {@code ]}. */
+        final List<String> sequences = new ArrayList<>();
+
+        @Override
+        public void beginText(Box box) {
+            sequences.add("[texto");
+        }
+
+        @Override
+        public void beginLinkText(Box box) {
+            sequences.add("[enlace");
+        }
+
+        @Override
+        public void endText() {
+            sequences.add("]");
         }
 
         @Override
@@ -216,9 +235,12 @@ class StackingContextTest {
         assertEquals(List.of("'A' 10.0/1.5", "'B' 8.0/1.5", "' ' 10.0/1.5", "'C' 8.0/1.5"), r.drawn);
     }
 
-    /** Una caja con {@code Link} es clicable entera, antes que su contenido (§5.20). */
+    /**
+     * Una caja con {@code Link} es clicable entera; su zona sigue a su propio texto (que el {@code Link} envuelve) y
+     * precede al de sus hijos, que se pintan después (§5.20).
+     */
     @Test
-    void aBoxWithLinkIsClickableWholeAndBeforeItsContent() {
+    void aBoxWithLinkIsClickableWholeAndBeforeItsChildren() {
         Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tBlock:", "\t\tLink: #fin", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tText: uno   dos", "\tText: fin", "\t\tId: fin");
@@ -236,9 +258,12 @@ class StackingContextTest {
         // "uno " son 20 pt; "dos tres" (8 caracteres, 40 pt) es una zona; " cuatro" (35 pt), otra.
         assertEquals(List.of("https://a.example " + new Rect(60, 40, 40, 12) + " dos tres",
                 "mailto:a@b.c " + new Rect(100, 40, 35, 12) + "  cuatro"), r.links);
-        // Las zonas se emiten antes que el texto de la caja.
-        assertEquals(List.of("link https://a.example", "link mailto:a@b.c", "text 'uno ' normal"),
-                r.events.stream().filter(e -> e.startsWith("link") || e.equals("text 'uno ' normal")).toList());
+        // Cada zona se emite dentro de la secuencia de su enlace, antes de su texto; el resto, una secuencia aparte.
+        assertEquals(List.of("text 'uno ' normal", "link https://a.example", "text 'dos' bold", "text ' tres' normal",
+                "link mailto:a@b.c", "text ' cuatro' normal"), r.events.stream()
+                .filter(e -> e.startsWith("link") || e.startsWith("text")).toList());
+        assertEquals(List.of("[texto", "'uno '", "]", "[enlace", "'dos'", "' tres'", "]", "[enlace", "' cuatro'", "]"),
+                r.sequences);
     }
 
     /** Un enlace que ocupa varias líneas tiene una zona en cada una. */
@@ -252,6 +277,26 @@ class StackingContextTest {
                 "https://a.example " + new Rect(40, 52, 20, 12) + " bbbb",
                 "https://a.example " + new Rect(40, 64, 20, 12) + " cccc",
                 "https://a.example " + new Rect(40, 76, 20, 12) + " dddd"), r.links);
+        // Pero es un solo contenido: una secuencia de enlace para las cuatro líneas.
+        assertEquals(List.of("[enlace", "'aaaa'", "'bbbb'", "'cccc'", "'dddd'", "]"), r.sequences);
+    }
+
+    /** El texto propio de una caja con {@code Link} va antes que su zona (el {@code Link} lo envuelve). */
+    @Test
+    void theOwnTextOfALinkedBoxPrecedesItsZone() {
+        Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: uno dos", "\t\tLink: https://a.example");
+        assertEquals(List.of("text 'uno dos' normal", "link https://a.example"), r.events);
+        assertEquals(List.of("[texto", "'uno dos'", "]"), r.sequences);
+    }
+
+    /** Un enlace seguido de más texto en la misma línea parte el texto en tres secuencias, en orden. */
+    @Test
+    void textAroundALinkIsOtherSequences() {
+        Recorder r = record(Map.of("T", List.of(run("ver "), link("la web", "", "https://a.example"), run(" hoy"))),
+                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: ver la web hoy", "\t\tId: T");
+        assertEquals(List.of("[texto", "'ver '", "]", "[enlace", "'la web'", "]", "[texto", "' hoy'", "]"), r.sequences);
     }
 
     @Test

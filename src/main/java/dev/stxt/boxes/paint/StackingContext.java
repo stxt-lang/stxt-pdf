@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Árbol de contextos de apilamiento (módulo 4, ESPECIFICACION.md §5.6), construido sobre los
@@ -256,9 +257,8 @@ public final class StackingContext {
         }
     }
 
-    /** El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen (§5.18), y sus enlaces. */
+    /** El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen (§5.18), y después su enlace. */
     private static void paintContent(Canvas canvas, Piece p) {
-        paintLinks(canvas, p);
         if (p.f().box().isImage()) {
             Insets inside = new Insets(p.f().border().top() + p.f().padding().top(),
                     p.f().border().right() + p.f().padding().right(),
@@ -270,48 +270,18 @@ public final class StackingContext {
         } else {
             paintText(canvas, p);
         }
+        paintLinks(canvas, p);
     }
 
     /**
-     * Las zonas clicables del fragmento (§5.20): su caja de borde entera si la caja tiene
-     * {@code Link}, y el rectángulo de cada tramo con enlace de cada línea de texto. Los tramos
-     * seguidos de una línea con el mismo destino (una parte en negrita dentro de un enlace) son
-     * una sola zona; un enlace que ocupa varias líneas, una por línea. Una caja partida entre
-     * páginas tiene una zona por fragmento.
+     * La zona clicable de la caja entera (§5.20): su caja de borde si la caja tiene {@code Link}. Las de
+     * los tramos con enlace de sus líneas de texto las pinta {@link #paintText}, dentro del contenido
+     * del enlace. Una caja partida entre páginas tiene una zona por fragmento.
      */
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
         if (box.style.link != null && p.f().width() > 0 && p.f().height() > 0) {
             canvas.link(box, p.borderBox(), box.style.link, describe(box));
-        }
-        if (p.f().lines().isEmpty()) {
-            return;
-        }
-        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
-        for (TextLine l : p.f().lines()) {
-            String destination = null;
-            double from = 0;
-            double to = 0;
-            StringBuilder text = new StringBuilder();
-            for (TextLine.Run r : l.runs()) {
-                String link = r.format().link();
-                if (destination != null && !destination.equals(link)) {
-                    canvas.link(box, linkArea(content, l, from, to), destination, text.toString());
-                    destination = null;
-                    text.setLength(0);
-                }
-                if (link != null) {
-                    if (destination == null) {
-                        destination = link;
-                        from = r.x();
-                    }
-                    to = r.x() + r.width();
-                    text.append(r.text());
-                }
-            }
-            if (destination != null) {
-                canvas.link(box, linkArea(content, l, from, to), destination, text.toString());
-            }
         }
     }
 
@@ -362,26 +332,72 @@ public final class StackingContext {
      * Las líneas de texto, cada tramo con su fuente (§5.4). Como en CSS, el subrayado se pinta
      * antes que el texto y el tachado después; los dos fuera del contenido marcado, porque no son
      * texto (en el PDF etiquetado, <em>artifacts</em>).
+     *
+     * <p>El texto se pinta en secuencias de tramos seguidos con el mismo enlace, también de una línea
+     * a la siguiente ({@link Canvas#beginText} si no tienen, {@link Canvas#beginLinkText} si lo
+     * tienen): cada secuencia es un contenido marcado aparte, y el de un enlace cuelga del
+     * {@code Link} del PDF etiquetado (§5.20). Dentro de cada una de enlace, una zona clicable por
+     * línea ({@link #paintLinkZone}).</p>
      */
     private static void paintText(Canvas canvas, Piece p) {
         if (p.f().lines().isEmpty()) {
             return;
         }
-        Style s = p.f().box().style;
+        Box box = p.f().box();
+        Style s = box.style;
         FontFace font = s.fontFace();
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
-        canvas.beginText(p.f().box());
+        boolean open = false;
+        String current = null;
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
-            for (TextLine.Run r : l.runs()) {
+            List<TextLine.Run> runs = l.runs();
+            for (int i = 0; i < runs.size(); i++) {
+                TextLine.Run r = runs.get(i);
+                String link = r.format().link();
+                if (!open || !Objects.equals(link, current)) {
+                    if (open) {
+                        canvas.endText();
+                    }
+                    if (link == null) {
+                        canvas.beginText(box);
+                    } else {
+                        canvas.beginLinkText(box);
+                    }
+                    open = true;
+                    current = link;
+                }
+                if (link != null && (i == 0 || !link.equals(runs.get(i - 1).format().link()))) {
+                    paintLinkZone(canvas, box, content, l, i, link);
+                }
                 canvas.text(content.x() + l.x() + r.x(), baseline, r.text(), r.format().face(font),
                         s.fontSize * r.format().scale(), s.color, l.wordSpacing(), s.letterSpacing);
             }
         }
-        canvas.endText();
+        if (open) {
+            canvas.endText();
+        }
         paintDecorations(canvas, p, content, metrics, false);
+    }
+
+    /**
+     * La zona clicable (§5.20) de los tramos de la línea {@code l} que empiezan en {@code first} y van
+     * seguidos con el mismo destino (una parte en negrita dentro de un enlace es una sola zona).
+     */
+    private static void paintLinkZone(Canvas canvas, Box box, Rect content, TextLine l, int first,
+                                      String destination) {
+        List<TextLine.Run> runs = l.runs();
+        StringBuilder text = new StringBuilder();
+        int end = first;
+        while (end < runs.size() && destination.equals(runs.get(end).format().link())) {
+            text.append(runs.get(end).text());
+            end++;
+        }
+        TextLine.Run last = runs.get(end - 1);
+        canvas.link(box, linkArea(content, l, runs.get(first).x(), last.x() + last.width()), destination,
+                text.toString());
     }
 
     /** Rayas de subrayado ({@code underline}) o de tachado de los tramos, con el color del texto. */

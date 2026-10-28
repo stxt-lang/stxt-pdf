@@ -53,6 +53,15 @@ public interface Canvas {
     }
 
     /**
+     * Empieza el texto de un enlace dentro del texto de la caja (ESPECIFICACION.md §5.20): como
+     * {@link #beginText(Box)}, pero lo que sigue, hasta {@link #endText()}, es el contenido de un
+     * {@code Link} del PDF etiquetado. Las zonas clicables de ese texto ({@link #link}) se piden
+     * después de empezarlo. Por defecto no hace nada.
+     */
+    default void beginLinkText(Box box) {
+    }
+
+    /**
      * La imagen de una {@code Image} (ESPECIFICACION.md §5.18) en su caja de contenido
      * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja con
      * las esquinas {@code radii} (las de la caja de contenido). Por defecto no pinta nada.

@@ -152,6 +152,8 @@ public final class PdfCanvas implements Canvas {
                 }
                 if (!canvas.annotations.isEmpty()) {
                     page.setAnnotations(canvas.annotations);
+                    // Las anotaciones se recorren en el orden de la estructura (PDF/UA, 7.18.3).
+                    page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
             }
             Map<Box, PDPageXYZDestination> destinations =
@@ -478,6 +480,24 @@ public final class PdfCanvas implements Canvas {
         });
     }
 
+    /** Si lo que se pinta es el texto de un enlace ({@link #beginLinkText}): sus zonas cuelgan de su {@code Link}. */
+    private boolean linkText;
+
+    @Override
+    public void beginLinkText(Box box) {
+        try {
+            int mcid = structure.markLink(box);
+            linkText = true;
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName("Link"), mcid);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     @Override
     public void beginText(Box box) {
         try {
@@ -596,11 +616,16 @@ public final class PdfCanvas implements Canvas {
             annotation.setQuadPoints(quad);
         }
         annotations.add(annotation);
-        structure.link(box, annotation, description);
+        if (linkText) {
+            structure.inlineLink(annotation, description);
+        } else {
+            structure.link(box, annotation, description);
+        }
     }
 
     @Override
     public void endText() {
+        linkText = false;
         try {
             out.endMarkedContent();
         } catch (IOException e) {

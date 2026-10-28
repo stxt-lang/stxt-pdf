@@ -2,6 +2,7 @@ package dev.stxt.boxes.examples;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.golden.PdfUa;
 import dev.stxt.boxes.golden.ReferenceFiles;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
@@ -19,9 +20,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -46,6 +51,15 @@ class ExamplesTest {
 
     private static final Path ROOT = Path.of("test", "examples");
     private static final float IMAGE_DPI = 110;
+
+    /**
+     * Reglas de PDF/UA-1 que los ejemplos todavía incumplen y no son de lo que se comprueba aquí; el resto
+     * (enlaces etiquetados, orden de tabulación, tablas, figuras…) debe cumplirse. Se quitan de aquí al
+     * arreglarlas (accesibilidad, {@code TODO.md}).
+     */
+    private static final Set<String> KNOWN_UA_FAILURES = Set.of(
+            "5-1" // El XMP no declara el identificador pdfuaid:part: no se afirma la conformidad.
+    );
 
     private final DocumentReader reader = new DocumentReader();
 
@@ -85,5 +99,13 @@ class ExamplesTest {
         PdfCanvas.write(document, resources, out, false);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
+        accessibility(dir, out.toByteArray());
+    }
+
+    /** El PDF etiquetado cumple PDF/UA-1 salvo en {@link #KNOWN_UA_FAILURES}. */
+    private static void accessibility(Path dir, byte[] pdf) {
+        Map<String, String> unexpected = new LinkedHashMap<>(PdfUa.failedRules(pdf));
+        unexpected.keySet().removeAll(KNOWN_UA_FAILURES);
+        assertEquals(Map.of(), unexpected, dir.getFileName() + ": reglas de PDF/UA-1 incumplidas");
     }
 }

@@ -78,6 +78,14 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Validador de PDF/UA (accesibilidad) de los PDF de los ejemplos: solo en los tests. -->
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>validation-model</artifactId>
+            <version>1.28.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

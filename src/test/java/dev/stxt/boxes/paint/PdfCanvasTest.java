@@ -338,9 +338,10 @@ class PdfCanvasTest {
 
     /**
      * Un enlace a una URL es una anotación {@code Link} sin borde con su acción {@code URI}, del
-     * tamaño de la caja o del tramo, y cuelga de la caja en el PDF etiquetado como un {@code Link}
-     * con su {@code OBJR}; el de un {@code Fixed}, que no es contenido, es clicable pero no está
-     * etiquetado (§5.20).
+     * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
+     * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
+     * lleva la {@code OBJR} de la anotación; el de un {@code Fixed}, que no es contenido, es un
+     * {@code Link} suelto del {@code Document} con su {@code Alt} (§5.20).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -367,27 +368,89 @@ class PdfCanvasTest {
             PDRectangle run = links.get(2).getRectangle();
             assertTrue(run.getWidth() > 20 && run.getWidth() < 60, run.toString());
             assertEquals("la web", links.get(2).getContents());
+            // PDF/UA: los cuatro están en la página con las anotaciones recorridas en orden de estructura.
+            assertEquals("S", pdf.getPage(0).getCOSObject().getNameAsString("Tabs"));
 
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
             PDStructureElement document = (PDStructureElement) tree.getKids().get(0);
-            assertEquals(List.of("Span", "Figure", "Div"), types(document));
+            assertEquals(List.of("Span", "Link", "Div", "Link"), types(document));
+            // La caja con Link: Span → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
             PDStructureElement span = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(span));
-            PDStructureElement link = (PDStructureElement) span.getKids().stream()
-                    .filter(k -> k instanceof PDStructureElement).findFirst().orElseThrow();
-            assertEquals("Escribe a soporte", link.getAlternateDescription());
-            PDObjectReference reference = (PDObjectReference) link.getKids().get(0);
+            PDStructureElement link = (PDStructureElement) span.getKids().get(0);
+            assertEquals(List.of("MCR", "OBJR"), shape(link));
+            assertNull(link.getAlternateDescription());
+            PDObjectReference reference = (PDObjectReference) link.getKids().get(1);
             assertEquals(text.getCOSObject(), ((PDAnnotationLink) reference.getReferencedObject()).getCOSObject());
             // El árbol de padres lleva de la anotación a su Link.
             assertEquals(link.getCOSObject(), ((COSObjectable) tree.getParentTree().getValue(text.getStructParent())).getCOSObject());
-            // El Link del tramo cuelga del párrafo del Markdown; el Fixed no tiene elemento ni Link.
+            // La imagen: Link → Figure (con su Alt) y la OBJR.
+            PDStructureElement imageLink = (PDStructureElement) document.getKids().get(1);
+            assertEquals(List.of("Figure", "OBJR"), shape(imageLink));
+            assertEquals("Logotipo", ((PDStructureElement) imageLink.getKids().get(0)).getAlternateDescription());
+            assertNull(imageLink.getAlternateDescription());
+            // El tramo del Markdown: P → [texto, Link → [texto del enlace, OBJR], texto].
             PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(2))
                     .getKids().get(0);
             assertEquals("P", paragraph.getStructureType());
-            assertEquals(List.of("Link"), types(paragraph));
-            assertEquals(-1, links.get(3).getStructParent());
+            assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
+            assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
+            // El Fixed: un Link suelto del Document, con el texto como Alt y la OBJR.
+            PDStructureElement fixed = (PDStructureElement) document.getKids().get(3);
+            assertEquals(List.of("OBJR"), shape(fixed));
+            assertEquals("pie", fixed.getAlternateDescription());
+            assertEquals(fixed.getCOSObject(), ((COSObjectable) tree.getParentTree()
+                    .getValue(links.get(3).getStructParent())).getCOSObject());
             String extracted = new PDFTextStripper().getText(pdf);
             assertTrue(extracted.contains("Visita la web hoy."), extracted);
+        }
+    }
+
+    /**
+     * Un enlace de texto que ocupa varias líneas es un solo {@code Link} con un contenido marcado y una
+     * {@code OBJR} por línea; las zonas son una por línea (§5.20).
+     */
+    @Test
+    void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
+        InlineNode doc = reader.read(LINKS.replace("Width: 300", "Width: 100")
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\tAntes [un enlace que ocupa bastantes líneas de texto](https://a.example) después.\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "link-lines"))) {
+            List<PDAnnotationLink> links = links(pdf, 0);
+            assertTrue(links.size() >= 3, "" + links.size());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(0))
+                    .getKids().get(0);
+            assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
+            List<String> link = shape((PDStructureElement) paragraph.getKids().get(1));
+            assertEquals(List.of("MCR"), link.subList(0, 1));
+            assertEquals(links.size(), link.stream().filter("OBJR"::equals).count());
+        }
+    }
+
+    /**
+     * Una caja con {@code Link} que contiene otras (un bloque con dos textos) las envuelve en su
+     * {@code Link}: {@code Div → Link → [Span, Span, OBJR]}; sin nada que leer dentro, el {@code Link}
+     * lleva su texto como {@code Alt}.
+     */
+    @Test
+    void aBoxLinkWrapsItsChildren() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tBlock:\n\t\tLink: https://a.example\n\t\tText: Uno\n\t\tText: Dos\n"
+                + "\tBlock:\n\t\tLink: https://b.example\n\t\tBox:\n\t\t\tHeight: 10\n\t\t\tBackground: #CCC\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "box-link"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("Div", "Div"), types(document));
+            PDStructureElement full = (PDStructureElement) document.getKids().get(0);
+            assertEquals(List.of("Link"), types(full));
+            PDStructureElement link = (PDStructureElement) full.getKids().get(0);
+            assertEquals(List.of("Span", "Span", "OBJR"), shape(link));
+            assertNull(link.getAlternateDescription());
+            PDStructureElement empty = (PDStructureElement) document.getKids().get(1);
+            PDStructureElement emptyLink = (PDStructureElement) empty.getKids().get(0);
+            assertEquals(List.of("OBJR"), shape(emptyLink));
+            assertEquals("https://b.example", emptyLink.getAlternateDescription());
         }
     }
 
@@ -446,7 +509,8 @@ class PdfCanvasTest {
 
     /**
      * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
-     * solo es contenido (y tiene {@code Link}) en la primera (§5.20, decisión L5).
+     * solo es contenido (y envuelve el texto de la celda) en la primera; en las demás es un {@code Link}
+     * suelto del {@code Document} (§5.20).
      */
     @Test
     void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {
@@ -469,10 +533,33 @@ class PdfCanvasTest {
             PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
             PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
             assertEquals(List.of("Link"), types(th));
-            assertEquals(pdf.getPage(0), ((PDStructureElement) th.getKids().stream()
-                    .filter(k -> k instanceof PDStructureElement).findFirst().orElseThrow()).getPage());
-            assertEquals(-1, links(pdf, 1).get(0).getStructParent());
+            // El Link de la celda solo tiene la anotación de la primera página.
+            PDStructureElement cellLink = (PDStructureElement) th.getKids().get(0);
+            assertEquals(List.of("MCR", "OBJR"), shape(cellLink));
+            assertEquals(pdf.getPage(0), ((PDObjectReference) cellLink.getKids().get(1)).getPage());
+            // La de la segunda es un Link suelto del Document.
+            PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
+            PDStructureElement repeated = (PDStructureElement) document.getKids().get(1);
+            assertEquals("Link", repeated.getStructureType());
+            assertEquals("Concepto", repeated.getAlternateDescription());
+            assertEquals(repeated.getCOSObject(), ((COSObjectable) tree.getParentTree()
+                    .getValue(links(pdf, 1).get(0).getStructParent())).getCOSObject());
         }
+    }
+
+    /** Los hijos de un elemento en orden: el tipo de cada elemento, {@code MCR} y {@code OBJR}. */
+    private static List<String> shape(PDStructureElement e) {
+        List<String> kids = new ArrayList<>();
+        for (Object k : e.getKids()) {
+            if (k instanceof PDStructureElement child) {
+                kids.add(child.getStructureType());
+            } else if (k instanceof PDObjectReference) {
+                kids.add("OBJR");
+            } else {
+                kids.add("MCR");
+            }
+        }
+        return kids;
     }
 
     private static List<String> types(PDStructureElement e) {
@@ -598,7 +685,10 @@ class PdfCanvasTest {
             assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("TOCI", "TOCI", "TOCI"), types(toc));
-            assertEquals(List.of("Span", "Span", "Link"), types((PDStructureElement) toc.getKids().get(0)));
+            // La entrada: TOCI → Link → [título, número, OBJR].
+            PDStructureElement entry = (PDStructureElement) toc.getKids().get(0);
+            assertEquals(List.of("Link"), types(entry));
+            assertEquals(List.of("Span", "Span", "OBJR"), shape((PDStructureElement) entry.getKids().get(0)));
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Uno"), text);
             assertTrue(text.matches("(?s).*Dos punto uno\\s*2.*"), text);

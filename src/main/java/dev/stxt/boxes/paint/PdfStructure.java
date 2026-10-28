@@ -65,8 +65,11 @@ import java.util.Set;
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
- * <p>Un enlace (§5.20) es un {@code Link} hijo del elemento de su caja, con la anotación del PDF
- * como referencia a objeto ({@code OBJR}).</p>
+ * <p>Un enlace (§5.20) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación del PDF
+ * como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del
+ * elemento de la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de
+ * texto ({@code [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto,
+ * uno por enlace y fragmento aunque ocupe varias líneas.</p>
  *
  * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, §6), que
  * llevan a la esquina superior izquierda de su primer fragmento ({@link PdfDestinations}).</p>
@@ -85,7 +88,19 @@ final class PdfStructure {
     /** Primera página con contenido de cada caja de {@link #repeated}: en las demás es un <em>artifact</em>. */
     private final Map<Box, PDPage> firstPage = new HashMap<>();
 
+    /** El {@code Link} de cada caja con {@code Link}: contiene su contenido y las anotaciones de su zona. */
+    private final Map<Box, PDStructureElement> boxLinks = new HashMap<>();
+    /** Donde cuelga el contenido propio (el texto) de las cajas con {@code Link}: su {@code Link}. */
+    private final Map<Box, PDStructureElement> holders = new HashMap<>();
+    /** Los {@code Link} de cajas sin texto ni figura, que no se leen por su contenido sino por su {@code Alt}. */
+    private final Set<PDStructureElement> emptyLinks = new HashSet<>();
+    /** El {@code Link} del enlace de texto que se está pintando, para colgarle la anotación de su zona. */
+    private PDStructureElement inline;
+
     private static final String[] TABLE_GROUPS = {"THead", "TBody", "TFoot"};
+
+    /** El elemento {@code Document}, raíz del árbol de estructura. */
+    private final PDStructureElement document;
 
     private PDPage page;
     private COSArray pageParents;
@@ -97,6 +112,7 @@ final class PdfStructure {
         markInfo.setMarked(true);
         catalog.setMarkInfo(markInfo);
         build(root, treeRoot);
+        document = elements.get(root);
     }
 
     /**
@@ -112,8 +128,10 @@ final class PdfStructure {
             // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
             return;
         }
-        PDStructureElement e = new PDStructureElement(type(box), parent);
-        parent.appendKid(e);
+        // Una imagen con enlace es el contenido de su Link: Link → Figure.
+        PDStructureNode owner = box.isImage() && box.style.link != null ? newLink(box, parent) : parent;
+        PDStructureElement e = new PDStructureElement(type(box), owner);
+        owner.appendKid(e);
         elements.put(box, e);
         if (box.headingLevel() > 0) {
             headings.add(box);
@@ -148,11 +166,45 @@ final class PdfStructure {
             e.appendKid(body);
             content = body;
         }
+        content = linked(box, content);
         for (Box child : box.children) {
             if (child.style.position != Style.Position.FIXED) {
                 build(child, content);
             }
         }
+    }
+
+    /**
+     * Si la caja tiene {@code Link} (§5.20), el {@code Link} que envuelve su contenido (su texto y sus
+     * hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción:
+     * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
+     */
+    private PDStructureNode linked(Box box, PDStructureNode content) {
+        if (box.style.link == null || box.isImage()) {
+            return content;
+        }
+        PDStructureElement link = newLink(box, content);
+        holders.put(box, link);
+        return link;
+    }
+
+    /** Un {@code Link} hijo de {@code parent} para la caja. */
+    private PDStructureElement newLink(Box box, PDStructureNode parent) {
+        PDStructureElement link = new PDStructureElement("Link", parent);
+        parent.appendKid(link);
+        boxLinks.put(box, link);
+        if (!hasContent(box)) {
+            emptyLinks.add(link);
+        }
+        return link;
+    }
+
+    /** Si la caja o lo que contiene tiene algo que leer: texto, un marcador o una imagen con {@code Alt}. */
+    private static boolean hasContent(Box box) {
+        if (box.hasText() || box.marker != null || box.isImage() && box.style.alt != null) {
+            return true;
+        }
+        return box.children.stream().anyMatch(c -> c.style.position != Style.Position.FIXED && hasContent(c));
     }
 
     /**
@@ -197,9 +249,10 @@ final class PdfStructure {
             if (group != 1) {
                 repeats(cell);
             }
+            PDStructureNode content = linked(cell, c);
             for (Box child : cell.children) {
                 if (child.style.position != Style.Position.FIXED) {
-                    build(child, c);
+                    build(child, content);
                 }
             }
         }
@@ -311,13 +364,37 @@ final class PdfStructure {
 
     /**
      * Apunta el texto de un fragmento de la caja en la página actual y da su {@code MCID}; -1 si
-     * es un <em>artifact</em> (dentro de un {@code Fixed}).
+     * es un <em>artifact</em> (dentro de un {@code Fixed}). Cuelga del elemento de la caja o, si la caja
+     * tiene {@code Link}, de este.
      */
     int mark(Box box) {
-        PDStructureElement e = elements.get(box);
+        PDStructureElement e = holders.containsKey(box) ? holders.get(box) : elements.get(box);
         if (e == null || !isContent(box)) {
             return -1;
         }
+        return reference(e);
+    }
+
+    /**
+     * Apunta el texto de un enlace de la caja ({@code [texto](destino)}) como contenido de un
+     * {@code Link} nuevo, hijo del elemento de la caja, en la página actual y da su {@code MCID}; -1 si es
+     * un <em>artifact</em>. Las anotaciones de sus zonas cuelgan de él ({@link #inlineLink}).
+     */
+    int markLink(Box box) {
+        inline = null;
+        PDStructureElement holder = holders.containsKey(box) ? holders.get(box) : elements.get(box);
+        if (holder == null || !isContent(box)) {
+            return -1;
+        }
+        PDStructureElement link = new PDStructureElement("Link", holder);
+        link.setPage(page);
+        holder.appendKid(link);
+        inline = link;
+        return reference(link);
+    }
+
+    /** Un contenido marcado de la página actual que cuelga de {@code e}; su {@code MCID}. */
+    private int reference(PDStructureElement e) {
         int mcid = pageParents.size();
         pageParents.add(e);
         PDMarkedContentReference ref = new PDMarkedContentReference();
@@ -340,20 +417,57 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta un enlace (ESPECIFICACION.md §5.20, decisión L5): un {@code Link} hijo del elemento
-     * de la caja, con la anotación como referencia a objeto ({@code OBJR}) y su texto como
-     * {@code Alt}. En un {@code Fixed}, en una imagen decorativa o en las filas repetidas de una
-     * tabla, donde la caja no es contenido, el enlace tampoco: la anotación sigue siendo clicable.
+     * Etiqueta la zona de una caja con {@code Link} (ESPECIFICACION.md §5.20, decisión 171): la
+     * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
+     * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. En un
+     * {@code Fixed}, en una imagen decorativa o en las filas repetidas de una tabla, donde la caja no
+     * es contenido, el enlace va a un {@code Link} aparte ({@link #outside}).
      */
     void link(Box box, PDAnnotationLink annotation, String description) {
         PDStructureElement parent = elements.get(box);
         if (parent == null || !isContent(box)) {
+            outside(annotation, description);
             return;
         }
-        PDStructureElement link = new PDStructureElement("Link", parent);
+        PDStructureElement link = boxLinks.get(box);
+        if (link == null) {
+            // Una caja que no puede envolver su contenido en un Link (una tabla): un Link aparte, hijo suyo.
+            link = new PDStructureElement("Link", parent);
+            link.setPage(page);
+            parent.appendKid(link);
+            emptyLinks.add(link);
+        }
+        if (emptyLinks.contains(link) && link.getAlternateDescription() == null) {
+            link.setAlternateDescription(description != null ? description : annotation.getContents());
+        }
+        attach(link, annotation);
+    }
+
+    /** Etiqueta la zona de una línea del enlace de texto que empezó {@link #markLink}. */
+    void inlineLink(PDAnnotationLink annotation, String description) {
+        if (inline != null) {
+            attach(inline, annotation);
+        } else {
+            outside(annotation, description);
+        }
+    }
+
+    /**
+     * Etiqueta el enlace de algo que no es contenido (un {@code Fixed}, una imagen decorativa, las filas
+     * repetidas de una tabla): PDF/UA exige que toda anotación de enlace esté en un {@code Link}. Es un
+     * {@code Link} hijo del {@code Document}, sin contenido marcado y con el texto del enlace como
+     * {@code Alt}: un lector de pantalla lo anuncia, y lo que se repite en cada página (un pie con una
+     * web) se anuncia en cada una.
+     */
+    private void outside(PDAnnotationLink annotation, String description) {
+        PDStructureElement link = new PDStructureElement("Link", document);
         link.setPage(page);
         link.setAlternateDescription(description != null ? description : annotation.getContents());
-        parent.appendKid(link);
+        document.appendKid(link);
+        attach(link, annotation);
+    }
+
+    private void attach(PDStructureElement link, PDAnnotationLink annotation) {
         PDObjectReference reference = new PDObjectReference();
         reference.setReferencedObject(annotation);
         reference.setPage(page);
