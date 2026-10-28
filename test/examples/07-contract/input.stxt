@@ -1,7 +1,8 @@
 # Contrato de servicios de diseño entre un estudio y una cooperativa, de varias páginas: cabecera
 # fija con el logotipo desde la segunda hoja (la primera lleva el título) y pie fijo con rúbricas,
-# reunidos y exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de
-# tres niveles de numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
+# reunidos (con las partes en negrita, gracias a Inline: markdown en la regla de Paragraph) y
+# exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de tres niveles de
+# numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
 # bloque de firmas, que no se parte entre páginas.
 Document (dev.stxt.boxes):
 	Media:
@@ -40,6 +41,7 @@ Document (dev.stxt.boxes):
 		Element: Paragraph
 			Typography:
 				Align: justify
+				Inline: markdown
 			Box:
 				Margin: 0 0 7 0
 		Element: List
@@ -152,12 +154,12 @@ Document (dev.stxt.boxes):
 			Class: party
 			Box:
 				Margin: 0 0 8 0
-			Markdown:
+			Paragraph:
 				Content >>
 					De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora (en adelante, «el Estudio»).
 		Block:
 			Class: party
-			Markdown:
+			Paragraph:
 				Content >>
 					De otra, **Cooperativa Solvent, S. Coop. Ltda.**, con CIF F-17482211 y domicilio en el polígono de la Canya, nave 6, de Olot (Girona), representada por doña Carme Vidal i Roca, presidenta de su Consejo Rector (en adelante, «la Cliente»).
 	Paragraph: Ambas partes se reconocen mutuamente la capacidad legal necesaria para obligarse y, a tal efecto,

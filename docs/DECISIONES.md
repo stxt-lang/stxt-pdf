@@ -1039,3 +1039,50 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      debajo, así que sus PNG no cambian); el boletín (05) gana un titulillo corrido desde la
      segunda página. La carta (02) es de una sola página y no cambia: su membrete ya es un bloque
      de la primera y no hay segunda hoja que enseñar.
+
+## Hito 26: formato dentro de la línea (2026-10-28)
+
+186. **`Inline: markdown` como propiedad de `Typography`** (F1, F3): el texto es literal salvo que
+     se pida, y se pide con una propiedad que se hereda, en `Document`, en una regla de `Styles` o
+     en el propio elemento; `Inline: none` vuelve al literal. Los documentos que ya existen no
+     cambian. *Dónde:* schema, `tree/Style.Inline`, `tree/PropertyReader`.
+     *Alternativa:* hijos `Run` con su propio `Typography` (más STXT, mucho más largo), o una
+     propiedad solo del elemento (se repetiría en cada texto, justo lo que quitó el hito 25).
+
+187. **La misma sintaxis y el mismo subconjunto que `Markdown`** (F2, F4): `**x**`, `*x*`, `++x++`,
+     `~~x~~` y `[x](destino)`, con los escapes de CommonMark (`\*`). Se reutiliza el parser y el
+     `Translator` de `MarkdownBuilder` en modo `inlineOnly` (`MarkdownBuilder.inline`), así que un
+     enlace con título o con un destino mal escrito da los mismos errores. *Dónde:*
+     `tree/MarkdownBuilder`. *Alternativa:* un parser en línea propio, o admitir también listas y
+     encabezados (que ya hace `Markdown`).
+
+188. **Solo párrafos** (F4, F5): un texto con `Inline: markdown` que empieza como un encabezado,
+     una lista, una cita, código o una tabla es `MARKDOWN_UNSUPPORTED`, con el mensaje propio de
+     este modo y la línea del párrafo; hay que escapar el primer carácter (`1\.`, `\-`, `\#`) si
+     es literal. Varios párrafos (línea en blanco entre ellos) se unen con `\n\n`, que es lo que ya
+     entiende el reparto en líneas. *Alternativa:* tratar lo que no es un párrafo como texto literal
+     (silencioso, contra la política del §6).
+
+189. **`Box.text` es el texto sin marcas y el texto deja de ser un bloque** (F2): lo que ven el
+     reparto en líneas, el PDF etiquetado, las referencias (`{page}`, `{page of: id}`) y el índice es
+     el texto interpretado. Como el texto ya no se corresponde línea a línea con el del
+     documento, `Box.textBlock` es falso y los errores del texto (fuente sin un carácter,
+     referencia desconocida, `LINK_UNKNOWN`) señalan la línea donde empieza. *Dónde:*
+     `tree/BoxTreeBuilder.inlineFormat`. *Alternativa:* llevar la correspondencia de líneas de cada
+     párrafo, más precisa pero más código para un caso poco frecuente.
+
+190. **No actúa dentro de un `Markdown`** (F1): sus textos ya vienen interpretados y lo escapado
+     debe seguir siendo literal; `Inline: markdown` heredado de `Document` no los vuelve a pasar
+     por el parser. Una caja de `Contents` genera sus entradas sin pasar por `element`, así que
+     tampoco. *Dónde:* `BuildContext.insideMarkdown`. *Alternativa:* un error por declararla dentro
+     de un `Markdown` (se hereda, así que sería habitual).
+
+191. **Qué admite:** `Text`, `Paragraph` (también como hijo de un `Heading`) y `Cell` con valor;
+     una `Cell` con elementos, no. `Image.Alt` y el resto de valores siguen siendo literales.
+     *Alternativa:* también `Alt`, `Title` y `Language` (no tienen formato que pintar).
+
+192. **Ejemplos** (hito 26): las partes del contrato (07), la leyenda del manual (08) y la carta de
+     la presidenta (04) pasan de `Markdown` a `Paragraph` con la regla `Element: Paragraph` y
+     `Inline: markdown`, sin cambiar un píxel; la factura (01), el currículum (03) y la carta del
+     restaurante (06) ganan una negrita o una cursiva dentro de una frase. Los pasos numerados
+     del manual y las cláusulas del contrato siguen siendo `Markdown` porque son listas.

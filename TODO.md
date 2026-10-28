@@ -53,8 +53,9 @@
   `[texto](destino)` en Markdown). Queda: el `Link` del PDF etiquetado no envuelve el contenido
   marcado del tramo (decisión 171), y un encabezado de un `Markdown` no se puede enlazar a mano
   porque no tiene `Id`.
-- **Formato dentro de la línea fuera de Markdown**: en `Text`, `Paragraph` y `Cell` los
-  asteriscos son literales, así que una negrita suelta en un texto corto obliga a usar `Markdown`.
+- ~~**Formato dentro de la línea fuera de Markdown**~~ (hito 26: `Inline: markdown` en
+  `Typography`). Queda que un texto con `Inline: markdown` no admite listas ni encabezados (van en
+  un `Markdown`) y que hay que escapar el primer carácter si empieza como una (`-`, `#`, `1.`).
 - ~~**Estilo de las tablas**~~ (hito 25: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell`,
   `Even row cell`, `For column` y `Column align`). Queda que una fila no tiene `Box` y que no se
   puede dar estilo a una fila concreta sin tocar cada una de sus celdas (el pie de totales de la

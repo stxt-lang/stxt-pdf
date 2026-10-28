@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 25 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 26 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -78,7 +78,9 @@ actualízala.
 
 | 25 | ~~Estilo de las tablas: `Element` por posición de la celda (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` y `Column align`~~ (hecho; caso 18) | schema, `tree/StyleRules`, `tree/CellPosition`, `tree/CellSelector`, `tree/TableBuilder`, `tree/BoxTreeBuilder` |
 
-Los hitos 26 a 31 (formato en línea, texto,
+| 26 | ~~Formato en línea fuera de `Markdown`: `Inline: markdown` en `Typography` (se hereda), con la sintaxis en línea y los enlaces de `Markdown`~~ (hecho; caso 19) | schema, `tree/Style.Inline`, `tree/PropertyReader`, `tree/MarkdownBuilder.inline`, `tree/BoxTreeBuilder.inlineFormat` |
+
+Los hitos 27 a 31 (texto,
 aspecto de las cajas, preformateado, rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
@@ -318,9 +320,17 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   (`LineBreaker.Word`, `LineBreaker.Line`) y `TextLine.runs` guarda cada tramo colocado, con el
   espaciado de `justify` incluido. `StackingContext` pinta cada tramo con su fuente y las rayas
   con `Canvas.decoration(font)` (`post` y `OS/2` en PDF). Un texto sin formato debe medirse y
-  pintarse exactamente igual que una cadena: los PNG golden lo vigilan. El documento solo
-  escribe tramos con `Markdown`; los tests de layout los ponen en el árbol con `TextRuns` y
-  `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
+  pintarse exactamente igual que una cadena: los PNG golden lo vigilan. El documento escribe
+  tramos con `Markdown` o con `Inline: markdown` (ver abajo); los tests de layout los ponen en el
+  árbol con `TextRuns` y `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
+- **Formato en línea (§5.4):** `Inline` (`Style.Inline`, `none` o `markdown`) es una propiedad de
+  `Typography` que se hereda y se admite en `Styles`. Con `markdown`, `BoxTreeBuilder.inlineFormat`
+  pasa el texto de un `Text`, un `Paragraph` o una `Cell` con valor por `MarkdownBuilder.inline`
+  (el mismo parser y el mismo `Translator` que `Markdown`, en modo `inlineOnly`: solo párrafos con
+  formato y enlaces; lo demás, `MARKDOWN_UNSUPPORTED` con la línea del párrafo). `Box.text` pasa a
+  ser el texto sin las marcas (los párrafos, separados por `\n\n`), `Box.runs` los tramos y
+  `Box.textBlock` deja de ser cierto: la línea de sus errores es la de donde empieza el texto. Dentro
+  de un `Markdown` no actúa (`BuildContext.insideMarkdown`): sus textos ya vienen interpretados.
 - **Markdown (§5.17):** `MarkdownBuilder` parsea el `Content` con commonmark-java y lo traduce
   a nodos STXT (`InlineNode` con la línea de su bloque: `Heading N` con un `Text`, `Paragraph`,
   `List` con `Marker` de `Bullet`/`Numbering`, `Table` con `Columns` de `Table columns`), que

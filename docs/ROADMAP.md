@@ -44,15 +44,15 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 23 | Enlaces (URL y destinos del documento) | hecho | 16 |
 | 24 | Primera página distinta (`Pages` en `Fixed`) | hecho | 17 |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | hecho | 18 |
-| 26 | Formato dentro de la línea fuera de Markdown | pendiente | 19 (previsto) |
+| 26 | Formato dentro de la línea fuera de Markdown | hecho | 19 |
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | pendiente | 20 (previsto) |
 | 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
 | 29 | Texto preformateado y código | pendiente | 22 (previsto) |
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 25, el 2026-10-28. Los hitos
-26 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 26, el 2026-10-28. Los hitos
+27 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -90,7 +90,7 @@ comportamiento" de [`CLAUDE.md`](../CLAUDE.md):
 - [x] **M6. Sintaxis de los tramos.** El formato dentro de una línea solo se escribe en
       `Markdown`: `Text` y `Paragraph` siguen siendo literales (no hay que escapar los
       asteriscos de los documentos que ya existen). El modelo de tramos es general, por si más
-      adelante se quiere una sintaxis STXT propia.
+      adelante se quiere una sintaxis STXT propia. *Revisada en el hito 26: ver F1.*
 
 ---
 
@@ -835,29 +835,46 @@ formato solo se escribe en `Markdown`), que se tomó cuando no había ejemplos r
   años**», el plato con su descripción en cursiva, el premio del currículum) obliga a partir el
   texto en dos `Text` o a usar `Markdown`.
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **F1. Mecanismo.** *Propuesta:* una propiedad `Inline: markdown` (o `Format: markdown`)
-      en `Text`, `Paragraph` y `Cell`, que interpreta su texto con la misma sintaxis y el
-      mismo subconjunto que `Markdown` (**negrita**, *cursiva*, `++subrayado++`, `~~tachado~~`);
-      sin ella, el texto sigue siendo literal. *Alternativa:* hijos `Run` con su propio
-      `Typography` dentro del texto, más STXT pero más largo de escribir.
-- [ ] **F2. Escapes.** *Propuesta:* los de CommonMark (`\*`). *Alternativa:* ninguno, porque
-      hay que pedirlo con la propiedad.
-- [ ] **F3. Herencia.** *Propuesta:* `Inline` es una propiedad de `Typography` (se hereda), así
-      que se declara una vez en `Document` o en una regla de `Styles`. *Alternativa:* solo en
-      el elemento.
-- [ ] **F4. Qué más entra.** *Propuesta:* los enlaces del hito 23 cuando estén; ni listas ni
-      encabezados (eso es `Markdown`). Un párrafo con líneas en blanco sigue siendo un error.
-- [ ] **F5. Errores.** *Propuesta:* lo que no está en el subconjunto es
-      `MARKDOWN_UNSUPPORTED`, como ahora, con la línea del texto.
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada, elegidas en un cuestionario con
+el usuario; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 186–192):
+
+- [x] F1. **Mecanismo.** Una propiedad `Inline: markdown` (con `none` por defecto) en `Text`,
+      `Paragraph` y `Cell`, que interpreta su texto con la misma sintaxis y el mismo subconjunto que
+      `Markdown` (**negrita**, *cursiva*, `++subrayado++`, `~~tachado~~`); sin ella, el texto sigue
+      siendo literal.
+- [x] F2. **Escapes.** Los de CommonMark (`\*`).
+- [x] F3. **Herencia.** `Inline` es una propiedad de `Typography` (se hereda): se declara una vez en
+      `Document` o en una regla de `Styles`, y `Inline: none` vuelve al literal.
+- [x] F4. **Qué más entra.** Los enlaces `[texto](destino)` del hito 23; ni listas ni encabezados (eso
+      es `Markdown`). Un texto con varios párrafos (línea en blanco) los une como un `Text`.
+- [x] F5. **Errores.** Lo que no está en el subconjunto es `MARKDOWN_UNSUPPORTED`, con la línea del
+      párrafo y un mensaje propio de este modo.
+
+**Diseño técnico** (como quedó):
+
+- **Propiedad.** `Style.Inline` (`NONE`, `MARKDOWN`), campo heredable de `Style`; el schema la tiene en
+  el grupo `Typography` y `PropertyReader.typography` la lee, así que vale también en `Styles`.
+- **Traducción.** `MarkdownBuilder.inline(texto, primeraLínea)` parsea con el mismo `PARSER` y el
+  mismo `Translator` (ahora con `inlineOnly`, sin las propiedades de `Markdown`): cada párrafo da sus
+  tramos y se unen con `\n\n`.
+- **Árbol.** `BoxTreeBuilder.inlineFormat`, después de leer el texto de un `Text`/`Paragraph` o el valor
+  de una `Cell`: `Box.text` es el texto sin marcas, `Box.runs` los tramos (`null` sin formato) y
+  `Box.textBlock` es falso, con `Box.textLine` la línea donde empieza el texto. No actúa dentro de un
+  `Markdown` (`BuildContext.insideMarkdown`).
+- **Layout y pintado.** Nada nuevo: los tramos son los del hito 16 y pasan por `LineBreaker`,
+  `PdfMetrics` y `StackingContext` como los de `Markdown`.
 
 **Tareas:**
 
-- [ ] Resolver F1–F5.
-- [ ] Schema (`Inline`), `Style`, y reutilizar `MarkdownBuilder` para un texto en línea.
-- [ ] Especificación (§4.4, §5.4, §5.17, §8), errores, tests y caso golden `19-inline`.
-- [ ] Ejemplos 01, 03, 04, 06, 07 y 08 sin los `Markdown` de relleno (ver arriba).
+- [x] Resolver F1–F5 (2026-10-28).
+- [x] Schema (`Inline`), `Style`, `PropertyReader` y reutilizar `MarkdownBuilder` para un texto en línea.
+- [x] Especificación (§4.4, §5.4, §5.17, §6, §8, §9 y glosario), errores (seis casos nuevos de
+      `MARKDOWN_UNSUPPORTED` en `test/errors/markdown/`), tests (`InlineFormatTest`,
+      `SchemaCoverageTest`) y caso golden `19-inline`, calculado a mano.
+- [x] Ejemplos 01, 03, 04, 06, 07 y 08 (ver arriba): 04, 07 y 08 sin los `Markdown` de relleno y sin
+      cambiar un píxel; 01, 03 y 06 con una negrita o una cursiva dentro de la frase.
 
 ---
 
@@ -1125,6 +1142,16 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (11).** Hito 26 terminado. Resueltas F1–F5 con un cuestionario (todas las propuestas):
+  `Inline: markdown` en `Typography` (se hereda y vale en `Styles`), con la sintaxis y los enlaces de
+  `Markdown`, escapes de CommonMark y solo párrafos. Reutiliza el parser y el `Translator` de
+  `MarkdownBuilder` (`inlineOnly`); `Box.text` es el texto sin marcas y no actúa dentro de un
+  `Markdown`. Seis casos nuevos de `MARKDOWN_UNSUPPORTED` en el catálogo, `InlineFormatTest` y el caso
+  golden `19-inline` (calculado a mano; al pasar se corrigió una cuenta mía, no el código). Ejemplos 04,
+  07 y 08 con `Paragraph` en vez de `Markdown` de relleno (los PNG y los volcados no cambian) y 01, 03 y
+  06 con una negrita o una cursiva. Decisiones 186–192 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 27 (mayúsculas, interletraje y versalitas), en otra sesión; resolver Y1–Y5
+  con el usuario antes de escribir código.
 - **2026-10-28 (10).** Hito 24 terminado. Resueltas N1–N5: `Pages` en `Fixed` y nada más (sin
   `First margin`, numeración física, sin reservar espacio, sin página en blanco). `Style.Pages`, el filtro
   del `Paginator`, dos casos de schema, `FixedPagesTest` y el caso golden `17-page-types`

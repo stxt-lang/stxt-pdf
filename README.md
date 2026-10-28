@@ -83,7 +83,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 23 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 26 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -102,7 +102,8 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 23 están termin
 | Colapso de márgenes, mínimos y máximos, centrado | Hecho y probado |
 | Ecuación de cajas absolutas | Hecho y probado |
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |
-| Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; se escriben con `Markdown` |
+| Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; se escriben con `Markdown` o con `Inline: markdown` |
+| Formato dentro de la línea en un `Text`, un `Paragraph` o una `Cell` (`Inline: markdown`, propiedad de `Typography`, se hereda): la misma sintaxis en línea y los enlaces de `Markdown`, con escapes de CommonMark; sin ella el texto es literal | Hecho y probado |
 | Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM, imágenes solas en su párrafo y formato dentro de la línea, traducidos a los elementos de siempre; el resto, error | Hecho y probado |
 | Reparto flex con congelación | Hecho y probado |
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
@@ -169,7 +170,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 23. ~~**Enlaces.** Propiedad `Link` en las cajas y enlaces de Markdown, a una URL o a otra caja del documento, con anotaciones de enlace en el PDF; las entradas del índice llevan a su encabezado (caso 16).~~ Hecho.
 24. ~~**Primera página distinta.** Propiedad `Pages` en `Fixed` (`first`, `not-first`, `odd`, `even`, `last`): una cabecera, un pie o un logotipo solo en las páginas que se quiera (caso 17). Sin margen distinto en la primera página ni numeración que no cuente la portada.~~ Hecho.
 25. ~~**Estilo de las tablas.** Reglas `Element` por posición (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` en `Styles` y `Column align` en la `Table`, sin repetir una clase en cada celda; también en las tablas de Markdown (caso 18).~~ Hecho.
-26. **Formato dentro de la línea fuera de Markdown.** Pendiente.
+26. ~~**Formato dentro de la línea fuera de Markdown.** Propiedad `Inline: markdown` en `Typography` (se hereda): negrita, cursiva, subrayado, tachado y enlaces dentro de un `Text`, un `Paragraph` o una `Cell`, con los escapes de CommonMark (caso 19).~~ Hecho.
 27. **Texto:** mayúsculas automáticas, interletraje y versalitas. Pendiente.
 28. **Aspecto de las cajas:** esquinas, bordes, sombras y degradados. Pendiente.
 29. **Texto preformateado y código.** Pendiente.

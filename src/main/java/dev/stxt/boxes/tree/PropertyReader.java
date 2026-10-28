@@ -96,6 +96,7 @@ final class PropertyReader {
                 case "align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
                 case "color" -> s.color = color(p);
                 case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
+                case "inline" -> s.inline = enumValue(Style.Inline.class, p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
                 default -> throw unread(p);

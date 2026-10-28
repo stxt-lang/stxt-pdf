@@ -1,6 +1,7 @@
 # Currículum de una diseñadora de producto. Una página A4 sin márgenes: un grid de dos columnas
 # a página completa, con una barra lateral de color (foto, contacto, herramientas con barras
 # de nivel e idiomas) y el cuerpo con perfil, cifras, experiencia en línea de tiempo y formación.
+# Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -33,6 +34,8 @@ Document (dev.stxt.boxes):
 		Element: Paragraph
 			Box:
 				Margin: 0 0 6 0
+			Typography:
+				Inline: markdown
 		Element: List
 			Box:
 				Padding: 0 0 0 11
@@ -242,7 +245,9 @@ Document (dev.stxt.boxes):
 								List item:
 									Text: Taller semanal de investigación con usuarios, abierto a los clientes.
 								List item:
-									Text: Premio Sol Digital 2021 al mejor diseño de interacción.
+									Text: **Premio Sol Digital 2021** al mejor diseño de interacción.
+										Typography:
+											Inline: markdown
 					Area:
 						Text: 2016 – 2018
 							Class: dates
@@ -282,4 +287,4 @@ Document (dev.stxt.boxes):
 								Class: place
 				Heading 2:
 					Text: CHARLAS Y PUBLICACIONES
-				Paragraph: «Diseñar para quien tiene prisa», Barcelona UX Days (2024) · «Accesibilidad sin florituras», artículo en la revista Interfaz (2023) · Jurado de los Premios Sol Digital (2024).
+				Paragraph: «*Diseñar para quien tiene prisa*», Barcelona UX Days (2024) · «*Accesibilidad sin florituras*», artículo en la revista *Interfaz* (2023) · Jurado de los Premios Sol Digital (2024).

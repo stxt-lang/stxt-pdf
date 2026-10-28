@@ -854,6 +854,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Text wrap
 				Max: 1
+			Child: Inline
+				Max: 1
 			Child: Widows
 				Max: 1
 			Child: Orphans
@@ -971,6 +973,12 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Values:
 			Value: auto
 			Value: pretty
+	Node: Inline
+		Type: ENUM
+		Description: Formato dentro de la línea del texto: none (por defecto; el texto es literal) o markdown (interpreta **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino), con los escapes de CommonMark; no hace nada dentro de un Markdown).
+		Values:
+			Value: none
+			Value: markdown
 	Node: Widows
 		Type: INTEGER
 		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.

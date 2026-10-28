@@ -80,6 +80,10 @@ final class MarkdownBuilder {
     private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, imágenes solas en "
             + "su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino)";
 
+    private static final String INLINE_SUBSET = "un texto con Inline: markdown solo admite párrafos con **negrita**, "
+            + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); encabezados, listas y tablas van en un "
+            + "Markdown, y un carácter especial se escribe con \\ delante (\\*)";
+
     /**
      * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
      * ({@code Text}, {@code Paragraph} o {@code Cell}).
@@ -93,7 +97,7 @@ final class MarkdownBuilder {
     static Translation translate(InlineNode markdown) {
         Node content = child(markdown, "content").orElseThrow();
         // El bloque Content >> empieza en la línea siguiente a la suya.
-        Translator t = new Translator(markdown, content.getLine() + 1);
+        Translator t = new Translator(markdown, content.getLine() + 1, false);
         List<InlineNode> elements = t.blocks(PARSER.parse(content.getText()), false);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown necesita contenido en Content");
@@ -101,6 +105,30 @@ final class MarkdownBuilder {
         // Red de seguridad: lo generado cumple el schema, como lo que escribe el autor.
         elements.forEach(DocumentSchema::validate);
         return new Translation(List.copyOf(elements), t.runs);
+    }
+
+    /**
+     * Un texto con {@code Inline: markdown} (§5.4): sus tramos. Solo párrafos, que se separan con una
+     * línea en blanco, como en un {@code Text}; lo demás es {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
+     *
+     * @param firstLine línea del documento donde empieza el texto
+     */
+    static List<TextRun> inline(String text, int firstLine) {
+        Translator t = new Translator(null, firstLine, true);
+        TextRun.Joiner out = new TextRun.Joiner();
+        boolean first = true;
+        for (org.commonmark.node.Node b = PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
+            int line = t.line(b);
+            if (!(b instanceof Paragraph p)) {
+                throw t.unsupported(b, line);
+            }
+            if (!first) {
+                out.add("\n\n", TextFormat.PLAIN);
+            }
+            first = false;
+            t.inline(p, TextFormat.PLAIN, out, line);
+        }
+        return out.build();
     }
 
     private static final class Translator {
@@ -115,13 +143,16 @@ final class MarkdownBuilder {
         /** Listas con viñetas y numeradas que contienen el bloque que se traduce. */
         private int bulletDepth;
         private int numberingDepth;
+        /** Es el texto en línea de un {@code Inline: markdown}, no un elemento {@code Markdown}. */
+        private final boolean inlineOnly;
 
-        Translator(InlineNode markdown, int firstLine) {
+        Translator(InlineNode markdown, int firstLine, boolean inlineOnly) {
             this.markdown = markdown;
             this.firstLine = firstLine;
-            this.bullet = child(markdown, "bullet");
-            this.numbering = child(markdown, "numbering");
-            this.tableColumns = child(markdown, "table-columns");
+            this.inlineOnly = inlineOnly;
+            this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet");
+            this.numbering = markdown == null ? Optional.empty() : child(markdown, "numbering");
+            this.tableColumns = markdown == null ? Optional.empty() : child(markdown, "table-columns");
             this.bullets = bullet.map(n -> markers(n, false)).orElse(List.of());
             this.numberings = numbering.map(n -> markers(n, true)).orElse(List.of());
         }
@@ -296,7 +327,7 @@ final class MarkdownBuilder {
         }
 
         /** El texto de los hijos de {@code parent}, con el formato que acumulan sus antecesores. */
-        private void inline(org.commonmark.node.Node parent, TextFormat f, TextRun.Joiner out, int line) {
+        void inline(org.commonmark.node.Node parent, TextFormat f, TextRun.Joiner out, int line) {
             for (org.commonmark.node.Node n = parent.getFirstChild(); n != null; n = n.getNext()) {
                 if (n instanceof Text t) {
                     out.add(t.getLiteral(), f);
@@ -362,10 +393,11 @@ final class MarkdownBuilder {
             return markers;
         }
 
-        private InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
+        InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
             if (n instanceof Image) {
-                what = "imágenes dentro de un texto (una imagen va sola en su párrafo)";
+                what = inlineOnly ? "imágenes (usa un Image)"
+                        : "imágenes dentro de un texto (una imagen va sola en su párrafo)";
             } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
                 what = "código";
             } else if (n instanceof BlockQuote) {
@@ -381,11 +413,13 @@ final class MarkdownBuilder {
             } else {
                 what = n.getClass().getSimpleName();
             }
-            return error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite " + what + ": " + SUBSET);
+            return inlineOnly
+                    ? error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Inline: markdown no admite " + what + ": " + INLINE_SUBSET)
+                    : error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite " + what + ": " + SUBSET);
         }
 
         /** Línea del documento donde empieza el bloque; la del {@code Content} si no la tiene. */
-        private int line(org.commonmark.node.Node b) {
+        int line(org.commonmark.node.Node b) {
             return b.getSourceSpans().isEmpty() ? firstLine - 1 : firstLine + b.getSourceSpans().get(0).getLineIndex();
         }
 

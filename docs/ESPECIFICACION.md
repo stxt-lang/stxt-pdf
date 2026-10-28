@@ -324,6 +324,7 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto. |
 | `Text wrap` | `auto`, `pretty` | `auto` | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
+| `Inline` | `none`, `markdown` | `none` | Formato dentro de la línea: con `markdown`, el texto interpreta **negrita**, *cursiva*, `++subrayado++`, `~~tachado~~` y `[enlaces](destino)`. Ver [§5.4](#54-texto). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 
@@ -694,9 +695,29 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   varios tramos (**neg**rita) es una sola palabra para el reparto, y mide lo que suman sus
   partes; el espacio entre dos palabras tiene el formato del tramo en que está su primer espacio
   en blanco. Con `justify`, el espacio extra de cada espacio pertenece a su tramo. Un texto sin
-  formato es un único tramo. Un `Text` no tiene sintaxis para escribirlos: los genera el
+  formato es un único tramo. Los tramos se escriben con `Inline: markdown` (abajo) o los genera el
   elemento `Markdown` ([§5.17](#517-markdown)). Un tramo puede llevar además el destino de un
   enlace ([§5.20](#520-enlaces)), que no cambia cómo se mide ni cómo se pinta.
+- **Formato en línea (`Inline`).** Por defecto el texto de un `Text`, un `Paragraph` o una `Cell`
+  es **literal**: los asteriscos son asteriscos. Con `Inline: markdown` se interpreta como el
+  Markdown en línea del [§5.17](#517-markdown), con la misma sintaxis y el mismo subconjunto:
+  `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](destino)` (§5.20), combinables.
+  Las marcas no son texto: no se miden, no se pintan y no cuentan para el reparto en líneas. Un
+  carácter especial se escribe con una barra delante, como en CommonMark (`\*`, `\_`, `\[`, `\\`).
+  Como `Content` admite varios párrafos, cada uno separado por una línea en blanco es un
+  párrafo; el salto de línea simple vale un espacio, igual que sin `Inline`. `Inline` es una
+  propiedad de `Typography`: **se hereda**, así que se declara una vez en `Document` o en una regla
+  de `Styles` (`Element: Paragraph`), y un texto concreto vuelve al literal con `Inline: none`.
+  Solo admite lo que cabe en una línea: un encabezado (`#`), una lista (`-`, `1.`), una tabla, una
+  cita, código, una imagen o HTML dentro de un texto con `Inline: markdown` es un error
+  (`MARKDOWN_UNSUPPORTED`, con la línea del párrafo), como un enlace con título o con un destino no
+  admitido (`LINK_SCHEME`); esas cosas van en un `Markdown`. Si el texto va a empezar por `-`, `#`,
+  `>` o `1.`, escapa el primer carácter. Dentro de un `Markdown` la propiedad no actúa: sus
+  textos ya vienen interpretados, y lo escapado sigue siendo literal. Las referencias
+  (`{page}`, `{page of: id}`) funcionan igual con y sin ella. El texto que ve el resto del motor
+  (el PDF etiquetado, el índice de un `Contents`, los mensajes) es el texto sin las marcas, y un
+  error del texto (un carácter que la fuente no tiene, una referencia desconocida) señala la línea
+  donde empieza.
 - **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
   espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
   los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
@@ -1539,7 +1560,9 @@ de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el des
 lista, como en un `List item`, ni una tabla quedarse sin filas debajo de la cabecera.
 
 **Texto.** Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Text`. El
-formato dentro de la línea se suma: `***x***` es negrita y cursiva. Un encabezado o un párrafo
+formato dentro de la línea se suma: `***x***` es negrita y cursiva. Esa misma sintaxis en línea,
+sin el resto de elementos, la admite `Inline: markdown` en un `Text`, un `Paragraph` o una `Cell`
+([§5.4](#54-texto)). Un encabezado o un párrafo
 sin texto es un error (`TEXT_CONTENT`).
 
 **Listas.** El nivel de una lista es el número de listas de su mismo tipo que la contienen: la
@@ -1886,7 +1909,7 @@ La validación se hace en cuatro niveles:
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
-| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces con título, ni definiciones de enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas y…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces con título, ni definiciones de enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque). Un texto con `Inline: markdown` ([§5.4](#54-texto)) solo admite párrafos con formato en línea: ni encabezados, ni listas, ni tablas, ni imágenes (línea del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas y…` |
 | `LINK_SCHEME` | El destino de un enlace (`Link` o enlace de Markdown, [§5.20](#520-enlaces)) es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito (línea del `Link`, o la del bloque en Markdown) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno (línea del `Link`, o la del bloque en Markdown) | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
@@ -1963,7 +1986,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Reglas de estilo | Selectores compuestos, combinadores, especificidad calculada, `!important` | Selectores simples (`Element`, que también nombra la posición de una celda de tabla, `For class`, `For id` y `For column`) con prioridad fija, solo con `Box`, `Typography` y `Break` ([§4.10](#410-reglas-reutilizables-styles)) |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
-| Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, viudas y huérfanas) |
+| Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, formato en línea, viudas y huérfanas) |
 | `display` | Combina tipo exterior e interior | El elemento (`Block`, `Flex`, `Grid`, `Text`) fija el interior; el exterior lo decide el padre. No hay `inline-block`. |
 | `position` | Propiedad de cualquier caja | Elementos `Relative`, `Absolute` y `Fixed`, que son bloques: un flex o grid posicionado va dentro de uno de ellos |
 | Propiedades de ítem (`flex-grow`, `grid-area`…) | En el propio ítem, con efecto solo si el padre es flex o grid | En el envoltorio `Item` o `Area`, que solo existe dentro de su contenedor |
@@ -1974,7 +1997,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Fuentes | Del sistema o con `@font-face`, con una lista de alternativas | Solo TTF de la carpeta de recursos, sin alternativas; la fuente es obligatoria y un carácter que no tiene es un error |
 | `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Weight: normal` o `bold` y `Style: normal` o `italic`, sin síntesis: el fichero debe existir |
 | Kerning y ligaduras | Sí | No |
-| Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color ([§5.4](#54-texto)) |
+| Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color. Se escriben con Markdown en línea, solo donde se pide con `Inline: markdown`; sin ello el texto es literal ([§5.4](#54-texto)) |
 | `text-decoration` | Estilos (`wavy`, `dotted`…), color, grosor y desplazamiento propios; el subrayado se interrumpe en los descendentes (`text-decoration-skip-ink`) | Una raya continua del color del texto, con la posición y el grosor de la fuente |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
@@ -2074,7 +2097,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Widows`, `Orphans` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Widows`, `Orphans` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
@@ -2253,4 +2276,5 @@ Document (dev.stxt.boxes):
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado y enlace) ([§5.4](#54-texto)). |
+| **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([§5.4](#54-texto)). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

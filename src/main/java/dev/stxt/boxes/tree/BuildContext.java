@@ -32,6 +32,8 @@ final class BuildContext {
     boolean insideFixed;
     /** Si se está construyendo el contenido de un {@code Multicol}. */
     boolean insideMulticol;
+    /** Si se está construyendo el contenido de un {@code Markdown}: sus textos ya vienen interpretados (§5.17). */
+    boolean insideMarkdown;
     /** Los {@code Contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
     final List<Box> contents = new ArrayList<>();
     /** Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo (§5.4). */

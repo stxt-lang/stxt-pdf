@@ -6,6 +6,7 @@ import dev.stxt.TextNode;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
@@ -307,11 +308,13 @@ public final class BoxTreeBuilder {
         if (kind.hasText()) {
             text(n, box);
             box.runs = ctx.runs.get(n);
+            inlineFormat(ctx, box);
         } else if (kind == Element.IMAGE) {
             image(n, box);
         } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
             cellText(n, box);
             box.runs = ctx.runs.get(n);
+            inlineFormat(ctx, box);
         } else {
             boolean outerFixed = ctx.insideFixed;
             ctx.insideFixed |= s.position == Style.Position.FIXED;
@@ -360,9 +363,29 @@ public final class BoxTreeBuilder {
     private void markdown(BuildContext ctx, InlineNode n, Box box) {
         MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
         ctx.runs.putAll(t.runs());
+        ctx.insideMarkdown = true;
         for (InlineNode e : t.elements()) {
             box.addChild(element(ctx, e, box, null, null));
         }
+        ctx.insideMarkdown = false;
+    }
+
+    /**
+     * Con {@code Inline: markdown} (§5.4), el texto de la caja es Markdown en línea: pasa a ser el texto
+     * seguido, sin las marcas, y los tramos con formato van en {@link Box#runs}. Dentro de un
+     * {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un
+     * bloque: sus errores señalan la línea donde empieza.
+     */
+    private static void inlineFormat(BuildContext ctx, Box box) {
+        if (box.style.inline != Style.Inline.MARKDOWN || ctx.insideMarkdown) {
+            return;
+        }
+        int first = box.textBlock ? box.textLine + 1 : box.textLine;
+        List<TextRun> runs = MarkdownBuilder.inline(box.text, first);
+        box.text = TextRun.text(runs);
+        box.textLine = first;
+        box.textBlock = false;
+        box.runs = TextRun.formatted(runs) ? runs : null;
     }
 
     /**

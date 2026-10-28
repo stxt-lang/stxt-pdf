@@ -58,8 +58,12 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   páginas: una portada a sangre sale al margen con un `Offset` negativo. `Pages` también quita el
   logotipo de la primera hoja del contrato (07), el pie de la primera página de la carta (06) y
   pone un titulillo corrido desde la segunda página del boletín (05).
-- **El texto con formato** solo se escribe en `Markdown`; en `Text` y `Paragraph` los asteriscos
-  son literales. Los ejemplos mezclan los dos según lo que necesitan.
+- **El texto con formato** se escribe con `Inline: markdown` (una regla `Element: Paragraph` o el
+  `Typography` de un `Text`: se hereda) para una negrita o una cursiva dentro de una frase, y con
+  `Markdown` cuando hay además listas, encabezados o tablas. Sin `Inline` los asteriscos son
+  literales. Las cláusulas del contrato (07) y los pasos del manual (08) siguen siendo `Markdown`
+  porque son listas; las partes del contrato, la leyenda de la figura (08) y la carta de la
+  presidenta (04) ya son `Paragraph`.
 - **Los espacios se colapsan**: no hay texto preformateado, así que un bloque de terminal con
   columnas alineadas (ejemplo 08) usa un grid.
 - **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la
@@ -68,8 +72,8 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   fila, como la de los totales de la factura.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) es clicable entero,
-  también el teléfono: sin formato en línea fuera de Markdown no se puede enlazar solo una parte
-  de un texto corto.
+  también el teléfono: con `Inline: markdown` se podría enlazar solo una parte (`[web](https://…)`),
+  y los ejemplos 02 y 09 aún no lo usan.
 - **El índice** lo da `Contents`, sus entradas son clicables, y las páginas, `{page of: id}`. Un `Contents` lista todos los
   encabezados de sus niveles, así que la portada y el título del propio índice son un `Text`, no
   un encabezado, para que no salgan en él (no hay forma de excluir uno).

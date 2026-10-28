@@ -1,8 +1,9 @@
 # Guía rápida de un termostato, de tres páginas. Reúne lo que suele tener un manual técnico:
 # una figura con números superpuestos (un Relative con sus Absolute encima) y su leyenda al
-# lado, avisos con color, pasos numerados en Markdown, un esquema de conexión, bloques de
-# terminal en monoespaciada y tablas de especificaciones y de averías. La estructura de
-# encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
+# lado (una List de Paragraph con la negrita escrita con Inline: markdown, que la regla de
+# Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
+# bloques de terminal en monoespaciada y tablas de especificaciones y de averías. La estructura
+# de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
 # {page of: wiring}, la página donde está (también dentro de Markdown).
 Document (dev.stxt.boxes):
 	Media:
@@ -45,6 +46,8 @@ Document (dev.stxt.boxes):
 			Box:
 				Margin: 12 0 4 0
 		Element: Paragraph
+			Typography:
+				Inline: markdown
 			Box:
 				Margin: 0 0 7 0
 		Element: List
@@ -215,13 +218,16 @@ Document (dev.stxt.boxes):
 					Text: Conoce tu termostato
 					Box:
 						Margin: 0 0 8 0
-				Markdown:
-					Numbering: decimal
-					Content >>
-						1. **Indicador de estado.** Verde fijo cuando está conectado a la red; parpadea mientras se empareja.
-						2. **Temperatura actual** de la estancia, en grados centígrados.
-						3. **Temperatura objetivo.** El punto naranja marca la que has elegido.
-						4. **Corona.** Gírala para subir o bajar la temperatura y púlsala para cambiar de modo.
+				List:
+					Marker: decimal
+					List item:
+						Paragraph: **Indicador de estado.** Verde fijo cuando está conectado a la red; parpadea mientras se empareja.
+					List item:
+						Paragraph: **Temperatura actual** de la estancia, en grados centígrados.
+					List item:
+						Paragraph: **Temperatura objetivo.** El punto naranja marca la que has elegido.
+					List item:
+						Paragraph: **Corona.** Gírala para subir o bajar la temperatura y púlsala para cambiar de modo.
 	Heading 2:
 		Text: En la caja
 	Grid:

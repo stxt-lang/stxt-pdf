@@ -1,6 +1,7 @@
 # Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
 # doble dibujados con Fixed de Layer negativa, que quedan detrás del contenido en todas las
-# páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación.
+# páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
+# con el precio y la nota final en negrita dentro de la línea (Inline: markdown).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 420
@@ -390,18 +391,19 @@ Document (dev.stxt.boxes):
 					Size: 8.5
 					Align: center
 					Color: #6E675C
-			Text: 54 €  ·  maridaje, 24 € más
+			Text: **54 €**  ·  maridaje, 24 € más
 				Typography:
 					Font: IBM Plex Sans
-					Weight: bold
+					Inline: markdown
 					Size: 10
 					Align: center
 					Color: #14365C
 				Box:
 					Margin: 8 0 0 0
-		Text: IVA incluido. Si tiene alguna alergia o intolerancia, avise a su camarero: casi todos los platos se pueden adaptar.
+		Text: **IVA incluido.** Si tiene alguna alergia o intolerancia, avise a su camarero: casi todos los platos se pueden adaptar.
 			Typography:
 				Font: IBM Plex Sans
+				Inline: markdown
 				Size: 7
 				Align: center
 				Color: #8A8174

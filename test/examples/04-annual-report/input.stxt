@@ -43,6 +43,7 @@ Document (dev.stxt.boxes):
 				Margin: 0 0 8 0
 			Typography:
 				Align: justify
+				Inline: markdown
 		Element: List
 			Box:
 				Padding: 0 0 0 16
@@ -286,16 +287,10 @@ Document (dev.stxt.boxes):
 			Text: Carta de la presidenta
 		Paragraph: Cuando fundamos Solvent, hace once años, teníamos tres tejados, un molino de viento prestado y más ganas que dinero. Hoy producimos energía para más de ocho mil hogares, comercios y empresas de la comarca, y lo hacemos sin salir de ella: lo que generamos aquí se consume aquí.
 			Class: lead
-		Markdown:
-			Bullet: dash
-			Content >>
-				El 2025 ha sido el año de la **consolidación**. Hemos puesto en marcha el parque solar de Les Preses, ampliado el de Sant Joan y renovado los tres aerogeneradores más antiguos. Hemos producido un 11 % más que el año anterior y hemos cerrado el ejercicio con un resultado positivo por quinto año consecutivo.
-
-				Nada de esto es obra de una persona. Es el resultado del trabajo de las veintitrés personas de la plantilla, de las más de mil doscientas socias y socios que deciden en la asamblea y de una red de proveedores locales que han montado, cada kilovatio, con las manos y con criterio.
-
-				Este informe cuenta lo que hemos conseguido, también lo que nos ha costado y lo que nos queda por hacer. Les invitamos a leerlo con ojo crítico: una cooperativa se mejora preguntando.
-
-				Con afecto y con ganas de seguir,
+		Paragraph: El 2025 ha sido el año de la **consolidación**. Hemos puesto en marcha el parque solar de Les Preses, ampliado el de Sant Joan y renovado los tres aerogeneradores más antiguos. Hemos producido un 11 % más que el año anterior y hemos cerrado el ejercicio con un resultado positivo por quinto año consecutivo.
+		Paragraph: Nada de esto es obra de una persona. Es el resultado del trabajo de las veintitrés personas de la plantilla, de las más de mil doscientas socias y socios que deciden en la asamblea y de una red de proveedores locales que han montado, cada kilovatio, con las manos y con criterio.
+		Paragraph: Este informe cuenta lo que hemos conseguido, también lo que nos ha costado y lo que nos queda por hacer. Les invitamos a leerlo con ojo crítico: una cooperativa se mejora preguntando.
+		Paragraph: Con afecto y con ganas de seguir,
 		Text: Carme Vidal i Roca
 			Typography:
 				Font: IBM Plex Serif

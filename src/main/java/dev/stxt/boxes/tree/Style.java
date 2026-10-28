@@ -37,6 +37,9 @@ public final class Style {
     /** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
     public enum TextWrap { AUTO, PRETTY }
 
+    /** Formato dentro de la línea: el texto literal ({@code none}) o escrito en Markdown ({@code markdown}). */
+    public enum Inline { NONE, MARKDOWN }
+
     public enum Direction { ROW, COLUMN }
 
     /** Reparto en un eje: {@code Main axis} y {@code Lines}. */
@@ -132,6 +135,7 @@ public final class Style {
     public Value lineHeight;
     public TextAlign textAlign = TextAlign.LEFT;
     public TextWrap textWrap = TextWrap.AUTO;
+    public Inline inline = Inline.NONE;
 
     // --- Flex ------------------------------------------------------------------------------------
     public Direction flexDirection = Direction.ROW;
@@ -253,6 +257,7 @@ public final class Style {
             s.lineHeight = parent.lineHeight;
             s.textAlign = parent.textAlign;
             s.textWrap = parent.textWrap;
+            s.inline = parent.inline;
             s.widows = parent.widows;
             s.orphans = parent.orphans;
         }

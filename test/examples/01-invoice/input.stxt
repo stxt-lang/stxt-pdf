@@ -1,6 +1,7 @@
 # Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
 # una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
-# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido.
+# fijo. El estilo está todo en Styles: los elementos solo llevan su contenido. Dos textos llevan
+# Inline: markdown para poner una negrita dentro de la frase.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -241,12 +242,15 @@ Document (dev.stxt.boxes):
 						Size: 9.5
 						Weight: bold
 				Text: Caixa Girona · BIC CAIXESBBXXX
-				Text: Indica el número de factura en el concepto.
+				Text: Indica el **número de factura** en el concepto.
+					Typography:
+						Inline: markdown
 		Area:
 			Block:
 				Text: CONDICIONES
 					Class: label
-				Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de cinco años sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
+				Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de **cinco años** sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
 					Typography:
 						Size: 8
 						Color: #5C4E43
+						Inline: markdown

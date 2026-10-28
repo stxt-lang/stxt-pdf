@@ -1,0 +1,16 @@
+# Los bloques del flujo, en (20, 20) y con todo el ancho: lit 24, fmt 12, escaped 24, blocks 24,
+# tab 12 y md 24 (ver input.stxt).
+Result:
+	Page: 1
+		Fragment: lit
+			Rect: 20 20 160 24
+		Fragment: fmt
+			Rect: 20 44 160 12
+		Fragment: escaped
+			Rect: 20 56 160 24
+		Fragment: blocks
+			Rect: 20 80 160 24
+		Fragment: tab
+			Rect: 20 104 160 12
+		Fragment: md
+			Rect: 20 116 160 24

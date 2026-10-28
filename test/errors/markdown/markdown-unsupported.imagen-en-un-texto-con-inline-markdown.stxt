@@ -1,0 +1,12 @@
+# Case: Una imagen en un texto con Inline: markdown
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+		Inline: markdown
+	Text: Mira ![logo](a.png) aquí

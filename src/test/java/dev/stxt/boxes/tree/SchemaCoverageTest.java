@@ -71,6 +71,7 @@ class SchemaCoverageTest {
             Map.entry("Align", "Align: center"),
             Map.entry("Color", "Color: #333333"),
             Map.entry("Text wrap", "Text wrap: pretty"),
+            Map.entry("Inline", "Inline: markdown"),
             Map.entry("Widows", "Widows: 3"),
             Map.entry("Orphans", "Orphans: 3"),
             // Break
