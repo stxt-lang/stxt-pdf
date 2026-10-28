@@ -1,9 +1,9 @@
-# Hoja de ruta: Markdown, imágenes, pruebas y ejemplos
+# Hoja de ruta: Markdown, imágenes, pruebas, ejemplos y mejoras que salieron de ellos
 
 Plan de trabajo para escribir el contenido de un documento en Markdown (un subconjunto cerrado
 que se traduce a los elementos que el motor ya conoce), para poner imágenes en él y para
-ordenar las pruebas y hacer ejemplos de documentos completos. Es el punto
-de partida de cada sesión: el estado, las decisiones tomadas y lo que queda por hacer están
+ordenar las pruebas, hacer ejemplos de documentos completos y mejorar el motor con lo que se
+echó en falta al escribirlos (hitos 22 a 31). Es el punto de partida de cada sesión: el estado, las decisiones tomadas y lo que queda por hacer están
 aquí, no en la memoria de la conversación.
 
 Los hitos 1 a 15 están terminados; ver la tabla de estado del [README](../README.md). Las
@@ -39,9 +39,20 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | hecho | 14 |
 | 19 | Los casos de prueba pasan de `src/test/resources` a `test/` | hecho | — |
 | 20 | Catálogo de errores: un fichero STXT por caso, en carpetas por grupo | hecho | — |
-| 21 | Ejemplos de verdad: once documentos completos, con PDF y PNG limpios | hecho | `examples/` |
+| 21 | Ejemplos de verdad: once documentos completos, con PNG limpios | hecho | `examples/` |
+| 22 | Referencias a páginas e índice automático (`Contents`) | pendiente | 15 (previsto) |
+| 23 | Enlaces (URL y destinos del documento) | pendiente | 16 (previsto) |
+| 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
+| 25 | Estilo de las tablas (cebra, cabecera, columnas) | pendiente | 18 (previsto) |
+| 26 | Formato dentro de la línea fuera de Markdown | pendiente | 19 (previsto) |
+| 27 | Texto: mayúsculas automáticas, interletraje y versalitas | pendiente | 20 (previsto) |
+| 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
+| 29 | Texto preformateado y código | pendiente | 22 (previsto) |
+| 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
+| 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y el 18, el 2026-10-28.
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 21, el 2026-10-28. Los hitos 22 a 31
+están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -447,11 +458,630 @@ está en [`test/examples/README.md`](../test/examples/README.md).
 
 ---
 
+## Hitos 22 a 31: lo que se echó en falta al escribir los ejemplos
+
+Al hacer los [once ejemplos](../test/examples/README.md) del hito 21 salieron diez huecos del
+motor (antes en `TODO.md`). Cada uno es un hito, **ordenados por el impacto que tienen en
+documentos reales** (cuántos ejemplos mejoran y cuánto se nota) y, a igual impacto, por lo poco
+que cuestan. El orden se puede cambiar: lo único que no es libre es que **el hito 23 (enlaces)
+va después del 22**, porque el índice se vuelve clicable con él.
+
+| Hito | Tema | Impacto | Esfuerzo | Ejemplos que mejoran |
+|---|---|---|---|---|
+| 22 | Referencias a páginas e índice automático | Alto | Medio | 04, 08, 09 |
+| 23 | Enlaces (URL y destinos del documento) | Alto | Medio | 01, 02, 03, 04, 05, 08, 09, 10 |
+| 24 | Primera página distinta y páginas con nombre | Alto | Medio-alto | 02, 04, 05, 06, 07, 09 |
+| 25 | Estilo de las tablas (cebra, cabecera, columnas) | Medio-alto | Bajo | 01, 04, 05, 07, 08, 09, 11 |
+| 26 | Formato dentro de la línea fuera de Markdown | Medio | Bajo-medio | 01, 03, 04, 06, 07, 08 |
+| 27 | Texto: mayúsculas automáticas, interletraje y versalitas | Medio | Medio | 01, 03, 04, 05, 06, 07, 08, 09, 10 |
+| 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | Medio | Alto | 01, 03, 04, 06, 08, 09, 10, 11 |
+| 29 | Texto preformateado y código | Medio-bajo | Bajo-medio | 01, 08 |
+| 30 | Rotación y orientación de la página | Medio-bajo | Medio | 09, 10, 11 |
+| 31 | Imágenes vectoriales (SVG) | Medio | Alto | 01, 02, 04, 06, 07, 08, 09, 10 |
+
+**Por qué este orden.** El índice (22) es lo que se ha pedido y arrastra las referencias a
+páginas, que son una pieza reutilizable. Los enlaces (23) están en casi todos los documentos
+(correos, webs, el propio índice) y en un PDF se esperan. La primera página distinta (24) es lo
+que hace falta en cuanto hay portada o membrete, y hoy se resuelve con un truco. Las tablas
+(25) son lo más repetido: siete ejemplos escriben la misma clase en cada celda de cabecera. El
+formato en línea (26), las mayúsculas (27) y el aspecto de las cajas (28) son los que más
+afinan el resultado visual; el 28 es el más caro, porque toca el pintado en PDF. El texto
+preformateado (29) y la rotación (30) mejoran un par de ejemplos cada uno. SVG (31) es el más
+caro (probablemente una dependencia nueva) y se puede vivir sin él: los PNG funcionan.
+
+**Cada hito cierra también los ejemplos que mejora.** Además de lo de [Criterios
+comunes](#criterios-comunes-definición-de-hecho), al terminarlo:
+
+- [ ] Se reescriben, con lo nuevo, los ejemplos que su sección lista en **«Se aplica en»**; se
+      revisan los PNG y se regenera su `expected.stxt` (`-Dexamples.update=true`). Si el
+      resultado se ve peor que antes, el hito no está terminado.
+- [ ] Se tacha o se borra su línea de [`TODO.md`](../TODO.md) y se actualiza el índice de
+      [`test/examples/README.md`](../test/examples/README.md) (y su apartado «Lo que se
+      aprende al escribirlos»).
+- [ ] Si hace falta una imagen nueva, se añade a `tools/ExampleImages.java`.
+
+---
+
+## Hito 22: referencias a páginas e índice automático
+
+**Objetivo.** Poder escribir en un texto el número de página en que está otra caja, y generar
+un índice (tabla de contenido) con los encabezados del documento y sus páginas, que se
+mantiene solo al cambiar el contenido. Hoy el contenido del informe anual lleva los números a
+mano y la tabla de averías del manual dice «página 2» a mano.
+
+**Qué se echó en falta.**
+
+- **Ejemplo 04 (informe anual):** la página «Contenido» tiene seis filas
+  (`Block` + `Flex` + dos `Text`) con el número de página escrito; si el texto crece, hay que
+  revisarlas. Con el hito, un solo `Contents`.
+- **Ejemplo 08 (manual):** la tabla de averías dice «Comprueba el esquema de la página 2», y
+  el pie de la hoja del esquema podría decir «véase la página N» desde la sección de
+  instalación.
+- **Ejemplo 09 (catálogo):** una página «Índice de productos» (ficha → página) que hoy no
+  se puede hacer.
+
+**Sintaxis (propuesta).**
+
+```
+Contents:
+	Levels: 1 2
+	Leader: dots
+
+Text: El esquema de conexión está en la página {page of: wiring}.
+```
+
+**Decisiones abiertas** (resolver con el usuario antes de escribir código):
+
+- [ ] **X1. Sintaxis de la referencia.** *Propuesta:* `{page of: id}` dentro del texto de un
+      `Text`, `Paragraph` o `Cell`, como `{page}` y `{pages}`, con el `Id` de una caja.
+      *Alternativa:* un elemento `Reference` propio.
+- [ ] **X2. Qué página es la de una caja partida.** *Propuesta:* la de su primer fragmento (donde
+      empieza). *Alternativa:* la del último.
+- [ ] **X3. Cómo se resuelve.** *Propuesta:* como `{pages}`: se mide con los dígitos
+      reservados (`reservePageDigits`) y, al terminar de paginar, `Engine.number` rehace solo
+      esas líneas con el número real. El alto de una línea no depende del número, así que el
+      índice no cambia el reparto en páginas. *Alternativa:* paginar dos veces hasta que
+      converja, que admitiría texto de longitud variable («página 12 de este manual»).
+- [ ] **X4. Errores nuevos.** *Propuesta:* `REFERENCE_UNKNOWN` (el `Id` no existe; línea del
+      texto) y `REFERENCE_NOT_PLACEABLE` (la caja está en un `Fixed` o es generada y no tiene
+      una única página). *Alternativa:* resolver lo que se pueda y dejar el resto en blanco
+      (descartado: contra la política de errores del §6).
+- [ ] **X5. Índice automático.** *Propuesta:* un elemento `Contents` en flujo, sin hijos, que
+      genera una entrada por encabezado de los niveles de `Levels` (por defecto `1 3`), en
+      orden del documento, **también los de un `Markdown`**. Cada entrada es una caja generada
+      (como el marcador de una lista o el flujo de un `Multicol`): un `Flex` con el texto del
+      encabezado, la guía y el número. *Alternativa:* no tener `Contents` y que el autor
+      escriba el índice con las referencias del X1.
+- [ ] **X6. Estilo de las entradas.** *Propuesta:* reglas `Element: Contents entry 1` …
+      `Contents entry 6`, una por nivel como los encabezados, con `Box` y `Typography`; la
+      sangría de cada nivel es su `Padding` izquierdo. *Alternativa:* una sola regla y la
+      sangría automática.
+- [ ] **X7. Puntos guía.** *Propuesta:* `Leader: dots | rule | none` en `Contents`, dibujados
+      entre el título y el número con el color del texto. *Alternativa:* sin guía (solo el
+      número a la derecha).
+- [ ] **X8. Qué texto lleva la entrada.** *Propuesta:* el del encabezado, con sus `Text`
+      unidos por un espacio y sin formato en línea. *Alternativa:* poder dar otro título con
+      una propiedad `Short title` del encabezado.
+- [ ] **X9. Otros números (cláusula 4, figura 2).** *Propuesta:* fuera de este hito; se apunta
+      como idea (`{number of: id}`) si hace falta. *Alternativa:* incluirlo aquí, porque el
+      contrato (ejemplo 07) cita «el Anexo I» y «la cláusula 4».
+- [ ] **X10. PDF etiquetado.** *Propuesta:* `TOC` con un `TOCI` por entrada; los marcadores no
+      cambian. El enlace al destino llega con el hito 23.
+
+**Tareas:**
+
+- [ ] Resolver X1–X10.
+- [ ] Schema (`Contents`, `Levels`, `Leader`) y `Element`; especificación (§2, §4, §5 —
+      nueva sección—, §6, §7, §8, §9, glosario y un ejemplo).
+- [ ] `{page of: id}`: lectura en el texto, `PageNumbers` y `Engine.number`; página de la
+      primera aparición de cada `Id` en el `Paginator`.
+- [ ] `Contents`: entradas generadas en el builder, con los encabezados (también los de
+      `Markdown`), y su pintado con guía.
+- [ ] Errores nuevos, con su fila en el §6 y sus casos en `test/errors/`.
+- [ ] Tests de las piezas puras y de layout (referencia hacia delante y hacia atrás, cambio de
+      dígitos, índice que ocupa páginas, encabezado en una página siguiente); caso golden
+      `15-contents`.
+- [ ] Ejemplos 04, 08 y 09 reescritos con lo nuevo (ver arriba).
+
+---
+
+## Hito 23: enlaces
+
+**Objetivo.** Que un texto, una imagen o una caja entera lleve a una URL o a otro sitio del
+documento, con anotaciones de enlace en el PDF. Hoy un enlace de Markdown es
+`MARKDOWN_UNSUPPORTED` y los correos y las webs de los ejemplos son texto plano.
+
+**Qué se echó en falta.**
+
+- **Ejemplos 01, 02, 03, 08, 10:** correos y webs (`administracion@tallernogal.example`,
+  `escuelaceramica.example/verificar`, el soporte del manual) sin poder pulsarlos.
+- **Ejemplo 04 (informe anual):** las entradas del índice del hito 22 y la web de contacto.
+- **Ejemplos 05 y 09:** la web del boletín y la del taller en el pie de cada página.
+- **Ejemplo 08 (manual):** «consulta la sección Especificaciones técnicas» como enlace interno.
+
+**Sintaxis (propuesta).**
+
+```
+Text: soporte@airemas.example
+	Link: mailto:soporte@airemas.example
+
+Image: examples/brand/nogal.png
+	Link: https://tallernogal.example
+
+Markdown: ... [la web](https://tallernogal.example) ...
+```
+
+**Decisiones abiertas:**
+
+- [ ] **L1. Dónde se declara.** *Propuesta:* una propiedad `Link` en cualquier caja con
+      contenido (`Text`, `Paragraph`, `Cell`, `Image`, `Block`…) que hace clicable toda la caja,
+      y el enlace de Markdown, que se traduce a un tramo con enlace (`TextFormat` ampliado).
+      *Alternativa:* solo en Markdown, o solo en cajas.
+- [ ] **L2. Destinos.** *Propuesta:* `https://…`, `http://…` y `mailto:…` hacia fuera, y
+      `#id` hacia una caja del documento (se resuelve al terminar de paginar, como las
+      referencias del hito 22). Cualquier otro esquema es un error (`LINK_SCHEME`) y un `#id`
+      que no existe, `LINK_UNKNOWN`. *Alternativa:* admitir cualquier URI.
+- [ ] **L3. Aspecto.** *Propuesta:* un enlace no cambia el aspecto por sí mismo; el autor
+      le da color y subrayado con su estilo, salvo en Markdown, donde el tramo sale subrayado.
+      *Alternativa:* un aspecto por defecto (azul y subrayado) o una regla `Element: Link`.
+- [ ] **L4. Cajas partidas.** *Propuesta:* una anotación por fragmento. *Alternativa:* solo
+      en el primero.
+- [ ] **L5. PDF etiquetado.** *Propuesta:* un elemento `Link` con su `OBJR` por enlace; en un
+      `Fixed` o en las filas repetidas de una tabla, el enlace no es contenido, igual que el
+      resto. *Alternativa:* no etiquetarlos.
+- [ ] **L6. Seguridad.** *Propuesta:* ni `javascript:` ni `file:` ni rutas relativas; el
+      motor no abre nada, solo escribe la anotación.
+
+**Tareas:**
+
+- [ ] Resolver L1–L6.
+- [ ] Schema (`Link`) y `Style`; Markdown (`[texto](url)` deja de ser `MARKDOWN_UNSUPPORTED`).
+- [ ] Rectángulos de enlace por fragmento en el layout; `PdfCanvas` escribe
+      `PDAnnotationLink` (URI y destino con página y posición); el índice del hito 22 usa los
+      destinos.
+- [ ] Especificación, errores, tests y caso golden `16-links`.
+- [ ] Ejemplos 01, 02, 03, 04, 05, 08, 09 y 10 con enlaces (ver arriba).
+
+---
+
+## Hito 24: primera página distinta y páginas con nombre
+
+**Objetivo.** Decir en qué páginas va un `Fixed` y poder tener una primera página con otro
+margen, para portadas y membretes sin trucos.
+
+**Qué se echó en falta.**
+
+- **Ejemplos 04 y 09:** la portada es un `Absolute` con `Layer: 5` del tamaño de la página que
+  tapa la cabecera y el pie de los `Fixed`, más un bloque de 1 pt con `Break: After: page` para
+  forzar el salto. Con el hito, la portada es un bloque normal y el pie no sale en ella.
+- **Ejemplo 02 (carta):** el membrete grande solo debería salir en la primera hoja, y una
+  cabecera corta en las siguientes (hoy, si la carta pasa de una página, repite o no hay nada).
+- **Ejemplo 05 (boletín):** la cabecera del periódico solo en la portada, y un titulillo corrido
+  en la segunda.
+- **Ejemplo 06 (menú):** el pie «La Cala · 1 / 2» no pega en la primera página, que es la de
+  presentación.
+- **Ejemplo 07 (contrato):** el logotipo en la cabecera de todas las hojas menos en la primera,
+  que ya lleva el título grande.
+- **Ejemplos 04 y 09:** que la portada no cuente en la numeración (`Página 1 de 6` en la
+  primera interior).
+
+**Sintaxis (propuesta).**
+
+```
+Fixed:
+	Pages: not-first
+	Offset: -34 0 auto 0
+	...
+
+Media:
+	Width: 595
+	Height: 842
+	Margin: 56
+	First margin: 0
+```
+
+**Decisiones abiertas:**
+
+- [ ] **N1. Qué páginas.** *Propuesta:* una propiedad `Pages` en `Fixed` con `all` (por
+      defecto), `first`, `not-first`, `odd`, `even` y `last`. *Alternativa:* páginas con
+      nombre como en CSS (`@page :first`), más general pero más pesado.
+- [ ] **N2. Margen de la primera página.** *Propuesta:* `First margin` en `Media`, para una
+      portada a sangre o un membrete alto; el flujo se maqueta con el área útil de esa página.
+      *Alternativa:* no tocarlo y que la portada sea un `Absolute`, como hoy. Es lo más caro
+      del hito: el `Paginator` maqueta hoy todas las páginas con el mismo ancho.
+- [ ] **N3. Numeración.** *Propuesta:* `Start` en `Media` (o `Count from`) que fija desde qué
+      página se numera: `{page}` y `{pages}` no cuentan la portada. *Alternativa:* `{page}`
+      sigue siendo la página física.
+- [ ] **N4. Lo que va debajo.** *Propuesta:* un `Fixed` con `Pages` distinto no reserva
+      espacio, como hoy; el autor sigue dejando sitio con el margen.
+- [ ] **N5. Página en blanco para imprimir a doble cara.** *Propuesta:* fuera del hito.
+      *Alternativa:* incluirla (`Break: Before: odd-page`).
+
+**Tareas:**
+
+- [ ] Resolver N1–N5.
+- [ ] Schema (`Pages`, y `First margin` y `Start` si se aceptan), `Style`, `Media`.
+- [ ] `Paginator`: qué `Fixed` pintar en cada página; margen de la primera página si se
+      acepta.
+- [ ] Especificación, errores, tests y caso golden `17-page-types`.
+- [ ] Ejemplos 02, 04, 05, 06, 07 y 09 sin el truco (ver arriba).
+
+---
+
+## Hito 25: estilo de las tablas
+
+**Objetivo.** Dar estilo a la cabecera, al pie, a las filas alternas y a las columnas de una
+tabla **sin repetir una clase en cada celda**, también en las tablas que genera `Markdown`.
+
+**Qué se echó en falta.**
+
+- **Ejemplos 01, 04, 05, 07, 08, 09 y 11:** cada celda de cabecera lleva `Class: th`
+  (de cuatro a seis por tabla; en el informe anual, cuatro tablas) y cada celda numérica,
+  `Class: num`. Es lo más repetido de todos los documentos.
+- **Ejemplo 01 (factura):** el pie con los totales exige `Class: total` en las dos celdas de
+  cada fila.
+- **Ejemplos 04 y 08:** la cabecera de las tablas de Markdown (la inversión del informe, las
+  averías del manual) **no se puede estilar**: sale igual que el cuerpo.
+- **Ejemplos 01 y 05:** una cebra (filas alternas) hoy obliga a una clase por fila.
+- **Ejemplo 11 (horario):** la columna de las horas, con otra alineación.
+
+**Sintaxis (propuesta).**
+
+```
+Styles:
+	Element: Head cell
+		Typography:
+			Weight: bold
+		Box:
+			Background: #3B2A1E
+	Element: Even row cell
+		Box:
+			Background: #F8F3EA
+	For column: 3
+		Typography:
+			Align: right
+```
+
+**Decisiones abiertas:**
+
+- [ ] **B1. Cómo se nombra.** *Propuesta:* nuevos `Element` de `Styles` que son una celda en
+      una posición: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell`
+      (la primera fila del cuerpo es la 1). *Alternativa:* que `Row` admita `Box` (solo fondo
+      y borde) y una regla `Element: Row`.
+- [ ] **B2. Columnas.** *Propuesta:* una regla `For column: n` (o `n m`) en `Styles`, que se
+      aplica a las celdas que empiezan en esa columna. *Alternativa:* `Align` por columna en
+      `Columns` de la tabla.
+- [ ] **B3. Prioridad.** *Propuesta:* se mezclan con las reglas de siempre: elemento
+      (`Cell`) < posición < columna < clase < id < lo propio de la celda.
+- [ ] **B4. Markdown.** *Propuesta:* nada que añadir: lo generado ya lleva `Head` y `Body`, y
+      las reglas nuevas se aplican solas. La alineación de la fila de separación sigue
+      ganando a la columna.
+- [ ] **B5. Cebra con celdas de varias filas.** *Propuesta:* la fila de una celda es la de su
+      primera fila. *Alternativa:* no aplicar la cebra a celdas con `Span` de filas.
+
+**Tareas:**
+
+- [ ] Resolver B1–B5.
+- [ ] Schema, `Element`, `StyleRules` (posición y columna) y `TableBuilder`.
+- [ ] Especificación (§4.10, §5.15, §6, §9), errores, tests y caso golden `18-table-styles`.
+- [ ] Ejemplos 01, 04, 05, 07, 08, 09 y 11 con una regla en vez de una clase por celda; un
+      ejemplo con cebra.
+
+---
+
+## Hito 26: formato dentro de la línea fuera de Markdown
+
+**Objetivo.** Poder poner una negrita, una cursiva o un subrayado en un `Text`, un
+`Paragraph` o una `Cell` sin envolverlo en un `Markdown`. Revisa la decisión **M6** (el
+formato solo se escribe en `Markdown`), que se tomó cuando no había ejemplos reales.
+
+**Qué se echó en falta.**
+
+- **Ejemplo 08 (manual):** la leyenda de la figura era una `List` de `Paragraph` con `**` y
+  salieron los asteriscos literales; hubo que reescribirla como `Markdown`.
+- **Ejemplo 07 (contrato):** las dos partes («**Lumen Estudio de Diseño, S.L.P.**») son un
+  `Block` con un `Markdown` dentro, solo para una negrita.
+- **Ejemplos 01, 03, 04 y 06:** un nombre en negrita dentro de una frase («Garantía de **cinco
+  años**», el plato con su descripción en cursiva, el premio del currículum) obliga a partir el
+  texto en dos `Text` o a usar `Markdown`.
+
+**Decisiones abiertas:**
+
+- [ ] **F1. Mecanismo.** *Propuesta:* una propiedad `Inline: markdown` (o `Format: markdown`)
+      en `Text`, `Paragraph` y `Cell`, que interpreta su texto con la misma sintaxis y el
+      mismo subconjunto que `Markdown` (**negrita**, *cursiva*, `++subrayado++`, `~~tachado~~`);
+      sin ella, el texto sigue siendo literal. *Alternativa:* hijos `Run` con su propio
+      `Typography` dentro del texto, más STXT pero más largo de escribir.
+- [ ] **F2. Escapes.** *Propuesta:* los de CommonMark (`\*`). *Alternativa:* ninguno, porque
+      hay que pedirlo con la propiedad.
+- [ ] **F3. Herencia.** *Propuesta:* `Inline` es una propiedad de `Typography` (se hereda), así
+      que se declara una vez en `Document` o en una regla de `Styles`. *Alternativa:* solo en
+      el elemento.
+- [ ] **F4. Qué más entra.** *Propuesta:* los enlaces del hito 23 cuando estén; ni listas ni
+      encabezados (eso es `Markdown`). Un párrafo con líneas en blanco sigue siendo un error.
+- [ ] **F5. Errores.** *Propuesta:* lo que no está en el subconjunto es
+      `MARKDOWN_UNSUPPORTED`, como ahora, con la línea del texto.
+
+**Tareas:**
+
+- [ ] Resolver F1–F5.
+- [ ] Schema (`Inline`), `Style`, y reutilizar `MarkdownBuilder` para un texto en línea.
+- [ ] Especificación (§4.4, §5.4, §5.17, §8), errores, tests y caso golden `19-inline`.
+- [ ] Ejemplos 01, 03, 04, 06, 07 y 08 sin los `Markdown` de relleno (ver arriba).
+
+---
+
+## Hito 27: texto — mayúsculas automáticas, interletraje y versalitas
+
+**Objetivo.** Las tres cosas que dan carácter a un rótulo y que hoy se hacen a mano:
+transformar a mayúsculas, separar las letras y las versalitas.
+
+**Qué se echó en falta.**
+
+- **Todos los ejemplos con rótulos** (01, 03, 04, 05, 06, 07, 08, 09, 10): `EMISOR`,
+  `CONTACTO`, `INFORME ANUAL · EJERCICIO 2025`, `PARA EMPEZAR`, `REUNIDOS`, `ATENCIÓN`,
+  `NOVEDAD`… están **escritos en mayúsculas en el documento** (con sus tildes, que hay que
+  acordarse de poner: «ÓN»), y el PDF etiquetado los lee así.
+- **Ejemplos 06 y 10 (carta de restaurante y certificado):** los rótulos pequeños en
+  mayúsculas pedirían unos puntos de separación entre letras, como en cualquier impreso cuidado.
+- **Ejemplo 04 y 09 (portadas):** «INFORME ANUAL» y «CATÁLOGO» con interletraje.
+
+**Sintaxis (propuesta).**
+
+```
+Typography:
+	Transform: uppercase
+	Letter spacing: 1.2
+	Small caps: true
+```
+
+**Decisiones abiertas:**
+
+- [ ] **Y1. Transformación.** *Propuesta:* `Transform: none | uppercase | lowercase |
+      capitalize` en `Typography` (se hereda); el texto del documento y el del PDF etiquetado
+      siguen siendo los escritos. *Alternativa:* solo `uppercase`.
+- [ ] **Y2. Interletraje.** *Propuesta:* `Letter spacing` en puntos (como las demás medidas)
+      que se suma al avance de cada carácter, en el reparto en líneas (la palabra mide más), en
+      Knuth-Plass y en `justify`; el último carácter de la línea no lo lleva. *Alternativa:*
+      una fracción del `Size`.
+- [ ] **Y3. Versalitas.** *Propuesta:* sintetizadas (mayúsculas al 80 % del tamaño); las
+      fuentes del repositorio no tienen la característica `smcp`. *Alternativa:* usarla si la
+      fuente la tiene, con un error si no.
+- [ ] **Y4. Mayúsculas y caracteres especiales.** *Propuesta:* las reglas de `String` de Java
+      con la configuración regional del documento (`Language`): la «ß» o la «i» turca.
+      *Alternativa:* siempre `Locale.ROOT`.
+- [ ] **Y5. PDF.** *Propuesta:* `Tc` por carácter o ajuste de `TJ`, para que el texto
+      seleccionable no se parta en letras.
+
+**Tareas:**
+
+- [ ] Resolver Y1–Y5.
+- [ ] Schema, `Style`, `LineBreaker`, `InlineLayout`, `PdfMetrics` y `PdfCanvas`.
+- [ ] Especificación (§4.4, §5.4, §8), tests y caso golden `20-typography`.
+- [ ] Ejemplos con rótulos en minúscula y la transformación en una regla de `Styles`.
+
+---
+
+## Hito 28: aspecto de las cajas — esquinas, bordes, sombras y degradados
+
+**Objetivo.** Lo que hace que un documento deje de parecer «de rectángulos»: esquinas
+redondeadas, un color de borde por lado, sombras y degradados. Es el hito más caro, porque
+toca el pintado en PDF.
+
+**Qué se echó en falta.**
+
+- **Ejemplo 03 (currículum):** la foto debería ser circular y las barras de nivel,
+  redondeadas.
+- **Ejemplo 08 (manual):** los avisos y los números sobre la figura (`1`, `2`, `3`, `4`) son
+  cuadrados; deberían ser círculos.
+- **Ejemplo 09 (catálogo):** las fichas con una sombra suave y la etiqueta «Novedad» con
+  esquinas redondeadas.
+- **Ejemplos 01 y 11:** las tarjetas de datos y las celdas del horario, con esquinas
+  redondeadas.
+- **Ejemplo 04 (informe anual):** un degradado oscuro sobre la foto de la portada para dar
+  contraste al título.
+- **Ejemplos 06 y 10:** el marco doble y los adornos de las esquinas se dibujan con dos o
+  tres `Fixed` y cuatro cuadrados; con esquinas y un borde por lado sería una caja.
+- **Ejemplos 01, 04, 07 y 08:** un borde de un solo lado con **otro color** que el resto (la
+  franja de color a la izquierda de un aviso) hoy solo se consigue con `Border: 0 0 0 3`.
+
+**Sintaxis (propuesta).**
+
+```
+Box:
+	Radius: 8
+	Border: 0 0 0 3
+	Border color: #E9A23B #E9A23B #E9A23B #B5651D
+	Shadow: 0 2 6 #00000033
+	Background: linear(180, #12315A00, #12315A)
+```
+
+**Decisiones abiertas:**
+
+- [ ] **A1. `Radius`.** *Propuesta:* en `Box`, de 1 a 4 valores (número o `%`; `50%` hace un
+      círculo o una elipse), que redondea el fondo, el borde y el recorte de lo que lleva
+      dentro (una `Image`). Es solo pintado: no cambia el layout. *Alternativa:* un solo
+      valor.
+- [ ] **A2. Color de borde por lado.** *Propuesta:* `Border color` admite de 1 a 4 colores,
+      como `Border`. *Alternativa:* propiedades `Border top color`….
+- [ ] **A3. Sombras.** *Propuesta:* `Shadow: x y desenfoque color`, una sola y solo exterior,
+      como aproximación con capas semitransparentes en PDF (PDFBox no tiene desenfoque).
+      *Alternativa:* no hacerlas; son lo más caro y lo que menos aporta.
+- [ ] **A4. Degradados.** *Propuesta:* `Background` admite `linear(ángulo, color, color…)`
+      (sombreado axial de PDF) y nada más; sin radiales ni repetidos. *Alternativa:* solo
+      dos colores.
+- [ ] **A5. Transparencia.** *Propuesta:* los colores admiten `#RRGGBBAA` (hoy no), que hace
+      falta para las sombras y el degradado hacia transparente. *Alternativa:* una propiedad
+      `Opacity`.
+- [ ] **A6. SVG de depuración.** *Propuesta:* lo mismo, con `rx` y `linearGradient`;
+      las sombras, con un filtro.
+
+**Tareas:**
+
+- [ ] Resolver A1–A6.
+- [ ] Schema, `Style`, `Canvas`, `StackingContext`, `PdfCanvas` y `SvgCanvas`.
+- [ ] Especificación (§4.3, §5.6, §8), tests (incluido el PNG de un caso golden) y caso
+      golden `21-box-looks`.
+- [ ] Ejemplos 01, 03, 04, 06, 08, 09, 10 y 11 con lo nuevo (ver arriba).
+
+---
+
+## Hito 29: texto preformateado y código
+
+**Objetivo.** Texto que conserva sus espacios y saltos de línea, y código en Markdown.
+
+**Qué se echó en falta.**
+
+- **Ejemplo 08 (manual):** el bloque de terminal con los bornes (`L   230 V   [ OK ]`) pierde
+  las columnas porque los espacios se colapsan; hoy es un `Grid` de doce `Area`.
+- **Ejemplo 01 (factura):** el IBAN en monoespaciada, que en Markdown sería `` `ES91 …` ``
+  (hoy `MARKDOWN_UNSUPPORTED`).
+- **Ejemplo 08:** los valores de las especificaciones técnicas en monoespaciada.
+
+**Sintaxis (propuesta).**
+
+```
+Text:
+	Typography:
+		Font: IBM Plex Mono
+		White space: pre
+	Content >>
+		> Ajustes > Servicio > Bornes
+		L   230 V     [ OK ]
+```
+
+**Decisiones abiertas:**
+
+- [ ] **W1. Forma.** *Propuesta:* `White space: normal | pre | pre-wrap` en `Typography` (se
+      hereda). *Alternativa:* un elemento `Preformatted`, que no admitiría un `Cell` con
+      valor.
+- [ ] **W2. Líneas más anchas que la caja.** *Propuesta:* con `pre`, sigue siendo
+      `TEXT_OVERFLOW`, como una palabra muy ancha; con `pre-wrap`, se parte. *Alternativa:*
+      recortar.
+- [ ] **W3. Tabuladores.** *Propuesta:* ocho espacios. *Alternativa:* error.
+- [ ] **W4. Markdown.** *Propuesta:* el código en línea es un tramo con la fuente de una
+      propiedad `Code font` de `Markdown` (como `Bullet`), y un bloque de código, un `Text` con
+      `pre` y esa fuente. *Alternativa:* seguir sin código.
+- [ ] **W5. Cortes.** *Propuesta:* un bloque preformateado se parte entre líneas, con viudas y
+      huérfanas como cualquier texto.
+
+**Tareas:**
+
+- [ ] Resolver W1–W5.
+- [ ] Schema, `Style`, `LineBreaker`/`InlineLayout` (líneas de origen) y `MarkdownBuilder`.
+- [ ] Especificación (§4.4, §5.4, §5.17, §6), errores, tests y caso golden
+      `22-preformatted`.
+- [ ] Ejemplos 01 y 08 (ver arriba).
+
+---
+
+## Hito 30: rotación y orientación de la página
+
+**Objetivo.** Girar una caja (un sello, una etiqueta en diagonal, un texto vertical) y poder
+declarar la página por nombre y orientación en vez de por sus puntos. Recoge también la idea
+de `TODO.md` «tamaños de página estilo A4, Letter + rotación».
+
+**Qué se echó en falta.**
+
+- **Ejemplo 10 (certificado):** el sello debería ir ligeramente girado, y un texto vertical
+  en el margen con el número de certificado.
+- **Ejemplo 09 (catálogo):** la etiqueta «Novedad» en diagonal en la esquina de la foto.
+- **Ejemplos 10 y 11 (apaisados):** hoy `Width: 842` y `Height: 595`; con el hito,
+  `Size: A4 landscape`.
+
+**Sintaxis (propuesta).**
+
+```
+Image: examples/certificate/seal.png
+	Rotate: -8
+
+Media:
+	Size: A4
+	Orientation: landscape
+```
+
+**Decisiones abiertas:**
+
+- [ ] **O1. Qué se gira.** *Propuesta:* `Rotate` (grados, en el sentido de las agujas del
+      reloj) en `Relative`, `Absolute`, `Fixed`, `Image` y `Text`, alrededor del centro de su
+      caja de borde; es solo pintado, como `Relative`: el hueco no cambia, y lo que se sale de
+      su sitio sigue la política de desbordamientos. *Alternativa:* también cambiar el layout
+      (la caja girada ocupa su rectángulo envolvente).
+- [ ] **O2. Ángulos.** *Propuesta:* cualquier número entre −360 y 360; con 90, 180 y 270 el
+      texto es nítido en el PDF. *Alternativa:* solo múltiplos de 90.
+- [ ] **O3. Origen.** *Propuesta:* el centro; una propiedad `Rotate origin` si hace falta.
+- [ ] **O4. Páginas con nombre.** *Propuesta:* `Size` con `A3`, `A4`, `A5`, `Letter`, `Legal`…
+      y `Orientation: portrait | landscape` en `Media`; `Width` y `Height` siguen
+      valiendo, y declarar las dos cosas es un error. *Alternativa:* dejarlo fuera del hito.
+- [ ] **O5. Accesibilidad.** *Propuesta:* el texto girado se etiqueta igual; la rotación no
+      cambia el orden de lectura.
+
+**Tareas:**
+
+- [ ] Resolver O1–O5.
+- [ ] Schema, `Style`, `Media`, `StackingContext`, `Canvas`/`PdfCanvas`/`SvgCanvas`.
+- [ ] Especificación (§4.1, §4.9, §5.6, §8), tests y caso golden `23-rotation`.
+- [ ] Ejemplos 09, 10 y 11 (ver arriba).
+
+---
+
+## Hito 31: imágenes vectoriales (SVG)
+
+**Objetivo.** Poder poner un SVG en un `Image`, nítido a cualquier tamaño y con texto
+seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son PNG generados.
+
+**Qué se echó en falta.**
+
+- **Ejemplo 04 (informe anual):** los tres gráficos (barras, anillo y línea) son PNG de
+  1400 px; en vectorial pesarían menos y se verían bien al ampliar.
+- **Ejemplos 01, 02, 07, 09 y 10:** los logotipos (`nogal.png`, `lumen.png`, el sello y las
+  firmas).
+- **Ejemplos 06 y 08:** el emblema y el ornamento del menú, el termostato y el esquema de
+  conexión.
+- **`tools/ExampleImages.java`** generaría SVG en vez de dibujar píxeles.
+
+**Decisiones abiertas:**
+
+- [ ] **V1. Cómo se incrusta.** *Propuesta:* convertir el SVG a gráficos vectoriales del PDF
+      (rutas y rellenos), con una librería pequeña que dibuje a `Graphics2D` y un adaptador a
+      PDFBox. *Alternativa:* rasterizar a la resolución del fichero al incrustar (más sencillo,
+      pero no es vectorial) o pasar por Apache Batik (completa pero enorme).
+- [ ] **V2. Librería.** *Propuesta:* una dependencia nueva, la más pequeña que cubra el
+      subconjunto de V3; es lo que más decide el coste del hito. *Alternativa:* escribir un
+      intérprete del subconjunto.
+- [ ] **V3. Subconjunto.** *Propuesta:* formas básicas, rutas, grupos, transformaciones, rellenos
+      sólidos y degradados, trazos y `viewBox`; sin scripts, sin animación, sin filtros.
+      *Alternativa:* lo que dé la librería.
+- [ ] **V4. Texto dentro del SVG.** *Propuesta:* solo con las fuentes de `resources/fonts/`
+      (misma política que el resto: sin sustitución), o error. *Alternativa:* convertirlo a
+      rutas al exportar.
+- [ ] **V5. Tamaño natural.** *Propuesta:* el de `width` y `height` (o el `viewBox`) a 96 ppp,
+      como los PNG (§5.18). *Alternativa:* exigirlos.
+- [ ] **V6. Seguridad.** *Propuesta:* ninguna referencia externa (`href` a ficheros o URL,
+      `<image>` externas, entidades): son un error (`IMAGE_FORMAT`).
+
+**Tareas:**
+
+- [ ] Resolver V1–V6.
+- [ ] `ImageLibrary` e `ImageFile` con el formato SVG, tamaño natural y validación.
+- [ ] `PdfCanvas` y `SvgCanvas`; `PdfStructure`, igual que las demás imágenes.
+- [ ] Especificación (§5.18, §6, §8), errores, tests y caso golden `24-svg`.
+- [ ] `tools/ExampleImages.java` y los ejemplos 01, 02, 04, 06, 07, 08, 09 y 10.
+
+---
+
 ## Registro de sesiones
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (5).** Se abren los hitos 22 a 31 (solo la hoja de ruta, sin código): el 22 es el
+  índice, pedido por el usuario, y los nueve siguientes son los huecos que salieron al escribir
+  los ejemplos, ordenados por impacto, con el ejemplo donde se echó en falta cada uno. Las
+  decisiones de cada hito están abiertas, con su propuesta, y se resuelven con el usuario antes
+  de escribir código. `TODO.md`, el README y `CLAUDE.md` no se han tocado: al empezar el hito 22
+  hay que actualizar la tabla de hitos de los dos últimos.
+  *Siguiente paso:* hito 22, resolver X1–X10 y empezar por la referencia `{page of: id}`.
 - **2026-10-28 (4).** Los PDF de los ejemplos dejan de versionarse (`git rm --cached`,
   `.gitignore`: `test/examples/**/*.pdf`) y `ExamplesTest` los escribe siempre; los PNG siguen
   versionados. Decisión 147 corregida.
