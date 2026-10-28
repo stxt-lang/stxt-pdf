@@ -1,6 +1,8 @@
 # Ideas varias
 
+- Índice!!
 - Float? Algo más que haga falta?
+- Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación
 - Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - Revisar ThreadSafe
 - Revisar rendimiento
