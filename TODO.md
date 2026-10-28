@@ -4,6 +4,7 @@
 
 - Styles en un documento aparte. Además, Typograpy de documento no puede ir, ahora debe ir en styles si es necesario
 - `Sections` o `Media Sections`, y retomar que una section no vaya al índex o algo así, cosas que habían quedado apartadas de páginas
+- Rotación de los fixed y absolutos
 - ~~Índice!!~~ (hito 22)
 - Float? Algo más que haga falta?
 - Referencia de cada elemento en páginas separadas + una referencia de elementos comunes de box, etc
