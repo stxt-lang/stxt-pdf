@@ -68,7 +68,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
 | QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
 | QA-09 | Integración continua | Alta | S | hecho |
-| TS-01 | Contrato de hilos documentado y comprobable | Alta | S | pendiente |
+| TS-01 | Contrato de hilos documentado y comprobable | Alta | S | hecho |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
 | TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
 | TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | hecho |
@@ -306,7 +306,7 @@ comparta un `Engine` entre hilos (por ejemplo, para «no reconstruir» los algor
 excepción clara. Además, un `Engine` reutilizado en secuencia conserva la caché del último documento hasta la
 siguiente llamada (`reservePageDigits` la vacía al empezar): retiene todo el árbol de cajas.
 
-### TS-01 · Contrato de hilos documentado · Alta · S
+### TS-01 · Contrato de hilos documentado · Alta · S · hecho
 
 Escribir en el javadoc de `Engine`, `PdfCanvas`, `PdfWriter`, `Resources`, `DocumentReader`, `LaidOutDocument`,
 `Box` y `Style` qué se puede compartir, y en el `README.md` un apartado «Uso desde varios hilos»: *un `Engine` por
@@ -317,6 +317,17 @@ que solo usa el `Paginator` (mismo package). Vaciar la caché al terminar `layOu
 `stxt-core` que se ha probado concurrentemente (hoy `1.0.3`) y escribir a quien la mantiene el contrato que se
 asume (seguridad del `SchemaValidator` compartido) o proteger el uso con una copia por hilo si no lo da.
 **Aceptación:** javadoc y README; `Engine` sin métodos públicos de protocolo interno; sin cambio visible.
+
+**Hecho (sesión 3), decisiones 300 a 302.** Contrato en el javadoc de `Engine`, `Resources`, `LaidOutDocument`, `Box`,
+`Style`, `BoxTreeBuilder`, `DocumentSchema`, `PdfCanvas` y `PdfImages.registerFonts` (`Converter` y `DocumentReader` ya lo
+decían), y un apartado «Uso desde varios hilos» en el README con una tabla de qué se comparte. `Engine.reservePageDigits`,
+`assume`, `number` y `absolute()` pasan a ser de package, y `layOutDocument` vacía la caché, el reparto en líneas y las
+páginas supuestas al terminar (antes un `Engine` guardado retenía el árbol del último documento: 351 entradas tras uno
+de los ejemplos). `EngineContractTest`: el protocolo no es público, la caché queda vacía (falla sin la limpieza) y un
+motor reutilizado da lo mismo que uno nuevo con los once ejemplos. El schema compartido de `stxt-core` 1.0.3 se
+revisó en su bytecode (`getSchema` solo lee, `SchemaValidator` solo escribe en el constructor) y la versión queda
+anotada en el `pom.xml`. **Sin hacer:** avisar a quien mantiene `stxt-core` del contrato que se asume (no se puede
+hacer desde aquí).
 
 ### TS-02 · Test de conversión concurrente · Alta · S
 
@@ -648,3 +659,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 2 · Ligaduras y rendimiento del pintado | `Ligatures` en `Typography` (heredable, `false` por defecto; schema, §4.4/§5.4/§9, decisiones 289 a 293), medida con ligaduras con el `GsubWorker` de fontbox y pintado con `setEnableGsub`; PF-02 y TS-04 (`FontFile` sin cerrojos con avances precalculados; `Resources`/`ImageLibrary` sin `synchronized` calientes). 22 PNG regenerados (revisados: solo `fi`/`fl`). Suite verde. Medido: pintar ≈ 9,5× más rápido, layout ≈ 2× más rápido. | Sesión 3 (TS-01, AR-09, AR-08 + TS-05, QA-06) |
 | 2026-10-28 | 3 · Contrato público (en curso) | AR-08 y TS-05 (commit `a25b014`): `Converter` (inmutable, seguro entre hilos, `layOut`/`toPdf`/`toSvg`) en el package `convert`; `PdfWriter` eliminado y sus llamadores migrados; decisión 294. Nuevos `ConverterTest` (9) y un test de `Converter` compartido entre hilos. | Resto de la sesión 3: TS-01 (contrato de hilos en javadoc/README y `Engine` sin protocolo público), AR-09 (`StxtPdfException`), QA-06 (`Limits` en el `Builder`) |
 | 2026-10-28 | 3 · Contrato público (en curso) | AR-09: `StxtPdfException` con `kind`/`code`/`line` para todos los errores del motor; `DocumentSyntaxException` para los de `stxt-core`; `PAGE_LIMIT` (primera parte de QA-06); `Converter` como frontera (`INTERNAL`); §6.1 de la especificación, README, decisiones 295 a 299. Tests nuevos: `ConverterErrorsTest` y el caso `PAGE_LIMIT`. | Resto de la sesión 3: TS-01 (contrato de hilos y `Engine` sin protocolo público) y QA-06 (`Limits` configurable, píxeles de imagen, elementos de SVG) |
+| 2026-10-28 | 3 · Contrato público (en curso) | TS-01: contrato de hilos en javadoc y README, protocolo de la paginación de `Engine` de package, `layOutDocument` suelta su estado al terminar; `EngineContractTest`; decisiones 300 a 302. | Último punto de la sesión 3: QA-06 (`Limits` configurable en el `Builder` del `Converter`, píxeles por imagen y elementos de SVG) |

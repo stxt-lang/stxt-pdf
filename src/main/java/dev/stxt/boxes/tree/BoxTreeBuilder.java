@@ -82,7 +82,8 @@ import static dev.stxt.boxes.tree.ValueReader.sides;
  * documento contra el schema ({@link DocumentSchema}), aunque ya venga validado de
  * {@code DocumentReader}: así la estructura (qué hijos admite cada nodo) solo está definida en el
  * schema, y el resto del código puede darla por buena. No guarda estado: cada llamada a
- * {@link #build} lleva el suyo en un {@link BuildContext}.</p>
+ * {@link #build} lleva el suyo en un {@link BuildContext}; por eso un mismo constructor se puede usar desde
+ * varios hilos, aunque cada conversión suele crear el suyo.</p>
  */
 public final class BoxTreeBuilder {
 

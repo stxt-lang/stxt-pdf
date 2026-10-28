@@ -12,6 +12,13 @@ import java.util.List;
  * los tests) sin volver a construir el árbol de cajas. Los fragmentos de las páginas apuntan a
  * las cajas del único árbol construido.
  *
+ * <p><strong>Hilos:</strong> una vez maquetado no cambia: las páginas y los fragmentos son {@code record}
+ * inmutables y el motor no escribe en las cajas a las que apuntan. Se puede pintar a PDF y a SVG desde varios
+ * hilos a la vez con el mismo {@link dev.stxt.boxes.convert.Converter}; lo comprueba
+ * {@code ConcurrentConversionTest}. Las cajas tienen campos que no son {@code final} ({@link Box}), así que hay
+ * que entregarlo a los otros hilos de forma segura (un {@code Future}, un ejecutor, un campo {@code volatile}…)
+ * y no por un campo corriente.</p>
+ *
  * @param media    el medio del documento: el de las secciones que no declaran el suyo; el de cada
  *                 página es {@link Page#media()}
  * @param metadata título e idioma del documento

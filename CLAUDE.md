@@ -274,6 +274,13 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   su valor en el documento** (`TextAlign.JUSTIFY` ↔ `justify`, `Marker.LOWER_ALPHA` ↔
   `lower-alpha`). Si cambias un valor, cambia la constante y el schema.
   `Layout` y `Position` no son valores del documento: los fija el elemento.
+- **Hilos (TS-01):** un `Engine` **no** se comparte entre hilos (caché del layout, reparto en líneas y páginas
+  supuestas sin sincronizar): uno por conversión, que es lo que hace `Converter`. Sí se comparten `Converter`,
+  `Resources` y `DocumentReader`, y un `LaidOutDocument` se puede pintar desde varios hilos (los fragmentos son
+  `record`; las cajas solo se escriben mientras `BoxTreeBuilder` construye). Un `Engine` guardado se puede reutilizar en
+  secuencia: `layOutDocument` suelta su caché al terminar. El protocolo con el `Paginator` (`reservePageDigits`,
+  `assume`, `number`, `absolute()`) es de package. El schema compartido de `stxt-core` 1.0.3 solo se lee (ver
+  `DocumentSchema`); al cambiar la versión hay que repasarlo. `ConcurrentConversionTest` y `EngineContractTest` lo vigilan.
 - **`Engine`** despacha por `Style.layout` al algoritmo correspondiente. **Toda llamada
   recursiva de layout o de tamaños intrínsecos pasa por `engine.layout(...)` /
   `engine.intrinsic(...)`**, nunca directamente al algoritmo, para usar la `LayoutCache` (sin

@@ -18,7 +18,11 @@ import java.util.List;
  * cada nodo: la usan {@code DocumentReader} al leer y {@link BoxTreeBuilder} al construir el
  * árbol, de modo que un documento que no ha pasado por el lector da los mismos errores.
  *
- * <p>Seguro entre hilos: el schema no cambia después de cargarlo.</p>
+ * <p>Seguro entre hilos: el schema se carga en un inicializador estático y no cambia después. Se apoya en
+ * dos hechos de {@code stxt-core} 1.0.3 (la versión fijada en el {@code pom.xml}), comprobados leyendo su
+ * código: {@code SchemaProviderMemory.getSchema} solo lee de su mapa, y {@code SchemaValidator} solo escribe
+ * sus campos en el constructor (cada validación crea el suyo). Si se cambia de versión, hay que volver a
+ * comprobarlo; {@code ConcurrentConversionTest} es la red de seguridad.</p>
  */
 public final class DocumentSchema {
 

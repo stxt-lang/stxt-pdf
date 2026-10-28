@@ -28,8 +28,20 @@ import java.util.Map;
 import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
- * Punto de entrada del motor y despachador de algoritmos por {@code Layout} (módulo 9).
- * Todas las llamadas recursivas de layout pasan por aquí para usar la caché.
+ * Maquetador y despachador de algoritmos por {@code Layout}. Todas las llamadas recursivas de layout
+ * pasan por aquí para usar la caché. Quien solo quiere convertir un documento usa
+ * {@link dev.stxt.boxes.convert.Converter}, que lo crea y lo configura.
+ *
+ * <p><strong>Hilos: un {@code Engine} no es seguro entre hilos y no se comparte.</strong> Guarda la caché del
+ * layout (mapas sin sincronizar), el reparto en líneas memorizado y las páginas supuestas de las referencias
+ * ({@link dev.stxt.boxes.layout.inline.InlineLayout}). Dos conversiones a la vez necesitan un motor cada una,
+ * que es lo que hace el {@code Converter}; lo que se puede compartir es lo que no cambia:
+ * {@link Resources}, {@link dev.stxt.boxes.stxt.DocumentReader} y el {@link LaidOutDocument} ya maquetado.
+ * Sí se puede reutilizar en secuencia: {@link #layOutDocument(BoxTreeBuilder.Result)} vacía la caché y el
+ * estado al terminar, de modo que un motor guardado no retiene el árbol de cajas del último documento.</p>
+ *
+ * <p>El protocolo con el {@link Paginator} (cifras reservadas, páginas supuestas, numeración y cajas fuera de
+ * flujo) no es público: solo se usa desde este package.</p>
  */
 public final class Engine {
 
@@ -103,16 +115,31 @@ public final class Engine {
         measurer.validate(tree.root());
         images.validate(tree.root());
         reservePageDigits(PageNumbers.DIGITS);
-        List<Page> pages = new Paginator(this).paginate(tree);
-        Overflow.check(pages);
-        return new LaidOutDocument(tree.media(), tree.metadata(), tree.root(), pages);
+        try {
+            List<Page> pages = new Paginator(this).paginate(tree);
+            Overflow.check(pages);
+            return new LaidOutDocument(tree.media(), tree.metadata(), tree.root(), pages);
+        } finally {
+            release();
+        }
+    }
+
+    /** Suelta lo que el motor memoriza de un documento: la caché, el reparto en líneas y las páginas supuestas. */
+    private void release() {
+        cache.clear();
+        inline.assume(Map.of(), Map.of());
+    }
+
+    /** Entradas de la caché ahora mismo, para comprobar que {@link #release} la vacía. */
+    int cachedEntries() {
+        return cache.entries();
     }
 
     /**
      * Cifras que reservan {@code {page}} y {@code {pages}} al maquetar ({@link PageNumbers}).
      * Vacía la caché, porque cambian las medidas del texto.
      */
-    public void reservePageDigits(int digits) {
+    void reservePageDigits(int digits) {
         inline.reservePageDigits(digits);
         cache.clear();
     }
@@ -122,7 +149,7 @@ public final class Engine {
      * referida con {@code {page of: id}}, que el {@link Paginator} supone y comprueba, y su número
      * con {@code {number of: id}}. Vacía la caché, porque cambian las medidas del texto.
      */
-    public void assume(Map<String, String> pages, Map<String, String> numbers) {
+    void assume(Map<String, String> pages, Map<String, String> numbers) {
         inline.assume(pages, numbers);
         cache.clear();
     }
@@ -194,12 +221,12 @@ public final class Engine {
      * Sustituye {@code {page}} y {@code {pages}} en las líneas de un fragmento ya maquetado y en
      * las de sus descendientes; el {@link Paginator} lo usa al terminar de paginar.
      */
-    public Fragment number(Fragment fragment, int page, int pages) {
+    Fragment number(Fragment fragment, int page, int pages) {
         return inline.number(fragment, page, pages);
     }
 
     /** Layout de las cajas fuera de flujo; el {@link Paginator} lo usa para las {@code fixed}. */
-    public AbsoluteLayout absolute() {
+    AbsoluteLayout absolute() {
         return absolute;
     }
 

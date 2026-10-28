@@ -98,7 +98,9 @@ final class PdfImages {
     /**
      * Da de alta en AWT las fuentes de {@code fonts/}, para que JSVG encuentre por su familia la
      * que nombra el SVG y no sustituya ninguna. Es un efecto en toda la JVM, pero solo añade esas
-     * fuentes y solo se hace una vez por fichero.
+     * fuentes y solo se hace una vez por fichero. Como es global a la JVM, dos {@code Resources} con carpetas
+     * distintas pero la misma familia comparten el registro (ROADMAP-QA-ARQ.md, TS-03); y AWT necesita
+     * {@code -Djava.awt.headless=true} en un servidor sin pantalla.
      */
     private void registerFonts() throws IOException {
         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();

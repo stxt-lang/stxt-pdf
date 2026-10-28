@@ -103,6 +103,24 @@ try {
 Los fallos de entrada y salida al escribir en el destino siguen siendo la `IOException` de `toPdf`. El detalle está en
 el §6.1 de la especificación.
 
+## Uso desde varios hilos
+
+La forma recomendada es crear **un `Converter` y compartirlo**: es inmutable y cada conversión crea su propio
+motor, así que dos hilos que convierten a la vez no comparten ningún estado que cambie.
+
+| Pieza | ¿Se comparte entre hilos? |
+|---|---|
+| `Converter`, `Resources`, `DocumentReader` | Sí. Se crean una vez y se usan desde todos los hilos |
+| `LaidOutDocument` (lo que devuelve `layOut`) | Sí, para pintarlo: un mismo documento maquetado se puede escribir a PDF y a SVG desde varios hilos. Entrégalo a los demás hilos con un `Future`, un ejecutor o un campo `volatile` |
+| `Engine` | **No.** Guarda la caché del layout y el estado de la numeración. Uno por conversión; reutilizarlo en secuencia es seguro (lo suelta todo al terminar cada documento) |
+| `Box` y `Style` (el árbol de cajas) | Solo lectura una vez construido; no se escribe en ellos |
+
+`Converter` es lo que se comprueba con ocho hilos convirtiendo los once ejemplos (`ConcurrentConversionTest`): el
+mismo PDF, byte a byte, que la conversión secuencial. Dos cosas dependen de fuera: la validación contra el schema
+comparte el de `stxt-core` 1.0.3 (la versión fijada en el `pom.xml`, que se revisó para que solo lea), y los SVG con
+texto dan de alta las fuentes en AWT, que es global a la JVM; en un servidor sin pantalla arranca la JVM con
+`-Djava.awt.headless=true`.
+
 ## Recursos y fuentes
 
 Las fuentes y las imágenes están en una carpeta de recursos, por defecto `resources/` en el

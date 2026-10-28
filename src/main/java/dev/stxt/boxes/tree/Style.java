@@ -27,6 +27,9 @@ import java.util.Map;
  * interpreta {@code BoxTreeBuilder}. {@link Layout} y {@link Position} no son
  * valores del documento: salen del elemento ({@code Text} es {@code INLINE}; {@code Absolute},
  * un {@code BLOCK} {@code ABSOLUTE}).</p>
+ *
+ * <p><strong>Hilos:</strong> como {@link Box}, se escribe solo mientras {@link BoxTreeBuilder} construye el
+ * árbol y después se lee.</p>
  */
 public final class Style {
 

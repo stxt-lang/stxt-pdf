@@ -81,6 +81,12 @@ import java.util.Map;
  *
  * <p>Con {@code debug}, como {@link SvgCanvas}, dibuja además el contorno de cada caja de borde
  * (lo usan las imágenes de los tests de referencia).</p>
+ *
+ * <p><strong>Hilos:</strong> {@link #write} es estático y todo su estado (el documento PDF, las fuentes
+ * incrustadas, la estructura, los enlaces) es de esa llamada, así que se puede llamar a la vez desde varios
+ * hilos, también con el mismo {@link dev.stxt.boxes.layout.LaidOutDocument} y los mismos {@link Resources}.
+ * Una instancia es de una página y no se comparte. La única salvedad es global a la JVM: los SVG con texto
+ * dan de alta las fuentes en AWT ({@link PdfImages}).</p>
  */
 public final class PdfCanvas implements Canvas {
 

@@ -1840,3 +1840,22 @@ interpretaciones que salieron al implementarlas.
      Los `IllegalStateException` de mal uso interno (`ConstraintSpace`, `Style.line`) se quedan como están.
      *Alternativa:* envolver también la `IOException` del destino, que no es un error del motor.
 
+300. **El protocolo de la paginación deja de ser público en `Engine`** (ROADMAP-QA-ARQ.md, TS-01):
+     `reservePageDigits`, `assume`, `number` y `absolute()` son de package, porque solo los usa el `Paginator`.
+     Quien compartía o manejaba un `Engine` desde fuera ya no puede romper la numeración de otro documento. Lo
+     público es `layOutDocument`, `layout`, `intrinsic`, `contentIntrinsic`, `measurer` y `natural`. *Alternativa:*
+     moverlos a un objeto de sesión por documento (`PaginationSession`, AR-04).
+
+301. **`layOutDocument` suelta lo que memoriza al terminar** (también si falla): vacía la caché, el reparto en
+     líneas y las páginas supuestas de las referencias. Un motor guardado ya no retiene el árbol de cajas del último
+     documento, y el resultado de uno reutilizado es idéntico al de uno nuevo (`EngineContractTest`, con los once
+     ejemplos). Costó nada medible: la caché solo sirve dentro de un documento. *Alternativa:* dejarlo y documentar
+     que no se guarde.
+
+302. **Contrato de hilos escrito, no solo observado** (TS-01): `Engine` no se comparte; `Converter`, `Resources` y
+     `DocumentReader` sí; un `LaidOutDocument` se puede pintar desde varios hilos (los fragmentos son `record`) y las
+     cajas son de solo lectura una vez construidas. El schema compartido de `stxt-core` se apoya en dos hechos de la
+     versión 1.0.3, comprobados en su bytecode: `SchemaProviderMemory.getSchema` solo lee de un `LinkedHashMap` y
+     `SchemaValidator` solo escribe campos en su constructor. Queda anotado en el `pom.xml` y en `DocumentSchema`
+     que un cambio de versión obliga a repasarlo. *Alternativa:* una copia del schema por hilo.
+

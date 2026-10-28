@@ -15,6 +15,12 @@ import java.util.stream.Collectors;
  * {@link dev.stxt.boxes.fragment.Fragment}.</p>
  *
  * <p>La igualdad es por identidad: la caché de layout usa la caja como clave.</p>
+ *
+ * <p><strong>Hilos:</strong> la caja es mutable (campos públicos que no son {@code final}) mientras
+ * {@link BoxTreeBuilder} construye el árbol, y después solo se lee: el layout, el pintado y el volcado no
+ * escriben en ella. Un árbol ya construido se puede leer desde varios hilos si se entrega de forma segura
+ * (un {@code Future}, un ejecutor, un campo {@code volatile}…); escribir en él después de entregarlo rompe esa
+ * garantía.</p>
  */
 public final class Box {
 

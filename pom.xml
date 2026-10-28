@@ -22,7 +22,9 @@
 
     <dependencies>
         <!-- Parser y validador oficial de STXT. Lo usa stxt.DocumentReader, y el motor trabaja con sus nodos.
-             Comprueba la última versión en https://central.sonatype.com/artifact/dev.stxt/stxt-core -->
+             Comprueba la última versión en https://central.sonatype.com/artifact/dev.stxt/stxt-core
+             Al cambiarla, vuelve a comprobar que el schema compartido (SchemaProviderMemory, SchemaValidator) se
+             lee sin escribir: ver tree/DocumentSchema, y ConcurrentConversionTest. 1.0.3 es la versión revisada. -->
         <dependency>
             <groupId>dev.stxt</groupId>
             <artifactId>stxt-core</artifactId>

@@ -14,6 +14,10 @@ import java.util.regex.Pattern;
  * <p>Los recursos se buscan siempre <strong>hacia abajo</strong>: {@link #resolve(String)}
  * rechaza las rutas absolutas, los segmentos {@code ..} y los enlaces simbólicos que apuntan
  * fuera de la carpeta.</p>
+ *
+ * <p><strong>Hilos:</strong> se puede compartir entre todas las conversiones y todos los hilos. Las fuentes y
+ * las imágenes se leen la primera vez que se piden, con una comprobación doble, y después se consultan sin
+ * cerrojo; la carpeta se explora una sola vez, así que los ficheros que se añadan después no se ven.</p>
  */
 public final class Resources {
 

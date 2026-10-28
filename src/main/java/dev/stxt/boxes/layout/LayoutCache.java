@@ -65,6 +65,11 @@ public final class LayoutCache {
         layouts.clear();
     }
 
+    /** Cuántos resultados guarda ahora mismo. */
+    int entries() {
+        return intrinsics.size() + contents.size() + layouts.size();
+    }
+
     /**
      * Para diagnosticar la eficacia de la caché ({@link Engine#toString}). Lo que la protege es
      * {@code LayoutCacheTest}, que mide el trabajo de documentos muy anidados.
