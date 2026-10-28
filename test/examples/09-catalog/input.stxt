@@ -126,7 +126,7 @@ Document (dev.stxt.boxes):
 			Box:
 				Background: #B5651D
 				Padding: 3 7
-		For class: th
+		Element: Head cell
 			Typography:
 				Weight: bold
 				Size: 8
@@ -585,13 +585,9 @@ Document (dev.stxt.boxes):
 			Head:
 				Row:
 					Cell: Madera
-						Class: th
 					Cell: Carácter
-						Class: th
 					Cell: Origen
-						Class: th
 					Cell: Acabados
-						Class: th
 			Body:
 				Row:
 					Cell: Nogal

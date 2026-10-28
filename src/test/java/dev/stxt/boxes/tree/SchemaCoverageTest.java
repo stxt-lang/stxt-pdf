@@ -109,6 +109,7 @@ class SchemaCoverageTest {
             Map.entry("Bullet", "Bullet: disc dash"),
             Map.entry("Numbering", "Numbering: decimal lower-alpha"),
             Map.entry("Table columns", "Table columns: auto"),
+            Map.entry("Column align", "Column align: right"),
             // Contents
             Map.entry("Levels", "Levels: 1 2"),
             Map.entry("Leader", "Leader: rule"),
@@ -177,6 +178,7 @@ class SchemaCoverageTest {
         t.put("Element", new Template(HEADER + "\t\tElement: Block\n\t\t\t{}"));
         t.put("For class", new Template(HEADER + "\t\tFor class: d\n\t\t\t{}"));
         t.put("For id", new Template(HEADER + "\t\tFor id: r\n\t\t\t{}\n\tBlock:\n\t\tId: r"));
+        t.put("For column", new Template(HEADER + "\t\tFor column: 1\n\t\t\t{}"));
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));

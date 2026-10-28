@@ -31,10 +31,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Weight: bold
 				Size: 10.5
-		For class: num
-			Typography:
-				Align: right
-		For class: th
+		Element: Head cell
 			Typography:
 				Weight: bold
 				Size: 8
@@ -51,6 +48,9 @@ Document (dev.stxt.boxes):
 				Background: #EFE4D2
 				Border: 1.5 0 0 0
 				Border color: #3B2A1E
+		Element: Foot cell
+			Typography:
+				Align: right
 		Element: Cell
 			Box:
 				Padding: 7 8
@@ -159,103 +159,74 @@ Document (dev.stxt.boxes):
 	Table:
 		Id: lines
 		Columns: 54 1fr 38 64 94
+		Column align: left left right right right
 		Box:
 			Margin: 0 0 24 0
 		Head:
 			Row:
 				Cell: Ref.
-					Class: th
 				Cell: Descripción
-					Class: th
 				Cell: Uds.
-					Class: th num
 				Cell: Precio
-					Class: th num
 				Cell: Importe
-					Class: th num
 		Body:
 			Row:
 				Cell: MN-014
 				Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
 				Cell: 6
-					Class: num
 				Cell: 640,00 €
-					Class: num
 				Cell: 3.840,00 €
-					Class: num
 			Row:
 				Cell: MN-022
 				Cell: Silla de roble con asiento de anea
 				Cell: 24
-					Class: num
 				Cell: 118,00 €
-					Class: num
 				Cell: 2.832,00 €
-					Class: num
 			Row:
 				Cell: MN-031
 				Cell: Estantería modular de pared, cinco baldas
 				Cell: 8
-					Class: num
 				Cell: 215,00 €
-					Class: num
 				Cell: 1.720,00 €
-					Class: num
 			Row:
 				Cell: MN-040
 				Cell: Banco tapizado para recibidor
 				Cell: 4
-					Class: num
 				Cell: 189,50 €
-					Class: num
 				Cell: 758,00 €
-					Class: num
 			Row:
 				Cell: MN-057
 				Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
 				Cell: 12
-					Class: num
 				Cell: 96,00 €
-					Class: num
 				Cell: 1.152,00 €
-					Class: num
 			Row:
 				Cell: SV-001
 				Cell: Transporte y montaje en obra (dos operarios, una jornada)
 				Cell: 1
-					Class: num
 				Cell: 480,00 €
-					Class: num
 				Cell: 480,00 €
-					Class: num
 			Row:
 				Cell: SV-004
 				Cell: Acabado con aceite natural y cera de abeja
 				Cell: 1
-					Class: num
 				Cell: 260,00 €
-					Class: num
 				Cell: 260,00 €
-					Class: num
 		Foot:
 			Row:
 				Cell: Base imponible
 					Span: 1 4
-					Class: num
 				Cell: 11.042,00 €
-					Class: num
 			Row:
 				Cell: IVA (21 %)
 					Span: 1 4
-					Class: num
 				Cell: 2.318,82 €
-					Class: num
 			Row:
 				Cell: TOTAL A PAGAR
 					Span: 1 4
-					Class: num total
+					Class: total
 				Cell: 13.360,82 €
-					Class: num total
+					Class: total
 	Grid:
 		Id: payment
 		Columns: 1fr 1fr

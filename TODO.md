@@ -51,9 +51,10 @@
   porque no tiene `Id`.
 - **Formato dentro de la línea fuera de Markdown**: en `Text`, `Paragraph` y `Cell` los
   asteriscos son literales, así que una negrita suelta en un texto corto obliga a usar `Markdown`.
-- **Estilo de las tablas**: una fila no tiene `Box`, así que un fondo alternado (cebra) exige una
-  clase en cada celda, y la cabecera de una tabla de Markdown no se puede estilar. Algo como
-  `Element: Head cell` o un selector por posición en `Styles`.
+- ~~**Estilo de las tablas**~~ (hito 25: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell`,
+  `Even row cell`, `For column` y `Column align`). Queda que una fila no tiene `Box` y que no se
+  puede dar estilo a una fila concreta sin tocar cada una de sus celdas (el pie de totales de la
+  factura sigue necesitando `Class: total` en las dos celdas de la fila).
 - **Aspecto de las cajas**: no hay esquinas redondeadas, sombras, degradados, ni un `Border color`
   distinto por lado. Los ejemplos se arreglan con rectángulos, filetes y fondos planos.
 - **Texto**: no hay interletraje (`letter-spacing`), versalitas ni `text-transform`; los títulos

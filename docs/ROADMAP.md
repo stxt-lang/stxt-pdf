@@ -43,7 +43,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 22 | Referencias a páginas e índice automático (`Contents`) | hecho | 15 |
 | 23 | Enlaces (URL y destinos del documento) | hecho | 16 |
 | 24 | Primera página distinta y páginas con nombre | pendiente | 17 (previsto) |
-| 25 | Estilo de las tablas (cebra, cabecera, columnas) | pendiente | 18 (previsto) |
+| 25 | Estilo de las tablas (cebra, cabecera, columnas) | hecho | 18 |
 | 26 | Formato dentro de la línea fuera de Markdown | pendiente | 19 (previsto) |
 | 27 | Texto: mayúsculas automáticas, interletraje y versalitas | pendiente | 20 (previsto) |
 | 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
@@ -51,8 +51,8 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 23, el 2026-10-28. Los hitos 24 a 31
-están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 23 y el 25, el 2026-10-28. Los hitos
+24 y 26 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -762,30 +762,48 @@ Styles:
 			Align: right
 ```
 
-**Decisiones abiertas:**
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] **B1. Cómo se nombra.** *Propuesta:* nuevos `Element` de `Styles` que son una celda en
-      una posición: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell`
-      (la primera fila del cuerpo es la 1). *Alternativa:* que `Row` admita `Box` (solo fondo
-      y borde) y una regla `Element: Row`.
-- [ ] **B2. Columnas.** *Propuesta:* una regla `For column: n` (o `n m`) en `Styles`, que se
-      aplica a las celdas que empiezan en esa columna. *Alternativa:* `Align` por columna en
-      `Columns` de la tabla.
-- [ ] **B3. Prioridad.** *Propuesta:* se mezclan con las reglas de siempre: elemento
-      (`Cell`) < posición < columna < clase < id < lo propio de la celda.
-- [ ] **B4. Markdown.** *Propuesta:* nada que añadir: lo generado ya lleva `Head` y `Body`, y
-      las reglas nuevas se aplican solas. La alineación de la fila de separación sigue
-      ganando a la columna.
-- [ ] **B5. Cebra con celdas de varias filas.** *Propuesta:* la fila de una celda es la de su
-      primera fila. *Alternativa:* no aplicar la cebra a celdas con `Span` de filas.
+**Decisiones tomadas** (2026-10-28, con la propuesta aceptada salvo B2, que añade además `Align` por
+columna; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 174–179):
+
+- [x] B1. **Cómo se nombra:** nuevos valores de `Element` en `Styles`, que son una celda en una
+      posición: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell` (la primera
+      fila del cuerpo es la 1; la cabecera y el pie no entran en la cebra).
+- [x] B2. **Columnas:** una regla `For column: n` (o `n m`, un rango) en `Styles`, que se aplica a las
+      celdas que empiezan en esas columnas, **y además** un `Align` por columna en la tabla. Como
+      `Columns` es la lista de pistas y la comparte `Grid`, queda como propiedad nueva de `Table`:
+      `Column align: left right right` (una alineación por columna), valor por defecto que
+      sobrescribe `For column`.
+- [x] B3. **Prioridad:** se mezclan con las reglas de siempre: elemento (`Cell`) < `Column align` <
+      posición < columna < clase < id < lo propio de la celda.
+- [x] B4. **Markdown:** nada que añadir: lo generado ya lleva `Head` y `Body`, y las reglas nuevas se
+      aplican solas. La alineación de la fila de separación (`:--`, `--:`) sigue ganando a todo.
+- [x] B5. **Cebra con celdas de varias filas:** la fila de una celda es la de su primera fila.
+
+**Diseño técnico** (como quedó):
+
+- **Posición.** `TableBuilder` calcula, al colocar cada celda, su `CellPosition` (grupo, fila dentro
+  del grupo, columna donde empieza y su `Column align`) y se la pasa a `BoxTreeBuilder.element`, que
+  la pasa a `StyleRules.apply`.
+- **Reglas.** `StyleRules` lee `Element` con un valor de `CellSelector` (5 posiciones) además de los
+  elementos, y `For column` (`ColumnRule`: desde, hasta). Al aplicarlas va primero `Element: Cell`,
+  luego el `Column align` (con la línea del `Column align`), las reglas de posición, las de columna,
+  las de clase y la de `Id`.
+- **Errores.** `TABLE_COLUMN_ALIGN` nuevo (seis casos nuevos en el catálogo, con los de `For column`
+  mal escrito o repetido, un `Column align` con un valor que no es una alineación y una regla de
+  posición con `Break`); `STYLE_UNKNOWN_ELEMENT` nombra ahora también las posiciones.
 
 **Tareas:**
 
-- [ ] Resolver B1–B5.
-- [ ] Schema, `Element`, `StyleRules` (posición y columna) y `TableBuilder`.
-- [ ] Especificación (§4.10, §5.15, §6, §9), errores, tests y caso golden `18-table-styles`.
-- [ ] Ejemplos 01, 04, 05, 07, 08, 09 y 11 con una regla en vez de una clase por celda; un
-      ejemplo con cebra.
+- [x] Resolver B1–B5 (2026-10-28).
+- [x] Schema (`For column`, `Column align`), `Element`/`CellSelector`, `StyleRules` (posición y columna) y
+      `TableBuilder`.
+- [x] Especificación (§4.10, tabla de §4, §5.15, §6, §8 y §9), errores (`TABLE_COLUMN_ALIGN`, seis
+      casos en el catálogo), tests (`TableStylesTest`, `SchemaCoverageTest`) y caso golden
+      `18-table-styles` (calculado a mano).
+- [x] Ejemplos 01, 04, 05, 07, 08, 09 y 11 con una regla en vez de una clase por celda; el 05 estrena la
+      cebra (ver `DECISIONES.md`, 179).
 
 ---
 
@@ -1095,6 +1113,16 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (9).** Hito 25 terminado, antes que el 24: era el siguiente paso del registro (el de menor
+  esfuerzo). Resueltas B1–B5, con una ampliación en B2 (`Align` por columna además de
+  `For column`, como `Column align` en la tabla). Reglas `Element` por posición, `For column` y
+  `Column align`, con `CellPosition` desde `TableBuilder`; `TABLE_COLUMN_ALIGN` y seis casos nuevos
+  en el catálogo; `TableStylesTest`; caso golden `18-table-styles`, calculado a mano y que pasó a la
+  primera. Ejemplos 01, 04, 05, 07, 08, 09 y 11 reescritos: los PNG no cambian salvo en las tablas de
+  Markdown de 04 y 08 (ahora con la cabecera estilada), la esquina del horario (11) y la cebra del
+  boletín (05). Decisiones 174–179 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 24 (primera página distinta, esfuerzo medio-alto), en otra sesión; resolver
+  N1–N5 con el usuario antes de escribir código. El pie de totales sigue necesitando una clase.
 - **2026-10-28 (8).** Hito 23 terminado. Resueltas L1–L6 con las propuestas. `Link` en las cajas y
   `[texto](destino)` en Markdown, a una URL (`https`, `http`, `mailto`) o a otra caja (`#id`), con
   anotaciones del PDF (una por fragmento o por tramo y línea), destinos con página y posición, y

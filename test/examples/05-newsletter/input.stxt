@@ -75,7 +75,7 @@ Document (dev.stxt.boxes):
 				Padding: 10 30
 				Border: 1 0 1 0
 				Border color: #A4301F
-		For class: th
+		Element: Head cell
 			Typography:
 				Font: IBM Plex Sans
 				Weight: bold
@@ -83,6 +83,9 @@ Document (dev.stxt.boxes):
 				Color: #FFFFFF
 			Box:
 				Background: #1C1A19
+		Element: Even row cell
+			Box:
+				Background: #F1EDE8
 		For class: ad
 			Box:
 				Padding: 8 10
@@ -247,13 +250,9 @@ Document (dev.stxt.boxes):
 			Head:
 				Row:
 					Cell: Fecha
-						Class: th
 					Cell: Hora
-						Class: th
 					Cell: Acto
-						Class: th
 					Cell: Lugar
-						Class: th
 			Body:
 				Row:
 					Cell: Sáb. 25 oct.

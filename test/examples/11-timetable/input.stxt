@@ -33,7 +33,7 @@ Document (dev.stxt.boxes):
 			Typography:
 				Size: 7.5
 				Color: #6B7A72
-		For class: th
+		Element: Head cell
 			Typography:
 				Weight: bold
 				Size: 9
@@ -159,15 +159,10 @@ Document (dev.stxt.boxes):
 			Row:
 				Cell:
 				Cell: Lunes
-					Class: th
 				Cell: Martes
-					Class: th
 				Cell: Miércoles
-					Class: th
 				Cell: Jueves
-					Class: th
 				Cell: Viernes
-					Class: th
 		Body:
 			Row:
 				Cell: 9:00 – 10:00

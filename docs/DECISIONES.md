@@ -957,3 +957,51 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      entrada de índice no cuenta. Sin texto (un `Block` solo con fondo), el propio destino.
      Las referencias (`{page of: …}`) y marcadores (`{page}`) del texto salen sin sustituir.
      *Dónde:* `paint/StackingContext.describe`. *Alternativa:* un `Alt` propio en `Link`.
+
+174. **Las reglas de posición son valores de `Element`, no elementos nuevos** (B1, hito 25):
+     `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell` se escriben en
+     `Element:` y se aplican además de la regla `Element: Cell`; el elemento de la caja sigue
+     siendo `Cell`. `Odd row cell` y `Even row cell` cuentan solo las filas del **cuerpo**, desde
+     la primera como la 1: la cabecera y el pie no entran en la cebra. La fila de una celda con
+     `Span` de varias filas es la primera de las que ocupa (B5). *Dónde:* `tree/CellSelector`,
+     `tree/CellPosition`, `tree/StyleRules`. *Alternativas:* que `Row` admita `Box` y una regla
+     `Element: Row` (no cubre el `Typography` de la celda), o no aplicar la cebra a celdas de
+     varias filas.
+
+175. **`For column: n` o `For column: n m`**: el valor es una columna o un rango de menor a mayor,
+     ambas incluidas (no una lista), y se aplica a las celdas que **empiezan** en una de ellas, en
+     cualquier grupo de la tabla; una celda con `Span` de columnas es de la columna donde empieza.
+     Dos `For column` con el mismo rango son `STYLE_DUPLICATE`; si se solapan, se aplican en el
+     orden de `Styles`, como las clases. No es error que una regla no se aplique a ninguna celda
+     (la tabla puede tener menos columnas). *Dónde:* `tree/StyleRules`. *Alternativa:* `n m` como
+     lista de columnas sueltas.
+
+176. **`Column align` es una propiedad nueva de `Table`, no un hijo de `Columns`** (B2): `Columns`
+     es la lista de pistas, un nodo que comparten `Grid` y `Table` con una sola definición en el
+     schema, y un hijo suyo habría obligado a prohibirlo en el `Grid`. Da una alineación por
+     columna (`left`, `center`, `right`, `justify`), tantas como `Columns` (`TABLE_COLUMN_ALIGN`),
+     y es el valor por defecto más bajo de `Align` en las celdas: **por encima de la regla
+     `Element: Cell`** (que es el tipo, más general que una columna concreta) **y por debajo de**
+     las reglas de posición, `For column`, clase, `Id` y lo que declara la celda. Así una cabecera
+     `Head cell` centrada gana a la alineación de su columna, y un `Element: Cell` con `Align` no
+     deja la propiedad sin efecto. La línea de la alineación es la del `Column align`.
+     *Dónde:* `tree/TableBuilder.columnAlign`, `tree/StyleRules.apply`. *Alternativa:* por debajo
+     también de `Element: Cell`, o por encima de las reglas de `Styles`.
+
+177. **Prioridad de las reglas de una celda** (B3), de menos a más: `Element: Cell`,
+     `Column align`, reglas de posición (grupo y luego fila), `For column`, `For class`, `For id`
+     y lo propio de la celda. Las tablas de `Markdown` reciben las mismas reglas; su `Align` sale
+     de la fila de separación, que lo declara cada celda y por tanto gana a todas (B4).
+     *Dónde:* `tree/StyleRules.apply`. *Alternativa:* que la posición gane a la columna.
+
+178. **Las reglas de posición y de columna tampoco dan `Break` a una celda**: se aplica el mismo
+     `STYLE_NOT_ALLOWED` que a `Element: Cell`, con el `Break` de la regla (los cortes de una
+     celda son los de su `Row`). *Dónde:* `tree/StyleRules.noBreak`.
+
+179. **Ejemplos reescritos con las reglas** (hito 25): `Class: th` pasa a `Element: Head cell`, y
+     `Class: num` a `Column align` por tabla (y a `Foot cell` con `Align: right` en el pie de la
+     factura, que tiene celdas con `Span`). El pie de totales sigue necesitando `Class: total`
+     en sus celdas. La cabecera de las tablas de Markdown (informe anual, manual) sale ahora con el
+     estilo de `Head cell`, y la celda vacía de la esquina del horario (ejemplo 11), que antes
+     no llevaba clase, también: la barra de cabecera queda entera. El ejemplo 05 estrena la
+     cebra con `Even row cell`.

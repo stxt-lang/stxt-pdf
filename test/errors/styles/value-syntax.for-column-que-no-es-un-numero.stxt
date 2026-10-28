@@ -1,0 +1,14 @@
+# Case: For column que no es un número
+# Code: VALUE_SYNTAX
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		For column: dos
+			Typography:
+				Align: right

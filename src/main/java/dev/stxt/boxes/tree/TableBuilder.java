@@ -4,7 +4,9 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.boxes.model.Cell;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static dev.stxt.boxes.tree.ModelValidator.font;
@@ -27,10 +29,13 @@ final class TableBuilder {
     private TableBuilder() {
     }
 
-    /** Construye la caja de una {@code Cell}, con su {@code Row}: la tabla no sabe construir elementos. */
+    /**
+     * Construye la caja de una {@code Cell}, con su {@code Row} y su posición en la tabla: la tabla
+     * no sabe construir elementos.
+     */
     @FunctionalInterface
     interface Cells {
-        Box build(InlineNode cell, InlineNode row);
+        Box build(InlineNode cell, InlineNode row, CellPosition position);
     }
 
     /** Filas y columnas que ocupa una {@code Cell}, y la línea de su {@code Span} (o de la celda, sin él). */
@@ -44,10 +49,13 @@ final class TableBuilder {
      * {@code Foot}; cada fila llena exactamente las columnas de {@code Columns}, y un
      * {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code Head} y {@code Foot}
      * se repiten en cada página y no admiten {@code Break}. {@code cells} construye la caja de
-     * cada celda, con la tabla como padre.
+     * cada celda, con la tabla como padre. Cada celda lleva su posición ({@link CellPosition}) para
+     * las reglas de {@code Styles} y el {@code Column align} de su columna.
      */
     static void table(InlineNode n, Box table, Cells cells) {
         int columns = table.style.gridColumns.size();
+        List<Style.TextAlign> aligns = columnAlign(n, columns);
+        int alignLine = child(n, "column-align").map(Node::getLine).orElse(0);
         int last = -1;
         int firstRow = 0;
         for (Node g : n.getChildren()) {
@@ -101,7 +109,8 @@ final class TableBuilder {
                             taken[rr][cc] = true;
                         }
                     }
-                    Box box = cells.build(cell, row);
+                    Style.TextAlign align = aligns.isEmpty() ? null : aligns.get(c);
+                    Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, alignLine));
                     box.style.declared(ITEM_AREA, cell.getLine());
                     box.style.itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
                     table.addChild(box);
@@ -121,6 +130,32 @@ final class TableBuilder {
             }
             firstRow += rows.size();
         }
+    }
+
+    /**
+     * El {@code Column align} de una {@code Table}: una alineación por columna, en el orden de
+     * {@code Columns}. Vacío si no lo declara.
+     */
+    private static List<Style.TextAlign> columnAlign(InlineNode table, int columns) {
+        Optional<Node> node = child(table, "column-align");
+        if (node.isEmpty()) {
+            return List.of();
+        }
+        String[] t = node.get().getText().trim().split("\\s+");
+        List<Style.TextAlign> aligns = new ArrayList<>();
+        for (String word : t) {
+            try {
+                aligns.add(Style.TextAlign.valueOf(word.toUpperCase(Locale.ROOT)));
+            } catch (IllegalArgumentException ex) {
+                throw error(node.get(), ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en Column align: " + word
+                        + " (left, center, right o justify)");
+            }
+        }
+        if (aligns.size() != columns) {
+            throw error(node.get(), ErrorCode.TABLE_COLUMN_ALIGN, "Column align da " + aligns.size()
+                    + " alineaciones y la tabla tiene " + columns + " columnas (Columns): escribe una por columna");
+        }
+        return aligns;
     }
 
     /** El {@code Span} de una celda: {@code filas columnas}, dos enteros positivos; sin él, 1 1. */

@@ -1,0 +1,14 @@
+# Case: For column con un rango al revés
+# Code: VALUE_NOT_ALLOWED
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		For column: 3 2
+			Typography:
+				Align: right

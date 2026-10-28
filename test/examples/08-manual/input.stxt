@@ -118,7 +118,7 @@ Document (dev.stxt.boxes):
 				Background: #1A1D23
 				Padding: 10 14
 				Margin: 4 0 10 0
-		For class: th
+		Element: Head cell
 			Typography:
 				Weight: bold
 				Size: 8
@@ -344,11 +344,8 @@ Document (dev.stxt.boxes):
 			Head:
 				Row:
 					Cell: Borne
-						Class: th
 					Cell: Función
-						Class: th
 					Cell: Cable habitual
-						Class: th
 			Body:
 				Row:
 					Cell: L
@@ -411,11 +408,8 @@ Document (dev.stxt.boxes):
 			Head:
 				Row:
 					Cell: Franja
-						Class: th
 					Cell: De lunes a viernes
-						Class: th
 					Cell: Fin de semana
-						Class: th
 			Body:
 				Row:
 					Cell: Mañana · 06:30–08:30

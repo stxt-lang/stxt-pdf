@@ -621,6 +621,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Columns
 				Min: 1
 				Max: 1
+			Child: Column align
+				Max: 1
 			Child: Gap
 				Max: 1
 			Child: Head
@@ -758,9 +760,10 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Element
 			Child: For class
 			Child: For id
+			Child: For column
 	Node: Element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…).
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…) o una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell).
 		Children:
 			Child: Box
 				Max: 1
@@ -781,6 +784,16 @@ Schema (@stxt.schema): dev.stxt.boxes
 	Node: For id
 		Type: INLINE
 		Description: Regla para el elemento con ese Id.
+		Children:
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+	Node: For column
+		Type: INLINE
+		Description: Regla para las celdas de tabla que empiezan en esa columna (n) o en cualquiera de un rango (n m, ambas incluidas).
 		Children:
 			Child: Box
 				Max: 1
@@ -1128,6 +1141,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): disc, dash o none.
 	Node: Numbering
 		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
+	Node: Column align
+		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
 	Node: Table columns
 		Type: ENUM
 		Description: Columnas de las tablas de un Markdown: equal, todas del mismo ancho (repeat(n, 1fr)); auto, cada una según su contenido (repeat(n, auto)).

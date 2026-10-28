@@ -1,0 +1,85 @@
+# Estilo de las tablas por posición y por columna (ESPECIFICACION.md §4.10, §5.15).
+# Área útil de 260 × 160 desde (20, 20). Con 10 de tamaño, una línea mide 12 y cada carácter 5.
+#
+# Columnas: 100, 100 y 60, sin hueco: x = 20, 120 y 220. Cell da a todas Padding 2 4 (16 de alto).
+#   Head cell: Border 0 0 1 0, así que la cabecera mide 17 (20..37).
+#   Odd row cell: solo el fondo de la cebra. Even row cell: Padding 4 4, y la fila mide 20.
+#   For column: 3 pone Padding 2 4 2 24 a la tercera columna, y gana a Even row cell (posición):
+#     el contenido de esa columna mide 60 − 28 = 32, así que «abc def» (35) se parte en dos líneas.
+#   Foot cell: Border 1 0 0 0 (17); «Total» ocupa las dos primeras columnas.
+# Filas: b1 (37..53, impar), b4 (53..73, par), b7 (73..101, impar: dos líneas en b9) y
+#   b10 (101..121, par); el pie, en 121..138. La tabla mide 118.
+Document (dev.stxt.boxes):
+	Media:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Cell
+			Box:
+				Padding: 2 4
+		Element: Head cell
+			Typography:
+				Weight: bold
+			Box:
+				Border: 0 0 1 0
+		Element: Foot cell
+			Typography:
+				Weight: bold
+			Box:
+				Border: 1 0 0 0
+		Element: Odd row cell
+			Box:
+				Background: #F2EEE6
+		Element: Even row cell
+			Box:
+				Padding: 4 4
+		For column: 3
+			Box:
+				Padding: 2 4 2 24
+	Table:
+		Id: t
+		Columns: 100 100 60
+		Column align: left left right
+		Head:
+			Row:
+				Cell: Concepto
+					Id: h1
+				Cell: Detalle
+				Cell: Total
+					Id: h3
+		Body:
+			Row:
+				Cell: Uno
+					Id: b1
+				Cell: dos
+				Cell: 1.234
+					Id: b3
+			Row:
+				Cell: Cuatro
+					Id: b4
+				Cell: cinco
+				Cell: 56
+					Id: b6
+			Row:
+				Cell: Siete
+					Id: b7
+				Cell: ocho
+				Cell: abc def
+					Id: b9
+			Row:
+				Cell: Diez
+					Id: b10
+				Cell: once
+				Cell: 1.112
+					Id: b12
+		Foot:
+			Row:
+				Cell: Total
+					Id: f1
+					Span: 1 2
+				Cell: 99
+					Id: f3

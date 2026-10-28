@@ -1,0 +1,22 @@
+# Case: Regla Head cell que aplica Break a una Cell
+# Code: STYLE_NOT_ALLOWED
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Styles:
+		Element: Head cell
+			Break:
+				After: avoid
+	Table:
+		Columns: 1fr
+		Head:
+			Row:
+				Cell: a
+		Body:
+			Row:
+				Cell: b

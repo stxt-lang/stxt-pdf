@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 23 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 23 y el 25 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -74,7 +74,9 @@ actualízala.
 
 | 23 | ~~Enlaces: `Link` en las cajas y `[texto](destino)` en Markdown, a una URL o a otra caja~~ (hecho; caso 16) | `model/Links`, `model/TextFormat`, `tree/LinkTargets`, `tree/MarkdownBuilder`, `paint/StackingContext`, `paint/PdfLinks`, `paint/PdfDestinations`, `paint/PdfStructure` |
 
-Los hitos 24 a 31 (primera página distinta, estilo de tablas, formato en línea, texto,
+| 25 | ~~Estilo de las tablas: `Element` por posición de la celda (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` y `Column align`~~ (hecho; caso 18) | schema, `tree/StyleRules`, `tree/CellPosition`, `tree/CellSelector`, `tree/TableBuilder`, `tree/BoxTreeBuilder` |
+
+Los hitos 24 y 26 a 31 (primera página distinta, formato en línea, texto,
 aspecto de las cajas, preformateado, rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
@@ -138,11 +140,16 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   las propiedades de `Flex`, `Grid` e `Item`, `PropertyReader`; las reglas de `Styles`,
   `StyleRules`; tablas y listas, `TableBuilder` y `ListBuilder`; y las reglas del §6 que miran
   la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
-- **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class` y `For id` con `Box`,
-  `Typography` y `Break`. `StyleRules.apply` las aplica entre la herencia y lo propio
-  del elemento (prioridad: elemento > id > clases en orden de `Styles` > tipo > herencia), con
+- **Reglas reutilizables (`Styles`, §4.10):** `Element`, `For class`, `For id` y `For column` con
+  `Box`, `Typography` y `Break`. `StyleRules.apply` las aplica entre la herencia y lo propio
+  del elemento (prioridad: elemento > id > clases en orden de `Styles` > `For column` en orden de
+  `Styles` > posición de la celda > `Column align` > tipo > herencia), con
   las mismas funciones que leen los grupos del elemento: cada propiedad guarda la línea de la
-  regla y se valida como si la declarara el elemento.
+  regla y se valida como si la declarara el elemento. Las reglas de las celdas dependen de dónde
+  están: `TableBuilder` da a `BoxTreeBuilder.element` una `CellPosition` (grupo, fila dentro del
+  grupo, columna donde empieza y el `Column align` de su columna) y `Element: Head cell`,
+  `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell` (`CellSelector`, que no son
+  elementos: el de la caja sigue siendo `Cell`) y `For column: n` o `n m` las seleccionan con ella.
 - **Elementos con significado (§5.13):** `Paragraph` (un `Text` de un solo párrafo) y
   `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element` guarda el `Element`
   del que procede (`HEADING_2`) para las reglas, los marcadores y las etiquetas; el enum da

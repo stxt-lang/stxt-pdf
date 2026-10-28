@@ -427,13 +427,15 @@ dentro.
 ### 4.10 Reglas reutilizables (`Styles`)
 
 `Styles`, hijo opcional de `Document` (como mucho uno), declara una vez propiedades que se
-aplican por defecto a muchos elementos. Contiene reglas de tres clases:
+aplican por defecto a muchos elementos. Contiene reglas de cuatro clases:
 
 | Regla | Valor | Se aplica a |
 |---|---|---|
 | `Element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
+| `Element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([§5.15](#515-tablas)) |
 | `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
+| `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas ([§5.15](#515-tablas)) |
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada; no admite
 las propiedades propias de un elemento (`Gap`, `Columns`, `Offset`…).
@@ -465,25 +467,34 @@ Text: Una nota al margen.
 2. la regla `For id` de su `Id`;
 3. las reglas `For class` de sus clases; si varias declaran la misma propiedad, gana la que va
    **después en `Styles`**, no el orden de `Class`;
-4. la regla `Element` de su tipo;
-5. lo heredado del padre (solo `Typography`);
-6. el valor por defecto.
+4. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
+5. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después
+   `Odd row cell` o `Even row cell`);
+6. el `Column align` de su tabla, solo para `Align` ([§5.15](#515-tablas));
+7. la regla `Element` de su tipo (`Cell`);
+8. lo heredado del padre (solo `Typography`);
+9. el valor por defecto.
+
+Las reglas de los puntos 4 a 6 solo se aplican a las celdas de una `Table`.
 
 Una regla gana a la herencia: con `Element: Text` y `Size: 10`, un `Text` mide 10 aunque su
 padre declare `Size: 20`. Las reglas se mezclan **propiedad a propiedad**, no por grupo: si la
 regla declara `Size` y el elemento `Weight`, se aplican las dos. Lo que una regla da a un
 elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
 `Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. Tampoco `Head`,
-`Body`, `Foot` y `Row`, que no se pueden nombrar en `Element`; `Table` y `Cell`, sí.
+`Body`, `Foot` y `Row`, que no se pueden nombrar en `Element` (para dar estilo a las celdas de
+cada grupo están las reglas de posición); `Table` y `Cell`, sí.
 
 **Validación.** Lo que aporta una regla se valida igual que si lo declarara el elemento
 ([§6](#6-validación)), y el error señala la línea de la propiedad dentro de la regla. Los valores
 de una regla se comprueban aunque no se aplique a ningún elemento. Son errores: un `Element` que
-no nombra un elemento de caja, un `For id` sin elemento con ese `Id`, dos reglas con el mismo
-selector, una regla que da `Break` a un elemento que no lo admite (`Absolute`, `Fixed`, un
-encabezado o un `Text` de un encabezado, [§5.13](#513-encabezados-y-párrafos)), y una clase de
-`Class` sin su regla `For class`. Un `Element` o un `For class` que no se aplican a ningún elemento no son
-errores: así las reglas se pueden reutilizar.
+no nombra un elemento de caja ni una posición en una tabla, un `For id` sin elemento con ese `Id`,
+un `For column` que no es una columna o un rango de menor a mayor, dos reglas con el mismo
+selector (también dos `For column` con el mismo rango), una regla que da `Break` a un elemento que no lo admite (`Absolute`, `Fixed`, un
+encabezado, un `Text` de un encabezado o una celda, también con una regla de posición o de columna,
+[§5.13](#513-encabezados-y-párrafos)), y una clase de `Class` sin su regla `For class`. Un
+`Element`, un `For class` o un `For column` que no se aplican a ningún elemento no son errores: así
+las reglas se pueden reutilizar.
 
 El `Typography` de `Document` sigue siendo lo que hereda la raíz; las reglas no se aplican a
 `Document`.
@@ -504,6 +515,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
 | `Columns` | lista de pistas | — (obligatorio) | `Table` | Las columnas, como en `Grid` ([§4.7](#47-grid)). |
+| `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna ([§5.15](#515-tablas)). Tantas como `Columns`. |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda ([§5.15](#515-tablas)). |
 
@@ -1298,6 +1310,26 @@ va en un `Paragraph`. Admite `Id`, `Class`, `Box`, `Typography` y `Span`. Los bo
 de cada celda, separados ([§8](#8-diferencias-con-css)): una línea entre filas se dibuja con
 el borde inferior de las celdas.
 
+**Estilo de las celdas.** Una regla de `Styles` ([§4.10](#410-reglas-reutilizables-styles)) da
+estilo a las celdas de una tabla sin repetir una clase en cada una:
+
+- **Por posición.** `Element: Head cell`, `Body cell` y `Foot cell` son las celdas de cada grupo;
+  `Odd row cell` y `Even row cell`, las de las filas impares y pares del **cuerpo**, contando
+  desde la primera fila de `Body` como la 1 (la cebra; la cabecera y el pie no entran). La fila
+  de una celda que ocupa varias es la **primera** de las que ocupa. Una celda cumple a la vez la
+  de su grupo y la de su fila, y la regla `Element: Cell` de siempre.
+- **Por columna.** `For column: 3` (o `For column: 2 4`, de la 2 a la 4) se aplica a las celdas
+  que **empiezan** en esas columnas, en cualquier grupo: una celda con `Span` de varias columnas
+  es de la columna donde empieza.
+- **`Column align`.** Un `Column align: left right right` de la `Table` da una alineación a cada
+  columna (tantas como `Columns`, `TABLE_COLUMN_ALIGN`). Es solo el valor por defecto del `Align`
+  de las celdas: lo sobrescriben las reglas de posición, de columna, de clase y de `Id`, y lo
+  que declara la propia celda.
+
+Las celdas de las tablas de un `Markdown` ([§5.17](#517-markdown)) reciben estas mismas reglas; su
+`Align` sale de la fila de separación de la tabla (`:--`, `--:`), que lo declara cada celda y
+gana a todo lo demás.
+
 **Filas.** Una `Row` no es una caja: no tiene `Box` ni se nombra en `Element`, como `Head`,
 `Body` y `Foot`. Su `Typography` lo heredan sus celdas (las reglas `Styles` de la celda le
 ganan, como a cualquier herencia), y su `Break` es el de sus celdas: con él se fuerza o se
@@ -1815,7 +1847,7 @@ La validación se hace en cuatro niveles:
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_UNKNOWN_ID` | Un `For id` tiene un elemento con ese `Id` | `Ningún elemento tiene el Id summary de esta regla For id` |
 | `STYLE_DUPLICATE` | Dos reglas no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -1827,6 +1859,7 @@ La validación se hace en cuatro niveles:
 | `TABLE_ORDER` | `Head`, `Body` y `Foot` van en ese orden ([§5.15](#515-tablas)) | `Body va después de Foot: los grupos de una Table van en el orden Head, Body, Foot` |
 | `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Columns`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): añade una Cell, vacía si hace falta, o usa Span` |
 | `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
+| `TABLE_COLUMN_ALIGN` | `Column align` da una alineación por columna de `Columns` (línea del `Column align`) | `Column align da 2 alineaciones y la tabla tiene 3 columnas (Columns): escribe una por columna` |
 | `CELL_CONTENT` | Una `Cell` tiene texto en el valor o elementos, no las dos cosas | `Una Cell tiene texto en el valor (línea 12) o elementos, no las dos cosas: pon el texto en un Paragraph` |
 | `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
 | `MULTICOL_COLUMNS` | Un `Multicol` declara `Count`, `Column width` o los dos ([§5.16](#516-bloques-en-columnas)) | `Un Multicol necesita Count, Column width o los dos…` |
@@ -1907,7 +1940,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Tema | CSS | Este modelo |
 |---|---|---|
 | Documento | HTML + hojas de estilo con cascada y selectores | Un árbol STXT de elementos; cada uno declara sus propiedades y solo admite las que tienen sentido en él |
-| Reglas de estilo | Selectores compuestos, combinadores, especificidad calculada, `!important` | Tres selectores simples (`Element`, `For class`, `For id`) con prioridad fija, solo con `Box`, `Typography` y `Break` ([§4.10](#410-reglas-reutilizables-styles)) |
+| Reglas de estilo | Selectores compuestos, combinadores, especificidad calculada, `!important` | Selectores simples (`Element`, que también nombra la posición de una celda de tabla, `For class`, `For id` y `For column`) con prioridad fija, solo con `Box`, `Typography` y `Break` ([§4.10](#410-reglas-reutilizables-styles)) |
 | Errores | Muy permisivo: lo que no tiene efecto se ignora y los conflictos se resuelven con reglas | Estricto: lo que no tiene efecto o se contradice es un error con código y línea ([§6](#6-validación)) |
 | Texto suelto entre cajas | Cajas anónimas | No existe: el texto va siempre en un `Text` |
 | Herencia | Muchas propiedades | Solo lo que va en `Typography` (fuente, tamaño, interlineado, alineación, color, reparto, viudas y huérfanas) |
@@ -1998,8 +2031,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 |---|---|---|
 | `Document` | `GROUP` | `Media` (exactamente uno), `Title`, `Language`, `Typography`, `Styles`; elementos |
 | `Media` | `GROUP` | `Width` y `Height` (obligatorios), `Margin` |
-| `Styles` | `GROUP` | `Element`, `For class`, `For id` (varios de cada) |
-| `Element`, `For class`, `For id` | `INLINE` | `Box`, `Typography`, `Break` |
+| `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada) |
+| `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
 | `Block` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
 | `Flex` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
@@ -2007,7 +2040,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Heading 1` … `Heading 6` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`; `Text` (al menos uno, varios) |
 | `List` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno, varios) |
 | `List item` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Gap`; `Head`, `Body` (obligatorio), `Foot` |
+| `Table` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `GROUP` | `Row` (al menos uno, varios) |
 | `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
 | `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |

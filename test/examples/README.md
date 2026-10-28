@@ -57,6 +57,10 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   son literales. Los ejemplos mezclan los dos según lo que necesitan.
 - **Los espacios se colapsan**: no hay texto preformateado, así que un bloque de terminal con
   columnas alineadas (ejemplo 08) usa un grid.
+- **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la
+  cabecera (también a las tablas de Markdown), `Even row cell` la cebra (ejemplo 05) y
+  `Column align` o `For column` las columnas numéricas. Queda una clase para lo que es de una sola
+  fila, como la de los totales de la factura.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) es clicable entero,
   también el teléfono: sin formato en línea fuera de Markdown no se puede enlazar solo una parte

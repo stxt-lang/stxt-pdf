@@ -65,6 +65,8 @@ public enum ErrorCode {
     CELL_CONTENT,
     /** {@code Break} en una fila de {@code Head} o de {@code Foot}, que se repiten en cada página. */
     TABLE_ROW_BREAK,
+    /** Un {@code Column align} con distinto número de alineaciones que columnas tiene la tabla. */
+    TABLE_COLUMN_ALIGN,
 
     // --- Columnas ------------------------------------------------------------------------------
     /** Un {@code Multicol} sin {@code Count} ni {@code Column width}. */

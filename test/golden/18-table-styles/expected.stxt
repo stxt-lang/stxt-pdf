@@ -1,0 +1,29 @@
+# Las alturas de las filas están calculadas en input.stxt: 17 + 16 + 20 + 28 + 20 + 17 = 118.
+Result:
+	Page: 1
+		Fragment: t
+			Rect: 20 20 260 118
+			Fragment: h1
+				Rect: 20 20 100 17
+			Fragment: h3
+				Rect: 220 20 60 17
+			Fragment: b1
+				Rect: 20 37 100 16
+			Fragment: b3
+				Rect: 220 37 60 16
+			Fragment: b4
+				Rect: 20 53 100 20
+			Fragment: b6
+				Rect: 220 53 60 20
+			Fragment: b7
+				Rect: 20 73 100 28
+			Fragment: b9
+				Rect: 220 73 60 28
+			Fragment: b10
+				Rect: 20 101 100 20
+			Fragment: b12
+				Rect: 220 101 60 20
+			Fragment: f1
+				Rect: 20 121 200 17
+			Fragment: f3
+				Rect: 220 121 60 17

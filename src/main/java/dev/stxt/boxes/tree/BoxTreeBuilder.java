@@ -90,7 +90,7 @@ public final class BoxTreeBuilder {
      * y lo que lee {@link MarkdownBuilder}.
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
-            "foot", "span", "bullet", "numbering", "table-columns");
+            "foot", "span", "bullet", "numbering", "table-columns", "column-align");
 
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
@@ -178,7 +178,7 @@ public final class BoxTreeBuilder {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
             if (isElement(h)) {
-                box.addChild(element(ctx, inline(h), box, null));
+                box.addChild(element(ctx, inline(h), box, null, null));
             } else if (name.equals("item") || name.equals("area")) {
                 InlineNode wrapper = inline(h);
                 List<Node> elements = wrapper.getChildren().stream().filter(Nodes::isItemElement).toList();
@@ -186,16 +186,16 @@ public final class BoxTreeBuilder {
                     throw error(elements.isEmpty() ? wrapper : elements.get(1), ErrorCode.SINGLE_ELEMENT,
                             "Un " + h.getName() + " contiene exactamente un elemento, y este tiene " + elements.size());
                 }
-                box.addChild(element(ctx, inline(elements.get(0)), box, wrapper));
+                box.addChild(element(ctx, inline(elements.get(0)), box, wrapper, null));
             }
         }
     }
 
     /**
      * Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem, o
-     * la {@code Row} de una {@code Cell}.
+     * la {@code Row} de una {@code Cell}, y {@code position} es entonces el sitio de la celda en su tabla.
      */
-    private Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper) {
+    private Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
         Element kind = Element.of(n.getCanonicalName()).orElseThrow();
         if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
             throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
@@ -215,7 +215,7 @@ public final class BoxTreeBuilder {
         } else if (wrapper != null) {
             item(wrapper, s, parent.style.gridAreas);
         }
-        ctx.rules.apply(n, kind, s, parent);
+        ctx.rules.apply(n, kind, s, parent, position);
         String id = null;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
@@ -315,7 +315,7 @@ public final class BoxTreeBuilder {
             boolean outerFixed = ctx.insideFixed;
             ctx.insideFixed |= s.position == Style.Position.FIXED;
             if (kind == Element.TABLE) {
-                table(n, box, (cell, row) -> element(ctx, cell, box, row));
+                table(n, box, (cell, row, at) -> element(ctx, cell, box, row, at));
             } else if (kind == Element.MULTICOL) {
                 columns(ctx, n, box);
             } else if (kind == Element.MARKDOWN) {
@@ -360,7 +360,7 @@ public final class BoxTreeBuilder {
         MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
         ctx.runs.putAll(t.runs());
         for (InlineNode e : t.elements()) {
-            box.addChild(element(ctx, e, box, null));
+            box.addChild(element(ctx, e, box, null, null));
         }
     }
 

@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -25,8 +27,9 @@ import static dev.stxt.boxes.tree.PropertyReader.fragmentation;
 import static dev.stxt.boxes.tree.PropertyReader.typography;
 
 /**
- * Las reglas reutilizables de {@code Styles} (ESPECIFICACION.md §4.10): {@code Element},
- * {@code For class} y {@code For id}, leídas una vez por documento.
+ * Las reglas reutilizables de {@code Styles} (ESPECIFICACION.md §4.10): {@code Element} (de un
+ * tipo de elemento o de una posición en una tabla), {@code For class}, {@code For id} y
+ * {@code For column}, leídas una vez por documento.
  */
 final class StyleRules {
 
@@ -36,6 +39,14 @@ final class StyleRules {
     private final Map<String, InlineNode> classRules = new LinkedHashMap<>();
     /** Reglas {@code For id}, por {@code Id}. */
     private final Map<String, InlineNode> idRules = new HashMap<>();
+    /** Reglas {@code Element} de una posición en una tabla ({@code Head cell}, {@code Even row cell}…). */
+    private final Map<CellSelector, InlineNode> cellRules = new EnumMap<>(CellSelector.class);
+    /** Reglas {@code For column}, por rango y en el orden del documento: en ese orden se aplican. */
+    private final Map<String, ColumnRule> columnRules = new LinkedHashMap<>();
+
+    /** Una regla {@code For column}: las columnas {@code from} a {@code to}, ambas incluidas. */
+    private record ColumnRule(int from, int to, InlineNode rule) {
+    }
 
     /**
      * Lee las reglas de {@code Styles} del documento. Sus valores se comprueban aquí, aunque la
@@ -51,11 +62,23 @@ final class StyleRules {
             String selector = rule.getText().trim();
             InlineNode previous = switch (rule.getCanonicalName()) {
                 case "element" -> {
-                    Element element = Element.of(selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-"))
+                    String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
+                    Optional<CellSelector> cell = CellSelector.of(canonical);
+                    if (cell.isPresent()) {
+                        yield cellRules.putIfAbsent(cell.get(), rule);
+                    }
+                    Element element = Element.of(canonical)
                             .orElseThrow(() -> error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "Element: '" + selector
-                                    + "' no es un elemento de caja (" + Element.selectable().stream()
-                                    .map(Element::label).collect(Collectors.joining(", ")) + ")"));
+                                    + "' no es un elemento de caja ni una posición en una tabla ("
+                                    + Stream.concat(Element.selectable().stream().map(Element::label),
+                                            Arrays.stream(CellSelector.values()).map(CellSelector::label))
+                                    .collect(Collectors.joining(", ")) + ")"));
                     yield elementRules.putIfAbsent(element, rule);
+                }
+                case "for-column" -> {
+                    ColumnRule column = columns(rule);
+                    ColumnRule other = columnRules.putIfAbsent(column.from() + " " + column.to(), column);
+                    yield other == null ? null : other.rule();
                 }
                 case "for-class" -> classRules.putIfAbsent(name(rule, "For class"), rule);
                 case "for-id" -> idRules.putIfAbsent(name(rule, "For id"), rule);
@@ -90,6 +113,22 @@ final class StyleRules {
         }
     }
 
+    /** El rango de una regla {@code For column}: {@code n} o {@code n m}, enteros positivos con {@code n <= m}. */
+    private static ColumnRule columns(InlineNode rule) {
+        String text = rule.getText().trim();
+        String[] t = text.split("\\s+");
+        if (t.length > 2 || !t[0].matches("[1-9]\\d*") || (t.length == 2 && !t[1].matches("[1-9]\\d*"))) {
+            throw error(rule, ErrorCode.VALUE_SYNTAX, "For column espera una columna o un rango 'desde hasta', "
+                    + "enteros positivos: '" + text + "'");
+        }
+        int from = Integer.parseInt(t[0]);
+        int to = t.length == 2 ? Integer.parseInt(t[1]) : from;
+        if (to < from) {
+            throw error(rule, ErrorCode.VALUE_NOT_ALLOWED, "For column: el rango va de menor a mayor: '" + text + "'");
+        }
+        return new ColumnRule(from, to, rule);
+    }
+
     /** El nombre de una clase o de un {@code Id} en una regla: una sola palabra. */
     private static String name(InlineNode rule, String what) {
         String name = rule.getText().trim();
@@ -101,14 +140,46 @@ final class StyleRules {
     }
 
     /**
-     * Aplica las reglas que corresponden a un elemento, de menos a más prioridad: la de su tipo,
-     * las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}. Van después de la
-     * herencia y antes de lo que declara el propio elemento, y se mezclan propiedad a propiedad.
+     * Aplica las reglas que corresponden a un elemento que no es una celda de tabla.
+     *
+     * @see #apply(InlineNode, Element, Style, Box, CellPosition)
      */
     void apply(InlineNode n, Element kind, Style s, Box parent) {
+        apply(n, kind, s, parent, null);
+    }
+
+    /**
+     * Aplica las reglas que corresponden a un elemento, de menos a más prioridad: la de su tipo,
+     * las de la posición de una celda en su tabla (primero el {@code Column align} de su columna,
+     * luego {@code Head cell}, {@code Body cell} o {@code Foot cell}, y {@code Odd row cell} o
+     * {@code Even row cell}), las de su columna ({@code For column}, en el orden de
+     * {@code Styles}), las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}.
+     * Van después de la herencia y antes de lo que declara el propio elemento, y se mezclan
+     * propiedad a propiedad. {@code position} es la de una {@code Cell}; {@code null} en los demás.
+     */
+    void apply(InlineNode n, Element kind, Style s, Box parent, CellPosition position) {
         String noBreak = noBreak(n, kind, s, parent);
         List<InlineNode> rules = new ArrayList<>();
         Optional.ofNullable(elementRules.get(kind)).ifPresent(rules::add);
+        applyAll(rules, noBreak, s);
+        rules.clear();
+        if (position != null) {
+            if (position.columnAlign() != null) {
+                // Es el valor por defecto de la columna: lo declara la tabla, en la línea de su Column align.
+                s.textAlign = position.columnAlign();
+                s.declared(PropertyKey.internal("align"), position.columnAlignLine());
+            }
+            for (CellSelector selector : CellSelector.values()) {
+                if (selector.matches(position)) {
+                    Optional.ofNullable(cellRules.get(selector)).ifPresent(rules::add);
+                }
+            }
+            for (ColumnRule column : columnRules.values()) {
+                if (position.column() >= column.from() && position.column() <= column.to()) {
+                    rules.add(column.rule());
+                }
+            }
+        }
         Optional<Node> classNode = child(n, "class");
         if (classNode.isPresent()) {
             Set<String> classes = classes(classNode.get());
@@ -119,6 +190,10 @@ final class StyleRules {
             });
         }
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::add);
+        applyAll(rules, noBreak, s);
+    }
+
+    private static void applyAll(List<InlineNode> rules, String noBreak, Style s) {
         for (InlineNode rule : rules) {
             if (noBreak != null) {
                 child(rule, "break").ifPresent(b -> {

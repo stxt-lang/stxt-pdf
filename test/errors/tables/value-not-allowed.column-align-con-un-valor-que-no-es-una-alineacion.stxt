@@ -1,0 +1,17 @@
+# Case: Column align con un valor que no es una alineación
+# Code: VALUE_NOT_ALLOWED
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Table:
+		Columns: 1fr 1fr
+		Column align: left top
+		Body:
+			Row:
+				Cell: a
+				Cell: b

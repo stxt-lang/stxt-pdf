@@ -130,16 +130,13 @@ Document (dev.stxt.boxes):
 				Padding: 0 0 10 0
 				Border: 0 0 1 0
 				Border color: #C9D5E3
-		For class: th
+		Element: Head cell
 			Typography:
 				Weight: bold
 				Size: 8
 				Color: #FFFFFF
 			Box:
 				Background: #12315A
-		For class: num
-			Typography:
-				Align: right
 		For class: total
 			Typography:
 				Weight: bold
@@ -465,69 +462,51 @@ Document (dev.stxt.boxes):
 		Table:
 			Id: accounts
 			Columns: 1fr 80 80 80
+			Column align: left right right right
 			Box:
 				Margin: 0 0 18 0
 			Head:
 				Row:
 					Cell: Concepto
-						Class: th
 					Cell: 2025
-						Class: th num
 					Cell: 2024
-						Class: th num
 					Cell: Variación
-						Class: th num
 			Body:
 				Row:
 					Cell: Venta de energía
 					Cell: 4.128
-						Class: num
 					Cell: 3.774
-						Class: num
 					Cell: +9,4 %
-						Class: num
 				Row:
 					Cell: Servicios y mantenimiento
 					Cell: 792
-						Class: num
 					Cell: 640
-						Class: num
 					Cell: +23,8 %
-						Class: num
 				Row:
 					Cell: Gastos de explotación
 					Cell: −3.980
-						Class: num
 					Cell: −3.612
-						Class: num
 					Cell: +10,2 %
-						Class: num
 				Row:
 					Cell: Amortizaciones
 					Cell: −540
-						Class: num
 					Cell: −498
-						Class: num
 					Cell: +8,4 %
-						Class: num
 				Row:
 					Cell: Resultado financiero
 					Cell: −88
-						Class: num
 					Cell: −71
-						Class: num
 					Cell: +23,9 %
-						Class: num
 			Foot:
 				Row:
 					Cell: Resultado del ejercicio
 						Class: total
 					Cell: 312
-						Class: total num
+						Class: total
 					Cell: 233
-						Class: total num
+						Class: total
 					Cell: +33,9 %
-						Class: total num
+						Class: total
 		Heading 2:
 			Text: Dónde ha ido la inversión
 		Markdown:
@@ -576,49 +555,34 @@ Document (dev.stxt.boxes):
 		Table:
 			Id: indicators
 			Columns: 1fr 70 70 70
+			Column align: left right right right
 			Head:
 				Row:
 					Cell: Indicador
-						Class: th
 					Cell: 2023
-						Class: th num
 					Cell: 2024
-						Class: th num
 					Cell: 2025
-						Class: th num
 			Body:
 				Row:
 					Cell: Producción renovable (MWh)
 					Cell: 1.930
-						Class: num
 					Cell: 2.148
-						Class: num
 					Cell: 2.384
-						Class: num
 				Row:
 					Cell: CO₂ evitado en el año (t)
 					Cell: 2.800
-						Class: num
 					Cell: 3.600
-						Class: num
 					Cell: 4.300
-						Class: num
 				Row:
 					Cell: Residuos valorizados (%)
 					Cell: 82
-						Class: num
 					Cell: 87
-						Class: num
 					Cell: 91
-						Class: num
 				Row:
 					Cell: Agua usada en las plantas (m³)
 					Cell: 640
-						Class: num
 					Cell: 590
-						Class: num
 					Cell: 540
-						Class: num
 	Block:
 		Id: governance
 		Class: section
@@ -629,42 +593,35 @@ Document (dev.stxt.boxes):
 		Table:
 			Id: board
 			Columns: 1fr 1fr 104
+			Column align: left left right
 			Box:
 				Margin: 0 0 18 0
 			Head:
 				Row:
 					Cell: Nombre
-						Class: th
 					Cell: Cargo
-						Class: th
 					Cell: En el cargo desde
-						Class: th num
 			Body:
 				Row:
 					Cell: Carme Vidal i Roca
 					Cell: Presidenta
 					Cell: 2019
-						Class: num
 				Row:
 					Cell: Oriol Pagès Vila
 					Cell: Vicepresidente
 					Cell: 2019
-						Class: num
 				Row:
 					Cell: Núria Serra Comas
 					Cell: Secretaria
 					Cell: 2023
-						Class: num
 				Row:
 					Cell: Jordi Casas Font
 					Cell: Tesorero
 					Cell: 2023
-						Class: num
 				Row:
 					Cell: Anna Bosch Puig
 					Cell: Vocal de consumo
 					Cell: 2023
-						Class: num
 		Heading 2:
 			Text: Qué viene ahora
 		Markdown:
@@ -683,20 +640,16 @@ Document (dev.stxt.boxes):
 		Table:
 			Id: calendar
 			Columns: 170 1fr 1fr 1fr 1fr
+			Column align: left right right right right
 			Box:
 				Margin: 0 0 6 0
 			Head:
 				Row:
 					Cell: Actividad
-						Class: th
 					Cell: 1.er trim.
-						Class: th num
 					Cell: 2.º trim.
-						Class: th num
 					Cell: 3.er trim.
-						Class: th num
 					Cell: 4.º trim.
-						Class: th num
 			Body:
 				Row:
 					Cell: Oficina de atención en Olot
