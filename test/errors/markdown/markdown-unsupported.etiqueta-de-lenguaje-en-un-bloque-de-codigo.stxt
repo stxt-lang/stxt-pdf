@@ -1,0 +1,17 @@
+# Case: Etiqueta de lenguaje en un bloque de código de Markdown
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 15
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Code font: IBM Plex Mono
+		Content >>
+			```java
+			int x = 1;
+			```

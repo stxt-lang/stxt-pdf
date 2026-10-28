@@ -1201,3 +1201,29 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
 210. **`SvgCanvas` conserva los espacios con `xml:space="preserve"`** cuando un texto tiene dos
      espacios seguidos o empieza o acaba en espacio; el SVG es de depuración, y los textos
      normales no cambian. *Dónde:* `paint/SvgCanvas.text`.
+
+211. **Código en Markdown con `Code font`** (hito 29, W4): una propiedad de `Markdown`, como `Bullet`
+     (obligatoria solo si hay código: `MARKDOWN_PROPERTY_MISSING` con la línea del código, K6), no una
+     propiedad de `Typography`, así que un texto con `Inline: markdown` no tiene código (sigue siendo
+     `MARKDOWN_UNSUPPORTED`). *Dónde:* schema, `tree/MarkdownBuilder`. *Alternativa:* `Code font` en
+     `Typography` (heredable, y valdría también en `Inline: markdown`).
+
+212. **El código en línea es un tramo con otra familia** (`TextFormat.family`, `null` = la de la caja),
+     no un elemento: se suma a la negrita y la cursiva del texto que lo rodea, puede ir dentro de un
+     enlace y no cambia el alto de la línea ni la línea base, que son los de la fuente de la caja.
+     Como en CSS, el espacio en blanco de un párrafo se colapsa también dentro del código en línea.
+     *Dónde:* `model/TextFormat`, `layout/inline/PdfMetrics` (una familia desconocida es `FONT_UNKNOWN`
+     con la línea del texto). *Alternativa:* un código en línea que conserve los espacios, o con la
+     altura de línea de su fuente.
+
+213. **Un bloque de código es un `Text` con `White space: pre`** y la fuente de `Code font`, con el
+     código en `Content >>` en la línea de las vallas (o la anterior, si está sangrado), de modo
+     que los errores de sus líneas señalan la correcta. No tiene `Id` ni `Class`, y las reglas de
+     `Styles` solo lo alcanzan con `Element: Text`, que también es el `Text` de cada encabezado de
+     un Markdown: un bloque de código no se puede estilar aparte (fondo, relleno) sin tocar los
+     encabezados. *Dónde:* `MarkdownBuilder.codeBlock`. *Alternativa:* un elemento generado que las
+     reglas `Element` nombren (`Code block`), como las entradas de un `Contents`; queda en `TODO.md`.
+
+214. **La etiqueta de lenguaje de las vallas es un error** (```` ```java ````): no hay resaltado y no
+     tendría efecto, como el título de un enlace o de una imagen. *Dónde:* `MarkdownBuilder.codeBlock`
+     (`MARKDOWN_UNSUPPORTED`). *Alternativa:* ignorarla.

@@ -696,7 +696,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Markdown
 		Type: GROUP
-		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino)), que se traduce a Heading, Paragraph, List y Table. Un bloque.
+		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM, bloques de código y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, `código` y [enlaces](destino)), que se traduce a Heading, Paragraph, List, Table y Text. Un bloque.
 		Children:
 			Child: Id
 				Max: 1
@@ -713,6 +713,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Numbering
 				Max: 1
 			Child: Table columns
+				Max: 1
+			Child: Code font
 				Max: 1
 			Child: Content
 				Min: 1
@@ -1195,6 +1197,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): disc, dash o none.
 	Node: Numbering
 		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
+	Node: Code font
+		Description: Familia de la fuente del código de un Markdown (`código` y bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si el contenido tiene código.
 	Node: Column align
 		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
 	Node: Table columns

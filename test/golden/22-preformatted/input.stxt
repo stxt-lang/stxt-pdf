@@ -1,5 +1,5 @@
-# Hito 29: texto preformateado (ESPECIFICACION.md §4.4, §5.4). Página de 200 × 200 con márgenes de 20:
-# área útil de 160 × 160 desde (20, 20). Líneas de 12 (Size 10); con las métricas de prueba cada
+# Hito 29: texto preformateado y código (ESPECIFICACION.md §4.4, §5.4, §5.17). Página de 200 × 300 con
+# márgenes de 20: área útil de 160 × 260 desde (20, 20). Líneas de 12 (Size 10); con las métricas de prueba cada
 # carácter mide 5 pt.
 #   term:    White space pre, cinco líneas del bloque, la cuarta vacía (una línea en blanco es una línea,
 #            no separa párrafos), y una tabulación tras «PE» que lleva a la columna 4. La más larga mide
@@ -10,11 +10,15 @@
 #            caracteres, 155 pt (con « gggg» serían 36 caracteres, 180). Quedan «gggg hhhh» y la segunda
 #            línea del texto, «corta»: 3 líneas, 36. y = 104.
 #   plain:   sin White space, los espacios se colapsan: una línea de 12. y = 140.
+#   md:      un Markdown con Code font: un Paragraph de una línea («Usa ls -l aquí.» con «ls -l» en la fuente
+#            del código; en un párrafo los espacios se colapsan, también en el código en línea: 12) y un
+#            bloque de código de dos líneas («a  b» y «  c»), que es un Text con White space pre: 24.
+#            Los dos van seguidos y sin márgenes: 36. y = 152.
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
 		Width: 200
-		Height: 200
+		Height: 300
 		Margin: 20
 	Typography:
 		Font: IBM Plex Mono
@@ -46,3 +50,15 @@ Document (dev.stxt.boxes):
 			corta
 	Text: a   b    c
 		Id: plain
+	Markdown:
+		Id: md
+		Code font: IBM Plex Mono
+		Typography:
+			Font: IBM Plex Sans
+		Content >>
+			Usa `ls  -l` aquí.
+
+			```
+			a  b
+			  c
+			```

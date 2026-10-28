@@ -84,4 +84,20 @@ class MarkdownTest {
         assertEquals(12, e.line());
         assertDoesNotThrow(() -> build("\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }
+
+    @Test
+    void codeBlocksArePreformattedTextsInTheCodeFont() {
+        Box root = build("\tMarkdown:", "\t\tCode font: IBM Plex Mono", "\t\tContent >>", "\t\t\tUsa `ls  -l` así.", "",
+                "\t\t\t```", "\t\t\ta  b", "\t\t\t  c", "\t\t\t```");
+        Box md = root.children.get(0);
+        Box paragraph = md.children.get(0);
+        assertEquals("Usa ls  -l así.", paragraph.text);
+        assertEquals("IBM Plex Mono", paragraph.runs.get(1).format().family());
+        assertEquals("IBM Plex Sans", paragraph.style.font);
+        Box code = md.children.get(1);
+        assertEquals(Element.TEXT, code.element);
+        assertEquals("a  b\n  c", code.text);
+        assertEquals(Style.WhiteSpace.PRE, code.style.whiteSpace);
+        assertEquals("IBM Plex Mono", code.style.font);
+    }
 }

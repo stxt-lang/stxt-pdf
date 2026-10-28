@@ -122,4 +122,26 @@ class PdfMetricsTest {
         assertEquals(ErrorCode.GLYPH_MISSING, e.code());
         assertEquals("línea 13: La fuente IBM Plex Sans italic no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
+
+    @Test
+    void theCodeFontOfAMarkdownIsCheckedAndMeasuredWithItsOwnFile() {
+        assertDoesNotThrow(() -> validate("\tMarkdown:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: IBM Plex Mono", "\t\tContent >>",
+                "\t\t\tFont Plex Sans y `mono`.", "", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
+        // hmtx de IBM Plex Mono: 600 unidades por carácter.
+        assertEquals(12, metrics.width("ab", new FontFace("IBM Plex Mono", FontWeight.NORMAL, FontStyle.NORMAL), 10),
+                1e-9);
+    }
+
+    @Test
+    void anUnknownCodeFontIsReportedWhereItIsDeclaredOrInTheText() {
+        InvalidModelException block = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
+                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
+        assertEquals(ErrorCode.FONT_UNKNOWN, block.code());
+        assertEquals(11, block.line());
+        InvalidModelException inline = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
+                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\tUsa `mvn`."));
+        assertEquals(ErrorCode.FONT_UNKNOWN, inline.code());
+        assertEquals(13, inline.line());
+        assertTrue(inline.getMessage().contains("Code font"), inline.getMessage());
+    }
 }

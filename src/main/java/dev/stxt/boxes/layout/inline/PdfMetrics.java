@@ -124,7 +124,13 @@ public final class PdfMetrics implements TextMeasurer {
         try {
             return fonts.find(face);
         } catch (ResourceException e) {
-            if (!fonts.families().contains(s.font)) {
+            if (!fonts.families().contains(face.family())) {
+                if (!face.family().equals(s.font)) {
+                    // La familia de un tramo (el código de un Markdown): el error es del texto, que no tiene
+                    // la línea de Code font.
+                    throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_UNKNOWN,
+                            e.getMessage() + " (la fuente del código, Code font)");
+                }
                 // El culpable es la declaración de Font, aunque esté en una antecesora.
                 throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }

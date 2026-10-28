@@ -27,6 +27,18 @@ class TextFormatTest {
     }
 
     @Test
+    void aFamilyReplacesTheOneOfTheBoxAndKeepsTheRest() {
+        TextFormat code = TextFormat.PLAIN.withFamily("M");
+        assertEquals(new FontFace("M", FontWeight.NORMAL, FontStyle.NORMAL), code.face(REGULAR));
+        assertEquals(new FontFace("M", FontWeight.BOLD, FontStyle.NORMAL), code.face(BOLD));
+        assertEquals(new FontFace("M", FontWeight.BOLD, FontStyle.ITALIC),
+                new TextFormat(true, true, false, false).withFamily("M").face(REGULAR));
+        // Los demás cambios del formato la conservan.
+        assertEquals("M", code.withLink("https://example.com/a").withSmallCaps(true).family());
+        assertEquals("https://example.com/a", code.withLink("https://example.com/a").link());
+    }
+
+    @Test
     void decorations() {
         assertFalse(new TextFormat(true, true, false, false).decorated());
         assertTrue(new TextFormat(false, false, true, false).decorated());

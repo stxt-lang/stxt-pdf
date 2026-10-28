@@ -80,7 +80,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
-| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas e imágenes, con enlaces en sus textos ([§5.17](#517-markdown)) | Su texto en `Content` |
+| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas, bloques de código e imágenes, con enlaces y código en sus textos ([§5.17](#517-markdown)) | Su texto en `Content` |
 | `Image` | Imagen PNG o JPEG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
 | `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
@@ -561,6 +561,7 @@ además `Id`, `Class`, `Box`, `Typography` y `Break`, como un `Block`.
 | `Bullet` | lista de `disc`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
 | `Numbering` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
 | `Table columns` | `equal`, `auto` | — | Las `Columns` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+| `Code font` | nombre de familia | — | La familia de la fuente del código (`código` y bloques de código), tal como la declara su fichero TTF; suele ser una monoespaciada. Obligatoria si hay código. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -700,8 +701,9 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
 - **Tramos.** El texto puede tener partes con formato dentro de una misma línea: **negrita**,
   *cursiva*, subrayado y tachado, combinables. Cada tramo mide y se pinta con su variante de la
   fuente; la negrita y la cursiva se suman a las de la caja (una palabra en negrita de un texto
-  ya en negrita sigue en negrita). La familia, el tamaño, el color y `Line height` son los de la
-  caja, así que la altura de las líneas y su línea base no cambian. Una palabra con partes de
+  ya en negrita sigue en negrita). El tamaño, el color y `Line height` son los de la caja, así que la
+  altura de las líneas y su línea base no cambian, y la familia también, salvo en el código de un
+  `Markdown` ([§5.17](#517-markdown)), que usa la de `Code font`. Una palabra con partes de
   varios tramos (**neg**rita) es una sola palabra para el reparto, y mide lo que suman sus
   partes; el espacio entre dos palabras tiene el formato del tramo en que está su primer espacio
   en blanco. Con `justify`, el espacio extra de cada espacio pertenece a su tramo. Un texto sin
@@ -1578,11 +1580,12 @@ Document (dev.stxt.boxes):
 		Bullet: disc dash
 		Numbering: decimal
 		Table columns: equal
+		Code font: IBM Plex Mono
 		Content >>
 			# Resultados
 
 			Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
-			con ~~pérdidas~~ beneficios.
+			con ~~pérdidas~~ beneficios. El informe sale de `mvn test`.
 
 			- Ventas en alza
 			- Costes:
@@ -1613,11 +1616,13 @@ tachado de GFM y el subrayado `++…++`. Se traduce así:
 | `++x++` | tramo subrayado |
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([§5.20](#520-enlaces)) |
+| `` `x` `` | tramo con la fuente de `Code font` ([§5.4](#54-texto)) |
+| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Text` con la fuente de `Code font` y `White space: pre`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`; con `![](ruta)`, decorativa ([§5.18](#518-imágenes)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`),
 imágenes dentro de un texto (también dentro de un enlace) o con título (`![Alt](ruta "título")`),
-código (en línea o en bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
+la etiqueta de lenguaje de un bloque de código (```` ```java ````: no hay resaltado), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
 de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se escribe en el propio enlace). Un encabezado tampoco puede ir dentro de un ítem de
 lista, como en un `List item`, ni una tabla quedarse sin filas debajo de la cabecera.
 
@@ -1626,6 +1631,21 @@ formato dentro de la línea se suma: `***x***` es negrita y cursiva. Esa misma s
 sin el resto de elementos, la admite `Inline: markdown` en un `Text`, un `Paragraph` o una `Cell`
 ([§5.4](#54-texto)). Un encabezado o un párrafo
 sin texto es un error (`TEXT_CONTENT`).
+
+**Código.** El código en línea es un tramo con la familia de `Code font` (`TextFormat.family`):
+conserva el peso y el estilo del texto que lo rodea y se suma a la negrita o la cursiva del
+párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace. Como en CSS, el
+espacio en blanco de una línea con código en línea se colapsa como en cualquier párrafo; lo que
+conserva los espacios es el bloque. Un bloque de código es un `Text` con `White space: pre` ([§5.4](#54-texto))
+y la familia de `Code font`, así que se parte entre líneas entre páginas y una línea más ancha que la
+caja es un error (`TEXT_OVERFLOW`); no tiene `Id` ni `Class`, pero lo nombra la regla `Element: Text`,
+que también alcanza a los `Text` de los encabezados de un Markdown (no hay un elemento propio). Su
+`Typography` es el del `Markdown` con la fuente cambiada, así que `Size`, `Color` o `Tab size` se
+declaran en el `Typography` del `Markdown` o en `Element: Text`. Se usa el `Line height` de la caja, no el
+de la fuente del código, así que las líneas con código en línea no cambian de alto. `Code font` solo es
+obligatoria si hay código; si la familia no existe, el error es `FONT_UNKNOWN`, con la línea de
+`Code font` para un bloque y la del párrafo para el código en línea. Un texto con `Inline: markdown`
+no tiene `Code font`, así que su código sigue siendo `MARKDOWN_UNSUPPORTED`.
 
 **Listas.** El nivel de una lista es el número de listas de su mismo tipo que la contienen: la
 primera lista con viñetas usa el primer marcador de `Bullet`; una con viñetas dentro de esa, el
@@ -1656,8 +1676,8 @@ no puede tener encabezados.
 **Errores.** Los errores de lo generado señalan la línea del documento donde empieza su bloque
 de Markdown (la del ítem, la de la fila de la tabla); los del marcador de una lista, la de
 `Bullet` o `Numbering`, y los de las columnas de una tabla, la de `Table columns`. Una lista o
-una tabla sin su propiedad es un error con la línea de la lista o la tabla
-(`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es.
+una tabla sin su propiedad, o código sin `Code font`, es un error con la línea de la lista, la
+tabla o el código (`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es.
 
 **Salida.** En el PDF etiquetado, el `Markdown` es un `Div` y lo generado cuelga de él con sus
 etiquetas (`H1`, `P`, `L`, `Table`…); sus encabezados son marcadores. En el volcado del
@@ -1972,13 +1992,13 @@ La validación se hace en cuatro niveles:
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
-| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces con título, ni definiciones de enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque). Un texto con `Inline: markdown` ([§5.4](#54-texto)) solo admite párrafos con formato en línea: ni encabezados, ni listas, ni tablas, ni imágenes (línea del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas y…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces con título, ni definiciones de enlaces, ni imágenes dentro de un texto o con título, ni la etiqueta de lenguaje de un bloque de código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque). Un texto con `Inline: markdown` ([§5.4](#54-texto)) solo admite párrafos con formato en línea: ni encabezados, ni listas, ni tablas, ni imágenes, ni código (línea del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas, bloques de código y…` |
 | `LINK_SCHEME` | El destino de un enlace (`Link` o enlace de Markdown, [§5.20](#520-enlaces)) es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito (línea del `Link`, o la del bloque en Markdown) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno (línea del `Link`, o la del bloque en Markdown) | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
 | `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
-| `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
+| `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns`; con código, `Code font` (línea de la lista, la tabla o el código) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
 | `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
 | `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
@@ -1994,7 +2014,7 @@ La validación se hace en cuatro niveles:
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([§5.9](#59-dimensionado)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([§3.6](#36-bases-de-los-porcentajes)) | `Height usa un porcentaje de un alto que no es definido…` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella (§5.8) | `Área desconocida en Area: foot` |
-| `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
+| `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` de un `Markdown` (línea de `Code font` para un bloque de código, la del texto para código en línea) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
@@ -2153,7 +2173,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Row` | `GROUP` | `Typography`, `Break`; `Cell` (al menos uno, varios) |
 | `Cell` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
-| `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
+| `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Code font`, `Content` (obligatorio) |
 | `Contents` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `INLINE` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit` |
 | `Relative` | `GROUP` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
@@ -2341,7 +2361,7 @@ Document (dev.stxt.boxes):
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
-| **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado y enlace) ([§5.4](#54-texto)). |
+| **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([§5.4](#54-texto)). |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([§5.4](#54-texto)). |
 | **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`, [§5.4](#54-texto)). |
 | **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`, [§5.4](#54-texto)). |

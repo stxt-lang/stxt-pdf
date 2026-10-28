@@ -92,7 +92,7 @@ public final class BoxTreeBuilder {
      * y lo que lee {@link MarkdownBuilder}.
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
-            "foot", "span", "bullet", "numbering", "table-columns", "column-align");
+            "foot", "span", "bullet", "numbering", "table-columns", "code-font", "column-align");
 
     /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
