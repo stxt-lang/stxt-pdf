@@ -3,7 +3,8 @@
 # grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
 # cabecera y pie, y secciones que empiezan siempre en página nueva. El contenido es un Contents:
 # lista las secciones con su página, que el motor calcula. El título de la portada y el de la página
-# de contenido son un Text, no un encabezado, para que no salgan en el índice.
+# de contenido son un Text, no un encabezado, para que no salgan en el índice. Los rótulos se escriben
+# en minúscula y las reglas los ponen en mayúsculas, con un poco de interletraje (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -75,6 +76,8 @@ Document (dev.stxt.boxes):
 				Size: 8
 				Weight: bold
 				Color: #E07B1F
+				Transform: uppercase
+				Letter spacing: 1
 			Box:
 				Margin: 0 0 6 0
 		For class: milestone
@@ -189,11 +192,13 @@ Document (dev.stxt.boxes):
 		Block:
 			Box:
 				Padding: 36 56 0 56
-			Text: INFORME ANUAL · EJERCICIO 2025
+			Text: Informe anual · Ejercicio 2025
 				Typography:
 					Size: 9
 					Weight: bold
 					Color: #F2A65A
+					Transform: uppercase
+					Letter spacing: 2
 				Box:
 					Margin: 0 0 10 0
 			Block:
@@ -311,25 +316,25 @@ Document (dev.stxt.boxes):
 			Area:
 				Block:
 					Class: milestone
-					Text: MARZO
+					Text: Marzo
 						Class: kicker
 					Text: La asamblea aprueba las cuentas de 2024 con el 94 % de los votos.
 			Area:
 				Block:
 					Class: milestone
-					Text: JUNIO
+					Text: Junio
 						Class: kicker
 					Text: Se conecta el parque solar de Les Preses, de 1,6 MWp.
 			Area:
 				Block:
 					Class: milestone
-					Text: SEPTIEMBRE
+					Text: Septiembre
 						Class: kicker
 					Text: Terminan las obras de renovación de los tres aerogeneradores.
 			Area:
 				Block:
 					Class: milestone
-					Text: NOVIEMBRE
+					Text: Noviembre
 						Class: kicker
 					Text: Llegamos al cliente número 8.000, una panadería de Sant Feliu.
 	Block:

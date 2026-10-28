@@ -2,7 +2,8 @@
 # noticia principal con una foto recortada (Fit: cover), artículos a tres columnas con filete y
 # cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
 # una rejilla. El cuerpo es Markdown dentro de Multicol. La cabecera de portada es un bloque de la
-# primera página; las siguientes llevan un titulillo fijo (Pages: not-first).
+# primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
+# minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -56,6 +57,8 @@ Document (dev.stxt.boxes):
 				Size: 7.5
 				Weight: bold
 				Color: #A4301F
+				Transform: uppercase
+				Letter spacing: 0.8
 		For class: caption
 			Typography:
 				Font: IBM Plex Sans
@@ -101,6 +104,8 @@ Document (dev.stxt.boxes):
 				Weight: bold
 				Size: 7
 				Color: #A4301F
+				Transform: uppercase
+				Letter spacing: 0.6
 			Box:
 				Margin: 0 0 3 0
 	Fixed:
@@ -114,10 +119,12 @@ Document (dev.stxt.boxes):
 		Flex:
 			Main axis: between
 			Item:
-				Text: GACETA DEL VALLE
+				Text: Gaceta del Valle
 					Typography:
 						Weight: bold
 						Color: #A4301F
+						Transform: uppercase
+						Letter spacing: 0.8
 			Item:
 				Text: Octubre de 2025 · Nº 87
 	Fixed:
@@ -157,13 +164,15 @@ Document (dev.stxt.boxes):
 				Font: IBM Plex Sans
 				Size: 7.5
 				Weight: bold
+				Transform: uppercase
+				Letter spacing: 0.8
 			Item:
-				Text: BOLETÍN MENSUAL DE LOS PUEBLOS DE LA GARROTXA
+				Text: Boletín mensual de los pueblos de la Garrotxa
 			Item:
-				Text: OCTUBRE DE 2025 · Nº 87 · GRATUITO
+				Text: Octubre de 2025 · Nº 87 · Gratuito
 	Block:
 		Id: lead
-		Text: SOCIEDAD
+		Text: Sociedad
 			Class: kicker
 		Heading 1:
 			Text: La castañada llega con el mercado más grande de la década
@@ -201,7 +210,7 @@ Document (dev.stxt.boxes):
 		Id: trails
 		Break:
 			Before: page
-		Text: NATURALEZA
+		Text: Naturaleza
 			Class: kicker
 		Heading 1:
 			Text: Tres caminos para no perderse el hayedo
@@ -259,7 +268,10 @@ Document (dev.stxt.boxes):
 
 					Cáritas organiza una recogida de ropa de abrigo del 3 al 14 de noviembre. Los puntos de entrega son la parroquia, el centro cívico y el polideportivo.
 		Heading 2:
-			Text: AGENDA DE OCTUBRE Y NOVIEMBRE
+			Text: Agenda de octubre y noviembre
+				Typography:
+					Transform: uppercase
+					Letter spacing: 0.6
 		Table:
 			Id: agenda
 			Columns: 70 52 1fr 120
@@ -298,7 +310,10 @@ Document (dev.stxt.boxes):
 					Cell: Cena del club de lectura
 					Cell: Centro cívico
 		Heading 2:
-			Text: ANUNCIOS POR PALABRAS
+			Text: Anuncios por palabras
+				Typography:
+					Transform: uppercase
+					Letter spacing: 0.6
 		Grid:
 			Id: classifieds
 			Columns: repeat(4, 1fr)
@@ -306,24 +321,24 @@ Document (dev.stxt.boxes):
 			Area:
 				Block:
 					Class: ad
-					Text: SE VENDE
+					Text: Se vende
 						Class: ad-title
 					Text: Estufa de leña en buen estado, con tubos y sombrero. 180 €. Llamar por las tardes al 600 11 22 33.
 			Area:
 				Block:
 					Class: ad
-					Text: SE BUSCA
+					Text: Se busca
 						Class: ad-title
 					Text: Persona de confianza para cuidar a dos niños de 4 y 7 años de lunes a viernes, de 4 a 8.
 			Area:
 				Block:
 					Class: ad
-					Text: SE OFRECE
+					Text: Se ofrece
 						Class: ad-title
 					Text: Clases de refuerzo de matemáticas y física para ESO y Bachillerato. Primera clase gratuita.
 			Area:
 				Block:
 					Class: ad
-					Text: PERDIDO
+					Text: Perdido
 						Class: ad-title
 					Text: Perro mestizo marrón, con collar azul, cerca del campo de fútbol. Se gratifica.

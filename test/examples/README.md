@@ -64,6 +64,11 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   literales. Las cláusulas del contrato (07) y los pasos del manual (08) siguen siendo `Markdown`
   porque son listas; las partes del contrato, la leyenda de la figura (08) y la carta de la
   presidenta (04) ya son `Paragraph`.
+- **Los rótulos en mayúsculas** se escriben como una frase normal (`Emisor`, `Fecha de emisión`) y
+  una regla de `Styles` los pone en mayúsculas con `Transform: uppercase`, casi siempre con unos
+  puntos de `Letter spacing` (ejemplos 01, 03, 04, 05, 06, 07, 08, 09 y 10). El PDF etiquetado y los
+  marcadores conservan lo escrito (`Experiencia`, no `EXPERIENCIA`). Las siglas y los códigos
+  (`CIF B-…`) se dejan como están.
 - **Los espacios se colapsan**: no hay texto preformateado, así que un bloque de terminal con
   columnas alineadas (ejemplo 08) usa un grid.
 - **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la

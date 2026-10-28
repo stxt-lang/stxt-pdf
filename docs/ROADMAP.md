@@ -45,14 +45,14 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 24 | Primera página distinta (`Pages` en `Fixed`) | hecho | 17 |
 | 25 | Estilo de las tablas (cebra, cabecera, columnas) | hecho | 18 |
 | 26 | Formato dentro de la línea fuera de Markdown | hecho | 19 |
-| 27 | Texto: mayúsculas automáticas, interletraje y versalitas | pendiente | 20 (previsto) |
+| 27 | Texto: mayúsculas automáticas, interletraje y versalitas | hecho | 20 |
 | 28 | Aspecto de las cajas: esquinas, bordes, sombras y degradados | pendiente | 21 (previsto) |
 | 29 | Texto preformateado y código | pendiente | 22 (previsto) |
 | 30 | Rotación y orientación de la página | pendiente | 23 (previsto) |
 | 31 | Imágenes vectoriales (SVG) | pendiente | 24 (previsto) |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 26, el 2026-10-28. Los hitos
-27 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 27, el 2026-10-28. Los hitos
+28 a 31 están pendientes, ordenados por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -921,13 +921,37 @@ Typography:
 - [x] Y5. **PDF** *(detalle técnico, sin consultar)*. Ajustes de `TJ` entre glifos, como `justify`
       (las fuentes son Type 0 Identity-H), para que el texto seleccionable no se parta en letras.
 
+**Diseño técnico** (como quedó):
+
+- **Propiedades.** `Style.transform` (`Style.Transform`), `Style.letterSpacing` (puntos) y
+  `Style.smallCaps`, heredables y en el grupo `Typography` del schema, así que valen en `Styles`.
+  `Style.locale` es la configuración regional de `Language` (obligatorio, ver abajo); no es una
+  propiedad de la caja: el builder la pone en la raíz y se hereda.
+- **Transformación.** `layout/inline/TextTransform` pasa los tramos de la caja por `Transform` y
+  luego por las versalitas (las minúsculas pasan a mayúsculas con `TextFormat.smallCaps`), sin tocar
+  los marcadores `{page}`/`{pages}`. `InlineLayout.runs` lo aplica después de sustituir las
+  referencias y antes de repartir en líneas.
+- **Medida.** `LineBreaker.advance` da el avance de cada tramo (`fontSize × format.scale()` más el
+  interletraje de cada carácter) y `LineBreaker.width`, el ancho como línea (sin el del último);
+  los usan el voraz, Knuth-Plass, los tamaños intrínsecos y `place`.
+- **Pintado.** `StackingContext` pasa a `Canvas.text` el tamaño del tramo y el interletraje;
+  `PdfCanvas.spaced` los escribe con `TJ` y `SvgCanvas`, con `letter-spacing`. `PdfStructure` da
+  `ActualText` (el texto escrito) a lo que tiene `Transform` o `Small caps` y no lleva números de
+  página ni referencias.
+- **`Language` obligatorio.** Se hizo antes del hito (decisión 193): era la condición de Y4.
+
 **Tareas:**
 
 - [x] Resolver Y1–Y5 (2026-10-28).
 - [x] `Language` obligatorio en `Document`, con todos los documentos de prueba y de ejemplo (Y4).
-- [ ] Schema, `Style`, `LineBreaker`, `InlineLayout`, `PdfMetrics` y `PdfCanvas`.
-- [ ] Especificación (§4.4, §5.4, §8), tests y caso golden `20-typography`.
-- [ ] Ejemplos con rótulos en minúscula y la transformación en una regla de `Styles`.
+- [x] Schema (`Transform`, `Letter spacing`, `Small caps`), `Style`, `PropertyReader`.
+- [x] `TextTransform`, `LineBreaker` (avance con interletraje y versalitas), `InlineLayout`.
+- [x] `Canvas`, `StackingContext`, `PdfCanvas`, `SvgCanvas` y `PdfStructure` (`ActualText`).
+- [x] Especificación (§2, §4.1, §4.4, §5.4, §5.13, §6, §8, §9 y glosario), cuatro casos en el catálogo
+      de errores, tests (`TextTransformTest`, `TextTypographyTest`, `TextCaseTest`, `LineBreakerTest`,
+      `StackingContextTest`, `SvgCanvasTest`, `PdfCanvasTest`) y caso golden `20-typography`.
+- [x] Ejemplos 01, 03, 04, 05, 06, 07, 08, 09 y 10 con los rótulos en minúscula y la transformación
+      en una regla de `Styles` (decisión 202).
 
 ---
 
@@ -1144,6 +1168,19 @@ seleccionable si se puede. Hoy los logotipos y los gráficos de los ejemplos son
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (12).** Hito 27 terminado. Resueltas Y1–Y4 con un cuestionario (todas las propuestas,
+  con una condición en Y4: si el idioma es una característica de accesibilidad, que sea obligatorio en el
+  schema; lo es, así que `Language` pasó a ser obligatorio en `Document` en un commit aparte, con
+  todos los documentos de prueba, los ejemplos y los de la especificación) y Y5 por mi cuenta (`TJ`).
+  `Transform`, `Letter spacing` y `Small caps` en `Typography`: `TextTransform` sobre los tramos antes
+  de repartir, avance con interletraje y versalitas en `LineBreaker` (el último carácter de la línea no
+  lo lleva), `TJ` en el PDF, `letter-spacing` en el SVG y `ActualText` en el PDF etiquetado. Cuatro
+  casos nuevos en el catálogo, `TextTransformTest`, `TextTypographyTest`, `TextCaseTest` y el caso
+  golden `20-typography` (calculado a mano, pasó a la primera). Nueve ejemplos con los rótulos en
+  minúscula y una regla `Transform` (ningún volcado cambia; los PNG solo en los rótulos). Decisiones
+  193–202 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* hito 29 (texto preformateado, de esfuerzo bajo-medio) o el 28 (aspecto de las
+  cajas, el más caro), en otra sesión; resolver sus decisiones con el usuario antes de escribir código.
 - **2026-10-28 (11).** Hito 26 terminado. Resueltas F1–F5 con un cuestionario (todas las propuestas):
   `Inline: markdown` en `Typography` (se hereda y vale en `Styles`), con la sintaxis y los enlaces de
   `Markdown`, escapes de CommonMark y solo párrafos. Reutiliza el parser y el `Translator` de

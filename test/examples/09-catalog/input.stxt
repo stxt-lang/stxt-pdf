@@ -4,6 +4,7 @@
 # (Fit: cover) y una etiqueta «Novedad» superpuesta, y una página final con maderas, pedidos y
 # contacto. Las fichas son todas iguales: el estilo está en Styles y solo cambia el contenido.
 # El título de la portada y el del índice son un Text, no un encabezado, para que no salgan en él.
+# Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -123,6 +124,8 @@ Document (dev.stxt.boxes):
 				Size: 7
 				Weight: bold
 				Color: #FFFFFF
+				Transform: uppercase
+				Letter spacing: 0.8
 			Box:
 				Background: #B5651D
 				Padding: 3 7
@@ -172,11 +175,13 @@ Document (dev.stxt.boxes):
 				Box:
 					Width: 74
 					Margin: 0 0 26 0
-			Text: CATÁLOGO
+			Text: Catálogo
 				Typography:
 					Size: 10
 					Weight: bold
 					Color: #F3C27C
+					Transform: uppercase
+					Letter spacing: 4
 				Box:
 					Margin: 0 0 8 0
 			Block:
@@ -348,7 +353,7 @@ Document (dev.stxt.boxes):
 						Absolute:
 							Offset: 10 auto auto 10
 							Class: new
-							Text: NOVEDAD
+							Text: Novedad
 					Block:
 						Class: body
 						Flex:
@@ -544,7 +549,7 @@ Document (dev.stxt.boxes):
 						Absolute:
 							Offset: 10 auto auto 10
 							Class: new
-							Text: NOVEDAD
+							Text: Novedad
 					Block:
 						Class: body
 						Flex:

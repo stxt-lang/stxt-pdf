@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 26 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 27 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -80,8 +80,10 @@ actualízala.
 
 | 26 | ~~Formato en línea fuera de `Markdown`: `Inline: markdown` en `Typography` (se hereda), con la sintaxis en línea y los enlaces de `Markdown`~~ (hecho; caso 19) | schema, `tree/Style.Inline`, `tree/PropertyReader`, `tree/MarkdownBuilder.inline`, `tree/BoxTreeBuilder.inlineFormat` |
 
-Los hitos 27 a 31 (texto,
-aspecto de las cajas, preformateado, rotación y SVG) están pendientes en
+| 27 | ~~Mayúsculas, interletraje y versalitas: `Transform`, `Letter spacing` y `Small caps` en `Typography` (se heredan); `Language` obligatorio~~ (hecho; caso 20) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/TextTransform`, `layout/inline/LineBreaker`, `model/TextFormat`, `paint/PdfCanvas`, `paint/PdfStructure` |
+
+Los hitos 28 a 31 (aspecto
+de las cajas, preformateado, rotación y SVG) están pendientes en
 [`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -331,6 +333,20 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   ser el texto sin las marcas (los párrafos, separados por `\n\n`), `Box.runs` los tramos y
   `Box.textBlock` deja de ser cierto: la línea de sus errores es la de donde empieza el texto. Dentro
   de un `Markdown` no actúa (`BuildContext.insideMarkdown`): sus textos ya vienen interpretados.
+- **Mayúsculas e interletraje (§4.4, §5.4):** `Transform`, `Letter spacing` y `Small caps` son
+  propiedades de `Typography` (se heredan y valen en `Styles`). `Document` exige un `Language`
+  (accesibilidad): el builder lo pone en `Style.locale` de la raíz y se hereda, y es la
+  configuración regional de `Transform`. `InlineLayout.runs` aplica `TextTransform` a los tramos
+  **antes** de repartirlos en líneas (cambia lo que miden: `ß` → `SS`) y después de sustituir las
+  referencias; `Box.text` no cambia y las líneas (`TextLine`) llevan el texto ya transformado. Los
+  marcadores `{page}`/`{pages}` no se transforman (`PageNumbers` los sustituye al final). Las
+  versalitas son tramos con `TextFormat.smallCaps` (texto en mayúsculas, al `SMALL_CAPS_SCALE` del
+  tamaño): `LineBreaker.advance` mide cada tramo con `fontSize × format.scale()` más el
+  interletraje de cada carácter, y el ancho de una línea resta el del último
+  (`LineBreaker.width`). `StackingContext` pasa el tamaño del tramo y `Style.letterSpacing` a
+  `Canvas.text`; `PdfCanvas.spaced` lo escribe con ajustes de `TJ`. `PdfStructure` da `ActualText`
+  (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva
+  `{page}` ni referencias.
 - **Markdown (§5.17):** `MarkdownBuilder` parsea el `Content` con commonmark-java y lo traduce
   a nodos STXT (`InlineNode` con la línea de su bloque: `Heading N` con un `Text`, `Paragraph`,
   `List` con `Marker` de `Bullet`/`Numbering`, `Table` con `Columns` de `Table columns`), que

@@ -1095,3 +1095,62 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      ejemplos y los de la especificación declaran `Language: es`. `Title` sigue siendo opcional.
      *Dónde:* schema, `docs/ESPECIFICACION.md` §2 y §4.1. *Alternativa:* dejarlo opcional y
      usar `Locale.ROOT` si falta.
+
+194. **`Transform` se aplica a los tramos antes de repartir en líneas** (Y1). Cambia lo que mide
+     el texto (`ß` → `SS`), así que no puede ser solo de pintado: `InlineLayout.runs` transforma
+     los tramos (después de sustituir las referencias) y las líneas llevan el texto ya
+     transformado; `Box.text` es el escrito. Los marcadores `{page}` y `{pages}` no se
+     transforman, porque `PageNumbers` los sustituye al terminar de paginar. *Dónde:*
+     `layout/inline/TextTransform`, `layout/inline/InlineLayout`. *Alternativa:* transformar al
+     construir el árbol (`Box.text` ya en mayúsculas), que perdería el texto escrito para el PDF
+     etiquetado.
+
+195. **`capitalize` solo sube la primera letra de cada palabra** (Y1). Una palabra empieza tras un
+     espacio o un salto de línea, aunque el espacio sea el final de otro tramo, y el resto de la
+     palabra se deja como está (`iPhone` da `IPhone`, no `Iphone`), como en CSS. *Dónde:*
+     `TextTransform.capitalize`. *Alternativa:* pasar el resto de la palabra a minúscula.
+
+196. **El interletraje lo lleva cada carácter menos el último de la línea** (Y2). Un espacio también
+     lo lleva, y el ancho de una línea es lo que suman sus caracteres menos un interletraje, así
+     que `right` y `center` alinean con la última letra y no con un hueco. Con `justify`, el
+     sobrante que reparte es lo que queda después del interletraje. Puede ser negativo (texto más
+     apretado) y no se comprueba que el avance del carácter siga siendo positivo. *Dónde:*
+     `LineBreaker.advance`, `LineBreaker.width` y `LineBreaker.place`. *Alternativa:* el de CSS,
+     que también lo pone tras el último carácter; o rechazar valores negativos.
+
+197. **Versalitas sintetizadas al 80 %** (Y3). Cada minúscula que tiene mayúscula distinta pasa a
+     mayúscula y se mide y se pinta al 80 % del `Size` (`TextFormat.SMALL_CAPS_SCALE`); los
+     espacios, las cifras, los signos y las mayúsculas no se reducen. No se usa la característica
+     `smcp` de la fuente (ninguna de las incluidas la tiene) y no hay error si falta. El
+     subrayado y el tachado, la altura de línea y la línea base son los del `Size` de la caja, no
+     los de las versalitas. Se aplica después de `Transform`. *Dónde:* `TextTransform.emit`,
+     `model/TextFormat`. *Alternativa:* usar `smcp` si la fuente la tiene.
+
+198. **`Small caps` con `Transform: uppercase` no es un error** aunque no tenga efecto (ninguna
+     minúscula que reducir): son propiedades heredables y un documento puede declarar `Small
+     caps` en `Document` y `uppercase` en un solo rótulo. *Dónde:* `TextTransform`. *Alternativa:*
+     un error (la política de §6 para lo que no tiene efecto), que obligaría a repetir las reglas.
+
+199. **Interletraje en el PDF con ajustes de `TJ`** (Y5, resuelta sin preguntar). Las fuentes son
+     Type 0 Identity-H, donde `Tw` no actúa, y `justify` ya usa `TJ`; con interletraje, cada
+     carácter va en su cadena con el desplazamiento entre ellas. El texto sigue siendo
+     seleccionable, aunque el extractor de un lector puede insertar espacios si la separación es
+     grande (`TODO.md`). *Dónde:* `paint/PdfCanvas.spaced`. *Alternativa:* el operador `Tc`.
+
+200. **`ActualText` solo si el texto escrito es fijo** (Y1). Un elemento con `Transform` o `Small
+     caps` lleva `ActualText` con el texto escrito (`Box.text`) en el PDF etiquetado, para que un
+     lector de pantalla lea «Emisor» y no «EMISOR», salvo si el texto contiene `{page}`, `{pages}` o
+     una referencia, que cambian con la página: ahí se lee lo pintado. *Dónde:*
+     `paint/PdfStructure.build`. *Alternativa:* dar el texto sustituido de cada fragmento
+     (más código, y el `ActualText` de un elemento partido en páginas no es por fragmento).
+
+201. **`Letter spacing` solo en puntos** (Y2). Un número; un porcentaje o un texto es
+     `VALUE_NOT_ALLOWED`. *Dónde:* `tree/ValueReader.signedPoints`. *Alternativa:* una fracción
+     del `Size` (`0.05em` de CSS).
+
+202. **Ejemplos** (hito 27): los rótulos de los ejemplos 01, 03, 04, 05, 06, 07, 08, 09 y 10 se
+     escriben en minúscula y las reglas de `Styles` (o el `Typography` del texto, si es uno solo)
+     los ponen en mayúsculas con `Transform: uppercase`, casi todos con 0,6 a 4 pt de interletraje.
+     Ningún volcado cambia (el interletraje no cambia el alto de las líneas) y los PNG solo se
+     diferencian en los rótulos. «CIF B-…», «Nº» y las siglas se quedan escritos como están. Los
+     marcadores del PDF de los encabezados ahora dicen «Experiencia» y no «EXPERIENCIA».

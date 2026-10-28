@@ -65,8 +65,10 @@
   factura sigue necesitando `Class: total` en las dos celdas de la fila).
 - **Aspecto de las cajas**: no hay esquinas redondeadas, sombras, degradados, ni un `Border color`
   distinto por lado. Los ejemplos se arreglan con rectángulos, filetes y fondos planos.
-- **Texto**: no hay interletraje (`letter-spacing`), versalitas ni `text-transform`; los títulos
-  en mayúsculas van escritos en mayúsculas.
+- ~~**Texto**: interletraje, versalitas y `text-transform`~~ (hito 27: `Transform`, `Letter spacing` y
+  `Small caps`). Queda que las versalitas son sintetizadas (mayúsculas al 80 %, no la característica
+  `smcp` de la fuente) y que el texto con interletraje grande puede extraerse del PDF con espacios
+  entre las letras.
 - **Imágenes vectoriales (SVG)**: los gráficos de los ejemplos son PNG generados; con SVG
   quedarían nítidos a cualquier tamaño.
 - **Rotación**: nada se puede girar, ni un sello ni un texto vertical.

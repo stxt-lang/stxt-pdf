@@ -3,7 +3,8 @@
 # reunidos (con las partes en negrita, gracias a Inline: markdown en la regla de Paragraph) y
 # exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de tres niveles de
 # numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
-# bloque de firmas, que no se parte entre páginas.
+# bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
+# de Styles los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -24,6 +25,8 @@ Document (dev.stxt.boxes):
 				Weight: bold
 				Align: center
 				Color: #3F3D8F
+				Transform: uppercase
+				Letter spacing: 0.4
 			Box:
 				Margin: 0 0 4 0
 		Element: Heading 2
@@ -33,6 +36,8 @@ Document (dev.stxt.boxes):
 				Line height: 13
 				Weight: bold
 				Color: #3F3D8F
+				Transform: uppercase
+				Letter spacing: 0.8
 			Box:
 				Margin: 16 0 6 0
 				Padding: 0 0 3 0
@@ -136,7 +141,7 @@ Document (dev.stxt.boxes):
 			Item:
 				Text: Página {page} de {pages}
 	Heading 1:
-		Text: CONTRATO DE PRESTACIÓN DE SERVICIOS DE DISEÑO
+		Text: Contrato de prestación de servicios de diseño
 	Text: En Olot, a 3 de noviembre de 2025
 		Typography:
 			Align: center
@@ -145,7 +150,7 @@ Document (dev.stxt.boxes):
 		Box:
 			Margin: 0 0 14 0
 	Heading 2:
-		Text: REUNIDOS
+		Text: Reunidos
 	Block:
 		Id: parties
 		Box:
@@ -164,7 +169,7 @@ Document (dev.stxt.boxes):
 					De otra, **Cooperativa Solvent, S. Coop. Ltda.**, con CIF F-17482211 y domicilio en el polígono de la Canya, nave 6, de Olot (Girona), representada por doña Carme Vidal i Roca, presidenta de su Consejo Rector (en adelante, «la Cliente»).
 	Paragraph: Ambas partes se reconocen mutuamente la capacidad legal necesaria para obligarse y, a tal efecto,
 	Heading 2:
-		Text: EXPONEN
+		Text: Exponen
 	List:
 		Marker: upper-roman
 		List item:
@@ -174,7 +179,7 @@ Document (dev.stxt.boxes):
 		List item:
 			Paragraph: Que ambas partes desean fijar las condiciones del encargo, y por ello acuerdan formalizar este contrato con arreglo a las siguientes
 	Heading 2:
-		Text: CLÁUSULAS
+		Text: Cláusulas
 	Markdown:
 		Id: clauses
 		Numbering: decimal lower-alpha lower-roman
@@ -216,7 +221,7 @@ Document (dev.stxt.boxes):
 		Break:
 			Before: page
 		Heading 2:
-			Text: ANEXO I · CALENDARIO Y HONORARIOS
+			Text: Anexo I · Calendario y honorarios
 		Table:
 			Id: fees
 			Columns: 36 1fr 84 74
@@ -265,10 +270,12 @@ Document (dev.stxt.boxes):
 			Area:
 				Block:
 					Class: sign
-					Text: POR EL ESTUDIO
+					Text: Por el estudio
 						Typography:
 							Weight: bold
 							Color: #3F3D8F
+							Transform: uppercase
+							Letter spacing: 0.6
 					Image: examples/certificate/signature-director.png
 						Alt: Firma de Irene Calvo Mas
 						Box:
@@ -284,10 +291,12 @@ Document (dev.stxt.boxes):
 			Area:
 				Block:
 					Class: sign
-					Text: POR LA CLIENTE
+					Text: Por la cliente
 						Typography:
 							Weight: bold
 							Color: #3F3D8F
+							Transform: uppercase
+							Letter spacing: 0.6
 					Image: examples/letter/signature.png
 						Alt: Firma de Carme Vidal i Roca
 						Box:

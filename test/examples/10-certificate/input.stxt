@@ -1,7 +1,8 @@
 # Certificado de un curso, en una página A4 apaisada (842 × 595). Un fondo crema y tres marcos
 # concéntricos con cuatro adornos en las esquinas, todos Fixed con Layer negativa; el contenido
 # centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
-# lados de un sello con cintas.
+# lados de un sello con cintas. El nombre de la escuela se escribe en minúscula y la regla de su clase
+# lo pone en mayúsculas, separadas (Transform y Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 842
@@ -38,6 +39,8 @@ Document (dev.stxt.boxes):
 				Size: 10
 				Weight: bold
 				Color: #A8782F
+				Transform: uppercase
+				Letter spacing: 3
 			Box:
 				Margin: 0 0 8 0
 		For class: aside
@@ -127,7 +130,7 @@ Document (dev.stxt.boxes):
 		Offset: auto 0 -22 0
 		Text: Certificado nº CER-2025-0412 · Verificable en escuelaceramica.example/verificar
 			Link: https://escuelaceramica.example/verificar
-	Text: ESCUELA DE CERÁMICA DEL VALLE
+	Text: Escuela de cerámica del Valle
 		Class: school
 	Heading 1:
 		Text: Certificado de finalización

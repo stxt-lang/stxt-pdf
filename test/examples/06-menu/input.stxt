@@ -1,7 +1,8 @@
 # Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
 # doble dibujados con Fixed de Layer negativa, que quedan detrás del contenido en todas las
 # páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
-# con el precio y la nota final en negrita dentro de la línea (Inline: markdown).
+# con el precio y la nota final en negrita dentro de la línea (Inline: markdown). Los rótulos de las
+# secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 420
@@ -31,6 +32,8 @@ Document (dev.stxt.boxes):
 				Weight: bold
 				Color: #A8782F
 				Align: center
+				Transform: uppercase
+				Letter spacing: 2
 			Box:
 				Margin: 16 0 9 0
 		Element: Fixed
@@ -109,7 +112,7 @@ Document (dev.stxt.boxes):
 				Width: 100%
 				Margin: 0 0 2 0
 		Heading 2:
-			Text: PARA EMPEZAR
+			Text: Para empezar
 		Flex:
 			Class: dish
 			Gap: 12
@@ -163,7 +166,7 @@ Document (dev.stxt.boxes):
 				Text: 14
 					Class: price
 		Heading 2:
-			Text: DEL MAR
+			Text: Del mar
 		Flex:
 			Class: dish
 			Gap: 12
@@ -217,7 +220,7 @@ Document (dev.stxt.boxes):
 				Text: 22
 					Class: price
 		Heading 2:
-			Text: DE LA TIERRA
+			Text: De la tierra
 		Flex:
 			Class: dish
 			Gap: 12
@@ -249,7 +252,7 @@ Document (dev.stxt.boxes):
 		Break:
 			Before: page
 		Heading 2:
-			Text: POSTRES
+			Text: Postres
 			Box:
 				Margin: 0 0 9 0
 		Flex:
@@ -309,7 +312,7 @@ Document (dev.stxt.boxes):
 				Width: 100%
 				Margin: 10 0 0 0
 		Heading 2:
-			Text: VINOS Y BEBIDAS POR COPA
+			Text: Vinos y bebidas por copa
 		Flex:
 			Class: dish
 			Gap: 12
@@ -370,12 +373,14 @@ Document (dev.stxt.boxes):
 				Border: 1.2
 				Border color: #14365C
 				Background: #FFFFFF
-			Text: MENÚ DEGUSTACIÓN
+			Text: Menú degustación
 				Typography:
 					Font: IBM Plex Sans
 					Size: 8
 					Weight: bold
 					Color: #A8782F
+					Transform: uppercase
+					Letter spacing: 2
 					Align: center
 			Text: Siete pasos, del mercado a la mesa
 				Typography:

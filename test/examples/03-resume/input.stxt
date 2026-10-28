@@ -1,7 +1,8 @@
 # Currículum de una diseñadora de producto. Una página A4 sin márgenes: un grid de dos columnas
 # a página completa, con una barra lateral de color (foto, contacto, herramientas con barras
 # de nivel e idiomas) y el cuerpo con perfil, cifras, experiencia en línea de tiempo y formación.
-# Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase.
+# Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase. Los
+# rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -26,6 +27,8 @@ Document (dev.stxt.boxes):
 				Line height: 14
 				Weight: bold
 				Color: #1F7A7A
+				Transform: uppercase
+				Letter spacing: 0.8
 			Box:
 				Margin: 20 0 9 0
 				Padding: 0 0 4 0
@@ -50,6 +53,8 @@ Document (dev.stxt.boxes):
 				Size: 8
 				Weight: bold
 				Color: #8FD1CC
+				Transform: uppercase
+				Letter spacing: 0.8
 			Box:
 				Margin: 20 0 8 0
 		For class: track
@@ -99,7 +104,7 @@ Document (dev.stxt.boxes):
 					Box:
 						Width: 100%
 						Margin: 0 0 4 0
-				Text: CONTACTO
+				Text: Contacto
 					Class: side-title
 				Text: marta.ferrer@correo.example
 					Link: mailto:marta.ferrer@correo.example
@@ -107,7 +112,7 @@ Document (dev.stxt.boxes):
 				Text: Girona, España
 				Text: martaferrer.example
 					Link: https://martaferrer.example
-				Text: HERRAMIENTAS
+				Text: Herramientas
 					Class: side-title
 				Text: Figma
 				Block:
@@ -144,12 +149,12 @@ Document (dev.stxt.boxes):
 						Class: fill
 						Box:
 							Width: 72%
-				Text: IDIOMAS
+				Text: Idiomas
 					Class: side-title
 				Text: Catalán y castellano · nativo
 				Text: Inglés · C1
 				Text: Francés · B1
-				Text: INTERESES
+				Text: Intereses
 					Class: side-title
 				Paragraph: Cerámica, carreras de montaña, ilustración botánica y cocina de temporada.
 		Area:
@@ -205,7 +210,7 @@ Document (dev.stxt.boxes):
 							Text: diseñadoras mentoradas
 								Class: caption
 				Heading 2:
-					Text: EXPERIENCIA
+					Text: Experiencia
 				Grid:
 					Id: jobs
 					Columns: 70 1fr
@@ -262,7 +267,7 @@ Document (dev.stxt.boxes):
 								List item:
 									Text: Identidad, cartelería y web para pequeñas cooperativas.
 				Heading 2:
-					Text: FORMACIÓN
+					Text: Formación
 				Grid:
 					Id: education
 					Columns: 70 1fr
@@ -286,5 +291,5 @@ Document (dev.stxt.boxes):
 							Text: Escola Superior de Disseny d'Olot
 								Class: place
 				Heading 2:
-					Text: CHARLAS Y PUBLICACIONES
+					Text: Charlas y publicaciones
 				Paragraph: «*Diseñar para quien tiene prisa*», Barcelona UX Days (2024) · «*Accesibilidad sin florituras*», artículo en la revista *Interfaz* (2023) · Jurado de los Premios Sol Digital (2024).

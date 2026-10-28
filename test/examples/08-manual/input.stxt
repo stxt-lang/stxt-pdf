@@ -4,7 +4,8 @@
 # Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
 # bloques de terminal en monoespaciada y tablas de especificaciones y de averías. La estructura
 # de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
-# {page of: wiring}, la página donde está (también dentro de Markdown).
+# {page of: wiring}, la página donde está (también dentro de Markdown). Los rótulos se escriben en
+# minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -98,6 +99,8 @@ Document (dev.stxt.boxes):
 				Size: 7.5
 				Weight: bold
 				Color: #8A5A0B
+				Transform: uppercase
+				Letter spacing: 0.6
 			Box:
 				Margin: 0 0 2 0
 		For class: badge
@@ -161,11 +164,13 @@ Document (dev.stxt.boxes):
 		Class: banner
 		Box:
 			Margin: 0 0 18 0
-		Text: GUÍA RÁPIDA
+		Text: Guía rápida
 			Typography:
 				Size: 8
 				Weight: bold
 				Color: #8FD1CC
+				Transform: uppercase
+				Letter spacing: 1.2
 		Heading 1:
 			Text: Termostato Aire+ T2
 			Box:
@@ -266,7 +271,7 @@ Document (dev.stxt.boxes):
 	Block:
 		Id: warning-power
 		Class: notice
-		Text: ATENCIÓN
+		Text: Atención
 			Class: label
 		Text: La instalación debe hacerla una persona cualificada. Antes de tocar ningún cable, corta la corriente desde el cuadro eléctrico y comprueba con un buscapolos que no hay tensión.
 	Block:
@@ -337,7 +342,7 @@ Document (dev.stxt.boxes):
 					Text: [ OK ]
 		Block:
 			Class: tip
-			Text: CONSEJO
+			Text: Consejo
 				Class: label
 				Typography:
 					Color: #134E4A
@@ -499,7 +504,7 @@ Document (dev.stxt.boxes):
 					Class: tip
 					Box:
 						Margin: 0
-					Text: TELÉFONO
+					Text: Teléfono
 						Class: label
 						Typography:
 							Color: #134E4A
@@ -515,7 +520,7 @@ Document (dev.stxt.boxes):
 					Class: tip
 					Box:
 						Margin: 0
-					Text: CORREO
+					Text: Correo
 						Class: label
 						Typography:
 							Color: #134E4A
@@ -532,7 +537,7 @@ Document (dev.stxt.boxes):
 					Class: tip
 					Box:
 						Margin: 0
-					Text: WEB
+					Text: Web
 						Class: label
 						Typography:
 							Color: #134E4A

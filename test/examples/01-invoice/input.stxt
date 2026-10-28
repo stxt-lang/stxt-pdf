@@ -1,7 +1,8 @@
 # Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
 # una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
 # fijo. El estilo está todo en Styles: los elementos solo llevan su contenido. Dos textos llevan
-# Inline: markdown para poner una negrita dentro de la frase.
+# Inline: markdown para poner una negrita dentro de la frase. Los rótulos se escriben como una frase
+# normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
 		Width: 595
@@ -20,6 +21,8 @@ Document (dev.stxt.boxes):
 				Size: 7
 				Weight: bold
 				Color: #B5651D
+				Transform: uppercase
+				Letter spacing: 0.6
 			Box:
 				Margin: 0 0 3 0
 		For class: party
@@ -45,6 +48,7 @@ Document (dev.stxt.boxes):
 				Weight: bold
 				Size: 11
 				Color: #3B2A1E
+				Transform: uppercase
 			Box:
 				Background: #EFE4D2
 				Border: 1.5 0 0 0
@@ -87,13 +91,15 @@ Document (dev.stxt.boxes):
 					Width: 172
 		Item:
 			Block:
-				Text: FACTURA
+				Text: Factura
 					Typography:
 						Size: 28
 						Weight: bold
 						Color: #3B2A1E
 						Align: right
 						Line height: 30
+						Transform: uppercase
+						Letter spacing: 2
 				Text: Nº 2025-0147
 					Typography:
 						Size: 12
@@ -108,7 +114,7 @@ Document (dev.stxt.boxes):
 		Area:
 			Block:
 				Class: party
-				Text: EMISOR
+				Text: Emisor
 					Class: label
 				Text: Taller Nogal S.L.
 					Class: strong
@@ -120,7 +126,7 @@ Document (dev.stxt.boxes):
 		Area:
 			Block:
 				Class: party
-				Text: CLIENTE
+				Text: Cliente
 					Class: label
 				Text: Hotel Mirador del Valle, S.A.
 					Class: strong
@@ -139,22 +145,22 @@ Document (dev.stxt.boxes):
 			Border color: #B5651D
 		Area:
 			Block:
-				Text: FECHA DE EMISIÓN
+				Text: Fecha de emisión
 					Class: label
 				Text: 14 de octubre de 2025
 		Area:
 			Block:
-				Text: VENCIMIENTO
+				Text: Vencimiento
 					Class: label
 				Text: 13 de noviembre de 2025
 		Area:
 			Block:
-				Text: FORMA DE PAGO
+				Text: Forma de pago
 					Class: label
 				Text: Transferencia a 30 días
 		Area:
 			Block:
-				Text: PEDIDO
+				Text: Pedido
 					Class: label
 				Text: PO-2025-311
 	Table:
@@ -223,7 +229,7 @@ Document (dev.stxt.boxes):
 					Span: 1 4
 				Cell: 2.318,82 €
 			Row:
-				Cell: TOTAL A PAGAR
+				Cell: Total a pagar
 					Span: 1 4
 					Class: total
 				Cell: 13.360,82 €
@@ -234,7 +240,7 @@ Document (dev.stxt.boxes):
 		Gap: 18
 		Area:
 			Block:
-				Text: DATOS PARA EL PAGO
+				Text: Datos para el pago
 					Class: label
 				Text: ES91 2100 0418 4502 0005 1332
 					Typography:
@@ -247,7 +253,7 @@ Document (dev.stxt.boxes):
 						Inline: markdown
 		Area:
 			Block:
-				Text: CONDICIONES
+				Text: Condiciones
 					Class: label
 				Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de **cinco años** sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
 					Typography:
