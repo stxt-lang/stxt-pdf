@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 31 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 32 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 31 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 32 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -90,7 +90,9 @@ actualízala.
 
 | 31 | ~~Imágenes vectoriales: `Image` admite SVG (subconjunto cerrado, texto con las fuentes de `fonts/`, sin referencias externas), vectorial en el PDF~~ (hecho; caso 24) | `resources/SvgInspector`, `resources/ImageFile`, `paint/PdfImages`, `paint/PdfCanvas`, `paint/SvgCanvas`, `tools/ExampleImages.java` |
 
-Los hitos 16 a 31 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
+| 32 | ~~Secciones: `Section` con su `Media` (heredado por grupos), sus `Fixed` y su numeración de páginas (`Page numbering`, `Inherit fixed`); todo el contenido va dentro de una sección~~ (hecho; caso 25) | schema, `tree/Section`, `tree/BoxTreeBuilder`, `tree/StyleRules.applySection`, `layout/Paginator`, `layout/Overflow`, `fragment/Page`, `paint/PdfCanvas`, `paint/PdfStructure`, `paint/PdfDestinations`, `output/StxtDump` |
+
+Los hitos 16 a 32 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
 registro. Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -102,8 +104,8 @@ pendiente describe el algoritmo a implementar (por ejemplo, el pseudocódigo de 
 Flujo de datos:
 
 ```
-texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media
-   ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ LaidOutDocument (Media, Metadata, List<Page>)
+texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBuilder──▶ Box (árbol) + Media + List<Section>
+   ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ LaidOutDocument (Media, Metadata, raíz, List<Page>)
    ──▶ StxtDump (tests) · StackingContext + Canvas (SvgCanvas / PdfCanvas)
 ```
 
@@ -212,6 +214,25 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   dentro del flujo; el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de
   `PERFECT_BREAK`, para que el `Multicol` deje de llenar columnas y lo pase al padre. Quien
   recorra los hijos de un `Multicol` (o sus fragmentos) encuentra el flujo, no el contenido.
+- **Secciones (§5.21):** un `Document` solo tiene `Media`, `Title`, `Language`, `Styles`, `Fixed` y una o más
+  `Section`; todo el contenido va dentro. `BoxTreeBuilder.Result` da la raíz del documento y la lista de
+  `Section` (`tree/Section`: caja, `Media`, `Page numbering` e `Inherit fixed`). La **caja de cada sección es la
+  raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**, como la raíz anónima de antes) y **cuelga de
+  `root.children` sin ser hija** (`root.children.add`, no `addChild`): los recorridos de todo el árbol (referencias,
+  enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
+  `parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con
+  `parent`) y no se maquetan en el flujo: los coloca el `Paginator`. `Media` de una sección sale de
+  `BoxTreeBuilder.media(n, base)`, que hereda por grupos (tamaño y `Margin`) y recuerda el `Paper` para
+  `Orientation` sola (`MediaSpec`). `Paginator` hace una pasada de flujo por sección (`flow`) con **una
+  sola convergencia** de las referencias, y calcula con `Numbering` el número impreso de cada página (el
+  contador, `restart` y `none`) y el último de su tanda (`{pages}`); `Page` lleva su `Media`, su sección y su
+  `printed` (0 = sin número). Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)` en cada página
+  de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance (documento o
+  sección). `{page of}` y los índices dan el número impreso; un texto con `{page}` en una página sin número es
+  `PAGE_NUMBER_UNAVAILABLE`. `StyleRules.applySection` solo deja pasar `Typography` a una sección.
+  `Overflow`, `StxtDump`, `PdfCanvas` y `PdfDestinations` usan el `Media` de cada página (`Page.media()`), y
+  `LaidOutDocument.root()` es la raíz para `PdfStructure` (`Sect` por sección, `PageLabels` del PDF).
+  Los tests escriben el contenido con `Docs.sectioned` (envuelve en una `Section` lo que no es cabecera).
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
@@ -501,7 +522,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`
   es un documento STXT de verdad, un fichero por caso, en la carpeta de su familia (`document`,
   `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`,
-  `images`, `references`, `links`, `contents`, `styles`, `combinations`, `overflow`, `fonts`; los códigos
+  `images`, `references`, `links`, `contents`, `sections`, `styles`, `combinations`, `overflow`, `fonts`; los códigos
   de `stxt-core` van en `schema`). Las tres primeras líneas son comentarios `# Case:`
   (descripción), `# Code:` y `# Line:`, y la línea esperada es la del propio fichero, cabecera incluida (la primera línea
   del documento es la 4). Se maqueta con las métricas reales. `everyCodeHasACase` exige un caso
@@ -531,7 +552,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   ficheros de terceros); si necesitas una, añádela al generador en vez de subir un binario.
 - Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área útil de
   515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture
-  declara en `Element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese); los demás
+  declara en `Element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese y envuelve el contenido en una `Section`); los demás
   documentos de test con texto deben declararlos ellos mismos. Los documentos se escriben como
   listas de líneas con tabuladores (`"\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A",
   "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10"`); el `Id` de un ítem va en su elemento, no en el

@@ -50,9 +50,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | hecho | 23 |
 | 31 | Imágenes vectoriales (SVG) | hecho | 24 |
-| 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | en curso | 25 |
+| 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | hecho | 25 |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 31, el 2026-10-28 (varios, en otras
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 32, el 2026-10-28 (varios, en otras
 sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -1332,30 +1332,34 @@ Document (dev.stxt.boxes):
 - [x] S10. **El documento sigue siendo uno** para la jerarquía de encabezados, los índices (`Contents`) y el
       `Styles`: se comprueban en el orden del documento, atravesando las secciones.
 
-**Diseño técnico** (propuesta):
+**Diseño técnico** (como quedó; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 275–279):
 
-- **Árbol.** Cada sección es la raíz de su propio layout: una `Box` (`Element.SECTION`, bloque) sin
-  `parent`, igual que la raíz anónima de hoy, que cuelga de la raíz del documento (que ya solo guarda las
-  secciones y los `Fixed` del documento). Los recorridos de todo el árbol (referencias, enlaces, índices, fuentes e
-  imágenes) siguen funcionando desde esa raíz. `BoxTreeBuilder.Result` da la lista de `Section` (caja,
-  `Media`, numeración y `Inherit fixed`).
+- **Árbol.** Cada sección es la raíz de su propio layout: una `Box` (`Element.SECTION`, bloque) sin `parent`,
+  igual que la raíz anónima de antes, que cuelga de `root.children` sin ser hija (la raíz del documento ya
+  solo guarda las secciones y los `Fixed` del documento, y no se maqueta). Los recorridos de todo el árbol
+  (referencias, enlaces, índices, fuentes e imágenes) siguen funcionando desde esa raíz.
+  `BoxTreeBuilder.Result` da la raíz y la lista de `Section` (caja, `Media`, numeración e `Inherit fixed`).
+- **`Media`.** `BoxTreeBuilder.media(n, base)` hereda por grupos y guarda el `Paper` para `Orientation` sola.
 - **Paginación.** `Paginator` recorre las secciones: una pasada de flujo por sección con su `Media`, con
-  una sola convergencia de las referencias para todo el documento. `Page` lleva su `Media`, su sección y su
-  número impreso; `Overflow`, el volcado y los lienzos usan el de cada página.
+  una sola convergencia de las referencias para todo el documento y el número impreso de cada página
+  (`Numbering`). `Page` lleva su `Media`, su sección y su número impreso; `Overflow`, el volcado y los
+  lienzos usan el de cada página; `LaidOutDocument` lleva la raíz.
 - **`Fixed`.** Los del documento los coloca el `Paginator` en cada página de cada sección que los hereda,
-  con el área útil de esa página.
+  con el área útil de esa página; los de la sección salen como siempre, de su flujo.
+- **PDF.** `Sect` por sección, páginas con el tamaño de su `Media` y `PageLabels` con los números impresos.
 
 **Tareas:**
 
 - [x] Resolver S1–S10 (2026-10-28).
-- [ ] Schema (`Section`, `Page numbering`, `Inherit fixed`) y especificación (§2, §4, §5, §6, §7, §8, §9).
-- [ ] `Section` en el builder; `Media` por sección; `Paginator`, `Page`, `Overflow`, volcado y lienzos por sección.
-- [ ] Migrar todos los documentos (tests, golden, catálogo, ejemplos, especificación y README) a `Section`.
-- [ ] `Fixed` del documento y de la sección; `Inherit fixed`.
-- [ ] Numeración (`Page numbering`, `{page}`, `{pages}`, `{page of}`) y `PageLabels` en el PDF.
-- [ ] Errores nuevos con su fila en el §6 y sus casos en `test/errors/`.
-- [ ] Caso golden `25-sections`, calculado a mano; ejemplos 04, 07 y 09 con la portada como sección.
-- [ ] README, `CLAUDE.md`, `DECISIONES.md`, `TODO.md` y este documento.
+- [x] Schema (`Section`, `Page numbering`, `Inherit fixed`) y especificación (§2, §4, §5.21, §6, §7, §8, §9 y glosario).
+- [x] `Section` en el builder; `Media` por sección; `Paginator`, `Page`, `Overflow`, volcado y lienzos por sección.
+- [x] Migrar todos los documentos (tests, golden, catálogo, ejemplos, especificación y README) a `Section`.
+- [x] `Fixed` del documento y de la sección; `Inherit fixed`.
+- [x] Numeración (`Page numbering`, `{page}`, `{pages}`, `{page of}`) y `PageLabels` en el PDF.
+- [x] Errores nuevos (`SECTION_EMPTY`, `PAGE_NUMBER_UNAVAILABLE`) con su fila en el §6 y sus casos en `test/errors/sections/`
+      (también `MEDIA_SIZE`, `REFERENCE_NOT_PLACEABLE` y `STYLE_NOT_ALLOWED` con una sección, y dos de schema).
+- [x] Caso golden `25-sections`, calculado a mano; ejemplos 04 y 09 con la portada como sección (el 07 no tiene portada y no cambia).
+- [x] README, `CLAUDE.md`, `DECISIONES.md`, `TODO.md` y este documento.
 
 ---
 
@@ -1364,6 +1368,23 @@ Document (dev.stxt.boxes):
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (21).** Hito 32 terminado, en cuatro commits (decisiones; `Section`, `Media` por página y migración de
+  los documentos; tests, PDF y caso golden; ejemplos y documentación). Resueltas S1–S10 con una discusión previa y
+  «todas con la propuesta»: `Section` obligatoria (nada de contenido suelto en `Document`), `Id` como hijo, `Media`
+  heredado por grupos, `Fixed` del documento y de la sección con `Pages` en su alcance e `Inherit fixed`,
+  numeración por contador (`Page numbering`: `continue`, `restart`, `none`) con `{page of}` y los índices en el
+  número impreso, `Class` solo con `Typography`, sección vacía como error y volcado sin la sección. Cada sección es
+  una `Box` sin padre que cuelga de la raíz sin ser hija, así que no se tocó ningún algoritmo de layout y los
+  recorridos del árbol siguen igual. Se migraron los 306 `.stxt` (script que envuelve y recalcula las líneas
+  esperadas), los ejemplos de la especificación y los tests Java (`Docs.sectioned`), sin que cambie ningún PNG ni
+  volcado. Al corregir la regla de la sección vacía salió que una portada solo de `Absolute` es legítima (cuenta).
+  Tests nuevos: `SectionsTest`, dos de PDF (`PageLabels`, `Sect` y tamaño por página), nueve casos del catálogo y
+  el caso golden `25-sections` (calculado a mano; dos bloques se partían porque un `Height` es el total de todos los
+  fragmentos, y se arregló con `Inside: avoid`). Ejemplos 04 y 09 con la portada como sección (`Relative` a sangre,
+  sin el bloque de 1 pt; «Página 1 de 6» y el índice con los números impresos); el 07 no cambia. Decisiones
+  275–279 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* los hitos 16 a 32 están terminados. Pendiente de la sección en `TODO.md`: `Start: odd` con página en
+  blanco para la doble cara, un número inicial, otros formatos de número y un `Background` de página.
 - **2026-10-28 (20).** Continúa el repaso de accesibilidad con los dos huecos de contenido que quedaron, y `Title`
   obligatorio (pedido por el usuario: `Min: 1`, `Max: 1`; con la declaración de PDF/UA-1 en todo PDF, un
   documento sin título no podría afirmarla). Todos los documentos de tests, golden, catálogo de errores y ejemplos

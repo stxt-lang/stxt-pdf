@@ -63,11 +63,14 @@ en el editor.
 El nodo raíz es `Document`, con exactamente un `Media`, un `Title` (el título) y un `Language` (el idioma
 del documento, [§4.1](#41-media)), un `Styles` opcional con las reglas reutilizables
 ([§4.10](#410-reglas-reutilizables-styles); también la tipografía base que heredan todas las cajas,
-con `Element: Document`) y los elementos de primer nivel. Las reglas pueden estar además en un
-documento de estilos aparte, que se pasa junto al documento al maquetar (§4.10).
+con `Element: Document`), los `Fixed` de todo el documento y una o más `Section`, que contienen el
+contenido ([§5.21](#521-secciones)). Un documento no tiene contenido suelto: todo lo que se maqueta
+va dentro de una sección. Las reglas pueden estar además en un documento de estilos aparte, que se
+pasa junto al documento al maquetar (§4.10).
 
 | Elemento | Qué es | Contiene |
 |---|---|---|
+| `Section` | Parte independiente del documento, con su `Media`, sus `Fixed` y su numeración ([§5.21](#521-secciones)). Hija de `Document` | Elementos, y su `Media` |
 | `Block` | Caja que apila sus hijos en vertical ([§5.3](#53-flujo-de-bloque)) | Elementos |
 | `Flex` | Contenedor flex ([§5.7](#57-flex)) | `Item`, `Absolute` y `Fixed` |
 | `Grid` | Contenedor grid ([§5.8](#58-grid)) | `Area`, `Absolute` y `Fixed` |
@@ -86,11 +89,11 @@ documento de estilos aparte, que se pasa junto al documento al maquetar (§4.10)
 | `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
-| `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en las páginas que dice `Pages` (todas por defecto) | Elementos |
+| `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en las páginas que dice `Pages` (todas por defecto), de todo el documento o de una sección | Elementos |
 | `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Area` | Ítem de un `Grid`: el área que ocupa y cómo se alinea en ella | Exactamente un elemento en flujo |
 
-**Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
+**Elementos** son todos menos `Section`, `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
 flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
 encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
 ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
@@ -281,7 +284,8 @@ Text: Resultados del trimestre
 
 ### 4.1 `Media`
 
-Obligatorio, exactamente uno, hijo de `Document`.
+Obligatorio, exactamente uno, hijo de `Document`: es el medio de las secciones que no declaran el suyo. Una
+`Section` puede declarar el suyo, que hereda del del documento por grupos ([§5.21](#521-secciones)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -313,7 +317,7 @@ Media:
 es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el containing block de los
-elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
+elementos de primer nivel de cada sección y de los `Fixed`, y su alto es siempre definido.
 
 **Título e idioma.** `Document` exige exactamente un `Title` (un texto no vacío; si no,
 `VALUE_NOT_ALLOWED`) y exactamente un `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no,
@@ -474,7 +478,7 @@ dentro.
 |---|---|---|---|
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Arriba, derecha, abajo, izquierda. Ver [§5.5](#55-posicionamiento). |
 | `Layer` | entero | `auto` | Orden de apilamiento. También en `Item` y `Area`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
-| `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | Solo en `Fixed`: las páginas en que sale. Ver [§5.5](#55-posicionamiento). |
+| `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | Solo en `Fixed`: las páginas en que sale, contadas en el documento o en la sección donde se declara. Ver [§5.5](#55-posicionamiento). |
 | `Rotate` | número de −360 a 360, sin `0` | — | Gira la caja al pintarla, en grados en el sentido de las agujas del reloj; no cambia el layout. También en `Image`. Ver [§5.6](#56-apilamiento-y-orden-de-pintado). |
 | `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center` | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`…). Solo con `Rotate`. |
 
@@ -692,6 +696,20 @@ de encabezado ([§4.10](#410-reglas-reutilizables-styles)).
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
+### 4.17 `Section`
+
+Propiedades del elemento `Section`, hijas directas suyas ([§5.21](#521-secciones)). Admite además su
+`Media` (ver [§4.1](#41-media)) y su contenido: elementos en flujo, `Relative`, `Absolute` y `Fixed`.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Id` | texto | — | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). No se vuelca como caja. |
+| `Class` | nombres separados por espacios | — | Le aplican las reglas `For class` con esos nombres, y `For id` y `Element: Section`; solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
+| `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas con `{page}` y `{pages}`: sigue el contador del documento, vuelve a 1 o no las numera. |
+| `Inherit fixed` | booleano | `true` | Si lleva los `Fixed` del documento. Con `false`, solo salen los suyos. |
+
+No van en las reglas de `Styles`, que solo admiten los grupos.
+
 ---
 
 ## 5. Semántica del layout
@@ -793,7 +811,8 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
 - **Tamaños intrínsecos.** min-content = la palabra más ancha; max-content = el párrafo más
   largo en una sola línea.
 - **Numeración de páginas.** `{page}` y `{pages}` en el texto se sustituyen por el número de
-  página y el total de páginas. Ver [§5.10](#510-fragmentación). `{page of: id}` da la página de
+  página y el total de páginas, según `Page numbering` de la sección ([§5.21](#521-secciones)).
+  Ver [§5.10](#510-fragmentación). `{page of: id}` da la página de
   otra caja ([§5.19](#519-referencias-a-otras-cajas)).
 - **Tramos.** El texto puede tener partes con formato dentro de una misma línea: **negrita**,
   *cursiva*, subrayado y tachado, combinables. Cada tramo mide y se pinta con su variante de la
@@ -945,16 +964,20 @@ el ajuste al contenido (`fit-content`) en horizontal y la altura del contenido e
   sin colapsar con el margen superior de la propia caja, que se suma después según la ecuación;
 - dentro de un contenedor flex o grid, la esquina superior izquierda de su caja de contenido.
 
-**`Fixed`.** Como `Absolute`, pero su containing block es el área útil, y **se pinta en
-las páginas que dice `Pages`**, todas por defecto (cabeceras, pies, marcas de agua). Los `Fixed` no
+**`Fixed`.** Como `Absolute`, pero su containing block es el área útil de la página, y **se pinta en
+las páginas que dice `Pages`**, todas por defecto (cabeceras, pies, marcas de agua). Un `Fixed` hijo de
+`Document` sale en todas las secciones que lo heredan, y uno hijo de una `Section`, solo en las suyas
+([§5.21](#521-secciones)). Los `Fixed` no
 reservan espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de
 la página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de
 su posición estática (desplazamientos `auto`), se toma la de la primera página en la que
 aparece el flujo que lo contiene y se repite igual en todas en las que sale.
 
 **`Pages`.** Propiedad solo del `Fixed` (en otro elemento es un error del schema, y un valor que no
-está en la lista, también). Cuenta las páginas desde la 1 en el **orden físico** del documento, con
-el mismo número que `{page}` ([§5.4](#54-texto)):
+está en la lista, también). Cuenta las páginas desde la 1 **dentro de su alcance**: las del
+documento entero, en orden físico, si el `Fixed` es hijo de `Document`, y las de su sección, si es hijo
+de una `Section` (`first` es la primera página de la sección). No es el número impreso de
+`{page}`, que puede reiniciarse o no existir ([§5.21](#521-secciones)):
 
 | Valor | Páginas |
 |---|---|
@@ -965,9 +988,8 @@ el mismo número que `{page}` ([§5.4](#54-texto)):
 | `last` | solo la última |
 
 Es una condición de pintado, no de espacio: un `Fixed` no reserva sitio ni donde sale ni donde no,
-así que el flujo es el mismo con él o sin él. La primera página con otro margen, o una numeración
-que no cuente la portada, no existen: una portada a sangre sigue siendo un `Absolute` y la
-numeración, la física. Un `Fixed` que no sale en ninguna página (`not-first` en un documento de una
+así que el flujo es el mismo con él o sin él. Una portada a sangre, con otro margen y sin numeración, es una
+sección ([§5.21](#521-secciones)). Un `Fixed` que no sale en ninguna página (`not-first` en un documento de una
 sola) es válido y no se comprueba (`BOX_OVERFLOW` solo mira los que salen). Si un `Fixed` contiene
 otro, el de dentro sale solo donde salen los dos, cada uno con su `Pages`.
 
@@ -2001,7 +2023,9 @@ List:
 ```
 
 - **Qué página es.** La de la **primera** caja que sale de la caja referida: si está partida entre
-  varias páginas, la página donde empieza. Si la caja es una fila repetida de una tabla (cabecera
+  varias páginas, la página donde empieza. Es el **número impreso** de esa página ([§5.21](#521-secciones)),
+  no el físico: el mismo que dice `{page}` en su pie. Si la página no tiene número
+  (`Page numbering: none`), es `REFERENCE_NOT_PLACEABLE`. Una `Section` con `Id` se puede referir: es su primera página. Si la caja es una fila repetida de una tabla (cabecera
   o pie), la primera de sus páginas.
 - **Dónde se puede referir.** Cualquier caja con `Id` que no sea un `Fixed` ni esté dentro de uno,
   que se repiten en todas las páginas (`REFERENCE_NOT_PLACEABLE`). La referencia puede ir antes o
@@ -2140,6 +2164,80 @@ Markdown:
     estructura.
 - **Volcado ([§7](#7-formato-de-resultados)).** Los enlaces no se vuelcan.
 
+### 5.21 Secciones
+
+Un documento se compone de **secciones**: partes independientes entre sí que se maquetan una detrás de
+otra. Todo el contenido está en alguna.
+
+```stxt
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Informe
+	Media:
+		Paper: A4
+		Margin: 56
+	Fixed:                         # en todas las secciones que lo heredan
+		Id: footer
+		Offset: auto 0 0 0
+		Text: Página {page} de {pages}
+	Section:
+		Id: front-cover
+		Page numbering: none       # la portada no cuenta
+		Inherit fixed: false       # ni lleva el pie
+		Media:
+			Margin: 0
+		Image: cover.jpg
+	Section:
+		Id: body
+		Block: …
+	Section:
+		Id: annex
+		Page numbering: restart    # el anexo vuelve a la 1
+		Media:
+			Orientation: landscape
+		Block: …
+```
+
+- **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página; y la siguiente
+  empieza otra. El contenido de una sección no se mezcla con el de otra.
+- **Cada sección es la raíz de su layout.** Su caja es el área útil de cada una de sus páginas (el containing
+  block de sus elementos de primer nivel, como la raíz de un documento de una sola página): sus márgenes y su
+  alto salen de su `Media`, y cada página lleva el suyo. Una `Section` no es una caja con `Box` propio: no tiene
+  `Margin`, `Padding` ni fondo, y es un contexto de formato de bloque que no colapsa con nada.
+- **`Media`.** El de una sección hereda del `Media` del documento **por grupos**: el tamaño (`Paper` con su
+  `Orientation`, o `Width` y `Height`) se hereda entero o se declara entero, y `Margin` se hereda o se declara.
+  Una sección que solo declara `Orientation` gira el `Paper` del documento (`Orientation: landscape` sobre
+  un documento A4 es un A4 apaisado); si el documento declara `Width` y `Height` no hay papel que girar y es
+  `MEDIA_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `MEDIA_SIZE`.
+- **`Fixed` por alcance.** Un `Fixed` de `Document` sale en las páginas de todas las secciones salvo las que
+  declaran `Inherit fixed: false`; uno de una `Section`, solo en las suyas. `Pages` cuenta dentro del alcance
+  donde se declara (arriba). Se colocan en el área útil de cada página, que es la de su sección. Los del
+  documento se pintan antes que los de la sección. `Inherit fixed: false` en un documento sin `Fixed`, que no
+  tiene efecto, no es un error: una plantilla puede ponerlos después.
+- **Numeración.** Hay un contador de páginas por documento. Cada sección dice qué hace con él:
+  `continue` (por defecto), sus páginas siguen numerándose; `restart`, su primera página vuelve a ser la 1;
+  `none`, sus páginas no tienen número y no avanzan el contador. `{page}` es el valor del contador, y `{pages}`,
+  el último valor de su **tanda**, la que empieza en cada `restart`: con una portada `none` y 6 páginas de
+  cuerpo, la primera página interior es «1 de 6» aunque sea la segunda del documento.
+- **Lo que se imprime manda.** `{page of: id}`, las entradas de un índice y el pie dicen el mismo número: el
+  del contador. Una referencia a algo que está en una página sin número es `REFERENCE_NOT_PLACEABLE`, y un
+  texto con `{page}` o `{pages}` que cae en una página sin número (el `Fixed` del documento en una portada que
+  lo hereda) es `PAGE_NUMBER_UNAVAILABLE`: nunca se deja en blanco. Los marcadores, los enlaces y
+  `Pages` siguen la página física. Un encabezado de una sección `none` no puede estar en un índice
+  (`In contents: false`).
+- **Tipografía por sección.** Las reglas `For class`, `For id` y `Element: Section` que llegan a una sección
+  solo pueden dar `Typography` (`Language` incluido: un anexo en inglés), que hereda todo su contenido.
+- **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Fixed`, que no ocupan sitio, no
+  tendría ninguna página. Un `Absolute` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
+- **Un solo documento.** La jerarquía de encabezados, los índices (`Contents`, que listan los encabezados de
+  todas las secciones, en orden), `Styles`, los `Id` (únicos en todo el documento) y la convergencia de las
+  referencias son del documento, no de la sección.
+- **PDF.** Cada página tiene el tamaño del `Media` de su sección. El PDF etiquetado agrupa cada sección en un
+  `Sect` (con `Lang`, si cambia su idioma), y las etiquetas de página (`PageLabels`) llevan el número impreso, o
+  ninguno en las páginas sin número; solo se escriben si alguna página no es su número físico.
+- **Volcado ([§7](#7-formato-de-resultados)).** Una sección no se vuelca como caja, aunque tenga `Id`; sus cajas
+  con `Id` sí, con las coordenadas de la página de su sección.
+
 ---
 
 ## 6. Validación
@@ -2175,7 +2273,9 @@ La validación se hace en cuatro niveles:
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
-| `MEDIA_SIZE` | El tamaño del medio, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
+| `MEDIA_SIZE` | El tamaño del medio, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil; una `Section` que solo gira (`Orientation`) un documento con papel | `Los márgenes del medio no dejan área útil` |
+| `SECTION_EMPTY` | Una `Section` tiene contenido: algún elemento que no sea un `Fixed` (línea de la sección) | `La sección no tiene contenido: sin elementos (los Fixed no cuentan…) no tiene ninguna página` |
+| `PAGE_NUMBER_UNAVAILABLE` | Un texto con `{page}` o `{pages}` no sale en una página sin número (`Page numbering: none`); línea del texto | `El texto de la caja pie tiene {page} o {pages} y sale en una página sin número…` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
 | `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` de −360 a 360 y distinto de 0; `Rotate origin` con una o dos palabras clave, como mucho una por eje | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
@@ -2186,7 +2286,7 @@ La validación se hace en cuatro niveles:
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado (también de `Document`) | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja ([§4.10](#410-reglas-reutilizables-styles)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen (el documento o el documento de estilos aparte) no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición o de columna) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([§5.13](#513-encabezados-y-párrafos)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -2215,7 +2315,7 @@ La validación se hace en cuatro niveles:
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns`; con código, `Code font` (línea de la lista, la tabla o el código) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
 | `REFERENCE_UNKNOWN` | Una referencia (`{page of: id}`, [§5.19](#519-referencias-a-otras-cajas)) tiene `Id`, y es el de una caja del documento (línea de la referencia) | `{page of: nada}: ninguna caja tiene el Id nada` |
-| `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
+| `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno ni en una página sin número (`Page numbering: none`) | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
 | `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada (línea de la referencia) | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada)` |
 | `REFERENCE_UNSTABLE` | La página de las cajas referidas se estabiliza en 10 pasadas de paginación (línea de la referencia) | `La página de x no se estabiliza: tras 10 pasadas sigue cambiando…` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
@@ -2269,6 +2369,8 @@ Un `Absolute` se anida dentro de su containing block, detrás de sus hijos en fl
 de su padre. Las columnas de un `Multicol` no tienen fragmento: sus hijos se anidan dentro del
 `Multicol`, y una caja partida entre dos columnas sale dos veces en la misma página
 ([§5.16](#516-bloques-en-columnas)).
+Las coordenadas son las del área útil del `Media` de la página, que es el de su sección; una `Section` no se
+vuelca como caja, y los `Fixed` del documento salen antes que los de la sección ([§5.21](#521-secciones)).
 Las cajas sin `Id` pueden incluirse para depurar. Las líneas de texto y sus tramos no se
 vuelcan, ni los enlaces ([§5.20](#520-enlaces)) ni el giro de `Rotate`
 ([§5.6](#56-apilamiento-y-orden-de-pintado)): no cambian el layout, y el `Rect` de una caja girada es
@@ -2313,7 +2415,8 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `transform: rotate()` | Cualquier caja, con `transform-origin` en cualquier unidad; puede salirse de la página sin aviso; una caja girada se parte entre páginas | `Rotate` solo en `Relative`, `Absolute`, `Fixed` e `Image`, alrededor de una o dos palabras clave de `Rotate origin`; lo girado que se sale de la página es un error, y un `Relative` girado no se parte ([§5.6](#56-apilamiento-y-orden-de-pintado)) |
 | `@page { size }` | `size: A4 landscape`, o dos longitudes | `Paper` y `Orientation` en `Media`, o `Width` y `Height` ([§4.1](#41-media)) |
 | Medio continuo (pantalla) | Sí | No: siempre páginas |
-| `position: fixed` en impresión | Repetido en cada página | Repetido, relativo al área útil, en las páginas que dice `Pages` (todas por defecto); no hay `@page :first` ni márgenes distintos por página |
+| `position: fixed` en impresión | Repetido en cada página | Repetido, relativo al área útil, en las páginas que dice `Pages` (todas por defecto), de todo el documento o de una `Section` |
+| `@page`, `@page :first` y páginas con nombre | Reglas de página, con márgenes y tamaño por página | `Section`, con su `Media` (tamaño, orientación y márgenes) y su numeración; sin pseudoclases de página |
 | `justify-content` | `space-between`, `space-around`, `space-evenly` | `Main axis: between`, `around`, `evenly` |
 | `z-index` | Propiedad `z-index` | `Layer` |
 | `box-decoration-break` | `slice`, `clone` | `Decoration: slice`, `clone` |
@@ -2379,7 +2482,8 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 
 | Nodo | Tipo | Hijos |
 |---|---|---|
-| `Document` | `GROUP` | `Media` (exactamente uno), `Title` (exactamente uno), `Language` (exactamente uno), `Styles`; elementos |
+| `Document` | `GROUP` | `Media` (exactamente uno), `Title` (exactamente uno), `Language` (exactamente uno), `Styles`; `Fixed`, `Section` (al menos una, varias) |
+| `Section` | `GROUP` | `Id`, `Class`, `Media`, `Page numbering`, `Inherit fixed`; elementos |
 | `Media` | `GROUP` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` (el tamaño, con `Paper` o con `Width` y `Height`: lo comprueba el motor) |
 | `Styles` | `GROUP` | `Element`, `For class`, `For id`, `For column` (varios de cada). Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `INLINE` | `Box`, `Typography`, `Break` |
@@ -2407,7 +2511,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `White space`, `Tab size`, `Widows`, `Orphans`, `Language` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
-*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
+*Elementos* (los de dentro de una `Section`) son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
 `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
@@ -2562,7 +2666,7 @@ Document (dev.stxt.boxes):
 
 | Término | Definición |
 |---|---|
-| **Área útil** | Rectángulo del medio menos sus márgenes; containing block inicial. |
+| **Área útil** | Rectángulo del medio menos sus márgenes; containing block inicial. Cada sección tiene la suya. |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([§5.11](#511-recursos-y-fuentes)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([§5.2](#52-modelo-de-caja-y-containing-block)). |
 | **Columna** | Cada fragmentainer en que un `Multicol` reparte su contenido en una página ([§5.16](#516-bloques-en-columnas)). |
@@ -2588,6 +2692,8 @@ Document (dev.stxt.boxes):
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([§5.19](#519-referencias-a-otras-cajas)). |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
+| **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Media`, sus `Fixed` y su numeración ([§5.21](#521-secciones)). |
+| **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya ([§5.21](#521-secciones)). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([§5.4](#54-texto)). |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([§5.4](#54-texto)). |
 | **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`, [§5.4](#54-texto)). |

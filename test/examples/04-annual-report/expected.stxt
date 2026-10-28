@@ -1,7 +1,5 @@
 Result:
 	Page: 1
-		Fragment: cover-spacer
-			Rect: 56 56 483 1
 		Fragment: cover
 			Rect: 0 0 595 842
 			Fragment: cover-photo

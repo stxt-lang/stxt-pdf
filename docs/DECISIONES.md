@@ -1652,3 +1652,36 @@ interpretaciones que salieron al implementarlas.
      el orden del documento, atravesando las secciones (un `Heading 1` en cada sección es correcto). Cada
      sección es la raíz de su layout (una `Box` sin padre, como la raíz anónima de antes) y cuelga de la raíz del
      documento, que ya no se maqueta. *Dónde:* `tree/BoxTreeBuilder`, `layout/Paginator`.
+
+275. **Una sección es la raíz de su layout, sin padre, y cuelga de la raíz del documento sin ser hija.** Es una `Box`
+     (`Element.SECTION`) como la raíz anónima de un documento de una sola sección, así que el layout, la caché,
+     `establishesBlockFormattingContext`, subir por `parent` hasta el containing block de un `Fixed` y todo lo que
+     ya miraba `parent == null` siguen igual. Se añade a `root.children` (no con `addChild`) para que los recorridos
+     del árbol entero (referencias, enlaces, índices, fuentes, imágenes, `Id`, el `PdfStructure`) la vean sin
+     tocarlos. Lo que se rompe es la invariante «el padre de mi hijo soy yo»: solo vale para las secciones y
+     para nadie más. *Dónde:* `tree/BoxTreeBuilder.build`, `layout/Paginator`. *Alternativa:* pasar a los
+     recorridos la lista de secciones.
+
+276. **Un `Fixed` del documento se coloca en `(0, 0)` del área útil de cada página** (su posición estática, ya que no
+     está en ningún flujo) y se pinta antes que los de la sección: el orden de apilamiento entre un `Fixed` del
+     documento y uno de una sección se decide sin árbol común (los del documento, primero). Los dos escriben en la
+     misma lista de `Page.fixed`. *Dónde:* `layout/Paginator`, `paint/StackingContext.compareTreeOrder`.
+
+277. **`{page of}` y los pies usan el contador; los marcadores, enlaces y `Pages` del documento, la página física.**
+     Se calcula una vez por pasada de paginación (`Numbering`), con la tanda de cada página para `{pages}`; el
+     contador no avanza en una sección `none`, así que una sección `continue` detrás de una portada empieza en 1.
+     Un `Fixed` de una sección cuenta sus `Pages` con las páginas de la sección, aunque esas páginas sean las
+     4 a 6 del documento. *Dónde:* `layout/Paginator.Numbering`.
+
+278. **El PDF escribe un `Sect` por sección y las `PageLabels` solo si alguna página no es su número físico.** Un `Sect`
+     lleva `Lang` si su idioma cambia respecto al del documento (el de la raíz). Las etiquetas: `decimal` desde el
+     número impreso donde el contador salta, y sin estilo (etiqueta vacía) en las páginas sin número; un documento
+     de una sola sección que numera como siempre no cambia ni un byte de estructura. Las páginas del PDF tienen el
+     tamaño del `Media` de su sección. *Dónde:* `paint/PdfCanvas.write` y `labels`, `paint/PdfStructure`.
+
+279. **La portada de los ejemplos 04 y 09 es una `Section` con `Relative`.** Era un `Absolute` que salía al margen y un
+     bloque de 1 pt con `Break: After: page`; ahora es una sección con `Margin: 0`, `Page numbering: none` e
+     `Inherit fixed: false`, y un `Relative` del tamaño de la página que hace de containing block de sus
+     `Absolute` (lo que era el propio `Absolute`). Los volcados solo pierden el `cover-spacer`; los PNG de la
+     portada no cambian y los de las páginas interiores dicen «Página 1 de 6» y el índice, los números impresos. El
+     ejemplo 07 (contrato) no cambia: no tiene portada y su `Pages: not-first` sigue valiendo.

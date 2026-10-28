@@ -56,12 +56,13 @@
   los ejemplos 04 y 09 son ya `Heading 1`).
 - **Numerar los encabezados** (`1`, `1.1`…): hoy `{number of: id}` solo da el número de un ítem de
   una lista numerada, así que «la sección 4.2» no se puede escribir de un encabezado.
-- ~~**Primera página distinta / páginas con nombre**~~ (hito 24: `Pages` en `Fixed`). Queda: un
-  margen distinto en la primera página (`First margin`: la portada a sangre sigue siendo un
-  `Absolute` con `Offset` negativo y la primera hoja del contrato deja el mismo hueco de la
-  cabecera), una numeración que no cuente la portada (`{page}` es la página física), páginas con
-  nombre al estilo de `@page`, y forzar que una sección empiece en página impar con una página en
-  blanco para imprimir a doble cara (`Break: Before: odd-page`).
+- ~~**Primera página distinta / páginas con nombre**~~ (hito 24: `Pages` en `Fixed`; hito 32: `Section`, que
+  da la portada con otro margen, la numeración que no la cuenta y el tamaño o la orientación por sección).
+  Queda: empezar un `Section` en página impar con una página en blanco para imprimir a doble cara
+  (`Start: odd`; la página en blanco tendría que numerarse o no), un número inicial de la numeración
+  (`Start: 5`, con `Page numbering: restart`), otros formatos de número (romanos en el prefacio), un
+  `Background` de página en la sección (hoy la portada a sangre pinta un bloque del tamaño de la página),
+  y una página apaisada que no sea una sección entera.
 - ~~**Enlaces** (a una URL o a un `Id` del documento) y anotaciones del PDF.~~ (hito 23: `Link` y
   `[texto](destino)` en Markdown). Queda: el `Link` del PDF etiquetado no envuelve el contenido
   marcado del tramo (decisión 171), y un encabezado de un `Markdown` no se puede enlazar a mano

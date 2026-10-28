@@ -1,34 +1,39 @@
-# Informe anual de una cooperativa de energía renovable, de siete páginas. Muestra una portada a
-# sangre (un Absolute que sale al margen, con el pie fijo solo desde la segunda página), contenido, cifras clave en un
-# grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
-# cabecera y pie, y secciones que empiezan siempre en página nueva. El contenido es un Contents:
-# lista las secciones con su página, que el motor calcula. El título de la portada y el de la página
-# de contenido son un Text, no un encabezado, para que no salgan en el índice. Los rótulos se escriben
-# en minúscula y las reglas los ponen en mayúsculas, con un poco de interletraje (Transform).
+# Informe anual de una cooperativa de energía renovable, de siete páginas. Son dos secciones: la
+# portada, a sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit fixed: false),
+# y el cuerpo, que numera desde 1 («Página 1 de 6» en la primera interior). Muestra además cifras clave
+# en un grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
+# cabecera y pie, y capítulos que empiezan siempre en página nueva. El contenido es un Contents:
+# lista los capítulos con su página impresa, que el motor calcula. El título de la portada y el de la
+# página de contenido son un Heading 1 con In contents: false, para que no salgan en el índice. Los
+# rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de interletraje
+# (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
 		Margin: 56 56 70 56
 	Title: Informe anual 2025 · Cooperativa Solvent
 	Language: es
+	Fixed:
+		Id: footer
+		Offset: auto 0 -42 0
+		Box:
+			Padding: 6 0 0 0
+			Border: 0.5 0 0 0
+			Border color: #C9D5E3
+		Flex:
+			Main axis: between
+			Item:
+				Text: Cooperativa Solvent · Informe anual 2025
+			Item:
+				Text: Página {page} de {pages}
 	Section:
-		Fixed:
-			Id: footer
-			Pages: not-first
-			Offset: auto 0 -42 0
-			Box:
-				Padding: 6 0 0 0
-				Border: 0.5 0 0 0
-				Border color: #C9D5E3
-			Flex:
-				Main axis: between
-				Item:
-					Text: Cooperativa Solvent · Informe anual 2025
-				Item:
-					Text: Página {page} de {pages}
-		Absolute:
+		Id: front-cover
+		Page numbering: none
+		Inherit fixed: false
+		Media:
+			Margin: 0
+		Relative:
 			Id: cover
-			Offset: -56 auto auto -56
 			Box:
 				Width: 595
 				Height: 842
@@ -130,12 +135,8 @@ Document (dev.stxt.boxes):
 					Color: #8FA4BF
 				Box:
 					Margin: 120 56 0 56
-		Block:
-			Id: cover-spacer
-			Box:
-				Height: 1
-			Break:
-				After: page
+	Section:
+		Id: body
 		Block:
 			Id: contents
 			Heading 1:

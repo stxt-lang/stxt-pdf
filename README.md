@@ -95,7 +95,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 31 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 32 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -194,8 +194,9 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 29. ~~**Texto preformateado y código.** `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography`, y `Code font` en `Markdown` para el código en línea y los bloques de código (caso 22).~~ Hecho.
 30. ~~**Rotación y orientación de la página.** `Rotate` y `Rotate origin` en `Relative`, `Absolute`, `Fixed` e `Image`; `Paper` y `Orientation` en `Media` (caso 23).~~ Hecho.
 31. ~~**Imágenes vectoriales (SVG).** `Image` admite SVG (formas, rutas, grupos, degradados, recortes, trazos y texto con las fuentes de `fonts/`), dibujado con JSVG y `pdfbox-graphics2d` como vectores del PDF; ninguna referencia externa (caso 24).~~ Hecho.
+32. ~~**Secciones.** `Section`: partes independientes del documento, cada una con su `Media` (heredado por grupos del del documento), sus `Fixed` y su numeración de páginas (`Page numbering`: `continue`, `restart`, `none`); los `Fixed` del documento salen en todas las secciones que los heredan (`Inherit fixed`). La portada a sangre, sin número y sin pie es una sección (caso 25).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 31 están en
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 32 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).

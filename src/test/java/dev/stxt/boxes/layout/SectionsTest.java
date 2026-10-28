@@ -233,4 +233,28 @@ class SectionsTest {
         assertEquals(2, d.pages().size());
         assertTrue(on(d.pages().get(1), "toc").children().size() >= 2);
     }
+
+    @Test
+    void elementAndIdRulesReachASectionToo() {
+        LaidOutDocument d = layWith(HEADER + "\t\tElement: Section\n\t\t\tTypography:\n\t\t\t\tSize: 20\n"
+                        + "\t\tFor id: small\n\t\t\tTypography:\n\t\t\t\tSize: 10\n",
+                "\tSection:", "\t\tText: ab", "\t\t\tId: t1",
+                "\tSection:", "\t\tId: small", "\t\tText: ab", "\t\t\tId: t2");
+        // Element: Section da 10 pt por carácter; la regla del Id de la segunda, que gana, vuelve a 5.
+        assertEquals(10, on(d.pages().get(0), "t1").lines().get(0).width() / 2, 1e-9);
+        assertEquals(5, on(d.pages().get(1), "t2").lines().get(0).width() / 2, 1e-9);
+    }
+
+    @Test
+    void aHeadingOfAnUnnumberedSectionCannotBeListedInAContents() {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> lay(
+                "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tText: Portada",
+                "\tSection:", "\t\tContents:"));
+        assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.code());
+        // Con In contents: false, el encabezado sigue siéndolo pero no se lista; el índice necesita otro.
+        LaidOutDocument d = lay(
+                "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tIn contents: false", "\t\t\tText: Portada",
+                "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", "\t\tContents:", "\t\t\tId: toc");
+        assertEquals(2, d.pages().size());
+    }
 }

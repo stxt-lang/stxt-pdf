@@ -1,35 +1,40 @@
-# Catálogo de producto de un taller de muebles, de cinco páginas: portada a sangre (un Absolute
-# que sale al margen, con el pie fijo solo desde la segunda página), un índice de productos con su página (un Contents, que el motor
-# rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
-# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Absolute con Rotate), y una página final con maderas, pedidos y
-# contacto. Las fichas son todas iguales: el estilo está en styles.stxt y solo cambia el contenido.
-# El título de la portada y el del índice son un Text, no un encabezado, para que no salgan en él.
-# Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
+# Catálogo de producto de un taller de muebles, de cinco páginas. Son dos secciones: la portada, a
+# sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit fixed: false), y el
+# cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Contents, que el
+# motor rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
+# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Absolute con Rotate), y una página
+# final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
+# solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
+# In contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
+# ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
 		Paper: A4
 		Margin: 54 50 64 50
 	Title: Catálogo 2026 · Taller Nogal
 	Language: es
+	Fixed:
+		Id: footer
+		Offset: auto 0 -40 0
+		Box:
+			Padding: 6 0 0 0
+			Border: 0.5 0 0 0
+			Border color: #DCCFB8
+		Flex:
+			Main axis: between
+			Item:
+				Text: Taller Nogal · Catálogo 2026 · tallernogal.example
+					Link: https://tallernogal.example
+			Item:
+				Text: Página {page} de {pages}
 	Section:
-		Fixed:
-			Id: footer
-			Pages: not-first
-			Offset: auto 0 -40 0
-			Box:
-				Padding: 6 0 0 0
-				Border: 0.5 0 0 0
-				Border color: #DCCFB8
-			Flex:
-				Main axis: between
-				Item:
-					Text: Taller Nogal · Catálogo 2026 · tallernogal.example
-						Link: https://tallernogal.example
-				Item:
-					Text: Página {page} de {pages}
-		Absolute:
+		Id: front-cover
+		Page numbering: none
+		Inherit fixed: false
+		Media:
+			Margin: 0
+		Relative:
 			Id: cover
-			Offset: -54 auto auto -50
 			Box:
 				Width: 595
 				Height: 842
@@ -109,12 +114,8 @@ Document (dev.stxt.boxes):
 						Color: #A89A88
 					Box:
 						Margin: 150 0 0 0
-		Block:
-			Id: cover-spacer
-			Box:
-				Height: 1
-			Break:
-				After: page
+	Section:
+		Id: body
 		Block:
 			Id: index
 			Heading 1:
