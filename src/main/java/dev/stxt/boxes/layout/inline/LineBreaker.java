@@ -31,6 +31,10 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  * partes de varios tramos ({@code **neg**rita}) y mide lo que suman sus partes, cada una con su
  * fuente; el espacio entre dos palabras tiene el formato del tramo en que está el primero de sus
  * espacios en blanco. Un texto sin formato es un único tramo y se mide igual que una cadena.</p>
+ *
+ * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, §4.4); el último
+ * de la línea no lo lleva, así que el ancho de una línea es lo que suman sus caracteres menos un
+ * interletraje. Un tramo en versalitas se mide al {@link TextFormat#SMALL_CAPS_SCALE} del tamaño.</p>
  */
 public final class LineBreaker {
 
@@ -91,10 +95,17 @@ public final class LineBreaker {
      */
     public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
                                                    FontFace font, double fontSize, Style.TextWrap wrap) {
+        return breakParagraphs(runs, available, measurer, font, fontSize, 0, wrap);
+    }
+
+    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}, con interletraje. */
+    public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
+                                                   FontFace font, double fontSize, double letterSpacing,
+                                                   Style.TextWrap wrap) {
         List<List<Line>> result = new ArrayList<>();
         for (List<Word> paragraph : paragraphs(runs)) {
             if (wrap == Style.TextWrap.PRETTY) {
-                result.add(optimal(paragraph, available, measurer, font, fontSize));
+                result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
                 continue;
             }
             List<Line> lines = new ArrayList<>();
@@ -103,7 +114,7 @@ public final class LineBreaker {
             for (Word word : paragraph) {
                 current.add(word);
                 if (current.size() > 1
-                        && !fits(width(line(current).runs(), measurer, font, fontSize), available)) {
+                        && !fits(width(line(current).runs(), measurer, font, fontSize, letterSpacing), available)) {
                     current.remove(current.size() - 1);
                     lines.add(line(current));
                     current.clear();
@@ -133,18 +144,19 @@ public final class LineBreaker {
      * <p>El ancho de una línea es la suma de los de sus palabras y espacios.</p>
      */
     static List<Line> optimal(List<Word> words, double available, TextMeasurer measurer,
-                              FontFace font, double fontSize) {
+                              FontFace font, double fontSize, double letterSpacing) {
         int n = words.size();
         Map<TextFormat, Double> spaces = new HashMap<>();
-        // prefix[i]: ancho de las i primeras palabras; gaps[i]: el de los i primeros espacios.
+        // prefix[i]: avance de las i primeras palabras; gaps[i]: el de los i primeros espacios (los dos,
+        // con el interletraje de cada carácter, también el del último).
         double[] prefix = new double[n + 1];
         double[] gaps = new double[n];
         for (int i = 0; i < n; i++) {
             Word w = words.get(i);
-            prefix[i + 1] = prefix[i] + width(w.parts(), measurer, font, fontSize);
+            prefix[i + 1] = prefix[i] + advance(w.parts(), measurer, font, fontSize, letterSpacing);
             if (i + 1 < n) {
                 gaps[i + 1] = gaps[i] + spaces.computeIfAbsent(w.gap(),
-                        f -> measurer.width(" ", f.face(font), fontSize));
+                        f -> advance(" ", f, measurer, font, fontSize, letterSpacing));
             }
         }
         // best[j]: deméritos mínimos de las líneas con las j primeras palabras; from[j]: primera
@@ -157,7 +169,7 @@ public final class LineBreaker {
             for (int i = j - 1; i >= 0; i--) {
                 boolean spaced = j - i > 1;
                 double space = gaps[j - 1] - gaps[i];
-                double width = prefix[j] - prefix[i] + space;
+                double width = prefix[j] - prefix[i] + space - letterSpacing;
                 if (spaced && !fits(width, available)) {
                     // Con más palabras sería aún más ancha; una sola sí puede desbordar.
                     break;
@@ -199,13 +211,19 @@ public final class LineBreaker {
     /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize) {
+        return intrinsics(runs, measurer, font, fontSize, 0);
+    }
+
+    /** Como {@link #intrinsics(List, TextMeasurer, FontFace, double)}, con interletraje. */
+    public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
+                                            double fontSize, double letterSpacing) {
         double min = 0;
         double max = 0;
         for (List<Word> paragraph : paragraphs(runs)) {
             for (Word word : paragraph) {
-                min = Math.max(min, width(word.parts(), measurer, font, fontSize));
+                min = Math.max(min, width(word.parts(), measurer, font, fontSize, letterSpacing));
             }
-            max = Math.max(max, width(line(paragraph).runs(), measurer, font, fontSize));
+            max = Math.max(max, width(line(paragraph).runs(), measurer, font, fontSize, letterSpacing));
         }
         return new IntrinsicSizes(min, max);
     }
@@ -261,9 +279,11 @@ public final class LineBreaker {
         double natural = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            widths[i] = measurer.width(r.text(), r.format().face(font), s.fontSize);
+            widths[i] = advance(r.text(), r.format(), measurer, font, s.fontSize, s.letterSpacing);
             natural += widths[i];
         }
+        // El último carácter de la línea no lleva interletraje.
+        natural -= s.letterSpacing;
         String text = TextRun.text(runs);
         double x = offset(natural, available, s.textAlign);
         double spacing = wordSpacing(text, natural, available, s.textAlign, !justify);
@@ -271,20 +291,37 @@ public final class LineBreaker {
         double at = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            double w = widths[i] + spacing * spaces(r.text());
+            double w = widths[i] + spacing * spaces(r.text()) - (i == widths.length - 1 ? s.letterSpacing : 0);
             placed.add(new TextLine.Run(at, w, r.text(), r.format()));
             at += w;
         }
         return new TextLine(x, y, natural + spacing * spaces(text), height, text, spacing, placed);
     }
 
-    /** Ancho de unos tramos, cada uno con su fuente. */
-    static double width(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize) {
+    /**
+     * Ancho de unos tramos como línea: cada uno con su fuente y su tamaño, y el interletraje entre
+     * sus caracteres pero no tras el último.
+     */
+    static double width(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
+                        double letterSpacing) {
+        return advance(runs, measurer, font, fontSize, letterSpacing) - letterSpacing;
+    }
+
+    /** Avance de unos tramos: su ancho más el interletraje de cada carácter, también el del último. */
+    static double advance(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
+                          double letterSpacing) {
         double width = 0;
         for (TextRun r : runs) {
-            width += measurer.width(r.text(), r.format().face(font), fontSize);
+            width += advance(r.text(), r.format(), measurer, font, fontSize, letterSpacing);
         }
         return width;
+    }
+
+    /** Avance de un texto con ese formato. */
+    static double advance(String text, TextFormat format, TextMeasurer measurer, FontFace font, double fontSize,
+                          double letterSpacing) {
+        return measurer.width(text, format.face(font), fontSize * format.scale())
+                + letterSpacing * text.codePointCount(0, text.length());
     }
 
     /** Las palabras de cada párrafo del texto (ver la descripción de la clase). */

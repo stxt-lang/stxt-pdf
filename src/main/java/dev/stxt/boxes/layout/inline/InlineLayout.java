@@ -91,13 +91,17 @@ public final class InlineLayout implements LayoutAlgorithm {
         broken.clear();
     }
 
-    /** Los tramos del texto de la caja, con sus referencias a otras cajas ya sustituidas. */
+    /**
+     * Los tramos del texto de la caja, con sus referencias a otras cajas ya sustituidas y sus
+     * mayúsculas transformadas ({@link TextTransform}).
+     */
     private List<TextRun> runs(Box box) {
         List<TextRun> runs = box.runs();
-        if (!Reference.contains(box.text)) {
-            return runs;
+        if (Reference.contains(box.text)) {
+            runs = runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format()))
+                    .toList();
         }
-        return runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format())).toList();
+        return TextTransform.apply(runs, box.style);
     }
 
     private String referenced(Reference.Kind kind, String id) {
@@ -141,7 +145,8 @@ public final class InlineLayout implements LayoutAlgorithm {
     private Broken breakText(Box box, double available) {
         Style s = box.style;
         List<List<LineBreaker.Line>> paragraphs = box.hasText()
-                ? LineBreaker.breakParagraphs(runs(box), available, measurer, s.fontFace(), s.fontSize, s.textWrap)
+                ? LineBreaker.breakParagraphs(runs(box), available, measurer, s.fontFace(), s.fontSize, s.letterSpacing,
+                        s.textWrap)
                 : List.of();
         List<LineBreaker.Line> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];
@@ -155,7 +160,8 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = box.hasText()
-                ? LineBreaker.intrinsics(runs(box), measurer, box.style.fontFace(), box.style.fontSize)
+                ? LineBreaker.intrinsics(runs(box), measurer, box.style.fontFace(), box.style.fontSize,
+                        box.style.letterSpacing)
                 : IntrinsicSizes.ZERO;
         return content;
     }

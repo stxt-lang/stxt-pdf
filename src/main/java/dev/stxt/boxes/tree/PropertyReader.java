@@ -31,6 +31,7 @@ import static dev.stxt.boxes.tree.ValueReader.integer;
 import static dev.stxt.boxes.tree.ValueReader.nonNegative;
 import static dev.stxt.boxes.tree.ValueReader.nonNegativeSides;
 import static dev.stxt.boxes.tree.ValueReader.positive;
+import static dev.stxt.boxes.tree.ValueReader.signedPoints;
 import static dev.stxt.boxes.tree.ValueReader.positiveInteger;
 import static dev.stxt.boxes.tree.ValueReader.sides;
 import static dev.stxt.boxes.tree.ValueReader.tracks;
@@ -97,6 +98,9 @@ final class PropertyReader {
                 case "color" -> s.color = color(p);
                 case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
                 case "inline" -> s.inline = enumValue(Style.Inline.class, p);
+                case "transform" -> s.transform = enumValue(Style.Transform.class, p);
+                case "letter-spacing" -> s.letterSpacing = signedPoints(p);
+                case "small-caps" -> s.smallCaps = bool(p);
                 case "widows" -> s.widows = positiveInteger(p);
                 case "orphans" -> s.orphans = positiveInteger(p);
                 default -> throw unread(p);

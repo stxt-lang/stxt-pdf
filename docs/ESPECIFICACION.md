@@ -237,7 +237,7 @@ Casi todas las propiedades van en uno de tres **grupos**, hijos de cada elemento
 | Grupo | Contenido | Se hereda | Elementos |
 |---|---|---|---|
 | `Box` ([§4.3](#43-box)) | El modelo de caja: tamaño, márgenes, relleno, borde y fondo | No | Todos los de caja |
-| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación y color del texto, viudas y huérfanas | **Sí** | Todos los de caja salvo `Image`, y `Document` |
+| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación, color, mayúsculas e interletraje del texto, viudas y huérfanas | **Sí** | Todos los de caja salvo `Image`, y `Document` |
 | `Break` ([§4.5](#45-break)) | Cortes de página y decoración en los cortes | No | Todos los de caja salvo `Absolute` y `Fixed` |
 
 Lo que hay en `Typography` lo hereda toda la descendencia; lo de `Box` y `Break` es solo de la
@@ -279,7 +279,8 @@ elementos de primer nivel y de los `Fixed`, y su alto es siempre definido.
 
 **Título e idioma.** `Document` admite también `Title` (un texto no vacío, opcional, como mucho
 uno) y exige exactamente un `Language` (una etiqueta BCP 47: `es`, `en-US`, `ca`…; si no,
-`VALUE_NOT_ALLOWED`; si falta, `TOO_FEW_CHILDREN`). No afectan al layout: van al PDF
+`VALUE_NOT_ALLOWED`; si falta, `TOO_FEW_CHILDREN`). No afectan al layout, salvo que `Language` da
+las reglas de las mayúsculas de `Transform` ([§4.4](#44-typography)). Van al PDF
 ([§5.13](#513-encabezados-y-párrafos)) como título del documento (información, metadatos XMP y el
 que muestra el visor) e idioma del contenido etiquetado. El idioma es obligatorio porque es una
 característica de accesibilidad: un lector de pantalla y PDF/UA lo necesitan para leer el
@@ -328,6 +329,9 @@ habitual para la fuente del documento: cada elemento declara solo lo que cambia.
 | `Color` | color | `#000000` | Color del texto. |
 | `Text wrap` | `auto`, `pretty` | `auto` | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). Ver [§5.4](#54-texto). |
 | `Inline` | `none`, `markdown` | `none` | Formato dentro de la línea: con `markdown`, el texto interpreta **negrita**, *cursiva*, `++subrayado++`, `~~tachado~~` y `[enlaces](destino)`. Ver [§5.4](#54-texto). |
+| `Transform` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas del texto al pintarlo; `capitalize` pone en mayúscula la primera letra de cada palabra. Las reglas de cada letra son las del idioma de `Language` ([§4.1](#41-media)). Ver [§5.4](#54-texto). |
+| `Letter spacing` | número (puntos) | `0` | Separación entre letras, que se suma al avance de cada carácter; puede ser negativa. Ver [§5.4](#54-texto). |
+| `Small caps` | `true`, `false` | `false` | Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente. Ver [§5.10](#510-fragmentación). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 
@@ -721,6 +725,31 @@ El texto de un `Text` se reparte en **líneas** del ancho de su caja de contenid
   (el PDF etiquetado, el índice de un `Contents`, los mensajes) es el texto sin las marcas, y un
   error del texto (un carácter que la fuente no tiene, una referencia desconocida) señala la línea
   donde empieza.
+- **Mayúsculas (`Transform` y `Small caps`).** Son propiedades de `Typography`: **se heredan**
+  y valen en `Styles`, así que un rótulo se escribe como una frase normal y la regla lo pone en
+  mayúsculas. `Transform` cambia **lo que se pinta, no lo que se escribe**: se aplica a los tramos
+  antes de repartir el texto en líneas, porque cambia lo que miden (`ß` pasa a `SS`) y las líneas
+  contienen el texto ya transformado; el texto de la caja no cambia, y el de la estructura del PDF
+  etiquetado (`ActualText`) es el escrito, salvo en un texto con `{page}`, `{pages}` o una
+  referencia, que cambia con la página. `uppercase` y `lowercase` usan las reglas de
+  `String` de Java con la configuración regional de `Language` (en turco, `i` pasa a `İ`); `capitalize`
+  solo cambia la primera letra de cada palabra (palabra: lo que sigue a un espacio o un salto de
+  línea, también entre dos tramos) y deja el resto como está. Los marcadores `{page}` y `{pages}`
+  no se transforman. `Small caps` pinta cada minúscula, ya pasada a mayúscula, al 80 % del
+  `Size` (los espacios, las cifras y las mayúsculas, no): el tramo lleva una marca
+  `TextFormat.smallCaps` que el documento no escribe. Se aplica después de `Transform`: con
+  `lowercase` todo son versalitas, con `uppercase` ninguna y con `capitalize` solo la inicial es
+  grande. No cambia el `Size` de la caja, así que la altura de las líneas y la línea base son las
+  de siempre, y el subrayado y el tachado, los del tamaño de la caja.
+- **Interletraje (`Letter spacing`).** Una medida en puntos que se suma al avance de cada
+  carácter (también el espacio): cuenta en el reparto en líneas (una palabra mide más, y con
+  `Text wrap: pretty` también), en los tamaños intrínsecos, en la alineación y en `justify`, que
+  reparte lo que sobra después. **El último carácter de cada línea no lo lleva**: el ancho de una
+  línea es lo que suman sus caracteres menos un interletraje, para que `right` y `center` queden
+  alineados con la última letra. Puede ser negativa (texto más apretado). En el PDF se escribe con
+  ajustes de `TJ` entre los caracteres (las fuentes son Type 0 Identity-H, donde `Tw` y `Tc` no
+  sirven), así que el texto sigue siendo seleccionable, aunque un lector puede interpretar una
+  separación grande como un espacio; en el SVG, con `letter-spacing`.
 - **Subrayado y tachado.** Una raya con el color del texto, a lo ancho del tramo (con sus
   espacios, pero no el espacio entre dos tramos que no la llevan). Su posición y su grosor son
   los de la variante del tramo: `underlinePosition` y `underlineThickness` de la tabla `post`
@@ -1885,7 +1914,7 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos (un porcentaje o un texto no valen); `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -2003,6 +2032,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | `font-weight`, `font-style` | Pesos de 100 a 900, `oblique`, síntesis de negrita y cursiva | `Weight: normal` o `bold` y `Style: normal` o `italic`, sin síntesis: el fichero debe existir |
 | Kerning y ligaduras | Sí | No |
 | Formato dentro de una línea | Elementos en línea (`<strong>`, `<em>`, `<span>`…) con cualquier propiedad | Tramos con negrita, cursiva, subrayado y tachado, que se suman a la fuente de la caja; no pueden quitar la negrita ni cambiar la familia, el tamaño o el color. Se escriben con Markdown en línea, solo donde se pide con `Inline: markdown`; sin ello el texto es literal ([§5.4](#54-texto)) |
+| `text-transform`, `letter-spacing`, `font-variant: small-caps` | `text-transform` también con `full-width`; el interletraje en cualquier unidad, también tras el último carácter; las versalitas con la característica `smcp` de la fuente | `Transform` con `none`, `uppercase`, `lowercase` y `capitalize`, y las reglas del idioma de `Language` (obligatorio); `Letter spacing` solo en puntos y sin interletraje tras el último carácter de la línea; `Small caps` sintetizadas con mayúsculas al 80 % del tamaño. Ver [§5.4](#54-texto) |
 | `text-decoration` | Estilos (`wavy`, `dotted`…), color, grosor y desplazamiento propios; el subrayado se interrumpe en los descendentes (`text-decoration-skip-ink`) | Una raya continua del color del texto, con la posición y el grosor de la fuente |
 | Palabras largas | Desbordan (configurable) | Error |
 | Desbordamiento | Visible por defecto (`overflow: visible`) | Error ([§5.12](#512-desbordamiento)) |
@@ -2102,7 +2132,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `INLINE` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `GROUP` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Background` |
-| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Widows`, `Orphans` |
+| `Typography` | `GROUP` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Widows`, `Orphans` |
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
@@ -2283,4 +2313,5 @@ Document (dev.stxt.boxes):
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado y enlace) ([§5.4](#54-texto)). |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([§5.4](#54-texto)). |
+| **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`, [§5.4](#54-texto)). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

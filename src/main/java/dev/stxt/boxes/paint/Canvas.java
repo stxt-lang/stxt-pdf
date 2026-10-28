@@ -40,9 +40,11 @@ public interface Canvas {
     /**
      * Texto con la línea base en {@code baselineY}.
      *
-     * @param wordSpacing espacio que se añade a cada espacio entre palabras ({@code justify})
+     * @param wordSpacing   espacio que se añade a cada espacio entre palabras ({@code justify})
+     * @param letterSpacing espacio que se añade tras cada carácter menos el último ({@code Letter spacing})
      */
-    void text(double x, double baselineY, String text, FontFace font, double fontSize, String color, double wordSpacing);
+    void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
+              double wordSpacing, double letterSpacing);
 
     /**
      * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},

@@ -254,16 +254,16 @@ public final class PdfCanvas implements Canvas {
 
     @Override
     public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
-                     double wordSpacing) {
+                     double wordSpacing, double letterSpacing) {
         try {
             out.beginText();
             out.setFont(pdfFont(font), (float) fontSize);
             setColor(color);
             out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
-            if (wordSpacing == 0) {
+            if (wordSpacing == 0 && letterSpacing == 0) {
                 out.showText(text);
             } else {
-                out.showTextWithPositioning(justified(text, wordSpacing, fontSize));
+                out.showTextWithPositioning(spaced(text, wordSpacing, letterSpacing, fontSize));
             }
             out.endText();
         } catch (IOException e) {
@@ -296,6 +296,28 @@ public final class PdfCanvas implements Canvas {
      * los trozos. Un número en {@code TJ} desplaza a la izquierda, en milésimas del cuerpo.
      */
     static Object[] justified(String text, double wordSpacing, double fontSize) {
+        return spaced(text, wordSpacing, 0, fontSize);
+    }
+
+    /**
+     * Argumento de {@code TJ} con el espacio extra de {@code justify} tras cada espacio y el
+     * interletraje tras cada carácter, salvo el último. Sin interletraje, el texto se parte solo
+     * tras los espacios; con él, un trozo por carácter. Se usa {@code TJ} y no {@code Tc}/{@code Tw}
+     * porque las fuentes son Type 0 Identity-H, donde {@code Tw} no actúa.
+     */
+    static Object[] spaced(String text, double wordSpacing, double letterSpacing, double fontSize) {
+        if (letterSpacing != 0) {
+            List<Object> parts = new ArrayList<>();
+            for (int i = 0; i < text.length(); ) {
+                int cp = text.codePointAt(i);
+                i += Character.charCount(cp);
+                parts.add(new String(Character.toChars(cp)));
+                if (i < text.length()) {
+                    parts.add((float) (-(letterSpacing + (cp == ' ' ? wordSpacing : 0)) * 1000 / fontSize));
+                }
+            }
+            return parts.toArray();
+        }
         Float shift = (float) (-wordSpacing * 1000 / fontSize);
         List<Object> parts = new ArrayList<>();
         int start = 0;

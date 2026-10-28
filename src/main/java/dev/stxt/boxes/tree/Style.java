@@ -10,6 +10,7 @@ import dev.stxt.boxes.model.Value;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -39,6 +40,9 @@ public final class Style {
 
     /** Formato dentro de la línea: el texto literal ({@code none}) o escrito en Markdown ({@code markdown}). */
     public enum Inline { NONE, MARKDOWN }
+
+    /** Transformación de las mayúsculas del texto (§4.4): {@code none}, {@code uppercase}, {@code lowercase} o {@code capitalize}. */
+    public enum Transform { NONE, UPPERCASE, LOWERCASE, CAPITALIZE }
 
     public enum Direction { ROW, COLUMN }
 
@@ -136,6 +140,15 @@ public final class Style {
     public TextAlign textAlign = TextAlign.LEFT;
     public TextWrap textWrap = TextWrap.AUTO;
     public Inline inline = Inline.NONE;
+    public Transform transform = Transform.NONE;
+    /** Separación entre letras, en puntos; puede ser negativa. */
+    public double letterSpacing;
+    public boolean smallCaps;
+    /**
+     * Configuración regional del texto: la de {@code Language} de {@code Document} (§4.1). No es una
+     * propiedad de la caja: la fija el constructor del árbol en la raíz y se hereda.
+     */
+    public Locale locale = Locale.ROOT;
 
     // --- Flex ------------------------------------------------------------------------------------
     public Direction flexDirection = Direction.ROW;
@@ -258,6 +271,10 @@ public final class Style {
             s.textAlign = parent.textAlign;
             s.textWrap = parent.textWrap;
             s.inline = parent.inline;
+            s.transform = parent.transform;
+            s.letterSpacing = parent.letterSpacing;
+            s.smallCaps = parent.smallCaps;
+            s.locale = parent.locale;
             s.widows = parent.widows;
             s.orphans = parent.orphans;
         }

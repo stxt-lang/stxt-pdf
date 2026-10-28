@@ -1,0 +1,106 @@
+package dev.stxt.boxes.layout.inline;
+
+import dev.stxt.boxes.model.TextFormat;
+import dev.stxt.boxes.model.TextRun;
+import dev.stxt.boxes.tree.Style;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Locale;
+
+import static dev.stxt.boxes.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+class TextTransformTest {
+
+    private static final Locale ES = Locale.forLanguageTag("es");
+    private static final TextFormat SMALL = TextFormat.PLAIN.withSmallCaps(true);
+
+    private static List<TextRun> apply(List<TextRun> runs, Style.Transform t, boolean smallCaps, Locale l) {
+        return TextTransform.apply(runs, t, smallCaps, l);
+    }
+
+    @Test
+    void withoutTransformNorSmallCapsTheRunsAreTheSame() {
+        List<TextRun> runs = List.of(run("Hola"), run("mundo", "b"));
+        assertSame(runs, TextTransform.apply(runs, new Style()));
+    }
+
+    @Test
+    void uppercaseAndLowercase() {
+        assertEquals(List.of(run("ÓRDENES")), apply(List.of(run("Órdenes")), Style.Transform.UPPERCASE, false, ES));
+        assertEquals(List.of(run("órdenes")), apply(List.of(run("ÓRDENES")), Style.Transform.LOWERCASE, false, ES));
+    }
+
+    @Test
+    void theFormatOfEachRunIsKept() {
+        assertEquals(List.of(run("UNO "), run("DOS", "b")),
+                apply(List.of(run("uno "), run("dos", "b")), Style.Transform.UPPERCASE, false, ES));
+    }
+
+    @Test
+    void theRulesAreThoseOfTheLanguage() {
+        assertEquals(List.of(run("STRASSE")), apply(List.of(run("Straße")), Style.Transform.UPPERCASE, false, ES));
+        assertEquals(List.of(run("İĞNE")),
+                apply(List.of(run("iğne")), Style.Transform.UPPERCASE, false, Locale.forLanguageTag("tr")));
+        assertEquals(List.of(run("IĞNE")), apply(List.of(run("iğne")), Style.Transform.UPPERCASE, false, Locale.ROOT));
+    }
+
+    @Test
+    void capitalizeOnlyChangesTheFirstLetterOfEachWord() {
+        assertEquals(List.of(run("Hola Mundo De IPhone")),
+                apply(List.of(run("hola mundo de iPhone")), Style.Transform.CAPITALIZE, false, ES));
+        assertEquals(List.of(run("Dos\nLíneas")), apply(List.of(run("dos\nlíneas")), Style.Transform.CAPITALIZE, false, ES));
+        // Una cifra o un signo delante no impiden que la palabra empiece por una letra después de un espacio.
+        assertEquals(List.of(run("3 Ratones")), apply(List.of(run("3 ratones")), Style.Transform.CAPITALIZE, false, ES));
+    }
+
+    @Test
+    void capitalizeContinuesAcrossRuns() {
+        // «neg|rita» es una sola palabra: solo la primera letra va en mayúscula.
+        assertEquals(List.of(run("Una "), run("Neg", "b"), run("rita")),
+                apply(List.of(run("una "), run("neg", "b"), run("rita")), Style.Transform.CAPITALIZE, false, ES));
+        // Tras un espacio al final de un tramo, el siguiente empieza palabra.
+        assertEquals(List.of(run("Uno "), run("Dos", "b")),
+                apply(List.of(run("uno "), run("dos", "b")), Style.Transform.CAPITALIZE, false, ES));
+    }
+
+    @Test
+    void smallCapsTurnLowercaseLettersIntoMarkedCapitals() {
+        // El espacio y las cifras no son minúsculas: no se reducen.
+        assertEquals(List.of(run("A"), new TextRun("BC", SMALL), run(" D1")),
+                apply(List.of(run("Abc D1")), Style.Transform.NONE, true, ES));
+    }
+
+    @Test
+    void smallCapsKeepTheRestOfTheFormatAndMergeEqualNeighbours() {
+        TextFormat boldSmall = new TextFormat(true, false, false, false).withSmallCaps(true);
+        assertEquals(List.of(new TextRun("HOLA", boldSmall)),
+                apply(List.of(run("hola", "b")), Style.Transform.NONE, true, ES));
+    }
+
+    @Test
+    void smallCapsWithTransform() {
+        // lowercase deja todo en minúsculas, así que todo son versalitas; uppercase no deja ninguna.
+        assertEquals(List.of(new TextRun("ABC", SMALL)), apply(List.of(run("AbC")), Style.Transform.LOWERCASE, true, ES));
+        assertEquals(List.of(run("ABC")), apply(List.of(run("abc")), Style.Transform.UPPERCASE, true, ES));
+        // capitalize: la inicial es una mayúscula de verdad y el resto son versalitas.
+        assertEquals(List.of(run("H"), new TextRun("OLA", SMALL), run(" M"), new TextRun("UNDO", SMALL)),
+                apply(List.of(run("hola mundo")), Style.Transform.CAPITALIZE, true, ES));
+    }
+
+    @Test
+    void letterWithoutCapitalIsNotMarked() {
+        // «ª» es minúscula pero no tiene mayúscula distinta.
+        assertEquals(List.of(run("1ª")), apply(List.of(run("1ª")), Style.Transform.NONE, true, ES));
+    }
+
+    @Test
+    void pageMarkersAreLeftAlone() {
+        assertEquals(List.of(run("PÁGINA {page} DE {pages}")),
+                apply(List.of(run("Página {page} de {pages}")), Style.Transform.UPPERCASE, false, ES));
+        assertEquals(List.of(run("P"), new TextRun("ÁGINA", SMALL), run(" {page}")),
+                apply(List.of(run("Página {page}")), Style.Transform.NONE, true, ES));
+    }
+}

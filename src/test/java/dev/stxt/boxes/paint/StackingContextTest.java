@@ -29,6 +29,8 @@ class StackingContextTest {
         final List<Rect> rects = new ArrayList<>();
         /** Fondos y textos en el orden en que se pintan. */
         final List<String> events = new ArrayList<>();
+        /** Cada texto con su tamaño y su interletraje: {@code 'texto' tamaño/interletraje}. */
+        final List<String> drawn = new ArrayList<>();
 
         @Override
         public void background(Rect paddingBox, String color) {
@@ -43,8 +45,9 @@ class StackingContextTest {
 
         @Override
         public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
-                         double wordSpacing) {
+                         double wordSpacing, double letterSpacing) {
             events.add("text '" + text + "' " + font.variant());
+            drawn.add("'" + text + "' " + fontSize + "/" + letterSpacing);
         }
 
         /** Las zonas clicables: destino, zona y lo que dicen. */
@@ -150,6 +153,15 @@ class StackingContextTest {
         // Línea de 12 pt desde y = 40: línea base en 40 + (12 − 10) / 2 + 8 = 49 (aproximación del SVG).
         assertEquals(new Rect(40, 50, 20, 0.6).toString(), round(r.rects.get(0)).toString());
         assertEquals(new Rect(60, 45.9, 15, 0.6).toString(), round(r.rects.get(1)).toString());
+    }
+
+    /** Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (§4.4). */
+    @Test
+    void smallCapsAreSmallerAndLetterSpacingIsPassedOn() {
+        Recorder r = record("\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10", "\t\tSmall caps: true",
+                "\t\tLetter spacing: 1.5",
+                "\tText: Ab c", "\t\tId: T");
+        assertEquals(List.of("'A' 10.0/1.5", "'B' 8.0/1.5", "' ' 10.0/1.5", "'C' 8.0/1.5"), r.drawn);
     }
 
     /** Una caja con {@code Link} es clicable entera, antes que su contenido (§5.20). */

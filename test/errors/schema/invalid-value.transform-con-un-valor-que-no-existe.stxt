@@ -1,0 +1,11 @@
+# Case: Transform con un valor que no existe
+# Code: INVALID_VALUE
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Typography:
+			Transform: shout

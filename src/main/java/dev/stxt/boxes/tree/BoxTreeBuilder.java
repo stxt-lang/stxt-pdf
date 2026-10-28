@@ -11,6 +11,7 @@ import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -119,6 +120,7 @@ public final class BoxTreeBuilder {
 
         // El Typography de Document lo heredan todas las cajas.
         Style rootStyle = new Style();
+        rootStyle.locale = Locale.forLanguageTag(metadata.language());
         child(document, "typography").map(Nodes::inline).ifPresent(t -> typography(t, rootStyle));
         Box root = new Box(null, null, rootStyle, true, document.getLine());
         // El área útil tiene el alto de la página, menos los márgenes: siempre definido.

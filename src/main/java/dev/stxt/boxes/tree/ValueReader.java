@@ -195,6 +195,15 @@ final class ValueReader {
         return p.pt();
     }
 
+    /** Un número de puntos, positivo, cero o negativo. */
+    static double signedPoints(Node n) {
+        Value v = parse(n, () -> ValueParser.value(n.getText()));
+        if (!(v instanceof Value.Points p)) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " debe ser un número de puntos: " + n.getText().trim());
+        }
+        return p.pt();
+    }
+
     static double positive(Node n) {
         double v = nonNegative(n);
         if (v == 0) {

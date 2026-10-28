@@ -112,6 +112,16 @@ class PdfCanvasTest {
     }
 
     @Test
+    void letterSpacingIsATjShiftBetweenCharactersButNotAfterTheLast() {
+        // 1,5 pt en un cuerpo de 10: 150 milésimas; un número positivo en TJ acerca, uno negativo separa.
+        assertArrayEquals(new Object[]{"a", -150f, "b", -150f, "c"}, PdfCanvas.spaced("abc", 0, 1.5, 10));
+        // Con justify, tras un espacio se suma el espacio extra.
+        assertArrayEquals(new Object[]{"a", -150f, " ", -650f, "b"}, PdfCanvas.spaced("a b", 5, 1.5, 10));
+        // Sin interletraje es el TJ de siempre.
+        assertArrayEquals(PdfCanvas.justified("uno dos", 5, 10), PdfCanvas.spaced("uno dos", 5, 0, 10));
+    }
+
+    @Test
     void justifiedTextUsesTj() {
         assertArrayEquals(new Object[]{"uno ", -500f, "dos ", -500f, "tres"},
                 PdfCanvas.justified("uno dos tres", 5, 10));
@@ -533,6 +543,36 @@ class PdfCanvasTest {
             assertEquals("Datos", informe.getFirstChild().getTitle());
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Con negrita y subrayado."), text);
+        }
+    }
+
+    /**
+     * Con {@code Transform} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura
+     * conserva el texto escrito (§4.4): {@code ActualText}. Un texto con el número de página no lo
+     * lleva, porque cambia con la página.
+     */
+    @Test
+    void capsAreOnlyPaintedAndTheStructureKeepsTheWrittenText() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tParagraph: Emisor y destinatario\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
+                + "\t\t\tLetter spacing: 1\n"
+                + "\tParagraph: Año nuevo\n\t\tTypography:\n\t\t\tSmall caps: true\n"
+                + "\tParagraph: Hoja {page}\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
+                + "\tParagraph: Sin cambios\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "caps"))) {
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            List<String> actual = new ArrayList<>();
+            for (Object kid : document.getKids()) {
+                actual.add(((PDStructureElement) kid).getActualText());
+            }
+            assertEquals(java.util.Arrays.asList("Emisor y destinatario", "Año nuevo", null, null), actual);
+            // Lo que se pinta son mayúsculas, y el interletraje no parte el texto en letras (pdfbox lo lee entero).
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("EMISOR Y DESTINATARIO"), text);
+            assertTrue(text.contains("AÑO NUEVO"), text);
+            assertTrue(text.contains("HOJA 1"), text);
         }
     }
 

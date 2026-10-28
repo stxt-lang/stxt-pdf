@@ -1,6 +1,9 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.layout.inline.PageNumbers;
+import dev.stxt.boxes.layout.inline.TextTransform;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Metadata;
@@ -117,6 +120,12 @@ final class PdfStructure {
         }
         if (box.isImage()) {
             e.setAlternateDescription(box.style.alt);
+        }
+        if (box.hasText() && TextTransform.applies(box.style) && !Reference.contains(box.text)
+                && !PageNumbers.contains(box.text)) {
+            // Las mayúsculas son solo de pintado (§4.4): el texto de la estructura es el escrito. Si
+            // lleva números de página o referencias, el texto cambia con la página y no se puede dar.
+            e.setActualText(box.text);
         }
         if (box.element == Element.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();

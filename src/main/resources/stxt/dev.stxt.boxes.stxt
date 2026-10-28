@@ -857,6 +857,12 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Inline
 				Max: 1
+			Child: Transform
+				Max: 1
+			Child: Letter spacing
+				Max: 1
+			Child: Small caps
+				Max: 1
 			Child: Widows
 				Max: 1
 			Child: Orphans
@@ -980,6 +986,19 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Values:
 			Value: none
 			Value: markdown
+	Node: Transform
+		Type: ENUM
+		Description: Mayúsculas del texto al pintarlo: none (por defecto), uppercase, lowercase o capitalize (la primera letra de cada palabra). El texto del documento y el de la estructura del PDF siguen siendo los escritos; las reglas de cada letra son las del idioma de Language.
+		Values:
+			Value: none
+			Value: uppercase
+			Value: lowercase
+			Value: capitalize
+	Node: Letter spacing
+		Description: Separación entre letras, en puntos, que se suma al avance de cada carácter (también en el reparto en líneas y en justify); el último carácter de la línea no la lleva. Puede ser negativa. Por defecto, 0.
+	Node: Small caps
+		Type: BOOLEAN
+		Description: Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Por defecto, false.
 	Node: Widows
 		Type: INTEGER
 		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.

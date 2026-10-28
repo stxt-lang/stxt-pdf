@@ -27,6 +27,18 @@ class SvgCanvasTest {
     }
 
     @Test
+    void letterSpacingIsAnAttributeOfTheText() {
+        LaidOutDocument spaced = new Engine().layOutDocument(new DocumentReader().read(
+                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tText: Hola\n\t\tTypography:\n\t\t\tLetter spacing: 1.5\n"
+                + "\tText: Adiós\n"));
+        String svg = SvgCanvas.page(spaced.pages().get(0), spaced.media(), false);
+        assertTrue(svg.contains("letter-spacing=\"1.50\">Hola</text>"), svg);
+        assertFalse(svg.contains("letter-spacing=\"0"), svg);
+    }
+
+    @Test
     void withoutResourcesOnlyTheBoxIsPainted() {
         String svg = SvgCanvas.page(document.pages().get(0), document.media(), true);
         assertFalse(svg.contains("<image"), svg);

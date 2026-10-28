@@ -74,8 +74,9 @@ public final class SvgCanvas implements Canvas {
 
     @Override
     public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
-                     double wordSpacing) {
-        String spacing = wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing);
+                     double wordSpacing, double letterSpacing) {
+        String spacing = (wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing))
+                + (letterSpacing == 0 ? "" : String.format(Locale.ROOT, " letter-spacing=\"%.2f\"", letterSpacing));
         String weight = font.weight() == FontWeight.BOLD ? " font-weight=\"bold\"" : "";
         String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,

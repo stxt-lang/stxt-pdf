@@ -1,0 +1,22 @@
+# row 160 × 12 con sus cuatro ítems seguidos (26, 9, 35 y 20); tight 12, loose 24, title 12 y caps 12
+# (ver input.stxt).
+Result:
+	Page: 1
+		Fragment: row
+			Rect: 20 20 160 12
+			Fragment: spaced
+				Rect: 20 20 26 12
+			Fragment: small
+				Rect: 46 20 9 12
+			Fragment: upper
+				Rect: 55 20 35 12
+			Fragment: plain
+				Rect: 90 20 20 12
+		Fragment: tight
+			Rect: 20 32 160 12
+		Fragment: loose
+			Rect: 20 44 160 24
+		Fragment: title
+			Rect: 20 68 160 12
+		Fragment: caps
+			Rect: 20 80 160 12

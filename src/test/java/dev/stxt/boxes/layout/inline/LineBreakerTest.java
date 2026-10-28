@@ -28,6 +28,10 @@ class LineBreakerTest {
         return lines.stream().map(LineBreaker.Line::text).toList();
     }
 
+    private static List<List<String>> paragraphs(List<List<LineBreaker.Line>> paragraphs) {
+        return paragraphs.stream().map(LineBreakerTest::texts).toList();
+    }
+
     @Test
     void greedyFirstFit() {
         List<String> l = LineBreaker.breakLines("uno dos tres cuatro", 8, measurer, F, 1);
@@ -186,5 +190,69 @@ class LineBreakerTest {
                         new TextLine.Run(12.5, 7.5, " tres", TextFormat.PLAIN)),
                 l.runs());
         assertEquals(new TextLine(0, 0, 20, 12, "uno dos tres", 2.5, l.runs()), l);
+    }
+
+    // --- Interletraje y versalitas (§4.4) ----------------------------------------------------
+
+    @Test
+    void letterSpacingAddsToEveryCharacterButTheLastOfTheLine() {
+        // «uno dos» mide 7; con 1 de interletraje, 7 + 6 = 13.
+        assertEquals(13, LineBreaker.width(List.of(run("uno dos")), measurer, F, 1, 1), 1e-9);
+        assertEquals(7, LineBreaker.width(List.of(run("uno dos")), measurer, F, 1, 0), 1e-9);
+        assertEquals(new IntrinsicSizes(5, 13),
+                LineBreaker.intrinsics(List.of(run("uno dos")), measurer, F, 1, 1));
+    }
+
+    @Test
+    void letterSpacingChangesTheBreaks() {
+        // Ancho 8: «uno dos» cabe (7), pero con interletraje 1 mide 13.
+        assertEquals(List.of(List.of("uno dos")),
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 0, Style.TextWrap.AUTO)));
+        assertEquals(List.of(List.of("uno", "dos")),
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 1, Style.TextWrap.AUTO)));
+    }
+
+    @Test
+    void letterSpacingWorksWithKnuthPlass() {
+        // Con interletraje 1 y ancho 9, entran dos palabras de dos letras (2+1 + 1+1 + 2... = 8) y no tres.
+        List<List<LineBreaker.Line>> l = LineBreaker.breakParagraphs(List.of(run("ab cd ef gh")), 9, measurer, F, 1, 1,
+                Style.TextWrap.PRETTY);
+        assertEquals(List.of(List.of("ab cd", "ef gh")), paragraphs(l));
+    }
+
+    @Test
+    void smallCapsAreMeasuredAtTheirScale() {
+        TextRun small = new TextRun("BC", TextFormat.PLAIN.withSmallCaps(true));
+        // «A» mide 1 y «BC», 2 × 0,8.
+        assertEquals(2.6, LineBreaker.width(List.of(run("A"), small), measurer, F, 1, 0), 1e-9);
+        // Con interletraje, el de cada carácter es el mismo, también en las versalitas.
+        assertEquals(2.6 + 2, LineBreaker.width(List.of(run("A"), small), measurer, F, 1, 1), 1e-9);
+    }
+
+    @Test
+    void aPlacedLineDropsTheLastLetterSpacingAndAlignsWithIt() {
+        Style s = new Style();
+        s.font = "F";
+        s.fontSize = 1;
+        s.letterSpacing = 2;
+        s.textAlign = Style.TextAlign.RIGHT;
+        TextLine line = LineBreaker.place("ab", measurer, s, 20, false, 0, 1);
+        // a (1) + 2 + b (1) = 4, a la derecha de 20.
+        assertEquals(4, line.width(), 1e-9);
+        assertEquals(16, line.x(), 1e-9);
+        assertEquals(4, line.runs().get(0).width(), 1e-9);
+    }
+
+    @Test
+    void justifyDistributesWhatLetterSpacingLeaves() {
+        Style s = new Style();
+        s.font = "F";
+        s.fontSize = 1;
+        s.letterSpacing = 1;
+        s.textAlign = Style.TextAlign.JUSTIFY;
+        // «ab cd» mide 5 + 4 = 9; en 15 sobran 6 para un solo espacio.
+        TextLine line = LineBreaker.place("ab cd", measurer, s, 15, true, 0, 1);
+        assertEquals(6, line.wordSpacing(), 1e-9);
+        assertEquals(15, line.width(), 1e-9);
     }
 }

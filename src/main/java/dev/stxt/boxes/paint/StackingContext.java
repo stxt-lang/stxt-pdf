@@ -317,8 +317,8 @@ public final class StackingContext {
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize);
             for (TextLine.Run r : l.runs()) {
-                canvas.text(content.x() + l.x() + r.x(), baseline, r.text(), r.format().face(font), s.fontSize,
-                        s.color, l.wordSpacing());
+                canvas.text(content.x() + l.x() + r.x(), baseline, r.text(), r.format().face(font),
+                        s.fontSize * r.format().scale(), s.color, l.wordSpacing(), s.letterSpacing);
             }
         }
         canvas.endText();
