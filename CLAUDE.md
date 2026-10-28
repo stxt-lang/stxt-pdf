@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 30 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 31 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -88,8 +88,10 @@ actualízala.
 
 | 30 | ~~Giro (`Rotate`, `Rotate origin`) de `Relative`, `Absolute`, `Fixed` e `Image`, solo pintado y que quepa en la página; papel con nombre (`Paper`, `Orientation`) en `Media`~~ (hecho; caso 23) | schema, `model/Rotation`, `tree/Media`, `tree/BoxTreeBuilder`, `layout/Engine`, `layout/Overflow`, `paint/StackingContext`, `paint/PdfCanvas`, `paint/SvgCanvas`, `paint/PdfDestinations` |
 
-El hito 31 (SVG) está pendiente en
-[`docs/ROADMAP.md`](docs/ROADMAP.md). Si se abre un hito nuevo, apúntalo allí y en esta tabla.
+| 31 | ~~Imágenes vectoriales: `Image` admite SVG (subconjunto cerrado, texto con las fuentes de `fonts/`, sin referencias externas), vectorial en el PDF~~ (hecho; caso 24) | `resources/SvgInspector`, `resources/ImageFile`, `paint/PdfImages`, `paint/PdfCanvas`, `paint/SvgCanvas`, `tools/ExampleImages.java` |
+
+Los hitos 16 a 31 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
+registro. Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
 así y lanza `UnsupportedOperationException` con el hito en el mensaje; el javadoc de cada clase
@@ -109,12 +111,12 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 |---|---|
 | `model` | Tipos puros: `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
-| `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `ResourceException` e `ImageFormatException` |
+| `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `SvgInspector` (lee un SVG y comprueba el subconjunto), `ResourceException` e `ImageFormatException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
@@ -426,7 +428,22 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   paso del texto; `PdfCanvas` incrusta cada fichero una vez y `PdfStructure` le da un `Figure`
   si tiene `Alt` (si no, es un *artifact*). Las imágenes de los tests están en
   `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30,
-  y `drawing.gif` y `broken.png` para los errores).
+  `shapes.svg` 150 × 75 y `label.svg` 120 × 36, y `drawing.gif`, `broken.png` y los `bad-*.svg` para
+  los errores).
+- **SVG (§5.18):** `ImageFile.read` reconoce un SVG por el contenido (empieza por `<`) y lo pasa por
+  `SvgInspector`, un lector SAX (sin DTD ni entidades) que comprueba el subconjunto cerrado de elementos
+  y propiedades, que no hay referencias fuera del fichero (`href` y `url(…)` solo a `#id`), el tamaño
+  natural (`width`/`height` o `viewBox`, en píxeles CSS: `ImageFile.pixelWidth()` es un `double`) y los
+  textos con su fuente (`ImageFile.checkText`: familia, `bold` e `italic` de `fonts/`, y todos los
+  caracteres; sin sustitución). Todo error es `IMAGE_FORMAT` con la línea del SVG en el mensaje.
+  `PdfImages` es quien incrusta las imágenes de un PDF: el PNG y el JPEG, con PDFBox; el SVG, con JSVG
+  (`ResourcePolicy.DENY_ALL`) dibujando en un `PdfBoxGraphics2D`, que da un `PDFormXObject` del tamaño
+  natural, una vez por fichero. `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde
+  manda `ImageFit` y **restablece los guiones antes de dibujarlo** (un formulario hereda el estado gráfico
+  y el modo `debug` deja un patrón de guiones activo). JSVG dibuja el texto como contornos, no como
+  texto del PDF: no se puede seleccionar. Para que encuentre la fuente por su familia,
+  `PdfImages.registerFonts` da de alta en AWT (`GraphicsEnvironment.registerFont`, efecto global en la
+  JVM, una vez por fichero) las fuentes de `fonts/`. `SvgCanvas` incrusta el SVG como `data:image/svg+xml`.
 
 ## Convenciones
 

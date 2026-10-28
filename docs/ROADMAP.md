@@ -49,10 +49,10 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 28 | Aspecto de las cajas: esquinas, color de borde por lado, degradados y opacidad (sin sombras) | hecho | 21 |
 | 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | hecho | 23 |
-| 31 | Imágenes vectoriales (SVG) | en curso | 24 (previsto) |
+| 31 | Imágenes vectoriales (SVG) | hecho | 24 |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 30, el 2026-10-28 (el 28 y el 30 en otras
-sesiones del mismo día). El hito 31 está pendiente; los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 31, el 2026-10-28 (varios, en otras
+sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -1232,13 +1232,32 @@ implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
 - [x] V6. **Seguridad:** ninguna referencia externa (`href` a ficheros o URL, `<image>` externas,
       entidades DTD): es `IMAGE_FORMAT`.
 
+**Decisiones abiertas:** *(ninguna)*
+
+**Diseño técnico** (como quedó; las interpretaciones, en [`DECISIONES.md`](DECISIONES.md), 242–251):
+
+- **Lectura y validación.** `resources/SvgInspector` lee el SVG con SAX (sin DTD ni entidades), comprueba el
+  subconjunto (V3) y que no hay referencias externas (V6), saca el tamaño natural (V5) y los textos con su
+  fuente; `ImageFile.read` reconoce el SVG por el contenido, comprueba las fuentes contra `fonts/` (V4) y
+  guarda el tamaño (ahora `double`) y si hay texto. Todo error es `IMAGE_FORMAT` con la línea del SVG.
+- **PDF.** `paint/PdfImages` agrupa lo que se incrusta: el PNG y el JPEG como antes y el SVG, que JSVG dibuja
+  en un `PdfBoxGraphics2D` (un `PDFormXObject` del tamaño natural, una vez por fichero). `PdfCanvas.image` lo
+  coloca con una matriz de escala dentro del recorte de la caja y restablece los guiones.
+- **SVG de depuración.** `SvgCanvas` incrusta el SVG como `data:image/svg+xml`.
+- **Texto.** JSVG lo dibuja como contornos de la fuente: se ve bien pero no se puede seleccionar (decisión 247;
+  la V4 suponía lo contrario).
+
 **Tareas:**
 
 - [x] Resolver V1–V6 (2026-10-28).
-- [ ] `ImageLibrary` e `ImageFile` con el formato SVG, tamaño natural y validación.
-- [ ] `PdfCanvas` y `SvgCanvas`; `PdfStructure`, igual que las demás imágenes.
-- [ ] Especificación (§5.18, §6, §8), errores, tests y caso golden `24-svg`.
-- [ ] `tools/ExampleImages.java` y los ejemplos 01, 02, 04, 06, 07, 08, 09 y 10.
+- [x] Dependencias (`jsvg` 2.2.0 y `graphics2d` 3.0.5) en el `pom.xml`.
+- [x] `ImageLibrary` e `ImageFile` con el formato SVG, tamaño natural y validación (`SvgInspector`; 3 casos
+      nuevos en `test/errors/images/`).
+- [x] `PdfCanvas` (`PdfImages`) y `SvgCanvas`; `PdfStructure`, igual que las demás imágenes.
+- [x] Especificación (§2, §4.15, §5.18, §6 y §8), tests (`SvgImageTest`, `ImageLayoutTest`, `SvgCanvasTest`,
+      `PdfCanvasTest.svgIsDrawnAsOneVectorFormAndScaledToItsBox`) y caso golden `24-svg`, calculado a mano.
+- [x] `tools/ExampleImages.java` (clase `Svg`) y los ejemplos 01, 02, 04, 06, 07, 08, 09 y 10 (con 03 y 05 sin
+      cambios: solo llevan fotos); PNG revisados a ojo y volcados sin cambios.
 
 ---
 
@@ -1247,14 +1266,19 @@ implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
-- **2026-10-28 (17).** Hito 31 en curso. Resueltas V1–V6 con un cuestionario (todas las propuestas): SVG
-  vectorial con JSVG y `pdfbox-graphics2d`, subconjunto cerrado (formas, rutas, grupos, degradados, trazos;
-  lo demás es `IMAGE_FORMAT`), texto solo con las fuentes de `resources/fonts/`, tamaño natural de
-  `width`/`height` o `viewBox` a 96 ppp y ninguna referencia externa. `mvn test` en verde (1205 tests) al
-  empezar. Central dio un 429 al comprobar las versiones de las librerías: hay que confirmarlas al
-  añadir las dependencias.
-  *Siguiente paso:* dependencias en el `pom.xml`, `ImageLibrary`/`ImageFile` con el formato SVG y su
-  validación.
+- **2026-10-28 (17).** Hito 31 terminado, en cuatro commits (decisiones, código y pruebas, ejemplos y
+  documentación). Resueltas V1–V6 con un cuestionario (todas las propuestas): SVG vectorial con JSVG 2.2.0 y
+  `pdfbox-graphics2d` 3.0.5, subconjunto cerrado (formas, rutas, grupos, degradados, recortes, trazos y texto;
+  lo demás es `IMAGE_FORMAT`), texto solo con las fuentes de `fonts/`, tamaño natural de `width`/`height` o
+  `viewBox` a 96 ppp y ninguna referencia externa. Al probar JSVG salió que dibuja el texto como contornos: se
+  ve igual pero no es seleccionable (decisión 247; ver `TODO.md`). Al mirar el PNG del caso golden salieron
+  los trazos discontinuos: el modo `debug` deja un patrón de guiones y los formularios heredan el estado
+  gráfico (decisión 249). Caso golden `24-svg` (calculado a mano, pasó a la primera), tres casos en el
+  catálogo y `SvgImageTest`. `tools/ExampleImages.java` escribe SVG (clase `Svg`) para los logotipos, las
+  firmas, el sello, los gráficos, el emblema, el adorno, el termostato y el esquema: ningún volcado cambia y
+  los PNG se ven igual o más nítidos. Decisiones 242–251 de `DECISIONES.md`. `mvn test` en verde.
+  *Siguiente paso:* los hitos 16 a 31 de esta hoja de ruta están terminados. Pendiente: repasar las
+  decisiones de `DECISIONES.md` y elegir el siguiente trabajo (ideas en `TODO.md`).
 - **2026-10-28 (16).** Hito 30 terminado, en tres commits (decisiones, código y documentación con el caso
   golden y los ejemplos). Resueltas O1–O5 con un cuestionario: `Rotate` en `Relative`, `Absolute`, `Fixed` e
   `Image` (no en `Text`), solo pintado pero lo girado debe caber en la página y un `Relative` girado no se

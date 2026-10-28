@@ -1419,3 +1419,80 @@ salieron al implementarlas.
      carta del restaurante, 06, que es de 420 × 700, `test/spec/report.stxt` y los ejemplos de la
      especificación y del README) usan `Paper: A4`; los tests y los casos golden siguen con `Width` y
      `Height`, porque prueban medidas concretas.
+
+## Hito 31: imágenes vectoriales (SVG) (2026-10-28)
+
+Las decisiones V1–V6 de la hoja de ruta se tomaron con un cuestionario (todas con la propuesta); estas son las
+interpretaciones que salieron al implementarlas.
+
+242. **El SVG se reconoce por el contenido: un fichero que empieza por `<`** (tras la marca de orden de bytes
+     de UTF-8 y los espacios). Un XML que no es SVG (raíz distinta, o sin el espacio de nombres de SVG) es
+     `IMAGE_FORMAT` con un mensaje propio. El mensaje de los que no son PNG, JPEG ni SVG pasó a decirlo
+     (`no es PNG, JPEG ni SVG`). *Dónde:* `ImageFile.read`. *Alternativa:* exigir la extensión `.svg`, contra
+     lo que ya se hace con PNG y JPEG (§5.18).
+
+243. **Subconjunto cerrado y estricto, con la línea del SVG en el mensaje.** Elementos: `svg` (sin anidar), `g`,
+     `defs`, `title`, `desc`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `path`,
+     `linearGradient`, `radialGradient`, `stop`, `clipPath`, `use`, `text` y `tspan`. Todo lo demás (también
+     `style`, `symbol`, `metadata`, `switch` y los elementos de otros espacios de nombres, como los de
+     Inkscape), un atributo de otro espacio de nombres (salvo `xlink` y `xml`), un manejador `on…` y las
+     propiedades `filter`, `mask` y `marker*` (del atributo o de `style`) son `IMAGE_FORMAT`: la política es
+     la del resto del motor, nada se ignora en silencio. El precio es que un SVG exportado de un editor suele
+     necesitar limpiarse. *Dónde:* `SvgInspector`. *Alternativa:* ignorar lo que JSVG ignora, o admitir
+     `metadata` y los atributos de editor (`inkscape:`) como inertes.
+
+244. **Referencias: solo internas.** Un `href` (también `xlink:href`) y un `url(…)` (en un atributo o en
+     `style`) que no empiecen por `#` son errores; un `href` solo tiene sentido en `use` y en los degradados.
+     Un DTD, una entidad o un `XInclude` también (el parser SAX los desactiva), y JSVG carga con
+     `ResourcePolicy.DENY_ALL` por si algo se le escapara a la validación. *Dónde:* `SvgInspector`,
+     `PdfImages.draw`.
+
+245. **Tamaño natural.** `width` y `height` con unidad absoluta (`px`, `pt`, `pc`, `in`, `cm`, `mm`; sin
+     unidad, píxeles) o, si faltan, el `viewBox`; con un solo lado y `viewBox`, el otro sale de la
+     proporción; en `%` o `em` no hay tamaño natural. Después, a 96 ppp como los PNG. `ImageFile.pixelWidth()`
+     pasó de `int` a `double`. *Dónde:* `SvgInspector.Handler.size`/`result`. *Alternativa:* exigir `width`,
+     `height` y `viewBox`.
+
+246. **Texto: la primera familia de `font-family`, sin sustitución.** Solo cuenta la primera familia de la
+     lista (`'IBM Plex Sans', sans-serif` es `IBM Plex Sans`) y no puede ser genérica (`sans-serif`…), porque
+     habría que sustituirla; `font-weight` solo `normal`/`400` o `bold`/`700` y `font-style` solo
+     `normal` o `italic`, propios o heredados de un `g`; la variante debe existir en `fonts/` y tener todos los
+     caracteres del texto. Sin `font-family` es un error (no hay fuente por defecto, §5.11). *Dónde:*
+     `ImageFile.checkText`. *Alternativa:* probar las familias de la lista en orden, como CSS.
+
+247. **El texto de un SVG no es texto del PDF.** La propuesta (V4) suponía que con `pdfbox-graphics2d` quedaría
+     seleccionable, pero JSVG dibuja los glifos como contornos (`fill(Shape)`), así que en el PDF son rutas
+     con la forma de la fuente de `fonts/`: se ve igual y no se puede seleccionar ni se extrae. Para que JSVG
+     encuentre la fuente por su familia hay que darla de alta en AWT (`GraphicsEnvironment.registerFont`),
+     lo que es global a la JVM; solo se hace si algún SVG tiene texto, una vez por fichero. Lo habitual en
+     un SVG de un documento accesible es que su texto vaya en el documento y el SVG sea un dibujo, y `Alt`
+     da el texto alternativo. *Dónde:* `PdfImages.registerFonts`. *Alternativa:* una `Output` propia de JSVG
+     (`TextOutput`) que escriba el texto con `drawString` y un `PdfBoxGraphics2DFontTextDrawer` con las
+     fuentes registradas (en `TODO.md`).
+
+248. **Un SVG es un formulario del PDF y se escala a su caja.** `PdfBoxGraphics2D` dibuja el SVG a su tamaño
+     natural en puntos (un formulario de `file.width()` × `file.height()`), una vez por fichero, y
+     `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde dice `ImageFit` (`contain`, `cover` y
+     `fill` valen igual que con un PNG; `fill` deforma el dibujo) dentro del recorte de la caja de contenido
+     con sus esquinas. El PDF etiquetado trata la imagen igual: `Figure` con `Alt`, *artifact* sin él.
+     *Dónde:* `PdfCanvas.image`, `PdfImages.drawing`.
+
+249. **Un formulario hereda el estado gráfico, y los guiones del modo `debug` se le colaban.** Al revisar el PNG
+     del caso golden, los trazos del SVG salían a trazos discontinuos: el modo `debug` deja activo el patrón
+     de guiones del contorno de las cajas, y `pdfbox-graphics2d` no fija los guiones si el trazo no los
+     tiene. `PdfCanvas.image` los restablece (`[] 0 d`) dentro de su `q … Q` antes del `Do`. Los demás
+     parámetros (ancho, remate, unión, colores) los escribe el dibujo en cada trazo. *Dónde:*
+     `PdfCanvas.image`. *Alternativa:* envolver cada contorno de depuración en su propio `q … Q`.
+
+250. **Los ejemplos con SVG y el generador.** Los logotipos, las firmas, el sello, los tres gráficos, el
+     emblema, el adorno, el termostato y el esquema de conexión de los ejemplos pasan a SVG con el mismo
+     tamaño natural que tenían los PNG (así ningún volcado cambia): `tools/ExampleImages.java` tiene una
+     clase `Svg` con lo justo de Java2D (rellenos, trazos, un degradado lineal y texto) y escribe las
+     mismas figuras que antes dibujaba en un `BufferedImage`. Las fotos, la pantalla del móvil (08) y el
+     icono del horario (11) siguen siendo PNG o JPEG. El recorte `AlphaComposite.Clear` del anillo de
+     clientes pasó a ser una resta de áreas. *Dónde:* `tools/ExampleImages.java`,
+     `resources/images/examples/`.
+
+251. **Dependencias nuevas:** JSVG 2.2.0 (`com.github.weisj:jsvg`, sin dependencias propias) y
+     `pdfbox-graphics2d` 3.0.5 (`de.rototor.pdfbox:graphics2d`, sobre el PDFBox que ya se usa). *Alternativa
+     descartada:* Apache Batik, que arrastra decenas de jars.

@@ -77,8 +77,8 @@ directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
 `PdfWriter.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
-Las imágenes (`Image: logos/acme.png`) son PNG o JPEG de `images/`, con la ruta relativa a esa
-carpeta; se incrustan una vez en el PDF con su resolución. Los detalles están en el §5.18 de la
+Las imágenes (`Image: logos/acme.png`) son PNG, JPEG o SVG de `images/`, con la ruta relativa a esa
+carpeta; se incrustan una vez en el PDF (los PNG y JPEG con su resolución; un SVG, como dibujo vectorial). Los detalles están en el §5.18 de la
 especificación.
 
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
@@ -93,7 +93,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 30 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 31 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -122,7 +122,7 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 30 están termin
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del schema | Hecho y probado |
-| Imágenes (`Image`): PNG y JPEG de la carpeta de recursos, tamaño natural a 96 ppp, proporción, `Fit` (`contain`, `cover`, `fill`), sin cortes, `Figure` con `Alt` en el PDF etiquetado; también desde Markdown | Hecho y probado |
+| Imágenes (`Image`): PNG, JPEG y SVG de la carpeta de recursos (el SVG, vectorial en el PDF, en un subconjunto cerrado), tamaño natural a 96 ppp, proporción, `Fit` (`contain`, `cover`, `fill`), sin cortes, `Figure` con `Alt` en el PDF etiquetado; también desde Markdown | Hecho y probado |
 | Markdown con commonmark-java 0.30.1 (CommonMark, tablas y tachado de GFM, subrayado `++…++`) | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Align: justify`) | Hecho y probado |
@@ -190,7 +190,7 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 28. ~~**Aspecto de las cajas.** `Radius` (esquinas redondeadas, también el recorte de una `Image`), `Border color` con un color por lado, degradados lineales en `Background` (`linear(ángulo, color, color…)`) y colores con opacidad (`#RGBA`, `#RRGGBBAA`); sin sombras (caso 21).~~ Hecho.
 29. ~~**Texto preformateado y código.** `White space` (`pre`, `pre-wrap`) y `Tab size` en `Typography`, y `Code font` en `Markdown` para el código en línea y los bloques de código (caso 22).~~ Hecho.
 30. ~~**Rotación y orientación de la página.** `Rotate` y `Rotate origin` en `Relative`, `Absolute`, `Fixed` e `Image`; `Paper` y `Orientation` en `Media` (caso 23).~~ Hecho.
-31. **Imágenes vectoriales (SVG).** Pendiente.
+31. ~~**Imágenes vectoriales (SVG).** `Image` admite SVG (formas, rutas, grupos, degradados, recortes, trazos y texto con las fuentes de `fonts/`), dibujado con JSVG y `pdfbox-graphics2d` como vectores del PDF; ninguna referencia externa (caso 24).~~ Hecho.
 
 El plan, las decisiones y el registro de sesiones de los hitos 16 a 31 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -223,15 +223,15 @@ src/main/java/dev/stxt/boxes/
     multicol/   MulticolLayout, Columns
     image/      ImageLayout, Images, NaturalSize
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
-  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure, ImageFit, Leaders,
-                PdfWriter
+  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfImages, PdfStructure, ImageFit,
+                Leaders, PdfWriter
   output/       StxtDump
 
 test/           Casos de prueba que no son código: golden/ (resultado calculado a mano), errors/
                 (un documento por error, en carpetas por grupo), examples/ (documentos
                 completos con PDF e imágenes) y spec/ (el ejemplo de la especificación)
 resources/      Carpeta de recursos: fonts/ (IBM Plex Sans, Serif y Mono) e images/
-tools/          ExampleImages.java, que genera las imágenes de los ejemplos
+tools/          ExampleImages.java, que genera las imágenes de los ejemplos (SVG las vectoriales)
 ```
 
 ## Validación en el editor

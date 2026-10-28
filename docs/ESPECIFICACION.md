@@ -82,7 +82,7 @@ documento de estilos aparte, que se pasa junto al documento al maquetar (§4.10)
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
 | `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas, bloques de código e imágenes, con enlaces y código en sus textos ([§5.17](#517-markdown)) | Su texto en `Content` |
-| `Image` | Imagen PNG o JPEG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
+| `Image` | Imagen PNG, JPEG o SVG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
 | `Contents` | Índice automático: una entrada por encabezado, con su página ([§5.19](#519-referencias-a-otras-cajas)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
@@ -664,7 +664,7 @@ Propiedades del elemento `Image`, hijas directas suyas ([§5.18](#518-imágenes)
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG o JPEG: `Image: logos/acme.png`. |
+| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG o SVG: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura del PDF etiquetado; sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Rotate`, `Rotate origin` | como en [§4.9](#49-posicionamiento) | — | Gira la imagen al pintarla (un sello, una etiqueta en diagonal). |
@@ -1830,7 +1830,7 @@ etiquetas (`H1`, `P`, `L`, `Table`…); sus encabezados son marcadores. En el vo
 
 ### 5.18 Imágenes
 
-Una `Image` pone en el documento una imagen PNG o JPEG de la carpeta `images/` de los recursos
+Una `Image` pone en el documento una imagen PNG, JPEG o SVG de la carpeta `images/` de los recursos
 ([§5.11](#511-recursos-y-fuentes)). Es una caja sin hijos, como un `Text`, cuyo contenido es la
 imagen: se coloca, se dimensiona, se corta entre páginas y se pinta como cualquier caja, con su
 `Box` (márgenes, relleno, borde y fondo) y su `Break`.
@@ -1872,15 +1872,40 @@ misma imagen recortada a lo que queda de ancho.)
 
 **Fichero.** El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo
 ([§5.11](#511-recursos-y-fuentes)): `Image: logos/acme.png` es `resources/images/logos/acme.png`.
-Se admiten PNG (con transparencia) y JPEG, y el formato se reconoce por el contenido, no por la
-extensión. Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son un
-error (`IMAGE_UNKNOWN`); un fichero que no es PNG ni JPEG (GIF, WebP, SVG…) o que no se puede
-leer, también (`IMAGE_FORMAT`). Los ficheros se comprueban antes de maquetar, con las fuentes, y
-los errores señalan la línea de la `Image`.
+Se admiten PNG (con transparencia), JPEG y SVG, y el formato se reconoce por el contenido, no por
+la extensión. Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son
+un error (`IMAGE_UNKNOWN`); un fichero que no es PNG, JPEG ni un SVG admitido (GIF, WebP…) o que
+no se puede leer, también (`IMAGE_FORMAT`). Los ficheros se comprueban antes de maquetar, con las
+fuentes, y los errores señalan la línea de la `Image`.
 
 **Tamaño natural.** Cada píxel mide 0,75 pt, como en CSS (96 píxeles por pulgada), sin mirar la
 resolución que declare el fichero: una imagen de 200 × 100 píxeles mide 150 × 75 pt. Para otro
-tamaño se declara `Width` o `Height`.
+tamaño se declara `Width` o `Height`. El de un SVG sale de su `width` y `height` (en `px`, `pt`,
+`pc`, `in`, `cm` o `mm`; sin unidad, píxeles) o, si faltan, de su `viewBox`, también a 96 píxeles
+por pulgada; con solo uno de los dos lados y un `viewBox`, el otro sale de su proporción. Sin
+tamaño, o con medidas relativas (`%`, `em`), un SVG no tiene tamaño natural y es un error
+(`IMAGE_FORMAT`).
+
+**SVG.** Un SVG es un dibujo vectorial: el PDF lo lleva como rutas, rellenos, degradados y
+recortes, no como píxeles, así que se ve nítido a cualquier tamaño y pesa poco; se dimensiona, se
+coloca (`Fit` incluido) y se corta como cualquier imagen. Es un fichero XML en el espacio de nombres
+de SVG, y se admite un subconjunto cerrado: `svg` (sin otro `svg` dentro), `g`, `defs`, `title`,
+`desc`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `path`, `linearGradient`,
+`radialGradient`, `stop`, `clipPath`, `use`, `text` y `tspan`, con sus atributos de presentación
+(rellenos y trazos lisos o con degradado, opacidad, `transform`, recortes). Es un error
+(`IMAGE_FORMAT`, con la línea del SVG en el mensaje) cualquier otro elemento (scripts, animación,
+filtros, máscaras, patrones, marcadores, `image`, `style`…), una propiedad con efecto fuera del
+subconjunto (`filter`, `mask`, `marker`), un atributo de otro espacio de nombres o un manejador de
+eventos (`onclick`…): nada se ignora en silencio. Tampoco se admite nada de fuera del fichero: un
+`href` o un `url(…)` solo pueden llevar a un `#id` del propio SVG, y un DTD o una entidad son un
+error.
+
+El texto de un SVG (`text`, `tspan`) usa solo las fuentes de `fonts/` ([§5.11](#511-recursos-y-fuentes)),
+sin sustitución: su `font-family` (solo cuenta la primera de la lista, y no puede ser una genérica
+como `sans-serif`), su `font-weight` (`normal` o `bold`) y su `font-style` (`normal` o `italic`),
+propios o heredados de un `g`, deben ser una variante que exista, con todos los caracteres del
+texto. Se dibuja con los contornos de la fuente: se ve como cualquier texto del documento, pero no
+se puede seleccionar ni se extrae del PDF.
 
 **Dimensionado.** La caja de contenido de una imagen tiene la **proporción** del fichero, o la de
 `Aspect ratio` si se declara, que la sustituye (no es un error). El relleno y el borde van
@@ -1926,8 +1951,9 @@ fondos. Dentro de un `Fixed` es siempre un *artifact*, y en las filas repetidas 
 es contenido la primera vez.
 
 **Salida.** El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la
-resolución del fichero: el JPEG tal cual y el PNG sin pérdida y con su transparencia. El SVG de
-depuración la incrusta como `data:`. En el volcado del [§7](#7-formato-de-resultados) es una caja
+resolución del fichero: el JPEG tal cual y el PNG sin pérdida y con su transparencia; un SVG, como
+un dibujo vectorial del tamaño del SVG que se escala a su caja. El SVG de depuración la incrusta
+como `data:`. En el volcado del [§7](#7-formato-de-resultados) es una caja
 más.
 
 ### 5.19 Referencias a otras cajas
@@ -2139,7 +2165,7 @@ La validación se hace en cuatro niveles:
 | `LINK_SCHEME` | El destino de un enlace (`Link` o enlace de Markdown, [§5.20](#520-enlaces)) es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito (línea del `Link`, o la del bloque en Markdown) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno (línea del `Link`, o la del bloque en Markdown) | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
-| `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
+| `IMAGE_FORMAT` | Una `Image` es un PNG, un JPEG o un SVG del subconjunto del [§5.18](#518-imágenes), que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG, JPEG ni SVG (es GIF): conviértela a uno de los tres` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns`; con código, `Code font` (línea de la lista, la tabla o el código) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
@@ -2279,7 +2305,7 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Columnas que no caben en el alto del contenedor | Columnas de desbordamiento a un lado | Error (`BOX_OVERFLOW`) |
 | `position: absolute` o `fixed` dentro de un multicolumna | Sí | Error (`POSITIONED_IN_MULTICOL`) |
 | `break-before: column` fuera de un multicolumna | Se ignora | Error (`COLUMN_BREAK_OUTSIDE_MULTICOL`) |
-| Imágenes (`<img>`) | Elemento en línea, dentro del texto; muchos formatos (GIF, WebP, SVG…); `srcset` y `sizes` | Una caja `Image` sola, con un PNG o un JPEG de la carpeta de recursos ([§5.18](#518-imágenes)) |
+| Imágenes (`<img>`) | Elemento en línea, dentro del texto; muchos formatos (GIF, WebP…); `srcset` y `sizes`; un SVG puede llevar scripts, estilos y referencias externas | Una caja `Image` sola, con un PNG, un JPEG o un SVG de la carpeta de recursos ([§5.18](#518-imágenes)) |
 | Tamaño de un píxel | 1/96 de pulgada | Igual (0,75 pt), sin mirar la resolución que declare el fichero |
 | `object-fit` | `fill` por defecto; también `none` y `scale-down`, con `object-position` | `Fit`, con `contain` por defecto; sin `none` ni `scale-down`, y siempre centrada |
 | Imagen más ancha que su contenedor | Desborda (se suele evitar con `max-width: 100%`) | Error (`BOX_OVERFLOW`): se declara `Width` |
@@ -2507,7 +2533,7 @@ Document (dev.stxt.boxes):
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Giro** (`Rotate`) | Una caja que se pinta girada alrededor de su `Rotate origin`, sin que cambie el layout; lo girado tiene que caber en la página. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
-| **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
+| **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG o un SVG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4`, `Letter`…), en vertical o, con `Orientation: landscape`, apaisado. |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
