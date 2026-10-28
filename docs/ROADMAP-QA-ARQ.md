@@ -61,7 +61,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 |---|---|---|---|---|
 | QA-01 | `ListMarkers`: mayúsculas con el `Locale` de la JVM | Alta | S | hecho |
 | QA-02 | El texto de un SVG cambia con el idioma de la JVM | Media | M | pendiente |
-| QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | decidir |
+| QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | hecho |
 | QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | hecho |
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
 | QA-06 | Límites y entradas hostiles | Media | M | pendiente |
@@ -71,10 +71,10 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | pendiente |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
 | TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
-| TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | pendiente |
+| TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | hecho |
 | TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | pendiente |
-| PF-01 | Coste del GSUB de PDFBox | Alta | M | decidir (con QA-03) |
-| PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | pendiente |
+| PF-01 | Coste del GSUB de PDFBox | Alta | M | hecho |
+| PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | hecho |
 | PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | pendiente |
 | PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | pendiente |
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
@@ -109,6 +109,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | `showText` de PDFBox, 2400 líneas | con GSUB **855 a 1508 ms**; sin GSUB **48 a 126 ms** (17 a 30 veces); mismo tamaño de PDF |
 | Perfil (JFR) del texto largo | ≈ 1/3 de las muestras en `fontbox.ttf.gsub` (expresiones regulares por llamada); `FontFile.width` 13 % |
 | Reparto de tiempo con `{page}` en un `Fixed` | al pasar de 99 a 100 páginas el layout se hace dos veces (PF-03): 23 → 46 fallos de caché por página |
+| Tras la sesión 2, texto largo | 153 páginas: layout 386 ms, pintar 232 ms (antes 954 y 2275); 657 páginas: layout 1,5 s, pintar 0,8 s (antes 3,2 y 9,3). Con `Ligatures: true`: layout 588 ms, pintar ≈ 2 s. 8 hilos × 10 rondas × 11 ejemplos: 6,8 a 7,0 s (antes 13,4 a 16,2 s) |
 | Entradas hostiles | anidado > 100 niveles y línea > 10 000 caracteres: `LimitException` de `stxt-core` (bien); `Columns: repeat(100000, 1fr)`: 182 ms; 2000 páginas: 0,5 s |
 
 ## QA
@@ -153,7 +154,7 @@ sustituya) cuando detecte que la fuente elegida no es la pedida.
 **Aceptación.** `ExamplesTest` con `-Duser.language=tr` deja `git status` limpio, o el motor rechaza el SVG con
 un error claro.
 
-### QA-03 · PDFBox aplica GSUB y el motor mide sin ligaduras · Alta · M · decidir
+### QA-03 · PDFBox aplica GSUB y el motor mide sin ligaduras · Alta · M · hecho
 
 **Evidencia (verificada con `GsubGlyphsProbe`).** `PdfCanvas.text` llama a `PDPageContentStream.showText`, que en
 PDFBox 3.0.8 aplica la tabla GSUB de la fuente (`PDAbstractContentStream.encodeForGsub`). Las fuentes que incluye el
@@ -168,7 +169,17 @@ Además PDFBox lanza `IllegalStateException: could not find the glyphId…` si r
 tiene mientras GSUB está activo (caso `ǅ`); hoy no se llega porque `PdfMetrics.validate` lo rechaza antes con
 `GLYPH_MISSING`, pero un `Engine` con `FixedMetrics` pintado con `PdfCanvas` sí podría.
 
-**Decisión abierta (con el usuario).**
+**Hecho (sesión 2), con la decisión del usuario: las dos opciones, elegible, y sin ligaduras por defecto.**
+Nueva propiedad `Ligatures` (`true`/`false`, `false` por defecto) en `Typography`, heredable y válida en `Styles`
+(decisiones 289 a 293 de `DECISIONES.md`, §4.4 y §5.4 de la especificación). Sin ella, `PdfCanvas` carga el TTF con
+`setEnableGsub(false)` (API pública de fontbox, no el truco de quitar la tabla) y PDFBox escribe un glifo por
+carácter; con ella, `FontFile.width(…, ligatures)` mide cada palabra con el mismo `GsubWorker` que PDFBox aplica al
+pintar. La opción viaja en `FontFace` (cuarto componente), y `Letter spacing` distinto de 0 la desactiva. Se
+regeneraron 22 PNG (solo cambia dónde había `fi`/`fl`, revisado). Test: `LigaturesTest` (anchos, valor por defecto,
+herencia con el documento, interletraje y glifos escritos en el PDF). **Cambia el aspecto de los documentos
+existentes** (por defecto, sin la ligadura `fi` de Plex Serif).
+
+**Decisión que se tomó (para el registro).**
 
 - **A (recomendada). Sin ligaduras en el PDF**: quitar la tabla GSUB al incrustar. Mide = pinta, el pintado del texto
   pasa a ser 17 a 30 veces más rápido (PF-01) y es coherente con «el texto se mide por carácter». Pierde `fi` como
@@ -329,14 +340,16 @@ validar, o pasar a JSVG un `FontResolver`/`Font` propio por `Resources` (comprob
 que no haya ningún estado de JVM. **Aceptación:** dos `Resources` con la misma familia y ficheros distintos dibujan
 cada uno el suyo (test); `PdfImages.REGISTERED` desaparece.
 
-### TS-04 · Cerrojos en la ruta caliente · Media · S
+### TS-04 · Cerrojos en la ruta caliente · Media · S · hecho
 
 `FontFile.width` es `synchronized` y `Resources.fonts()` también, y se llaman para **cada palabra medida** (varias
 veces: mínimo y máximo intrínseco, reparto en líneas, `place`). Medido: 880 conversiones en 4 núcleos con `Resources`
 compartido tardan un **20 % más** (16,2 s frente a 13,4 s) que con uno por hilo. **Propuesta:** (1) al abrir la
 fuente, precomputar los avances por glifo en un `int[]` inmutable (ver PF-02) y quitar el cerrojo de `width`;
 (2) `Resources.fonts()` y `images()` con un campo `volatile` y doble comprobación, o una carga garantizada en el
-constructor; (3) `ImageLibrary` con `ConcurrentHashMap.computeIfAbsent`. **Aceptación:** `ConcurrencyProbe` muestra
+constructor; (3) `ImageLibrary` con `ConcurrentHashMap.computeIfAbsent`. **Hecho (sesión 2):** (1) sin `synchronized` en `FontFile.width`; (2) `Resources.fonts()`/`images()` con `volatile` y comprobación doble; (3) `ImageLibrary` con `ConcurrentHashMap`. Queda un `synchronized (ttf)` en el camino raro de un glifo inexistente y otro en la primera petición del `GsubWorker`. `ConcurrencyProbe` (ahora en cuatro fases alternadas, porque el orden de las dos distorsionaba por el calentamiento de la JVM): compartir `Resources` es igual o más rápido que uno por hilo (6,8 s frente a 7,0 s; antes 16,2 s frente a 13,4 s, con el sesgo del orden).
+
+**Aceptación:** `ConcurrencyProbe` muestra
 que compartir `Resources` ya no es más lento que no compartirlo.
 
 ### TS-05 · Fachada reutilizable y segura entre hilos · Media · M
@@ -350,22 +363,26 @@ la base del servicio HTTP de `TODO.md`.
 El tiempo se va en el **pintado** (70-75 % en documentos de texto largo), no en el layout, y dentro del pintado en
 GSUB. El layout escala bien (casi lineal; el salto al pasar de 99 páginas es PF-03).
 
-### PF-01 · Coste del GSUB de PDFBox · Alta · M · decidir con QA-03
+### PF-01 · Coste del GSUB de PDFBox · Alta · M · hecho
 
 Medido con `GsubCostProbe`: 2400 `showText` tardan **855 a 1508 ms con GSUB y 48 a 126 ms sin él**, con un PDF del
 mismo tamaño; en el perfil, ≈ 1/3 de las muestras están en `org.apache.fontbox.ttf.gsub.*`
 (`CompoundCharacterTokenizer`, `GlyphArraySplitterRegexImpl`: compilan expresiones regulares en cada llamada). La
 opción A de QA-03 lo resuelve de golpe; si el usuario elige B (ligaduras), hay que aplicar la tabla una vez por
-cadena y cachear el resultado por `(fuente, texto)`. **Aceptación:** `ScaleProbe` con 3200 párrafos: pintar baja de
+cadena y cachear el resultado por `(fuente, texto)`. **Hecho (sesión 2):** con el valor por defecto (`Ligatures: false`) pintar 3200 párrafos baja de 2190 ms a **232 ms** (≈ 9,5 veces; 12 800 párrafos: 7,3 s → 0,8 s). Con `Ligatures: true` sigue costando lo de antes (≈ 2 s): es el coste de GSUB en PDFBox, que ya solo se paga si se pide. Si algún día hace falta rapidez *con* ligaduras, se puede codificar el texto con el `GsubWorker` del motor (ya se aplica al medir, con memoria por palabra) y escribir los glifos con `showGlyphs`/`TJ` en vez de `showText`: queda como mejora opcional.
+
+**Aceptación:** `ScaleProbe` con 3200 párrafos: pintar baja de
 ≈ 2,4 s a < 0,6 s.
 
-### PF-02 · `FontFile.width` · Media · S
+### PF-02 · `FontFile.width` · Media · S · hecho
 
 Cada carácter hace `cmap.getGlyphId` (búsqueda en `CmapSubtable`) y `ttf.getAdvanceWidth` (que busca la tabla `hmtx` en un
 `HashMap` cada vez: `TrueTypeFont.getTable`), dentro de un `synchronized`. `FontFile.width` es el 13 % de las muestras
 propias. **Propuesta:** al abrir la fuente, leer `hmtx` a un `short[]`/`int[]` por glifo ya redondeado como hoy
 (`Math.round(avance × 1000 / unitsPerEm)`) y un `char → avance` perezoso para el plano básico (`int[65536]` es 256 KB
-por fuente: mejor por bloques de 256 o un `HashMap<Character,Integer>`); quita el cerrojo (TS-04). **Aceptación:** los
+por fuente: mejor por bloques de 256 o un `HashMap<Character,Integer>`); quita el cerrojo (TS-04). **Hecho (sesión 2):** `FontFile` calcula al abrir el avance de cada glifo (`int[]`) y memoriza el de cada carácter del plano básico (`int[65536]`, escrituras idempotentes sin cerrojo). `FontFileTest` compara los 63 488 caracteres de las 12 fuentes con lo que contesta fontbox (idénticos) y mide desde 4 hilos. Layout de 12 800 párrafos: 3,2 s → 1,2 s; 3200: 954 → 512 ms. Los 22 PNG que cambiaron en esta sesión son solo por QA-03, no por esto (los anchos son los mismos).
+
+**Aceptación:** los
 anchos son idénticos bit a bit (test que recorre todos los glifos de las 12 fuentes contra la implementación anterior
 una vez); `ScaleProbe`: layout −15 % o mejor.
 
@@ -572,7 +589,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | Sesión | Tareas | Resultado |
 |---|---|---|
 | **1. Correcciones y red de seguridad** | QA-01, QA-04, QA-05, QA-09, TS-02 | Fallo del idioma corregido; CI con matriz de idiomas; test de hilos |
-| **2. Decisión de ligaduras y rendimiento del pintado** | QA-03 + PF-01 (tras decidir A o B), PF-02, TS-04 | Mide = pinta; pintar 4 a 20 veces más rápido; sin cerrojos calientes |
+| **2. Ligaduras y rendimiento del pintado** (hecha) | QA-03 + PF-01, PF-02, TS-04 | Mide = pinta; pintar ≈ 9,5 veces más rápido por defecto; sin cerrojos calientes |
 | **3. Contrato público** | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
 | **4. SVG y el estado global** | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
 | **5. Caché de la paginación** | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
@@ -587,8 +604,8 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 
 ## Decisiones abiertas
 
-1. **Ligaduras (QA-03/PF-01):** ¿se pintan sin ligaduras (A, recomendado: mide = pinta y es mucho más rápido) o se
-   miden con ellas (B)? Bloquea la sesión 2.
+1. ~~**Ligaduras (QA-03/PF-01)**~~ **Resuelta (sesión 2):** las dos, con `Ligatures` en `Typography`, heredable, sin
+   ligaduras por defecto.
 2. **Política de los PNG de referencia (QA-07):** ¿falla el test cuando cambia un PNG, salvo con `-D…update=true`?
    Hoy es una convención humana.
 3. **Fachada (AR-08):** ¿se mantiene `PdfWriter.write` como API estable (solo se desaconseja) o se depreca?
@@ -600,3 +617,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 |---|---|---|---|
 | 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |
 | 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). CI en verde en GitHub (JDK 17, 21 y turco). | Sesión 2 (decidir ligaduras: QA-03) |
+| 2026-10-28 | 2 · Ligaduras y rendimiento del pintado | `Ligatures` en `Typography` (heredable, `false` por defecto; schema, §4.4/§5.4/§9, decisiones 289 a 293), medida con ligaduras con el `GsubWorker` de fontbox y pintado con `setEnableGsub`; PF-02 y TS-04 (`FontFile` sin cerrojos con avances precalculados; `Resources`/`ImageLibrary` sin `synchronized` calientes). 22 PNG regenerados (revisados: solo `fi`/`fl`). Suite verde. Medido: pintar ≈ 9,5× más rápido, layout ≈ 2× más rápido. | Sesión 3 (TS-01, AR-09, AR-08 + TS-05, QA-06) |
