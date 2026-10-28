@@ -198,4 +198,48 @@ class BoxTreeBuilderTest {
         assertEquals(515, r.media().pageArea().width(), 1e-9);
         assertEquals(762, r.media().pageArea().height(), 1e-9);
     }
+
+    /** {@code Paper} y {@code Orientation} (§4.1): el tamaño en vertical, girado con {@code landscape}. */
+    @Test
+    void namedPaperSizes() {
+        String head = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n";
+        Media a4 = build(head + "\t\tPaper: A4\n\t\tMargin: 40\n").media();
+        assertEquals(new Media(595, 842, new dev.stxt.boxes.model.Insets(40, 40, 40, 40)), a4);
+        Media landscape = build(head + "\t\tPaper: A4\n\t\tOrientation: landscape\n").media();
+        assertEquals(842, landscape.width(), 1e-9);
+        assertEquals(595, landscape.height(), 1e-9);
+        Media portrait = build(head + "\t\tPaper: Letter\n\t\tOrientation: portrait\n").media();
+        assertEquals(612, portrait.width(), 1e-9);
+        assertEquals(792, portrait.height(), 1e-9);
+        for (Media.Paper paper : Media.Paper.values()) {
+            String name = paper.name().length() == 2 ? paper.name()
+                    : paper.name().charAt(0) + paper.name().substring(1).toLowerCase(java.util.Locale.ROOT);
+            Media m = build(head + "\t\tPaper: " + name + "\n").media();
+            assertTrue(m.width() < m.height(), name);
+        }
+    }
+
+    @Test
+    void paperExcludesWidthAndHeight() {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(
+                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tHeight: 842\n\t\tPaper: A4\n"));
+        assertEquals(ErrorCode.MEDIA_SIZE, e.code());
+        assertEquals(4, e.line());
+    }
+
+    /** {@code Rotate} y {@code Rotate origin} (§4.2): el giro y la fracción de la caja; sin origen, el centro. */
+    @Test
+    void rotateAndItsOrigin() {
+        Box root = build(document(
+                "\tRelative:", "\t\tRotate: -8.5",
+                "\tAbsolute:", "\t\tRotate: 90", "\t\tRotate origin: bottom right",
+                "\tFixed:", "\t\tRotate: 360", "\t\tRotate origin: top",
+                "\tImage: test/square.png", "\t\tRotate: -360",
+                "\tRelative:")).root();
+        assertEquals(new dev.stxt.boxes.model.Rotation(-8.5, 0.5, 0.5), root.children.get(0).style.rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(90, 1, 1), root.children.get(1).style.rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(360, 0.5, 0), root.children.get(2).style.rotation);
+        assertEquals(-360, root.children.get(3).style.rotation.degrees(), 1e-9);
+        assertEquals(null, root.children.get(4).style.rotation);
+    }
 }

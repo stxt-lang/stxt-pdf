@@ -1,10 +1,10 @@
-# Case: Medio sin alto
-# Code: TOO_FEW_CHILDREN
+# Case: Medio sin tamaño: ni Paper ni Width y Height
+# Code: MEDIA_SIZE
 # Line: 6
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
+		Margin: 40
 	Block:
 		Box:
 			Height: 10

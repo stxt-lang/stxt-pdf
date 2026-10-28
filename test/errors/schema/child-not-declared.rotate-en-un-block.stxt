@@ -1,0 +1,12 @@
+# Case: Rotate en un Block, que no es posicionado
+# Code: CHILD_NOT_DECLARED
+# Line: 10
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Block:
+		Rotate: 10
+		Box:
+			Height: 10

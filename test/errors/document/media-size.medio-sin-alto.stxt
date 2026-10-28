@@ -1,0 +1,10 @@
+# Case: Medio sin alto
+# Code: MEDIA_SIZE
+# Line: 7
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+	Block:
+		Box:
+			Height: 10

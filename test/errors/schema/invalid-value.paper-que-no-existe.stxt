@@ -1,0 +1,10 @@
+# Case: Paper con un tamaño que no está en la lista
+# Code: INVALID_VALUE
+# Line: 7
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Paper: A7
+	Block:
+		Box:
+			Height: 10

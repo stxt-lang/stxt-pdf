@@ -70,6 +70,19 @@ public interface Canvas {
     default void link(Box box, Rect area, String destination, String description) {
     }
 
+    /**
+     * Empieza a pintar girado (ESPECIFICACION.md §5.6): todo lo que se pinte hasta
+     * {@link #endRotation()}, también las zonas de los enlaces, gira {@code degrees} grados en el
+     * sentido de las agujas del reloj alrededor del punto ({@code x}, {@code y}) de la página. Los
+     * giros se anidan: uno dentro de otro se suma al de fuera. Por defecto no hace nada.
+     */
+    default void beginRotation(double degrees, double x, double y) {
+    }
+
+    /** Termina el giro empezado con {@link #beginRotation}. */
+    default void endRotation() {
+    }
+
     /** Termina el texto empezado con {@link #beginText(Box)}. */
     default void endText() {
     }

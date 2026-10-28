@@ -1,0 +1,18 @@
+# Case: Decoration de una regla en un Relative girado
+# Code: BREAK_IN_ROTATED
+# Line: 12
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		For class: stamp
+			Break:
+				Decoration: clone
+	Relative:
+		Class: stamp
+		Rotate: -8
+		Block:
+			Box:
+				Height: 10

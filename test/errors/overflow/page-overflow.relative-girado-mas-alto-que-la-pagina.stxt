@@ -1,0 +1,16 @@
+# Case: Relative girado más alto que el área útil: no se parte
+# Code: PAGE_OVERFLOW
+# Line: 10
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Paper: A6
+		Margin: 20
+	Relative:
+		Rotate: 180
+		Block:
+			Box:
+				Height: 300
+		Block:
+			Box:
+				Height: 300

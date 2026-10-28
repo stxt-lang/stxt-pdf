@@ -1,0 +1,12 @@
+# Case: Rotate: 0, que no gira nada
+# Code: VALUE_NOT_ALLOWED
+# Line: 10
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Relative:
+		Rotate: 0
+		Box:
+			Height: 10

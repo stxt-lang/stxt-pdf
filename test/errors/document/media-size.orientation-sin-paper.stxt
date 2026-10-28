@@ -1,0 +1,12 @@
+# Case: Orientation sin Paper
+# Code: MEDIA_SIZE
+# Line: 9
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 842
+		Height: 595
+		Orientation: landscape
+	Block:
+		Box:
+			Height: 10

@@ -5,6 +5,7 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.ErrorCode;
@@ -12,6 +13,7 @@ import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Media;
 import dev.stxt.boxes.tree.Style;
 
+import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -29,13 +31,16 @@ import static dev.stxt.boxes.tree.PropertyKey.MAX_HEIGHT;
 import static dev.stxt.boxes.tree.PropertyKey.MIN_WIDTH;
 import static dev.stxt.boxes.tree.PropertyKey.OFFSET;
 import static dev.stxt.boxes.tree.PropertyKey.PADDING;
+import static dev.stxt.boxes.tree.PropertyKey.ROTATE;
 import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
 
 /**
  * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
  * cada hijo en flujo (con sus márgenes horizontales) caben en la caja de contenido de su padre;
  * el flujo cabe en el área útil de cada página, y las cajas {@code absolute} y
- * {@code fixed} caben en la página. Se mira el resultado final, no las pasadas de medida.
+ * {@code fixed} y las giradas caben en la página (las giradas, y las que están dentro de una
+ * girada, con el rectángulo que envuelve lo que se pinta). Se mira el resultado final, no las
+ * pasadas de medida.
  *
  * <p>El error señala al culpable más profundo: la palabra que no cabe en su línea, la caja más
  * interior que se sale, o el {@code Height} que se queda corto.</p>
@@ -49,6 +54,9 @@ public final class Overflow {
      */
     private static final double TOLERANCE = 0.01;
 
+    /** Sin giros. Nadie la modifica: un giro se compone en una copia. */
+    private static final AffineTransform NONE = new AffineTransform();
+
     private Overflow() {
     }
 
@@ -59,29 +67,49 @@ public final class Overflow {
         // La página física, en coordenadas del área útil.
         Rect page = new Rect(-m.left(), -m.top(), media.width(), media.height());
         for (Page p : pages) {
-            content(p.content(), 0, 0, area.width(), area.height(), true, page);
+            content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
             for (Fragment f : p.fixed()) {
-                fragment(f, 0, 0, page);
+                fragment(f, 0, 0, page, NONE);
             }
         }
     }
 
-    /** Un fragmento cuya caja de contenido del padre empieza en ({@code ox}, {@code oy}). */
-    private static void fragment(Fragment f, double ox, double oy, Rect page) {
+    /**
+     * Un fragmento cuya caja de contenido del padre empieza en ({@code ox}, {@code oy});
+     * {@code turn} son los giros de sus ancestros (§5.6), que se pintan con él.
+     */
+    private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn) {
         double x = ox + f.x();
         double y = oy + f.y();
-        if (f.box().style.isOutOfFlow()) {
-            if (x < page.x() - TOLERANCE || y < page.y() - TOLERANCE
-                    || x + f.width() > page.right() + TOLERANCE || y + f.height() > page.bottom() + TOLERANCE) {
-                Style s = f.box().style;
-                throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : f.box().line,
-                        ErrorCode.BOX_OVERFLOW, "La caja " + name(f.box()) + " se sale de la página: revisa su "
-                        + "Offset y su tamaño");
+        Style s = f.box().style;
+        Rect borderBox = new Rect(x, y, f.width(), f.height());
+        if (s.rotation != null) {
+            turn = new AffineTransform(turn);
+            turn.concatenate(s.rotation.transform(borderBox));
+        }
+        if (s.rotation != null || (s.isOutOfFlow() && !turn.isIdentity())) {
+            // Lo girado se comprueba como se pinta: el rectángulo que lo envuelve, en la página.
+            if (!inside(Rotation.envelope(turn, borderBox), page)) {
+                boolean own = s.rotation != null;
+                throw new InvalidModelException(own ? s.line(ROTATE) : f.box().line, ErrorCode.BOX_OVERFLOW,
+                        "La caja " + name(f.box()) + (own ? " girada" : ", dentro de una caja girada,")
+                                + " se sale de la página: revisa su " + (own ? "Rotate, su Rotate origin, " : "")
+                                + "su posición y su tamaño");
             }
+        } else if (s.isOutOfFlow() && !inside(borderBox, page)) {
+            throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : f.box().line,
+                    ErrorCode.BOX_OVERFLOW, "La caja " + name(f.box()) + " se sale de la página: revisa su "
+                    + "Offset y su tamaño");
         }
         double cx = x + f.border().left() + f.padding().left();
         double cy = y + f.border().top() + f.padding().top();
-        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page);
+        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn);
+    }
+
+    /** Si {@code r} está dentro de {@code page}, con la tolerancia. */
+    private static boolean inside(Rect r, Rect page) {
+        return r.x() >= page.x() - TOLERANCE && r.y() >= page.y() - TOLERANCE
+                && r.right() <= page.right() + TOLERANCE && r.bottom() <= page.bottom() + TOLERANCE;
     }
 
     /**
@@ -89,7 +117,7 @@ public final class Overflow {
      * {@code cy}) y mide {@code width} × {@code height}; {@code isPage}: es el flujo de una página.
      */
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
-                                Rect page) {
+                                Rect page, AffineTransform turn) {
         for (TextLine l : f.lines()) {
             if (l.x() < -TOLERANCE || l.x() + l.width() > width + TOLERANCE) {
                 throw textOverflow(f.box(), l, width);
@@ -101,7 +129,7 @@ public final class Overflow {
         for (Fragment c : f.children()) {
             if (c.box().isMarker()) {
                 // Cuelga fuera del ítem: se comprueba en la sangría de su lista (marker).
-                fragment(c, cx, cy, page);
+                fragment(c, cx, cy, page, turn);
                 continue;
             }
             if (f.box().element == Element.LIST) {
@@ -122,7 +150,7 @@ public final class Overflow {
                     throw tooTall(f, y + c.height(), height, c);
                 }
             }
-            fragment(c, cx, cy, page);
+            fragment(c, cx, cy, page, turn);
         }
     }
 
@@ -211,13 +239,20 @@ public final class Overflow {
 
     /**
      * Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior
-     * que pasa del final, y en él, lo que no se puede partir: su borde y su relleno si ya no caben
+     * que pasa del final, y en él, lo que no se puede partir: el {@code Rotate} de una caja girada, que
+     * no se parte (§5.10), su borde y su relleno si ya no caben
      * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
      * o su {@code Height} (en una imagen sin él, su {@code Width}).
      */
     private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom,
                                                       double pageHeight) {
         while (true) {
+            if (c.box().style.rotation != null) {
+                // Lo que impide partirla es el giro: lo que contiene se partiría.
+                return new InvalidModelException(c.box().style.line(ROTATE), ErrorCode.PAGE_OVERFLOW, "La caja "
+                        + name(c.box()) + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
+                        + pt(c.height()) + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
+            }
             double cx = x + c.border().left() + c.padding().left();
             double cy = y + c.border().top() + c.padding().top();
             Fragment inner = null;

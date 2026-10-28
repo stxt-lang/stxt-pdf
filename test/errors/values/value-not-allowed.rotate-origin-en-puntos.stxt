@@ -1,0 +1,14 @@
+# Case: Rotate origin en puntos: solo admite palabras clave
+# Code: VALUE_NOT_ALLOWED
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Absolute:
+		Rotate: 10
+		Rotate origin: 20 30
+		Box:
+			Width: 10
+			Height: 10

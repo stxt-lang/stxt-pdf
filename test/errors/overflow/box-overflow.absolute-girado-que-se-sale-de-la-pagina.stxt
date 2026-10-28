@@ -1,0 +1,15 @@
+# Case: Absolute que cabe en la página sin girar y girado se sale
+# Code: BOX_OVERFLOW
+# Line: 12
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Absolute:
+		Offset: 0 auto auto 0
+		Rotate: 45
+		Box:
+			Width: 515
+			Height: 100

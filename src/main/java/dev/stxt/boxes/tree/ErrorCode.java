@@ -144,6 +144,10 @@ public enum ErrorCode {
     INDEFINITE_PERCENTAGE,
     /** {@code Areas} no rectangulares o un valor de {@code Area} no válido. */
     GRID_PLACEMENT,
+    /** {@code Rotate origin} sin {@code Rotate}. */
+    ROTATE_ORIGIN_WITHOUT_ROTATE,
+    /** {@code Inside} o {@code Decoration} en un {@code Relative} girado, que no se parte. */
+    BREAK_IN_ROTATED,
 
     // --- Desbordamientos (al maquetar) -------------------------------------------------------
     /** Una palabra más ancha que su línea. */

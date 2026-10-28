@@ -9,6 +9,7 @@ import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.ImageFile;
@@ -39,12 +40,16 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.util.Matrix;
 
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +95,13 @@ public final class PdfCanvas implements Canvas {
     private final boolean debug;
     /** Estados gráficos de opacidad de esta página, por opacidad (en milésimas). */
     private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
+    /**
+     * Los giros en curso ({@link #beginRotation}), compuestos, en coordenadas de la página (con la
+     * y hacia abajo); lo necesitan las zonas de los enlaces y el {@code BBox} de las figuras, que
+     * no siguen la matriz del contenido.
+     */
+    private AffineTransform turn = new AffineTransform();
+    private final Deque<AffineTransform> turns = new ArrayDeque<>();
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
                       Map<FontFace, PDFont> fonts, Map<Path, PDImageXObject> images, PdfStructure structure,
@@ -504,7 +516,7 @@ public final class PdfCanvas implements Canvas {
                 out.beginMarkedContent(COSName.ARTIFACT);
             } else {
                 out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
-                structure.figureBox(box, pdfRect(content));
+                structure.figureBox(box, turnedRect(content));
             }
             out.saveGraphicsState();
             Shapes.roundedRect(path(), content, radii);
@@ -518,6 +530,40 @@ public final class PdfCanvas implements Canvas {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Una matriz {@code cm} dentro de un {@code q}/{@code Q}. Con el origen abajo, el giro en el
+     * sentido de las agujas del reloj es un ángulo negativo.</p>
+     */
+    @Override
+    public void beginRotation(double degrees, double x, double y) {
+        turns.push(turn);
+        turn = new AffineTransform(turn);
+        turn.rotate(Math.toRadians(degrees), x, y);
+        try {
+            out.saveGraphicsState();
+            out.transform(new Matrix(AffineTransform.getRotateInstance(-Math.toRadians(degrees), x, pageHeight - y)));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void endRotation() {
+        turn = turns.pop();
+        try {
+            out.restoreGraphicsState();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /** El rectángulo de la página que ocupa {@code r} con los giros en curso, en coordenadas del PDF. */
+    private PDRectangle turnedRect(Rect r) {
+        return pdfRect(turn.isIdentity() ? r : Rotation.envelope(turn, r));
+    }
+
     /** Un rectángulo en coordenadas del PDF, con el origen abajo. */
     private PDRectangle pdfRect(Rect r) {
         return new PDRectangle((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
@@ -526,11 +572,24 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Una anotación {@code Link} sin borde; la estructura la cuelga de la caja ({@link PdfStructure#link}).</p>
+     * <p>Una anotación {@code Link} sin borde; la estructura la cuelga de la caja ({@link PdfStructure#link}).
+     * Girada, su rectángulo es el que envuelve la zona y sus {@code QuadPoints}, la zona girada: un
+     * visor que no los entiende la hace clicable entera.</p>
      */
     @Override
     public void link(Box box, Rect area, String destination, String description) {
-        PDAnnotationLink annotation = links.create(pdfRect(area), destination, description);
+        PDAnnotationLink annotation = links.create(turnedRect(area), destination, description);
+        if (!turn.isIdentity()) {
+            // Las cuatro esquinas en sentido antihorario desde abajo a la izquierda, con el origen abajo.
+            double[] c = Rotation.corners(turn, area);
+            float[] quad = new float[8];
+            int[] order = {3, 2, 1, 0};
+            for (int i = 0; i < 4; i++) {
+                quad[2 * i] = (float) c[2 * order[i]];
+                quad[2 * i + 1] = (float) (pageHeight - c[2 * order[i] + 1]);
+            }
+            annotation.setQuadPoints(quad);
+        }
         annotations.add(annotation);
         structure.link(box, annotation, description);
     }

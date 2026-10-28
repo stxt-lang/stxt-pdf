@@ -84,6 +84,16 @@ class StackingContextTest {
             links.add(destination + " " + round(area) + " " + description);
             events.add("link " + destination);
         }
+
+        @Override
+        public void beginRotation(double degrees, double x, double y) {
+            events.add(String.format(java.util.Locale.ROOT, "rotate %.0f %.1f %.1f", degrees, x, y));
+        }
+
+        @Override
+        public void endRotation() {
+            events.add("end rotate");
+        }
     }
 
     private static String corners(Radii r) {
@@ -320,5 +330,26 @@ class StackingContextTest {
 
     private static double round(double v) {
         return Math.round(v * 1000) / 1000.0;
+    }
+
+    /**
+     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Absolute}
+     * de dentro, alrededor de su origen (§5.6); una {@code Image} en flujo, en sus dos pasos.
+     */
+    @Test
+    void rotatedBoxesWrapEverythingTheyPaint() {
+        Recorder r = record(
+                "\tRelative:", "\t\tRotate: 8", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #111",
+                "\t\tAbsolute:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
+                "\t\t\t\tBackground: #222",
+                "\tImage: test/square.png", "\t\tRotate: 45", "\t\tBox:", "\t\t\tBackground: #333",
+                "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
+        // Primero el flujo (la imagen de 30 × 30 en (40, 140), con su centro en (55, 155), girada en
+        // el paso de los fondos y en el del contenido) y después el posicionado, girado entero.
+        assertEquals(List.of("rotate 45 55.0 155.0", "background #333", "end rotate", "background #444",
+                "rotate 45 55.0 155.0", "end rotate",
+                "rotate 8 40.0 40.0", "background #000", "background #111", "background #222", "end rotate"), r.events);
     }
 }

@@ -7,6 +7,7 @@ import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.GridAreas;
 import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
@@ -118,6 +119,11 @@ public final class Style {
     /** Solo en un {@code Fixed}: las páginas en que sale. */
     public Pages pages = Pages.ALL;
     public boolean isolate;
+    /**
+     * {@code Rotate} y {@code Rotate origin} (§5.6), solo en {@code Relative}, {@code Absolute},
+     * {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
+     */
+    public Rotation rotation;
 
     // --- Dimensiones ---------------------------------------------------------------------------
     public Value width = Value.AUTO;

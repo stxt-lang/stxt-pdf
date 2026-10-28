@@ -33,6 +33,7 @@ import static dev.stxt.boxes.tree.PropertyKey.MAX_WIDTH;
 import static dev.stxt.boxes.tree.PropertyKey.MIN_HEIGHT;
 import static dev.stxt.boxes.tree.PropertyKey.MIN_WIDTH;
 import static dev.stxt.boxes.tree.PropertyKey.OFFSET;
+import static dev.stxt.boxes.tree.PropertyKey.ROTATE_ORIGIN;
 import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
 import static dev.stxt.boxes.tree.ValueReader.amount;
 import static dev.stxt.boxes.tree.ValueReader.comparable;
@@ -86,6 +87,30 @@ final class ModelValidator {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
                         + " no tiene efecto en una Image, que no se parte entre páginas: quítalo");
+            }
+        }
+    }
+
+    /**
+     * El giro de una caja (§5.6): {@code Rotate origin} sin {@code Rotate} no tiene efecto, y un
+     * {@code Relative} girado no se parte entre páginas, así que {@code Inside} y {@code Decoration}
+     * tampoco (también si los da una regla de {@code Styles}).
+     */
+    static void validateRotation(Style s) {
+        if (s.rotation == null) {
+            if (s.isDeclared(ROTATE_ORIGIN)) {
+                throw error(s.line(ROTATE_ORIGIN), ErrorCode.ROTATE_ORIGIN_WITHOUT_ROTATE, "Rotate origin no tiene "
+                        + "efecto sin Rotate: declara el giro o quítalo");
+            }
+            return;
+        }
+        if (s.position != Style.Position.RELATIVE) {
+            return;
+        }
+        for (String p : List.of(BREAK_INSIDE, DECORATION)) {
+            if (s.isDeclared(p)) {
+                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
+                        + " no tiene efecto en un Relative girado, que no se parte entre páginas: quítalo");
             }
         }
     }

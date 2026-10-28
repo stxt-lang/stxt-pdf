@@ -652,4 +652,58 @@ class PdfCanvasTest {
         }
         return images;
     }
+
+    /**
+     * Una caja girada (§5.6) gira su contenido con una matriz {@code cm}; su enlace es el rectángulo
+     * que envuelve la zona girada con los {@code QuadPoints} de la zona, el {@code BBox} de una
+     * figura girada envuelve lo que se pinta, y un destino lleva a la esquina de ese envolvente. El
+     * texto girado sigue siendo texto.
+     */
+    @Test
+    void rotatedBoxesTurnTheirContentLinksAndFigures() throws Exception {
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+                + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n\t\tRotate: 90\n"
+                + "\tText: Ir al sello\n\t\tLink: #sello\n"
+                + "\tAbsolute:\n\t\tId: sello\n\t\tOffset: 60 auto auto 60\n\t\tRotate: 90\n\t\tLink: https://stxt.dev\n"
+                + "\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 20\n\t\tText: Sello\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "rotation"))) {
+            List<PDAnnotationLink> links = links(pdf, 0);
+            PDAnnotationLink stamp = links.stream().filter(l -> l.getAction() != null).findFirst().orElseThrow();
+            // La caja va de (100, 100) a (200, 120); girada 90 grados alrededor de (150, 110), de
+            // (140, 60) a (160, 160): con el origen abajo, de y = 140 a y = 240.
+            PDRectangle area = stamp.getRectangle();
+            assertEquals(140, area.getLowerLeftX(), 0.01);
+            assertEquals(140, area.getLowerLeftY(), 0.01);
+            assertEquals(20, area.getWidth(), 0.01);
+            assertEquals(100, area.getHeight(), 0.01);
+            float[] expected = {140, 240, 140, 140, 160, 140, 160, 240};
+            float[] quad = stamp.getQuadPoints();
+            for (int i = 0; i < expected.length; i++) {
+                assertEquals(expected[i], quad[i], 0.01, "QuadPoints " + i);
+            }
+
+            // El destino del enlace interno: la esquina de arriba a la izquierda del envolvente.
+            PDAnnotationLink internal = links.stream().filter(l -> l.getAction() == null).findFirst().orElseThrow();
+            PDPageXYZDestination target = (PDPageXYZDestination) internal.getDestination();
+            assertEquals(140, target.getLeft());
+            assertEquals(240, target.getTop());
+
+            // La imagen, de 150 × 75 en (40, 40), girada alrededor de (115, 77.5): de (77.5, 2.5) a (152.5, 152.5).
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
+            assertEquals("Figure", figure.getStructureType());
+            PDRectangle box = ((PDLayoutAttributeObject) figure.getAttributes().getObject(0)).getBBox();
+            assertEquals(77.5, box.getLowerLeftX(), 0.01);
+            assertEquals(147.5, box.getLowerLeftY(), 0.01);
+            assertEquals(75, box.getWidth(), 0.01);
+            assertEquals(150, box.getHeight(), 0.01);
+
+            String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.contains(" cm\n"), content);
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("Sello"), text);
+        }
+    }
 }

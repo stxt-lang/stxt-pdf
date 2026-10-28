@@ -42,6 +42,11 @@ class SchemaCoverageTest {
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
             Map.entry("Pages", "Pages: not-first"),
+            Map.entry("Rotate", "Rotate: -8"),
+            Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
+            // Media
+            Map.entry("Paper", "Paper: A4"),
+            Map.entry("Orientation", "Orientation: landscape"),
             Map.entry("Content", "Content >>\n\tHola"),
             Map.entry("Span", "Span: 1 1"),
             // Grupos
@@ -148,8 +153,9 @@ class SchemaCoverageTest {
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
         t.put("Document", new Template(HEADER + "\t{}", Set.of("Language")));
-        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\t{}",
-                Set.of("Width", "Height")));
+        // Paper excluye Width y Height, que leen todos los documentos (la cabecera).
+        t.put("Media", new Template("Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tPaper: A4\n\t\t{}",
+                Set.of("Paper", "Width", "Height")));
         for (String element : List.of("Block", "Relative", "Absolute", "Fixed")) {
             t.put(element, new Template(HEADER + "\t" + element + ":\n\t\t{}"));
         }

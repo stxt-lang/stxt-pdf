@@ -17,4 +17,27 @@ public record Media(double width, double height, Insets margin) {
     public Rect pageArea() {
         return new Rect(margin.left(), margin.top(), width - margin.horizontal(), height - margin.vertical());
     }
+
+    /**
+     * Los tamaños de papel con nombre de {@code Paper} (§4.1), en vertical y en puntos enteros:
+     * los de ISO 216 redondeados, como se usan siempre (A4 = 595 × 842), y los de EE. UU.
+     */
+    public enum Paper {
+        A3(842, 1191), A4(595, 842), A5(420, 595), A6(298, 420), B4(709, 1001), B5(499, 709),
+        LETTER(612, 792), LEGAL(612, 1008);
+
+        /** Ancho y alto en vertical, en pt. */
+        public final double width;
+        public final double height;
+
+        Paper(double width, double height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    /** {@code Orientation} (§4.1): {@code landscape} cambia el ancho por el alto del papel. */
+    public enum Orientation {
+        PORTRAIT, LANDSCAPE
+    }
 }

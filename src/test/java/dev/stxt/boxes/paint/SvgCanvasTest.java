@@ -43,4 +43,17 @@ class SvgCanvasTest {
         String svg = SvgCanvas.page(document.pages().get(0), document.media(), true);
         assertFalse(svg.contains("<image"), svg);
     }
+
+    /** Una caja girada es un grupo con {@code rotate(ángulo x y)} alrededor de su origen (§5.6). */
+    @Test
+    void rotationIsAGroupTransform() {
+        LaidOutDocument turned = new Engine().layOutDocument(new DocumentReader().read(
+                "Document (dev.stxt.boxes):\n\tLanguage: es\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 20\n\tAbsolute:\n\t\tOffset: 100 auto auto 100\n\t\tRotate: -12.5\n"
+                + "\t\tRotate origin: bottom\n\t\tBox:\n\t\t\tWidth: 40\n\t\t\tHeight: 10\n\t\t\tBackground: #F00\n"));
+        String svg = SvgCanvas.page(turned.pages().get(0), turned.media(), false);
+        // La caja va de (120, 120) a (160, 130): el centro de abajo es (140, 130).
+        assertTrue(svg.contains("<g transform=\"rotate(-12.5 140.00 130.00)\">\n<rect x=\"120.00\" y=\"120.00\""), svg);
+        assertTrue(svg.contains("</g>"), svg);
+    }
 }

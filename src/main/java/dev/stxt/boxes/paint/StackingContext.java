@@ -7,6 +7,7 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
@@ -35,6 +36,9 @@ import java.util.List;
  *
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
  * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
+ *
+ * <p>Una caja con {@code Rotate} (§5.6) es siempre posicionada o una {@code Image}: se pinta
+ * girada con todo lo que contiene ({@link #paint}).</p>
  *
  * <p>El "orden del árbol" es el del documento, no el de los fragmentos: las cajas
  * {@code absolute} cuelgan del fragmento de su containing block, detrás de sus hijos en flujo, y
@@ -163,14 +167,34 @@ public final class StackingContext {
         return path;
     }
 
+    /**
+     * Pinta el contexto. Si su caja está girada ({@code Rotate}, §5.6), lo pinta todo girado: la
+     * caja y lo que contiene, también los contextos hijos. Una caja en flujo solo puede girar si es
+     * una {@code Image}, que se gira en cada uno de sus dos pasos.
+     */
     public void paint(Canvas canvas) {
-        paintBackgroundAndBorder(canvas, root);
-        negative.forEach(s -> s.paint(canvas));
-        inFlow.forEach(p -> paintBackgroundAndBorder(canvas, p));
-        paintContent(canvas, root);
-        inFlow.forEach(p -> paintContent(canvas, p));
-        positionedZero.forEach(s -> s.paint(canvas));
-        positive.forEach(s -> s.paint(canvas));
+        turning(canvas, root, () -> {
+            paintBackgroundAndBorder(canvas, root);
+            negative.forEach(s -> s.paint(canvas));
+            inFlow.forEach(p -> turning(canvas, p, () -> paintBackgroundAndBorder(canvas, p)));
+            paintContent(canvas, root);
+            inFlow.forEach(p -> turning(canvas, p, () -> paintContent(canvas, p)));
+            positionedZero.forEach(s -> s.paint(canvas));
+            positive.forEach(s -> s.paint(canvas));
+        });
+    }
+
+    /** Pinta {@code body} girado como la caja de {@code p}, si tiene {@code Rotate}. */
+    private static void turning(Canvas canvas, Piece p, Runnable body) {
+        Rotation rotation = p.f().box().style.rotation;
+        if (rotation == null) {
+            body.run();
+            return;
+        }
+        Rect borderBox = p.borderBox();
+        canvas.beginRotation(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
+        body.run();
+        canvas.endRotation();
     }
 
     private static void paintBackgroundAndBorder(Canvas canvas, Piece p) {

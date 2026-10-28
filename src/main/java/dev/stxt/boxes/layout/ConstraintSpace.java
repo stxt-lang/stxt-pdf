@@ -90,6 +90,12 @@ public record ConstraintSpace(
                 percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, true);
     }
 
+    /** El mismo espacio, sin fragmentación: una caja que no se parte (un {@code Relative} girado, §5.10). */
+    public ConstraintSpace unfragmented() {
+        return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
+                percentBaseWidth, percentBaseHeight, OptionalDouble.empty(), atFragmentainerStart, contentHeight);
+    }
+
     /** El mismo espacio, con fragmentación aunque no la tuviera (los ítems que se parten en paralelo). */
     public ConstraintSpace fragmented(double remaining, boolean atStart) {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,

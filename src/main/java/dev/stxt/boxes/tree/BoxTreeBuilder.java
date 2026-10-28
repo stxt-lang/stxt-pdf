@@ -5,6 +5,7 @@ import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Links;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.Value;
@@ -28,13 +29,13 @@ import static dev.stxt.boxes.tree.ModelValidator.validateContainer;
 import static dev.stxt.boxes.tree.ModelValidator.validateFlex;
 import static dev.stxt.boxes.tree.ModelValidator.validateImage;
 import static dev.stxt.boxes.tree.ModelValidator.validateMulticol;
+import static dev.stxt.boxes.tree.ModelValidator.validateRotation;
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
 import static dev.stxt.boxes.tree.Nodes.is;
 import static dev.stxt.boxes.tree.Nodes.isElement;
 import static dev.stxt.boxes.tree.Nodes.parse;
-import static dev.stxt.boxes.tree.Nodes.required;
 import static dev.stxt.boxes.tree.Nodes.unread;
 import static dev.stxt.boxes.tree.PropertyReader.FLEX;
 import static dev.stxt.boxes.tree.PropertyReader.GRID;
@@ -49,6 +50,7 @@ import static dev.stxt.boxes.tree.PropertyReader.typography;
 import static dev.stxt.boxes.tree.TableBuilder.cellText;
 import static dev.stxt.boxes.tree.TableBuilder.table;
 import static dev.stxt.boxes.tree.ValueReader.LENGTH_OR_AUTO;
+import static dev.stxt.boxes.tree.ValueReader.angle;
 import static dev.stxt.boxes.tree.ValueReader.bool;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
 import static dev.stxt.boxes.tree.ValueReader.integer;
@@ -171,9 +173,40 @@ public final class BoxTreeBuilder {
         return new Metadata(title, language);
     }
 
+    /**
+     * El medio (§4.1): su tamaño es un {@code Paper} con su {@code Orientation} o un {@code Width}
+     * y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez.
+     */
     private static Media media(InlineNode n) {
-        double width = points(required(n, "Width"));
-        double height = points(required(n, "Height"));
+        Optional<Node> paper = child(n, "paper");
+        Optional<Node> orientation = child(n, "orientation");
+        Optional<Node> widthNode = child(n, "width");
+        Optional<Node> heightNode = child(n, "height");
+        double width;
+        double height;
+        if (paper.isPresent()) {
+            Optional<Node> both = widthNode.isPresent() ? widthNode : heightNode;
+            if (both.isPresent()) {
+                throw error(both.get(), ErrorCode.MEDIA_SIZE, "El medio declara Paper y " + both.get().getName()
+                        + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
+            }
+            Media.Paper p = enumValue(Media.Paper.class, paper.get());
+            boolean landscape = orientation.map(o -> enumValue(Media.Orientation.class, o))
+                    .orElse(Media.Orientation.PORTRAIT) == Media.Orientation.LANDSCAPE;
+            width = landscape ? p.height : p.width;
+            height = landscape ? p.width : p.height;
+        } else {
+            if (orientation.isPresent()) {
+                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
+                        + "medio no lo declara: usa Paper o cambia el Width por el Height");
+            }
+            if (widthNode.isEmpty() || heightNode.isEmpty()) {
+                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.MEDIA_SIZE, "El medio necesita "
+                        + "su tamaño: un Paper (A4, Letter…) o un Width y un Height");
+            }
+            width = points(widthNode.get());
+            height = points(heightNode.get());
+        }
         Optional<Node> marginNode = child(n, "margin");
         Insets margin = marginNode.map(BoxTreeBuilder::mediaMargin).orElse(Insets.ZERO);
         Media media = new Media(width, height, margin);
@@ -238,6 +271,8 @@ public final class BoxTreeBuilder {
         }
         ctx.rules.apply(n, kind, s, parent, position);
         String id = null;
+        Double rotate = null;
+        double[] rotateOrigin = Rotation.CENTER;
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
             if (isElement(p) || NOT_PROPERTIES.contains(name)) {
@@ -272,6 +307,8 @@ public final class BoxTreeBuilder {
                         case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
                         case "layer" -> s.layer = integer(p);
                         case "pages" -> s.pages = enumValue(Style.Pages.class, p);
+                        case "rotate" -> rotate = angle(p);
+                        case "rotate-origin" -> rotateOrigin = ValueReader.rotateOrigin(p);
                         case "marker" -> s.listMarker = enumValue(Style.Marker.class, p);
                         case "start" -> s.listStart = integer(p);
                         case "number" -> s.listNumber = integer(p);
@@ -302,6 +339,10 @@ public final class BoxTreeBuilder {
         if (kind == Element.IMAGE) {
             validateImage(s);
         }
+        if (rotate != null) {
+            s.rotation = new Rotation(rotate, rotateOrigin[0], rotateOrigin[1]);
+        }
+        validateRotation(s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (level > 0) {

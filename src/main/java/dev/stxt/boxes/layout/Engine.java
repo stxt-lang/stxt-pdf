@@ -157,8 +157,21 @@ public final class Engine {
      * <p>Si la caja termina en esta página y solo se salen de ella su borde y su relleno
      * inferiores, se repite el layout con ese espacio reservado (§5.10): la caja termina dentro
      * de la página o se corta antes, y el final pasa a la siguiente con el borde y el relleno.</p>
+     *
+     * <p>Una caja con {@code Rotate} no se parte, como una imagen: se maqueta sin fragmentación y,
+     * si no cabe en lo que queda de página, devuelve {@code BEFORE}; al principio de una página se
+     * coloca aunque no quepa, y el desbordamiento lo señala {@link Overflow}.</p>
      */
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        if (space.fragmenting() && box.style.rotation != null) {
+            // Una caja girada no se parte (§5.10): entera o, si no cabe, en la página siguiente.
+            LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
+            if (!space.atFragmentainerStart()
+                    && !fits(whole.fragment().height(), space.fragmentainerRemaining().getAsDouble())) {
+                return LayoutResult.before(box);
+            }
+            return whole;
+        }
         LayoutResult r = layoutOnce(box, space, from);
         if (!space.fragmenting() || r.breakToken() != null) {
             return r;

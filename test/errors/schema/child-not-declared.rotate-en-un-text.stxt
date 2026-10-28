@@ -1,0 +1,15 @@
+# Case: Rotate en un Text: se gira el bloque que lo contiene
+# Code: CHILD_NOT_DECLARED
+# Line: 15
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Text: Certificado n.º 2026-0147
+		Rotate: -90

@@ -4,6 +4,7 @@ import dev.stxt.Node;
 import dev.stxt.boxes.model.Colors;
 import dev.stxt.boxes.model.Corners;
 import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
@@ -175,6 +176,30 @@ final class ValueReader {
             return Integer.parseInt(n.getText().trim());
         } catch (NumberFormatException ex) {
             throw error(n, ErrorCode.VALUE_SYNTAX, "Se esperaba un entero: " + n.getText().trim());
+        }
+    }
+
+    /** {@code Rotate} (§4.2): grados de −360 a 360, sin 0, que no giraría nada. */
+    static double angle(Node n) {
+        double v;
+        try {
+            v = Double.parseDouble(n.getText().trim());
+        } catch (NumberFormatException ex) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Se esperaba un número de grados: " + n.getText().trim());
+        }
+        if (v == 0 || Math.abs(v) > 360) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate admite de -360 a 360 grados, sin 0, que no gira "
+                    + "nada: " + n.getText().trim());
+        }
+        return v;
+    }
+
+    /** {@code Rotate origin} (§4.2): la fracción del ancho y la del alto de la caja de borde. */
+    static double[] rotateOrigin(Node n) {
+        try {
+            return Rotation.origin(n.getText());
+        } catch (IllegalArgumentException ex) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, ex.getMessage());
         }
     }
 

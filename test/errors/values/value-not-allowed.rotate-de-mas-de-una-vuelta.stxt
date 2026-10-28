@@ -1,0 +1,12 @@
+# Case: Rotate de más de 360 grados
+# Code: VALUE_NOT_ALLOWED
+# Line: 10
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Width: 595
+		Height: 842
+	Relative:
+		Rotate: 400
+		Box:
+			Height: 10

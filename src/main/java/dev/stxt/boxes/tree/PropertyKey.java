@@ -37,6 +37,8 @@ public final class PropertyKey {
     // Propiedades de los elementos
     public static final String OFFSET = "offset";
     public static final String LAYER = "layer";
+    public static final String ROTATE = "rotate";
+    public static final String ROTATE_ORIGIN = "rotate-origin";
     public static final String START = "start";
     public static final String NUMBER = "number";
 

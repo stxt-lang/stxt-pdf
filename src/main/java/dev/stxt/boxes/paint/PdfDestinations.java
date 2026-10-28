@@ -3,10 +3,12 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.tree.Box;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 
+import java.awt.geom.AffineTransform;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,25 +35,36 @@ final class PdfDestinations {
                                                double pageHeight) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
         for (int i = 0; i < pages.size(); i++) {
-            find(pages.get(i).content(), area.x(), area.y(), pdfPages.get(i), pageHeight, targets);
+            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), pageHeight, targets);
         }
         return targets;
     }
 
-    /** {@code x}, {@code y}: la esquina de la caja de borde del fragmento en la página. */
-    private static void find(Fragment f, double x, double y, PDPage page, double pageHeight,
+    /**
+     * {@code x}, {@code y}: la esquina de la caja de borde del fragmento en la página, sin girar;
+     * {@code turn}, los giros de sus ancestros (§5.6). La esquina de una caja girada, o de dentro
+     * de una girada, es la del rectángulo que envuelve lo que se pinta.
+     */
+    private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double pageHeight,
                              Map<Box, PDPageXYZDestination> targets) {
         Box box = f.box();
+        Rect borderBox = new Rect(x, y, f.width(), f.height());
+        Rotation rotation = box.style.rotation;
+        if (rotation != null) {
+            turn = new AffineTransform(turn);
+            turn.concatenate(rotation.transform(borderBox));
+        }
         if (f.first() && (box.headingLevel() > 0 || box.key() != null) && !targets.containsKey(box)) {
+            Rect painted = turn.isIdentity() ? borderBox : Rotation.envelope(turn, borderBox);
             PDPageXYZDestination d = new PDPageXYZDestination();
             d.setPage(page);
-            d.setLeft((int) Math.floor(x));
-            d.setTop((int) Math.ceil(pageHeight - y));
+            d.setLeft((int) Math.floor(painted.x()));
+            d.setTop((int) Math.ceil(pageHeight - painted.y()));
             targets.put(box, d);
         }
-        Rect content = new Rect(x, y, f.width(), f.height()).shrink(f.border()).shrink(f.padding());
+        Rect content = borderBox.shrink(f.border()).shrink(f.padding());
         for (Fragment c : f.children()) {
-            find(c, content.x() + c.x(), content.y() + c.y(), page, pageHeight, targets);
+            find(c, content.x() + c.x(), content.y() + c.y(), turn, page, pageHeight, targets);
         }
     }
 }

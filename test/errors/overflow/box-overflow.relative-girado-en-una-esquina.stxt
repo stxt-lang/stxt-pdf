@@ -1,0 +1,13 @@
+# Case: Relative girado alrededor de su esquina que se sale por arriba
+# Code: BOX_OVERFLOW
+# Line: 10
+Document (dev.stxt.boxes):
+	Language: es
+	Media:
+		Paper: A5
+		Margin: 20
+	Relative:
+		Rotate: -30
+		Rotate origin: bottom left
+		Box:
+			Height: 40

@@ -64,6 +64,22 @@ public final class SvgCanvas implements Canvas {
                 media.width(), height, media.width(), height, c.svg);
     }
 
+    /** Un grupo {@code <g>} con el giro, que se cierra en {@link #endRotation()}. */
+    @Override
+    public void beginRotation(double degrees, double x, double y) {
+        svg.append(String.format(Locale.ROOT, "<g transform=\"rotate(%s %.2f %.2f)\">%n", number(degrees), x, y));
+    }
+
+    @Override
+    public void endRotation() {
+        svg.append("</g>\n");
+    }
+
+    /** Un número sin ceros de más: {@code -8}, {@code 12.5}. */
+    private static String number(double v) {
+        return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v);
+    }
+
     @Override
     public void background(Rect r, String color) {
         svg.append(String.format(Locale.ROOT, "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"%s/>%n",
