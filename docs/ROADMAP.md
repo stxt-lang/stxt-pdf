@@ -1258,6 +1258,9 @@ siguiente paso concreto.
   `DECISIONES.md`. `mvn test` en verde (1205 tests).
   *Siguiente paso:* hito 31 (SVG), en otra sesión; resolver V1–V6 con el usuario antes de escribir código
   (la V2, la librería, es la que más decide el coste). Lo que quedó fuera del 30 está en `TODO.md`.
+  Después, a petición del usuario, los demás documentos de muestra en A4 (ejemplos 01–05, 07 y 08,
+  `test/spec/report.stxt` y los ejemplos de la especificación y del README) pasan a `Paper: A4`; el 06 sigue
+  con su tamaño propio. Ningún PNG ni volcado cambia.
 - **2026-10-28 (15).** Documento de estilos aparte (primer punto de `TODO.md`; no es un hito de esta hoja de
   ruta). Resuelto con un cuestionario: la tipografía base pasa a `Element: Document` (y `Document` ya no admite
   `Typography`), las reglas del documento aparte valen menos que las del documento en cada nivel de

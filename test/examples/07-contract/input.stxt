@@ -7,8 +7,7 @@
 # de styles.stxt los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 92 70 80 70
 	Title: Contrato de prestación de servicios de diseño · LUM-2025-044
 	Language: es

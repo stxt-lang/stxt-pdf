@@ -9,8 +9,7 @@
 # minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 64 54 66 54
 	Title: Guía rápida del termostato Aire+ T2
 	Language: es

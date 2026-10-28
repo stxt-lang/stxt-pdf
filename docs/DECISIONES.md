@@ -1415,5 +1415,7 @@ salieron al implementarlas.
      `PdfCanvas.image`, `PdfDestinations`. *Alternativa:* solo el envolvente, sin `QuadPoints`.
 
 241. **El volcado (§7) no cambia:** el `Rect` de una caja girada es el de sin girar, como el de un enlace o un
-     fondo, porque el giro no cambia el layout. Los ejemplos que pasan a `Paper` son los que lo pedía la hoja
-     de ruta (09, 10 y 11); los demás A4 siguen con `Width` y `Height`, que son equivalentes.
+     fondo, porque el giro no cambia el layout. Todos los documentos de muestra en A4 (los ejemplos salvo la
+     carta del restaurante, 06, que es de 420 × 700, `test/spec/report.stxt` y los ejemplos de la
+     especificación y del README) usan `Paper: A4`; los tests y los casos golden siguen con `Width` y
+     `Height`, porque prueban medidas concretas.

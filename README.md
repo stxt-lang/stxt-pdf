@@ -22,8 +22,7 @@ modelo de caja), `Typography` (el texto, que se hereda) y `Break` (los cortes de
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 40
 	Styles:
 		Element: Document

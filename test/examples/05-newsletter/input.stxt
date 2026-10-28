@@ -6,8 +6,7 @@
 # minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 38 44 58 44
 	Title: Gaceta del Valle · Octubre de 2025
 	Language: es

@@ -7,8 +7,7 @@
 # en minúscula y las reglas los ponen en mayúsculas, con un poco de interletraje (Transform).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 56 56 70 56
 	Title: Informe anual 2025 · Cooperativa Solvent
 	Language: es

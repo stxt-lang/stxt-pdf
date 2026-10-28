@@ -96,5 +96,7 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   alrededor de su esquina de arriba a la izquierda (`Rotate origin: top left`), así que su `Offset` es
   el de esa esquina y la caja sube desde ella. Como el giro no cambia el layout, el sello girado del
   certificado no mueve las firmas; lo que hay que vigilar es que lo girado quepa en la página, porque
-  si no es un error. Los documentos apaisados (10 y 11) dicen `Paper: A4` y `Orientation: landscape` en
-  vez de escribir 842 × 595.
+  si no es un error.
+- **El papel tiene nombre**: los A4 dicen `Paper: A4` (y los apaisados, 10 y 11, además
+  `Orientation: landscape`) en vez de escribir 595 × 842. La carta del restaurante (06) es la única con
+  un tamaño propio (420 × 700), que se sigue escribiendo con `Width` y `Height`.

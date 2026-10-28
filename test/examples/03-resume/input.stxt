@@ -5,8 +5,7 @@
 # rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 	Title: Marta Ferrer Soler · Diseñadora de producto
 	Language: es
 	Grid:

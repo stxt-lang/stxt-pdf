@@ -3,8 +3,7 @@
 # cuerpo en serif; el membrete y el pie, en sans.
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 44 72 64 72
 	Title: Propuesta de mobiliario para el Mirador del Valle
 	Language: es

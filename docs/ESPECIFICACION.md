@@ -106,8 +106,7 @@ página).
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 40
 	Styles:
 		Element: Document
@@ -1709,8 +1708,7 @@ suyos, y lo generado hereda su `Typography`.
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 40
 	Styles:
 		Element: Document
@@ -1841,8 +1839,7 @@ imagen: se coloca, se dimensiona, se corta entre páginas y se pinta como cualqu
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 40
 	Fixed:
 		Offset: -30 0 auto auto
@@ -2375,8 +2372,7 @@ Fichero: [`test/spec/report.stxt`](../test/spec/report.stxt).
 Document (dev.stxt.boxes):
 	Language: es
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 40
 	Styles:
 		Element: Document
@@ -2457,7 +2453,7 @@ Document (dev.stxt.boxes):
 
 **Cómo se maqueta:**
 
-- **Área útil:** 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
+- **Área útil:** `Paper: A4` mide 595 × 842, así que quedan 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
 - **Fuentes:** la regla `Element: Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan

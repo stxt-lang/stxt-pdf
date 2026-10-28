@@ -6,8 +6,7 @@
 # normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
 Document (dev.stxt.boxes):
 	Media:
-		Width: 595
-		Height: 842
+		Paper: A4
 		Margin: 44 44 60 44
 	Title: Factura 2025-0147
 	Language: es
