@@ -35,9 +35,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 |---|---|---|---|
 | 16 | Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado) | hecho | 13 (con el 17) |
 | 17 | Elemento `Markdown`, traducido a elementos conocidos | hecho | 13 |
-| 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | diseño | 14 |
+| 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos | hecho | 14 |
 
-Los hitos 16 y 17 están terminados (2026-10-27). El 18 se abre el 2026-10-28.
+Los hitos 16 y 17 están terminados (2026-10-27), y el 18, el 2026-10-28.
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
 línea y son lo único que toca el layout. `Markdown` solo toca la construcción del árbol: todo
@@ -271,12 +271,12 @@ debajo de la cabecera no tiene traducción (una `Table` necesita su `Body`).
 
 ## Hito 18: imágenes
 
-**Objetivo.** Poner imágenes de la carpeta `images/` de los recursos (§5.11, hoy reservada) en
+**Objetivo.** Poner imágenes de la carpeta `images/` de los recursos (§5.11, hasta ahora reservada) en
 el documento: en el flujo, como ítem de un `Flex` o un `Grid`, en una celda y en un `Absolute`
 o un `Fixed` (el logotipo de la cabecera de cada página). Una imagen es una caja hoja, como un
 `Text`, con un tamaño y una proporción propios que salen del fichero.
 
-**Sintaxis propuesta.**
+**Sintaxis.**
 
 ```
 Image: logos/acme.png
@@ -289,27 +289,30 @@ Image: logos/acme.png
 		After: avoid
 ```
 
-**Decisiones abiertas** (con la propuesta de cada una; se resuelven antes de escribir código):
+**Decisiones abiertas:** *(ninguna)*
 
-- [ ] I1. **Elemento y dónde va.** Un elemento `Image` con la ruta en el valor, hoja (sin
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada; las interpretaciones que
+salieron al implementarlas, en [`DECISIONES.md`](DECISIONES.md), 135–143):
+
+- [x] I1. **Elemento y dónde va.** Un elemento `Image` con la ruta en el valor, hoja (sin
       elementos hijos), que admite `Id`, `Class`, `Box`, `Break`, `Alt` y `Fit`. Va donde va
       un elemento en flujo (como `Markdown`): en `Document`, `Block`, los posicionados,
       `Item`, `Area`, `List item`, `Cell` y `Multicol`. *Propuesta:* así. No admite
       `Typography` propia (no tiene texto), pero hereda `Color` para `Border color`.
-- [ ] I2. **Ruta.** *Propuesta:* relativa a `images/` (`Image: logos/acme.png`), no a la raíz de
+- [x] I2. **Ruta.** *Propuesta:* relativa a `images/` (`Image: logos/acme.png`), no a la raíz de
       los recursos: es más corta y no puede señalar a `fonts/`. Pasa por `Resources.resolve`
       (nunca hacia atrás). *Alternativa:* relativa a la raíz (`images/logos/acme.png`), como
       dice hoy el ejemplo del §5.11.
-- [ ] I3. **Formatos.** *Propuesta:* PNG (con transparencia) y JPEG, que PDFBox incrusta sin
+- [x] I3. **Formatos.** *Propuesta:* PNG (con transparencia) y JPEG, que PDFBox incrusta sin
       dependencias nuevas (el JPEG tal cual, sin recomprimir). El formato se reconoce por el
       contenido, no por la extensión. GIF, WebP, SVG y el resto son un error. Sin
       remuestreo: se incrusta la resolución del fichero, una sola vez aunque se use en varias
       páginas.
-- [ ] I4. **Tamaño natural.** Cuántos puntos mide un píxel. *Propuesta:* como CSS, 96 ppp
+- [x] I4. **Tamaño natural.** Cuántos puntos mide un píxel. *Propuesta:* como CSS, 96 ppp
       (1 px = 0,75 pt), sin mirar la resolución que declare el fichero (`pHYs`, JFIF), que
       suele faltar o estar mal. *Alternativas:* 72 ppp (1 px = 1 pt), o la resolución del
       fichero con 96 (o 72) si no la declara.
-- [ ] I5. **Dimensionado.** La imagen es una caja con proporción propia (la del fichero):
+- [x] I5. **Dimensionado.** La imagen es una caja con proporción propia (la del fichero):
       - con `Width` y `Height` en `auto`, mide su tamaño natural, **también en flujo de
         bloque** (no se estira al ancho del padre, como un `<img>`); si no cabe, es un
         `BOX_OVERFLOW`, como cualquier caja, y se arregla declarando `Width: 100%`;
@@ -317,58 +320,65 @@ Image: logos/acme.png
         ancho natural (o el declarado);
       - un `Aspect ratio` declarado sustituye a la proporción del fichero (no es error).
       *Propuesta:* así, como un elemento reemplazado de CSS.
-- [ ] I6. **Imagen en una caja de otra proporción** (`Width` y `Height` declarados, un ítem
+- [x] I6. **Imagen en una caja de otra proporción** (`Width` y `Height` declarados, un ítem
       estirado, un `Aspect ratio` distinto). *Propuesta:* propiedad `Fit` del elemento, con
       `contain` (cabe entera, centrada; por defecto), `cover` (llena la caja, centrada y
       recortada) y `fill` (se deforma). *Alternativas:* deformar siempre (el `object-fit: fill`
       por defecto de CSS) o que una proporción distinta sea un error.
-- [ ] I7. **Cortes de página.** La imagen no se parte: si no cabe en lo que queda de página, pasa
+- [x] I7. **Cortes de página.** La imagen no se parte: si no cabe en lo que queda de página, pasa
       entera a la siguiente, y si es más alta que el área útil, `PAGE_OVERFLOW`. `Before` y
       `After` funcionan como en cualquier caja. *Propuesta:* `Inside` y `Decoration` en una
       `Image` son un error (no tienen efecto en algo que no se parte), con un código nuevo.
       *Alternativa:* no admitirlos sin más (se ignoran).
-- [ ] I8. **Accesibilidad.** *Propuesta:* `Alt` opcional. Con `Alt`, la imagen es un `Figure`
+- [x] I8. **Accesibilidad.** *Propuesta:* `Alt` opcional. Con `Alt`, la imagen es un `Figure`
       del PDF etiquetado con ese texto alternativo; sin `Alt`, es decorativa y se pinta como
       *artifact*. *Alternativa:* `Alt` obligatorio, con un `Alt` vacío o una propiedad
       `Decorative` para las decorativas.
-- [ ] I9. **Markdown.** *Propuesta:* una imagen sola en su párrafo (`![Alt](logos/acme.png)`) se
+- [x] I9. **Markdown.** *Propuesta:* una imagen sola en su párrafo (`![Alt](logos/acme.png)`) se
       traduce a una `Image` con ese `Alt`; una imagen mezclada con texto sigue siendo
       `MARKDOWN_UNSUPPORTED` (no hay cajas dentro de una línea). El título (`"…"`) se ignora o
-      es un error. *Alternativa:* dejar las imágenes de Markdown para otro hito.
-- [ ] I10. **Errores nuevos.** *Propuesta:* `IMAGE_UNKNOWN` (no existe o la ruta sale de la
+      es un error (quedó como error, decisión 140). *Alternativa:* dejar las imágenes de Markdown para otro hito.
+- [x] I10. **Errores nuevos.** *Propuesta:* `IMAGE_UNKNOWN` (no existe o la ruta sale de la
       carpeta; línea del `Image`) e `IMAGE_FORMAT` (no es PNG ni JPEG o no se puede leer), y
       el de I7. Se comprueban al empezar a maquetar, con las fuentes, porque el tamaño natural
       hace falta para el layout.
 
-**Decisiones tomadas:** *(ninguna)*
+**Diseño técnico** (como quedó):
 
-**Diseño técnico** (borrador; se concreta al resolver las decisiones):
-
-- **Modelo.** `Element.IMAGE`, una caja hoja; `Style` guarda la ruta, `Alt` y `Fit`.
-- **Recursos.** `resources/ImageLibrary` lee el tamaño en píxeles y el formato de cada fichero
-  (una vez por ruta) y `PdfCanvas` crea un `PDImageXObject` por fichero (`JPEGFactory`,
-  `LosslessFactory`). `tree` no lee ficheros: el tamaño natural lo pide el layout, como las
-  métricas del texto, así que el motor necesita los recursos también con `FixedMetrics`
-  (los tests usan imágenes pequeñas generadas, en `src/test/resources`).
-- **Layout.** Un algoritmo `layout/image/ImageLayout`: `contentIntrinsic` da el ancho natural y
-  `layout` aplica el ancho, la proporción y los mínimos y máximos con `BoxModel` y `Sizing`;
-  como unidad de corte es monolítica, igual que una línea.
-- **Pintado.** `Canvas.image(rect, image, fit)`: en PDF, `drawImage` con un recorte para
-  `cover`; en SVG, un `<image>` con la imagen incrustada (`data:`) y `preserveAspectRatio`.
-  `PdfStructure` añade el `Figure` con `Alt` (y su `BBox`).
+- **Modelo.** `Element.IMAGE` y `Style.Layout.IMAGE`, una caja sin hijos; la ruta en
+  `Box.image` y `Alt` y `Fit` en `Style`. El builder solo comprueba que hay ruta y que no hay
+  `Inside` ni `Decoration` (`BREAK_IN_IMAGE`, también de una regla).
+- **Recursos.** `Resources.images()` da la `ImageLibrary`, que lee una vez cada fichero
+  (`ImageFile`: formato por el contenido y tamaño en píxeles, con `ImageIO`); `Resources.resolve`
+  admite una subcarpeta y no deja salir de ella. Los errores del fichero son
+  `ImageFormatException` o `ResourceException`, sin línea.
+- **Layout.** `Engine` tiene las imágenes de una carpeta de recursos (`layout/image/Images`), las
+  comprueba antes de maquetar con la línea de la `Image` y da su tamaño natural
+  (`Engine.natural`). `BoxModel.resolve(box, space, engine)` dimensiona la imagen como un
+  elemento reemplazado (`BoxModel.replaced`), así que las sondas de flex, grid y absolute la
+  miden bien; `ImageLayout` da los intrínsecos y la coloca sin partirla.
+- **Pintado.** `Canvas.image(box, content)`, en el paso del texto de `StackingContext`;
+  `ImageFit` calcula dónde va la imagen. `PdfCanvas` incrusta cada fichero una vez
+  (`PDImageXObject.createFromFileByContent`) y recorta a la caja de contenido; `SvgCanvas` la
+  incrusta como `data:` si recibe los recursos. `PdfStructure` crea un `Figure` con `Alt` y
+  `BBox`; sin `Alt`, la imagen es un *artifact*.
+- **Markdown.** `MarkdownBuilder.Translator.image`: un párrafo que solo tiene una imagen.
 
 **Tareas:**
 
-- [ ] Resolver I1–I10.
-- [ ] Schema (`Image`, `Alt`, `Fit`) y `Element`; especificación (§2, §4, §5.9, §5.10, §5.11,
-      §5.12, §5.13, nueva §5.18, §6, §8, §9 y glosario).
-- [ ] `ImageLibrary` y su validación (errores con línea, casos en el catálogo).
-- [ ] `ImageLayout` (tamaño natural, proporción, `Fit`, mínimos y máximos, flex, grid, cortes).
-- [ ] Pintado en PDF y SVG; `Figure` y *artifacts* en el PDF etiquetado.
-- [ ] Imágenes en `Markdown` (si I9 se acepta).
-- [ ] Tests de las piezas puras y de layout; caso golden `14-images`, calculado a mano y con
-      los PNG revisados; `DocumentReaderTest`.
-- [ ] README, `CLAUDE.md`, `DECISIONES.md` y este documento.
+- [x] Resolver I1–I10.
+- [x] Schema (`Image`, `Alt`, `Fit`) y `Element`; especificación (§2, §4, nueva §4.15, §5.1,
+      §5.9–§5.13, §5.17, nueva §5.18, §6, §8, §9 y glosario).
+- [x] `ImageLibrary` y su validación (errores con línea, casos en el catálogo: 14 nuevos).
+- [x] Dimensionado en `BoxModel` e `ImageLayout` (tamaño natural, proporción, `Fit`, mínimos y
+      máximos, flex, grid, absolute, tablas, columnas, cortes).
+- [x] Pintado en PDF y SVG; `Figure` y *artifacts* en el PDF etiquetado.
+- [x] Imágenes en `Markdown`.
+- [x] Tests (`ImageLibraryTest`, `ImageLayoutTest`, `ImageFitTest`, `SvgCanvasTest`,
+      `PdfCanvasTest.imagesAreFiguresOrArtifactsAndAreEmbeddedOnce`, `MarkdownBuilderTest`); caso
+      golden `14-images` de dos páginas, calculado a mano y con los PNG revisados;
+      `DocumentReaderTest`.
+- [x] README, `CLAUDE.md`, `DECISIONES.md` (135–143) y este documento.
 
 ---
 
@@ -377,6 +387,15 @@ Image: logos/acme.png
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (2).** Hito 18 terminado. Aceptadas I1–I10. Schema (`Image`, `Alt`, `Fit`);
+  `ImageLibrary` e `ImageFile`; dimensionado de elemento reemplazado en `BoxModel` e
+  `ImageLayout`; pintado en PDF (una copia por fichero, `Figure` con `Alt` y `BBox`) y SVG;
+  imágenes solas en su párrafo de Markdown; tres `ErrorCode` nuevos y 14 casos en el catálogo.
+  Imágenes de prueba en `resources/images/test/`. Caso golden `14-images`, que pasa con el
+  resultado calculado a mano. Especificación (§4.15 y §5.18 nuevas), `DECISIONES.md` (135–143),
+  README y `CLAUDE.md`. `mvn test` en verde.
+  *Siguiente paso:* los hitos de esta hoja de ruta están terminados. Pendiente: repasar las
+  decisiones de `DECISIONES.md` y elegir el siguiente trabajo (ideas en `TODO.md`).
 - **2026-10-28.** Se abre el hito 18 (imágenes), con las decisiones I1–I10 y su propuesta.
   `mvn test` en verde (746 tests).
   *Siguiente paso:* resolver I1–I10 con el usuario y empezar por el schema y `ImageLibrary`.

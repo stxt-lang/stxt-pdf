@@ -66,6 +66,10 @@ directorio de trabajo, con las subcarpetas `fonts/` e `images/`. Para usar otra:
 `PdfWriter.write(doc, new Resources(Path.of("otra")), out, false)`. Los recursos solo se buscan
 hacia abajo: no se admiten rutas absolutas, `..` ni enlaces que salgan de la carpeta.
 
+Las imágenes (`Image: logos/acme.png`) son PNG o JPEG de `images/`, con la ruta relativa a esa
+carpeta; se incrustan una vez en el PDF con su resolución. Los detalles están en el §5.18 de la
+especificación.
+
 Solo se usan las fuentes TTF de `fonts/`, que se incrustan en el PDF; cada fichero se reconoce
 por la familia, el peso y el estilo que declara. `Font` y `Size` (de `Typography`) son
 obligatorios en el texto y no tienen valor por defecto. El repositorio incluye
@@ -77,7 +81,7 @@ cursiva), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 17 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 18 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -97,12 +101,13 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 17 están termin
 | Ecuación de cajas absolutas | Hecho y probado |
 | Partición de líneas y tamaños intrínsecos del texto | Hecho y probado |
 | Tramos con formato dentro de una línea (negrita, cursiva, subrayado y tachado), con las métricas de cada variante de la fuente | Hecho y probado; se escriben con `Markdown` |
-| Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM y formato dentro de la línea, traducidos a los elementos de siempre; el resto, error | Hecho y probado |
+| Contenido en Markdown (`Markdown`): encabezados, párrafos, listas, tablas GFM, imágenes solas en su párrafo y formato dentro de la línea, traducidos a los elementos de siempre; el resto, error | Hecho y probado |
 | Reparto flex con congelación | Hecho y probado |
 | Grid: áreas, celdas, colocación automática, dimensionado de pistas | Hecho y probado |
 | Reglas de corte: viudas, huérfanas, garantía de progreso | Hecho y probado |
 | Paginador, caché, contextos de apilamiento, SVG, volcado STXT | Hecho |
 | Lectura con la librería oficial `stxt-core` 1.0.3 y validación del schema | Hecho y probado |
+| Imágenes (`Image`): PNG y JPEG de la carpeta de recursos, tamaño natural a 96 ppp, proporción, `Fit` (`contain`, `cover`, `fill`), sin cortes, `Figure` con `Alt` en el PDF etiquetado; también desde Markdown | Hecho y probado |
 | Markdown con commonmark-java 0.30.1 (CommonMark, tablas y tachado de GFM, subrayado `++…++`) | Hecho y probado |
 | `BlockLayout`, `InlineLayout` (colapso padre-hijo y cajas vacías incluidos) | Hecho y probado |
 | Texto justificado (`Align: justify`) | Hecho y probado |
@@ -144,8 +149,9 @@ en `target/pdf/`.
 15. ~~**Columnas.** `Multicol` con `Count`, `Column width`, `Column gap`, `Rule`, `Rule color` y `Fill`; las columnas son fragmentainers dentro de la página, equilibradas al final, y `Before`/`After: column` (caso 12).~~ Hecho.
 16. ~~**Tramos.** Negrita, cursiva, subrayado y tachado dentro de una misma línea, con las métricas de cada variante de la fuente.~~ Hecho (caso 13, con el hito 17).
 17. ~~**Markdown.** Elemento `Markdown` con un subconjunto cerrado (formato dentro de la línea, encabezados, listas y tablas) que se traduce a los elementos que ya existen (caso 13).~~ Hecho.
+18. ~~**Imágenes.** Elemento `Image` con PNG y JPEG de `images/`, dimensionado como un elemento reemplazado, `Alt` y `Fit`, sin cortes; imágenes en Markdown (caso 14).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 y 17 están en
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 18 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
@@ -158,7 +164,8 @@ src/main/java/dev/stxt/boxes/
                 FontFace, FontWeight, FontStyle, TextFormat, TextRun, GridAreas, Area, Cell,
                 Tolerance
   stxt/         DocumentReader (stxt-core + schema)
-  resources/    Resources, FontLibrary, FontFile, ResourceException
+  resources/    Resources, FontLibrary, FontFile, ImageLibrary, ImageFile, ResourceException,
+                ImageFormatException
   tree/         Box, Element, Style, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
                 StyleRules, TableBuilder, ListBuilder, MarkdownBuilder, ModelValidator…),
                 InvalidModelException
@@ -172,8 +179,9 @@ src/main/java/dev/stxt/boxes/
     position/   AbsoluteEquation, AbsoluteLayout, RelativeOffset
     table/      TableLayout
     multicol/   MulticolLayout, Columns
+    image/      ImageLayout, Images, NaturalSize
   fragment/     Fragment, BreakToken, BreakAppeal, Unit, Page, BreakRules, TextLine
-  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure
+  paint/        Canvas, StackingContext, SvgCanvas, PdfCanvas, PdfStructure, ImageFit, PdfWriter
   output/       StxtDump
 ```
 

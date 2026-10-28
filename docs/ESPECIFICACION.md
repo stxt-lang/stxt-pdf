@@ -80,7 +80,8 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda de una fila: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([§5.16](#516-bloques-en-columnas)) | Elementos en flujo |
-| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas y tablas ([§5.17](#517-markdown)) | Su texto en `Content` |
+| `Markdown` | Bloque con contenido escrito en Markdown, traducido a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)) | Su texto en `Content` |
+| `Image` | Imagen PNG o JPEG de la carpeta de recursos, con el tamaño y la proporción del fichero ([§5.18](#518-imágenes)) | Nada: la ruta del fichero va en el valor |
 | `Relative` | Bloque que se desplaza con `Offset` sin mover a sus hermanos ([§5.5](#55-posicionamiento)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado con `Offset` en su containing block | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil y repetido en cada página | Elementos |
@@ -89,7 +90,7 @@ todas las cajas (la fuente del documento), un `Styles` opcional con las reglas r
 
 **Elementos** son todos menos `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y **elementos en
 flujo**, los que pueden ser un ítem (`Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los
-encabezados, `List`, `Table`, `Multicol`, `Markdown` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
+encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Image` y `Relative`); `Absolute` y `Fixed` salen del flujo y nunca son
 ítems. `List item` solo va dentro de una `List`, y `Cell`, dentro de una `Row`. Todos son **elementos de caja**: cada uno es una caja
 del árbol ([§5.1](#51-árbol-de-cajas)). `Item` y `Area` no son cajas: envuelven al elemento que hace de
 ítem y le añaden lo que solo tiene sentido dentro de su contenedor. `Head`, `Body`, `Foot` y
@@ -234,7 +235,7 @@ Casi todas las propiedades van en uno de tres **grupos**, hijos de cada elemento
 | Grupo | Contenido | Se hereda | Elementos |
 |---|---|---|---|
 | `Box` ([§4.3](#43-box)) | El modelo de caja: tamaño, márgenes, relleno, borde y fondo | No | Todos los de caja |
-| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación y color del texto, viudas y huérfanas | **Sí** | Todos los de caja, y `Document` |
+| `Typography` ([§4.4](#44-typography)) | Fuente, tamaño, interlineado, alineación y color del texto, viudas y huérfanas | **Sí** | Todos los de caja salvo `Image`, y `Document` |
 | `Break` ([§4.5](#45-break)) | Cortes de página y decoración en los cortes | No | Todos los de caja salvo `Absolute` y `Fixed` |
 
 Lo que hay en `Typography` lo hereda toda la descendencia; lo de `Box` y `Break` es solo de la
@@ -245,8 +246,9 @@ vez, y los grupos, como mucho uno por elemento. Fuera de los grupos quedan las p
 definen el propio elemento: `Id`, `Class` e `Isolate` ([§4.2](#42-propiedades-del-elemento)), las de
 `Flex` y `Grid` ([§4.6](#46-flex), [§4.7](#47-grid)), las de `Item` y `Area`
 ([§4.8](#48-item-y-area)), las de posicionamiento ([§4.9](#49-posicionamiento)), las de las
-listas ([§4.11](#411-listas)), las de las tablas ([§4.12](#412-tablas)) y las de los bloques en
-columnas ([§4.13](#413-bloques-en-columnas)).
+listas ([§4.11](#411-listas)), las de las tablas ([§4.12](#412-tablas)), las de los bloques en
+columnas ([§4.13](#413-bloques-en-columnas)), las de `Markdown` ([§4.14](#414-markdown)) y las de las
+imágenes ([§4.15](#415-imágenes)).
 
 ```
 Text: Resultados del trimestre
@@ -537,6 +539,20 @@ además `Id`, `Class`, `Box`, `Typography` y `Break`, como un `Block`.
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
+### 4.15 Imágenes
+
+Propiedades del elemento `Image`, hijas directas suyas ([§5.18](#518-imágenes)). Admite además
+`Id`, `Class`, `Box` y `Break` (sin `Inside` ni `Decoration`, porque no se parte); no admite
+`Typography`, porque no tiene texto.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG o JPEG: `Image: logos/acme.png`. |
+| `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura del PDF etiquetado; sin él, es decorativa. |
+| `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+
+No van en las reglas de `Styles`, que solo admiten los grupos.
+
 ---
 
 ## 5. Semántica del layout
@@ -556,6 +572,7 @@ Cada elemento determina **cómo coloca a sus hijos**:
 | `Grid` | En una rejilla ([§5.8](#58-grid)) |
 | `Multicol` | En columnas, cada una en flujo de bloque ([§5.16](#516-bloques-en-columnas)) |
 | `Text`, `Paragraph` | No tiene hijos: reparte su texto en líneas ([§5.4](#54-texto)) |
+| `Image` | No tiene hijos: su contenido es la imagen ([§5.18](#518-imágenes)) |
 
 **Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque
 es un bloque apilado; dentro de un `Flex` o un `Grid` (envuelta en `Item` o `Area`), un ítem.
@@ -862,6 +879,7 @@ al dimensionar las filas, todavía sin área, cuentan como `auto`.
 | Elemento | min-content | max-content |
 |---|---|---|
 | `Text` | palabra más ancha | párrafo más largo en una línea |
+| `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
 | `Block`, `Relative`, `Absolute`, `Fixed` | máximo del min-content de los hijos | máximo del max-content de los hijos |
 | `Flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
 | `Flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
@@ -885,7 +903,8 @@ porcentaje), un mínimo mayor que el máximo, o un `Width`/`Height` fuera de ell
 Si no se pueden comparar hasta maquetar (`Min width: 150` y `Max width: 20%`) y chocan, **gana
 el mínimo**.
 
-**Proporción.** Con `Aspect ratio` y un eje `auto`, ese eje se deduce del otro.
+**Proporción.** Con `Aspect ratio` y un eje `auto`, ese eje se deduce del otro. Una `Image`
+tiene siempre proporción: la de su fichero, o la de `Aspect ratio` ([§5.18](#518-imágenes)).
 
 ### 5.10 Fragmentación
 
@@ -922,7 +941,7 @@ espacio para partirlo por dentro.
 
 **Garantía de progreso.** Al principio de una página siempre se coloca algo, aunque haya que
 cortarlo a la fuerza. Lo que no se puede partir y no cabe en una página entera (una línea más
-alta que el área útil, una fila con un ítem que no puede colocar nada) es un error
+alta que el área útil, una imagen, una fila con un ítem que no puede colocar nada) es un error
 ([§5.12](#512-desbordamiento)).
 
 **Cortes forzados.** `Before: page` y `After: page` (de `Break`) fuerzan un salto de página, y
@@ -972,6 +991,9 @@ Al elegir el
 corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un contenedor `column`
 con `Wrap` no se parte.
 
+**Imágenes.** Una `Image` no se parte: si no cabe en lo que queda de la página (o de la
+columna), pasa entera a la siguiente ([§5.18](#518-imágenes)).
+
 **Posicionadas.** Un `Absolute` se coloca en la página donde cae su posición y no se parte. Si
 su containing block está partido, se resuelve contra el fragmento de esa página: su alto es el
 de ese fragmento, no el total. Un `Fixed` se repite en todas las páginas. Un `Relative` se
@@ -994,16 +1016,17 @@ cambiar. Dentro hay dos subcarpetas fijas, que pueden organizarse a su vez en su
 ```
 resources/
 	fonts/      fuentes TTF
-	images/     imágenes (reservada)
+	images/     imágenes PNG y JPEG
 ```
 
-Los recursos se buscan **siempre hacia abajo**, desde la raíz de la carpeta. Una ruta de
-recurso es relativa a esa raíz (`images/logo.png`), admite `/` y `\` como separadores y no
+Los recursos se buscan **siempre hacia abajo**, desde la raíz de su subcarpeta. Una ruta de
+recurso es relativa a esa subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es
+`resources/images/logos/acme.png`, [§5.18](#518-imágenes)). Admite `/` y `\` como separadores y no
 puede:
 
 - ser absoluta (`/…`, `\…`, `C:…`) ni empezar por `~`;
 - contener un segmento `..`, aunque al normalizarla volviera a quedar dentro;
-- llegar, a través de un enlace simbólico, a un fichero fuera de la carpeta.
+- llegar, a través de un enlace simbólico, a un fichero fuera de su subcarpeta.
 
 **Fuentes.** Solo se usan las fuentes TTF de `fonts/`; no hay fuentes del sistema, ni las 14
 estándar de PDF, ni fuentes de sustitución. La salida PDF las incrusta (solo los glifos usados),
@@ -1051,7 +1074,7 @@ un error con la primera de estas situaciones:
   partir** (`PAGE_OVERFLOW`), en la línea de lo que impide partirlo: su `Padding` o su
   `Border` si el relleno y el borde del fragmento ya no caben en la página; si no, su
   `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no,
-  su `Height`;
+  su `Height` (en una `Image` sin él, su `Width`, del que sale el alto);
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la
   línea de su `Offset`. Pueden ocupar los márgenes del medio, pero no salir de la página;
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página
@@ -1124,10 +1147,11 @@ como en un `Block`; además admite `Id`, `Class`, `Box` y `Typography`, y nada m
 
 - **Árbol de estructura:** un elemento por caja, en orden del documento, que es el orden de
   lectura: `Document` (la raíz), `H1` … `H6` (los encabezados), `P` (`Paragraph`), `Span`
-  (`Text`), `L` y `LI` (las listas, [§5.14](#514-listas)) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
+  (`Text`), `L` y `LI` (las listas, [§5.14](#514-listas)), `Figure` (las `Image` con `Alt`, con su
+  texto alternativo y su `BBox`, [§5.18](#518-imágenes)) y `Div` (el resto). El texto de cada caja es contenido marcado de su elemento; una
   caja partida entre páginas tiene contenido en varias.
-- ***Artifacts*:** los fondos, los bordes y todo lo que hay dentro de un `Fixed` no forman parte
-  del contenido.
+- ***Artifacts*:** los fondos, los bordes, las imágenes sin `Alt` y todo lo que hay dentro de un
+  `Fixed` no forman parte del contenido.
 - **Marcadores:** uno por encabezado, con el texto de sus `Text` unido por espacios, anidados por
   nivel y que llevan a la esquina superior izquierda de su primer fragmento. El visor los
   muestra al abrir el documento.
@@ -1429,9 +1453,10 @@ tachado de GFM y el subrayado `++…++`. Se traduce así:
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
+| `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`; con `![](ruta)`, decorativa ([§5.18](#518-imágenes)) |
 
-Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces, imágenes, código (en línea o en
-bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
+Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces, imágenes dentro de un texto o con
+título (`![Alt](ruta "título")`), código (en línea o en bloque), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al final
 de la línea) y definiciones de enlaces. Un encabezado tampoco puede ir dentro de un ítem de
 lista, como en un `List item`, ni una tabla quedarse sin filas debajo de la cabecera.
 
@@ -1475,6 +1500,108 @@ una tabla sin su propiedad es un error con la línea de la lista o la tabla
 etiquetas (`H1`, `P`, `L`, `Table`…); sus encabezados son marcadores. En el volcado del
 [§7](#7-formato-de-resultados) solo sale el `Markdown`, si tiene `Id`: lo generado no lo tiene.
 
+### 5.18 Imágenes
+
+Una `Image` pone en el documento una imagen PNG o JPEG de la carpeta `images/` de los recursos
+([§5.11](#511-recursos-y-fuentes)). Es una caja sin hijos, como un `Text`, cuyo contenido es la
+imagen: se coloca, se dimensiona, se corta entre páginas y se pinta como cualquier caja, con su
+`Box` (márgenes, relleno, borde y fondo) y su `Break`.
+
+```
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Fixed:
+		Offset: -30 0 auto auto
+		Image: test/square.png
+			Box:
+				Width: 20
+	Image: test/wide.png
+		Alt: Un paisaje con montañas y un sol
+		Box:
+			Width: 100%
+			Margin: 0 0 10 0
+	Flex:
+		Gap: 10
+		Item:
+			Image: test/tall.jpg
+				Alt: Un retrato
+				Box:
+					Height: 60
+		Item:
+			Grow: 1
+			Image: test/wide.png
+				Fit: cover
+				Box:
+					Height: 60
+```
+
+(El ejemplo usa las imágenes de prueba del repositorio, en `resources/images/test/`: un logotipo
+en la esquina de cada página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la
+misma imagen recortada a lo que queda de ancho.)
+
+**Fichero.** El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo
+([§5.11](#511-recursos-y-fuentes)): `Image: logos/acme.png` es `resources/images/logos/acme.png`.
+Se admiten PNG (con transparencia) y JPEG, y el formato se reconoce por el contenido, no por la
+extensión. Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son un
+error (`IMAGE_UNKNOWN`); un fichero que no es PNG ni JPEG (GIF, WebP, SVG…) o que no se puede
+leer, también (`IMAGE_FORMAT`). Los ficheros se comprueban antes de maquetar, con las fuentes, y
+los errores señalan la línea de la `Image`.
+
+**Tamaño natural.** Cada píxel mide 0,75 pt, como en CSS (96 píxeles por pulgada), sin mirar la
+resolución que declare el fichero: una imagen de 200 × 100 píxeles mide 150 × 75 pt. Para otro
+tamaño se declara `Width` o `Height`.
+
+**Dimensionado.** La caja de contenido de una imagen tiene la **proporción** del fichero, o la de
+`Aspect ratio` si se declara, que la sustituye (no es un error). El relleno y el borde van
+fuera: no la deforman.
+
+- Con `Width` y `Height` en `auto`, mide su tamaño natural, **también en flujo de bloque**: no se
+  estira al ancho del padre. Si no cabe, es un desbordamiento (`BOX_OVERFLOW`); para que ocupe
+  el ancho disponible, se declara `Width: 100%`. `Margin: 0 auto` la centra, porque no ocupa
+  todo el ancho.
+- Con un eje declarado, o impuesto por el padre (un ítem flex con `Grow`, una columna de grid
+  con `Horizontal: stretch`), el otro sale de la proporción. Con los dos, la caja mide lo
+  declarado y `Fit` decide cómo la llena la imagen.
+- `Min width`, `Max width`, `Min height` y `Max height` se aplican como en cualquier caja. Si los
+  dos ejes son `auto` y el alto choca con su mínimo o su máximo, el ancho se vuelve a deducir del
+  alto limitado: la proporción se conserva.
+- Su alto es siempre definido, así que un flex no la estira en el eje cruzado de una fila, ni un
+  grid en vertical; en horizontal sí se estira, y el alto sigue a la proporción.
+- **Tamaños intrínsecos:** min-content y max-content son el ancho natural o, si declara `Height`
+  en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `1fr` de
+  grid o en un ítem flex sin `Min width`, la imagen no encoge por debajo de él.
+
+**`Fit`.** Si la caja de contenido y la imagen tienen proporciones distintas, `contain` (por
+defecto) dibuja la imagen entera, lo más grande que cabe y centrada, y deja ver el fondo a los
+lados; `cover` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra;
+`fill` la estira a la caja y la deforma. Con la misma proporción, las tres dan lo mismo.
+
+**Cortes de página.** Una imagen no se parte: si no cabe en lo que queda de la página (o de la
+columna de un `Multicol`), pasa entera a la siguiente, como una línea de texto. Si no cabe ni en
+una página entera, es `PAGE_OVERFLOW`, con la línea de su `Height` (o, sin él, de su `Width`).
+`Before` y `After` funcionan como en cualquier caja; `Inside` y `Decoration`, que solo cuentan al
+partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla de `Styles`.
+
+**Dónde va.** Donde va un elemento en flujo: en `Document`, `Block`, `Relative`, `Absolute`,
+`Fixed` (un logotipo que se repite en cada página), `Multicol`, `List item` (pero no al
+principio: el marcador necesita una línea con la que alinearse, `LIST_ITEM_WITHOUT_LINE`), `Cell`
+y como elemento de un `Item` o un `Area`. En un `Markdown`, una imagen sola en su párrafo
+(`![Alt](ruta)`) es una `Image` ([§5.17](#517-markdown)).
+
+**Accesibilidad.** Con `Alt`, un texto no vacío, la imagen es un elemento `Figure` del PDF
+etiquetado ([§5.13](#513-encabezados-y-párrafos)) con ese texto alternativo y su `BBox` (su caja
+de contenido en la página). Sin `Alt` es decorativa y se pinta como un *artifact*, igual que los
+fondos. Dentro de un `Fixed` es siempre un *artifact*, y en las filas repetidas de una tabla, solo
+es contenido la primera vez.
+
+**Salida.** El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la
+resolución del fichero: el JPEG tal cual y el PNG sin pérdida y con su transparencia. El SVG de
+depuración la incrusta como `data:`. En el volcado del [§7](#7-formato-de-resultados) es una caja
+más.
+
 ---
 
 ## 6. Validación
@@ -1501,8 +1628,9 @@ La validación se hace en cuatro niveles:
    valida también los documentos que no se han leído con el lector, así que estos errores salen
    siempre con los códigos de la librería.
 2. **Modelo:** las reglas que el schema no puede expresar, al construir el árbol de cajas.
-3. **Fuentes** ([§5.11](#511-recursos-y-fuentes)): con las métricas reales (la salida PDF),
-   antes de maquetar, porque necesitan la carpeta de fuentes.
+3. **Recursos** ([§5.11](#511-recursos-y-fuentes)): las fuentes, con las métricas reales (la
+   salida PDF), y las imágenes ([§5.18](#518-imágenes)), antes de maquetar, porque necesitan la
+   carpeta de recursos.
 4. **Desbordamientos** ([§5.12](#512-desbordamiento)): sobre el resultado, después de maquetar
    y paginar.
 
@@ -1511,7 +1639,7 @@ La validación se hace en cuatro niveles:
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz) | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
 | `MEDIA_SIZE` | `Width` y `Height` del medio, puntos positivos; `Margin`, solo puntos, y deja área útil | `Los márgenes del medio no dejan área útil` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([§3](#3-valores)), colores `#RGB` o `#RRGGBB`, `Aspect ratio` | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` no vacío y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([§3.1](#31-tipos-de-valor), [§4](#4-referencia-de-propiedades)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -1539,7 +1667,10 @@ La validación se hace en cuatro niveles:
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
-| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces, ni imágenes, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite enlaces: solo admite encabezados, párrafos, listas, tablas y…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto del [§5.17](#517-markdown): ni enlaces, ni imágenes dentro de un texto o con título, ni código, ni citas, ni HTML, ni líneas horizontales, ni saltos forzados; ni encabezados en un ítem de lista, ni tablas sin filas debajo de la cabecera (línea del bloque) | `Markdown no admite enlaces: solo admite encabezados, párrafos, listas, tablas y…` |
+| `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
+| `IMAGE_FORMAT` | Una `Image` es un PNG o un JPEG que se puede leer (línea de la `Image`) | `La imagen dibujo.gif no es PNG ni JPEG (es GIF): conviértela a uno de los dos` |
+| `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla ([§5.18](#518-imágenes)) | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `MARKDOWN_PROPERTY_MISSING` | Un Markdown con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
@@ -1662,6 +1793,12 @@ Un **test de referencia** es una carpeta con `input.stxt` (el documento) y `expe
 | Columnas que no caben en el alto del contenedor | Columnas de desbordamiento a un lado | Error (`BOX_OVERFLOW`) |
 | `position: absolute` o `fixed` dentro de un multicolumna | Sí | Error (`POSITIONED_IN_MULTICOL`) |
 | `break-before: column` fuera de un multicolumna | Se ignora | Error (`COLUMN_BREAK_OUTSIDE_MULTICOL`) |
+| Imágenes (`<img>`) | Elemento en línea, dentro del texto; muchos formatos (GIF, WebP, SVG…); `srcset` y `sizes` | Una caja `Image` sola, con un PNG o un JPEG de la carpeta de recursos ([§5.18](#518-imágenes)) |
+| Tamaño de un píxel | 1/96 de pulgada | Igual (0,75 pt), sin mirar la resolución que declare el fichero |
+| `object-fit` | `fill` por defecto; también `none` y `scale-down`, con `object-position` | `Fit`, con `contain` por defecto; sin `none` ni `scale-down`, y siempre centrada |
+| Imagen más ancha que su contenedor | Desborda (se suele evitar con `max-width: 100%`) | Error (`BOX_OVERFLOW`): se declara `Width` |
+| Imagen en un ítem estirado de flex o grid | Se estira en los dos ejes y se deforma | Su alto sale de la proporción y no se estira; su ancho, sí |
+| `alt=""` | Imagen decorativa | Sin `Alt`; un `Alt` vacío es un error |
 | Grid `dense` | Sí | No |
 | Subgrid | Sí | No (posible ampliación) |
 | Escritura vertical | Sí | No |
@@ -1698,6 +1835,7 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Cell` | `INLINE` | `Id`, `Class`, `Box`, `Typography`, `Span`; elementos salvo los encabezados |
 | `Multicol` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
+| `Image` | `INLINE` | `Id`, `Class`, `Box`, `Break`, `Alt`, `Fit` |
 | `Relative` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`; elementos |
 | `Absolute`, `Fixed` | `GROUP` | `Id`, `Class`, `Box`, `Typography`, `Offset`, `Layer`; elementos |
 | `Item` | `GROUP` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
@@ -1707,12 +1845,12 @@ Todos los hijos, salvo los elementos, admiten como mucho uno.
 | `Break` | `GROUP` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, `Heading 1` … `Heading 6`,
-`List`, `Table`, `Multicol`, `Markdown`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`List`, `Table`, `Multicol`, `Markdown`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Tipos de las propiedades: `Content` es `BLOCK` (solo `>>`); `Areas`, `TEXT` (en línea o en
 bloque); `Isolate` y `Wrap`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y
 `Count`, `INTEGER`; las de valores
-cerrados (`Table columns` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet` y `Numbering` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
+cerrados (`Table columns` y `Fit` entre ellas), `ENUM` con los valores del §4; el resto (`Bullet`, `Numbering` y `Alt` entre ellos), `INLINE` sin hijos, y su forma la comprueba el
 motor ([§3](#3-valores)). Los `GROUP` no admiten valor: `Block: algo` es un error.
 
 Lo que el schema no puede expresar lo comprueba el motor al construir el árbol ([§6](#6-validación)):
@@ -1873,7 +2011,8 @@ Document (dev.stxt.boxes):
 | **Fragmentainer** | Contenedor de fragmentos: cada página y, dentro de un `Multicol`, cada columna. |
 | **Fragmento** | Parte de una caja que cae en un fragmentainer. |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
-| **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas y tablas ([§5.17](#517-markdown)). |
+| **Imagen** | Elemento `Image`: una caja sin hijos con un PNG o un JPEG de la carpeta de recursos, su tamaño natural y su proporción ([§5.18](#518-imágenes)). |
+| **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas e imágenes ([§5.17](#517-markdown)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea. |
 | **Pista** | Columna o fila de una rejilla grid. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo. |

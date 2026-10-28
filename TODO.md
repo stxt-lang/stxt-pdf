@@ -13,7 +13,7 @@
    			Box
    			
 - Que pasa con tablas? Que tengan header y footer, etc.
-- Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...
+- ~~Que pasa con imágenes? Quizá sea un box fijo que se pondrá directo o algo así...~~ Hecho: elemento `Image` (hito 18).
 - Cambiar de src/test/resources a test
 - Muchos más ejemplos y pruebas de uso
 - Httpservice para probar, que se pueda ejecutar en maven, etc. 

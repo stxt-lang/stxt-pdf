@@ -680,3 +680,65 @@ propiedad con su nombre interno de siempre (`font-size`, `break-inside`), así q
 134. **El `Markdown` es un `Div` en el PDF etiquetado**, como un `Block`, y lo generado cuelga de
      él. *Dónde:* `paint/PdfStructure.type`. *Alternativa:* que no tenga elemento propio y lo
      generado cuelgue de su padre.
+
+## Hito 18: imágenes (2026-10-28)
+
+Decisiones I1–I10 de la hoja de ruta, todas con la propuesta aceptada: elemento `Image` con la
+ruta relativa a `images/`, PNG y JPEG, 96 píxeles por pulgada, tamaño natural también en flujo
+de bloque, `Fit` con `contain` por defecto, sin cortes, `Alt` opcional, imágenes solas en su
+párrafo de Markdown y tres errores nuevos. Las interpretaciones que salieron al implementarlas:
+
+135. **La proporción es la de la caja de contenido**: el relleno y el borde van fuera y no
+     deforman la imagen. En las demás cajas, `Aspect ratio` se aplica a la caja de borde (una
+     simplificación anterior). Un `Aspect ratio` declarado en una `Image` sustituye a la del
+     fichero y se aplica igual, a la caja de contenido. *Dónde:* `layout/BoxModel.replaced`,
+     `layout/image/ImageLayout.contentIntrinsic`. *Alternativa:* la caja de borde, como el resto.
+
+136. **El alto de una imagen es siempre definido**, porque sale de la proporción: un flex no la
+     estira en el eje cruzado de una fila, ni un grid en vertical (en CSS, `align-self: stretch`
+     la estira y la deforma). En horizontal sí se estira (un `flex column`, un área de grid), y el
+     alto la sigue. *Dónde:* `BoxModel.replaced` (da siempre `height`), que flex y grid consultan
+     antes de estirar. *Alternativa:* estirarla y dejar que `Fit` la coloque.
+
+137. **Mínimos y máximos con los dos ejes `auto`**: se limita el ancho, el alto sale de la
+     proporción y se limita, y si el alto ha cambiado, el ancho se vuelve a deducir de él (y se
+     vuelve a limitar). Es una aproximación de la tabla de CSS 2.1 §10.4; si los límites no se
+     pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen. *Dónde:*
+     `BoxModel.replaced`. *Alternativa:* la tabla completa de CSS.
+
+138. **Los tamaños intrínsecos son un mínimo de verdad**: min-content y max-content son el ancho
+     natural, o el que sale de un `Height` en puntos (un `Height` en porcentaje no cuenta, porque
+     no hay containing block). En una pista `1fr` o en un ítem flex sin `Min width`, la imagen
+     no encoge por debajo; si no cabe, es un desbordamiento. CSS deja encoger las imágenes con
+     ancho en porcentaje (*compressible replaced elements*). *Dónde:* `ImageLayout.contentIntrinsic`.
+     *Alternativa:* min-content 0 con `Width` en porcentaje, como CSS.
+
+139. **`Margin: 0 auto` centra una `Image` sin `Width`**, porque mide su ancho natural y no
+     ocupa todo el ancho: es la excepción a `MARGIN_AUTO_WITHOUT_EFFECT` en flujo de bloque.
+     *Dónde:* `tree/ModelValidator.validateMargins`. *Alternativa:* exigir `Width` o `Max width`
+     como en cualquier caja.
+
+140. **Errores de las imágenes:** una `Image` sin ruta es `IMAGE_UNKNOWN` al construir el árbol
+     (no hace falta la carpeta); que el fichero exista y sea PNG o JPEG se comprueba antes de
+     maquetar, en todos los motores, también con `FixedMetrics`, porque el tamaño natural hace
+     falta para el layout (`new Engine()` lee las imágenes de la carpeta de recursos por
+     defecto). Un `Alt` vacío es `VALUE_NOT_ALLOWED`; en Markdown, `![](ruta)` es una imagen
+     decorativa (sin `Alt`), y un título (`![a](ruta "t")`), que no tendría efecto,
+     `MARKDOWN_UNSUPPORTED`. *Dónde:* `BoxTreeBuilder.image` y `alt`, `layout/image/Images`,
+     `MarkdownBuilder.Translator.image`. *Alternativa:* comprobar los ficheros solo con la salida
+     PDF; aceptar el `Alt` vacío como decorativa.
+
+141. **`PAGE_OVERFLOW` de una imagen sin `Height` señala su `Width`**, del que sale el alto; sin
+     ninguno de los dos, la línea de la `Image`. *Dónde:* `layout/Overflow.pageOverflow`.
+     *Alternativa:* siempre la línea de la `Image`.
+
+142. **PDF etiquetado:** el `BBox` del `Figure` es la caja de contenido de la imagen (no la
+     parte visible con `contain`), y una imagen con `Alt` dentro de un `Fixed` o en las filas
+     repetidas de una tabla es un *artifact* (en la tabla, salvo la primera vez), como el resto
+     de su contenido. *Dónde:* `paint/PdfStructure.figureBox`, `PdfCanvas.image`.
+     *Alternativa:* el rectángulo dibujado como `BBox`.
+
+143. **Las imágenes de prueba están en la carpeta de recursos del repositorio**
+     (`resources/images/test/`), junto a la fuente, porque los tests de layout, el catálogo de
+     errores y los casos golden usan la carpeta por defecto. Las genera Java2D y no tienen
+     licencia de terceros. *Alternativa:* una carpeta de recursos solo para los tests.

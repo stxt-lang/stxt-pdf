@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 en adelante (Markdown e imágenes):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 18 (Markdown e imágenes):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -41,7 +41,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 17 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 18 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -63,7 +63,7 @@ actualízala.
 | 15 | ~~Bloque en columnas (`Multicol`), equilibrado y cortes de columna~~ (hecho; caso 12) | schema, `tree/BoxTreeBuilder`, `layout/multicol/MulticolLayout`, `fragment/BreakRules`, `paint/StackingContext` |
 | 16 | ~~Tramos con formato dentro del texto (negrita, cursiva, subrayado, tachado)~~ (hecho; caso 13) | `model/TextRun`, `layout/inline/LineBreaker`, `fragment/TextLine`, `paint/StackingContext`, `layout/inline/PdfMetrics` |
 | 17 | ~~Elemento `Markdown`, traducido a elementos conocidos~~ (hecho; caso 13) | schema, `tree/MarkdownBuilder`, `tree/BoxTreeBuilder` |
-| 18 | Imágenes (`Image`): PNG y JPEG de la carpeta de recursos (en diseño) | schema, `resources`, `layout`, `paint` |
+| 18 | ~~Imágenes (`Image`): PNG y JPEG de la carpeta de recursos~~ (hecho; caso 14) | schema, `resources/ImageLibrary`, `layout/image/ImageLayout`, `layout/BoxModel`, `paint/PdfCanvas`, `paint/PdfStructure`, `tree/MarkdownBuilder` |
 
 Si se abre un hito nuevo, apúntalo en [`docs/ROADMAP.md`](docs/ROADMAP.md) y en esta tabla.
 
@@ -85,12 +85,12 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 |---|---|
 | `model` | Tipos puros: `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
-| `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ResourceException` |
+| `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `ResourceException` e `ImageFormatException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ModelValidator`, `BuildContext`, `Nodes`; `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
-| `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
+| `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfStructure` (PDF etiquetado y marcadores), `PdfWriter` (documento → PDF en una llamada), `ImageFit` (dónde se dibuja una imagen según `Fit`) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
@@ -275,7 +275,22 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos
   con `element(...)` como hijos de la caja del `Markdown` (un bloque, `Element.MARKDOWN`), y el
   texto de cada uno recibe sus tramos. Lo que no está en el subconjunto es
-  `MARKDOWN_UNSUPPORTED`: amplíalo solo traduciendo a elementos que ya existen.
+  `MARKDOWN_UNSUPPORTED`: amplíalo solo traduciendo a elementos que ya existen. Una imagen
+  sola en su párrafo (`![Alt](ruta)`) es una `Image`.
+- **Imágenes (§5.18):** `Image` es una caja sin hijos (`Element.IMAGE`, `Layout.IMAGE`) con la
+  ruta, relativa a `images/`, en `Box.image`, y `Alt` y `Fit` en `Style`. `tree` no lee
+  ficheros: `Engine` tiene las imágenes de una carpeta de recursos (`layout/image/Images`, la
+  por defecto con `new Engine()`, también con `FixedMetrics`), las comprueba antes de maquetar
+  (`IMAGE_UNKNOWN`, `IMAGE_FORMAT`, con la línea de la `Image`) y da su tamaño natural
+  (`Engine.natural`, a 96 ppp). El dimensionado de elemento reemplazado está en
+  `BoxModel.replaced`, para que las sondas de flex, grid y absolute midan bien la imagen: usa
+  siempre `BoxModel.resolve(box, space, engine)`, que le pasa el tamaño natural. La proporción
+  es la de la caja de contenido y el alto sale siempre de ella (es definido). `ImageLayout` solo
+  coloca y no parte: si no cabe, `BEFORE`. `StackingContext` la pinta con `Canvas.image` en el
+  paso del texto; `PdfCanvas` incrusta cada fichero una vez y `PdfStructure` le da un `Figure`
+  si tiene `Alt` (si no, es un *artifact*). Las imágenes de los tests están en
+  `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30,
+  y `drawing.gif` y `broken.png` para los errores).
 
 ## Convenciones
 

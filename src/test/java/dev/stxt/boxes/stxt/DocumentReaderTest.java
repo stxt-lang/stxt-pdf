@@ -69,7 +69,7 @@ class DocumentReaderTest {
             new Engine(new PdfMetrics(new Resources())).layOutDocument(reader.read(m.group(1)));
             examples++;
         }
-        assertEquals(3, examples);
+        assertEquals(4, examples);
     }
 
     @Test
