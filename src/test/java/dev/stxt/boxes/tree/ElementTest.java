@@ -53,9 +53,14 @@ class ElementTest {
         assertTrue(Element.of("item").isEmpty());
         // Ni el flujo de columnas de un Multicol, que también es generado.
         assertTrue(Element.of("columns").isEmpty());
-        // Generados: el marcador, el flujo de columnas y, del índice, seis entradas, el título, la guía
-        // y el número de página.
-        assertEquals(Element.values().length - 11, Element.written().size());
+        // Generados: el marcador, el flujo de columnas, el bloque de código de un Markdown y, del índice,
+        // seis entradas, el título, la guía y el número de página.
+        assertEquals(Element.values().length - 12, Element.written().size());
+        // El bloque de código lo nombran las reglas Element, pero no se escribe.
+        assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
+        assertTrue(Element.selectable().contains(Element.CODE_BLOCK));
+        assertTrue(!Element.written().contains(Element.CODE_BLOCK));
+        assertTrue(Element.CODE_BLOCK.hasText());
         // Las entradas del índice las nombran las reglas Element, pero no se escriben.
         assertEquals(Optional.of(Element.CONTENTS_ENTRY_2), Element.of("contents-entry-2"));
         assertEquals(Element.CONTENTS_ENTRY_4, Element.contentsEntry(4));

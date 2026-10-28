@@ -1222,7 +1222,8 @@ en sus entradas. Las interpretaciones que salieron al implementarlas:
      `Styles` solo lo alcanzan con `Element: Text`, que también es el `Text` de cada encabezado de
      un Markdown: un bloque de código no se puede estilar aparte (fondo, relleno) sin tocar los
      encabezados. *Dónde:* `MarkdownBuilder.codeBlock`. *Alternativa:* un elemento generado que las
-     reglas `Element` nombren (`Code block`), como las entradas de un `Contents`; queda en `TODO.md`.
+     reglas `Element` nombren (`Code block`), como las entradas de un `Contents`. **Sustituida por la 285
+     (hito 34): ahora es ese elemento.**
 
 214. **La etiqueta de lenguaje de las vallas es un error** (```` ```java ````): no hay resaltado y no
      tendría efecto, como el título de un enlace o de una imagen. *Dónde:* `MarkdownBuilder.codeBlock`
@@ -1722,3 +1723,16 @@ interpretaciones que salieron al implementarlas.
      último nivel como el de un `List item`. Es el uso que pidió el usuario («la sección 4.2»). Un encabezado sin
      numerar sigue siendo `REFERENCE_NOT_NUMBERED`. Los encabezados de un `Markdown` se numeran pero no se pueden
      referir (no llevan `Id`). *Dónde:* `tree/References.validate`, `Box.number`.
+
+## Hito 34: el bloque de código como elemento generado (2026-10-28)
+
+285. **El bloque de código de un `Markdown` es el elemento generado `Code block`** (`Element.CODE_BLOCK`), que las
+     reglas `Element` nombran como las entradas de un `Contents` y que no se escribe en el documento (elegido por
+     cuestionario; las alternativas eran un elemento también escribible y una clase automática `code`, que
+     reservaría un nombre de clase al autor). Sigue siendo un texto (`Layout.INLINE`, lleva texto, un `P` en el
+     PDF etiquetado) con la fuente de `Code font` y `White space: pre`, sin caja envoltorio: su `Box` (fondo,
+     relleno, márgenes) lo da `Element: Code block`. **`Element: Text` ya no lo alcanza**, y un `Text` escrito a
+     mano con `White space: pre` tampoco es un `Code block`. `MarkdownBuilder` marca el nodo `Text` que genera
+     (`Translation.codeBlocks`) y `BoxTreeBuilder.element` le da el elemento; el nodo sigue validando contra el
+     schema como un `Text`. *Dónde:* `tree/Element`, `tree/MarkdownBuilder`, `tree/BuildContext`,
+     `tree/BoxTreeBuilder`, `paint/PdfStructure`. *Alternativa:* un `Code block` también escribible.

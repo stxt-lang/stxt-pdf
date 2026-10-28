@@ -816,7 +816,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: For column
 	Node: Element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; Contents entry 1 a 6, las entradas de un Contents), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
 		Children:
 			Child: Box
 				Max: 1

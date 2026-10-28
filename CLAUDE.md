@@ -16,7 +16,7 @@ Motor de layout de cajas inspirado en CSS cuyos documentos se escriben en
 
 - **Especificación (fuente de verdad del comportamiento):** [`docs/ESPECIFICACION.md`](docs/ESPECIFICACION.md)
 - **Estado:** [`README.md`](README.md)
-- **Hoja de ruta de los hitos 16 a 33 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Hoja de ruta de los hitos 16 a 34 (Markdown, imágenes, pruebas, ejemplos, referencias e índice y las mejoras que salieron de los ejemplos):** [`docs/ROADMAP.md`](docs/ROADMAP.md).
   Léela al empezar una sesión (estado, decisiones abiertas y registro de sesiones) y
   actualízala al terminar. Las de los hitos 11 a 15 y de calidad y arquitectura están
   terminadas y solo quedan en el historial de git.
@@ -42,7 +42,7 @@ naturaleza Java + m2e, Java 17, UTF-8). Si cambian las dependencias: *Maven → 
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación y salida SVG y PDF; los hitos 1
-a 33 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
+a 34 están terminados. La tabla de estado del README es la referencia; al terminar un hito,
 actualízala.
 
 | Hito | Trabajo | Dónde |
@@ -94,7 +94,9 @@ actualízala.
 
 | 33 | ~~Numeración de los encabezados: `Numbered` en `Typography` (se hereda); `1`, `1.1`, `1.1.1` delante del título, en `{number of: id}`, el índice y los marcadores; `Numbered: false` deja un encabezado fuera~~ (hecho; caso 26) | schema, `tree/Style`, `tree/PropertyReader`, `tree/HeadingNumbers`, `tree/BoxTreeBuilder`, `tree/References` |
 
-Los hitos 16 a 33 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
+| 34 | ~~Estilo del bloque de código: el bloque de código de un `Markdown` es el elemento generado `Code block`, que las reglas `Element: Code block` estilan aparte de los `Text`~~ (hecho; caso 27) | `tree/Element`, `tree/MarkdownBuilder`, `tree/BuildContext`, `tree/BoxTreeBuilder`, `paint/PdfStructure` |
+
+Los hitos 16 a 34 están terminados; la hoja de ruta ([`docs/ROADMAP.md`](docs/ROADMAP.md)) queda como
 registro. Si se abre un hito nuevo, apúntalo allí y en esta tabla.
 
 No queda ningún `// TODO(hito N)` en el código. Si se abre un hito nuevo, marca lo pendiente
@@ -456,7 +458,11 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   sola en su párrafo (`![Alt](ruta)`) es una `Image`. El código necesita `Code font` en el `Markdown`
   (`MARKDOWN_PROPERTY_MISSING` si falta): el código en línea es un tramo con `TextFormat.family` (la
   familia de la caja si es `null`) y un bloque de código, un `Text` con `White space: pre`, la
-  fuente de `Code font` y el código en un `Content` (sin `Id` ni `Class`: solo lo alcanza `Element: Text`).
+  fuente de `Code font` y el código en un `Content` (sin `Id` ni `Class`). Es el elemento generado
+  `Element.CODE_BLOCK` (`Code block`, nombrable en las reglas `Element` como las entradas de un `Contents`, y no
+  alcanzado por `Element: Text`): `MarkdownBuilder` marca el nodo `Text` que genera (`Translation.codeBlocks`),
+  `BuildContext.codeBlocks` lo pasa al builder y `BoxTreeBuilder.element` le da el elemento; sigue siendo un
+  `P` en el PDF etiquetado.
   Un texto con `Inline: markdown` no tiene `Code font`, así que su código sigue sin admitirse.
 - **Imágenes (§5.18):** `Image` es una caja sin hijos (`Element.IMAGE`, `Layout.IMAGE`) con la
   ruta, relativa a `images/`, en `Box.image`, y `Alt` y `Fit` en `Style`. `tree` no lee

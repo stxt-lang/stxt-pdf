@@ -16,7 +16,7 @@
 - Httpservice para probar, que se pueda ejecutar en maven, etc. 
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
 - Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS
-- Quizá necesitamos un Preformated o Code Block para el código monoespaciado
+- ~~Quizá necesitamos un Preformated o Code Block para el código monoespaciado~~ (hitos 29 y 34: `White space: pre` y el elemento generado `Code block`)
 - Un docker para esto
 - Un manual hecho a partir de referencia :-)
 - Al final de todo volver a versionar pdf's de ejemplos, para poner enlaces en readme y que se vean en github
@@ -44,9 +44,8 @@
 ## Huecos del motor detectados al escribir los ejemplos (hito 21)
 
 - ~~**Texto preformateado**~~ (hito 29: `White space: pre` y `pre-wrap`, `Tab size`, y `Code font` en
-  `Markdown`). Queda que un bloque de código de Markdown no se puede estilar aparte (es un `Text`, que
-  alcanza `Element: Text` pero también el `Text` de cada encabezado): haría falta un elemento
-  generado que las reglas `Element` nombren (`Code block`), como las entradas de un `Contents`; que el
+  `Markdown`). El bloque de código de Markdown ya se estila aparte (hito 34: elemento generado `Code
+  block`, decisión 285). Queda que el
   código en línea no está en un texto con `Inline: markdown` (no hay `Code font` fuera de `Markdown`, y
   podría ser una propiedad de `Typography`); que `justify` no se aplica a `pre-wrap`; y que el código
   en línea usa la altura de línea de la caja, no la de su fuente.

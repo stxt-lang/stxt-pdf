@@ -52,8 +52,9 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 31 | Imágenes vectoriales (SVG) | hecho | 24 |
 | 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | hecho | 25 |
 | 33 | Numeración de los encabezados (`Numbered`): `1`, `1.1`… delante del título y en `{number of: id}` | hecho | 26 |
+| 34 | Estilo del bloque de código: elemento generado `Code block` | hecho | 27 |
 
-Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 33, el 2026-10-28 (varios, en otras
+Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 34, el 2026-10-28 (varios, en otras
 sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
 
 **Orden:** primero los tramos, porque Markdown los necesita para el formato dentro de una
@@ -1440,11 +1441,62 @@ Section:
 
 ---
 
+## Hito 34: estilo del bloque de código
+
+**Objetivo.** Poder dar estilo (fondo, relleno, tamaño…) a los bloques de código de un `Markdown` sin tocar los
+demás `Text`. Es el hueco de [`TODO.md`](../TODO.md) «un bloque de código de Markdown no se puede estilar aparte»,
+que salió en el hito 29.
+
+**Sintaxis.**
+
+```
+Styles:
+	Element: Code block
+		Typography:
+			Size: 8
+		Box:
+			Background: #EEEEEE
+			Padding: 6
+```
+
+**Decisiones tomadas** (2026-10-28, por cuestionario con la propuesta; la interpretación, en
+[`DECISIONES.md`](DECISIONES.md), 285):
+
+- [x] **Elemento generado `Code block`**, que las reglas `Element` nombran como las entradas de un `Contents` y que no
+      se escribe en el documento. Las alternativas, descartadas: que también se pueda escribir a mano (obliga a
+      repetir `Font` y `White space`, y ya está `Text` con `White space: pre`) y una clase automática `code` (reservaría
+      un nombre al autor).
+- [x] **Sin caja envoltorio:** sigue siendo un texto con su `Box`. `Element: Text` ya no lo alcanza.
+
+**Diseño técnico** (como quedó):
+
+- `Element.CODE_BLOCK` (generado, con texto). `MarkdownBuilder` marca el nodo `Text` que genera
+  (`Translation.codeBlocks`), `BuildContext.codeBlocks` lo lleva al builder y `BoxTreeBuilder.element` le da el
+  elemento. En el PDF etiquetado sigue siendo un `P`.
+
+**Tareas:**
+
+- [x] Resolver las decisiones (2026-10-28).
+- [x] `Element.CODE_BLOCK`, la marca en `MarkdownBuilder` y su uso en el builder; el schema describe el selector.
+- [x] Especificación (§4.10 y §5.17), `DECISIONES.md` (285; la 213 queda sustituida), README, `CLAUDE.md` y `TODO.md`.
+- [x] Tests: `ElementTest`, `MarkdownTest` (el bloque tiene su elemento, `Element: Text` no lo alcanza, un `Text` escrito
+      con `pre` no es un `Code block`) y caso golden `27-code-block`, calculado a mano (pasó a la primera).
+- [x] Ejemplos: ninguno usa un bloque de código de Markdown (el del manual es un `Text` escrito), no cambia ninguno.
+
+---
+
 ## Registro de sesiones
 
 Una entrada por sesión, la más reciente arriba: fecha, qué se hizo, dónde se quedó y el
 siguiente paso concreto.
 
+- **2026-10-28 (26).** Hito 34 terminado: estilo del bloque de código (primera mitad de «Código y tablas» de
+  `TODO.md`, pedida por el usuario). Se partió del estado verde (1303 tests). Cuestionario de dos preguntas: el bloque
+  de código es un elemento generado `Code block` (no escribible a mano) y, para el hito 35, `Class` en la `Row` que se
+  aplica a sus celdas. `Element.CODE_BLOCK`, `MarkdownBuilder` marca el nodo y el builder le da el elemento;
+  `Element: Text` ya no lo alcanza. Caso golden `27-code-block` (calculado a mano, pasó a la primera). Ningún ejemplo
+  cambia. Decisión 285.
+  *Siguiente paso:* hito 35, `Class` en la `Row`.
 - **2026-10-28 (25).** Ejemplo 08 (manual) con encabezados numerados, pedido por el usuario. `Numbered: true` en su
   `styles.stxt`; el título del producto (`Heading 1`) declara `Numbered: false`. Los ocho `Heading 2` salen como 1 a 8
   y sus `Heading 3`, 3.1 a 3.3 y 8.1 y 8.2 (estos dos, escritos con `###` dentro de un `Markdown`). Tres títulos

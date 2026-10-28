@@ -41,11 +41,13 @@ import org.commonmark.parser.IncludeSourceSpans;
 import org.commonmark.parser.Parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -91,7 +93,7 @@ final class MarkdownBuilder {
      * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
      * ({@code Text}, {@code Paragraph} o {@code Cell}).
      */
-    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs) {
+    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks) {
     }
 
     private MarkdownBuilder() {
@@ -107,7 +109,7 @@ final class MarkdownBuilder {
         }
         // Red de seguridad: lo generado cumple el schema, como lo que escribe el autor.
         elements.forEach(DocumentSchema::validate);
-        return new Translation(List.copyOf(elements), t.runs);
+        return new Translation(List.copyOf(elements), t.runs, t.codeBlocks);
     }
 
     /**
@@ -144,6 +146,8 @@ final class MarkdownBuilder {
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
+        /** Los {@code Text} que son bloques de código: el builder les da el elemento {@code Code block}. */
+        private final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
         /** Listas con viñetas y numeradas que contienen el bloque que se traduce. */
         private int bulletDepth;
         private int numberingDepth;
@@ -249,6 +253,7 @@ final class MarkdownBuilder {
             // El Content >> va en la línea de las vallas; con sangría, en la anterior a la primera línea.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
                     fenced ? line : line - 1));
+            codeBlocks.add(text);
             return text;
         }
 

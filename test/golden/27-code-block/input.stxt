@@ -1,0 +1,47 @@
+# Hito 34: el bloque de código de un Markdown es el elemento generado Code block (ESPECIFICACION.md §4.10,
+# §5.17). Página de 200 × 300 con márgenes de 20: área útil de 160 × 260 desde (20, 20). La línea mide el 120 %
+# del Size de su caja.
+#   md:   un Markdown con tres bloques. «Antes.» y «Después.» son Paragraph de una línea (Size 10: 12). El bloque
+#         de código lo estila Element: Code block (Size 5, Margin 4 0, Padding 5): dos líneas de 6 son 12 y con el
+#         relleno, 22. Va entre los dos párrafos con 4 de margen por arriba y por abajo (los párrafos no tienen
+#         margen): 12 + 4 + 22 + 4 + 12 = 54. y = 20. Element: Text no lo alcanza: con su Padding 3 sería 6 más.
+#   t:    un Text normal: Element: Text le da Padding 3, así que mide 12 + 6 = 18. y = 74.
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 200
+		Height: 300
+		Margin: 20
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Mono
+				Size: 10
+		Element: Text
+			Box:
+				Padding: 3
+		Element: Code block
+			Typography:
+				Size: 5
+			Box:
+				Margin: 4 0
+				Padding: 5
+				Background: #EEEEEE
+	Section:
+		Markdown:
+			Id: md
+			Code font: IBM Plex Mono
+			Typography:
+				Font: IBM Plex Sans
+			Content >>
+				Antes.
+
+				```
+				a  b
+				  c
+				```
+
+				Después.
+		Text: Hola
+			Id: t

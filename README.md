@@ -95,7 +95,7 @@ familia), con licencia SIL Open Font License. `Font` y `Size` se suelen declarar
 ## Estado
 
 Los algoritmos de layout funcionan, con paginación, salida SVG de depuración y PDF con las
-fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 33 están terminados.
+fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 34 están terminados.
 
 | Pieza | Estado |
 |---|---|
@@ -198,7 +198,9 @@ ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carp
 32. ~~**Secciones.** `Section`: partes independientes del documento, cada una con su `Media` (heredado por grupos del del documento), sus `Fixed` y su numeración de páginas (`Page numbering`: `continue`, `restart`, `none`); los `Fixed` del documento salen en todas las secciones que los heredan (`Inherit fixed`). La portada a sangre, sin número y sin pie es una sección (caso 25).~~ Hecho.
 33. ~~**Numeración de los encabezados.** Propiedad `Numbered` en `Typography` (se hereda): `1`, `1.1`, `1.1.1` escrito delante del título, que también dan `{number of: id}` («la sección 4.2»), el índice y los marcadores del PDF; con `Numbered: false` un encabezado (la portada) no se numera ni cuenta (caso 26).~~ Hecho.
 
-El plan, las decisiones y el registro de sesiones de los hitos 16 a 33 están en
+34. ~~**Estilo del bloque de código.** El bloque de código de un `Markdown` es el elemento generado `Code block`, que las reglas `Element: Code block` estilan (fondo, relleno, tamaño…) sin tocar los demás `Text` (caso 27).~~ Hecho.
+
+El plan, las decisiones y el registro de sesiones de los hitos 16 a 34 están en
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](docs/DECISIONES.md).

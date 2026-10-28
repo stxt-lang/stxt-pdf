@@ -69,6 +69,12 @@ public enum Element {
      */
     COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
+     * Un bloque de código de un {@link #MARKDOWN} (§5.17): un texto preformateado generado. No se
+     * escribe en el documento, pero las reglas {@code Element} lo nombran ({@code Code block}) para
+     * darle estilo aparte de los {@code Text} (§4.10).
+     */
+    CODE_BLOCK("Code block", Layout.INLINE, true),
+    /**
      * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado
      * con el título, la guía y el número de página. No se escriben en el documento, pero las
      * reglas {@code Element} las nombran ({@code Contents entry 2}) para darles estilo (§5.19).
@@ -106,7 +112,12 @@ public enum Element {
 
     /** Un elemento generado que las reglas {@code Element} pueden nombrar. */
     Element(String label, Layout layout) {
-        this(label, layout, Position.STATIC, false, false, 0, true);
+        this(label, layout, false);
+    }
+
+    /** Un elemento generado que las reglas {@code Element} pueden nombrar; {@code text}: lleva texto. */
+    Element(String label, Layout layout, boolean text) {
+        this(label, layout, Position.STATIC, false, text, 0, true);
     }
 
     private Element(String label, Layout layout, Position position, boolean item, boolean text, int headingLevel,
@@ -130,7 +141,7 @@ public enum Element {
         return Arrays.stream(values()).filter(Element::isWritten).toList();
     }
 
-    /** Los elementos que una regla {@code Element} puede nombrar: los escritos y las entradas del índice. */
+    /** Los elementos que una regla {@code Element} puede nombrar: los escritos, los bloques de código y las entradas del índice. */
     public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
     }
@@ -168,7 +179,7 @@ public enum Element {
         return item;
     }
 
-    /** Si lleva el texto en el valor o en {@code Content} ({@code Text} y {@code Paragraph}). */
+    /** Si lleva el texto en el valor o en {@code Content} ({@code Text}, {@code Paragraph} y {@link #CODE_BLOCK}). */
     public boolean hasText() {
         return text;
     }

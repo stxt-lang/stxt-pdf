@@ -362,7 +362,7 @@ final class PdfStructure {
             return "H" + box.headingLevel();
         }
         return switch (box.element) {
-            case PARAGRAPH -> "P";
+            case PARAGRAPH, CODE_BLOCK -> "P";
             // Un Text es un bloque de texto, un párrafo; dentro de un encabezado es parte de su texto.
             case TEXT -> box.parent != null && box.parent.headingLevel() > 0 ? "Span" : "P";
             case LIST -> "L";

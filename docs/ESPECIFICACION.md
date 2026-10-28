@@ -496,6 +496,7 @@ aplican por defecto a muchos elementos. Las mismas reglas pueden estar también 
 |---|---|---|
 | `Element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `Element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
+| `Element` | un elemento generado por el motor: `Code block` o `Contents entry 1` … `Contents entry 6` | los bloques de código de un `Markdown` ([§5.17](#517-markdown)) o las entradas de un `Contents` ([§5.19](#519-referencias-a-otras-cajas)); no se escriben en el documento |
 | `Element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([§5.15](#515-tablas)) |
 | `For class` | un nombre, sin espacios | los elementos con ese nombre en su `Class` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
@@ -1870,10 +1871,13 @@ párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace.
 espacio en blanco de una línea con código en línea se colapsa como en cualquier párrafo; lo que
 conserva los espacios es el bloque. Un bloque de código es un `Text` con `White space: pre` ([§5.4](#54-texto))
 y la familia de `Code font`, así que se parte entre líneas entre páginas y una línea más ancha que la
-caja es un error (`TEXT_OVERFLOW`); no tiene `Id` ni `Class`, pero lo nombra la regla `Element: Text`,
-que también alcanza a los `Text` de los encabezados de un Markdown (no hay un elemento propio). Su
+caja es un error (`TEXT_OVERFLOW`); no tiene `Id` ni `Class`, pero es el elemento generado `Code block`
+y lo nombra la regla `Element: Code block` ([§4.10](#410-reglas-reutilizables-styles)), con `Box`,
+`Typography` y `Break` (un fondo, un relleno, un tamaño menor, `Inside: avoid`…). No lo alcanza `Element: Text`
+(que sigue valiendo para los `Text` de los encabezados de un Markdown y para los que se escriben); un `Text`
+escrito a mano con `White space: pre` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown` con la fuente cambiada, así que `Size`, `Color` o `Tab size` se
-declaran en el `Typography` del `Markdown` o en `Element: Text`. Se usa el `Line height` de la caja, no el
+declaran en el `Typography` del `Markdown` o en `Element: Code block`. Se usa el `Line height` de la caja, no el
 de la fuente del código, así que las líneas con código en línea no cambian de alto. `Code font` solo es
 obligatoria si hay código; si la familia no existe, el error es `FONT_UNKNOWN`, con la línea de
 `Code font` para un bloque y la del párrafo para el código en línea. Un texto con `Inline: markdown`
@@ -1895,7 +1899,8 @@ le añaden celdas vacías y las que sobran se descartan.
 
 **Estilo.** Lo generado no tiene `Id` ni `Class`: se le da estilo con las reglas `Element` de
 `Styles` (`Element: Heading 1`, `Element: Paragraph`…), que se aplican a todo el documento, y
-con el `Typography` del `Markdown`, que hereda.
+con el `Typography` del `Markdown`, que hereda. Un bloque de código tiene su propio elemento generado,
+`Element: Code block` (ver **Código**, abajo).
 
 **Encabezados.** `#` es siempre `Heading 1`, y la jerarquía se comprueba en orden del documento
 junto con los encabezados escritos fuera del `Markdown` ([§5.13](#513-encabezados-y-párrafos)):

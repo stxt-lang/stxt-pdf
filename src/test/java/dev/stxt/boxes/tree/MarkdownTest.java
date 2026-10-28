@@ -1,6 +1,9 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -96,9 +99,40 @@ class MarkdownTest {
         assertEquals("IBM Plex Mono", paragraph.runs.get(1).format().family());
         assertEquals("IBM Plex Sans", paragraph.style.font);
         Box code = md.children.get(1);
-        assertEquals(Element.TEXT, code.element);
+        assertEquals(Element.CODE_BLOCK, code.element);
         assertEquals("a  b\n  c", code.text);
         assertEquals(Style.WhiteSpace.PRE, code.style.whiteSpace);
         assertEquals("IBM Plex Mono", code.style.font);
+    }
+
+    /** §4.10: la regla {@code Element: Code block} da estilo al código y no a los demás textos, ni al revés. */
+    @Test
+    void aCodeBlockHasItsOwnElementRule() {
+        Box root = build("\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tColor: #FF0000",
+                "\t\tElement: Code block", "\t\t\tTypography:", "\t\t\t\tSize: 8", "\t\t\tBox:",
+                "\t\t\t\tBackground: #EEEEEE", "\t\t\t\tPadding: 6",
+                "\tMarkdown:", "\t\tCode font: IBM Plex Mono", "\t\tContent >>", "\t\t\t# Título", "", "\t\t\t```",
+                "\t\t\ta  b", "\t\t\t```");
+        Box md = root.children.get(0);
+        Box title = md.children.get(0).children.get(0);
+        Box code = md.children.get(1);
+        // El Text del encabezado sigue alcanzándolo Element: Text; el bloque de código, solo Code block.
+        assertEquals(Element.TEXT, title.element);
+        assertEquals("#FF0000", title.style.color);
+        assertEquals(Element.CODE_BLOCK, code.element);
+        assertEquals(8, code.style.fontSize, 1e-9);
+        assertEquals(new Paint.Solid("#EEEEEE"), code.style.background);
+        assertEquals(Sides.all(Value.pt(6)), code.style.padding);
+        assertEquals(Style.WhiteSpace.PRE, code.style.whiteSpace);
+        assertEquals("IBM Plex Mono", code.style.font);
+        // Y el Text del encabezado no recibe lo del bloque de código.
+        assertNull(title.style.background);
+    }
+
+    /** Un {@code Text} escrito a mano con {@code White space: pre} sigue siendo un {@code Text}. */
+    @Test
+    void aWrittenPreformattedTextIsNotACodeBlock() {
+        Box root = build("\tText:", "\t\tTypography:", "\t\t\tWhite space: pre", "\t\tContent >>", "\t\t\ta  b");
+        assertEquals(Element.TEXT, root.children.get(0).element);
     }
 }

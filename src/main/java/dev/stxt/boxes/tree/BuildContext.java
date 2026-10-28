@@ -4,10 +4,12 @@ import dev.stxt.Node;
 import dev.stxt.boxes.model.TextRun;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static dev.stxt.boxes.tree.Nodes.error;
 
@@ -40,6 +42,8 @@ final class BuildContext {
     final List<Box> contents = new ArrayList<>();
     /** Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo (§5.4). */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
+    /** Los {@code Text} que {@link MarkdownBuilder} genera como bloques de código: su elemento es {@code Code block} (§5.17). */
+    final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
 
     BuildContext(StyleRules rules) {
         this.rules = rules;

@@ -310,7 +310,7 @@ public final class BoxTreeBuilder {
      * la {@code Row} de una {@code Cell}, y {@code position} es entonces el sitio de la celda en su tabla.
      */
     private Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
-        Element kind = Element.of(n.getCanonicalName()).orElseThrow();
+        Element kind = ctx.codeBlocks.contains(n) ? Element.CODE_BLOCK : Element.of(n.getCanonicalName()).orElseThrow();
         if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
             throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
                     + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
@@ -497,6 +497,7 @@ public final class BoxTreeBuilder {
     private void markdown(BuildContext ctx, InlineNode n, Box box) {
         MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
         ctx.runs.putAll(t.runs());
+        ctx.codeBlocks.addAll(t.codeBlocks());
         ctx.insideMarkdown = true;
         for (InlineNode e : t.elements()) {
             box.addChild(element(ctx, e, box, null, null));

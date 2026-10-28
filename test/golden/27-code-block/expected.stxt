@@ -1,0 +1,7 @@
+# md 160 × 54 (párrafo 12, margen 4, bloque de código 22, margen 4, párrafo 12) y t 160 × 18 (ver input.stxt).
+Result:
+	Page: 1
+		Fragment: md
+			Rect: 20 20 160 54
+		Fragment: t
+			Rect: 20 74 160 18
