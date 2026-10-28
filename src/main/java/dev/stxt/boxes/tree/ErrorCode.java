@@ -1,10 +1,13 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.StxtPdfException.Kind;
+
 /**
  * Código estable de cada error del modelo (ESPECIFICACION.md §6). Los tests comparan el código y
  * la línea, no el texto del mensaje, que puede mejorar sin romperlos. Los errores de sintaxis
  * STXT y del schema llevan los códigos de la librería {@code stxt-core}
- * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}…).
+ * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}…), en un {@link DocumentSyntaxException}.
+ * Cada código dice de quién es la culpa ({@link #kind()}).
  */
 public enum ErrorCode {
 
@@ -173,5 +176,24 @@ public enum ErrorCode {
     /** La familia no tiene la variante de {@code Weight} y {@code Style}. */
     FONT_VARIANT_MISSING,
     /** La fuente no tiene un carácter del texto. */
-    GLYPH_MISSING
+    GLYPH_MISSING,
+
+    // --- Límites ------------------------------------------------------------------------------
+    /** El documento ocupa más páginas que el máximo que admite el motor; no es de ninguna línea. */
+    PAGE_LIMIT(Kind.LIMIT);
+
+    private final Kind kind;
+
+    ErrorCode() {
+        this(Kind.INVALID_DOCUMENT);
+    }
+
+    ErrorCode(Kind kind) {
+        this.kind = kind;
+    }
+
+    /** De quién es la culpa: del documento ({@link Kind#INVALID_DOCUMENT}) salvo los límites ({@link Kind#LIMIT}). */
+    public Kind kind() {
+        return kind;
+    }
 }

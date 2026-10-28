@@ -7,7 +7,6 @@ import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.convert.Converter;
 import dev.stxt.boxes.stxt.DocumentReader;
-import dev.stxt.exceptions.ParseException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -124,7 +123,7 @@ class StylesFileTest {
     void aRepeatedRuleInsideTheStylesDocumentIsAnErrorThatSaysWhere() {
         InvalidModelException e = error(BASE + "\tElement: Text\n\t\tBox:\n\t\t\tPadding: 1\n\tElement: Text\n\t\tBox:\n\t\t\tPadding: 2\n",
                 "\tText: hola");
-        assertEquals(ErrorCode.STYLE_DUPLICATE, e.code());
+        assertEquals(ErrorCode.STYLE_DUPLICATE, e.errorCode());
         assertEquals(9, e.line());
         assertTrue(e.getMessage().startsWith("línea 9 de los estilos: "), e.getMessage());
     }
@@ -146,7 +145,7 @@ class StylesFileTest {
     @Test
     void anUnknownElementInTheStylesDocumentIsAnError() {
         InvalidModelException e = error(BASE + "\tElement: Nada\n\t\tBox:\n\t\t\tPadding: 1\n", "\tText: hola");
-        assertEquals(ErrorCode.STYLE_UNKNOWN_ELEMENT, e.code());
+        assertEquals(ErrorCode.STYLE_UNKNOWN_ELEMENT, e.errorCode());
         assertTrue(e.getMessage().contains("de los estilos"), e.getMessage());
     }
 
@@ -154,7 +153,7 @@ class StylesFileTest {
     void breakFromTheStylesDocumentCannotGoToAnAbsolute() {
         InvalidModelException e = error(BASE + "\tElement: Absolute\n\t\tBreak:\n\t\t\tAfter: avoid\n",
                 "\tAbsolute:", "\t\tText: a");
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.code());
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
         assertEquals(7, e.line());
         assertTrue(e.getMessage().startsWith("línea 7 de los estilos: "), e.getMessage());
     }
@@ -163,29 +162,29 @@ class StylesFileTest {
     void elementDocumentOnlyAdmitsTypography() {
         // Dos Element: Document en el mismo origen son una regla repetida, como cualquier otra.
         InvalidModelException repeated = error(BASE + "\tElement: Document\n\t\tTypography:\n\t\t\tSize: 9\n", "\tText: hola");
-        assertEquals(ErrorCode.STYLE_DUPLICATE, repeated.code());
+        assertEquals(ErrorCode.STYLE_DUPLICATE, repeated.errorCode());
         InvalidModelException box = error("Styles (dev.stxt.boxes):\n\tElement: Document\n\t\tBox:\n\t\t\tPadding: 1\n",
                 "\tText: hola");
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, box.code());
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, box.errorCode());
         assertEquals(3, box.line());
         InvalidModelException inDocument = error(null, "\tStyles:", "\t\tElement: Document", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
                 "\tText: hola");
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, inDocument.code());
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, inDocument.errorCode());
         assertEquals(9, inDocument.line());
         assertTrue(!inDocument.getMessage().contains("de los estilos"), inDocument.getMessage());
     }
 
     @Test
     void theDocumentNoLongerTakesATypography() {
-        ParseException e = assertThrows(ParseException.class, () -> READER.read(Docs.sectioned(HEADER + "\tTypography:\n\t\tSize: 10\n\tText: a")));
-        assertEquals("CHILD_NOT_DECLARED", e.getCode());
+        DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class, () -> READER.read(Docs.sectioned(HEADER + "\tTypography:\n\t\tSize: 10\n\tText: a")));
+        assertEquals("CHILD_NOT_DECLARED", e.code());
     }
 
     @Test
     void theRootOfTheStylesDocumentMustBeStyles() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> READER.readStyles(HEADER + "\tSection:\n\t\tText: a"));
-        assertEquals(ErrorCode.DOCUMENT_ROOT, e.code());
+        assertEquals(ErrorCode.DOCUMENT_ROOT, e.errorCode());
         assertThrows(InvalidModelException.class, () -> READER.readStyles(BASE + "Styles (dev.stxt.boxes):\n"));
         // Y no se pasa un Document como estilos.
         InlineNode document = READER.read(Docs.sectioned(HEADER + "\tText: a"));
@@ -194,11 +193,11 @@ class StylesFileTest {
 
     @Test
     void theStylesDocumentIsValidatedAgainstTheSchema() {
-        ParseException e = assertThrows(ParseException.class,
+        DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class,
                 () -> READER.readStyles("Styles (dev.stxt.boxes):\n\tElement: Text\n\t\tColour: red\n"));
-        assertEquals("NODE_NOT_DEFINED_IN_SCHEMA", e.getCode());
+        assertEquals("NODE_NOT_DEFINED_IN_SCHEMA", e.code());
         // Un documento de estilos no tiene Media ni elementos.
-        assertThrows(ParseException.class, () -> READER.readStyles("Styles (dev.stxt.boxes):\n\tText: a\n"));
+        assertThrows(DocumentSyntaxException.class, () -> READER.readStyles("Styles (dev.stxt.boxes):\n\tText: a\n"));
     }
 
     @Test
@@ -228,6 +227,6 @@ class StylesFileTest {
         // Sin la fuente base no hay texto que maquetar: el documento solo no basta.
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> Converter.create().toPdf(document, new ByteArrayOutputStream()));
-        assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
+        assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.errorCode());
     }
 }

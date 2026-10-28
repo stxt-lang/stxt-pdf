@@ -93,7 +93,7 @@ class TextCaseTest {
     void languageMustBeABcp47Tag() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> build("\tText: Hola", "\t\tTypography:", "\t\t\tLanguage: español"));
-        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.code());
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
         assertEquals(15, e.line());
     }
 
@@ -105,7 +105,7 @@ class TextCaseTest {
                 + "\t\t\t\tLanguage: en\n\tText: Hola\n";
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))));
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.code());
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
         assertEquals(12, e.line());
     }
 
@@ -113,7 +113,7 @@ class TextCaseTest {
     void letterSpacingNeedsPoints() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> build("\tText: Hola", "\t\tTypography:", "\t\t\tLetter spacing: 10%"));
-        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.code());
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
         assertEquals(15, e.line());
     }
 }

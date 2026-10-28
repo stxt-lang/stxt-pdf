@@ -2405,6 +2405,33 @@ La validación se hace en cuatro niveles:
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
+| `PAGE_LIMIT` | El documento no ocupa más de 10 000 páginas (no es de ninguna línea) | `El documento tiene más de 10000 páginas, el máximo que admite el motor` |
+
+### 6.1 Tipos de error y de quién es la culpa
+
+Todos los errores que da el motor son un `StxtPdfException`, así que una sola `catch` basta para tratar
+cualquier fallo de una conversión. Cada uno lleva tres datos:
+
+- **`kind()`**, de quién es la culpa, que es lo que un servicio necesita para contestar:
+
+  | `kind` | Qué es | Un servicio contesta |
+  |---|---|---|
+  | `INVALID_DOCUMENT` | El documento o sus estilos no son válidos: sintaxis, schema, una regla del modelo, un desbordamiento, un recurso que el documento nombra y no existe | un error del cliente (4xx), con la línea |
+  | `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas) o no se puede leer el fichero del documento | un fallo de su configuración (5xx) |
+  | `LIMIT` | El documento es válido pero pide más de lo que se admite: más páginas que el máximo (`PAGE_LIMIT`) o más anidado de lo que lee la librería | un error del cliente por exceso (413 o 422) |
+  | `INTERNAL` | Un fallo del motor, no del documento ni del entorno; la causa original va en `getCause()` | un fallo del servidor (500), que conviene informar |
+
+- **`code()`**, el código estable en texto: el de esta tabla (`BOX_OVERFLOW`), el de la librería STXT de los errores
+  de sintaxis y de schema (`CHILD_NOT_DECLARED`), `RESOURCE`, `IMAGE_FORMAT` o `INTERNAL`.
+- **`line()`**, la línea del documento del nodo culpable, o `0` si el error no es de una línea (un recurso, un
+  límite o un fallo interno). Los mensajes con línea empiezan por `línea N:`.
+
+Los errores del modelo, de los desbordamientos y de los recursos del documento son `InvalidModelException`
+(`errorCode()` da el código como valor del enum); los de sintaxis y schema, `DocumentSyntaxException` (con la
+excepción de la librería como causa); los recursos de la carpeta, `ResourceException`; y los fallos del motor,
+`InternalException`. Un fallo de entrada y salida al escribir en el destino no es de esta familia: es la
+`IOException` que declaran los métodos que escriben. El `Converter` convierte cualquier otra excepción de ejecución
+que se le escape a las librerías en un `InternalException`.
 
 **Catálogo de errores.** [`test/errors/`](../test/errors) tiene un documento de ejemplo por
 regla (a veces varios), en un fichero cada uno y agrupados en carpetas por familia de errores,

@@ -1,6 +1,7 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.Node;
+import dev.stxt.boxes.model.InternalException;
 import dev.stxt.exceptions.ValidationException;
 import dev.stxt.schema.SchemaProvider;
 import dev.stxt.schema.SchemaProviderMemory;
@@ -8,7 +9,6 @@ import dev.stxt.schema.SchemaValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -40,26 +40,26 @@ public final class DocumentSchema {
     /**
      * Valida un árbol ya leído, con todos sus descendientes.
      *
-     * @throws ValidationException el primer error, con los códigos de {@code stxt-core}
+     * @throws DocumentSyntaxException el primer error, con los códigos de {@code stxt-core}
      *         ({@code CHILD_NOT_DECLARED}, {@code TOO_FEW_CHILDREN}…) y su línea
      */
     public static void validate(Node root) {
         List<ValidationException> errors = new SchemaValidator(PROVIDER, true).validate(root);
         if (!errors.isEmpty()) {
-            throw errors.get(0);
+            throw new DocumentSyntaxException(errors.get(0));
         }
     }
 
     private static SchemaProviderMemory load() {
         try (InputStream in = DocumentSchema.class.getResourceAsStream(RESOURCE)) {
             if (in == null) {
-                throw new IllegalStateException("No se encuentra el schema " + RESOURCE + " en el classpath");
+                throw new InternalException("No se encuentra el schema " + RESOURCE + " en el classpath");
             }
             SchemaProviderMemory provider = new SchemaProviderMemory();
             provider.addSchema(new String(in.readAllBytes(), StandardCharsets.UTF_8));
             return provider;
         } catch (IOException e) {
-            throw new UncheckedIOException("No se puede leer el schema " + RESOURCE, e);
+            throw new InternalException("No se puede leer el schema " + RESOURCE, e);
         }
     }
 }

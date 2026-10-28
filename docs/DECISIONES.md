@@ -1805,3 +1805,38 @@ interpretaciones que salieron al implementarlas.
      `PdfCanvas.write` y `Engine` siguen siendo públicos como capa de bajo nivel. *Dónde:*
      `convert/Converter`; se eliminó `paint/PdfWriter`. *Alternativa:* conservar `PdfWriter.write` como atajo
      o marcarlo `@Deprecated`.
+
+295. **Todos los errores del motor son un `StxtPdfException`** (ROADMAP-QA-ARQ.md, AR-09). Antes no tenían padre común
+     (`InvalidModelException`, `ResourceException`, la `ParseException` de `stxt-core`, `IllegalStateException`,
+     `UncheckedIOException`), y un servicio no podía distinguir un documento inválido (4xx) de un fallo del servidor
+     (5xx) sin conocerlos todos. Lleva `kind()` (`INVALID_DOCUMENT`, `RESOURCE`, `LIMIT`, `INTERNAL`), `code()` y
+     `line()` (`NO_LINE` = 0). Vive en `model`, que no depende de nada, para que `tree` y `resources` lo extiendan.
+     *Dónde:* `model/StxtPdfException`, `model/InternalException`. *Alternativa:* una interfaz o un `Result` en lugar
+     de una excepción.
+
+296. **`code()` es el código en texto y el enum pasa a `errorCode()`** en `InvalidModelException`. Hacía falta un
+     `code()` común a todos, y los errores de la librería tienen un conjunto abierto de códigos que no caben en
+     `ErrorCode`. Los tests comparan `e.errorCode()` con el enum y el catálogo compara `e.code()` en texto.
+     *Alternativa:* añadir cada código de `stxt-core` a `ErrorCode`, que ata el motor a la lista de la librería.
+
+297. **Los errores de `stxt-core` salen como `DocumentSyntaxException`** (en `tree`, con el código, la línea y el
+     mensaje de la librería, que va como causa) desde `DocumentReader` y `DocumentSchema.validate`. Un
+     `LimitException` de la librería (documento anidado más de 100 niveles o con una línea de más de 10 000
+     caracteres) es un `LIMIT` y no un documento inválido. El fichero que no se puede leer es un `ResourceException`;
+     un fallo del schema que lleva el propio motor, un `InternalException`. *Alternativa:* dejar pasar la excepción
+     de la librería.
+
+298. **`PAGE_LIMIT` es un `ErrorCode` con `Kind.LIMIT`, sin línea** (antes un `IllegalStateException` del
+     `Paginator`). Cada código sabe su `kind()` (`INVALID_DOCUMENT` por defecto), para que los límites de QA-06 con
+     línea (una imagen demasiado grande, un SVG enorme) puedan ser también un `InvalidModelException`. «Sin
+     progreso» (la garantía del §5.10 que no se cumple) y «enlace sin destino» son `InternalException`: son
+     defectos del motor. *Dónde:* `tree/ErrorCode`, `layout/Paginator`, `paint/PdfLinks`, caso
+     `test/errors/limits/PAGE_LIMIT.too-many-pages.stxt`. *Alternativa:* un `LimitExceededException` aparte.
+
+299. **`Converter` es la frontera de los errores**: deja pasar los `StxtPdfException` y las `IOException` del
+     destino, y convierte cualquier otra excepción de ejecución en un `InternalException` con el original como
+     causa, así que «una sola `catch`» vale también para un defecto del motor o de PDFBox. `PdfCanvas.write` saca
+     como `IOException` las `UncheckedIOException` de las primitivas del lienzo (que no pueden declararla).
+     Los `IllegalStateException` de mal uso interno (`ConstraintSpace`, `Style.line`) se quedan como están.
+     *Alternativa:* envolver también la `IOException` del destino, que no es un error del motor.
+

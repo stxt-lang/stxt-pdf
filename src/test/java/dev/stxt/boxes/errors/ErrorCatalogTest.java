@@ -6,8 +6,7 @@ import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.ErrorCode;
-import dev.stxt.boxes.tree.InvalidModelException;
-import dev.stxt.exceptions.ParseException;
+import dev.stxt.boxes.model.StxtPdfException;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -94,11 +93,9 @@ class ErrorCatalogTest {
         try {
             InlineNode document = reader.read(c.file());
             new Engine(new PdfMetrics(new Resources())).layOutDocument(document);
-        } catch (InvalidModelException e) {
+        } catch (StxtPdfException e) {
+            // Cualquier error del motor: los del modelo y los de la librería, con su código y su línea.
             assertEquals(c.code() + " en la línea " + c.line(), e.code() + " en la línea " + e.line(), e.getMessage());
-            return;
-        } catch (ParseException e) {
-            assertEquals(c.code() + " en la línea " + c.line(), e.getCode() + " en la línea " + e.getLine(), e.getMessage());
             return;
         }
         fail("Se esperaba " + c.code() + " en la línea " + c.line() + " y el documento es válido");

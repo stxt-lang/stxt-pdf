@@ -70,7 +70,7 @@ class RotationLayoutTest {
                 "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 100"};
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> LayoutFixture.layOut(with(lines, "\t\tLayer: 1")));
-        assertEquals(ErrorCode.BOX_OVERFLOW, e.code());
+        assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
         LayoutFixture l = LayoutFixture.layOut(with(lines, "\t\tRotate: 90"));
         assertEquals(new Rect(40, 760, 60, 100), l.rect("S"));
     }
@@ -81,7 +81,7 @@ class RotationLayoutTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
                 "\tRelative:", "\t\tRotate: -90", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 10"));
-        assertEquals(ErrorCode.BOX_OVERFLOW, e.code());
+        assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
         assertTrue(e.getMessage().contains("girada"), e.getMessage());
     }
 

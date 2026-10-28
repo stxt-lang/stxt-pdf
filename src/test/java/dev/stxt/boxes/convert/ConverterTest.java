@@ -57,7 +57,7 @@ class ConverterTest {
     void withoutStylesTheDocumentMustCarryItsOwn() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> Converter.create().toPdf(document(), new ByteArrayOutputStream()));
-        assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.code());
+        assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.errorCode());
     }
 
     @Test

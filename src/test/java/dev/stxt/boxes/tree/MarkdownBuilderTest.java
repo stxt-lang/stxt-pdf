@@ -204,20 +204,20 @@ class MarkdownBuilderTest {
     void aLinkWithATitleOrAnUnsupportedDestinationIsAnError() {
         InvalidModelException title = assertThrows(InvalidModelException.class,
                 () -> translate("Un [enlace](https://stxt.dev \"web\")."));
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.code());
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.errorCode());
         assertEquals(15, title.line());
         InvalidModelException scheme = assertThrows(InvalidModelException.class,
                 () -> translate("", "Un [enlace](javascript:alert(1))."));
-        assertEquals(ErrorCode.LINK_SCHEME, scheme.code());
+        assertEquals(ErrorCode.LINK_SCHEME, scheme.errorCode());
         assertEquals(16, scheme.line());
     }
 
     @Test
     void linkReferenceDefinitionsAndImagesInsideALinkStayUnsupported() {
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
-                () -> translate("[a][r]", "", "[r]: https://stxt.dev")).code());
+                () -> translate("[a][r]", "", "[r]: https://stxt.dev")).errorCode());
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
-                () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).code());
+                () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).errorCode());
     }
 
     private static TextRun link(String text, String format, String destination) {
@@ -275,11 +275,11 @@ class MarkdownBuilderTest {
     @Test
     void codeNeedsCodeFont() {
         InvalidModelException inline = assertThrows(InvalidModelException.class, () -> translate("Usa `mvn`."));
-        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, inline.code());
+        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, inline.errorCode());
         assertEquals(15, inline.line());
         InvalidModelException block = assertThrows(InvalidModelException.class,
                 () -> translate("Párrafo.", "", "```", "x", "```"));
-        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, block.code());
+        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, block.errorCode());
         assertEquals(17, block.line());
     }
 
@@ -287,7 +287,7 @@ class MarkdownBuilderTest {
     void theLanguageLabelOfAFenceIsNotSupported() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> translate(List.of(MONO), "```java", "int x;", "```"));
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.code());
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.errorCode());
         assertEquals(16, e.line());
     }
 
@@ -295,7 +295,7 @@ class MarkdownBuilderTest {
     void anEmptyCodeBlockIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> translate(List.of(MONO), "```", "```"));
-        assertEquals(ErrorCode.TEXT_CONTENT, e.code());
+        assertEquals(ErrorCode.TEXT_CONTENT, e.errorCode());
     }
 
     @Test

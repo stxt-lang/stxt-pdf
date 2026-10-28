@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.InternalException;
 import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.tree.Box;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -61,7 +62,7 @@ final class PdfLinks {
             PDPageXYZDestination d = byKey.get(link.id());
             if (d == null) {
                 // El builder ya comprobó que existe y que no está en un Fixed (LinkTargets).
-                throw new IllegalStateException("Enlace sin destino: #" + link.id());
+                throw new InternalException("Enlace sin destino: #" + link.id());
             }
             link.annotation().setDestination(d);
         }

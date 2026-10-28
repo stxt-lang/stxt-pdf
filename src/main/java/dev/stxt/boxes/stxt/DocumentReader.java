@@ -4,12 +4,19 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.Parser;
 import dev.stxt.schema.SchemaValidator;
+import dev.stxt.boxes.model.InternalException;
+import dev.stxt.boxes.resources.ResourceException;
 import dev.stxt.boxes.tree.DocumentSchema;
+import dev.stxt.boxes.tree.DocumentSyntaxException;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
+import dev.stxt.exceptions.ParseException;
+import dev.stxt.exceptions.STXTException;
+import dev.stxt.exceptions.STXTIOException;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Lee un documento de cajas con la librería oficial {@code dev.stxt:stxt-core} y lo valida
@@ -23,6 +30,10 @@ import java.util.List;
  * único nodo raíz {@code Document} que declare {@code (dev.stxt.boxes)}: sin el namespace pasaría
  * sin validar, y el schema admite cualquier elemento como raíz.</p>
  *
+ * <p>Los errores de la librería salen con el tipo del motor ({@link dev.stxt.boxes.model.StxtPdfException}):
+ * {@link DocumentSyntaxException} con su código y su línea si el documento no es válido, y
+ * {@link ResourceException} si el fichero no se puede leer.</p>
+ *
  * <p>Es reutilizable y seguro entre hilos: cada lectura crea su propio {@link Parser}.</p>
  */
 public final class DocumentReader {
@@ -32,12 +43,12 @@ public final class DocumentReader {
 
     /** Lee y valida un documento; devuelve su nodo raíz. */
     public InlineNode read(String content) {
-        return root(parser().parse(content));
+        return root(parse(() -> parser().parse(content)));
     }
 
     /** Lee y valida un documento desde un fichero UTF-8; devuelve su nodo raíz. */
     public InlineNode read(Path file) {
-        return root(parser().parseFile(file.toFile()));
+        return root(parse(() -> parser().parseFile(file.toFile())));
     }
 
     /**
@@ -45,12 +56,25 @@ public final class DocumentReader {
      * pasa junto al documento al maquetarlo; devuelve su nodo raíz.
      */
     public InlineNode readStyles(String content) {
-        return styles(parser().parse(content));
+        return styles(parse(() -> parser().parse(content)));
     }
 
     /** Lee y valida un documento de estilos aparte desde un fichero UTF-8; devuelve su nodo raíz. */
     public InlineNode readStyles(Path file) {
-        return styles(parser().parseFile(file.toFile()));
+        return styles(parse(() -> parser().parseFile(file.toFile())));
+    }
+
+    /** Lo que lee la librería, con los errores de la librería convertidos a los del motor. */
+    private static List<Node> parse(Supplier<List<Node>> parsing) {
+        try {
+            return parsing.get();
+        } catch (ParseException e) {
+            throw new DocumentSyntaxException(e);
+        } catch (STXTIOException e) {
+            throw new ResourceException("No se puede leer el documento: " + e.getMessage(), e);
+        } catch (STXTException e) {
+            throw new InternalException("Fallo de la librería STXT: " + e.getMessage(), e);
+        }
     }
 
     private static Parser parser() {

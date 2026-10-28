@@ -222,7 +222,7 @@ class SectionsTest {
     void theIdOfASectionIsAUniqueId() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> lay("\tSection:", "\t\tId: a", "\t\tBlock:", "\t\t\tId: b", "\tSection:", "\t\tId: b", "\t\tBlock:"));
-        assertEquals(ErrorCode.DUPLICATE_ID, e.code());
+        assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
     }
 
     @Test
@@ -250,7 +250,7 @@ class SectionsTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tText: Portada",
                 "\tSection:", "\t\tContents:"));
-        assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.code());
+        assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.errorCode());
         // Con In contents: false, el encabezado sigue siéndolo pero no se lista; el índice necesita otro.
         LaidOutDocument d = lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tIn contents: false", "\t\t\tText: Portada",

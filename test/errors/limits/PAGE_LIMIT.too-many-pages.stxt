@@ -1,0 +1,14 @@
+# Case: Un bloque con un alto fijo de diez millones de puntos ocupa más páginas que el máximo
+# Code: PAGE_LIMIT
+# Line: 0
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Section:
+		Block:
+			Box:
+				Height: 10000000

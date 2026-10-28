@@ -5,6 +5,8 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
+import dev.stxt.boxes.model.InternalException;
+import dev.stxt.boxes.model.StxtPdfException;
 import dev.stxt.boxes.paint.PdfCanvas;
 import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.resources.Resources;
@@ -15,6 +17,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Punto de entrada del motor: documento STXT → PDF (o SVG) con las métricas reales de las fuentes y las
@@ -31,6 +34,12 @@ import java.util.Objects;
  * InlineNode document = new DocumentReader().read(Path.of("report.stxt"));
  * converter.toPdf(document, out);
  * }</pre>
+ *
+ * <p><strong>Errores:</strong> todo fallo de la conversión sale como {@link StxtPdfException}, así que una sola
+ * {@code catch} basta; su {@link StxtPdfException#kind() kind} dice de quién es la culpa (el documento, los
+ * recursos, un límite o el propio motor), y {@code line()} y {@code code()} dónde y qué. Un error inesperado de
+ * cualquier otra clase se convierte en un {@link InternalException} que guarda el original. Los fallos de
+ * entrada y salida al escribir salen como {@link IOException}.</p>
  *
  * <p>Para usar las páginas antes de pintarlas (o pintarlas a PDF y a SVG a la vez) se maqueta con
  * {@link #layOut(InlineNode)} y se pinta el resultado con {@link #toPdf(LaidOutDocument, OutputStream)} y
@@ -68,11 +77,12 @@ public final class Converter {
      */
     public LaidOutDocument layOut(InlineNode document) {
         Objects.requireNonNull(document, "document");
-        return new Engine(new PdfMetrics(resources), resources).layOutDocument(document, styles);
+        return guarded(() -> new Engine(new PdfMetrics(resources), resources).layOutDocument(document, styles));
     }
 
     /** Maqueta {@code document} y escribe el PDF en {@code target}, que no se cierra. */
     public void toPdf(InlineNode document, OutputStream target) throws IOException {
+        Objects.requireNonNull(target, "target");
         toPdf(layOut(document), target);
     }
 
@@ -83,15 +93,49 @@ public final class Converter {
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
-        PdfCanvas.write(document, resources, target, debug);
+        guarded(() -> PdfCanvas.write(document, resources, target, debug));
     }
 
     /** El SVG de cada página de un documento ya maquetado, en orden. */
     public List<String> toSvg(LaidOutDocument document) {
         Objects.requireNonNull(document, "document");
-        return document.pages().stream()
+        return guarded(() -> document.pages().stream()
                 .map((Page page) -> SvgCanvas.page(page, page.media(), debug, resources))
-                .toList();
+                .toList());
+    }
+
+    /** Un trabajo que escribe en un destino. */
+    private interface Writing {
+        void run() throws IOException;
+    }
+
+    /**
+     * Ejecuta {@code work} dejando pasar los errores del motor ({@link StxtPdfException}) y convirtiendo cualquier
+     * otra excepción de ejecución en un {@link InternalException}.
+     */
+    private static <T> T guarded(Supplier<T> work) {
+        try {
+            return work.get();
+        } catch (StxtPdfException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw unexpected(e);
+        }
+    }
+
+    /** Como {@link #guarded(Supplier)}, para lo que escribe: los fallos de entrada y salida salen como son. */
+    private static void guarded(Writing work) throws IOException {
+        try {
+            work.run();
+        } catch (StxtPdfException | IOException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw unexpected(e);
+        }
+    }
+
+    private static InternalException unexpected(RuntimeException e) {
+        return new InternalException("Fallo inesperado al convertir: " + e, e);
     }
 
     /** Configura un {@link Converter}; cada opción es opcional. */

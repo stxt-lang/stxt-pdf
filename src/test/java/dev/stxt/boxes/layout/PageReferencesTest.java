@@ -135,7 +135,7 @@ class PageReferencesTest {
                 .append("\tBlock:\n\t\tId: x\n\t\tBox:\n\t\t\tHeight: 10\n");
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(Docs.sectioned(doc.toString()))));
-        assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.code());
+        assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.errorCode());
         // Cabecera (11 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
         assertEquals(13 + 6 * 3 + 3 + 1, e.line());
     }

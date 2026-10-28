@@ -1,17 +1,27 @@
 package dev.stxt.boxes.resources;
 
+import dev.stxt.boxes.model.StxtPdfException;
+
 /**
  * Recurso no válido o que no se encuentra: una ruta que sale de la carpeta de recursos, un
  * fichero que no existe, una fuente desconocida… (ESPECIFICACION.md §5.11). Quien conoce la
- * línea del documento la convierte en {@link dev.stxt.boxes.tree.InvalidModelException}.
+ * línea del documento la convierte en {@link dev.stxt.boxes.tree.InvalidModelException}; la que llega a
+ * quien convierte es un problema de su carpeta de recursos ({@link Kind#RESOURCE}), sin línea.
  */
-public class ResourceException extends RuntimeException {
+public class ResourceException extends StxtPdfException {
+
+    public static final String CODE = "RESOURCE";
 
     public ResourceException(String message) {
-        super(message);
+        this(CODE, message, null);
     }
 
     public ResourceException(String message, Throwable cause) {
-        super(message, cause);
+        this(CODE, message, cause);
+    }
+
+    /** Para los errores de recurso con un código propio ({@link ImageFormatException}). */
+    protected ResourceException(String code, String message, Throwable cause) {
+        super(Kind.RESOURCE, NO_LINE, code, message, cause);
     }
 }

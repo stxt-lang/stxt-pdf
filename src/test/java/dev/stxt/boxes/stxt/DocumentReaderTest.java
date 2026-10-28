@@ -4,7 +4,7 @@ import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
-import dev.stxt.exceptions.ParseException;
+import dev.stxt.boxes.tree.DocumentSyntaxException;
 import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.resources.Resources;
@@ -102,27 +102,27 @@ class DocumentReaderTest {
 
     @Test
     void schemaErrorsHaveCodeAndLine() {
-        ParseException e = assertThrows(ParseException.class,
+        DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tText: a", "\t\tTypography:", "\t\t\tAlign: middle")));
-        assertEquals("INVALID_VALUE", e.getCode());
-        assertEquals(10, e.getLine());
+        assertEquals("INVALID_VALUE", e.code());
+        assertEquals(10, e.line());
 
-        ParseException noMedia = assertThrows(ParseException.class,
+        DocumentSyntaxException noMedia = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read("Document (dev.stxt.boxes):\n\tSection:\n\t\tBlock:\n\t\t\tId: a"));
-        assertEquals("TOO_FEW_CHILDREN", noMedia.getCode());
+        assertEquals("TOO_FEW_CHILDREN", noMedia.code());
 
-        ParseException unknown = assertThrows(ParseException.class,
+        DocumentSyntaxException unknown = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tColour: #fff")));
-        assertEquals(9, unknown.getLine());
+        assertEquals(9, unknown.line());
 
         // Una propiedad fuera de su elemento es un error de estructura.
-        ParseException misplaced = assertThrows(ParseException.class,
+        DocumentSyntaxException misplaced = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tOffset: 10")));
-        assertEquals("CHILD_NOT_DECLARED", misplaced.getCode());
-        assertEquals(9, misplaced.getLine());
-        ParseException value = assertThrows(ParseException.class,
+        assertEquals("CHILD_NOT_DECLARED", misplaced.code());
+        assertEquals(9, misplaced.line());
+        DocumentSyntaxException value = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tBlock: hola")));
-        assertEquals(8, value.getLine());
+        assertEquals(8, value.line());
     }
 
     @Test
@@ -142,22 +142,22 @@ class DocumentReaderTest {
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
 
         // Columns y Body son obligatorios; las filas van en su grupo y Span solo en Cell.
-        assertEquals("TOO_FEW_CHILDREN", assertThrows(ParseException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).getCode());
-        assertEquals("TOO_FEW_CHILDREN", assertThrows(ParseException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).getCode());
-        ParseException row = assertThrows(ParseException.class, () -> reader.read(doc(
+        assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
+                "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
+        assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
+                "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
+        DocumentSyntaxException row = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tColumns: 1fr", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
-        assertEquals("CHILD_NOT_DECLARED", row.getCode());
-        assertEquals(10, row.getLine());
-        assertEquals("CHILD_NOT_DECLARED", assertThrows(ParseException.class, () -> reader.read(doc(
-                "\tGrid:", "\t\tArea:", "\t\t\tSpan: 1 2", "\t\t\tBlock:"))).getCode());
+        assertEquals("CHILD_NOT_DECLARED", row.code());
+        assertEquals(10, row.line());
+        assertEquals("CHILD_NOT_DECLARED", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
+                "\tGrid:", "\t\tArea:", "\t\t\tSpan: 1 2", "\t\t\tBlock:"))).code());
     }
 
     @Test
     void syntaxErrorsWithLine() {
-        ParseException e = assertThrows(ParseException.class, () -> reader.read(doc("\t\t\tBlock:")));
-        assertEquals(7, e.getLine());
+        DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc("\t\t\tBlock:")));
+        assertEquals(7, e.line());
     }
 
     @Test
@@ -171,6 +171,6 @@ class DocumentReaderTest {
         // El schema admite cualquier elemento como raíz; el motor, solo Document.
         InvalidModelException block = assertThrows(InvalidModelException.class,
                 () -> reader.read("Block (dev.stxt.boxes):\n\tId: a"));
-        assertEquals(ErrorCode.DOCUMENT_ROOT, block.code());
+        assertEquals(ErrorCode.DOCUMENT_ROOT, block.errorCode());
     }
 }

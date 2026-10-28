@@ -63,7 +63,7 @@ class MarkdownTest {
                 "\t\t\t## Uno punto uno", "\tHeading 2:", "\t\tText: Uno punto dos"));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tHeading 1:",
                 "\t\tText: Uno", "\tMarkdown:", "\t\tContent >>", "\t\t\t### Salto"));
-        assertEquals(ErrorCode.HEADING_LEVEL, e.code());
+        assertEquals(ErrorCode.HEADING_LEVEL, e.errorCode());
         assertEquals(17, e.line());
     }
 
@@ -84,7 +84,7 @@ class MarkdownTest {
     void headingsCannotGoInAFixed() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tBlock:", "\tFixed:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
-        assertEquals(ErrorCode.HEADING_IN_FIXED, e.code());
+        assertEquals(ErrorCode.HEADING_IN_FIXED, e.errorCode());
         assertEquals(17, e.line());
         assertDoesNotThrow(() -> build("\tBlock:", "\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }

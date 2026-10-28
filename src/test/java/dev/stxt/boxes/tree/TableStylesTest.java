@@ -233,7 +233,7 @@ class TableStylesTest {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
                 () -> root("\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tClass: nope",
                         "\t\t\t\tCell: a"));
-        assertEquals(ErrorCode.CLASS_WITHOUT_RULE, e.code());
+        assertEquals(ErrorCode.CLASS_WITHOUT_RULE, e.errorCode());
         assertEquals(17, e.line());
     }
 
@@ -244,6 +244,6 @@ class TableStylesTest {
                 () -> root("\tStyles:", "\t\tFor class: keep", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
                         "\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tClass: keep",
                         "\t\t\t\tCell: a"));
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.code());
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
     }
 }

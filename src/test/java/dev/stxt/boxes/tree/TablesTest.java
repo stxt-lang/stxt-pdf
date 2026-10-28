@@ -66,7 +66,7 @@ class TablesTest {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
                 () -> root("\tTable:", "\t\tColumns: 100", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
                         "\t\t\t\t\tHeader: true", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa"));
-        assertEquals(ErrorCode.TABLE_HEADER, e.code());
+        assertEquals(ErrorCode.TABLE_HEADER, e.errorCode());
         assertEquals(18, e.line());
     }
 

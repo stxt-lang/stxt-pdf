@@ -116,23 +116,23 @@ class InlineFormatTest {
     @Test
     void errorsPointToTheLineOfTheBlock() {
         InvalidModelException list = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Uno", "\tText: - lista"));
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, list.code());
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, list.errorCode());
         assertEquals(15, list.line());
         InvalidModelException second = assertThrows(InvalidModelException.class, () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\t# Dos"));
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.code());
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.errorCode());
         assertEquals(18, second.line());
     }
 
     @Test
     void anInternalLinkToAnIdThatDoesNotExistIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Ver [aquí](#nada)"));
-        assertEquals(ErrorCode.LINK_UNKNOWN, e.code());
+        assertEquals(ErrorCode.LINK_UNKNOWN, e.errorCode());
         assertEquals(14, e.line());
     }
 
     @Test
     void aLinkSchemeThatIsNotAllowedIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> buildInline("\tText: Ver [aquí](javascript:alert(1))"));
-        assertEquals(ErrorCode.LINK_SCHEME, e.code());
+        assertEquals(ErrorCode.LINK_SCHEME, e.errorCode());
     }
 }

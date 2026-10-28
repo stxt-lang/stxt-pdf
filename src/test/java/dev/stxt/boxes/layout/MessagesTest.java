@@ -39,7 +39,7 @@ class MessagesTest {
                 () -> LayoutFixture.layOut("\tText: " + "x".repeat(1000)));
         InvalidModelException longer = assertThrows(InvalidModelException.class,
                 () -> LayoutFixture.layOut("\tText: " + "x".repeat(2000)));
-        assertEquals(ErrorCode.TEXT_OVERFLOW, e.code());
+        assertEquals(ErrorCode.TEXT_OVERFLOW, e.errorCode());
         assertTrue(e.getMessage().length() < 400, e.getMessage());
         assertTrue(e.getMessage().contains("(1000 caracteres)"), e.getMessage());
         assertTrue(longer.getMessage().contains("(2000 caracteres)"), longer.getMessage());

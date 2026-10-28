@@ -72,7 +72,7 @@ class MulticolTest {
                 "\tStyles:", "\t\tElement: Paragraph", "\t\t\tBreak:", "\t\t\t\tBefore: column",
                 "\tMulticol:", "\t\tCount: 2", "\t\tParagraph: Dentro",
                 "\tParagraph: Fuera"));
-        assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, ex.code());
+        assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, ex.errorCode());
         assertEquals(14, ex.line());
     }
 }

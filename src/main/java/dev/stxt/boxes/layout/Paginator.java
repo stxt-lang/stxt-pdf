@@ -7,6 +7,8 @@ import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Reference;
+import dev.stxt.boxes.model.InternalException;
+import dev.stxt.boxes.model.StxtPdfException;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
@@ -44,7 +46,7 @@ import java.util.Set;
  */
 public final class Paginator {
 
-    /** Límite de seguridad ante errores de implementación en los algoritmos. */
+    /** Máximo de páginas de un documento ({@link ErrorCode#PAGE_LIMIT}); frena también un algoritmo que no acabase. */
     private static final int MAX_PAGES = 10_000;
     /** Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables (§5.19). */
     static final int MAX_REFERENCE_PASSES = 10;
@@ -314,7 +316,7 @@ public final class Paginator {
                 LayoutResult r = engine.layout(section.box(), space, token);
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
-                    throw new IllegalStateException("Sin progreso en la página " + (pages + results.size() + 1)
+                    throw new InternalException("Sin progreso en la página " + (pages + results.size() + 1)
                             + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
                 }
                 results.add(r);
@@ -322,7 +324,8 @@ public final class Paginator {
                 r.pending().forEach(p -> fixed.get(section0).putIfAbsent(p.box(), p));
                 token = next;
                 if (pages + results.size() > MAX_PAGES) {
-                    throw new IllegalStateException("Se ha superado el máximo de " + MAX_PAGES + " páginas");
+                    throw new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT,
+                            "El documento tiene más de " + MAX_PAGES + " páginas, el máximo que admite el motor");
                 }
             } while (token != null);
             pages += results.size();

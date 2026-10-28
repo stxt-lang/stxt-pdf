@@ -86,7 +86,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | pendiente |
 | AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | pendiente |
 | AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | hecho |
-| AR-09 | Modelo de errores sin tipo común | Media | M | pendiente |
+| AR-09 | Modelo de errores sin tipo común | Media | M | hecho |
 | AR-10 | Dos tolerancias | Baja | S | pendiente |
 | AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | pendiente |
 | AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | pendiente |
@@ -222,8 +222,9 @@ rechaza `stxt-core` con `LimitException` (no con `StackOverflowError`); `repeat(
 
 **Lo que falta o no está verificado.**
 
-1. `Paginator.MAX_PAGES = 10_000` lanza `IllegalStateException` genérica: no tiene `ErrorCode`, ni línea, ni se puede
-   distinguir de un fallo interno (ver AR-09). Debe ser un error del documento (`LimitExceededException`).
+1. ~~`Paginator.MAX_PAGES = 10_000` lanza `IllegalStateException` genérica~~ **Hecho (sesión 3, AR-09):** ahora es
+   `ErrorCode.PAGE_LIMIT` (`Kind.LIMIT`, sin línea), con su caso en `test/errors/limits/`. Queda hacer configurable el
+   número con `Limits`.
 2. **No verificado:** un PNG o JPEG pequeño en bytes pero enorme en píxeles (*decompression bomb*). `PdfImages.bitmap`
    usa `PDImageXObject.createFromFileByContent`, que decodifica a `BufferedImage`. Comprobar el tamaño con la cabecera
    (lo hace `ImageFile` para el tamaño natural) y fijar un máximo de píxeles configurable.
@@ -551,7 +552,7 @@ compartido. README, `CLAUDE.md` y especificación al día. Sin cambio en ningún
 esta tarea: `StxtPdf` como nombre de fachada (se usó `Converter`), `Limits` (QA-06) y `layOut(String|Path)` (quien
 lee usa `DocumentReader`, que ya es público y seguro entre hilos).
 
-### AR-09 · Modelo de errores · Media · M
+### AR-09 · Modelo de errores · Media · M · hecho
 
 Un cliente que convierte un documento debe poder distinguir «el documento es inválido» (4xx) de «el servidor falla»
 (5xx), y hoy las excepciones no tienen un tipo común: `dev.stxt.exceptions.ParseException`/`ValidationException`
@@ -563,6 +564,20 @@ destino…), `UncheckedIOException` (12 en `PdfCanvas`), `IOException` y `java.a
 las excepciones de `stxt-core` (conservando la causa); los `IllegalStateException` que son fallos del documento pasan
 a `LIMIT`, y los que son errores de programación, a `INTERNAL`. **Aceptación:** una sola `catch (StxtPdfException)` basta
 en un servicio; el catálogo de errores sigue verde; la tabla de §6 de la especificación incluye el nuevo `kind`.
+
+**Hecho (sesión 3), decisiones 295 a 299.** `StxtPdfException` (en `model`, con `Kind`, `code()` en texto, `line()` y
+`NO_LINE`) extendida por `InvalidModelException` (`errorCode()` da ahora el enum), `DocumentSyntaxException`
+(`tree`; los errores de `stxt-core`, con su causa), `ResourceException` (`RESOURCE`; `ImageFormatException` es
+`IMAGE_FORMAT`) e `InternalException`. `DocumentReader` y `DocumentSchema` convierten los errores de la librería (un
+`LimitException` es `LIMIT`); `Converter` los deja pasar, convierte cualquier otra excepción de ejecución en
+`INTERNAL` y no toca la `IOException` del destino; `PdfCanvas.write` saca como `IOException` las
+`UncheckedIOException` de las primitivas. `PAGE_LIMIT` (`Kind.LIMIT`, sin línea) sustituye al
+`IllegalStateException` del máximo de páginas, con su caso en un grupo nuevo del catálogo (`test/errors/limits/`); «sin
+progreso» y «enlace sin destino» son `InternalException`. §6.1 de la especificación (tipos, `kind` y qué contesta
+un servicio) y el apartado «Errores» del README. `ConverterErrorsTest` cubre cada `kind` y que el envoltorio de
+`INTERNAL` hace falta (falla sin él). **No se tocó** el resto de `IllegalArgumentException`/`IllegalStateException`
+de mal uso interno (`ConstraintSpace`, `Style.line`, `ValueParser`…), que el `Converter` ya convierte en `INTERNAL`
+si se escapan; ni el control de flujo con `Placement.NoRoom` (AR-13).
 
 ### AR-10 · Dos tolerancias · Baja · S
 
@@ -631,4 +646,5 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 0 · Revisión | Lectura del núcleo (`Engine`, `LayoutCache`, `InlineLayout`, `Paginator`, `BoxTreeBuilder`, `Box`, `Style`, `PdfCanvas`, `PdfImages`, recursos); `mvn test` (1314 verdes, cobertura por package); mediciones con `tools/qa/` (hilos, escala, JFR, GSUB, entradas hostiles, `tr`); este documento. **No se ha cambiado código de `src/`.** | Sesión 1 del plan |
 | 2026-10-28 | 1 · Correcciones y red de seguridad | QA-01 (`Locale.ROOT`; la suite pasa en turco), QA-04, QA-05 (`Messages.excerpt`), QA-09 (`.github/workflows/ci.yml`) y TS-02 (`ConcurrentConversionTest`). 1321 tests en verde con el idioma por defecto y con `tr`; con `tr` siguen reescribiéndose PNG (QA-02). CI en verde en GitHub (JDK 17, 21 y turco). | Sesión 2 (decidir ligaduras: QA-03) |
 | 2026-10-28 | 2 · Ligaduras y rendimiento del pintado | `Ligatures` en `Typography` (heredable, `false` por defecto; schema, §4.4/§5.4/§9, decisiones 289 a 293), medida con ligaduras con el `GsubWorker` de fontbox y pintado con `setEnableGsub`; PF-02 y TS-04 (`FontFile` sin cerrojos con avances precalculados; `Resources`/`ImageLibrary` sin `synchronized` calientes). 22 PNG regenerados (revisados: solo `fi`/`fl`). Suite verde. Medido: pintar ≈ 9,5× más rápido, layout ≈ 2× más rápido. | Sesión 3 (TS-01, AR-09, AR-08 + TS-05, QA-06) |
-| 2026-10-28 | 3 · Contrato público (en curso) | AR-08 y TS-05: `Converter` (inmutable, seguro entre hilos, `layOut`/`toPdf`/`toSvg`) en el package `convert`; `PdfWriter` eliminado y sus llamadores migrados; decisión 294. Nuevos `ConverterTest` (9) y un test de `Converter` compartido entre hilos. | Resto de la sesión 3: TS-01 (contrato de hilos en javadoc/README y `Engine` sin protocolo público), AR-09 (`StxtPdfException`), QA-06 (`Limits` en el `Builder`) |
+| 2026-10-28 | 3 · Contrato público (en curso) | AR-08 y TS-05 (commit `a25b014`): `Converter` (inmutable, seguro entre hilos, `layOut`/`toPdf`/`toSvg`) en el package `convert`; `PdfWriter` eliminado y sus llamadores migrados; decisión 294. Nuevos `ConverterTest` (9) y un test de `Converter` compartido entre hilos. | Resto de la sesión 3: TS-01 (contrato de hilos en javadoc/README y `Engine` sin protocolo público), AR-09 (`StxtPdfException`), QA-06 (`Limits` en el `Builder`) |
+| 2026-10-28 | 3 · Contrato público (en curso) | AR-09: `StxtPdfException` con `kind`/`code`/`line` para todos los errores del motor; `DocumentSyntaxException` para los de `stxt-core`; `PAGE_LIMIT` (primera parte de QA-06); `Converter` como frontera (`INTERNAL`); §6.1 de la especificación, README, decisiones 295 a 299. Tests nuevos: `ConverterErrorsTest` y el caso `PAGE_LIMIT`. | Resto de la sesión 3: TS-01 (contrato de hilos y `Engine` sin protocolo público) y QA-06 (`Limits` configurable, píxeles de imagen, elementos de SVG) |

@@ -120,7 +120,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
+| `model` | Tipos puros: `StxtPdfException` (la raíz de los errores del motor, con su `Kind`) e `InternalException`; `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `SvgInspector` (lee un SVG y comprueba el subconjunto), `ResourceException` e `ImageFormatException` |
 | `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
@@ -251,6 +251,17 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `Overflow`, `StxtDump`, `PdfCanvas` y `PdfDestinations` usan el `Media` de cada página (`Page.media()`), y
   `LaidOutDocument.root()` es la raíz para `PdfStructure` (`Sect` por sección, `PageLabels` del PDF).
   Los tests escriben el contenido con `Docs.sectioned` (envuelve en una `Section` lo que no es cabecera).
+- **Tipos de error (§6.1):** todo error del motor es un `StxtPdfException` (`model`; `kind()`, `code()` en texto y
+  `line()`, `NO_LINE` = 0 si no es de una línea), así que una sola `catch` basta. Lo extienden
+  `InvalidModelException` (reglas del modelo, desbordamientos y recursos que nombra el documento; `errorCode()` da el
+  `ErrorCode` y `ErrorCode.kind()` su `Kind`: `INVALID_DOCUMENT` salvo `PAGE_LIMIT`, que es `LIMIT`),
+  `DocumentSyntaxException` (sintaxis y schema de `stxt-core`, con su código y su línea y la excepción original como
+  causa; `LimitException` de la librería es `LIMIT`), `ResourceException` (la carpeta de recursos, `RESOURCE`; con
+  `ImageFormatException`) e `InternalException` (un fallo del motor). `DocumentReader` y `DocumentSchema` convierten
+  los errores de la librería; `Converter` deja pasar los del motor, convierte cualquier otra excepción de ejecución
+  en `InternalException` y no toca la `IOException` del destino. Un `IllegalStateException` o `IllegalArgumentException`
+  solo es válido dentro del motor para un mal uso interno; lo que puede ocurrirle a quien convierte va con uno de
+  estos tipos.
 - **Política de errores (§6):** más estricta que CSS. Lo que no tendría efecto o se contradice
   es un error, nunca un valor por defecto silencioso; se para en el primer error. Los
   porcentajes verticales necesitan un alto definido, que se decide al leer (§3.6,
@@ -550,7 +561,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`
   es un documento STXT de verdad, un fichero por caso, en la carpeta de su familia (`document`,
   `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`,
-  `images`, `references`, `links`, `contents`, `sections`, `styles`, `combinations`, `overflow`, `fonts`; los códigos
+  `images`, `references`, `links`, `contents`, `sections`, `styles`, `combinations`, `overflow`, `fonts`, `limits`; los códigos
   de `stxt-core` van en `schema`). Las tres primeras líneas son comentarios `# Case:`
   (descripción), `# Code:` y `# Line:`, y la línea esperada es la del propio fichero, cabecera incluida (la primera línea
   del documento es la 4). Se maqueta con las métricas reales. `everyCodeHasACase` exige un caso
