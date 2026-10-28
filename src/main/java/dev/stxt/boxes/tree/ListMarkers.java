@@ -1,5 +1,7 @@
 package dev.stxt.boxes.tree;
 
+import java.util.Locale;
+
 /**
  * Texto del marcador de un ítem de lista (ESPECIFICACION.md §5.14): un símbolo ({@code •},
  * {@code –}) o un número con su sufijo ({@code 3.}, {@code c.}, {@code iii.}), seguido del
@@ -39,9 +41,9 @@ final class ListMarkers {
         return switch (marker) {
             case DECIMAL -> Integer.toString(number);
             case LOWER_ALPHA -> alpha(number);
-            case UPPER_ALPHA -> alpha(number).toUpperCase();
+            case UPPER_ALPHA -> alpha(number).toUpperCase(Locale.ROOT);
             case LOWER_ROMAN -> roman(number);
-            case UPPER_ROMAN -> roman(number).toUpperCase();
+            case UPPER_ROMAN -> roman(number).toUpperCase(Locale.ROOT);
             default -> null;
         };
     }

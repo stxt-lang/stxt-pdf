@@ -1,6 +1,10 @@
 package dev.stxt.boxes.tree;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,6 +12,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ListMarkersTest {
+
+    private Locale previous;
+
+    /** La numeración no depende del idioma de la JVM: en turco, {@code "i".toUpperCase()} es {@code İ}. */
+    @BeforeEach
+    void turkishJvm() {
+        previous = Locale.getDefault();
+        Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+    }
+
+    @AfterEach
+    void restoreLocale() {
+        Locale.setDefault(previous);
+    }
 
     @Test
     void symbolsEndWithASpace() {

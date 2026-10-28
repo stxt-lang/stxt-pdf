@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Una imagen de la carpeta {@code images/} (ESPECIFICACION.md §5.18): su formato, reconocido por
@@ -137,7 +138,7 @@ public final class ImageFile {
         use.text().codePoints().filter(cp -> !Character.isWhitespace(cp) && !Character.isISOControl(cp))
                 .filter(cp -> !font.has(cp)).findFirst().ifPresent(cp -> {
                     throw new ImageFormatException(where + " tiene el carácter '" + new String(Character.toChars(cp))
-                            + "' (U+" + String.format("%04X", cp) + "), que la fuente " + face + " no tiene");
+                            + "' (U+" + String.format(Locale.ROOT, "%04X", cp) + "), que la fuente " + face + " no tiene");
                 });
     }
 
