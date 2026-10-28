@@ -12,9 +12,11 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.COSObjectable;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
@@ -22,6 +24,9 @@ import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeOb
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -307,6 +312,156 @@ class PdfCanvasTest {
         }
     }
 
+    private static final String LINKS = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+            + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n";
+
+    private static List<PDAnnotationLink> links(PDDocument pdf, int page) throws Exception {
+        return pdf.getPage(page).getAnnotations().stream().map(a -> (PDAnnotationLink) a).toList();
+    }
+
+    private static String uri(PDAnnotationLink link) {
+        return ((PDActionURI) link.getAction()).getURI();
+    }
+
+    /**
+     * Un enlace a una URL es una anotación {@code Link} sin borde con su acción {@code URI}, del
+     * tamaño de la caja o del tramo, y cuelga de la caja en el PDF etiquetado como un {@code Link}
+     * con su {@code OBJR}; el de un {@code Fixed}, que no es contenido, es clicable pero no está
+     * etiquetado (§5.20).
+     */
+    @Test
+    void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tText: Escribe a soporte\n\t\tLink: mailto:soporte@airemas.example\n"
+                + "\tImage: test/wide.png\n\t\tAlt: Logotipo\n\t\tLink: https://stxt.dev\n"
+                + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\tVisita [la web](https://web.example) hoy.\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "links"))) {
+            List<PDAnnotationLink> links = links(pdf, 0);
+            // Un Fixed se pinta el último, encima de todo.
+            assertEquals(List.of("mailto:soporte@airemas.example", "https://stxt.dev", "https://web.example",
+                    "https://pie.example"), links.stream().map(PdfCanvasTest::uri).toList());
+            PDAnnotationLink text = links.get(0);
+            // La caja de borde del texto: 40 pt de ancho de página útil menos... el área útil entera, 12 pt de alto.
+            assertEquals(20, text.getRectangle().getLowerLeftX(), 0.01);
+            assertEquals(200 - 20 - 12, text.getRectangle().getLowerLeftY(), 0.01);
+            assertEquals(260, text.getRectangle().getWidth(), 0.01);
+            assertEquals(12, text.getRectangle().getHeight(), 0.01);
+            assertEquals("Escribe a soporte", text.getContents());
+            assertEquals(0, text.getBorderStyle().getWidth(), 0.001);
+            assertEquals("Logotipo", links.get(1).getContents());
+            // El tramo con enlace del Markdown no ocupa toda la línea: "la web" y nada más.
+            PDRectangle run = links.get(2).getRectangle();
+            assertTrue(run.getWidth() > 20 && run.getWidth() < 60, run.toString());
+            assertEquals("la web", links.get(2).getContents());
+
+            PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
+            PDStructureElement document = (PDStructureElement) tree.getKids().get(0);
+            assertEquals(List.of("Span", "Figure", "Div"), types(document));
+            PDStructureElement span = (PDStructureElement) document.getKids().get(0);
+            assertEquals(List.of("Link"), types(span));
+            PDStructureElement link = (PDStructureElement) span.getKids().stream()
+                    .filter(k -> k instanceof PDStructureElement).findFirst().orElseThrow();
+            assertEquals("Escribe a soporte", link.getAlternateDescription());
+            PDObjectReference reference = (PDObjectReference) link.getKids().get(0);
+            assertEquals(text.getCOSObject(), ((PDAnnotationLink) reference.getReferencedObject()).getCOSObject());
+            // El árbol de padres lleva de la anotación a su Link.
+            assertEquals(link.getCOSObject(), ((COSObjectable) tree.getParentTree().getValue(text.getStructParent())).getCOSObject());
+            // El Link del tramo cuelga del párrafo del Markdown; el Fixed no tiene elemento ni Link.
+            PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(2))
+                    .getKids().get(0);
+            assertEquals("P", paragraph.getStructureType());
+            assertEquals(List.of("Link"), types(paragraph));
+            assertEquals(-1, links.get(3).getStructParent());
+            String extracted = new PDFTextStripper().getText(pdf);
+            assertTrue(extracted.contains("Visita la web hoy."), extracted);
+        }
+    }
+
+    /**
+     * Un enlace a una caja del documento lleva a su página y a su esquina, hacia delante y hacia
+     * atrás (§5.20).
+     */
+    @Test
+    void internalLinksGoToThePageOfTheirBox() throws Exception {
+        // Área útil de 160: el texto (12) y el bloque (140) llenan la primera página; el resto, la segunda.
+        InlineNode doc = reader.read(LINKS
+                + "\tText: Ir al final\n\t\tId: inicio\n\t\tLink: #fin\n"
+                + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 140\n"
+                + "\tText: Final\n\t\tId: fin\n"
+                + "\tText: Volver\n\t\tLink: #inicio\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "internal-links"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDPageXYZDestination forward = (PDPageXYZDestination) links(pdf, 0).get(0).getDestination();
+            assertEquals(1, pdf.getPages().indexOf(forward.getPage()));
+            assertEquals(20, forward.getLeft());
+            assertEquals(200 - 20, forward.getTop());
+            PDPageXYZDestination backward = (PDPageXYZDestination) links(pdf, 1).get(0).getDestination();
+            assertEquals(0, pdf.getPages().indexOf(backward.getPage()));
+            // Una acción de destino, no de URI.
+            assertNull(links(pdf, 0).get(0).getAction());
+        }
+    }
+
+    /** Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link} (§5.19, §5.20). */
+    @Test
+    void contentsEntriesLinkToTheirHeadings() throws Exception {
+        InlineNode doc = reader.read(LINKS
+                + "\tContents:\n\t\tLevels: 1 1\n"
+                + "\tHeading 1:\n\t\tText: Uno\n"
+                + "\tBlock:\n\t\tBreak:\n\t\t\tAfter: page\n"
+                + "\tHeading 1:\n\t\tText: Dos\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "contents-links"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            List<PDAnnotationLink> links = links(pdf, 0);
+            assertEquals(2, links.size());
+            assertEquals(List.of(0, 1), links.stream().map(l -> {
+                try {
+                    return pdf.getPages().indexOf(((PDPageXYZDestination) l.getDestination()).getPage());
+                } catch (java.io.IOException e) {
+                    throw new java.io.UncheckedIOException(e);
+                }
+            }).toList());
+            // El texto de la entrada, sin su número de página.
+            assertEquals(List.of("Uno", "Dos"), links.stream().map(PDAnnotation::getContents).toList());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
+            toc.getKids().forEach(k -> assertTrue(types((PDStructureElement) k).contains("Link")));
+        }
+    }
+
+    /**
+     * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
+     * solo es contenido (y tiene {@code Link}) en la primera (§5.20, decisión L5).
+     */
+    @Test
+    void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {
+        StringBuilder body = new StringBuilder();
+        for (int i = 1; i <= 15; i++) {
+            body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
+        }
+        InlineNode doc = reader.read("Document (dev.stxt.boxes):\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tTypography:\n\t\tFont: IBM Plex Sans\n\t\tSize: 10\n"
+                + "\tTable:\n\t\tColumns: 1fr 60\n"
+                + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\t\tLink: https://c.example\n\t\t\t\tCell: Valor\n"
+                + "\t\tBody:\n" + body);
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "table-links"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            assertEquals(List.of("https://c.example"), links(pdf, 0).stream().map(PdfCanvasTest::uri).toList());
+            assertEquals(List.of("https://c.example"), links(pdf, 1).stream().map(PdfCanvasTest::uri).toList());
+            PDStructureElement document = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            PDStructureElement table = (PDStructureElement) document.getKids().get(0);
+            PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
+            PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
+            assertEquals(List.of("Link"), types(th));
+            assertEquals(pdf.getPage(0), ((PDStructureElement) th.getKids().stream()
+                    .filter(k -> k instanceof PDStructureElement).findFirst().orElseThrow()).getPage());
+            assertEquals(-1, links(pdf, 1).get(0).getStructParent());
+        }
+    }
+
     private static List<String> types(PDStructureElement e) {
         return e.getKids().stream().filter(k -> k instanceof PDStructureElement)
                 .map(k -> ((PDStructureElement) k).getStructureType()).toList();
@@ -400,7 +555,7 @@ class PdfCanvasTest {
             assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("TOCI", "TOCI", "TOCI"), types(toc));
-            assertEquals(List.of("Span", "Span"), types((PDStructureElement) toc.getKids().get(0)));
+            assertEquals(List.of("Span", "Span", "Link"), types((PDStructureElement) toc.getKids().get(0)));
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Uno"), text);
             assertTrue(text.matches("(?s).*Dos punto uno\\s*2.*"), text);

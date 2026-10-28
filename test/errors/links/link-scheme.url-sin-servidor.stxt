@@ -1,0 +1,12 @@
+# Case: Un Link https sin servidor
+# Code: LINK_SCHEME
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: Pulsa aquí
+		Link: https://

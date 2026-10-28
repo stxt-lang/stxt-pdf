@@ -158,6 +158,14 @@ public final class Style {
     /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
     public Integer listNumber;
 
+    // --- Enlace ----------------------------------------------------------------------------------
+    /**
+     * Destino del {@code Link} de la caja ({@link dev.stxt.boxes.model.Links}, §5.20); {@code null}
+     * = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella,
+     * pero no lleva enlace propio.
+     */
+    public String link;
+
     // --- Imagen ----------------------------------------------------------------------------------
     /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
     public String alt;

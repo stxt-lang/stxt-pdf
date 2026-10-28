@@ -37,6 +37,7 @@ class SchemaCoverageTest {
             // Elementos
             Map.entry("Id", "Id: x"),
             Map.entry("Class", "Class: c"),
+            Map.entry("Link", "Link: https://example.com/a"),
             Map.entry("Isolate", "Isolate: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),

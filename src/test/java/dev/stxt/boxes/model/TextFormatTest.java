@@ -6,6 +6,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,5 +46,18 @@ class TextFormatTest {
         DecorationMetrics d = new DecorationMetrics(-0.1, 0.05, 0.3, 0.04);
         assertEquals(new Rect(5, 101, 20, 0.5), d.underline(5, 100, 20, 10));
         assertEquals(new Rect(5, 97, 20, 0.4), d.strikeout(5, 100, 20, 10));
+    }
+
+    @Test
+    void aLinkIsPartOfTheFormatButDoesNotChangeTheFont() {
+        TextFormat plain = new TextFormat(false, false, false, false);
+        TextFormat link = plain.withLink("https://stxt.dev");
+        assertEquals("https://stxt.dev", link.link());
+        assertNull(plain.link());
+        assertEquals(REGULAR, link.face(REGULAR));
+        assertFalse(link.decorated());
+        // Dos enlaces distintos no se unen en un tramo, aunque lo demás sea igual.
+        assertNotEquals(link, plain.withLink("https://otro.example"));
+        assertNotEquals(link, plain);
     }
 }

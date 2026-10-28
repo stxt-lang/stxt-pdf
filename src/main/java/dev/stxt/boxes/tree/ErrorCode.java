@@ -100,6 +100,12 @@ public enum ErrorCode {
     /** Las páginas a las que se refiere el texto no se estabilizan: cada pasada de paginación las cambia. */
     REFERENCE_UNSTABLE,
 
+    // --- Enlaces ------------------------------------------------------------------------------
+    /** Un destino de enlace vacío, mal escrito o con un esquema que no es https, http, mailto ni {@code #id}. */
+    LINK_SCHEME,
+    /** Un enlace {@code #id} a un {@code Id} que no existe o que está en un {@code Fixed}, que se repite en todas las páginas. */
+    LINK_UNKNOWN,
+
     // --- Índice -------------------------------------------------------------------------------
     /** Un {@code Contents} sin ningún encabezado en los niveles de {@code Levels}. */
     CONTENTS_EMPTY,

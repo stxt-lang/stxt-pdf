@@ -1,0 +1,12 @@
+# Case: Un Link a un Id que no existe
+# Code: LINK_UNKNOWN
+# Line: 12
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Text: Pulsa aquí
+		Link: #nada

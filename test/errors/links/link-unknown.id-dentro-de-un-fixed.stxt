@@ -1,0 +1,16 @@
+# Case: Un Link a una caja de un Fixed, que se repite en todas las páginas
+# Code: LINK_UNKNOWN
+# Line: 16
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Fixed:
+		Offset: 0 0 auto auto
+		Text: Cabecera
+			Id: cabecera
+	Text: Pulsa aquí
+		Link: #cabecera

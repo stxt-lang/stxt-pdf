@@ -13,6 +13,7 @@ import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -167,5 +168,57 @@ class MarkdownBuilderTest {
         List<TextRun> runs = t.runs().get(t.elements().get(0));
         assertEquals(t.elements().get(0).getText(), TextRun.text(runs));
         assertFalse(runs.isEmpty());
+    }
+
+    /** Un enlace es un tramo subrayado con su destino; el formato de dentro se conserva (§5.20). */
+    @Test
+    void linksAreUnderlinedRunsWithTheirDestination() {
+        MarkdownBuilder.Translation t = translate("Mira [la **web**](https://stxt.dev) y <mailto:a@b.c>.");
+        assertEquals("Mira la web y mailto:a@b.c.", t.elements().get(0).getText());
+        assertEquals(List.of(run("Mira "), link("la ", "u", "https://stxt.dev"), link("web", "bu", "https://stxt.dev"),
+                run(" y "), link("mailto:a@b.c", "u", "mailto:a@b.c"), run(".")), t.runs().get(t.elements().get(0)));
+    }
+
+    @Test
+    void linksToABoxAndLinksInTablesAndHeadings() {
+        MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "# Ver [anexo](#anexo)", "",
+                "| A | B |", "|---|---|", "| [uno](https://a.example) | dos |");
+        assertEquals(List.of(run("Ver "), link("anexo", "u", "#anexo")),
+                t.runs().get(t.elements().get(0).getChildren().get(0)));
+        // Table: Columns, Head, Body; la primera celda de la primera fila del cuerpo.
+        Node body = ((InlineNode) t.elements().get(1)).getChildren().get(2);
+        Node cell = ((InlineNode) ((InlineNode) body).getChildren().get(0)).getChildren().get(0);
+        assertEquals(List.of(link("uno", "u", "https://a.example")), t.runs().get(cell));
+    }
+
+    @Test
+    void sameDestinationRunsJoinAndDifferentOnesDoNot() {
+        MarkdownBuilder.Translation t = translate("[a](https://x.example)[b](https://y.example)[c](https://y.example)");
+        assertEquals(List.of(link("a", "u", "https://x.example"), link("bc", "u", "https://y.example")),
+                t.runs().get(t.elements().get(0)));
+    }
+
+    @Test
+    void aLinkWithATitleOrAnUnsupportedDestinationIsAnError() {
+        InvalidModelException title = assertThrows(InvalidModelException.class,
+                () -> translate("Un [enlace](https://stxt.dev \"web\")."));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.code());
+        assertEquals(10, title.line());
+        InvalidModelException scheme = assertThrows(InvalidModelException.class,
+                () -> translate("", "Un [enlace](javascript:alert(1))."));
+        assertEquals(ErrorCode.LINK_SCHEME, scheme.code());
+        assertEquals(11, scheme.line());
+    }
+
+    @Test
+    void linkReferenceDefinitionsAndImagesInsideALinkStayUnsupported() {
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
+                () -> translate("[a][r]", "", "[r]: https://stxt.dev")).code());
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
+                () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).code());
+    }
+
+    private static TextRun link(String text, String format, String destination) {
+        return dev.stxt.boxes.tree.TextRuns.link(text, format, destination);
     }
 }

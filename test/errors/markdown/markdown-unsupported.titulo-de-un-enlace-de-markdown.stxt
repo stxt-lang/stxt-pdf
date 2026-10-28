@@ -1,0 +1,13 @@
+# Case: Título de un enlace de Markdown
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Texto con un [enlace](https://stxt.dev "web").

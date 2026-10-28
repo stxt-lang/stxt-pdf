@@ -6,6 +6,7 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.TextRuns;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static dev.stxt.boxes.tree.TextRuns.link;
 import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,6 +45,15 @@ class StackingContextTest {
         public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                          double wordSpacing) {
             events.add("text '" + text + "' " + font.variant());
+        }
+
+        /** Las zonas clicables: destino, zona y lo que dicen. */
+        final List<String> links = new ArrayList<>();
+
+        @Override
+        public void link(Box box, Rect area, String destination, String description) {
+            links.add(destination + " " + round(area) + " " + description);
+            events.add("link " + destination);
         }
     }
 
@@ -139,6 +150,50 @@ class StackingContextTest {
         // Línea de 12 pt desde y = 40: línea base en 40 + (12 − 10) / 2 + 8 = 49 (aproximación del SVG).
         assertEquals(new Rect(40, 50, 20, 0.6).toString(), round(r.rects.get(0)).toString());
         assertEquals(new Rect(60, 45.9, 15, 0.6).toString(), round(r.rects.get(1)).toString());
+    }
+
+    /** Una caja con {@code Link} es clicable entera, antes que su contenido (§5.20). */
+    @Test
+    void aBoxWithLinkIsClickableWholeAndBeforeItsContent() {
+        Recorder r = record("\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10",
+                "\tBlock:", "\t\tLink: #fin", "\t\tBox:", "\t\t\tPadding: 5",
+                "\t\tText: uno   dos", "\tText: fin", "\t\tId: fin");
+        assertEquals(List.of("#fin " + new Rect(40, 40, 515, 22) + " uno dos"), r.links);
+        assertEquals(List.of("link #fin", "text 'uno dos' normal", "text 'fin' normal"), r.events);
+    }
+
+    /** Un tramo con enlace es una zona del alto de la línea; los seguidos con el mismo destino, una sola (§5.20). */
+    @Test
+    void linkedRunsAreOneZonePerLineAndDestination() {
+        Recorder r = record(Map.of("T", List.of(run("uno "), link("dos", "b", "https://a.example"),
+                        link(" tres", "", "https://a.example"), link(" cuatro", "u", "mailto:a@b.c"))),
+                "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10",
+                "\tText: uno dos tres cuatro", "\t\tId: T");
+        // "uno " son 20 pt; "dos tres" (8 caracteres, 40 pt) es una zona; " cuatro" (35 pt), otra.
+        assertEquals(List.of("https://a.example " + new Rect(60, 40, 40, 12) + " dos tres",
+                "mailto:a@b.c " + new Rect(100, 40, 35, 12) + "  cuatro"), r.links);
+        // Las zonas se emiten antes que el texto de la caja.
+        assertEquals(List.of("link https://a.example", "link mailto:a@b.c", "text 'uno ' normal"),
+                r.events.stream().filter(e -> e.startsWith("link") || e.equals("text 'uno ' normal")).toList());
+    }
+
+    /** Un enlace que ocupa varias líneas tiene una zona en cada una. */
+    @Test
+    void aLinkOverSeveralLinesHasAZoneInEach() {
+        Recorder r = record(Map.of("T", List.of(link("aaaa bbbb cccc dddd", "", "https://a.example"))),
+                "\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10",
+                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30",
+                "\t\tText: aaaa bbbb cccc dddd", "\t\t\tId: T");
+        assertEquals(List.of("https://a.example " + new Rect(40, 40, 20, 12) + " aaaa",
+                "https://a.example " + new Rect(40, 52, 20, 12) + " bbbb",
+                "https://a.example " + new Rect(40, 64, 20, 12) + " cccc",
+                "https://a.example " + new Rect(40, 76, 20, 12) + " dddd"), r.links);
+    }
+
+    @Test
+    void noLinkMeansNoZone() {
+        assertEquals(List.of(), record("\tTypography:", "\t\tFont: IBM Plex Sans", "\t\tSize: 10",
+                "\tText: sin enlace").links);
     }
 
     private static Rect round(Rect r) {

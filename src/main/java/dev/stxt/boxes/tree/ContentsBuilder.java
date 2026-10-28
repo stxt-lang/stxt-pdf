@@ -1,6 +1,7 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
@@ -108,6 +109,8 @@ final class ContentsBuilder {
         Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line);
         ctx.definiteHeight.put(entry, false);
         entry.parent = contents;
+        // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
+        es.link = Links.to(heading.key());
 
         boolean leader = contents.style.contentsLeader != Style.Leader.NONE;
         int line = heading.children.isEmpty() ? heading.line : heading.children.get(0).textLine;

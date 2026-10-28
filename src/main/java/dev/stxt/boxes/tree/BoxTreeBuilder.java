@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
@@ -125,6 +126,7 @@ public final class BoxTreeBuilder {
         ContentsBuilder.build(ctx, root);
         ctx.rules.checkIds(ctx.ids.keySet());
         References.validate(root);
+        LinkTargets.validate(root);
         return new Result(media, root, metadata);
     }
 
@@ -252,6 +254,7 @@ public final class BoxTreeBuilder {
                         case "start" -> s.listStart = integer(p);
                         case "number" -> s.listNumber = integer(p);
                         case "isolate" -> s.isolate = bool(p);
+                        case "link" -> s.link = link(p);
                         case "alt" -> s.alt = alt(p);
                         case "fit" -> s.fit = enumValue(Style.Fit.class, p);
                         case "levels" -> ContentsBuilder.levels(p, s);
@@ -391,6 +394,15 @@ public final class BoxTreeBuilder {
                     + "images/ de los recursos: Image: logos/acme.png");
         }
         box.image = path;
+    }
+
+    /** El destino de un {@code Link} (§5.20): una URL admitida o {@code #id}; que el {@code Id} exista se comprueba al final. */
+    private static String link(Node p) {
+        String destination = p.getText().trim();
+        Links.problem(destination).ifPresent(problem -> {
+            throw error(p, ErrorCode.LINK_SCHEME, "Link: " + problem);
+        });
+        return destination;
     }
 
     /** El texto alternativo de una {@code Image}: no vacío; para una imagen decorativa, no se declara. */

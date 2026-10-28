@@ -2,6 +2,7 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 import org.commonmark.ext.gfm.strikethrough.Strikethrough;
@@ -52,12 +53,13 @@ import static dev.stxt.boxes.tree.Nodes.error;
  * Traduce un {@code Markdown} (ESPECIFICACION.md §5.17) a los nodos STXT de los elementos que ya
  * existen: encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a
  * {@code Paragraph}, listas a {@code List} y {@code List item}, tablas GFM a {@code Table} e
- * imágenes solas en su párrafo a {@code Image} (§5.18).
+ * imágenes solas en su párrafo a {@code Image} (§5.18). Un enlace es un tramo subrayado con su destino
+ * (§5.20).
  * {@link BoxTreeBuilder} construye después esos nodos como cualquier otro elemento, así que el
  * schema, las reglas de {@code Styles}, la validación del §6, el PDF etiquetado y los marcadores
  * los tratan igual.
  *
- * <p>El formato dentro de una línea (negrita, cursiva, subrayado y tachado) no cabe en un nodo
+ * <p>El formato dentro de una línea (negrita, cursiva, subrayado, tachado y enlace) no cabe en un nodo
  * STXT: el texto del nodo es el texto seguido y sus tramos van aparte, en
  * {@link Translation#runs()}.</p>
  *
@@ -76,7 +78,7 @@ final class MarkdownBuilder {
             .build();
 
     private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, imágenes solas en "
-            + "su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~";
+            + "su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino)";
 
     /**
      * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
@@ -302,17 +304,36 @@ final class MarkdownBuilder {
                     // Un salto de línea simple vale un espacio, como en un Text (§5.4).
                     out.add(" ", f);
                 } else if (n instanceof StrongEmphasis) {
-                    inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike()), out, line);
+                    inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
                 } else if (n instanceof Emphasis) {
-                    inline(n, new TextFormat(f.bold(), true, f.underline(), f.strike()), out, line);
+                    inline(n, new TextFormat(f.bold(), true, f.underline(), f.strike(), f.link()), out, line);
                 } else if (n instanceof Ins) {
-                    inline(n, new TextFormat(f.bold(), f.italic(), true, f.strike()), out, line);
+                    inline(n, new TextFormat(f.bold(), f.italic(), true, f.strike(), f.link()), out, line);
                 } else if (n instanceof Strikethrough) {
-                    inline(n, new TextFormat(f.bold(), f.italic(), f.underline(), true), out, line);
+                    inline(n, new TextFormat(f.bold(), f.italic(), f.underline(), true, f.link()), out, line);
+                } else if (n instanceof Link l) {
+                    inline(n, link(l, f, line), out, line);
                 } else {
                     throw unsupported(n, line);
                 }
             }
+        }
+
+        /**
+         * El formato de los tramos de un enlace (§5.20): el de fuera, subrayado y con su destino.
+         * Un enlace de Markdown es el único que se subraya solo. El título ({@code "…"}) no
+         * tendría efecto y es un error, como el de una imagen.
+         */
+        private static TextFormat link(Link l, TextFormat f, int line) {
+            if (l.getTitle() != null && !l.getTitle().isEmpty()) {
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de un enlace (\""
+                        + l.getTitle() + "\"): quítalo, [texto](destino)");
+            }
+            String destination = l.getDestination().strip();
+            Links.problem(destination).ifPresent(problem -> {
+                throw error(line, ErrorCode.LINK_SCHEME, "Enlace de Markdown: " + problem);
+            });
+            return new TextFormat(f.bold(), f.italic(), true, f.strike(), destination);
         }
 
         /** Marcadores de {@code Bullet} (sin numerar) o de {@code Numbering} (numerados), uno por nivel. */
@@ -343,9 +364,7 @@ final class MarkdownBuilder {
 
         private InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
-            if (n instanceof Link) {
-                what = "enlaces";
-            } else if (n instanceof Image) {
+            if (n instanceof Image) {
                 what = "imágenes dentro de un texto (una imagen va sola en su párrafo)";
             } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
                 what = "código";

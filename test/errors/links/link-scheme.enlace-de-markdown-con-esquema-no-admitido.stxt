@@ -1,5 +1,5 @@
-# Case: Enlace en Markdown
-# Code: MARKDOWN_UNSUPPORTED
+# Case: Un enlace de Markdown a un fichero local
+# Code: LINK_SCHEME
 # Line: 13
 Document (dev.stxt.boxes):
 	Media:
@@ -10,4 +10,4 @@ Document (dev.stxt.boxes):
 		Size: 10
 	Markdown:
 		Content >>
-			Texto con un [enlace](https://stxt.dev).
+			Mira [mis claves](file:///etc/passwd).

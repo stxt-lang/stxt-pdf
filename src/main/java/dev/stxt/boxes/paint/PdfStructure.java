@@ -1,9 +1,6 @@
 package dev.stxt.boxes.paint;
 
-import dev.stxt.boxes.fragment.Fragment;
-import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.model.Cell;
-import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Metadata;
@@ -19,6 +16,7 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDParentTreeValue;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
@@ -26,6 +24,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -39,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,8 +62,11 @@ import java.util.Set;
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
+ * <p>Un enlace (§5.20) es un {@code Link} hijo del elemento de su caja, con la anotación del PDF
+ * como referencia a objeto ({@code OBJR}).</p>
+ *
  * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, §6), que
- * llevan a la esquina superior izquierda de su primer fragmento.</p>
+ * llevan a la esquina superior izquierda de su primer fragmento ({@link PdfDestinations}).</p>
  */
 final class PdfStructure {
 
@@ -305,15 +306,8 @@ final class PdfStructure {
      */
     int mark(Box box) {
         PDStructureElement e = elements.get(box);
-        if (e == null) {
+        if (e == null || !isContent(box)) {
             return -1;
-        }
-        if (repeated.contains(box)) {
-            // La cabecera y el pie de una tabla son contenido en la primera página en que salen.
-            PDPage first = firstPage.putIfAbsent(box, page);
-            if (first != null && first != page) {
-                return -1;
-            }
         }
         int mcid = pageParents.size();
         pageParents.add(e);
@@ -322,6 +316,43 @@ final class PdfStructure {
         ref.setPage(page);
         e.appendKid(ref);
         return mcid;
+    }
+
+    /**
+     * Si la caja es contenido en la página actual: la cabecera y el pie de una tabla lo son en la
+     * primera página en que salen, y en las demás, donde se repiten, no.
+     */
+    private boolean isContent(Box box) {
+        if (repeated.contains(box)) {
+            PDPage first = firstPage.putIfAbsent(box, page);
+            return first == null || first == page;
+        }
+        return true;
+    }
+
+    /**
+     * Etiqueta un enlace (ESPECIFICACION.md §5.20, decisión L5): un {@code Link} hijo del elemento
+     * de la caja, con la anotación como referencia a objeto ({@code OBJR}) y su texto como
+     * {@code Alt}. En un {@code Fixed}, en una imagen decorativa o en las filas repetidas de una
+     * tabla, donde la caja no es contenido, el enlace tampoco: la anotación sigue siendo clicable.
+     */
+    void link(Box box, PDAnnotationLink annotation, String description) {
+        PDStructureElement parent = elements.get(box);
+        if (parent == null || !isContent(box)) {
+            return;
+        }
+        PDStructureElement link = new PDStructureElement("Link", parent);
+        link.setPage(page);
+        link.setAlternateDescription(description != null ? description : annotation.getContents());
+        parent.appendKid(link);
+        PDObjectReference reference = new PDObjectReference();
+        reference.setReferencedObject(annotation);
+        reference.setPage(page);
+        link.appendKid(reference);
+        // La anotación se ve desde el árbol de padres con su propia clave, junto a las de las páginas.
+        int key = parents.size();
+        annotation.setStructParent(key);
+        parents.put(key, new PDParentTreeValue(link.getCOSObject()));
     }
 
     /**
@@ -338,18 +369,17 @@ final class PdfStructure {
         e.addAttribute(layout);
     }
 
-    /** Termina: el árbol de padres y los marcadores de los encabezados. */
-    void finish(PDDocument doc, List<Page> pages, List<PDPage> pdfPages, Rect area, double pageHeight) {
+    /**
+     * Termina: el árbol de padres y los marcadores de los encabezados, que llevan a su destino de
+     * {@code destinations}.
+     */
+    void finish(PDDocument doc, Map<Box, PDPageXYZDestination> destinations) {
         PDNumberTreeNode parentTree = new PDNumberTreeNode(PDParentTreeValue.class);
         parentTree.setNumbers(parents);
         treeRoot.setParentTree(parentTree);
         treeRoot.setParentTreeNextKey(parents.size());
         if (headings.isEmpty()) {
             return;
-        }
-        Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
-        for (int i = 0; i < pages.size(); i++) {
-            find(pages.get(i).content(), area.x(), area.y(), pdfPages.get(i), pageHeight, targets);
         }
         PDDocumentOutline outline = new PDDocumentOutline();
         // Pila de los encabezados abiertos: el padre de cada uno es el último de nivel menor.
@@ -363,7 +393,7 @@ final class PdfStructure {
             PDOutlineNode parent = open.isEmpty() ? outline : open.peek();
             PDOutlineItem item = new PDOutlineItem();
             item.setTitle(h.headingText());
-            item.setDestination(targets.get(h));
+            item.setDestination(destinations.get(h));
             parent.addLast(item);
             open.push(item);
             levels.push(h.headingLevel());
@@ -372,21 +402,5 @@ final class PdfStructure {
         PDDocumentCatalog catalog = doc.getDocumentCatalog();
         catalog.setDocumentOutline(outline);
         catalog.setPageMode(PageMode.USE_OUTLINES);
-    }
-
-    /** El destino de cada encabezado: la esquina de su primer fragmento. {@code x}, {@code y}: su caja de borde. */
-    private static void find(Fragment f, double x, double y, PDPage page, double pageHeight,
-                             Map<Box, PDPageXYZDestination> targets) {
-        if (f.first() && f.box().headingLevel() > 0 && !targets.containsKey(f.box())) {
-            PDPageXYZDestination d = new PDPageXYZDestination();
-            d.setPage(page);
-            d.setLeft((int) Math.floor(x));
-            d.setTop((int) Math.ceil(pageHeight - y));
-            targets.put(f.box(), d);
-        }
-        Rect content = new Rect(x, y, f.width(), f.height()).shrink(f.border()).shrink(f.padding());
-        for (Fragment c : f.children()) {
-            find(c, content.x() + c.x(), content.y() + c.y(), page, pageHeight, targets);
-        }
     }
 }

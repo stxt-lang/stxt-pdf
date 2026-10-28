@@ -201,8 +201,9 @@ public final class StackingContext {
         }
     }
 
-    /** El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen (§5.18). */
+    /** El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen (§5.18), y sus enlaces. */
     private static void paintContent(Canvas canvas, Piece p) {
+        paintLinks(canvas, p);
         if (p.f().box().isImage()) {
             canvas.image(p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()));
         } else if (p.f().box().element == Element.CONTENTS_LEADER) {
@@ -210,6 +211,79 @@ public final class StackingContext {
         } else {
             paintText(canvas, p);
         }
+    }
+
+    /**
+     * Las zonas clicables del fragmento (§5.20): su caja de borde entera si la caja tiene
+     * {@code Link}, y el rectángulo de cada tramo con enlace de cada línea de texto. Los tramos
+     * seguidos de una línea con el mismo destino (una parte en negrita dentro de un enlace) son
+     * una sola zona; un enlace que ocupa varias líneas, una por línea. Una caja partida entre
+     * páginas tiene una zona por fragmento.
+     */
+    private static void paintLinks(Canvas canvas, Piece p) {
+        Box box = p.f().box();
+        if (box.style.link != null && p.f().width() > 0 && p.f().height() > 0) {
+            canvas.link(box, p.borderBox(), box.style.link, describe(box));
+        }
+        if (p.f().lines().isEmpty()) {
+            return;
+        }
+        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        for (TextLine l : p.f().lines()) {
+            String destination = null;
+            double from = 0;
+            double to = 0;
+            StringBuilder text = new StringBuilder();
+            for (TextLine.Run r : l.runs()) {
+                String link = r.format().link();
+                if (destination != null && !destination.equals(link)) {
+                    canvas.link(box, linkArea(content, l, from, to), destination, text.toString());
+                    destination = null;
+                    text.setLength(0);
+                }
+                if (link != null) {
+                    if (destination == null) {
+                        destination = link;
+                        from = r.x();
+                    }
+                    to = r.x() + r.width();
+                    text.append(r.text());
+                }
+            }
+            if (destination != null) {
+                canvas.link(box, linkArea(content, l, from, to), destination, text.toString());
+            }
+        }
+    }
+
+    /**
+     * Lo que dice la caja con enlace, para quien no la ve: el texto alternativo de una imagen o el
+     * texto de la caja y de lo que contiene (sin el número de página de las entradas de un
+     * índice); {@code null} si no tiene texto.
+     */
+    private static String describe(Box box) {
+        if (box.style.alt != null) {
+            return box.style.alt;
+        }
+        StringBuilder out = new StringBuilder();
+        collectText(box, out);
+        String text = out.toString().replaceAll("\\s+", " ").strip();
+        return text.isEmpty() ? null : text;
+    }
+
+    private static void collectText(Box box, StringBuilder out) {
+        if (box.element == Element.CONTENTS_PAGE) {
+            return;
+        }
+        if (box.hasText()) {
+            out.append(box.text).append(' ');
+        }
+        box.children.forEach(child -> collectText(child, out));
+    }
+
+    /** Zona de un tramo de la línea {@code l}, desde {@code from} hasta {@code to} (relativos a la línea). */
+    private static Rect linkArea(Rect content, TextLine l, double from, double to) {
+        return new Rect(content.x() + l.x() + from, content.y() + l.y(), to - from, l.height());
     }
 
     /**

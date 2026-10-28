@@ -27,6 +27,11 @@ public final class TextRuns {
                 format.contains("s")));
     }
 
+    /** Un tramo con el formato de {@code format} y un enlace a {@code destination}. */
+    public static TextRun link(String text, String format, String destination) {
+        return new TextRun(text, run(text, format).format().withLink(destination));
+    }
+
     /** Construye el árbol del documento y pone los tramos de cada caja de texto por su {@code Id}. */
     public static BoxTreeBuilder.Result build(InlineNode document, Map<String, List<TextRun>> runs) {
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document);

@@ -63,6 +63,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -99,6 +101,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -127,6 +131,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -159,6 +165,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -174,6 +182,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -191,6 +201,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -204,6 +216,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -219,6 +233,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -232,6 +248,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -247,6 +265,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -261,6 +281,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -274,6 +296,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -295,6 +319,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -325,6 +351,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -370,6 +398,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -410,6 +440,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -445,6 +477,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -576,6 +610,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -630,6 +666,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 				Max: 1
 			Child: Class
 				Max: 1
+			Child: Link
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -653,7 +691,7 @@ Schema (@stxt.schema): dev.stxt.boxes
 
 	Node: Markdown
 		Type: GROUP
-		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++ y ~~tachado~~), que se traduce a Heading, Paragraph, List y Table. Un bloque.
+		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino)), que se traduce a Heading, Paragraph, List y Table. Un bloque.
 		Children:
 			Child: Id
 				Max: 1
@@ -699,6 +737,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 			Child: Id
 				Max: 1
 			Child: Class
+				Max: 1
+			Child: Link
 				Max: 1
 			Child: Box
 				Max: 1
@@ -829,6 +869,8 @@ Schema (@stxt.schema): dev.stxt.boxes
 		Description: Identificador para volcados, tests, mensajes y reglas For id. Único en el documento.
 	Node: Class
 		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres.
+	Node: Link
+		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
 	Node: Isolate
 		Type: BOOLEAN
 		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.

@@ -1,0 +1,17 @@
+# Página 1: mail en 20; md en 20 + 12 + 8 = 40; logo en 40 + 12 + 8 = 60; card en 60 + 75 + 8 = 143.
+# Página 2: end en 20 y back en 32, de 12 cada uno.
+Result:
+	Page: 1
+		Fragment: mail
+			Rect: 20 20 260 12
+		Fragment: md
+			Rect: 20 40 260 12
+		Fragment: logo
+			Rect: 20 60 150 75
+		Fragment: card
+			Rect: 20 143 260 32
+	Page: 2
+		Fragment: end
+			Rect: 20 20 260 12
+		Fragment: back
+			Rect: 20 32 260 12

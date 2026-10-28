@@ -18,6 +18,9 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,13 +65,18 @@ public final class PdfCanvas implements Canvas {
     private final Map<Path, PDImageXObject> images;
     /** Árbol de estructura del documento, compartido por todas sus páginas. */
     private final PdfStructure structure;
+    /** Anotaciones de enlace del documento, compartidas por todas sus páginas. */
+    private final PdfLinks links;
+    /** Las anotaciones de esta página, que se le ponen al terminar de pintarla. */
+    private final List<PDAnnotation> annotations = new ArrayList<>();
     private final boolean debug;
 
     private PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources,
                       Map<FontFace, PDFont> fonts, Map<Path, PDImageXObject> images, PdfStructure structure,
-                      boolean debug) {
+                      PdfLinks links, boolean debug) {
         this.doc = doc;
         this.out = out;
+        this.links = links;
         this.pageHeight = pageHeight;
         this.resources = resources;
         this.fonts = fonts;
@@ -90,20 +98,34 @@ public final class PdfCanvas implements Canvas {
             Map<FontFace, PDFont> fonts = new HashMap<>();
             Map<Path, PDImageXObject> images = new HashMap<>();
             PdfStructure structure = new PdfStructure(doc, root(pages));
+            PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata());
             Rect area = media.pageArea();
+            // Todas las páginas existen antes de pintar ninguna: un enlace puede ir hacia delante.
             List<PDPage> pdfPages = new ArrayList<>();
-            for (Page p : pages) {
+            for (int i = 0; i < pages.size(); i++) {
                 PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) media.height()));
                 doc.addPage(page);
                 pdfPages.add(page);
+            }
+            for (int i = 0; i < pages.size(); i++) {
+                Page p = pages.get(i);
+                PDPage page = pdfPages.get(i);
                 structure.startPage(page);
+                PdfCanvas canvas;
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
-                    StackingContext.build(p.content(), p.fixed(), area.x(), area.y())
-                            .paint(new PdfCanvas(doc, cs, media.height(), resources, fonts, images, structure, debug));
+                    canvas = new PdfCanvas(doc, cs, media.height(), resources, fonts, images, structure, links,
+                            debug);
+                    StackingContext.build(p.content(), p.fixed(), area.x(), area.y()).paint(canvas);
+                }
+                if (!canvas.annotations.isEmpty()) {
+                    page.setAnnotations(canvas.annotations);
                 }
             }
-            structure.finish(doc, pages, pdfPages, area, media.height());
+            Map<Box, PDPageXYZDestination> destinations =
+                    PdfDestinations.find(pages, pdfPages, area, media.height());
+            links.resolve(destinations);
+            structure.finish(doc, destinations);
             doc.save(target);
         }
     }
@@ -190,6 +212,18 @@ public final class PdfCanvas implements Canvas {
     /** Un rectángulo en coordenadas del PDF, con el origen abajo. */
     private PDRectangle pdfRect(Rect r) {
         return new PDRectangle((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Una anotación {@code Link} sin borde; la estructura la cuelga de la caja ({@link PdfStructure#link}).</p>
+     */
+    @Override
+    public void link(Box box, Rect area, String destination, String description) {
+        PDAnnotationLink annotation = links.create(pdfRect(area), destination, description);
+        annotations.add(annotation);
+        structure.link(box, annotation, description);
     }
 
     @Override

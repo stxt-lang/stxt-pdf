@@ -1,0 +1,13 @@
+# Case: Un enlace de Markdown a un Id que no existe
+# Code: LINK_UNKNOWN
+# Line: 13
+Document (dev.stxt.boxes):
+	Media:
+		Width: 595
+		Height: 842
+	Typography:
+		Font: IBM Plex Sans
+		Size: 10
+	Markdown:
+		Content >>
+			Véase [el anexo](#anexo).
