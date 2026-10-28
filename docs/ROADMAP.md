@@ -50,6 +50,7 @@ hojas de ruta de los hitos 11 a 15 y de calidad y arquitectura están en el hist
 | 29 | Texto preformateado y código | hecho | 22 |
 | 30 | Rotación y orientación de la página | hecho | 23 |
 | 31 | Imágenes vectoriales (SVG) | hecho | 24 |
+| 32 | Secciones (`Section`): `Media`, `Fixed` y numeración propios | en curso | 25 |
 
 Los hitos 16 y 17 están terminados (2026-10-27), y del 18 al 31, el 2026-10-28 (varios, en otras
 sesiones del mismo día). Los hitos se ordenaron por impacto (ver [Hitos 22 a 31](#hitos-22-a-31-lo-que-se-echó-en-falta-al-escribir-los-ejemplos)).
@@ -1258,6 +1259,102 @@ implementarlas, en [`DECISIONES.md`](DECISIONES.md)):
       `PdfCanvasTest.svgIsDrawnAsOneVectorFormAndScaledToItsBox`) y caso golden `24-svg`, calculado a mano.
 - [x] `tools/ExampleImages.java` (clase `Svg`) y los ejemplos 01, 02, 04, 06, 07, 08, 09 y 10 (con 03 y 05 sin
       cambios: solo llevan fotos); PNG revisados a ojo y volcados sin cambios.
+
+---
+
+## Hito 32: secciones
+
+**Objetivo.** Que un documento tenga varias secciones independientes entre sí, cada una con su
+`Media` (papel, orientación y márgenes), sus propios `Fixed` y su propia numeración de páginas. Una
+sección empieza siempre una página nueva. Generaliza varios pendientes de `TODO.md`: el margen de la
+primera página (la portada es una sección con otro margen), la numeración que no cuenta la portada,
+una página apaisada dentro de un documento vertical y las páginas con nombre al estilo de `@page`.
+
+**Sintaxis.**
+
+```
+Document (dev.stxt.boxes):
+	Media:
+		Paper: A4
+		Margin: 44 44 60 44
+	Title: Factura 2025-0147
+	Language: es
+	Fixed:                       # de todas las secciones
+		Pages: not-first
+		...
+	Section:
+		Id: cover
+		Page numbering: none
+		Inherit fixed: false
+		Media:
+			Margin: 0
+		Block: ...
+	Section:
+		Id: body
+		Page numbering: restart
+		Media:
+			Orientation: landscape
+		Fixed: ...               # solo de esta sección
+		Block: ...
+```
+
+**Decisiones tomadas** (2026-10-28, todas con la propuesta aceptada; las interpretaciones, en
+[`DECISIONES.md`](DECISIONES.md), 265–274):
+
+- [x] S1. **`Section` es obligatoria.** `Document` tiene `Media`, `Title`, `Language`, `Styles`, `Fixed` y
+      una o más `Section` (`Min: 1`); el contenido en flujo y los demás elementos posicionados van dentro de
+      una sección. Un `Document` con contenido suelto es un error del schema.
+- [x] S2. **El `Id` es un hijo**, como en el resto de elementos (`Section` no tiene valor): sirve para
+      `Link: #id`, `{page of: id}` y `For id`.
+- [x] S3. **`Media` de la sección** hereda del `Media` del documento por grupos: el tamaño (`Paper` +
+      `Orientation`, o `Width` + `Height`) se hereda entero o se reemplaza entero, y `Margin` se hereda o se
+      reemplaza. `Orientation` sola gira el `Paper` del documento; si el documento da `Width` y `Height`, es
+      un error (`MEDIA_SIZE`).
+- [x] S4. **`Fixed` por alcance.** El `Fixed` del documento sale en todas las secciones; el de una sección,
+      solo en las suyas. `Pages` cuenta dentro del alcance donde se declara (`first` de una sección es su
+      primera página; `first` del documento, la primera del documento). `Inherit fixed: false` en una
+      sección la deja sin los `Fixed` del documento.
+- [x] S5. **Numeración.** `Page numbering: continue` (por defecto), `restart` o `none`. Un contador: `continue`
+      sigue, `restart` vuelve a 1, `none` no numera ni avanza. `{page}` es el contador y `{pages}`, su último
+      valor en la tanda (las páginas desde el último `restart`).
+- [x] S6. **Lo impreso manda.** `{page of: id}` y las entradas de un índice dan el número impreso, no el
+      físico; una referencia a algo de una sección `none` es `REFERENCE_NOT_PLACEABLE`, y un `{page}` que cae
+      en una página sin número (un `Fixed` del documento en una portada), `PAGE_NUMBER_UNAVAILABLE`. Los
+      marcadores, los enlaces y `Pages` siguen la página física del PDF; las etiquetas de página del PDF
+      (`PageLabels`) llevan la numeración impresa.
+- [x] S7. **Qué admite una `Section`:** `Id`, `Class` (las reglas `For class` y `For id` que le llegan solo
+      pueden ser `Typography`, que hereda todo su contenido), `Media`, `Page numbering`, `Inherit fixed` y su
+      contenido. No hay `Background` de página ni `Start` (ver `TODO.md`).
+- [x] S8. **Sección vacía:** `SECTION_EMPTY` (una sección sin contenido en flujo no tiene ninguna página).
+- [x] S9. **Volcado (§7):** una sección con `Id` no se vuelca como caja; sí sus cajas con `Id`, con las
+      coordenadas de la página de su sección.
+- [x] S10. **El documento sigue siendo uno** para la jerarquía de encabezados, los índices (`Contents`) y el
+      `Styles`: se comprueban en el orden del documento, atravesando las secciones.
+
+**Diseño técnico** (propuesta):
+
+- **Árbol.** Cada sección es la raíz de su propio layout: una `Box` (`Element.SECTION`, bloque) sin
+  `parent`, igual que la raíz anónima de hoy, que cuelga de la raíz del documento (que ya solo guarda las
+  secciones y los `Fixed` del documento). Los recorridos de todo el árbol (referencias, enlaces, índices, fuentes e
+  imágenes) siguen funcionando desde esa raíz. `BoxTreeBuilder.Result` da la lista de `Section` (caja,
+  `Media`, numeración y `Inherit fixed`).
+- **Paginación.** `Paginator` recorre las secciones: una pasada de flujo por sección con su `Media`, con
+  una sola convergencia de las referencias para todo el documento. `Page` lleva su `Media`, su sección y su
+  número impreso; `Overflow`, el volcado y los lienzos usan el de cada página.
+- **`Fixed`.** Los del documento los coloca el `Paginator` en cada página de cada sección que los hereda,
+  con el área útil de esa página.
+
+**Tareas:**
+
+- [x] Resolver S1–S10 (2026-10-28).
+- [ ] Schema (`Section`, `Page numbering`, `Inherit fixed`) y especificación (§2, §4, §5, §6, §7, §8, §9).
+- [ ] `Section` en el builder; `Media` por sección; `Paginator`, `Page`, `Overflow`, volcado y lienzos por sección.
+- [ ] Migrar todos los documentos (tests, golden, catálogo, ejemplos, especificación y README) a `Section`.
+- [ ] `Fixed` del documento y de la sección; `Inherit fixed`.
+- [ ] Numeración (`Page numbering`, `{page}`, `{pages}`, `{page of}`) y `PageLabels` en el PDF.
+- [ ] Errores nuevos con su fila en el §6 y sus casos en `test/errors/`.
+- [ ] Caso golden `25-sections`, calculado a mano; ejemplos 04, 07 y 09 con la portada como sección.
+- [ ] README, `CLAUDE.md`, `DECISIONES.md`, `TODO.md` y este documento.
 
 ---
 

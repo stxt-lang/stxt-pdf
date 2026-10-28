@@ -1597,3 +1597,57 @@ interpretaciones que salieron al implementarlas.
      `Element: Heading 1`, se quita. *Dónde:* schema, `tree/Style.inContents`, `tree/BoxTreeBuilder`,
      `tree/ContentsBuilder.collect`. *Alternativa:* `Levels` por encabezado, que no sirve cuando la portada y los
      capítulos son del mismo nivel.
+
+265. **`Section` es el único contenido de `Document`** (hito 32). Un documento tiene `Media`, `Title`,
+     `Language`, `Styles`, `Fixed` y una o más `Section` (`Min: 1`); el flujo y los demás elementos posicionados
+     van dentro. No hay sección implícita para el contenido suelto: así la separación está siempre a la vista, y
+     migrar un documento es mecánico (envolver). *Dónde:* schema. *Alternativa:* aceptar contenido suelto como
+     una sección implícita.
+
+266. **El `Id` de una sección es un hijo `Id`**, no el valor: en este schema el valor de un elemento es su
+     contenido (la ruta de `Image`, la colocación de `Area`) y el `Id` ya es una sola definición para todo el
+     namespace (`Link: #id`, `{page of: id}`, `For id`). *Alternativa:* `Section: nombre`.
+
+267. **`Media` de una sección hereda por grupos del `Media` del documento:** el tamaño (`Paper` +
+     `Orientation`, o `Width` + `Height`) es un grupo y `Margin` otro; cada uno se hereda entero o se declara
+     entero. Así `Orientation: landscape` sola da el papel del documento apaisado, y si el documento declara
+     `Width` y `Height` esa sección no puede girarlo (`MEDIA_SIZE`). *Dónde:* `tree/BoxTreeBuilder.media`.
+     *Alternativa:* `Media` completo en cada sección.
+
+268. **`Fixed` del documento y de la sección.** El del documento sale en todas las secciones (con el área útil
+     de cada página), el de la sección solo en las suyas, y `Pages` cuenta dentro del alcance donde se declara.
+     `Inherit fixed: false` deja una sección sin los del documento. Que sobre (sin `Fixed` en el documento) no es
+     un error, como las propiedades que sobran de `Markdown` (decisión 130): una plantilla puede ponerlos
+     después. *Dónde:* `layout/Paginator`, `tree/Style.pages`. *Alternativa:* `Pages` siempre físico.
+
+269. **La numeración es un contador por documento:** `Page numbering: continue` (por defecto), `restart` (vuelve a
+     1) o `none` (la página no tiene número y el contador no avanza). `{page}` es el valor del contador y
+     `{pages}`, el último de su tanda, la que empieza en cada `restart`: con una portada `none`, la primera página
+     interior dice «1 de N». El nombre no puede ser `Numbering` (ya es una propiedad de `Markdown`).
+     *Dónde:* `tree/Style`, `layout/Paginator`. *Alternativa:* un `Start` para empezar en otro número (no se hace
+     por ahora, `TODO.md`).
+
+270. **Lo que se imprime manda.** `{page of: id}` y las entradas de los índices dan el número del contador, no el
+     de la página física, para que el índice y el pie coincidan. Una referencia a una caja de una sección `none`
+     es `REFERENCE_NOT_PLACEABLE`, y un texto con `{page}` o `{pages}` que cae en una página sin número (un
+     `Fixed` del documento en una portada) es `PAGE_NUMBER_UNAVAILABLE`, con la línea del texto: nada de dejarlo
+     en blanco. Los marcadores y los enlaces siguen la página física; las `PageLabels` del PDF llevan la
+     numeración impresa. *Alternativa:* dejar el hueco vacío.
+
+271. **Una `Section` admite `Id`, `Class`, `Media`, `Page numbering`, `Inherit fixed` y su contenido.** Las reglas
+     `For class` y `For id` que le llegan solo pueden dar `Typography`, que hereda su contenido (un anexo con otro
+     `Language`), como `Element: Document` pero por sección; con `Box` o `Break` es `STYLE_NOT_ALLOWED`. Sin
+     `Background` de página ni `Start`. *Dónde:* `tree/StyleRules`.
+
+272. **Una sección sin contenido en flujo es `SECTION_EMPTY`** (línea de la sección): no tiene ninguna página, y
+     una página en blanco que nadie escribió es un valor por defecto silencioso. *Alternativa:* una página en
+     blanco.
+
+273. **Una sección no se vuelca como caja** (§7) aunque tenga `Id`: es la página, no una caja; se vuelcan sus
+     cajas con `Id` con las coordenadas de la página de su sección. Su `Id` sí es un destino de `Link` y de
+     `{page of: id}` (la primera página de la sección). *Alternativa:* volcar el rango de páginas.
+
+274. **El documento sigue siendo uno** para la jerarquía de encabezados, `Contents` y `Styles`: se comprueban en
+     el orden del documento, atravesando las secciones (un `Heading 1` en cada sección es correcto). Cada
+     sección es la raíz de su layout (una `Box` sin padre, como la raíz anónima de antes) y cuelga de la raíz del
+     documento, que ya no se maqueta. *Dónde:* `tree/BoxTreeBuilder`, `layout/Paginator`.
