@@ -119,13 +119,13 @@ final class ContentsBuilder {
         // Sin guía, el título llena el hueco y deja el número a la derecha.
         Box title = generated(ctx, entry, Element.CONTENTS_TITLE, Layout.INLINE, heading.line());
         title.setText(heading.headingText(), line, false);
-        title.style().itemGrow = leader ? 0 : 1;
+        title.style().item().setGrow(leader ? 0 : 1);
         entry.addChild(title);
 
         if (leader) {
             Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Layout.BLOCK, heading.line());
             guide.style().contentsLeader = contents.style().contentsLeader;
-            guide.style().itemGrow = 1;
+            guide.style().item().setGrow(1);
             guide.style().height = Value.pt(es.usedLineHeight());
             guide.style().margin = new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP));
             entry.addChild(guide);
@@ -133,7 +133,7 @@ final class ContentsBuilder {
 
         Box page = generated(ctx, entry, Element.CONTENTS_PAGE, Layout.INLINE, heading.line());
         page.setText("{page of: " + heading.key() + "}", line, false);
-        page.style().itemShrink = 0;
+        page.style().item().setShrink(0);
         entry.addChild(page);
         return entry;
     }

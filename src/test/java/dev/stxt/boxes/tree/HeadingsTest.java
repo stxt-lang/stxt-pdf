@@ -85,6 +85,6 @@ class HeadingsTest {
     void headingsCanBeItems() {
         Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tHeading 1:", "\t\t\t\tText: A").children().get(0);
         assertEquals(Element.HEADING_1, flex.children().get(0).element());
-        assertEquals(1, flex.children().get(0).style().itemGrow, 1e-9);
+        assertEquals(1, flex.children().get(0).style().item().grow(), 1e-9);
     }
 }

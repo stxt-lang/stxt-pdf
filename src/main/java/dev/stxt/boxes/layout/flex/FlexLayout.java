@@ -316,7 +316,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             } else {
                 min = is.minWidth().resolve(contentWidth).orElse(0) + margins;
             }
-            it.flex = new FlexItem(base, is.itemGrow(), is.itemShrink(), min, max);
+            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max);
             return it;
         }
 
@@ -356,17 +356,17 @@ public final class FlexLayout implements LayoutAlgorithm {
             }
             double max = is.maxHeight() == null ? Double.POSITIVE_INFINITY
                     : is.maxHeight().resolve(contentHeight).orElse(Double.POSITIVE_INFINITY) + margins;
-            it.flex = new FlexItem(base, is.itemGrow(), is.itemShrink(), min, max);
+            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max);
             return it;
         }
 
         /** {@code Basis} en caja de borde; vacío si es {@code auto} o un porcentaje de un tamaño indefinido. */
         OptionalDouble declaredBasis(Style is) {
-            return is.itemBasis().resolve(mainSize);
+            return is.item().basis().resolve(mainSize);
         }
 
         Alignment alignment(Style is) {
-            return is.itemCrossAxis() != null ? is.itemCrossAxis() : s.flex().crossAxis();
+            return is.item().crossAxis() != null ? is.item().crossAxis() : s.flex().crossAxis();
         }
 
         // --- Pasos 4 a 7 ----------------------------------------------------------------------------

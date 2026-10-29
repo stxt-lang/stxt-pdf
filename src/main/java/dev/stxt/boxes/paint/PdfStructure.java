@@ -240,7 +240,7 @@ final class PdfStructure {
         PDStructureElement row = null;
         int rowIndex = -1;
         for (Box cell : table.children()) {
-            Cell p = cell.style().itemArea();
+            Cell p = cell.style().item().area();
             int group = group(cell);
             if (groups[group] == null) {
                 groups[group] = new PDStructureElement(TABLE_GROUPS[group], e);
@@ -294,11 +294,11 @@ final class PdfStructure {
     private static int group(Box cell) {
         Box table = cell.parent();
         // Fila desde 0 de la celda en el grid de la tabla; la colocación la da TableBuilder.
-        int row = cell.style().itemArea().row() - 1;
+        int row = cell.style().item().area().row() - 1;
         if (row < table.headRows()) {
             return 0;
         }
-        int rows = table.children().stream().mapToInt(c -> c.style().itemArea().row() - 1 + c.style().itemArea().rows())
+        int rows = table.children().stream().mapToInt(c -> c.style().item().area().row() - 1 + c.style().item().area().rows())
                 .max().orElse(0);
         return row >= rows - table.footRows() ? 2 : 1;
     }

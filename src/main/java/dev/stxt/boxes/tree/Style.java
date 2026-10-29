@@ -128,22 +128,6 @@ public final class Style {
      */
     Locale locale = Locale.ROOT;
 
-    // --- Item (como hijo de flex o grid) -----------------------------------------------------
-    double itemGrow = 0;
-    double itemShrink = 1;
-    Value itemBasis = Value.AUTO;
-    /** {@code null} = la del contenedor. */
-    Alignment itemCrossAxis;
-    /**
-     * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
-     * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
-     */
-    Cell itemArea = Cell.AUTO;
-    /** {@code null} = la del contenedor. */
-    Alignment itemHorizontal;
-    /** {@code null} = la del contenedor. */
-    Alignment itemVertical;
-
     // --- Lista ---------------------------------------------------------------------------------
     /** Marcador de los ítems de una {@code List}; {@code null} en el resto de cajas. */
     Marker listMarker;
@@ -203,9 +187,15 @@ public final class Style {
 
     private final GridStyle grid = new GridStyle();
 
+    private final ItemStyle item = new ItemStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
+    public ItemStyle item() {
+        return item;
+    }
+
     public GridStyle grid() {
         return grid;
     }
@@ -365,35 +355,6 @@ public final class Style {
 
     public Locale locale() {
         return locale;
-    }
-
-    // --- Item (como hijo de flex o grid) ---------------------------------------------------------
-    public double itemGrow() {
-        return itemGrow;
-    }
-
-    public double itemShrink() {
-        return itemShrink;
-    }
-
-    public Value itemBasis() {
-        return itemBasis;
-    }
-
-    public Alignment itemCrossAxis() {
-        return itemCrossAxis;
-    }
-
-    public Cell itemArea() {
-        return itemArea;
-    }
-
-    public Alignment itemHorizontal() {
-        return itemHorizontal;
-    }
-
-    public Alignment itemVertical() {
-        return itemVertical;
     }
 
     // --- Lista -----------------------------------------------------------------------------------
@@ -592,6 +553,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        item.close();
         grid.close();
         flex.close();
     }

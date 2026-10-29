@@ -86,7 +86,7 @@ class StylesTest {
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tBlock:", "\t\t\t\tClass: card")
                 .children().get(0).children().get(0);
         assertEquals(new Paint.Solid("#F1EFE8"), block.style().background);
-        assertEquals(1, block.style().itemGrow, 1e-9);
+        assertEquals(1, block.style().item().grow(), 1e-9);
     }
 
     @Test

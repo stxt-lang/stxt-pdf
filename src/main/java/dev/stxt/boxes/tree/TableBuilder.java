@@ -111,7 +111,7 @@ final class TableBuilder {
                 Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, columns.alignLine(),
                         child(row, "class").orElse(null)));
                 box.style().declared(ITEM_AREA, cell.getLine());
-                box.style().itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
+                box.style().item().setArea(new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns()));
                 table.addChild(box);
                 c += span.columns();
             }

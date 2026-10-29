@@ -276,7 +276,7 @@ final class PropertyReader {
     static void item(InlineNode w, Style s, GridAreas areas) {
         if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
             s.declared(PropertyKey.ITEM_AREA, w.getLine());
-            s.itemArea = placement(w, () -> Cell.parse(w.getText(), areas));
+            s.item().setArea(placement(w, () -> Cell.parse(w.getText(), areas)));
         }
         for (Node p : w.getChildren()) {
             String name = p.getCanonicalName();
@@ -290,12 +290,12 @@ final class PropertyReader {
             }
             s.declared(PropertyKey.item(name), p.getLine());
             switch (name) {
-                case "grow" -> s.itemGrow = nonNegative(p);
-                case "shrink" -> s.itemShrink = nonNegative(p);
-                case "basis" -> s.itemBasis = value(p, LENGTH_OR_AUTO, false);
-                case "cross-axis" -> s.itemCrossAxis = enumValue(Alignment.class, p);
-                case "horizontal" -> s.itemHorizontal = enumValue(Alignment.class, p);
-                case "vertical" -> s.itemVertical = enumValue(Alignment.class, p);
+                case "grow" -> s.item().setGrow(nonNegative(p));
+                case "shrink" -> s.item().setShrink(nonNegative(p));
+                case "basis" -> s.item().setBasis(value(p, LENGTH_OR_AUTO, false));
+                case "cross-axis" -> s.item().setCrossAxis(enumValue(Alignment.class, p));
+                case "horizontal" -> s.item().setHorizontal(enumValue(Alignment.class, p));
+                case "vertical" -> s.item().setVertical(enumValue(Alignment.class, p));
                 default -> throw unread(p);
             }
         }

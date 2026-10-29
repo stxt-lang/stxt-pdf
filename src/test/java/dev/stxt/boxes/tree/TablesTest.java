@@ -26,7 +26,7 @@ class TablesTest {
 
     /** Colocación de cada celda como {@code fila columna filas columnas}. */
     private static List<String> areas(Box table) {
-        return table.children().stream().map(c -> c.style().itemArea)
+        return table.children().stream().map(c -> c.style().item().area())
                 .map(a -> a.row() + " " + a.column() + " " + a.rows() + " " + a.columns()).toList();
     }
 

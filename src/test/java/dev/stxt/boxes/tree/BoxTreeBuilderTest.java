@@ -78,13 +78,13 @@ class BoxTreeBuilderTest {
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
         Box a = root.children().get(0).children().get(0);
         assertEquals("a", a.id());
-        assertEquals(2, a.style().itemGrow, 1e-9);
+        assertEquals(2, a.style().item().grow(), 1e-9);
         assertEquals(1, a.style().layer);
         Box b = root.children().get(1).children().get(0);
-        assertEquals(new Cell(1, 2, 1, 1), b.style().itemArea);
-        assertEquals(Alignment.CENTER, b.style().itemVertical);
+        assertEquals(new Cell(1, 2, 1, 1), b.style().item().area());
+        assertEquals(Alignment.CENTER, b.style().item().vertical());
         assertEquals(17, b.style().line("item.area"));
-        assertEquals(Cell.AUTO, root.children().get(1).children().get(1).style().itemArea);
+        assertEquals(Cell.AUTO, root.children().get(1).children().get(1).style().item().area());
     }
 
     @Test

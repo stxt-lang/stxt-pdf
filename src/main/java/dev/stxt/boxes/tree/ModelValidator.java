@@ -271,10 +271,10 @@ final class ModelValidator {
         }
         boolean column = parent.style().flex().direction() == Direction.COLUMN;
         if (flexItem && column && !parentDefinite) {
-            if (hasPercentage(s.itemBasis)) {
+            if (hasPercentage(s.item().basis())) {
                 throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
             }
-            if (s.itemGrow > 0) {
+            if (s.item().grow() > 0) {
                 throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
                         + "column del padre no tiene un alto definido que repartir; declara su Height");
             }
@@ -318,7 +318,7 @@ final class ModelValidator {
         if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
             return true;
         }
-        Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().grid().vertical();
+        Alignment vertical = s.item().vertical() != null ? s.item().vertical() : parent.style().grid().vertical();
         return h.isAuto() && gridItem && vertical == Alignment.STRETCH;
     }
 

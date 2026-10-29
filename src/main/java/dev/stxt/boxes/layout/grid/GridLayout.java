@@ -69,7 +69,7 @@ public final class GridLayout implements LayoutAlgorithm {
         int explicitColumns = Math.max(s.grid().columns().size(), s.grid().areas().columns());
         int explicitRows = Math.max(s.grid().rows().size(), s.grid().areas().rows());
         List<Box> items = box.inFlowChildren();
-        List<Cell> cells = items.stream().map(i -> i.style().itemArea()).toList();
+        List<Cell> cells = items.stream().map(i -> i.style().item().area()).toList();
         Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().flow());
         if (placement instanceof Placement.NoRoom e) {
             throw noRoom(items.get(e.item()), e, s.grid().flow());
@@ -300,11 +300,13 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     private static Alignment horizontal(Box item, Style container) {
-        return item.style().itemHorizontal() != null ? item.style().itemHorizontal() : container.grid().horizontal();
+        Alignment own = item.style().item().horizontal();
+        return own != null ? own : container.grid().horizontal();
     }
 
     private static Alignment vertical(Box item, Style container) {
-        return item.style().itemVertical() != null ? item.style().itemVertical() : container.grid().vertical();
+        Alignment own = item.style().item().vertical();
+        return own != null ? own : container.grid().vertical();
     }
 
     /** Posición de cada pista desde el principio de la caja de contenido. */
