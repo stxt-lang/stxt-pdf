@@ -77,7 +77,7 @@ del `Markdown` o, una vez para todo el documento, en `Element: Document`, y es o
 
 | Markdown | Sale |
 |---|---|
-| `#` … `######` | `Heading 1` … `Heading 6` |
+| `#` … `######` | `Heading 1` … `Heading 6`; con `{#id}` al final (`## Ventas {#ventas}`), lleva ese `Id`, para enlazarlo o citarlo |
 | Un párrafo | `Paragraph` |
 | `-`, `*`, `+` y `1.` | `List`, con viñetas o numerada |
 | Una tabla | `Table`, con la primera fila de cabecera; la alineación de cada columna sale de la fila de separación (`:--`, `--:`). A una fila con menos celdas que la cabecera se le añaden vacías; una con más es un error |
@@ -92,16 +92,17 @@ imágenes dentro de un párrafo, enlaces con título, la etiqueta de lenguaje de
 
 ## Estilo
 
-Lo que genera un `Markdown` no tiene `Id` ni `Class`: se le da estilo con las reglas `Element` de `Styles`
-(`Element: Heading 1`, `Element: Paragraph`, `Element: List`, `Element: Code block`), que valen para todo el documento, y con
-la `Typography` del `Markdown`. Nada tiene estilo por defecto: sin `Element: List` con un `Padding` izquierdo, las listas no
-tienen sitio para el marcador.
+Lo que genera un `Markdown` no tiene `Class`, ni `Id` salvo los encabezados con `{#id}`: se le da estilo con las reglas
+`Element` de `Styles` (`Element: Heading 1`, `Element: Paragraph`, `Element: List`, `Element: Code block`), que valen
+para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo por defecto: sin `Element: List` con un
+`Padding` izquierdo, las listas no tienen sitio para el marcador.
 
 ## Cosas a tener en cuenta
 
 - Los encabezados de un `Markdown` cuentan en los niveles del documento: después de un `Heading 1` escrito en STXT, un
   Markdown puede empezar por `##`. Se numeran y salen en el índice como los demás.
-- Lo generado no tiene `Id`, así que no se puede enlazar ni referir a mano.
+- Lo generado no tiene `Id`, salvo un encabezado que lo escribe al final, `## Ventas {#ventas}`: así se enlaza
+  (`[ver ventas](#ventas)`) o se cita (`{page of: ventas}`, `{number of: ventas}`).
 - Los errores dicen la línea del documento donde empieza el bloque de Markdown que falla.
 - Para negrita o cursiva en un párrafo suelto, no hace falta un `Markdown`: basta `Inline: markdown`
   ([Formato del texto](../comun/formato-del-texto.md)).

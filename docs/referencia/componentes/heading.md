@@ -152,7 +152,8 @@ Paragraph: Los importes del anexo {number of: fees}.
 > descartada:* el número colgado a la izquierda, que alinea los títulos pero obliga a un hueco fijo.
 
 `{number of: id}` da el número completo (`4.2`), no el de su último nivel como el de un `List item`. Los encabezados de un
-`Markdown` se numeran pero no se pueden referir: no llevan `Id`.
+`Markdown` se numeran como los demás, y se pueden referir si llevan `Id`, que se escribe al final de su texto
+(`## Ventas {#ventas}`, [Markdown](markdown.md#encabezados)).
 
 ## Marcadores y accesibilidad
 
@@ -162,4 +163,4 @@ lo anuncia como encabezado de su nivel.
 ## Lo que no hay
 
 - Estilos por defecto de los niveles: se declaran en `Styles`.
-- Número colgado a la izquierda y referir los encabezados de un `Markdown`.
+- Número colgado a la izquierda.

@@ -71,7 +71,7 @@ así:
 
 | Markdown | Elemento |
 |---|---|
-| `#` … `######` (y los subrayados con `===` y `---`) | `Heading 1` … `Heading 6`, con un `Text` |
+| `#` … `######` (y los subrayados con `===` y `---`) | `Heading 1` … `Heading 6`, con un `Text`; con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet` para su nivel; un `List item` por ítem |
 | `1.`, `1)` | `List` con el `Marker` de `Numbering` para su nivel y `Start`, el primer número si no es 1 |
@@ -162,16 +162,25 @@ escapada no separa celdas). Las celdas reciben las reglas de las celdas de cualq
 
 ## Estilo
 
-Lo generado no tiene `Id` ni `Class`: se le da estilo con las reglas `Element` de `Styles` (`Element: Heading 1`,
-`Element: Paragraph`, `Element: Code block`…), que se aplican a todo el documento, y con el `Typography` del `Markdown`, que
-hereda.
+Lo generado no tiene `Class`, ni `Id` salvo los encabezados que lo escriben ([abajo](#encabezados)): se le da estilo con
+las reglas `Element` de `Styles` (`Element: Heading 1`, `Element: Paragraph`, `Element: Code block`…), que se aplican a
+todo el documento, y con el `Typography` del `Markdown`, que hereda.
 
 ## Encabezados
 
 `#` es siempre `Heading 1`, y la jerarquía se comprueba en orden del documento junto con los encabezados escritos fuera del
 `Markdown` ([Encabezados](heading.md#jerarquía)): después de un `Heading 1`, un Markdown puede empezar por `##`. Se numeran
-como los demás y entran en los índices, pero no se pueden referir ni enlazar a mano, porque no tienen `Id`. Dentro de un
-`Fixed`, un Markdown no puede tener encabezados.
+como los demás y entran en los índices. Dentro de un `Fixed`, un Markdown no puede tener encabezados.
+
+Un encabezado lleva `Id` si lo escribe al final de su texto, `{#id}`: `## Ventas {#ventas}` es un `Heading 2` con
+`Id: ventas` y el texto «Ventas». Es su `Id` como si lo hubiera escrito el autor: único en el documento
+(`DUPLICATE_ID`), destino de `Link: #id` y de `[texto](#id)`, y lo refieren `{page of: id}` y, si está numerado,
+`{number of: id}`. No se pinta; vacío o con espacios (`{#mis ventas}`) es `VALUE_NOT_ALLOWED`, con la línea del
+encabezado. Es lo único de lo generado que lleva `Id`.
+
+> **Decisión:** el `Id` de un encabezado se escribe con la sintaxis de Pandoc y kramdown, `{#id}`, que conocen quienes
+> escriben Markdown. *Alternativa descartada:* un `Id` sacado del texto (`ventas-del-año`), que cambia al corregir el
+> título y puede chocar con los del autor.
 
 ## Dónde va
 
@@ -196,4 +205,4 @@ Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tabl
 
 - Citas, HTML, líneas horizontales, saltos de línea forzados, notas al pie, listas de tareas y resaltado de código.
 - Imágenes dentro de un texto y enlaces con título o con definición aparte.
-- `Id` y `Class` en lo generado.
+- `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Class`.

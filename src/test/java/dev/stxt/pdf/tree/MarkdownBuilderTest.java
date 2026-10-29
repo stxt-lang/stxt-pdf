@@ -236,6 +236,32 @@ class MarkdownBuilderTest {
                 () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).errorCode());
     }
 
+    /** {@code {#id}} al final de un encabezado le da su {@code Id} y se quita del texto. */
+    @Test
+    void aHeadingTakesTheIdAtTheEndOfItsText() {
+        MarkdownBuilder.Translation t = translate("# Ventas del año {#ventas}", "", "## **Costes** {#costes}", "",
+                "## Sin id");
+        assertEquals(List.of("Heading 1 @15", "  Id: ventas @15", "  Text: Ventas del año @15"),
+                outline(t.elements().get(0)));
+        InlineNode costes = t.elements().get(1);
+        assertEquals("costes", costes.getChild("id").getText());
+        assertEquals(List.of(new TextRun("Costes", new TextFormat(true, false, false, false))),
+                t.runs().get(costes.getChild("text")));
+        assertEquals(List.of("Heading 2 @19", "  Text: Sin id @19"), outline(t.elements().get(2)));
+    }
+
+    @Test
+    void aHeadingIdWithSpacesOrEmptyIsAnError() {
+        InvalidModelException spaces = assertThrows(InvalidModelException.class,
+                () -> translate("# Ventas {#mis ventas}"));
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, spaces.errorCode());
+        assertEquals(15, spaces.line());
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED,
+                assertThrows(InvalidModelException.class, () -> translate("# Ventas {#}")).errorCode());
+        assertEquals(ErrorCode.TEXT_CONTENT,
+                assertThrows(InvalidModelException.class, () -> translate("# {#solo}")).errorCode());
+    }
+
     private static TextRun link(String text, String format, String destination) {
         return dev.stxt.pdf.tree.TextRuns.link(text, format, destination);
     }

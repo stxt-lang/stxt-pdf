@@ -206,6 +206,21 @@ class HeadingNumbersTest {
         assertEquals("1.1", headings(tree).get(1).number());
     }
 
+    /** Un encabezado de Markdown con {@code {#id}} se puede referir y su {@code Id} es del documento. */
+    @Test
+    void aMarkdownHeadingWithAnIdCanBeReferred() {
+        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+                "\tMarkdown:", "\t\tContent >>", "\t\t\t# Uno", "", "\t\t\t## Ventas {#ventas}",
+                "\tParagraph: Véase la sección {number of: ventas}.");
+        Box ventas = headings(tree).get(1);
+        assertEquals("ventas", ventas.id());
+        assertEquals("1.1", ventas.number());
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("", "",
+                "\tParagraph: Uno", "\t\tId: ventas",
+                "\tMarkdown:", "\t\tContent >>", "\t\t\t# Ventas {#ventas}"));
+        assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
+    }
+
     /** Cada nivel del número se escribe con el {@code Number style} de su encabezado. */
     @Test
     void eachLevelIsWrittenWithTheStyleOfItsHeading() {

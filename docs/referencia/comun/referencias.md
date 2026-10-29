@@ -51,10 +51,11 @@ Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador
 «4.2» de una lista anidada, se escriben los dos, `{number of: clausula}.{number of: apartado}`. También lo tienen los
 encabezados con `Numbered: true`, y su número es el completo (`4.2`: sus niveles unidos por puntos,
 [Encabezados](../componentes/heading.md#numeración-numbered)). Un `List item` de una lista con viñetas o sin marcador, un
-encabezado sin numerar o cualquier otra caja no tiene número (`REFERENCE_NOT_NUMBERED`). No se puede referir a un ítem ni
-a un encabezado escrito en un `Markdown`, porque lo generado no lleva `Id`.
+encabezado sin numerar o cualquier otra caja no tiene número (`REFERENCE_NOT_NUMBERED`). Un encabezado escrito en un
+`Markdown` se puede referir si lleva `{#id}` ([Markdown](../componentes/markdown.md#encabezados)); un ítem de una lista
+de Markdown, no, porque no lleva `Id`.
 
 ## Lo que no hay
 
-- Contadores propios del autor, ni otros formatos de número que los de los marcadores y el decimal de los encabezados.
-- Referir los elementos generados por un `Markdown`.
+- Contadores propios del autor, ni otros formatos de número que los de los marcadores y los de `Number style`.
+- Referir los elementos generados por un `Markdown`, salvo sus encabezados con `{#id}`.

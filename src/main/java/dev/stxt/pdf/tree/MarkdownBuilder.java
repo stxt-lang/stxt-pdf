@@ -49,6 +49,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
@@ -91,6 +93,9 @@ final class MarkdownBuilder {
             .extensions(List.of(StrikethroughExtension.builder().requireTwoTildes(true).build(), InsExtension.create()))
             .includeSourceSpans(IncludeSourceSpans.BLOCKS)
             .build();
+
+    /** El {@code {#id}} al final del texto de un encabezado. */
+    private static final Pattern HEADING_ID = Pattern.compile("\\{#([^{}]*)}\\s*$");
 
     private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, bloques de código, "
             + "imágenes solas en su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, "
@@ -196,6 +201,10 @@ final class MarkdownBuilder {
                             + "ítem de lista, como en un List item");
                 }
                 InlineNode heading = node("Heading " + h.getLevel(), "", line);
+                String id = headingId(h, line);
+                if (id != null) {
+                    heading.addChild(node("Id", id, line));
+                }
                 heading.addChild(text("Text", h, line, "Un encabezado de Markdown necesita texto"));
                 return heading;
             }
@@ -386,6 +395,33 @@ final class MarkdownBuilder {
         }
 
         /** Un {@code Text} o un {@code Paragraph} con el texto de un bloque y sus tramos. */
+        /**
+         * El {@code Id} de un encabezado, escrito al final de su texto como {@code {#id}}
+         * (referencia/componentes/markdown.md), que se quita del texto; {@code null} si no lo lleva. Un {@code {#…}}
+         * vacío o con espacios es un error.
+         */
+        private String headingId(Heading h, int line) {
+            if (!(h.getLastChild() instanceof Text last)) {
+                return null;
+            }
+            Matcher m = HEADING_ID.matcher(last.getLiteral());
+            if (!m.find()) {
+                return null;
+            }
+            String id = m.group(1);
+            if (id.isEmpty() || !id.equals(id.strip()) || id.chars().anyMatch(Character::isWhitespace)) {
+                throw error(line, ErrorCode.VALUE_NOT_ALLOWED, "El Id de un encabezado de Markdown, {#" + id + "}, "
+                        + "necesita un nombre sin espacios: ## Ventas {#ventas}");
+            }
+            String rest = last.getLiteral().substring(0, m.start()).stripTrailing();
+            if (rest.isEmpty()) {
+                last.unlink();
+            } else {
+                last.setLiteral(rest);
+            }
+            return id;
+        }
+
         private InlineNode text(String name, org.commonmark.node.Node block, int line, String empty) {
             List<TextRun> text = inline(block, line);
             String value = TextRun.text(text);

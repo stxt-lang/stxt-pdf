@@ -30,7 +30,7 @@ sin servidor, con otro esquema (`javascript:`, `file:`, `tel:`…) o una ruta re
 `#id` lleva a la página y a la esquina superior izquierda de la caja con ese `Id` (de su primer trozo, si está partida),
 que puede estar antes o después del enlace. Es `LINK_UNKNOWN`, con la línea del `Link`, si no existe o si está en un
 `Fixed`, que se repite en todas las páginas y no tiene un único sitio. Una `Section` con `Id` lleva a su primera página. Un
-encabezado de un `Markdown` no tiene `Id`: lo enlaza el índice que lo lista ([Contents](../componentes/contents.md)).
+encabezado de un `Markdown` es un destino si lleva `{#id}` ([Markdown](../componentes/markdown.md#encabezados)).
 
 ## Dónde se admite `Link`
 
@@ -71,5 +71,4 @@ texto, el destino. Los enlaces se recorren con el tabulador en el orden de lectu
 - Enlaces con título, definiciones de enlaces aparte (`[x][ref]`) e imágenes dentro de un enlace de Markdown: una imagen
   clicable es una `Image` con `Link`.
 - Un texto propio para el enlace distinto de lo que enlaza.
-- Enlazar a mano un encabezado de un `Markdown`, que no tiene `Id`.
 - El enlace de un `Fixed` se anuncia al final del documento, no en su sitio de lectura.
