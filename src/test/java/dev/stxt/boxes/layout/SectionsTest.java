@@ -257,4 +257,46 @@ class SectionsTest {
                 "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", "\t\tContents:", "\t\t\tId: toc");
         assertEquals(2, d.pages().size());
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+
+    /** Una portada sin números no es un error si su contenido no escribe {page}: solo lo es lo que lo escribe. */
+    @Test
+    void anUnnumberedPageWithoutPageNumbersIsFine() {
+        LaidOutDocument d = lay("\tSection:", "\t\tPage numbering: none", "\t\tText: Portada",
+                "\tSection:", "\t\tText: Página {page}");
+        assertEquals(2, d.pages().size());
+    }
+
+    @Test
+    void theMessageNamesTheTextWithPageNumbers() {
+        InvalidModelException named = assertThrows(InvalidModelException.class, () -> lay(
+                "\tSection:", "\t\tPage numbering: none", "\t\tText: Hay {pages}", "\t\t\tId: t"));
+        assertEquals(ErrorCode.PAGE_NUMBER_UNAVAILABLE, named.errorCode());
+        assertTrue(named.getMessage().contains("El texto de la caja t tiene {page}"), named.getMessage());
+        InvalidModelException anonymous = assertThrows(InvalidModelException.class, () -> lay(
+                "\tSection:", "\t\tPage numbering: none", "\t\tText: Hay {pages}"));
+        assertTrue(anonymous.getMessage().contains("El texto de la caja (sin Id) tiene"), anonymous.getMessage());
+    }
+
+    /** {@code {number of}} no necesita página: puede nombrar una caja de una sección sin números. */
+    @Test
+    void numberReferencesDoNotNeedAPage() {
+        LaidOutDocument d = lay("\tSection:", "\t\tPage numbering: none", "\t\tList:", "\t\t\tMarker: decimal",
+                "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20", "\t\t\tList item:", "\t\t\t\tId: n", "\t\t\t\tText: uno",
+                "\tSection:", "\t\tText: Ver el punto {number of: n}");
+        assertEquals(2, d.pages().size());
+    }
+
+    /** El error señala la referencia a la caja sin página, no la primera del documento. */
+    @Test
+    void theErrorPointsToTheReferenceOfTheUnplaceableBox() {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> lay(
+                "\tSection:", "\t\tPage numbering: none", "\t\tText: Portada", "\t\t\tId: portada",
+                "\tSection:", "\t\tText: a", "\t\t\tId: other", "\t\tText: Ver {page of: other}",
+                "\t\tText: Ver {page of: portada}"));
+        assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.errorCode());
+        // Cabecera de 12 líneas: la referencia a la portada es la 9.ª del cuerpo.
+        assertEquals(21, e.line());
+    }
 }

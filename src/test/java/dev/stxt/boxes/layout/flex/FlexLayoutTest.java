@@ -302,7 +302,7 @@ class FlexLayoutTest {
     // tamaños intrínsecos con más de dos ítems y márgenes en los ítems.
 
     private static String block(String id, String... box) {
-        StringBuilder sb = new StringBuilder("\t\t\tBlock:\n\t\t\t\tId: " + id + "\n\t\t\t\tBox:");
+        StringBuilder sb = new StringBuilder("\t\t\tBlock:\n\t\t\t\tId: " + id + (box.length > 0 ? "\n\t\t\t\tBox:" : ""));
         for (String b : box) {
             sb.append("\n\t\t\t\t\t").append(b);
         }
@@ -405,5 +405,111 @@ class FlexLayoutTest {
                 "\t\tItem:", block("C", "Height: 10", "Margin: 5"));
         assertRect(45, 45, 50, 20, l.rect("A"));
         assertRect(45, 75, 505, 10, l.rect("C"));
+    }
+
+    @Test
+    void threeLinesWithLinesBetween() {
+        // Tres líneas de 20 con huecos de 10 en 100: sobran 20, 10 entre cada dos líneas.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLines: between",
+                "\t\tItem:", block("A", "Width: 300", "Height: 20"),
+                "\t\tItem:", block("B", "Width: 300", "Height: 20"),
+                "\t\tItem:", block("C", "Width: 300", "Height: 20"));
+        assertRect(40, 40, 300, 20, l.rect("A"));
+        assertRect(40, 80, 300, 20, l.rect("B"));
+        assertRect(40, 120, 300, 20, l.rect("C"));
+    }
+
+    @Test
+    void wrapCountsTheGapsExactly() {
+        // 200 + 10 + 200 + 10 + 95 = 515: una línea. Con 110, el tercero pasa a otra.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\t\tItem:", block("A", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("B", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("C", "Width: 95", "Height: 20"),
+                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\t\tItem:", block("D", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("E", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("G", "Width: 110", "Height: 20"));
+        assertRect(460, 40, 95, 20, l.rect("C"));
+        assertRect(40, 90, 110, 20, l.rect("G"));
+    }
+
+    @Test
+    void automaticMinimumCountsBorderAndPadding() {
+        // La palabra de A mide 300, más 2 + 2 de borde y 10 + 10 de relleno: no baja de 324.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\t\t\t\t\tBorder: 2", "\t\t\t\t\tPadding: 0 10",
+                "\t\tItem:", "\t\t\tBasis: 500", block("B", "Height: 10"));
+        assertEquals(324, l.rect("A").width(), 1e-9);
+        assertRect(364, 40, 191, 10, l.rect("B"));
+    }
+
+    @Test
+    void maxWidthCountsTheMargins() {
+        // Crecerían 147.5 cada uno, pero A no pasa de 150 (170 con márgenes): B se queda con 345.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("A", "Max width: 150", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
+        assertRect(50, 40, 150, 10, l.rect("A"));
+        assertRect(210, 40, 345, 10, l.rect("B"));
+    }
+
+    @Test
+    void columnLimitsCountTheMargins() {
+        // Columnas de 100. Max height 30 (40 con márgenes): B se queda con 60. Min height 70 (80): D, con 20.
+        // Mínimo automático: el texto de E, en cuatro líneas, mide 48 (58 con márgenes): F, con 42.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("A", "Max height: 30", "Margin: 5 0"),
+                "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("B"),
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\t\tItem:", "\t\t\tBasis: 80", block("C", "Min height: 70", "Margin: 5 0"),
+                "\t\tItem:", "\t\t\tBasis: 80", block("D"),
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\t\tItem:", "\t\t\tBasis: 80", "\t\t\tText: aa aa aa aa", "\t\t\t\tId: E", "\t\t\t\tBox:",
+                "\t\t\t\t\tWidth: 10", "\t\t\t\t\tMargin: 5 0",
+                "\t\tItem:", "\t\t\tBasis: 80", block("F"));
+        assertRect(40, 45, 515, 30, l.rect("A"));
+        assertRect(40, 80, 515, 60, l.rect("B"));
+        assertRect(40, 145, 515, 70, l.rect("C"));
+        assertRect(40, 220, 515, 20, l.rect("D"));
+        assertRect(40, 245, 10, 48, l.rect("E"));
+        assertRect(40, 298, 515, 42, l.rect("F"));
+    }
+
+    @Test
+    void columnItemsThatDoNotStretchFitTheirContentInsideTheirMargins() {
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tDirection: column",
+                "\t\tItem:", "\t\t\tCross axis: start", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\t\t\t\t\tMargin: 0 10");
+        assertRect(50, 40, 15, 12, l.rect("A"));
+    }
+
+    @Test
+    void columnLinesMeasureTheirItemsWithMargins() {
+        // Columna con Wrap en 60 de alto: A (50 de ancho y 5 de margen a cada lado) y B, en otra línea. La primera
+        // línea mide 60, así que B empieza en 40 + 60.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: column", "\t\tWrap: true", "\t\tLines: start",
+                "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
+                "\t\tItem:", block("B", "Width: 80", "Height: 40"));
+        assertRect(45, 40, 50, 40, l.rect("A"));
+        assertRect(100, 40, 80, 40, l.rect("B"));
+    }
+
+    @Test
+    void stretchingWithDifferentMarginsInEachAxis() {
+        // La línea mide 40 (B). A tiene 10 de margen arriba y abajo y 5 a los lados: se estira a 40 − 20.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", block("A", "Width: 50", "Padding: 5 0", "Margin: 10 5"),
+                "\t\tItem:", block("B", "Width: 50", "Height: 40"));
+        assertRect(45, 50, 50, 20, l.rect("A"));
     }
 }

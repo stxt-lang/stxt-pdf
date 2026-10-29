@@ -127,12 +127,16 @@ class PageReferencesTest {
         };
         StringBuilder doc = new StringBuilder("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
                 + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
-        for (int i = 0; i < 6; i++) {
+        // El primer bloque es un texto con {number of: n}: el culpable es la referencia de página que cambia, no la
+        // primera referencia del documento (QA-08, mutación). Mide y ocupa lo mismo que los demás.
+        doc.append("\tText: Punto {number of: n}\n\t\tBox:\n\t\t\tHeight: 100\n");
+        for (int i = 1; i < 6; i++) {
             doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 100\n");
         }
         doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 76\n")
                 .append("\tText: Ver página {page of: x}\n\t\tBox:\n\t\t\tWidth: 62\n")
-                .append("\tBlock:\n\t\tId: x\n\t\tBox:\n\t\t\tHeight: 10\n");
+                .append("\tBlock:\n\t\tId: x\n\t\tBox:\n\t\t\tHeight: 10\n")
+                .append("\tList:\n\t\tMarker: decimal\n\t\tBox:\n\t\t\tPadding: 0 0 0 20\n\t\tList item:\n\t\t\tId: n\n\t\t\tText: uno\n");
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(Docs.sectioned(doc.toString()))));
         assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.errorCode());

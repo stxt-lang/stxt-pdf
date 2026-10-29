@@ -118,4 +118,19 @@ class FlexFragmentationTest {
         assertFalse(l.has(1, "F"));
         assertRect(40, 40, 515, 40, l.rect(2, "F"));
     }
+
+    /**
+     * Una columna con Wrap se corta entera (es una sola unidad). Tras X (50), F (Height: 60, líneas de 40) cabe
+     * con sus ítems en la página 1 y su alto sigue en la 2.
+     */
+    @Test
+    void aWrappedColumnIsASingleUnit() {
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tBlock:", "\t\tBox:", "\t\t\tHeight: 50"},
+                new String[]{"\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: column",
+                        "\t\tWrap: true", "\t\tLines: start"},
+                item("A", "Width: 50"), item("B", "Width: 50")));
+        assertRect(40, 90, 50, 40, l.rect(1, "A"));
+        assertRect(90, 90, 50, 40, l.rect(1, "B"));
+    }
 }

@@ -84,6 +84,17 @@ class LimitsTest {
         assertTrue(e.getMessage().contains("más de 2 páginas"), e.getMessage());
     }
 
+    /** El límite cuenta las páginas de todas las secciones: dos de 2 páginas son 4. */
+    @Test
+    void thePageLimitCountsEverySection() throws IOException {
+        InlineNode twoSections = document("\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300",
+                "\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300");
+        convert(converter(Limits.DEFAULT.withMaxPages(4)), twoSections);
+        StxtPdfException e = assertThrows(StxtPdfException.class,
+                () -> convert(converter(Limits.DEFAULT.withMaxPages(3)), twoSections));
+        assertEquals("PAGE_LIMIT", e.code());
+    }
+
     @Test
     void theDefaultPageLimitIsTwoThousand() {
         // 2001 páginas de 200 pt de alto: se rechaza antes de pintar nada.

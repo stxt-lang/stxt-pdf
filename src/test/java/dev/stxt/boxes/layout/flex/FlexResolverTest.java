@@ -53,4 +53,24 @@ class FlexResolverTest {
         double[] r = FlexResolver.resolve(List.of(FlexItem.of(100, 0.5, 1, 0)), 300);
         assertArrayEquals(new double[]{200}, r, 1e-9);
     }
+
+    /** Al crecer, A llega a su máximo (150): se congela y B y C se reparten el resto (175 cada uno). */
+    @Test
+    void anItemAtItsMaximumLeavesTheRestToTheOthers() {
+        double[] r = FlexResolver.resolve(List.of(
+                new FlexItem(100, 1, 1, 0, 150, 0),
+                FlexItem.of(100, 1, 1, 0),
+                FlexItem.of(100, 1, 1, 0)), 500);
+        assertArrayEquals(new double[]{150, 175, 175}, r, 1e-9);
+    }
+
+    /** Al encoger, A no baja de su mínimo (250): B y C ceden el resto (175 cada uno). */
+    @Test
+    void anItemAtItsMinimumLeavesTheRestToTheOthers() {
+        double[] r = FlexResolver.resolve(List.of(
+                FlexItem.of(300, 0, 1, 250),
+                FlexItem.of(300, 0, 1, 0),
+                FlexItem.of(300, 0, 1, 0)), 600);
+        assertArrayEquals(new double[]{250, 175, 175}, r, 1e-9);
+    }
 }
