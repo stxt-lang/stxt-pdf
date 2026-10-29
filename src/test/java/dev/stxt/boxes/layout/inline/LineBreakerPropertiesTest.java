@@ -172,4 +172,69 @@ class LineBreakerPropertiesTest {
                     available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
         }
     }
+
+    /** Las palabras de antes de PF-06, con {@code \\S+}: la referencia de {@link #theWordsAreTheSameAsWithTheRegex}. */
+    private static List<List<LineBreaker.Word>> paragraphsWithTheRegex(List<TextRun> runs) {
+        String text = TextRun.text(runs);
+        int[] starts = new int[runs.size() + 1];
+        for (int i = 0; i < runs.size(); i++) {
+            starts[i + 1] = starts[i] + runs.get(i).text().length();
+        }
+        LineBreaker.RunCursor cursor = new LineBreaker.RunCursor(runs, starts);
+        List<List<LineBreaker.Word>> result = new ArrayList<>();
+        List<LineBreaker.Word> paragraph = new ArrayList<>();
+        List<TextRun> previous = null;
+        int previousEnd = 0;
+        Matcher m = WORD.matcher(text);
+        while (m.find()) {
+            if (previous != null) {
+                String gap = text.substring(previousEnd, m.start());
+                boolean blankLine = gap.indexOf('\n') != gap.lastIndexOf('\n');
+                paragraph.add(new LineBreaker.Word(previous, blankLine ? TextFormat.PLAIN : cursor.format(previousEnd)));
+                if (blankLine) {
+                    result.add(paragraph);
+                    paragraph = new ArrayList<>();
+                }
+            }
+            TextRun.Joiner parts = new TextRun.Joiner();
+            for (int i = m.start(); i < m.end(); ) {
+                TextFormat f = cursor.format(i);
+                int run = 0;
+                while (starts[run + 1] <= i) {
+                    run++;
+                }
+                int stop = Math.min(m.end(), starts[run + 1]);
+                parts.add(text.substring(i, stop), f);
+                i = stop;
+            }
+            previous = parts.build();
+            previousEnd = m.end();
+        }
+        if (previous != null) {
+            paragraph.add(new LineBreaker.Word(previous, TextFormat.PLAIN));
+            result.add(paragraph);
+        }
+        return result;
+    }
+
+    /**
+     * Las palabras y los párrafos se sacan recorriendo el texto (PF-06) y son los mismos que con la expresión regular
+     * de antes: con todos los espacios en blanco de {@code \\s}, otros que no lo son ({@code U+00A0}) y cambios de
+     * formato dentro de las palabras y de los huecos.
+     */
+    @Test
+    void theWordsAreTheSameAsWithTheRegex() {
+        String[] pieces = {"a", "bc", "fi", "é", "\u00A0", "\uD83D\uDE00", " ", "  ", "\t", "\n", "\n\n", " \n \n", "\u000B",
+                "\f", "\r", "\r\n"};
+        Random random = new Random(20261031);
+        for (int i = 0; i < 20000; i++) {
+            TextRun.Joiner runs = new TextRun.Joiner();
+            int count = 1 + random.nextInt(30);
+            for (int k = 0; k < count; k++) {
+                runs.add(pieces[random.nextInt(pieces.length)], FORMATS[random.nextInt(FORMATS.length)]);
+            }
+            List<TextRun> text = runs.build();
+            assertEquals(paragraphsWithTheRegex(text), LineBreaker.paragraphs(text), text.toString());
+        }
+    }
 }

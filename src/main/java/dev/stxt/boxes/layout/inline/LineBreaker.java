@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
@@ -47,7 +45,6 @@ public final class LineBreaker {
     private static final double MAX_BADNESS = 10_000;
     /** Cuánto se puede estirar cada espacio, en proporción a su ancho (el de TeX). */
     private static final double STRETCH = 0.5;
-    private static final Pattern WORD = Pattern.compile("\\S+");
 
     /**
      * Una palabra: sus partes, con los tramos seguidos del mismo formato unidos, y el formato
@@ -354,7 +351,10 @@ public final class LineBreaker {
                 + letterSpacing * text.codePointCount(0, text.length());
     }
 
-    /** Las palabras de cada párrafo del texto (ver la descripción de la clase). */
+    /**
+     * Las palabras de cada párrafo del texto (ver la descripción de la clase): lo que hay entre los espacios en blanco
+     * ({@link #isSpace}, el {@code \s} de las expresiones regulares), con un recorrido del texto (PF-06).
+     */
     static List<List<Word>> paragraphs(List<TextRun> runs) {
         String text = TextRun.text(runs);
         // starts[i]: posición en el texto donde empieza el tramo i.
@@ -367,26 +367,45 @@ public final class LineBreaker {
         List<Word> paragraph = new ArrayList<>();
         List<TextRun> previous = null;
         int previousEnd = 0;
-        Matcher m = WORD.matcher(text);
-        while (m.find()) {
+        int n = text.length();
+        int i = 0;
+        while (true) {
+            int newlines = 0;
+            while (i < n && isSpace(text.charAt(i))) {
+                if (text.charAt(i) == '\n') {
+                    newlines++;
+                }
+                i++;
+            }
+            if (i == n) {
+                break;
+            }
+            int start = i;
+            while (i < n && !isSpace(text.charAt(i))) {
+                i++;
+            }
             if (previous != null) {
-                String gap = text.substring(previousEnd, m.start());
                 // Una línea en blanco: dos saltos de línea con solo espacio en blanco entre ellos.
-                boolean blankLine = gap.indexOf('\n') != gap.lastIndexOf('\n');
+                boolean blankLine = newlines > 1;
                 paragraph.add(new Word(previous, blankLine ? TextFormat.PLAIN : cursor.format(previousEnd)));
                 if (blankLine) {
                     result.add(paragraph);
                     paragraph = new ArrayList<>();
                 }
             }
-            previous = cursor.parts(text, m.start(), m.end());
-            previousEnd = m.end();
+            previous = cursor.parts(text, start, i);
+            previousEnd = i;
         }
         if (previous != null) {
             paragraph.add(new Word(previous, TextFormat.PLAIN));
             result.add(paragraph);
         }
         return result;
+    }
+
+    /** Los espacios en blanco que separan palabras: los de {@code \s} ({@code [ \t\n\x0B\f\r]}). */
+    private static boolean isSpace(char c) {
+        return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r';
     }
 
     /** Recorre los tramos hacia delante: las posiciones que se le piden nunca retroceden. */
@@ -410,6 +429,11 @@ public final class LineBreaker {
 
         /** Las partes del texto entre {@code start} y {@code end}, cada una con su formato. */
         List<TextRun> parts(String text, int start, int end) {
+            TextFormat first = format(start);
+            if (end <= starts[run + 1]) {
+                // Todo en un tramo, que es lo normal: sin unir nada.
+                return List.of(new TextRun(text.substring(start, end), first));
+            }
             TextRun.Joiner parts = new TextRun.Joiner();
             for (int i = start; i < end; ) {
                 TextFormat f = format(i);
