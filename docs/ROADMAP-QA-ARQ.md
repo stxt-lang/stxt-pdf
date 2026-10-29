@@ -424,6 +424,39 @@ desborda o lo que el estirado vuelve a calcular), dos `return` sin cobertura que
 se olvidan al cambiar una referencia (los dos solo cambian el trabajo, no el resultado), y el mensaje de «sin progreso»,
 que no se alcanza.
 
+**Después: Grid y el resto.** Del 89,2 % al **91,8 %** de mutantes detectados (fuerza 92,6 %; 176 sin detectar de
+2138). Por package, desde la segunda pasada:
+
+| Package | Mutantes | Tras la 2.ª pasada | Ahora |
+|---|---|---|---|
+| `fragment` | 134 | 87 % | 90 % |
+| `layout` | 633 | 83 % | 91 % |
+| `layout.block` | 116 | 83 % | 85 % |
+| `layout.flex` | 251 | 84 % | 92 % |
+| `layout.grid` | 365 | 90 % | 94 % |
+| `layout.image` | 29 | 76 % | 93 % |
+| `layout.inline` | 356 | 88 % | 89 % |
+| `layout.multicol` | 92 | 74 % | 96 % |
+| `layout.position` | 138 | 92 % | 99 % |
+| `layout.table` | 24 | 83 % | 88 % |
+
+Solo tests, sin cambios en el motor: los mensajes de «no queda hueco» de Grid, `Min height` y `Max height` en porcentaje
+de un ítem sin estirar, `minmax` con máximo fijo, fracciones sin ancho y huecos al cruzar fracciones; `Placement` en los
+bordes; la posición estática con relleno en el containing block y tras un margen, márgenes de un `Absolute` al ajustar y
+al estirar, un `Fixed` dentro de un `Absolute` con borde, márgenes `auto` a un lado; el marcador tras un bloque con
+borde; la caja de contenido con borde y relleno en `Overflow`; el mensaje de cabecera y pie de una tabla; imágenes con
+borde, relleno, `Height` y `Max height`; los megapíxeles del mensaje; tabuladores; el min-content de `pre` y
+`pre-wrap`; la última línea justificada de un párrafo; el `Height` de un texto en dos páginas; una fila alta de grid
+partida desde la página 2; y un motor reutilizado que olvida las cifras reservadas.
+
+Lo que queda, revisado clase a clase: fronteras con la tolerancia o con 0 (≈ 58); cachés y contadores (`LayoutCache`,
+`Engine.release`, qué textos se olvidan), que solo cambian el trabajo; `PdfMetrics.validate`, que solo daría otro
+resultado con una fuente sin llaves o sin cifras (las IBM Plex las tienen); `Slice.cloned` con el contenido sin
+terminar, que solo actúa cuando el alto ya no deja sitio (y entonces el documento desborda); y ramas que no se alcanzan.
+
+**Un fallo encontrado, sin corregir (decisión abierta 5):** al escribir el test de la fila de grid partida apareció que
+una caja con `Height` igual al alto de su contenido desborda si se parte entre páginas.
+
 ### QA-09 · Integración continua · Alta · S
 
 No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
@@ -968,6 +1001,14 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 4. ~~**SVG con texto (QA-02/TS-03)**~~ **Resuelta (sesión 4):** ni lo uno ni lo otro: JSVG sigue dibujando, pero con el
    fichero de `fonts/` que le da el motor (`PlatformSupport.customFont`), sin registro en AWT ni búsqueda por nombre.
 
+5. **Una caja con `Height` que se parte entre páginas (§5.10).** Cada fragmento consume la página entera del alto de la
+   caja, pero sus líneas o sus hijos pueden dejar un hueco al final de cada página (8 líneas de 12 en 100 dejan 4).
+   Así, un `Text` o un `Block` de `Height: 240` con 240 de contenido, en páginas de 100, termina con 40 de caja para 48
+   de contenido: `BOX_OVERFLOW`. Lo mismo un ítem de grid estirado a una fila que se parte. En CSS el contenido se
+   saldría de la caja en el último fragmento; aquí es un error que el autor no puede evitar ajustando el `Height`.
+   Opciones: que cada fragmento consuma solo lo que usa su contenido (el alto propio que sobra va al último), o
+   mantenerlo y documentarlo. Pendiente de decidir con el usuario.
+
 ## Registro de sesiones
 
 | Fecha | Sesión | Qué se hizo | Siguiente paso |
@@ -995,3 +1036,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · QA-08 (5) | Perfil `pit`; dos pasadas (80,7 % → 85,5 % de mutantes detectados, `layout.position` de 56 a 92 %, `layout.grid` de 81 a 90 %). Tests nuevos de `AbsoluteEquation`, `TrackSizing`, flex, grid y posición estática; dos fallos encontrados y corregidos con el usuario: el max-content de un ítem de varias pistas (decisión 323) y el encogimiento flex con márgenes (decisión 324). Ningún golden ni ejemplo cambia; 1428 tests en verde. QA-08 terminada. | Revisión QA y arquitectura terminada; lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: `MulticolLayout` y `Overflow` | `OverflowTest` (el culpable y las medidas de cada mensaje) y tests de Multicol; `Overflow` de 62 a 83 % de mutantes detectados y `MulticolLayout` de 74 a 96 % (total 88,1 %). Un mensaje con «su su» corregido y tres trozos de código sin efecto quitados. 1447 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: `FlexLayout` y `Paginator` | Tests de flex (huecos, márgenes en los límites, columnas con `Wrap`, estirado) y del `Paginator` (portadas, mensajes, `{number of}`, líneas y culpables de los errores, límite de páginas entre secciones, tercera cifra de `{page}`); Flex de 84 a 91 % y `Paginator` de 86 a 91 % (total 89,2 %). Sin cambios en el motor. 1465 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
+| 2026-10-29 | Fuera del plan · PIT: Grid y el resto | Tests de Grid, `TrackSizing`, `Placement`, posicionamiento, listas, imágenes, texto y fragmentación; total 91,8 % de mutantes detectados. Encontrado, sin corregir: una caja con `Height` igual a su contenido desborda al partirse entre páginas (decisión abierta 5). 1492 tests en verde; los 72 PDF y los 54 SVG, iguales. | Decidir la decisión abierta 5 |
