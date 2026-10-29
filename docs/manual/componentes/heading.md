@@ -79,6 +79,25 @@ una regla, en todo el documento o en un encabezado concreto.
 - Un nivel sin número no aporta al número de los de debajo: con el título sin número, los `Heading 2` son `1`, `2`, `3`.
 - El número se escribe delante del texto, con un espacio, y sale también en el índice y en los marcadores.
 - `{number of: id}` escribe el número de un encabezado numerado: «la sección {number of: wiring}» da «la sección 2».
+- `Number style` (también de `Typography`) escribe el número de un nivel en letras o en romanos: `decimal` (por
+  defecto), `lower-alpha`, `upper-alpha`, `lower-roman` o `upper-roman`. Cada nivel usa el suyo: capítulos en romanos y
+  apartados en cifras dan `II.1`.
+- `Number label` cambia lo que va delante del título: `Number label: Anexo {number}.` escribe «Anexo A. Honorarios». El
+  `{number}` es donde va el número, y `{number of: id}` sigue dando solo el número («el anexo A»).
+
+```
+Styles:
+	For class: annex
+		Typography:
+			Numbered: true
+			Number style: upper-alpha
+			Number label: Anexo {number}.
+Heading 1:
+	Text: Anexos
+Heading 2:
+	Class: annex
+	Text: Honorarios        # «Anexo A. Honorarios»
+```
 
 ## Fuera del índice (`In contents`)
 

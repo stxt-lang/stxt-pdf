@@ -17,6 +17,7 @@ import dev.stxt.pdf.model.Inline;
 import dev.stxt.pdf.model.Leader;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextWrap;
@@ -106,6 +107,8 @@ final class PropertyReader {
             entry("white-space", (p, s) -> s.typography().setWhiteSpace(enumValue(WhiteSpace.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
             entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
+            entry("number-style", (p, s) -> s.typography().setNumberStyle(enumValue(NumberStyle.class, p))),
+            entry("number-label", (p, s) -> s.typography().setNumberLabel(numberLabel(p))),
             entry("widows", (p, s) -> s.typography().setWidows(positiveInteger(p))),
             entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
             entry("language", (p, s) -> s.typography().setLocale(Locale.forLanguageTag(language(p)))));
@@ -305,6 +308,17 @@ final class PropertyReader {
                 default -> throw unread(p);
             }
         }
+    }
+
+    /** {@code Number label}: una plantilla con {@code {number}} una sola vez (referencia/componentes/heading.md). */
+    private static String numberLabel(Node p) {
+        String label = p.getText().strip();
+        int at = label.indexOf(HeadingNumbers.NUMBER);
+        if (at < 0 || label.indexOf(HeadingNumbers.NUMBER, at + 1) >= 0) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Number label lleva {number} una vez, donde va el número: "
+                    + "Number label: Anexo {number}.");
+        }
+        return label;
     }
 
     /**

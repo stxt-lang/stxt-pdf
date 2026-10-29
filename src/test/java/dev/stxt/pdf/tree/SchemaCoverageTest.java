@@ -92,6 +92,8 @@ class SchemaCoverageTest {
             Map.entry("White space", "White space: pre-wrap"),
             Map.entry("Tab size", "Tab size: 8"),
             Map.entry("Numbered", "Numbered: true"),
+            Map.entry("Number style", "Number style: upper-roman"),
+            Map.entry("Number label", "Number label: Anexo {number}."),
             Map.entry("Widows", "Widows: 3"),
             Map.entry("Orphans", "Orphans: 3"),
             // Break

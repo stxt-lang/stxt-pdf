@@ -252,7 +252,8 @@ public final class BoxTreeBuilder {
         ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
-            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered());
+            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
+                    s.typography().numberStyle());
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, headingNumber);
             }

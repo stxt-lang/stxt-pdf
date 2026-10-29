@@ -28,6 +28,8 @@ celdas).
 | `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `pre` o `pre-wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md#numeración-numbered)). |
+| `Number style` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-style-number-label)). |
+| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-style-number-label)). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente ([Cortes](cortes.md#elección-del-corte)). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 | `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`…) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |

@@ -34,6 +34,7 @@ Styles:
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | `es`, `en-GB`, `ca`… | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md)) |
+| `Number style`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
 
 El resto (`Inline`, `Transform`, `Small caps`, `Letter spacing`, `Ligatures`, `White space` y `Tab size`) está en
 [Formato del texto](formato-del-texto.md).

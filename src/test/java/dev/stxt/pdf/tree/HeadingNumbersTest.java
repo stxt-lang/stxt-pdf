@@ -205,4 +205,46 @@ class HeadingNumbersTest {
                 "\tText: Véase la sección {number of: ventas}.");
         assertEquals("1.1", headings(tree).get(1).number());
     }
+
+    /** Cada nivel del número se escribe con el {@code Number style} de su encabezado. */
+    @Test
+    void eachLevelIsWrittenWithTheStyleOfItsHeading() {
+        BoxTreeBuilder.Result tree = build(NUMBERED,
+                "\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumber style: upper-roman\n"
+                        + "\t\tElement: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumber style: lower-alpha\n",
+                "\tHeading 1:", "\t\tText: Uno",
+                "\tHeading 1:", "\t\tText: Dos",
+                "\tHeading 2:", "\t\tText: A",
+                "\tHeading 2:", "\t\tText: B",
+                "\tHeading 3:", "\t\tText: C");
+        assertEquals(List.of("I", "II", "II.a", "II.b", "II.b.1"), numbers(tree));
+        assertEquals(List.of("I Uno", "II Dos", "II.a A", "II.b B", "II.b.1 C"), titles(tree));
+    }
+
+    /**
+     * {@code Number label} es lo que va delante del título, con el número en su {@code {number}}; {@code {number of:
+     * id}} sigue siendo el número.
+     */
+    @Test
+    void aLabelGoesInFrontOfTheTitleWithTheNumberInside() {
+        BoxTreeBuilder.Result tree = build("",
+                "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n\t\t\t\tNumber style: upper-alpha\n"
+                        + "\t\t\t\tNumber label: Anexo {number}.\n",
+                "\tHeading 1:", "\t\tText: Anexos",
+                "\tHeading 2:", "\t\tId: fees", "\t\tClass: annex", "\t\tText: Honorarios",
+                "\tHeading 2:", "\t\tClass: annex", "\t\tText: Calendario");
+        assertEquals(java.util.Arrays.asList(null, "A", "B"), numbers(tree));
+        assertEquals(List.of("Anexos", "Anexo A. Honorarios", "Anexo B. Calendario"), titles(tree));
+    }
+
+    @Test
+    void aLabelWithoutItsNumberIsAnError() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> build("\t\t\t\tNumber label: Anexo\n", "",
+                        "\tHeading 1:", "\t\tText: Uno"));
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
+        assertEquals(12, e.line());
+        assertThrows(InvalidModelException.class, () -> build("\t\t\t\tNumber label: {number}.{number}\n", "",
+                "\tHeading 1:", "\t\tText: Uno"));
+    }
 }

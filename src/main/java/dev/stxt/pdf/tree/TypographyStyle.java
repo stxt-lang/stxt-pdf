@@ -4,6 +4,7 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Inline;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextWrap;
 import dev.stxt.pdf.model.Transform;
@@ -50,6 +51,10 @@ public final class TypographyStyle extends StyleGroup {
      * encabezado.
      */
     private boolean numbered;
+    /** {@code Number style}: cómo se escribe el número del nivel del encabezado. */
+    private NumberStyle numberStyle = NumberStyle.DECIMAL;
+    /** {@code Number label}: lo que se escribe delante del título, con {@code {number}}; {@code null} = el número. */
+    private String numberLabel;
     /**
      * Idioma y configuración regional del texto: el de {@code Language} de {@code Document}
      * (referencia/componentes/document.md) en la raíz y, si una caja declara {@code Language} en {@code Typography}
@@ -82,6 +87,8 @@ public final class TypographyStyle extends StyleGroup {
         whiteSpace = parent.whiteSpace;
         tabSize = parent.tabSize;
         numbered = parent.numbered;
+        numberStyle = parent.numberStyle;
+        numberLabel = parent.numberLabel;
         locale = parent.locale;
         color = parent.color;
         widows = parent.widows;
@@ -230,6 +237,25 @@ public final class TypographyStyle extends StyleGroup {
     void setNumbered(boolean v) {
         writable();
         numbered = v;
+    }
+
+    public NumberStyle numberStyle() {
+        return numberStyle;
+    }
+
+    void setNumberStyle(NumberStyle v) {
+        writable();
+        numberStyle = v;
+    }
+
+    /** La plantilla de {@code Number label}, o {@code null} si no se declara. */
+    public String numberLabel() {
+        return numberLabel;
+    }
+
+    void setNumberLabel(String v) {
+        writable();
+        numberLabel = v;
     }
 
     public Locale locale() {

@@ -34,8 +34,8 @@ saliendo al trabajar y solo toca ese.
 
 ### Encabezados y secciones
 
-- Numeración de los encabezados: formatos por nivel (romanos, letras para los anexos), prefijos y sufijos propios
-  (`Anexo A.`), número colgado a la izquierda y poder referir y enlazar los encabezados de un `Markdown`.
+- Numeración de los encabezados: número colgado a la izquierda y poder referir y enlazar los encabezados de un
+  `Markdown`.
 - Secciones: empezar en página impar con una página en blanco (doble cara), un número inicial (`Start: 5`), otros formatos
   de número (romanos en el prefacio), un `Background` de página y una página apaisada que no sea una sección entera.
 

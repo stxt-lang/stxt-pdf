@@ -931,6 +931,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Numbered
 				Max: 1
+			Child: Number style
+				Max: 1
+			Child: Number label
+				Max: 1
 	Node: Break
 		Type: GROUP
 		Description: Cortes de página: antes, después y dentro de la caja, y su decoración. No se hereda.
@@ -1119,6 +1123,17 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Numbered
 		Type: BOOLEAN
 		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: Element: Document lo activa en todos, una regla Element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
+	Node: Number style
+		Type: ENUM
+		Description: Cómo se escribe el número del nivel de un encabezado numerado: decimal (1, por defecto), lower-alpha (a), upper-alpha (A), lower-roman (i) o upper-roman (I). Cada nivel del número completo se escribe con el de su encabezado (II.a). Se hereda.
+		Values:
+			Value: decimal
+			Value: lower-alpha
+			Value: upper-alpha
+			Value: lower-roman
+			Value: upper-roman
+	Node: Number label
+		Description: Lo que se escribe delante del título de un encabezado numerado, con {number} donde va el número (Number label: Anexo {number}.); sin él, el número. Se hereda.
 	Node: Widows
 		Type: INTEGER
 		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.

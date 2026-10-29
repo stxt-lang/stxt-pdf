@@ -33,6 +33,20 @@ Styles (dev.stxt.pdf):
 			Padding: 0 0 3 0
 			Border: 0 0 0.5 0
 			Border color: #B9B8D9
+	For class: annex
+		Typography:
+			Font: IBM Plex Sans
+			Size: 9
+			Line height: 13
+			Align: left
+			Letter spacing: 0.8
+			Number style: upper-roman
+			Number label: Anexo {number} ·
+		Box:
+			Margin: 16 0 6 0
+			Padding: 0 0 3 0
+			Border: 0 0 0.5 0
+			Border color: #B9B8D9
 	Element: Paragraph
 		Typography:
 			Align: justify

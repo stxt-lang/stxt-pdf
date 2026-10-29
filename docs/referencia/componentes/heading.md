@@ -92,20 +92,58 @@ Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 
 - **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus encabezados `#`, `##`… se
   numeran como los demás), con un contador por nivel: sube con cada encabezado numerado de ese nivel y vuelve a 0 con
-  cualquier encabezado de un nivel superior, esté numerado o no. El número es el de los niveles 1 a N unidos por puntos, en
-  decimal, **sin los niveles que no tienen número**. Un encabezado sin numerar no cuenta ni lleva número.
+  cualquier encabezado de un nivel superior, esté numerado o no. El número es el de los niveles 1 a N unidos por puntos,
+  **sin los niveles que no tienen número**, cada uno escrito con el `Number style` de su encabezado (abajo). Un
+  encabezado sin numerar no cuenta ni lleva número.
 - **Un título sin número.** Lo normal: el título del documento es un `Heading 1` con `Numbered: false` y las secciones,
   `Heading 2` numerados, que son `1`, `2`, `3` (y sus `Heading 3`, `2.1`…) porque el título no aporta nivel. Un nuevo
   `Heading 1` sin número (otra parte, un anexo) hace que los contadores de debajo vuelvan a empezar.
-- **Se escribe delante del título.** El número y un espacio van delante del primer `Text` del encabezado, como si el autor
-  los hubiera escrito: miden lo que escriben, el texto puede pasar a una línea más (continúa bajo el número, sin sangría)
-  y salen en el índice, en los marcadores y en lo que se lee. Un `Transform` no los cambia (son dígitos);
-  `Letter spacing` y `Small caps`, sí.
+- **Se escribe delante del título.** El número (o su `Number label`, abajo) y un espacio van delante del primer `Text`
+  del encabezado, como si el autor los hubiera escrito: miden lo que escriben, el texto puede pasar a una línea más
+  (continúa bajo el número, sin sangría) y salen en el índice, en los marcadores y en lo que se lee. `Transform`,
+  `Letter spacing` y `Small caps` los cambian como al resto del texto (`Transform: uppercase` escribe `ANEXO A.`).
 - **Se puede referir.** `{number of: id}` de un encabezado con `Id` y numerado da su número completo (`1.1`): «la sección
   {number of: ventas}» escribe «la sección 1.1» ([Referencias](../comun/referencias.md#number-of-id)).
 
-> **Decisión:** `Numbered` va en `Typography` para poder darlo en una regla y heredarlo. Solo decimal con puntos.
-> *Alternativa descartada:* un formato por nivel, o prefijos y sufijos propios (`Anexo A.`).
+### Formato y etiqueta (`Number style`, `Number label`)
+
+Dos propiedades de `Typography`, que se heredan y se dan como `Numbered`: en `Element: Heading N` para un nivel o en
+`For class` para unos encabezados.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Number style` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el contador del nivel del encabezado: `1`, `a`, `A`, `i`, `I`. Las letras siguen tras la `z` con `aa`; los romanos, tras 3999, con más `M`. |
+| `Number label` | texto con `{number}` una vez | el número | Lo que va delante del título: `{number}` es el número completo (`Number label: Anexo {number}.` da `Anexo A.`). Sin `{number}`, o con él dos veces, es `VALUE_NOT_ALLOWED`. |
+
+Cada nivel del número completo se escribe con el `Number style` del último encabezado de ese nivel: capítulos
+`upper-roman` y apartados `decimal` dan `II.1`. `{number of: id}` da el número, sin la etiqueta: «el anexo
+{number of: fees}» escribe «el anexo A». Los anexos se numeran aparte con un encabezado sin número por encima, que
+reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` con `Number style: upper-alpha` son `A`,
+`B`…
+
+```
+Styles:
+	For class: annex
+		Typography:
+			Numbered: true
+			Number style: upper-alpha
+			Number label: Anexo {number}.
+Heading 1:
+	Text: Anexos
+Heading 2:
+	Id: fees
+	Class: annex
+	Text: Honorarios            # «Anexo A. Honorarios»
+Paragraph: Los importes del anexo {number of: fees}.
+```
+
+> **Decisión:** `Numbered`, `Number style` y `Number label` van en `Typography` para poder darlos en una regla y
+> heredarlos; el formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativa descartada:* una
+> plantilla con el número de cada nivel por separado (`{1}.{2}`), más difícil de escribir y de leer.
+
+> **Decisión:** los romanos pasados de 3999 se escriben con más `M` (4000 es `MMMM`), en lugar de un error que no se
+> daría nunca en un documento real. *Alternativa descartada:* volver a cifras, como hacen otros motores, que mezcla
+> formatos sin avisar.
 
 > **Decisión:** los encabezados sin numerar no aportan nivel al número de los de debajo. *Alternativa descartada:* un error
 > si un encabezado numerado está bajo uno sin número, que obliga a numerar el título.
@@ -124,5 +162,4 @@ lo anuncia como encabezado de su nivel.
 ## Lo que no hay
 
 - Estilos por defecto de los niveles: se declaran en `Styles`.
-- Formatos de numeración distintos del decimal, prefijos y sufijos propios (`Anexo A.`), número colgado a la izquierda y
-  referir los encabezados de un `Markdown`.
+- Número colgado a la izquierda y referir los encabezados de un `Markdown`.

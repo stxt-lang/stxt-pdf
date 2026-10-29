@@ -5,9 +5,10 @@
 # numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
 # bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
 # de styles.stxt los ponen en mayúsculas (Transform). Los apartados (Reunidos, Exponen, Cláusulas) son
-# Heading 2 numerados (Numbered: true en styles.stxt); el título del contrato y el anexo, que ya tiene
-# su nombre («Anexo I»), declaran Numbered: false, y el considerando III remite al apartado de las
-# cláusulas con {number of: terms}.
+# Heading 2 numerados (Numbered: true en styles.stxt) y el título del contrato declara Numbered: false.
+# El anexo es un Heading 1 de la clase annex, numerado en romanos con su etiqueta (Number style y Number
+# label: «Anexo I · …»), al que remiten las cláusulas con {number of: annex-title}; el considerando III
+# remite al apartado de las cláusulas con {number of: terms}.
 Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
@@ -105,7 +106,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Text wrap: pretty
 			Content >>
-				1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo I.
+				1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo {number of: annex-title}.
 
 				2. **Alcance de los servicios.** Los servicios comprenden:
 
@@ -118,7 +119,7 @@ Document (dev.stxt.pdf):
 
 				3. **Plazos.** El Estudio entregará la identidad visual en un plazo de seis semanas desde la firma y el sitio web, en otras ocho semanas desde la aprobación de la identidad. Los plazos se suspenderán mientras la Cliente no facilite los materiales o las aprobaciones que le correspondan.
 
-				4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable, que se abonarán según el calendario del Anexo I mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
+				4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable, que se abonarán según el calendario del Anexo {number of: annex-title} mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
 
 				5. **Obligaciones del Estudio.** El Estudio ejecutará el encargo con la diligencia profesional debida, designará a una persona responsable de la relación con la Cliente e informará con regularidad del avance de los trabajos.
 
@@ -128,7 +129,7 @@ Document (dev.stxt.pdf):
 
 				8. **Confidencialidad.** Cada parte mantendrá en secreto la información confidencial de la otra a la que acceda con motivo del contrato y no la utilizará para otro fin, durante su vigencia y durante los cinco años siguientes.
 
-				9. **Modificaciones y trabajos adicionales.** Cualquier modificación del alcance, los plazos o los honorarios deberá constar por escrito y estar firmada por ambas partes. Los trabajos que no estén comprendidos en el Anexo I se presupuestarán aparte.
+				9. **Modificaciones y trabajos adicionales.** Cualquier modificación del alcance, los plazos o los honorarios deberá constar por escrito y estar firmada por ambas partes. Los trabajos que no estén comprendidos en el Anexo {number of: annex-title} se presupuestarán aparte.
 
 				10. **Duración y resolución.** El contrato estará vigente hasta la entrega y aceptación del último de los trabajos. Cualquiera de las partes podrá resolverlo por incumplimiento grave de la otra, previo aviso escrito y quince días para subsanarlo.
 
@@ -139,10 +140,10 @@ Document (dev.stxt.pdf):
 			Id: annex
 			Break:
 				Before: page
-			Heading 2:
-				Text: Anexo I · Calendario y honorarios
-				Typography:
-					Numbered: false
+			Heading 1:
+				Id: annex-title
+				Class: annex
+				Text: Calendario y honorarios
 			Table:
 				Id: fees
 				Columns: 36 1fr 84 74

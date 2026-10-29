@@ -18,6 +18,8 @@ Result:
 	Page: 3
 		Fragment: annex
 			Rect: 70 108 455 190.7
+			Fragment: annex-title
+				Rect: 70 108 455 16.5
 			Fragment: fees
 				Rect: 70 130.5 455 168.2
 		Fragment: signatures
