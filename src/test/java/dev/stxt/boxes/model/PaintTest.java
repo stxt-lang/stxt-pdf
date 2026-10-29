@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** El relleno de un fondo (ESPECIFICACION.md §4.3): colores lisos y degradados. */
+/** El relleno de un fondo (referencia/comun/caja.md): colores lisos y degradados. */
 class PaintTest {
 
     private static final Rect BOX = new Rect(10, 20, 100, 50);

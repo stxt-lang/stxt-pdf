@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los desbordamientos (ESPECIFICACION.md §5.12): el culpable que señala {@link Overflow} y las medidas de su mensaje.
- * El catálogo de errores comprueba el código y la línea de cada caso; estos tests, con {@code FixedMetrics} (cada
- * carácter mide 5 con {@code Size: 10} y una línea 12), lo que el catálogo no mira: qué caja se nombra y qué medidas
- * da el mensaje (QA-08, mutación).
+ * Los desbordamientos (referencia/comun/desbordamiento.md): el culpable que señala {@link Overflow} y las medidas de su
+ * mensaje. El catálogo de errores comprueba el código y la línea de cada caso; estos tests, con {@code FixedMetrics}
+ * (cada carácter mide 5 con {@code Size: 10} y una línea 12), lo que el catálogo no mira: qué caja se nombra y qué
+ * medidas da el mensaje (pruebas de mutación).
  */
 class OverflowTest {
 
@@ -179,7 +179,8 @@ class OverflowTest {
 
     /**
      * T va en un Relative desplazado 8 hacia abajo dentro de P: el desbordamiento se mide en su sitio, sin el
-     * desplazamiento (§5.12), así que la línea de 120 acaba en 10 + 120 = 130, 30 más allá.
+     * desplazamiento (referencia/comun/desbordamiento.md), así que la línea de 120 acaba en 10 + 120 = 130, 30 más
+     * allá.
      */
     @Test
     void pageOverflowIgnoresRelativeOffsets() {

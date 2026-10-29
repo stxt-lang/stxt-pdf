@@ -11,7 +11,7 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
  * Reparte en líneas un texto con {@code White space: pre} o {@code pre-wrap}
- * (ESPECIFICACION.md §4.4, §5.4): los espacios y los saltos de línea del texto se conservan.
+ * (referencia/comun/formato-del-texto.md): los espacios y los saltos de línea del texto se conservan.
  *
  * <p>Cada línea del texto es una línea de la caja, también las vacías (una línea en blanco no
  * separa párrafos: todo el texto es uno solo para las viudas y huérfanas). Una tabulación lleva

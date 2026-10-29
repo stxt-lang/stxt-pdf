@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Una imagen de la carpeta {@code images/} (ESPECIFICACION.md §5.18): su formato, reconocido por
+ * Una imagen de la carpeta {@code images/} (referencia/componentes/image.md): su formato, reconocido por
  * el contenido y no por la extensión, y su tamaño en píxeles. Se admiten PNG, JPEG y SVG (el
  * subconjunto de {@link SvgInspector}).
  *

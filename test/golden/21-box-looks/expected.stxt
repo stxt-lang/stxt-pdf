@@ -1,4 +1,4 @@
-# Hito 28: aspecto de las cajas (ESPECIFICACION.md §4.3, §5.6). Radius, Border color por lado, Background con
+# Hito 28: aspecto de las cajas (referencia/comun/caja.md). Radius, Border color por lado, Background con
 # degradado y colores con opacidad solo cambian el pintado: el volcado comprueba que no mueven ninguna caja y los
 # PNG (con los contornos de depuración) se miran a ojo. Página de 300 × 300 con márgenes de 20: área útil de
 # 260 × 260 desde (20, 20). Cada fila es un Flex de 260 × 50 con huecos de 10 y 10 de margen debajo: y = 20, 80, 140

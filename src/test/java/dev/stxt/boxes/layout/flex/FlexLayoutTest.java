@@ -298,7 +298,7 @@ class FlexLayoutTest {
         assertArrayEquals(new double[]{-15, 0}, FlexLayout.distribute(Distribution.EVENLY, -30, 3), 1e-9);
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): huecos distintos en cada eje,
+    // Casos que faltaban según las pruebas de mutación: huecos distintos en cada eje,
     // tamaños intrínsecos con más de dos ítems y márgenes en los ítems.
 
     private static String block(String id, String... box) {
@@ -384,7 +384,7 @@ class FlexLayoutTest {
     @Test
     void shrinkIsWeightedByTheBasisWithoutMargins() {
         // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Basis (300 y 300), no por los
-        // tamaños con márgenes (§5.7): 52.5 cada uno.
+        // tamaños con márgenes (referencia/componentes/flex.md): 52.5 cada uno.
         LayoutFixture l = layOut(
                 "\tFlex:",
                 "\t\tItem:", "\t\t\tBasis: 300", block("A", "Height: 10", "Margin: 0 10"),

@@ -3,12 +3,12 @@ package dev.stxt.boxes.model;
 import java.util.Objects;
 
 /**
- * Fuente de un texto: familia, peso y estilo (ESPECIFICACION.md §4.4). En la salida PDF
- * identifica un fichero TTF de la carpeta de fuentes (§5.11).
+ * Fuente de un texto: familia, peso y estilo (referencia/comun/tipografia.md). En la salida PDF
+ * identifica un fichero TTF de la carpeta de fuentes (referencia/comun/recursos.md).
  *
  * <p>{@code ligatures} dice si el texto se mide y se pinta con las ligaduras de la fuente
- * ({@code Ligatures}, §4.4). No cambia el fichero: dos fuentes que solo se distinguen en esto son el mismo
- * TTF ({@link #base()}), pero el texto mide y se pinta distinto.</p>
+ * ({@code Ligatures}, referencia/comun/formato-del-texto.md). No cambia el fichero: dos fuentes que solo se distinguen
+ * en esto son el mismo TTF ({@link #base()}), pero el texto mide y se pinta distinto.</p>
  */
 public record FontFace(String family, FontWeight weight, FontStyle style, boolean ligatures) {
 

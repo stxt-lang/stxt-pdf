@@ -26,17 +26,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Bucle de paginación (ESPECIFICACION.md §5.10): maqueta la raíz una vez por página, desde el
+ * Bucle de paginación (referencia/comun/cortes.md): maqueta la raíz una vez por página, desde el
  * {@link BreakToken} de la anterior, hasta que vuelve como {@code null}.
  *
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
- * y se repiten en las páginas que dice su {@code Pages}, todas por defecto (ESPECIFICACION.md
- * §5.5). Su containing block es el área útil.</p>
+ * y se repiten en las páginas que dice su {@code Pages}, todas por defecto
+ * (referencia/componentes/relative-absolute-fixed.md). Su containing block es el área útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
  * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
  *
- * <p>Las referencias a la página de otra caja ({@code {page of: id}}, §5.19) se resuelven
+ * <p>Las referencias a la página de otra caja ({@code {page of: id}}, referencia/comun/referencias.md) se resuelven
  * paginando hasta que converjan: cada pasada supone una página para cada caja referida (la
  * primera, un número de prueba), maqueta con ella y mira dónde ha quedado la caja; si no coincide,
  * se vuelve a paginar con la que ha salido. Termina cuando coinciden, o con
@@ -45,7 +45,10 @@ import java.util.Set;
  */
 public final class Paginator {
 
-    /** Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables (§5.19). */
+    /**
+     * Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables
+     * (referencia/comun/referencias.md).
+     */
     static final int MAX_REFERENCE_PASSES = 10;
 
     private final Engine engine;
@@ -55,8 +58,8 @@ public final class Paginator {
     }
 
     /**
-     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus
-     * {@code Fixed} y los del documento (§5.21). Las referencias convergen para todo el documento a la vez.
+     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus {@code Fixed} y los del
+     * documento (referencia/componentes/document.md). Las referencias convergen para todo el documento a la vez.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
@@ -77,7 +80,7 @@ public final class Paginator {
     /**
      * Pagina el flujo hasta que no cambia nada: las cifras del total de páginas (solo crecen) y las páginas
      * referidas con {@code {page of: id}}, que cambian el ancho de los textos que las escriben. Solo se vuelve a
-     * maquetar lo que depende de esos textos (PF-03): el resto sale de la caché.
+     * maquetar lo que depende de esos textos: el resto sale de la caché.
      */
     private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingAbsolute>> fixed,
                           List<Box> numberedTexts) {
@@ -137,7 +140,8 @@ public final class Paginator {
             for (int i = 0; i < own.size(); i++) {
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
-                // Pages cuenta dentro del alcance donde se declara: el documento o la sección (§5.21).
+                // Pages cuenta dentro del alcance donde se declara: el documento o la sección
+                // (referencia/componentes/document.md).
                 List<Queued> queue = new ArrayList<>();
                 if (section.inheritFixed()) {
                     documentFixed.forEach(b -> queue.add(new Queued(new PendingAbsolute(b, 0, 0), number,
@@ -160,7 +164,8 @@ public final class Paginator {
 
     /**
      * Los {@code Fixed} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
-     * (§5.5), que no ocupan sitio donde no salen. Una fixed dentro de otra sale en su resultado y se coloca después.
+     * (referencia/componentes/relative-absolute-fixed.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
+     * sale en su resultado y se coloca después.
      */
     private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, int tanda) {
         Rect area = section.media().pageArea();
@@ -186,7 +191,7 @@ public final class Paginator {
 
     /**
      * Un texto con {@code {page}} o {@code {pages}} en una página sin número: no hay qué escribir y no se
-     * deja en blanco (§5.21).
+     * deja en blanco (referencia/componentes/document.md).
      */
     private static void unavailable(Box box) {
         Box found = withPageNumbers(box);
@@ -225,9 +230,9 @@ public final class Paginator {
     }
 
     /**
-     * La página en que empieza cada caja referida: la de su primer fragmento (§5.19), con su número
-     * impreso (§5.21). Una caja que no sale en ninguna página (no debería pasar: las cajas con {@code Fixed}
-     * se rechazan al construir el árbol) o que está en una página sin número es un error.
+     * La página en que empieza cada caja referida: la de su primer fragmento (referencia/comun/referencias.md), con su
+     * número impreso (referencia/componentes/document.md). Una caja que no sale en ninguna página (no debería pasar:
+     * las cajas con {@code Fixed} se rechazan al construir el árbol) o que está en una página sin número es un error.
      */
     private static Map<String, String> pagesOf(List<List<LayoutResult>> results, Numbering numbering,
                                                Set<String> targets, List<References.Site> sites) {
@@ -296,7 +301,7 @@ public final class Paginator {
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
                     throw new InternalException("Sin progreso en la página " + (pages + results.size() + 1)
-                            + ": se ha incumplido la garantía de progreso (ESPECIFICACION.md §5.10)");
+                            + ": se ha incumplido la garantía de progreso (referencia/comun/cortes.md)");
                 }
                 results.add(r);
                 int section0 = k;

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Contents} (ESPECIFICACION.md §5.19). Páginas de 180 pt con márgenes de 40: área útil de
+ * {@code Contents} (referencia/componentes/contents.md). Páginas de 180 pt con márgenes de 40: área útil de
  * 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
  */
 class ContentsTest {
@@ -41,7 +41,7 @@ class ContentsTest {
 
     /**
      * Un encabezado con {@code In contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y las
-     * páginas no cambian) pero no tiene entrada (§5.19).
+     * páginas no cambian) pero no tiene entrada (referencia/componentes/contents.md).
      */
     @Test
     void aHeadingWithInContentsFalseHasNoEntry() {

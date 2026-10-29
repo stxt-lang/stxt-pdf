@@ -5,7 +5,7 @@ import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
 
 /**
- * Las formas que pintan los lienzos (ESPECIFICACION.md §5.6): un rectángulo de esquinas
+ * Las formas que pintan los lienzos (referencia/comun/caja.md): un rectángulo de esquinas
  * redondeadas y los cuatro trapecios en que se reparte un borde. Se describen como un camino que
  * cada lienzo dibuja a su manera ({@link Path}), para que el PDF y el SVG pinten lo mismo.
  */

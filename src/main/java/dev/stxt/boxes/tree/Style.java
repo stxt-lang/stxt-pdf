@@ -16,15 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Propiedades especificadas de una caja, con los valores por defecto de ESPECIFICACION.md §4 (AR-02).
+ * Propiedades especificadas de una caja, con los valores por defecto de referencia/comun/estructura.md.
  *
  * <p>Las propiedades van por grupos, cada uno en su clase: los del documento ({@link TypographyStyle},
- * {@link BoxStyle} y {@link BreakStyle}, §4) y los de un tipo de elemento ({@link FlexStyle}, {@link GridStyle},
- * {@link ItemStyle}, {@link ListStyle}, {@link MulticolStyle}, {@link ImageStyle} y {@link ContentsStyle}). Un
- * algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code style.box().margin()}. En el propio
- * {@code Style} quedan las propiedades que definen el elemento (§4.2 y §4.9: el layout y la posición, que salen
- * del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate}, el giro, {@code Link},
- * {@code Header} e {@code In contents}) y la línea donde se declaró cada propiedad.</p>
+ * {@link BoxStyle} y {@link BreakStyle}, referencia/comun/estructura.md) y los de un tipo de elemento ({@link
+ * FlexStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link MulticolStyle}, {@link ImageStyle} y
+ * {@link ContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
+ * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
+ * (referencia/comun/estructura.md y referencia/componentes/relative-absolute-fixed.md: el layout y la posición, que
+ * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate}, el giro, {@code Link}, {@code
+ * Header} e {@code In contents}) y la línea donde se declaró cada propiedad.</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
  * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
@@ -61,19 +62,24 @@ public final class Style extends StyleGroup {
     private Pages pages = Pages.ALL;
     private boolean isolate;
     /**
-     * {@code Rotate} y {@code Rotate origin} (§5.6), solo en {@code Relative}, {@code Absolute},
-     * {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
+     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Relative}, {@code
+     * Absolute}, {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
      */
     private Rotation rotation;
     /**
-     * Destino del {@code Link} de la caja ({@link dev.stxt.boxes.model.Links}, §5.20); {@code null}
-     * = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella,
-     * pero no lleva enlace propio.
+     * Destino del {@code Link} de la caja ({@link dev.stxt.boxes.model.Links}, referencia/comun/enlaces.md); {@code
+     * null} = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva
+     * enlace propio.
      */
     private String link;
-    /** {@code Header} de una {@code Cell}: es la cabecera de su fila (§5.15). No se hereda. */
+    /**
+     * {@code Header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se hereda.
+     */
     private boolean header;
-    /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
+    /**
+     * {@code In contents} de un encabezado: si tiene entrada en los índices (referencia/componentes/contents.md). No se
+     * hereda.
+     */
     private boolean inContents = true;
 
     /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
@@ -81,52 +87,55 @@ public final class Style extends StyleGroup {
     }
 
     // --- Grupos ------------------------------------------------------------------------------------
-    /** El grupo {@code Typography}: se hereda (§4.4). */
+    /** El grupo {@code Typography}: se hereda (referencia/comun/tipografia.md). */
     public TypographyStyle typography() {
         return typography;
     }
 
-    /** El grupo {@code Box}: el modelo de caja (§4.3). */
+    /** El grupo {@code Box}: el modelo de caja (referencia/comun/caja.md). */
     public BoxStyle box() {
         return box;
     }
 
-    /** El grupo {@code Break}: los cortes (§4.5). */
+    /** El grupo {@code Break}: los cortes (referencia/comun/cortes.md). */
     public BreakStyle breaks() {
         return breaks;
     }
 
-    /** Las propiedades de {@code Flex} (§4.6). */
+    /** Las propiedades de {@code Flex} (referencia/componentes/flex.md). */
     public FlexStyle flex() {
         return flex;
     }
 
-    /** Las propiedades de {@code Grid} y {@code Table} (§4.7). */
+    /** Las propiedades de {@code Grid} y {@code Table} (referencia/componentes/grid.md). */
     public GridStyle grid() {
         return grid;
     }
 
-    /** Las de {@code Item} y {@code Area}, o la celda de una tabla (§4.8). */
+    /**
+     * Las de {@code Item} y {@code Area}, o la celda de una tabla (referencia/componentes/flex.md y
+     * referencia/componentes/grid.md).
+     */
     public ItemStyle item() {
         return item;
     }
 
-    /** Las de {@code List} y {@code List item} (§4.11). */
+    /** Las de {@code List} y {@code List item} (referencia/componentes/list.md). */
     public ListStyle list() {
         return list;
     }
 
-    /** Las de {@code Multicol} (§4.13). */
+    /** Las de {@code Multicol} (referencia/componentes/multicol.md). */
     public MulticolStyle multicol() {
         return multicol;
     }
 
-    /** Las de {@code Image} (§4.15). */
+    /** Las de {@code Image} (referencia/componentes/image.md). */
     public ImageStyle image() {
         return image;
     }
 
-    /** Las de {@code Contents} (§4.16). */
+    /** Las de {@code Contents} (referencia/componentes/contents.md). */
     public ContentsStyle contents() {
         return contents;
     }
@@ -234,7 +243,7 @@ public final class Style extends StyleGroup {
     /**
      * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
      * (las de {@code Typography} que la eligen) y {@code Line height}, que fijan el alto de las
-     * líneas (§5.12).
+     * líneas (referencia/comun/desbordamiento.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
             PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT);

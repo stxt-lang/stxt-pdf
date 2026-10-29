@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * El trozo de una caja que cae en un fragmentainer (ESPECIFICACION.md §5.10). Una caja que se
+ * El trozo de una caja que cae en un fragmentainer (referencia/comun/cortes.md). Una caja que se
  * parte entre páginas produce varios.
  *
  * @param box      caja de origen (sus propiedades de pintado se leen de su estilo)
@@ -27,9 +27,9 @@ import java.util.List;
  * @param lines    líneas de texto, si la caja contiene texto
  * @param first    es el primer fragmento de la caja
  * @param last     es el último fragmento de la caja
- * @param offsetX  desplazamiento de un {@code Relative} (§5.5), ya sumado a {@code x}: su sitio
- *                 en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo, con la base
- *                 de porcentajes de su layout; 0 en las demás cajas
+ * @param offsetX  desplazamiento de un {@code Relative} (referencia/componentes/relative-absolute-fixed.md), ya
+ *                 sumado a {@code x}: su sitio en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo,
+ *                 con la base de porcentajes de su layout; 0 en las demás cajas
  * @param offsetY  ídem en vertical
  */
 public record Fragment(Box box, double x, double y, double width, double height, Insets margin,

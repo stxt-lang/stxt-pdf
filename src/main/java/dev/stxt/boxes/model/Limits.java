@@ -1,7 +1,7 @@
 package dev.stxt.boxes.model;
 
 /**
- * Lo máximo que acepta una conversión (ESPECIFICACION.md §6.2). Un documento que lo supera es válido pero
+ * Lo máximo que acepta una conversión (referencia/comun/limites.md). Un documento que lo supera es válido pero
  * pide más de lo que se quiere pagar en memoria y en tiempo, y falla con un error de
  * {@link StxtPdfException.Kind#LIMIT}: es lo que impide que un documento, o una imagen, pequeños en bytes
  * ocupen un servidor entero. Los valores por defecto ({@link #DEFAULT}) son conservadores y se miden en

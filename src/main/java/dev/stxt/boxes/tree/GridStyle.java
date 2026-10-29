@@ -8,8 +8,8 @@ import dev.stxt.boxes.model.Value;
 import java.util.List;
 
 /**
- * Las propiedades de los elementos {@code Grid} y {@code Table} (ESPECIFICACION.md §4.7): las pistas, las áreas, la
- * colocación automática, la alineación de los ítems y el hueco entre pistas. No se heredan.
+ * Las propiedades de los elementos {@code Grid} y {@code Table} (referencia/componentes/grid.md): las pistas, las
+ * áreas, la colocación automática, la alineación de los ítems y el hueco entre pistas. No se heredan.
  */
 public final class GridStyle extends StyleGroup {
 

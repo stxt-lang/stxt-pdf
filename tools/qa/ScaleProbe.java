@@ -1,6 +1,6 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, PF-*): documentos de texto largo de 200 a 12 800 párrafos, con {page} y {pages}
+// Sonda de QA: documentos de texto largo de 200 a 12 800 párrafos, con {page} y {pages}
 // en un Fixed; da el tiempo de lectura, layout y pintado y los aciertos y fallos de la caché, también por página.
-// Los de 2000 y 2100 párrafos quedan a los dos lados de la página 100, donde {pages} necesita una cifra más (PF-03);
+// Los de 2000 y 2100 párrafos quedan a los dos lados de la página 100, donde {pages} necesita una cifra más;
 // los "indice" llevan además un Contents y un {page of: …} por capítulo, que se repiten hasta converger. Para el perfil: añade
 // -XX:StartFlightRecording=filename=rec.jfr,settings=profile y mira "jfr print --events jdk.ExecutionSample".
 import dev.stxt.InlineNode;

@@ -1,4 +1,4 @@
-# Hito 35: Class en una Row (ESPECIFICACION.md §4.10, §5.15). Página de 200 × 300 con márgenes de 20: área útil de
+# Hito 35: Class en una Row (referencia/comun/estilos.md y referencia/componentes/table.md). Página de 200 × 300 con márgenes de 20: área útil de
 # 160 × 260 desde (20, 20). Líneas de 12 (Size 10) y dos columnas de 80.
 #   La clase total da Padding 6 (arriba y abajo) a cada celda de las filas que la declaran en su Row: una celda
 #   de una línea mide 12 + 12 = 24. Las filas sin clase miden 12.

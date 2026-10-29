@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Cuatro valores por lado en el orden de CSS: arriba, derecha, abajo, izquierda.
  * Se usa para {@code Margin}, {@code Padding}, {@code Border} y {@code Offset}
- * (ESPECIFICACION.md §3.3).
+ * (referencia/comun/valores.md).
  */
 public record Sides<T>(T top, T right, T bottom, T left) {
 

@@ -1,4 +1,4 @@
-# Bloque en columnas (ESPECIFICACION.md §5.16). Área útil de 260 × 160 desde (20, 20).
+# Bloque en columnas (referencia/componentes/multicol.md). Área útil de 260 × 160 desde (20, 20).
 #
 # Dos columnas de (260 − 20) / 2 = 120, la segunda desde x = 160: caben 24 caracteres por línea
 # (5 pt cada uno) y cada línea mide 12. Los párrafos tienen 11, 7, 8, 4 y 3 líneas.

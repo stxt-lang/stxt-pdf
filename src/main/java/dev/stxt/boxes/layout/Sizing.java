@@ -7,7 +7,7 @@ import dev.stxt.boxes.model.Value;
 import java.util.OptionalDouble;
 
 /**
- * Reglas comunes de dimensionado (módulos 1 y 7, ESPECIFICACION.md §5.9).
+ * Reglas comunes de dimensionado (módulos 1 y 7, referencia/comun/caja.md).
  */
 public final class Sizing {
 
@@ -55,7 +55,8 @@ public final class Sizing {
 
     /**
      * Desplazamiento de una caja de tamaño {@code size} alineada en un espacio {@code space}
-     * (§5.7, §5.8). Con {@code stretch} la caja ya ocupa el espacio y empieza al principio.
+     * (referencia/componentes/flex.md y referencia/componentes/grid.md). Con {@code stretch} la caja ya ocupa el
+     * espacio y empieza al principio.
      */
     public static double align(Alignment alignment, double space, double size) {
         return switch (alignment) {

@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Las fuentes con que JSVG dibuja el texto de un SVG (ESPECIFICACION.md §5.18): los ficheros de {@code fonts/} que
- * {@link ImageFile} comprobó, sin dar nada de alta en AWT ni buscar ninguna fuente por su nombre. Uno por dibujo.
+ * Las fuentes con que JSVG dibuja el texto de un SVG (referencia/componentes/image.md): los ficheros de {@code fonts/}
+ * que {@link ImageFile} comprobó, sin dar nada de alta en AWT ni buscar ninguna fuente por su nombre. Uno por dibujo.
  *
  * <p>JSVG busca la fuente por familia en AWT, que tiene dos problemas: con la JVM en turco no encuentra
  * {@code IBM Plex Sans} (pasa {@code I} a minúscula con el idioma y da {@code ıbm}) y dibuja con {@code Dialog}
  * sin avisar, y el registro de AWT es de toda la JVM, así que dos carpetas de recursos con la misma familia
- * comparten la primera (ROADMAP-QA-ARQ.md, QA-02 y TS-03). Por eso, al leer el SVG, {@link #rewrite} pone en cada
+ * comparten la primera. Por eso, al leer el SVG, {@link #rewrite} pone en cada
  * {@code <text>} y {@code <tspan>} la fuente que comprobó {@code ImageFile}: una familia clave
  * ({@code stxt-font-} y la huella del fichero, {@link FontFile#digest()}), que no es de ninguna fuente instalada, y
  * su peso y su estilo explícitos. JSVG no la encuentra en AWT y la pide a {@link #customFont}, que la crea con
@@ -112,7 +112,7 @@ final class SvgFonts implements PlatformSupport {
         return created.computeIfAbsent(family, key -> {
             try {
                 // Desde los bytes y no desde el fichero: AWT deja abierto el fichero que se le pasa mientras viva la
-                // fuente, y en Windows no se podría borrar ni sustituir. Son los que se midieron (PF-05).
+                // fuente, y en Windows no se podría borrar ni sustituir. Son los que se midieron.
                 return Font.createFont(Font.TRUETYPE_FONT, font.content());
             } catch (FontFormatException | IOException e) {
                 failure = "AWT no carga la fuente " + font.face() + " (" + e.getMessage() + ")";

@@ -20,13 +20,16 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.parse;
 
 /**
- * Interpreta el valor de una propiedad (ESPECIFICACION.md §3.1 y §4) y comprueba lo que admite:
- * longitudes, {@code auto}, palabras clave intrínsecas, pistas de grid, enteros, colores… Los
- * errores llevan la línea del nodo.
+ * Interpreta el valor de una propiedad (referencia/comun/valores.md y referencia/comun/estructura.md) y comprueba lo
+ * que admite: longitudes, {@code auto}, palabras clave intrínsecas, pistas de grid, enteros, colores… Los errores
+ * llevan la línea del nodo.
  */
 final class ValueReader {
 
-    /** Clases de valor, para comprobar lo que admite cada propiedad (§3.1 y §4). */
+    /**
+     * Clases de valor, para comprobar lo que admite cada propiedad (referencia/comun/valores.md y
+     * referencia/comun/estructura.md).
+     */
     enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, MINMAX }
 
     static final Set<Kind> SIZE = EnumSet.of(Kind.LENGTH, Kind.AUTO, Kind.INTRINSIC);
@@ -180,7 +183,7 @@ final class ValueReader {
         }
     }
 
-    /** {@code Rotate} (§4.2): grados de −360 a 360, sin 0, que no giraría nada. */
+    /** {@code Rotate} (referencia/comun/estructura.md): grados de −360 a 360, sin 0, que no giraría nada. */
     static double angle(Node n) {
         double v;
         try {
@@ -195,7 +198,9 @@ final class ValueReader {
         return v;
     }
 
-    /** {@code Rotate origin} (§4.2): la fracción del ancho y la del alto de la caja de borde. */
+    /**
+     * {@code Rotate origin} (referencia/comun/estructura.md): la fracción del ancho y la del alto de la caja de borde.
+     */
     static double[] rotateOrigin(Node n) {
         try {
             return Rotation.origin(n.getText());

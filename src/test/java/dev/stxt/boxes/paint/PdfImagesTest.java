@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El texto de un SVG se dibuja con el fichero de {@code fonts/} que se comprobó al leerlo (ESPECIFICACION.md §5.18),
- * sin estado de la JVM: ni el idioma por defecto (QA-02) ni otra carpeta de recursos con la misma familia (TS-03)
- * lo cambian.
+ * El texto de un SVG se dibuja con el fichero de {@code fonts/} que se comprobó al leerlo
+ * (referencia/componentes/image.md), sin estado de la JVM: ni el idioma por defecto ni otra carpeta de recursos con la
+ * misma familia lo cambian.
  */
 class PdfImagesTest {
 
@@ -129,7 +129,7 @@ class PdfImagesTest {
     @Test
     void aTextRepeatedByAUseKeepsTheFontOfItsPlaceInTheFile() throws IOException {
         // El texto se comprueba con la fuente de su sitio en el fichero (Regular), y esa es la que se dibuja aunque
-        // el <use> esté dentro de un grupo en negrita (DECISIONES.md).
+        // el <use> esté dentro de un grupo en negrita (referencia/componentes/image.md).
         String used = "<svg " + NS + " viewBox=\"0 0 120 30\"><defs><text id=\"t\" x=\"4\" y=\"20\" "
                 + "font-family=\"IBM Plex Sans\" font-size=\"16\">Nogal</text></defs>"
                 + "<g font-weight=\"bold\"><use href=\"#t\"/></g></svg>";

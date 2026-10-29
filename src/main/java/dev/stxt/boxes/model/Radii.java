@@ -1,7 +1,7 @@
 package dev.stxt.boxes.model;
 
 /**
- * Las esquinas redondeadas de una caja ya resueltas, en puntos (ESPECIFICACION.md §5.6): un cuarto
+ * Las esquinas redondeadas de una caja ya resueltas, en puntos (referencia/comun/caja.md): un cuarto
  * de elipse por esquina, con su radio horizontal y su radio vertical. Es solo pintado.
  */
 public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner bottomLeft) {
@@ -69,8 +69,8 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     }
 
     /**
-     * Las esquinas de un fragmento de una caja partida (§5.10): con {@code Decoration: slice}, solo
-     * el primer fragmento tiene las de arriba y solo el último las de abajo.
+     * Las esquinas de un fragmento de una caja partida (referencia/comun/cortes.md): con {@code Decoration: slice},
+     * solo el primer fragmento tiene las de arriba y solo el último las de abajo.
      */
     public Radii forFragment(boolean topEdge, boolean bottomEdge) {
         return new Radii(topEdge ? topLeft : Corner.SQUARE, topEdge ? topRight : Corner.SQUARE,

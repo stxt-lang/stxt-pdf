@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** {@code {number of: id}} (ESPECIFICACION.md §5.19): el número que escribe el marcador de un ítem. */
+/** {@code {number of: id}} (referencia/comun/referencias.md): el número que escribe el marcador de un ítem. */
 class NumberReferencesTest {
 
     private static String text(LayoutFixture l, String id) {

@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, QA-03): qué cadenas pinta distinto PDFBox con GSUB (ligaduras) que con las
+// Sonda de QA: qué cadenas pinta distinto PDFBox con GSUB (ligaduras) que con las
 // métricas del motor, que no las aplica, para cada fuente de resources/fonts.
 import org.apache.fontbox.ttf.*;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;

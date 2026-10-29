@@ -1,4 +1,4 @@
-# Giro y papel con nombre (ESPECIFICACION.md §4.1, §5.6, §5.10, §5.12).
+# Giro y papel con nombre (referencia/componentes/document.md, referencia/comun/capas-y-giro.md, referencia/comun/cortes.md y referencia/comun/desbordamiento.md).
 #
 # Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
 # El giro solo cambia el pintado: los Rect son los de las cajas sin girar.

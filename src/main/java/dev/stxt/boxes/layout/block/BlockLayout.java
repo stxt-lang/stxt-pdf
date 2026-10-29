@@ -28,7 +28,7 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 import static dev.stxt.boxes.model.Tolerance.same;
 
 /**
- * Layout {@code block}: apila los hijos en flujo en vertical (ESPECIFICACION.md §5.3).
+ * Layout {@code block}: apila los hijos en flujo en vertical (referencia/componentes/block.md).
  *
  * <pre>
  * cursor = 0; strut = vacío
@@ -47,7 +47,7 @@ import static dev.stxt.boxes.model.Tolerance.same;
  * <p>Los márgenes que salen de la caja se devuelven en {@link AdjoiningMargins}: el padre los
  * colapsa con los márgenes propios de la caja. Un hijo vacío deja pasar sus márgenes.</p>
  *
- * <p><strong>Fragmentación</strong> (§5.10). Cada hijo recibe lo que queda de página desde su
+ * <p><strong>Fragmentación</strong> (referencia/comun/cortes.md). Cada hijo recibe lo que queda de página desde su
  * borde superior. Delante de cada hijo, si ya se ha colocado algo en este fragmento, hay un corte
  * posible con su calidad ({@link BreakRules#between}); se guarda el estado para poder volver a él.
  * Cuando un hijo no cabe (no coloca nada, se parte por dentro o desborda sin partirse), se elige
@@ -149,8 +149,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             for (int i = start; i < box.children().size(); i++) {
                 Box child = box.children().get(i);
                 if (child.style().isOutOfFlow()) {
-                    // Posición estática: donde empezaría si estuviera en flujo (§5.5). La caja se
-                    // resuelve en su containing block (AbsoluteLayout).
+                    // Posición estática: donde empezaría si estuviera en flujo
+                    // (referencia/componentes/relative-absolute-fixed.md). La caja se resuelve en su containing block
+                    // (AbsoluteLayout).
                     pending.add(new PendingAbsolute(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
                 }
@@ -217,7 +218,8 @@ public final class BlockLayout implements LayoutAlgorithm {
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
-            // Una caja relative se desplaza después de colocarla; el cursor no se entera (§5.5).
+            // Una caja relative se desplaza después de colocarla; el cursor no se entera
+            // (referencia/componentes/relative-absolute-fixed.md).
             RelativeOffset offset = RelativeOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();
@@ -292,7 +294,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /**
          * Los fragmentos hijos y, en el primer fragmento de un {@code List item}, su marcador
-         * delante (§5.14): va con la primera línea, que está en este fragmento si hay alguno.
+         * delante (referencia/componentes/list.md): va con la primera línea, que está en este fragmento si hay alguno.
          */
         List<Fragment> withMarker(List<Fragment> children, Slice slice) {
             if (box.marker() == null || !first) {

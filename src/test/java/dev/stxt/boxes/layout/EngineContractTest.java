@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El contrato de {@link Engine} (ROADMAP-QA-ARQ.md, TS-01): el protocolo con el {@link Paginator} no es
+ * El contrato de {@link Engine}: el protocolo con el {@link Paginator} no es
  * público, y un motor guardado entre conversiones no retiene nada del último documento ni cambia el resultado
  * del siguiente.
  */
@@ -93,7 +93,7 @@ class EngineContractTest {
 
     /**
      * Un motor reutilizado olvida las cifras que reservó el documento anterior: tras uno de 101 páginas, «Página
-     * {page}» se vuelve a medir con dos cifras (45) y cabe en una línea de su caja de 48 (QA-08, mutación).
+     * {page}» se vuelve a medir con dos cifras (45) y cabe en una línea de su caja de 48 (pruebas de mutación).
      */
     @Test
     void aReusedEngineForgetsTheReservedDigits() {

@@ -17,15 +17,18 @@ import static dev.stxt.boxes.tree.ValueReader.enumValue;
 import static dev.stxt.boxes.tree.ValueReader.points;
 
 /**
- * Lo que el documento dice de sí mismo y de sus páginas: el {@code Media} del documento y de cada
- * {@code Section} (§4.1, §5.21) y el {@code Title} y el {@code Language} (§4.1).
+ * Lo que el documento dice de sí mismo y de sus páginas: el {@code Media} del documento y de cada {@code Section}
+ * (referencia/componentes/document.md) y el {@code Title} y el {@code Language} (referencia/componentes/document.md).
  */
 final class MediaReader {
 
     private MediaReader() {
     }
 
-    /** Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo (§5.21). */
+    /**
+     * Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo
+     * (referencia/componentes/document.md).
+     */
     record Spec(Media media, Media.Paper paper) {
     }
 
@@ -43,8 +46,8 @@ final class MediaReader {
     }
 
     /**
-     * El medio (§4.1): su tamaño es un {@code Paper} con su {@code Orientation} o un {@code Width}
-     * y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez. El de una
+     * El medio (referencia/componentes/document.md): su tamaño es un {@code Paper} con su {@code Orientation} o un
+     * {@code Width} y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez. El de una
      * sección hereda por grupos el del documento, {@code base} ({@code null} en el del documento).
      */
     static Spec media(InlineNode n, Spec base) {

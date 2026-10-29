@@ -1,4 +1,4 @@
-# Enlaces (ESPECIFICACION.md §5.20). Área útil de 260 × 260 desde (20, 20); con FixedMetrics, cada
+# Enlaces (referencia/comun/enlaces.md). Área útil de 260 × 260 desde (20, 20); con FixedMetrics, cada
 # carácter mide 5 pt con Size: 10 y cada línea, 12. Un enlace no cambia el layout: lo que se
 # comprueba aquí son las posiciones, y que el PDF se escribe con sus anotaciones (el PNG no las
 # muestra; lo hacen PdfCanvasTest y StackingContextTest).

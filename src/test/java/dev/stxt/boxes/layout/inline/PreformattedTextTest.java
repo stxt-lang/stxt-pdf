@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code White space: pre} y {@code pre-wrap} y {@code Tab size} (§4.4, §5.4). Con
+ * {@code White space: pre} y {@code pre-wrap} y {@code Tab size} (referencia/comun/formato-del-texto.md). Con
  * {@link FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}, y cada línea, 12.
  */
 class PreformattedTextTest {

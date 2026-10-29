@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code {page of: id}} (ESPECIFICACION.md §5.19). Páginas de 180 pt con márgenes de 40: área
+ * {@code {page of: id}} (referencia/comun/referencias.md). Páginas de 180 pt con márgenes de 40: área
  * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada
  * línea, 12.
  */
@@ -128,7 +128,7 @@ class PageReferencesTest {
         StringBuilder doc = new StringBuilder("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
                 + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
         // El primer bloque es un texto con {number of: n}: el culpable es la referencia de página que cambia, no la
-        // primera referencia del documento (QA-08, mutación). Mide y ocupa lo mismo que los demás.
+        // primera referencia del documento (pruebas de mutación). Mide y ocupa lo mismo que los demás.
         doc.append("\tText: Punto {number of: n}\n\t\tBox:\n\t\t\tHeight: 100\n");
         for (int i = 1; i < 6; i++) {
             doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 100\n");

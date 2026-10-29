@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Dimensionado y colocación de {@code Image} (ESPECIFICACION.md §5.18), con las imágenes de
+ * Dimensionado y colocación de {@code Image} (referencia/componentes/image.md), con las imágenes de
  * {@code resources/images/test/}: {@code wide.png} de 200 × 100 píxeles (150 × 75 pt, proporción
  * 2), {@code tall.jpg} de 120 × 160 (90 × 120 pt) y {@code square.png} de 40 × 40 (30 × 30 pt), y los SVG
  * {@code shapes.svg} (200 × 100 px: 150 × 75 pt) y {@code label.svg}, sin {@code width} ni {@code height}
@@ -312,7 +312,7 @@ class ImageLayoutTest {
     }
 
     /**
-     * El algoritmo depende de {@link LayoutContext}, no del motor (AR-04): se prueba con un doble que solo da el
+     * El algoritmo depende de {@link LayoutContext}, no del motor: se prueba con un doble que solo da el
      * tamaño natural de la imagen, sin carpeta de recursos ni fichero.
      */
     @Test
@@ -351,7 +351,7 @@ class ImageLayoutTest {
         assertEquals(new IntrinsicSizes(120, 120), new ImageLayout(context).contentIntrinsic(image));
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): la proporción es la de la caja de
+    // Casos que faltaban según las pruebas de mutación: la proporción es la de la caja de
     // contenido, sin el borde (2) ni el relleno (3).
 
     @Test

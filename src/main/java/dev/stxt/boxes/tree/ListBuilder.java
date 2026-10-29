@@ -13,7 +13,7 @@ import static dev.stxt.boxes.tree.PropertyKey.NUMBER;
 import static dev.stxt.boxes.tree.PropertyKey.START;
 
 /**
- * Listas (ESPECIFICACION.md §5.14): numeración de los {@code List item}, la caja generada de su
+ * Listas (referencia/componentes/list.md): numeración de los {@code List item}, la caja generada de su
  * marcador y las reglas de {@code Start} y {@code Number}.
  */
 final class ListBuilder {
@@ -22,8 +22,8 @@ final class ListBuilder {
     }
 
     /**
-     * Número de un {@code List item} (§5.14): el de su {@code Number} o el siguiente al del ítem
-     * anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
+     * Número de un {@code List item} (referencia/componentes/list.md): el de su {@code Number} o el siguiente al del
+     * ítem anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
         Marker marker = list.style().list().marker();
@@ -47,8 +47,8 @@ final class ListBuilder {
     }
 
     /**
-     * La caja generada del marcador de un {@code List item} (§5.14): texto con la tipografía del
-     * ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
+     * La caja generada del marcador de un {@code List item} (referencia/componentes/list.md): texto con la tipografía
+     * del ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
      */
     static Box marker(InlineNode n, Box item, String text) {
         if (item.style().typography().font() == null) {
@@ -68,7 +68,7 @@ final class ListBuilder {
 
     /**
      * Comprueba que el marcador de un {@code List item} tiene una línea con la que alinearse
-     * (§5.14): bajando por el primer hijo en flujo de cada bloque se llega a un texto.
+     * (referencia/componentes/list.md): bajando por el primer hijo en flujo de cada bloque se llega a un texto.
      */
     static void markerLine(Box item) {
         Box b = item;

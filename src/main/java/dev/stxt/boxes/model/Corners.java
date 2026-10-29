@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Un valor por esquina, en el orden de CSS: arriba a la izquierda, arriba a la derecha, abajo a la
- * derecha y abajo a la izquierda. Se usa para {@code Radius} (ESPECIFICACION.md §3.3).
+ * derecha y abajo a la izquierda. Se usa para {@code Radius} (referencia/comun/valores.md).
  */
 public record Corners<T>(T topLeft, T topRight, T bottomRight, T bottomLeft) {
 

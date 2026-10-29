@@ -1,15 +1,15 @@
 package dev.stxt.boxes.model;
 
 /**
- * Las dos tolerancias del motor al comparar medidas en puntos (ROADMAP-QA-ARQ.md, AR-10):
+ * Las dos tolerancias del motor al comparar medidas en puntos:
  *
  * <ul>
  *   <li>{@link #EPSILON}, la de la aritmética de coma flotante: dos medidas que difieren en menos son la misma. Es la
  *       del layout ({@link #fits}, {@link #same}).</li>
  *   <li>{@link #MODEL}, la del modelo: lo que se ve. Una caja que se sale menos de su sitio no desborda
- *       ({@code Overflow}, ESPECIFICACION.md §5.12), y dos volcados del §7 que difieren menos son iguales. Es más
- *       ancha a propósito: absorbe lo que acumulan las medidas de las fuentes, en milésimas del cuerpo, y los
- *       decimales que escribe el autor.</li>
+ *       ({@code Overflow}, referencia/comun/desbordamiento.md), y dos volcados (referencia/implementacion/pruebas.md)
+ *       que difieren menos son iguales. Es más ancha a propósito: absorbe lo que acumulan las medidas de las fuentes,
+ *       en milésimas del cuerpo, y los decimales que escribe el autor.</li>
  * </ul>
  */
 public final class Tolerance {

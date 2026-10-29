@@ -24,7 +24,7 @@ import static dev.stxt.boxes.tree.TextRuns.link;
 import static dev.stxt.boxes.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Orden de pintado (ESPECIFICACION.md §5.6), visto por los colores de fondo que se pintan. */
+/** Orden de pintado (referencia/comun/caja.md), visto por los colores de fondo que se pintan. */
 class StackingContextTest {
 
     private static final DocumentReader READER = new DocumentReader();
@@ -235,7 +235,10 @@ class StackingContextTest {
         assertEquals(List.of("#00F"), r.backgrounds);
     }
 
-    /** Cada tramo con su fuente; el subrayado antes del texto y el tachado después (§5.4). */
+    /**
+     * Cada tramo con su fuente; el subrayado antes del texto y el tachado después
+     * (referencia/comun/formato-del-texto.md).
+     */
     @Test
     void runsWithTheirFontAndDecorations() {
         Recorder r = record(Map.of("T", List.of(run("uno ", "u"), run("dos", "bs"), run(" tres"))),
@@ -248,7 +251,9 @@ class StackingContextTest {
         assertEquals(new Rect(60, 45.9, 15, 0.6).toString(), round(r.rects.get(1)).toString());
     }
 
-    /** Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (§4.4). */
+    /**
+     * Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (referencia/comun/tipografia.md).
+     */
     @Test
     void smallCapsAreSmallerAndLetterSpacingIsPassedOn() {
         Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\t\t\t\tSmall caps: true",
@@ -259,7 +264,7 @@ class StackingContextTest {
 
     /**
      * Una caja con {@code Link} es clicable entera; su zona sigue a su propio texto (que el {@code Link} envuelve) y
-     * precede al de sus hijos, que se pintan después (§5.20).
+     * precede al de sus hijos, que se pintan después (referencia/comun/enlaces.md).
      */
     @Test
     void aBoxWithLinkIsClickableWholeAndBeforeItsChildren() {
@@ -270,7 +275,10 @@ class StackingContextTest {
         assertEquals(List.of("link #fin", "text 'uno dos' normal", "text 'fin' normal"), r.events);
     }
 
-    /** Un tramo con enlace es una zona del alto de la línea; los seguidos con el mismo destino, una sola (§5.20). */
+    /**
+     * Un tramo con enlace es una zona del alto de la línea; los seguidos con el mismo destino, una sola
+     * (referencia/comun/enlaces.md).
+     */
     @Test
     void linkedRunsAreOneZonePerLineAndDestination() {
         Recorder r = record(Map.of("T", List.of(run("uno "), link("dos", "b", "https://a.example"),
@@ -306,7 +314,7 @@ class StackingContextTest {
     /**
      * Las líneas que no son la última del fragmento llevan un espacio invisible tras la última palabra (el corte
      * se lo come), para que el texto de las líneas unido no pegue palabras; la última y el texto preformateado,
-     * no (§5.4).
+     * no (referencia/comun/formato-del-texto.md).
      */
     @Test
     void aWrappedLineEndsWithASpaceExceptTheLastAndPreformatted() {
@@ -424,8 +432,8 @@ class StackingContextTest {
     }
 
     /**
-     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Absolute}
-     * de dentro, alrededor de su origen (§5.6); una {@code Image} en flujo, en sus dos pasos.
+     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Absolute} de dentro, alrededor
+     * de su origen (referencia/comun/capas-y-giro.md); una {@code Image} en flujo, en sus dos pasos.
      */
     @Test
     void rotatedBoxesWrapEverythingTheyPaint() {

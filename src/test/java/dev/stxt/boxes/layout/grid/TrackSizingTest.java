@@ -114,8 +114,8 @@ class TrackSizingTest {
 
     /**
      * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su min-content va solo a la auto, y su
-     * max-content se cuenta con las bases ya subidas (como en CSS, §5.8): el área del ítem mide su max-content
-     * (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (QA-08, mutación).
+     * max-content se cuenta con las bases ya subidas (como en CSS, referencia/componentes/grid.md): el área del ítem
+     * mide su max-content (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (pruebas de mutación).
      */
     @Test
     void itemSpanningAFixedAndAnAutoTrack() {

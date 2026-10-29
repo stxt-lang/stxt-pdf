@@ -14,9 +14,9 @@ import java.util.List;
 import static dev.stxt.boxes.paint.PdfContent.io;
 
 /**
- * El etiquetado de una página PDF (AR-05, AR-06): el contenido marcado del PDF etiquetado, que {@link PdfStructure}
- * cuelga de su elemento (§5.13), y las anotaciones de los enlaces (§5.20), que crea {@link PdfLinks} y se ponen en
- * la página al terminar de pintarla ({@link #annotations}).
+ * El etiquetado de una página PDF: el contenido marcado del PDF etiquetado, que {@link PdfStructure} cuelga de su
+ * elemento (referencia/comun/pdf.md), y las anotaciones de los enlaces (referencia/comun/enlaces.md), que crea {@link
+ * PdfLinks} y se ponen en la página al terminar de pintarla ({@link #annotations}).
  */
 final class PdfTagging implements Tagging {
 

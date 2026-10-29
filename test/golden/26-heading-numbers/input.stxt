@@ -1,4 +1,4 @@
-# Numeración de los encabezados (ESPECIFICACION.md §5.13). Área útil de 260 × 260 desde (20, 20);
+# Numeración de los encabezados (referencia/componentes/heading.md). Área útil de 260 × 260 desde (20, 20);
 # con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
 #
 # Element: Document activa Numbered en todos los encabezados y Element: Heading 3 lo quita en el

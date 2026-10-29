@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * El contenido de una página PDF (AR-06), lo que comparten su lienzo ({@link PdfCanvas}) y su etiquetado
+ * El contenido de una página PDF, lo que comparten su lienzo ({@link PdfCanvas}) y su etiquetado
  * ({@link PdfTagging}): el flujo de contenido, el paso de las coordenadas de la página (con la y hacia abajo) a
  * las del PDF (con el origen abajo), los caminos, el color con su opacidad y los giros en curso.
  */

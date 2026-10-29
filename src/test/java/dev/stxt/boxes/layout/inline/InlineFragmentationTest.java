@@ -70,7 +70,7 @@ class InlineFragmentationTest {
 
     @Test
     void orphansAreRelaxedBeforeAvoid() {
-        // Cortar antes de P incumpliría el avoid de T; dejar una huérfana es menos grave (§5.10).
+        // Cortar antes de P incumpliría el avoid de T; dejar una huérfana es menos grave (referencia/comun/cortes.md).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tAfter: avoid",
                 "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
@@ -106,7 +106,7 @@ class InlineFragmentationTest {
 
     /**
      * Un texto con Height: 150 llega al final de la página 1 (100), pero sus 8 líneas solo consumen 96: en la 2 le
-     * quedan 54 para las 2 líneas que siguen (§5.10).
+     * quedan 54 para las 2 líneas que siguen (referencia/comun/cortes.md).
      */
     @Test
     void theHeightOfATextIsTheTotal() {

@@ -12,8 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Rotate} en el layout (ESPECIFICACION.md §5.6, §5.10, §5.12): no mueve nada, una caja
- * girada no se parte, y lo que se comprueba contra la página es lo que se pinta.
+ * {@code Rotate} en el layout (referencia/comun/capas-y-giro.md, referencia/comun/cortes.md y
+ * referencia/comun/desbordamiento.md): no mueve nada, una caja girada no se parte, y lo que se comprueba contra la
+ * página es lo que se pinta.
  */
 class RotationLayoutTest {
 

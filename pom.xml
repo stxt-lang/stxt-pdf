@@ -9,8 +9,8 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Motor de cajas</name>
-    <description>Motor de layout de cajas descrito en STXT, en páginas (ver docs/ESPECIFICACION.md).</description>
+    <name>stxt-pdf</name>
+    <description>Motor de layout y generación de PDF a partir de documentos STXT (manual en docs/manual).</description>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
@@ -62,7 +62,7 @@
         </dependency>
 
         <!-- Imágenes SVG (resources.ImageFile, paint.PdfCanvas): JSVG lee y dibuja el SVG en un Graphics2D y
-             pdfbox-graphics2d convierte lo dibujado en rutas, rellenos y texto del PDF (ESPECIFICACION.md §5.18). -->
+             pdfbox-graphics2d convierte lo dibujado en rutas, rellenos y texto del PDF (referencia/componentes/image.md). -->
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>
@@ -128,7 +128,7 @@
     </build>
 
     <profiles>
-        <!-- Pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): una pasada puntual sobre layout y fragment, no en la CI.
+        <!-- Pruebas de mutación: una pasada puntual sobre layout y fragment, no en la CI.
              mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage
              El informe queda en target/pit-reports/index.html. -->
         <profile>

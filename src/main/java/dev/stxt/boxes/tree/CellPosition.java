@@ -4,7 +4,7 @@ import dev.stxt.Node;
 import dev.stxt.boxes.model.TextAlign;
 
 /**
- * Dónde está una {@code Cell} en su tabla (ESPECIFICACION.md §5.15), para las reglas de
+ * Dónde está una {@code Cell} en su tabla (referencia/componentes/table.md), para las reglas de
  * {@code Styles} que la nombran por su posición.
  *
  * @param group           grupo de filas: 0 {@code Head}, 1 {@code Body}, 2 {@code Foot}

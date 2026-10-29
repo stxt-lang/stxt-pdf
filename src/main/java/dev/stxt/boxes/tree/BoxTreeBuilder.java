@@ -36,11 +36,11 @@ import static dev.stxt.boxes.tree.ValueReader.bool;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
 
 /**
- * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
+ * Construye el árbol de cajas a partir del documento (referencia/comun/estructura.md): traduce cada
  * elemento a una caja con el {@link Layout} y la {@link Position} de su
  * {@link Element}, pasa las propiedades de {@code Item} y {@code Area} al elemento que envuelven,
  * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
- * puede expresar (§6).
+ * puede expresar (referencia/comun/errores.md).
  *
  * <p>Es el orquestador: lee los valores con {@link ValueReader} y las propiedades con
  * {@link PropertyReader}, aplica las reglas con {@link StyleRules}, construye tablas y listas con
@@ -75,8 +75,8 @@ public final class BoxTreeBuilder {
             "foot", "span", "bullet", "numbering", "table-columns", "code-font", "column-align");
 
     /**
-     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus
-     * secciones (§5.21), las secciones en orden y el título y el idioma. Cada sección es la raíz de
+     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus secciones
+     * (referencia/componentes/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
      * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
      */
     public record Result(Media media, Box root, List<Section> sections, Metadata metadata) {
@@ -85,20 +85,21 @@ public final class BoxTreeBuilder {
     /**
      * Construye el árbol de un documento, validado o no.
      *
-     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (§9)
-     * @throws InvalidModelException si incumple una regla del modelo (§6)
+     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (referencia/comun/estructura.md)
+     * @throws InvalidModelException si incumple una regla del modelo (referencia/comun/errores.md)
      */
     public Result build(InlineNode document) {
         return build(document, null);
     }
 
     /**
-     * Como {@link #build(InlineNode)}, con un documento de estilos aparte (raíz {@code Styles}, §4.10)
-     * cuyas reglas valen menos que las del propio documento. {@code styles} puede ser {@code null}.
+     * Como {@link #build(InlineNode)}, con un documento de estilos aparte (raíz {@code Styles},
+     * referencia/comun/estilos.md) cuyas reglas valen menos que las del propio documento. {@code styles} puede ser
+     * {@code null}.
      *
-     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (§9)
-     * @throws InvalidModelException si incumple una regla del modelo (§6); la línea de un error de
-     *         las reglas del documento de estilos es la suya, y el mensaje lo dice
+     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (referencia/comun/estructura.md)
+     * @throws InvalidModelException si incumple una regla del modelo (referencia/comun/errores.md); la línea de un
+     *         error de las reglas del documento de estilos es la suya, y el mensaje lo dice
      */
     public Result build(InlineNode document, InlineNode styles) {
         return build(document, styles, root -> {
@@ -155,8 +156,8 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Una {@code Section} (§5.21): su caja, que es la raíz de su layout y tiene el alto de la página
-     * menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
+     * Una {@code Section} (referencia/componentes/document.md): su caja, que es la raíz de su layout y tiene el alto de
+     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia) {
         Style s = Style.inheriting(documentRoot.style());
@@ -226,7 +227,8 @@ public final class BoxTreeBuilder {
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
-            // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
+            // El motor evita cortar dentro del encabezado y después de él (referencia/componentes/heading.md); no se
+            // declara.
             s.breaks().setAfter(Break.AVOID);
             s.breaks().setAvoidInside(true);
         }
@@ -255,8 +257,8 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un
-     * {@code Multicol} (§5.16) y un encabezado respeta la jerarquía (§5.13).
+     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un {@code Multicol}
+     * (referencia/componentes/multicol.md) y un encabezado respeta la jerarquía (referencia/componentes/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideMulticol && kind.position() != Position.STATIC && kind.position() != Position.RELATIVE) {
@@ -269,8 +271,8 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Un {@code List item} (§5.14): su número, que no puede ser de un ítem vacío, y la caja de su
-     * marcador, si la lista lo lleva.
+     * Un {@code List item} (referencia/componentes/list.md): su número, que no puede ser de un ítem vacío, y la caja de
+     * su marcador, si la lista lo lleva.
      */
     private static void listItem(BuildContext ctx, InlineNode n, Box box, Box list, int number) {
         ctx.itemNumbers.put(box, number);
@@ -330,7 +332,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que un encabezado está en su sitio (§5.13): fuera de un {@code Fixed} y sin
+     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Fixed} y sin
      * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
      * como mucho un nivel respecto al anterior.
      */

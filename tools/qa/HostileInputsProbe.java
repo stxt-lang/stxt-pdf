@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, QA-06): entradas patológicas (anidado, rejillas enormes, palabras largas,
+// Sonda de QA: entradas patológicas (anidado, rejillas enormes, palabras largas,
 // muchas páginas, índice con muchas referencias) con tiempo y resultado o error de cada una.
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.layout.Engine;

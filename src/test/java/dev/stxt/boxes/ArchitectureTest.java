@@ -35,7 +35,7 @@ class ArchitectureTest {
     private static final Pattern STRING = Pattern.compile("\"(?:\\\\.|[^\"\\\\\\n])*\"");
 
     /**
-     * Lo que puede usar cada package (AR-12): las dependencias de hoy, escritas a mano. Una nueva no es un
+     * Lo que puede usar cada package: las dependencias de hoy, escritas a mano. Una nueva no es un
      * accidente: se decide y se apunta aquí.
      */
     private static final Map<String, Set<String>> ALLOWED = Map.of(
@@ -174,7 +174,7 @@ class ArchitectureTest {
     }
 
     /**
-     * Los algoritmos dependen de {@code LayoutContext}, no del motor que los crea (AR-04): nada de los subpackages
+     * Los algoritmos dependen de {@code LayoutContext}, no del motor que los crea: nada de los subpackages
      * de {@code layout} nombra {@code Engine} fuera de los comentarios.
      */
     @Test
@@ -191,7 +191,7 @@ class ArchitectureTest {
     }
 
     /**
-     * El layout y el pintado preguntan a la caja lo que significa ({@code Box.role()}), no qué elemento es (AR-07):
+     * El layout y el pintado preguntan a la caja lo que significa ({@code Box.role()}), no qué elemento es:
      * fuera de {@code tree} no se nombra ninguna constante de {@code Element} salvo en el despacho de
      * {@code Engine} (la tabla tiene su algoritmo). Un elemento nuevo con un papel que ya existe no toca nada fuera
      * de {@code tree}.

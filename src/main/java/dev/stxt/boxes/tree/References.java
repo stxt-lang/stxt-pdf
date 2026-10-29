@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las referencias de los textos del árbol a otras cajas ({@code {page of: id}}, ESPECIFICACION.md
- * §5.19): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo que
- * valen lo decide quien maqueta: la página, el {@link dev.stxt.boxes.layout.Paginator}; el
- * número, el builder ({@link Box#number()}).
+ * Las referencias de los textos del árbol a otras cajas ({@code {page of: id}},
+ * referencia/comun/referencias.md): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo
+ * que valen lo decide quien maqueta: la página, el {@link dev.stxt.boxes.layout.Paginator}; el número, el builder
+ * ({@link Box#number()}).
  */
 public final class References {
 

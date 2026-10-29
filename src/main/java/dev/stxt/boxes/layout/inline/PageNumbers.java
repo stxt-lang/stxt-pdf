@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout.inline;
 
 /**
- * Numeración de páginas en el texto: {@code {page}} y {@code {pages}} (ESPECIFICACION.md §5.4 y
- * §5.10). Se resuelve en dos fases:
+ * Numeración de páginas en el texto: {@code {page}} y {@code {pages}} (referencia/comun/cortes.md y
+ * referencia/comun/cortes.md). Se resuelve en dos fases:
  *
  * <ol>
  *   <li>Se pagina midiendo cada marcador como un número de prueba de {@value #DIGITS} cifras

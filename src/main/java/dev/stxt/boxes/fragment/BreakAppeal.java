@@ -1,16 +1,16 @@
 package dev.stxt.boxes.fragment;
 
 /**
- * Calidad de un corte (ESPECIFICACION.md §5.10): mayor es mejor. {@link BreakRules#best} se
+ * Calidad de un corte (referencia/comun/cortes.md): mayor es mejor. {@link BreakRules#best} se
  * queda con el último corte de mayor calidad, que es lo mismo que relajar las reglas en el orden
- * de la especificación.
+ * de la referencia.
  */
 public final class BreakAppeal {
 
     /**
      * Corte forzado de página ({@code Before} o {@code After: page} de {@code Break}): mejor que
      * cualquier otro, y distinto de un corte perfecto para que un {@code Multicol} no lo tome por
-     * el final de una columna y lo deje pasar hasta la página (§5.16).
+     * el final de una columna y lo deje pasar hasta la página (referencia/componentes/multicol.md).
      */
     public static final int FORCED_PAGE = 4;
     /** Corte que no incumple ninguna regla; también el forzado de columna. */

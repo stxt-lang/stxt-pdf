@@ -3,7 +3,7 @@ package dev.stxt.boxes.fragment;
 import dev.stxt.boxes.model.Break;
 
 /**
- * Una unidad de la fragmentación de un contenedor (ESPECIFICACION.md §5.10): una línea de un
+ * Una unidad de la fragmentación de un contenedor (referencia/comun/cortes.md): una línea de un
  * contenedor flex en {@code row}, un ítem de uno en {@code column} o una fila de una rejilla. Se
  * corta entre unidades, nunca dentro de una (salvo partiendo sus ítems en paralelo).
  *

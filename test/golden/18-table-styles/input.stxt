@@ -1,4 +1,4 @@
-# Estilo de las tablas por posición y por columna (ESPECIFICACION.md §4.10, §5.15).
+# Estilo de las tablas por posición y por columna (referencia/comun/estilos.md y referencia/componentes/table.md).
 # Área útil de 260 × 160 desde (20, 20). Con 10 de tamaño, una línea mide 12 y cada carácter 5.
 #
 # Columnas: 100, 100 y 60, sin hueco: x = 20, 120 y 220. Cell da a todas Padding 2 4 (16 de alto).

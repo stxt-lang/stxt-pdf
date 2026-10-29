@@ -215,7 +215,7 @@ class PdfCanvasTest {
 
     /**
      * Una caja que declara otro idioma lleva su {@code Lang}, que heredan los elementos de dentro; las demás no
-     * lo repiten (§4.4, §5.13).
+     * lo repiten (referencia/comun/tipografia.md y referencia/componentes/heading.md).
      */
     @Test
     void aBoxInAnotherLanguageHasLang() throws Exception {
@@ -330,7 +330,7 @@ class PdfCanvasTest {
 
     /**
      * Una celda con {@code Header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la cabecera
-     * siguen siendo {@code Scope: Column} y las demás, {@code TD} (§5.15).
+     * siguen siendo {@code Scope: Column} y las demás, {@code TD} (referencia/componentes/table.md).
      */
     @Test
     void headerCellsAreRowHeaders() throws Exception {
@@ -357,7 +357,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador (§5.13, §5.19). */
+    /**
+     * Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador
+     * (referencia/componentes/heading.md y referencia/componentes/contents.md).
+     */
     @Test
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
@@ -376,7 +379,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** El número de un encabezado numerado es parte de su título: también de su marcador y de su entrada del índice (§5.13). */
+    /**
+     * El número de un encabezado numerado es parte de su título: también de su marcador y de su entrada del índice
+     * (referencia/componentes/heading.md).
+     */
     @Test
     void theNumberOfAHeadingIsPartOfItsBookmarkAndItsContentsEntry() throws Exception {
         InlineNode doc = reader.read(Docs.mergeStyles(LINKS
@@ -396,7 +402,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna (§5.16). */
+    /**
+     * Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna
+     * (referencia/componentes/multicol.md).
+     */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
@@ -430,7 +439,7 @@ class PdfCanvasTest {
      * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
      * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
      * lleva la {@code OBJR} de la anotación; el de un {@code Fixed}, que no es contenido, es un
-     * {@code Link} suelto del {@code Document} con su {@code Alt} (§5.20).
+     * {@code Link} suelto del {@code Document} con su {@code Alt} (referencia/comun/enlaces.md).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -500,7 +509,7 @@ class PdfCanvasTest {
 
     /**
      * Un enlace de texto que ocupa varias líneas es un solo {@code Link} con un contenido marcado y una
-     * {@code OBJR} por línea; las zonas son una por línea (§5.20).
+     * {@code OBJR} por línea; las zonas son una por línea (referencia/comun/enlaces.md).
      */
     @Test
     void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
@@ -548,7 +557,7 @@ class PdfCanvasTest {
 
     /**
      * Un enlace a una caja del documento lleva a su página y a su esquina, hacia delante y hacia
-     * atrás (§5.20).
+     * atrás (referencia/comun/enlaces.md).
      */
     @Test
     void internalLinksGoToThePageOfTheirBox() throws Exception {
@@ -571,7 +580,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link} (§5.19, §5.20). */
+    /**
+     * Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link}
+     * (referencia/componentes/contents.md y referencia/comun/enlaces.md).
+     */
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
@@ -602,7 +614,7 @@ class PdfCanvasTest {
     /**
      * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
      * solo es contenido (y envuelve el texto de la celda) en la primera; en las demás es un {@code Link}
-     * suelto del {@code Document} (§5.20).
+     * suelto del {@code Document} (referencia/comun/enlaces.md).
      */
     @Test
     void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {
@@ -670,8 +682,8 @@ class PdfCanvasTest {
             + "negrita a medias y un texto justificado que ocupa varias líneas con sus tramos.";
 
     /**
-     * Cada tramo con su fuente, en el mismo contenido marcado del párrafo; el subrayado y el
-     * tachado, <em>artifacts</em> (§5.4). Se revisa a ojo en {@code target/pdf/runs.pdf}.
+     * Cada tramo con su fuente, en el mismo contenido marcado del párrafo; el subrayado y el tachado,
+     * <em>artifacts</em> (referencia/comun/formato-del-texto.md). Se revisa a ojo en {@code target/pdf/runs.pdf}.
      */
     @Test
     void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
@@ -706,7 +718,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor (§5.17). */
+    /**
+     * Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor
+     * (referencia/componentes/markdown.md).
+     */
     @Test
     void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
@@ -730,8 +745,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con {@code Transform} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura
-     * conserva el texto escrito (§4.4): {@code ActualText}. Un texto con el número de página no lo
+     * Con {@code Transform} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura conserva el texto
+     * escrito (referencia/comun/formato-del-texto.md): {@code ActualText}. Un texto con el número de página no lo
      * lleva, porque cambia con la página.
      */
     @Test
@@ -760,9 +775,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un índice (§5.19) es un {@code TOC} con un {@code TOCI} por entrada (título y número, dos
-     * {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada
-     * encabezado, también la de un encabezado de un Markdown.
+     * Un índice (referencia/componentes/contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título y
+     * número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada encabezado,
+     * también la de un encabezado de un Markdown.
      */
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
@@ -789,8 +804,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox};
-     * sin él, y en un {@code Fixed}, es un artifact (§5.18). Cada fichero se incrusta una vez.
+     * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox}; sin él, y en un
+     * {@code Fixed}, es un artifact (referencia/componentes/image.md). Cada fichero se incrusta una vez.
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
@@ -831,10 +846,10 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un SVG (§5.18) es un dibujo vectorial: un formulario del PDF, no una imagen, que se incrusta una
-     * vez aunque se use en dos páginas y se escala a su caja; con {@code Alt} es un {@code Figure}.
-     * El texto del SVG se dibuja con la fuente de {@code fonts/}: los píxeles de las letras están donde
-     * toca (blancos sobre el fondo oscuro).
+     * Un SVG (referencia/componentes/image.md) es un dibujo vectorial: un formulario del PDF, no una imagen, que se
+     * incrusta una vez aunque se use en dos páginas y se escala a su caja; con {@code Alt} es un {@code Figure}. El
+     * texto del SVG se dibuja con la fuente de {@code fonts/}: los píxeles de las letras están donde toca (blancos
+     * sobre el fondo oscuro).
      */
     @Test
     void svgIsDrawnAsOneVectorFormAndScaledToItsBox() throws Exception {
@@ -895,10 +910,10 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una caja girada (§5.6) gira su contenido con una matriz {@code cm}; su enlace es el rectángulo
-     * que envuelve la zona girada con los {@code QuadPoints} de la zona, el {@code BBox} de una
-     * figura girada envuelve lo que se pinta, y un destino lleva a la esquina de ese envolvente. El
-     * texto girado sigue siendo texto.
+     * Una caja girada (referencia/comun/capas-y-giro.md) gira su contenido con una matriz {@code cm}; su enlace es el
+     * rectángulo que envuelve la zona girada con los {@code QuadPoints} de la zona, el {@code BBox} de una figura
+     * girada envuelve lo que se pinta, y un destino lleva a la esquina de ese envolvente. El texto girado sigue siendo
+     * texto.
      */
     @Test
     void rotatedBoxesTurnTheirContentLinksAndFigures() throws Exception {
@@ -952,7 +967,10 @@ class PdfCanvasTest {
             + "\t\tHeight: 200\n\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
             + "\t\t\t\tSize: 10\n\t\tFor class: english\n\t\t\tTypography:\n\t\t\t\tLanguage: en\n";
 
-    /** Las etiquetas de página del PDF son el número impreso (§5.21): ninguno en la portada, y el anexo reinicia. */
+    /**
+     * Las etiquetas de página del PDF son el número impreso (referencia/componentes/document.md): ninguno en la
+     * portada, y el anexo reinicia.
+     */
     @Test
     void pageLabelsAreThePrintedNumbers() throws Exception {
         InlineNode doc = reader.read(SECTIONS_HEAD
@@ -988,7 +1006,10 @@ class PdfCanvasTest {
         }
     }
 
-    /** La primera {@code Sect} de un documento etiquetado (§5.21): lo que cuelga de ella es el contenido. */
+    /**
+     * La primera {@code Sect} de un documento etiquetado (referencia/componentes/document.md): lo que cuelga de ella es
+     * el contenido.
+     */
     private static PDStructureElement firstSection(PDStructureElement document) {
         assertEquals("Document", document.getStructureType());
         PDStructureElement section = (PDStructureElement) document.getKids().get(0);

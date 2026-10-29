@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * La conversión es segura entre hilos con un {@code Engine} por conversión (que es lo que hace {@link Converter}) (ROADMAP-QA-ARQ.md, TS-01
- * y TS-02): varios hilos convierten los ejemplos a la vez, con las fuentes y las imágenes reales, y
- * cada PDF es el mismo que da la conversión secuencial.
+ * La conversión es segura entre hilos con un {@code Engine} por conversión (que es lo que hace {@link Converter}):
+ * varios hilos convierten los ejemplos a la vez, con las fuentes y las imágenes reales, y cada PDF es el mismo que da
+ * la conversión secuencial.
  *
  * <p>Se comparan los bytes del PDF una vez quitadas las fechas y los identificadores, que son lo único
  * que cambia de una conversión a otra. Cubre los cuatro usos que importan: un {@link Resources} por hilo,

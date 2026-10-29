@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.Locale;
 
 /**
- * El giro de una caja al pintarla (ESPECIFICACION.md §5.6): {@code Rotate}, en grados en el
+ * El giro de una caja al pintarla (referencia/comun/capas-y-giro.md): {@code Rotate}, en grados en el
  * sentido de las agujas del reloj, alrededor de {@code Rotate origin}, un punto de la caja de
  * borde dado como fracción de su ancho y de su alto ({@code center} es 0,5 0,5).
  *

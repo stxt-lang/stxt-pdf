@@ -5,7 +5,7 @@ import dev.stxt.boxes.model.Value;
 import java.util.OptionalDouble;
 
 /**
- * Pista de grid con su función mínima y máxima (ESPECIFICACION.md §5.8). {@code auto} equivale a
+ * Pista de grid con su función mínima y máxima (referencia/componentes/grid.md). {@code auto} equivale a
  * {@code minmax(auto, auto)} y {@code 1fr} a {@code minmax(auto, 1fr)}: una fracción nunca baja
  * del min-content de su contenido.
  */
@@ -31,7 +31,7 @@ public record Track(Value min, Value max) {
 
     /**
      * La misma pista sin base para los porcentajes: las funciones que dependen de ella se
-     * comportan como {@code auto} (ESPECIFICACION.md §3.1).
+     * comportan como {@code auto} (referencia/comun/valores.md).
      */
     Track withoutPercentBase() {
         return new Track(definiteOrAuto(min), definiteOrAuto(max));

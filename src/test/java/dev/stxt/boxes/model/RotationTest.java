@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Rotate} y {@code Rotate origin} (ESPECIFICACION.md §5.6). */
+/** {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md). */
 class RotationTest {
 
     private static final double E = 1e-9;

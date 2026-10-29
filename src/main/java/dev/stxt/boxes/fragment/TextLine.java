@@ -13,7 +13,7 @@ import java.util.List;
  * @param height      altura de la línea ({@code Line height})
  * @param text        contenido de la línea; las palabras van separadas por un solo espacio
  * @param wordSpacing espacio que se añade a cada espacio entre palabras ({@code justify}); 0 si no
- * @param runs        tramos de la línea en orden (ESPECIFICACION.md §5.4); su texto seguido es
+ * @param runs        tramos de la línea en orden (referencia/comun/formato-del-texto.md); su texto seguido es
  *                    {@code text}
  */
 public record TextLine(double x, double y, double width, double height, String text, double wordSpacing,

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las imágenes de los tests de referencia se comparan con las versionadas y fallan si cambian (QA-07). */
+/** Las imágenes de los tests de referencia se comparan con las versionadas y fallan si cambian. */
 class ReferenceFilesTest {
 
     private static final String UPDATE = "reference-files-test.update";

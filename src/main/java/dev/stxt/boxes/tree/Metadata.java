@@ -1,7 +1,7 @@
 package dev.stxt.boxes.tree;
 
 /**
- * Datos del documento que no afectan al layout (ESPECIFICACION.md §5.13): van a la salida PDF.
+ * Datos del documento que no afectan al layout (referencia/comun/pdf.md): van a la salida PDF.
  *
  * @param title    título ({@code Title}), o {@code null} solo en {@link #NONE}
  * @param language idioma del contenido ({@code Language}), una etiqueta BCP 47, o {@code null}

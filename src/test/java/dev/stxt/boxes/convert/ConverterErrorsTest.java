@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los errores de una conversión (ESPECIFICACION.md §6): todos son un {@link StxtPdfException} y su
+ * Los errores de una conversión (referencia/comun/errores.md): todos son un {@link StxtPdfException} y su
  * {@link StxtPdfException#kind() kind} dice de quién es la culpa. Una sola {@code catch} basta en un servicio.
  */
 class ConverterErrorsTest {

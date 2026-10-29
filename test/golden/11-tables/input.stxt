@@ -1,4 +1,4 @@
-# Tablas (ESPECIFICACION.md §5.15). Área útil de 260 × 160 desde (20, 20).
+# Tablas (referencia/componentes/table.md). Área útil de 260 × 160 desde (20, 20).
 #
 # Columnas: 100 y 1fr con 10 de hueco: 260 − 100 − 10 = 150, desde x = 130. Cada celda tiene
 # Padding 2 4: una línea mide 12 + 4 = 16, y la cabecera, con su borde inferior, 17. El pie

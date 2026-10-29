@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Las imágenes que lleva un PDF (ESPECIFICACION.md §5.18), cada fichero una sola vez aunque se use
+ * Las imágenes que lleva un PDF (referencia/componentes/image.md), cada fichero una sola vez aunque se use
  * en varias páginas.
  *
  * <p>Un PNG o un JPEG se incrusta tal cual ({@link PDImageXObject}: el JPEG sin recomprimir y el

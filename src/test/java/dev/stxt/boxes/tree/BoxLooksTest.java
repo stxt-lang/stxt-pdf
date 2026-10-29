@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** {@code Radius}, {@code Border color} por lado y {@code Background} con degradado (§4.3). */
+/** {@code Radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md). */
 class BoxLooksTest {
 
     private static Box block(String... boxLines) {

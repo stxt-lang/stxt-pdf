@@ -3,8 +3,8 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.Fit;
 
 /**
- * Las propiedades de una {@code Image} (ESPECIFICACION.md §4.15): el texto alternativo y cómo llena su caja. No se
- * heredan.
+ * Las propiedades de una {@code Image} (referencia/componentes/image.md): el texto alternativo y cómo llena su caja. No
+ * se heredan.
  */
 public final class ImageStyle extends StyleGroup {
 

@@ -4,8 +4,8 @@ import dev.stxt.boxes.model.Fit;
 import dev.stxt.boxes.model.Rect;
 
 /**
- * Dónde se dibuja una imagen en su caja de contenido según {@code Fit} (ESPECIFICACION.md
- * §5.18). Con proporciones iguales, las tres formas dan la caja de contenido.
+ * Dónde se dibuja una imagen en su caja de contenido según {@code Fit}
+ * (referencia/componentes/image.md). Con proporciones iguales, las tres formas dan la caja de contenido.
  */
 final class ImageFit {
 

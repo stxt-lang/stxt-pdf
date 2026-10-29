@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)), ESPECIFICACION.md
- * §5.16. Con {@code Count: 2} y {@code Column gap: 15}, las columnas miden 250 y la segunda
- * empieza en x = 305.
+ * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)),
+ * referencia/componentes/multicol.md. Con {@code Count: 2} y {@code Column gap: 15}, las columnas miden 250 y la
+ * segunda empieza en x = 305.
  */
 class MulticolLayoutTest {
 
@@ -213,7 +213,7 @@ class MulticolLayoutTest {
         assertRect(305, 40, 250, 12, l.rect("T"));
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+    // Casos que faltaban según las pruebas de mutación.
 
     /**
      * El texto mide 20 (min-content, «aaaa») y 35 (max-content). Con Count: 3 y huecos de 10, tres columnas de

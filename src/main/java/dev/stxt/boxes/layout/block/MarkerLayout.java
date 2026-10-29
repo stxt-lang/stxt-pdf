@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 
 /**
- * Marcador de un {@code List item} (ESPECIFICACION.md §5.14): un fragmento de una línea que
+ * Marcador de un {@code List item} (referencia/componentes/list.md): un fragmento de una línea que
  * cuelga a la izquierda de la caja de borde del ítem, con su línea base en la de la primera línea
  * del ítem.
  *

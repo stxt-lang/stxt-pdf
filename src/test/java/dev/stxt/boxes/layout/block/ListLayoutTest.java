@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Marcadores de las listas (ESPECIFICACION.md §5.14). Con {@code FixedMetrics}, cada carácter
+ * Marcadores de las listas (referencia/componentes/list.md). Con {@code FixedMetrics}, cada carácter
  * mide 5 pt con {@code Size: 10}, así que {@code "1. "} mide 15; la línea mide 12, y la línea
  * base, con la aproximación 0,8/0,2, queda 9 pt por debajo de su parte superior.
  */

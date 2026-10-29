@@ -6,9 +6,9 @@ import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.Value;
 
 /**
- * Las propiedades de {@code Item} y {@code Area} (ESPECIFICACION.md §4.8), que pasan al elemento que envuelven: cómo
- * crece y se encoge en un {@code Flex}, dónde va en un {@code Grid} (o la celda que le da la tabla) y su alineación.
- * No se heredan.
+ * Las propiedades de {@code Item} y {@code Area} (referencia/componentes/flex.md y referencia/componentes/grid.md), que
+ * pasan al elemento que envuelven: cómo crece y se encoge en un {@code Flex}, dónde va en un {@code Grid} (o la celda
+ * que le da la tabla) y su alineación. No se heredan.
  */
 public final class ItemStyle extends StyleGroup {
 

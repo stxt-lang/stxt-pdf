@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Caché de medidas y layouts (ESPECIFICACION.md §5.9). Sin ella, flex y grid anidados hacen un número de
+ * Caché de medidas y layouts (referencia/comun/caja.md). Sin ella, flex y grid anidados hacen un número de
  * layouts que crece exponencialmente con la profundidad.
  *
  * <p>No se usa {@code computeIfAbsent} porque el cálculo es recursivo y vuelve a escribir en el

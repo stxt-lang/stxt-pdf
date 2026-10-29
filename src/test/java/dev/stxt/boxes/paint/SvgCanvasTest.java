@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las imágenes en la salida SVG (ESPECIFICACION.md §5.18). */
+/** Las imágenes en la salida SVG (referencia/componentes/image.md). */
 class SvgCanvasTest {
 
     private static final String DOC = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
@@ -56,7 +56,10 @@ class SvgCanvasTest {
         assertFalse(svg.contains("<image"), svg);
     }
 
-    /** Una caja girada es un grupo con {@code rotate(ángulo x y)} alrededor de su origen (§5.6). */
+    /**
+     * Una caja girada es un grupo con {@code rotate(ángulo x y)} alrededor de su origen
+     * (referencia/comun/capas-y-giro.md).
+     */
     @Test
     void rotationIsAGroupTransform() {
         LaidOutDocument turned = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(
@@ -69,7 +72,7 @@ class SvgCanvasTest {
         assertTrue(svg.contains("</g>"), svg);
     }
 
-    /** El SVG solo dibuja (AR-05): no marca el texto ni crea enlaces, y lo dice con {@link Tagging#NONE}. */
+    /** El SVG solo dibuja: no marca el texto ni crea enlaces, y lo dice con {@link Tagging#NONE}. */
     @Test
     void theSvgCanvasOnlyDraws() {
         assertSame(Tagging.NONE, new SvgCanvas(false).tagging());

@@ -1,10 +1,10 @@
-# Schema del modelo de cajas (docs/ESPECIFICACION.md §9).
+# Schema del modelo de cajas (referencia/comun/estructura.md).
 # Primero los elementos, después las reglas reutilizables (Styles), los grupos (Box, Typography,
 # Break) y al final las propiedades.
 # Cada nombre tiene una única definición en todo el namespace: el Width de Media y el de Box son
 # el mismo nodo.
 Schema (@stxt.schema): dev.stxt.boxes
-	Description: Documentos del motor de cajas. Referencia completa en docs/ESPECIFICACION.md.
+	Description: Documentos de stxt-pdf, el motor de layout y generación de PDF. Manual en docs/manual y referencia completa en docs/referencia.
 
 	# Elementos
 

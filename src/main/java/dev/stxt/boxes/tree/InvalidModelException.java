@@ -3,9 +3,9 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.StxtPdfException;
 
 /**
- * Regla del modelo incumplida que el schema STXT no puede expresar (ESPECIFICACION.md §6),
+ * Regla del modelo incumplida que el schema STXT no puede expresar (referencia/comun/errores.md),
  * con su código y la línea del documento donde está el nodo culpable. Si el nodo está en el
- * documento de estilos aparte ({@code Styles}, §4.10), la línea es la de ese documento y el
+ * documento de estilos aparte ({@code Styles}, referencia/comun/estilos.md), la línea es la de ese documento y el
  * mensaje lo dice. Su {@link #kind()} es el del código ({@link ErrorCode#kind()}): casi siempre un
  * documento no válido, pero un límite superado ({@link ErrorCode#PAGE_LIMIT}) es un {@link Kind#LIMIT}.
  */

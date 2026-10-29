@@ -6,7 +6,7 @@ import dev.stxt.boxes.tree.Style;
 import java.util.OptionalDouble;
 
 /**
- * Desplazamiento visual de una caja {@code relative} (ESPECIFICACION.md §5.5). Se aplica
+ * Desplazamiento visual de una caja {@code relative} (referencia/componentes/relative-absolute-fixed.md). Se aplica
  * después de colocarla como si fuera {@code static}: su hueco se conserva y sus hermanos no se
  * mueven. Si se declaran arriba y abajo, gana arriba; si se declaran izquierda y derecha, gana
  * izquierda.

@@ -19,8 +19,8 @@ import java.util.Map;
  * incluidos los de las cajas {@code fixed}. Sin número de página, se refiere a la primera.
  *
  * <p>Declara en el {@code Typography} de {@code Document} {@code Font: IBM Plex Sans} y
- * {@code Size: 10}, porque el texto los necesita (§6); con {@link dev.stxt.boxes.layout.inline.FixedMetrics} la familia no
- * influye en las medidas.</p>
+ * {@code Size: 10}, porque el texto los necesita (referencia/comun/errores.md); con {@link
+ * dev.stxt.boxes.layout.inline.FixedMetrics} la familia no influye en las medidas.</p>
  */
 public final class LayoutFixture {
 
@@ -103,7 +103,7 @@ public final class LayoutFixture {
         return rects.get(page - 1).containsKey(id);
     }
 
-    /** Caja del marcador del {@code List item} con ese {@code Id} (§5.14). */
+    /** Caja del marcador del {@code List item} con ese {@code Id} (referencia/componentes/list.md). */
     public Rect marker(String id) {
         return marker(1, id);
     }

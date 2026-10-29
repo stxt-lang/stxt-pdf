@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Tests de referencia (ESPECIFICACION.md §7): cada carpeta de {@code golden/} contiene
+ * Tests de referencia (referencia/implementacion/pruebas.md): cada carpeta de {@code golden/} contiene
  * {@code input.stxt} y {@code expected.stxt}. Se comparan nombres y valores; los números de
  * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el schema; el
  * volcado no tiene namespace y se lee sin validación.

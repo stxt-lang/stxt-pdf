@@ -1,7 +1,7 @@
 package dev.stxt.boxes.tree;
 
 /**
- * Lo común a {@link Style} y a sus grupos de propiedades ({@link FlexStyle}…, AR-02): solo {@code tree} los
+ * Lo común a {@link Style} y a sus grupos de propiedades ({@link FlexStyle}…): solo {@code tree} los
  * escribe, mientras {@link BoxTreeBuilder} construye el árbol, y se cierran con su caja ({@link Box#close}).
  * Escribir en uno cerrado es un {@code IllegalStateException}: después de construir el árbol, un estilo solo
  * se lee y se puede compartir entre hilos.

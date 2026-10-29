@@ -46,9 +46,9 @@ import static dev.stxt.boxes.tree.ValueReader.comparable;
 import static dev.stxt.boxes.tree.ValueReader.hasPercentage;
 
 /**
- * Reglas del modelo que el schema no puede expresar (ESPECIFICACION.md §6) y que miran la caja
+ * Reglas del modelo que el schema no puede expresar (referencia/comun/errores.md) y que miran la caja
  * ya leída: desplazamientos, márgenes {@code auto}, mínimo y máximo, porcentajes verticales y si
- * el alto es definido (§3.6), y la fuente de los textos.
+ * el alto es definido (referencia/comun/valores.md), y la fuente de los textos.
  */
 final class ModelValidator {
 
@@ -69,7 +69,7 @@ final class ModelValidator {
 
     /**
      * Un {@code Multicol} fija sus columnas con {@code Count}, {@code Column width} o los dos, y
-     * su línea entre columnas cabe en el hueco (§5.16).
+     * su línea entre columnas cabe en el hueco (referencia/componentes/multicol.md).
      */
     static void validateMulticol(Style s, int line) {
         if (s.multicol().count() == null && s.multicol().columnWidth() == null) {
@@ -85,7 +85,7 @@ final class ModelValidator {
     }
 
     /**
-     * Una {@code Image} no se parte (§5.18): {@code Inside} y {@code Decoration}, que solo
+     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Inside} y {@code Decoration}, que solo
      * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
      */
     static void validateImage(Style s) {
@@ -98,9 +98,9 @@ final class ModelValidator {
     }
 
     /**
-     * El giro de una caja (§5.6): {@code Rotate origin} sin {@code Rotate} no tiene efecto, y un
-     * {@code Relative} girado no se parte entre páginas, así que {@code Inside} y {@code Decoration}
-     * tampoco (también si los da una regla de {@code Styles}).
+     * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
+     * y un {@code Relative} girado no se parte entre páginas, así que {@code Inside} y {@code Decoration} tampoco
+     * (también si los da una regla de {@code Styles}).
      */
     static void validateRotation(Style s) {
         if (s.rotation() == null) {
@@ -246,7 +246,7 @@ final class ModelValidator {
     }
 
     /**
-     * Porcentajes verticales de la caja: su base debe ser un alto definido (§3.6). La base de
+     * Porcentajes verticales de la caja: su base debe ser un alto definido (referencia/comun/valores.md). La base de
      * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
      * definido para Absolute y Fixed) o el área (los ítems de grid); la de los desplazamientos
      * de un Relative y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.

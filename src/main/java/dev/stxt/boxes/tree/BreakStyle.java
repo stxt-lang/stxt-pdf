@@ -4,8 +4,8 @@ import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.Decoration;
 
 /**
- * El grupo {@code Break} (ESPECIFICACION.md §4.5): los cortes de página o de columna antes, después y dentro de la caja
- * y su decoración en un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
+ * El grupo {@code Break} (referencia/comun/cortes.md): los cortes de página o de columna antes, después y dentro de la
+ * caja y su decoración en un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
  */
 public final class BreakStyle extends StyleGroup {
 

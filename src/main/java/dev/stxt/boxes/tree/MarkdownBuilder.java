@@ -54,15 +54,14 @@ import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
 
 /**
- * Traduce un {@code Markdown} (ESPECIFICACION.md §5.17) a los nodos STXT de los elementos que ya
- * existen: encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a
- * {@code Paragraph}, listas a {@code List} y {@code List item}, tablas GFM a {@code Table}, bloques de
- * código a un {@code Text} con {@code White space: pre} e imágenes solas en su párrafo a
- * {@code Image} (§5.18). Un enlace es un tramo subrayado con su destino (§5.20); el código en línea,
- * un tramo con la fuente de {@code Code font}.
- * {@link BoxTreeBuilder} construye después esos nodos como cualquier otro elemento, así que el
- * schema, las reglas de {@code Styles}, la validación del §6, el PDF etiquetado y los marcadores
- * los tratan igual.
+ * Traduce un {@code Markdown} (referencia/componentes/markdown.md) a los nodos STXT de los elementos que ya existen:
+ * encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a {@code Paragraph}, listas a {@code
+ * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code White space:
+ * pre} e imágenes solas en su párrafo a {@code Image} (referencia/componentes/image.md). Un enlace es un tramo
+ * subrayado con su destino (referencia/comun/enlaces.md); el código en línea, un tramo con la fuente de {@code Code
+ * font}. {@link BoxTreeBuilder} construye después esos nodos como cualquier otro elemento, así que el schema, las
+ * reglas de {@code Styles}, la validación de referencia/comun/errores.md, el PDF etiquetado y los marcadores los tratan
+ * igual.
  *
  * <p>El formato dentro de una línea (negrita, cursiva, subrayado, tachado y enlace) no cabe en un nodo
  * STXT: el texto del nodo es el texto seguido y sus tramos van aparte, en
@@ -114,8 +113,8 @@ final class MarkdownBuilder {
     }
 
     /**
-     * Un texto con {@code Inline: markdown} (§5.4): sus tramos. Solo párrafos, que se separan con una
-     * línea en blanco, como en un {@code Text}; lo demás es {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
+     * Un texto con {@code Inline: markdown} (referencia/comun/formato-del-texto.md): sus tramos. Solo párrafos, que se
+     * separan con una línea en blanco, como en un {@code Text}; lo demás es {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
      *
      * @param firstLine línea del documento donde empieza el texto
      */
@@ -398,7 +397,7 @@ final class MarkdownBuilder {
                 if (n instanceof Text t) {
                     out.add(t.getLiteral(), f);
                 } else if (n instanceof SoftLineBreak) {
-                    // Un salto de línea simple vale un espacio, como en un Text (§5.4).
+                    // Un salto de línea simple vale un espacio, como en un Text (referencia/comun/tipografia.md).
                     out.add(" ", f);
                 } else if (n instanceof StrongEmphasis) {
                     inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
@@ -419,7 +418,7 @@ final class MarkdownBuilder {
         }
 
         /**
-         * El formato de los tramos de un enlace (§5.20): el de fuera, subrayado y con su destino.
+         * El formato de los tramos de un enlace (referencia/comun/enlaces.md): el de fuera, subrayado y con su destino.
          * Un enlace de Markdown es el único que se subraya solo. El título ({@code "…"}) no
          * tendría efecto y es un error, como el de una imagen.
          */

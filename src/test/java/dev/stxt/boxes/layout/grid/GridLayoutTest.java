@@ -203,7 +203,7 @@ class GridLayoutTest {
         assertEquals(Insets.all(20), l.fragment("M").margin());
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): ítems con márgenes y tamaños
+    // Casos que faltaban según las pruebas de mutación: ítems con márgenes y tamaños
     // intrínsecos con más de dos columnas.
 
     @Test

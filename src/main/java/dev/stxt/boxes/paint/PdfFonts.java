@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las fuentes de un PDF y cómo se escribe el texto con ellas (AR-06). Cada fuente TTF de la carpeta de recursos
- * (ESPECIFICACION.md §5.11) se incrusta una vez por documento y combinación de {@link FontFace}, como subconjunto
+ * Las fuentes de un PDF y cómo se escribe el texto con ellas. Cada fuente TTF de la carpeta de recursos
+ * (referencia/comun/recursos.md) se incrusta una vez por documento y combinación de {@link FontFace}, como subconjunto
  * (solo los glifos usados) en una fuente Type 0 con codificación Identity-H: el PDF se ve igual en cualquier
  * máquina. Con Identity-H cada carácter ocupa dos bytes y el operador {@code Tw} no actúa, así que la
  * justificación y el interletraje van en los argumentos de {@code TJ} ({@link #spaced}).
@@ -39,7 +39,7 @@ final class PdfFonts {
         PDFont f = fonts.get(font);
         if (f == null) {
             // Sin ligaduras se quita la tabla GSUB: PDFBox escribe un glifo por carácter, que es lo que se midió.
-            // Desde los bytes que se midieron, sin volver a leer el fichero (PF-05). Se parsea de nuevo porque
+            // Desde los bytes que se midieron, sin volver a leer el fichero. Se parsea de nuevo porque
             // TrueTypeFont no es seguro entre hilos y PDFBox lo cambia al incrustarlo.
             TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(
                     resources.fonts().find(font).content()));

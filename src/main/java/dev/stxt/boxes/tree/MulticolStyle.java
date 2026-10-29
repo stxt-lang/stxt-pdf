@@ -3,8 +3,8 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.ColumnFill;
 
 /**
- * Las propiedades de un {@code Multicol} (ESPECIFICACION.md §4.13): cuántas columnas y de qué ancho, el hueco y la
- * línea entre ellas y cómo se llenan. No se heredan.
+ * Las propiedades de un {@code Multicol} (referencia/componentes/multicol.md): cuántas columnas y de qué ancho, el
+ * hueco y la línea entre ellas y cómo se llenan. No se heredan.
  */
 public final class MulticolStyle extends StyleGroup {
 

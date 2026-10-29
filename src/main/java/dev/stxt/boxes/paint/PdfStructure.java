@@ -47,35 +47,34 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Significado del documento en el PDF (ESPECIFICACION.md §5.13): el árbol de estructura del PDF
+ * Significado del documento en el PDF (referencia/comun/pdf.md): el árbol de estructura del PDF
  * etiquetado y los marcadores (<em>outline</em>) de los encabezados.
  *
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
- * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P}
- * para {@code Paragraph} y para {@code Text} ({@code Span} si es parte del texto de un encabezado),
- * {@code L} y {@code LI} para las listas y sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, §5.14),
- * {@code Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y
- * {@code TD} para las tablas (§5.15), {@code Figure} para las imágenes con {@code Alt} (con su
- * texto alternativo y su {@code BBox}, §5.18) y {@code Div} para el resto, también un {@code Multicol}
- * (§5.16), cuyas columnas no tienen elemento propio. El texto de
- * cada fragmento es contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del
- * elemento de su caja; una caja partida entre páginas tiene contenido en varias. Los fondos, los
- * bordes, las imágenes sin {@code Alt} (decorativas) y los {@code Fixed} (repetidos en cada
- * página) son <em>artifacts</em>: no forman parte del contenido.</p>
+ * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P} para {@code Paragraph}
+ * y para {@code Text} ({@code Span} si es parte del texto de un encabezado), {@code L} y {@code LI} para las listas y
+ * sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, referencia/componentes/list.md), {@code
+ * Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y {@code TD} para las tablas
+ * (referencia/componentes/table.md), {@code Figure} para las imágenes con {@code Alt} (con su texto alternativo y su
+ * {@code BBox}, referencia/componentes/image.md) y {@code Div} para el resto, también un {@code Multicol}
+ * (referencia/componentes/multicol.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
+ * contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del elemento de su caja; una caja partida
+ * entre páginas tiene contenido en varias. Los fondos, los bordes, las imágenes sin {@code Alt} (decorativas) y los
+ * {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
  *
- * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, §4.4) es el
- * {@code Lang} de su elemento, que heredan los de dentro.</p>
+ * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, referencia/comun/tipografia.md) es
+ * el {@code Lang} de su elemento, que heredan los de dentro.</p>
  *
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
- * <p>Un enlace (§5.20) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación del PDF
- * como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del
- * elemento de la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de
- * texto ({@code [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto,
- * uno por enlace y fragmento aunque ocupe varias líneas.</p>
+ * <p>Un enlace (referencia/comun/enlaces.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación del
+ * PDF como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del elemento de
+ * la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de texto ({@code
+ * [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto, uno por enlace y fragmento
+ * aunque ocupe varias líneas.</p>
  *
- * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, §6), que
+ * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, referencia/comun/errores.md), que
  * llevan a la esquina superior izquierda de su primer fragmento ({@link PdfDestinations}).</p>
  */
 final class PdfStructure {
@@ -106,7 +105,7 @@ final class PdfStructure {
     /** El elemento {@code Document}, raíz del árbol de estructura. */
     private final PDStructureElement document;
 
-    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (§5.21). */
+    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (referencia/componentes/document.md). */
     private final Box root;
 
     private PDPage page;
@@ -184,8 +183,8 @@ final class PdfStructure {
         }
         if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
                 && !PageNumbers.contains(box.text())) {
-            // Las mayúsculas son solo de pintado (§4.4): el texto de la estructura es el escrito. Si
-            // lleva números de página o referencias, el texto cambia con la página y no se puede dar.
+            // Las mayúsculas son solo de pintado (referencia/comun/formato-del-texto.md): el texto de la estructura es
+            // el escrito. Si lleva números de página o referencias, el texto cambia con la página y no se puede dar.
             e.setActualText(box.text());
         }
         if (box.role() == Role.LIST) {
@@ -196,9 +195,9 @@ final class PdfStructure {
     }
 
     /**
-     * Si la caja tiene {@code Link} (§5.20), el {@code Link} que envuelve su contenido (su texto y sus
-     * hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción:
-     * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
+     * Si la caja tiene {@code Link} (referencia/comun/enlaces.md), el {@code Link} que envuelve su contenido (su texto
+     * y sus hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción: su
+     * {@code Link} envuelve a su {@code Figure} ({@link #build}).
      */
     private PDStructureNode linked(Box box, PDStructureNode content) {
         if (box.style().link() == null || box.isImage()) {
@@ -229,7 +228,7 @@ final class PdfStructure {
     }
 
     /**
-     * Una tabla (§5.15): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
+     * Una tabla (referencia/componentes/table.md): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
      * {@code TFoot}, una {@code TR} por fila. Cada celda es {@code TH} (con {@code Scope:
      * Column}) en la cabecera y {@code TD} en el resto, con {@code RowSpan} y {@code ColSpan} si
      * ocupa más de una fila o columna. Las celdas de la cabecera y el pie, y lo que contienen, se
@@ -444,7 +443,7 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta la zona de una caja con {@code Link} (ESPECIFICACION.md §5.20, decisión 171): la
+     * Etiqueta la zona de una caja con {@code Link} (referencia/comun/enlaces.md, decisión 171): la
      * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
      * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. En un
      * {@code Fixed}, en una imagen decorativa o en las filas repetidas de una tabla, donde la caja no

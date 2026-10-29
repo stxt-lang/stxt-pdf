@@ -9,7 +9,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Propiedad de la fragmentación con documentos y páginas al azar (ROADMAP-QA-ARQ.md, QA-08): los fragmentos de un
+ * Propiedad de la fragmentación con documentos y páginas al azar: los fragmentos de un
  * párrafo repartido en varias páginas suman lo que mide entero, así que no se pierde ni se repite ninguna línea, y
  * cada uno empieza en la página en que acaba el anterior o en la siguiente. La semilla es fija: un fallo se repite.
  */

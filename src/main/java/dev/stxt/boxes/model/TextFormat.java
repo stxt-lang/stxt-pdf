@@ -1,20 +1,20 @@
 package dev.stxt.boxes.model;
 
 /**
- * Formato de un tramo de texto (ESPECIFICACION.md §5.4): lo que cambia dentro de una línea. La
+ * Formato de un tramo de texto (referencia/comun/formato-del-texto.md): lo que cambia dentro de una línea. La
  * negrita y la cursiva se suman a las de la caja (un tramo en negrita de un texto ya en negrita
  * sigue en negrita); el tamaño, el color y {@code Line height} son siempre los de la caja, y la
  * familia también salvo en el código de un {@code Markdown} ({@code family}).
  *
- * <p>{@code smallCaps} marca las minúsculas que se pintan como versalitas (§4.4): el texto del
- * tramo ya está en mayúsculas y se mide y se pinta al {@link #SMALL_CAPS_SCALE} del tamaño. Lo
- * pone el layout al aplicar {@code Small caps}; el documento no lo escribe.</p>
+ * <p>{@code smallCaps} marca las minúsculas que se pintan como versalitas (referencia/comun/formato-del-texto.md): el
+ * texto del tramo ya está en mayúsculas y se mide y se pinta al {@link #SMALL_CAPS_SCALE} del tamaño. Lo pone el layout
+ * al aplicar {@code Small caps}; el documento no lo escribe.</p>
  *
  * <p>{@code family} es la familia del tramo cuando no es la de la caja: el código de un
- * {@code Markdown} (§5.17), que se escribe con la fuente de su {@code Code font}; {@code null} = la de
- * la caja. Conserva el peso y el estilo de la caja y los de las marcas del tramo.</p>
+ * {@code Markdown} (referencia/componentes/markdown.md), que se escribe con la fuente de su {@code Code font}; {@code
+ * null} = la de la caja. Conserva el peso y el estilo de la caja y los de las marcas del tramo.</p>
  *
- * <p>{@code link} es el destino del enlace del tramo ({@link Links}, §5.20), o {@code null} si no
+ * <p>{@code link} es el destino del enlace del tramo ({@link Links}, referencia/comun/enlaces.md), o {@code null} si no
  * lo lleva. No cambia cómo se mide ni cómo se pinta el texto: el subrayado de un enlace de
  * Markdown es el {@code underline} de su tramo.</p>
  */

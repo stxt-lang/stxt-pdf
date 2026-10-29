@@ -1,6 +1,9 @@
 package dev.stxt.boxes.model;
 
-/** Las páginas en que sale un {@code Fixed} (§5.5); la página 1 es la primera del documento. */
+/**
+ * Las páginas en que sale un {@code Fixed} (referencia/componentes/relative-absolute-fixed.md); la página 1 es la
+ * primera del documento.
+ */
 public enum Pages {
     ALL, FIRST, NOT_FIRST, ODD, EVEN, LAST;
 

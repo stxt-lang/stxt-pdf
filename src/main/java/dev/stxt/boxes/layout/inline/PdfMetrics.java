@@ -22,14 +22,13 @@ import static dev.stxt.boxes.tree.PropertyKey.FONT_STYLE;
 import static dev.stxt.boxes.tree.PropertyKey.FONT_WEIGHT;
 
 /**
- * Métricas reales de las fuentes TTF de la carpeta de recursos (ESPECIFICACION.md §5.11): es la
+ * Métricas reales de las fuentes TTF de la carpeta de recursos (referencia/comun/recursos.md): es la
  * métrica que corresponde a la salida de {@link dev.stxt.boxes.paint.PdfCanvas}, que incrusta
  * esas mismas fuentes: {@code new Engine(new PdfMetrics(resources))}.
  *
  * <p>{@link #validate(Box)} comprueba antes de maquetar que cada texto tiene su fuente (familia,
- * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución. Un
- * texto con tramos (§5.4) necesita la variante de cada tramo, y cada tramo, sus caracteres en
- * ella.</p>
+ * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución. Un texto con tramos
+ * (referencia/comun/formato-del-texto.md) necesita la variante de cada tramo, y cada tramo, sus caracteres en ella.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
@@ -39,7 +38,7 @@ public final class PdfMetrics implements TextMeasurer {
     private final Resources resources;
     /**
      * La última fuente que se ha pedido y su fichero: el texto de una caja se mide casi siempre con la misma, y buscarla
-     * en {@link FontLibrary} en cada palabra se notaba (PF-06). Se puede leer y escribir desde varios hilos sin cerrojo:
+     * en {@link FontLibrary} en cada palabra se notaba. Se puede leer y escribir desde varios hilos sin cerrojo:
      * la entrada es un {@code record}, con los campos finales, y en el peor caso se vuelve a buscar.
      */
     private Found last;
@@ -106,7 +105,7 @@ public final class PdfMetrics implements TextMeasurer {
             for (int i = 0; i < text.length(); ) {
                 int cp = text.codePointAt(i);
                 if (cp == '{') {
-                    // {page}, {pages} y las referencias empiezan por llave: solo entonces se buscan (PF-06).
+                    // {page}, {pages} y las referencias empiezan por llave: solo entonces se buscan.
                     int end = markerEnd(text, i);
                     if (end > i) {
                         // Una página o un número, que se pintan con cifras (o letras, en las listas).
@@ -117,7 +116,7 @@ public final class PdfMetrics implements TextMeasurer {
                         continue;
                     }
                 }
-                // Los espacios en blanco del documento se pintan como espacios (§5.4).
+                // Los espacios en blanco del documento se pintan como espacios (referencia/comun/tipografia.md).
                 requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
                 i += Character.charCount(cp);
             }

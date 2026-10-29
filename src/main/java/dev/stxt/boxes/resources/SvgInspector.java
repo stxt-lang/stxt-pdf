@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 /**
  * Lee un SVG de {@code images/} y comprueba que está en el subconjunto que admite el motor
- * (ESPECIFICACION.md §5.18): formas básicas, rutas, grupos, transformaciones, degradados,
+ * (referencia/componentes/image.md): formas básicas, rutas, grupos, transformaciones, degradados,
  * recortes, trazos y texto. Todo lo demás (scripts, animación, filtros, máscaras, patrones,
  * marcadores, imágenes incrustadas, estilos CSS) es un error, y también cualquier referencia
  * fuera del propio fichero ({@code href} y {@code url(…)} que no empiecen por {@code #}) y los

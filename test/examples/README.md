@@ -10,9 +10,10 @@ Cada carpeta tiene:
 | Fichero | Qué es |
 |---|---|
 | `input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
-| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`Element: Document`), en un [documento de estilos aparte](../../docs/ESPECIFICACION.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
+| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`Element: Document`), en un [documento de estilos aparte](../../docs/referencia/comun/estilos.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
 | `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
-| `expected.stxt` | El volcado ([§7](../../docs/ESPECIFICACION.md#7-formato-de-resultados)) de las cajas con `Id`, con las métricas reales. |
+| `expected.stxt` | El [volcado](../../docs/referencia/implementacion/pruebas.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
+| `output.pdf` | El PDF, para abrirlo desde el repositorio. Se reescribe con `-Dexamples.update=true` y no se compara: lleva la fecha y un identificador. |
 
 Los ejemplos los ejecuta `ExamplesTest` con `mvn test`: comprueba que el documento se lee y se
 maqueta, que el volcado no cambia (tolerancia de 0,01 pt) y que las imágenes de las páginas son las

@@ -12,7 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Transform}, {@code Letter spacing} y {@code Small caps} en el árbol (§4.4). */
+/**
+ * {@code Transform}, {@code Letter spacing} y {@code Small caps} en el árbol (referencia/comun/formato-del-texto.md).
+ */
 class TextCaseTest {
 
     private static String header(String language) {
@@ -70,7 +72,10 @@ class TextCaseTest {
         assertEquals(Locale.forLanguageTag("es"), es.children().get(0).style().typography().locale());
     }
 
-    /** {@code Language} en {@code Typography} cambia el idioma de la caja y de lo que hay dentro (§4.4). */
+    /**
+     * {@code Language} en {@code Typography} cambia el idioma de la caja y de lo que hay dentro
+     * (referencia/comun/tipografia.md).
+     */
     @Test
     void aBoxCanDeclareItsOwnLanguageAndItIsInherited() {
         Box root = build("\tBlock:", "\t\tTypography:", "\t\t\tLanguage: tr", "\t\tText: iğne", "\tText: Hola");

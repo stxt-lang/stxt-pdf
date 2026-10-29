@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Volver a paginar porque el total necesita más cifras o porque cambia la página de una referencia solo vuelve a
- * maquetar los textos que las escriben y sus antepasados; el resto sale de la caché (ROADMAP-QA-ARQ.md, PF-03).
- * Se mide con los layouts calculados: antes de PF-03 se vaciaba la caché entera y el documento costaba el doble.
+ * maquetar los textos que las escriben y sus antepasados; el resto sale de la caché.
+ * Se mide con los layouts calculados: antes se vaciaba la caché entera y el documento costaba el doble.
  */
 class PaginationCacheTest {
 
@@ -58,7 +58,7 @@ class PaginationCacheTest {
 
     /**
      * Con 101 páginas, el texto con {page} del flujo se vuelve a medir con tres cifras: «Página 000» (50) no cabe en su
-     * caja de 48 y ocupa dos líneas; medido con dos (45) cabría en una. La caché tiene que olvidarlo (QA-08, mutación).
+     * caja de 48 y ocupa dos líneas; medido con dos (45) cabría en una. La caché tiene que olvidarlo (pruebas de mutación).
      */
     @Test
     void aThirdDigitIsMeasuredInTheTextsThatWriteIt() {

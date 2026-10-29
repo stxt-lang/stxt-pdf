@@ -1,7 +1,7 @@
 package dev.stxt.boxes.tree;
 
 /**
- * Una sección del documento (ESPECIFICACION.md §5.21): su caja, que es la raíz de su layout (una
+ * Una sección del documento (referencia/componentes/document.md): su caja, que es la raíz de su layout (una
  * {@code Box} sin padre, como la raíz anónima de un documento de una sola sección), su medio y lo
  * que dice de las páginas que ocupa.
  *
@@ -12,7 +12,7 @@ package dev.stxt.boxes.tree;
  */
 public record Section(Box box, Media media, PageNumbering numbering, boolean inheritFixed) {
 
-    /** {@code Page numbering} (§5.21): qué hace la sección con el contador de páginas. */
+    /** {@code Page numbering} (referencia/componentes/document.md): qué hace la sección con el contador de páginas. */
     public enum PageNumbering {
         /** Sus páginas siguen el contador del documento. */
         CONTINUE,

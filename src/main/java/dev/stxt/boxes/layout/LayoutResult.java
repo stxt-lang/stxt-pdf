@@ -16,7 +16,7 @@ import java.util.List;
  * @param breakAppeal calidad del corte elegido (una de las constantes de {@link BreakAppeal})
  * @param pending     cajas absolutas cuyo containing block es un ancestro de esta caja, con la
  *                    posición estática relativa a la caja de contenido de esta caja
- * @param adjoining   márgenes de los descendientes que colapsan fuera de la caja (§5.3)
+ * @param adjoining   márgenes de los descendientes que colapsan fuera de la caja (referencia/componentes/block.md)
  */
 public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAppeal,
                            List<PendingAbsolute> pending, AdjoiningMargins adjoining) {

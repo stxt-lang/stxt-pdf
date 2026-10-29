@@ -149,7 +149,10 @@ class BoxTreeBuilderTest {
                 assertThrows(InvalidModelException.class, () -> new BoxTreeBuilder().build(noNamespace)).errorCode());
     }
 
-    /** Un documento necesita al menos una sección (§5.21): el contenido suelto no se admite. */
+    /**
+     * Un documento necesita al menos una sección (referencia/componentes/document.md): el contenido suelto no se
+     * admite.
+     */
     @Test
     void aDocumentNeedsASection() {
         DocumentSyntaxException none = assertThrows(DocumentSyntaxException.class, () -> build(document()));
@@ -206,7 +209,10 @@ class BoxTreeBuilderTest {
         assertEquals(762, r.media().pageArea().height(), 1e-9);
     }
 
-    /** {@code Paper} y {@code Orientation} (§4.1): el tamaño en vertical, girado con {@code landscape}. */
+    /**
+     * {@code Paper} y {@code Orientation} (referencia/componentes/document.md): el tamaño en vertical, girado con
+     * {@code landscape}.
+     */
     @Test
     void namedPaperSizes() {
         String head = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n";
@@ -235,7 +241,10 @@ class BoxTreeBuilderTest {
         assertEquals(5, e.line());
     }
 
-    /** {@code Rotate} y {@code Rotate origin} (§4.2): el giro y la fracción de la caja; sin origen, el centro. */
+    /**
+     * {@code Rotate} y {@code Rotate origin} (referencia/comun/estructura.md): el giro y la fracción de la caja; sin
+     * origen, el centro.
+     */
     @Test
     void rotateAndItsOrigin() {
         Box root = build(document(

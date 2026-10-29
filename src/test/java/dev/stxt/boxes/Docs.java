@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Ayudas para escribir documentos de test. La tipografía base del documento va en
- * {@code Styles} (ESPECIFICACION.md §4.10), en la regla {@code Element: Document}; los tests la
+ * {@code Styles} (referencia/comun/estilos.md), en la regla {@code Element: Document}; los tests la
  * escriben aparte del cuerpo, que a veces trae su propio {@code Styles}.
  */
 public final class Docs {
@@ -17,9 +17,10 @@ public final class Docs {
     private static final java.util.Set<String> DOCUMENT_LEVEL = java.util.Set.of("media", "title", "language", "styles");
 
     /**
-     * Envuelve en una {@code Section} todo lo que {@code Document} no admite suelto (§5.21): lo que sigue a
-     * {@code Media}, {@code Title}, {@code Language} y {@code Styles}, que quedan donde estaban. No cambia un
-     * texto que ya tiene una {@code Section}, que no es un {@code Document} o que no tiene contenido.
+     * Envuelve en una {@code Section} todo lo que {@code Document} no admite suelto
+     * (referencia/componentes/document.md): lo que sigue a {@code Media}, {@code Title}, {@code Language} y {@code
+     * Styles}, que quedan donde estaban. No cambia un texto que ya tiene una {@code Section}, que no es un {@code
+     * Document} o que no tiene contenido.
      */
     public static String sectioned(String document) {
         String[] lines = document.split("\n", -1);

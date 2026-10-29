@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * El documento PDF (AR-06): crea las páginas, pinta cada una con su {@link PdfCanvas}, y pone las etiquetas de
+ * El documento PDF: crea las páginas, pinta cada una con su {@link PdfCanvas}, y pone las etiquetas de
  * las páginas, los destinos de los enlaces y el árbol de estructura ({@link PdfStructure}) antes de guardarlo.
  * Una página PDF por página del resultado, en pt, del tamaño del medio de su sección.
  *
@@ -75,7 +75,7 @@ public final class PdfDocumentWriter {
             }
             for (int i = 0; i < pages.size(); i++) {
                 Page p = pages.get(i);
-                // Cada página tiene el medio de su sección (§5.21).
+                // Cada página tiene el medio de su sección (referencia/componentes/document.md).
                 Media media = p.media();
                 Rect area = media.pageArea();
                 PDPage page = pdfPages.get(i);
@@ -101,9 +101,9 @@ public final class PdfDocumentWriter {
     }
 
     /**
-     * Las etiquetas de las páginas (§5.21): el visor muestra el número impreso de cada una, y ninguno en las
-     * que no se numeran. Solo se escriben si alguna página no es su número físico; si no, no añaden nada.
-     * Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
+     * Las etiquetas de las páginas (referencia/componentes/document.md): el visor muestra el número impreso de cada
+     * una, y ninguno en las que no se numeran. Solo se escriben si alguna página no es su número físico; si no, no
+     * añaden nada. Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
      */
     private static void labels(PDDocument doc, List<Page> pages) {
         if (pages.stream().allMatch(p -> p.printed() == p.number())) {

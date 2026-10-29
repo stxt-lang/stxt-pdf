@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Tablas al construir el árbol (ESPECIFICACION.md §5.15): traducción a un grid, filas y celdas. */
+/** Tablas al construir el árbol (referencia/componentes/table.md): traducción a un grid, filas y celdas. */
 class TablesTest {
 
     private static Box root(String... lines) {
@@ -51,7 +51,7 @@ class TablesTest {
         assertEquals("Ventas", cell.text().trim());
     }
 
-    /** {@code Header} es de la celda, no se hereda y por defecto es falso (§5.15). */
+    /** {@code Header} es de la celda, no se hereda y por defecto es falso (referencia/componentes/table.md). */
     @Test
     void headerMarksTheRowHeaderCells() {
         Box table = root("\tTable:", "\t\tColumns: 100 100",

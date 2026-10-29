@@ -12,7 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las imágenes SVG de {@code images/} (ESPECIFICACION.md §5.18): su tamaño natural y el subconjunto que se admite. */
+/**
+ * Las imágenes SVG de {@code images/} (referencia/componentes/image.md): su tamaño natural y el subconjunto que se
+ * admite.
+ */
 class SvgImageTest {
 
     private static final String NS = "xmlns=\"http://www.w3.org/2000/svg\"";
@@ -214,7 +217,7 @@ class SvgImageTest {
                 : dev.stxt.boxes.model.FontStyle.NORMAL);
     }
 
-    // --- Cuánto dibuja un SVG (ROADMAP-QA-ARQ.md, QA-06) ---------------------------------------------------
+    // --- Cuánto dibuja un SVG ---------------------------------------------------
 
     @Test
     void anSvgCountsItsElementsAndItsDepth() throws IOException {

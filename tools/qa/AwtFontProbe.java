@@ -8,8 +8,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * QA-02: qué fuente da AWT por el nombre de una familia de resources/fonts/ después de darla de alta con
- * registerFont, que es como la buscaba JSVG antes de la sesión 4. Con la JVM arrancada en turco
+ * Qué fuente da AWT por el nombre de una familia de resources/fonts/ después de darla de alta con
+ * registerFont, que es como la buscaba JSVG antes de SvgFonts. Con la JVM arrancada en turco
  * (-Duser.language=tr -Duser.country=TR) devuelve Dialog aunque la familia esté en la lista: cambiar el Locale en
  * caliente no lo reproduce.
  */

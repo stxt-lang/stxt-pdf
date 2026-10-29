@@ -69,7 +69,7 @@ class ConverterTest {
         assertArrayEquals(fromText, pdf(Converter.builder().styles(file).build(), document()));
     }
 
-    /** Las fuentes se leen al indexar la carpeta (PF-05): el PDF no cambia aunque después desaparezca el fichero. */
+    /** Las fuentes se leen al indexar la carpeta: el PDF no cambia aunque después desaparezca el fichero. */
     @Test
     void theFontsAreReadOnce(@org.junit.jupiter.api.io.TempDir Path folder) throws IOException {
         Path fonts = Files.createDirectories(folder.resolve("fonts"));

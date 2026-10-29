@@ -10,7 +10,7 @@ import java.util.List;
  * @param number  número de página física, desde 1, en todo el documento
  * @param content fragmento raíz con el flujo de esta página: el de la caja de su sección
  * @param fixed   fragmentos de las cajas {@code fixed} que salen en esta página
- * @param media   el medio de la página: el de su sección (ESPECIFICACION.md §5.21)
+ * @param media   el medio de la página: el de su sección (referencia/componentes/document.md)
  * @param section posición de su sección en el documento, desde 0
  * @param printed número impreso de la página (lo que dicen {@code {page}} y los índices), desde 1;
  *                0 si la página no se numera ({@code Page numbering: none})

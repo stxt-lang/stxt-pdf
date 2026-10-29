@@ -180,7 +180,7 @@ class PositioningTest {
         assertRect(50, 80, 10, 10, l.rect("G"));
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): el borde y el relleno de las cajas
+    // Casos que faltaban según las pruebas de mutación: el borde y el relleno de las cajas
     // entre un Absolute y su containing block, en un bloque, un ítem flex y un área de grid.
 
     @Test
@@ -207,7 +207,7 @@ class PositioningTest {
     @Test
     void anAbsoluteMayLeaveItsContainingBlockButNotThePage() {
         // La caja de relleno de R empieza en (42, 42); A sale 42 por la izquierda y por arriba, hasta la esquina de la
-        // página (0, 0), y no más: no es un desbordamiento (§5.12).
+        // página (0, 0), y no más: no es un desbordamiento (referencia/comun/desbordamiento.md).
         LayoutFixture l = layOut(
                 "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
                 "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: -42 auto auto -42", "\t\t\tBox:", "\t\t\t\tWidth: 20",

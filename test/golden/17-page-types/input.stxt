@@ -1,4 +1,4 @@
-# Páginas en que sale un Fixed (ESPECIFICACION.md §5.5). Área útil de 260 × 160 desde (20, 20).
+# Páginas en que sale un Fixed (referencia/componentes/relative-absolute-fixed.md). Área útil de 260 × 160 desde (20, 20).
 #
 # Cuatro páginas, una por bloque de 60 (Break After: page). Los Fixed no ocupan sitio: el flujo
 # no cambia con ellos ni sin ellos. Pages cuenta las páginas desde la 1, en el orden del documento.

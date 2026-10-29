@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Pages} de un {@code Fixed} (ESPECIFICACION.md §5.5): en qué páginas sale. */
+/** {@code Pages} de un {@code Fixed} (referencia/componentes/relative-absolute-fixed.md): en qué páginas sale. */
 class FixedPagesTest {
 
     /** Un documento de {@code pages} páginas (una por bloque) y un {@code Fixed} por cada valor de {@code Pages}. */

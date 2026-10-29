@@ -1,4 +1,4 @@
-# Secciones (ESPECIFICACION.md §5.21). Páginas de 300 × 200 con márgenes de 20 (área útil de 260 × 160 desde (20, 20)).
+# Secciones (referencia/componentes/document.md). Páginas de 300 × 200 con márgenes de 20 (área útil de 260 × 160 desde (20, 20)).
 #
 # Tres secciones, cinco páginas, cada una con su Media:
 #   cover (1 página):  Margin 0, área útil de 300 × 200 desde (0, 0), sin números ni los Fixed del documento.

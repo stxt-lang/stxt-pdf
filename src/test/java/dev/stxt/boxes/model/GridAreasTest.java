@@ -7,7 +7,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** {@code Areas} y el valor de {@code Area} (ESPECIFICACION.md §4.7 y §4.8). */
+/** {@code Areas} y el valor de {@code Area} (referencia/componentes/grid.md). */
 class GridAreasTest {
 
     @Test

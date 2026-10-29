@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Adónde lleva el PDF a quien busca una caja: la esquina superior izquierda de su primer
  * fragmento, en su página. Lo usan los marcadores de los encabezados ({@link PdfStructure}) y los
- * enlaces a una caja del documento ({@link PdfLinks}, ESPECIFICACION.md §5.20).
+ * enlaces a una caja del documento ({@link PdfLinks}, referencia/comun/enlaces.md).
  *
  * <p>Tienen destino los encabezados y las cajas que se pueden señalar ({@link Box#key()}: con
  * {@code Id}, o los encabezados que lista un índice). Los {@code Fixed} no: se repiten en todas
@@ -43,7 +43,7 @@ final class PdfDestinations {
 
     /**
      * {@code x}, {@code y}: la esquina de la caja de borde del fragmento en la página, sin girar;
-     * {@code turn}, los giros de sus ancestros (§5.6). La esquina de una caja girada, o de dentro
+     * {@code turn}, los giros de sus ancestros (referencia/comun/caja.md). La esquina de una caja girada, o de dentro
      * de una girada, es la del rectángulo que envuelve lo que se pinta.
      */
     private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double pageHeight,

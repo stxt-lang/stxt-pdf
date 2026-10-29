@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Propiedades del reparto en líneas con textos y anchos al azar (ROADMAP-QA-ARQ.md, QA-08), con los dos algoritmos:
+ * Propiedades del reparto en líneas con textos y anchos al azar, con los dos algoritmos:
  * no se pierde ni se duplica ninguna palabra y quedan en orden, los párrafos son los del texto (una línea en blanco
  * los separa), ninguna línea está vacía y toda línea de más de una palabra cabe. Con {@link FixedMetrics} cada
  * carácter mide 5 pt con {@code Size: 10}. La semilla es fija: un fallo se repite.
@@ -118,7 +118,7 @@ class LineBreakerPropertiesTest {
         return runs.build();
     }
 
-    /** El reparto voraz de antes de PF-06: con cada palabra, la línea se construye y se mide entera. */
+    /** El reparto voraz de antes de sumar los avances: con cada palabra, la línea se construye y se mide entera. */
     private static List<List<LineBreaker.Line>> measuringEveryLine(List<TextRun> runs, double available,
             TextMeasurer metrics, FontFace font, double size, double spacing) {
         List<List<LineBreaker.Line>> result = new ArrayList<>();
@@ -142,7 +142,7 @@ class LineBreakerPropertiesTest {
     }
 
     /**
-     * El reparto voraz suma los avances de las palabras y los espacios (PF-06) y da las mismas líneas que midiendo la
+     * El reparto voraz suma los avances de las palabras y los espacios y da las mismas líneas que midiendo la
      * línea entera con cada palabra, como antes: con las métricas reales (negrita, cursiva, versalitas y ligaduras),
      * con interletraje y con anchos que son justo el de una línea, donde el redondeo de la suma podría decidir.
      */
@@ -173,7 +173,7 @@ class LineBreakerPropertiesTest {
         }
     }
 
-    /** Las palabras de antes de PF-06, con {@code \\S+}: la referencia de {@link #theWordsAreTheSameAsWithTheRegex}. */
+    /** Las palabras de antes, con {@code \\S+}: la referencia de {@link #theWordsAreTheSameAsWithTheRegex}. */
     private static List<List<LineBreaker.Word>> paragraphsWithTheRegex(List<TextRun> runs) {
         String text = TextRun.text(runs);
         int[] starts = new int[runs.size() + 1];
@@ -218,7 +218,7 @@ class LineBreakerPropertiesTest {
     }
 
     /**
-     * Las palabras y los párrafos se sacan recorriendo el texto (PF-06) y son los mismos que con la expresión regular
+     * Las palabras y los párrafos se sacan recorriendo el texto y son los mismos que con la expresión regular
      * de antes: con todos los espacios en blanco de {@code \\s}, otros que no lo son ({@code U+00A0}) y cambios de
      * formato dentro de las palabras y de los huecos.
      */

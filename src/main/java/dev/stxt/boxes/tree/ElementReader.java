@@ -29,7 +29,7 @@ import static dev.stxt.boxes.tree.TableBuilder.cellText;
 import static dev.stxt.boxes.tree.TableBuilder.table;
 
 /**
- * Lo propio de cada familia de elementos al construir su caja (AR-01): las propiedades de su tipo, lo que
+ * Lo propio de cada familia de elementos al construir su caja: las propiedades de su tipo, lo que
  * comprueba de las propiedades ya leídas y su contenido (un texto, una imagen o sus hijos).
  * {@link BoxTreeBuilder#element} hace lo común a todos, en orden, y llama a la familia del elemento
  * ({@link #of}) en cada paso. Un elemento nuevo sin nada propio es un {@link #CONTAINER}; si tiene algo propio,
@@ -60,8 +60,8 @@ enum ElementReader {
     },
 
     /**
-     * La {@code Cell} de una tabla (§5.15): con valor es una caja de texto y, sin él, un bloque. Su fila
-     * ({@code wrapper}) le da su {@code Typography}, como herencia, y su {@code Break}.
+     * La {@code Cell} de una tabla (referencia/componentes/table.md): con valor es una caja de texto y, sin él, un
+     * bloque. Su fila ({@code wrapper}) le da su {@code Typography}, como herencia, y su {@code Break}.
      */
     CELL {
         @Override
@@ -97,7 +97,7 @@ enum ElementReader {
         }
     },
 
-    /** Una {@code Table} (§5.15): un grid cuyas celdas coloca {@link TableBuilder}. */
+    /** Una {@code Table} (referencia/componentes/table.md): un grid cuyas celdas coloca {@link TableBuilder}. */
     TABLE {
         @Override
         boolean property(Node p, Style s) {
@@ -149,9 +149,10 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Multicol} (§5.16): su contenido va en su flujo de columnas, una caja de bloque generada que es
-     * su único hijo y de la que cada columna es un fragmento. Crea un contexto de formato de bloque, para que
-     * los márgenes no salgan de las columnas, y su alto no es definido: lo decide el reparto en columnas.
+     * Un {@code Multicol} (referencia/componentes/multicol.md): su contenido va en su flujo de columnas, una caja de
+     * bloque generada que es su único hijo y de la que cada columna es un fragmento. Crea un contexto de formato de
+     * bloque, para que los márgenes no salgan de las columnas, y su alto no es definido: lo decide el reparto en
+     * columnas.
      */
     MULTICOL {
         @Override
@@ -183,8 +184,8 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Markdown} (§5.17): los elementos que genera {@link MarkdownBuilder}, construidos como si los
-     * hubiera escrito el autor; sus textos con formato llevan sus tramos.
+     * Un {@code Markdown} (referencia/componentes/markdown.md): los elementos que genera {@link MarkdownBuilder},
+     * construidos como si los hubiera escrito el autor; sus textos con formato llevan sus tramos.
      */
     MARKDOWN {
         @Override
@@ -200,7 +201,10 @@ enum ElementReader {
         }
     },
 
-    /** Un {@code Contents} (§5.19): sus entradas las genera {@link ContentsBuilder} al final, con todos los encabezados. */
+    /**
+     * Un {@code Contents} (referencia/componentes/contents.md): sus entradas las genera {@link ContentsBuilder} al
+     * final, con todos los encabezados.
+     */
     CONTENTS {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
@@ -212,7 +216,7 @@ enum ElementReader {
     /** El resto: {@code Block}, los encabezados, {@code List item}, las cajas posicionadas…, con sus hijos. */
     CONTAINER;
 
-    /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
+    /** Una línea en blanco dentro del texto: separa párrafos (referencia/comun/tipografia.md). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
     /** La familia de un elemento. */
@@ -264,10 +268,10 @@ enum ElementReader {
     }
 
     /**
-     * Con {@code Inline: markdown} (§5.4), el texto de la caja es Markdown en línea: pasa a ser el texto
-     * seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro de un
-     * {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un
-     * bloque: sus errores señalan la línea donde empieza.
+     * Con {@code Inline: markdown} (referencia/comun/formato-del-texto.md), el texto de la caja es Markdown en línea:
+     * pasa a ser el texto seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro
+     * de un {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un bloque:
+     * sus errores señalan la línea donde empieza.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
         if (box.style().typography().inline() != Inline.MARKDOWN || ctx.insideMarkdown) {
@@ -280,8 +284,8 @@ enum ElementReader {
     }
 
     /**
-     * La ruta de una {@code Image} (§5.18), relativa a {@code images/}. Que el fichero exista y
-     * sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
+     * La ruta de una {@code Image} (referencia/componentes/image.md), relativa a {@code images/}. Que el fichero exista
+     * y sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
      */
     private static void image(InlineNode n, Box box) {
         String path = n.getText().trim();

@@ -4,9 +4,9 @@ import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.tree.Box;
 
 /**
- * Lo que un lienzo hace con el significado de lo que pinta, aparte de dibujarlo (AR-05): las secuencias de texto
- * del PDF etiquetado (ESPECIFICACION.md §5.13) y las zonas de los enlaces (§5.20). Cada {@link Canvas} da la
- * suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que solo dibuja,
+ * Lo que un lienzo hace con el significado de lo que pinta, aparte de dibujarlo: las secuencias de texto del PDF
+ * etiquetado (referencia/comun/pdf.md) y las zonas de los enlaces (referencia/comun/enlaces.md). Cada {@link Canvas} da
+ * la suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que solo dibuja,
  * {@link #NONE}, que no hace nada. No cambia lo que se ve.
  */
 public interface Tagging {
@@ -32,12 +32,12 @@ public interface Tagging {
 
     /**
      * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},
-     * son su contenido (el PDF etiquetado lo marca, §5.13).
+     * son su contenido (el PDF etiquetado lo marca, referencia/comun/pdf.md).
      */
     void beginText(Box box);
 
     /**
-     * Empieza el texto de un enlace dentro del texto de la caja (ESPECIFICACION.md §5.20): como
+     * Empieza el texto de un enlace dentro del texto de la caja (referencia/comun/enlaces.md): como
      * {@link #beginText(Box)}, pero lo que sigue, hasta {@link #endText()}, es el contenido de un
      * {@code Link} del PDF etiquetado. Las zonas clicables de ese texto ({@link #link}) se piden
      * después de empezarlo.
@@ -48,7 +48,7 @@ public interface Tagging {
     void endText();
 
     /**
-     * Una zona clicable (ESPECIFICACION.md §5.20): el área {@code area} de la página lleva a
+     * Una zona clicable (referencia/comun/enlaces.md): el área {@code area} de la página lleva a
      * {@code destination} ({@link dev.stxt.boxes.model.Links}). {@code box} es la caja a la que
      * pertenece (el PDF etiquetado cuelga el enlace de ella) y {@code description} el texto que
      * se lee en su lugar, que puede ser {@code null}.

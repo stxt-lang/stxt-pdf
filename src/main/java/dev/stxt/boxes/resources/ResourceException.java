@@ -4,7 +4,7 @@ import dev.stxt.boxes.model.StxtPdfException;
 
 /**
  * Recurso no válido o que no se encuentra: una ruta que sale de la carpeta de recursos, un
- * fichero que no existe, una fuente desconocida… (ESPECIFICACION.md §5.11). Quien conoce la
+ * fichero que no existe, una fuente desconocida… (referencia/comun/recursos.md). Quien conoce la
  * línea del documento la convierte en {@link dev.stxt.boxes.tree.InvalidModelException}; la que llega a
  * quien convierte es un problema de su carpeta de recursos ({@link Kind#RESOURCE}), sin línea.
  */

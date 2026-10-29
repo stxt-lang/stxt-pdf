@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los {@link Limits} de una conversión (ROADMAP-QA-ARQ.md, QA-06): se aplican justo donde se dicen (un documento
+ * Los {@link Limits} de una conversión: se aplican justo donde se dicen (un documento
  * que está en el límite pasa, uno por encima falla con {@code LIMIT} y la línea de la {@code Image}) y lo que el
  * motor acepta es lo que se puede dibujar.
  */

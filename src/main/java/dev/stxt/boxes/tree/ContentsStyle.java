@@ -3,8 +3,8 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.Leader;
 
 /**
- * Las propiedades de un {@code Contents} (ESPECIFICACION.md §4.16): los niveles que lista y la guía de sus entradas,
- * que también lleva la guía generada de cada una. No se heredan.
+ * Las propiedades de un {@code Contents} (referencia/componentes/contents.md): los niveles que lista y la guía de sus
+ * entradas, que también lleva la guía generada de cada una. No se heredan.
  */
 public final class ContentsStyle extends StyleGroup {
 

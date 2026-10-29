@@ -62,8 +62,8 @@ class AbsoluteEquationTest {
     }
 
     /**
-     * Cada caso de la ecuación (ESPECIFICACION.md §5.5) con márgenes distintos de 0 y todos los valores comprobados
-     * (QA-08, mutación: los tests de arriba miran un valor y con márgenes nulos).
+     * Cada caso de la ecuación (referencia/componentes/relative-absolute-fixed.md) con márgenes distintos de 0 y todos
+     * los valores comprobados (pruebas de mutación: los tests de arriba miran un valor y con márgenes nulos).
      */
     @Test
     void everyCaseWithMargins() {

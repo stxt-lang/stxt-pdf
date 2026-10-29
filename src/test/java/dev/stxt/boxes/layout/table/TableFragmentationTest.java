@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Cabecera y pie repetidos (ESPECIFICACION.md §5.15). Páginas de 180 pt con márgenes de 40: área
+ * Cabecera y pie repetidos (referencia/componentes/table.md). Páginas de 180 pt con márgenes de 40: área
  * útil de 515 × 100 desde (40, 40). Las tablas tienen una columna y celdas de alto fijo.
  */
 class TableFragmentationTest {

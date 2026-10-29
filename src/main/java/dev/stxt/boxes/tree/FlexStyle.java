@@ -6,8 +6,8 @@ import dev.stxt.boxes.model.Distribution;
 import dev.stxt.boxes.model.Value;
 
 /**
- * Las propiedades del elemento {@code Flex} (ESPECIFICACION.md §4.6): el eje, el reparto y el hueco entre ítems y
- * líneas. No se heredan.
+ * Las propiedades del elemento {@code Flex} (referencia/componentes/flex.md): el eje, el reparto y el hueco entre ítems
+ * y líneas. No se heredan.
  */
 public final class FlexStyle extends StyleGroup {
 

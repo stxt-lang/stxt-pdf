@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Número y ancho de las columnas (ESPECIFICACION.md §5.16). */
+/** Número y ancho de las columnas (referencia/componentes/multicol.md). */
 class ColumnsTest {
 
     @Test

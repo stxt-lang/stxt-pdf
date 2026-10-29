@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Una referencia a otra caja dentro de un texto (ESPECIFICACION.md §5.19): {@code {page of: id}}
+ * Una referencia a otra caja dentro de un texto (referencia/comun/referencias.md): {@code {page of: id}}
  * da la página en que empieza la caja con ese {@code Id} y {@code {number of: id}}, su número.
  * Es una pieza pura: busca las referencias de un texto y las sustituye, sin saber qué valen.
  *

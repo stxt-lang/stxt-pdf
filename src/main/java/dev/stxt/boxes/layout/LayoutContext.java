@@ -6,7 +6,7 @@ import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.tree.Box;
 
 /**
- * Lo que un algoritmo de layout necesita del motor (AR-04): maquetar y medir otras cajas, que siempre pasa por
+ * Lo que un algoritmo de layout necesita del motor: maquetar y medir otras cajas, que siempre pasa por
  * aquí para usar la caché, las métricas del texto y el tamaño natural de las imágenes. Lo implementa
  * {@link Engine}; los algoritmos dependen de esta interfaz y no del motor, que es quien los crea.
  */
@@ -18,18 +18,20 @@ public interface LayoutContext {
      */
     LayoutResult layout(Box box, ConstraintSpace space, BreakToken from);
 
-    /** min-content y max-content de la caja de margen (§5.9). */
+    /** min-content y max-content de la caja de margen (referencia/comun/caja.md). */
     IntrinsicSizes intrinsic(Box box);
 
     /**
      * min-content y max-content del contenido de la caja, sin su {@code Width}: el mínimo automático de un ítem
-     * flex depende de ellos (§5.7).
+     * flex depende de ellos (referencia/componentes/flex.md).
      */
     IntrinsicSizes contentIntrinsic(Box box);
 
-    /** Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (§5.14). */
+    /**
+     * Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (referencia/componentes/list.md).
+     */
     TextMeasurer measurer();
 
-    /** Tamaño natural de una {@code Image}, de su fichero (§5.18). */
+    /** Tamaño natural de una {@code Image}, de su fichero (referencia/componentes/image.md). */
     NaturalSize natural(Box box);
 }

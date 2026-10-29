@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los destinos de un enlace (ESPECIFICACION.md §5.20). */
+/** Los destinos de un enlace (referencia/comun/enlaces.md). */
 class LinksTest {
 
     @ParameterizedTest

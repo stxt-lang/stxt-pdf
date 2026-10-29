@@ -3,7 +3,7 @@ package dev.stxt.boxes.layout.multicol;
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 
 /**
- * Número y ancho de las columnas de un {@code Multicol} (ESPECIFICACION.md §5.16), con el
+ * Número y ancho de las columnas de un {@code Multicol} (referencia/componentes/multicol.md), con el
  * pseudoalgoritmo de CSS ({@code column-count} y {@code column-width}):
  *
  * <ul>

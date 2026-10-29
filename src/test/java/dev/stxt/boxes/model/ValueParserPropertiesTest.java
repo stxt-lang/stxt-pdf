@@ -7,7 +7,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Propiedades de {@link ValueParser} con textos al azar (ROADMAP-QA-ARQ.md, QA-08): lo único que puede lanzar es un
+ * Propiedades de {@link ValueParser} con textos al azar: lo único que puede lanzar es un
  * {@link IllegalArgumentException}, que el builder convierte en un error con línea; nunca otra excepción. La semilla
  * es fija: un fallo se repite.
  */

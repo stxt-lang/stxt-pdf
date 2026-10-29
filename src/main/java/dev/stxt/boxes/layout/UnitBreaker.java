@@ -15,7 +15,7 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
  * Fragmentación de los contenedores cuyos ítems se agrupan en <em>unidades</em>
- * (ESPECIFICACION.md §5.10): las líneas de un contenedor flex en {@code row}, los ítems de uno en
+ * (referencia/comun/cortes.md): las líneas de un contenedor flex en {@code row}, los ítems de uno en
  * {@code column} y las filas de una rejilla.
  *
  * <p>El contenedor hace su layout completo sin fragmentar y después {@link #fragment} se queda
@@ -99,7 +99,7 @@ public final class UnitBreaker {
 
     /**
      * Ítems que se repiten enteros en cada fragmento, fuera de las unidades: la cabecera de una
-     * tabla arriba y su pie debajo de las unidades colocadas (ESPECIFICACION.md §5.15). Nunca se
+     * tabla arriba y su pie debajo de las unidades colocadas (referencia/componentes/table.md). Nunca se
      * parten, y lo que queda de página para las unidades es el resto.
      *
      * @param head       ítems de la cabecera, con su posición desde la caja de contenido
@@ -386,7 +386,7 @@ public final class UnitBreaker {
                     repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
-            // Los márgenes de los ítems nunca colapsan con los del contenedor (§5.3).
+            // Los márgenes de los ítems nunca colapsan con los del contenedor (referencia/componentes/block.md).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
             }

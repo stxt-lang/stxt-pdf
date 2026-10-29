@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Estilo de las celdas de una tabla por su posición y su columna (ESPECIFICACION.md §4.10, §5.15):
- * {@code Head cell}, {@code Body cell}, {@code Foot cell}, {@code Odd row cell},
+ * Estilo de las celdas de una tabla por su posición y su columna (referencia/comun/estilos.md y
+ * referencia/componentes/table.md): {@code Head cell}, {@code Body cell}, {@code Foot cell}, {@code Odd row cell},
  * {@code Even row cell}, {@code For column} y {@code Column align}.
  */
 class TableStylesTest {
@@ -189,7 +189,10 @@ class TableStylesTest {
         assertNull(cell(table, "2").style().box().background());
     }
 
-    /** §5.15: el {@code Class} de una {@code Row} aplica sus reglas {@code For class} a cada celda de la fila. */
+    /**
+     * referencia/componentes/table.md: el {@code Class} de una {@code Row} aplica sus reglas {@code For class} a cada
+     * celda de la fila.
+     */
     @Test
     void aRowClassGivesItsRulesToEveryCellOfTheRow() {
         Box table = root("\tStyles:",

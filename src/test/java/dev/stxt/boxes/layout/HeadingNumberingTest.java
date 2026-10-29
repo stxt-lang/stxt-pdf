@@ -9,7 +9,7 @@ import static dev.stxt.boxes.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * La numeración de los encabezados, {@code Numbered} (ESPECIFICACION.md §5.13), ya maquetada. Con
+ * La numeración de los encabezados, {@code Numbered} (referencia/componentes/heading.md), ya maquetada. Con
  * {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
  */
 class HeadingNumberingTest {

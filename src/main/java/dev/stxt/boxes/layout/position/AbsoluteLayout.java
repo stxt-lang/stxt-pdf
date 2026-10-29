@@ -21,8 +21,8 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Layout de las cajas {@code absolute} y {@code fixed} (ESPECIFICACION.md §5.5). Se resuelven
- * cuando su containing block ya conoce su tamaño, después del layout en flujo:
+ * Layout de las cajas {@code absolute} y {@code fixed} (referencia/componentes/relative-absolute-fixed.md). Se
+ * resuelven cuando su containing block ya conoce su tamaño, después del layout en flujo:
  *
  * <ul>
  *   <li>Las {@code absolute} suben como {@link PendingAbsolute} hasta su containing block, y

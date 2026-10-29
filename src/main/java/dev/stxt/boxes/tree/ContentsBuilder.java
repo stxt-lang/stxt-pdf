@@ -13,7 +13,7 @@ import java.util.List;
 import static dev.stxt.boxes.tree.Nodes.error;
 
 /**
- * El índice automático (ESPECIFICACION.md §5.19): lee {@code Levels} y {@code Leader} de un
+ * El índice automático (referencia/componentes/contents.md): lee {@code Levels} y {@code Leader} de un
  * {@code Contents} y, cuando el árbol está construido y se conocen todos los encabezados, genera
  * sus entradas.
  *
@@ -110,7 +110,7 @@ final class ContentsBuilder {
         ModelValidator.validateBox(ctx, es, contents);
         Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line());
         ctx.definiteHeight.put(entry, false);
-        // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
+        // La entrada lleva a su encabezado (referencia/comun/enlaces.md): toda ella es clicable.
         es.setLink(Links.to(heading.key()));
 
         boolean leader = contents.style().contents().leader() != Leader.NONE;

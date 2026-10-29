@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, QA-03/PF-01): coste de showText de PDFBox con y sin la tabla GSUB de la fuente.
+// Sonda de QA: coste de showText de PDFBox con y sin la tabla GSUB de la fuente.
 import org.apache.fontbox.ttf.*;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.*;

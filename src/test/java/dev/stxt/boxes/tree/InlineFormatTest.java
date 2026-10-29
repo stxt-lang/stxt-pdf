@@ -13,7 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** {@code Inline: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell} (§5.4). */
+/**
+ * {@code Inline: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell}
+ * (referencia/comun/formato-del-texto.md).
+ */
 class InlineFormatTest {
 
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"

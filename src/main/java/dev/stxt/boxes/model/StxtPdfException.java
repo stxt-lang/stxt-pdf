@@ -1,7 +1,7 @@
 package dev.stxt.boxes.model;
 
 /**
- * Raíz de todos los errores que el motor da a quien lo usa (ESPECIFICACION.md §6): con una sola
+ * Raíz de todos los errores que el motor da a quien lo usa (referencia/comun/errores.md): con una sola
  * {@code catch (StxtPdfException)} basta para tratar cualquier fallo de una conversión, y {@link #kind()} dice
  * de quién es la culpa, que es lo que un servicio necesita para contestar (un 4xx o un 5xx).
  *

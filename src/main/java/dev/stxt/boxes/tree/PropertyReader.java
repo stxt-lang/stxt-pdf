@@ -62,7 +62,7 @@ import static dev.stxt.boxes.tree.ValueReader.value;
 
 /**
  * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
- * y {@code Break} (ESPECIFICACION.md §4), que comparten los elementos y las reglas de
+ * y {@code Break} (referencia/comun/estructura.md), que comparten los elementos y las reglas de
  * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Multicol} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
@@ -72,7 +72,9 @@ import static dev.stxt.boxes.tree.ValueReader.value;
  */
 final class PropertyReader {
 
-    /** Propiedades del elemento {@code Flex} (la estructura completa está en el schema, §9). */
+    /**
+     * Propiedades del elemento {@code Flex} (la estructura completa está en el schema, referencia/comun/estructura.md).
+     */
     static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
@@ -163,9 +165,9 @@ final class PropertyReader {
     }
 
     /**
-     * Una propiedad suelta de un elemento, fuera de los grupos (§4.2 y siguientes): {@code Offset}, {@code Marker},
-     * {@code Link}, {@code Alt}… Su línea se guarda con su nombre. {@code Id}, {@code Rotate} y
-     * {@code Rotate origin} no van en el estilo de la misma forma y los lee {@link BoxTreeBuilder}.
+     * Una propiedad suelta de un elemento, fuera de los grupos (referencia/comun/estructura.md y siguientes): {@code
+     * Offset}, {@code Marker}, {@code Link}, {@code Alt}… Su línea se guarda con su nombre. {@code Id}, {@code Rotate}
+     * y {@code Rotate origin} no van en el estilo de la misma forma y los lee {@link BoxTreeBuilder}.
      */
     static void single(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
@@ -181,7 +183,10 @@ final class PropertyReader {
         property.read(p, s);
     }
 
-    /** El destino de un {@code Link} (§5.20): una URL admitida o {@code #id}; que el {@code Id} exista se comprueba al final. */
+    /**
+     * El destino de un {@code Link} (referencia/comun/enlaces.md): una URL admitida o {@code #id}; que el {@code Id}
+     * exista se comprueba al final.
+     */
     private static String link(Node p) {
         String destination = p.getText().trim();
         Links.problem(destination).ifPresent(problem -> {
@@ -251,8 +256,8 @@ final class PropertyReader {
     }
 
     /**
-     * Propiedades de {@code Multicol}, hijas del elemento (§4.13); sus nombres no se repiten en
-     * otro elemento y su línea se guarda sin prefijo ({@code column-gap}).
+     * Propiedades de {@code Multicol}, hijas del elemento (referencia/componentes/multicol.md); sus nombres no se
+     * repiten en otro elemento y su línea se guarda sin prefijo ({@code column-gap}).
      */
     static void multicol(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());

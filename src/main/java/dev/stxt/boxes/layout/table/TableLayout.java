@@ -20,7 +20,7 @@ import static dev.stxt.boxes.layout.Messages.pt;
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 
 /**
- * Layout de una {@code Table} (ESPECIFICACION.md §5.15): el de su grid, con las filas de
+ * Layout de una {@code Table} (referencia/componentes/table.md): el de su grid, con las filas de
  * {@code Head} y {@code Foot} repetidas en cada fragmento.
  *
  * <p>{@code BoxTreeBuilder} traduce la tabla a un grid con colocación explícita; las primeras

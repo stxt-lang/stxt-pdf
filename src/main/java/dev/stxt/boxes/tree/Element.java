@@ -12,10 +12,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Elementos de caja del documento (ESPECIFICACION.md §2, §9), el marcador que el motor genera
- * para cada {@code List item} (§5.14) y el flujo de columnas de cada {@code Multicol} (§5.16). Cada uno da su {@code Layout} y su {@code Position}, que
- * no se declaran, y el significado que usan las reglas {@code Element}, los marcadores y las
- * etiquetas del PDF.
+ * Elementos de caja del documento (referencia/comun/estructura.md), el marcador que el motor genera para cada {@code
+ * List item} (referencia/componentes/list.md) y el flujo de columnas de cada {@code Multicol}
+ * (referencia/componentes/multicol.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
+ * significado que usan las reglas {@code Element}, los marcadores y las etiquetas del PDF.
  *
  * <p>La estructura (qué hijos admite cada elemento) está solo en el schema; {@code ElementTest}
  * comprueba que este enum tiene los mismos elementos que él.</p>
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public enum Element {
 
     /**
-     * Una sección del documento (§5.21): un bloque que es la raíz de su propio layout, con su
-     * {@code Media}. Solo es hijo de la raíz del documento.
+     * Una sección del documento (referencia/componentes/document.md): un bloque que es la raíz de su propio layout, con
+     * su {@code Media}. Solo es hijo de la raíz del documento.
      */
     SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
     BLOCK("Block", Layout.BLOCK, Position.STATIC, true, false, 0),
@@ -40,22 +40,28 @@ public enum Element {
     HEADING_6("Heading 6", Layout.BLOCK, Position.STATIC, true, false, 6),
     LIST("List", Layout.BLOCK, Position.STATIC, true, false, 0),
     LIST_ITEM("List item", Layout.BLOCK, Position.STATIC, false, false, 0),
-    /** Una tabla se maqueta como un grid con colocación explícita (§5.15). */
+    /** Una tabla se maqueta como un grid con colocación explícita (referencia/componentes/table.md). */
     TABLE("Table", Layout.GRID, Position.STATIC, true, false, 0),
     /** Sin valor, un bloque; con valor, una caja de texto ({@link BoxTreeBuilder} cambia el {@code Layout}). */
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
-    /** Bloque en columnas (§5.16): su contenido va en el flujo de columnas, {@link #COLUMNS}. */
+    /**
+     * Bloque en columnas (referencia/componentes/multicol.md): su contenido va en el flujo de columnas, {@link
+     * #COLUMNS}.
+     */
     MULTICOL("Multicol", Layout.MULTICOL, Position.STATIC, true, false, 0),
     /**
-     * Contenido en Markdown (§5.17): un bloque cuyos hijos son los elementos que
+     * Contenido en Markdown (referencia/componentes/markdown.md): un bloque cuyos hijos son los elementos que
      * {@link MarkdownBuilder} genera a partir de su {@code Content}.
      */
     MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
-    /** Imagen de la carpeta de recursos (§5.18): una caja sin hijos con la ruta en {@link Box#image()}. */
+    /**
+     * Imagen de la carpeta de recursos (referencia/componentes/image.md): una caja sin hijos con la ruta en {@link
+     * Box#image()}.
+     */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
-     * Índice automático (§5.19): un bloque cuyos hijos, generados al construir el árbol, son una
-     * entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
+     * Índice automático (referencia/comun/referencias.md): un bloque cuyos hijos, generados al construir el árbol, son
+     * una entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
      */
     CONTENTS("Contents", Layout.BLOCK, Position.STATIC, true, false, 0),
     RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
@@ -64,20 +70,20 @@ public enum Element {
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
-     * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos
-     * del {@code Multicol}, que es su único hijo. Cada columna es un fragmento suyo (§5.16).
+     * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos del {@code Multicol},
+     * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/multicol.md).
      */
     COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Un bloque de código de un {@link #MARKDOWN} (§5.17): un texto preformateado generado. No se
-     * escribe en el documento, pero las reglas {@code Element} lo nombran ({@code Code block}) para
-     * darle estilo aparte de los {@code Text} (§4.10).
+     * Un bloque de código de un {@link #MARKDOWN} (referencia/componentes/markdown.md): un texto preformateado
+     * generado. No se escribe en el documento, pero las reglas {@code Element} lo nombran ({@code Code block}) para
+     * darle estilo aparte de los {@code Text} (referencia/comun/estilos.md).
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
-     * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado
-     * con el título, la guía y el número de página. No se escriben en el documento, pero las
-     * reglas {@code Element} las nombran ({@code Contents entry 2}) para darles estilo (§5.19).
+     * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el título, la
+     * guía y el número de página. No se escriben en el documento, pero las reglas {@code Element} las nombran ({@code
+     * Contents entry 2}) para darles estilo (referencia/componentes/contents.md).
      */
     CONTENTS_ENTRY_1("Contents entry 1", Layout.FLEX),
     CONTENTS_ENTRY_2("Contents entry 2", Layout.FLEX),
@@ -136,7 +142,7 @@ public enum Element {
         return Optional.ofNullable(BY_NAME.get(canonicalName));
     }
 
-    /** Los elementos que se escriben en el documento, en el orden de la especificación. */
+    /** Los elementos que se escriben en el documento, en el orden de la referencia. */
     public static List<Element> written() {
         return Arrays.stream(values()).filter(Element::isWritten).toList();
     }
@@ -190,10 +196,10 @@ public enum Element {
     }
 
     /**
-     * Lo que significa una caja para quien lee el documento (AR-07): el papel con que la etiqueta el PDF
-     * (§5.13) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos comparten
-     * uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Fixed}, un
-     * bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link #role()}).
+     * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
+     * (referencia/comun/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
+     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Fixed},
+     * un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link #role()}).
      */
     public enum Role {
         /** La raíz anónima del documento, que no tiene elemento. */
@@ -204,21 +210,24 @@ public enum Element {
         PARAGRAPH,
         /** Un {@code Text}: un párrafo o, dentro de un encabezado, parte de su texto. */
         TEXT,
-        /** Una lista, cuyos ítems llevan su marcador a la izquierda (§5.14). */
+        /** Una lista, cuyos ítems llevan su marcador a la izquierda (referencia/componentes/list.md). */
         LIST,
         LIST_ITEM,
         TABLE,
         CELL,
         /** Una imagen. */
         FIGURE,
-        /** Un índice ({@code Contents}, §5.19). */
+        /** Un índice ({@code Contents}, referencia/componentes/contents.md). */
         CONTENTS,
         CONTENTS_ENTRY,
         /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
         SPAN,
         /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
         PAGE_NUMBER,
-        /** La guía de una entrada del índice: no tiene texto, se pinta (§5.19) y no es contenido. */
+        /**
+         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/contents.md) y no es
+         * contenido.
+         */
         LEADER,
         /** El flujo de columnas de un {@code Multicol}: no tiene significado propio, su contenido es el del {@code Multicol}. */
         FLOW,

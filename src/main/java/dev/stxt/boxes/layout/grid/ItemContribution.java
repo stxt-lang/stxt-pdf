@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout.grid;
 
 /**
- * Lo que aporta un ítem al dimensionado de pistas en un eje (ESPECIFICACION.md §5.8). Para columnas son sus
+ * Lo que aporta un ítem al dimensionado de pistas en un eje (referencia/componentes/grid.md). Para columnas son sus
  * anchos min-content y max-content; para filas, su altura tras el layout con el ancho ya resuelto.
  *
  * @param track primera pista que ocupa (desde 0)

@@ -30,7 +30,7 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 import static dev.stxt.boxes.model.Tolerance.same;
 
 /**
- * Layout {@code flex} (ESPECIFICACION.md §5.7). Los ocho pasos:
+ * Layout {@code flex} (referencia/componentes/flex.md). Los ocho pasos:
  * <ol>
  *   <li>Espacio disponible en el eje principal.</li>
  *   <li>Base de cada ítem: {@code Basis}, el tamaño declarado o el max-content.</li>
@@ -56,7 +56,7 @@ import static dev.stxt.boxes.model.Tolerance.same;
  * <p>Simplificación: en {@code column}, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
  *
- * <p>Entre páginas (§5.10) se corta entre líneas en {@code row} y entre ítems en
+ * <p>Entre páginas (referencia/comun/cortes.md) se corta entre líneas en {@code row} y entre ítems en
  * {@code column}, con {@link UnitBreaker}; una línea (en {@code column}, un ítem) que no cabe en
  * una página se parte en paralelo. Un contenedor {@code column} con {@code Wrap} no se parte.</p>
  */
@@ -68,7 +68,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         this.context = context;
     }
 
-    /** Tabla de ESPECIFICACION.md §5.9. */
+    /** Tabla de referencia/comun/caja.md. */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
@@ -161,7 +161,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
-            // Base de los porcentajes: la caja de contenido en el eje de cada hueco (§3.6).
+            // Base de los porcentajes: la caja de contenido en el eje de cada hueco (referencia/comun/valores.md).
             double columnGap = s.flex().columnGap().resolve(contentWidth).orElse(0);
             double rowGap = s.flex().rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
@@ -309,8 +309,8 @@ public final class FlexLayout implements LayoutAlgorithm {
                     : is.box().maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.box().minWidth().isAuto()) {
-                // Mínimo automático (§5.7): el min-content de su contenido, sin pasar de Max width,
-                // y nunca más que el ancho declarado.
+                // Mínimo automático (referencia/componentes/flex.md): el min-content de su contenido, sin pasar de Max
+                // width, y nunca más que el ancho declarado.
                 double content = Math.min(context.contentIntrinsic(b).minContent() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
@@ -345,8 +345,8 @@ public final class FlexLayout implements LayoutAlgorithm {
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
             double min;
             if (is.box().minHeight().isAuto()) {
-                // Mínimo automático (§5.7): el alto de su contenido, sin pasar de Max height, y
-                // nunca más que el alto declarado.
+                // Mínimo automático (referencia/componentes/flex.md): el alto de su contenido, sin pasar de Max height,
+                // y nunca más que el alto declarado.
                 double content = sized.height().isPresent()
                         ? context.layout(b, measure.measuringContentHeight(), null).fragment().height()
                         : contentSize;
@@ -479,7 +479,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     /**
      * Reparto del sobrante {@code free} entre {@code n} elementos (tabla de {@code Main axis},
-     * §5.7). Si falta sitio, {@code between} se alinea al principio y {@code around} y
+     * referencia/componentes/flex.md). Si falta sitio, {@code between} se alinea al principio y {@code around} y
      * {@code evenly} se centran, como en CSS.
      *
      * @return {antes del primero, extra entre elementos}

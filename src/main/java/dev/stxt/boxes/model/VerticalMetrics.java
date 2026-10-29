@@ -2,7 +2,7 @@ package dev.stxt.boxes.model;
 
 /**
  * Ascendente y descendente de una fuente, en fracciones del cuerpo (los dos positivos). Colocan
- * la línea base dentro de una línea (ESPECIFICACION.md §5.4).
+ * la línea base dentro de una línea (referencia/comun/tipografia.md).
  */
 public record VerticalMetrics(double ascent, double descent) {
 

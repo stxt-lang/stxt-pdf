@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * El PDF de cada ejemplo y de cada caso golden es el mismo en otra JVM (ROADMAP-QA-ARQ.md, QA-08), sin fechas ni
+ * El PDF de cada ejemplo y de cada caso golden es el mismo en otra JVM, sin fechas ni
  * identificadores. En otra JVM cambian los {@code identityHashCode} de las cajas, y con ellos el orden en que se
  * recorre un {@code IdentityHashMap} o un {@code HashSet} de cajas: si el resultado dependiera de ese orden, aquí se
  * vería. Dentro de una misma JVM lo comprueba {@link ConcurrentConversionTest}.

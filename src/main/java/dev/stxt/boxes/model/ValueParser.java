@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Convierte el texto de una propiedad en {@link Value} (ESPECIFICACION.md §3).
+ * Convierte el texto de una propiedad en {@link Value} (referencia/comun/valores.md).
  *
  * <ul>
  *   <li>Números en puntos con punto decimal: {@code 12}, {@code 12.5}, {@code -4}.</li>

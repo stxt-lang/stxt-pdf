@@ -37,7 +37,7 @@ import static dev.stxt.boxes.tree.PropertyKey.ROTATE;
 import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
 
 /**
- * Comprueba, ya paginado, que nada desborda (ESPECIFICACION.md §5.12): cada línea de texto y
+ * Comprueba, ya paginado, que nada desborda (referencia/comun/desbordamiento.md): cada línea de texto y
  * cada hijo en flujo (con sus márgenes horizontales) caben en la caja de contenido de su padre;
  * el flujo cabe en el área útil de cada página, y las cajas {@code absolute} y
  * {@code fixed} y las giradas caben en la página (las giradas, y las que están dentro de una
@@ -61,7 +61,7 @@ public final class Overflow {
     /** @throws InvalidModelException con el primer desbordamiento que encuentra */
     public static void check(List<Page> pages) {
         for (Page p : pages) {
-            // Cada página tiene el medio de su sección (§5.21).
+            // Cada página tiene el medio de su sección (referencia/componentes/document.md).
             Media media = p.media();
             Rect area = media.pageArea();
             Insets m = media.margin();
@@ -76,7 +76,7 @@ public final class Overflow {
 
     /**
      * Un fragmento cuya caja de contenido del padre empieza en ({@code ox}, {@code oy});
-     * {@code turn} son los giros de sus ancestros (§5.6), que se pintan con él.
+     * {@code turn} son los giros de sus ancestros (referencia/comun/capas-y-giro.md), que se pintan con él.
      */
     private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn) {
         double x = ox + f.x();
@@ -155,8 +155,8 @@ public final class Overflow {
     }
 
     /**
-     * El marcador de un ítem cabe en su sangría (§5.14): el relleno izquierdo de la lista más el
-     * margen izquierdo del ítem.
+     * El marcador de un ítem cabe en su sangría (referencia/componentes/list.md): el relleno izquierdo de la lista más
+     * el margen izquierdo del ítem.
      */
     private static void marker(Fragment list, Fragment item) {
         for (Fragment m : item.children()) {
@@ -239,7 +239,7 @@ public final class Overflow {
     /**
      * Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior
      * que pasa del final, y en él, lo que no se puede partir: el {@code Rotate} de una caja girada, que
-     * no se parte (§5.10), su borde y su relleno si ya no caben
+     * no se parte (referencia/comun/cortes.md), su borde y su relleno si ya no caben
      * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
      * o su {@code Height} (en una imagen sin él, su {@code Width}). Solo cuenta la posición vertical: {@code y} es la
      * de la caja de borde de {@code c} en las coordenadas de {@code bottom}.

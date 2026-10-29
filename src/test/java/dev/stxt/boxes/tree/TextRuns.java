@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Tramos con formato para los tests (ESPECIFICACION.md §5.4). El documento todavía no tiene
+ * Tramos con formato para los tests (referencia/comun/formato-del-texto.md). El documento todavía no tiene
  * sintaxis para escribirlos: se ponen en el árbol ya construido, antes de maquetarlo.
  */
 public final class TextRuns {

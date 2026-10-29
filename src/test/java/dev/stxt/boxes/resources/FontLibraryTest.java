@@ -84,7 +84,7 @@ class FontLibraryTest {
     }
 
     /**
-     * El fichero se lee una vez, al indexar la carpeta (PF-05): el contenido y la huella son los de entonces aunque el
+     * El fichero se lee una vez, al indexar la carpeta: el contenido y la huella son los de entonces aunque el
      * fichero cambie o desaparezca.
      */
     @Test

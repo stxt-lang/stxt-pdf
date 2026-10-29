@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Una caja del árbol de cajas (ESPECIFICACION.md §5.1): cada elemento de caja del documento
+ * Una caja del árbol de cajas (referencia/comun/estructura.md): cada elemento de caja del documento
  * ({@code Block}, {@code Flex}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
  * {@code Text} guarda su texto directamente.
  *
@@ -92,7 +92,7 @@ public final class Box {
 
     /**
      * Los hijos, en orden del documento; la lista no se puede cambiar. En la raíz del documento, también las
-     * secciones, que cuelgan de ella sin ser sus hijas (§5.21).
+     * secciones, que cuelgan de ella sin ser sus hijas (referencia/componentes/document.md).
      */
     public List<Box> children() {
         return closed ? children : Collections.unmodifiableList(children);
@@ -109,7 +109,7 @@ public final class Box {
     }
 
     /**
-     * Tramos del texto con su formato (ESPECIFICACION.md §5.4), cuyo texto seguido es
+     * Tramos del texto con su formato (referencia/comun/formato-del-texto.md), cuyo texto seguido es
      * {@link #text()}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
      */
     public List<TextRun> formattedRuns() {
@@ -117,7 +117,7 @@ public final class Box {
     }
 
     /**
-     * Ruta de la imagen de una {@code Image} (ESPECIFICACION.md §5.18), relativa a la carpeta
+     * Ruta de la imagen de una {@code Image} (referencia/componentes/image.md), relativa a la carpeta
      * {@code images/} de los recursos; {@code null} en el resto de cajas.
      */
     public String image() {
@@ -125,8 +125,8 @@ public final class Box {
     }
 
     /**
-     * Nombre con que se refiere a la caja un índice (§5.19) cuando no tiene {@code Id}: el de un
-     * encabezado que lista un {@code Contents}. {@code null} en el resto.
+     * Nombre con que se refiere a la caja un índice (referencia/componentes/contents.md) cuando no tiene {@code Id}: el
+     * de un encabezado que lista un {@code Contents}. {@code null} en el resto.
      */
     public String anchor() {
         return anchor;
@@ -134,7 +134,7 @@ public final class Box {
 
     /**
      * Número de la caja en el documento, tal como lo da {@code {number of: id}}
-     * (ESPECIFICACION.md §5.19); {@code null} si no tiene.
+     * (referencia/comun/referencias.md); {@code null} si no tiene.
      */
     public String number() {
         return number;
@@ -151,7 +151,7 @@ public final class Box {
     }
 
     /**
-     * Caja del marcador de un {@code List item} (ESPECIFICACION.md §5.14), generada por el motor:
+     * Caja del marcador de un {@code List item} (referencia/componentes/list.md), generada por el motor:
      * una caja de texto ({@link Element#MARKER}) con la tipografía del ítem y el texto del
      * marcador más el espacio que lo separa del contenido ({@code "3. "}, {@code "• "}). No está
      * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
@@ -162,7 +162,7 @@ public final class Box {
     }
 
     /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Head} (ESPECIFICACION.md §5.15): las
+     * Filas de la rejilla de una {@code Table} que son de su {@code Head} (referencia/componentes/table.md): las
      * primeras. 0 en el resto de cajas.
      */
     public int headRows() {
@@ -182,7 +182,10 @@ public final class Box {
         children.add(child);
     }
 
-    /** Cuelga la caja de una sección de la raíz del documento sin ser su hija: no le pone padre (§5.21). */
+    /**
+     * Cuelga la caja de una sección de la raíz del documento sin ser su hija: no le pone padre
+     * (referencia/componentes/document.md).
+     */
     void addSection(Box section) {
         writable();
         children.add(section);
@@ -272,7 +275,10 @@ public final class Box {
 
     // --- Consultas -------------------------------------------------------------------------------------
 
-    /** Cómo la nombra una referencia (§5.19): su {@code Id} o, si no tiene, su {@link #anchor}; puede ser {@code null}. */
+    /**
+     * Cómo la nombra una referencia (referencia/comun/referencias.md): su {@code Id} o, si no tiene, su {@link
+     * #anchor}; puede ser {@code null}.
+     */
     public String key() {
         return id != null ? id : anchor;
     }
@@ -298,7 +304,7 @@ public final class Box {
 
     /**
      * Crea un contexto de formato de bloque, que aísla el colapso de márgenes
-     * (ESPECIFICACION.md §5.3): el área útil (la raíz), las cajas {@code absolute} y
+     * (referencia/componentes/block.md): el área útil (la raíz), las cajas {@code absolute} y
      * {@code fixed}, los ítems de flex y grid y las cajas con {@code Isolate: true}.
      */
     public boolean establishesBlockFormattingContext() {
@@ -310,7 +316,7 @@ public final class Box {
     }
 
     /**
-     * Containing block de una caja fuera de flujo (ESPECIFICACION.md §5.2): para {@code absolute},
+     * Containing block de una caja fuera de flujo (referencia/comun/caja.md): para {@code absolute},
      * el ancestro más cercano con {@code Position} distinta de {@code static}; si no hay ninguno,
      * o si la caja es {@code fixed}, la raíz, que representa el área útil.
      */

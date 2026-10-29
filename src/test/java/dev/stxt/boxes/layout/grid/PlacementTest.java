@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-/** Colocación automática de los ítems en la rejilla (ESPECIFICACION.md §5.8). */
+/** Colocación automática de los ítems en la rejilla (referencia/componentes/grid.md). */
 class PlacementTest {
 
     private static List<Area> place(List<Cell> cells, int columns) {
@@ -84,7 +84,7 @@ class PlacementTest {
                 Direction.COLUMN));
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+    // Casos que faltaban según las pruebas de mutación.
 
     @Test
     void aFixedRowItemMayEndInTheLastColumn() {

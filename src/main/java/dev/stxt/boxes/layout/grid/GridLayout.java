@@ -33,7 +33,7 @@ import java.util.OptionalDouble;
 import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
 
 /**
- * Layout {@code grid} (ESPECIFICACION.md §5.8). Pasos:
+ * Layout {@code grid} (referencia/componentes/grid.md). Pasos:
  * <ol>
  *   <li>Colocación: {@link GridAreas}, {@link Cell} y {@link Placement}.</li>
  *   <li>Columnas: {@link TrackSizing} con min/max-content en ancho.</li>
@@ -49,7 +49,7 @@ import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
  * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
  *
- * <p>Entre páginas (§5.10) se corta entre filas con {@link UnitBreaker}; los ítems de una
+ * <p>Entre páginas (referencia/comun/cortes.md) se corta entre filas con {@link UnitBreaker}; los ítems de una
  * fila que no cabe en una página se parten en paralelo.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
@@ -84,7 +84,10 @@ public final class GridLayout implements LayoutAlgorithm {
         return new Grid(items, areas, tracks(s.grid().columns(), columns), tracks(s.grid().rows(), rows));
     }
 
-    /** El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco (§5.8). */
+    /**
+     * El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco
+     * (referencia/componentes/grid.md).
+     */
     private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
         boolean row = flow == Direction.ROW;
         String track = row ? "fila" : "columna";
@@ -106,7 +109,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /**
      * Suma de las columnas dimensionadas con restricción min-content (sin espacio libre) y con
-     * restricción max-content (espacio infinito y los ítems aportando su max-content), §5.9.
+     * restricción max-content (espacio infinito y los ítems aportando su max-content), referencia/comun/caja.md.
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
@@ -122,7 +125,7 @@ public final class GridLayout implements LayoutAlgorithm {
             maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.maxContent(), is.maxContent()));
         }
         double gaps = gap * Math.max(0, g.columns().size() - 1);
-        // Sin containing block, las columnas en porcentaje cuentan como auto (§3.1).
+        // Sin containing block, las columnas en porcentaje cuentan como auto (referencia/comun/valores.md).
         List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
         double min = Sizing.sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
         double max = Sizing.sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
@@ -215,7 +218,7 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Las filas como unidades de la fragmentación (§5.10). No se puede cortar entre dos filas que
+     * Las filas como unidades de la fragmentación (referencia/comun/cortes.md). No se puede cortar entre dos filas que
      * ocupa un mismo ítem; entre las demás, la calidad del corte sale de los ítems que acaban
      * antes y de los que empiezan después.
      */
@@ -283,7 +286,7 @@ public final class GridLayout implements LayoutAlgorithm {
             }
         }
         // Un ítem estirado se maqueta siempre con su alto fijado, aunque mida lo mismo: es la base
-        // definida de los porcentajes de sus hijos (§3.6).
+        // definida de los porcentajes de sus hijos (referencia/comun/valores.md).
         if (fixedHeight.isEmpty() && !dependsOnHeightBase(is)) {
             return measureSpace;
         }

@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Lo que comparten los tests de referencia ({@link GoldenTest}) y los de los ejemplos
- * ({@code ExamplesTest}): comparar un volcado (ESPECIFICACION.md §7) con el esperado, y las imágenes de cada página
- * del PDF con las versionadas en la carpeta del caso (ROADMAP-QA-ARQ.md, QA-07).
+ * Lo que comparten los tests de referencia ({@link GoldenTest}) y los de los ejemplos ({@code ExamplesTest}): comparar
+ * un volcado (referencia/implementacion/pruebas.md) con el esperado, y las imágenes de cada página del PDF con las
+ * versionadas en la carpeta del caso.
  *
  * <p>El PDF y las imágenes nuevas se escriben siempre en {@code target/reference/} ({@link #writeActual}), nunca en
  * {@code test/}: {@code mvn test} no cambia ningún fichero versionado. Si una imagen nueva no es la versionada (más

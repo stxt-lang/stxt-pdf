@@ -3,8 +3,8 @@ package dev.stxt.boxes.tree;
 import dev.stxt.boxes.model.Marker;
 
 /**
- * Las propiedades de las listas (ESPECIFICACION.md §4.11): el {@code Marker} y el {@code Start} de una {@code List} y el
- * {@code Number} de un {@code List item}. No se heredan.
+ * Las propiedades de las listas (referencia/componentes/list.md): el {@code Marker} y el {@code Start} de una {@code
+ * List} y el {@code Number} de un {@code List item}. No se heredan.
  */
 public final class ListStyle extends StyleGroup {
 

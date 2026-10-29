@@ -5,7 +5,7 @@ import dev.stxt.boxes.model.Marker;
 import java.util.Locale;
 
 /**
- * Texto del marcador de un ítem de lista (ESPECIFICACION.md §5.14): un símbolo ({@code •},
+ * Texto del marcador de un ítem de lista (referencia/componentes/list.md): un símbolo ({@code •},
  * {@code –}) o un número con su sufijo ({@code 3.}, {@code c.}, {@code iii.}), seguido del
  * espacio que lo separa del contenido.
  */
@@ -35,9 +35,8 @@ final class ListMarkers {
     }
 
     /**
-     * El número de un ítem tal como lo escribe su numeración, sin el sufijo ({@code 3}, {@code c},
-     * {@code III}), que es lo que da {@code {number of: id}} (§5.19); {@code null} si el marcador
-     * no numera.
+     * El número de un ítem tal como lo escribe su numeración, sin el sufijo ({@code 3}, {@code c}, {@code III}), que es
+     * lo que da {@code {number of: id}} (referencia/comun/referencias.md); {@code null} si el marcador no numera.
      */
     static String number(Marker marker, int number) {
         return switch (marker) {

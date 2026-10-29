@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (ESPECIFICACION.md §5.11).
+ * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (referencia/comun/recursos.md).
  *
  * <p>Los anchos son los que escribe PDFBox en el PDF al incrustar la fuente (el avance de cada
  * glifo en milésimas del cuerpo, redondeado): así el texto mide al maquetar lo mismo que al
@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * son idempotentes (dos hilos escriben el mismo valor en la misma casilla, y un entero se escribe
  * entero).</p>
  *
- * <p>El fichero se lee una sola vez, al indexar la carpeta (PF-05): {@link #content()} da esos bytes a quien incrusta
+ * <p>El fichero se lee una sola vez, al indexar la carpeta: {@link #content()} da esos bytes a quien incrusta
  * la fuente en el PDF o la carga en AWT para un SVG, y {@link #digest()} sale de ellos. Lo que se incrusta y se dibuja
  * es lo que se midió aunque el fichero cambie o desaparezca después.</p>
  */
@@ -142,7 +142,7 @@ public final class FontFile {
 
     /**
      * Si la fuente tiene un glifo para el carácter. Los del plano básico se memorizan: se pregunta por cada carácter
-     * del documento antes de maquetar (PF-06). Como {@link #bmpAdvance}, varios hilos pueden escribir la misma
+     * del documento antes de maquetar. Como {@link #bmpAdvance}, varios hilos pueden escribir la misma
      * respuesta a la vez.
      */
     public boolean has(int codePoint) {

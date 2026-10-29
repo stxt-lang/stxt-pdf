@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Los caminos de las formas que pintan los lienzos (§5.6). */
+/** Los caminos de las formas que pintan los lienzos (referencia/comun/caja.md). */
 class ShapesTest {
 
     /** Apunta las operaciones del camino. */

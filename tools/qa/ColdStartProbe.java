@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, PF-05): de qué se compone el arranque en frío y cuánto cuesta cargar las fuentes
+// Sonda de QA: de qué se compone el arranque en frío y cuánto cuesta cargar las fuentes
 // del PDF en cada conversión. Hay que ejecutarla en una JVM recién arrancada (la primera fase es el frío).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
@@ -92,7 +92,7 @@ public class ColdStartProbe {
         int n = rounds * files.size();
         System.out.printf("por fuente y documento (%d ficheros, %d veces): leer %.3f ms, parsear %.3f ms, PDType0Font.load %.3f ms, subconjunto y guardar %.3f ms%n",
                 files.size(), n, read / 1e6 / n, parse / 1e6 / n, load / 1e6 / n, save / 1e6 / n);
-        // Lo que hace PdfFonts desde PF-05: parsear los bytes que ya tiene FontFile, sin leer el fichero.
+        // Lo que hace PdfFonts: parsear los bytes que ya tiene FontFile, sin leer el fichero.
         System.out.printf("ídem, parsear desde FontFile.content(): %.3f ms%n", fromContent / 1e6 / n);
     }
 

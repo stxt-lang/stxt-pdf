@@ -1,4 +1,4 @@
-# Integración continua (docs/ROADMAP-QA-ARQ.md, QA-09).
+# Integración continua.
 name: CI
 
 on:
@@ -26,7 +26,7 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test
-      # Los tests no deben modificar nada versionado (ROADMAP-QA-ARQ.md, QA-07): escriben en target/ y fallan
+      # Los tests no deben modificar nada versionado: escriben en target/ y fallan
       # si cambia un PNG de referencia.
       - name: El árbol sigue limpio
         run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
@@ -39,7 +39,7 @@ jobs:
             target/surefire-reports
             target/site/jacoco
           if-no-files-found: ignore
-      # Si cambia una imagen de referencia, el PDF y las imágenes nuevas, para mirarlas (QA-07).
+      # Si cambia una imagen de referencia, el PDF y las imágenes nuevas, para mirarlas.
       - name: Imágenes nuevas
         if: failure()
         uses: actions/upload-artifact@v4
@@ -48,7 +48,7 @@ jobs:
           path: target/reference
           if-no-files-found: ignore
 
-  # El resultado no debe depender del idioma de la JVM (QA-01, QA-02): en turco tampoco cambia ningún PNG.
+  # El resultado no debe depender del idioma de la JVM: en turco tampoco cambia ningún PNG.
   locale:
     name: Tests con la JVM en turco
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
           if-no-files-found: ignore
 
   # Windows (separadores de ruta, fin de línea, ficheros abiertos que no se pueden borrar), a diario y a mano: es más
-  # lento y no bloquea los cambios (ROADMAP-QA-ARQ.md, QA-09).
+  # lento y no bloquea los cambios.
   windows:
     name: Tests en Windows
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

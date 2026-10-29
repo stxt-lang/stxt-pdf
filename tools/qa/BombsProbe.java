@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, QA-06): imágenes y SVG pequeños en bytes pero enormes al dibujarlos
+// Sonda de QA: imágenes y SVG pequeños en bytes pero enormes al dibujarlos
 // («bombas de descompresión»). Dos modos, para repetir la medición con la memoria limitada de una JVM aparte:
 //
 //   java BombsProbe gen <carpeta>            crea <carpeta>/{fonts -> resources/fonts, images/*} con cada caso

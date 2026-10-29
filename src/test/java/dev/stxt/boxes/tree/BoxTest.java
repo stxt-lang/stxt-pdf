@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** El árbol de cajas se escribe solo en {@code tree} y no cambia después de construirlo (AR-02, AR-03). */
+/** El árbol de cajas se escribe solo en {@code tree} y no cambia después de construirlo. */
 class BoxTest {
 
     /** Un bloque con una lista numerada y una caja fuera de flujo. */

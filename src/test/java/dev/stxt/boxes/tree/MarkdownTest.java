@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** El {@code Markdown} en el árbol de cajas (ESPECIFICACION.md §5.17). */
+/** El {@code Markdown} en el árbol de cajas (referencia/componentes/markdown.md). */
 class MarkdownTest {
 
     private static final String HEADER = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -108,7 +108,10 @@ class MarkdownTest {
         assertEquals("IBM Plex Mono", code.style().typography().font());
     }
 
-    /** §4.10: la regla {@code Element: Code block} da estilo al código y no a los demás textos, ni al revés. */
+    /**
+     * referencia/comun/estilos.md: la regla {@code Element: Code block} da estilo al código y no a los demás textos, ni
+     * al revés.
+     */
     @Test
     void aCodeBlockHasItsOwnElementRule() {
         Box root = build("\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tColor: #FF0000",

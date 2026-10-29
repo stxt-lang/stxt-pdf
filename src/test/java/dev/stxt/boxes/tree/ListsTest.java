@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** Listas al construir el árbol (ESPECIFICACION.md §5.14): elementos, numeración y reglas. */
+/** Listas al construir el árbol (referencia/componentes/list.md): elementos, numeración y reglas. */
 class ListsTest {
 
     private static Box root(String... lines) {

@@ -3,7 +3,7 @@ package dev.stxt.boxes.model;
 import java.util.List;
 
 /**
- * El relleno de un fondo (ESPECIFICACION.md §4.3): un color o un degradado lineal. Los colores
+ * El relleno de un fondo (referencia/comun/caja.md): un color o un degradado lineal. Los colores
  * siguen siendo el texto del documento ({@link Colors}).
  */
 public sealed interface Paint {

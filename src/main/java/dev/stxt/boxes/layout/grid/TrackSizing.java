@@ -10,7 +10,7 @@ import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
- * Dimensionado de pistas (ESPECIFICACION.md §5.8; simplificación de Grid §12). La misma función sirve para
+ * Dimensionado de pistas (referencia/componentes/grid.md; simplificación de Grid §12). La misma función sirve para
  * columnas y filas: solo cambian las aportaciones de los ítems.
  *
  * <ol>
@@ -46,7 +46,7 @@ public final class TrackSizing {
         double[] base = new double[n];
         double[] limit = new double[n];
         double space = finite ? available - gap * Math.max(0, n - 1) : Double.POSITIVE_INFINITY;
-        // Los porcentajes se refieren a la caja de contenido entera, huecos incluidos (§3.6).
+        // Los porcentajes se refieren a la caja de contenido entera, huecos incluidos (referencia/comun/valores.md).
         double reference = finite ? available : 0;
 
         // 1. Inicializar.

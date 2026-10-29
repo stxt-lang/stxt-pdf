@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Imágenes de la carpeta {@code images/} (ESPECIFICACION.md §5.18), por su ruta relativa a
+ * Imágenes de la carpeta {@code images/} (referencia/componentes/image.md), por su ruta relativa a
  * ella ({@code logos/acme.png}). Cada fichero se lee una sola vez (salvo en una carrera entre hilos, que deja una de las lecturas). Es segura entre hilos.
  */
 public final class ImageLibrary {

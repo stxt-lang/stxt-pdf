@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * El número impreso de cada página física y el último de su tanda (§5.21): las páginas desde el último
- * {@code Page numbering: restart}; {@code none} no numera ni avanza el contador.
+ * El número impreso de cada página física y el último de su tanda (referencia/componentes/document.md): las páginas
+ * desde el último {@code Page numbering: restart}; {@code none} no numera ni avanza el contador.
  */
 record Numbering(int[] printed, int[] totals) {
 

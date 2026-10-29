@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Bloques en columnas al construir el árbol (ESPECIFICACION.md §5.16): propiedades y flujo de columnas. */
+/** Bloques en columnas al construir el árbol (referencia/componentes/multicol.md): propiedades y flujo de columnas. */
 class MulticolTest {
 
     private static Box root(String... lines) {

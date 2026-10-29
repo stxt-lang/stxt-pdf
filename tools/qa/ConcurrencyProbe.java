@@ -1,4 +1,4 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, TS-02): convierte los ejemplos en secuencial y con 8 hilos y compara
+// Sonda de QA: convierte los ejemplos en secuencial y con 8 hilos y compara
 // los PDF (sin fechas ni ID). Mide también la contención de un Resources compartido frente a uno por hilo
 // (cuatro fases alternadas, para que el calentamiento de la JVM no favorezca a ninguno).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.

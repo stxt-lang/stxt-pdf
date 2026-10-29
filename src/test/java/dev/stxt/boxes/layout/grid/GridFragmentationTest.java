@@ -117,7 +117,7 @@ class GridFragmentationTest {
 
     /**
      * La segunda fila (20 líneas de 12 en una columna de 30) no cabe en ninguna página: empieza en la 2, donde se
-     * parte en paralelo desde arriba aunque en el grid entero empiece en 30 (QA-08, mutación). T no se estira (8, 8 y
+     * parte en paralelo desde arriba aunque en el grid entero empiece en 30 (pruebas de mutación). T no se estira (8, 8 y
      * 4 líneas); B se estira a la fila y se parte con ella: 100, 100 y 40.
      */
     @Test

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El documento de estilos aparte (ESPECIFICACION.md §4.10): sus reglas valen menos que las del
+ * El documento de estilos aparte (referencia/comun/estilos.md): sus reglas valen menos que las del
  * propio documento, que las mezcla propiedad a propiedad, y la tipografía base va en
  * {@code Element: Document}.
  */

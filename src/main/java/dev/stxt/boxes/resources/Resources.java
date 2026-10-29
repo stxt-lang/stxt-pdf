@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 /**
- * Carpeta de recursos (ESPECIFICACION.md §5.11): fuentes en {@code fonts/} e imágenes en
+ * Carpeta de recursos (referencia/comun/recursos.md): fuentes en {@code fonts/} e imágenes en
  * {@code images/}. Por defecto es {@code resources/}, relativa al directorio de trabajo; este
  * objeto solo sirve para cambiarla.
  *

@@ -20,7 +20,7 @@ import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
- * Reparte un texto en líneas (ESPECIFICACION.md §5.4). Con {@code Text wrap: auto},
+ * Reparte un texto en líneas (referencia/comun/tipografia.md). Con {@code Text wrap: auto},
  * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code pretty}, con
  * Knuth-Plass ({@link #optimal}).
  *
@@ -33,8 +33,8 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  * fuente; el espacio entre dos palabras tiene el formato del tramo en que está el primero de sus
  * espacios en blanco. Un texto sin formato es un único tramo y se mide igual que una cadena.</p>
  *
- * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, §4.4); el último
- * de la línea no lo lleva, así que el ancho de una línea es lo que suman sus caracteres menos un
+ * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, referencia/comun/formato-del-texto.md);
+ * el último de la línea no lo lleva, así que el ancho de una línea es lo que suman sus caracteres menos un
  * interletraje. Un tramo en versalitas se mide al {@link TextFormat#SMALL_CAPS_SCALE} del tamaño.</p>
  */
 public final class LineBreaker {
@@ -115,7 +115,7 @@ public final class LineBreaker {
 
     /**
      * El reparto voraz de un párrafo: cada palabra va a la línea en curso si cabe y, si no, empieza otra. El ancho de
-     * la línea en curso se lleva sumando los avances de sus palabras y espacios, cada uno medido una vez (PF-06); solo
+     * la línea en curso se lleva sumando los avances de sus palabras y espacios, cada uno medido una vez; solo
      * cuando la suma queda a menos de {@link Tolerance#MODEL} del ancho disponible se construye la línea y se mide
      * entera, así que la decisión es la misma que midiéndola siempre, sin que importe el redondeo de la suma.
      */
@@ -289,9 +289,9 @@ public final class LineBreaker {
     }
 
     /**
-     * Una línea colocada en la caja de contenido (§5.4): cada tramo medido con la fuente de
-     * {@code s} y su formato, la línea alineada en {@code available} y, si se justifica, con el
-     * espacio extra entre palabras sumado a su ancho y al de cada tramo.
+     * Una línea colocada en la caja de contenido (referencia/comun/formato-del-texto.md): cada tramo medido con la
+     * fuente de {@code s} y su formato, la línea alineada en {@code available} y, si se justifica, con el espacio extra
+     * entre palabras sumado a su ancho y al de cada tramo.
      *
      * @param runs    tramos de la línea, con las palabras separadas por un espacio
      * @param justify si la línea se puede justificar: no es la última de su párrafo (al numerar
@@ -353,7 +353,7 @@ public final class LineBreaker {
 
     /**
      * Las palabras de cada párrafo del texto (ver la descripción de la clase): lo que hay entre los espacios en blanco
-     * ({@link #isSpace}, el {@code \s} de las expresiones regulares), con un recorrido del texto (PF-06).
+     * ({@link #isSpace}, el {@code \s} de las expresiones regulares), con un recorrido del texto.
      */
     static List<List<Word>> paragraphs(List<TextRun> runs) {
         String text = TextRun.text(runs);
@@ -422,7 +422,7 @@ public final class LineBreaker {
         /** Formato del carácter en la posición {@code index}. */
         TextFormat format(int index) {
             if (runs.size() == 1) {
-                // Un texto sin formato, que es lo normal: no hay tramo que buscar (PF-06).
+                // Un texto sin formato, que es lo normal: no hay tramo que buscar.
                 return runs.get(0).format();
             }
             while (starts[run + 1] <= index) {

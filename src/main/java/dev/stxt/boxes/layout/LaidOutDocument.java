@@ -22,7 +22,7 @@ import java.util.List;
  * @param media    el medio del documento: el de las secciones que no declaran el suyo; el de cada
  *                 página es {@link Page#media()}
  * @param metadata título e idioma del documento
- * @param root     la raíz del documento, de la que cuelgan sus secciones (§5.21)
+ * @param root     la raíz del documento, de la que cuelgan sus secciones (referencia/componentes/document.md)
  * @param pages    las páginas, en orden; nunca vacía
  */
 public record LaidOutDocument(Media media, Metadata metadata, Box root, List<Page> pages) {

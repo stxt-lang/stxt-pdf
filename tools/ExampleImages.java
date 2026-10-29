@@ -84,7 +84,7 @@ public class ExampleImages {
     /**
      * Un dibujo SVG que se escribe a medida que se dibuja: lo justo de Java2D (relleno, trazo, degradado y
      * texto) para las ilustraciones vectoriales de los ejemplos. Los textos son {@code <text>} con las
-     * familias de {@code resources/fonts/}, que es lo único que admite el motor (ESPECIFICACION.md §5.18).
+     * familias de {@code resources/fonts/}, que es lo único que admite el motor (referencia/componentes/image.md).
      */
     static final class Svg {
         final int w;

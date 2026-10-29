@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Las secciones (ESPECIFICACION.md §5.21): páginas de 300 × 200 con márgenes de 20 (área útil de
+ * Las secciones (referencia/componentes/document.md): páginas de 300 × 200 con márgenes de 20 (área útil de
  * 260 × 160). Con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt.
  */
 class SectionsTest {
@@ -258,7 +258,7 @@ class SectionsTest {
         assertEquals(2, d.pages().size());
     }
 
-    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+    // Casos que faltaban según las pruebas de mutación.
 
     /** Una portada sin números no es un error si su contenido no escribe {page}: solo lo es lo que lo escribe. */
     @Test

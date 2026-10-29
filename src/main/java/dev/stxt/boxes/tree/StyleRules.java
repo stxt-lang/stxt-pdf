@@ -29,15 +29,14 @@ import static dev.stxt.boxes.tree.PropertyReader.fragmentation;
 import static dev.stxt.boxes.tree.PropertyReader.typography;
 
 /**
- * Las reglas reutilizables de {@code Styles} (ESPECIFICACION.md §4.10): {@code Element} (de un
+ * Las reglas reutilizables de {@code Styles} (referencia/comun/estilos.md): {@code Element} (de un
  * tipo de elemento, de una posición en una tabla o {@code Document}), {@code For class},
  * {@code For id} y {@code For column}, leídas una vez por llamada.
  *
  * <p>Pueden venir de dos sitios: del {@code Styles} del propio documento y de un documento de
- * estilos aparte (raíz {@code Styles}, §4.10). En cada nivel de prioridad van antes las reglas del
- * documento aparte y después las del documento, así que si las dos declaran la misma propiedad
- * gana el documento. Cada origen se lee por separado: una regla repetida es un error dentro de un
- * origen, no entre los dos.</p>
+ * estilos aparte (raíz {@code Styles}, referencia/comun/estilos.md). En cada nivel de prioridad van antes las reglas
+ * del documento aparte y después las del documento, así que si las dos declaran la misma propiedad gana el documento.
+ * Cada origen se lee por separado: una regla repetida es un error dentro de un origen, no entre los dos.</p>
  */
 final class StyleRules {
 
@@ -83,7 +82,7 @@ final class StyleRules {
      * Lee las reglas de {@code Styles} del documento y, si lo hay, del documento de estilos
      * aparte ({@code styles}, de raíz {@code Styles}; {@code null} si no hay). Sus valores se
      * comprueban aquí, aunque la regla no se aplique a ningún elemento; lo que depende del
-     * elemento (§6), al aplicarla.
+     * elemento (referencia/comun/errores.md), al aplicarla.
      */
     StyleRules(InlineNode document, InlineNode styles) {
         if (styles != null) {
@@ -179,8 +178,8 @@ final class StyleRules {
     }
 
     /**
-     * Aplica la regla {@code Element} de un elemento generado (una entrada del índice, §5.19), si
-     * la hay: no tiene nodo, así que no hay clases ni {@code Id} que mirar.
+     * Aplica la regla {@code Element} de un elemento generado (una entrada del índice,
+     * referencia/componentes/contents.md), si la hay: no tiene nodo, así que no hay clases ni {@code Id} que mirar.
      */
     void apply(Element kind, Style s) {
         for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {
@@ -216,9 +215,10 @@ final class StyleRules {
     }
 
     /**
-     * Aplica a una {@code Section} (§5.21) las reglas que le llegan: {@code Element: Section}, las de sus
-     * clases y la de su {@code Id}. Solo pueden dar {@code Typography}, que hereda todo su contenido;
-     * con {@code Box} o {@code Break} son un error (una sección es el área útil de sus páginas, no una caja).
+     * Aplica a una {@code Section} (referencia/componentes/document.md) las reglas que le llegan: {@code Element:
+     * Section}, las de sus clases y la de su {@code Id}. Solo pueden dar {@code Typography}, que hereda todo su
+     * contenido; con {@code Box} o {@code Break} son un error (una sección es el área útil de sus páginas, no una
+     * caja).
      */
     void applySection(InlineNode n, Style s) {
         List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(Element.SECTION, List.of()));

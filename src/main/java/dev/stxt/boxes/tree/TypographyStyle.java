@@ -13,18 +13,18 @@ import dev.stxt.boxes.model.WhiteSpace;
 import java.util.Locale;
 
 /**
- * El grupo {@code Typography} (ESPECIFICACION.md §4.4): la fuente, el tamaño, el interlineado, la alineación, el color,
- * las mayúsculas, el interletraje y el espacio en blanco del texto, la numeración de los encabezados, el idioma y las
- * viudas y huérfanas. Es el único grupo que se <strong>hereda</strong>: cada caja empieza con una copia del de su
- * padre ({@link Style#inheriting}).
+ * El grupo {@code Typography} (referencia/comun/tipografia.md): la fuente, el tamaño, el interlineado, la alineación,
+ * el color, las mayúsculas, el interletraje y el espacio en blanco del texto, la numeración de los encabezados, el
+ * idioma y las viudas y huérfanas. Es el único grupo que se <strong>hereda</strong>: cada caja empieza con una copia
+ * del de su padre ({@link Style#inheriting}).
  */
 public final class TypographyStyle extends StyleGroup {
 
-    /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (§6). */
+    /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (referencia/comun/errores.md). */
     private String font;
     private FontWeight fontWeight = FontWeight.NORMAL;
     private FontStyle fontStyle = FontStyle.NORMAL;
-    /** {@code NaN} = sin declarar, que es un error en una caja con texto (§6). */
+    /** {@code NaN} = sin declarar, que es un error en una caja con texto (referencia/comun/errores.md). */
     private double fontSize = Double.NaN;
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     private Value lineHeight;
@@ -35,16 +35,23 @@ public final class TypographyStyle extends StyleGroup {
     /** Separación entre letras, en puntos; puede ser negativa. */
     private double letterSpacing;
     private boolean smallCaps;
-    /** {@code Ligatures}: si el texto se mide y se pinta con las ligaduras de la fuente (§4.4). Se hereda. */
+    /**
+     * {@code Ligatures}: si el texto se mide y se pinta con las ligaduras de la fuente
+     * (referencia/comun/formato-del-texto.md). Se hereda.
+     */
     private boolean ligatures;
     private WhiteSpace whiteSpace = WhiteSpace.NORMAL;
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
     private int tabSize = 4;
-    /** {@code Numbered}: si los encabezados se numeran (§5.13). Se hereda: la lee el encabezado. */
+    /**
+     * {@code Numbered}: si los encabezados se numeran (referencia/componentes/heading.md). Se hereda: la lee el
+     * encabezado.
+     */
     private boolean numbered;
     /**
-     * Idioma y configuración regional del texto: el de {@code Language} de {@code Document} (§4.1) en
-     * la raíz y, si una caja declara {@code Language} en {@code Typography} (§4.4), el suyo. Se hereda.
+     * Idioma y configuración regional del texto: el de {@code Language} de {@code Document}
+     * (referencia/componentes/document.md) en la raíz y, si una caja declara {@code Language} en {@code Typography}
+     * (referencia/comun/tipografia.md), el suyo. Se hereda.
      */
     private Locale locale = Locale.ROOT;
     /** {@code Color} del texto; también el de los bordes y la línea de un {@code Multicol} que no declaran el suyo. */
@@ -250,9 +257,9 @@ public final class TypographyStyle extends StyleGroup {
     }
 
     /**
-     * Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (§6). Las ligaduras se
-     * desactivan con {@code Letter spacing} distinto de 0, como en CSS: separar las letras y unir dos en un
-     * glifo se contradicen.
+     * Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (referencia/comun/errores.md). Las
+     * ligaduras se desactivan con {@code Letter spacing} distinto de 0, como en CSS: separar las letras y unir dos en
+     * un glifo se contradicen.
      */
     public FontFace fontFace() {
         return new FontFace(font, fontWeight, fontStyle, ligatures && letterSpacing == 0);

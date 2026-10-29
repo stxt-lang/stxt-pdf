@@ -24,25 +24,36 @@ final class BuildContext {
     final StyleRules rules;
     /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
     final Map<String, Integer> ids = new HashMap<>();
-    /** Si el alto de la caja de contenido es definido: base de los porcentajes verticales (§3.6). */
+    /**
+     * Si el alto de la caja de contenido es definido: base de los porcentajes verticales (referencia/comun/valores.md).
+     */
     final Map<Box, Boolean> definiteHeight = new HashMap<>();
     /** Número de cada {@code List item} ya construido: el siguiente continúa desde él. */
     final Map<Box, Integer> itemNumbers = new HashMap<>();
     /** Nivel del último encabezado, en orden del documento; 0 antes del primero. */
     int headingLevel;
-    /** Los contadores de la numeración de los encabezados ({@code Numbered}, §5.13). */
+    /** Los contadores de la numeración de los encabezados ({@code Numbered}, referencia/componentes/heading.md). */
     final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Si se está construyendo el contenido de un {@code Fixed}. */
     boolean insideFixed;
     /** Si se está construyendo el contenido de un {@code Multicol}. */
     boolean insideMulticol;
-    /** Si se está construyendo el contenido de un {@code Markdown}: sus textos ya vienen interpretados (§5.17). */
+    /**
+     * Si se está construyendo el contenido de un {@code Markdown}: sus textos ya vienen interpretados
+     * (referencia/componentes/markdown.md).
+     */
     boolean insideMarkdown;
     /** Los {@code Contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
     final List<Box> contents = new ArrayList<>();
-    /** Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo (§5.4). */
+    /**
+     * Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo
+     * (referencia/comun/formato-del-texto.md).
+     */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
-    /** Los {@code Text} que {@link MarkdownBuilder} genera como bloques de código: su elemento es {@code Code block} (§5.17). */
+    /**
+     * Los {@code Text} que {@link MarkdownBuilder} genera como bloques de código: su elemento es {@code Code block}
+     * (referencia/componentes/markdown.md).
+     */
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
 
     BuildContext(StyleRules rules) {
