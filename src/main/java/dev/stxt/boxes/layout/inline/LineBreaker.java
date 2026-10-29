@@ -421,6 +421,10 @@ public final class LineBreaker {
 
         /** Formato del carácter en la posición {@code index}. */
         TextFormat format(int index) {
+            if (runs.size() == 1) {
+                // Un texto sin formato, que es lo normal: no hay tramo que buscar (PF-06).
+                return runs.get(0).format();
+            }
             while (starts[run + 1] <= index) {
                 run++;
             }

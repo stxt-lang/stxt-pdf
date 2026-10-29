@@ -37,6 +37,15 @@ public final class PdfMetrics implements TextMeasurer {
     private static final String DIGITS = "0123456789";
 
     private final Resources resources;
+    /**
+     * La última fuente que se ha pedido y su fichero: el texto de una caja se mide casi siempre con la misma, y buscarla
+     * en {@link FontLibrary} en cada palabra se notaba (PF-06). Se puede leer y escribir desde varios hilos sin cerrojo:
+     * la entrada es un {@code record}, con los campos finales, y en el peor caso se vuelve a buscar.
+     */
+    private Found last;
+
+    private record Found(FontFace face, FontFile file) {
+    }
 
     /** Métricas de las fuentes de la carpeta de recursos por defecto. */
     public PdfMetrics() {
@@ -49,13 +58,22 @@ public final class PdfMetrics implements TextMeasurer {
 
     @Override
     public double width(String text, FontFace font, double fontSize) {
-        return resources.fonts().find(font).width(text, fontSize, font.ligatures());
+        return file(font).width(text, fontSize, font.ligatures());
+    }
+
+    private FontFile file(FontFace font) {
+        Found found = last;
+        if (found == null || !found.face().equals(font)) {
+            found = new Found(font, resources.fonts().find(font));
+            last = found;
+        }
+        return found.file();
     }
 
     /** Las de la tabla {@code hhea} de la fuente, las mismas con que pinta {@link dev.stxt.boxes.paint.PdfCanvas}. */
     @Override
     public VerticalMetrics vertical(FontFace font) {
-        return resources.fonts().find(font).vertical();
+        return file(font).vertical();
     }
 
     /**
