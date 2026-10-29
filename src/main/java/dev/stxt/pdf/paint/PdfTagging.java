@@ -3,8 +3,10 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.tree.Box;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.documentinterchange.markedcontent.PDPropertyList;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 
@@ -117,6 +119,18 @@ final class PdfTagging implements Tagging {
     @Override
     public void endText() {
         linkText = false;
+        io(out::endMarkedContent);
+    }
+
+    @Override
+    public void beginActualText(String text) {
+        COSDictionary properties = new COSDictionary();
+        properties.setString(COSName.ACTUAL_TEXT, text);
+        io(() -> out.beginMarkedContent(COSName.getPDFName("Span"), PDPropertyList.create(properties)));
+    }
+
+    @Override
+    public void endActualText() {
         io(out::endMarkedContent);
     }
 }

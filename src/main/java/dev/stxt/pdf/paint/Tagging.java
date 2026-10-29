@@ -26,6 +26,14 @@ public interface Tagging {
         }
 
         @Override
+        public void beginActualText(String text) {
+        }
+
+        @Override
+        public void endActualText() {
+        }
+
+        @Override
         public void link(Box box, Rect area, String destination, String description) {
         }
     };
@@ -46,6 +54,15 @@ public interface Tagging {
 
     /** Termina el texto empezado con {@link #beginText(Box)} o {@link #beginLinkText(Box)}. */
     void endText();
+
+    /**
+     * Lo que se pinta hasta {@link #endActualText()}, dentro de un texto empezado, se extrae como {@code text}
+     * (referencia/implementacion/pdf.md): el texto con interletraje, cuyas letras separadas harían adivinar espacios.
+     */
+    void beginActualText(String text);
+
+    /** Termina lo empezado con {@link #beginActualText(String)}. */
+    void endActualText();
 
     /**
      * Una zona clicable (referencia/comun/enlaces.md): el área {@code area} de la página lleva a

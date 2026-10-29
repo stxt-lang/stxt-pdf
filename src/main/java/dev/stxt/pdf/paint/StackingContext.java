@@ -362,6 +362,9 @@ public final class StackingContext {
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
         Tagging tags = canvas.tagging();
+        // Con interletraje, quien extrae el texto adivina espacios entre las letras: cada secuencia de tramos de una
+        // línea lleva su texto aparte (referencia/implementacion/pdf.md).
+        boolean spaced = s.typography().letterSpacing() != 0;
         boolean open = false;
         String current = null;
         List<TextLine> lines = p.f().lines();
@@ -387,18 +390,40 @@ public final class StackingContext {
                     open = true;
                     current = link;
                 }
-                if (link != null && (i == 0 || !link.equals(runs.get(i - 1).format().link()))) {
+                boolean first = i == 0 || !Objects.equals(link, runs.get(i - 1).format().link());
+                if (link != null && first) {
                     paintLinkZone(tags, box, content, l, i, link);
+                }
+                if (spaced && first) {
+                    tags.beginActualText(sameLinkText(runs, i, spaceAfter));
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
                 canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
                         s.typography().fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
+                if (spaced && (i == runs.size() - 1 || !Objects.equals(link, runs.get(i + 1).format().link()))) {
+                    tags.endActualText();
+                }
             }
         }
         if (open) {
             tags.endText();
         }
         paintDecorations(canvas, p, content, metrics, false);
+    }
+
+    /**
+     * El texto de los tramos de una línea que empiezan en {@code first} y van seguidos con el mismo enlace, con el
+     * espacio invisible del final si llegan al final de la línea y lo lleva ({@code spaceAfter}).
+     */
+    private static String sameLinkText(List<TextLine.Run> runs, int first, boolean spaceAfter) {
+        StringBuilder text = new StringBuilder();
+        String link = runs.get(first).format().link();
+        int end = first;
+        while (end < runs.size() && Objects.equals(link, runs.get(end).format().link())) {
+            text.append(runs.get(end).text());
+            end++;
+        }
+        return spaceAfter && end == runs.size() ? text.append(' ').toString() : text.toString();
     }
 
     /**

@@ -775,6 +775,23 @@ class PdfCanvasTest {
     }
 
     /**
+     * Con un interletraje grande, un extractor pondría espacios entre las letras; cada tramo lleva en su contenido
+     * marcado el {@code ActualText} con su texto (referencia/implementacion/pdf.md), que pdfbox respeta.
+     */
+    @Test
+    void letterSpacedTextIsExtractedWhole() throws Exception {
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+                + "\tParagraph: Informe del trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n"
+                + "\tParagraph: Informe **del** trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n\t\t\tInline: markdown\n"));
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "letter-spacing"))) {
+            // pdfbox deja espacios tras el ActualText de cada secuencia: el texto es el de cada línea sin ellos.
+            assertEquals(List.of("Informe del trimestre", "Informe del trimestre"),
+                    new PDFTextStripper().getText(pdf).strip().lines().map(String::stripTrailing).toList());
+        }
+    }
+
+    /**
      * Un índice (referencia/componentes/contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título y
      * número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada encabezado,
      * también la de un encabezado de un Markdown.

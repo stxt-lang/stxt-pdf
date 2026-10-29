@@ -68,6 +68,16 @@ y `pre-wrap` no lo lleva: sus líneas son líneas.
 > **Decisión:** el espacio invisible al final de cada línea partida. *Alternativa descartada:* dejarlo a la geometría,
 > como hacen algunos extractores.
 
+Con `Letter spacing`, los caracteres de un texto se pintan separados, y quien extrae el texto mirando dónde está cada
+uno adivina espacios entre ellos (con PDFBox, `I n f o r m e` desde 1,5 pt en un cuerpo de 10). Por eso cada secuencia
+de tramos seguidos de una línea con el mismo enlace va en un contenido marcado `Span` con `ActualText`: su texto, con el
+espacio invisible del final si llega al final de la línea. Lo respetan Acrobat, poppler (`pdftotext`) y PDFBox, que deja
+espacios tras él. No está en la estructura: la de un elemento con `Transform` sigue siendo la del texto escrito.
+
+> **Decisión:** un `ActualText` por secuencia de tramos y línea. *Alternativa descartada:* uno por tramo, que deja entre
+> dos tramos el hueco del interletraje y hace adivinar un espacio de más; o `Tc` en vez de `TJ`, que separa los
+> caracteres igual y los extractores tratan del mismo modo.
+
 ### Listas
 
 `L` lleva el atributo `ListNumbering` según el `Marker`: `Disc`, `Decimal`, `LowerAlpha`, `UpperAlpha`, `LowerRoman`,

@@ -35,10 +35,7 @@ saliendo al trabajar y solo toca ese.
 ### Texto
 
 - Código en línea en un texto con `Inline: markdown` (no hay `Code font` fuera de `Markdown`; podría ser de `Typography`).
-- `justify` en `pre-wrap`, y que el código en línea use la altura de línea de su fuente en vez de la de la caja.
 - Un texto con `Inline: markdown` no admite listas ni encabezados, y hay que escapar el primer carácter si empieza como una.
-- Versalitas con la característica `smcp` de la fuente, en lugar de mayúsculas al 80 %.
-- Un texto con interletraje grande puede extraerse del PDF con espacios entre las letras.
 
 ### Encabezados y secciones
 

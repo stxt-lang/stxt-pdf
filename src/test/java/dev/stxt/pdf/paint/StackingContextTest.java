@@ -89,7 +89,10 @@ class StackingContextTest {
             events.add("link " + destination);
         }
 
-        /** Las secuencias de texto: {@code [texto} o {@code [enlace}, los tramos que pinta y {@code ]}. */
+        /**
+         * Las secuencias de texto: {@code [texto} o {@code [enlace}, los tramos que pinta y {@code ]}; dentro, lo que
+         * lleva {@code ActualText} entre {@code (actual 'texto'} y {@code )}.
+         */
         final List<String> sequences = new ArrayList<>();
 
         @Override
@@ -105,6 +108,16 @@ class StackingContextTest {
         @Override
         public void endText() {
             sequences.add("]");
+        }
+
+        @Override
+        public void beginActualText(String text) {
+            sequences.add("(actual '" + text + "'");
+        }
+
+        @Override
+        public void endActualText() {
+            sequences.add(")");
         }
 
         @Override
@@ -351,6 +364,22 @@ class StackingContextTest {
                 "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ver la web hoy", "\t\tId: T");
         assertEquals(List.of("[texto", "'ver '", "]", "[enlace", "'la web'", "]", "[texto", "' hoy'", "]"), r.sequences);
+    }
+
+    /**
+     * Con interletraje, los tramos seguidos de una línea con el mismo enlace llevan un solo {@code ActualText}, con
+     * el espacio invisible del final de la línea si llegan a él (referencia/implementacion/pdf.md).
+     */
+    @Test
+    void letterSpacedRunsShareOneActualTextPerLinkSequenceAndLine() {
+        Recorder r = record(Map.of("T", List.of(run("ver "), run("la", "b"), run(" "), link("web", "", "https://a.example"),
+                        run(" hoy y mañana"))),
+                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: ver la web hoy y mañana", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 90",
+                "\t\tTypography:", "\t\t\tLetter spacing: 1");
+        assertEquals(List.of("[texto", "(actual 'ver la '", "'ver '", "'la'", "' '", ")", "]",
+                "[enlace", "(actual 'web'", "'web'", ")", "]",
+                "[texto", "(actual ' hoy '", "' hoy '", ")", "(actual 'y mañana'", "'y mañana'", ")", "]"), r.sequences);
     }
 
     @Test

@@ -77,7 +77,8 @@ Puntos que se suman al avance de cada carácter, también el espacio, **menos el
 alineación; `justify` reparte lo que sobra después. Puede ser negativo, y no se comprueba que el avance siga siendo
 positivo. Un porcentaje es `VALUE_NOT_ALLOWED`.
 
-Un interletraje grande puede hacer que el texto copiado del PDF salga con espacios entre las letras.
+El texto que se copia o se extrae del PDF es el de la línea, sin espacios entre las letras
+([El PDF por dentro](../implementacion/pdf.md#texto-que-se-lee)).
 
 ## Ligaduras (`Ligatures`)
 
