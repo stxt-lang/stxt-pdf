@@ -199,4 +199,39 @@ class GridLayoutTest {
         assertRect(60, 60, 160, 10, l.rect("M"));
         assertEquals(Insets.all(20), l.fragment("M").margin());
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): ítems con márgenes y tamaños
+    // intrínsecos con más de dos columnas.
+
+    @Test
+    void alignmentAndStretchKeepTheItemMargins() {
+        // Áreas de 200 × 100. E (50 × 20, margen 10) al final y centrado: x = 40 + 200 − 10 − 50, y = 40 + 30 + 10.
+        // S, sin tamaño, se estira dentro de sus márgenes: 180 × 80 desde (250, 50).
+        LayoutFixture l = layOut(
+                "\tGrid:", "\t\tColumns: 200 200", "\t\tRows: 100",
+                "\t\tArea:", "\t\t\tHorizontal: end", "\t\t\tVertical: center",
+                "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
+                "\t\t\t\t\tMargin: 10",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10");
+        assertRect(180, 80, 50, 20, l.rect("E"));
+        assertRect(250, 50, 180, 80, l.rect("S"));
+    }
+
+    @Test
+    void notStretchedItemsFitTheirContentInsideTheirMargins() {
+        // Horizontal: start: el texto (15) en un área de 200 con 10 de margen a cada lado.
+        LayoutFixture l = layOut(
+                "\tGrid:", "\t\tColumns: 200", "\t\tHorizontal: start",
+                "\t\tArea:", "\t\t\tText: aaa", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10");
+        assertRect(50, 50, 15, 12, l.rect("T"));
+    }
+
+    @Test
+    void intrinsicWidthsWithThreeColumns() {
+        // 5 + 10 + 15 y dos huecos de 10.
+        LayoutFixture l = layOut(
+                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumns: auto auto auto",
+                "\t\tGap: 10", "\t\tArea:", "\t\t\tText: a", "\t\tArea:", "\t\t\tText: bb", "\t\tArea:", "\t\t\tText: ccc");
+        assertEquals(50, l.rect("G").width(), 1e-9);
+    }
 }

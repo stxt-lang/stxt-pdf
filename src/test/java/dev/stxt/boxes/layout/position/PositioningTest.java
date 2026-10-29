@@ -179,4 +179,39 @@ class PositioningTest {
         assertRect(40, 40, 10, 10, l.rect("F"));
         assertRect(50, 80, 10, 10, l.rect("G"));
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): el borde y el relleno de las cajas
+    // entre un Absolute y su containing block, en un bloque, un ítem flex y un área de grid.
+
+    @Test
+    void staticPositionInsideABorderedBox() {
+        // La caja de contenido de M empieza en (40 + 3 + 5, 40 + 3 + 5).
+        String inner = "\t\t\tBox:\n\t\t\t\tBorder: 3\n\t\t\t\tPadding: 5\n\t\t\tAbsolute:\n\t\t\t\tId: %s\n"
+                + "\t\t\t\tText: aaa";
+        LayoutFixture l = layOut(
+                "\tRelative:", "\t\tBlock:", inner.formatted("A"));
+        assertRect(48, 48, 15, 12, l.rect("A"));
+    }
+
+    @Test
+    void staticPositionInsideABorderedFlexItemAndGridArea() {
+        String inner = "\t\t\t\t\tBox:\n\t\t\t\t\t\tBorder: 3\n\t\t\t\t\t\tPadding: 5\n\t\t\t\t\tAbsolute:\n"
+                + "\t\t\t\t\t\tId: %s\n\t\t\t\t\t\tText: aaa";
+        LayoutFixture flex = layOut("\tRelative:", "\t\tFlex:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
+        assertRect(48, 48, 15, 12, flex.rect("F"));
+        LayoutFixture grid = layOut("\tRelative:", "\t\tGrid:", "\t\t\tColumns: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
+                inner.formatted("G"));
+        assertRect(48, 48, 15, 12, grid.rect("G"));
+    }
+
+    @Test
+    void anAbsoluteMayLeaveItsContainingBlockButNotThePage() {
+        // La caja de relleno de R empieza en (42, 42); A sale 37 por la izquierda y por arriba, hasta (5, 5), aún
+        // dentro de la página: no es un desbordamiento (§5.12).
+        LayoutFixture l = layOut(
+                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
+                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: -37 auto auto -37", "\t\t\tBox:", "\t\t\t\tWidth: 20",
+                "\t\t\t\tHeight: 20");
+        assertRect(5, 5, 20, 20, l.rect("A"));
+    }
 }
