@@ -124,12 +124,12 @@ class MarkdownTest {
         assertEquals("#FF0000", title.style().color);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals(8, code.style().fontSize, 1e-9);
-        assertEquals(new Paint.Solid("#EEEEEE"), code.style().background);
-        assertEquals(Sides.all(Value.pt(6)), code.style().padding);
+        assertEquals(new Paint.Solid("#EEEEEE"), code.style().box().background());
+        assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
         assertEquals(WhiteSpace.PRE, code.style().whiteSpace);
         assertEquals("IBM Plex Mono", code.style().font);
         // Y el Text del encabezado no recibe lo del bloque de código.
-        assertNull(title.style().background);
+        assertNull(title.style().box().background());
     }
 
     /** Un {@code Text} escrito a mano con {@code White space: pre} sigue siendo un {@code Text}. */

@@ -68,52 +68,52 @@ public final class StyleEditor {
     }
 
     public StyleEditor width(Value v) {
-        style.width = v;
+        style.box().setWidth(v);
         return this;
     }
 
     public StyleEditor height(Value v) {
-        style.height = v;
+        style.box().setHeight(v);
         return this;
     }
 
     public StyleEditor minWidth(Value v) {
-        style.minWidth = v;
+        style.box().setMinWidth(v);
         return this;
     }
 
     public StyleEditor maxWidth(Value v) {
-        style.maxWidth = v;
+        style.box().setMaxWidth(v);
         return this;
     }
 
     public StyleEditor minHeight(Value v) {
-        style.minHeight = v;
+        style.box().setMinHeight(v);
         return this;
     }
 
     public StyleEditor maxHeight(Value v) {
-        style.maxHeight = v;
+        style.box().setMaxHeight(v);
         return this;
     }
 
     public StyleEditor aspectRatio(Double v) {
-        style.aspectRatio = v;
+        style.box().setAspectRatio(v);
         return this;
     }
 
     public StyleEditor margin(Sides<Value> v) {
-        style.margin = v;
+        style.box().setMargin(v);
         return this;
     }
 
     public StyleEditor padding(Sides<Value> v) {
-        style.padding = v;
+        style.box().setPadding(v);
         return this;
     }
 
     public StyleEditor border(Sides<Value> v) {
-        style.border = v;
+        style.box().setBorder(v);
         return this;
     }
 }

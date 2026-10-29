@@ -98,7 +98,7 @@ class BoxTreeBuilderTest {
         assertEquals(14, child.style().fontSize, 1e-9);
         assertEquals(3, child.style().widows);
         assertEquals(16.8, child.style().usedLineHeight(), 1e-9);
-        assertEquals(Sides.all(Value.pt(0)), child.style().padding); // Padding no se hereda
+        assertEquals(Sides.all(Value.pt(0)), child.style().box().padding()); // Padding no se hereda
     }
 
     @Test

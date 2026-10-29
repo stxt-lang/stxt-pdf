@@ -85,8 +85,8 @@ class StylesFileTest {
                 "\t\tFor class: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tBlock:", "\t\tClass: a");
         Box block = root.children().get(0);
-        assertEquals(Sides.all(Value.pt(3)), block.style().padding);
-        assertEquals(Sides.all(Value.pt(2)), block.style().margin);
+        assertEquals(Sides.all(Value.pt(3)), block.style().box().padding());
+        assertEquals(Sides.all(Value.pt(2)), block.style().box().margin());
     }
 
     @Test
@@ -94,13 +94,13 @@ class StylesFileTest {
         String styles = BASE + "\tFor id: x\n\t\tBox:\n\t\t\tPadding: 5\n";
         Box block = root(styles, "\tStyles:", "\t\tFor class: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tBlock:", "\t\tId: x", "\t\tClass: a").children().get(0);
-        assertEquals(Sides.all(Value.pt(5)), block.style().padding);
+        assertEquals(Sides.all(Value.pt(5)), block.style().box().padding());
     }
 
     @Test
     void aClassCanHaveItsRuleOnlyInTheStylesDocument() {
         Box block = root(BASE + "\tFor class: a\n\t\tBox:\n\t\t\tPadding: 4\n", "\tBlock:", "\t\tClass: a").children().get(0);
-        assertEquals(Sides.all(Value.pt(4)), block.style().padding);
+        assertEquals(Sides.all(Value.pt(4)), block.style().box().padding());
     }
 
     @Test
@@ -207,15 +207,15 @@ class StylesFileTest {
         Box table = root(styles, "\tStyles:", "\t\tElement: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
-        assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().padding);
-        assertEquals(Sides.all(Value.pt(7)), table.children().get(1).style().padding);
+        assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().box().padding());
+        assertEquals(Sides.all(Value.pt(7)), table.children().get(1).style().box().padding());
     }
 
     @Test
     void theGeneratedEntriesOfAContentsTakeTheRulesOfTheStylesDocument() {
         String styles = BASE + "\tElement: Contents entry 1\n\t\tBox:\n\t\t\tPadding: 6\n";
         Box contents = root(styles, "\tHeading 1:", "\t\tText: Uno", "\tContents:").children().get(1);
-        assertEquals(Sides.all(Value.pt(6)), contents.children().get(0).style().padding);
+        assertEquals(Sides.all(Value.pt(6)), contents.children().get(0).style().box().padding());
     }
 
     @Test

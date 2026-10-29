@@ -126,8 +126,8 @@ final class ContentsBuilder {
             Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Layout.BLOCK, heading.line());
             guide.style().contents().setLeader(contents.style().contents().leader());
             guide.style().item().setGrow(1);
-            guide.style().height = Value.pt(es.usedLineHeight());
-            guide.style().margin = new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP));
+            guide.style().box().setHeight(Value.pt(es.usedLineHeight()));
+            guide.style().box().setMargin(new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP)));
             entry.addChild(guide);
         }
 

@@ -46,11 +46,11 @@ class TableStylesTest {
 
     /** El color liso del fondo de una celda. */
     private static String color(Box cell) {
-        return ((dev.stxt.boxes.model.Paint.Solid) cell.style().background).color();
+        return ((dev.stxt.boxes.model.Paint.Solid) cell.style().box().background()).color();
     }
 
     private static List<String> background(Box table) {
-        return table.children().stream().map(c -> c.style().background == null ? "-" : color(c))
+        return table.children().stream().map(c -> c.style().box().background() == null ? "-" : color(c))
                 .toList();
     }
 
@@ -65,8 +65,8 @@ class TableStylesTest {
         assertEquals(TextAlign.RIGHT, cell(table, "f1").style().textAlign);
         assertEquals(TextAlign.LEFT, cell(table, "h1").style().textAlign);
         assertEquals(FontWeight.NORMAL, cell(table, "a1").style().fontWeight);
-        assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style().padding.top()));
-        assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style().padding.top()));
+        assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style().box().padding().top()));
+        assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style().box().padding().top()));
         // La línea de lo que aporta la regla es la de la regla.
         assertEquals(14, cell(table, "h1").style().line("font-weight"));
     }
@@ -88,11 +88,11 @@ class TableStylesTest {
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tSpan: 2 1", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tCell: c",
                 "\t\t\tRow:", "\t\t\t\tCell: d", "\t\t\t\tCell: e").children().get(0);
-        assertNull(cell(table, "a").style().background);
-        assertNull(cell(table, "b").style().background);
+        assertNull(cell(table, "a").style().box().background());
+        assertNull(cell(table, "b").style().box().background());
         // c está en la fila 2 (par); d y e, en la 3.
         assertEquals("#222222", color(cell(table, "c")).toLowerCase());
-        assertNull(cell(table, "d").style().background);
+        assertNull(cell(table, "d").style().box().background());
     }
 
     @Test
@@ -102,11 +102,11 @@ class TableStylesTest {
                 "\t\tElement: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 2",
                 "\t\tElement: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\t\tElement: Odd row cell", "\t\t\tBox:", "\t\t\t\tPadding: 4"}, TABLE)).children().get(0);
-        assertEquals(Value.pt(2), cell(table, "h1").style().padding.top());
-        assertEquals(Value.pt(4), cell(table, "a1").style().padding.top());
-        assertEquals(Value.pt(3), cell(table, "b1").style().padding.top());
-        assertEquals(Value.pt(1), cell(table, "f1").style().padding.top());
-        assertEquals(Value.pt(1), cell(table, "f1").style().margin.top());
+        assertEquals(Value.pt(2), cell(table, "h1").style().box().padding().top());
+        assertEquals(Value.pt(4), cell(table, "a1").style().box().padding().top());
+        assertEquals(Value.pt(3), cell(table, "b1").style().box().padding().top());
+        assertEquals(Value.pt(1), cell(table, "f1").style().box().padding().top());
+        assertEquals(Value.pt(1), cell(table, "f1").style().box().margin().top());
     }
 
     @Test
@@ -186,7 +186,7 @@ class TableStylesTest {
         assertEquals(TextAlign.LEFT, cell(table, "3").style().textAlign);
         assertEquals(TextAlign.RIGHT, cell(table, "4").style().textAlign);
         assertEquals("#444444", color(cell(table, "4")).toLowerCase());
-        assertNull(cell(table, "2").style().background);
+        assertNull(cell(table, "2").style().box().background());
     }
 
     /** §5.15: el {@code Class} de una {@code Row} aplica sus reglas {@code For class} a cada celda de la fila. */
@@ -205,7 +205,7 @@ class TableStylesTest {
         }
         for (String other : List.of("a", "b", "c")) {
             assertEquals(FontWeight.NORMAL, cell(table, other).style().fontWeight, other);
-            assertNull(cell(table, other).style().background, other);
+            assertNull(cell(table, other).style().box().background(), other);
         }
         // La línea de lo que aporta la clase es la de su regla.
         assertEquals(14, cell(table, "t2").style().line("font-weight"));

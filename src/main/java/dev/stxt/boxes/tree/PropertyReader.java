@@ -132,19 +132,19 @@ final class PropertyReader {
         for (Node p : group.getChildren()) {
             s.declared(p.getCanonicalName(), p.getLine());
             switch (p.getCanonicalName()) {
-                case "width" -> s.width = value(p, SIZE, false);
-                case "height" -> s.height = value(p, SIZE, false);
-                case "min-width" -> s.minWidth = value(p, LENGTH_OR_AUTO, false);
-                case "max-width" -> s.maxWidth = value(p, LENGTH, false);
-                case "min-height" -> s.minHeight = value(p, LENGTH_OR_AUTO, false);
-                case "max-height" -> s.maxHeight = value(p, LENGTH, false);
-                case "aspect-ratio" -> s.aspectRatio = aspectRatio(p);
-                case "margin" -> s.margin = sides(p, LENGTH_OR_AUTO, true);
-                case "padding" -> s.padding = nonNegativeSides(p, true);
-                case "border" -> s.border = nonNegativeSides(p, false);
-                case "border-color" -> s.borderColor = colorSides(p);
-                case "radius" -> s.radius = radius(p);
-                case "background" -> s.background = paint(p);
+                case "width" -> s.box().setWidth(value(p, SIZE, false));
+                case "height" -> s.box().setHeight(value(p, SIZE, false));
+                case "min-width" -> s.box().setMinWidth(value(p, LENGTH_OR_AUTO, false));
+                case "max-width" -> s.box().setMaxWidth(value(p, LENGTH, false));
+                case "min-height" -> s.box().setMinHeight(value(p, LENGTH_OR_AUTO, false));
+                case "max-height" -> s.box().setMaxHeight(value(p, LENGTH, false));
+                case "aspect-ratio" -> s.box().setAspectRatio(aspectRatio(p));
+                case "margin" -> s.box().setMargin(sides(p, LENGTH_OR_AUTO, true));
+                case "padding" -> s.box().setPadding(nonNegativeSides(p, true));
+                case "border" -> s.box().setBorder(nonNegativeSides(p, false));
+                case "border-color" -> s.box().setBorderColor(colorSides(p));
+                case "radius" -> s.box().setRadius(radius(p));
+                case "background" -> s.box().setBackground(paint(p));
                 default -> throw unread(p);
             }
         }

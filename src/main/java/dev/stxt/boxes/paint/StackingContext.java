@@ -211,8 +211,8 @@ public final class StackingContext {
         Style s = p.f().box().style();
         Rect borderBox = p.borderBox();
         Radii radii = radii(p);
-        if (s.background() != null) {
-            canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.background());
+        if (s.box().background() != null) {
+            canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.box().background());
         }
         canvas.border(borderBox, p.f().border(), radii, borderColors(s));
         if (s.multicol().rule() > 0) {
@@ -227,7 +227,7 @@ public final class StackingContext {
      */
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
-        Radii radii = Radii.resolve(s.radius(), p.f().width(), p.f().height());
+        Radii radii = Radii.resolve(s.box().radius(), p.f().width(), p.f().height());
         if (s.breaks().decoration() == Decoration.CLONE) {
             return radii;
         }
@@ -236,11 +236,11 @@ public final class StackingContext {
 
     /** El color de cada lado del borde: el suyo o, si no lo declara, el del texto. */
     private static Sides<String> borderColors(Style s) {
-        if (s.borderColor() == null) {
+        if (s.box().borderColor() == null) {
             return Sides.all(s.color());
         }
-        return new Sides<>(orText(s.borderColor().top(), s), orText(s.borderColor().right(), s),
-                orText(s.borderColor().bottom(), s), orText(s.borderColor().left(), s));
+        return new Sides<>(orText(s.box().borderColor().top(), s), orText(s.box().borderColor().right(), s),
+                orText(s.box().borderColor().bottom(), s), orText(s.box().borderColor().left(), s));
     }
 
     private static String orText(String color, Style s) {

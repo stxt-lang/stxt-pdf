@@ -131,12 +131,12 @@ final class ModelValidator {
 
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
-        if (s.isDeclared(ASPECT_RATIO) && !s.width.isAuto() && !s.height.isAuto()) {
+        if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
             throw error(s.line(ASPECT_RATIO), ErrorCode.ASPECT_RATIO_CONFLICT,
                     "Aspect ratio no tiene efecto si Width y Height están declarados");
         }
-        validateMinMax(s, WIDTH, s.width, MIN_WIDTH, s.minWidth, MAX_WIDTH, s.maxWidth);
-        validateMinMax(s, HEIGHT, s.height, MIN_HEIGHT, s.minHeight, MAX_HEIGHT, s.maxHeight);
+        validateMinMax(s, WIDTH, s.box().width(), MIN_WIDTH, s.box().minWidth(), MAX_WIDTH, s.box().maxWidth());
+        validateMinMax(s, HEIGHT, s.box().height(), MIN_HEIGHT, s.box().minHeight(), MAX_HEIGHT, s.box().maxHeight());
         validatePercentages(ctx, s, parent, flexItem, gridItem);
         validateColumnBreaks(ctx, s);
     }
@@ -173,13 +173,13 @@ final class ModelValidator {
             return;
         }
         // Absolute y Fixed: inicio + tamaño + fin no puede fijar la posición dos veces.
-        if (!o.left().isAuto() && !s.width.isAuto() && !o.right().isAuto()
-                && !s.margin.left().isAuto() && !s.margin.right().isAuto()) {
+        if (!o.left().isAuto() && !s.box().width().isAuto() && !o.right().isAuto()
+                && !s.box().margin().left().isAuto() && !s.box().margin().right().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
                     + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
         }
-        if (!o.top().isAuto() && !s.height.isAuto() && !o.bottom().isAuto()
-                && !s.margin.top().isAuto() && !s.margin.bottom().isAuto()) {
+        if (!o.top().isAuto() && !s.box().height().isAuto() && !o.bottom().isAuto()
+                && !s.box().margin().top().isAuto() && !s.box().margin().bottom().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Arriba, Height y abajo declarados fijan la "
                     + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
         }
@@ -187,7 +187,7 @@ final class ModelValidator {
 
     /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Absolute y Fixed, con inicio, tamaño y fin. */
     private static void validateMargins(Style s, Layout parentLayout, boolean flexItem, boolean gridItem) {
-        Sides<Value> m = s.margin;
+        Sides<Value> m = s.box().margin();
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
         boolean verticalAuto = m.top().isAuto() || m.bottom().isAuto();
         if (!horizontalAuto && !verticalAuto) {
@@ -208,7 +208,7 @@ final class ModelValidator {
                         "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
             }
             // Una imagen con Width auto mide su ancho natural, no todo el ancho: se puede centrar.
-            if (s.width.isAuto() && s.maxWidth == null && s.layout != Layout.IMAGE) {
+            if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout != Layout.IMAGE) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }
@@ -218,11 +218,11 @@ final class ModelValidator {
     /** Un {@code Absolute} o un {@code Fixed} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
     private static void validateOutOfFlowMargins(Style s, int line, boolean horizontalAuto, boolean verticalAuto) {
         Sides<Value> o = s.offset;
-        if (horizontalAuto && (o.left().isAuto() || s.width.isAuto() || o.right().isAuto())) {
+        if (horizontalAuto && (o.left().isAuto() || s.box().width().isAuto() || o.right().isAuto())) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
                     + position(s) + " con izquierda, Width y derecha declarados");
         }
-        if (verticalAuto && (o.top().isAuto() || s.height.isAuto() || o.bottom().isAuto())) {
+        if (verticalAuto && (o.top().isAuto() || s.box().height().isAuto() || o.bottom().isAuto())) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
                     + position(s) + " con arriba, Height y abajo declarados");
         }
@@ -256,9 +256,9 @@ final class ModelValidator {
         boolean ownBase = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         for (String p : List.of(HEIGHT, MIN_HEIGHT, MAX_HEIGHT)) {
             Value v = switch (p) {
-                case HEIGHT -> s.height;
-                case MIN_HEIGHT -> s.minHeight;
-                default -> s.maxHeight;
+                case HEIGHT -> s.box().height();
+                case MIN_HEIGHT -> s.box().minHeight();
+                default -> s.box().maxHeight();
             };
             if (!ownBase && v != null && hasPercentage(v)) {
                 throw indefinite(s.line(p), label(p));
@@ -308,11 +308,11 @@ final class ModelValidator {
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
         boolean gridItem = !s.isOutOfFlow() && parent.style().layout == Layout.GRID;
         boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
-        Value h = s.height;
+        Value h = s.box().height();
         if (!h.isAuto() && !h.isIntrinsic()) {
             return base || !hasPercentage(h);
         }
-        if (h.isAuto() && s.aspectRatio != null) {
+        if (h.isAuto() && s.box().aspectRatio() != null) {
             return true;
         }
         if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {

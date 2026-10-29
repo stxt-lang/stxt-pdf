@@ -72,32 +72,9 @@ public final class Style {
      */
     Rotation rotation;
 
-    // --- Dimensiones ---------------------------------------------------------------------------
-    Value width = Value.AUTO;
-    Value height = Value.AUTO;
-    Value minWidth = Value.AUTO;
-    Value minHeight = Value.AUTO;
-    /** {@code null} = sin máximo. */
-    Value maxWidth;
-    /** {@code null} = sin máximo. */
-    Value maxHeight;
-    /** Ancho / alto; {@code null} = sin proporción. */
-    Double aspectRatio;
-
-    // --- Modelo de caja ------------------------------------------------------------------------
-    Sides<Value> margin = Sides.all(Value.pt(0));
-    Sides<Value> padding = Sides.all(Value.pt(0));
-    Sides<Value> border = Sides.all(Value.pt(0));
-
     // --- Pintado (no afecta al layout) ---------------------------------------------------------
-    /** {@code null} = transparente. */
-    Paint background;
     /** Heredable. */
     String color = "#000000";
-    /** Un color por lado; {@code null} = igual que {@link #color}. */
-    Sides<String> borderColor;
-    /** Esquinas redondeadas, de la caja de borde; solo pintado. */
-    Corners<Value> radius = Corners.all(Value.pt(0));
 
     // --- Texto (heredables) ---------------------------------------------------------------------
     /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (§6). */
@@ -162,10 +139,16 @@ public final class Style {
 
     private final BreakStyle breaks = new BreakStyle();
 
+    private final BoxStyle box = new BoxStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public BreakStyle breaks() {
+    public BoxStyle box() {
+            return box;
+        }
+
+        public BreakStyle breaks() {
             return breaks;
         }
 
@@ -226,63 +209,9 @@ public final class Style {
         return rotation;
     }
 
-    // --- Dimensiones -----------------------------------------------------------------------------
-    public Value width() {
-        return width;
-    }
-
-    public Value height() {
-        return height;
-    }
-
-    public Value minWidth() {
-        return minWidth;
-    }
-
-    public Value minHeight() {
-        return minHeight;
-    }
-
-    public Value maxWidth() {
-        return maxWidth;
-    }
-
-    public Value maxHeight() {
-        return maxHeight;
-    }
-
-    public Double aspectRatio() {
-        return aspectRatio;
-    }
-
-    // --- Modelo de caja --------------------------------------------------------------------------
-    public Sides<Value> margin() {
-        return margin;
-    }
-
-    public Sides<Value> padding() {
-        return padding;
-    }
-
-    public Sides<Value> border() {
-        return border;
-    }
-
     // --- Pintado (no afecta al layout) -----------------------------------------------------------
-    public Paint background() {
-        return background;
-    }
-
     public String color() {
         return color;
-    }
-
-    public Sides<String> borderColor() {
-        return borderColor;
-    }
-
-    public Corners<Value> radius() {
-        return radius;
     }
 
     // --- Texto (heredables) ----------------------------------------------------------------------
@@ -470,6 +399,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        box.close();
         breaks.close();
         multicol.close();
         image.close();

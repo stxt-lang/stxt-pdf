@@ -23,7 +23,7 @@ class StylesTest {
     }
 
     private static double padding(Box b) {
-        return ((Value.Points) b.style().padding.top()).pt();
+        return ((Value.Points) b.style().box().padding().top()).pt();
     }
 
     @Test
@@ -34,7 +34,7 @@ class StylesTest {
         Box outer = root.children().get(0);
         assertEquals(5, padding(outer), 1e-9);
         assertEquals(5, padding(outer.children().get(0)), 1e-9);
-        assertEquals(Sides.all(Value.pt(0)), root.children().get(1).style().padding);
+        assertEquals(Sides.all(Value.pt(0)), root.children().get(1).style().box().padding());
         // La línea es la de la regla: los errores la señalan.
         assertEquals(14, outer.style().line("padding"));
     }
@@ -76,7 +76,7 @@ class StylesTest {
                 "\tBlock:", "\t\tClass: a b", "\t\tId: y", "\t\tBox:", "\t\t\tPadding: 5");
         assertEquals(List.of(1.0, 2.0, 3.0, 4.0, 5.0), root.children().stream().map(StylesTest::padding).toList());
         // La regla del tipo sigue aportando lo que las demás no declaran.
-        root.children().forEach(b -> assertEquals(Sides.all(Value.pt(1)), b.style().margin));
+        root.children().forEach(b -> assertEquals(Sides.all(Value.pt(1)), b.style().box().margin()));
     }
 
     @Test
@@ -85,7 +85,7 @@ class StylesTest {
                 "\tStyles:", "\t\tFor class: card", "\t\t\tBox:", "\t\t\t\tBackground: #F1EFE8",
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tBlock:", "\t\t\t\tClass: card")
                 .children().get(0).children().get(0);
-        assertEquals(new Paint.Solid("#F1EFE8"), block.style().background);
+        assertEquals(new Paint.Solid("#F1EFE8"), block.style().box().background());
         assertEquals(1, block.style().item().grow(), 1e-9);
     }
 
@@ -103,6 +103,6 @@ class StylesTest {
                 "\tStyles:", "\t\tElement: Grid", "\t\t\tBox:", "\t\t\t\tPadding: 5",
                 "\t\tFor class: unused", "\t\t\tBox:", "\t\t\t\tPadding: 5",
                 "\tBlock:");
-        assertEquals(Sides.all(Value.pt(0)), root.children().get(0).style().padding);
+        assertEquals(Sides.all(Value.pt(0)), root.children().get(0).style().box().padding());
     }
 }

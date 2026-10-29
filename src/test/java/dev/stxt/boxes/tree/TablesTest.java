@@ -113,7 +113,7 @@ class TablesTest {
         assertEquals(FontWeight.BOLD, a.style().fontWeight);
         // La regla gana a lo heredado de la fila; lo propio de la celda, a los dos.
         assertEquals(8, a.style().fontSize);
-        assertEquals(Value.pt(3), a.style().padding.top());
+        assertEquals(Value.pt(3), a.style().box().padding().top());
         assertEquals(FontWeight.NORMAL, b.style().fontWeight);
     }
 

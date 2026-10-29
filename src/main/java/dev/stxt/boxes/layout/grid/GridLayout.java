@@ -170,7 +170,7 @@ public final class GridLayout implements LayoutAlgorithm {
             Box item = g.items().get(i);
             Area a = g.areas().get(i);
             areaWidths[i] = span(columns, a.column() - 1, a.columns(), columnGap);
-            margins[i] = Insets.resolve(item.style().margin(), areaWidths[i]);
+            margins[i] = Insets.resolve(item.style().box().margin(), areaWidths[i]);
             itemWidths[i] = itemWidth(item, areaWidths[i], margins[i], horizontal(item, s), atStart);
             spaces[i] = ConstraintSpace.fixed(itemWidths[i], OptionalDouble.empty(), areaWidths[i],
                     OptionalDouble.empty(), atStart);
@@ -254,7 +254,7 @@ public final class GridLayout implements LayoutAlgorithm {
         Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
         BoxModel probe = BoxModel.resolve(item, free, context);
-        if (!is.width().isAuto()) {
+        if (!is.box().width().isAuto()) {
             return probe.width();
         }
         double width = horizontal == Alignment.STRETCH
@@ -292,7 +292,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /** El alto del ítem se declara con un porcentaje (o una función que lo contiene). */
     private static boolean dependsOnHeightBase(Style s) {
-        return dependsOnBase(s.height()) || dependsOnBase(s.minHeight()) || (s.maxHeight() != null && dependsOnBase(s.maxHeight()));
+        return dependsOnBase(s.box().height()) || dependsOnBase(s.box().minHeight()) || (s.box().maxHeight() != null && dependsOnBase(s.box().maxHeight()));
     }
 
     private static boolean dependsOnBase(Value v) {
