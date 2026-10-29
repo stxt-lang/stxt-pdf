@@ -236,17 +236,16 @@ final class PropertyReader {
     static void grid(Node p, Style s) {
         s.declared(PropertyKey.grid(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "columns" -> s.gridColumns = tracks(p);
-            case "rows" -> s.gridRows = tracks(p);
+            case "columns" -> s.grid().setColumns(tracks(p));
+            case "rows" -> s.grid().setRows(tracks(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
-                s.rowGap = gap.get(0);
-                s.columnGap = gap.get(1);
+                s.grid().setGap(gap.get(0), gap.get(1));
             }
-            case "areas" -> s.gridAreas = placement(p, () -> GridAreas.parse(p.getText()));
-            case "flow" -> s.gridFlow = enumValue(Direction.class, p);
-            case "horizontal" -> s.gridHorizontal = enumValue(Alignment.class, p);
-            case "vertical" -> s.gridVertical = enumValue(Alignment.class, p);
+            case "areas" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
+            case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
+            case "horizontal" -> s.grid().setHorizontal(enumValue(Alignment.class, p));
+            case "vertical" -> s.grid().setVertical(enumValue(Alignment.class, p));
             default -> throw unread(p);
         }
     }

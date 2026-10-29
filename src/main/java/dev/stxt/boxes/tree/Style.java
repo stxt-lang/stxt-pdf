@@ -128,19 +128,6 @@ public final class Style {
      */
     Locale locale = Locale.ROOT;
 
-    // --- Hueco (flex y grid) -------------------------------------------------------------------
-    Value rowGap = Value.pt(0);
-    Value columnGap = Value.pt(0);
-
-    // --- Grid ------------------------------------------------------------------------------------
-    List<Value> gridColumns = List.of();
-    List<Value> gridRows = List.of();
-    /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
-    GridAreas gridAreas = GridAreas.NONE;
-    Direction gridFlow = Direction.ROW;
-    Alignment gridHorizontal = Alignment.STRETCH;
-    Alignment gridVertical = Alignment.STRETCH;
-
     // --- Item (como hijo de flex o grid) -----------------------------------------------------
     double itemGrow = 0;
     double itemShrink = 1;
@@ -214,9 +201,15 @@ public final class Style {
 
     private final FlexStyle flex = new FlexStyle();
 
+    private final GridStyle grid = new GridStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
+    public GridStyle grid() {
+        return grid;
+    }
+
     public FlexStyle flex() {
         return flex;
     }
@@ -372,40 +365,6 @@ public final class Style {
 
     public Locale locale() {
         return locale;
-    }
-
-    // --- Hueco (flex y grid) ---------------------------------------------------------------------
-    public Value rowGap() {
-        return rowGap;
-    }
-
-    public Value columnGap() {
-        return columnGap;
-    }
-
-    // --- Grid ------------------------------------------------------------------------------------
-    public List<Value> gridColumns() {
-        return gridColumns;
-    }
-
-    public List<Value> gridRows() {
-        return gridRows;
-    }
-
-    public GridAreas gridAreas() {
-        return gridAreas;
-    }
-
-    public Direction gridFlow() {
-        return gridFlow;
-    }
-
-    public Alignment gridHorizontal() {
-        return gridHorizontal;
-    }
-
-    public Alignment gridVertical() {
-        return gridVertical;
     }
 
     // --- Item (como hijo de flex o grid) ---------------------------------------------------------
@@ -633,6 +592,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        grid.close();
         flex.close();
     }
 }

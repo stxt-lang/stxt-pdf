@@ -38,9 +38,9 @@ class TablesTest {
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
         assertEquals(Element.TABLE, table.element());
         assertEquals(Layout.GRID, table.style().layout);
-        assertEquals(List.of(Value.pt(120), new Value.Fraction(1), new Value.Fraction(1)), table.style().gridColumns);
-        assertEquals(Value.pt(2), table.style().rowGap);
-        assertEquals(Value.pt(4), table.style().columnGap);
+        assertEquals(List.of(Value.pt(120), new Value.Fraction(1), new Value.Fraction(1)), table.style().grid().columns());
+        assertEquals(Value.pt(2), table.style().grid().rowGap());
+        assertEquals(Value.pt(4), table.style().grid().columnGap());
         assertEquals(List.of("1 1 1 1", "1 2 1 1", "1 3 1 1", "2 1 1 1", "2 2 1 1", "2 3 1 1", "3 1 1 3"),
                 areas(table));
         assertEquals(1, table.headRows());

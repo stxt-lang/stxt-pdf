@@ -54,7 +54,7 @@ final class TableBuilder {
      * las reglas de {@code Styles} y el {@code Column align} de su columna.
      */
     static void table(InlineNode n, Box table, Cells cells) {
-        int count = table.style().gridColumns.size();
+        int count = table.style().grid().columns().size();
         Columns columns = new Columns(count, columnAlign(n, count),
                 child(n, "column-align").map(Node::getLine).orElse(0));
         int last = -1;

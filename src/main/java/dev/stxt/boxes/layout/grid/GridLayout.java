@@ -66,13 +66,13 @@ public final class GridLayout implements LayoutAlgorithm {
 
     private static Grid grid(Box box) {
         Style s = box.style();
-        int explicitColumns = Math.max(s.gridColumns().size(), s.gridAreas().columns());
-        int explicitRows = Math.max(s.gridRows().size(), s.gridAreas().rows());
+        int explicitColumns = Math.max(s.grid().columns().size(), s.grid().areas().columns());
+        int explicitRows = Math.max(s.grid().rows().size(), s.grid().areas().rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style().itemArea()).toList();
-        Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow());
+        Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().flow());
         if (placement instanceof Placement.NoRoom e) {
-            throw noRoom(items.get(e.item()), e, s.gridFlow());
+            throw noRoom(items.get(e.item()), e, s.grid().flow());
         }
         List<Area> areas = ((Placement.Placed) placement).areas();
         int columns = Math.max(1, explicitColumns);
@@ -81,7 +81,7 @@ public final class GridLayout implements LayoutAlgorithm {
             columns = Math.max(columns, a.columnEnd());
             rows = Math.max(rows, a.rowEnd());
         }
-        return new Grid(items, areas, tracks(s.gridColumns(), columns), tracks(s.gridRows(), rows));
+        return new Grid(items, areas, tracks(s.grid().columns(), columns), tracks(s.grid().rows(), rows));
     }
 
     /** El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco (§5.8). */
@@ -112,7 +112,7 @@ public final class GridLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Grid g = grid(box);
         // Sin containing block, un hueco en porcentaje cuenta como 0.
-        double gap = box.style().columnGap().resolve(OptionalDouble.empty()).orElse(0);
+        double gap = box.style().grid().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<ItemContribution> minContributions = new ArrayList<>();
         List<ItemContribution> maxContributions = new ArrayList<>();
         for (int i = 0; i < g.items().size(); i++) {
@@ -143,8 +143,8 @@ public final class GridLayout implements LayoutAlgorithm {
         Style s = box.style();
         double contentWidth = model.contentWidth();
         OptionalDouble contentHeight = model.contentHeight();
-        double columnGap = s.columnGap().resolve(contentWidth).orElse(0);
-        double rowGap = s.rowGap().resolve(contentHeight).orElse(0);
+        double columnGap = s.grid().columnGap().resolve(contentWidth).orElse(0);
+        double rowGap = s.grid().rowGap().resolve(contentHeight).orElse(0);
         boolean atStart = space.atFragmentainerStart();
         Grid g = grid(box);
         int n = g.items().size();
@@ -300,11 +300,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     private static Alignment horizontal(Box item, Style container) {
-        return item.style().itemHorizontal() != null ? item.style().itemHorizontal() : container.gridHorizontal();
+        return item.style().itemHorizontal() != null ? item.style().itemHorizontal() : container.grid().horizontal();
     }
 
     private static Alignment vertical(Box item, Style container) {
-        return item.style().itemVertical() != null ? item.style().itemVertical() : container.gridVertical();
+        return item.style().itemVertical() != null ? item.style().itemVertical() : container.grid().vertical();
     }
 
     /** Posición de cada pista desde el principio de la caja de contenido. */

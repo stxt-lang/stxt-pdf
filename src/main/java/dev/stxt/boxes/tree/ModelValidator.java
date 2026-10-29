@@ -286,13 +286,13 @@ final class ModelValidator {
         if (ctx.isDefinite(box)) {
             return;
         }
-        if (s.gridRows.stream().anyMatch(ValueReader::hasPercentage)) {
+        if (s.grid().rows().stream().anyMatch(ValueReader::hasPercentage)) {
             throw indefinite(s.line(GRID_ROWS), "Rows");
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
         boolean rowGapUsed = s.layout == Layout.GRID
                 || (s.layout == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.COLUMN));
-        Value rowGap = s.layout == Layout.GRID ? s.rowGap : s.flex().rowGap();
+        Value rowGap = s.layout == Layout.GRID ? s.grid().rowGap() : s.flex().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
             String gap = s.layout == Layout.GRID ? GRID_GAP : FLEX_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
@@ -318,7 +318,7 @@ final class ModelValidator {
         if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
             return true;
         }
-        Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().gridVertical;
+        Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().grid().vertical();
         return h.isAuto() && gridItem && vertical == Alignment.STRETCH;
     }
 
