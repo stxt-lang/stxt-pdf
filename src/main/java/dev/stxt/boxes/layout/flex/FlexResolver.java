@@ -54,7 +54,7 @@ public final class FlexResolver {
                     anyActive = true;
                     FlexItem it = items.get(i);
                     factorSum += growing ? it.grow() : it.shrink();
-                    scaledSum += it.shrink() * it.basis();
+                    scaledSum += it.scaledShrink();
                 }
             }
             if (!anyActive) {
@@ -78,7 +78,7 @@ public final class FlexResolver {
                 if (growing) {
                     target[i] = it.basis() + (factorSum > 0 ? free * it.grow() / factorSum : 0);
                 } else {
-                    double scaled = it.shrink() * it.basis();
+                    double scaled = it.scaledShrink();
                     target[i] = it.basis() + (scaledSum > 0 ? free * scaled / scaledSum : 0);
                 }
             }

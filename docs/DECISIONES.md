@@ -2078,3 +2078,12 @@ interpretaciones que salieron al implementarlas.
      (la `auto` mide 340 y el área 400). No cambia ningún golden ni ejemplo. Aceptado por el usuario. *Dónde:*
      `layout/grid/TrackSizing.distributeExcess`, §5.8, `TrackSizingTest`. *Alternativa:* dejarlo, con ítems de varias
      pistas que agrandan su área más allá de su max-content.
+
+324. **Al encoger, cada ítem flex cede en proporción a `Shrink × Basis` sin sus márgenes.** Lo dice el §5.7 y es lo de
+     CSS (la *inner flex base size*); el resolvedor trabaja con tamaños exteriores y ponderaba con la base más los
+     márgenes, así que un ítem con márgenes cedía de más (dos ítems con `Basis: 300`, uno con 10 de margen a cada lado,
+     en 515: 54,2 y 50,8 en vez de 52,5 cada uno). Encontrado al escribir los tests de márgenes que pedían los mutantes
+     supervivientes de `FlexLayout`. `FlexItem` guarda los márgenes del eje principal y `scaledShrink` los descuenta.
+     No cambia ningún golden ni ejemplo. Aceptado por el usuario. *Dónde:* `layout/flex/FlexItem`,
+     `layout/flex/FlexResolver`, `layout/flex/FlexLayout`, `FlexLayoutTest`. *Alternativa:* cambiar el §5.7 para que
+     pondere con la base y los márgenes.

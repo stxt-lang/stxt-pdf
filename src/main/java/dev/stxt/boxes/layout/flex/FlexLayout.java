@@ -316,7 +316,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             } else {
                 min = is.box().minWidth().resolve(contentWidth).orElse(0) + margins;
             }
-            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max);
+            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
             return it;
         }
 
@@ -356,7 +356,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             }
             double max = is.box().maxHeight() == null ? Double.POSITIVE_INFINITY
                     : is.box().maxHeight().resolve(contentHeight).orElse(Double.POSITIVE_INFINITY) + margins;
-            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max);
+            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
             return it;
         }
 

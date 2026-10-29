@@ -297,4 +297,113 @@ class FlexLayoutTest {
         assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Distribution.BETWEEN, -30, 3), 1e-9);
         assertArrayEquals(new double[]{-15, 0}, FlexLayout.distribute(Distribution.EVENLY, -30, 3), 1e-9);
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): huecos distintos en cada eje,
+    // tamaños intrínsecos con más de dos ítems y márgenes en los ítems.
+
+    private static String block(String id, String... box) {
+        StringBuilder sb = new StringBuilder("\t\t\tBlock:\n\t\t\t\tId: " + id + "\n\t\t\t\tBox:");
+        for (String b : box) {
+            sb.append("\n\t\t\t\t\t").append(b);
+        }
+        return sb.toString();
+    }
+
+    @Test
+    void rowAndColumnGapsInARow() {
+        // Gap: filas 7, columnas 13. 200 + 13 + 200 = 413 caben en 515; el tercero pasa a otra línea, 7 más abajo.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 7 13",
+                "\t\tItem:", block("A", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("B", "Width: 200", "Height: 20"),
+                "\t\tItem:", block("C", "Width: 200", "Height: 20"));
+        assertRect(40, 40, 515, 47, l.rect("F"));
+        assertRect(253, 40, 200, 20, l.rect("B"));
+        assertRect(40, 67, 200, 20, l.rect("C"));
+    }
+
+    @Test
+    void rowAndColumnGapsInAColumn() {
+        // En columna, el hueco entre ítems es el de las filas (7).
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tId: F", "\t\tDirection: column", "\t\tGap: 7 13",
+                "\t\tItem:", block("A", "Width: 100", "Height: 20"),
+                "\t\tItem:", block("B", "Width: 100", "Height: 20"));
+        assertRect(40, 67, 100, 20, l.rect("B"));
+        assertRect(40, 40, 515, 47, l.rect("F"));
+    }
+
+    @Test
+    void intrinsicWidthsWithThreeItems() {
+        // max-content de 5 + 10 + 15 y dos huecos de 10, con y sin Wrap; min-content sin Wrap, igual con 5 + 10 + 15.
+        String items = "\t\tItem:\n\t\t\tText: a\n\t\tItem:\n\t\t\tText: bb\n\t\tItem:\n\t\t\tText: ccc";
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tGap: 10", items,
+                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tGap: 10", "\t\tWrap: true",
+                items,
+                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tGap: 10", items);
+        assertEquals(50, l.rect("max").width(), 1e-9);
+        assertEquals(50, l.rect("wrap").width(), 1e-9);
+        assertEquals(50, l.rect("min").width(), 1e-9);
+    }
+
+    @Test
+    void basisCountsTheMargins() {
+        // Tamaños hipotéticos exteriores 100 + 20 y 100: sobran 295, 147.5 para cada uno.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("A", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
+        assertRect(50, 40, 247.5, 10, l.rect("A"));
+        assertRect(307.5, 40, 247.5, 10, l.rect("B"));
+    }
+
+    @Test
+    void shrinkingStopsAtTheMinimumWithItsMargins() {
+        // Exteriores 320 y 300 en 515: faltan 105. A no baja de 280 (300 con márgenes) y B se queda con 215.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 300", block("A", "Min width: 280", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBasis: 300", block("B", "Height: 10"));
+        assertRect(50, 40, 280, 10, l.rect("A"));
+        assertRect(340, 40, 215, 10, l.rect("B"));
+    }
+
+    @Test
+    void automaticMinimumWithMargins() {
+        // La palabra de A mide 300 y sus márgenes 20: no baja de 320 exteriores, y B se queda con 195.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\t\t\t\t\tMargin: 0 10",
+                "\t\tItem:", "\t\t\tBasis: 500", block("B", "Height: 10"));
+        assertEquals(300, l.rect("A").width(), 1e-9);
+        assertRect(360, 40, 195, 10, l.rect("B"));
+    }
+
+    @Test
+    void shrinkIsWeightedByTheBasisWithoutMargins() {
+        // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Basis (300 y 300), no por los
+        // tamaños con márgenes (§5.7): 52.5 cada uno.
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", "\t\t\tBasis: 300", block("A", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBasis: 300", block("B", "Height: 10"));
+        assertRect(50, 40, 247.5, 10, l.rect("A"));
+        assertRect(307.5, 40, 247.5, 10, l.rect("B"));
+    }
+
+    @Test
+    void stretchingLeavesTheMargins() {
+        // Fila: la línea mide 30 y A, con 5 de margen arriba y abajo, se estira a 20.
+        // Columna: el ancho es 515 menos los márgenes de C (505).
+        LayoutFixture l = layOut(
+                "\tFlex:",
+                "\t\tItem:", block("A", "Width: 50", "Margin: 5"),
+                "\t\tItem:", block("B", "Width: 50", "Height: 30"),
+                "\tFlex:", "\t\tDirection: column",
+                "\t\tItem:", block("C", "Height: 10", "Margin: 5"));
+        assertRect(45, 45, 50, 20, l.rect("A"));
+        assertRect(45, 75, 505, 10, l.rect("C"));
+    }
 }
