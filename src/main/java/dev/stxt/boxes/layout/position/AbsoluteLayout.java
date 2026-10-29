@@ -4,7 +4,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  *
  * <ul>
  *   <li>Las {@code absolute} suben como {@link PendingAbsolute} hasta su containing block, y
- *       {@link Engine#layout} las resuelve con {@link #resolvePending} al terminar el layout de
+ *       {@link LayoutContext#layout} las resuelve con {@link #resolvePending} al terminar el layout de
  *       esa caja. Sus fragmentos se añaden al final de los hijos del fragmento del containing
  *       block, no de su padre en el árbol de cajas.</li>
  *   <li>Las {@code fixed} suben hasta la raíz y las resuelve el
@@ -40,10 +40,10 @@ import java.util.function.Supplier;
  */
 public final class AbsoluteLayout {
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public AbsoluteLayout(Engine engine) {
-        this.engine = engine;
+    public AbsoluteLayout(LayoutContext context) {
+        this.context = context;
     }
 
     /**
@@ -93,7 +93,7 @@ public final class AbsoluteLayout {
         Box box = p.box();
         Style s = box.style();
         OptionalDouble cbHeightBase = OptionalDouble.of(cbHeight);
-        Supplier<IntrinsicSizes> intrinsic = () -> engine.intrinsic(box);
+        Supplier<IntrinsicSizes> intrinsic = () -> context.intrinsic(box);
         // La ecuación trabaja en la caja de relleno del containing block.
         double staticX = p.staticX() + cbPadding.left();
         double staticY = p.staticY() + cbPadding.top();
@@ -135,7 +135,7 @@ public final class AbsoluteLayout {
             height = OptionalDouble.of(Sizing.constrain(stretched, sized.minHeight(), sized.maxHeight()));
             space = ConstraintSpace.fixed(h.size(), height, cbWidth, cbHeightBase, false);
         }
-        LayoutResult r = engine.layout(box, space, null);
+        LayoutResult r = context.layout(box, space, null);
         Fragment f = r.fragment();
         AbsoluteEquation.Solution v = AbsoluteEquation.vertical(top, height, bottom, marginTop, marginBottom,
                 cbHeight, staticY, f.height());

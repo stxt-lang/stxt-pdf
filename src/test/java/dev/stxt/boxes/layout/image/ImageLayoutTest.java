@@ -1,8 +1,19 @@
 package dev.stxt.boxes.layout.image;
 
+import dev.stxt.boxes.fragment.BreakToken;
+import dev.stxt.boxes.layout.ConstraintSpace;
+import dev.stxt.boxes.layout.IntrinsicSizes;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.layout.LayoutResult;
+import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.tree.Box;
+import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
+
+import java.util.OptionalDouble;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
 import static dev.stxt.boxes.layout.LayoutFixture.layOutPaged;
@@ -299,5 +310,44 @@ class ImageLayoutTest {
         assertRect(40, 40, 120, 60, f.rect("A"));
         assertRect(297.5, 40, 120, 60, f.rect("B"));
     }
-}
 
+    /**
+     * El algoritmo depende de {@link LayoutContext}, no del motor (AR-04): se prueba con un doble que solo da el
+     * tamaño natural de la imagen, sin carpeta de recursos ni fichero.
+     */
+    @Test
+    void anImageIsLaidOutWithAContextDouble() {
+        LayoutContext context = new LayoutContext() {
+            @Override
+            public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+                throw new AssertionError("una imagen no maqueta otras cajas");
+            }
+
+            @Override
+            public IntrinsicSizes intrinsic(Box box) {
+                throw new AssertionError("con Width auto no hacen falta");
+            }
+
+            @Override
+            public IntrinsicSizes contentIntrinsic(Box box) {
+                throw new AssertionError("con Width auto no hacen falta");
+            }
+
+            @Override
+            public TextMeasurer measurer() {
+                throw new AssertionError("una imagen no tiene texto");
+            }
+
+            @Override
+            public NaturalSize natural(Box box) {
+                return new NaturalSize(120, 60);
+            }
+        };
+        Box image = new StyleEditor().box("I", Element.IMAGE);
+        LayoutResult r = new ImageLayout(context).layout(image,
+                ConstraintSpace.free(400, 400, OptionalDouble.empty(), false), null);
+        assertEquals(120, r.fragment().width(), 1e-9);
+        assertEquals(60, r.fragment().height(), 1e-9);
+        assertEquals(new IntrinsicSizes(120, 120), new ImageLayout(context).contentIntrinsic(image));
+    }
+}

@@ -7,7 +7,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -34,7 +34,7 @@ import static dev.stxt.boxes.model.Tolerance.same;
  * cursor = 0; strut = vacío
  * para cada hijo:
  *     si es absolute/fixed: anotar PendingAbsolute con la posición estática; continuar
- *     r = engine.layout(hijo, caja de contenido como containing block)
+ *     r = context.layout(hijo, caja de contenido como containing block)
  *     strut += margen superior del hijo + los que salen de él por arriba
  *     si aún no hay nada entre el borde superior de la caja y el hijo: el strut sale de la caja
  *     si no: cursor += strut                                           // colapso
@@ -63,10 +63,10 @@ import static dev.stxt.boxes.model.Tolerance.same;
  */
 public final class BlockLayout implements LayoutAlgorithm {
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public BlockLayout(Engine engine) {
-        this.engine = engine;
+    public BlockLayout(LayoutContext context) {
+        this.context = context;
     }
 
     @Override
@@ -74,7 +74,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         double min = 0;
         double max = 0;
         for (Box child : box.inFlowChildren()) {
-            IntrinsicSizes i = engine.intrinsic(child);
+            IntrinsicSizes i = context.intrinsic(child);
             min = Math.max(min, i.minContent());
             max = Math.max(max, i.maxContent());
         }
@@ -83,7 +83,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         return new Run(box, model, space, (BreakToken.Block) from).layOut();
     }
 
@@ -258,7 +258,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             ConstraintSpace s = fragmenting
                     ? childSpace.withRemaining(contentRemaining - y, space.atFragmentainerStart() && !progress)
                     : childSpace;
-            return engine.layout(child, s, childToken);
+            return context.layout(child, s, childToken);
         }
 
         /** El corte que abre este fragmento de continuación fue forzado. */
@@ -298,7 +298,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             if (box.marker() == null || !first) {
                 return children;
             }
-            return MarkerLayout.place(box, children, slice.border(), slice.padding(), engine.measurer())
+            return MarkerLayout.place(box, children, slice.border(), slice.padding(), context.measurer())
                     .map(marker -> {
                         List<Fragment> all = new ArrayList<>(children);
                         all.add(0, marker);

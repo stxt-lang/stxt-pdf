@@ -2,7 +2,7 @@ package dev.stxt.boxes.layout.table;
 
 import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -38,10 +38,10 @@ import static dev.stxt.boxes.model.Tolerance.EPSILON;
 public final class TableLayout implements LayoutAlgorithm {
 
     private final GridLayout grid;
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public TableLayout(Engine engine, GridLayout grid) {
-        this.engine = engine;
+    public TableLayout(LayoutContext context, GridLayout grid) {
+        this.context = context;
         this.grid = grid;
     }
 
@@ -84,6 +84,6 @@ public final class TableLayout implements LayoutAlgorithm {
         UnitBreaker.Arranged bodyOnly = new UnitBreaker.Arranged(a.model(), body, a.outOfFlow(),
                 all.slice(head, bodyEnd, bodyStart));
         UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight);
-        return UnitBreaker.fragment(engine, box, space, from, bodyOnly, repeat);
+        return UnitBreaker.fragment(context, box, space, from, bodyOnly, repeat);
     }
 }

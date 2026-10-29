@@ -5,7 +5,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -22,7 +22,7 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 /**
  * Layout de una {@code Image} (ESPECIFICACION.md §5.18): una caja sin hijos con el tamaño y la
  * proporción del fichero, como un elemento reemplazado de CSS. El tamaño lo resuelve
- * {@link BoxModel#resolve(Box, ConstraintSpace, Engine)}, que también usan los padres flex, grid
+ * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, que también usan los padres flex, grid
  * y absolute para medirla; aquí solo se coloca.
  *
  * <p>No se parte entre páginas (§5.10): si no cabe en lo que queda de página, corta antes de
@@ -31,10 +31,10 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  */
 public final class ImageLayout implements LayoutAlgorithm {
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public ImageLayout(Engine engine) {
-        this.engine = engine;
+    public ImageLayout(LayoutContext context) {
+        this.context = context;
     }
 
     /**
@@ -45,7 +45,7 @@ public final class ImageLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
-        NaturalSize natural = engine.natural(box);
+        NaturalSize natural = context.natural(box);
         double ratio = s.aspectRatio() != null ? s.aspectRatio() : natural.ratio();
         OptionalDouble height = s.height().resolve(OptionalDouble.empty());
         double width = natural.width();
@@ -60,7 +60,7 @@ public final class ImageLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         double height = model.height().getAsDouble();
         if (space.fragmenting() && !space.atFragmentainerStart()
                 && !fits(height, space.fragmentainerRemaining().getAsDouble())) {

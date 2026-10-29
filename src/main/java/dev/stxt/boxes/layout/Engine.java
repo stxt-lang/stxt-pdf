@@ -22,9 +22,11 @@ import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Style;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,8 @@ import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
  * Maquetador y despachador de algoritmos por {@code Layout}. Todas las llamadas recursivas de layout
- * pasan por aquí para usar la caché. Quien solo quiere convertir un documento usa
+ * pasan por aquí para usar la caché: los algoritmos lo ven como su {@link LayoutContext}, sin depender del
+ * motor. Quien solo quiere convertir un documento usa
  * {@link dev.stxt.boxes.convert.Converter}, que lo crea y lo configura.
  *
  * <p><strong>Hilos: un {@code Engine} no es seguro entre hilos y no se comparte.</strong> Guarda la caché del
@@ -48,20 +51,17 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  * <p>El protocolo con el {@link Paginator} (cifras reservadas, páginas supuestas, numeración y cajas fuera de
  * flujo) no es público: solo se usa desde este package.</p>
  */
-public final class Engine {
+public final class Engine implements LayoutContext {
 
     private final LayoutCache cache = new LayoutCache();
     private final TextMeasurer measurer;
     private final Images images;
     private final Limits limits;
-    private final BlockLayout block;
     private final InlineLayout inline;
-    private final FlexLayout flex;
-    private final GridLayout grid;
     private final TableLayout table;
-    private final MulticolLayout multicol;
     private final AbsoluteLayout absolute;
-    private final ImageLayout image;
+    /** El algoritmo de cada {@code Layout}; una tabla, que es un grid, tiene el suyo ({@link #algorithm}). */
+    private final Map<Style.Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Style.Layout.class);
 
     /**
      * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
@@ -88,14 +88,16 @@ public final class Engine {
         this.measurer = measurer;
         this.limits = limits;
         this.images = new Images(resources, limits);
-        this.block = new BlockLayout(this);
         this.inline = new InlineLayout(this, measurer);
-        this.flex = new FlexLayout(this);
-        this.grid = new GridLayout(this);
+        GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
-        this.multicol = new MulticolLayout(this);
         this.absolute = new AbsoluteLayout(this);
-        this.image = new ImageLayout(this);
+        algorithms.put(Style.Layout.BLOCK, new BlockLayout(this));
+        algorithms.put(Style.Layout.INLINE, inline);
+        algorithms.put(Style.Layout.FLEX, new FlexLayout(this));
+        algorithms.put(Style.Layout.GRID, grid);
+        algorithms.put(Style.Layout.MULTICOL, new MulticolLayout(this));
+        algorithms.put(Style.Layout.IMAGE, new ImageLayout(this));
     }
 
     /**
@@ -199,25 +201,22 @@ public final class Engine {
         }
     }
 
-    /** Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (§5.14). */
+    @Override
     public TextMeasurer measurer() {
         return measurer;
     }
 
-    /** Tamaño natural de una {@code Image}, de su fichero (§5.18). */
+    @Override
     public NaturalSize natural(Box box) {
         return images.natural(box);
     }
 
-    /** min-content y max-content de la caja de margen (§5.9). */
+    @Override
     public IntrinsicSizes intrinsic(Box box) {
         return cache.intrinsic(box, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
     }
 
-    /**
-     * min-content y max-content del contenido de la caja, sin su {@code Width}: el mínimo
-     * automático de un ítem flex depende de ellos (§5.7).
-     */
+    @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         return cache.contentIntrinsic(box, () -> algorithm(box).contentIntrinsic(box));
     }
@@ -234,6 +233,7 @@ public final class Engine {
      * si no cabe en lo que queda de página, devuelve {@code BEFORE}; al principio de una página se
      * coloca aunque no quepa, y el desbordamiento lo señala {@link Overflow}.</p>
      */
+    @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         if (space.fragmenting() && box.style().rotation() != null) {
             // Una caja girada no se parte (§5.10): entera o, si no cabe, en la página siguiente.
@@ -275,16 +275,10 @@ public final class Engine {
         return absolute;
     }
 
+    /** El algoritmo de la caja: el de su {@code Layout} o, si es una tabla, el de las tablas. */
     private LayoutAlgorithm algorithm(Box box) {
-        return switch (box.style().layout()) {
-            case BLOCK -> block;
-            case INLINE -> inline;
-            case FLEX -> flex;
-            // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
-            case GRID -> box.element() == Element.TABLE ? table : grid;
-            case MULTICOL -> multicol;
-            case IMAGE -> image;
-        };
+        // Una tabla es un grid que repite su cabecera y su pie en cada página (§5.15).
+        return box.element() == Element.TABLE ? table : algorithms.get(box.style().layout());
     }
 
     @Override

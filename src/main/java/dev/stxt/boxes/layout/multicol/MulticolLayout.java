@@ -6,7 +6,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -36,7 +36,7 @@ import static dev.stxt.boxes.tree.PropertyKey.MAX_HEIGHT;
  *
  * <p>{@code BoxTreeBuilder} mete el contenido en el flujo de columnas, una caja de bloque que es
  * el único hijo del {@code Multicol}. Cada columna es un fragmento de esa caja: se maqueta con
- * {@code engine.layout}, con el alto de la columna como lo que queda de fragmentainer y el token
+ * {@code context.layout}, con el alto de la columna como lo que queda de fragmentainer y el token
  * de la columna anterior como punto de partida. Los algoritmos que ya saben partir hacen el
  * resto.</p>
  *
@@ -68,10 +68,10 @@ public final class MulticolLayout implements LayoutAlgorithm {
      */
     private static final double PRECISION = 1e-3;
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public MulticolLayout(Engine engine) {
-        this.engine = engine;
+    public MulticolLayout(LayoutContext context) {
+        this.context = context;
     }
 
     /**
@@ -81,7 +81,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        IntrinsicSizes content = engine.intrinsic(flow(box));
+        IntrinsicSizes content = context.intrinsic(flow(box));
         Style s = box.style();
         int count = s.multicolCount() != null ? s.multicolCount() : 1;
         int narrowest = s.multicolWidth() == null ? count : 1;
@@ -92,7 +92,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         return new Run(box, model, space, (BreakToken.Block) from).layOut();
     }
 
@@ -162,7 +162,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
             double limit = Math.min(page, own);
             if (Double.isInfinite(limit)) {
                 // Sin página ni alto que llenar: se equilibra, también con Fill: auto.
-                double single = engine.layout(flow, columnSpace(OptionalDouble.empty(), true), resume)
+                double single = context.layout(flow, columnSpace(OptionalDouble.empty(), true), resume)
                         .fragment().height();
                 Fill fill = fill(single, true);
                 if (!fill.fitsIn(single, BreakAppeal.FORCED)) {
@@ -217,7 +217,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
             int worst = BreakAppeal.FORCED_PAGE;
             double tallest = 0;
             for (int i = 0; i < columns.count(); i++) {
-                LayoutResult r = engine.layout(flow, columnSpace(OptionalDouble.of(height), atStart), token);
+                LayoutResult r = context.layout(flow, columnSpace(OptionalDouble.of(height), atStart), token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     // Lo siguiente no cabe en una columna de este alto: tampoco en las demás.
                     return new Fill(placed, token, appeal, worst, i == 0, tallest);

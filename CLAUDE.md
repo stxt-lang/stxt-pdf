@@ -133,7 +133,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 Las dependencias entre packages van en un solo sentido: `model` no depende de nada, `tree` solo
 de `model`, y no hay ciclos (`ArchitectureTest`, que cuenta cada package con sus subpackages).
-Un tipo que necesitan `tree` y `layout` va en `model`.
+Un tipo que necesitan `tree` y `layout` va en `model`. `ArchitectureTest` tiene escrito qué puede usar cada
+package (`ALLOWED`) y cada algoritmo de `layout` de los demás (`ALLOWED_IN_LAYOUT`: el bloque usa `inline` y
+`position`; flex y grid, `position`; la tabla, `grid`), y que ningún algoritmo nombra `Engine` (AR-12): una
+dependencia nueva se decide y se apunta allí.
 
 ### Piezas clave
 
@@ -230,7 +233,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Columnas (§5.16):** el builder mete el contenido de un `Multicol` en el **flujo de
   columnas**, una caja de bloque generada (`Element.COLUMNS`, fuera del documento como el
   marcador) que es su único hijo: crea un contexto de formato de bloque y su alto no es
-  definido. `MulticolLayout` maqueta ese flujo una vez por columna con `engine.layout`, con el
+  definido. `MulticolLayout` maqueta ese flujo una vez por columna con `context.layout`, con el
   alto de la columna como `fragmentainerRemaining` y el token de la columna anterior como
   `from`; cada columna es un fragmento suyo, hijo del fragmento del `Multicol`. Llena en orden
   y, si el contenido termina y `Fill` es `balance`, busca el alto mínimo (búsqueda binaria) sin
@@ -297,14 +300,16 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   secuencia: `layOutDocument` suelta su caché al terminar. El protocolo con el `Paginator` (`reservePageDigits`,
   `assume`, `number`, `absolute()`) es de package. El schema compartido de `stxt-core` 1.0.3 solo se lee (ver
   `DocumentSchema`); al cambiar la versión hay que repasarlo. `ConcurrentConversionTest` y `EngineContractTest` lo vigilan.
-- **`Engine`** despacha por `Style.layout` al algoritmo correspondiente. **Toda llamada
-  recursiva de layout o de tamaños intrínsecos pasa por `engine.layout(...)` /
-  `engine.intrinsic(...)`**, nunca directamente al algoritmo, para usar la `LayoutCache` (sin
-  ella, flex y grid anidados crecen de forma exponencial).
+- **`Engine`** despacha por `Style.layout` al algoritmo correspondiente (un `EnumMap`; la tabla, que es un
+  grid, tiene el suyo). Los algoritmos no conocen el motor: dependen de **`LayoutContext`** (`layout`,
+  `intrinsic`, `contentIntrinsic`, `measurer`, `natural`), que `Engine` implementa y que un test puede
+  sustituir por un doble (AR-04). **Toda llamada recursiva de layout o de tamaños intrínsecos pasa por
+  `context.layout(...)` / `context.intrinsic(...)`**, nunca directamente al algoritmo, para usar la
+  `LayoutCache` (sin ella, flex y grid anidados crecen de forma exponencial).
 - **`LayoutAlgorithm`**: `contentIntrinsic(box)` (min/max-content del contenido, sin borde,
   relleno, margen ni `Width`; independiente del espacio) y `layout(box, space, from)`. Los de la
-  caja de margen los da `engine.intrinsic(box)` con `BoxModel.intrinsic`; los del contenido,
-  `engine.contentIntrinsic(box)` (el mínimo automático de un ítem flex).
+  caja de margen los da `context.intrinsic(box)` con `BoxModel.intrinsic`; los del contenido,
+  `context.contentIntrinsic(box)` (el mínimo automático de un ítem flex).
 - **`ConstraintSpace`** es la entrada inmutable del layout y parte de la clave de la caché:
   ancho disponible, alto (vacío = indefinido), tamaños impuestos por el padre, bases de
   porcentajes, espacio restante en la página desde el borde superior de la caja (vacío = sin

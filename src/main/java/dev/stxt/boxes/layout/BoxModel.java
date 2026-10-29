@@ -36,8 +36,8 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
      * Resuelve el modelo de caja de una caja con los tamaños intrínsecos del motor y, si es una
      * {@code Image}, su tamaño natural.
      */
-    public static BoxModel resolve(Box box, ConstraintSpace space, Engine engine) {
-        return resolve(box, space, () -> engine.intrinsic(box), box.isImage() ? engine.natural(box) : null);
+    public static BoxModel resolve(Box box, ConstraintSpace space, LayoutContext context) {
+        return resolve(box, space, () -> context.intrinsic(box), box.isImage() ? context.natural(box) : null);
     }
 
     /**

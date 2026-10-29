@@ -8,7 +8,7 @@ import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * <p>El reparto en líneas de un texto se hace una sola vez por ancho disponible y se reutiliza en
  * cada página: cada fragmento empieza en otra línea ({@code from}), así que la caché del
- * {@link Engine} no ayuda, y sin él un texto de N páginas se partía N veces (coste cuadrático).</p>
+ * {@link LayoutContext} no ayuda, y sin él un texto de N páginas se partía N veces (coste cuadrático).</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
@@ -52,7 +52,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     private record BrokenKey(Box box, double available) {
     }
 
-    private final Engine engine;
+    private final LayoutContext context;
     /** Mide {@code {page}} y {@code {pages}} como el número de prueba ({@link PageNumbers}). */
     private TextMeasurer measurer;
     private final TextMeasurer real;
@@ -63,8 +63,8 @@ public final class InlineLayout implements LayoutAlgorithm {
     /** Número de cada caja referida con {@code {number of: id}}. */
     private Map<String, String> numbers = Map.of();
 
-    public InlineLayout(Engine engine, TextMeasurer measurer) {
-        this.engine = engine;
+    public InlineLayout(LayoutContext context, TextMeasurer measurer) {
+        this.context = context;
         this.real = measurer;
         reset();
     }
@@ -80,7 +80,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     /**
      * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia lo que miden los textos con esos
      * marcadores: quien llama olvida su reparto memorizado ({@link #forget}) y lo que guarda de ellos la caché del
-     * {@link Engine}.
+     * {@link LayoutContext}.
      */
     public void reservePageDigits(int digits) {
         this.measurer = PageNumbers.probing(real, digits);
@@ -191,7 +191,7 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         Style s = box.style();
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();

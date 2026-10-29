@@ -6,7 +6,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -58,10 +58,10 @@ import static dev.stxt.boxes.model.Tolerance.same;
  */
 public final class FlexLayout implements LayoutAlgorithm {
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public FlexLayout(Engine engine) {
-        this.engine = engine;
+    public FlexLayout(LayoutContext context) {
+        this.context = context;
     }
 
     /** Tabla de ESPECIFICACION.md §5.9. */
@@ -76,7 +76,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         double sumMin = 0;
         double sumMax = 0;
         for (Box item : items) {
-            IntrinsicSizes i = engine.intrinsic(item);
+            IntrinsicSizes i = context.intrinsic(item);
             maxMin = Math.max(maxMin, i.minContent());
             maxMax = Math.max(maxMax, i.maxContent());
             sumMin += i.minContent();
@@ -96,7 +96,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         return new Run(box, model, space).layOut(from);
     }
 
@@ -186,7 +186,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
             CrossSizes cross = crossSizes(lines);
             stretchItems(lines, cross.lines());
-            return UnitBreaker.fragment(engine, box, space, from, arrange(lines, cross, pending));
+            return UnitBreaker.fragment(context, box, space, from, arrange(lines, cross, pending));
         }
 
         /** Paso 6: tamaño cruzado de cada línea y lo que sobra en el eje cruzado. */
@@ -292,9 +292,9 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style();
             Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.horizontal();
-            BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
+            BoxModel probe = BoxModel.resolve(b, probeSpace(), context);
             double extra = probe.border().horizontal() + probe.padding().horizontal();
-            IntrinsicSizes intrinsic = engine.intrinsic(b);
+            IntrinsicSizes intrinsic = context.intrinsic(b);
 
             OptionalDouble declared = is.width().isAuto() ? OptionalDouble.empty() : OptionalDouble.of(probe.width());
             OptionalDouble basis = declaredBasis(is);
@@ -307,7 +307,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (is.minWidth().isAuto()) {
                 // Mínimo automático (§5.7): el min-content de su contenido, sin pasar de Max width,
                 // y nunca más que el ancho declarado.
-                double content = Math.min(engine.contentIntrinsic(b).minContent() + extra + margins, max);
+                double content = Math.min(context.contentIntrinsic(b).minContent() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
                 min = is.minWidth().resolve(contentWidth).orElse(0) + margins;
@@ -320,7 +320,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             Style is = b.style();
             Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.vertical();
-            BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
+            BoxModel probe = BoxModel.resolve(b, probeSpace(), context);
 
             // Ancho con el que se mide: el declarado, el del contenedor (stretch) o el ajuste al contenido.
             double width;
@@ -329,13 +329,13 @@ public final class FlexLayout implements LayoutAlgorithm {
             } else if (it.align == Style.Alignment.STRETCH && !multiLine) {
                 width = Math.max(0, contentWidth - it.margin.horizontal());
             } else {
-                width = Math.max(0, engine.intrinsic(b).fitContent(contentWidth) - it.margin.horizontal());
+                width = Math.max(0, context.intrinsic(b).fitContent(contentWidth) - it.margin.horizontal());
             }
             it.crossWidth = BoxModel.constrainWidth(is, width, contentWidth);
 
             ConstraintSpace measure = itemSpace(it.crossWidth, OptionalDouble.empty());
-            BoxModel sized = BoxModel.resolve(b, measure, engine);
-            double contentSize = engine.layout(b, measure, null).fragment().height();
+            BoxModel sized = BoxModel.resolve(b, measure, context);
+            double contentSize = context.layout(b, measure, null).fragment().height();
 
             OptionalDouble basis = declaredBasis(is);
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
@@ -344,7 +344,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 // Mínimo automático (§5.7): el alto de su contenido, sin pasar de Max height, y
                 // nunca más que el alto declarado.
                 double content = sized.height().isPresent()
-                        ? engine.layout(b, measure.measuringContentHeight(), null).fragment().height()
+                        ? context.layout(b, measure.measuringContentHeight(), null).fragment().height()
                         : contentSize;
                 min = Math.min(contentSize, content) + margins;
             } else {
@@ -415,13 +415,13 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (row) {
                 double width = Math.max(0, it.main - it.margin.horizontal());
                 it.space = itemSpace(width, cross);
-                it.result = engine.layout(it.box, it.space, null);
+                it.result = context.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().height() + it.margin.vertical();
             } else {
                 double height = Math.max(0, it.main - it.margin.vertical());
                 double width = cross.orElse(it.crossWidth);
                 it.space = itemSpace(width, OptionalDouble.of(height));
-                it.result = engine.layout(it.box, it.space, null);
+                it.result = context.layout(it.box, it.space, null);
                 it.cross = it.result.fragment().width() + it.margin.horizontal();
             }
         }
@@ -432,7 +432,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double target;
             if (row) {
                 Fragment f = it.result.fragment();
-                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()), engine);
+                BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()), context);
                 if (m.height().isPresent()) {
                     return;
                 }

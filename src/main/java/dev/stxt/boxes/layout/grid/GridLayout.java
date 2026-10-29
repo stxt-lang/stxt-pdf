@@ -6,7 +6,7 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
 import dev.stxt.boxes.layout.LayoutResult;
@@ -51,10 +51,10 @@ import static dev.stxt.boxes.tree.PropertyKey.ITEM_AREA;
  */
 public final class GridLayout implements LayoutAlgorithm {
 
-    private final Engine engine;
+    private final LayoutContext context;
 
-    public GridLayout(Engine engine) {
-        this.engine = engine;
+    public GridLayout(LayoutContext context) {
+        this.context = context;
     }
 
     /** Ítems en flujo, el área de cada uno y las pistas, explícitas e implícitas. */
@@ -114,7 +114,7 @@ public final class GridLayout implements LayoutAlgorithm {
         List<ItemContribution> minContributions = new ArrayList<>();
         List<ItemContribution> maxContributions = new ArrayList<>();
         for (int i = 0; i < g.items().size(); i++) {
-            IntrinsicSizes is = engine.intrinsic(g.items().get(i));
+            IntrinsicSizes is = context.intrinsic(g.items().get(i));
             Area a = g.areas().get(i);
             minContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.minContent(), is.maxContent()));
             maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.maxContent(), is.maxContent()));
@@ -129,7 +129,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        return UnitBreaker.fragment(engine, box, space, from, arrange(box, space));
+        return UnitBreaker.fragment(context, box, space, from, arrange(box, space));
     }
 
     /**
@@ -137,7 +137,7 @@ public final class GridLayout implements LayoutAlgorithm {
      * tabla lo usa para cortar solo su cuerpo.
      */
     public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
-        BoxModel model = BoxModel.resolve(box, space, engine);
+        BoxModel model = BoxModel.resolve(box, space, context);
         Style s = box.style();
         double contentWidth = model.contentWidth();
         OptionalDouble contentHeight = model.contentHeight();
@@ -150,7 +150,7 @@ public final class GridLayout implements LayoutAlgorithm {
         // Columnas.
         List<ItemContribution> widths = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            IntrinsicSizes is = engine.intrinsic(g.items().get(i));
+            IntrinsicSizes is = context.intrinsic(g.items().get(i));
             Area a = g.areas().get(i);
             widths.add(new ItemContribution(a.column() - 1, a.columns(), is.minContent(), is.maxContent()));
         }
@@ -172,7 +172,7 @@ public final class GridLayout implements LayoutAlgorithm {
             itemWidths[i] = itemWidth(item, areaWidths[i], margins[i], horizontal(item, s), atStart);
             spaces[i] = ConstraintSpace.fixed(itemWidths[i], OptionalDouble.empty(), areaWidths[i],
                     OptionalDouble.empty(), atStart);
-            results[i] = engine.layout(item, spaces[i], null);
+            results[i] = context.layout(item, spaces[i], null);
             double h = results[i].fragment().height() + margins[i].vertical();
             heights.add(new ItemContribution(a.row() - 1, a.rows(), h, h));
         }
@@ -197,7 +197,7 @@ public final class GridLayout implements LayoutAlgorithm {
             Style.Alignment vertical = vertical(item, s);
             ConstraintSpace finalSpace = finalSpace(item, spaces[i], itemWidths[i], areaWidths[i],
                     areaHeight, margin, vertical, atStart);
-            LayoutResult r = engine.layout(item, finalSpace, null);
+            LayoutResult r = context.layout(item, finalSpace, null);
             Fragment f = r.fragment();
             double px = x[a.column() - 1] + margin.left()
                     + Sizing.align(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
@@ -251,13 +251,13 @@ public final class GridLayout implements LayoutAlgorithm {
     private double itemWidth(Box item, double areaWidth, Insets margin, Style.Alignment horizontal, boolean atStart) {
         Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
-        BoxModel probe = BoxModel.resolve(item, free, engine);
+        BoxModel probe = BoxModel.resolve(item, free, context);
         if (!is.width().isAuto()) {
             return probe.width();
         }
         double width = horizontal == Style.Alignment.STRETCH
                 ? areaWidth - margin.horizontal()
-                : engine.intrinsic(item).fitContent(areaWidth) - margin.horizontal();
+                : context.intrinsic(item).fitContent(areaWidth) - margin.horizontal();
         return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth);
     }
 
@@ -274,7 +274,7 @@ public final class GridLayout implements LayoutAlgorithm {
         OptionalDouble fixedHeight = OptionalDouble.empty();
         if (vertical == Style.Alignment.STRETCH) {
             ConstraintSpace probe = ConstraintSpace.fixed(width, OptionalDouble.empty(), areaWidth, base, atStart);
-            BoxModel m = BoxModel.resolve(item, probe, engine);
+            BoxModel m = BoxModel.resolve(item, probe, context);
             if (m.height().isEmpty()) {
                 fixedHeight = OptionalDouble.of(Sizing.constrain(
                         Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));

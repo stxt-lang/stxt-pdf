@@ -118,15 +118,15 @@ public final class UnitBreaker {
      * @param from     token del contenedor; {@code null} en su primer fragmento
      * @param arranged el contenedor maquetado sin fragmentar
      */
-    public static LayoutResult fragment(Engine engine, Box box, ConstraintSpace space, BreakToken from,
+    public static LayoutResult fragment(LayoutContext context, Box box, ConstraintSpace space, BreakToken from,
                                         Arranged arranged) {
-        return fragment(engine, box, space, from, arranged, Repeat.NONE);
+        return fragment(context, box, space, from, arranged, Repeat.NONE);
     }
 
-    /** Como {@link #fragment(Engine, Box, ConstraintSpace, BreakToken, Arranged)}, con ítems que se repiten en cada fragmento. */
-    public static LayoutResult fragment(Engine engine, Box box, ConstraintSpace space, BreakToken from,
+    /** Como {@link #fragment(LayoutContext, Box, ConstraintSpace, BreakToken, Arranged)}, con ítems que se repiten en cada fragmento. */
+    public static LayoutResult fragment(LayoutContext context, Box box, ConstraintSpace space, BreakToken from,
                                         Arranged arranged, Repeat repeat) {
-        return new Run(engine, box, space, (BreakToken.Container) from, arranged, repeat).layOut();
+        return new Run(context, box, space, (BreakToken.Container) from, arranged, repeat).layOut();
     }
 
     /** Un ítem en este fragmento: su fragmento ya colocado y sus cajas absolutas. */
@@ -146,7 +146,7 @@ public final class UnitBreaker {
 
     /** Un fragmento de un contenedor. */
     private static final class Run {
-        final Engine engine;
+        final LayoutContext context;
         final Box box;
         final BoxModel model;
         final ConstraintSpace space;
@@ -162,9 +162,9 @@ public final class UnitBreaker {
         /** Ítem de cada índice de {@code placed} colocado en este fragmento. */
         final Piece[] pieces;
 
-        Run(Engine engine, Box box, ConstraintSpace space, BreakToken.Container from, Arranged arranged,
+        Run(LayoutContext context, Box box, ConstraintSpace space, BreakToken.Container from, Arranged arranged,
             Repeat repeat) {
-            this.engine = engine;
+            this.context = context;
             this.box = box;
             this.model = arranged.model();
             this.space = space;
@@ -273,7 +273,7 @@ public final class UnitBreaker {
                     continue;
                 }
                 double y = tokens == null ? p.y() - origin : 0;
-                LayoutResult r = engine.layout(p.box(),
+                LayoutResult r = context.layout(p.box(),
                         p.space().fragmented(remaining - y, space.atFragmentainerStart()), token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return null;
