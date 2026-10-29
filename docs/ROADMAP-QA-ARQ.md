@@ -66,7 +66,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
 | QA-06 | Límites y entradas hostiles | Media | M | hecho |
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | hecho |
-| QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | en curso |
+| QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | hecho |
 | QA-09 | Integración continua | Alta | S | hecho |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | hecho |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
@@ -337,6 +337,52 @@ había: `report.stxt` se había separado del §10 (`Title: Prueba` frente a `Tit
 lo vigila. Sustituye a `DocumentReaderTest.specificationExamplesAreValid`. Medido también, sin añadirlo al test: el
 `input.stxt` de los 28 golden, sin depuración, cumple PDF/UA-1 (5,4 s los 33 documentos).
 
+**Fuera del plan: hecho el punto 5** (con él, QA-08 queda terminada). Perfil `pit` en el `pom.xml` (pitest-maven 1.30.1
+con el plugin de JUnit 5): `mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, sobre `layout.*` y
+`fragment`, con los mutadores por defecto, 4 hilos y ≈ 12 min. Deja fuera los tests que escriben en carpetas compartidas
+de `target/` (los minions corren a la vez) o arrancan otra JVM: `GoldenTest`, los de `examples`, `PdfCanvasTest` y los
+de `concurrency`; así algún superviviente lo matarían los golden o los ejemplos. No va en la CI.
+
+| Package | Mutantes | Detectados, 1.ª pasada | Detectados, tras los tests nuevos |
+|---|---|---|---|
+| `fragment` | 134 | 87 % | 87 % |
+| `layout` | 643 | 82 % | 83 % |
+| `layout.block` | 116 | 81 % | 83 % |
+| `layout.flex` | 251 | 79 % | 84 % |
+| `layout.grid` | 365 | 81 % | 90 % |
+| `layout.image` | 29 | 76 % | 76 % |
+| `layout.inline` | 356 | 88 % | 88 % |
+| `layout.multicol` | 97 | 74 % | 74 % |
+| `layout.position` | 138 | 56 % | 92 % |
+| `layout.table` | 24 | 83 % | 83 % |
+| **Total** | 2153 | **80,7 %** (fuerza 82 %) | **85,5 %** (fuerza 87 %) |
+
+(Fuerza: detectados entre los mutantes que algún test ejecuta. Cobertura de líneas de las clases mutadas: 98 %.)
+
+**Lo que dijeron los supervivientes.** Donde se concentraban había huecos reales en los tests, y al llenarlos salieron
+**dos fallos** del motor, los dos corregidos con el acuerdo del usuario y sin cambiar ningún golden ni ejemplo:
+- `AbsoluteEquation` (51 supervivientes): los tests miraban un solo valor de la solución y nunca con márgenes. Un test
+  por caso de la ecuación, con márgenes y los cinco valores.
+- `TrackSizing.distributeExcess` (45): los ítems de varias pistas solo se probaban sobre pistas `auto` iguales y sin
+  hueco. Con una fija y una `auto` salió el primer fallo: el max-content se repartía sin contar las bases ya subidas y el
+  área del ítem pasaba de su max-content (decisión 323).
+- `FlexLayout` (37): ningún test con `Gap` distinto en cada eje, márgenes en los ítems ni el hueco intrínseco con más de
+  dos ítems. Con márgenes salió el segundo fallo: el encogimiento se ponderaba con la base más los márgenes, contra el
+  §5.7 (decisión 324).
+- El borde y el relleno de las cajas entre un `Absolute` y su containing block (`BlockLayout`, `UnitBreaker`, `Overflow`)
+  y los ítems de grid con márgenes: tests de posición estática en bloque, ítem flex y área de grid, de un `Absolute` que
+  sale de su containing block sin salir de la página, y de alineación y estirado con márgenes.
+
+**Lo que queda (313 mutantes sin detectar), sin tocar:** ≈ 56 son fronteras con la tolerancia o con 0 (`<` frente a
+`<=` de `Tolerance.EPSILON`, `fits`, `same`), equivalentes en la práctica; 19 cambian solo el texto de un mensaje (el
+catálogo de errores compara código y línea, no el texto); 3 vacían cachés (solo rendimiento); 33 no los ejecuta ningún
+test de la pasada (ramas defensivas como `return LayoutResult.before(box)` tras un `null` imposible, y los mensajes de
+`MulticolLayout`); y ≈ 200 son cuentas y condiciones repartidas (`Overflow` al buscar el culpable de un error, la
+búsqueda binaria del equilibrado de `MulticolLayout`, el `Paginator` con referencias que no convergen, la caja de
+contenido de un `Multicol` con `Decoration: clone`), muchas en caminos de error; no se han revisado una a una. El
+informe HTML
+(`target/pit-reports/index.html`) las lista por línea; se pueden atacar por clases cuando se toque cada una.
+
 ### QA-09 · Integración continua · Alta · S
 
 No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
@@ -345,6 +391,13 @@ no está vacío tras los tests (QA-07); subir `target/site/jacoco` y `target/sur
 trabajo nocturno aparte con `-Dgroups=perf -DexcludedGroups=none` y con `tools/qa/`. Nota de entorno: dentro de esta
 sesión, `mvn` solo funcionó con red (el plugin de JaCoCo no estaba en la caché local; `-o` falla).
 **Hecho (sesión 1):** `.github/workflows/ci.yml` con tres trabajos: `test` (JDK 17 y 21, `mvn -B test`, comprueba que el árbol versionado queda limpio y sube los informes), `locale` (la suite con la JVM en turco; **no** comprueba el árbol hasta QA-02) y `perf` (`@Tag("perf")`, solo programado y a mano). Primera ejecución en GitHub (commit `9d544cc`): los tres trabajos en verde, también el del árbol limpio (el antialiasing de la máquina de GitHub no reescribe ningún PNG).
+
+**Windows (fuera del plan):** un cuarto trabajo, `windows` (`windows-latest`, JDK 17, `mvn -B test` y el árbol limpio),
+**solo en la ejecución diaria y a mano** (`workflow_dispatch`), como `perf`: es más lento y no bloquea los commits. Usa
+el `core.autocrlf` del runner, como una copia de trabajo de Windows. La primera ejecución pasó los tests pero falló en el
+árbol limpio sin ningún fichero cambiado: GitHub ejecuta `bash` con `pipefail` y en Windows `tee /dev/stderr` falla. El
+paso de Windows ya no usa `tee`: escribe cada fichero cambiado como una anotación de error del trabajo (se lee sin abrir
+el log). Segunda ejecución, a mano: en verde.
 
 **Aceptación:** el commit siguiente al cambio muestra el workflow en verde.
 
@@ -897,3 +950,5 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · QA-08 (6) | `SpecificationDocumentsTest`: los cuatro ejemplos de la especificación y `report.stxt`, con las métricas reales, en PDF y con veraPDF (PDF/UA-1); los cinco ya lo cumplían. `report.stxt` vuelve a ser el ejemplo del §10 (el título se había separado) y un test lo vigila. 1408 tests en verde. | `UnitBreaker.Run.layOut` (complejidad 22) y PF-05; quedan QA-08 (5) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · `UnitBreaker.Run.layOut` | Partido en sus fases: `layOut` (de complejidad 22 a 9) elige; `continueGroup` (4) sigue el grupo partido en la página anterior, `cut` (9) busca el corte en lo que queda de página o parte el primer grupo en paralelo, y `place` (5) coloca las unidades y cierra el fragmento. El cursor (`next`, `origin`, `top`, `continued`) son campos de `Run`, que ya era el estado de un fragmento. 1408 tests en verde; los 72 PDF y los 54 SVG, iguales salvo fechas e `ID`. | PF-05; quedan QA-08 (5) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · PF-05 | `ColdStartProbe` mide el arranque en frío por partes y la carga de las fuentes por documento: leer el fichero era ≈ 1 % de una conversión, el resto es carga de clases y JIT. `FontFile.content()` (los bytes de fontbox, sin copia) para `PdfFonts`, `SvgFonts` y `digest`: cada TTF se lee una vez, y el PDF lleva la fuente que se midió aunque el fichero cambie o desaparezca (antes, `NoSuchFileException`). Decisión 322. 1410 tests en verde; los 72 PDF y los 54 SVG, iguales salvo fechas e `ID`. | Quedan QA-08 (5, PIT) y `windows-latest` en la CI |
+| 2026-10-29 | Fuera del plan · CI en Windows | Trabajo `windows` (`windows-latest`) solo en la ejecución diaria y a mano; el árbol limpio, sin `tee` (con `pipefail`, `tee /dev/stderr` fallaba en Windows) y con anotaciones. En verde. | — |
+| 2026-10-29 | Fuera del plan · QA-08 (5) | Perfil `pit`; dos pasadas (80,7 % → 85,5 % de mutantes detectados, `layout.position` de 56 a 92 %, `layout.grid` de 81 a 90 %). Tests nuevos de `AbsoluteEquation`, `TrackSizing`, flex, grid y posición estática; dos fallos encontrados y corregidos con el usuario: el max-content de un ítem de varias pistas (decisión 323) y el encogimiento flex con márgenes (decisión 324). Ningún golden ni ejemplo cambia; 1428 tests en verde. QA-08 terminada. | Revisión QA y arquitectura terminada; lo que queda de PIT, por clases cuando se toquen |

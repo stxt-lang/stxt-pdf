@@ -659,6 +659,10 @@ dependencia nueva se decide y se apunta allí.
   `FixedMetrics`, cada carácter mide 5 pt con `Size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
   una página concreta; los tests `*FragmentationTest` lo usan.
+- **Pruebas de mutación (QA-08):** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
+  (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, ≈ 13 min; informe en `target/pit-reports/`). No
+  está en la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera los tests que escriben en carpetas
+  compartidas de `target/` o arrancan otra JVM (golden, ejemplos, `PdfCanvasTest`, `concurrency`).
 - **Propiedades y determinismo (QA-08):** `ValueParserPropertiesTest`, `LineBreakerPropertiesTest` y
   `FragmentationPropertiesTest` prueban propiedades con miles de entradas al azar de un `Random` con semilla fija
   (un fallo se repite; sin librerías nuevas), y `CrossJvmDeterminismTest`, que una JVM hija da el mismo PDF de
