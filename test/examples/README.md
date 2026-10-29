@@ -39,7 +39,7 @@ Open Font License). Los nombres, las empresas y los datos de los documentos son 
 
 | | Documento | Qué enseña |
 |---|---|---|
-| [![](01-invoice/page-1.png)](01-invoice) | **[01 · Factura](01-invoice)**<br>Una página A4 | Logotipo y datos de las partes en un grid, tira de condiciones, tabla con cabecera, cuerpo y **pie de totales**, pie de página fijo con `{page}` y `{pages}`, **correos clicables** (`Link: mailto:…`), y los datos para el pago en un `Markdown` con el IBAN y el BIC como **código en línea** (`Code font`). Todo el estilo en `styles.stxt`; las tarjetas del emisor y del cliente con la franja de color a la izquierda y **esquinas redondeadas a la derecha** (`Radius: 0 6 6 0`). |
+| [![](01-invoice/page-1.png)](01-invoice) | **[01 · Factura](01-invoice)**<br>Una página A4 | Logotipo y datos de las partes en un grid, tira de condiciones, tabla con cabecera, cuerpo y **pie de totales**, pie de página fijo con `{page}` y `{pages}`, **correos clicables** (`Link: mailto:…`), y los datos para el pago con el IBAN y el BIC como **código en línea** (`Inline: markdown` y `Code font`). Todo el estilo en `styles.stxt`; las tarjetas del emisor y del cliente con la franja de color a la izquierda y **esquinas redondeadas a la derecha** (`Radius: 0 6 6 0`). |
 | [![](02-letter/page-1.png)](02-letter) | **[02 · Carta comercial](02-letter)**<br>Una página A4 | Membrete con logotipo, cuerpo en **Markdown** justificado con **Knuth-Plass** (`Text wrap: pretty`), negrita, cursiva y subrayado dentro de la línea, firma escaneada, web del taller en el pie y en el membrete con `Link`. |
 | [![](03-resume/page-1.png)](03-resume) | **[03 · Currículum](03-resume)**<br>Una página A4, sin márgenes | Grid de dos columnas a **página completa**, foto **circular** (`Radius: 50%`), barras de nivel con anchos en porcentaje y **extremos redondeados**, línea de tiempo en un grid y cifras en un `Flex`; correo y web clicables. |
 | [![](04-annual-report/page-1.png)](04-annual-report) | **[04 · Informe anual](04-annual-report)**<br>7 páginas A4 | **Portada a sangre** con un **degradado** de transparente a azul (`linear(180, #12315A00, #12315A)`) que funde la foto con el panel, en una **sección propia** (`Margin: 0`, sin número de página ni el pie del documento: `Page numbering: none` e `Inherit fixed: false`) y un cuerpo que numera desde 1 («Página 1 de 6»), **capítulos y apartados numerados** (`Numbered`: `1`, `1.1`…, también en el índice), **índice automático** (`Contents`, con puntos guía, las páginas calculadas por el motor y cada entrada clicable), cifras clave, **gráficos** como imágenes, texto en **dos columnas** con filete, tabla financiera con cabecera y pie, calendario con celdas de varias columnas (`Span`) y secciones que empiezan en página nueva. |
@@ -75,8 +75,8 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   (`CIF B-…`) se dejan como están.
 - **Los espacios se colapsan**, salvo con `White space: pre` (o `pre-wrap`): el bloque de terminal con
   columnas alineadas del manual (08) es un solo `Text` en monoespaciada con los espacios escritos, y
-  en un `Markdown` con `Code font` el código se escribe con comillas invertidas (el IBAN y el BIC de la
-  factura, 01; el borne `N` del manual, 08).
+  con `Code font` el código se escribe con comillas invertidas, en un texto con `Inline: markdown` (el
+  IBAN y el BIC de la factura, 01) o en un `Markdown` (el borne `N` del manual, 08).
 - **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la
   cabecera (también a las tablas de Markdown), `Even row cell` la cebra (ejemplo 05) y
   `Column align` o `For column` las columnas numéricas. Lo que es de una sola fila, como los

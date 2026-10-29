@@ -1,6 +1,6 @@
-# Case: Código en un texto con Inline: markdown
-# Code: MARKDOWN_UNSUPPORTED
-# Line: 17
+# Case: Bloque de código sin Code font
+# Code: CODE_WITHOUT_FONT
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -12,6 +12,9 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Inline: markdown
 	Section:
-		Text: Usa `mvn test` para probar
+		Markdown:
+			Content >>
+				```
+				int x = 1;
+				```

@@ -185,7 +185,8 @@ Document (dev.stxt.pdf):
 			Heading 3:
 				Text: Si tu instalación no tiene neutro
 			Markdown:
-				Code font: IBM Plex Mono
+				Typography:
+					Code font: IBM Plex Mono
 				Content >>
 					El termostato puede funcionar con pilas en las casas sin cable neutro. Deja libre el borne `N` y consulta [la sección {number of: specs-heading}](#specs) para saber qué pilas usar. En ese caso la pantalla se apaga cuando no se toca.
 			Heading 3:

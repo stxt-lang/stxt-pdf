@@ -12,6 +12,7 @@ celdas).
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Font` | nombre de familia | — | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declara el fichero TTF de la carpeta de fuentes ([Recursos](recursos.md#fuentes)). |
+| `Code font` | nombre de familia | — | La familia del código, en línea y en bloques ([Formato del texto](formato-del-texto.md#código-en-línea)); suele ser una monoespaciada. **Obligatoria** si hay código, propia o heredada (`CODE_WITHOUT_FONT`). |
 | `Weight` | `normal`, `bold` | `normal` | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
 | `Style` | `normal`, `italic` | `normal` | |
 | `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |

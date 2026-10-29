@@ -1,6 +1,6 @@
 # Case: Code font con una familia que no existe, en código en línea
 # Code: FONT_UNKNOWN
-# Line: 19
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -14,6 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Markdown:
-			Code font: Courier
+			Typography:
+				Code font: Courier
 			Content >>
 				Usa `mvn test` para probar.

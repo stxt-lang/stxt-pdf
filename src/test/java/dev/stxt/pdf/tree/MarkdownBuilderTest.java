@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -241,85 +242,73 @@ class MarkdownBuilderTest {
 
     // --- Código ------------------------------------------------------------------------------------
 
-    private static final String MONO = "Code font: IBM Plex Mono";
-
+    /** El código es un tramo de código; su familia, la de {@code Code font}, la recibe al construir su caja. */
     @Test
-    void inlineCodeIsARunWithTheCodeFont() {
-        MarkdownBuilder.Translation t = translate(List.of(MONO), "Usa `mvn test` ya.");
+    void inlineCodeIsACodeRun() {
+        MarkdownBuilder.Translation t = translate("Usa `mvn test` ya.");
         InlineNode paragraph = t.elements().get(0);
         assertEquals("Usa mvn test ya.", paragraph.getText());
         assertEquals(List.of(new TextRun("Usa ", TextFormat.PLAIN),
-                new TextRun("mvn test", TextFormat.PLAIN.withFamily("IBM Plex Mono")),
+                new TextRun("mvn test", TextFormat.PLAIN.asCode()),
                 new TextRun(" ya.", TextFormat.PLAIN)), t.runs().get(paragraph));
     }
 
     @Test
     void inlineCodeKeepsTheFormatAroundIt() {
-        MarkdownBuilder.Translation t = translate(List.of(MONO), "**negrita y `código`** y [`enlace`](https://example.com/a)");
+        MarkdownBuilder.Translation t = translate("**negrita y `código`** y [`enlace`](https://example.com/a)");
         List<TextRun> runs = t.runs().get(t.elements().get(0));
-        TextFormat boldCode = new TextFormat(true, false, false, false).withFamily("IBM Plex Mono");
+        TextFormat boldCode = new TextFormat(true, false, false, false).asCode();
         assertEquals(new TextRun("código", boldCode), runs.get(1));
         TextRun link = runs.get(runs.size() - 1);
         assertEquals("enlace", link.text());
-        assertEquals("IBM Plex Mono", link.format().family());
+        assertTrue(link.format().code());
         assertEquals("https://example.com/a", link.format().link());
         assertTrue(link.format().underline());
     }
 
     @Test
     void aFencedCodeBlockIsAPreformattedText() {
-        MarkdownBuilder.Translation t = translate(List.of(MONO), "Antes.", "", "```", "a  b", "  c", "```", "", "Después.");
+        MarkdownBuilder.Translation t = translate("Antes.", "", "```", "a  b", "  c", "```", "", "Después.");
         assertEquals(List.of("Paragraph", "Text", "Paragraph"), t.elements().stream().map(Node::getName).toList());
         assertEquals(List.of(
-                "Text @18",
-                "  Typography @18",
-                "    Font: IBM Plex Mono @14",
-                "    White space: pre @18",
-                "  Content: a  b\n  c @18"), outline(t.elements().get(1)));
+                "Text @17",
+                "  Typography @17",
+                "    White space: pre @17",
+                "  Content: a  b\n  c @17"), outline(t.elements().get(1)));
+        assertEquals(Set.of(t.elements().get(1)), t.codeBlocks());
     }
 
     @Test
     void anIndentedCodeBlockKeepsItsRelativeIndentation() {
-        MarkdownBuilder.Translation t = translate(List.of(MONO), "Antes.", "", "    uno", "      dos");
+        MarkdownBuilder.Translation t = translate("Antes.", "", "    uno", "      dos");
         InlineNode code = t.elements().get(1);
         assertEquals("uno\n  dos", ((InlineNode) code).getChild("content").getText());
-        // El Content >> va en la línea anterior a la primera línea del código (la 14).
-        assertEquals(17, code.getChild("content").getLine());
-    }
-
-    @Test
-    void codeNeedsCodeFont() {
-        InvalidModelException inline = assertThrows(InvalidModelException.class, () -> translate("Usa `mvn`."));
-        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, inline.errorCode());
-        assertEquals(15, inline.line());
-        InvalidModelException block = assertThrows(InvalidModelException.class,
-                () -> translate("Párrafo.", "", "```", "x", "```"));
-        assertEquals(ErrorCode.MARKDOWN_PROPERTY_MISSING, block.errorCode());
-        assertEquals(17, block.line());
+        // El Content >> va en la línea anterior a la primera línea del código (la 17).
+        assertEquals(16, code.getChild("content").getLine());
     }
 
     @Test
     void theLanguageLabelOfAFenceIsNotSupported() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> translate(List.of(MONO), "```java", "int x;", "```"));
+                () -> translate("```java", "int x;", "```"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.errorCode());
-        assertEquals(16, e.line());
+        assertEquals(15, e.line());
     }
 
     @Test
     void anEmptyCodeBlockIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> translate(List.of(MONO), "```", "```"));
+                () -> translate("```", "```"));
         assertEquals(ErrorCode.TEXT_CONTENT, e.errorCode());
     }
 
     @Test
     void codeInATableCellAndInAListItem() {
-        MarkdownBuilder.Translation t = translate(List.of(MONO, "Bullet: disc", "Table columns: auto"),
+        MarkdownBuilder.Translation t = translate(List.of("Bullet: disc", "Table columns: auto"),
                 "| A |", "|---|", "| `x` |", "", "- uno", "", "  ```", "  y", "  ```");
         InlineNode cell = (InlineNode) ((InlineNode) ((InlineNode) t.elements().get(0).getChild("body")).getChildren()
                 .get(0)).getChildren().get(0);
-        assertEquals("IBM Plex Mono", t.runs().get(cell).get(0).format().family());
+        assertTrue(t.runs().get(cell).get(0).format().code());
         InlineNode item = (InlineNode) t.elements().get(1).getChild("list-item");
         assertEquals("Text", item.getChildren().get(1).getName());
     }

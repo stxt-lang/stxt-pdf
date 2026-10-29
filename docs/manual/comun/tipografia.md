@@ -23,6 +23,7 @@ Styles:
 | Propiedad | Valores | Por defecto | Qué hace |
 |---|---|---|---|
 | `Font` | nombre de familia | — | La fuente. **Obligatoria** en todo texto, propia o heredada |
+| `Code font` | nombre de familia | — | La fuente del código ([Formato del texto](formato-del-texto.md#código)). **Obligatoria** si hay código |
 | `Size` | número > 0 | — | El tamaño de la letra, en puntos. **Obligatorio** en todo texto |
 | `Weight` | `normal`, `bold` | `normal` | Negrita |
 | `Style` | `normal`, `italic` | `normal` | Cursiva |

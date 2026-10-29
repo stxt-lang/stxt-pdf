@@ -1,6 +1,6 @@
-# Case: Código de Markdown sin Code font
-# Code: MARKDOWN_PROPERTY_MISSING
-# Line: 18
+# Case: Código en un texto con Inline: markdown, sin Code font
+# Code: CODE_WITHOUT_FONT
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -12,7 +12,6 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
+				Inline: markdown
 	Section:
-		Markdown:
-			Content >>
-				Usa `mvn test` para probar.
+		Text: Usa `mvn test` para probar

@@ -39,6 +39,15 @@ class TextFormatTest {
     }
 
     @Test
+    void codeIsKeptByTheOtherChanges() {
+        TextFormat code = TextFormat.PLAIN.asCode();
+        assertTrue(code.withLink("https://example.com/a").withSmallCaps(true).withFamily("M").code());
+        assertFalse(TextFormat.PLAIN.withFamily("M").code());
+        // Sin su familia todavía, se pinta con la de la caja.
+        assertEquals(REGULAR, code.face(REGULAR));
+    }
+
+    @Test
     void decorations() {
         assertFalse(new TextFormat(true, true, false, false).decorated());
         assertTrue(new TextFormat(false, false, true, false).decorated());

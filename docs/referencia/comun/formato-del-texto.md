@@ -11,8 +11,8 @@ combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (aba
 
 - Cada tramo usa su variante de la fuente, que debe existir (`FONT_VARIANT_MISSING`, con la línea del tramo) y tener sus
   caracteres (`GLYPH_MISSING`). La negrita y la cursiva se **suman** a las de la caja: no se pueden quitar.
-- El tamaño, el color, `Line height` y la familia son los de la caja (salvo el código de un `Markdown`, que usa
-  `Code font`, [Markdown](../componentes/markdown.md#código)), así que las líneas no cambian de alto.
+- El tamaño, el color, `Line height` y la familia son los de la caja (salvo el código, que usa `Code font`,
+  [abajo](#código-en-línea)), así que las líneas no cambian de alto.
 - Una palabra con partes de varios tramos (**neg**rita) es una sola palabra: no se parte entre ellos y mide lo que suman
   sus partes.
 - El espacio entre dos palabras tiene el formato del tramo de su primer espacio en blanco: un subrayado cubre los espacios
@@ -28,7 +28,8 @@ combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (aba
 
 Por defecto el texto de un `Text`, un `Paragraph` o una `Cell` es **literal**: los asteriscos son asteriscos. Con
 `Inline: markdown` se interpreta como el Markdown en línea de un [`Markdown`](../componentes/markdown.md), con la misma
-sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](destino)` ([Enlaces](enlaces.md)).
+sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `código` `` ([abajo](#código-en-línea)) y
+`[texto](destino)` ([Enlaces](enlaces.md)).
 
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
@@ -36,8 +37,8 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](
 - **Se hereda**: se declara una vez en `Element: Document` o en una regla, y un texto vuelve al literal con `Inline: none`.
 - Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
   `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
-  escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, código, una imagen, HTML o un
-  salto de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no
+  escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen, HTML o un salto
+  de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no
   admitido, como en un `Markdown`.
 - No actúa dentro de un `Markdown`, aunque se herede (lo escapado sigue siendo literal), ni en las entradas de un
   `Contents`. `Alt` y los demás valores son siempre literales.
@@ -54,6 +55,17 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](
 > una lista que empieza a media frase). Quien escriba una lista en un texto con `Inline: markdown` la obtiene literal,
 > como sin `Inline`. *Alternativa descartada:* `MARKDOWN_UNSUPPORTED` con la línea del bloque, que obligaba a escapar el
 > primer carácter.
+
+## Código en línea
+
+Con `Inline: markdown`, o en un `Markdown`, lo que va entre comillas invertidas (`` `mvn test` ``) es **código**: un
+tramo con la familia de `Code font`, que conserva el peso y el estilo de la caja y los de las marcas del tramo
+(``**`x`**`` es código en negrita). El tamaño, el color y `Line height` son los de la caja, así que las líneas no
+cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
+
+`Code font` es de `Typography` ([Tipografía](tipografia.md)) y se hereda: se declara una vez, en `Element: Document`,
+para todo el documento. Sin ella, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en
+un `Markdown`, la del párrafo); si la familia no existe, `FONT_UNKNOWN`, con la línea de `Code font`.
 
 ## Mayúsculas (`Transform`)
 
@@ -135,8 +147,6 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 ## Lo que no hay
 
-- Tramos con otro tamaño, otro color u otra familia (salvo el código de un `Markdown`), ni que quiten la negrita o la
-  cursiva de la caja.
+- Tramos con otro tamaño, otro color u otra familia (salvo el código), ni que quiten la negrita o la cursiva de la caja.
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Transform` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `White space`.
-- Código en línea en un texto con `Inline: markdown` (`MARKDOWN_UNSUPPORTED`): no hay `Code font` fuera de `Markdown`.

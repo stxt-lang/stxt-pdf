@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static dev.stxt.pdf.tree.PropertyKey.CODE_FONT;
 import static dev.stxt.pdf.tree.PropertyKey.FONT;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_WEIGHT;
@@ -148,9 +149,8 @@ public final class PdfMetrics implements TextMeasurer {
         } catch (ResourceException e) {
             if (!fonts.families().contains(face.family())) {
                 if (!face.family().equals(s.typography().font())) {
-                    // La familia de un tramo (el código de un Markdown): el error es del texto, que no tiene
-                    // la línea de Code font.
-                    throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_UNKNOWN,
+                    // La familia de un tramo de código: el culpable es la declaración de Code font.
+                    throw new InvalidModelException(s.line(CODE_FONT), ErrorCode.FONT_UNKNOWN,
                             e.getMessage() + " (la fuente del código, Code font)");
                 }
                 // El culpable es la declaración de Font, aunque esté en una antecesora.

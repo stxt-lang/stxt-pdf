@@ -189,7 +189,7 @@ vez; los elementos, las veces que se quiera.
 | `Row` | `Class`, `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
 | `Multicol` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
-| `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Code font`, `Content` (obligatorio) |
+| `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
 | `Contents` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Rotate`, `Rotate origin` |
 | `Relative` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
@@ -198,7 +198,7 @@ vez; los elementos, las veces que se quiera.
 | `Item` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `Font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `Font`, `Code font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`,

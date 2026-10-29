@@ -94,7 +94,8 @@ class MarkdownTest {
 
     @Test
     void codeBlocksArePreformattedTextsInTheCodeFont() {
-        Box root = build("\tMarkdown:", "\t\tCode font: IBM Plex Mono", "\t\tContent >>", "\t\t\tUsa `ls  -l` así.", "",
+        Box root = build("\tMarkdown:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono", "\t\tContent >>",
+                "\t\t\tUsa `ls  -l` así.", "",
                 "\t\t\t```", "\t\t\ta  b", "\t\t\t  c", "\t\t\t```");
         Box md = root.children().get(0);
         Box paragraph = md.children().get(0);
@@ -109,6 +110,28 @@ class MarkdownTest {
     }
 
     /**
+     * {@code Code font} es de {@code Typography}: se hereda de un antecesor, y {@code Element: Code block} cambia la de
+     * los bloques sin tocar la del código en línea (referencia/componentes/markdown.md).
+     */
+    @Test
+    void theCodeFontIsInheritedAndACodeBlockRuleChangesOnlyTheBlocks() {
+        Box root = build("\tStyles:", "\t\tElement: Code block", "\t\t\tTypography:", "\t\t\t\tCode font: IBM Plex Serif",
+                "\tBlock:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono",
+                "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tUsa `ls`.", "", "\t\t\t\t```", "\t\t\t\tls -l", "\t\t\t\t```");
+        Box md = root.children().get(0).children().get(0);
+        assertEquals("IBM Plex Mono", md.children().get(0).formattedRuns().get(1).format().family());
+        assertEquals("IBM Plex Serif", md.children().get(1).style().typography().font());
+    }
+
+    @Test
+    void aCodeBlockWithoutCodeFontIsAnErrorOnItsLine() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> build("\tMarkdown:", "\t\tContent >>", "\t\t\tAntes.", "", "\t\t\t```", "\t\t\tx", "\t\t\t```"));
+        assertEquals(ErrorCode.CODE_WITHOUT_FONT, e.errorCode());
+        assertEquals(17, e.line());
+    }
+
+    /**
      * referencia/comun/estilos.md: la regla {@code Element: Code block} da estilo al código y no a los demás textos, ni
      * al revés.
      */
@@ -117,7 +140,8 @@ class MarkdownTest {
         Box root = build("\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tColor: #FF0000",
                 "\t\tElement: Code block", "\t\t\tTypography:", "\t\t\t\tSize: 8", "\t\t\tBox:",
                 "\t\t\t\tBackground: #EEEEEE", "\t\t\t\tPadding: 6",
-                "\tMarkdown:", "\t\tCode font: IBM Plex Mono", "\t\tContent >>", "\t\t\t# Título", "", "\t\t\t```",
+                "\tMarkdown:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono", "\t\tContent >>", "\t\t\t# Título", "",
+                "\t\t\t```",
                 "\t\t\ta  b", "\t\t\t```");
         Box md = root.children().get(0);
         Box title = md.children().get(0).children().get(0);

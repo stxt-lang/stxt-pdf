@@ -92,6 +92,8 @@ public enum ErrorCode {
     MARKDOWN_UNSUPPORTED,
     /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet}, {@code Numbering} o {@code Table columns}. */
     MARKDOWN_PROPERTY_MISSING,
+    /** Código, en línea o en un bloque, sin {@code Code font} en {@code Typography}, propia o heredada. */
+    CODE_WITHOUT_FONT,
 
     // --- Imágenes -------------------------------------------------------------------------------
     /** Una {@code Image} sin ruta, con una ruta que sale de la carpeta o que no existe. */

@@ -34,10 +34,11 @@ Document (dev.stxt.pdf):
 				Background: #F1EFE8
 	Section:
 		Markdown:
+			Typography:
+				Code font: IBM Plex Mono
 			Bullet: disc dash
 			Numbering: decimal
 			Table columns: auto
-			Code font: IBM Plex Mono
 			Content >>
 				# Condiciones de pago
 
@@ -67,9 +68,10 @@ Document (dev.stxt.pdf):
 | `Bullet` | El marcador de las listas con viñetas, uno por nivel: `disc dash` usa `•` en el primer nivel y `–` en los siguientes. Obligatorio si hay listas con viñetas |
 | `Numbering` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas |
 | `Table columns` | Las columnas de las tablas: `equal` (todas iguales) o `auto` (según su contenido). Obligatorio si hay tablas |
-| `Code font` | La fuente del código. Obligatoria si hay código |
 
-Admite además `Id`, `Class`, `Box`, `Typography` (que hereda todo lo de dentro) y `Break`.
+Admite además `Id`, `Class`, `Box`, `Typography` (que hereda todo lo de dentro) y `Break`. La fuente del código es la
+`Code font` de `Typography` ([Formato del texto](../comun/formato-del-texto.md#código)): se declara en el `Typography`
+del `Markdown` o, una vez para todo el documento, en `Element: Document`, y es obligatoria si hay código.
 
 ## Lo que se admite
 

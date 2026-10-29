@@ -56,8 +56,8 @@ Document (dev.stxt.pdf):
 			Id: plain
 		Markdown:
 			Id: md
-			Code font: IBM Plex Mono
 			Typography:
+				Code font: IBM Plex Mono
 				Font: IBM Plex Sans
 			Content >>
 				Usa `ls  -l` aquí.

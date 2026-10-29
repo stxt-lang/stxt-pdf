@@ -383,7 +383,7 @@ final class ValueReader {
     static String fontFamily(Node n) {
         String family = n.getText().trim();
         if (family.isEmpty()) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Font necesita el nombre de una familia");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " necesita el nombre de una familia");
         }
         return family;
     }

@@ -760,8 +760,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Table columns
 				Max: 1
-			Child: Code font
-				Max: 1
 			Child: Content
 				Min: 1
 				Max: 1
@@ -891,9 +889,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Fuente, tamaño, interlineado, alineación, color e idioma del texto, numeración de los encabezados, y viudas y huérfanas. Se hereda.
+		Description: Fuente, fuente del código, tamaño, interlineado, alineación, color e idioma del texto, numeración de los encabezados, y viudas y huérfanas. Se hereda.
 		Children:
 			Child: Font
+				Max: 1
+			Child: Code font
 				Max: 1
 			Child: Weight
 				Max: 1
@@ -1050,6 +1050,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Font
 		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document).
+	Node: Code font
+		Description: Familia de la fuente del código (`código` en un texto con Inline: markdown o en un Markdown, y los bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si hay código, propia o heredada.
 	Node: Weight
 		Type: ENUM
 		Description: Peso: normal (por defecto) o bold.
@@ -1302,8 +1304,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): disc, dash o none.
 	Node: Numbering
 		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
-	Node: Code font
-		Description: Familia de la fuente del código de un Markdown (`código` y bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si el contenido tiene código.
 	Node: Column align
 		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
 	Node: Table columns

@@ -33,6 +33,7 @@ public final class PropertyKey {
     public static final String FONT_STYLE = "font-style";
     public static final String FONT_SIZE = "font-size";
     public static final String LINE_HEIGHT = "line-height";
+    public static final String CODE_FONT = "code-font";
 
     // Propiedades de los elementos
     public static final String OFFSET = "offset";

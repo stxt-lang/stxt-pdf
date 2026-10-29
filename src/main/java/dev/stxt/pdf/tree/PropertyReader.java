@@ -90,6 +90,7 @@ final class PropertyReader {
     /** Grupo {@code Typography}, por nombre canónico. */
     private static final Map<String, Property> TYPOGRAPHY = Map.ofEntries(
             entry("font", (p, s) -> s.typography().setFont(fontFamily(p))),
+            entry("code-font", (p, s) -> s.typography().setCodeFont(fontFamily(p))),
             entry("weight", (p, s) -> s.typography().setFontWeight(enumValue(FontWeight.class, p))),
             entry("style", (p, s) -> s.typography().setFontStyle(enumValue(FontStyle.class, p))),
             entry("size", (p, s) -> s.typography().setFontSize(positive(p))),

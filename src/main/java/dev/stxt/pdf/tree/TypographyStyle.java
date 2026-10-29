@@ -22,6 +22,8 @@ public final class TypographyStyle extends StyleGroup {
 
     /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (referencia/comun/errores.md). */
     private String font;
+    /** {@code Code font}: la familia del código, en línea o en un bloque; {@code null} si no se declara. */
+    private String codeFont;
     private FontWeight fontWeight = FontWeight.NORMAL;
     private FontStyle fontStyle = FontStyle.NORMAL;
     /** {@code NaN} = sin declarar, que es un error en una caja con texto (referencia/comun/errores.md). */
@@ -65,6 +67,7 @@ public final class TypographyStyle extends StyleGroup {
     /** Una copia abierta del de {@code parent}: lo que hereda una caja nueva. */
     TypographyStyle(TypographyStyle parent) {
         font = parent.font;
+        codeFont = parent.codeFont;
         fontWeight = parent.fontWeight;
         fontStyle = parent.fontStyle;
         fontSize = parent.fontSize;
@@ -92,6 +95,15 @@ public final class TypographyStyle extends StyleGroup {
     void setFont(String v) {
         writable();
         font = v;
+    }
+
+    public String codeFont() {
+        return codeFont;
+    }
+
+    void setCodeFont(String v) {
+        writable();
+        codeFont = v;
     }
 
     public FontWeight fontWeight() {

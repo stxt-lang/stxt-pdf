@@ -2,6 +2,8 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Inline;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -140,6 +142,26 @@ class InlineFormatTest {
                 "1) Primero", "Hay que comprar: - leche ==="), texts);
         assertEquals(List.of(run("Hay que comprar: - "), run("leche", "b"), run(" ===")),
                 root.children().get(6).formattedRuns());
+    }
+
+    /** El código en línea usa la familia de {@code Code font}, que se hereda (referencia/comun/formato-del-texto.md). */
+    @Test
+    void inlineCodeUsesTheInheritedCodeFont() {
+        Box root = buildInline("\tBlock:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono",
+                "\t\tText: Usa `mvn test` ya.");
+        Box text = root.children().get(0).children().get(0);
+        assertEquals("Usa mvn test ya.", text.text());
+        assertEquals(List.of(run("Usa "), new TextRun("mvn test", TextFormat.PLAIN.asCode().withFamily("IBM Plex Mono")),
+                run(" ya.")), text.formattedRuns());
+        assertEquals("IBM Plex Sans", text.style().typography().font());
+    }
+
+    @Test
+    void codeWithoutCodeFontIsAnErrorOnTheLineOfTheText() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\tUsa `mvn`."));
+        assertEquals(ErrorCode.CODE_WITHOUT_FONT, e.errorCode());
+        assertEquals(16, e.line());
     }
 
     @Test

@@ -32,10 +32,6 @@ saliendo al trabajar y solo toca ese.
 - Los errores que se detectan después de construir el árbol (una fuente que no existe, un desbordamiento) señalan la línea
   de una regla del documento de estilos aparte sin decir que es de ese fichero.
 
-### Texto
-
-- Código en línea en un texto con `Inline: markdown` (no hay `Code font` fuera de `Markdown`; podría ser de `Typography`).
-
 ### Encabezados y secciones
 
 - Numeración de los encabezados: formatos por nivel (romanos, letras para los anexos), prefijos y sufijos propios

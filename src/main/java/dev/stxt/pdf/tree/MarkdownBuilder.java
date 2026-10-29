@@ -58,10 +58,10 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a {@code Paragraph}, listas a {@code
  * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code White space:
  * pre} e imágenes solas en su párrafo a {@code Image} (referencia/componentes/image.md). Un enlace es un tramo
- * subrayado con su destino (referencia/comun/enlaces.md); el código en línea, un tramo con la fuente de {@code Code
- * font}. {@link BoxTreeBuilder} construye después esos nodos como cualquier otro elemento, así que el schema, las
- * reglas de {@code Styles}, la validación de referencia/comun/errores.md, el PDF etiquetado y los marcadores los tratan
- * igual.
+ * subrayado con su destino (referencia/comun/enlaces.md); el código en línea, un tramo de código, que recibe la
+ * familia de {@code Code font} al construir su caja. {@link BoxTreeBuilder} construye después esos nodos como
+ * cualquier otro elemento, así que el schema, las reglas de {@code Styles}, la validación de
+ * referencia/comun/errores.md, el PDF etiquetado y los marcadores los tratan igual.
  *
  * <p>El formato dentro de una línea (negrita, cursiva, subrayado, tachado y enlace) no cabe en un nodo
  * STXT: el texto del nodo es el texto seguido y sus tramos van aparte, en
@@ -154,7 +154,6 @@ final class MarkdownBuilder {
         private final Optional<Node> bullet;
         private final Optional<Node> numbering;
         private final Optional<Node> tableColumns;
-        private final Optional<Node> codeFont;
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
@@ -176,7 +175,6 @@ final class MarkdownBuilder {
             this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet");
             this.numbering = markdown == null ? Optional.empty() : child(markdown, "numbering");
             this.tableColumns = markdown == null ? Optional.empty() : child(markdown, "table-columns");
-            this.codeFont = markdown == null ? Optional.empty() : child(markdown, "code-font");
             this.bullets = bullet.map(n -> markers(n, false)).orElse(List.of());
             this.numberings = numbering.map(n -> markers(n, true)).orElse(List.of());
         }
@@ -220,30 +218,10 @@ final class MarkdownBuilder {
         }
 
         /**
-         * La familia de {@code Code font}. Sin ella, el código de un {@code Markdown} es un error con la
-         * línea del código; en un texto con {@code Inline: markdown}, que no tiene esa propiedad, el código no
-         * está admitido.
-         */
-        private String codeFamily(org.commonmark.node.Node code, int line) {
-            if (markdown == null) {
-                throw unsupported(code, line);
-            }
-            if (codeFont.isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "El código necesita Code font en su Markdown "
-                        + "(línea " + markdown.getLine() + "): la familia de la fuente del código, como "
-                        + "Code font: IBM Plex Mono");
-            }
-            String family = codeFont.get().getText().trim();
-            if (family.isEmpty()) {
-                throw error(codeFont.get(), ErrorCode.VALUE_NOT_ALLOWED, "Code font necesita el nombre de una familia");
-            }
-            return family;
-        }
-
-        /**
-         * Un bloque de código (con vallas o sangrado): un {@code Text} con la fuente de {@code Code font} y
-         * {@code White space: pre}, con el código en un {@code Content}. La etiqueta de lenguaje de las vallas
-         * (<code>```java</code>) no tendría efecto, porque no hay resaltado, y es un error.
+         * Un bloque de código (con vallas o sangrado): un {@code Text} con {@code White space: pre}, con el código en
+         * un {@code Content}; es un {@code Code block} y su fuente es su {@code Code font} ({@link ElementReader}). La
+         * etiqueta de lenguaje de las vallas (<code>```java</code>) no tendría efecto, porque no hay resaltado, y es un
+         * error.
          */
         private InlineNode codeBlock(org.commonmark.node.Node b, int line) {
             boolean fenced = b instanceof FencedCodeBlock;
@@ -253,7 +231,6 @@ final class MarkdownBuilder {
                         + "bloque de código (" + ((FencedCodeBlock) b).getInfo().strip() + "): no hay resaltado; "
                         + "quítala");
             }
-            String family = codeFamily(b, line);
             if (literal.endsWith("\n")) {
                 literal = literal.substring(0, literal.length() - 1);
             }
@@ -262,7 +239,6 @@ final class MarkdownBuilder {
             }
             InlineNode text = node("Text", "", line);
             InlineNode typography = node("Typography", "", line);
-            typography.addChild(node("Font", family, codeFont.get().getLine()));
             typography.addChild(node("White space", "pre", line));
             text.addChild(typography);
             // El Content >> va en la línea de las vallas; con sangría, en la anterior a la primera línea.
@@ -452,7 +428,7 @@ final class MarkdownBuilder {
                 } else if (n instanceof Link l) {
                     inline(n, link(l, f, line), out, line);
                 } else if (n instanceof Code c) {
-                    out.add(c.getLiteral(), f.withFamily(codeFamily(c, line)));
+                    out.add(c.getLiteral(), f.asCode());
                 } else {
                     throw unsupported(n, line);
                 }

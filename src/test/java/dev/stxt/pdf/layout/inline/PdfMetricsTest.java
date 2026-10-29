@@ -126,7 +126,7 @@ class PdfMetricsTest {
 
     @Test
     void theCodeFontOfAMarkdownIsCheckedAndMeasuredWithItsOwnFile() {
-        assertDoesNotThrow(() -> validate("\tMarkdown:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: IBM Plex Mono", "\t\tContent >>",
+        assertDoesNotThrow(() -> validate("\tMarkdown:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tCode font: IBM Plex Mono", "\t\tContent >>",
                 "\t\t\tFont Plex Sans y `mono`.", "", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
         // hmtx de IBM Plex Mono: 600 unidades por carácter.
         assertEquals(12, metrics.width("ab", new FontFace("IBM Plex Mono", FontWeight.NORMAL, FontStyle.NORMAL), 10),
@@ -134,15 +134,15 @@ class PdfMetricsTest {
     }
 
     @Test
-    void anUnknownCodeFontIsReportedWhereItIsDeclaredOrInTheText() {
+    void anUnknownCodeFontIsReportedWhereItIsDeclared() {
         InvalidModelException block = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
-                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
+                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tCode font: Courier", "\t\tContent >>", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
         assertEquals(ErrorCode.FONT_UNKNOWN, block.errorCode());
         assertEquals(15, block.line());
         InvalidModelException inline = assertThrows(InvalidModelException.class, () -> validate("\tMarkdown:",
-                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\tCode font: Courier", "\t\tContent >>", "\t\t\tUsa `mvn`."));
+                "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tCode font: Courier", "\t\tContent >>", "\t\t\tUsa `mvn`."));
         assertEquals(ErrorCode.FONT_UNKNOWN, inline.errorCode());
-        assertEquals(17, inline.line());
+        assertEquals(15, inline.line());
         assertTrue(inline.getMessage().contains("Code font"), inline.getMessage());
     }
 }

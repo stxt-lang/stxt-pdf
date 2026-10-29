@@ -14,6 +14,7 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Inline: mark
 | `++subrayado++` | subrayado |
 | `~~tachado~~` | ~~tachado~~ |
 | `[texto](https://…)` | un enlace, subrayado ([Referencias y enlaces](referencias-y-enlaces.md)) |
+| `` `código` `` | código, en la fuente de `Code font` ([abajo](#código)) |
 
 ```
 Styles:
@@ -30,6 +31,26 @@ como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `
 
 La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita. El tamaño, el
 color y la fuente son los de la caja.
+
+## Código
+
+Con `Inline: markdown`, lo que va entre comillas invertidas es código y se escribe en la fuente de `Code font`, que
+suele ser una monoespaciada. `Code font` va en `Typography` y se hereda: se declara una vez para todo el documento, y
+vale también para el código de un [`Markdown`](../componentes/markdown.md).
+
+```
+Styles:
+	Element: Document
+		Typography:
+			Font: IBM Plex Sans
+			Size: 10
+			Inline: markdown
+			Code font: IBM Plex Mono
+Paragraph: Ejecuta `mvn test` antes de publicar.
+```
+
+El código conserva la negrita y la cursiva de lo que lo rodea y no cambia el alto de la línea. Sin `Code font`, un texto
+con código es un error.
 
 ## Mayúsculas (`Transform`)
 

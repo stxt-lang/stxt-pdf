@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.Inline;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.TextRun;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -44,6 +45,29 @@ enum ElementReader {
             text(n, box);
             box.setRuns(ctx.runs.get(n));
             inlineFormat(ctx, box);
+            codeFont(box);
+        }
+    },
+
+    /**
+     * El bloque de código de un {@code Markdown} (referencia/componentes/markdown.md): un texto cuya fuente es su
+     * {@code Code font}, propia o heredada, con la línea de su declaración.
+     */
+    CODE_BLOCK {
+        @Override
+        void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
+            if (s.typography().codeFont() == null) {
+                throw error(n, ErrorCode.CODE_WITHOUT_FONT, "El bloque de código necesita Code font: declárala en el "
+                        + "Typography del Markdown, de un antecesor o de Styles (Element: Document o Element: Code "
+                        + "block), como Code font: IBM Plex Mono");
+            }
+            s.typography().setFont(s.typography().codeFont());
+            s.declared(PropertyKey.FONT, s.line(PropertyKey.CODE_FONT));
+        }
+
+        @Override
+        void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
+            TEXT.content(builder, ctx, n, box);
         }
     },
 
@@ -91,6 +115,7 @@ enum ElementReader {
                 cellText(n, box);
                 box.setRuns(ctx.runs.get(n));
                 inlineFormat(ctx, box);
+                codeFont(box);
             } else {
                 builder.buildContent(ctx, n, box);
             }
@@ -224,6 +249,9 @@ enum ElementReader {
 
     /** La familia de un elemento. */
     static ElementReader of(Element kind) {
+        if (kind == Element.CODE_BLOCK) {
+            return CODE_BLOCK;
+        }
         if (kind.hasText()) {
             return TEXT;
         }
@@ -284,6 +312,33 @@ enum ElementReader {
         List<TextRun> runs = MarkdownBuilder.inline(box.text(), first);
         box.setText(TextRun.text(runs), first, false);
         box.setRuns(TextRun.formatted(runs) ? runs : null);
+    }
+
+    /**
+     * El código en línea (referencia/comun/formato-del-texto.md) se escribe con la familia de {@code Code font}, propia
+     * o heredada, que solo conoce la caja: sus tramos la reciben aquí. Sin ella es un error, con la línea del código.
+     */
+    private static void codeFont(Box box) {
+        List<TextRun> runs = box.formattedRuns();
+        if (runs == null || runs.stream().noneMatch(r -> r.format().code())) {
+            return;
+        }
+        String family = box.style().typography().codeFont();
+        List<TextRun> resolved = new ArrayList<>(runs.size());
+        int index = 0;
+        for (TextRun r : runs) {
+            if (r.format().code()) {
+                if (family == null) {
+                    throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "El código necesita Code font: "
+                            + "declárala en el Typography del texto, de un antecesor o de Styles (Element: Document), "
+                            + "como Code font: IBM Plex Mono");
+                }
+                r = new TextRun(r.text(), r.format().withFamily(family));
+            }
+            resolved.add(r);
+            index += r.text().length();
+        }
+        box.setRuns(List.copyOf(resolved));
     }
 
     /**

@@ -1,6 +1,6 @@
 # Case: Code font con una familia que no existe, en un bloque de código
 # Code: FONT_UNKNOWN
-# Line: 17
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -14,7 +14,8 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Markdown:
-			Code font: Courier
+			Typography:
+				Code font: Courier
 			Content >>
 				```
 				int x = 1;
