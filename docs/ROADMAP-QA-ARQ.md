@@ -80,7 +80,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
 | PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | hecho |
-| AR-02 | `Style`: 70 campos públicos mutables | Alta | L | en curso |
+| AR-02 | `Style`: 70 campos públicos mutables | Alta | L | hecho |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | hecho |
 | AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | hecho |
 | AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | hecho |
@@ -350,7 +350,7 @@ conversión secuencial: 0 diferencias, con `Resources` compartido y con uno por 
 | `DocumentReader` | Sí | Crea un `Parser` por lectura |
 | `Resources`, `FontLibrary`, `ImageLibrary` | Sí | Carga perezosa con `synchronized`; `FontLibrary` es inmutable; `ImageLibrary.find` es `synchronized` |
 | `FontFile` | Sí | Mide sin cerrojos con los avances precalculados (TS-04, sesión 2); `digest` se calcula una vez, sin cerrojo |
-| `Box`, `Style`, `LaidOutDocument` | Sí (solo lectura) | Fuera de `tree` solo se leen; el árbol se cierra al construirlo y escribir en una caja cerrada es un error (AR-02 etapas 1 y 2, AR-03, sesión 7) |
+| `Box`, `Style`, `LaidOutDocument` | Sí (solo lectura) | Fuera de `tree` solo se leen; el árbol se cierra al construirlo, con sus estilos, y escribir en una caja o un estilo cerrados es un error (AR-02, AR-03, sesiones 7 y 10) |
 | **`Engine`** | **No** | `LayoutCache` (`HashMap`/`IdentityHashMap` sin sincronizar), `InlineLayout` (`broken`, `measurer`, `pages`, `numbers` reasignados sin `volatile`) y contadores; `layOutDocument`, `assume` y `reservePageDigits` mutan estado compartido |
 | `Paginator`, `BuildContext`, `PdfCanvas`, `PdfImages`, `PdfStructure`, `PdfLinks` | No (uno por conversión) | Estado de la conversión; los crea `PdfCanvas.write` |
 | La caché de fuentes de JSVG (`FontResolver`) | Global, sin sincronizar | Los SVG con texto se dibujan dentro de `PdfImages.JSVG_FONTS`; ya no se da nada de alta en AWT (TS-03, sesión 4) |
@@ -594,6 +594,21 @@ cuatro tests de otros packages que escribían un estilo a mano (`BoxModelTest`, 
 `UnitBreakerTest`) usan `StyleEditor`, un ayudante de los tests en el package `tree`. Quedan las etapas 3 y 4
 (sesión 10).
 
+**Sesión 10: hechas las etapas 3 y 4.** Los 17 enums pasan a `model` (`Fill` de `Multicol` es `ColumnFill`; decisión
+319). `Style` se parte en diez grupos, uno por commit: `FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`,
+`ContentsStyle`, `ImageStyle`, `MulticolStyle`, `BreakStyle`, `BoxStyle` y `TypographyStyle`, que es el único que se
+hereda (`Style.inheriting` copia el grupo del padre en vez de 19 campos) y lleva `fontFace()` y `usedLineHeight()`. El
+hueco es de `FlexStyle` y de `GridStyle`, cada uno el suyo. En `Style` quedan las diez propiedades del elemento (§4.2
+y §4.9), los grupos y las líneas: de 731 líneas a 302. Las lecturas y escrituras (unas 600) se migraron con los
+errores de `javac` como guía, como en la sesión 7. **Congelar (etapa 4):** los campos de `Style` y de los grupos son
+privados y se escriben con un `set…` del package que falla si el estilo está cerrado (`StyleGroup`); `Box.close`
+cierra el estilo con sus grupos. Los grupos no son `record`: el builder escribe las propiedades de una en una
+(decisión 318). Aceptación: ningún campo de `Style` ni de sus grupos deja de ser privado (`BoxTest`); `FlexLayout` lee
+`flex()`, `box()` y el `item()` de sus hijos (y `isOutOfFlow()`); el PDF de los ejemplos y los golden y los SVG de los
+golden, iguales byte a byte (sin fechas ni ID). `ScaleProbe`, tres veces alternando con el principio de la sesión:
+dentro del ruido (657 páginas: layout de 687 a 771 ms antes y de 730 a 833 ahora; índice de 163 páginas: de 253 a 280
+antes y de 229 a 259 ahora).
+
 ### AR-03 · `Box` · Media · M
 
 `Box` (180 líneas) tiene `text`, `runs`, `image`, `anchor`, `number`, `marker`, `headRows`, `footRows`, `textLine`,
@@ -796,7 +811,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **7. Encapsulación del modelo** (hecha) | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
 | **8. Constructor del árbol** (hecha) | AR-01 | `BoxTreeBuilder.element` partido por familias |
 | **9. Algoritmos y lienzos** (hecha) | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
-| **10. Partir `Style`** | AR-02 (etapas 3 y 4), AR-13 | Registros inmutables por familia; árbol congelado |
+| **10. Partir `Style`** (hecha) | AR-02 (etapas 3 y 4), AR-13 | Un grupo por familia, cerrado con el árbol; árbol congelado |
 
 Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una sesión entera y conviene hacerlas con
 `ConcurrencyProbe` (comparación del PDF) y los PNG como red.
@@ -830,3 +845,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 8 · Constructor del árbol (hecha) | AR-01 en cuatro commits: `MediaReader`; tablas de propiedades en `PropertyReader` y `BoxTreeBuilder.properties`; `ElementReader` (una constante por familia: layout, envoltorio, propiedades del tipo, comprobaciones y contenido) con `element` como el orden común; `TableBuilder.table` y `ModelValidator.validateMargins` partidos. `element` de 162 a 42 líneas y de complejidad 67 a 8; `BoxTreeBuilder` de 617 a 347 líneas; ningún método de `tree` pasa de 44 líneas ni de complejidad 18. Decisión 315. 1392 tests en verde; el PDF de los ejemplos y los golden, el mismo byte a byte. | Sesión 9: algoritmos y lienzos (AR-04, AR-12, AR-05, AR-06, AR-07) |
 | 2026-10-29 | 9 · Algoritmos y lienzos (hecha) | AR-04 (`LayoutContext`, despacho con `EnumMap`, un doble en `ImageLayoutTest`), AR-12 (reglas de dirección como datos en `ArchitectureTest`), AR-05 (`Canvas` solo dibuja; `Tagging` aparte, `Canvas.tagging()`), AR-06 (`PdfCanvas` de 788 a 318 líneas: `PdfDocumentWriter`, `PdfContent`, `PdfTagging`, `PdfFonts`, `PdfGradients`; un solo `io`) y AR-07 (`Element.Role`; solo el despacho de `Engine` nombra un elemento fuera de `tree`). Decisión 316. 1398 tests en verde; los PDF de los ejemplos y los golden, iguales byte a byte, y los 54 SVG de los golden, iguales. | Sesión 10: partir `Style` (AR-02 etapas 3 y 4) y AR-13. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6) y `UnitBreaker.Run.layOut` (complejidad 22) |
 | 2026-10-29 | Fuera del plan · Tests en Windows | `mvn test` fallaba en Windows (1 fallo y 4 errores) y no en la CI, que es solo Linux: `SvgCanvas` con `%n` (ahora `\n`), `SvgFonts` dejaba abierto el TTF (ahora crea la fuente con su contenido) y `LimitsTest` usaba un enlace simbólico (ahora copia la fuente). Decisión 317. | Valorar `windows-latest` en la CI |
+| 2026-10-29 | 10 · Partir `Style` (hecha) | AR-13 (tres commits: el javadoc remite a la especificación; `Placement.place` devuelve `Placed` o `NoRoom`; `Box.describe()` es la única forma de nombrar una caja, sin `Messages.name`). AR-02 etapa 3: los enums a `model` y `Style` partido en diez grupos, uno por commit; etapa 4: `Style` y sus grupos se cierran con la caja (`StyleGroup`). Decisiones 318 a 320. 1400 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte; `ScaleProbe` dentro del ruido. | Plan terminado. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |

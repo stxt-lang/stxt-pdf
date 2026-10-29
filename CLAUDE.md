@@ -120,10 +120,10 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 
 | Package | Contenido |
 |---|---|
-| `model` | Tipos puros: `StxtPdfException` (la raíz de los errores del motor, con su `Kind`), `InternalException` y `Limits` (páginas, píxeles de una imagen, elementos y niveles de un SVG); `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
+| `model` | Tipos puros: los enums de los valores (`TextAlign`, `Marker`, `Break`, `Layout`, `Position`…), `StxtPdfException` (la raíz de los errores del motor, con su `Kind`), `InternalException` y `Limits` (páginas, píxeles de una imagen, elementos y niveles de un SVG); `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `SvgInspector` (lee un SVG y comprueba el subconjunto), `ResourceException` e `ImageFormatException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ElementReader` (lo propio de cada familia de elementos), `MediaReader` (`Media`, `Title` y `Language`), `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (las propiedades de una caja: las del elemento, sus grupos y la línea de cada una) y sus grupos (`TypographyStyle`, el único que se hereda, `BoxStyle`, `BreakStyle`, `FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `MulticolStyle`, `ImageStyle` y `ContentsStyle`, sobre `StyleGroup`), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ElementReader` (lo propio de cada familia de elementos), `MediaReader` (`Media`, `Title` y `Language`), `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `Numbering` (el número impreso de cada página), `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
@@ -205,7 +205,7 @@ dependencia nueva se decide y se apunta allí.
   schema. Fuera de `tree`, el layout y el pintado preguntan el papel, nunca el elemento (salvo el
   despacho de la tabla en `Engine`; `ArchitectureTest` lo vigila, AR-07): `PdfStructure.type` es un
   `switch` exhaustivo sobre `Role`, así que un elemento nuevo con un papel que ya existe no toca `paint`. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
-  jerarquía en orden del documento. **Numeración:** `Numbered` (`Style.numbered`, de `Typography`, así que
+  jerarquía en orden del documento. **Numeración:** `Numbered` (`TypographyStyle.numbered`, de `Typography`, así que
   se hereda y vale en `Styles`) numera los encabezados: `HeadingNumbers` (en `BuildContext`) lleva un contador
   por nivel en orden del documento, a través de secciones y `Markdown`, y `BoxTreeBuilder.element` escribe el
   número delante del primer `Text` del encabezado cuando ya están leídos sus textos (`HeadingNumbers.prefix`:
@@ -224,7 +224,7 @@ dependencia nueva se decide y se apunta allí.
   marcadores si busca contenido en flujo; `Overflow` los comprueba contra la sangría de la
   lista (`LIST_MARKER_OVERFLOW`).
 - **Tablas (§5.15):** el builder traduce una `Table` a una caja `GRID` (`Box.element` =
-  `TABLE`) cuyos ítems son sus `Cell`, con la colocación explícita en `Style.itemArea` (fila y
+  `TABLE`) cuyos ítems son sus `Cell`, con la colocación explícita en `ItemStyle.area` (fila y
   columna por orden y `Span`); `Head`, `Body`, `Foot` y `Row` no son cajas. `Box.headRows` y
   `Box.footRows` dicen qué filas de la rejilla son cabecera y pie. El `Typography` de la `Row`
   se aplica a sus celdas como herencia, su `Break`, como el de las celdas, y su `Class` da a cada
@@ -301,7 +301,7 @@ dependencia nueva se decide y se apunta allí.
 - **Hilos (TS-01):** un `Engine` **no** se comparte entre hilos (caché del layout, reparto en líneas y páginas
   supuestas sin sincronizar): uno por conversión, que es lo que hace `Converter`. Sí se comparten `Converter`,
   `Resources` y `DocumentReader`, y un `LaidOutDocument` se puede pintar desde varios hilos (los fragmentos son
-  `record`; el árbol de cajas se cierra al terminar `BoxTreeBuilder.build` y ya no cambia). Un `Engine` guardado se puede reutilizar en
+  `record`; el árbol de cajas, con sus estilos, se cierra al terminar `BoxTreeBuilder.build` y ya no cambia). Un `Engine` guardado se puede reutilizar en
   secuencia: `layOutDocument` suelta su caché al terminar. El protocolo con el `Paginator` (`reservePageDigits`,
   `assume`, `number`, `absolute()`) es de package. El schema compartido de `stxt-core` 1.0.3 solo se lee (ver
   `DocumentSchema`); al cambiar la versión hay que repasarlo. `ConcurrentConversionTest` y `EngineContractTest` lo vigilan.
@@ -410,7 +410,7 @@ dependencia nueva se decide y se apunta allí.
   una imagen decorativa, las filas repetidas de una tabla) tiene un `Link` suelto, hijo del `Document`,
   con el texto como `Alt` (`PdfStructure.outside`): PDF/UA exige que toda anotación esté en un `Link`.
   Las páginas con anotaciones llevan `Tabs: S`. El SVG no pinta enlaces.
-- **Aspecto de las cajas (§5.6):** `Radius`, `Border color` (de 1 a 4 colores: `Style.borderColor` es un
+- **Aspecto de las cajas (§5.6):** `Radius`, `Border color` (de 1 a 4 colores: `BoxStyle.borderColor` es un
   `Sides<String>`, `null` = el `Color` del texto) y `Background` (un `Paint`: `Solid` o `Linear`) solo cambian
   el pintado; el layout no los lee. Los colores siguen siendo texto (`#RRGGBBAA`, `Colors` los valida y los
   pasa a componentes). `StackingContext` resuelve los radios de cada fragmento (`Radii.resolve` sobre su
@@ -458,8 +458,8 @@ dependencia nueva se decide y se apunta allí.
 - **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
   `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
   SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.
-  **Ligaduras:** `Ligatures` (`Style.ligatures`, de `Typography`, se hereda; `false` por defecto) va en `FontFace.ligatures`
-  (`Style.fontFace()` lo apaga con `Letter spacing` distinto de 0). `FontLibrary.find` identifica el fichero con
+  **Ligaduras:** `Ligatures` (`TypographyStyle.ligatures`, de `Typography`, se hereda; `false` por defecto) va en `FontFace.ligatures`
+  (`TypographyStyle.fontFace()` lo apaga con `Letter spacing` distinto de 0). `FontLibrary.find` identifica el fichero con
   `FontFace.base()`; `FontFile.width(texto, tamaño, ligaturas)` mide cada palabra con el `GsubWorker` de fontbox, el mismo que
   PDFBox aplica al pintar, y `PdfFonts.font` incrusta una fuente por combinación con
   `TrueTypeFont.setEnableGsub(font.ligatures())`: sin la opción PDFBox no aplica `GSUB` (un glifo por carácter,
@@ -484,7 +484,7 @@ dependencia nueva se decide y se apunta allí.
   de un `Markdown` no actúa (`BuildContext.insideMarkdown`): sus textos ya vienen interpretados.
 - **Mayúsculas e interletraje (§4.4, §5.4):** `Transform`, `Letter spacing` y `Small caps` son
   propiedades de `Typography` (se heredan y valen en `Styles`). `Document` exige un `Language`
-  (accesibilidad): el builder lo pone en `Style.locale` de la raíz y se hereda, y es la
+  (accesibilidad): el builder lo pone en `TypographyStyle.locale` de la raíz y se hereda, y es la
   configuración regional de `Transform`; una caja puede declarar el suyo (`Language` en `Typography`, que
   `PdfStructure` escribe como `Lang`; `Element: Document` no). `InlineLayout.runs` aplica `TextTransform` a los tramos
   **antes** de repartirlos en líneas (cambia lo que miden: `ß` → `SS`) y después de sustituir las
@@ -493,7 +493,7 @@ dependencia nueva se decide y se apunta allí.
   versalitas son tramos con `TextFormat.smallCaps` (texto en mayúsculas, al `SMALL_CAPS_SCALE` del
   tamaño): `LineBreaker.advance` mide cada tramo con `fontSize × format.scale()` más el
   interletraje de cada carácter, y el ancho de una línea resta el del último
-  (`LineBreaker.width`). `StackingContext` pasa el tamaño del tramo y `Style.letterSpacing` a
+  (`LineBreaker.width`). `StackingContext` pasa el tamaño del tramo y `TypographyStyle.letterSpacing` a
   `Canvas.text`; `PdfFonts.spaced` lo escribe con ajustes de `TJ`. `StackingContext.paintText` añade un
   espacio invisible a la última palabra de cada línea que no es la última del fragmento (salvo con `pre` y
   `pre-wrap`), porque el corte se come el espacio y quien une las líneas pegaría las palabras.
@@ -575,10 +575,14 @@ dependencia nueva se decide y se apunta allí.
   hijos y el alto sube de hijos a padres.
 - **Inmutabilidad:** las entradas y salidas del layout son `record` con listas copiadas
   (`List.copyOf`). `Box` y `Style` solo se escriben en `tree` (AR-02, AR-03): fuera se leen con métodos del
-  nombre de la propiedad (`box.text()`, `style.fontSize()`); los campos de `Box` son privados y los de `Style`,
-  del package. `BoxTreeBuilder.build` cierra el árbol al terminar (`Box.close`): los hijos pasan a una lista
-  inmutable, los que están en flujo se calculan una vez y escribir en una caja cerrada es un
-  `IllegalStateException` (`BoxTest`). Un test de otro package que necesita un estilo hecho a mano usa
+  nombre de la propiedad (`box.text()`, `style.layout()`), y las de un grupo, a través de él
+  (`style.typography().fontSize()`, `style.flex().direction()`, `style.box().margin()`): un algoritmo solo mira los
+  grupos que usa. Los campos de `Box`, de `Style` y de sus grupos son privados; los de `Style` y sus grupos se
+  escriben con un `set…` del package que comprueba que no están cerrados (`StyleGroup`). Una propiedad nueva va en
+  el grupo de su sitio en el documento (o en `Style` si es del elemento, §4.2 y §4.9), con su lectura y su `set…`.
+  `BoxTreeBuilder.build` cierra el árbol al terminar (`Box.close`, que cierra también el estilo): los hijos pasan
+  a una lista inmutable, los que están en flujo se calculan una vez y escribir en una caja o un estilo cerrados es
+  un `IllegalStateException` (`BoxTest`). Un test de otro package que necesita un estilo hecho a mano usa
   `StyleEditor` (en el package `tree` de los tests). La igualdad de `Box` es por identidad (clave de la caché).
 - **Comparar medidas:** con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)` (o
   `Tolerance.EPSILON`), nunca con un `1e-9` propio. Lo que se ve tiene su propia tolerancia, más
@@ -660,7 +664,7 @@ dependencia nueva se decide y se apunta allí.
 1. La especificación manda: si el código y `ESPECIFICACION.md` discrepan, aclara cuál es el
    correcto antes de cambiar ninguno de los dos.
 2. Si añades o cambias una propiedad, actualiza a la vez: el schema `.stxt` (en su grupo o
-   en cada elemento que la admite), el resumen del §9, la tabla del §4, `Style`,
+   en cada elemento que la admite), el resumen del §9, la tabla del §4, el grupo de `Style` que le toca,
    su lectura (`PropertyReader`, o `BoxTreeBuilder.element` si es propia de un elemento) y, si
    aplica, la validación del §6 (`ModelValidator`).
    Una regla de validación nueva lleva su `ErrorCode`, su fila en la tabla del §6 y un caso en

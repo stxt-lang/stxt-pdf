@@ -283,11 +283,13 @@ Las decisiones de interpretación de cada hito están en [`docs/DECISIONES.md`](
 src/main/java/dev/stxt/boxes/
   model/        Value, ValueParser, Sides, Insets, Rect, VerticalMetrics, DecorationMetrics,
                 FontFace, FontWeight, FontStyle, TextFormat, TextRun, Reference, GridAreas, Area,
-                Cell, Tolerance, Colors, Corners, Radii, Paint
+                Cell, Tolerance, Colors, Corners, Radii, Paint; los enums de los valores
+                (Layout, Position, TextAlign, Marker, Break…)
   stxt/         DocumentReader (stxt-core + schema)
   resources/    Resources, FontLibrary, FontFile, ImageLibrary, ImageFile, ResourceException,
                 ImageFormatException
-  tree/         Box, Element, Style, Media, BoxTreeBuilder (y ValueReader, PropertyReader,
+  tree/         Box, Element, Style y sus grupos (TypographyStyle, BoxStyle, BreakStyle,
+                FlexStyle, GridStyle, ItemStyle…), Media, BoxTreeBuilder (y ValueReader, PropertyReader,
                 StyleRules, TableBuilder, ListBuilder, MarkdownBuilder, ContentsBuilder,
                 ModelValidator…), References,
                 InvalidModelException

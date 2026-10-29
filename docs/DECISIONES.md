@@ -2015,3 +2015,31 @@ interpretaciones que salieron al implementarlas.
      Windows necesita privilegios; ahora copia la fuente. *Dónde:* `paint/SvgCanvas`, `paint/SvgFonts`,
      `convert/LimitsTest`. *Alternativa:* cambiar solo los tests (aceptar `\r\n`, no borrar la carpeta temporal), que
      dejaba el SVG distinto según el sistema y el TTF bloqueado en un servicio de larga duración.
+
+### Revisión de QA, sesión 10: partir `Style` (ROADMAP-QA-ARQ.md, AR-02 etapas 3 y 4, AR-13)
+
+318. **Los grupos de `Style` son clases que se cierran con la caja, no `record`.** `Style` se parte en un grupo por
+     cada grupo del documento (`TypographyStyle`, `BoxStyle`, `BreakStyle`) y por cada tipo de elemento con
+     propiedades propias (`FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `MulticolStyle`, `ImageStyle`,
+     `ContentsStyle`); en `Style` quedan las propiedades que definen el elemento (§4.2 y §4.9) y las líneas. Cada grupo
+     tiene sus campos privados, un método público de lectura y uno de escritura del package que falla si el estilo
+     está cerrado (`StyleGroup`), y `Box.close` cierra el estilo con todos sus grupos: es lo que pedía la etapa 4
+     («congelar»), con la misma forma que `Box` (decisión 314). Solo se hereda `TypographyStyle`: `Style.inheriting`
+     copia el grupo del padre. El hueco (`Gap`) es de `FlexStyle` y de `GridStyle`, cada uno el suyo. *Dónde:*
+     `tree/Style`, `tree/StyleGroup`, `tree/*Style`, `tree/PropertyReader`, `BoxTest`. *Alternativa:* `record`
+     inmutables por grupo, como decía la propuesta de AR-02: el builder escribe las propiedades de una en una (los
+     grupos, después las reglas de `Styles` por prioridad y después lo del elemento), así que cada escritura sería un
+     `with…` que rehace un `record` de hasta 19 componentes, o haría falta un borrador mutable con los mismos campos.
+319. **Los enums de los valores están en `model`, uno por fichero.** Los 17 enums que había dentro de `Style`
+     (`Layout`, `Position`, `TextAlign`, `Marker`, `Break`…) pasan a `model`, como ya estaban `FontWeight` y
+     `FontStyle`. El de `Fill` de `Multicol` se llama `ColumnFill`, porque `Fill` choca con un `record` de
+     `MulticolLayout` y no dice de qué es; lo que tiene que coincidir con el documento son las constantes, que no
+     cambian. *Dónde:* `model/*`. *Alternativa:* dejarlos como enums anidados en su grupo (`ListStyle.Marker`), que
+     no podría nombrar `model` y repartía `Direction` y `Alignment`, que usan varios grupos.
+320. **`Box.describe()` es la única forma de nombrar una caja.** La de los mensajes (`main (línea 12)`,
+     `de la línea 12`) estaba en `Messages.name` y la de los volcados en `Box.describe()`; ahora `describe()` da la de
+     los mensajes y `StxtDump` escribe el `Id` de la caja, que es lo que define el §7 (solo se vuelcan las que lo
+     tienen). Ningún mensaje ni volcado cambia. `Placement.place` devuelve un resultado (`Placed` o `NoRoom`) en vez
+     de lanzar una excepción que `GridLayout` capturaba. *Dónde:* `tree/Box`, `output/StxtDump`, `layout/Overflow`,
+     `layout/grid/Placement`, `layout/grid/GridLayout`. *Alternativa:* mantener `Messages.name` y quitar
+     `describe()`, que obligaba a `output` a depender de `layout`.
