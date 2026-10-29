@@ -30,7 +30,7 @@ class MulticolTest {
                 "\t\tRule color: #999999", "\t\tFill: auto", "\t\tTypography:", "\t\t\tSize: 9",
                 "\t\tParagraph: Uno", "\t\tBlock:", "\t\t\tId: b").children().get(0);
         assertEquals(Element.MULTICOL, multicol.element());
-        assertEquals(Layout.MULTICOL, multicol.style().layout);
+        assertEquals(Layout.MULTICOL, multicol.style().layout());
         assertEquals(3, multicol.style().multicol().count());
         assertNull(multicol.style().multicol().columnWidth());
         assertEquals(12, multicol.style().multicol().columnGap());
@@ -41,7 +41,7 @@ class MulticolTest {
         assertEquals(1, multicol.children().size());
         Box flow = multicol.children().get(0);
         assertEquals(Element.COLUMNS, flow.element());
-        assertEquals(Layout.BLOCK, flow.style().layout);
+        assertEquals(Layout.BLOCK, flow.style().layout());
         assertTrue(flow.establishesBlockFormattingContext());
         assertEquals(List.of(Element.PARAGRAPH, Element.BLOCK), flow.children().stream().map(b -> b.element()).toList());
         assertSame(flow, flow.children().get(1).parent());

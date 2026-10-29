@@ -109,7 +109,7 @@ public final class References {
     /** Si la caja es un {@code Fixed} o está dentro de uno. */
     static boolean insideFixed(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
-            if (b.style().position == Position.FIXED) {
+            if (b.style().position() == Position.FIXED) {
                 return true;
             }
         }

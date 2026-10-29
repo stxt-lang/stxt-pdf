@@ -41,12 +41,12 @@ class LinksTest {
         Box root = build("\tBlock:", "\t\tLink: https://stxt.dev", "\t\tText: dentro", "\t\tImage: test/wide.png",
                 "\t\t\tLink: mailto:a@b.c");
         Box block = root.children().get(0);
-        assertEquals("https://stxt.dev", block.style().link);
+        assertEquals("https://stxt.dev", block.style().link());
         assertEquals(14, block.style().line("link"));
         // Lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva enlace propio.
-        assertNull(block.children().get(0).style().link);
-        assertEquals("mailto:a@b.c", block.children().get(1).style().link);
-        assertNull(root.children().get(0).children().get(0).style().link);
+        assertNull(block.children().get(0).style().link());
+        assertEquals("mailto:a@b.c", block.children().get(1).style().link());
+        assertNull(root.children().get(0).children().get(0).style().link());
     }
 
     @Test
@@ -55,18 +55,18 @@ class LinksTest {
                 "\tHeading 1:", "\t\tLink: https://c.example", "\t\tText: C",
                 "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tLink: https://d.example",
                 "\tTable:", "\t\tColumns: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: e", "\t\t\t\t\tLink: https://e.example");
-        assertEquals("https://a.example", root.children().get(0).style().link);
-        assertEquals("https://b.example", root.children().get(1).style().link);
-        assertEquals("https://c.example", root.children().get(2).style().link);
-        assertEquals("https://d.example", root.children().get(3).children().get(0).style().link);
-        assertEquals("https://e.example", root.children().get(4).children().get(0).style().link);
+        assertEquals("https://a.example", root.children().get(0).style().link());
+        assertEquals("https://b.example", root.children().get(1).style().link());
+        assertEquals("https://c.example", root.children().get(2).style().link());
+        assertEquals("https://d.example", root.children().get(3).children().get(0).style().link());
+        assertEquals("https://e.example", root.children().get(4).children().get(0).style().link());
     }
 
     @Test
     void anInternalLinkMayGoForwardOrBackward() {
         Box root = build("\tText: antes", "\t\tId: a", "\t\tLink: #b", "\tText: después", "\t\tId: b", "\t\tLink: #a");
-        assertEquals("#b", root.children().get(0).style().link);
-        assertEquals("#a", root.children().get(1).style().link);
+        assertEquals("#b", root.children().get(0).style().link());
+        assertEquals("#a", root.children().get(1).style().link());
     }
 
     @Test
@@ -122,11 +122,11 @@ class LinksTest {
         Box contents = root.children().get(0);
         assertEquals(3, contents.children().size());
         // Un encabezado con Id se enlaza por él; uno de Markdown, por el nombre que le da el índice.
-        assertEquals("#uno", contents.children().get(0).style().link);
+        assertEquals("#uno", contents.children().get(0).style().link());
         Box markdownHeading = root.children().get(2).children().get(0);
-        assertEquals("#" + markdownHeading.key(), contents.children().get(1).style().link);
+        assertEquals("#" + markdownHeading.key(), contents.children().get(1).style().link());
         assertTrue(markdownHeading.key() != null);
         // Sus hijos (título, guía y número) no llevan enlace: lo lleva la entrada.
-        contents.children().get(0).children().forEach(c -> assertNull(c.style().link));
+        contents.children().get(0).children().forEach(c -> assertNull(c.style().link()));
     }
 }

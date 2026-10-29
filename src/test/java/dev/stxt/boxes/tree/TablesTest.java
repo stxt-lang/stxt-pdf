@@ -37,7 +37,7 @@ class TablesTest {
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Ventas", "\t\t\t\tCell: 100", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
         assertEquals(Element.TABLE, table.element());
-        assertEquals(Layout.GRID, table.style().layout);
+        assertEquals(Layout.GRID, table.style().layout());
         assertEquals(List.of(Value.pt(120), new Value.Fraction(1), new Value.Fraction(1)), table.style().grid().columns());
         assertEquals(Value.pt(2), table.style().grid().rowGap());
         assertEquals(Value.pt(4), table.style().grid().columnGap());
@@ -47,7 +47,7 @@ class TablesTest {
         assertEquals(1, table.footRows());
         Box cell = table.children().get(3);
         assertEquals(Element.CELL, cell.element());
-        assertEquals(Layout.INLINE, cell.style().layout);
+        assertEquals(Layout.INLINE, cell.style().layout());
         assertEquals("Ventas", cell.text().trim());
     }
 
@@ -59,7 +59,7 @@ class TablesTest {
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120").children().get(0);
         assertEquals(List.of(false, false, true, false, true, false),
-                table.children().stream().map(c -> c.style().header).toList());
+                table.children().stream().map(c -> c.style().header()).toList());
         assertEquals(22, table.children().get(2).style().line("header"));
     }
 
@@ -91,11 +91,11 @@ class TablesTest {
                 "\t\t\t\t\t\tList item:", "\t\t\t\t\t\t\tText: dos",
                 "\t\t\t\tCell:").children().get(0);
         Box full = table.children().get(0);
-        assertEquals(Layout.BLOCK, full.style().layout);
+        assertEquals(Layout.BLOCK, full.style().layout());
         assertNull(full.text());
         assertEquals(List.of(Element.PARAGRAPH, Element.LIST), full.children().stream().map(b -> b.element()).toList());
         Box empty = table.children().get(1);
-        assertEquals(Layout.BLOCK, empty.style().layout);
+        assertEquals(Layout.BLOCK, empty.style().layout());
         assertTrue(empty.children().isEmpty());
     }
 

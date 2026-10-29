@@ -109,16 +109,16 @@ final class PropertyReader {
 
     /** Propiedades sueltas de los elementos ({@link #single}), por nombre canónico. */
     private static final Map<String, Property> SINGLE = Map.ofEntries(
-            entry("offset", (p, s) -> s.offset = sides(p, LENGTH_OR_AUTO, true)),
-            entry("layer", (p, s) -> s.layer = integer(p)),
-            entry("pages", (p, s) -> s.pages = enumValue(Pages.class, p)),
+            entry("offset", (p, s) -> s.setOffset(sides(p, LENGTH_OR_AUTO, true))),
+            entry("layer", (p, s) -> s.setLayer(integer(p))),
+            entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
-            entry("isolate", (p, s) -> s.isolate = bool(p)),
-            entry("link", (p, s) -> s.link = link(p)),
-            entry("header", (p, s) -> s.header = bool(p)),
-            entry("in-contents", (p, s) -> s.inContents = bool(p)),
+            entry("isolate", (p, s) -> s.setIsolate(bool(p))),
+            entry("link", (p, s) -> s.setLink(link(p))),
+            entry("header", (p, s) -> s.setHeader(bool(p))),
+            entry("in-contents", (p, s) -> s.setInContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("levels", ContentsBuilder::levels),
@@ -285,7 +285,7 @@ final class PropertyReader {
             }
             if (name.equals("layer")) {
                 s.declared(PropertyKey.LAYER, p.getLine());
-                s.layer = integer(p);
+                s.setLayer(integer(p));
                 continue;
             }
             s.declared(PropertyKey.item(name), p.getLine());

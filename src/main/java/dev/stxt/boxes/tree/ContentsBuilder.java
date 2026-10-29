@@ -76,7 +76,7 @@ final class ContentsBuilder {
 
     /** Los encabezados del árbol con entrada en los índices ({@code In contents}), en orden del documento. */
     private static void collect(Box box, List<Box> headings) {
-        if (box.headingLevel() > 0 && box.style().inContents) {
+        if (box.headingLevel() > 0 && box.style().inContents()) {
             headings.add(box);
         }
         box.children().forEach(child -> collect(child, headings));
@@ -105,13 +105,13 @@ final class ContentsBuilder {
 
     private static Box entry(BuildContext ctx, Box contents, Box heading) {
         Style es = Style.inheriting(contents.style());
-        es.layout = Layout.FLEX;
+        es.setLayout(Layout.FLEX);
         ctx.rules.apply(Element.contentsEntry(heading.headingLevel()), es);
         ModelValidator.validateBox(ctx, es, contents);
         Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line());
         ctx.definiteHeight.put(entry, false);
         // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
-        es.link = Links.to(heading.key());
+        es.setLink(Links.to(heading.key()));
 
         boolean leader = contents.style().contents().leader() != Leader.NONE;
         int line = heading.children().isEmpty() ? heading.line() : heading.children().get(0).textLine();
@@ -141,7 +141,7 @@ final class ContentsBuilder {
     /** Una caja generada de una entrada: hereda la tipografía de la entrada, y el layout lo da su tipo. */
     private static Box generated(BuildContext ctx, Box entry, Element kind, Layout layout, int line) {
         Style s = Style.inheriting(entry.style());
-        s.layout = layout;
+        s.setLayout(layout);
         Box box = new Box(null, kind, s, false, line);
         ctx.definiteHeight.put(box, false);
         return box;

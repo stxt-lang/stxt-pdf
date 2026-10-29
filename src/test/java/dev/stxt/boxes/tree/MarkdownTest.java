@@ -35,7 +35,7 @@ class MarkdownTest {
                 "\t\t\t| *1* |");
         Box md = root.children().get(0);
         assertEquals(Element.MARKDOWN, md.element());
-        assertEquals(Layout.BLOCK, md.style().layout);
+        assertEquals(Layout.BLOCK, md.style().layout());
         assertEquals(List.of(Element.HEADING_1, Element.PARAGRAPH, Element.LIST, Element.TABLE),
                 md.children().stream().map(b -> b.element()).toList());
         Box paragraph = md.children().get(1);

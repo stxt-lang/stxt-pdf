@@ -24,7 +24,7 @@ class HeadingsTest {
         Box h = root("\tHeading 1:", "\t\tId: title", "\t\tText: Resultados", "\t\tText: del trimestre").children().get(0);
         assertEquals(Element.HEADING_1, h.element());
         assertEquals(1, h.headingLevel());
-        assertEquals(Layout.BLOCK, h.style().layout);
+        assertEquals(Layout.BLOCK, h.style().layout());
         assertEquals(2, h.children().size());
         assertEquals(Element.TEXT, h.children().get(0).element());
         assertEquals("Resultados del trimestre", h.headingText());
@@ -42,7 +42,7 @@ class HeadingsTest {
     void paragraphIsATextWithMeaning() {
         Box p = root("\tParagraph: Hola.").children().get(0);
         assertEquals(Element.PARAGRAPH, p.element());
-        assertEquals(Layout.INLINE, p.style().layout);
+        assertEquals(Layout.INLINE, p.style().layout());
         assertEquals("Hola.", p.text());
         assertEquals(0, p.headingLevel());
     }

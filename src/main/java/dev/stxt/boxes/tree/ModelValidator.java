@@ -103,14 +103,14 @@ final class ModelValidator {
      * tampoco (también si los da una regla de {@code Styles}).
      */
     static void validateRotation(Style s) {
-        if (s.rotation == null) {
+        if (s.rotation() == null) {
             if (s.isDeclared(ROTATE_ORIGIN)) {
                 throw error(s.line(ROTATE_ORIGIN), ErrorCode.ROTATE_ORIGIN_WITHOUT_ROTATE, "Rotate origin no tiene "
                         + "efecto sin Rotate: declara el giro o quítalo");
             }
             return;
         }
-        if (s.position != Position.RELATIVE) {
+        if (s.position() != Position.RELATIVE) {
             return;
         }
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
@@ -123,7 +123,7 @@ final class ModelValidator {
 
     /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
-        Layout parentLayout = parent.style().layout;
+        Layout parentLayout = parent.style().layout();
         // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
         // de una Table, ítems de su grid.
         boolean flexItem = !s.isOutOfFlow() && parentLayout == Layout.FLEX;
@@ -160,8 +160,8 @@ final class ModelValidator {
             return;
         }
         int line = s.line(OFFSET);
-        Sides<Value> o = s.offset;
-        if (s.position == Position.RELATIVE) {
+        Sides<Value> o = s.offset();
+        if (s.position() == Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
                 throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
                         + "desde arriba y desde abajo: deja uno de los dos en auto");
@@ -208,7 +208,7 @@ final class ModelValidator {
                         "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
             }
             // Una imagen con Width auto mide su ancho natural, no todo el ancho: se puede centrar.
-            if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout != Layout.IMAGE) {
+            if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout() != Layout.IMAGE) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }
@@ -217,7 +217,7 @@ final class ModelValidator {
 
     /** Un {@code Absolute} o un {@code Fixed} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
     private static void validateOutOfFlowMargins(Style s, int line, boolean horizontalAuto, boolean verticalAuto) {
-        Sides<Value> o = s.offset;
+        Sides<Value> o = s.offset();
         if (horizontalAuto && (o.left().isAuto() || s.box().width().isAuto() || o.right().isAuto())) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
                     + position(s) + " con izquierda, Width y derecha declarados");
@@ -265,8 +265,8 @@ final class ModelValidator {
             }
         }
         boolean parentDefinite = ctx.isDefinite(parent);
-        if (s.position == Position.RELATIVE && !parentDefinite
-                && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
+        if (s.position() == Position.RELATIVE && !parentDefinite
+                && (hasPercentage(s.offset().top()) || hasPercentage(s.offset().bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
         boolean column = parent.style().flex().direction() == Direction.COLUMN;
@@ -290,11 +290,11 @@ final class ModelValidator {
             throw indefinite(s.line(GRID_ROWS), "Rows");
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
-        boolean rowGapUsed = s.layout == Layout.GRID
-                || (s.layout == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.COLUMN));
-        Value rowGap = s.layout == Layout.GRID ? s.grid().rowGap() : s.flex().rowGap();
+        boolean rowGapUsed = s.layout() == Layout.GRID
+                || (s.layout() == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.COLUMN));
+        Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.flex().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
-            String gap = s.layout == Layout.GRID ? GRID_GAP : FLEX_GAP;
+            String gap = s.layout() == Layout.GRID ? GRID_GAP : FLEX_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
         }
     }
@@ -306,7 +306,7 @@ final class ModelValidator {
      * estirado ({@code Vertical: stretch}) en su área.
      */
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
-        boolean gridItem = !s.isOutOfFlow() && parent.style().layout == Layout.GRID;
+        boolean gridItem = !s.isOutOfFlow() && parent.style().layout() == Layout.GRID;
         boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         Value h = s.box().height();
         if (!h.isAuto() && !h.isIntrinsic()) {
@@ -315,7 +315,7 @@ final class ModelValidator {
         if (h.isAuto() && s.box().aspectRatio() != null) {
             return true;
         }
-        if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
+        if (h.isAuto() && s.isOutOfFlow() && !s.offset().top().isAuto() && !s.offset().bottom().isAuto()) {
             return true;
         }
         Alignment vertical = s.item().vertical() != null ? s.item().vertical() : parent.style().grid().vertical();

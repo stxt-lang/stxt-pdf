@@ -79,7 +79,7 @@ enum ElementReader {
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
-            if (s.header && position != null && position.group() == CellPosition.HEAD) {
+            if (s.header() && position != null && position.group() == CellPosition.HEAD) {
                 throw error(s.line("header"), ErrorCode.TABLE_HEADER, "Header no tiene efecto en una celda de Head: "
                         + "las celdas de la cabecera ya son cabeceras de columna");
             }
@@ -87,7 +87,7 @@ enum ElementReader {
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            if (box.style().layout == Layout.INLINE) {
+            if (box.style().layout() == Layout.INLINE) {
                 cellText(n, box);
                 box.setRuns(ctx.runs.get(n));
                 inlineFormat(ctx, box);
@@ -171,7 +171,7 @@ enum ElementReader {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box multicol) {
             Style s = Style.inheriting(multicol.style());
-            s.isolate = true;
+            s.setIsolate(true);
             Box flow = new Box(null, Element.COLUMNS, s, false, n.getLine());
             multicol.addChild(flow);
             ctx.definiteHeight.put(flow, false);

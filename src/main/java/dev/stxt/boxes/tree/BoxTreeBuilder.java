@@ -160,8 +160,8 @@ public final class BoxTreeBuilder {
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia) {
         Style s = Style.inheriting(documentRoot.style());
-        s.layout = Layout.BLOCK;
-        s.position = Position.STATIC;
+        s.setLayout(Layout.BLOCK);
+        s.setPosition(Position.STATIC);
         ctx.rules.applySection(n, s);
         String id = null;
         MediaReader.Spec media = documentMedia;
@@ -180,7 +180,7 @@ public final class BoxTreeBuilder {
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
-        if (box.children().stream().allMatch(c -> c.style().position == Position.FIXED)) {
+        if (box.children().stream().allMatch(c -> c.style().position() == Position.FIXED)) {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
@@ -216,8 +216,8 @@ public final class BoxTreeBuilder {
         ElementReader reader = ElementReader.of(kind);
         place(ctx, n, kind);
         Style s = Style.inheriting(parent.style());
-        s.layout = reader.layout(n, kind);
-        s.position = kind.position();
+        s.setLayout(reader.layout(n, kind));
+        s.setPosition(kind.position());
         reader.wrapper(wrapper, s, parent);
         ctx.rules.apply(n, kind, s, parent, position);
         String id = properties(ctx, n, reader, s, parent);
@@ -238,7 +238,7 @@ public final class BoxTreeBuilder {
             listItem(ctx, n, box, parent, number);
         }
         boolean outerFixed = ctx.insideFixed;
-        ctx.insideFixed |= s.position == Position.FIXED;
+        ctx.insideFixed |= s.position() == Position.FIXED;
         reader.content(this, ctx, n, box);
         ctx.insideFixed = outerFixed;
         if (kind.headingLevel() > 0) {
@@ -324,7 +324,7 @@ public final class BoxTreeBuilder {
             }
         }
         if (rotate != null) {
-            s.rotation = new Rotation(rotate, rotateOrigin[0], rotateOrigin[1]);
+            s.setRotation(new Rotation(rotate, rotateOrigin[0], rotateOrigin[1]));
         }
         return id;
     }

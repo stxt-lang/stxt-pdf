@@ -33,7 +33,7 @@ public final class StyleEditor {
     }
 
     public StyleEditor layout(Layout v) {
-        style.layout = v;
+        style.setLayout(v);
         return this;
     }
 

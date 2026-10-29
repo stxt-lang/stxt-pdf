@@ -302,10 +302,10 @@ public final class Box {
      * {@code fixed}, los ítems de flex y grid y las cajas con {@code Isolate: true}.
      */
     public boolean establishesBlockFormattingContext() {
-        if (parent == null || style.isolate || style.isOutOfFlow()) {
+        if (parent == null || style.isolate() || style.isOutOfFlow()) {
             return true;
         }
-        Layout l = parent.style.layout;
+        Layout l = parent.style.layout();
         return l == Layout.FLEX || l == Layout.GRID;
     }
 
@@ -316,7 +316,7 @@ public final class Box {
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
-        boolean fixed = style.position == Position.FIXED;
+        boolean fixed = style.position() == Position.FIXED;
         while (b.parent != null && (fixed || !b.style.isPositioned())) {
             b = b.parent;
         }
@@ -374,6 +374,6 @@ public final class Box {
 
     @Override
     public String toString() {
-        return "Box[" + describe() + ", " + style.layout + "]";
+        return "Box[" + describe() + ", " + style.layout() + "]";
     }
 }

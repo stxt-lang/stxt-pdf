@@ -60,7 +60,7 @@ final class Nodes {
 
     /** Nombre del elemento posicionado: {@code Absolute} o {@code Fixed}. */
     static String position(Style s) {
-        return s.position == Position.FIXED ? "Fixed" : "Absolute";
+        return s.position() == Position.FIXED ? "Fixed" : "Absolute";
     }
 
     /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */

@@ -45,7 +45,7 @@ class BoxTreeBuilderTest {
         Box parent = r.sections().get(0).box().children().get(0);
         assertEquals(2, parent.children().size());
         assertFalse(parent.children().get(0).anonymous());
-        assertEquals(Layout.INLINE, parent.children().get(0).style().layout);
+        assertEquals(Layout.INLINE, parent.children().get(0).style().layout());
         assertEquals("antes", parent.children().get(0).text());
         assertEquals("child", parent.children().get(1).id());
     }
@@ -56,10 +56,10 @@ class BoxTreeBuilderTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\tGrid:", "\tRelative:", "\tAbsolute:", "\tFixed:")).sections().get(0).box();
         assertEquals(List.of(Layout.INLINE, Layout.FLEX, Layout.GRID, Layout.BLOCK,
-                Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout).toList());
+                Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout()).toList());
         assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
                 Position.RELATIVE, Position.ABSOLUTE, Position.FIXED),
-                root.children().stream().map(b -> b.style().position).toList());
+                root.children().stream().map(b -> b.style().position()).toList());
         assertEquals("hola", root.children().get(0).text());
     }
 
@@ -79,7 +79,7 @@ class BoxTreeBuilderTest {
         Box a = root.children().get(0).children().get(0);
         assertEquals("a", a.id());
         assertEquals(2, a.style().item().grow(), 1e-9);
-        assertEquals(1, a.style().layer);
+        assertEquals(1, a.style().layer());
         Box b = root.children().get(1).children().get(0);
         assertEquals(new Cell(1, 2, 1, 1), b.style().item().area());
         assertEquals(Alignment.CENTER, b.style().item().vertical());
@@ -244,10 +244,10 @@ class BoxTreeBuilderTest {
                 "\tFixed:", "\t\tRotate: 360", "\t\tRotate origin: top",
                 "\tImage: test/square.png", "\t\tRotate: -360",
                 "\tRelative:")).sections().get(0).box();
-        assertEquals(new dev.stxt.boxes.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation);
-        assertEquals(new dev.stxt.boxes.model.Rotation(90, 1, 1), root.children().get(1).style().rotation);
-        assertEquals(new dev.stxt.boxes.model.Rotation(360, 0.5, 0), root.children().get(2).style().rotation);
-        assertEquals(-360, root.children().get(3).style().rotation.degrees(), 1e-9);
-        assertEquals(null, root.children().get(4).style().rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation());
+        assertEquals(new dev.stxt.boxes.model.Rotation(90, 1, 1), root.children().get(1).style().rotation());
+        assertEquals(new dev.stxt.boxes.model.Rotation(360, 0.5, 0), root.children().get(2).style().rotation());
+        assertEquals(-360, root.children().get(3).style().rotation().degrees(), 1e-9);
+        assertEquals(null, root.children().get(4).style().rotation());
     }
 }

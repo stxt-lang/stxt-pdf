@@ -30,12 +30,12 @@ class ListsTest {
         Box list = root("\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tParagraph: Uno",
                 "\t\tList item:", "\t\t\tText: Dos", "\t\t\tText: y más").children().get(0);
         assertEquals(Element.LIST, list.element());
-        assertEquals(Layout.BLOCK, list.style().layout);
+        assertEquals(Layout.BLOCK, list.style().layout());
         assertEquals(Marker.DISC, list.style().list().marker());
         assertEquals(2, list.children().size());
         Box item = list.children().get(1);
         assertEquals(Element.LIST_ITEM, item.element());
-        assertEquals(Layout.BLOCK, item.style().layout);
+        assertEquals(Layout.BLOCK, item.style().layout());
         assertEquals(2, item.children().size());
         assertEquals(List.of("• ", "• "), markers(list));
     }

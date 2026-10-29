@@ -28,7 +28,7 @@ final class LinkTargets {
     }
 
     private static void check(Box box, Map<String, Box> boxes) {
-        String link = box.style().link;
+        String link = box.style().link();
         if (link != null && Links.internal(link)) {
             int line = box.style().isDeclared("link") ? box.style().line("link") : box.line();
             target(link, line, boxes);

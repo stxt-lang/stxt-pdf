@@ -38,7 +38,7 @@ import java.util.Map;
  * <p>Solo {@code tree} escribe un estilo, mientras {@link BoxTreeBuilder} construye el árbol; al terminar se
  * cierra con su caja ({@link Box#close}) y ya solo se lee, también desde varios hilos.</p>
  */
-public final class Style {
+public final class Style extends StyleGroup {
 
     private TypographyStyle typography = new TypographyStyle();
     private final BoxStyle box = new BoxStyle();
@@ -52,29 +52,29 @@ public final class Style {
     private final ContentsStyle contents = new ContentsStyle();
 
     // --- Propiedades del elemento ------------------------------------------------------------------
-    Layout layout = Layout.BLOCK;
-    Position position = Position.STATIC;
-    Sides<Value> offset = Sides.all(Value.AUTO);
+    private Layout layout = Layout.BLOCK;
+    private Position position = Position.STATIC;
+    private Sides<Value> offset = Sides.all(Value.AUTO);
     /** {@code null} = auto. */
-    Integer layer;
+    private Integer layer;
     /** Solo en un {@code Fixed}: las páginas en que sale. */
-    Pages pages = Pages.ALL;
-    boolean isolate;
+    private Pages pages = Pages.ALL;
+    private boolean isolate;
     /**
      * {@code Rotate} y {@code Rotate origin} (§5.6), solo en {@code Relative}, {@code Absolute},
      * {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
      */
-    Rotation rotation;
+    private Rotation rotation;
     /**
      * Destino del {@code Link} de la caja ({@link dev.stxt.boxes.model.Links}, §5.20); {@code null}
      * = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella,
      * pero no lleva enlace propio.
      */
-    String link;
+    private String link;
     /** {@code Header} de una {@code Cell}: es la cabecera de su fila (§5.15). No se hereda. */
-    boolean header;
+    private boolean header;
     /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
-    boolean inContents = true;
+    private boolean inContents = true;
 
     /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
     Style() {
@@ -136,40 +136,90 @@ public final class Style {
         return layout;
     }
 
+    void setLayout(Layout v) {
+        writable();
+        layout = v;
+    }
+
     public Position position() {
         return position;
+    }
+
+    void setPosition(Position v) {
+        writable();
+        position = v;
     }
 
     public Sides<Value> offset() {
         return offset;
     }
 
+    void setOffset(Sides<Value> v) {
+        writable();
+        offset = v;
+    }
+
     public Integer layer() {
         return layer;
+    }
+
+    void setLayer(Integer v) {
+        writable();
+        layer = v;
     }
 
     public Pages pages() {
         return pages;
     }
 
+    void setPages(Pages v) {
+        writable();
+        pages = v;
+    }
+
     public boolean isolate() {
         return isolate;
+    }
+
+    void setIsolate(boolean v) {
+        writable();
+        isolate = v;
     }
 
     public Rotation rotation() {
         return rotation;
     }
 
+    void setRotation(Rotation v) {
+        writable();
+        rotation = v;
+    }
+
     public String link() {
         return link;
+    }
+
+    void setLink(String v) {
+        writable();
+        link = v;
     }
 
     public boolean header() {
         return header;
     }
 
+    void setHeader(boolean v) {
+        writable();
+        header = v;
+    }
+
     public boolean inContents() {
         return inContents;
+    }
+
+    void setInContents(boolean v) {
+        writable();
+        inContents = v;
     }
 
     // --- Líneas de las propiedades -------------------------------------------------------------------
@@ -205,6 +255,7 @@ public final class Style {
 
     /** Apunta la línea donde se declara una propiedad. */
     void declared(String property, int line) {
+        writable();
         lines.put(property, line);
     }
 
@@ -236,6 +287,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        super.close();
         typography.close();
         box.close();
         breaks.close();

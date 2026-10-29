@@ -60,7 +60,7 @@ final class ListBuilder {
                     + "en el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
         Style s = Style.inheriting(item.style());
-        s.layout = Layout.INLINE;
+        s.setLayout(Layout.INLINE);
         Box marker = new Box(null, Element.MARKER, s, false, n.getLine());
         marker.setText(text, n.getLine(), false);
         return marker;
@@ -72,9 +72,9 @@ final class ListBuilder {
      */
     static void markerLine(Box item) {
         Box b = item;
-        while (b.style().layout != Layout.INLINE) {
+        while (b.style().layout() != Layout.INLINE) {
             String problem = null;
-            if (b.style().layout == Layout.FLEX || b.style().layout == Layout.GRID) {
+            if (b.style().layout() == Layout.FLEX || b.style().layout() == Layout.GRID) {
                 problem = "empieza con un " + b.element().label();
             } else if (b.isImage()) {
                 problem = "empieza con una Image";

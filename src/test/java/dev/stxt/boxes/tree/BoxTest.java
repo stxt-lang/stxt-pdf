@@ -1,6 +1,7 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -75,12 +77,40 @@ class BoxTest {
         assertThrows(IllegalStateException.class, () -> parent.addChild(style.box("D", Element.BLOCK)));
     }
 
-    /** Fuera de {@code tree}, {@code Box} y {@code Style} solo se leen: ningún campo es público salvo las constantes. */
+    @Test
+    void theStyleIsClosedWithItsBox() {
+        Box section = build(BLOCK).sections().get(0).box();
+        Box list = section.children().get(0).children().get(0);
+        Box text = list.children().get(0).children().get(0);
+        Style s = list.style();
+        assertThrows(IllegalStateException.class, () -> s.setIsolate(true));
+        assertThrows(IllegalStateException.class, () -> s.declared(PropertyKey.FONT_SIZE, 3));
+        assertThrows(IllegalStateException.class, () -> s.list().setStart(4));
+        assertThrows(IllegalStateException.class, () -> s.box().setHeight(Value.pt(10)));
+        // El grupo que hereda una caja es una copia suya, y también se cierra.
+        assertNotSame(s.typography(), text.style().typography());
+        assertThrows(IllegalStateException.class, () -> text.style().typography().setFontSize(12));
+        assertEquals(10, text.style().typography().fontSize());
+    }
+
+    /**
+     * Fuera de {@code tree}, {@code Box}, {@code Style} y sus grupos solo se leen: los campos de {@code Box} no son
+     * públicos (salvo las constantes) y los de {@code Style} y sus grupos son privados, que se escriben con un método
+     * que comprueba que el estilo no está cerrado.
+     */
     @Test
     void noFieldIsPublicButTheConstants() {
         for (Class<?> c : List.of(Box.class, Style.class)) {
             List<String> open = Arrays.stream(c.getDeclaredFields())
                     .filter(f -> Modifier.isPublic(f.getModifiers()) && !isConstant(f))
+                    .map(Field::getName).toList();
+            assertEquals(List.of(), open, c.getSimpleName());
+        }
+        for (Class<?> c : List.of(Style.class, TypographyStyle.class, BoxStyle.class, BreakStyle.class, FlexStyle.class,
+                GridStyle.class, ItemStyle.class, ListStyle.class, MulticolStyle.class, ImageStyle.class,
+                ContentsStyle.class)) {
+            List<String> open = Arrays.stream(c.getDeclaredFields())
+                    .filter(f -> !Modifier.isPrivate(f.getModifiers()) && !isConstant(f))
                     .map(Field::getName).toList();
             assertEquals(List.of(), open, c.getSimpleName());
         }
