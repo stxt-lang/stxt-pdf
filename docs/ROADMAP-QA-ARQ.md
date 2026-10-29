@@ -91,7 +91,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-10 | Dos tolerancias | Baja | S | hecho |
 | AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | hecho |
 | AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | hecho |
-| AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | pendiente |
+| AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | hecho |
 
 ## Línea base medida
 
@@ -772,6 +772,13 @@ y `onlyTheDispatchNamesAnElement` (AR-07); comprobado a mano que las reglas fall
 - `Placement.NoRoom` (`extends RuntimeException`) se usa como control de flujo en `GridLayout.arrange` (`catch` en
   `GridLayout.java:73`): valorar devolver un resultado (`Optional`/valor) en vez de lanzar.
 - `Box.describe()` y `Box.toString()` duplican la forma de nombrar una caja (`StxtDump`, mensajes): una función.
+
+**Sesión 10: hecho.** Los 13 javadoc y el comentario de `TrackSizingTest` remiten a la sección de la especificación
+(`§3`, `§3.6`, `§5.4` a `§5.9`). `Placement.place` devuelve un `Placement.Result` (`Placed` con las áreas o `NoRoom`, un
+`record` con el primer ítem que no cabe) y `GridLayout` lo convierte en `GRID_PLACEMENT`, sin `try`. La duplicación
+estaba entre `Box.describe()` (volcados) y `Messages.name` (mensajes): queda solo `Box.describe()`, con la forma de los
+mensajes (`main (línea 12)`, `de la línea 12`, `(área útil)`), y `StxtDump` escribe el `Id`, que es lo que define el §7;
+ningún mensaje ni volcado cambia.
 
 ## Plan de sesiones
 

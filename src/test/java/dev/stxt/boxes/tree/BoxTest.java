@@ -45,6 +45,16 @@ class BoxTest {
     }
 
     @Test
+    void describeNamesTheBoxForMessages() {
+        Box section = build("\tBlock:", "\t\tId: main", "\tBlock:").sections().get(0).box();
+        Box named = section.children().get(0);
+        Box unnamed = section.children().get(1);
+        assertEquals("main (línea " + named.line() + ")", named.describe());
+        assertEquals("de la línea " + unnamed.line(), unnamed.describe());
+        assertEquals("(área útil)", new Box(null, Element.BLOCK, new Style(), true, 0).describe());
+    }
+
+    @Test
     void theInFlowChildrenAreComputedOnceWhenClosing() {
         Box block = build(BLOCK).sections().get(0).box().children().get(0);
         assertEquals(2, block.children().size());

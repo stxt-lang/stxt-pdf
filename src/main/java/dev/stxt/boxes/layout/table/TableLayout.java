@@ -16,7 +16,6 @@ import dev.stxt.boxes.tree.InvalidModelException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.stxt.boxes.layout.Messages.name;
 import static dev.stxt.boxes.layout.Messages.pt;
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 
@@ -63,7 +62,7 @@ public final class TableLayout implements LayoutAlgorithm {
         if (head + box.footRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
                 && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
             throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "La cabecera y el pie de la "
-                    + "tabla " + name(box) + " miden " + pt(bodyStart + footHeight) + " y no dejan sitio al cuerpo "
+                    + "tabla " + box.describe() + " miden " + pt(bodyStart + footHeight) + " y no dejan sitio al cuerpo "
                     + "en una página vacía: se repiten en cada página; reduce su alto o quita filas de Head y Foot");
         }
 

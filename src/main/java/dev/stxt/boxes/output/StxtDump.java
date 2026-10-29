@@ -67,7 +67,8 @@ public final class StxtDump {
         int childLevel = level;
         if (visible) {
             String tab = "\t".repeat(level);
-            sb.append(tab).append("Fragment: ").append(f.box().describe()).append('\n');
+            String name = f.box().id() != null ? f.box().id() : f.box().describe();
+            sb.append(tab).append("Fragment: ").append(name).append('\n');
             appendRect(sb, tab, x, y, f);
             childLevel = level + 1;
         }

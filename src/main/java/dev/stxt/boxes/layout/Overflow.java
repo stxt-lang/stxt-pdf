@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static dev.stxt.boxes.layout.Messages.excerpt;
-import static dev.stxt.boxes.layout.Messages.name;
 import static dev.stxt.boxes.layout.Messages.pt;
 import static dev.stxt.boxes.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.boxes.tree.PropertyKey.BORDER;
@@ -92,13 +91,13 @@ public final class Overflow {
             if (!inside(Rotation.envelope(turn, borderBox), page)) {
                 boolean own = s.rotation() != null;
                 throw new InvalidModelException(own ? s.line(ROTATE) : f.box().line(), ErrorCode.BOX_OVERFLOW,
-                        "La caja " + name(f.box()) + (own ? " girada" : ", dentro de una caja girada,")
+                        "La caja " + f.box().describe() + (own ? " girada" : ", dentro de una caja girada,")
                                 + " se sale de la página: revisa su " + (own ? "Rotate, su Rotate origin, " : "")
                                 + "su posición y su tamaño");
             }
         } else if (s.isOutOfFlow() && !inside(borderBox, page)) {
             throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : f.box().line(),
-                    ErrorCode.BOX_OVERFLOW, "La caja " + name(f.box()) + " se sale de la página: revisa su "
+                    ErrorCode.BOX_OVERFLOW, "La caja " + f.box().describe() + " se sale de la página: revisa su "
                     + "Offset y su tamaño");
         }
         double cx = x + f.border().left() + f.padding().left();
@@ -166,7 +165,7 @@ public final class Overflow {
             double room = item.x() + list.padding().left();
             if (m.width() > room + TOLERANCE) {
                 throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "El marcador '"
-                        + m.box().text().strip() + "' del List item " + name(item.box()) + " mide " + pt(m.width())
+                        + m.box().text().strip() + "' del List item " + item.box().describe() + " mide " + pt(m.width())
                         + " con su espacio, y la sangría deja " + pt(room) + ": aumenta el Padding izquierdo de "
                         + "la lista o el margen izquierdo del ítem");
             }
@@ -213,7 +212,7 @@ public final class Overflow {
             if (inner == null) {
                 String property = s.isDeclared(WIDTH) ? WIDTH : s.isDeclared(MIN_WIDTH) ? MIN_WIDTH : null;
                 return new InvalidModelException(property != null ? s.line(property) : c.box().line(),
-                        ErrorCode.BOX_OVERFLOW, "La caja " + name(c.box()) + " no cabe a lo ancho: mide "
+                        ErrorCode.BOX_OVERFLOW, "La caja " + c.box().describe() + " no cabe a lo ancho: mide "
                         + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left)
                         + "; reduce su ancho o el de su contenido");
             }
@@ -231,9 +230,9 @@ public final class Overflow {
         Style s = box.style();
         String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO, GRID_ROWS)
                 .filter(s::isDeclared).findFirst().orElse(null);
-        String what = child == null ? "su texto" : "la caja " + name(child.box());
+        String what = child == null ? "su texto" : "la caja " + child.box().describe();
         return new InvalidModelException(property != null ? s.line(property) : box.line(), ErrorCode.BOX_OVERFLOW,
-                "El contenido de la caja " + name(box) + " no cabe en su alto: " + what + " llega a "
+                "El contenido de la caja " + box.describe() + " no cabe en su alto: " + what + " llega a "
                         + pt(needed) + " y la caja deja " + pt(height));
     }
 
@@ -250,7 +249,7 @@ public final class Overflow {
             if (c.box().style().rotation() != null) {
                 // Lo que impide partirla es el giro: lo que contiene se partiría.
                 return new InvalidModelException(c.box().style().line(ROTATE), ErrorCode.PAGE_OVERFLOW, "La caja "
-                        + name(c.box()) + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
+                        + c.box().describe() + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
                         + pt(c.height()) + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
             }
             double cx = x + c.border().left() + c.padding().left();
@@ -279,7 +278,7 @@ public final class Overflow {
                     property = HEIGHT;
                 }
                 int line = s.isDeclared(property) ? s.line(property) : c.box().line();
-                return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "La caja " + name(c.box())
+                return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "La caja " + c.box().describe()
                         + " no cabe en la página y no se puede partir: mide " + pt(c.height())
                         + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
             }

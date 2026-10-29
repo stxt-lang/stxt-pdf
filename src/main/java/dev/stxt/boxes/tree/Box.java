@@ -358,12 +358,15 @@ public final class Box {
         return text != null && !text.isBlank();
     }
 
-    /** Nombre legible para mensajes y volcados. */
+    /**
+     * La caja en un mensaje, la única forma de nombrarla: {@code main (línea 12)} si tiene {@code Id},
+     * {@code de la línea 12} si no y {@code (área útil)} la raíz anónima.
+     */
     public String describe() {
-        if (id != null) {
-            return id;
+        if (anonymous) {
+            return "(área útil)";
         }
-        return anonymous ? "(área útil)" : "(caja línea " + line + ")";
+        return id != null ? id + " (línea " + line + ")" : "de la línea " + line;
     }
 
     @Override
