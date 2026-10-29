@@ -87,9 +87,16 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test
+      # Cada fichero cambiado, como anotación del job: se ve sin abrir el log.
       - name: El árbol sigue limpio
         shell: bash
-        run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
+        run: |
+          changed=$(git status --porcelain --untracked-files=no)
+          if [ -n "$changed" ]; then
+            echo "$changed" | while IFS= read -r line; do echo "::error title=Fichero cambiado por los tests::$line"; done
+            git diff --stat
+            exit 1
+          fi
       - name: Imágenes nuevas
         if: failure()
         uses: actions/upload-artifact@v4
