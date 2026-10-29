@@ -606,8 +606,9 @@ dependencia nueva se decide y se apunta allí.
   de una regla del §6 comprueba así que el schema no la detecta antes. Los volcados de §7
   (`expected.stxt`) no tienen namespace y se leen con `STXT.rawParser()`.
   `DocumentReaderTest` comprueba que el ejemplo y las entradas de los casos golden validan
-  (añade ahí los documentos nuevos) y que los ejemplos de la especificación se maquetan sin
-  errores; los de `test/examples/` los lee y los maqueta `ExamplesTest`.
+  (añade ahí los documentos nuevos); los de `test/examples/` los lee y los maqueta `ExamplesTest`, y los de la
+  especificación (sus ejemplos y `test/spec/report.stxt`, que debe ser el del §10 sin su cabecera de comentarios),
+  `SpecificationDocumentsTest`, con las métricas reales y veraPDF (PDF/UA-1).
 - **Medidas de rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` (el `pom.xml`
   excluye el grupo); se ejecutan con `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=…`.
 - **Catálogo de errores** (`errors/ErrorCatalogTest`): `test/errors/<grupo>/<código>.<descripción>.stxt`

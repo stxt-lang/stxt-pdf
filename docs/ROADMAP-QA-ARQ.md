@@ -327,6 +327,15 @@ más de una palabra cabe) y `FragmentationPropertiesTest` (150 documentos y altu
 párrafo suman su alto entero y van en páginas seguidas). No han encontrado ningún fallo. Comprobado que detectan uno:
 perder la última línea de un párrafo y repetir una línea al cambiar de página hacen fallar el suyo.
 
+**Fuera del plan: hecho el punto 6** (queda el 5). Ya se maquetaban con `PdfMetrics` (`DocumentReaderTest`); faltaban el
+PDF y veraPDF. `SpecificationDocumentsTest` trata los cuatro ejemplos de la especificación y `test/spec/report.stxt`
+como los de `test/examples/`: los maqueta con las métricas reales y `resources/`, escribe el PDF en
+`target/reference/spec/` y exige PDF/UA-1 sin ninguna regla incumplida. **Los cinco ya lo cumplían**: no ha hecho falta
+cambiar el motor. Comprobado que el test detecta un fallo (cambiar `pdfuaid:part` en el PDF da la regla 5-2). Lo que sí
+había: `report.stxt` se había separado del §10 (`Title: Prueba` frente a `Title: Informe`); ahora es el mismo y un test
+lo vigila. Sustituye a `DocumentReaderTest.specificationExamplesAreValid`. Medido también, sin añadirlo al test: el
+`input.stxt` de los 28 golden, sin depuración, cumple PDF/UA-1 (5,4 s los 33 documentos).
+
 ### QA-09 · Integración continua · Alta · S
 
 No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
@@ -864,3 +873,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · Tests en Windows | `mvn test` fallaba en Windows (1 fallo y 4 errores) y no en la CI, que es solo Linux: `SvgCanvas` con `%n` (ahora `\n`), `SvgFonts` dejaba abierto el TTF (ahora crea la fuente con su contenido) y `LimitsTest` usaba un enlace simbólico (ahora copia la fuente). Decisión 317. | Valorar `windows-latest` en la CI |
 | 2026-10-29 | 10 · Partir `Style` (hecha) | AR-13 (tres commits: el javadoc remite a la especificación; `Placement.place` devuelve `Placed` o `NoRoom`; `Box.describe()` es la única forma de nombrar una caja, sin `Messages.name`). AR-02 etapa 3: los enums a `model` y `Style` partido en diez grupos, uno por commit; etapa 4: `Style` y sus grupos se cierran con la caja (`StyleGroup`). Decisiones 318 a 320. 1400 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte; `ScaleProbe` dentro del ruido. | Plan terminado. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · PF-06 | El reparto voraz suma los avances de las palabras y mide la línea entera solo cerca del límite; las palabras sin expresión regular; `validate` sin buscar marcadores en cada carácter y con los glifos memorizados; la última fuente recordada. Decisión 321. 1402 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte. Layout de 33 a 51 % más rápido en `ScaleProbe` (657 páginas: de 743 a 430 ms). | Quedan PF-05, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |
+| 2026-10-29 | Fuera del plan · QA-08 (6) | `SpecificationDocumentsTest`: los cuatro ejemplos de la especificación y `report.stxt`, con las métricas reales, en PDF y con veraPDF (PDF/UA-1); los cinco ya lo cumplían. `report.stxt` vuelve a ser el ejemplo del §10 (el título se había separado) y un test lo vigila. 1408 tests en verde. | `UnitBreaker.Run.layOut` (complejidad 22) y PF-05; quedan QA-08 (5) y `windows-latest` en la CI |
