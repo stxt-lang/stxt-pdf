@@ -59,7 +59,7 @@ ejemplo. Las imágenes de los ejemplos están en `resources/images/examples/` y 
 > con su licencia OFL. *Alternativa descartada:* imágenes de bancos libres, que habría que citar y que no se pueden
 > regenerar.
 
-## Documentos de la documentación (`SpecificationDocumentsTest`)
+## Documentos de la documentación (`DocumentationExamplesTest`)
 
 Cada documento completo (`Document (dev.stxt.boxes):` en un bloque de código) del [manual](../../manual/README.md) y de la
 referencia se maqueta con las métricas reales y se escribe en PDF, que debe cumplir PDF/UA-1 según veraPDF; el PDF queda en
