@@ -332,7 +332,7 @@ public final class StackingContext {
         Style s = p.f().box().style();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double baseline = canvas.vertical(s.fontFace()).baseline(content.y(), s.usedLineHeight(), s.fontSize());
-        for (Rect shape : Leaders.shapes(s.contentsLeader(), content, baseline, s.fontSize())) {
+        for (Rect shape : Leaders.shapes(s.contents().leader(), content, baseline, s.fontSize())) {
             canvas.background(shape, s.color());
         }
     }

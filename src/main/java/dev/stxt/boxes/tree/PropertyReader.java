@@ -122,7 +122,7 @@ final class PropertyReader {
             entry("alt", (p, s) -> s.alt = alt(p)),
             entry("fit", (p, s) -> s.fit = enumValue(Fit.class, p)),
             entry("levels", ContentsBuilder::levels),
-            entry("leader", (p, s) -> s.contentsLeader = enumValue(Leader.class, p)));
+            entry("leader", (p, s) -> s.contents().setLeader(enumValue(Leader.class, p))));
 
     private PropertyReader() {
     }

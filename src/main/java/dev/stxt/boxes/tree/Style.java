@@ -145,13 +145,6 @@ public final class Style {
     String alt;
     Fit fit = Fit.CONTAIN;
 
-    // --- Contents --------------------------------------------------------------------------------
-    /** Primer y último nivel de encabezado que lista un {@code Contents} ({@code Levels}). */
-    int contentsFrom = 1;
-    int contentsTo = 3;
-    /** {@code Leader} de un {@code Contents}; también lo lleva la guía generada de cada entrada. */
-    Leader contentsLeader = Leader.DOTS;
-
     // --- Multicol --------------------------------------------------------------------------------
     /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
     Integer multicolCount;
@@ -183,10 +176,16 @@ public final class Style {
 
     private final ListStyle list = new ListStyle();
 
+    private final ContentsStyle contents = new ContentsStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public ListStyle list() {
+    public ContentsStyle contents() {
+            return contents;
+        }
+
+        public ListStyle list() {
             return list;
         }
 
@@ -377,19 +376,6 @@ public final class Style {
         return fit;
     }
 
-    // --- Contents --------------------------------------------------------------------------------
-    public int contentsFrom() {
-        return contentsFrom;
-    }
-
-    public int contentsTo() {
-        return contentsTo;
-    }
-
-    public Leader contentsLeader() {
-        return contentsLeader;
-    }
-
     // --- Multicol --------------------------------------------------------------------------------
     public Integer multicolCount() {
         return multicolCount;
@@ -538,6 +524,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        contents.close();
         list.close();
         item.close();
         grid.close();

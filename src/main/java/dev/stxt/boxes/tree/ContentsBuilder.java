@@ -51,8 +51,8 @@ final class ContentsBuilder {
             throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Levels va de un nivel a otro igual o mayor, entre 1 y 6: '"
                     + n.getText().trim() + "'");
         }
-        s.contentsFrom = levels[0];
-        s.contentsTo = levels[1];
+        s.contents().setFrom(levels[0]);
+        s.contents().setTo(levels[1]);
     }
 
     /** Genera las entradas de todos los {@code Contents} del documento. */
@@ -93,10 +93,10 @@ final class ContentsBuilder {
                     + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
         List<Box> listed = headings.stream()
-                .filter(h -> h.headingLevel() >= s.contentsFrom && h.headingLevel() <= s.contentsTo).toList();
+                .filter(h -> h.headingLevel() >= s.contents().from() && h.headingLevel() <= s.contents().to()).toList();
         if (listed.isEmpty()) {
             throw error(contents.line(), ErrorCode.CONTENTS_EMPTY, "El índice no tiene ningún encabezado de los niveles "
-                    + s.contentsFrom + " a " + s.contentsTo + " (Levels): no tendría entradas");
+                    + s.contents().from() + " a " + s.contents().to() + " (Levels): no tendría entradas");
         }
         for (Box heading : listed) {
             contents.addChild(entry(ctx, contents, heading));
@@ -113,7 +113,7 @@ final class ContentsBuilder {
         // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
         es.link = Links.to(heading.key());
 
-        boolean leader = contents.style().contentsLeader != Leader.NONE;
+        boolean leader = contents.style().contents().leader() != Leader.NONE;
         int line = heading.children().isEmpty() ? heading.line() : heading.children().get(0).textLine();
 
         // Sin guía, el título llena el hueco y deja el número a la derecha.
@@ -124,7 +124,7 @@ final class ContentsBuilder {
 
         if (leader) {
             Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Layout.BLOCK, heading.line());
-            guide.style().contentsLeader = contents.style().contentsLeader;
+            guide.style().contents().setLeader(contents.style().contents().leader());
             guide.style().item().setGrow(1);
             guide.style().height = Value.pt(es.usedLineHeight());
             guide.style().margin = new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP));
