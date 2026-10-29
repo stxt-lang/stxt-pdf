@@ -560,8 +560,9 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   (`List.copyOf`). `Box` es mutable solo mientras `BoxTreeBuilder` construye el árbol; el layout no la
   escribe nunca. Su igualdad es por identidad (clave de la caché).
 - **Comparar medidas:** con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)` (o
-  `Tolerance.EPSILON`), nunca con un `1e-9` propio. `Overflow` usa su propia tolerancia, más
-  ancha (`TOLERANCE`, 0,01 pt).
+  `Tolerance.EPSILON`), nunca con un `1e-9` propio. Lo que se ve tiene su propia tolerancia, más
+  ancha: `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar (`Overflow`) y la
+  precisión de los volcados (`ReferenceFiles`).
 - **Min y max:** primero se aplica el máximo y luego el mínimo; si chocan, gana el mínimo
   (`Sizing.constrain`).
 - **Comentarios y javadoc** en castellano, con referencias a la especificación del tipo

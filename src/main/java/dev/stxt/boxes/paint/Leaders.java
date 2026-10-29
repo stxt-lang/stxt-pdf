@@ -1,6 +1,7 @@
 package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ final class Leaders {
             case DOTS -> {
                 double dot = Math.max(MIN, fontSize * DOT);
                 double step = Math.max(2 * dot, fontSize * STEP);
-                for (double x = content.right() - dot; x >= content.x() - 1e-9; x -= step) {
+                for (double x = content.right() - dot; x >= content.x() - Tolerance.EPSILON; x -= step) {
                     shapes.add(new Rect(x, baseline - dot, dot, dot));
                 }
             }

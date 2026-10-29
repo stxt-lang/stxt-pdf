@@ -5,6 +5,7 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
@@ -48,12 +49,8 @@ import static dev.stxt.boxes.tree.PropertyKey.WIDTH;
  */
 public final class Overflow {
 
-    /**
-     * Lo que una caja puede salirse sin que sea un error: 0,01 pt, la misma precisión con que se comparan
-     * los volcados del §7. Es una tolerancia del modelo, más ancha que la de redondeo
-     * ({@link dev.stxt.boxes.model.Tolerance#EPSILON}); ningún test depende hoy de la diferencia.
-     */
-    private static final double TOLERANCE = 0.01;
+    /** Lo que una caja puede salirse sin que sea un error ({@link Tolerance#MODEL}). */
+    private static final double TOLERANCE = Tolerance.MODEL;
 
     /** Sin giros. Nadie la modifica: un giro se compone en una copia. */
     private static final AffineTransform NONE = new AffineTransform();

@@ -1937,3 +1937,10 @@ interpretaciones que salieron al implementarlas.
      páginas, y de 57 a 33 con un índice y una referencia por capítulo. *Dónde:* `Engine.forget`,
      `LayoutCache.forget`, `InlineLayout.forget`, `Paginator.paginate`. *Alternativa:* repetir solo los `Fixed`
      (no sirve para las referencias del cuerpo).
+
+312. **Dos tolerancias con nombre, no una.** `Tolerance.EPSILON` (1e-9) es la de la aritmética y la usa el layout;
+     `Tolerance.MODEL` (0,01 pt) es lo que una caja puede salirse sin desbordar (`Overflow`) y la precisión con que se
+     comparan los volcados (`ReferenceFiles`). Con `EPSILON` en `Overflow` pasan todos los tests, pero el motor sería más
+     estricto: una caja que se sale 0,005 pt (un `Width` con decimales, lo que acumulan las medidas de las fuentes en
+     milésimas) pasaría a ser un error. *Dónde:* `model/Tolerance`, `Overflow`, `Leaders` (que tenía su propio `1e-9`).
+     *Alternativa:* una sola tolerancia, `EPSILON`, con ese cambio de comportamiento.

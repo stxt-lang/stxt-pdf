@@ -76,8 +76,9 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-01 | Coste del GSUB de PDFBox | Alta | M | hecho |
 | PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | hecho |
 | PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | hecho |
-| PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | pendiente |
+| PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | hecho |
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
+| PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | pendiente |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | pendiente |
@@ -87,7 +88,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | pendiente |
 | AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | hecho |
 | AR-09 | Modelo de errores sin tipo común | Media | M | hecho |
-| AR-10 | Dos tolerancias | Baja | S | pendiente |
+| AR-10 | Dos tolerancias | Baja | S | hecho |
 | AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | pendiente |
 | AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | pendiente |
 | AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | pendiente |
@@ -467,13 +468,18 @@ los fallos por página, 96 y 100 páginas a los dos lados de la frontera y dos d
 Ningún golden, ejemplo ni PNG cambia. Test: `PaginationCacheTest` (con la caché vaciada entera calcula el doble de
 layouts y falla).
 
-### PF-04 · Cálculos que se repiten · Baja · S
+### PF-04 · Cálculos que se repiten · Baja · S · hecho
 
 `Box.inFlowChildren()` crea una lista nueva con un `stream` en cada llamada (`BlockLayout`, `FlexLayout`,
 `GridLayout`, dos veces en `BreakRules`); `Paginator.hasPageNumbers` y `withPageNumbers` recorren el árbol entero;
 `pagesOf`/`firstPages` recorren todos los fragmentos de todas las páginas en cada pasada. **Propuesta:** calcular
 `inFlowChildren` al terminar de construir (AR-03) y las marcas del documento (`hasPageNumbers`, destinos de
 referencia) en `BoxTreeBuilder.Result`. Es una mejora pequeña: medirla antes con JFR para no optimizar a ciegas.
+
+**Hecho (sesión 5): medido, sin cambios.** JFR con las pilas enteras (`jfr print --stack-depth 64`; con las 5 de por
+defecto casi nada se atribuye) sobre 40 layouts de los documentos de 153 y 163 páginas de `ScaleProbe`, 481 muestras:
+`Box.inFlowChildren` 0,2 %, `pagesOf`/`firstPages` 0 %, `withPageNumbers` 0,2 % (desde PF-03 se recorre el árbol una
+vez), `References.sites`/`byId` 0,6 %. No compensa tocarlos. El tiempo está en el reparto en líneas: ver PF-06.
 
 ### PF-05 · Fuentes leídas dos veces y arranque en frío · Baja · S
 
@@ -482,6 +488,18 @@ referencia) en `BoxTreeBuilder.Result`. Es una mejora pequeña: medirla antes co
 PDFBox (`PDType0Font.load(doc, InputStream, true)`) ahorra la lectura de disco, no el análisis. El arranque en frío
 de los 11 ejemplos es 2,6 s (frente a 0,6 s en caliente): JIT, escaneo de `fonts/`, AWT para los SVG. Para un servicio,
 calentar al arrancar con un documento mínimo. **No verificado** cuánto aporta cada parte.
+
+### PF-06 · El reparto en líneas vuelve a construir y medir la línea entera por cada palabra · Media · M
+
+**Evidencia (medida en la sesión 5, PF-04).** En el perfil de 40 layouts de 153 y 163 páginas, `LineBreaker.breakParagraphs`
+es el **71,5 %** de las muestras, y dentro, `FontFile.width` el 21,6 % y el `StringBuilder` de `TextRun.Joiner` cerca
+del 19 %. Con `Text wrap: normal`, por cada palabra que se añade a la línea se construye la línea entera
+(`LineBreaker.line`) y se mide entera (`width`): coste cuadrático en las palabras de cada línea (unas 15). El reparto
+`pretty` (`optimal`) ya usa sumas acumuladas de los avances de las palabras y los espacios. Además,
+`PdfMetrics.validate` (comprobar los glifos de cada texto antes de maquetar) es cerca del 8 %.
+**Propuesta.** Medir la línea en curso con la suma acumulada (como `optimal`) y medir la línea entera solo cuando la
+suma queda a menos de `Tolerance.MODEL` del ancho disponible, para que las decisiones sean exactamente las de hoy.
+**Aceptación.** El mismo reparto (ningún PNG ni volcado cambia) y `ScaleProbe` con el layout al menos un 30 % más rápido.
 
 ## Arquitectura
 
@@ -643,12 +661,17 @@ un servicio) y el apartado «Errores» del README. `ConverterErrorsTest` cubre c
 de mal uso interno (`ConstraintSpace`, `Style.line`, `ValueParser`…), que el `Converter` ya convierte en `INTERNAL`
 si se escapan; ni el control de flujo con `Placement.NoRoom` (AR-13).
 
-### AR-10 · Dos tolerancias · Baja · S
+### AR-10 · Dos tolerancias · Baja · S · hecho
 
 `Overflow.TOLERANCE = 0.01` frente a `Tolerance.EPSILON` del resto del motor; el comentario admite que «ningún test
 depende hoy de la diferencia». `CLAUDE.md` pide usar `Tolerance` y dice que `Overflow` es la excepción. Unificar
 (probar con `EPSILON` y ver si algún golden/ejemplo cambia) o dar nombre a las dos en `Tolerance`
 (`LAYOUT`, `OVERFLOW`) con su razón. DRY.
+
+**Hecho (sesión 5).** Con `EPSILON` en `Overflow` pasan los 1381 tests, pero unificar haría el motor más estricto (una
+caja que se sale 0,005 pt sería un error), y eso es un cambio de comportamiento. Se quedan las dos con nombre y su
+razón en `Tolerance`: `EPSILON` (aritmética, el layout) y `MODEL` (0,01 pt, lo que se ve: `Overflow` y la comparación de
+los volcados en `ReferenceFiles`); `Leaders` deja su `1e-9` propio (decisión 312).
 
 ### AR-11 · `Paginator.paginate` · Baja · S
 

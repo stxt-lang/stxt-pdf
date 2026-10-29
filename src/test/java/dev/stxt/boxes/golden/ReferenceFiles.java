@@ -2,6 +2,7 @@ package dev.stxt.boxes.golden;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Tolerance;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -26,8 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public final class ReferenceFiles {
 
-    /** Los {@code Rect} se comparan con esta tolerancia, en puntos. */
-    public static final double TOLERANCE = 0.01;
+    /** Los {@code Rect} se comparan con esta tolerancia, en puntos: la del modelo ({@link Tolerance#MODEL}). */
+    public static final double TOLERANCE = Tolerance.MODEL;
     /**
      * Diferencia máxima por canal (de 0 a 255) entre dos píxeles que se consideran iguales. El
      * antialiasing de PDFBox cambia de una máquina a otra: entre dos equipos se han visto hasta 30
