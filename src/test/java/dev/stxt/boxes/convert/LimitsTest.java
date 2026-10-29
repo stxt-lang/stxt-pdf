@@ -152,7 +152,10 @@ class LimitsTest {
         java.nio.file.Path dir = java.nio.file.Files.createTempDirectory("limits");
         try {
             java.nio.file.Files.createDirectories(dir.resolve("images"));
-            java.nio.file.Files.createSymbolicLink(dir.resolve("fonts"), RESOURCES.fontsFolder());
+            // Una copia y no un enlace simbólico, que en Windows necesita privilegios.
+            java.nio.file.Path font = RESOURCES.fontsFolder().resolve("IBM Plex Sans/IBMPlexSans-Regular.ttf");
+            java.nio.file.Files.createDirectories(dir.resolve("fonts"));
+            java.nio.file.Files.copy(font, dir.resolve("fonts").resolve(font.getFileName()));
             StringBuilder svg = new StringBuilder("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">");
             for (int i = 0; i < 3_000; i++) {
                 svg.append("<rect x=\"").append(i % 100).append("\" width=\"1\" height=\"1\"/>");

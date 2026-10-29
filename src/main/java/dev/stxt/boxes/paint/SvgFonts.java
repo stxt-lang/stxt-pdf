@@ -12,7 +12,9 @@ import dev.stxt.boxes.resources.ImageFormatException;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.image.ImageObserver;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -33,7 +35,7 @@ import java.util.Set;
  * {@code <text>} y {@code <tspan>} la fuente que comprobó {@code ImageFile}: una familia clave
  * ({@code stxt-font-} y la huella del fichero, {@link FontFile#digest()}), que no es de ninguna fuente instalada, y
  * su peso y su estilo explícitos. JSVG no la encuentra en AWT y la pide a {@link #customFont}, que la crea con
- * {@link Font#createFont} desde el fichero.</p>
+ * {@link Font#createFont} con el contenido del fichero.</p>
  *
  * <p>JSVG guarda las fuentes que resuelve en una caché de toda la JVM cuya clave no incluye este objeto: por eso la
  * clave es la huella del contenido, y lo que guarda vale para cualquier carpeta con ese mismo fichero.</p>
@@ -111,7 +113,9 @@ final class SvgFonts implements PlatformSupport {
         }
         return created.computeIfAbsent(family, key -> {
             try {
-                return Font.createFont(Font.TRUETYPE_FONT, font.path().toFile());
+                // Desde los bytes y no desde el fichero: AWT deja abierto el fichero que se le pasa mientras viva la
+                // fuente, y en Windows no se podría borrar ni sustituir.
+                return Font.createFont(Font.TRUETYPE_FONT, new ByteArrayInputStream(Files.readAllBytes(font.path())));
             } catch (FontFormatException | IOException e) {
                 failure = "AWT no carga la fuente " + font.face() + " (" + e.getMessage() + ")";
                 return null;

@@ -61,15 +61,15 @@ public final class SvgCanvas implements Canvas {
         Rect area = media.pageArea();
         StackingContext.build(page.content(), page.fixed(), area.x(), area.y()).paint(c);
         return String.format(Locale.ROOT,
-                "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.2fpt\" height=\"%.2fpt\" viewBox=\"0 0 %.2f %.2f\">%n"
-                        + "<rect width=\"100%%\" height=\"100%%\" fill=\"#ffffff\"/>%n%s</svg>%n",
+                "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.2fpt\" height=\"%.2fpt\" viewBox=\"0 0 %.2f %.2f\">\n"
+                        + "<rect width=\"100%%\" height=\"100%%\" fill=\"#ffffff\"/>\n%s</svg>\n",
                 media.width(), height, media.width(), height, c.svg);
     }
 
     /** Un grupo {@code <g>} con el giro, que se cierra en {@link #endRotation()}. */
     @Override
     public void beginRotation(double degrees, double x, double y) {
-        svg.append(String.format(Locale.ROOT, "<g transform=\"rotate(%s %.2f %.2f)\">%n", number(degrees), x, y));
+        svg.append(String.format(Locale.ROOT, "<g transform=\"rotate(%s %.2f %.2f)\">\n", number(degrees), x, y));
     }
 
     @Override
@@ -84,7 +84,7 @@ public final class SvgCanvas implements Canvas {
 
     @Override
     public void background(Rect r, String color) {
-        svg.append(String.format(Locale.ROOT, "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"%s/>%n",
+        svg.append(String.format(Locale.ROOT, "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"%s/>\n",
                 r.x(), r.y(), r.width(), r.height(), fillAttr(color)));
     }
 
@@ -238,7 +238,7 @@ public final class SvgCanvas implements Canvas {
     public void outline(Rect r) {
         if (debug) {
             svg.append(String.format(Locale.ROOT,
-                    "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"none\" stroke=\"#d33\" stroke-width=\"0.3\" stroke-dasharray=\"2 2\"/>%n",
+                    "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"none\" stroke=\"#d33\" stroke-width=\"0.3\" stroke-dasharray=\"2 2\"/>\n",
                     r.x(), r.y(), r.width(), r.height()));
         }
     }
@@ -255,7 +255,7 @@ public final class SvgCanvas implements Canvas {
         String weight = font.weight() == FontWeight.BOLD ? " font-weight=\"bold\"" : "";
         String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,
-                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\"%s%s>%s</text>%n",
+                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\"%s%s>%s</text>\n",
                 x, baselineY, escape(font.family()), weight, style, fontSize, fillAttr(color), spacing, escape(text)));
     }
 
@@ -291,7 +291,7 @@ public final class SvgCanvas implements Canvas {
         }
         svg.append(String.format(Locale.ROOT, "<svg x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\">"
                         + "<image x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" preserveAspectRatio=\"none\" "
-                        + "href=\"data:%s;base64,%s\"/></svg>%n",
+                        + "href=\"data:%s;base64,%s\"/></svg>\n",
                 content.x(), content.y(), content.width(), content.height(), target.x() - content.x(),
                 target.y() - content.y(), target.width(), target.height(), mime, data));
         if (rounded) {

@@ -2004,3 +2004,14 @@ interpretaciones que salieron al implementarlas.
      `paint/PdfContent`, `tree/Element.Role`, `ArchitectureTest`. *Alternativa:* `pdfRole()`/`structural()`/
      `decorative()` en `Element` (pone el PDF en `tree`) y primitivas con `throws IOException` (obliga a todos los
      lienzos por un fallo que solo da el PDF).
+
+### Los tests en Windows
+
+317. **La suite pasa también en Windows, aunque la CI solo la ejecuta en Linux.** Tres cosas dependían del sistema:
+     (a) `SvgCanvas` escribía las líneas con `%n`, que en Windows es `\r\n`; ahora con `\n`, así que el SVG es el mismo
+     en cualquier sistema; (b) `SvgFonts` creaba la fuente de AWT desde el fichero, que AWT deja abierto mientras vive
+     la fuente: en Windows no se podía borrar ni sustituir el TTF de `fonts/` (ni la carpeta temporal de un test);
+     ahora la crea con el contenido del fichero; (c) `LimitsTest` enlazaba `fonts/` con un enlace simbólico, que en
+     Windows necesita privilegios; ahora copia la fuente. *Dónde:* `paint/SvgCanvas`, `paint/SvgFonts`,
+     `convert/LimitsTest`. *Alternativa:* cambiar solo los tests (aceptar `\r\n`, no borrar la carpeta temporal), que
+     dejaba el SVG distinto según el sistema y el TTF bloqueado en un servicio de larga duración.
