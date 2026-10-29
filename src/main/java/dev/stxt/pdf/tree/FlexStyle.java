@@ -19,6 +19,8 @@ public final class FlexStyle extends StyleGroup {
     /** {@code Gap}: entre líneas ({@code row}) y entre ítems de una línea ({@code column}). */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
+    /** Si {@code Gap} se escribió con dos valores. */
+    private boolean gapPair;
 
     FlexStyle() {
     }
@@ -76,9 +78,15 @@ public final class FlexStyle extends StyleGroup {
         return columnGap;
     }
 
-    void setGap(Value row, Value column) {
+    /** Si {@code Gap} tiene dos valores ({@code filas columnas}) y no uno para los dos ejes. */
+    boolean gapPair() {
+        return gapPair;
+    }
+
+    void setGap(Value row, Value column, boolean pair) {
         writable();
         rowGap = row;
         columnGap = column;
+        gapPair = pair;
     }
 }

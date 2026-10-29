@@ -143,6 +143,8 @@ public enum ErrorCode {
     MARGIN_AUTO_WITHOUT_EFFECT,
     /** {@code Lines} sin {@code Wrap: true}. */
     LINES_WITHOUT_WRAP,
+    /** {@code Gap} de dos valores en un {@code Flex} sin {@code Wrap: true}. */
+    GAP_WITHOUT_WRAP,
     /** {@code Grow} en un contenedor {@code column} sin alto definido. */
     GROW_WITHOUT_EFFECT,
     /** {@code Aspect ratio} con {@code Width} y {@code Height} declarados. */

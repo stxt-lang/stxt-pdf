@@ -324,13 +324,17 @@ class FlexLayoutTest {
 
     @Test
     void rowAndColumnGapsInAColumn() {
-        // En columna, el hueco entre ítems es el de las filas (7).
+        // En columna, el hueco entre ítems es el de las filas (7) y entre líneas, el de las columnas (13): 40 + 7 + 40
+        // = 87 caben en 100; el tercero pasa a la línea siguiente, 100 + 13 a la derecha.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tDirection: column", "\t\tGap: 7 13",
-                "\t\tItem:", block("A", "Width: 100", "Height: 20"),
-                "\t\tItem:", block("B", "Width: 100", "Height: 20"));
-        assertRect(40, 67, 100, 20, l.rect("B"));
-        assertRect(40, 40, 515, 47, l.rect("F"));
+                "\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column", "\t\tWrap: true",
+                "\t\tLines: start", "\t\tGap: 7 13",
+                "\t\tItem:", block("A", "Width: 100", "Height: 40"),
+                "\t\tItem:", block("B", "Width: 100", "Height: 40"),
+                "\t\tItem:", block("C", "Width: 100", "Height: 40"));
+        assertRect(40, 87, 100, 40, l.rect("B"));
+        assertRect(153, 40, 100, 40, l.rect("C"));
+        assertRect(40, 40, 515, 100, l.rect("F"));
     }
 
     @Test

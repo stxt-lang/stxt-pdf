@@ -22,10 +22,17 @@ Flex:
 |---|---|---|---|
 | `Direction` | `row`, `column` | `row` | Eje principal horizontal o vertical. |
 | `Wrap` | booleano | `false` | Permite repartir los ítems en varias líneas. |
-| `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`. |
+| `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap: true` (`GAP_WITHOUT_WRAP`). |
 | `Main axis` | `start`, `end`, `center`, `between`, `around`, `evenly` | `start` | Reparto del sobrante en el eje principal. |
 | `Cross axis` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación de los ítems dentro de su línea. |
 | `Lines` | `start`, `end`, `center`, `between`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINES_WITHOUT_WRAP`). |
+
+> **Decisión:** sin `Wrap` hay una sola línea, así que de un `Gap` de dos valores solo actuaría uno, el hueco entre
+> ítems (el de las columnas en `row`, el de las filas en `column`): es un error (`GAP_WITHOUT_WRAP`), como `Lines` sin
+> `Wrap`. Un solo valor sí vale, porque es el hueco entre ítems y, si hay varias líneas, también entre líneas; por eso
+> `Gap: 5%` en un `Flex` `row` de una línea sin alto definido no es un error: el hueco entre filas, que necesitaría ese
+> alto, no se usa. *Alternativa descartada:* aceptar los dos valores y no usar el que sobra, que deja en el documento una
+> medida sin efecto.
 
 ## `Item`
 
@@ -90,9 +97,6 @@ Sobrante `L`, `n` ítems; solo actúa si nadie crece:
 Un sobrante negativo después de encoger significa que los ítems no caben: es un error
 ([Desbordamiento](../comun/desbordamiento.md)). Los márgenes `auto` de un ítem son un error: la alineación se hace con
 `Main axis` y `Cross axis`.
-
-> **Decisión:** el hueco entre filas de un `Flex` `row` sin `Wrap` no se comprueba: no se usa, así que `Gap: 5%` en un
-> `Flex` de una línea sin alto definido no es un error.
 
 ## Comportamientos a tener en cuenta
 

@@ -14,9 +14,9 @@ se obtiene.
 
 ## Lo que no tiene efecto
 
-Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Lines` sin `Wrap`, `Rotate origin`
-sin `Rotate`, `Rule color` sin `Rule`, un margen `auto` que no centra, un `Break` dentro de un `Absolute`… No lo es, a
-propósito:
+Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Lines` o un `Gap` de dos valores
+sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `auto` que no centra, un `Break` dentro de un
+`Absolute`… No lo es, a propósito:
 
 - **Escribir el valor por defecto:** `Span: 1 1`, `Isolate: false`, `Start: 1`. No contradice nada.
 - **Lo que se hereda:** una propiedad de `Typography` vale para los descendientes, así que no se comprueba si la caja que
@@ -31,8 +31,6 @@ propósito:
   [La caja](caja.md#mínimos-y-máximos)) y `Fill: auto` en un `Multicol` sin alto que llenar.
 - **Las propiedades de un `Markdown` que su contenido no usa** (`Bullet` sin listas): el contenido cambia a menudo
   ([Markdown](../componentes/markdown.md)).
-- **El hueco entre filas** de un `Gap` de dos valores en un `Flex` sin `Wrap`, que tiene una sola línea
-  ([Flex](../componentes/flex.md#alineación-en-el-eje-principal)).
 
 ## Niveles de validación
 
@@ -102,6 +100,7 @@ propósito:
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([La caja](caja.md#márgenes-auto)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
 | `ISOLATE_IN_ITEM` | `Isolate: true` no va en un ítem de `Flex` o `Grid`, que ya corta el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)) | `Isolate no tiene efecto en un ítem de Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
+| `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Flex`, solo con `Wrap: true` ([Flex](../componentes/flex.md#propiedades-del-flex)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: escribe un solo valor…` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([La caja](caja.md#mínimos-y-máximos)) | `Min width es mayor que Max width (línea 7)` |

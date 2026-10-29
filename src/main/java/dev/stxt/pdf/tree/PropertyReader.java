@@ -228,7 +228,7 @@ final class PropertyReader {
             case "wrap" -> s.flex().setWrap(bool(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
-                s.flex().setGap(gap.get(0), gap.get(1));
+                s.flex().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
             }
             case "main-axis" -> s.flex().setMainAxis(enumValue(Distribution.class, p));
             case "cross-axis" -> s.flex().setCrossAxis(enumValue(Alignment.class, p));
@@ -245,7 +245,7 @@ final class PropertyReader {
             case "rows" -> s.grid().setRows(tracks(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
-                s.grid().setGap(gap.get(0), gap.get(1));
+                s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
             }
             case "areas" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
             case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
@@ -306,13 +306,16 @@ final class PropertyReader {
         }
     }
 
-    /** {@code Gap} de {@code Flex} o {@code Grid}: el hueco entre filas y el hueco entre columnas. */
+    /**
+     * {@code Gap} de {@code Flex} o {@code Grid}, como se escribió: un valor para los dos ejes, o el hueco entre filas
+     * y el hueco entre columnas.
+     */
     private static List<Value> gap(Node p) {
         List<Value> v = parse(p, () -> ValueParser.list(p.getText()));
         if (v.size() > 2) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap admite 1 o 2 valores (filas columnas): " + p.getText().trim());
         }
         v.forEach(x -> check(p, x, LENGTH, false));
-        return List.of(v.get(0), v.size() == 2 ? v.get(1) : v.get(0));
+        return v;
     }
 }

@@ -15,11 +15,6 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
-### Documentación
-
-- **`Gap` de dos valores en un `Flex` sin `Wrap`:** el hueco entre filas no tiene efecto (hay una sola línea) y no es un
-  error, a diferencia de `Lines` sin `Wrap`. Decidir si lo es.
-
 ### Accesibilidad
 
 - Verificar los PDF con lectores de pantalla reales (NVDA, JAWS, VoiceOver): hoy los comprueba veraPDF (PDF/UA-1) y un

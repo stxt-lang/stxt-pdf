@@ -70,7 +70,7 @@ Cada hijo de un `Flex` va dentro de un `Item`, que envuelve **exactamente un ele
 | Propiedad | Valores | Por defecto | Qué hace |
 |---|---|---|---|
 | `Direction` | `row`, `column` | `row` | En fila o en columna |
-| `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems (con dos: entre filas y entre columnas) |
+| `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap`, puede tener dos: entre filas y entre columnas |
 | `Wrap` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
 | `Main axis` | `start`, `end`, `center`, `between`, `around`, `evenly` | `start` | Dónde va lo que sobra en la dirección del `Flex`: al final, al principio, a los dos lados, entre los ítems… |
 | `Cross axis` | `start`, `end`, `center`, `stretch` | `stretch` | Cómo se alinean los ítems en el otro eje: `stretch` los estira al alto de la fila |

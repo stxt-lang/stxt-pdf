@@ -56,7 +56,7 @@ final class ModelValidator {
     private ModelValidator() {
     }
 
-    /** {@code Main axis} y {@code Lines} de un {@code Flex}. */
+    /** {@code Main axis}, {@code Lines} y {@code Gap} de un {@code Flex}. */
     static void validateFlex(Style s) {
         if (s.flex().mainAxis() == Distribution.STRETCH) {
             throw error(s.line(FLEX_MAIN_AXIS), ErrorCode.VALUE_NOT_ALLOWED,
@@ -65,6 +65,13 @@ final class ModelValidator {
         if (s.isDeclared(FLEX_LINES) && !s.flex().wrap()) {
             throw error(s.line(FLEX_LINES), ErrorCode.LINES_WITHOUT_WRAP,
                     "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
+        }
+        // Sin Wrap hay una sola línea: no hay hueco entre filas en row ni entre columnas en column.
+        if (s.flex().gapPair() && !s.flex().wrap()) {
+            String unused = s.flex().direction() == Direction.ROW
+                    ? "primero, el hueco entre filas," : "segundo, el hueco entre columnas,";
+            throw error(s.line(FLEX_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
+                    + " línea y el " + unused + " no tiene efecto: escribe un solo valor, el hueco entre ítems");
         }
     }
 
