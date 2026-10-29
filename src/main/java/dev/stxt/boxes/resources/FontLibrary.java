@@ -92,12 +92,11 @@ public final class FontLibrary {
      * @throws ResourceException si no hay ninguna fuente de esa familia o no tiene esa variante
      */
     public FontFile find(FontFace requested) {
-        // Un fichero sirve con y sin ligaduras: se identifica sin esa opción.
-        FontFace face = requested.base();
-        FontFile file = faces.get(face);
+        FontFile file = lookup(requested);
         if (file != null) {
             return file;
         }
+        FontFace face = requested.base();
         if (!families.contains(face.family())) {
             String similar = families.stream()
                     .filter(f -> f.equalsIgnoreCase(face.family()))
@@ -114,6 +113,12 @@ public final class FontLibrary {
                 .collect(Collectors.joining(", "));
         throw new ResourceException("La fuente " + face.family() + " no tiene la variante " + face.variant()
                 + ". Variantes en " + folder + ": " + (variants.isEmpty() ? "ninguna" : variants));
+    }
+
+    /** El fichero de una fuente, o {@code null} si no está. */
+    FontFile lookup(FontFace requested) {
+        // Un fichero sirve con y sin ligaduras: se identifica sin esa opción.
+        return faces.get(requested.base());
     }
 
     /** Todas las fuentes que se pueden usar, en orden de familia y variante. */

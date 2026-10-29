@@ -153,7 +153,7 @@ public final class PdfCanvas implements Canvas {
         List<Page> pages = document.pages();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
-            PdfImages images = new PdfImages(doc, resources, limits);
+            PdfImages images = new PdfImages(doc, limits);
             PdfStructure structure = new PdfStructure(doc, document.root());
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata());

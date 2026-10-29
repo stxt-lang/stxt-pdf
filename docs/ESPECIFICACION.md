@@ -2016,8 +2016,11 @@ error.
 El texto de un SVG (`text`, `tspan`) usa solo las fuentes de `fonts/` ([§5.11](#511-recursos-y-fuentes)),
 sin sustitución: su `font-family` (solo cuenta la primera de la lista, y no puede ser una genérica
 como `sans-serif`), su `font-weight` (`normal` o `bold`) y su `font-style` (`normal` o `italic`),
-propios o heredados de un `g`, deben ser una variante que exista, con todos los caracteres del
-texto. Se dibuja con los contornos de la fuente: se ve como cualquier texto del documento, pero no
+propios o heredados de sus antepasados en el fichero (un `g`, o el `text` de un `tspan`), deben ser una
+variante que exista, con todos los caracteres del texto. Esa variante es la que lo dibuja, siempre: un
+texto que repite un `use` conserva la fuente de su sitio en el fichero y no hereda la del `use` (en SVG la
+heredaría), y el resultado no depende del idioma de la JVM ni de otras carpetas de recursos con una familia
+del mismo nombre. Se dibuja con los contornos de la fuente: se ve como cualquier texto del documento, pero no
 se puede seleccionar ni se extrae del PDF.
 
 **Dimensionado.** La caja de contenido de una imagen tiene la **proporción** del fichero, o la de

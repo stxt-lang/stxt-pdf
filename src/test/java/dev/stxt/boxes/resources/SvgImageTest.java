@@ -193,6 +193,27 @@ class SvgImageTest {
                 .contains("Fuente desconocida: Nope"));
     }
 
+    @Test
+    void everyTextAndTspanHasTheFontThatDrawsIt() throws IOException {
+        // En orden del documento, con la herencia del fichero y lo que declara style; null en uno sin familia.
+        ImageFile f = read("<svg " + NS + " width=\"100\" height=\"50\">"
+                + "<g font-family=\"'IBM Plex Serif'\" font-style=\"italic\"><text style=\"font-weight:bold\">"
+                + "Hola <tspan font-family=\"IBM Plex Mono, monospace\" font-style=\"normal\">mundo</tspan></text></g>"
+                + "<text> <tspan font-family=\"IBM Plex Sans\">x</tspan></text></svg>");
+        java.util.List<dev.stxt.boxes.model.FontFace> expected = java.util.Arrays.asList(
+                face("IBM Plex Serif", true, true), face("IBM Plex Mono", true, false), null,
+                face("IBM Plex Sans", false, false));
+        assertEquals(expected, f.textFonts().stream().map(font -> font == null ? null : font.face()).toList());
+        assertTrue(f.hasText());
+        assertTrue(read("<svg " + NS + " width=\"10\" height=\"10\"/>").textFonts().isEmpty());
+    }
+
+    private static dev.stxt.boxes.model.FontFace face(String family, boolean bold, boolean italic) {
+        return new dev.stxt.boxes.model.FontFace(family, bold ? dev.stxt.boxes.model.FontWeight.BOLD
+                : dev.stxt.boxes.model.FontWeight.NORMAL, italic ? dev.stxt.boxes.model.FontStyle.ITALIC
+                : dev.stxt.boxes.model.FontStyle.NORMAL);
+    }
+
     // --- Cuánto dibuja un SVG (ROADMAP-QA-ARQ.md, QA-06) ---------------------------------------------------
 
     @Test

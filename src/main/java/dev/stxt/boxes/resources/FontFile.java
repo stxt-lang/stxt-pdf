@@ -11,9 +11,13 @@ import org.apache.fontbox.ttf.model.GsubData;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,6 +59,8 @@ public final class FontFile {
     /** Lo mismo que aplica PDFBox al pintar; {@code null} hasta que se pide y si la fuente no tiene GSUB. */
     private volatile GsubWorker gsub;
     private volatile boolean gsubRead;
+    /** Ver {@link #digest()}; {@code null} hasta que se pide. */
+    private volatile String digest;
 
     FontFile(Path path, FontFace face, TrueTypeFont ttf) throws IOException {
         this.path = path;
@@ -81,6 +87,28 @@ public final class FontFile {
 
     public FontFace face() {
         return face;
+    }
+
+    /**
+     * La huella del contenido del fichero (SHA-256 en hexadecimal, en minúsculas): dos ficheros con los mismos bytes
+     * tienen la misma, estén donde estén, y dos distintos no. Se calcula la primera vez que se pide.
+     *
+     * @throws ResourceException si el fichero ya no se puede leer
+     */
+    public String digest() {
+        String value = digest;
+        if (value == null) {
+            try {
+                value = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(path)));
+            } catch (IOException e) {
+                throw new ResourceException("No se puede leer la fuente " + path + ": " + e.getMessage(), e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new IllegalStateException("La JVM no tiene SHA-256", e);
+            }
+            // Dos hilos pueden calcularla a la vez: los dos escriben la misma cadena.
+            digest = value;
+        }
+        return value;
     }
 
     /** Ascendente y descendente de la tabla {@code hhea}. */

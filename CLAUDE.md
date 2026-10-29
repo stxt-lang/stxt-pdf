@@ -127,7 +127,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
+| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores) y `SvgFonts` (las fuentes de `fonts/` con que JSVG dibuja el texto de un SVG), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 | `convert` | `Converter`: la entrada del motor. Reúne la carpeta de recursos, los estilos aparte y la depuración en un objeto inmutable y seguro entre hilos (`builder()`), y da `layOut`, `toPdf` y `toSvg`; cada conversión crea su propio `Engine`. Es la capa de arriba: nada del motor depende de ella (`ArchitectureTest`) |
 
@@ -531,9 +531,13 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   natural, una vez por fichero. `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde
   manda `ImageFit` y **restablece los guiones antes de dibujarlo** (un formulario hereda el estado gráfico
   y el modo `debug` deja un patrón de guiones activo). JSVG dibuja el texto como contornos, no como
-  texto del PDF: no se puede seleccionar. Para que encuentre la fuente por su familia,
-  `PdfImages.registerFonts` da de alta en AWT (`GraphicsEnvironment.registerFont`, efecto global en la
-  JVM, una vez por fichero) las fuentes de `fonts/`. `SvgCanvas` incrusta el SVG como `data:image/svg+xml`.
+  texto del PDF: no se puede seleccionar. **Nada se da de alta en AWT** (QA-02, TS-03): `SvgInspector` apunta
+  la fuente de cada `<text>` y `<tspan>` con la herencia del fichero (`ImageFile.textFonts`, en orden del
+  documento) y `SvgFonts`, el `DomProcessor` de JSVG, le pone una familia clave (`stxt-font-` y
+  `FontFile.digest`, la huella del contenido) con su peso y su estilo explícitos, y la da
+  `PlatformSupport.customFont` con `Font.createFont`; un texto que repite un `<use>` conserva la fuente de su sitio.
+  La caché de fuentes de JSVG es de toda la JVM y no está sincronizada: un SVG con texto se dibuja dentro de
+  `PdfImages.JSVG_FONTS`. `SvgCanvas` incrusta el SVG como `data:image/svg+xml`.
 
 ## Convenciones
 

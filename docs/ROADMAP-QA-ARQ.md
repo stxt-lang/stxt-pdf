@@ -14,7 +14,7 @@ como *no verificado*. Los programas con que se midió están en [`tools/qa/`](..
 1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
 2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
    evidencia, propuesta y criterio de aceptación.
-3. Ejecuta `mvn test` para partir de verde (1321 tests tras la sesión 1) y comprueba que `git status` queda limpio.
+3. Ejecuta `mvn test` para partir de verde (1379 tests tras la sesión 4) y comprueba que `git status` queda limpio.
 
 **Al terminar una sesión:**
 
@@ -60,7 +60,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | ID | Tarea | Prio | Esf. | Estado |
 |---|---|---|---|---|
 | QA-01 | `ListMarkers`: mayúsculas con el `Locale` de la JVM | Alta | S | hecho |
-| QA-02 | El texto de un SVG cambia con el idioma de la JVM | Media | M | pendiente |
+| QA-02 | El texto de un SVG cambia con el idioma de la JVM | Media | M | hecho |
 | QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | hecho |
 | QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | hecho |
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
@@ -70,7 +70,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-09 | Integración continua | Alta | S | hecho |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | hecho |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
-| TS-03 | `registerFont` de AWT es global a la JVM | Media | M | pendiente |
+| TS-03 | `registerFont` de AWT es global a la JVM | Media | M | hecho |
 | TS-04 | Cerrojos en la ruta caliente (`FontFile`, `Resources`) | Media | S | hecho |
 | TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | hecho |
 | PF-01 | Coste del GSUB de PDFBox | Alta | M | hecho |
@@ -112,6 +112,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | Tras la sesión 2, texto largo | 153 páginas: layout 386 ms, pintar 232 ms (antes 954 y 2275); 657 páginas: layout 1,5 s, pintar 0,8 s (antes 3,2 y 9,3). Con `Ligatures: true`: layout 588 ms, pintar ≈ 2 s. 8 hilos × 10 rondas × 11 ejemplos: 6,8 a 7,0 s (antes 13,4 a 16,2 s) |
 | Entradas hostiles | anidado > 100 niveles y línea > 10 000 caracteres: `LimitException` de `stxt-core` (bien); `Columns: repeat(100000, 1fr)`: 182 ms; 2000 páginas: 0,5 s |
 | Bombas de imagen (`BombsProbe`, JVM de 512 MB) | PNG sin transparencia: 64 Mpx en 4,6 s, 144 Mpx en 4,3 s, 900 Mpx (106 KB) en 23 s; con transparencia: 64 Mpx en 5,3 s, 144 Mpx (547 KB) `OutOfMemoryError` (13 s con 1,5 GB); JPEG de 400 Mpx: 0,5 s. SVG con los límites de JSVG subidos: 300 000 rectángulos 5,4 s (PDF de 4 MB), 100 000 `<use>` 1,8 s, 2000 niveles bien, **20 000 niveles `StackOverflowError`**, 10⁹ elementos por `<use>` `OutOfMemoryError` a los 51 s. Con los límites por defecto de JSVG (2000 elementos y 30 niveles) falla incluso un SVG legítimo de 3000 rectángulos |
+| Tras la sesión 4, SVG con texto | Formulario PDF de los 10 SVG con texto idéntico en `en` y en `tr` (antes, en `tr`, de 1 a 19 KB menos: dibujados con `Dialog`; `AwtFontProbe` muestra la causa); `mvn test` en turco deja el árbol limpio. `ConcurrencyProbe` en la misma máquina, antes y después: 7,7 a 10,0 s y 7,8 a 10,1 s, 0 diferencias de bytes; 1.ª ronda en frío 2,1 a 2,2 s y 1,9 a 2,1 s |
 
 ## QA
 
@@ -134,7 +135,7 @@ documento). `ImageFile.java:140` usa `String.format("%04X")` sin `Locale`: poner
 a turco en un `@BeforeEach`/`@AfterEach` (o usa el `@DefaultLocale` equivalente) para que lo guarde sin CI;
 QA-09 añade la matriz de idiomas.
 
-### QA-02 · Un SVG con texto sale distinto según el idioma de la JVM · Media · M
+### QA-02 · Un SVG con texto sale distinto según el idioma de la JVM · Media · M · hecho
 
 **Evidencia (verificada).** Con `-Duser.language=tr -Duser.country=TR`, `ExamplesTest` pasa (los volcados coinciden)
 pero **12 PNG versionados se reescriben** (en la sesión 1 también `golden/24-svg/page-2`; el conjunto exacto varía de una ejecución a otra: `01-invoice/page-1`, `02-letter/page-1`, `04-annual-report/page-3,4,6`,
@@ -154,6 +155,15 @@ sustituya) cuando detecte que la fuente elegida no es la pedida.
 
 **Aceptación.** `ExamplesTest` con `-Duser.language=tr` deja `git status` limpio, o el motor rechaza el SVG con
 un error claro.
+
+**Hecho (sesión 4).** Causa aislada con una sonda: AWT tiene `IBM Plex Sans` dada de alta y en la lista de familias,
+pero con la JVM arrancada en turco `new Font(familia)` devuelve `Dialog` (cambiar el `Locale` en caliente no lo
+reproduce). JSVG 2.2.0 no deja inyectar su resolución de fuentes (`FontResolver` es estático), pero, si la familia no
+está en AWT, pide la fuente a `PlatformSupport.customFont`: `SvgFonts` reescribe con un `DomProcessor` la fuente de
+cada `<text>` y `<tspan>` a una familia clave del fichero (la huella de su contenido) y la crea con `Font.createFont`,
+sin registro ni búsqueda por nombre (decisiones 308 a 310). Los diez SVG con texto dan el mismo formulario PDF, byte a
+byte, en inglés, en turco y con el código anterior en inglés. La suite entera en turco deja el árbol limpio, y el job
+de la CI en turco ya lo comprueba. Test: `PdfImagesTest.theLanguageOfTheJvmDoesNotChangeTheText` (dos JVM hijas).
 
 ### QA-03 · PDFBox aplica GSUB y el motor mide sin ligaduras · Alta · M · hecho
 
@@ -319,11 +329,11 @@ conversión secuencial: 0 diferencias, con `Resources` compartido y con uno por 
 | `DocumentSchema` (estático) | Sí | Se carga una vez en una constante; el uso concurrente de `SchemaValidator` sobre el mismo `SchemaProviderMemory` de `stxt-core` funcionó en las 880 conversiones, pero **es un contrato de otra librería** que el repositorio solo da por cierto (TS-01) |
 | `DocumentReader` | Sí | Crea un `Parser` por lectura |
 | `Resources`, `FontLibrary`, `ImageLibrary` | Sí | Carga perezosa con `synchronized`; `FontLibrary` es inmutable; `ImageLibrary.find` es `synchronized` |
-| `FontFile` | Sí, con cerrojo | `width` es `synchronized` porque `TrueTypeFont` de PDFBox no es seguro entre hilos (TS-04) |
+| `FontFile` | Sí | Mide sin cerrojos con los avances precalculados (TS-04, sesión 2); `digest` se calcula una vez, sin cerrojo |
 | `Box`, `Style`, `LaidOutDocument` | Solo lectura | Campos públicos y mutables: es seguro mientras nadie escriba después de construir (AR-02/AR-03) |
 | **`Engine`** | **No** | `LayoutCache` (`HashMap`/`IdentityHashMap` sin sincronizar), `InlineLayout` (`broken`, `measurer`, `pages`, `numbers` reasignados sin `volatile`) y contadores; `layOutDocument`, `assume` y `reservePageDigits` mutan estado compartido |
 | `Paginator`, `BuildContext`, `PdfCanvas`, `PdfImages`, `PdfStructure`, `PdfLinks` | No (uno por conversión) | Estado de la conversión; los crea `PdfCanvas.write` |
-| `PdfImages.REGISTERED` + `GraphicsEnvironment.registerFont` | Sincronizado, pero **global** | Ver TS-03 |
+| La caché de fuentes de JSVG (`FontResolver`) | Global, sin sincronizar | Los SVG con texto se dibujan dentro de `PdfImages.JSVG_FONTS`; ya no se da nada de alta en AWT (TS-03, sesión 4) |
 
 `PdfWriter.write` crea un `Engine` y un `PdfCanvas` nuevos en cada llamada, así que **la ruta recomendada es
 segura**. El riesgo está en que `Engine` es `public final class` con constructores públicos, sin una palabra sobre
@@ -366,7 +376,7 @@ si pasa de unos segundos y ejecutarlo en CI (QA-09). **Hecho (sesión 1):** `con
 **Aceptación:** pasa; falla si se introduce a propósito un
 `static` mutable en la ruta (probarlo una vez a mano).
 
-### TS-03 · `GraphicsEnvironment.registerFont` es global a la JVM · Media · M
+### TS-03 · `GraphicsEnvironment.registerFont` es global a la JVM · Media · M · hecho
 
 `PdfImages.registerFonts` da de alta en AWT las fuentes de `fonts/` (JSVG busca por familia). Es un efecto de toda la
 JVM: dos `Resources` con carpetas distintas pero la **misma familia** (dos clientes con su propia «IBM Plex Sans»)
@@ -377,6 +387,14 @@ el mismo origen que QA-02 (el SVG con texto es el único punto donde el motor de
 validar, o pasar a JSVG un `FontResolver`/`Font` propio por `Resources` (comprobar si JSVG 2.2.0 lo permite), de modo
 que no haya ningún estado de JVM. **Aceptación:** dos `Resources` con la misma familia y ficheros distintos dibujan
 cada uno el suyo (test); `PdfImages.REGISTERED` desaparece.
+
+**Hecho (sesión 4).** Con QA-02: nada se da de alta en AWT y `REGISTERED` y `registerFonts` desaparecen. La caché de
+fuentes de JSVG sigue siendo de toda la JVM y su clave no incluye el `PlatformSupport`; por eso la familia clave es la
+huella SHA-256 del fichero (`FontFile.digest`), que es igual para el mismo fichero en dos carpetas y distinta para dos
+ficheros. Esa caché es además un `HashMap` sin sincronizar: los SVG con texto se dibujan dentro de un cerrojo
+(`PdfImages.JSVG_FONTS`), sin coste medible (decisión 310). Tests: `PdfImagesTest.twoFoldersWithTheSameFamilyDrawEachItsOwnFile`
+(una copia de IBM Plex Serif que se declara «IBM Plex Sans» se dibuja como Serif), y además
+`theFontOfStyleAndOfTheAncestorsIsTheOneDrawn` y `aTextRepeatedByAUseKeepsTheFontOfItsPlaceInTheFile` (decisión 309).
 
 ### TS-04 · Cerrojos en la ruta caliente · Media · S · hecho
 
@@ -655,7 +673,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **1. Correcciones y red de seguridad** | QA-01, QA-04, QA-05, QA-09, TS-02 | Fallo del idioma corregido; CI con matriz de idiomas; test de hilos |
 | **2. Ligaduras y rendimiento del pintado** (hecha) | QA-03 + PF-01, PF-02, TS-04 | Mide = pinta; pintar ≈ 9,5 veces más rápido por defecto; sin cerrojos calientes |
 | **3. Contrato público** (hecha) | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
-| **4. SVG y el estado global** | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
+| **4. SVG y el estado global** (hecha) | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
 | **5. Caché de la paginación** | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
 | **6. Tests de referencia** | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
 | **7. Encapsulación del modelo** | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
@@ -674,7 +692,8 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
    Hoy es una convención humana.
 3. ~~**Fachada (AR-08)**~~ **Resuelta (sesión 3):** `PdfWriter` se eliminó y lo sustituye `Converter` (sin código externo
    que migrar, no se dejó nada obsoleto).
-4. **SVG con texto (QA-02/TS-03):** ¿contornos hechos por el motor (sin AWT) o seguir con JSVG y documentar sus límites?
+4. ~~**SVG con texto (QA-02/TS-03)**~~ **Resuelta (sesión 4):** ni lo uno ni lo otro: JSVG sigue dibujando, pero con el
+   fichero de `fonts/` que le da el motor (`PlatformSupport.customFont`), sin registro en AWT ni búsqueda por nombre.
 
 ## Registro de sesiones
 
@@ -687,3 +706,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 3 · Contrato público (en curso) | AR-09: `StxtPdfException` con `kind`/`code`/`line` para todos los errores del motor; `DocumentSyntaxException` para los de `stxt-core`; `PAGE_LIMIT` (primera parte de QA-06); `Converter` como frontera (`INTERNAL`); §6.1 de la especificación, README, decisiones 295 a 299. Tests nuevos: `ConverterErrorsTest` y el caso `PAGE_LIMIT`. | Resto de la sesión 3: TS-01 (contrato de hilos y `Engine` sin protocolo público) y QA-06 (`Limits` configurable, píxeles de imagen, elementos de SVG) |
 | 2026-10-28 | 3 · Contrato público (en curso) | TS-01: contrato de hilos en javadoc y README, protocolo de la paginación de `Engine` de package, `layOutDocument` suelta su estado al terminar; `EngineContractTest`; decisiones 300 a 302. | Último punto de la sesión 3: QA-06 (`Limits` configurable en el `Builder` del `Converter`, píxeles por imagen y elementos de SVG) |
 | 2026-10-29 | 3 · Contrato público (terminada) | QA-06: `Limits` (2000 páginas, 25 Mpx, 20 000 elementos y 64 niveles de SVG, elegidos por el usuario tras medirlos con `BombsProbe`) en `Converter.builder().limits(…)`; `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX` antes de maquetar; JSVG con los mismos límites (corrige que rechazara SVG legítimos de más de 2000 elementos con una `IOException`); casos del catálogo, `LimitsTest`, §6.2 de la especificación; decisiones 303 a 307. | Sesión 4: SVG y estado global (QA-02, TS-03). Decidir antes la decisión abierta 4 (contornos hechos por el motor o JSVG con sus límites) |
+| 2026-10-29 | 4 · SVG y el estado global (hecha) | QA-02 y TS-03: causa aislada (AWT da `Dialog` para `IBM Plex Sans` en una JVM en turco); `SvgFonts` da a JSVG el fichero comprobado con una familia clave (huella SHA-256) y `PlatformSupport.customFont`, sin `registerFont`; `ImageFile.textFonts`, `FontFile.digest`; cerrojo para la caché global de JSVG; un texto de un `<use>` conserva la fuente de su sitio. `PdfImagesTest` (4 tests, 3 fallan sin el cambio) y `SvgImageTest`; §5.18, decisiones 308 a 310; la CI en turco comprueba el árbol. 1379 tests en verde con el idioma por defecto y en turco; ningún PNG ni volcado cambia. | Sesión 5: caché de la paginación (PF-03, PF-04, AR-11, AR-10) |

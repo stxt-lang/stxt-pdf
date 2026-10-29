@@ -1,5 +1,8 @@
 package dev.stxt.boxes.resources;
 
+import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.FontStyle;
+import dev.stxt.boxes.model.FontWeight;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -14,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +37,8 @@ import java.util.regex.Pattern;
  *
  * <p>Del SVG sale su tamaño natural en píxeles CSS ({@code width} y {@code height}, o el
  * {@code viewBox}) y los textos con su fuente, que {@link ImageFile} comprueba contra
- * {@code fonts/}. Los errores llevan la línea del SVG.</p>
+ * {@code fonts/}, y la fuente de cada {@code <text>} y {@code <tspan>}, que es la que se dibuja. Los errores
+ * llevan la línea del SVG.</p>
  */
 final class SvgInspector {
 
@@ -67,8 +72,11 @@ final class SvgInspector {
      * @param elements los que dibuja: todos los del fichero y, además, cada vez que un {@code <use>} repite un
      *                 trozo, los de ese trozo; es un tope de lo que cuenta el dibujo, saturado en {@link #SATURATED}
      * @param depth    los niveles de anidado, contando el {@code <svg>} de la raíz
+     * @param fonts    la fuente de cada {@code <text>} y {@code <tspan>}, en orden del documento, con la herencia de
+     *                 sus antepasados en el fichero (no la del {@code <use>} que lo repite); {@code null} si no
+     *                 declara {@code font-family} ni la hereda
      */
-    record Info(double widthPx, double heightPx, List<TextUse> texts, long elements, int depth) {
+    record Info(double widthPx, double heightPx, List<TextUse> texts, long elements, int depth, List<FontFace> fonts) {
     }
 
     /** Tope del recuento de elementos dibujados, para que las repeticiones de los {@code <use>} no desborden. */
@@ -113,6 +121,20 @@ final class SvgInspector {
             return new FontState(family != null ? family : this.family, weight != null ? weight : this.weight,
                     style != null ? style : this.style);
         }
+
+        boolean bold() {
+            return weight.equals("bold") || weight.equals("700");
+        }
+
+        boolean italic() {
+            return style.equals("italic");
+        }
+
+        /** La fuente de {@code fonts/} que pide, o {@code null} si no tiene familia. */
+        FontFace face() {
+            return family == null ? null : new FontFace(firstFamily(family), bold() ? FontWeight.BOLD
+                    : FontWeight.NORMAL, italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
+        }
     }
 
     private static final class Handler extends DefaultHandler {
@@ -120,6 +142,7 @@ final class SvgInspector {
         private final String name;
         private final Deque<FontState> fonts = new ArrayDeque<>();
         private final List<TextUse> texts = new ArrayList<>();
+        private final List<FontFace> elementFonts = new ArrayList<>();
         private Locator locator;
         private int depth;
         private int maxDepth;
@@ -238,6 +261,9 @@ final class SvgInspector {
             }
             FontState font = fonts.peek().with(family, weight, style);
             fonts.push(font);
+            if (local.equals("text") || local.equals("tspan")) {
+                elementFonts.add(font.face());
+            }
 
             if (local.equals("svg")) {
                 size(attrs);
@@ -296,8 +322,8 @@ final class SvgInspector {
                             + " (línea " + textLine + ") tiene font-style " + style
                             + ": solo se admiten normal e italic");
                 }
-                texts.add(new TextUse(textLine, textFont.family(), weight.equals("bold") || weight.equals("700"),
-                        style.equals("italic"), text.toString()));
+                texts.add(new TextUse(textLine, textFont.family(), textFont.bold(), textFont.italic(),
+                        text.toString()));
             }
             text.setLength(0);
         }
@@ -454,7 +480,8 @@ final class SvgInspector {
                     h = w * viewBox[3] / viewBox[2];
                 }
             }
-            return new Info(w, h, List.copyOf(texts), drawn(), maxDepth);
+            return new Info(w, h, List.copyOf(texts), drawn(), maxDepth,
+                    Collections.unmodifiableList(new ArrayList<>(elementFonts)));
         }
     }
 

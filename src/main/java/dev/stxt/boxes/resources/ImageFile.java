@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -42,9 +45,10 @@ public final class ImageFile {
     private final boolean text;
     private final long svgElements;
     private final int svgDepth;
+    private final List<FontFile> textFonts;
 
     private ImageFile(Path path, Format format, double pixelWidth, double pixelHeight, boolean text,
-            long svgElements, int svgDepth) {
+            long svgElements, int svgDepth, List<FontFile> textFonts) {
         this.path = path;
         this.format = format;
         this.pixelWidth = pixelWidth;
@@ -52,6 +56,7 @@ public final class ImageFile {
         this.text = text;
         this.svgElements = svgElements;
         this.svgDepth = svgDepth;
+        this.textFonts = textFonts;
     }
 
     /**
@@ -85,7 +90,7 @@ public final class ImageFile {
             if (width <= 0 || height <= 0) {
                 throw new ImageFormatException("La imagen " + name + " no tiene píxeles");
             }
-            return new ImageFile(path, format, width, height, false, 0, 0);
+            return new ImageFile(path, format, width, height, false, 0, 0, List.of());
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
@@ -117,8 +122,14 @@ public final class ImageFile {
         for (SvgInspector.TextUse use : info.texts()) {
             checkText(use, name, resources);
         }
+        // Cada texto que se ve ya tiene su fuente; un <text> o <tspan> sin ella (sin familia, o una que no está en
+        // fonts/) solo puede tener espacios, que no se dibujan.
+        List<FontFile> fonts = new ArrayList<>();
+        for (FontFace face : info.fonts()) {
+            fonts.add(face == null ? null : resources.fonts().lookup(face));
+        }
         return new ImageFile(path, Format.SVG, info.widthPx(), info.heightPx(), !info.texts().isEmpty(),
-                info.elements(), info.depth());
+                info.elements(), info.depth(), Collections.unmodifiableList(fonts));
     }
 
     /** Que la fuente de un texto del SVG exista en {@code fonts/} y tenga todos sus caracteres: no hay sustitución. */
@@ -204,6 +215,16 @@ public final class ImageFile {
     /** Si es un SVG con texto, que se dibuja con las fuentes de {@code fonts/}. */
     public boolean hasText() {
         return text;
+    }
+
+    /**
+     * La fuente de {@code fonts/} de cada {@code <text>} y {@code <tspan>} del SVG, en orden del documento: la que se
+     * comprobó y la que lo dibuja. Es la de su sitio en el fichero, con la herencia de sus antepasados (no la del
+     * {@code <use>} que lo repita). {@code null} en uno que no tiene fuente, que solo puede contener espacios.
+     * Vacía si no es un SVG.
+     */
+    public List<FontFile> textFonts() {
+        return textFonts;
     }
 
     /** Si es un dibujo vectorial, que se pinta sin perder nitidez a ningún tamaño. */

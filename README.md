@@ -136,10 +136,10 @@ motor, así que dos hilos que convierten a la vez no comparten ningún estado qu
 | `Box` y `Style` (el árbol de cajas) | Solo lectura una vez construido; no se escribe en ellos |
 
 `Converter` es lo que se comprueba con ocho hilos convirtiendo los once ejemplos (`ConcurrentConversionTest`): el
-mismo PDF, byte a byte, que la conversión secuencial. Dos cosas dependen de fuera: la validación contra el schema
-comparte el de `stxt-core` 1.0.3 (la versión fijada en el `pom.xml`, que se revisó para que solo lea), y los SVG con
-texto dan de alta las fuentes en AWT, que es global a la JVM; en un servidor sin pantalla arranca la JVM con
-`-Djava.awt.headless=true`.
+mismo PDF, byte a byte, que la conversión secuencial. La validación contra el schema comparte el de `stxt-core` 1.0.3
+(la versión fijada en el `pom.xml`, que se revisó para que solo lea). El texto de un SVG se dibuja con las fuentes de la
+carpeta de recursos sin darlas de alta en la JVM, así que no depende de su idioma ni de otras carpetas; JSVG lo dibuja
+con AWT, así que en un servidor sin pantalla arranca la JVM con `-Djava.awt.headless=true`.
 
 ## Recursos y fuentes
 

@@ -40,8 +40,7 @@ jobs:
             target/site/jacoco
           if-no-files-found: ignore
 
-  # El resultado no debe depender del idioma de la JVM (QA-01, QA-02). Mientras QA-02 siga abierta, el
-  # texto de un SVG cambia en turco y reescribe PNG: esta ejecución no comprueba el árbol.
+  # El resultado no debe depender del idioma de la JVM (QA-01, QA-02): en turco tampoco cambia ningún PNG.
   locale:
     name: Tests con la JVM en turco
     runs-on: ubuntu-latest
@@ -54,6 +53,8 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test -DargLine="-Duser.language=tr -Duser.country=TR"
+      - name: El árbol sigue limpio
+        run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
 
   # Medidas de rendimiento (@Tag("perf")), a diario y a mano; no bloquean los cambios.
   perf:

@@ -91,9 +91,7 @@
   una `Output` propia que implemente `TextOutput` y escriba el texto con `drawString` en el
   `PdfBoxGraphics2D`); que el SVG de depuración incrusta el SVG como `data:` y un navegador no tiene las
   fuentes de `fonts/`; que no hay `pattern`, `mask`, `filter`, `marker`, `image` ni CSS (`style`) en el
-  subconjunto, y que un SVG no puede enlazar a otro del repositorio; y que las fuentes de AWT que da de
-  alta `PdfImages` son globales a la JVM (dos carpetas de recursos con la misma familia y distinto TTF no
-  se distinguen). Los PNG de los ejemplos que no son dibujos (fotos, la pantalla del móvil del manual, el
+  subconjunto, y que un SVG no puede enlazar a otro del repositorio. Los PNG de los ejemplos que no son dibujos (fotos, la pantalla del móvil del manual, el
   icono del horario) se quedan como están.
 - ~~**Rotación**~~ (hito 30). Queda: girar un `Text` o un `Block` directamente (hoy se gira el posicionado
   que lo contiene), `Rotate origin` con medidas (puntos o porcentajes), que una caja girada ocupe en el

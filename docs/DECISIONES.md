@@ -1470,7 +1470,7 @@ interpretaciones que salieron al implementarlas.
      un SVG de un documento accesible es que su texto vaya en el documento y el SVG sea un dibujo, y `Alt`
      da el texto alternativo. *Dónde:* `PdfImages.registerFonts`. *Alternativa:* una `Output` propia de JSVG
      (`TextOutput`) que escriba el texto con `drawString` y un `PdfBoxGraphics2DFontTextDrawer` con las
-     fuentes registradas (en `TODO.md`).
+     fuentes registradas (en `TODO.md`). *Cambiada por la 308:* ya no se da nada de alta en AWT.
 
 248. **Un SVG es un formulario del PDF y se escala a su caja.** `PdfBoxGraphics2D` dibuja el SVG a su tamaño
      natural en puntos (un formulario de `file.width()` × `file.height()`), una vez por fichero, y
@@ -1893,3 +1893,33 @@ interpretaciones que salieron al implementarlas.
      `stxt-core`, ya dan un error `LIMIT` desde `DocumentReader` y se pueden cambiar con sus propios métodos si hiciera
      falta. `Limits` solo tiene lo que el motor comprueba por su cuenta. *Alternativa:* un `DocumentReader` con `Limits`.
 
+### Revisión de QA, sesión 4: el texto de los SVG sin estado de la JVM (ROADMAP-QA-ARQ.md, QA-02 y TS-03)
+
+308. **El texto de un SVG se dibuja con el fichero que se comprobó, sin dar nada de alta en AWT.** Medido: con la JVM
+     en turco, AWT tiene `IBM Plex Sans` dada de alta pero `new Font(familia)` devuelve `Dialog` (pasa la `I` a
+     minúscula con el idioma), así que JSVG dibujaba el texto con otra fuente sin avisar y se reescribían 12 PNG; y el
+     registro es de toda la JVM, así que una segunda carpeta de recursos con otra «IBM Plex Sans» se dibujaba con la de
+     la primera. Ahora `SvgInspector` apunta la fuente de cada `<text>` y `<tspan>` (`ImageFile.textFonts`), y al
+     dibujar `SvgFonts` (un `DomProcessor` de JSVG) le pone una familia clave, `stxt-font-` y la huella SHA-256 del
+     fichero (`FontFile.digest`), con su peso y su estilo, y la da `PlatformSupport.customFont` con `Font.createFont`.
+     El formulario PDF de los diez SVG con texto del repositorio es el mismo, byte a byte, que antes en inglés y que
+     ahora en turco: no cambia ningún PNG. La clave es la huella del contenido porque JSVG guarda las fuentes en una
+     caché de toda la JVM cuya clave no incluye el `PlatformSupport`: así lo que guarda vale para cualquier carpeta con
+     ese mismo fichero, y crece con los ficheros distintos, no con las conversiones. *Dónde:* `paint/SvgFonts`,
+     `PdfImages.draw`, `ImageFile.textFonts`, `SvgInspector`. *Alternativa:* que el motor convierta el texto en
+     contornos con sus propias fuentes, sin JSVG; obligaba a reimplementar la disposición del texto de SVG
+     (`text-anchor`, listas de `x` e `y`, `dx`, `rotate`, `textLength`…, que el subconjunto admite) o a recortarlo.
+
+309. **Un texto que repite un `<use>` conserva la fuente de su sitio en el fichero.** En SVG, lo que repite un `<use>`
+     hereda las propiedades del `<use>`; el motor comprueba cada texto con la herencia de sus antepasados en el fichero,
+     y `SvgFonts` le pone esa fuente explícita, de modo que lo que se dibuja es lo que se comprobó. Antes, un texto
+     Regular de un `<defs>` repetido dentro de un `g` en negrita se comprobaba en Regular y se dibujaba en negrita.
+     *Dónde:* `SvgFonts.apply`. *Alternativa:* comprobar cada texto en el contexto de cada `<use>` que lo repite (y
+     dibujarlo con una fuente por contexto, que el DOM de JSVG no permite expresar).
+
+310. **Los SVG con texto se dibujan de uno en uno.** La caché de fuentes de JSVG (`FontResolver`) es un `HashMap`
+     estático sin sincronizar, y los glifos de cada fuente también se guardan sin sincronizar: dos hilos dibujando texto
+     a la vez podían romperla. `PdfImages` dibuja un SVG con texto dentro de un cerrojo de clase (`JSVG_FONTS`); cada
+     fichero se dibuja una vez por conversión. Medido con `ConcurrencyProbe` (8 hilos × 10 rondas × 11 ejemplos): el
+     mismo tiempo que antes (7,8 a 10,1 s en los dos casos, en la misma máquina) y los mismos bytes que en secuencial.
+     *Dónde:* `PdfImages.draw`. *Alternativa:* `FontResolver.resolveWithoutCache`, que JSVG no deja elegir.
