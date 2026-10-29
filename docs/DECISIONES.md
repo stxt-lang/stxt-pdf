@@ -2067,3 +2067,14 @@ interpretaciones que salieron al implementarlas.
      desaparezca con el `Resources` ya indexado, y que pintar no pueda fallar con una `IOException` de una fuente.
      *Dónde:* `resources/FontFile`, `paint/PdfFonts`, `paint/SvgFonts`. *Alternativa:* guardar una copia propia de los
      bytes en `FontFile` (duplica la memoria de las fuentes) o seguir leyendo el fichero en cada conversión.
+
+### QA-08: lo que encontraron las pruebas de mutación
+
+323. **El max-content de un ítem de varias pistas se reparte contando las bases ya subidas.** Encontrado al revisar los
+     mutantes de `TrackSizing.distributeExcess` que sobrevivían: el límite que le faltaba al ítem se calculaba con las
+     bases de antes de repartir su min-content, así que lo ya dado se daba otra vez (columnas `50 auto 1fr`, hueco 10 y
+     un ítem de max-content 400 en las dos primeras: la `auto` llegaba a 480 y el área del ítem a 540). Ahora se cuenta
+     cada límite como el mayor de él y su base ya subida, como CSS, que iguala el límite a la base antes de ese paso
+     (la `auto` mide 340 y el área 400). No cambia ningún golden ni ejemplo. Aceptado por el usuario. *Dónde:*
+     `layout/grid/TrackSizing.distributeExcess`, §5.8, `TrackSizingTest`. *Alternativa:* dejarlo, con ítems de varias
+     pistas que agrandan su área más allá de su max-content.

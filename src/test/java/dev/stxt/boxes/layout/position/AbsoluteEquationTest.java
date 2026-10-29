@@ -54,6 +54,52 @@ class AbsoluteEquationTest {
         assertEquals(150, s.end(), 1e-9);
     }
 
+    /** Los cinco valores de la solución, y que suman el containing block. */
+    private static void assertSolution(AbsoluteEquation.Solution s, double cb, double start, double marginStart,
+                                       double size, double marginEnd, double end) {
+        assertEquals(new AbsoluteEquation.Solution(start, marginStart, size, marginEnd, end), s);
+        assertEquals(cb, s.start() + s.marginStart() + s.size() + s.marginEnd() + s.end(), 1e-9);
+    }
+
+    /**
+     * Cada caso de la ecuación (ESPECIFICACION.md §5.5) con márgenes distintos de 0 y todos los valores comprobados
+     * (QA-08, mutación: los tests de arriba miran un valor y con márgenes nulos).
+     */
+    @Test
+    void everyCaseWithMargins() {
+        double cb = 300;
+        OptionalDouble ms = v(7);
+        OptionalDouble me = v(11);
+        // Todo auto: posición estática; el tamaño, el contenido (vertical) o lo disponible si cabe (horizontal).
+        assertSolution(AbsoluteEquation.vertical(AUTO, AUTO, AUTO, ms, me, cb, 20, 45), cb, 20, 7, 45, 11, 217);
+        assertSolution(AbsoluteEquation.horizontal(AUTO, AUTO, AUTO, ms, me, cb, 20, new IntrinsicSizes(80, 400)),
+                cb, 20, 7, 262, 11, 0);
+        // Nada auto: los márgenes auto se reparten el sobrante (o el final se lo come), o se ignora el fin.
+        assertSolution(AbsoluteEquation.vertical(v(30), v(100), v(50), AUTO, AUTO, cb, 20, 45), cb, 30, 60, 100, 60, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), v(250), v(50), AUTO, AUTO, cb, 20, 45), cb, 30, 0, 250, -30, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), v(100), v(50), AUTO, me, cb, 20, 45), cb, 30, 109, 100, 11, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), v(100), v(50), ms, AUTO, cb, 20, 45), cb, 30, 7, 100, 113, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), v(100), v(50), ms, me, cb, 20, 45), cb, 30, 7, 100, 11, 152);
+        // Inicio y tamaño auto: el tamaño del contenido, pegado al fin.
+        assertSolution(AbsoluteEquation.vertical(AUTO, AUTO, v(50), ms, me, cb, 20, 45), cb, 187, 7, 45, 11, 50);
+        assertSolution(AbsoluteEquation.horizontal(AUTO, AUTO, v(50), ms, me, cb, 20, CONTENT), cb, 52, 7, 180, 11, 50);
+        assertSolution(AbsoluteEquation.horizontal(AUTO, AUTO, v(50), ms, me, cb, 20, new IntrinsicSizes(80, 400)),
+                cb, 0, 7, 232, 11, 50);
+        // Inicio y fin auto: posición estática.
+        assertSolution(AbsoluteEquation.vertical(AUTO, v(100), AUTO, ms, me, cb, 20, 45), cb, 20, 7, 100, 11, 162);
+        // Tamaño y fin auto: el tamaño del contenido desde el inicio.
+        assertSolution(AbsoluteEquation.vertical(v(30), AUTO, AUTO, ms, me, cb, 20, 45), cb, 30, 7, 45, 11, 207);
+        assertSolution(AbsoluteEquation.horizontal(v(30), AUTO, AUTO, ms, me, cb, 20, CONTENT), cb, 30, 7, 180, 11, 72);
+        assertSolution(AbsoluteEquation.horizontal(v(30), AUTO, AUTO, ms, me, cb, 20, new IntrinsicSizes(80, 400)),
+                cb, 30, 7, 252, 11, 0);
+        // Solo un auto: se despeja.
+        assertSolution(AbsoluteEquation.vertical(AUTO, v(100), v(50), ms, me, cb, 20, 45), cb, 132, 7, 100, 11, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), AUTO, v(50), ms, me, cb, 20, 45), cb, 30, 7, 202, 11, 50);
+        assertSolution(AbsoluteEquation.vertical(v(30), v(100), AUTO, ms, me, cb, 20, 45), cb, 30, 7, 100, 11, 152);
+        // Un tamaño despejado negativo vale 0, y el fin cede.
+        assertSolution(AbsoluteEquation.vertical(v(200), AUTO, v(150), ms, me, cb, 20, 45), cb, 200, 7, 0, 11, 82);
+    }
+
     @Test
     void verticalUsesContentHeight() {
         AbsoluteEquation.Solution s = AbsoluteEquation.vertical(AUTO, AUTO, v(0), AUTO, AUTO, 300, 0, 45);

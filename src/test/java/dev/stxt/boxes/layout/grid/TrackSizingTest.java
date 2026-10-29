@@ -111,4 +111,38 @@ class TrackSizingTest {
         double[] narrow = TrackSizing.size(t, List.of(new ItemContribution(0, 2, 100, 300)), 120, 0);
         assertArrayEquals(new double[]{60, 60}, narrow, 1e-9);
     }
+
+    /**
+     * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su min-content va solo a la auto, y su
+     * max-content se cuenta con las bases ya subidas (como en CSS, §5.8): el área del ítem mide su max-content
+     * (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (QA-08, mutación).
+     */
+    @Test
+    void itemSpanningAFixedAndAnAutoTrack() {
+        List<Track> t = ValueParser.list("50 auto 1fr").stream().map(Track::of).toList();
+        assertArrayEquals(new double[]{50, 340, 590},
+                TrackSizing.size(t, List.of(new ItemContribution(0, 2, 200, 400)), 1000, 10), 1e-9);
+        List<Track> intrinsic = ValueParser.list("50 auto").stream().map(Track::of).toList();
+        assertArrayEquals(new double[]{50, 340}, TrackSizing.size(intrinsic,
+                List.of(new ItemContribution(0, 2, 200, 400)), Double.POSITIVE_INFINITY, 10), 1e-9);
+    }
+
+    /** Los huecos que cruza el ítem cuentan como suyos, y el exceso se reparte a partes iguales entre las auto. */
+    @Test
+    void itemSpanningThreeTracksCountsItsGaps() {
+        List<Track> t = ValueParser.list("50 auto auto").stream().map(Track::of).toList();
+        // 300 − 50 − 2 × 10 = 230, 115 por pista auto.
+        assertArrayEquals(new double[]{50, 115, 115}, TrackSizing.size(t,
+                List.of(new ItemContribution(0, 3, 300, 300)), Double.POSITIVE_INFINITY, 10), 1e-9);
+    }
+
+    /**
+     * Un ítem de dos pistas sobre una que ya tiene un ítem propio: el min-content que falta se reparte entre las dos,
+     * y el max-content que falta se suma a lo que ya tienen (237.5 + 62.5 = 300).
+     */
+    @Test
+    void itemSpanningTracksThatAlreadyHaveContent() {
+        assertArrayEquals(new double[]{237.5, 62.5}, spanning("auto auto", Double.POSITIVE_INFINITY,
+                new ItemContribution(0, 1, 50, 200), new ItemContribution(0, 2, 100, 300)), 1e-9);
+    }
 }

@@ -207,12 +207,10 @@ public final class TrackSizing {
             }
         }
         double baseSum = gaps;
-        double limitSum = gaps;
         int intrinsicMin = 0;
         int intrinsicMax = 0;
         for (int i = from; i < to; i++) {
             baseSum += base[i];
-            limitSum += Math.max(limit[i], base[i]);
             if (tracks.get(i).minIntrinsic()) {
                 intrinsicMin++;
             }
@@ -227,6 +225,12 @@ public final class TrackSizing {
                     base[i] += excess / intrinsicMin;
                 }
             }
+        }
+        // Los límites, con las bases ya subidas (un límite nunca es menor que su base): lo que el ítem ya tiene
+        // no se vuelve a dar.
+        double limitSum = gaps;
+        for (int i = from; i < to; i++) {
+            limitSum += Math.max(limit[i], base[i]);
         }
         double limitExcess = it.maxContent() - limitSum;
         if (limitExcess > 0 && intrinsicMax > 0) {

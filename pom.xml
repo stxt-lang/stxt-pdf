@@ -126,4 +126,55 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): una pasada puntual sobre layout y fragment, no en la CI.
+             mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage
+             El informe queda en target/pit-reports/index.html. -->
+        <profile>
+            <id>pit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>1.30.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.pitest</groupId>
+                                <artifactId>pitest-junit5-plugin</artifactId>
+                                <version>1.2.3</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <targetClasses>
+                                <param>dev.stxt.boxes.layout.*</param>
+                                <param>dev.stxt.boxes.fragment.*</param>
+                            </targetClasses>
+                            <targetTests>
+                                <param>dev.stxt.boxes.*</param>
+                            </targetTests>
+                            <!-- Los que escriben en carpetas compartidas de target/ (los minions corren a la vez) o
+                                 arrancan otra JVM. -->
+                            <excludedTestClasses>
+                                <param>dev.stxt.boxes.golden.GoldenTest</param>
+                                <param>dev.stxt.boxes.examples.*</param>
+                                <param>dev.stxt.boxes.paint.PdfCanvasTest</param>
+                                <param>dev.stxt.boxes.concurrency.*</param>
+                            </excludedTestClasses>
+                            <excludedGroups>
+                                <param>perf</param>
+                            </excludedGroups>
+                            <threads>4</threads>
+                            <timestampedReports>false</timestampedReports>
+                            <outputFormats>
+                                <param>HTML</param>
+                                <param>CSV</param>
+                            </outputFormats>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

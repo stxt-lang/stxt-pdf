@@ -1176,7 +1176,9 @@ ambas; `auto` equivale a `minmax(min-content, max-content)`; `1fr` equivale a
    las fracciones).
 2. **Aportaciones del contenido:** las pistas intrínsecas toman el min-content o el max-content
    de sus ítems; el exceso de los ítems que ocupan varias pistas se reparte entre las pistas
-   intrínsecas que ocupan. Si alguna de ellas es una fracción, lo que le falta al ítem hasta su
+   intrínsecas que ocupan: primero lo que le falta hasta su min-content, a las bases, y después,
+   contando las bases ya subidas, lo que le falta hasta su max-content, a los límites (como en CSS,
+   el área del ítem no pasa de su max-content por repartirlo). Si alguna de ellas es una fracción, lo que le falta al ítem hasta su
    min-content se reparte solo entre las fracciones, en proporción a su `fr`: un ítem que cruza
    columnas `1fr` no desborda su área.
 3. **Maximizar:** el espacio libre se reparte a partes iguales entre las pistas no flexibles
