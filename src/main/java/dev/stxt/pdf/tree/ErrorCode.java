@@ -155,6 +155,14 @@ public enum ErrorCode {
     GRID_PLACEMENT,
     /** {@code Rotate origin} sin {@code Rotate}. */
     ROTATE_ORIGIN_WITHOUT_ROTATE,
+    /** {@code Column gap} o {@code Rule} en un {@code Multicol} con {@code Count: 1}. */
+    SINGLE_COLUMN,
+    /** {@code Rule color} sin {@code Rule}. */
+    RULE_COLOR_WITHOUT_RULE,
+    /** {@code Isolate: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
+    ISOLATE_IN_ITEM,
+    /** Un {@code Break} propio dentro de un {@code Absolute}, un {@code Fixed} o un {@code Relative} girado. */
+    BREAK_IN_UNBREAKABLE,
     /** {@code Inside} o {@code Decoration} en un {@code Relative} girado, que no se parte. */
     BREAK_IN_ROTATED,
 

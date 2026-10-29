@@ -46,7 +46,9 @@ Block:
 - Los encabezados ya evitan quedarse solos al final de una página: no hace falta `After: avoid`
   ([Encabezados](../componentes/heading.md)).
 - `Inside: avoid` no impide partir una caja que no cabe ni en una página entera.
-- Los elementos posicionados `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo.
+- Los elementos posicionados `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo. Tampoco
+  lo que hay dentro de ellos o de una caja girada: un `Break` escrito ahí es un error (salvo en las columnas de un
+  `Multicol`). El que llega de una regla de `Styles` simplemente no tiene efecto.
 
 ## Cajas partidas
 

@@ -17,8 +17,8 @@ saliendo al trabajar y solo toca ese.
 
 ### Documentación
 
-- **Repasar las decisiones de la referencia** (los bloques «Decisión»): están todas aplicadas, pero solo las de los hitos
-  1 a 7 se repasaron juntas; las demás se tomaron al implementar cada hito.
+- **`Gap` de dos valores en un `Flex` sin `Wrap`:** el hueco entre filas no tiene efecto (hay una sola línea) y no es un
+  error, a diferencia de `Lines` sin `Wrap`. Decidir si lo es.
 
 ### Accesibilidad
 

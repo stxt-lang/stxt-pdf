@@ -50,10 +50,10 @@ de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Mul
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Isolate` | booleano | `false` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Solo en `Block` y `Relative`. |
+| `Isolate` | booleano | `false` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Solo en `Block` y `Relative`, y no en un ítem de `Flex` o `Grid` (`ISOLATE_IN_ITEM`). |
 
 > **Decisión:** `Isolate` solo está donde puede tener efecto: `Absolute`, `Fixed` y los ítems ya aíslan, y `Flex`, `Grid`
-> y `Text` no tienen hijos en flujo de bloque. Un `Block` que es ítem lo admite aunque no tenga efecto.
+> y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Relative` que es ítem, `Isolate: true` es un error.
 
 ## Tamaños intrínsecos
 

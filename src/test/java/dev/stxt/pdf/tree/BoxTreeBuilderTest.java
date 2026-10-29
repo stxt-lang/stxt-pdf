@@ -250,13 +250,33 @@ class BoxTreeBuilderTest {
         Box root = build(document(
                 "\tRelative:", "\t\tRotate: -8.5",
                 "\tAbsolute:", "\t\tRotate: 90", "\t\tRotate origin: bottom right",
-                "\tFixed:", "\t\tRotate: 360", "\t\tRotate origin: top",
-                "\tImage: test/square.png", "\t\tRotate: -360",
+                "\tFixed:", "\t\tRotate: 359.5", "\t\tRotate origin: top",
+                "\tImage: test/square.png", "\t\tRotate: -359",
                 "\tRelative:")).sections().get(0).box();
         assertEquals(new dev.stxt.pdf.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation());
         assertEquals(new dev.stxt.pdf.model.Rotation(90, 1, 1), root.children().get(1).style().rotation());
-        assertEquals(new dev.stxt.pdf.model.Rotation(360, 0.5, 0), root.children().get(2).style().rotation());
-        assertEquals(-360, root.children().get(3).style().rotation().degrees(), 1e-9);
+        assertEquals(new dev.stxt.pdf.model.Rotation(359.5, 0.5, 0), root.children().get(2).style().rotation());
+        assertEquals(-359, root.children().get(3).style().rotation().degrees(), 1e-9);
         assertEquals(null, root.children().get(4).style().rotation());
+    }
+
+    /**
+     * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
+     * (referencia/comun/errores.md): {@code Isolate: false} en un ítem es el valor por defecto, un {@code Break} que
+     * llega de una regla no se mira, y en las columnas de un {@code Multicol} los cortes tienen efecto aunque esté
+     * dentro de un {@code Absolute}.
+     */
+    @Test
+    void breaksAndIsolateWithoutEffectOnlyFailWhenTheElementWritesThem() {
+        build(document(
+                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
+                "\t\t\t\tSize: 10", "\t\tElement: Paragraph", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
+                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate: false",
+                "\tAbsolute:", "\t\tParagraph: Sello",
+                "\t\tMulticol:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
+                "\t\t\tBlock:"));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
+                "\tFixed:", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: page", "\tBlock:")));
+        assertEquals(ErrorCode.BREAK_IN_UNBREAKABLE, e.errorCode());
     }
 }

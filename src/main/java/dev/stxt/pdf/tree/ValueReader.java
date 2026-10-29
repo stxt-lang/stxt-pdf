@@ -183,7 +183,10 @@ final class ValueReader {
         }
     }
 
-    /** {@code Rotate} (referencia/comun/estructura.md): grados de −360 a 360, sin 0, que no giraría nada. */
+    /**
+     * {@code Rotate} (referencia/comun/capas-y-giro.md): grados entre −360 y 360, sin 0 ni las vueltas enteras, que no
+     * girarían nada.
+     */
     static double angle(Node n) {
         double v;
         try {
@@ -191,9 +194,9 @@ final class ValueReader {
         } catch (NumberFormatException ex) {
             throw error(n, ErrorCode.VALUE_SYNTAX, "Se esperaba un número de grados: " + n.getText().trim());
         }
-        if (v == 0 || Math.abs(v) > 360) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate admite de -360 a 360 grados, sin 0, que no gira "
-                    + "nada: " + n.getText().trim());
+        if (v == 0 || Math.abs(v) >= 360) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate admite grados entre -360 y 360, sin 0 ni 360 ni -360, "
+                    + "que no giran nada: " + n.getText().trim());
         }
         return v;
     }

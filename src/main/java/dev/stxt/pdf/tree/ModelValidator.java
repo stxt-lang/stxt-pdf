@@ -24,6 +24,7 @@ import static dev.stxt.pdf.tree.PropertyKey.BREAK_INSIDE;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.RULE;
+import static dev.stxt.pdf.tree.PropertyKey.RULE_COLOR;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_LINES;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_MAIN_AXIS;
@@ -68,13 +69,27 @@ final class ModelValidator {
     }
 
     /**
-     * Un {@code Multicol} fija sus columnas con {@code Count}, {@code Column width} o los dos, y
-     * su línea entre columnas cabe en el hueco (referencia/componentes/multicol.md).
+     * Un {@code Multicol} fija sus columnas con {@code Count}, {@code Column width} o los dos; con una sola columna no
+     * hay hueco ni línea entre columnas, {@code Rule color} necesita {@code Rule} y la línea cabe en el hueco
+     * (referencia/componentes/multicol.md).
      */
     static void validateMulticol(Style s, int line) {
         if (s.multicol().count() == null && s.multicol().columnWidth() == null) {
             throw error(line, ErrorCode.MULTICOL_COLUMNS, "Un Multicol necesita Count, Column width o los dos: "
                     + "Count fija el número de columnas y Column width su ancho mínimo");
+        }
+        if (s.multicol().count() != null && s.multicol().count() == 1) {
+            for (String p : List.of(COLUMN_GAP, RULE)) {
+                if (s.isDeclared(p)) {
+                    throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(RULE) ? "Rule" : "Column gap")
+                            + " no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo");
+                }
+            }
+        }
+        if (s.isDeclared(RULE_COLOR) && !s.isDeclared(RULE)) {
+            throw error(s.line(RULE_COLOR), ErrorCode.RULE_COLOR_WITHOUT_RULE,
+                    "Rule color no tiene efecto sin Rule, que es la que pinta la línea entre columnas: declara su "
+                            + "grosor o quítalo");
         }
         if (s.multicol().rule() > s.multicol().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (línea " + s.line(COLUMN_GAP) + ")"

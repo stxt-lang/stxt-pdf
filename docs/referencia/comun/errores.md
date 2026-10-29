@@ -12,6 +12,28 @@ se obtiene.
 - **Se para en el primer error**: acumularlos daría errores en cascada (una caja mal definida provoca otros en sus
   hijos).
 
+## Lo que no tiene efecto
+
+Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Lines` sin `Wrap`, `Rotate origin`
+sin `Rotate`, `Rule color` sin `Rule`, un margen `auto` que no centra, un `Break` dentro de un `Absolute`… No lo es, a
+propósito:
+
+- **Escribir el valor por defecto:** `Span: 1 1`, `Isolate: false`, `Start: 1`. No contradice nada.
+- **Lo que se hereda:** una propiedad de `Typography` vale para los descendientes, así que no se comprueba si la caja que
+  la declara la usa (`Numbered` en un `Block`, `Small caps` con `Transform: uppercase`).
+- **El aspecto que depende de otra propiedad:** `Border color` sin `Border` y `Radius` sin fondo, borde ni imagen. Suelen
+  venir de una regla de clase que comparten cajas con y sin borde.
+- **Un `Break` que llega de una regla** a un elemento dentro de una caja que no se parte: una regla por tipo
+  (`Element: Paragraph`) daría un error en cada párrafo de un pie ([Cortes](cortes.md#cortes-forzados)).
+- **Lo que puede llegar después:** una regla que no se aplica a ningún elemento e `Inherit fixed: false` sin `Fixed` en el
+  documento. Una plantilla puede añadirlos.
+- **Lo que depende de la maquetación:** un mínimo y un máximo en unidades distintas que chocan (gana el mínimo,
+  [La caja](caja.md#mínimos-y-máximos)) y `Fill: auto` en un `Multicol` sin alto que llenar.
+- **Las propiedades de un `Markdown` que su contenido no usa** (`Bullet` sin listas): el contenido cambia a menudo
+  ([Markdown](../componentes/markdown.md)).
+- **El hueco entre filas** de un `Gap` de dos valores en un `Flex` sin `Wrap`, que tiene una sola línea
+  ([Flex](../componentes/flex.md#alineación-en-el-eje-principal)).
+
 ## Niveles de validación
 
 1. **Sintaxis STXT y schema** ([Estructura](estructura.md#schema)): qué hijos admite cada elemento, cuántos, valores
@@ -31,7 +53,7 @@ se obtiene.
 | `SECTION_EMPTY` | Una `Section` tiene contenido: algún elemento que no sea un `Fixed` (línea de la sección) | `La sección no tiene contenido: sin elementos (los Fixed no cuentan…) no tiene ninguna página` |
 | `PAGE_NUMBER_UNAVAILABLE` | Un texto con `{page}` o `{pages}` no sale en una página sin número (`Page numbering: none`); línea del texto | `El texto de la caja pie tiene {page} o {pages} y sale en una página sin número…` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([Valores](valores.md)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio`, `For column` que no es un número | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([Valores](valores.md#tipos-de-valor)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos; `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` de −360 a 360 y distinto de 0; `Rotate origin` con una o dos palabras clave, como mucho una por eje; `For column` de menor a mayor | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([Valores](valores.md#tipos-de-valor)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos; `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet` con marcadores sin numerar y `Numbering` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` entre −360 y 360, sin 0 ni las vueltas enteras; `Rotate origin` con una o dos palabras clave, como mucho una por eje; `For column` de menor a mayor | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -58,9 +80,11 @@ se obtiene.
 | `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
 | `MULTICOL_COLUMNS` | Un `Multicol` declara `Count`, `Column width` o los dos ([Multicol](../componentes/multicol.md)) | `Un Multicol necesita Count, Column width o los dos…` |
 | `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
+| `SINGLE_COLUMN` | Un `Multicol` con `Count: 1` no declara `Column gap` ni `Rule`, que separan columnas ([Multicol](../componentes/multicol.md)) | `Column gap no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo` |
+| `RULE_COLOR_WITHOUT_RULE` | `Rule color` va con `Rule` | `Rule color no tiene efecto sin Rule, que es la que pinta la línea entre columnas…` |
 | `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
-| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto de [Markdown](../componentes/markdown.md#el-subconjunto); un texto con `Inline: markdown` solo admite párrafos con formato en línea ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)) (línea del bloque o del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas, bloques de código y…` |
+| `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto de [Markdown](../componentes/markdown.md#el-subconjunto), y una fila de tabla no tiene más celdas que la cabecera; un texto con `Inline: markdown` solo admite párrafos con formato en línea ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)) (línea del bloque o del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas, bloques de código y…` |
 | `MARKDOWN_PROPERTY_MISSING` | Un `Markdown` con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns`; con código, `Code font` (línea de la lista, la tabla o el código) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
 | `LINK_SCHEME` | El destino de un enlace es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito ([Enlaces](enlaces.md)) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
@@ -76,6 +100,7 @@ se obtiene.
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([La caja](caja.md#márgenes-auto)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
+| `ISOLATE_IN_ITEM` | `Isolate: true` no va en un ítem de `Flex` o `Grid`, que ya corta el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)) | `Isolate no tiene efecto en un ítem de Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
@@ -83,6 +108,7 @@ se obtiene.
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([Valores](valores.md#alto-definido)) | `Height usa un porcentaje de un alto que no es definido…` |
 | `ROTATE_ORIGIN_WITHOUT_ROTATE` | `Rotate origin` solo con `Rotate` | `Rotate origin no tiene efecto sin Rotate: declara el giro o quítalo` |
 | `BREAK_IN_ROTATED` | Un `Relative` girado no declara `Inside` ni `Decoration`, tampoco en una regla ([Capas y giro](capas-y-giro.md#giro-rotate)) | `Inside no tiene efecto en un Relative girado, que no se parte entre páginas: quítalo` |
+| `BREAK_IN_UNBREAKABLE` | Un elemento dentro de un `Absolute`, un `Fixed` o un `Relative` girado, que no se parten, no escribe `Break` (tampoco la `Row` de una celda); lo que llega de una regla no se comprueba ([Cortes](cortes.md#cortes-forzados)) | `Before no tiene efecto dentro de un Absolute, que no se parte entre páginas: quítalo` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella ([Grid](../componentes/grid.md#colocación)) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` de un `Markdown` | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |

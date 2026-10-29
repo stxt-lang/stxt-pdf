@@ -44,9 +44,9 @@ Document (dev.stxt.pdf):
 |---|---|---|
 | `Count` | — | El número de columnas |
 | `Column width` | — | El ancho mínimo de una columna: caben tantas como permita el ancho. Con `Count`, como mucho `Count` |
-| `Column gap` | `0` | El hueco entre columnas |
-| `Rule` | sin línea | El grosor de una línea entre columnas, en medio del hueco; no puede ser más ancha que el hueco |
-| `Rule color` | el del texto | El color de esa línea |
+| `Column gap` | `0` | El hueco entre columnas; con `Count: 1` es un error, porque no hay columnas que separar |
+| `Rule` | sin línea | El grosor de una línea entre columnas, en medio del hueco; no puede ser más ancha que el hueco, y con `Count: 1` es un error |
+| `Rule color` | el del texto | El color de esa línea; solo con `Rule` |
 | `Fill` | `balance` | `balance`: en la última página, las columnas quedan igual de altas; `auto`: se llenan en orden |
 
 `Count`, `Column width` o los dos son obligatorios. Admite además `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`.

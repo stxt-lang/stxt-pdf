@@ -1,0 +1,19 @@
+# Case: Column gap con Count: 1, que no tiene dos columnas que separar
+# Code: SINGLE_COLUMN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Multicol:
+			Count: 1
+			Column gap: 20
+			Text: Hola

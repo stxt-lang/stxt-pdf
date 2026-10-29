@@ -1,0 +1,14 @@
+# Case: Rotate: 360, una vuelta entera que deja la caja como estaba
+# Code: VALUE_NOT_ALLOWED
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Section:
+		Relative:
+			Rotate: 360
+			Box:
+				Height: 10

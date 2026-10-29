@@ -23,9 +23,9 @@ Multicol:
 |---|---|---|---|
 | `Count` | entero ≥ 1 | — | Número de columnas; con `Column width`, el máximo. |
 | `Column width` | número > 0 | — | Ancho mínimo de las columnas: caben tantas como permita el ancho. Solo puntos. |
-| `Column gap` | número ≥ 0 | `0` | Separación entre columnas. Solo puntos. |
-| `Rule` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Column gap` (`COLUMN_RULE_WIDTH`). |
-| `Rule color` | color | el `Color` del texto | No afecta al layout. |
+| `Column gap` | número ≥ 0 | `0` | Separación entre columnas. Solo puntos. Con `Count: 1` es un error (`SINGLE_COLUMN`). |
+| `Rule` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Column gap` (`COLUMN_RULE_WIDTH`); con `Count: 1` es un error (`SINGLE_COLUMN`). |
+| `Rule color` | color | el `Color` del texto | Solo con `Rule` (`RULE_COLOR_WITHOUT_RULE`). No afecta al layout. |
 | `Fill` | `balance`, `auto` | `balance` | `balance` iguala las columnas de la última página; `auto` las llena en orden. |
 
 `Count`, `Column width` o los dos son obligatorios (`MULTICOL_COLUMNS`). No van en las reglas de `Styles`, que solo

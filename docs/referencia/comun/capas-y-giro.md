@@ -32,7 +32,7 @@ mayores. Los `Fixed` del documento se pintan antes que los de la sección
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Rotate` | número de −360 a 360, sin `0` | — | Gira la caja al pintarla, en grados en el sentido de las agujas del reloj. |
+| `Rotate` | número entre −360 y 360, sin `0` | — | Gira la caja al pintarla, en grados en el sentido de las agujas del reloj. |
 | `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center` | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`…). Solo con `Rotate` (`ROTATE_ORIGIN_WITHOUT_ROTATE`). |
 
 Una caja con `Rotate` se pinta girada tantos grados como dice alrededor de su `Rotate origin` (el centro de su caja de
@@ -53,7 +53,7 @@ suma al de fuera.
 - **Texto.** Sigue siendo texto seleccionable y nítido con cualquier ángulo, y el orden de lectura no cambia. Un enlace en
   una caja girada se pulsa en la zona girada.
 
-`Rotate` va entre −360 y 360 grados, sin `0`, que no gira nada (`VALUE_NOT_ALLOWED`); 360 y −360 se admiten.
+`Rotate` va entre −360 y 360 grados, sin incluirlos; `0`, `360` y `−360`, que no giran nada, son `VALUE_NOT_ALLOWED`.
 `Rotate origin` son una o dos palabras clave en cualquier orden (`top left` = `left top`); el eje que no se nombra es
 `center`. Dos del mismo eje, o algo que no es una palabra clave, es `VALUE_NOT_ALLOWED`.
 

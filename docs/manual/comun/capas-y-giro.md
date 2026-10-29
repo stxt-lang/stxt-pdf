@@ -27,8 +27,9 @@ dentro tenga una `Layer` mayor.
 
 ## Girar una caja (`Rotate`)
 
-`Relative`, `Absolute`, `Fixed` e `Image` admiten `Rotate`: un ángulo en grados, en el sentido de las agujas del reloj (de
-−360 a 360, sin 0). Gira todo lo que tiene la caja: fondo, borde, texto, imágenes y lo que contiene.
+`Relative`, `Absolute`, `Fixed` e `Image` admiten `Rotate`: un ángulo en grados, en el sentido de las agujas del reloj
+(entre −360 y 360, sin 0 ni las vueltas enteras, que no giran nada). Gira todo lo que tiene la caja: fondo, borde, texto,
+imágenes y lo que contiene.
 
 ```
 Absolute:

@@ -41,6 +41,12 @@ El motor no adivina: lo que no tendría efecto o se contradice es un error, para
 sale en el PDF. Un `Margin: auto` que no centra, un `Lines` en un `Flex` sin `Wrap` o un `Rotate origin` sin `Rotate` no
 harían nada, y es mejor saberlo.
 
+Hay excepciones pensadas para no estorbar: escribir el valor por defecto (`Span: 1 1`), lo que se hereda (una
+`Typography` vale para lo que hay dentro), un `Border color` sin `Border` o un `Radius` sin nada que redondear (suelen
+venir de una clase compartida), lo que llega de una regla a donde no puede actuar, una regla que todavía no se aplica a
+nada y las propiedades de un `Markdown` que su contenido no usa. La lista completa está en la
+[referencia](../../referencia/comun/errores.md#lo-que-no-tiene-efecto).
+
 ## Errores que no son del documento
 
 Una carpeta de recursos que no existe, un fichero de fuente estropeado o un documento que pide demasiado (más de 2000

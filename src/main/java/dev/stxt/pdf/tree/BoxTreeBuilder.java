@@ -10,6 +10,7 @@ import dev.stxt.pdf.model.Rotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -224,6 +225,7 @@ public final class BoxTreeBuilder {
         String id = properties(ctx, n, reader, s, parent);
         reader.check(n, wrapper, s, position);
         validateRotation(s);
+        withoutEffect(ctx, n, wrapper, s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
@@ -240,9 +242,14 @@ public final class BoxTreeBuilder {
             listItem(ctx, n, box, parent, number);
         }
         boolean outerFixed = ctx.insideFixed;
+        String outerUnbreakable = ctx.unbreakable;
         ctx.insideFixed |= s.position() == Position.FIXED;
+        if (ctx.unbreakable == null) {
+            ctx.unbreakable = unbreakable(s);
+        }
         reader.content(this, ctx, n, box);
         ctx.insideFixed = outerFixed;
+        ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
             String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered());
@@ -254,6 +261,41 @@ public final class BoxTreeBuilder {
             markerLine(box);
         }
         return box;
+    }
+
+    /**
+     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate} en un ítem de {@code Flex} o {@code
+     * Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row} de una
+     * celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se mira
+     * aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
+     */
+    private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
+        boolean item = wrapper != null && !is(wrapper, "row");
+        if (item && s.isolate()) {
+            throw error(s.line("isolate"), ErrorCode.ISOLATE_IN_ITEM, "Isolate no tiene efecto en un ítem de "
+                    + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo");
+        }
+        if (ctx.unbreakable == null) {
+            return;
+        }
+        for (InlineNode owner : wrapper == null || item ? List.of(n) : List.of(n, wrapper)) {
+            Optional<Node> group = child(owner, "break");
+            if (group.isPresent() && !inline(group.get()).getChildren().isEmpty()) {
+                Node p = inline(group.get()).getChildren().get(0);
+                throw error(p, ErrorCode.BREAK_IN_UNBREAKABLE, p.getName() + " no tiene efecto dentro de "
+                        + ctx.unbreakable + ", que no se parte entre páginas: quítalo");
+            }
+        }
+    }
+
+    /** Cómo se nombra la caja en los mensajes si no se parte entre páginas, o {@code null} si se parte. */
+    private static String unbreakable(Style s) {
+        return switch (s.position()) {
+            case ABSOLUTE -> "un Absolute";
+            case FIXED -> "un Fixed";
+            case RELATIVE -> s.rotation() != null ? "un Relative girado" : null;
+            default -> null;
+        };
     }
 
     /**

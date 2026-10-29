@@ -187,9 +187,9 @@ class SchemaCoverageTest {
                 Set.of("Marker")));
         t.put("List item", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\tList item:\n\t\t\t{}\n"
                 + "\t\t\tParagraph: Uno"));
-        // Rule necesita un Column gap que la contenga.
-        t.put("Multicol", new Template(HEADER + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\t{}\n"
-                + "\t\tText: Hola", Set.of("Count", "Column gap")));
+        // Rule necesita un Column gap que la contenga, y Rule color, una Rule.
+        t.put("Multicol", new Template(HEADER + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 1\n"
+                + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Column gap", "Rule")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
         // Un índice necesita algún encabezado que listar.

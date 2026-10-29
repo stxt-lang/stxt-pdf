@@ -150,6 +150,19 @@ class MarkdownBuilderTest {
         assertEquals(List.of(run("120", "b")), t.runs().get(cell));
     }
 
+    /**
+     * Una fila con más celdas que la cabecera es un error, en la línea de la fila (referencia/componentes/markdown.md);
+     * una barra escapada no separa celdas, y las de los extremos son opcionales.
+     */
+    @Test
+    void rowsWithMoreCellsThanTheHeadAreAnError() {
+        translate(List.of("Table columns: auto"), "A | B", "--|--", "1 \\| 2 | 3", "| x | y |");
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> translate(
+                List.of("Table columns: auto"), "| A | B |", "|---|---|", "| 1 | 2 |", "3 | 4 | 5"));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.errorCode());
+        assertEquals(19, e.line());
+    }
+
     @Test
     void autoColumns() {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "| A |", "|---|", "| 1 |");

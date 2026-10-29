@@ -102,7 +102,7 @@ final class MarkdownBuilder {
     static Translation translate(InlineNode markdown) {
         Node content = child(markdown, "content").orElseThrow();
         // El bloque Content >> empieza en la línea siguiente a la suya.
-        Translator t = new Translator(markdown, content.getLine() + 1, false);
+        Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1));
         List<InlineNode> elements = t.blocks(PARSER.parse(content.getText()), false);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown necesita contenido en Content");
@@ -119,7 +119,7 @@ final class MarkdownBuilder {
      * @param firstLine línea del documento donde empieza el texto
      */
     static List<TextRun> inline(String text, int firstLine) {
-        Translator t = new Translator(null, firstLine, true);
+        Translator t = new Translator(null, firstLine, true, new String[0]);
         TextRun.Joiner out = new TextRun.Joiner();
         boolean first = true;
         for (org.commonmark.node.Node b = PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
@@ -153,9 +153,12 @@ final class MarkdownBuilder {
         private int numberingDepth;
         /** Es el texto en línea de un {@code Inline: markdown}, no un elemento {@code Markdown}. */
         private final boolean inlineOnly;
+        /** Las líneas del Markdown, para contar las celdas de una fila de tabla, que el parser no conserva. */
+        private final String[] source;
 
-        Translator(InlineNode markdown, int firstLine, boolean inlineOnly) {
+        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source) {
             this.markdown = markdown;
+            this.source = source;
             this.firstLine = firstLine;
             this.inlineOnly = inlineOnly;
             this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet");
@@ -333,7 +336,34 @@ final class MarkdownBuilder {
             table.addChild(node("Columns", "repeat(" + columns + ", " + track + ")", mode.getLine()));
             table.addChild(rows("Head", head));
             table.addChild(rows("Body", body));
+            for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {
+                extraCells(r, columns);
+            }
             return table;
+        }
+
+        /**
+         * Una fila con más celdas que la cabecera es un error (referencia/componentes/markdown.md#tablas): el parser
+         * descarta las que sobran, así que se cuentan en el texto de la fila, separadas por {@code |} sin escapar.
+         */
+        private void extraCells(org.commonmark.node.Node row, int columns) {
+            if (row.getSourceSpans().isEmpty()) {
+                return;
+            }
+            String text = source[row.getSourceSpans().get(0).getLineIndex()].strip();
+            int cells = 1;
+            for (int i = 0; i < text.length(); i++) {
+                char ch = text.charAt(i);
+                if (ch == '\\') {
+                    i++;
+                } else if (ch == '|' && i > 0 && i < text.length() - 1) {
+                    cells++;
+                }
+            }
+            if (cells > columns) {
+                throw error(line(row), ErrorCode.MARKDOWN_UNSUPPORTED, "La fila tiene " + cells + " celdas y la "
+                        + "cabecera " + columns + ": quita las que sobran, que Markdown descartaría sin avisar");
+            }
         }
 
         /** {@code Head} o {@code Body} con sus filas; las celdas no tienen línea propia: la de su fila. */

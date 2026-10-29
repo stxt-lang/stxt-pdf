@@ -1,0 +1,24 @@
+# Case: Una fila de tabla con Break dentro de un Fixed, que se repite y no se parte
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 23
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Cuerpo
+		Fixed:
+			Table:
+				Columns: 1fr
+				Body:
+					Row:
+						Break:
+							Inside: avoid
+						Cell: Pie

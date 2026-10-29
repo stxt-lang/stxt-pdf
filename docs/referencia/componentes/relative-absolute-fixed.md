@@ -22,9 +22,10 @@ también `Break` e `Isolate`.
 > (`Absolute` > `Flex`), con una caja más. *Alternativa descartada:* que fueran envoltorios de un elemento, como `Area`, que
 > se leería peor en el caso habitual (un sello, una cabecera).
 
-> **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página. Sus
-> descendientes sí lo admiten aunque tampoco se parten, para que una regla como `Element: Paragraph` con `After: avoid`
-> no dé un error en cada párrafo de un pie.
+> **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página. Un
+> `Break` escrito en un elemento de dentro es un error (`BREAK_IN_UNBREAKABLE`, [Cortes](../comun/cortes.md#cortes-forzados));
+> el que llega de una regla no, para que `Element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
+> *Alternativa descartada:* comprobar también lo que llega de las reglas.
 
 ## `Relative`
 

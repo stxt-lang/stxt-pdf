@@ -177,9 +177,12 @@ enum ElementReader {
             multicol.addChild(flow);
             ctx.definiteHeight.put(flow, false);
             boolean outer = ctx.insideMulticol;
+            String outerUnbreakable = ctx.unbreakable;
             ctx.insideMulticol = true;
+            ctx.unbreakable = null;
             builder.buildContent(ctx, n, flow);
             ctx.insideMulticol = outer;
+            ctx.unbreakable = outerUnbreakable;
         }
     },
 

@@ -78,7 +78,7 @@ Admite además `Id`, `Class`, `Box`, `Typography` (que hereda todo lo de dentro)
 | `#` … `######` | `Heading 1` … `Heading 6` |
 | Un párrafo | `Paragraph` |
 | `-`, `*`, `+` y `1.` | `List`, con viñetas o numerada |
-| Una tabla | `Table`, con la primera fila de cabecera; la alineación de cada columna sale de la fila de separación (`:--`, `--:`) |
+| Una tabla | `Table`, con la primera fila de cabecera; la alineación de cada columna sale de la fila de separación (`:--`, `--:`). A una fila con menos celdas que la cabecera se le añaden vacías; una con más es un error |
 | `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` | Formato dentro de la línea |
 | `[texto](destino)` | Un enlace, subrayado ([Referencias y enlaces](../comun/referencias-y-enlaces.md)) |
 | `` `código` `` | Código en línea, con `Code font` |

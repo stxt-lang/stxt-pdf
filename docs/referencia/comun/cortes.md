@@ -62,8 +62,9 @@ un salto a la columna siguiente (que, en la última columna, es también de pág
 - Un corte forzado al principio de una página (o de una columna) se ignora: no deja páginas en blanco. Lo mismo el
   `After: page` de la última caja de una sección.
 - Un corte de página dentro de un `Multicol` deja sin llenar las columnas que quedan en esa página.
-- Dentro de una caja que no se parte (un `Relative` girado, un `Absolute`), los cortes forzados de sus descendientes no
-  tienen efecto.
+- Dentro de una caja que no se parte (un `Absolute`, un `Fixed` o un `Relative` girado), ningún `Break` tiene efecto. Si
+  lo escribe el propio elemento (o la `Row` de una celda) es un error (`BREAK_IN_UNBREAKABLE`); si llega de una regla de
+  `Styles`, no tiene efecto y no es un error. Las columnas de un `Multicol` de dentro sí se cortan, y sus `Break` cuentan.
 
 > **Decisión:** un corte de página atraviesa las columnas de un `Multicol`. *Límite:* dentro de un ítem de un `Flex` o
 > un `Grid` partido en paralelo, un corte de página actúa como uno de columna.

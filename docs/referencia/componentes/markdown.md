@@ -147,11 +147,13 @@ izquierdo, que se suele declarar en la regla `Element: List` ([List](list.md)).
 
 Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`) como `Align` de sus celdas; sin alineación,
 la de la caja. Una celda con texto es una `Cell` con valor; una vacía, una `Cell` vacía. A una fila con menos celdas que la
-cabecera se le añaden celdas vacías y las que sobran se descartan. Las celdas reciben las reglas de las celdas de cualquier
-tabla ([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Header`).
+cabecera se le añaden celdas vacías, como en GFM; una con más es `MARKDOWN_UNSUPPORTED`, con la línea de la fila (una `\|`
+escapada no separa celdas). Las celdas reciben las reglas de las celdas de cualquier tabla
+([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Header`).
 
-> **Decisión:** las filas con celdas de menos o de más siguen a GFM, sin error, a diferencia de una `Table` escrita en
-> STXT.
+> **Decisión:** las celdas que faltan se completan, como en GFM, porque una celda vacía al final de la fila se escribe a
+> menudo sin su barra; las que sobran son un error, porque GFM las descarta sin avisar. *Alternativa descartada:* seguir
+> a GFM también con las que sobran.
 
 ## Estilo
 

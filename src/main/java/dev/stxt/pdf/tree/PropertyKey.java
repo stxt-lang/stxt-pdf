@@ -46,6 +46,7 @@ public final class PropertyKey {
     public static final String COUNT = "count";
     public static final String COLUMN_GAP = "column-gap";
     public static final String RULE = "rule";
+    public static final String RULE_COLOR = "rule-color";
 
     // Break
     public static final String BREAK_BEFORE = "break-before";

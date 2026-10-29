@@ -1,0 +1,20 @@
+# Case: Rule color sin Rule, que es la que pinta la línea
+# Code: RULE_COLOR_WITHOUT_RULE
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Multicol:
+			Count: 2
+			Column gap: 20
+			Rule color: #999999
+			Text: Hola
