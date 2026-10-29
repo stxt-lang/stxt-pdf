@@ -14,7 +14,7 @@ como *no verificado*. Los programas con que se midió están en [`tools/qa/`](..
 1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
 2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
    evidencia, propuesta y criterio de aceptación.
-3. Ejecuta `mvn test` para partir de verde (1388 tests tras la sesión 6) y comprueba que `git status` queda limpio.
+3. Ejecuta `mvn test` para partir de verde (1493 tests tras la decisión abierta 5) y comprueba que `git status` queda limpio.
 
 **Al terminar una sesión:**
 
@@ -1039,4 +1039,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · PIT: `MulticolLayout` y `Overflow` | `OverflowTest` (el culpable y las medidas de cada mensaje) y tests de Multicol; `Overflow` de 62 a 83 % de mutantes detectados y `MulticolLayout` de 74 a 96 % (total 88,1 %). Un mensaje con «su su» corregido y tres trozos de código sin efecto quitados. 1447 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: `FlexLayout` y `Paginator` | Tests de flex (huecos, márgenes en los límites, columnas con `Wrap`, estirado) y del `Paginator` (portadas, mensajes, `{number of}`, líneas y culpables de los errores, límite de páginas entre secciones, tercera cifra de `{page}`); Flex de 84 a 91 % y `Paginator` de 86 a 91 % (total 89,2 %). Sin cambios en el motor. 1465 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: Grid y el resto | Tests de Grid, `TrackSizing`, `Placement`, posicionamiento, listas, imágenes, texto y fragmentación; total 91,8 % de mutantes detectados. Encontrado, sin corregir: una caja con `Height` igual a su contenido desborda al partirse entre páginas (decisión abierta 5). 1492 tests en verde; los 72 PDF y los 54 SVG, iguales. | Decidir la decisión abierta 5 |
-| 2026-10-29 | Fuera del plan · Decisión abierta 5 | Un fragmento cortado de una caja con alto definido consume solo lo que ocupa su contenido (sigue llegando al final de la página): una caja con `Height` igual a su contenido ya no desborda al partirse. Decisión 325, §5.10. Ningún golden ni ejemplo cambia. | — |
+| 2026-10-29 | Fuera del plan · Decisión abierta 5 | Un fragmento cortado de una caja con alto definido consume solo lo que ocupa su contenido (sigue llegando al final de la página): una caja con `Height` igual a su contenido ya no desborda al partirse. Decisión 325, §5.10. Ningún golden ni ejemplo cambia; 1493 tests en verde. | — |

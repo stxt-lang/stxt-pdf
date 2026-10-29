@@ -11,11 +11,11 @@
 - ~~Más pdf friendly: Tamaños de páginas estilo A4, Letter, etc. + rotación~~ (hito 30: `Paper` y `Orientation` en `Media`). Queda: que cada página o sección tenga su propio tamaño u orientación (una página apaisada dentro de un documento vertical).
 - Renombre de elementos para que no sea tan "css copy" y más "css inspired". Es como un repensado de css
 - ~~Revisar ThreadSafe~~ (revisado el 2026-10-28: ver «Hilos» en `docs/ROADMAP-QA-ARQ.md`; tareas TS-01 a TS-05)
-- ~~Revisar rendimiento~~ (revisado el 2026-10-28: ver «Rendimiento» en `docs/ROADMAP-QA-ARQ.md`; tareas PF-01 a PF-05)
+- ~~Revisar rendimiento~~ (revisado el 2026-10-28: ver «Rendimiento» en `docs/ROADMAP-QA-ARQ.md`; tareas PF-01 a PF-06)
 - Como extender fácil? Valorar alternativas
 - Httpservice para probar, que se pueda ejecutar en maven, etc. 
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder poner listeners, e integrar en otros lados
-- ~~Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS~~ (revisado el 2026-10-28: `docs/ROADMAP-QA-ARQ.md`; las correcciones están pendientes, en sesiones aparte)
+- ~~Revisión código desde punto de vista de QA y Arquitectura: SOLID, DRY, KISS~~ (revisado el 2026-10-28: `docs/ROADMAP-QA-ARQ.md`; todas las tareas, hechas el 2026-10-29)
 - ~~Quizá necesitamos un Preformated o Code Block para el código monoespaciado~~ (hitos 29 y 34: `White space: pre` y el elemento generado `Code block`)
 - Un docker para esto
 - Un manual hecho a partir de referencia :-)
