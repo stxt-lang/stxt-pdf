@@ -195,11 +195,8 @@ public final class MulticolLayout implements LayoutAlgorithm {
             if (cap.isEmpty()) {
                 return Double.POSITIVE_INFINITY;
             }
-            double decoration = model.border().vertical() + model.padding().vertical();
-            if (model.clones()) {
-                // Con clone, lo consumido es el alto del contenido de los fragmentos anteriores.
-                return cap.getAsDouble() - decoration - consumed;
-            }
+            // Con clone, Slice.top es el borde y el relleno de arriba en todos los fragmentos, y lo consumido, el alto
+            // del contenido de los anteriores; con slice, lo consumido incluye lo de arriba del primero.
             return cap.getAsDouble() - consumed - Slice.top(model, first) - model.border().bottom()
                     - model.padding().bottom();
         }

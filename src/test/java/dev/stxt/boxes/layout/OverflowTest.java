@@ -141,4 +141,53 @@ class OverflowTest {
         assertContains("Una línea de un texto con White space: pre", e);
         assertContains("la línea mide 595 y la caja deja 515", e);
     }
+
+    /** Los márgenes negativos dejan la caja de borde fuera de su contenedor, pero no la de margen: no desborda. */
+    @Test
+    void negativeMarginsAreNotOverflows() {
+        LayoutFixture l = layOut("\tBlock:", "\t\tId: N", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 0 -10");
+        assertEquals(535, l.rect("N").width(), 1e-9);
+    }
+
+    /**
+     * El Flex tiene 10 de relleno (su contenido mide 495) y un primer ítem de 20: R empieza en 30 y su contenido en 40;
+     * S, un Relative desplazado 60 (que no cuenta), ocupa de 44 a 504, dentro de la página: la culpable es R.
+     */
+    @Test
+    void tooWideMeasuresFromTheContainerAndIgnoresRelativeOffsets() {
+        InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
+                "\tFlex:", "\t\tBox:", "\t\t\tPadding: 10",
+                "\t\tItem:", "\t\t\tShrink: 0", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 20", "\t\t\t\t\tHeight: 10",
+                "\t\tItem:", "\t\t\tBasis: 600", "\t\t\tShrink: 0",
+                "\t\t\tBlock:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 4", "\t\t\t\t\tPadding: 6",
+                "\t\t\t\tRelative:", "\t\t\t\t\tId: S", "\t\t\t\t\tOffset: auto auto auto 60", "\t\t\t\t\tBox:",
+                "\t\t\t\t\t\tWidth: 460", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tMargin: 0 0 0 4")));
+        assertContains("La caja R (línea", e);
+        assertContains("mide 600 y el contenido de su contenedor mide 495", e);
+    }
+
+    /** P empieza 10 más abajo (su margen): la línea de 120 acaba en 10 + 10 + 120 = 140, 40 más allá. */
+    @Test
+    void pageOverflowCountsWhereTheBoxStarts() {
+        InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
+                        "\t\t\tMargin: 10 0 0 0",
+                        "\t\tText: a", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tLine height: 120")));
+        assertContains("La caja T (línea", e);
+        assertContains("llega 40 más allá del área útil", e);
+    }
+
+    /**
+     * T va en un Relative desplazado 8 hacia abajo dentro de P: el desbordamiento se mide en su sitio, sin el
+     * desplazamiento (§5.12), así que la línea de 120 acaba en 10 + 120 = 130, 30 más allá.
+     */
+    @Test
+    void pageOverflowIgnoresRelativeOffsets() {
+        InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
+                        "\t\tRelative:", "\t\t\tOffset: 8 auto auto auto",
+                        "\t\t\tText: a", "\t\t\t\tId: T", "\t\t\t\tTypography:", "\t\t\t\t\tLine height: 120")));
+        assertContains("La caja T (línea", e);
+        assertContains("llega 30 más allá del área útil", e);
+    }
 }

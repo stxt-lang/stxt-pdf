@@ -152,4 +152,15 @@ class MulticolFragmentationTest {
         assertRect(40, 40, 515, 100, l.rect(1, "M"));
         assertRect(40, 40, 515, 50, l.rect(2, "M"));
     }
+
+    /** Height: 150 con doce bloques: en la página 2 quedan 50, dos bloques por columna (K empieza la segunda). */
+    @Test
+    void theRestOfTheHeightLimitsTheLastPage() {
+        LayoutFixture l = layOutPaged(PAGE, multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:",
+                "\tHeight: 150"), blocks(12, true)));
+        assertEquals(2, l.pages());
+        assertRect(40, 65, 250, 25, l.rect(2, "J"));
+        assertRect(305, 40, 250, 25, l.rect(2, "K"));
+        assertRect(305, 65, 250, 25, l.rect(2, "L"));
+    }
 }
