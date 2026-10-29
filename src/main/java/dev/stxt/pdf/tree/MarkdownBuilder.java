@@ -81,13 +81,24 @@ final class MarkdownBuilder {
             .includeSourceSpans(IncludeSourceSpans.BLOCKS)
             .build();
 
+    /**
+     * El de un texto con {@code Inline: markdown}: sin bloques ni tablas, así que lo que en un {@code Markdown}
+     * empezaría un bloque ({@code -}, {@code 2024.}, {@code #}, {@code >}, {@code ---}) es texto
+     * (referencia/comun/formato-del-texto.md).
+     */
+    private static final Parser INLINE_PARSER = Parser.builder()
+            .enabledBlockTypes(Set.of())
+            .extensions(List.of(StrikethroughExtension.builder().requireTwoTildes(true).build(), InsExtension.create()))
+            .includeSourceSpans(IncludeSourceSpans.BLOCKS)
+            .build();
+
     private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, bloques de código, "
             + "imágenes solas en su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, "
             + "`código` y [enlaces](destino)";
 
     private static final String INLINE_SUBSET = "un texto con Inline: markdown solo admite párrafos con **negrita**, "
-            + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); encabezados, listas y tablas van en un "
-            + "Markdown, y un carácter especial se escribe con \\ delante (\\*)";
+            + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); lo demás va en un Markdown, y un carácter "
+            + "especial se escribe con \\ delante (\\*)";
 
     /**
      * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
@@ -114,7 +125,8 @@ final class MarkdownBuilder {
 
     /**
      * Un texto con {@code Inline: markdown} (referencia/comun/formato-del-texto.md): sus tramos. Solo párrafos, que se
-     * separan con una línea en blanco, como en un {@code Text}; lo demás es {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
+     * separan con una línea en blanco, como en un {@code Text}; la sintaxis de los bloques es texto, y lo que no se
+     * admite dentro de la línea, {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
      *
      * @param firstLine línea del documento donde empieza el texto
      */
@@ -122,7 +134,7 @@ final class MarkdownBuilder {
         Translator t = new Translator(null, firstLine, true, new String[0]);
         TextRun.Joiner out = new TextRun.Joiner();
         boolean first = true;
-        for (org.commonmark.node.Node b = PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
+        for (org.commonmark.node.Node b = INLINE_PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
             int line = t.line(b);
             if (!(b instanceof Paragraph p)) {
                 throw t.unsupported(b, line);

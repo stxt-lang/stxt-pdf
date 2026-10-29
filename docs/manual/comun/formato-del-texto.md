@@ -25,8 +25,8 @@ Paragraph: El pago se hace en **30 días**, salvo *acuerdo* en contra.
 
 Las marcas se pueden combinar (`***negrita y cursiva***`) y no se ven en el PDF. Para escribir un asterisco literal, ponle
 una barra delante (`\*`). Solo vale lo que cabe dentro de una línea: un título, una lista o una tabla van en un
-[`Markdown`](../componentes/markdown.md). Si un párrafo con `Inline: markdown` empieza por `-`, `#`, `>` o `1.`, escapa el
-primer carácter (`\-`). Un texto concreto vuelve a ser literal con `Inline: none`.
+[`Markdown`](../componentes/markdown.md). Lo demás es texto tal cual: `2024. Un buen año` o `- 5 % de descuento` se ven
+como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `Inline: none`.
 
 La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita. El tamaño, el
 color y la fuente son los de la caja.

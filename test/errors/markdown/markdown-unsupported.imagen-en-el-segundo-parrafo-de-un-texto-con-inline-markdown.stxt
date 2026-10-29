@@ -1,6 +1,6 @@
-# Case: Un encabezado en un texto con Inline: markdown
+# Case: Un texto con Inline: markdown con la línea de su segundo párrafo
 # Code: MARKDOWN_UNSUPPORTED
-# Line: 17
+# Line: 21
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -14,4 +14,8 @@ Document (dev.stxt.pdf):
 				Size: 10
 				Inline: markdown
 	Section:
-		Text: # Título
+		Text:
+			Content >>
+				Primer párrafo con **negrita**.
+
+				Ver ![logo](logo.png)

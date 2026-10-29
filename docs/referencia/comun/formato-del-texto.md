@@ -34,9 +34,11 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](
   `\\`).
 - Cada párrafo de `Content`, separado por una línea en blanco, es un párrafo; el salto de línea simple vale un espacio.
 - **Se hereda**: se declara una vez en `Element: Document` o en una regla, y un texto vuelve al literal con `Inline: none`.
-- Solo admite lo que cabe en una línea. Un encabezado (`#`), una lista (`-`, `1.`), una tabla, una cita, código, una imagen
-  o HTML son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no admitido, como en
-  un `Markdown`. Si el texto empieza por `-`, `#`, `>` o `1.`, se escapa el primer carácter.
+- Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
+  `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
+  escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, código, una imagen, HTML o un
+  salto de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no
+  admitido, como en un `Markdown`.
 - No actúa dentro de un `Markdown`, aunque se herede (lo escapado sigue siendo literal), ni en las entradas de un
   `Contents`. `Alt` y los demás valores son siempre literales.
 - Las referencias (`{page}`, `{page of: id}`) funcionan igual.
@@ -45,6 +47,13 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` y `[texto](
 
 > **Decisión:** el formato en línea se pide con una propiedad heredable: el texto es literal salvo que se pida, y se pide
 > una vez. *Alternativa descartada:* hijos `Run` con su propio `Typography`, mucho más largos de escribir.
+
+> **Decisión:** la sintaxis de los bloques es texto, no un error. Como `Inline` se hereda y se declara una vez para todo
+> el documento, un error alcanzaría a cualquier texto, celda o encabezado que empiece por un número con punto, un guion
+> o un `#`, y la lista de lo que hay que escapar es larga (`-`, `+`, `*`, `1.`, `1)`, `>`, `#`, una línea `---` o `===`,
+> una lista que empieza a media frase). Quien escriba una lista en un texto con `Inline: markdown` la obtiene literal,
+> como sin `Inline`. *Alternativa descartada:* `MARKDOWN_UNSUPPORTED` con la línea del bloque, que obligaba a escapar el
+> primer carácter.
 
 ## Mayúsculas (`Transform`)
 

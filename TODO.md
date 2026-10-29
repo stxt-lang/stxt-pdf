@@ -35,7 +35,6 @@ saliendo al trabajar y solo toca ese.
 ### Texto
 
 - Código en línea en un texto con `Inline: markdown` (no hay `Code font` fuera de `Markdown`; podría ser de `Typography`).
-- Un texto con `Inline: markdown` no admite listas ni encabezados, y hay que escapar el primer carácter si empieza como una.
 
 ### Encabezados y secciones
 
