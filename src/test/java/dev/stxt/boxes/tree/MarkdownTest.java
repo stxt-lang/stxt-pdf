@@ -45,7 +45,7 @@ class MarkdownTest {
         assertNull(md.children().get(0).children().get(0).formattedRuns());
         Box cell = md.children().get(3).children().get(1);
         assertEquals(List.of(run("1", "i")), cell.formattedRuns());
-        assertEquals(Marker.DISC, md.children().get(2).style().listMarker);
+        assertEquals(Marker.DISC, md.children().get(2).style().list().marker());
     }
 
     @Test

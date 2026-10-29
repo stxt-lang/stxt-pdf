@@ -278,8 +278,8 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
                     + "un Paragraph, un Text, un Block…");
         }
-        box.setNumber(ListMarkers.number(list.style().listMarker, number));
-        String marker = ListMarkers.text(list.style().listMarker, number);
+        box.setNumber(ListMarkers.number(list.style().list().marker(), number));
+        String marker = ListMarkers.text(list.style().list().marker(), number);
         if (marker != null) {
             box.setMarker(marker(n, box, marker));
         }

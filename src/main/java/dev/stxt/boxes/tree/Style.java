@@ -128,14 +128,6 @@ public final class Style {
      */
     Locale locale = Locale.ROOT;
 
-    // --- Lista ---------------------------------------------------------------------------------
-    /** Marcador de los ítems de una {@code List}; {@code null} en el resto de cajas. */
-    Marker listMarker;
-    /** Número del primer ítem de una {@code List}. */
-    int listStart = 1;
-    /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
-    Integer listNumber;
-
     // --- Enlace ----------------------------------------------------------------------------------
     /**
      * Destino del {@code Link} de la caja ({@link dev.stxt.boxes.model.Links}, §5.20); {@code null}
@@ -189,10 +181,16 @@ public final class Style {
 
     private final ItemStyle item = new ItemStyle();
 
+    private final ListStyle list = new ListStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public ItemStyle item() {
+    public ListStyle list() {
+            return list;
+        }
+
+        public ItemStyle item() {
         return item;
     }
 
@@ -355,19 +353,6 @@ public final class Style {
 
     public Locale locale() {
         return locale;
-    }
-
-    // --- Lista -----------------------------------------------------------------------------------
-    public Marker listMarker() {
-        return listMarker;
-    }
-
-    public int listStart() {
-        return listStart;
-    }
-
-    public Integer listNumber() {
-        return listNumber;
     }
 
     // --- Enlace ----------------------------------------------------------------------------------
@@ -553,6 +538,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        list.close();
         item.close();
         grid.close();
         flex.close();

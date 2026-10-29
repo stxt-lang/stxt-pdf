@@ -190,7 +190,7 @@ final class PdfStructure {
         }
         if (box.role() == Role.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();
-            numbering.setListNumbering(listNumbering(box.style().listMarker()));
+            numbering.setListNumbering(listNumbering(box.style().list().marker()));
             e.addAttribute(numbering);
         }
     }

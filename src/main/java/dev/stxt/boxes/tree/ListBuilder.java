@@ -26,7 +26,7 @@ final class ListBuilder {
      * anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
-        Marker marker = list.style().listMarker;
+        Marker marker = list.style().list().marker();
         if (!marker.numbered()) {
             if (s.isDeclared(NUMBER)) {
                 throw error(s.line(NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
@@ -35,11 +35,11 @@ final class ListBuilder {
             return 0;
         }
         List<Box> previous = list.children();
-        int number = s.listNumber != null ? s.listNumber
-                : previous.isEmpty() ? list.style().listStart
+        int number = s.list().number() != null ? s.list().number()
+                : previous.isEmpty() ? list.style().list().start()
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
-            throw error(s.listNumber != null ? s.line(NUMBER) : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
+            throw error(s.list().number() != null ? s.line(NUMBER) : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
                     "El número " + number + " no se puede escribir con Marker: " + markerName(marker)
                             + ", que numera " + ListMarkers.range(marker));
         }
@@ -95,14 +95,14 @@ final class ListBuilder {
         if (!s.isDeclared(START)) {
             return;
         }
-        if (!s.listMarker.numbered()) {
+        if (!s.list().marker().numbered()) {
             throw error(s.line(START), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Start no tiene efecto con Marker: "
-                    + markerName(s.listMarker) + ", que no numera los ítems");
+                    + markerName(s.list().marker()) + ", que no numera los ítems");
         }
-        if (!ListMarkers.inRange(s.listMarker, s.listStart)) {
-            throw error(s.line(START), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.listStart + " no se puede "
-                    + "escribir con Marker: " + markerName(s.listMarker) + ", que numera "
-                    + ListMarkers.range(s.listMarker));
+        if (!ListMarkers.inRange(s.list().marker(), s.list().start())) {
+            throw error(s.line(START), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.list().start() + " no se puede "
+                    + "escribir con Marker: " + markerName(s.list().marker()) + ", que numera "
+                    + ListMarkers.range(s.list().marker()));
         }
     }
 

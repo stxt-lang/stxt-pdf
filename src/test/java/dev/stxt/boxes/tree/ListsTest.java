@@ -31,7 +31,7 @@ class ListsTest {
                 "\t\tList item:", "\t\t\tText: Dos", "\t\t\tText: y más").children().get(0);
         assertEquals(Element.LIST, list.element());
         assertEquals(Layout.BLOCK, list.style().layout);
-        assertEquals(Marker.DISC, list.style().listMarker);
+        assertEquals(Marker.DISC, list.style().list().marker());
         assertEquals(2, list.children().size());
         Box item = list.children().get(1);
         assertEquals(Element.LIST_ITEM, item.element());
@@ -54,7 +54,7 @@ class ListsTest {
     void markersWithAHyphen() {
         Box list = root("\tList:", "\t\tMarker: upper-roman", "\t\tStart: 4",
                 "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b").children().get(0);
-        assertEquals(Marker.UPPER_ROMAN, list.style().listMarker);
+        assertEquals(Marker.UPPER_ROMAN, list.style().list().marker());
         assertEquals(List.of("IV. ", "V. "), markers(list));
     }
 
