@@ -4,7 +4,7 @@ El índice automático. Un `Contents` genera una entrada por cada encabezado del
 la página donde está. Cada entrada es clicable y lleva a su encabezado.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:

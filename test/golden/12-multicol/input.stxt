@@ -8,7 +8,7 @@
 # Página 2: quedan 11 líneas y se equilibran. Con 5 líneas por columna no cabe (p4 no se
 # puede partir en 1 + 3); con 6, la primera tiene p3 (4) y 2 de p4, y la segunda, 2 de p4 y p5:
 # m mide 72 y end va detrás, con el margen de 8.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

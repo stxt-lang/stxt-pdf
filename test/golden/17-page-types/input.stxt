@@ -10,7 +10,7 @@
 #   end (last):        Offset auto 0 0 auto, 30 × 10: x = 250, y = 170; solo la página 4 (la última).
 #   inner (first):     dentro de head, que no sale en la página 1: tampoco sale (not-first y first
 #                      no coinciden en ninguna página).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

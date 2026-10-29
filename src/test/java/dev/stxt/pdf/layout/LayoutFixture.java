@@ -1,0 +1,144 @@
+package dev.stxt.pdf.layout;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.TextRuns;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Maqueta un documento de 595 pt de ancho con márgenes de 40 (área útil de 515 pt desde
+ * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página,
+ * incluidos los de las cajas {@code fixed}. Sin número de página, se refiere a la primera.
+ *
+ * <p>Declara en el {@code Typography} de {@code Document} {@code Font: IBM Plex Sans} y
+ * {@code Size: 10}, porque el texto los necesita (referencia/comun/errores.md); con {@link
+ * dev.stxt.pdf.layout.inline.FixedMetrics} la familia no influye en las medidas.</p>
+ */
+public final class LayoutFixture {
+
+    private static final DocumentReader READER = new DocumentReader();
+    private static final String FONT = "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
+    private static final String A4 = "\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n";
+    /** Sufijo de la clave del marcador de un ítem. */
+    private static final String MARKER = "#marker";
+
+    private final List<Page> pages;
+    private final List<Map<String, Fragment>> fragments = new ArrayList<>();
+    private final List<Map<String, Rect>> rects = new ArrayList<>();
+
+    private LayoutFixture(List<Page> pages) {
+        this.pages = pages;
+        for (Page page : pages) {
+            Map<String, Fragment> f = new HashMap<>();
+            Map<String, Rect> r = new HashMap<>();
+            walk(page.content().children(), 40, 40, f, r);
+            walk(page.fixed(), 40, 40, f, r);
+            fragments.add(f);
+            rects.add(r);
+        }
+    }
+
+    /**
+     * Documento A4 (595 × 842; área útil de 515 × 762). Líneas de las cajas de primer nivel, con
+     * tabuladores como en el documento.
+     */
+    public static LayoutFixture layOut(String... boxLines) {
+        return layOut(A4, boxLines);
+    }
+
+    /** Documento con páginas de {@code height} pt: el área útil mide {@code height − 80}. */
+    public static LayoutFixture layOutPaged(double height, String... boxLines) {
+        return layOut(paged(height), boxLines);
+    }
+
+    /** Como {@link #layOut(String...)}, con los tramos de cada texto por su {@code Id} ({@link TextRuns}). */
+    public static LayoutFixture layOutRuns(Map<String, List<TextRun>> runs, String... boxLines) {
+        return layOut(A4, runs, boxLines);
+    }
+
+    /** Como {@link #layOutPaged(double, String...)}, con tramos ({@link #layOutRuns}). */
+    public static LayoutFixture layOutPagedRuns(double height, Map<String, List<TextRun>> runs, String... boxLines) {
+        return layOut(paged(height), runs, boxLines);
+    }
+
+    private static String paged(double height) {
+        return "\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n";
+    }
+
+    private static LayoutFixture layOut(String media, String... boxLines) {
+        return layOut(media, Map.of(), boxLines);
+    }
+
+    private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
+        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)).pages());
+    }
+
+    public int pages() {
+        return pages.size();
+    }
+
+    public Rect rect(String id) {
+        return rect(1, id);
+    }
+
+    public Rect rect(int page, String id) {
+        Rect r = rects.get(page - 1).get(id);
+        if (r == null) {
+            throw new IllegalArgumentException("No hay fragmento con Id " + id + " en la página " + page
+                    + ": " + rects.get(page - 1).keySet());
+        }
+        return r;
+    }
+
+    public boolean has(int page, String id) {
+        return rects.get(page - 1).containsKey(id);
+    }
+
+    /** Caja del marcador del {@code List item} con ese {@code Id} (referencia/componentes/list.md). */
+    public Rect marker(String id) {
+        return marker(1, id);
+    }
+
+    public Rect marker(int page, String id) {
+        return rect(page, id + MARKER);
+    }
+
+    public boolean hasMarker(int page, String id) {
+        return has(page, id + MARKER);
+    }
+
+    public Fragment fragment(String id) {
+        return fragment(1, id);
+    }
+
+    public Fragment fragment(int page, String id) {
+        rect(page, id);
+        return fragments.get(page - 1).get(id);
+    }
+
+    /** Recorre fragmentos relativos a una caja de contenido que empieza en (x, y). */
+    private static void walk(List<Fragment> children, double x, double y,
+                             Map<String, Fragment> fragments, Map<String, Rect> rects) {
+        for (Fragment f : children) {
+            Rect border = new Rect(x + f.x(), y + f.y(), f.width(), f.height());
+            if (f.box().isMarker() && f.box().parent().id() != null) {
+                rects.put(f.box().parent().id() + MARKER, border);
+            }
+            if (f.box().id() != null) {
+                fragments.put(f.box().id(), f);
+                rects.put(f.box().id(), border);
+            }
+            Rect content = border.shrink(f.border()).shrink(f.padding());
+            walk(f.children(), content.x(), content.y(), fragments, rects);
+        }
+    }
+}

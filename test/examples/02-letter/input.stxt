@@ -1,7 +1,7 @@
 # Carta comercial en una página: membrete con logotipo, remitente, destinatario, asunto, cuerpo
 # en Markdown (justificado con el reparto de Knuth-Plass), firma escaneada y pie fijo. Todo el
 # cuerpo en serif; el membrete y el pie, en sans.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 44 72 64 72

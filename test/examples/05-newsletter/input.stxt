@@ -4,7 +4,7 @@
 # una rejilla. El cuerpo es Markdown dentro de Multicol. La cabecera de portada es un bloque de la
 # primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 38 44 58 44

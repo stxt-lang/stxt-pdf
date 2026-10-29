@@ -1,7 +1,7 @@
 # Case: Corte de columna fuera de un Multicol
 # Code: COLUMN_BREAK_OUTSIDE_MULTICOL
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

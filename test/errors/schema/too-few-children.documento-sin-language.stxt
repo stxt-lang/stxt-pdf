@@ -1,7 +1,7 @@
 # Case: Documento sin idioma
 # Code: TOO_FEW_CHILDREN
 # Line: 4
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Title: Prueba
 	Media:
 		Width: 595

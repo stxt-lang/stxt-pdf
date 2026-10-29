@@ -12,7 +12,7 @@
 #            segunda "eeee ffff": 24. y = 44.
 #   title:   Transform uppercase y Letter spacing 3 no cambian el alto: 12. y = 68.
 #   caps:    Small caps con Letter spacing 1, una línea: 12. y = 80.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

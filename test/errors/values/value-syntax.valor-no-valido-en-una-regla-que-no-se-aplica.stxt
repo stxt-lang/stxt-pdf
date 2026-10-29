@@ -1,7 +1,7 @@
 # Case: Valor no válido en una regla que no se aplica
 # Code: VALUE_SYNTAX
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

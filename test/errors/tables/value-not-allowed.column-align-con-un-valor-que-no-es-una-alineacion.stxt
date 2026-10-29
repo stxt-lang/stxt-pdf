@@ -1,7 +1,7 @@
 # Case: Column align con un valor que no es una alineación
 # Code: VALUE_NOT_ALLOWED
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

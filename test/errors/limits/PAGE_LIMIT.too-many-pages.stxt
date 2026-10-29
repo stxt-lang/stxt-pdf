@@ -1,7 +1,7 @@
 # Case: Un bloque con un alto fijo de diez millones de puntos ocupa más páginas que el máximo
 # Code: PAGE_LIMIT
 # Line: 0
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,6 +1,6 @@
 # Uso desde Java
 
-El motor es una librería Java 17 (Maven: `dev.stxt:stxt-boxes`).
+El motor es una librería Java 17 (Maven: `dev.stxt:stxt-pdf`).
 
 ## Convertir un documento
 

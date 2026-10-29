@@ -1,6 +1,6 @@
 # Referencia de stxt-pdf
 
-**Versión del modelo:** 0.1 · **Namespace:** `dev.stxt.boxes` · **Unidades:** puntos tipográficos (pt)
+**Versión del modelo:** 0.1 · **Namespace:** `dev.stxt.pdf` · **Unidades:** puntos tipográficos (pt)
 
 La referencia es la **fuente de verdad** del comportamiento del motor: dice qué admite cada elemento, qué significa
 cada propiedad, cómo calcula el motor la posición y el tamaño de cada caja, qué es un error y qué se escribe en el PDF.
@@ -11,7 +11,7 @@ al que afecta, en un bloque así:
 
 > **Decisión:** lo que se decidió y lo que implica. *Alternativa descartada:* lo que se podría haber hecho en su lugar.
 
-El schema STXT del modelo es [`src/main/resources/stxt/dev.stxt.boxes.stxt`](../../src/main/resources/stxt/dev.stxt.boxes.stxt);
+El schema STXT del modelo es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../src/main/resources/stxt/dev.stxt.pdf.stxt);
 si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el fichero.
 
 ## Comportamiento común

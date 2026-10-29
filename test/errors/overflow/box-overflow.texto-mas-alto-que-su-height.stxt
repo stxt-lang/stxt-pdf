@@ -1,7 +1,7 @@
 # Case: Texto más alto que su Height
 # Code: BOX_OVERFLOW
 # Line: 19
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -2,14 +2,14 @@
 // del PDF en cada conversión. Hay que ejecutarla en una JVM recién arrancada (la primera fase es el frío).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
-import dev.stxt.boxes.convert.Converter;
-import dev.stxt.boxes.layout.LaidOutDocument;
-import dev.stxt.boxes.model.FontFace;
-import dev.stxt.boxes.model.FontStyle;
-import dev.stxt.boxes.model.FontWeight;
-import dev.stxt.boxes.resources.FontFile;
-import dev.stxt.boxes.resources.Resources;
-import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.resources.FontFile;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;

@@ -7,7 +7,7 @@ por las reglas de `Styles`, por la validación ([Errores](../comun/errores.md)) 
 generado hereda su `Typography`. No admite `Link`: su contenido lleva sus propios enlaces.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:

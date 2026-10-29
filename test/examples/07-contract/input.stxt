@@ -8,7 +8,7 @@
 # Heading 2 numerados (Numbered: true en styles.stxt); el título del contrato y el anexo, que ya tiene
 # su nombre («Anexo I»), declaran Numbered: false, y el considerando III remite al apartado de las
 # cláusulas con {number of: terms}.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 92 70 80 70

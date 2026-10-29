@@ -3,7 +3,7 @@
 Una tabla de filas y columnas. Su cabecera y su pie se repiten en cada página por la que pasa.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Factura
 	Media:

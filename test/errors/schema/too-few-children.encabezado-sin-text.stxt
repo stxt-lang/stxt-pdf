@@ -1,7 +1,7 @@
 # Case: Encabezado sin Text
 # Code: TOO_FEW_CHILDREN
 # Line: 16
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

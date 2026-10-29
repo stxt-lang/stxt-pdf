@@ -1,7 +1,7 @@
 # Case: Aspect ratio con Width y Height
 # Code: ASPECT_RATIO_CONFLICT
 # Line: 15
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

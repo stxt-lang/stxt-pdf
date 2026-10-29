@@ -7,7 +7,7 @@
 # debajo, en 88 (con el 3 ya escrito: «Véase la página 3.» son 18 caracteres, 90 pt, una línea).
 # Cada encabezado grande va en un bloque con Break: Before: page. Página 2: method en 20, data
 # (Heading 2) en 32 y fine (Heading 3) en 44. Página 3: results en 20.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Width: 300
 		Height: 300

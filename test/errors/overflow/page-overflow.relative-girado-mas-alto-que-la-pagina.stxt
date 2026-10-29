@@ -1,7 +1,7 @@
 # Case: Relative girado más alto que el área útil: no se parte
 # Code: PAGE_OVERFLOW
 # Line: 12
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

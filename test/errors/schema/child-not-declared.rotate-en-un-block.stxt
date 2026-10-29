@@ -1,7 +1,7 @@
 # Case: Rotate en un Block, que no es posicionado
 # Code: CHILD_NOT_DECLARED
 # Line: 12
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,7 +1,7 @@
 # Case: Texto más alto que la página sin Line height
 # Code: PAGE_OVERFLOW
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

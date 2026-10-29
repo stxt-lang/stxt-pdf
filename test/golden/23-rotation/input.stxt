@@ -15,7 +15,7 @@
 #   side (Fixed):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
 #                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Girado −90 alrededor de su esquina
 #                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

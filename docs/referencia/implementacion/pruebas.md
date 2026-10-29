@@ -10,7 +10,7 @@ mvn test -Dtest='TrackSizingTest#nombre'   # un método
 
 ## Tests unitarios y de layout
 
-JUnit 5. Un test por pieza pura, en el mismo package que la clase (`src/test/java/dev/stxt/boxes/...`). Los nombres de los
+JUnit 5. Un test por pieza pura, en el mismo package que la clase (`src/test/java/dev/stxt/pdf/...`). Los nombres de los
 métodos de test están en inglés y en camelCase (`autoMarginsCenter`).
 
 Los documentos de test se leen con `DocumentReader`, que valida contra el schema: un test de una regla del modelo comprueba
@@ -67,7 +67,7 @@ ejemplo. Las imágenes de los ejemplos están en `resources/images/examples/` y 
 
 ## Documentos de la documentación (`DocumentationExamplesTest`)
 
-Cada documento completo (`Document (dev.stxt.boxes):` en un bloque de código) del [manual](../../manual/README.md) y de la
+Cada documento completo (`Document (dev.stxt.pdf):` en un bloque de código) del [manual](../../manual/README.md) y de la
 referencia se maqueta con las métricas reales y se escribe en PDF, que debe cumplir PDF/UA-1 según veraPDF; el PDF queda en
 `target/reference/docs/`. El [ejemplo completo](../comun/ejemplo-completo.md) debe ser `test/spec/report.stxt` sin su cabecera
 de comentarios. Así ningún ejemplo de la documentación deja de funcionar sin que se note.

@@ -4,7 +4,7 @@ Un `Block` agrupa elementos **uno debajo de otro**. Sirve para dar un fondo, un 
 grupo no se parta entre páginas o para que sus hijos hereden una tipografía.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Aviso
 	Media:

@@ -1,7 +1,7 @@
 # Case: Página de una caja de una sección sin números
 # Code: REFERENCE_NOT_PLACEABLE
 # Line: 20
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

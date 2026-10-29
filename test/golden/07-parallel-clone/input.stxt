@@ -8,7 +8,7 @@
 #   g1 coloca 160 y g2 cabe entero (50).
 # Página 4: sigue g1 desde arriba (40) y end va detrás.
 # El pie muestra "{page}/{pages}" con los valores de cada página.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

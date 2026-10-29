@@ -4,7 +4,7 @@ Una imagen PNG, JPEG o SVG de la carpeta `images/` de los recursos. Es una caja 
 márgenes, su borde, sus esquinas, y se coloca en el flujo o en un `Flex`, un `Grid` o un posicionado.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Catálogo
 	Media:

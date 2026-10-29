@@ -1,7 +1,7 @@
 # Case: Start fuera del rango de las letras
 # Code: LIST_NUMBER_RANGE
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

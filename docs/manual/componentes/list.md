@@ -3,7 +3,7 @@
 Una lista con viñetas o numerada. Cada `List item` es un ítem, con un marcador (la viñeta o el número) que pone el motor.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Pasos
 	Media:

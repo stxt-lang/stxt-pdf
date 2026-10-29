@@ -4,7 +4,7 @@ Un `Multicol` reparte su contenido en **columnas**, como un periódico: el texto
 y, al acabar las columnas de una página, continúa en la página siguiente.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Boletín
 	Media:

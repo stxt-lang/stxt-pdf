@@ -9,7 +9,7 @@
 #   Foot cell: Border 1 0 0 0 (17); «Total» ocupa las dos primeras columnas.
 # Filas: b1 (37..53, impar), b4 (53..73, par), b7 (73..101, impar: dos líneas en b9) y
 #   b10 (101..121, par); el pie, en 121..138. La tabla mide 118.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

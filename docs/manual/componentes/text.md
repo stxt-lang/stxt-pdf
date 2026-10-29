@@ -5,7 +5,7 @@ significado: un `Paragraph` es **un párrafo** (y así lo etiqueta el PDF para l
 más, que puede tener varios párrafos.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Carta
 	Media:

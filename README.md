@@ -5,7 +5,7 @@ cada página y cómo se ve; el motor calcula dónde va cada cosa, reparte el con
 fuentes incrustadas, accesible (PDF/UA-1) y con marcadores.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe del trimestre
 	Media:

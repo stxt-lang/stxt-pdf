@@ -5,7 +5,7 @@
 # en el margen izquierdo: un Fixed girado −90 grados alrededor de su esquina de arriba a la izquierda.
 # El nombre de la escuela se escribe en minúscula y la regla de su clase lo pone en mayúsculas,
 # separadas (Transform y Letter spacing).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Orientation: landscape

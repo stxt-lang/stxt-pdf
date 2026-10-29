@@ -9,7 +9,7 @@
 # styles.stxt: 1 a 6) y sus apartados, Heading 2 (1.1, 2.1…); el índice y los marcadores del PDF llevan el
 # número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
 # interletraje (Transform).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 56 56 70 56

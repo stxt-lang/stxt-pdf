@@ -10,7 +10,7 @@
 # los de un Markdown); el título del producto declara Numbered: false. Un enlace de Markdown remite al
 # apartado de las especificaciones con {number of: specs-heading}. Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 64 54 66 54

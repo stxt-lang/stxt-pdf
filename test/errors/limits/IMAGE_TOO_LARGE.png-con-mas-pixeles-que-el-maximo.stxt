@@ -1,7 +1,7 @@
 # Case: Un PNG de 6000 × 6000 píxeles, que pesa 35 KB, pasa del máximo de 25 millones de píxeles
 # Code: IMAGE_TOO_LARGE
 # Line: 11
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

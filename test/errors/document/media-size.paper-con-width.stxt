@@ -1,7 +1,7 @@
 # Case: Paper y Width a la vez en el medio
 # Code: MEDIA_SIZE
 # Line: 9
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

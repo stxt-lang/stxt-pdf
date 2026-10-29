@@ -1,7 +1,7 @@
 # Case: Una línea de un texto con White space: pre más ancha que su caja
 # Code: TEXT_OVERFLOW
 # Line: 22
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

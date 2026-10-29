@@ -1,7 +1,7 @@
 # Case: Fuente desconocida, declarada en Document
 # Code: FONT_UNKNOWN
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -8,7 +8,7 @@
 # inicio.», 33 caracteres: una línea de 12) en 40; logo (una Image de 150 × 75 con Link a end) en
 # 60; card (un Block con Link a end, con relleno de 4 y dos líneas de texto: 12 + 12 + 8 = 32) en
 # 143. Página 2: end, el destino de logo y card, en 20; back, con Link a mail, en 32.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Width: 300
 		Height: 300

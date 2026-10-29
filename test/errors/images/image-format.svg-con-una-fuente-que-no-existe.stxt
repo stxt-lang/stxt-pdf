@@ -1,7 +1,7 @@
 # Case: SVG con un texto en una fuente que no existe
 # Code: IMAGE_FORMAT
 # Line: 11
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

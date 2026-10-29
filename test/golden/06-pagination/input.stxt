@@ -7,7 +7,7 @@
 #   grid tiene Before: page en su Break.
 # Página 3: filas de grid en 0..50, 60..110 y 120..170; caben las dos primeras.
 # Página 4: la tercera fila, sin el hueco que la separaba de la segunda, y end.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -3,9 +3,9 @@
 // (cuatro fases alternadas, para que el calentamiento de la JVM no favorezca a ninguno).
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
-import dev.stxt.boxes.convert.Converter;
-import dev.stxt.boxes.resources.Resources;
-import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;

@@ -12,7 +12,7 @@
 # con los dos ejes declarados la imagen cubre la caja (Fit: cover). md traduce la imagen sola en
 # su párrafo a una Image de su tamaño natural (150 × 75) y el párrafo va debajo: md mide 75 + 12.
 # logo: un Fixed en la esquina de arriba a la derecha, de 12 × 6, en las dos.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Width: 300
 		Height: 300

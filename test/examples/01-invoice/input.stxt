@@ -4,7 +4,7 @@
 # Inline: markdown para poner una negrita dentro de la frase, y los datos para el pago son un Markdown con
 # Code font: el IBAN y el BIC, en la fuente monoespaciada. Los rótulos se escriben como una frase
 # normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 44 44 60 44

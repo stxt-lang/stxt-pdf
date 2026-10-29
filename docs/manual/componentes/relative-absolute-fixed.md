@@ -10,7 +10,7 @@ desplazamiento de 1 a 4 valores: arriba, derecha, abajo, izquierda.
 | `Fixed` | Como `Absolute`, pero respecto al área útil de **cada página**, y se repite en todas: cabeceras, pies, marcas de agua |
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Presupuesto
 	Media:

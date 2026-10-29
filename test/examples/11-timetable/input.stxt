@@ -2,7 +2,7 @@
 # separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
 # recreo y comedor que ocupan los cinco días con Span, una leyenda en un Flex con salto de línea
 # y unas notas en Markdown. Cada color es una clase de styles.stxt.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Orientation: landscape

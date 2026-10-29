@@ -1,7 +1,7 @@
 # Case: Texto sin Size
 # Code: TEXT_WITHOUT_FONT_SIZE
 # Line: 15
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

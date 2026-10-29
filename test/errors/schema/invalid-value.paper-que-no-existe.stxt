@@ -1,7 +1,7 @@
 # Case: Paper con un tamaño que no está en la lista
 # Code: INVALID_VALUE
 # Line: 8
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

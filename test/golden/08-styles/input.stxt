@@ -9,7 +9,7 @@
 # e: su propio Height (30) gana a todas las reglas.
 # t: Element: Text da Size 12, línea de 14.4. Element: Block no se aplica a un Text: sin margen.
 # p: Block con Size 20; su Text u mide 12 porque la regla gana a la herencia.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -7,7 +7,7 @@
 # Página 1: intro (40) deja 120 a la tabla y 87 al cuerpo: b1…b5 (80).
 # Página 2: 127 para el cuerpo: b6…b12 (16 × 6 + 28 = 124); b13 ya no cabe.
 # Página 3: b13 y b14, el pie detrás, y end.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

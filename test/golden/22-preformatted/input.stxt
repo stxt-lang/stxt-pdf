@@ -14,7 +14,7 @@
 #            del código; en un párrafo los espacios se colapsan, también en el código en línea: 12) y un
 #            bloque de código de dos líneas («a  b» y «  c»), que es un Text con White space pre: 24.
 #            Los dos van seguidos y sin márgenes: 36. y = 152.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

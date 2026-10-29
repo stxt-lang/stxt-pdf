@@ -5,7 +5,7 @@ Un `Markdown` es un bloque cuyo contenido se escribe en Markdown. El motor lo tr
 en STXT. Es la forma cómoda de escribir texto largo con formato.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Condiciones
 	Media:

@@ -3,7 +3,7 @@
 # de nivel e idiomas) y el cuerpo con perfil, cifras, experiencia en línea de tiempo y formación.
 # Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase. Los
 # rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 	Title: Marta Ferrer Soler · Diseñadora de producto

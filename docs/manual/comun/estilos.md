@@ -67,7 +67,7 @@ Las reglas pueden ir en un documento propio, con raíz `Styles`, para compartirl
 documento solo con el contenido:
 
 ```
-Styles (dev.stxt.boxes):
+Styles (dev.stxt.pdf):
 	Element: Document
 		Typography:
 			Font: IBM Plex Sans

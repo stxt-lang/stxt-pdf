@@ -1,12 +1,12 @@
 # `Document`
 
-La raíz de todo documento: `Document`, con el namespace `dev.stxt.boxes`. Tiene exactamente un `Media`, un `Title` y un
+La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Media`, un `Title` y un
 `Language`, un `Styles` opcional ([Styles](../comun/estilos.md)), los `Fixed` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
 `Element: Document`.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:

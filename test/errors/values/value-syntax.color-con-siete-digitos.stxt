@@ -1,7 +1,7 @@
 # Case: Un color de siete dígitos no es RGBA ni RRGGBBAA
 # Code: VALUE_SYNTAX
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

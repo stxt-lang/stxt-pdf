@@ -4,7 +4,7 @@
 #   de una línea mide 12 + 12 = 24. Las filas sin clase miden 12.
 #   Body: fila 1, sin clase: 12 (y = 20); fila 2, con la clase: 24 (y = 32); fila 3, sin clase: 12 (y = 56).
 #   Foot: una fila con la clase, 24 (y = 68). La tabla mide 12 + 24 + 12 + 24 = 72.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

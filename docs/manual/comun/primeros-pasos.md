@@ -3,7 +3,7 @@
 ## Un documento completo
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe del trimestre
 	Media:
@@ -35,7 +35,7 @@ Document (dev.stxt.boxes):
 
 Línea a línea:
 
-- **`Document (dev.stxt.boxes):`** es la raíz. El namespace `dev.stxt.boxes` dice que es un documento de stxt-pdf.
+- **`Document (dev.stxt.pdf):`** es la raíz. El namespace `dev.stxt.pdf` dice que es un documento de stxt-pdf.
 - **`Language`** es el idioma del documento y **`Title`**, su título. Los dos son obligatorios: el visor de PDF muestra el
   título, y un lector de pantalla necesita el idioma para leer el texto en voz alta.
 - **`Media`** es el papel: un A4 con 50 puntos de margen por los cuatro lados. Todas las medidas están en

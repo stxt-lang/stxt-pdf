@@ -1,7 +1,7 @@
 # Case: Un índice en un documento sin encabezados
 # Code: CONTENTS_EMPTY
 # Line: 16
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

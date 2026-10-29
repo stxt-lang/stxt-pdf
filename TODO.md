@@ -21,9 +21,6 @@ saliendo al trabajar y solo toca ese.
   quede para las reglas exactas.
 - **Repasar las decisiones de la referencia** (los bloques «Decisión»): están todas aplicadas, pero solo las de los hitos
   1 a 7 se repasaron juntas; las demás se tomaron al implementar cada hito.
-- **Renombrar a stxt-pdf lo que aún se llama «boxes»:** el artefacto Maven (`dev.stxt:stxt-boxes`), el package
-  (`dev.stxt.boxes`), el proyecto de Eclipse y el namespace de los documentos (`Document (dev.stxt.boxes):`, que cambia
-  todos los `.stxt`) y del schema.
 
 ### Accesibilidad
 

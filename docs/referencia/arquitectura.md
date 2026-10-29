@@ -3,7 +3,7 @@
 Qué hay en el código, cómo se relaciona y cuáles son las clases principales. Es un mapa: el detalle de cada parte está en
 las páginas de [implementación](README.md#implementación) y en el javadoc.
 
-Java 17 y Maven: artefacto `dev.stxt:stxt-boxes`, package raíz `dev.stxt.boxes`. Las dependencias de terceros son
+Java 17 y Maven: artefacto `dev.stxt:stxt-pdf`, package raíz `dev.stxt.pdf`. Las dependencias de terceros son
 `stxt-core` (leer y validar STXT), PDFBox (escribir el PDF), commonmark-java (Markdown), JSVG y `pdfbox-graphics2d`
 (dibujar SVG en el PDF); en los tests, JUnit 5, veraPDF y PIT.
 

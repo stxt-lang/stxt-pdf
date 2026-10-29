@@ -1,7 +1,7 @@
 # Case: Medio sin tamaño: ni Paper ni Width y Height
 # Code: MEDIA_SIZE
 # Line: 7
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,7 +1,7 @@
 # Case: Fracción fuera de grid
 # Code: VALUE_NOT_ALLOWED
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

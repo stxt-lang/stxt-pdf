@@ -1,7 +1,7 @@
 # Case: Una sección gira un medio que no tiene papel
 # Code: MEDIA_SIZE
 # Line: 17
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

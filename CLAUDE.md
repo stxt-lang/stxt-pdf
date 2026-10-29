@@ -32,7 +32,7 @@ documentos se maquetan en páginas de tamaño fijo y se escriben en un PDF con l
   (lo que queda de algo, una mejora vista de pasada) y quita lo que se haga.
 - **Las referencias desde el código** a la documentación se escriben con la ruta dentro de `docs/`:
   `(referencia/componentes/grid.md)`.
-- **Ejemplos de la documentación:** cada documento completo (`Document (dev.stxt.boxes):` en un bloque de código) del
+- **Ejemplos de la documentación:** cada documento completo (`Document (dev.stxt.pdf):` en un bloque de código) del
   README, del manual y de la referencia se maqueta y se valida con veraPDF en `DocumentationExamplesTest`. Cada página de
   componente del manual tiene al menos uno. El [ejemplo completo](docs/referencia/comun/ejemplo-completo.md) es
   `test/spec/report.stxt`.
@@ -43,7 +43,7 @@ valores STXT. El contenido de `Text` en los documentos puede estar en cualquier 
 
 ## Comandos
 
-Java 17 y Maven (`dev.stxt:stxt-boxes`, package raíz `dev.stxt.boxes`).
+Java 17 y Maven (`dev.stxt:stxt-pdf`, package raíz `dev.stxt.pdf`).
 
 ```bash
 mvn test                                   # compila, ejecuta todos los tests y deja la cobertura (JaCoCo) en target/site/jacoco/index.html
@@ -56,7 +56,7 @@ mvn test -Dtest=ExamplesTest -Dexamples.update=true    # acepta el volcado, el P
 `mvn test` no escribe nada en `test/`: si cambia una imagen de referencia, el test falla y deja las nuevas en
 `target/reference/`. Míralas antes de aceptarlas. Más en [pruebas](docs/referencia/implementacion/pruebas.md).
 
-Eclipse: el repositorio incluye `.project`, `.classpath` y `.settings/` (proyecto `stxt-boxes`, Java + m2e, Java 17,
+Eclipse: el repositorio incluye `.project`, `.classpath` y `.settings/` (proyecto `stxt-pdf`, Java + m2e, Java 17,
 UTF-8). Si cambian las dependencias: *Maven → Update Project*.
 
 ## Convenciones del código

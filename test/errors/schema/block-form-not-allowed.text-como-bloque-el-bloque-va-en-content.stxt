@@ -1,7 +1,7 @@
 # Case: Text como bloque (el bloque va en Content)
 # Code: BLOCK_FORM_NOT_ALLOWED
 # Line: 11
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

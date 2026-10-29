@@ -1,7 +1,7 @@
 # Case: Línea más alta que la página dentro de una lista
 # Code: PAGE_OVERFLOW
 # Line: 23
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -9,7 +9,7 @@
 - una o más `Section`, con el contenido.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe anual
 	Media:

@@ -1,7 +1,7 @@
 # Case: Relative desde izquierda y derecha
 # Code: OFFSET_CONFLICT
 # Line: 12
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

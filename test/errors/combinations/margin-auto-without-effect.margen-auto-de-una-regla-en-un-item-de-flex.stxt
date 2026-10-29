@@ -1,7 +1,7 @@
 # Case: Margen auto de una regla en un ítem de flex
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -4,7 +4,7 @@ Un `Grid` es una **rejilla**: declaras sus columnas (y, si quieres, sus filas) y
 varias. Sirve para composiciones de página: una barra lateral y el cuerpo, fichas en dos columnas, un currículum.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Ficha
 	Media:

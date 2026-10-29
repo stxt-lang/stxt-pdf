@@ -3,7 +3,7 @@
 # páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
 # con el precio y la nota final en negrita dentro de la línea (Inline: markdown). Los rótulos de las
 # secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Width: 420
 		Height: 700

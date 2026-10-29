@@ -1,7 +1,7 @@
 # Case: Página de una caja que está en un Fixed
 # Code: REFERENCE_NOT_PLACEABLE
 # Line: 16
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -4,7 +4,7 @@ Los títulos de capítulo y de apartado. Un encabezado es un bloque con uno o va
 importante) a 6.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Manual de instalación
 	Media:

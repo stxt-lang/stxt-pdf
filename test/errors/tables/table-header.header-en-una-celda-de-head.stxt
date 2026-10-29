@@ -1,7 +1,7 @@
 # Case: Header en una celda de Head, que ya es cabecera de columna
 # Code: TABLE_HEADER
 # Line: 21
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

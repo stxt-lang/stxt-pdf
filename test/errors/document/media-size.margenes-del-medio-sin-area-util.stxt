@@ -1,7 +1,7 @@
 # Case: Márgenes del medio sin área útil
 # Code: MEDIA_SIZE
 # Line: 10
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

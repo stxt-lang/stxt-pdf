@@ -10,7 +10,7 @@
 #   wide (2 páginas):  Width 400, Height 150, Margin 10: área útil de 380 × 130 desde (10, 10). w1 (10, 10, 380 × 50);
 #                      w2 (100, sin partirse) no cabe debajo (50 + 100 > 130) y pasa a la 5. foot: y = 10 + 130 - 12 = 128, 380 de ancho.
 # Los números impresos: la portada no tiene; body es la 1 y la 2 («Página 1 de 2»); wide reinicia, 1 y 2.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

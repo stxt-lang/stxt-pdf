@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.stxt</groupId>
-    <artifactId>stxt-boxes</artifactId>
+    <artifactId>stxt-pdf</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -148,19 +148,19 @@
                         </dependencies>
                         <configuration>
                             <targetClasses>
-                                <param>dev.stxt.boxes.layout.*</param>
-                                <param>dev.stxt.boxes.fragment.*</param>
+                                <param>dev.stxt.pdf.layout.*</param>
+                                <param>dev.stxt.pdf.fragment.*</param>
                             </targetClasses>
                             <targetTests>
-                                <param>dev.stxt.boxes.*</param>
+                                <param>dev.stxt.pdf.*</param>
                             </targetTests>
                             <!-- Los que escriben en carpetas compartidas de target/ (los minions corren a la vez) o
                                  arrancan otra JVM. -->
                             <excludedTestClasses>
-                                <param>dev.stxt.boxes.golden.GoldenTest</param>
-                                <param>dev.stxt.boxes.examples.*</param>
-                                <param>dev.stxt.boxes.paint.PdfCanvasTest</param>
-                                <param>dev.stxt.boxes.concurrency.*</param>
+                                <param>dev.stxt.pdf.golden.GoldenTest</param>
+                                <param>dev.stxt.pdf.examples.*</param>
+                                <param>dev.stxt.pdf.paint.PdfCanvasTest</param>
+                                <param>dev.stxt.pdf.concurrency.*</param>
                             </excludedTestClasses>
                             <excludedGroups>
                                 <param>perf</param>

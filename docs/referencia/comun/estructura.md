@@ -126,7 +126,7 @@ un bloque `Content >>`, sin caracteres de escape. Un `Text` tiene uno de los dos
 ## Ejemplo
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:
@@ -182,8 +182,8 @@ del flujo del padre. Un `Relative` participa como cualquier caja en flujo y desp
 
 ## Schema
 
-Fichero: [`src/main/resources/stxt/dev.stxt.boxes.stxt`](../../../src/main/resources/stxt/dev.stxt.boxes.stxt), un schema
-`@stxt.schema` con el namespace `dev.stxt.boxes`. Define cada nodo una sola vez, con su tipo, su descripción y los hijos
+Fichero: [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../../src/main/resources/stxt/dev.stxt.pdf.stxt), un schema
+`@stxt.schema` con el namespace `dev.stxt.pdf`. Define cada nodo una sola vez, con su tipo, su descripción y los hijos
 que admite (cada propiedad, como mucho una vez). Un elemento solo puede tener los hijos que declara su definición, así
 que el schema es lo que garantiza que cada propiedad está en un elemento donde tiene efecto.
 

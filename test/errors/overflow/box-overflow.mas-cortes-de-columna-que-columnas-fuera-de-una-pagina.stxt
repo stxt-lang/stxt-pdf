@@ -1,7 +1,7 @@
 # Case: Más cortes de columna que columnas fuera de una página
 # Code: BOX_OVERFLOW
 # Line: 19
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,7 +1,7 @@
 # Case: Idioma que no es una etiqueta BCP 47
 # Code: VALUE_NOT_ALLOWED
 # Line: 8
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Width: 595
 		Height: 842

@@ -1,7 +1,7 @@
 # Case: Un Link a una caja de un Fixed, que se repite en todas las páginas
 # Code: LINK_UNKNOWN
 # Line: 21
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

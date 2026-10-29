@@ -1,6 +1,6 @@
 # Uso desde Java
 
-El motor es una librería Java 17 (`dev.stxt:stxt-boxes`). Lo que usa quien convierte documentos es `Converter` y
+El motor es una librería Java 17 (`dev.stxt:stxt-pdf`). Lo que usa quien convierte documentos es `Converter` y
 `DocumentReader`.
 
 ## Convertir
@@ -131,5 +131,5 @@ otras carpetas; JSVG lo dibuja con AWT, así que en un servidor sin pantalla se 
 ## Validación en el editor
 
 La extensión de STXT para VS Code carga los schemas de la carpeta `.stxt/` del espacio de trabajo. Copiando allí el schema
-([`dev.stxt.boxes.stxt`](../../../src/main/resources/stxt/dev.stxt.boxes.stxt)) se tiene validación y ayuda contextual
+([`dev.stxt.pdf.stxt`](../../../src/main/resources/stxt/dev.stxt.pdf.stxt)) se tiene validación y ayuda contextual
 mientras se escriben documentos.

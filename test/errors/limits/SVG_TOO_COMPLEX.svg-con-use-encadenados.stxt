@@ -1,7 +1,7 @@
 # Case: Un SVG pequeño cuyos use encadenados dibujan más de cien mil elementos
 # Code: SVG_TOO_COMPLEX
 # Line: 11
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,7 +1,7 @@
 # Case: Absolute que cabe en la página sin girar y girado se sale
 # Code: BOX_OVERFLOW
 # Line: 14
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

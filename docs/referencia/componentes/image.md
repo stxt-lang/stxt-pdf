@@ -7,7 +7,7 @@ esquinas) y su `Break` (sin `Inside` ni `Decoration`, porque no se parte). Admit
 `Typography`, porque no tiene texto.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:

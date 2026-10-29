@@ -1,6 +1,6 @@
 # Estilos del ejemplo «contract»: las reglas reutilizables y la tipografía base. Se pasan junto a
 # input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
-Styles (dev.stxt.boxes):
+Styles (dev.stxt.pdf):
 	Element: Document
 		Typography:
 			Font: IBM Plex Serif

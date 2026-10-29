@@ -1,7 +1,7 @@
 # Case: Fixed del documento con {page} en una portada sin números
 # Code: PAGE_NUMBER_UNAVAILABLE
 # Line: 17
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

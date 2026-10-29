@@ -1,7 +1,7 @@
 # Case: Regla para algo que no es un elemento de caja
 # Code: STYLE_UNKNOWN_ELEMENT
 # Line: 11
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

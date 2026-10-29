@@ -33,7 +33,7 @@ se obtiene.
 
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
-| `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.boxes` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.boxes):` |
+| `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.pdf` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.pdf):` |
 | `MEDIA_SIZE` | El tamaño del medio, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil; una `Section` que solo gira (`Orientation`) un documento con papel ([Document](../componentes/document.md#media)) | `Los márgenes del medio no dejan área útil` |
 | `SECTION_EMPTY` | Una `Section` tiene contenido: algún elemento que no sea un `Fixed` (línea de la sección) | `La sección no tiene contenido: sin elementos (los Fixed no cuentan…) no tiene ninguna página` |
 | `PAGE_NUMBER_UNAVAILABLE` | Un texto con `{page}` o `{pages}` no sale en una página sin número (`Page numbering: none`); línea del texto | `El texto de la caja pie tiene {page} o {pages} y sale en una página sin número…` |

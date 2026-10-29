@@ -1,7 +1,7 @@
 # Case: Element: Document con Language, que ya es el de Document
 # Code: STYLE_NOT_ALLOWED
 # Line: 15
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

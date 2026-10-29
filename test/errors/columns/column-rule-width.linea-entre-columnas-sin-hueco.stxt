@@ -1,7 +1,7 @@
 # Case: Línea entre columnas sin hueco
 # Code: COLUMN_RULE_WIDTH
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

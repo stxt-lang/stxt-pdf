@@ -2,7 +2,7 @@
 # Informe de ejemplo (referencia/comun/ejemplo-completo.md): A4 paginado con cabecera y pie repetidos,
 # título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto. El estilo
 # va en las reglas de Styles; los elementos solo declaran lo que es suyo.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

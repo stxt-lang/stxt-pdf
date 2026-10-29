@@ -1,7 +1,7 @@
 # Case: Un enlace de Markdown a un fichero local
 # Code: LINK_SCHEME
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -1,7 +1,7 @@
 # Case: Contenido suelto en el Document, fuera de una Section
 # Code: CHILD_NOT_DECLARED
 # Line: 17
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

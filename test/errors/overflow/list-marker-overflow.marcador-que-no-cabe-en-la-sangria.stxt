@@ -1,7 +1,7 @@
 # Case: Marcador que no cabe en la sangría
 # Code: LIST_MARKER_OVERFLOW
 # Line: 20
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

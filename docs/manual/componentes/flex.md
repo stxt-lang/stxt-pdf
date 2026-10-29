@@ -4,7 +4,7 @@ Un `Flex` coloca sus ítems **en fila** (o en columna) y reparte entre ellos el 
 poner cosas una al lado de otra: un logotipo y unos datos, tres cifras, un precio a la derecha de un plato.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Cifras
 	Media:

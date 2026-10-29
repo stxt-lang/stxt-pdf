@@ -1,7 +1,7 @@
 # Case: Línea entre columnas más ancha que el hueco
 # Code: COLUMN_RULE_WIDTH
 # Line: 19
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -14,7 +14,7 @@
 #            líneas; interpretada, "aaaa bbbb" es una línea: la fila y la tabla miden 12. y = 104.
 #   md:      un Markdown no se interpreta dos veces: "\*\*aaaa\*\* …" da 35 caracteres literales
 #            (Inline: markdown lo hereda, pero no actúa dentro): 2 líneas, 24. y = 116.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

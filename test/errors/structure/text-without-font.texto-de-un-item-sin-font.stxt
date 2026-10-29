@@ -1,7 +1,7 @@
 # Case: Texto de un ítem sin Font
 # Code: TEXT_WITHOUT_FONT
 # Line: 13
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

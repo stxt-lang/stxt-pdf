@@ -1,7 +1,7 @@
 # Case: Contenido que no cabe en las columnas del alto de un Multicol
 # Code: BOX_OVERFLOW
 # Line: 18
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

@@ -7,7 +7,7 @@
 # solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
 # In contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
 # ponen en mayúsculas (Transform).
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Media:
 		Paper: A4
 		Margin: 54 50 64 50

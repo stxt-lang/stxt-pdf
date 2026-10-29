@@ -6,7 +6,7 @@ columnas y un sello superpuesto. Es el fichero [`test/spec/report.stxt`](../../.
 comprueba cada medida de abajo.
 
 ```
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
 	Media:

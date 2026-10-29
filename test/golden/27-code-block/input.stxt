@@ -6,7 +6,7 @@
 #         relleno, 22. Va entre los dos párrafos con 4 de margen por arriba y por abajo (los párrafos no tienen
 #         margen): 12 + 4 + 22 + 4 + 12 = 54. y = 20. Element: Text no lo alcanza: con su Padding 3 sería 6 más.
 #   t:    un Text normal: Element: Text le da Padding 3, así que mide 12 + 6 = 18. y = 74.
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

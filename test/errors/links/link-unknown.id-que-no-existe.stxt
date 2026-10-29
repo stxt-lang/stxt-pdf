@@ -1,7 +1,7 @@
 # Case: Un Link a un Id que no existe
 # Code: LINK_UNKNOWN
 # Line: 17
-Document (dev.stxt.boxes):
+Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
 	Media:

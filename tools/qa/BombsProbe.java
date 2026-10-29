@@ -6,9 +6,9 @@
 //
 // Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
 import dev.stxt.InlineNode;
-import dev.stxt.boxes.convert.Converter;
-import dev.stxt.boxes.resources.Resources;
-import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -83,7 +83,7 @@ public class BombsProbe {
     }
 
     static void run(Path dir, String image) throws Exception {
-        String document = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+        String document = "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tSection:\n\t\tImage: " + image + "\n\t\t\tBox:\n\t\t\t\tWidth: 100\n";
         long t0 = System.nanoTime();

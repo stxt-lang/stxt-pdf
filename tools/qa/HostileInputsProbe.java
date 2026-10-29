@@ -1,18 +1,18 @@
 // Sonda de QA: entradas patológicas (anidado, rejillas enormes, palabras largas,
 // muchas páginas, índice con muchas referencias) con tiempo y resultado o error de cada una.
 import dev.stxt.InlineNode;
-import dev.stxt.boxes.layout.Engine;
-import dev.stxt.boxes.layout.inline.PdfMetrics;
-import dev.stxt.boxes.paint.PdfDocumentWriter;
-import dev.stxt.boxes.resources.Resources;
-import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.paint.PdfDocumentWriter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 public class HostileInputsProbe {
     static String head(String extraStyles) {
-        return "Document (dev.stxt.boxes):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+        return "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
              + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + extraStyles
              + "\tSection:\n";
     }
@@ -49,7 +49,7 @@ public class HostileInputsProbe {
             Engine e = new Engine(new PdfMetrics(r), r);
             var lo = e.layOutDocument(doc);
             ByteArrayOutputStream o = new ByteArrayOutputStream();
-            PdfDocumentWriter.write(lo, r, dev.stxt.boxes.model.Limits.DEFAULT, o, false);
+            PdfDocumentWriter.write(lo, r, dev.stxt.pdf.model.Limits.DEFAULT, o, false);
             return "OK paginas=" + lo.pages().size() + " pdf=" + o.size() / 1024 + "KB";
         });
         String res;

@@ -127,11 +127,11 @@ descendientes.
 
 ## Documento de estilos aparte
 
-Las reglas pueden escribirse en un documento aparte, de raíz `Styles` con el namespace `dev.stxt.boxes`, para quitarlas
+Las reglas pueden escribirse en un documento aparte, de raíz `Styles` con el namespace `dev.stxt.pdf`, para quitarlas
 del documento principal o compartirlas entre varios:
 
 ```
-Styles (dev.stxt.boxes):
+Styles (dev.stxt.pdf):
 	Element: Document
 		Typography:
 			Font: IBM Plex Sans
