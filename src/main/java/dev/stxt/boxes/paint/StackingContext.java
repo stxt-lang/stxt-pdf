@@ -86,7 +86,7 @@ public final class StackingContext {
     }
 
     private void addContext(Piece p) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         StackingContext child = new StackingContext(p, s.layer() != null ? s.layer() : 0);
         child.walkChildren(p);
         child.sort();
@@ -103,7 +103,7 @@ public final class StackingContext {
         Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
         for (Fragment h : parent.f().children()) {
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y());
-            Style s = h.box().style;
+            Style s = h.box().style();
             if (createsContext(h)) {
                 addContext(p);
             } else if (s.isPositioned()) {
@@ -119,14 +119,14 @@ public final class StackingContext {
     }
 
     private static boolean createsContext(Fragment f) {
-        Style s = f.box().style;
+        Style s = f.box().style();
         if (s.position() == Style.Position.FIXED) {
             return true;
         }
         if (s.layer() == null) {
             return false;
         }
-        Style.Layout parent = f.box().parent != null ? f.box().parent.style.layout() : null;
+        Style.Layout parent = f.box().parent() != null ? f.box().parent().style().layout() : null;
         boolean item = parent == Style.Layout.FLEX || parent == Style.Layout.GRID;
         return s.isPositioned() || item;
     }
@@ -154,19 +154,19 @@ public final class StackingContext {
         if (i == 0) {
             // Raíces distintas: un Fixed del documento y uno de una sección, que es la raíz de su layout (§5.21).
             // Los del documento van antes.
-            return Boolean.compare(pathA.get(0).element != null, pathB.get(0).element != null);
+            return Boolean.compare(pathA.get(0).element() != null, pathB.get(0).element() != null);
         }
         if (i == pathA.size() || i == pathB.size()) {
             return Integer.compare(pathA.size(), pathB.size());
         }
-        List<Box> siblings = pathA.get(i - 1).children;
+        List<Box> siblings = pathA.get(i - 1).children();
         return Integer.compare(siblings.indexOf(pathA.get(i)), siblings.indexOf(pathB.get(i)));
     }
 
     /** La caja y sus ancestros, desde la raíz. */
     private static List<Box> ancestry(Box box) {
         List<Box> path = new ArrayList<>();
-        for (Box b = box; b != null; b = b.parent) {
+        for (Box b = box; b != null; b = b.parent()) {
             path.add(b);
         }
         Collections.reverse(path);
@@ -192,7 +192,7 @@ public final class StackingContext {
 
     /** Pinta {@code body} girado como la caja de {@code p}, si tiene {@code Rotate}. */
     private static void turning(Canvas canvas, Piece p, Runnable body) {
-        Rotation rotation = p.f().box().style.rotation();
+        Rotation rotation = p.f().box().style().rotation();
         if (rotation == null) {
             body.run();
             return;
@@ -204,7 +204,7 @@ public final class StackingContext {
     }
 
     private static void paintBackgroundAndBorder(Canvas canvas, Piece p) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         Rect borderBox = p.borderBox();
         Radii radii = radii(p);
         if (s.background() != null) {
@@ -222,7 +222,7 @@ public final class StackingContext {
      * arriba en el primer fragmento y las de abajo en el último.
      */
     private static Radii radii(Piece p) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         Radii radii = Radii.resolve(s.radius(), p.f().width(), p.f().height());
         if (s.decoration() == Style.Decoration.CLONE) {
             return radii;
@@ -249,7 +249,7 @@ public final class StackingContext {
      * columna más alta. Sus hijos son las columnas, en orden.
      */
     private static void paintRules(Canvas canvas, Piece p) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         List<Fragment> columns = p.f().children();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double height = columns.stream().mapToDouble(Fragment::height).max().orElse(0);
@@ -270,7 +270,7 @@ public final class StackingContext {
                     p.f().border().bottom() + p.f().padding().bottom(),
                     p.f().border().left() + p.f().padding().left());
             canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside));
-        } else if (p.f().box().element == Element.CONTENTS_LEADER) {
+        } else if (p.f().box().element() == Element.CONTENTS_LEADER) {
             paintLeader(canvas, p);
         } else {
             paintText(canvas, p);
@@ -285,8 +285,8 @@ public final class StackingContext {
      */
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
-        if (box.style.link() != null && p.f().width() > 0 && p.f().height() > 0) {
-            canvas.link(box, p.borderBox(), box.style.link(), describe(box));
+        if (box.style().link() != null && p.f().width() > 0 && p.f().height() > 0) {
+            canvas.link(box, p.borderBox(), box.style().link(), describe(box));
         }
     }
 
@@ -296,8 +296,8 @@ public final class StackingContext {
      * índice); {@code null} si no tiene texto.
      */
     private static String describe(Box box) {
-        if (box.style.alt() != null) {
-            return box.style.alt();
+        if (box.style().alt() != null) {
+            return box.style().alt();
         }
         StringBuilder out = new StringBuilder();
         collectText(box, out);
@@ -306,13 +306,13 @@ public final class StackingContext {
     }
 
     private static void collectText(Box box, StringBuilder out) {
-        if (box.element == Element.CONTENTS_PAGE) {
+        if (box.element() == Element.CONTENTS_PAGE) {
             return;
         }
         if (box.hasText()) {
-            out.append(box.text).append(' ');
+            out.append(box.text()).append(' ');
         }
-        box.children.forEach(child -> collectText(child, out));
+        box.children().forEach(child -> collectText(child, out));
     }
 
     /** Zona de un tramo de la línea {@code l}, desde {@code from} hasta {@code to} (relativos a la línea). */
@@ -325,7 +325,7 @@ public final class StackingContext {
      * de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
      */
     private static void paintLeader(Canvas canvas, Piece p) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double baseline = canvas.vertical(s.fontFace()).baseline(content.y(), s.usedLineHeight(), s.fontSize());
         for (Rect shape : Leaders.shapes(s.contentsLeader(), content, baseline, s.fontSize())) {
@@ -349,7 +349,7 @@ public final class StackingContext {
             return;
         }
         Box box = p.f().box();
-        Style s = box.style;
+        Style s = box.style();
         FontFace font = s.fontFace();
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
@@ -414,7 +414,7 @@ public final class StackingContext {
     /** Rayas de subrayado ({@code underline}) o de tachado de los tramos, con el color del texto. */
     private static void paintDecorations(Canvas canvas, Piece p, Rect content, VerticalMetrics metrics,
                                          boolean underline) {
-        Style s = p.f().box().style;
+        Style s = p.f().box().style();
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize());
             for (TextLine.Run r : l.runs()) {

@@ -40,16 +40,16 @@ class TableStylesTest {
     }
 
     private static Box cell(Box table, String text) {
-        return table.children.stream().filter(c -> text.equals(c.text.trim())).findFirst().orElseThrow();
+        return table.children().stream().filter(c -> text.equals(c.text().trim())).findFirst().orElseThrow();
     }
 
     /** El color liso del fondo de una celda. */
     private static String color(Box cell) {
-        return ((dev.stxt.boxes.model.Paint.Solid) cell.style.background).color();
+        return ((dev.stxt.boxes.model.Paint.Solid) cell.style().background).color();
     }
 
     private static List<String> background(Box table) {
-        return table.children.stream().map(c -> c.style.background == null ? "-" : color(c))
+        return table.children().stream().map(c -> c.style().background == null ? "-" : color(c))
                 .toList();
     }
 
@@ -58,23 +58,23 @@ class TableStylesTest {
         Box table = root(doc(new String[]{"\tStyles:",
                 "\t\tElement: Head cell", "\t\t\tTypography:", "\t\t\t\tWeight: bold",
                 "\t\tElement: Foot cell", "\t\t\tTypography:", "\t\t\t\tWeight: bold", "\t\t\t\tAlign: right",
-                "\t\tElement: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3"}, TABLE)).children.get(0);
-        assertEquals(FontWeight.BOLD, cell(table, "h2").style.fontWeight);
-        assertEquals(FontWeight.BOLD, cell(table, "f1").style.fontWeight);
-        assertEquals(Style.TextAlign.RIGHT, cell(table, "f1").style.textAlign);
-        assertEquals(Style.TextAlign.LEFT, cell(table, "h1").style.textAlign);
-        assertEquals(FontWeight.NORMAL, cell(table, "a1").style.fontWeight);
-        assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style.padding.top()));
-        assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style.padding.top()));
+                "\t\tElement: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3"}, TABLE)).children().get(0);
+        assertEquals(FontWeight.BOLD, cell(table, "h2").style().fontWeight);
+        assertEquals(FontWeight.BOLD, cell(table, "f1").style().fontWeight);
+        assertEquals(Style.TextAlign.RIGHT, cell(table, "f1").style().textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "h1").style().textAlign);
+        assertEquals(FontWeight.NORMAL, cell(table, "a1").style().fontWeight);
+        assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style().padding.top()));
+        assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style().padding.top()));
         // La línea de lo que aporta la regla es la de la regla.
-        assertEquals(14, cell(table, "h1").style.line("font-weight"));
+        assertEquals(14, cell(table, "h1").style().line("font-weight"));
     }
 
     @Test
     void zebraCountsTheRowsOfTheBodyFromOne() {
         Box table = root(doc(new String[]{"\tStyles:",
                 "\t\tElement: Odd row cell", "\t\t\tBox:", "\t\t\t\tBackground: #111111",
-                "\t\tElement: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #222222"}, TABLE)).children.get(0);
+                "\t\tElement: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #222222"}, TABLE)).children().get(0);
         // Ni la cabecera ni el pie entran en la cebra.
         assertEquals(List.of("-", "-", "#111111", "#111111", "#222222", "#222222", "#111111", "#111111", "-", "-"),
                 background(table).stream().map(b -> b.equals("-") ? b : b.toLowerCase()).toList());
@@ -86,12 +86,12 @@ class TableStylesTest {
                 "\tTable:", "\t\tColumns: 1fr 1fr", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tSpan: 2 1", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tCell: c",
-                "\t\t\tRow:", "\t\t\t\tCell: d", "\t\t\t\tCell: e").children.get(0);
-        assertNull(cell(table, "a").style.background);
-        assertNull(cell(table, "b").style.background);
+                "\t\t\tRow:", "\t\t\t\tCell: d", "\t\t\t\tCell: e").children().get(0);
+        assertNull(cell(table, "a").style().background);
+        assertNull(cell(table, "b").style().background);
         // c está en la fila 2 (par); d y e, en la 3.
         assertEquals("#222222", color(cell(table, "c")).toLowerCase());
-        assertNull(cell(table, "d").style.background);
+        assertNull(cell(table, "d").style().background);
     }
 
     @Test
@@ -100,12 +100,12 @@ class TableStylesTest {
                 "\t\tElement: Cell", "\t\t\tBox:", "\t\t\t\tPadding: 1", "\t\t\t\tMargin: 1",
                 "\t\tElement: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 2",
                 "\t\tElement: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\t\tElement: Odd row cell", "\t\t\tBox:", "\t\t\t\tPadding: 4"}, TABLE)).children.get(0);
-        assertEquals(Value.pt(2), cell(table, "h1").style.padding.top());
-        assertEquals(Value.pt(4), cell(table, "a1").style.padding.top());
-        assertEquals(Value.pt(3), cell(table, "b1").style.padding.top());
-        assertEquals(Value.pt(1), cell(table, "f1").style.padding.top());
-        assertEquals(Value.pt(1), cell(table, "f1").style.margin.top());
+                "\t\tElement: Odd row cell", "\t\t\tBox:", "\t\t\t\tPadding: 4"}, TABLE)).children().get(0);
+        assertEquals(Value.pt(2), cell(table, "h1").style().padding.top());
+        assertEquals(Value.pt(4), cell(table, "a1").style().padding.top());
+        assertEquals(Value.pt(3), cell(table, "b1").style().padding.top());
+        assertEquals(Value.pt(1), cell(table, "f1").style().padding.top());
+        assertEquals(Value.pt(1), cell(table, "f1").style().margin.top());
     }
 
     @Test
@@ -119,13 +119,13 @@ class TableStylesTest {
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\t\tClass: left",
                 "\t\t\tRow:", "\t\t\t\tCell: c1", "\t\t\t\tCell: c2", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center")
-                .children.get(0);
-        assertEquals(Style.TextAlign.CENTER, cell(table, "h1").style.textAlign);
-        assertEquals(Style.TextAlign.RIGHT, cell(table, "h2").style.textAlign);
-        assertEquals(Style.TextAlign.LEFT, cell(table, "a1").style.textAlign);
-        assertEquals(Style.TextAlign.RIGHT, cell(table, "a2").style.textAlign);
-        assertEquals(Style.TextAlign.LEFT, cell(table, "b2").style.textAlign);
-        assertEquals(Style.TextAlign.CENTER, cell(table, "c2").style.textAlign);
+                .children().get(0);
+        assertEquals(Style.TextAlign.CENTER, cell(table, "h1").style().textAlign);
+        assertEquals(Style.TextAlign.RIGHT, cell(table, "h2").style().textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "a1").style().textAlign);
+        assertEquals(Style.TextAlign.RIGHT, cell(table, "a2").style().textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "b2").style().textAlign);
+        assertEquals(Style.TextAlign.CENTER, cell(table, "c2").style().textAlign);
     }
 
     @Test
@@ -134,7 +134,7 @@ class TableStylesTest {
                 "\t\tFor column: 2 3", "\t\t\tBox:", "\t\t\t\tBackground: #333333",
                 "\tTable:", "\t\tColumns: 1fr 1fr 1fr 1fr",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tSpan: 1 3",
-                "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d", "\t\t\t\tCell: e", "\t\t\t\tCell: f").children.get(0);
+                "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d", "\t\t\t\tCell: e", "\t\t\t\tCell: f").children().get(0);
         assertEquals(List.of("-", "#333333", "-", "#333333", "#333333", "-"),
                 background(table).stream().map(b -> b.equals("-") ? b : b.toLowerCase()).toList());
     }
@@ -148,15 +148,15 @@ class TableStylesTest {
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2", "\t\t\t\tCell: h3",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2", "\t\t\t\tCell: a3",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\tCell: b3",
-                "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center").children.get(0);
-        assertEquals(Style.TextAlign.LEFT, cell(table, "a1").style.textAlign);
-        assertEquals(Style.TextAlign.RIGHT, cell(table, "a2").style.textAlign);
+                "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center").children().get(0);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "a1").style().textAlign);
+        assertEquals(Style.TextAlign.RIGHT, cell(table, "a2").style().textAlign);
         // For column pisa a Column align; la cabecera, también.
-        assertEquals(Style.TextAlign.LEFT, cell(table, "a3").style.textAlign);
-        assertEquals(Style.TextAlign.CENTER, cell(table, "h2").style.textAlign);
-        assertEquals(Style.TextAlign.CENTER, cell(table, "b3").style.textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "a3").style().textAlign);
+        assertEquals(Style.TextAlign.CENTER, cell(table, "h2").style().textAlign);
+        assertEquals(Style.TextAlign.CENTER, cell(table, "b3").style().textAlign);
         // La línea de la alineación es la de Column align.
-        assertEquals(21, cell(table, "a2").style.line("text-align"));
+        assertEquals(21, cell(table, "a2").style().line("text-align"));
     }
 
     @Test
@@ -164,8 +164,8 @@ class TableStylesTest {
         Box root = root("\tTable:", "\t\tColumns: 1fr", "\t\tColumn align: right", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a",
                 "\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b");
-        assertEquals(Style.TextAlign.RIGHT, cell(root.children.get(0), "a").style.textAlign);
-        assertEquals(Style.TextAlign.LEFT, cell(root.children.get(1), "b").style.textAlign);
+        assertEquals(Style.TextAlign.RIGHT, cell(root.children().get(0), "a").style().textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(root.children().get(1), "b").style().textAlign);
     }
 
     @Test
@@ -176,16 +176,16 @@ class TableStylesTest {
                 "\t\tElement: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #444444",
                 "\tMarkdown:", "\t\tTable columns: equal",
                 "\t\tContent >>",
-                "\t\t\t| A | B |", "\t\t\t|:--|--:|", "\t\t\t| 1 | 2 |", "\t\t\t| 3 | 4 |").children.get(0);
-        Box table = markdown.children.get(0);
-        assertEquals(FontWeight.BOLD, cell(table, "A").style.fontWeight);
-        assertEquals(FontWeight.NORMAL, cell(table, "1").style.fontWeight);
+                "\t\t\t| A | B |", "\t\t\t|:--|--:|", "\t\t\t| 1 | 2 |", "\t\t\t| 3 | 4 |").children().get(0);
+        Box table = markdown.children().get(0);
+        assertEquals(FontWeight.BOLD, cell(table, "A").style().fontWeight);
+        assertEquals(FontWeight.NORMAL, cell(table, "1").style().fontWeight);
         // La primera columna es left en la fila de separación: gana a For column.
-        assertEquals(Style.TextAlign.LEFT, cell(table, "A").style.textAlign);
-        assertEquals(Style.TextAlign.LEFT, cell(table, "3").style.textAlign);
-        assertEquals(Style.TextAlign.RIGHT, cell(table, "4").style.textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "A").style().textAlign);
+        assertEquals(Style.TextAlign.LEFT, cell(table, "3").style().textAlign);
+        assertEquals(Style.TextAlign.RIGHT, cell(table, "4").style().textAlign);
         assertEquals("#444444", color(cell(table, "4")).toLowerCase());
-        assertNull(cell(table, "2").style.background);
+        assertNull(cell(table, "2").style().background);
     }
 
     /** §5.15: el {@code Class} de una {@code Row} aplica sus reglas {@code For class} a cada celda de la fila. */
@@ -197,17 +197,17 @@ class TableStylesTest {
                 "\tTable:", "\t\tColumns: 1fr 1fr 1fr",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tClass: total", "\t\t\t\tCell: t1", "\t\t\t\t\tSpan: 1 2",
-                "\t\t\t\tCell: t2").children.get(0);
+                "\t\t\t\tCell: t2").children().get(0);
         for (String total : List.of("t1", "t2")) {
-            assertEquals(FontWeight.BOLD, cell(table, total).style.fontWeight, total);
+            assertEquals(FontWeight.BOLD, cell(table, total).style().fontWeight, total);
             assertEquals("#efe4d2", color(cell(table, total)).toLowerCase(), total);
         }
         for (String other : List.of("a", "b", "c")) {
-            assertEquals(FontWeight.NORMAL, cell(table, other).style.fontWeight, other);
-            assertNull(cell(table, other).style.background, other);
+            assertEquals(FontWeight.NORMAL, cell(table, other).style().fontWeight, other);
+            assertNull(cell(table, other).style().background, other);
         }
         // La línea de lo que aporta la clase es la de su regla.
-        assertEquals(14, cell(table, "t2").style.line("font-weight"));
+        assertEquals(14, cell(table, "t2").style().line("font-weight"));
     }
 
     /** Gana a las reglas de columna y de posición y pierde con las clases de la propia celda. */
@@ -221,7 +221,7 @@ class TableStylesTest {
                 "\tTable:", "\t\tColumns: 1fr 1fr",
                 "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tClass: row", "\t\t\t\tCell: a1", "\t\t\t\t\tClass: own", "\t\t\t\tCell: a2",
-                "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2").children.get(0);
+                "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2").children().get(0);
         // a1: su clase; a2: la de su fila, que gana a las impares y a la columna; b1 (fila par): nada; b2: la columna.
         assertEquals(List.of("#555555", "#444444", "-", "#333333"),
                 background(table).stream().map(String::toLowerCase).toList());

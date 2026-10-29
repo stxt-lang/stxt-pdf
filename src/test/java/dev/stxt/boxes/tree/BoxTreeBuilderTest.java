@@ -39,12 +39,12 @@ class BoxTreeBuilderTest {
         BoxTreeBuilder.Result r = build(document(
                 "\tBlock:", "\t\tId: parent", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\t\tText: antes", "\t\tBlock:", "\t\t\tId: child"));
-        Box parent = r.sections().get(0).box().children.get(0);
-        assertEquals(2, parent.children.size());
-        assertFalse(parent.children.get(0).anonymous);
-        assertEquals(Style.Layout.INLINE, parent.children.get(0).style.layout);
-        assertEquals("antes", parent.children.get(0).text);
-        assertEquals("child", parent.children.get(1).id);
+        Box parent = r.sections().get(0).box().children().get(0);
+        assertEquals(2, parent.children().size());
+        assertFalse(parent.children().get(0).anonymous());
+        assertEquals(Style.Layout.INLINE, parent.children().get(0).style().layout);
+        assertEquals("antes", parent.children().get(0).text());
+        assertEquals("child", parent.children().get(1).id());
     }
 
     @Test
@@ -53,35 +53,35 @@ class BoxTreeBuilderTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\tGrid:", "\tRelative:", "\tAbsolute:", "\tFixed:")).sections().get(0).box();
         assertEquals(List.of(Style.Layout.INLINE, Style.Layout.FLEX, Style.Layout.GRID, Style.Layout.BLOCK,
-                Style.Layout.BLOCK, Style.Layout.BLOCK), root.children.stream().map(b -> b.style.layout).toList());
+                Style.Layout.BLOCK, Style.Layout.BLOCK), root.children().stream().map(b -> b.style().layout).toList());
         assertEquals(List.of(Style.Position.STATIC, Style.Position.STATIC, Style.Position.STATIC,
                 Style.Position.RELATIVE, Style.Position.ABSOLUTE, Style.Position.FIXED),
-                root.children.stream().map(b -> b.style.position).toList());
-        assertEquals("hola", root.children.get(0).text);
+                root.children().stream().map(b -> b.style().position).toList());
+        assertEquals("hola", root.children().get(0).text());
     }
 
     @Test
     void textInAContentBlock() {
         Box b = build(document("\tText:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
-                "\t\tContent >>", "\t\t\tuno", "\t\t\tdos")).sections().get(0).box().children.get(0);
-        assertEquals("uno\ndos", b.text);
-        assertEquals(13, b.textLine);
-        assertTrue(b.textBlock);
+                "\t\tContent >>", "\t\t\tuno", "\t\t\tdos")).sections().get(0).box().children().get(0);
+        assertEquals("uno\ndos", b.text());
+        assertEquals(13, b.textLine());
+        assertTrue(b.textBlock());
     }
 
     @Test
     void itemAndAreaPropertiesGoToTheirElement() {
         Box root = build(document(
                 "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
-        Box a = root.children.get(0).children.get(0);
-        assertEquals("a", a.id);
-        assertEquals(2, a.style.itemGrow, 1e-9);
-        assertEquals(1, a.style.layer);
-        Box b = root.children.get(1).children.get(0);
-        assertEquals(new Cell(1, 2, 1, 1), b.style.itemArea);
-        assertEquals(Style.Alignment.CENTER, b.style.itemVertical);
-        assertEquals(17, b.style.line("item.area"));
-        assertEquals(Cell.AUTO, root.children.get(1).children.get(1).style.itemArea);
+        Box a = root.children().get(0).children().get(0);
+        assertEquals("a", a.id());
+        assertEquals(2, a.style().itemGrow, 1e-9);
+        assertEquals(1, a.style().layer);
+        Box b = root.children().get(1).children().get(0);
+        assertEquals(new Cell(1, 2, 1, 1), b.style().itemArea);
+        assertEquals(Style.Alignment.CENTER, b.style().itemVertical);
+        assertEquals(17, b.style().line("item.area"));
+        assertEquals(Cell.AUTO, root.children().get(1).children().get(1).style().itemArea);
     }
 
     @Test
@@ -89,13 +89,13 @@ class BoxTreeBuilderTest {
         Box child = build(document(
                 "\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tWeight: bold", "\t\t\tStyle: italic",
                 "\t\t\tSize: 14", "\t\t\tWidows: 3", "\t\tBox:", "\t\t\tPadding: 10",
-                "\t\tText: x")).sections().get(0).box().children.get(0).children.get(0);
+                "\t\tText: x")).sections().get(0).box().children().get(0).children().get(0);
         assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.ITALIC),
-                child.style.fontFace());
-        assertEquals(14, child.style.fontSize, 1e-9);
-        assertEquals(3, child.style.widows);
-        assertEquals(16.8, child.style.usedLineHeight(), 1e-9);
-        assertEquals(Sides.all(Value.pt(0)), child.style.padding); // Padding no se hereda
+                child.style().fontFace());
+        assertEquals(14, child.style().fontSize, 1e-9);
+        assertEquals(3, child.style().widows);
+        assertEquals(16.8, child.style().usedLineHeight(), 1e-9);
+        assertEquals(Sides.all(Value.pt(0)), child.style().padding); // Padding no se hereda
     }
 
     @Test
@@ -185,14 +185,14 @@ class BoxTreeBuilderTest {
         String doc = "Document (dev.stxt.boxes):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n\t\t\t\tColor: #333\n\t\t\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
-        Box text = build(doc).sections().get(0).box().children.get(0).children.get(0);
-        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style.fontFace());
-        assertEquals(12, text.style.fontSize, 1e-9);
+        Box text = build(doc).sections().get(0).box().children().get(0).children().get(0);
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style().fontFace());
+        assertEquals(12, text.style().fontSize, 1e-9);
         // Document admite todo Typography, no solo la fuente.
-        assertEquals("#333", text.style.color);
-        assertEquals(20, text.style.usedLineHeight(), 1e-9);
+        assertEquals("#333", text.style().color);
+        assertEquals(20, text.style().usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
-        assertEquals(10, text.style.line("font"));
+        assertEquals(10, text.style().line("font"));
     }
 
     @Test
@@ -241,10 +241,10 @@ class BoxTreeBuilderTest {
                 "\tFixed:", "\t\tRotate: 360", "\t\tRotate origin: top",
                 "\tImage: test/square.png", "\t\tRotate: -360",
                 "\tRelative:")).sections().get(0).box();
-        assertEquals(new dev.stxt.boxes.model.Rotation(-8.5, 0.5, 0.5), root.children.get(0).style.rotation);
-        assertEquals(new dev.stxt.boxes.model.Rotation(90, 1, 1), root.children.get(1).style.rotation);
-        assertEquals(new dev.stxt.boxes.model.Rotation(360, 0.5, 0), root.children.get(2).style.rotation);
-        assertEquals(-360, root.children.get(3).style.rotation.degrees(), 1e-9);
-        assertEquals(null, root.children.get(4).style.rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(90, 1, 1), root.children().get(1).style().rotation);
+        assertEquals(new dev.stxt.boxes.model.Rotation(360, 0.5, 0), root.children().get(2).style().rotation);
+        assertEquals(-360, root.children().get(3).style().rotation.degrees(), 1e-9);
+        assertEquals(null, root.children().get(4).style().rotation);
     }
 }

@@ -36,24 +36,24 @@ public final class Images {
         if (box.isImage()) {
             checkLimits(file(box), box);
         }
-        box.children.forEach(this::validate);
+        box.children().forEach(this::validate);
     }
 
     /** Que la imagen no pida más de lo que admiten los {@link Limits}; se mira en la cabecera o en el recuento del SVG, sin dibujarla. */
     private void checkLimits(ImageFile file, Box box) {
         if (file.pixels() > limits.maxImagePixels()) {
-            throw new InvalidModelException(box.line, ErrorCode.IMAGE_TOO_LARGE, "La imagen " + box.image + " tiene "
+            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_TOO_LARGE, "La imagen " + box.image() + " tiene "
                     + (long) file.pixelWidth() + " × " + (long) file.pixelHeight() + " píxeles ("
                     + megapixels(file.pixels()) + ") y el máximo es " + megapixels(limits.maxImagePixels())
                     + ": reduce su resolución (Limits.maxImagePixels lo cambia)");
         }
         if (file.svgDepth() > limits.maxSvgDepth()) {
-            throw new InvalidModelException(box.line, ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image + " anida "
+            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " anida "
                     + file.svgDepth() + " niveles y el máximo es " + limits.maxSvgDepth()
                     + ": aplánalo (Limits.maxSvgDepth lo cambia)");
         }
         if (file.svgElements() > limits.maxSvgElements()) {
-            throw new InvalidModelException(box.line, ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image + " dibuja "
+            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " dibuja "
                     + (file.svgElements() >= (1L << 50) ? "una cantidad desorbitada de" : String.valueOf(file.svgElements()))
                     + " elementos, contando cada vez que un <use> repite un trozo, y el máximo es "
                     + limits.maxSvgElements() + ": simplifícalo (Limits.maxSvgElements lo cambia)");
@@ -67,11 +67,11 @@ public final class Images {
     /** El fichero de una {@code Image}. */
     public ImageFile file(Box box) {
         try {
-            return resources.images().find(box.image);
+            return resources.images().find(box.image());
         } catch (ImageFormatException e) {
-            throw new InvalidModelException(box.line, ErrorCode.IMAGE_FORMAT, e.getMessage());
+            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, e.getMessage());
         } catch (ResourceException e) {
-            throw new InvalidModelException(box.line, ErrorCode.IMAGE_UNKNOWN, e.getMessage()
+            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_UNKNOWN, e.getMessage()
                     + " (la ruta de una Image es relativa a la carpeta images/ de los recursos)");
         }
     }

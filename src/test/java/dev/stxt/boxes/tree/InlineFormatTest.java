@@ -30,77 +30,77 @@ class InlineFormatTest {
 
     @Test
     void withoutItTheTextIsLiteral() {
-        Box text = build("\tText: Una **negrita** literal").children.get(0);
-        assertEquals("Una **negrita** literal", text.text);
-        assertNull(text.runs);
+        Box text = build("\tText: Una **negrita** literal").children().get(0);
+        assertEquals("Una **negrita** literal", text.text());
+        assertNull(text.formattedRuns());
     }
 
     @Test
     void theFourFormatsAndLinksBecomeRuns() {
         Box text = build("\tText: Una **negrita**, *cursiva*, ++subrayado*, ~~tachado~~ y [web](https://a.example).",
-                "\t\tTypography:", "\t\t\tInline: markdown").children.get(0);
-        assertEquals("Una negrita, cursiva, ++subrayado*, tachado y web.", text.text);
+                "\t\tTypography:", "\t\t\tInline: markdown").children().get(0);
+        assertEquals("Una negrita, cursiva, ++subrayado*, tachado y web.", text.text());
         assertEquals(List.of(run("Una "), run("negrita", "b"), run(", "), run("cursiva", "i"),
                 run(", ++subrayado*, "), run("tachado", "s"), run(" y "),
-                link("web", "u", "https://a.example"), run(".")), text.runs);
+                link("web", "u", "https://a.example"), run(".")), text.formattedRuns());
     }
 
     @Test
     void underlineIsTwoPlusSigns() {
         Box text = build("\tText: Un ++subrayado++ y **++ambos++**", "\t\tTypography:", "\t\t\tInline: markdown")
-                .children.get(0);
-        assertEquals(List.of(run("Un "), run("subrayado", "u"), run(" y "), run("ambos", "bu")), text.runs);
+                .children().get(0);
+        assertEquals(List.of(run("Un "), run("subrayado", "u"), run(" y "), run("ambos", "bu")), text.formattedRuns());
     }
 
     @Test
     void escapesGiveTheLiteralCharacter() {
         Box text = build("\tText: Dos \\*\\*estrellas\\*\\* y 3 \\* 4", "\t\tTypography:", "\t\t\tInline: markdown")
-                .children.get(0);
-        assertEquals("Dos **estrellas** y 3 * 4", text.text);
-        assertNull(text.runs);
+                .children().get(0);
+        assertEquals("Dos **estrellas** y 3 * 4", text.text());
+        assertNull(text.formattedRuns());
     }
 
     @Test
     void theContentBlockJoinsLinesWithASpaceAndKeepsParagraphs() {
         Box text = build("\tText:", "\t\tTypography:", "\t\t\tInline: markdown", "\t\tContent >>",
-                "\t\t\tPrimera línea con **negrita**", "\t\t\tsigue aquí.", "", "", "\t\t\tOtro *párrafo*.").children.get(0);
-        assertEquals("Primera línea con negrita sigue aquí.\n\nOtro párrafo.", text.text);
+                "\t\t\tPrimera línea con **negrita**", "\t\t\tsigue aquí.", "", "", "\t\t\tOtro *párrafo*.").children().get(0);
+        assertEquals("Primera línea con negrita sigue aquí.\n\nOtro párrafo.", text.text());
         assertEquals(List.of(run("Primera línea con "), run("negrita", "b"), run(" sigue aquí.\n\nOtro "),
-                run("párrafo", "i"), run(".")), text.runs);
+                run("párrafo", "i"), run(".")), text.formattedRuns());
     }
 
     @Test
     void itIsInheritedAndNoneTurnsItOff() {
         Box root = buildInline("\tBlock:", "\t\tText: Uno **dos**",
                 "\t\tText: Tres **cuatro**", "\t\t\tTypography:", "\t\t\t\tInline: none");
-        Box block = root.children.get(0);
-        assertEquals(Style.Inline.MARKDOWN, block.style.inline);
-        assertEquals("Uno dos", block.children.get(0).text);
-        assertEquals(List.of(run("Uno "), run("dos", "b")), block.children.get(0).runs);
-        assertEquals("Tres **cuatro**", block.children.get(1).text);
-        assertNull(block.children.get(1).runs);
+        Box block = root.children().get(0);
+        assertEquals(Style.Inline.MARKDOWN, block.style().inline);
+        assertEquals("Uno dos", block.children().get(0).text());
+        assertEquals(List.of(run("Uno "), run("dos", "b")), block.children().get(0).formattedRuns());
+        assertEquals("Tres **cuatro**", block.children().get(1).text());
+        assertNull(block.children().get(1).formattedRuns());
     }
 
     @Test
     void aStylesRuleTurnsItOnForAnElement() {
         Box root = build("\tStyles:", "\t\tElement: Paragraph", "\t\t\tTypography:", "\t\t\t\tInline: markdown",
                 "\tParagraph: Un **párrafo**", "\tText: Un **texto**");
-        assertEquals("Un párrafo", root.children.get(0).text);
-        assertEquals(List.of(run("Un "), run("párrafo", "b")), root.children.get(0).runs);
-        assertEquals("Un **texto**", root.children.get(1).text);
+        assertEquals("Un párrafo", root.children().get(0).text());
+        assertEquals(List.of(run("Un "), run("párrafo", "b")), root.children().get(0).formattedRuns());
+        assertEquals("Un **texto**", root.children().get(1).text());
     }
 
     @Test
     void cellsAndHeadingTextsToo() {
         Box root = buildInline("\tHeading 1:", "\t\tText: Un *título*", "\tTable:",
                 "\t\tColumns: 100 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Una **celda**", "\t\t\t\tCell: Otra");
-        Box heading = root.children.get(0).children.get(0);
-        assertEquals("Un título", heading.text);
-        assertEquals(List.of(run("Un "), run("título", "i")), heading.runs);
-        Box cell = root.children.get(1).children.get(0);
-        assertEquals("Una celda", cell.text);
-        assertEquals(List.of(run("Una "), run("celda", "b")), cell.runs);
-        assertNull(root.children.get(1).children.get(1).runs);
+        Box heading = root.children().get(0).children().get(0);
+        assertEquals("Un título", heading.text());
+        assertEquals(List.of(run("Un "), run("título", "i")), heading.formattedRuns());
+        Box cell = root.children().get(1).children().get(0);
+        assertEquals("Una celda", cell.text());
+        assertEquals(List.of(run("Una "), run("celda", "b")), cell.formattedRuns());
+        assertNull(root.children().get(1).children().get(1).formattedRuns());
     }
 
     @Test
@@ -108,9 +108,9 @@ class InlineFormatTest {
         // Lo escapado en un Markdown es literal: no se vuelve a interpretar como negrita.
         Box root = buildInline("\tMarkdown:", "\t\tContent >>",
                 "\t\t\t\\*\\*x\\*\\* y **z**");
-        Box paragraph = root.children.get(0).children.get(0);
-        assertEquals("**x** y z", paragraph.text);
-        assertEquals(List.of(run("**x** y "), run("z", "b")), paragraph.runs);
+        Box paragraph = root.children().get(0).children().get(0);
+        assertEquals("**x** y z", paragraph.text());
+        assertEquals(List.of(run("**x** y "), run("z", "b")), paragraph.formattedRuns());
     }
 
     @Test

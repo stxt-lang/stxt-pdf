@@ -167,11 +167,10 @@ class BreakRulesTest {
     void aMulticolOnlyPropagatesPageBreaks() {
         Box multicol = box(Element.MULTICOL, Style.Break.AUTO, Style.Break.AUTO);
         Box flow = box(Element.COLUMNS, Style.Break.AUTO, Style.Break.AUTO);
-        multicol.addChild(flow);
+        StyleEditor.addChildren(multicol, flow);
         Box first = box(Element.BLOCK, Style.Break.COLUMN, Style.Break.AUTO);
         Box last = box(Element.BLOCK, Style.Break.AUTO, Style.Break.PAGE);
-        flow.addChild(first);
-        flow.addChild(last);
+        StyleEditor.addChildren(flow, first, last);
         assertEquals(Style.Break.COLUMN, BreakRules.forcedBefore(flow));
         assertEquals(Style.Break.AUTO, BreakRules.forcedBefore(multicol));
         assertEquals(Style.Break.PAGE, BreakRules.forcedAfter(multicol));

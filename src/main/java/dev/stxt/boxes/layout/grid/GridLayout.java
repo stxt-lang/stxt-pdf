@@ -62,11 +62,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     private static Grid grid(Box box) {
-        Style s = box.style;
+        Style s = box.style();
         int explicitColumns = Math.max(s.gridColumns().size(), s.gridAreas().columns());
         int explicitRows = Math.max(s.gridRows().size(), s.gridAreas().rows());
         List<Box> items = box.inFlowChildren();
-        List<Cell> cells = items.stream().map(i -> i.style.itemArea()).toList();
+        List<Cell> cells = items.stream().map(i -> i.style().itemArea()).toList();
         List<Area> areas;
         try {
             areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow());
@@ -88,7 +88,7 @@ public final class GridLayout implements LayoutAlgorithm {
         String track = row ? "fila" : "columna";
         String across = row ? "columna" : "fila";
         String hole = e.span == 1 ? "1 " + across + " libre" : e.span + " " + across + "s libres";
-        return new InvalidModelException(item.style.line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
+        return new InvalidModelException(item.style().line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
                 + e.track + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks + " "
                 + across + (e.tracks == 1 ? "" : "s") + "): elige otra " + track + " o déjala en auto");
     }
@@ -110,7 +110,7 @@ public final class GridLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Grid g = grid(box);
         // Sin containing block, un hueco en porcentaje cuenta como 0.
-        double gap = box.style.columnGap().resolve(OptionalDouble.empty()).orElse(0);
+        double gap = box.style().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<ItemContribution> minContributions = new ArrayList<>();
         List<ItemContribution> maxContributions = new ArrayList<>();
         for (int i = 0; i < g.items().size(); i++) {
@@ -138,7 +138,7 @@ public final class GridLayout implements LayoutAlgorithm {
      */
     public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, engine);
-        Style s = box.style;
+        Style s = box.style();
         double contentWidth = model.contentWidth();
         OptionalDouble contentHeight = model.contentHeight();
         double columnGap = s.columnGap().resolve(contentWidth).orElse(0);
@@ -168,7 +168,7 @@ public final class GridLayout implements LayoutAlgorithm {
             Box item = g.items().get(i);
             Area a = g.areas().get(i);
             areaWidths[i] = span(columns, a.column() - 1, a.columns(), columnGap);
-            margins[i] = Insets.resolve(item.style.margin(), areaWidths[i]);
+            margins[i] = Insets.resolve(item.style().margin(), areaWidths[i]);
             itemWidths[i] = itemWidth(item, areaWidths[i], margins[i], horizontal(item, s), atStart);
             spaces[i] = ConstraintSpace.fixed(itemWidths[i], OptionalDouble.empty(), areaWidths[i],
                     OptionalDouble.empty(), atStart);
@@ -184,8 +184,8 @@ public final class GridLayout implements LayoutAlgorithm {
         // Alinear cada ítem en su área.
         List<UnitBreaker.Placed> placed = new ArrayList<>();
         List<PendingAbsolute> pending = new ArrayList<>();
-        for (Box child : box.children) {
-            if (child.style.isOutOfFlow()) {
+        for (Box child : box.children()) {
+            if (child.style().isOutOfFlow()) {
                 pending.add(new PendingAbsolute(child, 0, 0));
             }
         }
@@ -203,7 +203,7 @@ public final class GridLayout implements LayoutAlgorithm {
                     + Sizing.align(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
             double py = y[a.row() - 1] + margin.top()
                     + Sizing.align(vertical, areaHeight, f.height() + margin.vertical());
-            RelativeOffset relative = RelativeOffset.of(item.style, contentWidth, contentHeight);
+            RelativeOffset relative = RelativeOffset.of(item.style(), contentWidth, contentHeight);
             placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1,
                     relative));
         }
@@ -249,7 +249,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */
     private double itemWidth(Box item, double areaWidth, Insets margin, Style.Alignment horizontal, boolean atStart) {
-        Style is = item.style;
+        Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
         BoxModel probe = BoxModel.resolve(item, free, engine);
         if (!is.width().isAuto()) {
@@ -269,7 +269,7 @@ public final class GridLayout implements LayoutAlgorithm {
     private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, double width,
                                        double areaWidth, double areaHeight, Insets margin, Style.Alignment vertical,
                                        boolean atStart) {
-        Style is = item.style;
+        Style is = item.style();
         OptionalDouble base = OptionalDouble.of(areaHeight);
         OptionalDouble fixedHeight = OptionalDouble.empty();
         if (vertical == Style.Alignment.STRETCH) {
@@ -298,11 +298,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     private static Style.Alignment horizontal(Box item, Style container) {
-        return item.style.itemHorizontal() != null ? item.style.itemHorizontal() : container.gridHorizontal();
+        return item.style().itemHorizontal() != null ? item.style().itemHorizontal() : container.gridHorizontal();
     }
 
     private static Style.Alignment vertical(Box item, Style container) {
-        return item.style.itemVertical() != null ? item.style.itemVertical() : container.gridVertical();
+        return item.style().itemVertical() != null ? item.style().itemVertical() : container.gridVertical();
     }
 
     /** Posición de cada pista desde el principio de la caja de contenido. */

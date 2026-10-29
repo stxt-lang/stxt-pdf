@@ -40,11 +40,11 @@ class HeadingNumbersTest {
         if (box.headingLevel() > 0) {
             out.add(box);
         }
-        box.children.forEach(c -> collect(c, out));
+        box.children().forEach(c -> collect(c, out));
     }
 
     private static List<String> numbers(BoxTreeBuilder.Result tree) {
-        return headings(tree).stream().map(h -> h.number).toList();
+        return headings(tree).stream().map(h -> h.number()).toList();
     }
 
     private static List<String> titles(BoxTreeBuilder.Result tree) {
@@ -76,9 +76,9 @@ class HeadingNumbersTest {
                 "\tHeading 1:", "\t\tText: Resultados", "\t\tText: del trimestre",
                 "\tHeading 2:", "\t\tText: Ventas");
         Box h1 = headings(tree).get(0);
-        assertEquals("1 Resultados", h1.children.get(0).text);
+        assertEquals("1 Resultados", h1.children().get(0).text());
         // Solo el primer Text lleva el número.
-        assertEquals("del trimestre", h1.children.get(1).text);
+        assertEquals("del trimestre", h1.children().get(1).text());
         assertEquals("1 Resultados del trimestre", h1.headingText());
         assertEquals("1.1 Ventas", headings(tree).get(1).headingText());
     }
@@ -151,12 +151,12 @@ class HeadingNumbersTest {
     void theNumberIsAPlainRunBeforeTheFormattedOnes() {
         BoxTreeBuilder.Result tree = build(NUMBERED + "\t\t\t\tInline: markdown\n", "",
                 "\tHeading 1:", "\t\tText: Un **gran** título");
-        Box text = headings(tree).get(0).children.get(0);
-        assertEquals("1 Un gran título", text.text);
-        assertEquals(4, text.runs.size());
-        assertEquals("1 ", text.runs.get(0).text());
-        assertEquals(dev.stxt.boxes.model.TextFormat.PLAIN, text.runs.get(0).format());
-        assertTrue(text.runs.get(2).format().bold());
+        Box text = headings(tree).get(0).children().get(0);
+        assertEquals("1 Un gran título", text.text());
+        assertEquals(4, text.formattedRuns().size());
+        assertEquals("1 ", text.formattedRuns().get(0).text());
+        assertEquals(dev.stxt.boxes.model.TextFormat.PLAIN, text.formattedRuns().get(0).format());
+        assertTrue(text.formattedRuns().get(2).format().bold());
     }
 
     @Test
@@ -203,6 +203,6 @@ class HeadingNumbersTest {
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 2:", "\t\tId: ventas", "\t\tText: Ventas",
                 "\tText: Véase la sección {number of: ventas}.");
-        assertEquals("1.1", headings(tree).get(1).number);
+        assertEquals("1.1", headings(tree).get(1).number());
     }
 }

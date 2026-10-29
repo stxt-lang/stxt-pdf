@@ -130,12 +130,12 @@ public final class LayoutFixture {
                              Map<String, Fragment> fragments, Map<String, Rect> rects) {
         for (Fragment f : children) {
             Rect border = new Rect(x + f.x(), y + f.y(), f.width(), f.height());
-            if (f.box().isMarker() && f.box().parent.id != null) {
-                rects.put(f.box().parent.id + MARKER, border);
+            if (f.box().isMarker() && f.box().parent().id() != null) {
+                rects.put(f.box().parent().id() + MARKER, border);
             }
-            if (f.box().id != null) {
-                fragments.put(f.box().id, f);
-                rects.put(f.box().id, border);
+            if (f.box().id() != null) {
+                fragments.put(f.box().id(), f);
+                rects.put(f.box().id(), border);
             }
             Rect content = border.shrink(f.border()).shrink(f.padding());
             walk(f.children(), content.x(), content.y(), fragments, rects);

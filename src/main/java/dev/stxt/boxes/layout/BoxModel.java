@@ -60,7 +60,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
                                    NaturalSize natural) {
-        Style s = box.style;
+        Style s = box.style();
         double baseWidth = space.percentBaseWidth();
         OptionalDouble baseHeight = space.percentBaseHeight();
         Insets margin = Insets.resolve(s.margin(), baseWidth);
@@ -192,7 +192,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
      * se pueden resolver sin containing block y cuentan como 0 (o como {@code auto}).
      */
     public static IntrinsicSizes intrinsic(Box box, IntrinsicSizes content) {
-        Style s = box.style;
+        Style s = box.style();
         Insets border = Insets.resolve(s.border(), 0);
         Insets padding = Insets.resolve(s.padding(), 0);
         double extra = border.horizontal() + padding.horizontal();

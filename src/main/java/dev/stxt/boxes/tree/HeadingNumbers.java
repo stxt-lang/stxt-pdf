@@ -1,7 +1,5 @@
 package dev.stxt.boxes.tree;
 
-import dev.stxt.boxes.model.TextFormat;
-import dev.stxt.boxes.model.TextRun;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,15 +53,7 @@ final class HeadingNumbers {
      * un espacio.
      */
     static void prefix(Box heading, String number) {
-        heading.number = number;
-        Box first = heading.children.get(0);
-        String prefix = number + " ";
-        first.text = prefix + first.text;
-        if (first.runs != null) {
-            List<TextRun> runs = new ArrayList<>(first.runs.size() + 1);
-            runs.add(new TextRun(prefix, TextFormat.PLAIN));
-            runs.addAll(first.runs);
-            first.runs = List.copyOf(runs);
-        }
+        heading.setNumber(number);
+        heading.children().get(0).prependText(number + " ");
     }
 }

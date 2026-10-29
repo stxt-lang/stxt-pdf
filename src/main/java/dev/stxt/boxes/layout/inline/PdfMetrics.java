@@ -73,14 +73,14 @@ public final class PdfMetrics implements TextMeasurer {
         if (box.hasText()) {
             check(box, fonts);
         }
-        if (box.marker != null) {
-            check(box.marker, fonts);
+        if (box.marker() != null) {
+            check(box.marker(), fonts);
         }
-        box.children.forEach(child -> validate(child, fonts));
+        box.children().forEach(child -> validate(child, fonts));
     }
 
     private static void check(Box box, FontLibrary fonts) {
-        Style s = box.style;
+        Style s = box.style();
         int start = 0;
         for (TextRun run : box.runs()) {
             FontFile font = font(box, fonts, run.format().face(s.fontFace()), start);
@@ -120,7 +120,7 @@ public final class PdfMetrics implements TextMeasurer {
      * formato, la línea del tramo.
      */
     private static FontFile font(Box box, FontLibrary fonts, FontFace face, int index) {
-        Style s = box.style;
+        Style s = box.style();
         try {
             return fonts.find(face);
         } catch (ResourceException e) {
@@ -138,7 +138,7 @@ public final class PdfMetrics implements TextMeasurer {
                 throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_VARIANT_MISSING,
                         e.getMessage() + " (texto con formato " + face.variant() + ")");
             }
-            throw new InvalidModelException(box.textLine, ErrorCode.FONT_VARIANT_MISSING,
+            throw new InvalidModelException(box.textLine(), ErrorCode.FONT_VARIANT_MISSING,
                     e.getMessage() + " (" + declarations(s) + ")");
         }
     }

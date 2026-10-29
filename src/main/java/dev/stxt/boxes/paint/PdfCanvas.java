@@ -571,8 +571,8 @@ public final class PdfCanvas implements Canvas {
             return;
         }
         try {
-            ImageFile file = resources.images().find(box.image);
-            Rect target = ImageFit.place(box.style.fit(), content, file.width(), file.height());
+            ImageFile file = resources.images().find(box.image());
+            Rect target = ImageFit.place(box.style().fit(), content, file.width(), file.height());
             int mcid = structure.mark(box);
             if (mcid < 0) {
                 out.beginMarkedContent(COSName.ARTIFACT);

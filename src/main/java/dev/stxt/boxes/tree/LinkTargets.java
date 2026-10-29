@@ -28,20 +28,20 @@ final class LinkTargets {
     }
 
     private static void check(Box box, Map<String, Box> boxes) {
-        String link = box.style.link;
+        String link = box.style().link;
         if (link != null && Links.internal(link)) {
-            int line = box.style.isDeclared("link") ? box.style.line("link") : box.line;
+            int line = box.style().isDeclared("link") ? box.style().line("link") : box.line();
             target(link, line, boxes);
         }
-        if (box.runs != null) {
-            for (var run : box.runs) {
+        if (box.formattedRuns() != null) {
+            for (var run : box.formattedRuns()) {
                 TextFormat format = run.format();
                 if (format.link() != null && Links.internal(format.link())) {
-                    target(format.link(), box.textLine, boxes);
+                    target(format.link(), box.textLine(), boxes);
                 }
             }
         }
-        box.children.forEach(child -> check(child, boxes));
+        box.children().forEach(child -> check(child, boxes));
     }
 
     private static void target(String destination, int line, Map<String, Box> boxes) {

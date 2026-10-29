@@ -62,7 +62,7 @@ class ContentsTest {
         String[] pages = {"1", "2", "3"};
         for (int i = 0; i < 3; i++) {
             Fragment entry = entries.get(i);
-            assertEquals(Element.contentsEntry(i == 1 ? 2 : 1), entry.box().element);
+            assertEquals(Element.contentsEntry(i == 1 ? 2 : 1), entry.box().element());
             assertEquals(12 * i, entry.y(), 1e-9);
             assertEquals(3, entry.children().size());
             Fragment title = entry.children().get(0);
@@ -70,7 +70,7 @@ class ContentsTest {
             Fragment page = entry.children().get(2);
             assertEquals(titles[i], text(title));
             assertEquals(pages[i], text(page));
-            assertEquals(Element.CONTENTS_LEADER, leader.box().element);
+            assertEquals(Element.CONTENTS_LEADER, leader.box().element());
             // El título y el número miden lo que escriben; la guía llena el hueco, con 4 pt a cada lado.
             double titleWidth = 5 * titles[i].length();
             assertEquals(0, title.x(), 1e-9);
@@ -102,9 +102,9 @@ class ContentsTest {
     void aHeadingWithoutIdIsReferredWithAGeneratedName() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2"));
         // El último tiene Id (last): su entrada lo usa; los demás, un nombre generado.
-        assertEquals("(heading 1)", l.fragment("toc").box().children.get(0).children.get(2).text
+        assertEquals("(heading 1)", l.fragment("toc").box().children().get(0).children().get(2).text()
                 .replace("{page of: ", "").replace("}", ""));
-        assertEquals("{page of: last}", l.fragment("toc").box().children.get(2).children.get(2).text);
+        assertEquals("{page of: last}", l.fragment("toc").box().children().get(2).children().get(2).text());
     }
 
     @Test

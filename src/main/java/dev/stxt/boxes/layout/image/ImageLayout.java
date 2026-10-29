@@ -44,7 +44,7 @@ public final class ImageLayout implements LayoutAlgorithm {
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        Style s = box.style;
+        Style s = box.style();
         NaturalSize natural = engine.natural(box);
         double ratio = s.aspectRatio() != null ? s.aspectRatio() : natural.ratio();
         OptionalDouble height = s.height().resolve(OptionalDouble.empty());

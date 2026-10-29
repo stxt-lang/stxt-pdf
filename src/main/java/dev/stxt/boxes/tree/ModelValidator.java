@@ -117,7 +117,7 @@ final class ModelValidator {
 
     /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
-        Style.Layout parentLayout = parent.style.layout;
+        Style.Layout parentLayout = parent.style().layout;
         // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
         // de una Table, ítems de su grid.
         boolean flexItem = !s.isOutOfFlow() && parentLayout == Style.Layout.FLEX;
@@ -258,7 +258,7 @@ final class ModelValidator {
                 && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
-        boolean column = parent.style.flexDirection == Style.Direction.COLUMN;
+        boolean column = parent.style().flexDirection == Style.Direction.COLUMN;
         if (flexItem && column && !parentDefinite) {
             if (hasPercentage(s.itemBasis)) {
                 throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
@@ -294,7 +294,7 @@ final class ModelValidator {
      * estirado ({@code Vertical: stretch}) en su área.
      */
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
-        boolean gridItem = !s.isOutOfFlow() && parent.style.layout == Style.Layout.GRID;
+        boolean gridItem = !s.isOutOfFlow() && parent.style().layout == Style.Layout.GRID;
         boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         Value h = s.height;
         if (!h.isAuto() && !h.isIntrinsic()) {
@@ -306,7 +306,7 @@ final class ModelValidator {
         if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
             return true;
         }
-        Style.Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style.gridVertical;
+        Style.Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().gridVertical;
         return h.isAuto() && gridItem && vertical == Style.Alignment.STRETCH;
     }
 
@@ -317,11 +317,11 @@ final class ModelValidator {
 
     /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
     static void font(InlineNode n, Node source, Box box) {
-        if (box.style.font == null) {
+        if (box.style().font == null) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
                     + n.getName() + ", de un antecesor o de Styles (Element: Document)");
         }
-        if (!box.style.isDeclared(FONT_SIZE)) {
+        if (!box.style().isDeclared(FONT_SIZE)) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
                     + n.getName() + ", de un antecesor o de Styles (Element: Document)");
         }

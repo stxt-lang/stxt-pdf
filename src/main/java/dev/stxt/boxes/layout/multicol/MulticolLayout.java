@@ -82,7 +82,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = engine.intrinsic(flow(box));
-        Style s = box.style;
+        Style s = box.style();
         int count = s.multicolCount() != null ? s.multicolCount() : 1;
         int narrowest = s.multicolWidth() == null ? count : 1;
         double width = s.multicolWidth() != null ? s.multicolWidth() : 0;
@@ -98,7 +98,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
     /** El flujo de columnas: el único hijo del {@code Multicol}. */
     private static Box flow(Box multicol) {
-        return multicol.children.get(0);
+        return multicol.children().get(0);
     }
 
     /**
@@ -149,7 +149,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
             this.consumed = BreakToken.consumed(from);
             this.resume = first ? null : from.childToken();
             this.contentDone = !first && from.nextChild() > 0;
-            Style s = box.style;
+            Style s = box.style();
             this.columns = Columns.of(s.multicolCount(), s.multicolWidth(), s.multicolGap(), model.contentWidth());
         }
 
@@ -180,7 +180,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
                 // El Multicol termina en esta página y su contenido no.
                 throw tooTall(limit);
             }
-            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style.multicolFill() == Style.Fill.BALANCE) {
+            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicolFill() == Style.Fill.BALANCE) {
                 fill = balance(fill, limit, atStart);
             }
             return result(fill);
@@ -286,9 +286,9 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
         /** El contenido no cabe en las columnas del alto que le queda a la caja, que termina en esta página. */
         InvalidModelException tooTall(double limit) {
-            Style s = box.style;
+            Style s = box.style();
             String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO).filter(s::isDeclared).findFirst().orElse(null);
-            return new InvalidModelException(property != null ? s.line(property) : box.line, ErrorCode.BOX_OVERFLOW,
+            return new InvalidModelException(property != null ? s.line(property) : box.line(), ErrorCode.BOX_OVERFLOW,
                     "El contenido del Multicol " + name(box) + " no cabe en su alto: " + columns.count()
                             + (columns.count() == 1 ? " columna" : " columnas") + " de " + pt(Math.max(0, limit))
                             + " no bastan; aumenta su alto o reduce el contenido");
@@ -296,8 +296,8 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
         /** Sin página ni alto que llenar, los cortes de columna necesitan más columnas de las que hay. */
         InvalidModelException tooManyColumnBreaks() {
-            Style s = box.style;
-            return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : box.line, ErrorCode.BOX_OVERFLOW,
+            Style s = box.style();
+            return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : box.line(), ErrorCode.BOX_OVERFLOW,
                     "El Multicol " + name(box) + " tiene " + columns.count() + (columns.count() == 1 ? " columna" : " columnas")
                             + " y sus cortes de columna necesitan más: sin página ni alto que llenar, lo que no "
                             + "cabe no puede seguir en otra página; quita cortes de columna o añade columnas");

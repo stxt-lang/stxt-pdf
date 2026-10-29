@@ -1,8 +1,10 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,52 +18,136 @@ import java.util.stream.Collectors;
  *
  * <p>La igualdad es por identidad: la caché de layout usa la caja como clave.</p>
  *
- * <p><strong>Hilos:</strong> la caja es mutable (campos públicos que no son {@code final}) mientras
- * {@link BoxTreeBuilder} construye el árbol, y después solo se lee: el layout, el pintado y el volcado no
- * escriben en ella. Un árbol ya construido se puede leer desde varios hilos si se entrega de forma segura
- * (un {@code Future}, un ejecutor, un campo {@code volatile}…); escribir en él después de entregarlo rompe esa
- * garantía.</p>
+ * <p><strong>Escritura:</strong> los campos son privados y solo el package {@code tree} los escribe, con los
+ * métodos {@code set…} y {@link #addChild}, mientras {@link BoxTreeBuilder} construye el árbol. Al terminar,
+ * {@link #close()} lo cierra entero: los hijos pasan a una lista inmutable, los que están en flujo se calculan
+ * una vez y cualquier escritura posterior es un {@link IllegalStateException}. Fuera de {@code tree} una caja
+ * solo se lee.</p>
+ *
+ * <p><strong>Hilos:</strong> un árbol cerrado no cambia. Se puede leer desde varios hilos si se entrega de forma
+ * segura (un {@code Future}, un ejecutor, un campo {@code volatile}…).</p>
  */
 public final class Box {
 
-    public final String id;
+    private final String id;
+    private final Element element;
+    private final Style style;
+    private final boolean anonymous;
+    private final int line;
+    /** Una {@code ArrayList} mientras se construye; al cerrar, una lista inmutable. */
+    private List<Box> children = new ArrayList<>();
+    /** Los hijos en flujo, calculados al cerrar; {@code null} antes. */
+    private List<Box> inFlowChildren;
+    private Box parent;
+    private String text;
+    private List<TextRun> runs;
+    private String image;
+    private String anchor;
+    private String number;
+    private int textLine;
+    private boolean textBlock;
+    private Box marker;
+    private int headRows;
+    private int footRows;
+    private boolean closed;
+
+    Box(String id, Element element, Style style, boolean anonymous, int line) {
+        this.id = id;
+        this.element = element;
+        this.style = style;
+        this.anonymous = anonymous;
+        this.line = line;
+    }
+
+    // --- Lectura ---------------------------------------------------------------------------------------
+
+    /** El {@code Id} de la caja; {@code null} si no tiene. */
+    public String id() {
+        return id;
+    }
+
     /**
      * Elemento del que procede; {@code null} en la raíz. Da el significado: reglas
      * {@code Element}, marcadores y etiquetas del PDF.
      */
-    public final Element element;
-    public final Style style;
-    public final boolean anonymous;
+    public Element element() {
+        return element;
+    }
+
+    public Style style() {
+        return style;
+    }
+
+    /** Si es la raíz anónima, que representa el área útil. */
+    public boolean anonymous() {
+        return anonymous;
+    }
+
     /** Línea del documento de la que procede, para mensajes de error. */
-    public final int line;
-    public final List<Box> children = new ArrayList<>();
-    public Box parent;
-    /** Contenido en línea, si la caja contiene texto directamente. */
-    public String text;
+    public int line() {
+        return line;
+    }
+
+    /**
+     * Los hijos, en orden del documento; la lista no se puede cambiar. En la raíz del documento, también las
+     * secciones, que cuelgan de ella sin ser sus hijas (§5.21).
+     */
+    public List<Box> children() {
+        return closed ? children : Collections.unmodifiableList(children);
+    }
+
+    /** La caja padre; {@code null} en la raíz y en la caja de una sección, que es la raíz de su layout. */
+    public Box parent() {
+        return parent;
+    }
+
+    /** Contenido en línea, si la caja contiene texto directamente; {@code null} si no. */
+    public String text() {
+        return text;
+    }
+
     /**
      * Tramos del texto con su formato (ESPECIFICACION.md §5.4), cuyo texto seguido es
-     * {@link #text}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
+     * {@link #text()}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
      */
-    public List<TextRun> runs;
+    public List<TextRun> formattedRuns() {
+        return runs;
+    }
+
     /**
      * Ruta de la imagen de una {@code Image} (ESPECIFICACION.md §5.18), relativa a la carpeta
      * {@code images/} de los recursos; {@code null} en el resto de cajas.
      */
-    public String image;
+    public String image() {
+        return image;
+    }
+
     /**
      * Nombre con que se refiere a la caja un índice (§5.19) cuando no tiene {@code Id}: el de un
      * encabezado que lista un {@code Contents}. {@code null} en el resto.
      */
-    public String anchor;
+    public String anchor() {
+        return anchor;
+    }
+
     /**
      * Número de la caja en el documento, tal como lo da {@code {number of: id}}
      * (ESPECIFICACION.md §5.19); {@code null} si no tiene.
      */
-    public String number;
+    public String number() {
+        return number;
+    }
+
     /** Línea del nodo {@code Text}. */
-    public int textLine;
+    public int textLine() {
+        return textLine;
+    }
+
     /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
-    public boolean textBlock;
+    public boolean textBlock() {
+        return textBlock;
+    }
+
     /**
      * Caja del marcador de un {@code List item} (ESPECIFICACION.md §5.14), generada por el motor:
      * una caja de texto ({@link Element#MARKER}) con la tipografía del ítem y el texto del
@@ -69,21 +155,119 @@ public final class Box {
      * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
      * lleva marcador.
      */
-    public Box marker;
-    /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Head} y de su {@code Foot}
-     * (ESPECIFICACION.md §5.15): las primeras y las últimas. 0 en el resto de cajas.
-     */
-    public int headRows;
-    public int footRows;
-
-    public Box(String id, Element element, Style style, boolean anonymous, int line) {
-        this.id = id;
-        this.element = element;
-        this.style = style;
-        this.anonymous = anonymous;
-        this.line = line;
+    public Box marker() {
+        return marker;
     }
+
+    /**
+     * Filas de la rejilla de una {@code Table} que son de su {@code Head} (ESPECIFICACION.md §5.15): las
+     * primeras. 0 en el resto de cajas.
+     */
+    public int headRows() {
+        return headRows;
+    }
+
+    /** Filas de la rejilla de una {@code Table} que son de su {@code Foot}: las últimas. 0 en el resto de cajas. */
+    public int footRows() {
+        return footRows;
+    }
+
+    // --- Escritura, solo en tree mientras se construye -------------------------------------------------
+
+    void addChild(Box child) {
+        writable();
+        child.parent = this;
+        children.add(child);
+    }
+
+    /** Cuelga la caja de una sección de la raíz del documento sin ser su hija: no le pone padre (§5.21). */
+    void addSection(Box section) {
+        writable();
+        children.add(section);
+    }
+
+    void setText(String text, int line, boolean block) {
+        writable();
+        this.text = text;
+        this.textLine = line;
+        this.textBlock = block;
+    }
+
+    /** Pone los tramos con formato del texto; {@code null} si no tiene formato. */
+    void setRuns(List<TextRun> runs) {
+        writable();
+        this.runs = runs;
+    }
+
+    /** Escribe {@code prefix} delante del texto; si el texto tiene formato, como un tramo sin formato. */
+    void prependText(String prefix) {
+        writable();
+        text = prefix + text;
+        if (runs != null) {
+            List<TextRun> prefixed = new ArrayList<>(runs.size() + 1);
+            prefixed.add(new TextRun(prefix, TextFormat.PLAIN));
+            prefixed.addAll(runs);
+            runs = List.copyOf(prefixed);
+        }
+    }
+
+    void setImage(String image) {
+        writable();
+        this.image = image;
+    }
+
+    void setAnchor(String anchor) {
+        writable();
+        this.anchor = anchor;
+    }
+
+    void setNumber(String number) {
+        writable();
+        this.number = number;
+    }
+
+    /** Pone el marcador del ítem, que tiene la caja por padre sin ser su hijo. */
+    void setMarker(Box marker) {
+        writable();
+        marker.parent = this;
+        this.marker = marker;
+    }
+
+    void setHeadRows(int rows) {
+        writable();
+        this.headRows = rows;
+    }
+
+    void setFootRows(int rows) {
+        writable();
+        this.footRows = rows;
+    }
+
+    /**
+     * Cierra la caja, su marcador y todo su subárbol: los hijos pasan a una lista inmutable, los que están en
+     * flujo se calculan una vez y ya no se puede escribir en ellos.
+     */
+    void close() {
+        if (closed) {
+            return;
+        }
+        children = List.copyOf(children);
+        inFlowChildren = children.stream().filter(h -> !h.style.isOutOfFlow()).toList();
+        closed = true;
+        children.forEach(Box::close);
+        if (marker != null) {
+            marker.close();
+        }
+    }
+
+    private void writable() {
+        if (closed) {
+            throw new IllegalStateException("La caja ya está cerrada: el árbol no cambia después de construirlo ("
+                    + describe() + ")");
+        }
+    }
+
+    // --- Consultas -------------------------------------------------------------------------------------
 
     /** Cómo la nombra una referencia (§5.19): su {@code Id} o, si no tiene, su {@link #anchor}; puede ser {@code null}. */
     public String key() {
@@ -101,13 +285,11 @@ public final class Box {
                 .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");
     }
 
-    public void addChild(Box child) {
-        child.parent = this;
-        children.add(child);
-    }
-
     /** Hijos que participan en el flujo del padre ({@code static} y {@code relative}). */
     public List<Box> inFlowChildren() {
+        if (inFlowChildren != null) {
+            return inFlowChildren;
+        }
         return children.stream().filter(h -> !h.style.isOutOfFlow()).toList();
     }
 
@@ -162,7 +344,7 @@ public final class Box {
         return element == Element.MARKER;
     }
 
-    /** Tramos del texto: los de {@link #runs} o, sin formato, un único tramo con todo el texto. */
+    /** Tramos del texto: los de {@link #formattedRuns()} o, sin formato, un único tramo con todo el texto. */
     public List<TextRun> runs() {
         return runs != null ? runs : TextRun.plain(text);
     }

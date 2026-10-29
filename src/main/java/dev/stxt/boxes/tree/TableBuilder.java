@@ -53,7 +53,7 @@ final class TableBuilder {
      * las reglas de {@code Styles} y el {@code Column align} de su columna.
      */
     static void table(InlineNode n, Box table, Cells cells) {
-        int columns = table.style.gridColumns.size();
+        int columns = table.style().gridColumns.size();
         List<Style.TextAlign> aligns = columnAlign(n, columns);
         int alignLine = child(n, "column-align").map(Node::getLine).orElse(0);
         int last = -1;
@@ -112,8 +112,8 @@ final class TableBuilder {
                     Style.TextAlign align = aligns.isEmpty() ? null : aligns.get(c);
                     Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, alignLine,
                             child(row, "class").orElse(null)));
-                    box.style.declared(ITEM_AREA, cell.getLine());
-                    box.style.itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
+                    box.style().declared(ITEM_AREA, cell.getLine());
+                    box.style().itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
                     table.addChild(box);
                     c += span.columns();
                 }
@@ -125,9 +125,9 @@ final class TableBuilder {
                 }
             }
             if (group == 0) {
-                table.headRows = rows.size();
+                table.setHeadRows(rows.size());
             } else if (group == 2) {
-                table.footRows = rows.size();
+                table.setFootRows(rows.size());
             }
             firstRow += rows.size();
         }
@@ -181,7 +181,6 @@ final class TableBuilder {
                     + ") o elementos, no las dos cosas: pon el texto en un Paragraph");
         });
         font(n, n, box);
-        box.text = n.getText();
-        box.textLine = n.getLine();
+        box.setText(n.getText(), n.getLine(), false);
     }
 }

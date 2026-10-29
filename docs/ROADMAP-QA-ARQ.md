@@ -81,7 +81,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | en curso |
-| AR-03 | `Box` mutable y con campos públicos | Media | M | pendiente |
+| AR-03 | `Box` mutable y con campos públicos | Media | M | hecho |
 | AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | pendiente |
 | AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | pendiente |
 | AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | pendiente |
@@ -350,7 +350,7 @@ conversión secuencial: 0 diferencias, con `Resources` compartido y con uno por 
 | `DocumentReader` | Sí | Crea un `Parser` por lectura |
 | `Resources`, `FontLibrary`, `ImageLibrary` | Sí | Carga perezosa con `synchronized`; `FontLibrary` es inmutable; `ImageLibrary.find` es `synchronized` |
 | `FontFile` | Sí | Mide sin cerrojos con los avances precalculados (TS-04, sesión 2); `digest` se calcula una vez, sin cerrojo |
-| `Box`, `Style`, `LaidOutDocument` | Solo lectura | Campos públicos y mutables: es seguro mientras nadie escriba después de construir (AR-02/AR-03) |
+| `Box`, `Style`, `LaidOutDocument` | Sí (solo lectura) | Fuera de `tree` solo se leen; el árbol se cierra al construirlo y escribir en una caja cerrada es un error (AR-02 etapas 1 y 2, AR-03, sesión 7) |
 | **`Engine`** | **No** | `LayoutCache` (`HashMap`/`IdentityHashMap` sin sincronizar), `InlineLayout` (`broken`, `measurer`, `pages`, `numbers` reasignados sin `volatile`) y contadores; `layOutDocument`, `assume` y `reservePageDigits` mutan estado compartido |
 | `Paginator`, `BuildContext`, `PdfCanvas`, `PdfImages`, `PdfStructure`, `PdfLinks` | No (uno por conversión) | Estado de la conversión; los crea `PdfCanvas.write` |
 | La caché de fuentes de JSVG (`FontResolver`) | Global, sin sincronizar | Los SVG con texto se dibujan dentro de `PdfImages.JSVG_FONTS`; ya no se da nada de alta en AWT (TS-03, sesión 4) |
@@ -591,6 +591,14 @@ una garantía, y `LaidOutDocument.root()` la entrega a cualquier cliente. **Prop
 accesores; los mutadores package-private en `tree`; `children()` devuelve una vista no modificable; `inFlowChildren`
 se calcula una vez al cerrar el árbol (PF-04); `BoxTreeBuilder.Result` marca el árbol como cerrado. Se hace junto con AR-02.
 
+**Sesión 7: hecho.** Campos privados con métodos de lectura (`id()`, `children()`, `text()`, `formattedRuns()` para los
+tramos crudos, porque `runs()` ya daba un tramo sin formato…), constructor y escritura del package (`addChild`,
+`addSection` para las secciones, `setText`, `setRuns`, `prependText`, `setMarker`…). `BoxTreeBuilder.build` cierra el
+árbol al terminar (`Box.close`, recursivo y también sobre los marcadores): los hijos pasan a `List.copyOf`,
+`inFlowChildren` se calcula una vez y cualquier escritura posterior es un `IllegalStateException`. `TextRuns` pone sus
+tramos con el `finish` de un `build` del package, antes de cerrar. `BoxTest` vigila el cierre y que ni `Box` ni
+`Style` tengan campos públicos. Decisión 314.
+
 ### AR-04 · `Engine` y los algoritmos · Media · M
 
 **Evidencia.** 8 algoritmos (`layout/*/…Layout`) importan la clase concreta `Engine` (para `engine.layout`,
@@ -739,7 +747,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **4. SVG y el estado global** (hecha) | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
 | **5. Caché de la paginación** (hecha) | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
 | **6. Tests de referencia** (hecha) | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
-| **7. Encapsulación del modelo** | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
+| **7. Encapsulación del modelo** (hecha) | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
 | **8. Constructor del árbol** | AR-01 | `BoxTreeBuilder.element` partido por familias |
 | **9. Algoritmos y lienzos** | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
 | **10. Partir `Style`** | AR-02 (etapas 3 y 4), AR-13 | Registros inmutables por familia; árbol congelado |
@@ -772,3 +780,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 4 · SVG y el estado global (hecha) | QA-02 y TS-03: causa aislada (AWT da `Dialog` para `IBM Plex Sans` en una JVM en turco); `SvgFonts` da a JSVG el fichero comprobado con una familia clave (huella SHA-256) y `PlatformSupport.customFont`, sin `registerFont`; `ImageFile.textFonts`, `FontFile.digest`; cerrojo para la caché global de JSVG; un texto de un `<use>` conserva la fuente de su sitio. `PdfImagesTest` (4 tests, 3 fallan sin el cambio) y `SvgImageTest`; §5.18, decisiones 308 a 310; la CI en turco comprueba el árbol. 1379 tests en verde con el idioma por defecto y en turco; ningún PNG ni volcado cambia. | Sesión 5: caché de la paginación (PF-03, PF-04, AR-11, AR-10) |
 | 2026-10-29 | 5 · Caché de la paginación (hecha) | PF-03: volver a paginar olvida solo los textos que cambian y sus antepasados (`Engine.forget`, decisión 311; `PaginationCacheTest`; `ScaleProbe` con fallos por página e índice): la mitad de layouts a partir de la página 100. PF-04: medido con JFR, sin cambios (< 1 %); de ahí sale PF-06 (el reparto en líneas, 71 % del layout). AR-10: `Tolerance.EPSILON` y `Tolerance.MODEL` con nombre (decisión 312). AR-11: `paginate` partido en `converge`, `pages` y `placeFixed`; `Numbering` en su fichero. El PDF de los ejemplos, los golden y dos documentos grandes es el mismo byte a byte que antes. 1381 tests en verde. | Sesión 6: tests de referencia (QA-07, QA-08). Decidir antes la decisión abierta 2 (¿falla el test si cambia un PNG?). PF-06 queda pendiente fuera del plan |
 | 2026-10-29 | 6 · Tests de referencia (hecha) | QA-07 con la decisión del usuario (un PNG que cambia hace fallar el test; decisión 313): imágenes y PDF en `target/reference/`, `ReferenceFiles.checkImages`, `-Dgolden.update`/`-Dexamples.update`, la CI sube `target/reference` si falla; `ReferenceFilesTest`. QA-08 puntos 3 y 4: `CrossJvmDeterminismTest` y las propiedades de `ValueParser`, `LineBreaker` y la fragmentación (sin fallos encontrados; comprobado con dos mutaciones a mano). 1388 tests en verde; `mvn test` no cambia ningún fichero versionado. | Sesión 7: encapsulación del modelo (AR-03, AR-02 etapas 1 y 2). QA-08 puntos 5 (PIT, una pasada) y 6 (documentos de la especificación con `PdfMetrics` y PDF/UA) pendientes |
+| 2026-10-29 | 7 · Encapsulación del modelo (hecha) | AR-02 etapas 1 y 2 (commit `84a461c`): los 80 campos de `Style` son del package `tree` y se leen con un método del mismo nombre; 233 lecturas migradas siguiendo los errores de `javac`; `StyleEditor` para los tests de otros packages. AR-03: `Box` con campos privados, escritura del package y el árbol cerrado al construirlo (`Box.close`, decisión 314); 827 lecturas migradas igual; `BoxTest` (4). 1392 tests en verde; el PDF de los ejemplos y los golden es el mismo byte a byte (sin fechas ni ID). | Sesión 8: constructor del árbol (AR-01) |

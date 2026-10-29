@@ -43,7 +43,7 @@ class UnitBreakerTest {
 
     /** Ítem ya maquetado sin fragmentar, en {@code y} de la caja de contenido del contenedor. */
     private static UnitBreaker.Placed placed(Box item, double y, int unit) {
-        double h = ((Value.Points) item.style.height()).pt();
+        double h = ((Value.Points) item.style().height()).pt();
         LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
                 Insets.ZERO, List.of(), List.of(), true, true));
         return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit,
@@ -105,7 +105,7 @@ class UnitBreakerTest {
         assertNull(last.breakToken());
         assertEquals(40, last.fragment().height(), 1e-9);
         assertEquals(List.of(0.0), ys(last.fragment()));
-        assertEquals("D", last.fragment().children().get(0).box().id);
+        assertEquals("D", last.fragment().children().get(0).box().id());
     }
 
     @Test
@@ -147,7 +147,7 @@ class UnitBreakerTest {
         assertNull(last.breakToken());
         assertEquals(60, last.fragment().height(), 1e-9);
         assertEquals(List.of(0.0, 10.0, 50.0), ys(last.fragment()));
-        assertEquals(List.of("H", "D", "F"), last.fragment().children().stream().map(f -> f.box().id).toList());
+        assertEquals(List.of("H", "D", "F"), last.fragment().children().stream().map(f -> f.box().id()).toList());
     }
 
     @Test
@@ -171,7 +171,7 @@ class UnitBreakerTest {
         assertNull(last.breakToken());
         assertEquals(50, last.fragment().height(), 1e-9);
         assertEquals(1, last.fragment().children().size());
-        assertEquals("A", last.fragment().children().get(0).box().id);
+        assertEquals("A", last.fragment().children().get(0).box().id());
         assertEquals(50, last.fragment().children().get(0).height(), 1e-9);
     }
 

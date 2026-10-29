@@ -19,7 +19,7 @@ import static dev.stxt.boxes.tree.Nodes.error;
  * nivel del encabezado), con tres hijos: el título (el texto del encabezado), la guía, que crece
  * hasta llenar el hueco, y el número de página, que es un {@code {page of: …}} del encabezado: el
  * mismo mecanismo que escribe el autor, así que se resuelve paginando hasta que converja. Como un
- * encabezado de un {@code Markdown} no tiene {@code Id}, se le da un {@link Box#anchor} para
+ * encabezado de un {@code Markdown} no tiene {@code Id}, se le da un {@link Box#anchor()} para
  * poder referirlo. Las entradas se estilan con las reglas {@code Element: Contents entry N}.</p>
  */
 final class ContentsBuilder {
@@ -63,8 +63,8 @@ final class ContentsBuilder {
         int n = 0;
         for (Box heading : headings) {
             n++;
-            if (heading.id == null) {
-                heading.anchor = "(heading " + n + ")";
+            if (heading.id() == null) {
+                heading.setAnchor("(heading " + n + ")");
             }
         }
         for (Box contents : ctx.contents) {
@@ -74,26 +74,26 @@ final class ContentsBuilder {
 
     /** Los encabezados del árbol con entrada en los índices ({@code In contents}), en orden del documento. */
     private static void collect(Box box, List<Box> headings) {
-        if (box.headingLevel() > 0 && box.style.inContents) {
+        if (box.headingLevel() > 0 && box.style().inContents) {
             headings.add(box);
         }
-        box.children.forEach(child -> collect(child, headings));
+        box.children().forEach(child -> collect(child, headings));
     }
 
     private static void fill(BuildContext ctx, Box contents, List<Box> headings) {
-        Style s = contents.style;
+        Style s = contents.style();
         if (s.font == null) {
-            throw error(contents.line, ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
+            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
                     + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
         if (!s.isDeclared(PropertyKey.FONT_SIZE)) {
-            throw error(contents.line, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
+            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
                     + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
         List<Box> listed = headings.stream()
                 .filter(h -> h.headingLevel() >= s.contentsFrom && h.headingLevel() <= s.contentsTo).toList();
         if (listed.isEmpty()) {
-            throw error(contents.line, ErrorCode.CONTENTS_EMPTY, "El índice no tiene ningún encabezado de los niveles "
+            throw error(contents.line(), ErrorCode.CONTENTS_EMPTY, "El índice no tiene ningún encabezado de los niveles "
                     + s.contentsFrom + " a " + s.contentsTo + " (Levels): no tendría entradas");
         }
         for (Box heading : listed) {
@@ -102,49 +102,45 @@ final class ContentsBuilder {
     }
 
     private static Box entry(BuildContext ctx, Box contents, Box heading) {
-        Style es = Style.inheriting(contents.style);
+        Style es = Style.inheriting(contents.style());
         es.layout = Style.Layout.FLEX;
         ctx.rules.apply(Element.contentsEntry(heading.headingLevel()), es);
         ModelValidator.validateBox(ctx, es, contents);
-        Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line);
+        Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line());
         ctx.definiteHeight.put(entry, false);
-        entry.parent = contents;
         // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
         es.link = Links.to(heading.key());
 
-        boolean leader = contents.style.contentsLeader != Style.Leader.NONE;
-        int line = heading.children.isEmpty() ? heading.line : heading.children.get(0).textLine;
+        boolean leader = contents.style().contentsLeader != Style.Leader.NONE;
+        int line = heading.children().isEmpty() ? heading.line() : heading.children().get(0).textLine();
 
         // Sin guía, el título llena el hueco y deja el número a la derecha.
-        Box title = generated(ctx, entry, Element.CONTENTS_TITLE, Style.Layout.INLINE, heading.line);
-        title.text = heading.headingText();
-        title.textLine = line;
-        title.style.itemGrow = leader ? 0 : 1;
-        entry.children.add(title);
+        Box title = generated(ctx, entry, Element.CONTENTS_TITLE, Style.Layout.INLINE, heading.line());
+        title.setText(heading.headingText(), line, false);
+        title.style().itemGrow = leader ? 0 : 1;
+        entry.addChild(title);
 
         if (leader) {
-            Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Style.Layout.BLOCK, heading.line);
-            guide.style.contentsLeader = contents.style.contentsLeader;
-            guide.style.itemGrow = 1;
-            guide.style.height = Value.pt(es.usedLineHeight());
-            guide.style.margin = new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP));
-            entry.children.add(guide);
+            Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Style.Layout.BLOCK, heading.line());
+            guide.style().contentsLeader = contents.style().contentsLeader;
+            guide.style().itemGrow = 1;
+            guide.style().height = Value.pt(es.usedLineHeight());
+            guide.style().margin = new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP));
+            entry.addChild(guide);
         }
 
-        Box page = generated(ctx, entry, Element.CONTENTS_PAGE, Style.Layout.INLINE, heading.line);
-        page.text = "{page of: " + heading.key() + "}";
-        page.textLine = line;
-        page.style.itemShrink = 0;
-        entry.children.add(page);
+        Box page = generated(ctx, entry, Element.CONTENTS_PAGE, Style.Layout.INLINE, heading.line());
+        page.setText("{page of: " + heading.key() + "}", line, false);
+        page.style().itemShrink = 0;
+        entry.addChild(page);
         return entry;
     }
 
     /** Una caja generada de una entrada: hereda la tipografía de la entrada, y el layout lo da su tipo. */
     private static Box generated(BuildContext ctx, Box entry, Element kind, Style.Layout layout, int line) {
-        Style s = Style.inheriting(entry.style);
+        Style s = Style.inheriting(entry.style());
         s.layout = layout;
         Box box = new Box(null, kind, s, false, line);
-        box.parent = entry;
         ctx.definiteHeight.put(box, false);
         return box;
     }

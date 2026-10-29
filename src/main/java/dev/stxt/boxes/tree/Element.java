@@ -51,7 +51,7 @@ public enum Element {
      * {@link MarkdownBuilder} genera a partir de su {@code Content}.
      */
     MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
-    /** Imagen de la carpeta de recursos (§5.18): una caja sin hijos con la ruta en {@link Box#image}. */
+    /** Imagen de la carpeta de recursos (§5.18): una caja sin hijos con la ruta en {@link Box#image()}. */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
      * Índice automático (§5.19): un bloque cuyos hijos, generados al construir el árbol, son una

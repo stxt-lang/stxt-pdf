@@ -67,7 +67,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     /** Tabla de ESPECIFICACION.md §5.9. */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        Style s = box.style;
+        Style s = box.style();
         // Sin containing block, un hueco en porcentaje cuenta como 0.
         double gap = s.columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<Box> items = box.inFlowChildren();
@@ -149,7 +149,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
         Run(Box box, BoxModel model, ConstraintSpace space) {
             this.box = box;
-            this.s = box.style;
+            this.s = box.style();
             this.model = model;
             this.row = s.flexDirection() == Style.Direction.ROW;
             this.multiLine = s.flexWrap();
@@ -169,8 +169,8 @@ public final class FlexLayout implements LayoutAlgorithm {
         LayoutResult layOut(BreakToken from) {
             List<PendingAbsolute> pending = new ArrayList<>();
             List<Item> items = new ArrayList<>();
-            for (Box child : box.children) {
-                if (child.style.isOutOfFlow()) {
+            for (Box child : box.children()) {
+                if (child.style().isOutOfFlow()) {
                     pending.add(new PendingAbsolute(child, 0, 0));
                 } else {
                     items.add(row ? rowItem(child) : columnItem(child));
@@ -289,7 +289,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         // --- Pasos 2 y 3: base, mínimo y máximo de cada ítem ------------------------------------
 
         Item rowItem(Box b) {
-            Style is = b.style;
+            Style is = b.style();
             Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.horizontal();
             BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
@@ -317,7 +317,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
 
         Item columnItem(Box b) {
-            Style is = b.style;
+            Style is = b.style();
             Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.vertical();
             BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
@@ -428,7 +428,7 @@ public final class FlexLayout implements LayoutAlgorithm {
 
         /** Un ítem sin tamaño cruzado declarado pasa a medir lo que la línea (paso 7). */
         void stretch(Item it, double lineCross) {
-            Style is = it.box.style;
+            Style is = it.box.style();
             double target;
             if (row) {
                 Fragment f = it.result.fragment();
@@ -454,7 +454,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         UnitBreaker.Placed place(Item it, double mainPos, double crossPos, int unit) {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
-            RelativeOffset offset = RelativeOffset.of(it.box.style, contentWidth, contentHeight);
+            RelativeOffset offset = RelativeOffset.of(it.box.style(), contentWidth, contentHeight);
             return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit,
                     offset);
         }

@@ -56,14 +56,14 @@ public final class StxtDump {
         double y = originY + f.y();
         if (f.box().isMarker()) {
             // Va dentro del ítem: solo si se vuelca el ítem.
-            if (f.box().parent.id != null || includeWithoutId) {
+            if (f.box().parent().id() != null || includeWithoutId) {
                 String tab = "\t".repeat(level);
-                sb.append(tab).append("Marker: ").append(f.box().text.strip()).append('\n');
+                sb.append(tab).append("Marker: ").append(f.box().text().strip()).append('\n');
                 appendRect(sb, tab, x, y, f);
             }
             return;
         }
-        boolean visible = f.box().id != null || includeWithoutId;
+        boolean visible = f.box().id() != null || includeWithoutId;
         int childLevel = level;
         if (visible) {
             String tab = "\t".repeat(level);

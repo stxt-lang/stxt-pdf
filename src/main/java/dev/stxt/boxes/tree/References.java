@@ -11,7 +11,7 @@ import java.util.Map;
  * Las referencias de los textos del árbol a otras cajas ({@code {page of: id}}, ESPECIFICACION.md
  * §5.19): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo que
  * valen lo decide quien maqueta: la página, el {@link dev.stxt.boxes.layout.Paginator}; el
- * número, el builder ({@link Box#number}).
+ * número, el builder ({@link Box#number()}).
  */
 public final class References {
 
@@ -35,12 +35,12 @@ public final class References {
     }
 
     private static void collect(Box box, List<Site> sites) {
-        if (box.text != null) {
-            for (Reference r : Reference.find(box.text)) {
+        if (box.text() != null) {
+            for (Reference r : Reference.find(box.text())) {
                 sites.add(new Site(box, r));
             }
         }
-        box.children.forEach(child -> collect(child, sites));
+        box.children().forEach(child -> collect(child, sites));
     }
 
     /** Las cajas que se pueden referir (con {@code Id}, o encabezados de un índice) de un árbol, por su {@link Box#key}. */
@@ -54,7 +54,7 @@ public final class References {
         if (box.key() != null) {
             boxes.put(box.key(), box);
         }
-        box.children.forEach(child -> index(child, boxes));
+        box.children().forEach(child -> index(child, boxes));
     }
 
     /**
@@ -90,7 +90,7 @@ public final class References {
                     }
                 }
                 case NUMBER -> {
-                    if (target.number == null) {
+                    if (target.number() == null) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_NUMBERED, text
                                 + ": " + r.id() + " no tiene número (solo lo tienen los ítems de una lista "
                                 + "numerada y los encabezados con Numbered: true)");
@@ -107,8 +107,8 @@ public final class References {
 
     /** Si la caja es un {@code Fixed} o está dentro de uno. */
     static boolean insideFixed(Box box) {
-        for (Box b = box; b != null; b = b.parent) {
-            if (b.style.position == Style.Position.FIXED) {
+        for (Box b = box; b != null; b = b.parent()) {
+            if (b.style().position == Style.Position.FIXED) {
                 return true;
             }
         }

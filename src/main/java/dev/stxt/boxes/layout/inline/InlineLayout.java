@@ -109,11 +109,11 @@ public final class InlineLayout implements LayoutAlgorithm {
      */
     private List<TextRun> runs(Box box) {
         List<TextRun> runs = box.runs();
-        if (Reference.contains(box.text)) {
+        if (Reference.contains(box.text())) {
             runs = runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format()))
                     .toList();
         }
-        return TextTransform.apply(runs, box.style);
+        return TextTransform.apply(runs, box.style());
     }
 
     private String referenced(Reference.Kind kind, String id) {
@@ -135,7 +135,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             children.add(numbered);
         }
         List<TextLine> lines = new ArrayList<>();
-        Style s = f.box().style;
+        Style s = f.box().style();
         double available = f.contentWidth();
         for (TextLine l : f.lines()) {
             if (!PageNumbers.contains(l.text())) {
@@ -155,7 +155,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     }
 
     private Broken breakText(Box box, double available) {
-        Style s = box.style;
+        Style s = box.style();
         List<List<LineBreaker.Line>> paragraphs;
         if (!box.hasText()) {
             paragraphs = List.of();
@@ -178,7 +178,7 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        Style s = box.style;
+        Style s = box.style();
         if (!box.hasText()) {
             return IntrinsicSizes.ZERO;
         }
@@ -192,7 +192,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         BoxModel model = BoxModel.resolve(box, space, engine);
-        Style s = box.style;
+        Style s = box.style();
         double available = model.contentWidth();
         double lineHeight = s.usedLineHeight();
         boolean first = from == null;

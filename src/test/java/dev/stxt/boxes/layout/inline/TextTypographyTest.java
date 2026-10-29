@@ -49,7 +49,7 @@ class TextTypographyTest {
     @Test
     void theTextOfTheBoxIsNotChanged() {
         LayoutFixture l = layOut("\tText: hola", "\t\tId: T", "\t\tTypography:", "\t\t\tTransform: uppercase");
-        assertEquals("hola", l.fragment("T").box().text);
+        assertEquals("hola", l.fragment("T").box().text());
     }
 
     @Test

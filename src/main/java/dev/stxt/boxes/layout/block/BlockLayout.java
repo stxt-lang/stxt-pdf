@@ -146,9 +146,9 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         LayoutResult layOut() {
-            for (int i = start; i < box.children.size(); i++) {
-                Box child = box.children.get(i);
-                if (child.style.isOutOfFlow()) {
+            for (int i = start; i < box.children().size(); i++) {
+                Box child = box.children().get(i);
+                if (child.style().isOutOfFlow()) {
                     // Posición estática: donde empezaría si estuviera en flujo (§5.5). La caja se
                     // resuelve en su containing block (AbsoluteLayout).
                     pending.add(new PendingAbsolute(child, 0, atTop ? 0 : cursor + strut.resolve()));
@@ -172,7 +172,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         /** Coloca un hijo en flujo; devuelve el resultado de la caja si hay que cortar aquí. */
         LayoutResult place(int i, Box child) {
             BreakToken childToken = i == start ? resume : null;
-            Insets margin = Insets.resolve(child.style.margin(), contentWidth);
+            Insets margin = Insets.resolve(child.style().margin(), contentWidth);
             // El hijo que empieza un fragmento de continuación toca el corte: sus márgenes se
             // truncan, salvo si el corte fue forzado. Un hijo reanudado ya no tiene margen superior.
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
@@ -216,9 +216,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
-                    child.style.margin().left(), child.style.margin().right())[0];
+                    child.style().margin().left(), child.style().margin().right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera (§5.5).
-            RelativeOffset offset = RelativeOffset.of(child.style, contentWidth, childSpace.percentBaseHeight());
+            RelativeOffset offset = RelativeOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();
             fragments.add(f.moved(childX, childY, offset.dx(), offset.dy()));
@@ -263,10 +263,10 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /** El corte que abre este fragmento de continuación fue forzado. */
         boolean forcedBeforeStart() {
-            Box next = box.children.get(start);
+            Box next = box.children().get(start);
             for (int j = start - 1; j >= 0; j--) {
-                Box before = box.children.get(j);
-                if (!before.style.isOutOfFlow()) {
+                Box before = box.children().get(j);
+                if (!before.style().isOutOfFlow()) {
                     return BreakRules.isForced(BreakRules.forcedBetween(before, next));
                 }
             }
@@ -295,7 +295,7 @@ public final class BlockLayout implements LayoutAlgorithm {
          * delante (§5.14): va con la primera línea, que está en este fragmento si hay alguno.
          */
         List<Fragment> withMarker(List<Fragment> children, Slice slice) {
-            if (box.marker == null || !first) {
+            if (box.marker() == null || !first) {
                 return children;
             }
             return MarkerLayout.place(box, children, slice.border(), slice.padding(), engine.measurer())
@@ -333,7 +333,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 return LayoutResult.finished(fragment, pending, out);
             }
             // El contenido ha terminado, pero el alto propio de la caja sigue en la página siguiente.
-            BreakToken token = new BreakToken.Block(box.children.size(), null, slice.consumed());
+            BreakToken token = new BreakToken.Block(box.children().size(), null, slice.consumed());
             return new LayoutResult(fragment, token, BreakAppeal.PERFECT_BREAK, pending,
                     new AdjoiningMargins(out.top(), MarginStrut.EMPTY, false));
         }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +128,15 @@ public final class BoxTreeBuilder {
      *         las reglas del documento de estilos es la suya, y el mensaje lo dice
      */
     public Result build(InlineNode document, InlineNode styles) {
+        return build(document, styles, root -> {
+        });
+    }
+
+    /**
+     * Como {@link #build(InlineNode, InlineNode)}, con {@code finish} sobre la raíz justo antes de cerrar el
+     * árbol: lo usan los tests del package para poner en él lo que el documento no puede escribir.
+     */
+    Result build(InlineNode document, InlineNode styles, Consumer<Box> finish) {
         // Sin el namespace, el schema no validaría nada.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
@@ -159,12 +169,15 @@ public final class BoxTreeBuilder {
                 Section section = section(ctx, inline(h), root, documentMedia);
                 sections.add(section);
                 // Cuelga de la raíz sin ser su hija (sin padre): cada sección es la raíz de su layout.
-                root.children.add(section.box());
+                root.addSection(section.box());
             }
         }
         ContentsBuilder.build(ctx, root);
         References.validate(root);
         LinkTargets.validate(root);
+        finish.accept(root);
+        // Desde aquí el árbol no cambia: el layout, el pintado y otros hilos solo lo leen.
+        root.close();
         return new Result(media, root, List.copyOf(sections), metadata);
     }
 
@@ -173,7 +186,7 @@ public final class BoxTreeBuilder {
      * menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaSpec documentMedia) {
-        Style s = Style.inheriting(documentRoot.style);
+        Style s = Style.inheriting(documentRoot.style());
         s.layout = Style.Layout.BLOCK;
         s.position = Style.Position.STATIC;
         ctx.rules.applySection(n, s);
@@ -194,7 +207,7 @@ public final class BoxTreeBuilder {
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
-        if (box.children.stream().allMatch(c -> c.style.position == Style.Position.FIXED)) {
+        if (box.children().stream().allMatch(c -> c.style().position == Style.Position.FIXED)) {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
@@ -320,7 +333,7 @@ public final class BoxTreeBuilder {
         if (level > 0) {
             heading(ctx, n, level);
         }
-        Style s = Style.inheriting(parent.style);
+        Style s = Style.inheriting(parent.style());
         // Con valor, la celda es una caja de texto; sin valor, un bloque.
         s.layout = kind == Element.CELL && !n.getText().isBlank() ? Style.Layout.INLINE : kind.layout();
         s.position = kind.position();
@@ -328,7 +341,7 @@ public final class BoxTreeBuilder {
             // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
             child(wrapper, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
         } else if (wrapper != null) {
-            item(wrapper, s, parent.style.gridAreas);
+            item(wrapper, s, parent.style().gridAreas);
         }
         ctx.rules.apply(n, kind, s, parent, position);
         String id = null;
@@ -427,21 +440,21 @@ public final class BoxTreeBuilder {
                 throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
                         + "un Paragraph, un Text, un Block…");
             }
-            box.number = ListMarkers.number(parent.style.listMarker, number);
-            String marker = ListMarkers.text(parent.style.listMarker, number);
+            box.setNumber(ListMarkers.number(parent.style().listMarker, number));
+            String marker = ListMarkers.text(parent.style().listMarker, number);
             if (marker != null) {
-                box.marker = marker(n, box, marker);
+                box.setMarker(marker(n, box, marker));
             }
         }
         if (kind.hasText()) {
             text(n, box);
-            box.runs = ctx.runs.get(n);
+            box.setRuns(ctx.runs.get(n));
             inlineFormat(ctx, box);
         } else if (kind == Element.IMAGE) {
             image(n, box);
         } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
             cellText(n, box);
-            box.runs = ctx.runs.get(n);
+            box.setRuns(ctx.runs.get(n));
             inlineFormat(ctx, box);
         } else {
             boolean outerFixed = ctx.insideFixed;
@@ -464,7 +477,7 @@ public final class BoxTreeBuilder {
                 HeadingNumbers.prefix(box, headingNumber);
             }
         }
-        if (box.marker != null) {
+        if (box.marker() != null) {
             markerLine(box);
         }
         if (kind == Element.CONTENTS) {
@@ -480,7 +493,7 @@ public final class BoxTreeBuilder {
      * definido: lo decide el reparto en columnas.
      */
     private void columns(BuildContext ctx, InlineNode n, Box multicol) {
-        Style s = Style.inheriting(multicol.style);
+        Style s = Style.inheriting(multicol.style());
         s.isolate = true;
         Box flow = new Box(null, Element.COLUMNS, s, false, n.getLine());
         multicol.addChild(flow);
@@ -508,20 +521,18 @@ public final class BoxTreeBuilder {
 
     /**
      * Con {@code Inline: markdown} (§5.4), el texto de la caja es Markdown en línea: pasa a ser el texto
-     * seguido, sin las marcas, y los tramos con formato van en {@link Box#runs}. Dentro de un
+     * seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro de un
      * {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un
      * bloque: sus errores señalan la línea donde empieza.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style.inline != Style.Inline.MARKDOWN || ctx.insideMarkdown) {
+        if (box.style().inline != Style.Inline.MARKDOWN || ctx.insideMarkdown) {
             return;
         }
-        int first = box.textBlock ? box.textLine + 1 : box.textLine;
-        List<TextRun> runs = MarkdownBuilder.inline(box.text, first);
-        box.text = TextRun.text(runs);
-        box.textLine = first;
-        box.textBlock = false;
-        box.runs = TextRun.formatted(runs) ? runs : null;
+        int first = box.textBlock() ? box.textLine() + 1 : box.textLine();
+        List<TextRun> runs = MarkdownBuilder.inline(box.text(), first);
+        box.setText(TextRun.text(runs), first, false);
+        box.setRuns(TextRun.formatted(runs) ? runs : null);
     }
 
     /**
@@ -553,7 +564,7 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.IMAGE_UNKNOWN, "Image necesita la ruta de la imagen, relativa a la carpeta "
                     + "images/ de los recursos: Image: logos/acme.png");
         }
-        box.image = path;
+        box.setImage(path);
     }
 
     /** El destino de un {@code Link} (§5.20): una URL admitida o {@code #id}; que el {@code Id} exista se comprueba al final. */
@@ -589,7 +600,7 @@ public final class BoxTreeBuilder {
         }
         Node source = content.orElse(n);
         font(n, source, box);
-        if (box.element == Element.PARAGRAPH) {
+        if (box.element() == Element.PARAGRAPH) {
             // Las líneas en blanco al principio o al final no separan nada.
             String text = source.getText();
             Matcher blank = BLANK_LINE.matcher(text)
@@ -601,8 +612,6 @@ public final class BoxTreeBuilder {
                         + "en blanco o usa un Paragraph para cada uno");
             }
         }
-        box.text = source.getText();
-        box.textLine = source.getLine();
-        box.textBlock = source instanceof TextNode;
+        box.setText(source.getText(), source.getLine(), source instanceof TextNode);
     }
 }

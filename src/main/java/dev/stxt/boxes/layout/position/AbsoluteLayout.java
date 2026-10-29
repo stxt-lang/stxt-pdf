@@ -75,7 +75,7 @@ public final class AbsoluteLayout {
     }
 
     private static boolean resolvesHere(PendingAbsolute p, Box box) {
-        return p.box().style.position() == Style.Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
+        return p.box().style().position() == Style.Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
     }
 
     /**
@@ -91,7 +91,7 @@ public final class AbsoluteLayout {
      */
     public LayoutResult layOut(PendingAbsolute p, double cbWidth, double cbHeight, Insets cbPadding) {
         Box box = p.box();
-        Style s = box.style;
+        Style s = box.style();
         OptionalDouble cbHeightBase = OptionalDouble.of(cbHeight);
         Supplier<IntrinsicSizes> intrinsic = () -> engine.intrinsic(box);
         // La ecuación trabaja en la caja de relleno del containing block.

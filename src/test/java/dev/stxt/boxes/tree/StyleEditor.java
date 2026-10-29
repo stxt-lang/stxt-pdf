@@ -4,9 +4,9 @@ import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 
 /**
- * Un {@link Style} escrito a mano, para los tests de otros packages que prueban una pieza con un estilo
- * concreto sin leer un documento: fuera de {@code tree} un estilo solo se lee. El estilo se puede seguir
- * cambiando después de crear sus cajas, como hacen esos tests entre una comprobación y la siguiente.
+ * Un {@link Style} escrito a mano, y cajas con él, para los tests de otros packages que prueban una pieza con
+ * un estilo concreto sin leer un documento: fuera de {@code tree} un estilo o una caja solo se leen. El estilo se
+ * puede seguir cambiando después de crear sus cajas, como hacen esos tests entre una comprobación y la siguiente.
  */
 public final class StyleEditor {
 
@@ -20,6 +20,13 @@ public final class StyleEditor {
     /** Una caja con este estilo, sin padre ni hijos. */
     public Box box(String id, Element element) {
         return new Box(id, element, style, false, 1);
+    }
+
+    /** Cuelga {@code children} de {@code parent}, como hijas suyas y en este orden. */
+    public static void addChildren(Box parent, Box... children) {
+        for (Box child : children) {
+            parent.addChild(child);
+        }
     }
 
     public StyleEditor layout(Style.Layout v) {

@@ -24,17 +24,17 @@ final class ListBuilder {
      * anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
-        Style.Marker marker = list.style.listMarker;
+        Style.Marker marker = list.style().listMarker;
         if (!marker.numbered()) {
             if (s.isDeclared(NUMBER)) {
                 throw error(s.line(NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
-                        + "(línea " + list.line + ") tiene Marker: " + markerName(marker) + ", que no numera sus ítems");
+                        + "(línea " + list.line() + ") tiene Marker: " + markerName(marker) + ", que no numera sus ítems");
             }
             return 0;
         }
-        List<Box> previous = list.children;
+        List<Box> previous = list.children();
         int number = s.listNumber != null ? s.listNumber
-                : previous.isEmpty() ? list.style.listStart
+                : previous.isEmpty() ? list.style().listStart
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
             throw error(s.listNumber != null ? s.line(NUMBER) : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
@@ -49,20 +49,18 @@ final class ListBuilder {
      * ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
      */
     static Box marker(InlineNode n, Box item, String text) {
-        if (item.style.font == null) {
+        if (item.style().font == null) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
                     + "el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
-        if (!item.style.isDeclared(FONT_SIZE)) {
+        if (!item.style().isDeclared(FONT_SIZE)) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: decláralo "
                     + "en el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
-        Style s = Style.inheriting(item.style);
+        Style s = Style.inheriting(item.style());
         s.layout = Style.Layout.INLINE;
         Box marker = new Box(null, Element.MARKER, s, false, n.getLine());
-        marker.parent = item;
-        marker.text = text;
-        marker.textLine = n.getLine();
+        marker.setText(text, n.getLine(), false);
         return marker;
     }
 
@@ -72,18 +70,18 @@ final class ListBuilder {
      */
     static void markerLine(Box item) {
         Box b = item;
-        while (b.style.layout != Style.Layout.INLINE) {
+        while (b.style().layout != Style.Layout.INLINE) {
             String problem = null;
-            if (b.style.layout == Style.Layout.FLEX || b.style.layout == Style.Layout.GRID) {
-                problem = "empieza con un " + b.element.label();
+            if (b.style().layout == Style.Layout.FLEX || b.style().layout == Style.Layout.GRID) {
+                problem = "empieza con un " + b.element().label();
             } else if (b.isImage()) {
                 problem = "empieza con una Image";
             } else if (b.inFlowChildren().isEmpty()) {
-                problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + b.element.label() + " vacío";
+                problem = b == item ? "no tiene contenido en flujo" : "empieza con un " + b.element().label() + " vacío";
             }
             if (problem != null) {
-                throw error(b.line, ErrorCode.LIST_ITEM_WITHOUT_LINE, "El marcador del List item de la línea "
-                        + item.line + " se alinea con su primera línea, y el ítem " + problem
+                throw error(b.line(), ErrorCode.LIST_ITEM_WITHOUT_LINE, "El marcador del List item de la línea "
+                        + item.line() + " se alinea con su primera línea, y el ítem " + problem
                         + ": empieza con un texto, o usa Marker: none");
             }
             b = b.inFlowChildren().get(0);

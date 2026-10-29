@@ -1956,3 +1956,20 @@ interpretaciones que salieron al implementarlas.
      fichero versionado y la CI sube `target/reference` cuando falla. *Dónde:* `golden/ReferenceFiles` (`writeActual`,
      `checkImages`), `GoldenTest`, `ExamplesTest`. *Alternativa:* seguir reescribiéndolas y que la CI compruebe el
      árbol, que avisa pero no dice qué página ni deja las imágenes a mano.
+
+### Revisión de QA, sesión 7: encapsulación del modelo (ROADMAP-QA-ARQ.md, AR-02 y AR-03)
+
+314. **El árbol de cajas se cierra al construirlo y solo `tree` lo escribe.** `Box` tiene los campos privados, se lee
+     con métodos (`text()`, `children()`, `formattedRuns()`…) y se escribe con métodos `set…` del package; `Style`
+     tiene los campos del package y un método de lectura por propiedad. Al terminar, `BoxTreeBuilder.build` llama a
+     `Box.close`, que recorre el árbol (también los marcadores, que no son hijos): los hijos pasan a una lista
+     inmutable, los que están en flujo se calculan una vez y escribir en una caja cerrada es un
+     `IllegalStateException`. Así «el layout no escribe en el árbol» deja de ser una convención y un
+     `LaidOutDocument` se puede leer desde varios hilos sin depender de que nadie escriba. Los tests que ponen en el
+     árbol tramos que el documento no puede escribir (`TextRuns`) lo hacen antes de cerrarlo, con el `finish` de un
+     `build` del package; los de otros packages que necesitan un estilo hecho a mano usan `StyleEditor`, un ayudante
+     de los tests en el package `tree`. Los campos de `Style` siguen siendo mutables dentro de `tree`: partirlo en
+     registros inmutables es la etapa 3 de AR-02. *Dónde:* `tree/Box`, `tree/Style`, `BoxTreeBuilder.build`,
+     `test/…/tree/StyleEditor`, `BoxTest`. *Alternativa:* accesores sin cierre (la garantía seguiría siendo una
+     convención dentro de `tree`) o un `StyleBuilder` aparte (más código para el mismo efecto mientras `Style` no
+     se parta).

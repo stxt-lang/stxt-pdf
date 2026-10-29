@@ -49,7 +49,7 @@ class SectionsTest {
     }
 
     private static Fragment find(Fragment f, String id) {
-        if (id.equals(f.box().id)) {
+        if (id.equals(f.box().id())) {
             return f;
         }
         for (Fragment child : f.children()) {
@@ -71,7 +71,7 @@ class SectionsTest {
     }
 
     private static List<String> fixedIds(Page page) {
-        return page.fixed().stream().map(f -> f.box().id).collect(Collectors.toList());
+        return page.fixed().stream().map(f -> f.box().id()).collect(Collectors.toList());
     }
 
     /** El texto de la caja con ese {@code Id}, o el de sus descendientes si ella no tiene líneas. */

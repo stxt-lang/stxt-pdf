@@ -12,7 +12,7 @@ public final class Messages {
 
     /** La caja de un mensaje: {@code main (línea 12)} si tiene {@code Id}, o {@code de la línea 12}. */
     public static String name(Box box) {
-        return box.id != null ? box.id + " (línea " + box.line + ")" : "de la línea " + box.line;
+        return box.id() != null ? box.id() + " (línea " + box.line() + ")" : "de la línea " + box.line();
     }
 
     /** Máximo de caracteres de un texto del documento que se cita en un mensaje. */

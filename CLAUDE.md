@@ -236,7 +236,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `Section`; todo el contenido va dentro. `BoxTreeBuilder.Result` da la raíz del documento y la lista de
   `Section` (`tree/Section`: caja, `Media`, `Page numbering` e `Inherit fixed`). La **caja de cada sección es la
   raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**, como la raíz anónima de antes) y **cuelga de
-  `root.children` sin ser hija** (`root.children.add`, no `addChild`): los recorridos de todo el árbol (referencias,
+  `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol (referencias,
   enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
   `parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con
   `parent`) y no se maquetan en el flujo: los coloca el `Paginator`. `Media` de una sección sale de
@@ -286,7 +286,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
 - **Hilos (TS-01):** un `Engine` **no** se comparte entre hilos (caché del layout, reparto en líneas y páginas
   supuestas sin sincronizar): uno por conversión, que es lo que hace `Converter`. Sí se comparten `Converter`,
   `Resources` y `DocumentReader`, y un `LaidOutDocument` se puede pintar desde varios hilos (los fragmentos son
-  `record`; las cajas solo se escriben mientras `BoxTreeBuilder` construye). Un `Engine` guardado se puede reutilizar en
+  `record`; el árbol de cajas se cierra al terminar `BoxTreeBuilder.build` y ya no cambia). Un `Engine` guardado se puede reutilizar en
   secuencia: `layOutDocument` suelta su caché al terminar. El protocolo con el `Paginator` (`reservePageDigits`,
   `assume`, `number`, `absolute()`) es de package. El schema compartido de `stxt-core` 1.0.3 solo se lee (ver
   `DocumentSchema`); al cambiar la versión hay que repasarlo. `ConcurrentConversionTest` y `EngineContractTest` lo vigilan.
@@ -447,7 +447,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   PDFBox aplica al pintar, y `PdfCanvas.pdfFont` incrusta una fuente por combinación con
   `TrueTypeFont.setEnableGsub(font.ligatures())`: sin la opción PDFBox no aplica `GSUB` (un glifo por carácter,
   17 a 30 veces más rápido) y lo medido es lo pintado.
-- **Tramos (§5.4):** `Box.text` es siempre el texto entero y `Box.runs` (`null` sin formato) lo
+- **Tramos (§5.4):** `Box.text()` es siempre el texto entero y `Box.formattedRuns()` (`null` sin formato) lo
   parte en `TextRun` con un `TextFormat` (negrita, cursiva, subrayado, tachado, que se suman a
   la fuente de la caja con `TextFormat.face`); usa `Box.runs()`, que da un único tramo si no
   hay formato. `LineBreaker` reparte palabras que pueden tener partes de varios tramos
@@ -456,14 +456,14 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   con `Canvas.decoration(font)` (`post` y `OS/2` en PDF). Un texto sin formato debe medirse y
   pintarse exactamente igual que una cadena: los PNG golden lo vigilan. El documento escribe
   tramos con `Markdown` o con `Inline: markdown` (ver abajo); los tests de layout los ponen en el
-  árbol con `TextRuns` y `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
+  árbol antes de cerrarlo con `TextRuns` y `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
 - **Formato en línea (§5.4):** `Inline` (`Style.Inline`, `none` o `markdown`) es una propiedad de
   `Typography` que se hereda y se admite en `Styles`. Con `markdown`, `BoxTreeBuilder.inlineFormat`
   pasa el texto de un `Text`, un `Paragraph` o una `Cell` con valor por `MarkdownBuilder.inline`
   (el mismo parser y el mismo `Translator` que `Markdown`, en modo `inlineOnly`: solo párrafos con
-  formato y enlaces; lo demás, `MARKDOWN_UNSUPPORTED` con la línea del párrafo). `Box.text` pasa a
-  ser el texto sin las marcas (los párrafos, separados por `\n\n`), `Box.runs` los tramos y
-  `Box.textBlock` deja de ser cierto: la línea de sus errores es la de donde empieza el texto. Dentro
+  formato y enlaces; lo demás, `MARKDOWN_UNSUPPORTED` con la línea del párrafo). `Box.text()` pasa a
+  ser el texto sin las marcas (los párrafos, separados por `\n\n`), `Box.formattedRuns()` los tramos y
+  `Box.textBlock()` deja de ser cierto: la línea de sus errores es la de donde empieza el texto. Dentro
   de un `Markdown` no actúa (`BuildContext.insideMarkdown`): sus textos ya vienen interpretados.
 - **Mayúsculas e interletraje (§4.4, §5.4):** `Transform`, `Letter spacing` y `Small caps` son
   propiedades de `Typography` (se heredan y valen en `Styles`). `Document` exige un `Language`
@@ -557,8 +557,12 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   cosa; `Width` y `Height` la miden siempre (no hay `Box sizing`). El ancho baja de padres a
   hijos y el alto sube de hijos a padres.
 - **Inmutabilidad:** las entradas y salidas del layout son `record` con listas copiadas
-  (`List.copyOf`). `Box` es mutable solo mientras `BoxTreeBuilder` construye el árbol; el layout no la
-  escribe nunca. Su igualdad es por identidad (clave de la caché).
+  (`List.copyOf`). `Box` y `Style` solo se escriben en `tree` (AR-02, AR-03): fuera se leen con métodos del
+  nombre de la propiedad (`box.text()`, `style.fontSize()`); los campos de `Box` son privados y los de `Style`,
+  del package. `BoxTreeBuilder.build` cierra el árbol al terminar (`Box.close`): los hijos pasan a una lista
+  inmutable, los que están en flujo se calculan una vez y escribir en una caja cerrada es un
+  `IllegalStateException` (`BoxTest`). Un test de otro package que necesita un estilo hecho a mano usa
+  `StyleEditor` (en el package `tree` de los tests). La igualdad de `Box` es por identidad (clave de la caché).
 - **Comparar medidas:** con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)` (o
   `Tolerance.EPSILON`), nunca con un `1e-9` propio. Lo que se ve tiene su propia tolerancia, más
   ancha: `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar (`Overflow`) y la

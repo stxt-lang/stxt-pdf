@@ -128,7 +128,7 @@ public final class Paginator {
     private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingAbsolute>> fixed,
                              boolean numbered) {
         // Los Fixed del documento: los hijos de la raíz que no son una sección.
-        List<Box> documentFixed = root.children.stream().filter(b -> b.element != Element.SECTION).toList();
+        List<Box> documentFixed = root.children().stream().filter(b -> b.element() != Element.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
         for (int k = 0; k < sections.size(); k++) {
@@ -167,7 +167,7 @@ public final class Paginator {
         List<Fragment> fragments = new ArrayList<>();
         for (int q = 0; q < queue.size(); q++) {
             Queued item = queue.get(q);
-            if (!item.pending().box().style.pages().includes(item.number(), item.total())) {
+            if (!item.pending().box().style().pages().includes(item.number(), item.total())) {
                 continue;
             }
             if (numbered && printed == 0) {
@@ -191,8 +191,8 @@ public final class Paginator {
     private static void unavailable(Box box) {
         Box found = withPageNumbers(box);
         if (found != null) {
-            throw new InvalidModelException(found.line, ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
-                    + (found.id != null ? found.id : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
+            throw new InvalidModelException(found.line(), ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
+                    + (found.id() != null ? found.id() : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
                     + "sin número (Page numbering: none): quita el marcador, o pon la sección con Inherit fixed: false "
                     + "o el Fixed en las secciones que numeran");
         }
@@ -200,10 +200,10 @@ public final class Paginator {
 
     /** La primera caja, ella o sus descendientes, con {@code {page}} o {@code {pages}}; {@code null} si no hay. */
     private static Box withPageNumbers(Box box) {
-        if (PageNumbers.contains(box.text)) {
+        if (PageNumbers.contains(box.text())) {
             return box;
         }
-        for (Box child : box.children) {
+        for (Box child : box.children()) {
             Box found = withPageNumbers(child);
             if (found != null) {
                 return found;
@@ -218,7 +218,7 @@ public final class Paginator {
         Map<String, String> numbers = new LinkedHashMap<>();
         for (References.Site site : sites) {
             if (site.reference().kind() == Reference.Kind.NUMBER) {
-                numbers.put(site.reference().id(), boxes.get(site.reference().id()).number);
+                numbers.put(site.reference().id(), boxes.get(site.reference().id()).number());
             }
         }
         return numbers;
@@ -317,10 +317,10 @@ public final class Paginator {
 
     /** Los textos del árbol que contienen {@code {page}} o {@code {pages}}, en orden del documento. */
     private static List<Box> withPageNumbers(Box box, List<Box> found) {
-        if (PageNumbers.contains(box.text)) {
+        if (PageNumbers.contains(box.text())) {
             found.add(box);
         }
-        box.children.forEach(child -> withPageNumbers(child, found));
+        box.children().forEach(child -> withPageNumbers(child, found));
         return found;
     }
 
