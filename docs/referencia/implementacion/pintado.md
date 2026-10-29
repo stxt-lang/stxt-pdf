@@ -56,8 +56,29 @@ ajustes de `TJ` entre los caracteres, no con `Tw` ni `Tc`. `PdfFonts.font` incru
 `TrueTypeFont.setEnableGsub(font.ligatures())`: sin ligaduras PDFBox no aplica `GSUB` (un glifo por carácter, de 17 a 30
 veces más rápido) y lo medido es lo pintado.
 
+El ancho de cada glifo se redondea a milésimas del cuerpo, que es lo que el PDF escribe en la tabla de anchos de la fuente
+incrustada: así maquetar y pintar miden lo mismo con fuentes de cualquier `unitsPerEm`. La línea base sale del ascendente y
+el descendente de la tabla `hhea`.
+
+> **Decisión:** sin kerning: aplicar el de las tablas `kern`/`GPOS` obligaría a colocar cada glifo por separado en el PDF.
+
+> **Decisión:** el ascendente y el descendente salen de `hhea`, no de `OS/2` (`sTypo*`, ni cuando la fuente marca
+> `USE_TYPO_METRICS`; ni `usWin*`). En IBM Plex Sans, `hhea` da 1025 y 275 por 1000, igual que `usWin*`; `sTypo*`, 780 y
+> 220.
+
 > **Decisión:** la justificación y el interletraje van con `TJ`: con la codificación Identity-H, `Tw` no tiene efecto. En el
 > SVG son `word-spacing` y `letter-spacing`.
+
+Con `Ligatures: true`, `FontFile.width` aplica `GSUB` palabra a palabra con el mismo procesador que usa PDFBox al pintar
+(`ccmp`, `liga` y `clig` para escritura latina), así que una ligadura no cruza un espacio ni un cambio de tramo y lo
+medido son los glifos que se escriben.
+
+> **Decisión:** el mismo procesador de `GSUB` que PDFBox. *Alternativa descartada:* leer solo la característica `liga`
+> de la tabla, con otro algoritmo que el del PDF.
+
+El subrayado y el tachado usan las métricas de la variante del tramo: `underlinePosition` y `underlineThickness` de la
+tabla `post`, y `yStrikeoutPosition` y `yStrikeoutSize` de `OS/2`, medidos desde la línea base hasta la parte de arriba de
+la raya, que es lo que dice la especificación OpenType. Se pintan como *artifacts*.
 
 > **Decisión:** la opción de las ligaduras viaja en `FontFace` (su cuarto componente; `base()` es la fuente sin ella): así
 > la usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del PDF, y un fichero se identifica igual con y

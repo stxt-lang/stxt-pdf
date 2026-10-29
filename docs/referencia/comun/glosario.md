@@ -7,7 +7,7 @@
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([Recursos](recursos.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Multicol` reparte su contenido en una página ([Multicol](../componentes/multicol.md)). |
 | **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Multicol`, cada columna ([Cortes](cortes.md#modelo)). |
-| **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](caja.md#el-contenedor-de-referencia)). En el código, *containing block*. |
+| **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](caja.md#el-contenedor-de-referencia)). |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](capas-y-giro.md)). |
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |

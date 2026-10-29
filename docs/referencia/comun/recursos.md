@@ -20,9 +20,8 @@ subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es `resources/image
 - contener un segmento `..`, aunque al normalizarla volviera a quedar dentro;
 - llegar, a través de un enlace simbólico, a un fichero fuera de su subcarpeta.
 
-> **Decisión:** los enlaces simbólicos dentro de la carpeta se admiten si su destino, una vez resuelto, está dentro de la
-> carpeta de recursos; si apunta fuera es un error, también al explorar `fonts/`. *Alternativa descartada:* rechazar
-> cualquier enlace.
+> **Decisión:** se admiten los enlaces simbólicos que no salen de la carpeta de recursos. *Alternativa descartada:*
+> rechazar cualquier enlace.
 
 ## Fuentes
 
@@ -31,29 +30,25 @@ sustitución. La salida PDF las incrusta (solo los glifos usados), de modo que e
 máquina; por eso deben tener una licencia que permita incrustarlas, como la SIL Open Font License. El repositorio incluye
 IBM Plex Sans, IBM Plex Serif e IBM Plex Mono, cada una en normal, negrita, cursiva y negrita cursiva.
 
-Cada fichero se identifica por lo que declara su interior, no por su nombre:
+Cada fichero se identifica por lo que declara su interior, no por su nombre
+([detalles](../implementacion/api.md#recursos)):
 
-- **familia:** la familia tipográfica de la tabla `name` (`nameID` 16) o, si no la tiene, la familia (`nameID` 1). Se
-  compara exactamente, con mayúsculas y espacios; si solo difiere en mayúsculas, el error lo sugiere
+- **familia:** la que muestran los programas de fuentes (`IBM Plex Sans`, no `IBM Plex Sans Bold`). Se compara
+  exactamente, con mayúsculas y espacios; si solo difiere en mayúsculas, el error lo sugiere
   (`¿Querías decir 'IBM Plex Sans'?`);
-- **peso:** `usWeightClass` de la tabla `OS/2`: 400 es `normal` y 700 es `bold`. Los ficheros de otros pesos (300, 500…)
-  se ignoran;
-- **estilo:** el bit de cursiva de `fsSelection` (`OS/2`).
+- **peso:** 400 es `normal` y 700 es `bold`; los ficheros de otros pesos (300, 500…) se ignoran;
+- **estilo:** normal o cursiva.
 
 Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El kerning no se aplica; las
 ligaduras, solo con `Ligatures: true` ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). `Font` y `Size` no
 tienen valor por defecto: son obligatorios en todo texto ([Tipografía](tipografia.md)).
 
-> **Decisión:** solo pesos 400 y 700: `normal` es el fichero con `usWeightClass` 400 y `bold`, el de 700, y los ficheros de
-> otros pesos se ignoran sin error. *Alternativa descartada:* un `Weight` numérico (100 a 900), o tratar como error un
-> fichero que no se puede usar.
-
-> **Decisión:** la familia se compara exactamente, con mayúsculas y espacios, y es la tipográfica (`nameID` 16) o, si
-> falta, la 1. *Alternativa descartada:* comparar sin distinguir mayúsculas.
+> **Decisión:** solo pesos 400 y 700, y la familia se compara exactamente. *Alternativa descartada:* un `Weight` numérico
+> (100 a 900), o comparar sin distinguir mayúsculas.
 
 ## Comprobaciones
 
-Con las métricas reales, antes de maquetar se comprueba que cada caja con texto tiene su fuente (familia, peso y estilo) en
+Antes de maquetar se comprueba que cada caja con texto tiene su fuente (familia, peso y estilo) en
 `fonts/` y que la fuente tiene todos los caracteres de su texto (los espacios en blanco se comprueban como espacios;
 `{page}`, `{pages}` y las referencias a otras cajas, como cifras). Un texto con tramos necesita además la variante de cada
 tramo (`Weight: normal` con un tramo en negrita necesita la negrita), y cada tramo, sus caracteres en ella. Una fuente
@@ -65,12 +60,8 @@ declaran `Font`, `Weight` y `Style`; la del carácter dentro de un bloque `Conte
 También son errores, sin línea porque no son del documento (`RESOURCE`), que no exista `fonts/`, un fichero que no se puede
 leer, una fuente variable o dos ficheros con la misma familia, peso y estilo.
 
-> **Decisión:** un carácter que la fuente no tiene es un error, con su línea; no se pinta el glifo de sustitución
-> (`.notdef`) ni se busca otra fuente. *Alternativa descartada:* pintar `.notdef`, o una lista de fuentes de sustitución.
-
-> **Decisión:** las fuentes solo se comprueban con las métricas reales, las del PDF. Con las métricas fijas de los tests de
-> layout no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar siempre
-> las fuentes al construir el árbol, que obligaría a tener la carpeta también para maquetar sin PDF.
+> **Decisión:** un carácter que la fuente no tiene es un error, con su línea; no se pinta un recuadro vacío ni se busca
+> otra fuente. *Alternativa descartada:* el glifo de sustitución, o una lista de fuentes de sustitución.
 
 ## Imágenes
 

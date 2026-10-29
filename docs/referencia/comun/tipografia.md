@@ -60,17 +60,12 @@ No se parten palabras ni se ponen guiones.
 
 ## Altura de las líneas y línea base
 
-Cada línea mide `Line height`, y la altura del contenido es el número de líneas por `Line height`. La línea base no
-afecta al layout, solo al pintado: la caja de la fuente (su ascendente más su descendente, de la tabla `hhea` del
-fichero TTF) se centra en la línea:
+Cada línea mide `Line height`, y la altura del contenido es el número de líneas por `Line height`. Dentro de la línea, la
+caja de la fuente (su ascendente más su descendente) se centra en vertical, lo que da la línea base:
 
 ```
 línea base = arriba + (Line height − (ascendente + descendente) · Size) / 2 + ascendente · Size
 ```
-
-> **Decisión:** el ascendente y el descendente salen de la tabla `hhea` de la fuente, no de los de `OS/2` (`sTypo*`, ni
-> cuando la fuente marca `USE_TYPO_METRICS`; ni `usWin*`). En IBM Plex Sans, `hhea` da 1025 y 275 por 1000, igual que
-> `usWin*`; `sTypo*` da 780 y 220. *Alternativa descartada:* `sTypo*` cuando la fuente marca `USE_TYPO_METRICS`.
 
 ## Alineación
 
@@ -83,12 +78,8 @@ siguiente, así que se justifica.
 
 El ancho de un texto es la suma de los avances de sus glifos, redondeados a milésimas del cuerpo; sin kerning, y con
 ligaduras solo si se piden ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). Una palabra con partes de
-varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que se pinta.
-
-> **Decisión:** el avance de cada glifo se redondea a milésimas del cuerpo, que es lo que escribe el PDF en la tabla de
-> anchos de la fuente incrustada, así que maquetar y pintar miden lo mismo con fuentes de cualquier `unitsPerEm`; el
-> kerning no se aplica. *Alternativa descartada:* aplicar el kerning de las tablas `kern`/`GPOS`, que obligaría a
-> colocar cada glifo por separado en el PDF.
+varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que se pinta
+([detalles](../implementacion/pintado.md#texto)).
 
 ## Tamaños intrínsecos
 
@@ -98,16 +89,12 @@ min-content = la palabra más ancha; max-content = el párrafo más largo en una
 ## Idioma (`Language`)
 
 Una caja cuyo texto no está en el idioma del documento declara el suyo en `Typography` (`Language: en-GB`), también desde
-una regla de `Styles` (`For class: english`). Se hereda, y lo que hay dentro lo usa para las reglas de las letras de
-`Transform`. En el PDF etiquetado es el atributo `Lang` del elemento de la caja, solo donde el idioma cambia respecto al
-de fuera (los elementos de dentro lo heredan), para que un lector de pantalla cambie de voz. Es una etiqueta BCP 47
-(`VALUE_NOT_ALLOWED`) y `Element: Document` no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language`
-de `Document` ([Document](../componentes/document.md#title-y-language)).
+una regla de `Styles` (`For class: english`). Se hereda; un lector de pantalla cambia de voz al leer esa caja, y
+`Transform` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `Element: Document`
+no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de `Document`
+([Document](../componentes/document.md#title-y-language)).
 
-> **Decisión:** `Language` en `Typography` reutiliza el nombre y la definición del `Language` de `Document` (la misma
-> etiqueta y el mismo error), cambia las reglas de las letras de `Transform` de lo que contiene y es el `Lang` de su
-> elemento del PDF etiquetado. No hay idioma por tramo dentro de una línea ni en Markdown. *Alternativa descartada:* un
-> idioma por tramo, que parte el contenido marcado del PDF.
+> **Decisión:** el idioma es de la caja, no de un tramo dentro de una línea ni de una parte de un `Markdown`.
 
 ## Lo que no hay
 

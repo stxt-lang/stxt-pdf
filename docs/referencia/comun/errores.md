@@ -9,25 +9,18 @@ se obtiene.
 - **La línea es la del nodo culpable:** la de la propiedad, no la de su caja ni la de su grupo; la del carácter dentro de
   un bloque `Content >>`; la de la `Font` declarada en una antecesora, si la familia no existe. Si el problema es la
   combinación de dos propiedades, el mensaje nombra la línea de la otra. Los mensajes con línea empiezan por `línea N:`.
-- **Se para en el primer error.**
-
-> **Decisión:** se para en el primer error. Acumularlos tiene el problema de los errores en cascada: una caja mal definida
-> provoca otros en sus hijos. *Alternativa descartada:* devolver la lista de errores independientes.
-
-> **Decisión:** los errores señalan la línea de la propiedad, dentro del grupo, nunca la del grupo ni la de la caja.
+- **Se para en el primer error**: acumularlos daría errores en cascada (una caja mal definida provoca otros en sus
+  hijos).
 
 ## Niveles de validación
 
-1. **Sintaxis STXT y schema** ([Estructura](estructura.md#schema)): qué hijos admite cada elemento, cardinalidades, valores
-   vacíos donde no se admiten, bloques `>>` y tipos `ENUM`, `INTEGER` y `BOOLEAN`. La realiza la librería STXT con sus
-   propios códigos (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`, `TOO_FEW_CHILDREN`, `INVALID_VALUE`…). Es donde se detecta una
-   propiedad fuera de su elemento: `Offset` en un `Block`, `Grow` en un `Area`, `Columns` en un `Flex`. El motor valida
-   también los documentos que no se han leído con el lector, así que estos errores salen siempre con los códigos de la
-   librería.
-2. **Modelo:** las reglas que el schema no puede expresar, al construir el árbol de cajas.
-3. **Recursos** ([Recursos](recursos.md)): las fuentes, con las métricas reales, y las imágenes
-   ([Image](../componentes/image.md)), antes de maquetar, porque necesitan la carpeta de recursos.
-4. **Desbordamientos** ([Desbordamiento](desbordamiento.md)): sobre el resultado, después de maquetar y paginar.
+1. **Sintaxis STXT y schema** ([Estructura](estructura.md#schema)): qué hijos admite cada elemento, cuántos, valores
+   vacíos, valores cerrados, enteros y booleanos. Es donde se detecta una propiedad fuera de su elemento (`Offset` en un
+   `Block`, `Columns` en un `Flex`), con los códigos de STXT (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`,
+   `TOO_FEW_CHILDREN`, `INVALID_VALUE`…).
+2. **Modelo:** las reglas que el schema no puede expresar, con los códigos de abajo.
+3. **Recursos** ([Recursos](recursos.md)): las fuentes y las imágenes ([Image](../componentes/image.md)).
+4. **Desbordamientos** ([Desbordamiento](desbordamiento.md)): sobre el resultado maquetado.
 
 ## Códigos
 
@@ -103,8 +96,7 @@ se obtiene.
 | `IMAGE_TOO_LARGE` | Un PNG o un JPEG no tiene más píxeles que el límite, 25 millones por defecto (línea de la `Image`) | `La imagen test/limit-huge.png tiene 6000 × 6000 píxeles (36,0 Mpx) y el máximo es 25,0 Mpx: reduce su resolución…` |
 | `SVG_TOO_COMPLEX` | Un SVG no dibuja más elementos (contando lo que repite cada `<use>`) ni anida más niveles que el límite, 20 000 y 64 por defecto (línea de la `Image`) | `El SVG test/limit-depth.svg anida 72 niveles y el máximo es 64: aplánalo…` |
 
-**Catálogo de errores.** [`test/errors/`](../../../test/errors) tiene un documento de ejemplo por regla (a veces varios), en
-un fichero cada uno y agrupados en carpetas por familia de errores, con el código y la línea que debe dar
+[`test/errors/`](../../../test/errors) tiene un documento de ejemplo por cada código, con la línea que debe dar
 ([Pruebas](../implementacion/pruebas.md#catálogo-de-errores-errorcatalogtest)).
 
 ## Tipos de error
@@ -116,21 +108,12 @@ contestar:
 |---|---|---|
 | `INVALID_DOCUMENT` | El documento o sus estilos no son válidos: sintaxis, schema, una regla del modelo, un desbordamiento, un recurso que el documento nombra y no existe | un error del cliente (4xx), con la línea |
 | `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas) o no se puede leer el fichero del documento | un fallo de su configuración (5xx) |
-| `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limites.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, o más anidado de lo que lee la librería STXT | un error del cliente por exceso (413 o 422) |
+| `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limites.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, o un texto STXT demasiado grande o anidado | un error del cliente por exceso (413 o 422) |
 | `INTERNAL` | Un fallo del motor, no del documento ni del entorno | un fallo del servidor (500), que conviene informar |
 
-El código es el de la tabla de arriba, el de la librería STXT para los errores de sintaxis y de schema
-(`CHILD_NOT_DECLARED`), `RESOURCE`, `IMAGE_FORMAT` o `INTERNAL`. La línea es `0` si el error no es de una línea (un recurso,
-un límite o un fallo interno). Cómo se ven desde Java está en [Uso desde Java](../implementacion/api.md#errores).
+El código es el de la tabla de arriba, el de STXT para los errores de sintaxis y de schema (`CHILD_NOT_DECLARED`),
+`RESOURCE`, `IMAGE_FORMAT` o `INTERNAL`. La línea es `0` si el error no es de una línea (un recurso, un límite o un fallo
+interno). Cómo se ven desde Java está en [Uso desde Java](../implementacion/api.md#errores).
 
-> **Decisión:** todos los errores del motor tienen un tipo común con el tipo de culpa, el código y la línea, para que un
-> servicio distinga un documento inválido (4xx) de un fallo del servidor (5xx) sin conocer cada clase. *Alternativa
-> descartada:* un resultado en lugar de una excepción.
-
-> **Decisión:** un error de la librería STXT que es un límite (un documento anidado más de 100 niveles o con una línea de
-> más de 10 000 caracteres) es de tipo `LIMIT`, no un documento inválido; el fichero que no se puede leer es un
-> `RESOURCE`, y un fallo del schema que lleva el propio motor, `INTERNAL`.
-
-> **Decisión:** `PAGE_LIMIT` es un código del motor de tipo `LIMIT` y sin línea. «Sin progreso» (la garantía de
-> [Cortes](cortes.md#garantía-de-progreso) que no se cumple) y «enlace sin destino» son fallos internos: son defectos del
-> motor, no del documento.
+> **Decisión:** un fallo que el motor debería haber evitado (una página que no avanza, un enlace sin destino) es
+> `INTERNAL`: es un defecto del motor, no del documento.

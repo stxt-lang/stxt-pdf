@@ -67,7 +67,7 @@ Un `Block` se parte entre sus hijos, o dentro del hijo que no cabe ([Cortes](../
 
 ## Salida PDF
 
-Un `Block` es un `Div` del PDF etiquetado ([El PDF](../comun/pdf.md#pdf-etiquetado)).
+Un `Block` es un `Div` del PDF etiquetado ([El PDF](../comun/pdf.md#accesibilidad)).
 
 ## Lo que no hay
 

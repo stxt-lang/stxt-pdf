@@ -55,7 +55,7 @@ Un texto se parte entre líneas, respetando `Widows` y `Orphans` de cada párraf
 ## Salida PDF
 
 Un `Text` y un `Paragraph` son un `P` del PDF etiquetado; el `Text` de un encabezado es un `Span` del texto del encabezado
-([El PDF](../comun/pdf.md#pdf-etiquetado)). Un `Text` con varios párrafos es un solo `P`.
+([El PDF](../comun/pdf.md#accesibilidad)). Un `Text` con varios párrafos es un solo `P`.
 
 ## Lo que no hay
 

@@ -149,7 +149,20 @@ en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa co
 
 **Referencias.** `Engine.assume` fija las páginas supuestas (la primera vez, `00`), se pagina, se mira en qué página ha
 quedado el primer fragmento de cada caja referida (`Box.key()`) y se vuelve a paginar si alguna difiere, hasta 10 pasadas que
-cambien algo.
+cambien algo; si no convergen, `REFERENCE_UNSTABLE`. Las pasadas por crecer las cifras de `{pages}` no cuentan, porque
+solo crecen. Con un medidor aditivo la paginación converge siempre: el error es una red de seguridad.
+
+> **Decisión:** `{page of: id}` se sustituye antes de repartir el texto en líneas, no en un hueco reservado como `{page}`:
+> el marcador tiene espacios y el reparto lo partiría en tres palabras, y con la convergencia no hace falta un segundo
+> paso. Como la primera pasada supone `00`, con referencias a páginas siempre hay al menos dos. *Alternativa descartada:*
+> quedarse con la última pasada sin avisar.
+
+> **Decisión:** un `Id` que no existe (`REFERENCE_UNKNOWN`) y la página de una caja de un `Fixed`
+> (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura; la
+> de una caja que cae en una página sin número, al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
+
+> **Decisión:** con `{pages}` y 100 páginas o más se vuelve a paginar reservando las cifras del total, en lugar de dejar
+> que el número real se salga del hueco reservado.
 
 **Volver a paginar no vacía la caché.** Cuando el total de páginas necesita otra cifra (`Engine.reservePageDigits`) o cambia
 la página de una referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo
@@ -167,6 +180,10 @@ que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasad
 usando el `Media` de cada página. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
 layout, y `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar y la precisión de los volcados. Se
 compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un `1e-9` propio.
+
+> **Decisión:** los desbordamientos se buscan sobre el resultado paginado, no en cada algoritmo al colocar: así no cuentan
+> las pasadas de medida, en las que una caja se maqueta con un espacio provisional. Solo dos se detectan al maquetar,
+> porque sin sitio no se avanza: `TABLE_REPEAT_OVERFLOW` y los cortes de columna de más de un `Multicol`.
 
 > **Decisión:** dos tolerancias con nombre, no una: con `EPSILON` en `Overflow` el motor sería más estricto y una caja que se
 > sale 0,005 pt sería un error. *Alternativa descartada:* una sola tolerancia, con ese cambio de comportamiento.

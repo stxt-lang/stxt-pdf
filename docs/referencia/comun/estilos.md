@@ -41,9 +41,8 @@ Text: Una nota al margen.
 	Class: note
 ```
 
-> **Decisión:** las reglas solo admiten `Box`, `Typography` y `Break`, no las propiedades propias de un elemento: el
-> schema no podría validarlas, porque el tipo de elemento va en el valor de `Element`. *Alternativa descartada:*
-> admitirlas y validarlas en el motor.
+> **Decisión:** las reglas solo admiten los grupos: las propiedades propias de un elemento no se podrían validar al
+> escribir el documento, porque el tipo de elemento va en el valor de `Element`.
 
 ## Prioridad
 
@@ -72,9 +71,7 @@ cada una de sus celdas. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en `
 cada grupo están las reglas de posición); `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../componentes/document.md#section)).
 
-> **Decisión:** prioridad fija en lugar de especificidad calculada: de más a menos fuerte, el elemento, `For id`,
-> `For class` (entre clases, la que va después en `Styles`), `Element`, la herencia y el valor por defecto, más los
-> niveles propios de las celdas. Una regla gana a la herencia. *Alternativa descartada:* especificidad calculada y
+> **Decisión:** prioridad fija en lugar de especificidad calculada. *Alternativa descartada:* especificidad calculada y
 > selectores compuestos, más potentes pero menos predecibles.
 
 ## Validación
@@ -95,14 +92,9 @@ Son errores:
 Un `Element`, un `For class`, un `For id` o un `For column` que no se aplican a ningún elemento no son errores: así las
 reglas se pueden reutilizar, y un elemento con ese `Id` o esa clase puede llegar después (de una plantilla, por ejemplo).
 
-> **Decisión:** lo que aporta una regla se valida como si lo declarara el elemento, así que una regla por tipo puede dar
-> un error en un elemento concreto (un `Margin: auto` que no centra en un ítem de `Flex`), con la línea de la regla.
-> *Alternativa descartada:* ignorar lo que no tiene efecto cuando viene de una regla, que obligaría a saber de dónde viene
-> cada valor en cada comprobación.
-
-> **Decisión:** una regla que no se aplica a nada no es un error (las reglas se reutilizan, y el elemento puede llegar
-> después de una plantilla); una clase de `Class` sin su regla y dos reglas con el mismo selector sí lo son.
-> *Alternativa descartada:* tratarlos todos igual, todos error o ninguno.
+> **Decisión:** una regla por tipo puede dar un error en un elemento concreto (un `Margin: auto` que no centra en un ítem
+> de `Flex`), con la línea de la regla. *Alternativa descartada:* ignorar lo que no tiene efecto cuando viene de una
+> regla.
 
 ## La tipografía base
 
@@ -121,9 +113,8 @@ Styles:
 Es la base de la herencia: la regla `Element` de un tipo o lo que declara una caja la cambian para esa caja y sus
 descendientes.
 
-> **Decisión:** la tipografía base va en `Element: Document`, una regla más de `Styles`, y `Document` no admite
-> `Typography`: así la base de la herencia está en el mismo sitio que todo el estilo y se puede llevar al documento de
-> estilos aparte. *Alternativa descartada:* un `Typography` propio de `Styles`, sin selector.
+> **Decisión:** la base va en una regla, no en `Document`, para que esté con el resto del estilo y se pueda llevar al
+> documento de estilos aparte.
 
 ## Documento de estilos aparte
 
@@ -153,27 +144,15 @@ Styles (dev.stxt.pdf):
   (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Una clase de `Class` puede tener su `For class` en
   cualquiera de los dos.
 - **Errores.** Una regla del documento de estilos se valida como una del documento, y su error lleva la línea **de ese
-  fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Lo que se detecta
-  después de construir el árbol (una fuente que no existe, un desbordamiento) señala la línea de la propiedad sin decir en
+  fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Los errores que
+  dependen de la maquetación (una fuente que no existe, un desbordamiento) señalan la línea de la propiedad sin decir en
   qué fichero está.
 
-> **Decisión:** la prioridad entre los dos orígenes es por nivel: dentro de cada nivel van antes las reglas del documento
-> de estilos aparte y después las del documento, así que gana el documento y sacar el `Styles` a un fichero no cambia
-> nada. *Alternativa descartada:* que todas las reglas del fichero valgan menos que cualquiera del documento, aunque sea de
-> un nivel inferior.
+> **Decisión:** la prioridad entre los dos orígenes es por nivel, así que sacar el `Styles` a un fichero no cambia nada.
+> *Alternativa descartada:* que todas las reglas del fichero valgan menos que cualquiera del documento.
 
-> **Decisión:** cada origen es estricto por separado: dos reglas iguales son un error dentro de un origen, no entre los
-> dos, y un `For id` sin elemento no es nunca un error, ni en el documento aparte (sirve para varios documentos) ni en el
-> propio (el elemento puede llegar después, de una plantilla). *Alternativa descartada:* exigir que cada `For id` tenga su
-> elemento, que obliga a un fichero de estilos por documento e impide estilar lo que rellenará una plantilla.
-
-> **Decisión:** los errores de una regla del documento aparte llevan su línea y lo dicen (`línea 8 de los estilos: …`),
-> con el mismo código; lo que se detecta después de construir el árbol señala la línea sin decir el fichero, porque el
-> motor recibe el árbol, no la ruta. *Alternativa descartada:* guardar el origen de cada línea y el nombre del fichero.
-
-> **Decisión:** el documento no nombra su documento de estilos ni el motor lo busca: lo pasa quien convierte. El mismo
-> nodo `Styles` del schema es hijo de `Document` y raíz de un documento aparte. *Alternativa descartada:* una propiedad
-> `Styles file` en `Document`.
+> **Decisión:** el documento no nombra su documento de estilos: lo pasa quien convierte. *Alternativa descartada:* una
+> propiedad `Styles file` en `Document`.
 
 ## Lo que no hay
 

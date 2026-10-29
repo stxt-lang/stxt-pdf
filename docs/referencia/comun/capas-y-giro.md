@@ -41,39 +41,28 @@ borde por defecto). Gira **todo lo que se pinta de la caja**: fondo, borde, text
 suma al de fuera.
 
 - **No cambia el layout.** Como el `Offset` de un `Relative`, es solo pintado: la caja ocupa su sitio sin girar, sus
-  hermanos no se mueven y el volcado da su rectángulo sin girar. Para un texto vertical en el margen se gira un
+  hermanos no se mueven. Para un texto vertical en el margen se gira un
   `Absolute` o un `Fixed` que lo contiene (`Text` no admite `Rotate`).
 - **Tiene que caber en la página.** El rectángulo que envuelve la caja de borde girada (con los giros de sus ancestros) no
   puede salirse de la página física ([Desbordamiento](desbordamiento.md)), y lo mismo un `Absolute` sin girar que cuelga
   de una caja girada.
 - **No se parte.** Un `Relative` girado no se parte entre páginas, como una `Image` ([Cortes](cortes.md)); `Inside` y
   `Decoration` no tienen efecto en él y son un error (`BREAK_IN_ROTATED`), también desde una regla.
-- **Orden de pintado.** No cambia: la caja girada se pinta en el mismo paso que sin girar.
-- **PDF.** El contenido se gira con una matriz, así que el texto sigue siendo texto seleccionable y nítido con cualquier
-  ángulo, y el PDF etiquetado y el orden de lectura no cambian. Un enlace en una caja girada es la zona girada dentro del
-  rectángulo que la envuelve, que es lo que pulsan los visores que no entienden zonas giradas; el rectángulo de una figura
-  girada y el destino de una caja girada ([Enlaces](enlaces.md)) son los del rectángulo que la envuelve.
+  Si es más alto que el área útil, es `PAGE_OVERFLOW` en la línea de su `Rotate`.
+- **Orden de pintado.** No cambia: la caja girada se pinta donde se pintaría sin girar.
+- **Texto.** Sigue siendo texto seleccionable y nítido con cualquier ángulo, y el orden de lectura no cambia. Un enlace en
+  una caja girada se pulsa en la zona girada.
 
-> **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni en un grupo y no se hereda
-> (aunque lo que contiene la caja gira con ella), y solo la admiten `Relative`, `Absolute`, `Fixed` e `Image`. Un `Text`
-> no gira: se gira el bloque que lo contiene. *Alternativa descartada:* `Rotate` en `Box`, para poder darlo con una clase.
+`Rotate` va entre −360 y 360 grados, sin `0`, que no gira nada (`VALUE_NOT_ALLOWED`); 360 y −360 se admiten.
+`Rotate origin` son una o dos palabras clave en cualquier orden (`top left` = `left top`); el eje que no se nombra es
+`center`. Dos del mismo eje, o algo que no es una palabra clave, es `VALUE_NOT_ALLOWED`.
 
-> **Decisión:** el ángulo va de −360 a 360 grados; `0`, que no gira nada, y lo de fuera son `VALUE_NOT_ALLOWED`. 360 y
-> −360 se admiten aunque dejen la caja como estaba. *Alternativa descartada:* normalizar a (−180, 180] o rechazar las
-> vueltas enteras.
+> **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni se hereda (aunque lo que
+> contiene la caja gira con ella). Un `Text` no gira: se gira el bloque que lo contiene. *Alternativa descartada:* `Rotate`
+> en `Box`, para poder darlo con una clase.
 
-> **Decisión:** `Rotate origin` son una o dos palabras clave en cualquier orden (`top left` = `left top`); el eje que no se
-> nombra es `center`, y `center center` vale. Dos del mismo eje, o algo que no es una palabra clave (puntos, porcentajes),
-> es `VALUE_NOT_ALLOWED`.
-
-> **Decisión:** un `Relative` girado no se parte: se maqueta entero y, si no cabe en lo que queda de página, pasa a la
-> siguiente, como una imagen; si es más alto que el área útil, `PAGE_OVERFLOW` en la línea de su `Rotate`. Los cortes
-> forzados de sus descendientes no tienen efecto. *Alternativa descartada:* partirlo y girar cada fragmento sobre su
-> propio centro (un sello partido en dos páginas no tiene sentido), o un error para los cortes forzados de dentro.
-
-> **Decisión:** el giro envuelve todo el contexto de apilamiento de la caja girada, también sus posicionados y sus
-> contextos con `Layer`; una `Image` en flujo se gira en sus dos pasos (fondo y borde, y contenido). El orden de pintado
-> no cambia.
+> **Decisión:** un `Relative` girado no se parte. *Alternativa descartada:* girar cada fragmento sobre su propio centro: un
+> sello partido en dos páginas no tiene sentido.
 
 ## Lo que no hay
 

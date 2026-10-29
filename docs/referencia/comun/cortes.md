@@ -38,12 +38,11 @@ este orden:
 
 Si sigue sin haber corte posible, corta donde se acaba el espacio.
 
-Un párrafo que no puede respetar `Widows` y `Orphans` y no tiene nada antes en la página ofrece igualmente un corte que
-las incumple, para que su padre pueda preferirlo a otro que incumpla `avoid`. En ese corte se respetan las viudas si se
-puede y, si no, se llena el espacio.
+Un párrafo que no puede respetar `Widows` y `Orphans` se parte igualmente si la alternativa es incumplir un `avoid`; en
+ese corte se respetan las viudas si se puede y, si no, se llena el espacio.
 
-Solo se vuelve atrás a cortes entre hijos: si el mejor corte es anterior al hijo que no cabe, se descarta lo colocado
-después, pero nunca se repite el layout de un hijo anterior con menos espacio para partirlo por dentro.
+Si el mejor corte es anterior al hijo que no cabe, lo que va después pasa a la página siguiente, pero un hijo anterior
+nunca se parte por dentro para dejar sitio.
 
 ## Garantía de progreso
 
@@ -66,11 +65,8 @@ un salto a la columna siguiente (que, en la última columna, es también de pág
 - Dentro de una caja que no se parte (un `Relative` girado, un `Absolute`), los cortes forzados de sus descendientes no
   tienen efecto.
 
-> **Decisión:** un corte forzado de página tiene una calidad propia, por encima de la de un corte perfecto, para que
-> atraviese las columnas: el `Multicol` deja de llenarlas y pasa el corte a su padre; el de columna es un corte perfecto
-> dentro de las columnas. *Límite:* en los ítems de un `Flex` o un `Grid` partidos en paralelo, el corte de la fila es el
-> peor de sus ítems, así que un corte de página dentro de uno de ellos actúa como de columna. *Alternativa descartada:*
-> marcar aparte en el resultado del layout si un corte es de página.
+> **Decisión:** un corte de página atraviesa las columnas de un `Multicol`. *Límite:* dentro de un ítem de un `Flex` o
+> un `Grid` partido en paralelo, un corte de página actúa como uno de columna.
 
 ## Márgenes en los cortes
 
@@ -84,13 +80,9 @@ Con `Decoration: slice`, el primer fragmento no tiene borde ni relleno inferiore
 superiores. Con `Decoration: clone`, cada fragmento se pinta como una caja completa: el contenido de cada página cabe entre
 su borde y relleno superiores e inferiores.
 
-Con `slice`, el borde y el relleno inferiores solo se reservan cuando hacen falta: si la caja terminaría en la página pero
-ellos no caben, se maqueta de nuevo con ese espacio reservado, de modo que se corta antes (o pasa entera a la página
-siguiente) y termina allí con su borde y su relleno. Si la caja se corta de todos modos, su fragmento llega hasta el final
-de la página.
-
-> **Decisión:** con `slice` el borde y el relleno inferiores no se reservan siempre, como con `clone`, sino solo si la caja
-> terminaría en la página: así no queda un hueco al final de cada página cuando la caja se corta de todos modos.
+Con `slice`, el borde y el relleno inferiores solo se reservan si la caja terminaría en la página: si entonces no caben,
+la caja se corta antes (o pasa entera a la página siguiente) y termina allí con ellos. Si la caja se corta de todos modos,
+su fragmento llega hasta el final de la página, sin dejar hueco.
 
 ## Alto definido y cortes
 
@@ -107,12 +99,9 @@ superiores): el hueco que dejan las líneas o los hijos al final de la página n
 una caja con `Height` igual al alto de su contenido no desborda al partirse, y el alto que se ve puede pasar del `Height`
 en lo que suman esos huecos.
 
-> **Decisión:** un fragmento cortado de una caja con alto definido llega hasta el final de la página pero solo consume lo
-> que ocupa su contenido. Antes, una caja con `Height` igual al alto de su contenido desbordaba al partirse (un `Text` de
-> `Height: 240` con 20 líneas, en páginas de 100, acababa con 40 de caja para 48 de líneas), y también un ítem de grid
-> estirado a una fila que se parte, sin que el autor pudiera evitarlo. A cambio, el alto que se ve puede pasar del
-> `Height`. *Alternativa descartada:* que el fragmento mida solo lo que ocupa su contenido (el `Height` se respeta
-> exactamente, pero la caja ya no llega al final de la página), o dejar que el contenido desborde el último fragmento.
+> **Decisión:** así una caja (o un ítem de grid estirado) no desborda por partirse, a cambio de que el alto que se ve
+> pueda pasar del `Height`. *Alternativa descartada:* un fragmento que mide solo lo que ocupa su contenido (no llega al
+> final de la página), o dejar que el contenido desborde el último fragmento.
 
 ## Cortes en `Flex`, `Grid` y `Table`
 
@@ -140,23 +129,15 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../componente
 ## Números de página: `{page}` y `{pages}`
 
 `{page}` y `{pages}` en un texto se sustituyen por el número impreso de la página y el último número de su tanda, según
-el `Page numbering` de cada sección ([Document](../componentes/document.md#numeración-de-las-páginas)). Se resuelven en
-dos fases: se pagina reservando el ancho de un número de prueba de dos cifras (`00`) y después se sustituyen los valores
-reales. Si el total tiene más cifras (100 páginas o más), antes se vuelve a paginar reservando tantas cifras como tenga el
-total, y así hasta que basten. Si el texto cambia de ancho, solo se vuelve a maquetar esa caja: sus líneas conservan los
-saltos y se vuelven a medir y alinear. Como los `Fixed` no ocupan espacio, el flujo principal no cambia.
+el `Page numbering` de cada sección ([Document](../componentes/document.md#numeración-de-las-páginas)). El reparto en
+líneas y en páginas se hace con el ancho de un número de dos cifras (`00`), o de tantas como tenga el total si son más;
+el número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus saltos.
 
-`{page of: id}`, en cambio, se resuelve paginando hasta que el valor supuesto coincida con el real
-([Referencias](referencias.md)): el texto se mide ya con la página escrita, así que puede cambiar el reparto en líneas y
-en páginas.
-
-> **Decisión:** con 100 páginas o más se vuelve a paginar reservando las cifras del total, en lugar de dejar que el número
-> real se salga del hueco reservado.
+`{page of: id}`, en cambio, se mide con la página escrita, así que puede cambiar el reparto
+([Referencias](referencias.md)).
 
 ## Lo que no hay
 
-- **Páginas en blanco para imprimir a doble cara** (empezar en página impar).
-  > **Decisión:** no hay `Before: odd-page` ni `even-page`: una página en blanco que nadie escribió sería un valor por
-  > defecto silencioso, y habría que decidir si se numera. *Alternativa descartada:* `odd-page` y `even-page` en `Before` y
-  > `After`.
-- Volver a maquetar un hijo ya colocado con menos espacio para partirlo por dentro.
+- **Páginas en blanco para imprimir a doble cara** (`Before: odd-page`): una página que nadie escribió, y habría que
+  decidir si se numera.
+- Partir por dentro un hijo ya colocado para dejar sitio a lo que sigue.

@@ -16,16 +16,10 @@
 | `max(a, b, …)` | El mayor de los valores. | `max(200, 30%)` |
 | `clamp(a, b, c)` | `b`, pero nunca menos que `a` ni más que `c`. | `clamp(200, 50%, 400)` |
 
-Cada propiedad admite solo algunas de estas formas (la columna *Valores* de su tabla); cualquier otra es un error:
-`Width: 1fr`, `Max width: max-content`, `Gap: auto`. Los argumentos de `min()`, `max()` y `clamp()` son números o
-porcentajes. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos.
-
-> **Decisión:** cada propiedad admite solo las formas de su columna *Valores*: `Width: 1fr`, `Max width: max-content`,
-> `Gap: auto`, un `minmax()` fuera de las pistas o un número negativo fuera de `Margin` y `Offset` son
-> `VALUE_NOT_ALLOWED`, no un `auto` silencioso.
-
-Un porcentaje cuya base es un alto que no es definido (por ejemplo, el `Height: 50%` de una caja cuyo padre tiene alto
-`auto`) es un error. Ver [alto definido](#alto-definido).
+Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: 1fr`,
+`Max width: max-content`, `Gap: auto`, un `minmax()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
+silencioso. Los argumentos de `min()`, `max()` y `clamp()` son números o porcentajes. Solo `Margin`, `Offset` y
+`Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es [definido](#alto-definido) es un error.
 
 ## Listas y `repeat`
 
@@ -59,18 +53,14 @@ pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la
 **opacidad** (`FF` o `F`, opaco; `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
 color (`Color`, `Border color`, `Background`, `Rule color`).
 
-> **Decisión:** los colores llevan su opacidad (`#RGBA`, `#RRGGBBAA`) en todas las propiedades de color, también en el
-> texto y en `Rule color`; no hay una propiedad `Opacity` de la caja. *Alternativa descartada:* `Opacity` por caja, que
-> afectaría también a todo lo que contiene.
+> **Decisión:** la opacidad va en cada color; no hay `Opacity` de la caja, que afectaría a todo lo que contiene.
 
 El fondo también admite un **degradado lineal**: `linear(ángulo, color, color…)`, con el ángulo en grados (`0` va hacia
 arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores, repartidos a partes iguales:
 `linear(180, #12315A00, #12315A)`. Cómo se pinta está en [La caja](caja.md#degradado).
 
-> **Decisión:** `linear(ángulo, color, color…)` reparte los colores a partes iguales; no hay paradas con posición, ni
-> degradados radiales, cónicos o repetidos. *Alternativa descartada:* solo dos colores, o paradas con posición.
-
-No hay colores con nombre (`red`) ni funciones de color (`rgb()`).
+No hay colores con nombre (`red`), funciones de color (`rgb()`), paradas con posición ni degradados radiales, cónicos o
+repetidos.
 
 ## Booleanos y enteros
 
@@ -95,8 +85,8 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 
 ## Alto definido
 
-Los anchos se conocen siempre al maquetar; los altos, no. Un porcentaje vertical es un error
-(`INDEFINITE_PERCENTAGE`) si su base no es un **alto definido**, que se decide al leer el documento:
+Los anchos se conocen siempre; los altos, no. Un porcentaje vertical es un error (`INDEFINITE_PERCENTAGE`) si su base no
+es un **alto definido**, que se decide al leer el documento con esta regla fija:
 
 - el área útil;
 - el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
@@ -109,8 +99,6 @@ La base de `Height`, `Min height` y `Max height` de un `Absolute` o un `Fixed` e
 si lo necesitan, declara su `Height`. El alto de las columnas de un `Multicol` tampoco es definido
 ([Multicol](../componentes/multicol.md#contenido)).
 
-> **Decisión:** el alto definido se decide al leer el documento, con esta regla fija, y no al maquetar. Es más estricta
-> que lo que el motor sabe al maquetar: un ítem de `Flex` estirado no da un alto definido a sus hijos aunque el motor sí
-> lo conozca en ese momento. A cambio, el error sale siempre, en la línea de la propiedad, y no depende de por qué
-> camino se maquetó la caja. *Alternativa descartada:* detectar los porcentajes sin base durante el layout final,
-> distinguiéndolo de las pasadas de medida (un `Grid` mide sus ítems sin base y luego los maqueta con el alto del área).
+> **Decisión:** el alto definido se decide al leer el documento, no al maquetar. Es más estricto (un ítem de `Flex`
+> estirado no da alto definido aunque su alto se acabe conociendo), pero el error sale siempre, en la línea de la
+> propiedad. *Alternativa descartada:* detectar los porcentajes sin base durante el layout.

@@ -51,6 +51,14 @@ ser `null` en esos dos. Ver [Styles](../comun/estilos.md#documento-de-estilos-ap
 `new Resources(Path.of("otra"))` usa otra carpeta de recursos; toda ruta pasa por `Resources.resolve`, que nunca va hacia
 atrás. `Resources` se comparte entre hilos y entre conversiones; indexa `fonts/` una vez y guarda las imágenes leídas.
 
+`FontLibrary` identifica cada TTF por su interior: la familia es la tipográfica de la tabla `name` (`nameID` 16) o, si no
+la tiene, la familia (`nameID` 1); el peso, `usWeightClass` de `OS/2` (400 o 700; los demás se ignoran sin error), y el
+estilo, el bit de cursiva de `fsSelection`.
+
+> **Decisión:** las fuentes solo se comprueban con `PdfMetrics` (`Engine.layOutDocument` llama a `validate`). Con
+> `FixedMetrics` no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar
+> siempre las fuentes al construir el árbol, que obligaría a tener la carpeta también para maquetar sin PDF.
+
 ## Errores
 
 Todo error del motor es un `StxtPdfException` (lo lanzan `DocumentReader` y `Converter`), así que una sola `catch` basta.
@@ -104,6 +112,23 @@ Converter converter = Converter.builder()
 Llega al `Engine` (que lo pasa a `Images` y al `Paginator`) y a `PdfDocumentWriter.write` (los límites del dibujo de JSVG).
 `Images.validate` los comprueba antes de maquetar con lo que `ImageFile` leyó sin decodificar nada: los píxeles de la
 cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin recursión.
+
+> **Decisión:** los valores por defecto se eligieron midiendo: un PNG con transparencia de 144 Mpx (547 KB en disco) agota
+> un heap de 512 MB, uno de 900 Mpx de 106 KB tarda 23 s, 20 000 niveles de SVG desbordan la pila de la JVM y una cadena de
+> `<use>` de 10⁹ elementos agota la memoria a los 51 s. Un juego más alto (10 000 páginas, 100 Mpx, 100 000 elementos y
+> 256 niveles) dejaba a un servicio expuesto a cada una de ellas. *Alternativa descartada:* propiedades del sistema, o
+> constantes sin configurar.
+
+> **Decisión:** los límites son de cada conversión, no de `Resources`: dos conversiones con límites distintos comparten los
+> mismos recursos. *Alternativa descartada:* atar la caché de imágenes a un único juego de límites.
+
+> **Decisión:** `SvgInspector` cuenta por exceso lo que contará JSVG, así que lo que cumple el límite no falla al dibujar.
+> JSVG trae sus propios límites (2000 elementos y 30 niveles, y 15 niveles de `<use>` anidados), que rechazaban SVG
+> legítimos: el motor le da los suyos, y si aun así no carga un SVG es `IMAGE_FORMAT`. *Alternativa descartada:* dejar que
+> JSVG cuente al dibujar, que falla tarde, sin línea y sin tipo.
+
+> **Decisión:** los límites del texto STXT (10 MB, 100 niveles, 10 000 caracteres por línea) son los de `stxt-core`, que ya
+> da un error `LIMIT`; `Limits` solo tiene lo que el motor comprueba por su cuenta.
 
 ## Hilos
 

@@ -38,10 +38,8 @@ El modelo de caja. No se hereda.
 | `Radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(…)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
 
-> **Decisión:** lo que se hereda va en `Typography` y lo que no, en `Box` o `Break`. Por eso `Background` y
-> `Border color` van en `Box` (no son geometría, pero no se heredan) y `Widows` y `Orphans` van en `Typography` (son de
-> los párrafos y se heredan), no en `Break`. *Alternativa descartada:* un cuarto grupo de pintado, o `Widows` y
-> `Orphans` en `Break`; en los dos casos un grupo mezclaría lo que se hereda con lo que no.
+> **Decisión:** lo que se hereda va en `Typography` y lo que no, en `Box` o `Break`: por eso `Background` y
+> `Border color` van en `Box`, y `Widows` y `Orphans`, en `Typography`. *Alternativa descartada:* un grupo de pintado.
 
 ### Márgenes `auto`
 
@@ -55,10 +53,8 @@ El modelo de caja. No se hereda.
 Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Flex` y `Grid` (que se alinean
 con `Main axis`, `Cross axis`, `Horizontal` y `Vertical`) son errores.
 
-> **Decisión:** un `Margin: auto` horizontal en flujo de bloque necesita `Width` o `Max width`: con ancho `auto` la caja
-> ocupa toda la línea y los márgenes valdrían 0. Con el mismo criterio son errores los verticales en flujo de bloque, los
-> de un `Absolute` sin inicio, tamaño y fin y los de los ítems de `Flex` y `Grid`: un margen `auto` que no centra no
-> tendría efecto. *Alternativa descartada:* que valgan 0 en silencio.
+> **Decisión:** un margen `auto` que no centraría nada es un error, no un 0 silencioso: con ancho `auto` la caja ocupa
+> toda la línea y no hay sobrante que repartir.
 
 ## Dimensionado
 
@@ -96,9 +92,7 @@ documento (los dos en puntos o los dos en porcentaje), un mínimo mayor que el m
 ellos, es un error (`MIN_MAX_CONFLICT`). Si no se pueden comparar hasta maquetar (`Min width: 150` y `Max width: 20%`) y
 chocan, **gana el mínimo**.
 
-> **Decisión:** los mínimos y los máximos solo se comparan al leer si están en las mismas unidades (puntos con puntos,
-> porcentaje con porcentaje); si no, al maquetar gana el mínimo, sin error. *Alternativa descartada:* compararlos
-> también al maquetar y dar un error de layout.
+> **Decisión:** el choque entre unidades distintas no es un error de layout: gana el mínimo.
 
 ### Proporción
 
@@ -106,14 +100,14 @@ Con `Aspect ratio` y un eje `auto`, ese eje se deduce del otro, sobre la caja de
 proporción: la de su fichero, o la de `Aspect ratio`, y en ella se aplica a la caja de contenido
 ([Image](../componentes/image.md#dimensionado)).
 
-> **Decisión:** `Aspect ratio` se aplica a la caja de borde en todas las cajas salvo en una `Image`, donde se aplica a la
-> caja de contenido para que el relleno y el borde no deformen el dibujo. *Alternativa descartada:* la caja de contenido
-> también en las demás.
+> **Decisión:** en una `Image`, la proporción es la de la caja de contenido, para que el relleno y el borde no deformen
+> el dibujo; en las demás cajas, la de la caja de borde.
 
 ## Fondo, borde y esquinas
 
-`Background`, `Border color` y `Radius` solo cambian el pintado: ninguno mueve ni cambia el tamaño de una caja. El fondo
-y el borde se pintan en el paso de fondos de su contexto ([Capas y giro](capas-y-giro.md#orden-de-pintado)).
+`Background`, `Border color` y `Radius` solo cambian el aspecto: ninguno mueve ni cambia el tamaño de una caja. El fondo
+y el borde van debajo del contenido ([Capas y giro](capas-y-giro.md#orden-de-pintado)). Para quien lee el PDF con un
+lector de pantalla son decoración ([El PDF](pdf.md#accesibilidad)).
 
 ### Esquinas
 
@@ -129,11 +123,8 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
   el último, las de abajo; con `clone`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
   fragmento, no sobre el de la caja entera.
 
-> **Decisión:** `Radius` es un radio por esquina, de 1 a 4 valores; la elipse se pide con %. *Alternativa descartada:*
-> un solo valor para las cuatro esquinas, o dos radios por esquina (`10 / 20`).
-
-> **Decisión:** los radios en % de una caja partida se resuelven sobre cada fragmento, no sobre la caja entera, que el
-> pintado no conoce: un fragmento muy bajo reduce sus radios.
+> **Decisión:** un radio por esquina; la elipse se pide con %. Los % de una caja partida son de cada fragmento: uno muy
+> bajo reduce sus radios. *Alternativa descartada:* dos radios por esquina (`10 / 20`).
 
 ### Borde
 
@@ -142,9 +133,6 @@ lado con su color, y dos lados seguidos se encuentran en la **diagonal** que une
 la de relleno (con esquinas redondeadas, la diagonal sigue hacia dentro para cubrir la curva). Un lado sin grosor no
 tiene color: `Border: 0 0 0 3` con `Border color: #B5651D` es una franja a la izquierda. El borde es siempre una línea
 continua.
-
-> **Decisión:** `Border color` admite de 1 a 4 colores (arriba, derecha, abajo, izquierda), sin propiedades por lado.
-> *Alternativa descartada:* `Border top color` y las demás, cuatro nombres más en el schema.
 
 ### Fondo
 
@@ -161,17 +149,9 @@ extremo. Cada color se pinta con su opacidad: un degradado hacia un color transp
 El color de un fondo, de un borde o de un texto con opacidad deja ver lo que hay debajo; en un borde de un solo color,
 las esquinas no se pintan dos veces.
 
-### PDF etiquetado
-
-Fondos, bordes y degradados son *artifacts*: no forman parte del contenido ([El PDF](pdf.md#pdf-etiquetado)).
-
 ## Lo que no hay
 
-- Sombras.
+- Sombras: el PDF no desenfoca y habría que aproximarlas con capas semitransparentes.
 - Estilos de borde (punteado, doble…), varias capas de fondo ni imágenes de fondo.
 - Recorte del contenido por el contorno de la caja: lo que se sale de la caja es un
   [desbordamiento](desbordamiento.md), y las esquinas redondeadas solo recortan una `Image`.
-
-> **Decisión:** no hay sombras (`Shadow`): PDFBox no desenfoca y habría que aproximarlas con capas semitransparentes, lo
-> más caro de pintar y lo que menos aporta. *Alternativa descartada:* `Shadow: x y desenfoque color`, exterior y única,
-> con capas.

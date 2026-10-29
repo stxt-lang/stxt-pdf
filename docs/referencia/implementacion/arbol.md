@@ -16,6 +16,22 @@ en `DocumentSyntaxException` ([Uso desde Java](api.md#errores)).
 La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `DocumentReader` valida con él al leer y
 `BoxTreeBuilder` vuelve a validar el árbol al empezar, así que el resto del builder da la estructura por buena.
 
+En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `Text`, `Paragraph`, `Cell`, `Image`,
+`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Isolate`, `Wrap`, `Header` e
+`In contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
+valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
+`ValueReader`.
+
+Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Media` declare su tamaño de una sola forma, que
+`Item` y `Area` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
+tenga su texto en un sitio y solo uno, que la raíz sea `Document`, que el `Text` de un encabezado no tenga `Break`, la
+jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Head`, `Body`, `Foot`, que una `Cell` no tenga a la
+vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema como lo que
+escribe el autor.
+
+> **Decisión:** lo que ya rechaza el schema no tiene código propio del motor: `Main axis: stretch`, `Inside: page` o un
+> bloque `>>` donde van hijos son errores del schema, con su código de `stxt-core`.
+
 > **Decisión:** `BoxTreeBuilder` valida contra el schema al empezar, aunque el documento venga de `DocumentReader`: un árbol
 > construido sin validar (`STXT.rawParser()`) da los mismos errores que el lector, con los códigos de `stxt-core`, en lugar de
 > interpretar mal una propiedad fuera de su sitio. Cuesta validar dos veces lo que viene del lector. *Alternativa
