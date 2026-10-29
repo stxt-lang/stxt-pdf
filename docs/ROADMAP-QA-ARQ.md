@@ -14,7 +14,7 @@ como *no verificado*. Los programas con que se midió están en [`tools/qa/`](..
 1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
 2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
    evidencia, propuesta y criterio de aceptación.
-3. Ejecuta `mvn test` para partir de verde (1379 tests tras la sesión 4) y comprueba que `git status` queda limpio.
+3. Ejecuta `mvn test` para partir de verde (1381 tests tras la sesión 5) y comprueba que `git status` queda limpio.
 
 **Al terminar una sesión:**
 
@@ -89,7 +89,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | hecho |
 | AR-09 | Modelo de errores sin tipo común | Media | M | hecho |
 | AR-10 | Dos tolerancias | Baja | S | hecho |
-| AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | pendiente |
+| AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | hecho |
 | AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | pendiente |
 | AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | pendiente |
 
@@ -114,6 +114,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | Entradas hostiles | anidado > 100 niveles y línea > 10 000 caracteres: `LimitException` de `stxt-core` (bien); `Columns: repeat(100000, 1fr)`: 182 ms; 2000 páginas: 0,5 s |
 | Bombas de imagen (`BombsProbe`, JVM de 512 MB) | PNG sin transparencia: 64 Mpx en 4,6 s, 144 Mpx en 4,3 s, 900 Mpx (106 KB) en 23 s; con transparencia: 64 Mpx en 5,3 s, 144 Mpx (547 KB) `OutOfMemoryError` (13 s con 1,5 GB); JPEG de 400 Mpx: 0,5 s. SVG con los límites de JSVG subidos: 300 000 rectángulos 5,4 s (PDF de 4 MB), 100 000 `<use>` 1,8 s, 2000 niveles bien, **20 000 niveles `StackOverflowError`**, 10⁹ elementos por `<use>` `OutOfMemoryError` a los 51 s. Con los límites por defecto de JSVG (2000 elementos y 30 niveles) falla incluso un SVG legítimo de 3000 rectángulos |
 | Tras la sesión 4, SVG con texto | Formulario PDF de los 10 SVG con texto idéntico en `en` y en `tr` (antes, en `tr`, de 1 a 19 KB menos: dibujados con `Dialog`; `AwtFontProbe` muestra la causa); `mvn test` en turco deja el árbol limpio. `ConcurrencyProbe` en la misma máquina, antes y después: 7,7 a 10,0 s y 7,8 a 10,1 s, 0 diferencias de bytes; 1.ª ronda en frío 2,1 a 2,2 s y 1,9 a 2,1 s |
+| Tras la sesión 5, paginación | `ScaleProbe`, layouts por página: 96 páginas 22,8; 100 páginas de 46,0 a 23,0; 153 de 45,8 a 22,9; 657 de 43,0 a 21,5; índice de 163 páginas de 57,1 a 33,0. Layout: 657 páginas de 1459 a 794 ms; 153 de 394 a 283; índice de 364 a 225. Perfil del layout (JFR, pilas enteras): `LineBreaker.breakParagraphs` 71,5 %, `FontFile.width` 21,6 %, `TextRun.Joiner` ≈ 19 %, `PdfMetrics.validate` ≈ 8 % (PF-06) |
 
 ## QA
 
@@ -673,11 +674,16 @@ caja que se sale 0,005 pt sería un error), y eso es un cambio de comportamiento
 razón en `Tolerance`: `EPSILON` (aritmética, el layout) y `MODEL` (0,01 pt, lo que se ve: `Overflow` y la comparación de
 los volcados en `ReferenceFiles`); `Leaders` deja su `1e-9` propio (decisión 312).
 
-### AR-11 · `Paginator.paginate` · Baja · S
+### AR-11 · `Paginator.paginate` · Baja · S · hecho
 
 96 líneas, complejidad 21, con tres fases (convergencia, segunda fase de numeración, colocación de los `Fixed`)
 y los registros privados `Queued` y `Numbering`. Extraer `converge(...)`, `placeFixed(...)` y `Numbering` a su
 fichero. Antes de tocarlo, PF-03 (que lo modifica). Sin cambio de comportamiento.
+
+**Hecho (sesión 5).** `paginate` (11 líneas) prepara y encadena `converge` (las pasadas hasta que no cambia nada, 41
+líneas; devuelve un `Flow` con los resultados y la numeración), `pages` (la segunda fase, 32) y `placeFixed` (los
+`Fixed` de una página, 17); `Numbering` está en su fichero. El PDF de los 11 ejemplos, los 28 golden y dos documentos
+grandes de `ScaleProbe` es el mismo, byte a byte (sin fechas ni `ID`), que antes de la sesión 5.
 
 ### AR-12 · `ArchitectureTest` solo detecta ciclos · Baja · S
 
@@ -706,7 +712,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **2. Ligaduras y rendimiento del pintado** (hecha) | QA-03 + PF-01, PF-02, TS-04 | Mide = pinta; pintar ≈ 9,5 veces más rápido por defecto; sin cerrojos calientes |
 | **3. Contrato público** (hecha) | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
 | **4. SVG y el estado global** (hecha) | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
-| **5. Caché de la paginación** | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
+| **5. Caché de la paginación** (hecha) | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
 | **6. Tests de referencia** | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
 | **7. Encapsulación del modelo** | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
 | **8. Constructor del árbol** | AR-01 | `BoxTreeBuilder.element` partido por familias |
@@ -739,3 +745,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 3 · Contrato público (en curso) | TS-01: contrato de hilos en javadoc y README, protocolo de la paginación de `Engine` de package, `layOutDocument` suelta su estado al terminar; `EngineContractTest`; decisiones 300 a 302. | Último punto de la sesión 3: QA-06 (`Limits` configurable en el `Builder` del `Converter`, píxeles por imagen y elementos de SVG) |
 | 2026-10-29 | 3 · Contrato público (terminada) | QA-06: `Limits` (2000 páginas, 25 Mpx, 20 000 elementos y 64 niveles de SVG, elegidos por el usuario tras medirlos con `BombsProbe`) en `Converter.builder().limits(…)`; `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX` antes de maquetar; JSVG con los mismos límites (corrige que rechazara SVG legítimos de más de 2000 elementos con una `IOException`); casos del catálogo, `LimitsTest`, §6.2 de la especificación; decisiones 303 a 307. | Sesión 4: SVG y estado global (QA-02, TS-03). Decidir antes la decisión abierta 4 (contornos hechos por el motor o JSVG con sus límites) |
 | 2026-10-29 | 4 · SVG y el estado global (hecha) | QA-02 y TS-03: causa aislada (AWT da `Dialog` para `IBM Plex Sans` en una JVM en turco); `SvgFonts` da a JSVG el fichero comprobado con una familia clave (huella SHA-256) y `PlatformSupport.customFont`, sin `registerFont`; `ImageFile.textFonts`, `FontFile.digest`; cerrojo para la caché global de JSVG; un texto de un `<use>` conserva la fuente de su sitio. `PdfImagesTest` (4 tests, 3 fallan sin el cambio) y `SvgImageTest`; §5.18, decisiones 308 a 310; la CI en turco comprueba el árbol. 1379 tests en verde con el idioma por defecto y en turco; ningún PNG ni volcado cambia. | Sesión 5: caché de la paginación (PF-03, PF-04, AR-11, AR-10) |
+| 2026-10-29 | 5 · Caché de la paginación (hecha) | PF-03: volver a paginar olvida solo los textos que cambian y sus antepasados (`Engine.forget`, decisión 311; `PaginationCacheTest`; `ScaleProbe` con fallos por página e índice): la mitad de layouts a partir de la página 100. PF-04: medido con JFR, sin cambios (< 1 %); de ahí sale PF-06 (el reparto en líneas, 71 % del layout). AR-10: `Tolerance.EPSILON` y `Tolerance.MODEL` con nombre (decisión 312). AR-11: `paginate` partido en `converge`, `pages` y `placeFixed`; `Numbering` en su fichero. El PDF de los ejemplos, los golden y dos documentos grandes es el mismo byte a byte que antes. 1381 tests en verde. | Sesión 6: tests de referencia (QA-07, QA-08). Decidir antes la decisión abierta 2 (¿falla el test si cambia un PNG?). PF-06 queda pendiente fuera del plan |

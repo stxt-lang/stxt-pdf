@@ -19,7 +19,6 @@ import dev.stxt.boxes.tree.References;
 import dev.stxt.boxes.tree.Section;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -62,14 +61,26 @@ public final class Paginator {
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
         List<Section> sections = tree.sections();
-        // Los Fixed del documento: los hijos de la raíz que no son una sección.
-        List<Box> documentFixed = root.children.stream().filter(b -> b.element != Element.SECTION).toList();
         // Cada caja fixed de una sección una sola vez, con la posición estática de la página donde aparece.
         List<Map<Box, PendingAbsolute>> fixed = new ArrayList<>();
         sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
         // Los textos con {page} o {pages}, que cambian de ancho si el total necesita más cifras.
         List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
-        boolean numbered = !numberedTexts.isEmpty();
+        Flow flow = converge(root, sections, fixed, numberedTexts);
+        return pages(root, sections, flow, fixed, !numberedTexts.isEmpty());
+    }
+
+    /** El flujo de cada sección, un resultado por página, y la numeración de sus páginas. */
+    private record Flow(List<List<LayoutResult>> results, Numbering numbering) {
+    }
+
+    /**
+     * Pagina el flujo hasta que no cambia nada: las cifras del total de páginas (solo crecen) y las páginas
+     * referidas con {@code {page of: id}}, que cambian el ancho de los textos que las escriben. Solo se vuelve a
+     * maquetar lo que depende de esos textos (PF-03): el resto sale de la caché.
+     */
+    private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingAbsolute>> fixed,
+                          List<Box> numberedTexts) {
         List<References.Site> sites = References.sites(root);
         Set<String> targets = new LinkedHashSet<>();
         sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE)
@@ -83,19 +94,14 @@ public final class Paginator {
         }
         engine.assume(assumed, numbers, List.of());
 
-        // Se vuelve a paginar mientras algo cambie: las cifras del total de páginas (solo crecen) y
-        // las páginas referidas, que cambian el ancho de los textos que las escriben. Solo se vuelve a
-        // maquetar lo que depende de esos textos (PF-03): el resto sale de la caché.
         int digits = PageNumbers.DIGITS;
         int changes = 0;
-        List<List<LayoutResult>> results;
-        Numbering numbering;
         while (true) {
             fixed.forEach(Map::clear);
-            results = flow(sections, fixed);
-            numbering = Numbering.of(sections, results);
+            List<List<LayoutResult>> results = flow(sections, fixed);
+            Numbering numbering = Numbering.of(sections, results);
             boolean again = false;
-            if (numbered && PageNumbers.digits(numbering.pages()) > digits) {
+            if (!numberedTexts.isEmpty() && PageNumbers.digits(numbering.pages()) > digits) {
                 digits = PageNumbers.digits(numbering.pages());
                 engine.reservePageDigits(digits, numberedTexts);
                 again = true;
@@ -110,100 +116,72 @@ public final class Paginator {
                 again = true;
             }
             if (!again) {
-                break;
+                return new Flow(results, numbering);
             }
         }
+    }
 
-        // Segunda fase de la numeración: ya se sabe cuántas páginas hay.
-        int total = numbering.pages();
+    /**
+     * Segunda fase, ya con el total de páginas: cada página con su contenido numerado ({@code {page}} y
+     * {@code {pages}}) y sus {@code Fixed}, los de su sección y, si los hereda, los del documento.
+     */
+    private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingAbsolute>> fixed,
+                             boolean numbered) {
+        // Los Fixed del documento: los hijos de la raíz que no son una sección.
+        List<Box> documentFixed = root.children.stream().filter(b -> b.element != Element.SECTION).toList();
+        Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
         for (int k = 0; k < sections.size(); k++) {
             Section section = sections.get(k);
-            Rect area = section.media().pageArea();
-            List<LayoutResult> own = results.get(k);
+            List<LayoutResult> own = flow.results().get(k);
             for (int i = 0; i < own.size(); i++) {
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
-                int tanda = numbering.total(number);
-                // Una fixed dentro de otra sale en su resultado y se coloca después; solo salen las
-                // que Pages incluye en esta página (§5.5), y no ocupan sitio donde no salen. Pages
-                // cuenta dentro del alcance donde se declara: el documento o la sección (§5.21).
+                // Pages cuenta dentro del alcance donde se declara: el documento o la sección (§5.21).
                 List<Queued> queue = new ArrayList<>();
                 if (section.inheritFixed()) {
-                    documentFixed.forEach(b -> queue.add(new Queued(new PendingAbsolute(b, 0, 0), number, total)));
+                    documentFixed.forEach(b -> queue.add(new Queued(new PendingAbsolute(b, 0, 0), number,
+                            numbering.pages())));
                 }
                 for (PendingAbsolute p : fixed.get(k).values()) {
                     queue.add(new Queued(p, i + 1, own.size()));
                 }
-                List<Fragment> fixedFragments = new ArrayList<>();
-                for (int q = 0; q < queue.size(); q++) {
-                    Queued item = queue.get(q);
-                    if (!item.pending().box().style.pages.includes(item.number(), item.total())) {
-                        continue;
-                    }
-                    if (numbered && printed == 0) {
-                        unavailable(item.pending().box());
-                    }
-                    LayoutResult f = engine.absolute().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
-                    fixedFragments.add(numbered ? engine.number(f.fragment(), printed, tanda) : f.fragment());
-                    f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
-                }
+                List<Fragment> fixedFragments = placeFixed(queue, section, numbered, printed, numbering.total(number));
                 if (numbered && printed == 0) {
                     unavailable(section.box());
                 }
                 Fragment content = numbered && printed > 0
-                        ? engine.number(own.get(i).fragment(), printed, tanda) : own.get(i).fragment();
+                        ? engine.number(own.get(i).fragment(), printed, numbering.total(number)) : own.get(i).fragment();
                 pages.add(new Page(number, content, fixedFragments, section.media(), k, printed));
             }
         }
         return pages;
     }
 
-    /** Una caja fixed por colocar y las páginas de su alcance: el documento o su sección. */
-    private record Queued(PendingAbsolute pending, int number, int total) {
+    /**
+     * Los {@code Fixed} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
+     * (§5.5), que no ocupan sitio donde no salen. Una fixed dentro de otra sale en su resultado y se coloca después.
+     */
+    private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, int tanda) {
+        Rect area = section.media().pageArea();
+        List<Fragment> fragments = new ArrayList<>();
+        for (int q = 0; q < queue.size(); q++) {
+            Queued item = queue.get(q);
+            if (!item.pending().box().style.pages.includes(item.number(), item.total())) {
+                continue;
+            }
+            if (numbered && printed == 0) {
+                unavailable(item.pending().box());
+            }
+            LayoutResult f = engine.absolute().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
+            fragments.add(numbered ? engine.number(f.fragment(), printed, tanda) : f.fragment());
+            f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
+        }
+        return fragments;
     }
 
-    /**
-     * El número impreso de cada página física y el último de su tanda (§5.21): las páginas desde el último
-     * {@code Page numbering: restart}; {@code none} no numera ni avanza el contador.
-     */
-    private record Numbering(int[] printed, int[] totals) {
-
-        static Numbering of(List<Section> sections, List<List<LayoutResult>> results) {
-            int pages = results.stream().mapToInt(List::size).sum();
-            int[] printed = new int[pages];
-            int[] totals = new int[pages];
-            int counter = 0;
-            int tandaFirst = 0;
-            int i = 0;
-            for (int k = 0; k < sections.size(); k++) {
-                Section.PageNumbering mode = sections.get(k).numbering();
-                if (mode == Section.PageNumbering.RESTART) {
-                    Arrays.fill(totals, tandaFirst, i, counter);
-                    counter = 0;
-                    tandaFirst = i;
-                }
-                for (int j = 0; j < results.get(k).size(); j++) {
-                    printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
-                }
-            }
-            Arrays.fill(totals, tandaFirst, i, counter);
-            return new Numbering(printed, totals);
-        }
-
-        int pages() {
-            return printed.length;
-        }
-
-        /** Número impreso de la página física {@code number} (desde 1); 0 si no se numera. */
-        int printed(int number) {
-            return printed[number - 1];
-        }
-
-        /** Último número de la tanda de la página física {@code number}. */
-        int total(int number) {
-            return totals[number - 1];
-        }
+    /** Una caja fixed por colocar y las páginas de su alcance: el documento o su sección. */
+    private record Queued(PendingAbsolute pending, int number, int total) {
     }
 
     /**
