@@ -67,12 +67,11 @@ public final class GridLayout implements LayoutAlgorithm {
         int explicitRows = Math.max(s.gridRows().size(), s.gridAreas().rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style().itemArea()).toList();
-        List<Area> areas;
-        try {
-            areas = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow());
-        } catch (Placement.NoRoom e) {
-            throw noRoom(items.get(e.item), e, s.gridFlow());
+        Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.gridFlow());
+        if (placement instanceof Placement.NoRoom e) {
+            throw noRoom(items.get(e.item()), e, s.gridFlow());
         }
+        List<Area> areas = ((Placement.Placed) placement).areas();
         int columns = Math.max(1, explicitColumns);
         int rows = explicitRows;
         for (Area a : areas) {
@@ -87,10 +86,10 @@ public final class GridLayout implements LayoutAlgorithm {
         boolean row = flow == Style.Direction.ROW;
         String track = row ? "fila" : "columna";
         String across = row ? "columna" : "fila";
-        String hole = e.span == 1 ? "1 " + across + " libre" : e.span + " " + across + "s libres";
+        String hole = e.span() == 1 ? "1 " + across + " libre" : e.span() + " " + across + "s libres";
         return new InvalidModelException(item.style().line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
-                + e.track + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks + " "
-                + across + (e.tracks == 1 ? "" : "s") + "): elige otra " + track + " o déjala en auto");
+                + e.track() + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks() + " "
+                + across + (e.tracks() == 1 ? "" : "s") + "): elige otra " + track + " o déjala en auto");
     }
 
     /** Pistas declaradas y, detrás, las implícitas {@code auto}. */

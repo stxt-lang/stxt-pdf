@@ -18,7 +18,7 @@ import java.util.List;
  * </ol>
  *
  * <p>Un ítem con la fila fija y la columna automática va a la primera columna libre de esa fila,
- * sin mover el cursor; si no queda ninguna, es un error ({@link NoRoom}): la fila no crece. Con
+ * sin mover el cursor; si no queda ninguna, no hay colocación ({@link NoRoom}): la fila no crece. Con
  * la columna fija y la fila automática, va a la primera fila libre desde el cursor.</p>
  *
  * <p>{@code Flow: column} es el mismo algoritmo con los ejes intercambiados: se trasponen la
@@ -29,6 +29,17 @@ public final class Placement {
     private Placement() {
     }
 
+    /** Lo que da la colocación: el área de cada ítem o el primero que no cabe. */
+    public sealed interface Result permits Placed, NoRoom {
+    }
+
+    /** @param areas el área asignada a cada ítem, en el orden de las celdas */
+    public record Placed(List<Area> areas) implements Result {
+        public Placed {
+            areas = List.copyOf(areas);
+        }
+    }
+
     /**
      * Un ítem con la fila fija (la columna, con {@code Flow: column}) no cabe en ella.
      *
@@ -37,19 +48,7 @@ public final class Placement {
      * @param span   columnas (o filas) que ocupa
      * @param tracks columnas (o filas) de la rejilla
      */
-    public static final class NoRoom extends RuntimeException {
-        public final int item;
-        public final int track;
-        public final int span;
-        public final int tracks;
-
-        NoRoom(int item, int track, int span, int tracks) {
-            super("El ítem " + item + " no cabe en la pista " + track);
-            this.item = item;
-            this.track = track;
-            this.span = span;
-            this.tracks = tracks;
-        }
+    public record NoRoom(int item, int track, int span, int tracks) implements Result {
     }
 
     /**
@@ -57,28 +56,32 @@ public final class Placement {
      * @param columns columnas de la rejilla explícita
      * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: column})
      * @param flow    dirección de la colocación automática
-     * @return el área asignada a cada ítem, en el mismo orden
-     * @throws NoRoom si un ítem con la fila fija (la columna, en {@code column}) no cabe en ella
+     * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija (la
+     *         columna, en {@code column}) no cabe en ella
      */
-    public static List<Area> place(List<Cell> cells, int columns, int rows, Style.Direction flow) {
+    public static Result place(List<Cell> cells, int columns, int rows, Style.Direction flow) {
         if (flow == Style.Direction.ROW) {
             return place(cells, columns);
         }
         List<Cell> transposed = cells.stream()
                 .map(c -> new Cell(c.column(), c.row(), c.columns(), c.rows()))
                 .toList();
-        return place(transposed, rows).stream()
+        Result result = place(transposed, rows);
+        if (!(result instanceof Placed placed)) {
+            return result;
+        }
+        return new Placed(placed.areas().stream()
                 .map(a -> new Area(a.column(), a.row(), a.columns(), a.rows()))
-                .toList();
+                .toList());
     }
 
     /**
      * @param cells   celdas pedidas, en orden del árbol
      * @param columns columnas de la rejilla explícita
-     * @return el área asignada a cada ítem, en el mismo orden
-     * @throws NoRoom si un ítem con la fila fija no cabe en ella
+     * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija no
+     *         cabe en ella
      */
-    public static List<Area> place(List<Cell> cells, int columns) {
+    public static Result place(List<Cell> cells, int columns) {
         int cols = Math.max(1, columns);
         for (Cell c : cells) {
             int last = c.column() != null ? c.column() + c.columns() - 1 : c.columns();
@@ -109,7 +112,7 @@ public final class Placement {
                     col++;
                 }
                 if (col + c.columns() - 1 > cols) {
-                    throw new NoRoom(i, c.row(), c.columns(), cols);
+                    return new NoRoom(i, c.row(), c.columns(), cols);
                 }
                 result[i] = new Area(c.row(), col, c.rows(), c.columns());
             } else if (c.column() != null) {
@@ -145,7 +148,7 @@ public final class Placement {
             }
             occupancy.mark(result[i]);
         }
-        return List.of(result);
+        return new Placed(List.of(result));
     }
 
     /**
