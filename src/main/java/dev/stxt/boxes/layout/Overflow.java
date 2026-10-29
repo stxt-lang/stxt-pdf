@@ -93,7 +93,7 @@ public final class Overflow {
                 boolean own = s.rotation() != null;
                 throw new InvalidModelException(own ? s.line(ROTATE) : f.box().line(), ErrorCode.BOX_OVERFLOW,
                         "La caja " + f.box().describe() + (own ? " girada" : ", dentro de una caja girada,")
-                                + " se sale de la página: revisa su " + (own ? "Rotate, su Rotate origin, " : "")
+                                + " se sale de la página: revisa " + (own ? "su Rotate, su Rotate origin, " : "")
                                 + "su posición y su tamaño");
             }
         } else if (s.isOutOfFlow() && !inside(borderBox, page)) {
@@ -141,11 +141,11 @@ public final class Overflow {
                 double y = c.y() - c.offsetY();
                 Insets margin = c.margin();
                 if (x - margin.left() < -TOLERANCE || x + c.width() + margin.right() > width + TOLERANCE) {
-                    throw tooWide(c, cx + x, cy + y, cx, cx + width);
+                    throw tooWide(c, cx + x, cx, cx + width);
                 }
                 if (y + c.height() > height + TOLERANCE) {
                     if (isPage) {
-                        throw pageOverflow(c, cx + x, cy + y, cy + height, height);
+                        throw pageOverflow(c, cy + y, cy + height, height);
                     }
                     throw tooTall(f, y + c.height(), height, c);
                 }
@@ -180,12 +180,12 @@ public final class Overflow {
     /**
      * Un hijo se sale por los lados: el culpable es lo más interior que se sale. Si la caja
      * declara su ancho ({@code Width} o {@code Min width}), sus hijos que solo la llenan no son
-     * culpables: solo se baja a un hijo que se sale también de ella.
+     * culpables: solo se baja a un hijo que se sale también de ella. Solo cuenta la posición horizontal: {@code x} es
+     * la de la caja de borde de {@code c} en las coordenadas de {@code left} y {@code right}.
      */
-    private static InvalidModelException tooWide(Fragment c, double x, double y, double left, double right) {
+    private static InvalidModelException tooWide(Fragment c, double x, double left, double right) {
         while (true) {
             double cx = x + c.border().left() + c.padding().left();
-            double cy = y + c.border().top() + c.padding().top();
             // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
             for (TextLine l : c.lines()) {
                 if (l.x() < -TOLERANCE || l.x() + l.width() > c.contentWidth() + TOLERANCE) {
@@ -206,7 +206,6 @@ public final class Overflow {
                 if (outside && (!sized || outsideParent)) {
                     inner = d;
                     x = dx;
-                    y = cy + d.y() - d.offsetY();
                     break;
                 }
             }
@@ -242,10 +241,10 @@ public final class Overflow {
      * que pasa del final, y en él, lo que no se puede partir: el {@code Rotate} de una caja girada, que
      * no se parte (§5.10), su borde y su relleno si ya no caben
      * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
-     * o su {@code Height} (en una imagen sin él, su {@code Width}).
+     * o su {@code Height} (en una imagen sin él, su {@code Width}). Solo cuenta la posición vertical: {@code y} es la
+     * de la caja de borde de {@code c} en las coordenadas de {@code bottom}.
      */
-    private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom,
-                                                      double pageHeight) {
+    private static InvalidModelException pageOverflow(Fragment c, double y, double bottom, double pageHeight) {
         while (true) {
             if (c.box().style().rotation() != null) {
                 // Lo que impide partirla es el giro: lo que contiene se partiría.
@@ -253,14 +252,12 @@ public final class Overflow {
                         + c.box().describe() + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
                         + pt(c.height()) + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
             }
-            double cx = x + c.border().left() + c.padding().left();
             double cy = y + c.border().top() + c.padding().top();
             Fragment inner = null;
             for (Fragment d : c.children()) {
                 double dy = cy + d.y() - d.offsetY();
                 if (!d.box().style().isOutOfFlow() && !d.box().isMarker() && dy + d.height() > bottom + TOLERANCE) {
                     inner = d;
-                    x = cx + d.x() - d.offsetX();
                     y = dy;
                     break;
                 }

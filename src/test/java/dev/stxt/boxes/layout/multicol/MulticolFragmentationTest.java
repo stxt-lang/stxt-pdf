@@ -125,4 +125,31 @@ class MulticolFragmentationTest {
         assertRect(45, 45, 245, 25, l.rect(2, "G"));
         assertRect(305, 45, 245, 25, l.rect(2, "H"));
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+
+    /**
+     * Height: 160 con clone y relleno de 5: en la página 1 las columnas miden 90 (las limita la página); en la 2 les
+     * quedan 160 − 10 − 90 = 60, dos bloques de 25 por columna.
+     */
+    @Test
+    void cloneWithHeightLeavesTheRestToTheLastPage() {
+        LayoutFixture l = layOutPaged(PAGE, multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:",
+                "\tHeight: 160", "\tPadding: 5", "Break:", "\tDecoration: clone"), blocks(10, true)));
+        assertEquals(2, l.pages());
+        assertRect(305, 95, 245, 25, l.rect(1, "F"));
+        assertRect(45, 70, 245, 25, l.rect(2, "H"));
+        assertRect(305, 45, 245, 25, l.rect(2, "I"));
+        assertRect(305, 70, 245, 25, l.rect(2, "J"));
+    }
+
+    /** El contenido cabe en la página 1, pero Height: 150 sigue: la página 2 tiene el resto de la caja, vacío. */
+    @Test
+    void theHeightGoesOnAfterTheContent() {
+        LayoutFixture l = layOutPaged(PAGE, multicol(List.of("Count: 2", "Column gap: 15", "Box:", "\tHeight: 150"),
+                blocks(2)));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "M"));
+        assertRect(40, 40, 515, 50, l.rect(2, "M"));
+    }
 }

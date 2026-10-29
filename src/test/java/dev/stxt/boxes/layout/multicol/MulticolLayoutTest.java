@@ -2,6 +2,7 @@ package dev.stxt.boxes.layout.multicol;
 
 import dev.stxt.boxes.layout.LayoutFixture;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import java.util.List;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)), ESPECIFICACION.md
@@ -208,5 +211,58 @@ class MulticolLayoutTest {
         LayoutFixture l = layOut(threeLines("Widows: 1", "Orphans: 1"));
         assertRect(40, 40, 515, 24, l.rect("M"));
         assertRect(305, 40, 250, 12, l.rect("T"));
+    }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+
+    /**
+     * El texto mide 20 (min-content, «aaaa») y 35 (max-content). Con Count: 3 y huecos de 10, tres columnas de
+     * cada uno; con Column width el mínimo es una columna y el máximo, columnas de al menos ese ancho.
+     */
+    @Test
+    void intrinsicWidthsWithThreeColumns() {
+        LayoutFixture l = layOut(
+                "\tMulticol:", "\t\tId: min", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\t\tText: aaaa bb",
+                "\tMulticol:", "\t\tId: max", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tBox:", "\t\t\tWidth: max-content",
+                "\t\tText: aaaa bb",
+                "\tMulticol:", "\t\tId: wmin", "\t\tCount: 3", "\t\tColumn width: 50", "\t\tColumn gap: 10", "\t\tBox:",
+                "\t\t\tWidth: min-content", "\t\tText: aaaa bb",
+                "\tMulticol:", "\t\tId: wmax", "\t\tCount: 3", "\t\tColumn width: 50", "\t\tColumn gap: 10", "\t\tBox:",
+                "\t\t\tWidth: max-content", "\t\tText: aaaa bb");
+        assertEquals(80, l.rect("min").width(), 1e-9);
+        assertEquals(125, l.rect("max").width(), 1e-9);
+        assertEquals(20, l.rect("wmin").width(), 1e-9);
+        assertEquals(170, l.rect("wmax").width(), 1e-9);
+    }
+
+    /**
+     * Height: 60 con borde y relleno de 5: las columnas miden 40 (60 − 20) y caben tres bloques de 12 en cada una;
+     * el cuarto empieza la segunda columna, en (305, 50).
+     */
+    @Test
+    void heightWithBorderAndPaddingLeavesTheColumnsTheRest() {
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:", "\tHeight: 60",
+                        "\tBorder: 5", "\tPadding: 5"), block("A", 12, true), block("B", 12, true), block("C", 12, true),
+                block("D", 12, true), block("E", 12, true)));
+        assertRect(50, 74, 240, 12, l.rect("C"));
+        assertRect(305, 50, 240, 12, l.rect("D"));
+        assertRect(305, 62, 240, 12, l.rect("E"));
+    }
+
+    @Test
+    void theMessageCountsTheColumns() {
+        // Bloques enteros de 40 en columnas de 30: no caben.
+        String one = assertThrows(InvalidModelException.class, () -> layOut(multicol(List.of("Count: 1", "Box:",
+                "\tHeight: 30"), block("A", 40, true)))).getMessage();
+        assertTrue(one.contains("1 columna de 30 no bastan"), one);
+        String two = assertThrows(InvalidModelException.class, () -> layOut(multicol(List.of("Count: 2", "Box:",
+                "\tHeight: 30"), block("A", 40, true), block("B", 40, true), block("C", 40, true)))).getMessage();
+        assertTrue(two.contains("2 columnas de 30 no bastan"), two);
+        // Sin página (un ítem flex no se parte) ni alto, los cortes de columna necesitan más columnas de las que hay.
+        String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tFlex:", "\t\tItem:",
+                "\t\t\tMulticol:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
+                "\t\t\t\t\t\tBefore: column")).getMessage();
+        assertTrue(breaks.contains("tiene 1 columna y sus cortes"), breaks);
     }
 }

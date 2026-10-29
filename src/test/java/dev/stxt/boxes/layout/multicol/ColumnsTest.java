@@ -44,4 +44,10 @@ class ColumnsTest {
         assertEquals(175, c.x(1));
         assertEquals(350, c.x(2));
     }
+
+    /** Las columnas que caben cuentan el hueco con el ancho de cada una: (515 + 50) / (100 + 50) = 3,77. */
+    @Test
+    void aWideGapLeavesFewerColumns() {
+        assertEquals(3, Columns.of(null, 100.0, 50, 515).count());
+    }
 }
