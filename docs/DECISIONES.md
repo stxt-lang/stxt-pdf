@@ -2087,3 +2087,14 @@ interpretaciones que salieron al implementarlas.
      No cambia ningún golden ni ejemplo. Aceptado por el usuario. *Dónde:* `layout/flex/FlexItem`,
      `layout/flex/FlexResolver`, `layout/flex/FlexLayout`, `FlexLayoutTest`. *Alternativa:* cambiar el §5.7 para que
      pondere con la base y los márgenes.
+
+325. **Un fragmento cortado de una caja con alto definido consume solo lo que ocupa su contenido.** Sigue llegando
+     hasta el final de la página (§5.10), pero el hueco que dejan las líneas o los hijos al final (8 líneas de 12 en 100
+     dejan 4) ya no se descuenta del `Height`: pasa al contenido que sigue. Antes, una caja con `Height` igual al alto de
+     su contenido desbordaba al partirse (un `Text` de `Height: 240` con 20 líneas, en páginas de 100, acababa con 40 de
+     caja para 48 de líneas), y también un ítem de grid estirado a una fila que se parte; el autor no podía evitarlo.
+     A cambio, el alto que se ve puede pasar del `Height` en lo que suman esos huecos. Encontrado con las pruebas de
+     mutación (QA-08); decidido con el usuario. Ningún golden ni ejemplo cambia. *Dónde:* `layout/Slice`, §5.10,
+     `SliceTest`, `InlineFragmentationTest`, `GridFragmentationTest`, `MulticolFragmentationTest`. *Alternativa:*
+     que el fragmento mida solo lo que ocupa su contenido (el `Height` se respeta exactamente, pero la caja ya no llega al
+     final de la página), o dejarlo como CSS y documentar el desbordamiento.

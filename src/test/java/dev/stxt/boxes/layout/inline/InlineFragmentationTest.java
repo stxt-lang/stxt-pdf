@@ -104,13 +104,40 @@ class InlineFragmentationTest {
         assertEquals(List.of(new TextLine.Run(0, 25, "aaaaa", TextFormat.PLAIN)), lines.get(1).runs());
     }
 
-    /** Un texto con Height: 150 es el total: 100 en la página 1 y 50 en la 2, con las líneas que quedan. */
+    /**
+     * Un texto con Height: 150 llega al final de la página 1 (100), pero sus 8 líneas solo consumen 96: en la 2 le
+     * quedan 54 para las 2 líneas que siguen (§5.10).
+     */
     @Test
     void theHeightOfATextIsTheTotal() {
         LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(10), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30",
                 "\t\t\tHeight: 150");
         assertEquals(2, l.pages());
         assertRect(40, 40, 30, 100, l.rect(1, "P"));
-        assertRect(40, 40, 30, 50, l.rect(2, "P"));
+        assertRect(40, 40, 30, 54, l.rect(2, "P"));
+    }
+
+    /**
+     * Height igual al contenido (20 líneas, 240) en páginas de 100: cada página tiene 8 líneas (96) y el hueco de 4
+     * del final no se le quita al texto, así que las 4 últimas caben en la página 3. Antes era BOX_OVERFLOW: la caja
+     * consumía 100 por página y le quedaban 40 para 48 de líneas.
+     */
+    @Test
+    void aHeightEqualToTheContentIsNotAnOverflowWhenItBreaks() {
+        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(20), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30",
+                "\t\t\tHeight: 240",
+                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 240",
+                "\t\tText: " + words(20), "\t\t\tId: Q", "\t\t\tBox:", "\t\t\t\tWidth: 30");
+        assertRect(40, 40, 30, 100, l.rect(1, "P"));
+        assertRect(40, 40, 30, 100, l.rect(2, "P"));
+        assertRect(40, 40, 30, 48, l.rect(3, "P"));
+        assertEquals(4, lines(l, 3, "P"));
+        // Un Block con el mismo alto y el texto dentro, detrás (empieza en la página 3): tampoco desborda, y sus 20
+        // líneas están en sus fragmentos.
+        int total = 0;
+        for (int page = 3; page <= l.pages(); page++) {
+            total += l.has(page, "Q") ? lines(l, page, "Q") : 0;
+        }
+        assertEquals(20, total);
     }
 }

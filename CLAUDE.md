@@ -344,7 +344,8 @@ dependencia nueva se decide y se apunta allí.
   la física, la misma de `{page}`). Lo filtra el `Paginator` al colocarlas: el resto del motor
   (`Overflow`, `StxtDump`, el pintado y el PDF) recorre lo que hay en `Page.fixed`.
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya
-  consumido por la caja (un `Height` definido es el total de todos los fragmentos), y `BEFORE`:
+  consumido por la caja (un `Height` definido es el total de todos los fragmentos; un fragmento cortado llega al final
+  de la página pero solo consume lo que ocupa su contenido, decisión 325), y `BEFORE`:
   "no cabe nada, corta antes de mí", que nunca se pasa como `from`. El `Paginator` detecta la
   falta de progreso comparando tokens. El token de la raíz no acumula alto: cada página tiene
   el área útil entera.

@@ -129,8 +129,8 @@ class MulticolFragmentationTest {
     // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
 
     /**
-     * Height: 160 con clone y relleno de 5: en la página 1 las columnas miden 90 (las limita la página); en la 2 les
-     * quedan 160 − 10 − 90 = 60, dos bloques de 25 por columna.
+     * Height: 160 con clone y relleno de 5: en la página 1 las columnas miden 90 (las limita la página) y caben tres
+     * bloques de 25 por columna, que consumen 75 (§5.10); en la 2 les quedan 160 − 10 − 75 = 75, otros tres por columna.
      */
     @Test
     void cloneWithHeightLeavesTheRestToTheLastPage() {
@@ -139,8 +139,8 @@ class MulticolFragmentationTest {
         assertEquals(2, l.pages());
         assertRect(305, 95, 245, 25, l.rect(1, "F"));
         assertRect(45, 70, 245, 25, l.rect(2, "H"));
-        assertRect(305, 45, 245, 25, l.rect(2, "I"));
-        assertRect(305, 70, 245, 25, l.rect(2, "J"));
+        assertRect(45, 95, 245, 25, l.rect(2, "I"));
+        assertRect(305, 45, 245, 25, l.rect(2, "J"));
     }
 
     /** El contenido cabe en la página 1, pero Height: 150 sigue: la página 2 tiene el resto de la caja, vacío. */

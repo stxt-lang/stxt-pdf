@@ -17,8 +17,9 @@ import static dev.stxt.boxes.model.Tolerance.fits;
  *   <li>Un {@code Height} definido es el total de todos los fragmentos: si el contenido termina
  *       y el alto propio de la caja no cabe en la página, lo que falta pasa al fragmento
  *       siguiente. Un fragmento cortado dentro del contenido llega hasta el final de la página,
- *       sin pasar del alto que le queda a la caja. Con {@code clone}, el total es el del
- *       contenido: el alto menos un borde y un relleno.</li>
+ *       sin pasar del alto que le queda a la caja, pero solo consume lo que ocupa su contenido: el
+ *       hueco del final de la página no se le quita al contenido que sigue. Con {@code clone}, el
+ *       total es el del contenido: el alto menos un borde y un relleno.</li>
  *   <li>Con alto {@code auto}, el fragmento mide lo que su contenido; {@code Min height} y
  *       {@code Max height} se aplican al total.</li>
  * </ul>
@@ -88,7 +89,10 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
         if (model.height().isPresent()) {
             h = Math.max(h, Math.min(remaining, model.height().getAsDouble() - consumed));
         }
-        return open(model, first, h, consumed);
+        // Llega hasta el final de la página, pero solo consume lo que ocupa su contenido: el hueco que dejan las
+        // líneas o los hijos al final de la página no se le quita al contenido que sigue.
+        return new Slice(h, sides(model.border(), first, false), sides(model.padding(), first, false), false,
+                consumed + upToContent);
     }
 
     /**
@@ -114,7 +118,9 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             }
         } else if (model.height().isPresent()) {
             double total = Math.max(0, model.height().getAsDouble() - decoration);
+            // Como con slice: hasta el final de la página, consumiendo solo el contenido.
             h = Math.max(h, Math.min(available, total - consumed));
+            return new Slice(decoration + h, model.border(), model.padding(), false, consumed + content);
         }
         return new Slice(decoration + h, model.border(), model.padding(), finished, consumed + h);
     }

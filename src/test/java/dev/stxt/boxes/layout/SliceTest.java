@@ -72,9 +72,11 @@ class SliceTest {
     @Test
     void definiteHeightCutInsideTheContentFillsThePage() {
         BoxModel m = model(OptionalDouble.of(300), 0, NONE, Decoration.SLICE);
-        assertSlice(Slice.of(m, true, 0, 50, false, page(100)), 100, true, false, false, 100);
+        // Llega al final de la página, pero solo consume su borde y relleno superiores (5) y lo que ocupa el contenido
+        // (50): el resto del alto queda para el contenido que sigue.
+        assertSlice(Slice.of(m, true, 0, 50, false, page(100)), 100, true, false, false, 55);
         // Sin pasar de lo que le queda a la caja.
-        assertSlice(Slice.of(m, false, 250, 10, false, page(100)), 50, false, false, false, 300);
+        assertSlice(Slice.of(m, false, 250, 10, false, page(100)), 50, false, false, false, 260);
     }
 
     @Test
@@ -112,8 +114,8 @@ class SliceTest {
         assertSlice(second, 100, true, true, false, 180);
         Slice last = Slice.of(m, false, second.consumed(), 0, true, page(100));
         assertSlice(last, 70, true, true, true, 240);
-        // Cortado dentro del contenido, llega al final de la página.
-        assertSlice(Slice.of(m, true, 0, 20, false, page(100)), 100, true, true, false, 90);
+        // Cortado dentro del contenido, llega al final de la página y consume solo el contenido.
+        assertSlice(Slice.of(m, true, 0, 20, false, page(100)), 100, true, true, false, 20);
     }
 
     @Test

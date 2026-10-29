@@ -134,4 +134,21 @@ class GridFragmentationTest {
         assertRect(70, 40, 100, 100, l.rect(2, "B"));
         assertRect(70, 40, 100, 40, l.rect(4, "B"));
     }
+
+    /**
+     * Un texto estirado a una fila que se parte tiene el alto de la fila (240) y sus líneas dejan 4 al final de cada
+     * página: ese hueco no se le quita, y sus 4 últimas líneas caben en la página 4 (antes era BOX_OVERFLOW).
+     */
+    @Test
+    void aStretchedTextInATallRowFitsItsLines() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumns: 30 100",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
+                "\t\tArea:", "\t\t\tText: " + text, "\t\t\t\tId: T",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B");
+        assertEquals(4, l.pages());
+        assertEquals(4, l.fragment(4, "T").lines().size());
+        assertRect(40, 40, 30, 100, l.rect(2, "T"));
+    }
 }

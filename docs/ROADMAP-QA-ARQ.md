@@ -454,8 +454,9 @@ Lo que queda, revisado clase a clase: fronteras con la tolerancia o con 0 (≈ 5
 resultado con una fuente sin llaves o sin cifras (las IBM Plex las tienen); `Slice.cloned` con el contenido sin
 terminar, que solo actúa cuando el alto ya no deja sitio (y entonces el documento desborda); y ramas que no se alcanzan.
 
-**Un fallo encontrado, sin corregir (decisión abierta 5):** al escribir el test de la fila de grid partida apareció que
-una caja con `Height` igual al alto de su contenido desborda si se parte entre páginas.
+**Un fallo encontrado y corregido (decisión abierta 5, ya resuelta):** al escribir el test de la fila de grid partida
+apareció que una caja con `Height` igual al alto de su contenido desbordaba si se partía entre páginas. Ahora un fragmento
+cortado llega al final de la página pero solo consume lo que ocupa su contenido (decisión 325).
 
 ### QA-09 · Integración continua · Alta · S
 
@@ -1001,7 +1002,8 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 4. ~~**SVG con texto (QA-02/TS-03)**~~ **Resuelta (sesión 4):** ni lo uno ni lo otro: JSVG sigue dibujando, pero con el
    fichero de `fonts/` que le da el motor (`PlatformSupport.customFont`), sin registro en AWT ni búsqueda por nombre.
 
-5. **Una caja con `Height` que se parte entre páginas (§5.10).** Cada fragmento consume la página entera del alto de la
+5. ~~**Una caja con `Height` que se parte entre páginas (§5.10).**~~ **Resuelta:** cada fragmento cortado llega al
+   final de la página pero solo consume lo que ocupa su contenido (decisión 325). Lo que se planteó: Cada fragmento consume la página entera del alto de la
    caja, pero sus líneas o sus hijos pueden dejar un hueco al final de cada página (8 líneas de 12 en 100 dejan 4).
    Así, un `Text` o un `Block` de `Height: 240` con 240 de contenido, en páginas de 100, termina con 40 de caja para 48
    de contenido: `BOX_OVERFLOW`. Lo mismo un ítem de grid estirado a una fila que se parte. En CSS el contenido se
@@ -1037,3 +1039,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · PIT: `MulticolLayout` y `Overflow` | `OverflowTest` (el culpable y las medidas de cada mensaje) y tests de Multicol; `Overflow` de 62 a 83 % de mutantes detectados y `MulticolLayout` de 74 a 96 % (total 88,1 %). Un mensaje con «su su» corregido y tres trozos de código sin efecto quitados. 1447 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: `FlexLayout` y `Paginator` | Tests de flex (huecos, márgenes en los límites, columnas con `Wrap`, estirado) y del `Paginator` (portadas, mensajes, `{number of}`, líneas y culpables de los errores, límite de páginas entre secciones, tercera cifra de `{page}`); Flex de 84 a 91 % y `Paginator` de 86 a 91 % (total 89,2 %). Sin cambios en el motor. 1465 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: Grid y el resto | Tests de Grid, `TrackSizing`, `Placement`, posicionamiento, listas, imágenes, texto y fragmentación; total 91,8 % de mutantes detectados. Encontrado, sin corregir: una caja con `Height` igual a su contenido desborda al partirse entre páginas (decisión abierta 5). 1492 tests en verde; los 72 PDF y los 54 SVG, iguales. | Decidir la decisión abierta 5 |
+| 2026-10-29 | Fuera del plan · Decisión abierta 5 | Un fragmento cortado de una caja con alto definido consume solo lo que ocupa su contenido (sigue llegando al final de la página): una caja con `Height` igual a su contenido ya no desborda al partirse. Decisión 325, §5.10. Ningún golden ni ejemplo cambia. | — |

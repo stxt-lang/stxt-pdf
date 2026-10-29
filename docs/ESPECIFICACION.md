@@ -1310,7 +1310,10 @@ Una caja con `Height` definido se parte como cualquier otra, aunque no tenga con
 no cabe de su alto pasa a la página siguiente. Para evitarlo se declara `Inside: avoid`,
 que no impide partirla si no cabe en una página entera. Un fragmento cortado de una caja con
 alto `auto` mide hasta el corte; con alto definido, llega hasta el final de la página sin pasar
-del alto que le queda.
+del alto que le queda, pero solo **consume** de ese alto lo que ocupa su contenido (con su borde
+y relleno superiores): el hueco que dejan las líneas o los hijos al final de la página no se le
+quita al contenido que sigue. Así, una caja con `Height` igual al alto de su contenido no
+desborda al partirse, y el alto que se ve puede pasar del `Height` en lo que suman esos huecos.
 
 **Flex y grid.** En `column`, el corte se hace entre ítems. En `row` y en grid, entre líneas
 o filas. Una línea, fila o ítem que no cabe en lo que queda de página pasa entero a la
