@@ -82,15 +82,15 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | hecho |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | en curso |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | hecho |
-| AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | pendiente |
-| AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | pendiente |
-| AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | pendiente |
-| AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | pendiente |
+| AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | hecho |
+| AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | hecho |
+| AR-06 | `PdfCanvas` (760 líneas) hace demasiado | Media | M | hecho |
+| AR-07 | Conocimiento de `Element` repartido por `layout` y `paint` | Media | M | hecho |
 | AR-08 | Superficie pública: 4 sobrecargas de `PdfWriter.write` y ninguna fachada | Media | M | hecho |
 | AR-09 | Modelo de errores sin tipo común | Media | M | hecho |
 | AR-10 | Dos tolerancias | Baja | S | hecho |
 | AR-11 | `Paginator.paginate` (96 líneas) | Baja | S | hecho |
-| AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | pendiente |
+| AR-12 | `ArchitectureTest` solo detecta ciclos | Baja | S | hecho |
 | AR-13 | Limpieza: referencias a «módulo N», excepción como control de flujo | Baja | S | pendiente |
 
 ## Línea base medida
@@ -628,6 +628,12 @@ implementa `Engine`; los algoritmos dependen de ella y se pueden probar con un d
 conserva solo `layOutDocument` y el despacho. **Aceptación:** ningún `…Layout` importa `Engine`; `ArchitectureTest`
 (AR-12) lo comprueba.
 
+**Sesión 9: hecho.** `LayoutContext` (`layout`, `intrinsic`, `contentIntrinsic`, `measurer`, `natural`) lo
+implementa `Engine`; los ocho algoritmos, `BoxModel.resolve` y `UnitBreaker` la reciben (el campo se llama `context`).
+El despacho es un `EnumMap<Style.Layout, LayoutAlgorithm>` más la tabla, elegida por su elemento (la excepción que
+AR-07 permite). El punto (3) ya lo cumplía TS-01 (el protocolo de la paginación es de package) y no se movió a otra
+clase: separarlo no quitaba ninguna dependencia. `ImageLayoutTest` prueba `ImageLayout` con un doble.
+
 ### AR-05 · `Canvas` · Media · M
 
 La interfaz mezcla dos cosas: primitivas de dibujo (`background`, `fill`, `border`, `text`, `vertical`) y, con
@@ -637,6 +643,11 @@ sin saber si el lienzo las entiende: un tercer lienzo (por ejemplo un PNG) hered
 cuenta de que debería implementar alguno. ISP. **Propuesta:** `Canvas` con el dibujo; `TaggedCanvas`/`LinkCanvas`
 (o un solo `Annotating`) como interfaces opcionales que `StackingContext` obtiene con `canvas instanceof`/un método
 `Optional<…> tagging()`. **Aceptación:** `SvgCanvas` no tiene métodos vacíos heredados; golden SVG sin cambios.
+
+**Sesión 9: hecho.** `Canvas` solo tiene métodos abstractos de dibujo (más `tagging()`); `Tagging` (`beginText`,
+`beginLinkText`, `endText`, `link`) es aparte: `PdfCanvas` da su `PdfTagging` y `SvgCanvas`, `Tagging.NONE`, y declara
+sus métricas aproximadas en lugar de heredarlas. Un método explícito en lugar de `instanceof`: cada lienzo dice lo
+que hace con el etiquetado. Los 54 SVG de los golden, iguales.
 
 ### AR-06 · `PdfCanvas` · Media · M
 
@@ -650,6 +661,13 @@ UncheckedIOException(e); }`. **Propuesta:** `PdfDocumentWriter` (1), `PdfGradien
 `Canvas` declaren `throws IOException`, que es lo honesto. **Aceptación:** `PdfCanvas` < 350 líneas; PDF byte a byte
 igual (normalizado) en los 11 ejemplos antes y después, con `ConcurrencyProbe`.
 
+**Sesión 9: hecho.** `PdfDocumentWriter` (el documento; su `write` sustituye a `PdfCanvas.write`), `PdfCanvas` (318
+líneas, el dibujo de una página), `PdfContent` (el flujo de la página con el origen abajo, el color, los giros y `io`,
+el único punto que convierte las `IOException`), `PdfTagging` (contenido marcado y anotaciones), `PdfFonts` (fuentes
+y `TJ`) y `PdfGradients`. Se mantienen las primitivas sin `throws IOException` (cambiarlo obligaría a todos los
+lienzos y a `StackingContext` a declararlo para un fallo que solo puede dar el PDF). PF-05 no se tocó. El PDF de los
+ejemplos y los golden, igual byte a byte.
+
 ### AR-07 · Conocimiento de `Element` fuera de `tree` · Media · M
 
 Hay 12 comparaciones `x.element == Element.Y` en `layout` y `paint` (`Engine`, `Overflow`, `StackingContext`,
@@ -658,6 +676,12 @@ de elemento; añadir un elemento obliga a tocar `PdfStructure`, `Element` y, a m
 conceptual y OCP. **Propuesta:** que `Element` (que ya da `layout()`, `position()`, `hasText()`, `headingLevel()`) lo
 describa todo: `pdfRole()` (etiqueta y si es contenedor), `structural()`, `decorative()`; `PdfStructure` consulta, no
 compara. **Aceptación:** ninguna comparación con una constante de `Element` en `paint` ni `layout`, salvo el despacho.
+
+**Sesión 9: hecho.** En lugar de `pdfRole()`, `structural()` y `decorative()` en `Element`, un solo `Element.Role`
+(el papel de la caja: sección, encabezado, párrafo, lista, celda, figura, guía, flujo de columnas, bloque…), que
+comparten varios elementos: así `tree` no sabe nombres de etiquetas del PDF y `PdfStructure.type` es un `switch`
+exhaustivo sobre `Role`. `PdfStructure.build` saca `attributes` (de complejidad 22 a menos de 20). `ArchitectureTest`
+comprueba que solo `Engine` nombra una constante de `Element` fuera de `tree`. Decisión 316.
 
 ### AR-08 · Superficie pública · Media · M · hecho
 
@@ -738,6 +762,9 @@ Hoy comprueba que no hay ciclos entre packages de primer nivel. Añadir **reglas
 los dos casos actuales (`block` → `inline`/`position`; `table` → `grid`; `flex`/`grid` → `position`); y, tras AR-04,
 ningún `…Layout` importa `Engine`. Las reglas se escriben como datos en el test (tabla de permitidos).
 
+**Sesión 9: hecho**: `ALLOWED` (packages), `ALLOWED_IN_LAYOUT` (algoritmos), `noLayoutAlgorithmUsesTheEngine` (AR-04)
+y `onlyTheDispatchNamesAnElement` (AR-07); comprobado a mano que las reglas fallan con una dependencia nueva.
+
 ### AR-13 · Limpieza · Baja · S
 
 - 14 javadoc nombran un «módulo N» de un documento que no está en el repositorio (`CLAUDE.md` pide no usarlos):
@@ -761,7 +788,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **6. Tests de referencia** (hecha) | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
 | **7. Encapsulación del modelo** (hecha) | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
 | **8. Constructor del árbol** (hecha) | AR-01 | `BoxTreeBuilder.element` partido por familias |
-| **9. Algoritmos y lienzos** | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
+| **9. Algoritmos y lienzos** (hecha) | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
 | **10. Partir `Style`** | AR-02 (etapas 3 y 4), AR-13 | Registros inmutables por familia; árbol congelado |
 
 Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una sesión entera y conviene hacerlas con
@@ -794,3 +821,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 6 · Tests de referencia (hecha) | QA-07 con la decisión del usuario (un PNG que cambia hace fallar el test; decisión 313): imágenes y PDF en `target/reference/`, `ReferenceFiles.checkImages`, `-Dgolden.update`/`-Dexamples.update`, la CI sube `target/reference` si falla; `ReferenceFilesTest`. QA-08 puntos 3 y 4: `CrossJvmDeterminismTest` y las propiedades de `ValueParser`, `LineBreaker` y la fragmentación (sin fallos encontrados; comprobado con dos mutaciones a mano). 1388 tests en verde; `mvn test` no cambia ningún fichero versionado. | Sesión 7: encapsulación del modelo (AR-03, AR-02 etapas 1 y 2). QA-08 puntos 5 (PIT, una pasada) y 6 (documentos de la especificación con `PdfMetrics` y PDF/UA) pendientes |
 | 2026-10-29 | 7 · Encapsulación del modelo (hecha) | AR-02 etapas 1 y 2 (commit `84a461c`): los 80 campos de `Style` son del package `tree` y se leen con un método del mismo nombre; 233 lecturas migradas siguiendo los errores de `javac`; `StyleEditor` para los tests de otros packages. AR-03: `Box` con campos privados, escritura del package y el árbol cerrado al construirlo (`Box.close`, decisión 314); 827 lecturas migradas igual; `BoxTest` (4). 1392 tests en verde; el PDF de los ejemplos y los golden es el mismo byte a byte (sin fechas ni ID). | Sesión 8: constructor del árbol (AR-01) |
 | 2026-10-29 | 8 · Constructor del árbol (hecha) | AR-01 en cuatro commits: `MediaReader`; tablas de propiedades en `PropertyReader` y `BoxTreeBuilder.properties`; `ElementReader` (una constante por familia: layout, envoltorio, propiedades del tipo, comprobaciones y contenido) con `element` como el orden común; `TableBuilder.table` y `ModelValidator.validateMargins` partidos. `element` de 162 a 42 líneas y de complejidad 67 a 8; `BoxTreeBuilder` de 617 a 347 líneas; ningún método de `tree` pasa de 44 líneas ni de complejidad 18. Decisión 315. 1392 tests en verde; el PDF de los ejemplos y los golden, el mismo byte a byte. | Sesión 9: algoritmos y lienzos (AR-04, AR-12, AR-05, AR-06, AR-07) |
+| 2026-10-29 | 9 · Algoritmos y lienzos (hecha) | AR-04 (`LayoutContext`, despacho con `EnumMap`, un doble en `ImageLayoutTest`), AR-12 (reglas de dirección como datos en `ArchitectureTest`), AR-05 (`Canvas` solo dibuja; `Tagging` aparte, `Canvas.tagging()`), AR-06 (`PdfCanvas` de 788 a 318 líneas: `PdfDocumentWriter`, `PdfContent`, `PdfTagging`, `PdfFonts`, `PdfGradients`; un solo `io`) y AR-07 (`Element.Role`; solo el despacho de `Engine` nombra un elemento fuera de `tree`). Decisión 316. 1398 tests en verde; los PDF de los ejemplos y los golden, iguales byte a byte, y los 54 SVG de los golden, iguales. | Sesión 10: partir `Style` (AR-02 etapas 3 y 4) y AR-13. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6) y `UnitBreaker.Run.layOut` (complejidad 22) |

@@ -8,7 +8,7 @@ import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Media;
@@ -132,7 +132,7 @@ public final class Overflow {
                 fragment(c, cx, cy, page, turn);
                 continue;
             }
-            if (f.box().element() == Element.LIST) {
+            if (f.box().role() == Role.LIST) {
                 marker(f, c);
             }
             if (!c.box().style().isOutOfFlow()) {

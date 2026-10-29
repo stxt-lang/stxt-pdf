@@ -189,4 +189,29 @@ class ArchitectureTest {
             }
         }
     }
+
+    /**
+     * El layout y el pintado preguntan a la caja lo que significa ({@code Box.role()}), no qué elemento es (AR-07):
+     * fuera de {@code tree} no se nombra ninguna constante de {@code Element} salvo en el despacho de
+     * {@code Engine} (la tabla tiene su algoritmo). Un elemento nuevo con un papel que ya existe no toca nada fuera
+     * de {@code tree}.
+     */
+    @Test
+    void onlyTheDispatchNamesAnElement() throws IOException {
+        Pattern constant = Pattern.compile("\\bElement\\.(?!Role\\b)[A-Z_]+\\b");
+        List<String> found = new ArrayList<>();
+        try (Stream<Path> files = Files.walk(SOURCES)) {
+            for (Path file : files.filter(f -> f.toString().endsWith(".java")).toList()) {
+                String from = SOURCES.relativize(file).getName(0).toString();
+                if (from.equals("tree") || file.endsWith(Path.of("layout", "Engine.java"))) {
+                    continue;
+                }
+                Matcher m = constant.matcher(code(file));
+                while (m.find()) {
+                    found.add(SOURCES.relativize(file) + ": " + m.group());
+                }
+            }
+        }
+        assertEquals(List.of(), found);
+    }
 }

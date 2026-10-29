@@ -1989,3 +1989,18 @@ interpretaciones que salieron al implementarlas.
      `tree/ElementReader`, `BoxTreeBuilder.element` y `properties`, `PropertyReader.single`, `tree/MediaReader`.
      *Alternativa:* la interfaz `ElementReader` con una clase por familia de la propuesta de AR-01, o dejar las
      familias como métodos privados del builder (no baja de 350 líneas ni separa lo propio de cada familia).
+
+### Revisión de QA, sesión 9: algoritmos y lienzos (ROADMAP-QA-ARQ.md, AR-04 a AR-07 y AR-12)
+
+316. **Los algoritmos ven un `LayoutContext`, los lienzos dan su `Tagging` y el pintado pregunta el `Role`.** Tres
+     decisiones de la misma sesión, todas sin cambio de resultado (los PDF y los SVG, iguales):
+     (a) los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`; el protocolo de la
+     paginación se queda en `Engine`, de package (TS-01), porque moverlo a otra clase no quitaba ninguna dependencia;
+     (b) `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (un método explícito, no
+     `instanceof`: un lienzo nuevo tiene que decir qué hace con el etiquetado); las primitivas siguen sin declarar
+     `IOException` y la convierte un único `PdfContent.io`; (c) `Element.Role` es el papel de una caja, compartido por
+     varios elementos, y es lo único que `layout` y `paint` miran (salvo el despacho de la tabla): los nombres de las
+     etiquetas del PDF siguen en `PdfStructure`. *Dónde:* `layout/LayoutContext`, `paint/Tagging`,
+     `paint/PdfContent`, `tree/Element.Role`, `ArchitectureTest`. *Alternativa:* `pdfRole()`/`structural()`/
+     `decorative()` en `Element` (pone el PDF en `tree`) y primitivas con `throws IOException` (obliga a todos los
+     lienzos por un fallo que solo da el PDF).

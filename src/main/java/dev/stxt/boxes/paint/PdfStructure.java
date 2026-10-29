@@ -5,7 +5,7 @@ import dev.stxt.boxes.layout.inline.TextTransform;
 import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.Metadata;
 import dev.stxt.boxes.tree.Style;
 import org.apache.pdfbox.cos.COSArray;
@@ -127,11 +127,11 @@ final class PdfStructure {
      * de un {@code Multicol} no tiene elemento: su contenido cuelga del {@code Multicol}.
      */
     private void build(Box box, PDStructureNode parent) {
-        if (box.element() == Element.COLUMNS) {
+        if (box.role() == Role.FLOW) {
             box.children().forEach(child -> build(child, parent));
             return;
         }
-        if (box.isImage() && box.style().alt() == null || box.element() == Element.CONTENTS_LEADER) {
+        if (box.isImage() && box.style().alt() == null || box.role() == Role.LEADER) {
             // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
             return;
         }
@@ -140,34 +140,16 @@ final class PdfStructure {
         PDStructureElement e = new PDStructureElement(type(box), owner);
         owner.appendKid(e);
         elements.put(box, e);
-        Box outer = box.element() == Element.SECTION ? root : box.parent();
-        if (outer != null && !box.style().locale().equals(outer.style().locale())) {
-            // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
-            e.setLanguage(box.style().locale().toLanguageTag());
-        }
         if (box.headingLevel() > 0) {
             headings.add(box);
         }
-        if (box.isImage()) {
-            e.setAlternateDescription(box.style().alt());
-        }
-        if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
-                && !PageNumbers.contains(box.text())) {
-            // Las mayúsculas son solo de pintado (§4.4): el texto de la estructura es el escrito. Si
-            // lleva números de página o referencias, el texto cambia con la página y no se puede dar.
-            e.setActualText(box.text());
-        }
-        if (box.element() == Element.LIST) {
-            PDListAttributeObject numbering = new PDListAttributeObject();
-            numbering.setListNumbering(listNumbering(box.style().listMarker()));
-            e.addAttribute(numbering);
-        }
-        if (box.element() == Element.TABLE) {
+        attributes(box, e);
+        if (box.role() == Role.TABLE) {
             table(box, e);
             return;
         }
         PDStructureNode content = e;
-        if (box.element() == Element.LIST_ITEM) {
+        if (box.role() == Role.LIST_ITEM) {
             // LI: el marcador (Lbl) y el contenido (LBody).
             if (box.marker() != null) {
                 PDStructureElement label = new PDStructureElement("Lbl", e);
@@ -183,6 +165,32 @@ final class PdfStructure {
             if (child.style().position() != Style.Position.FIXED) {
                 build(child, content);
             }
+        }
+    }
+
+    /**
+     * Lo que el elemento dice de la caja además de su tipo: su idioma si cambia, el texto alternativo de una
+     * imagen, el texto escrito si se pinta transformado y la numeración de una lista.
+     */
+    private void attributes(Box box, PDStructureElement e) {
+        Box outer = box.role() == Role.SECTION ? root : box.parent();
+        if (outer != null && !box.style().locale().equals(outer.style().locale())) {
+            // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
+            e.setLanguage(box.style().locale().toLanguageTag());
+        }
+        if (box.isImage()) {
+            e.setAlternateDescription(box.style().alt());
+        }
+        if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
+                && !PageNumbers.contains(box.text())) {
+            // Las mayúsculas son solo de pintado (§4.4): el texto de la estructura es el escrito. Si
+            // lleva números de página o referencias, el texto cambia con la página y no se puede dar.
+            e.setActualText(box.text());
+        }
+        if (box.role() == Role.LIST) {
+            PDListAttributeObject numbering = new PDListAttributeObject();
+            numbering.setListNumbering(listNumbering(box.style().listMarker()));
+            e.addAttribute(numbering);
         }
     }
 
@@ -352,29 +360,22 @@ final class PdfStructure {
 
     /** Tipo estándar de estructura de la caja (decisión G1 de la hoja de ruta). */
     static String type(Box box) {
-        if (box.element() == null) {
-            return "Document";
-        }
-        if (box.element() == Element.SECTION) {
-            return "Sect";
-        }
-        if (box.headingLevel() > 0) {
-            return "H" + box.headingLevel();
-        }
-        return switch (box.element()) {
-            case PARAGRAPH, CODE_BLOCK -> "P";
+        return switch (box.role()) {
+            case DOCUMENT -> "Document";
+            case SECTION -> "Sect";
+            case HEADING -> "H" + box.headingLevel();
+            case PARAGRAPH -> "P";
             // Un Text es un bloque de texto, un párrafo; dentro de un encabezado es parte de su texto.
             case TEXT -> box.parent() != null && box.parent().headingLevel() > 0 ? "Span" : "P";
             case LIST -> "L";
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
             case CELL -> group(box) == 0 || box.style().header() ? "TH" : "TD";
-            case IMAGE -> "Figure";
+            case FIGURE -> "Figure";
             case CONTENTS -> "TOC";
-            case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,
-                 CONTENTS_ENTRY_6 -> "TOCI";
-            case CONTENTS_TITLE, CONTENTS_PAGE -> "Span";
-            default -> "Div";
+            case CONTENTS_ENTRY -> "TOCI";
+            case SPAN, PAGE_NUMBER -> "Span";
+            case LEADER, FLOW, BLOCK -> "Div";
         };
     }
 

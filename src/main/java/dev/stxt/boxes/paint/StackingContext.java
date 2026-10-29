@@ -11,7 +11,7 @@ import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -270,7 +270,7 @@ public final class StackingContext {
                     p.f().border().bottom() + p.f().padding().bottom(),
                     p.f().border().left() + p.f().padding().left());
             canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside));
-        } else if (p.f().box().element() == Element.CONTENTS_LEADER) {
+        } else if (p.f().box().role() == Role.LEADER) {
             paintLeader(canvas, p);
         } else {
             paintText(canvas, p);
@@ -306,7 +306,7 @@ public final class StackingContext {
     }
 
     private static void collectText(Box box, StringBuilder out) {
-        if (box.element() == Element.CONTENTS_PAGE) {
+        if (box.role() == Role.PAGE_NUMBER) {
             return;
         }
         if (box.hasText()) {

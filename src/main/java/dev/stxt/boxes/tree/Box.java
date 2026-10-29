@@ -334,6 +334,11 @@ public final class Box {
         return line;
     }
 
+    /** Lo que significa la caja ({@link Element#role()}); la raíz anónima del documento es {@link Element.Role#DOCUMENT}. */
+    public Element.Role role() {
+        return element == null ? Element.Role.DOCUMENT : element.role();
+    }
+
     /** Si es una {@code Image}. */
     public boolean isImage() {
         return element == Element.IMAGE;

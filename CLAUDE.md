@@ -197,10 +197,14 @@ dependencia nueva se decide y se apunta allí.
   `Body cell`, `Foot cell`, `Odd row cell` y `Even row cell` (`CellSelector`, que no son
   elementos: el de la caja sigue siendo `Cell`) y `For column: n` o `n m` las seleccionan con ella.
 - **Elementos con significado (§5.13):** `Paragraph` (un `Text` de un solo párrafo) y
-  `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element` guarda el `Element`
+  `Heading 1`…`Heading 6` (un bloque con hijos `Text`). `Box.element()` guarda el `Element`
   del que procede (`HEADING_2`) para las reglas, los marcadores y las etiquetas; el enum da
-  también su `Layout`, su `Position` y si puede ser un ítem, y `ElementTest` lo compara con el
-  schema. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
+  también su `Layout`, su `Position`, si puede ser un ítem y su **papel** (`Element.role()`, un
+  `Element.Role`: sección, encabezado, párrafo, lista, celda, figura, guía de un índice, flujo de
+  columnas, bloque…; `Box.role()` da `DOCUMENT` en la raíz), y `ElementTest` lo compara con el
+  schema. Fuera de `tree`, el layout y el pintado preguntan el papel, nunca el elemento (salvo el
+  despacho de la tabla en `Engine`; `ArchitectureTest` lo vigila, AR-07): `PdfStructure.type` es un
+  `switch` exhaustivo sobre `Role`, así que un elemento nuevo con un papel que ya existe no toca `paint`. El builder fija `After: avoid` e `Inside: avoid` en los encabezados y comprueba su
   jerarquía en orden del documento. **Numeración:** `Numbered` (`Style.numbered`, de `Typography`, así que
   se hereda y vale en `Styles`) numera los encabezados: `HeadingNumbers` (en `BuildContext`) lleva un contador
   por nivel en orden del documento, a través de secciones y `Markdown`, y `BoxTreeBuilder.element` escribe el

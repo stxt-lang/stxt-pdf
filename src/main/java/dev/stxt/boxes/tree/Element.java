@@ -188,4 +188,66 @@ public enum Element {
     public int headingLevel() {
         return headingLevel;
     }
+
+    /**
+     * Lo que significa una caja para quien lee el documento (AR-07): el papel con que la etiqueta el PDF
+     * (§5.13) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos comparten
+     * uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Fixed}, un
+     * bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link #role()}).
+     */
+    public enum Role {
+        /** La raíz anónima del documento, que no tiene elemento. */
+        DOCUMENT,
+        SECTION,
+        HEADING,
+        /** Un texto de un solo párrafo: {@code Paragraph} y el bloque de código. */
+        PARAGRAPH,
+        /** Un {@code Text}: un párrafo o, dentro de un encabezado, parte de su texto. */
+        TEXT,
+        /** Una lista, cuyos ítems llevan su marcador a la izquierda (§5.14). */
+        LIST,
+        LIST_ITEM,
+        TABLE,
+        CELL,
+        /** Una imagen. */
+        FIGURE,
+        /** Un índice ({@code Contents}, §5.19). */
+        CONTENTS,
+        CONTENTS_ENTRY,
+        /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
+        SPAN,
+        /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
+        PAGE_NUMBER,
+        /** La guía de una entrada del índice: no tiene texto, se pinta (§5.19) y no es contenido. */
+        LEADER,
+        /** El flujo de columnas de un {@code Multicol}: no tiene significado propio, su contenido es el del {@code Multicol}. */
+        FLOW,
+        /** Una caja sin más significado. */
+        BLOCK
+    }
+
+    /** El papel de la caja ({@link Role}). */
+    public Role role() {
+        if (headingLevel > 0) {
+            return Role.HEADING;
+        }
+        return switch (this) {
+            case SECTION -> Role.SECTION;
+            case PARAGRAPH, CODE_BLOCK -> Role.PARAGRAPH;
+            case TEXT -> Role.TEXT;
+            case LIST -> Role.LIST;
+            case LIST_ITEM -> Role.LIST_ITEM;
+            case TABLE -> Role.TABLE;
+            case CELL -> Role.CELL;
+            case IMAGE -> Role.FIGURE;
+            case CONTENTS -> Role.CONTENTS;
+            case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,
+                 CONTENTS_ENTRY_6 -> Role.CONTENTS_ENTRY;
+            case CONTENTS_TITLE -> Role.SPAN;
+            case CONTENTS_PAGE -> Role.PAGE_NUMBER;
+            case CONTENTS_LEADER -> Role.LEADER;
+            case COLUMNS -> Role.FLOW;
+            default -> Role.BLOCK;
+        };
+    }
 }

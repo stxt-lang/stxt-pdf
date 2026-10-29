@@ -11,7 +11,7 @@ import dev.stxt.boxes.model.InternalException;
 import dev.stxt.boxes.model.StxtPdfException;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
-import dev.stxt.boxes.tree.Element;
+import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
 import dev.stxt.boxes.tree.Media;
@@ -128,7 +128,7 @@ public final class Paginator {
     private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingAbsolute>> fixed,
                              boolean numbered) {
         // Los Fixed del documento: los hijos de la raíz que no son una sección.
-        List<Box> documentFixed = root.children().stream().filter(b -> b.element() != Element.SECTION).toList();
+        List<Box> documentFixed = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
         for (int k = 0; k < sections.size(); k++) {
