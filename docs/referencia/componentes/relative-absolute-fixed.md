@@ -1,0 +1,125 @@
+# `Relative`, `Absolute` y `Fixed`
+
+Los tres **elementos posicionados** son bloques: apilan a sus hijos en flujo de bloque ([Block](block.md)). Para posicionar
+un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Class`, `Link`, `Box` y `Typography`; `Relative`
+también `Break` e `Isolate`.
+
+| Propiedad | Valores | Por defecto | Elementos | Notas |
+|---|---|---|---|---|
+| `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Los tres | Arriba, derecha, abajo, izquierda ([Valores](../comun/valores.md#abreviados-de-cuatro-lados)). |
+| `Layer` | entero | `auto` | Los tres | Orden de apilamiento ([Capas y giro](../comun/capas-y-giro.md)). También en `Item` y `Area`. |
+| `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Fixed` | Las páginas en que sale ([Pages](#pages)). |
+| `Rotate`, `Rotate origin` | ver [Capas y giro](../comun/capas-y-giro.md#giro-rotate) | — | Los tres | Gira la caja al pintarla. También en `Image`. |
+
+`Offset`, `Layer`, `Pages` y `Rotate` son propiedades del elemento: no van en `Styles` ni se heredan.
+
+> **Decisión:** `Relative` es un elemento, no una propiedad de cualquier caja: así `Offset` y `Layer` solo existen en los
+> elementos posicionados y en `Item`/`Area`, y el schema detecta su mal uso sin reglas propias; un `Relative` sin `Offset`
+> marca el contenedor de referencia de los `Absolute`. *Alternativa descartada:* un `Offset` en cualquier elemento en flujo,
+> que necesitaría otra forma de marcar el contenedor de referencia sin desplazar.
+
+> **Decisión:** los elementos posicionados son bloques, y un `Flex` o un `Grid` posicionado se escribe dentro
+> (`Absolute` > `Flex`), con una caja más. *Alternativa descartada:* que fueran envoltorios de un elemento, como `Area`, que
+> se leería peor en el caso habitual (un sello, una cabecera).
+
+> **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página; `Widows` y
+> `Orphans` van en `Typography` y se admiten, porque se heredan. Sus descendientes sí admiten `Break` (el schema no
+> distingue dónde está un `Block`), aunque tampoco se parten.
+
+## `Relative`
+
+La caja se coloca como cualquier caja en flujo y después se desplaza visualmente según `Offset`. Su hueco original se
+conserva y sus hermanos no se mueven. Declarar a la vez arriba y abajo, o izquierda y derecha, es un error
+(`OFFSET_CONFLICT`): deja uno de los dos en `auto`. Un `Relative` sin `Offset` no se desplaza y sirve como contenedor de
+referencia de sus descendientes `Absolute`. Los porcentajes del `Offset` se resuelven contra el ancho o el alto del
+contenedor de referencia; uno vertical necesita que su alto sea definido ([Valores](../comun/valores.md#alto-definido)).
+Un `Relative` se comprueba en su sitio, sin su desplazamiento ([Desbordamiento](../comun/desbordamiento.md)).
+
+## `Absolute`
+
+La caja sale del flujo: no ocupa espacio ni contribuye a la altura `auto` de su padre. Su contenedor de referencia es la
+caja de relleno del elemento posicionado más cercano entre sus ancestros, o el área útil ([La caja](../comun/caja.md#el-contenedor-de-referencia)).
+En cada eje se cumple:
+
+```
+inicio + margen inicio + tamaño + margen fin + fin = tamaño del contenedor de referencia
+```
+
+donde *inicio/fin* son izquierda/derecha o arriba/abajo del `Offset`. Según qué términos sean `auto`:
+
+| `auto` | Resultado |
+|---|---|
+| inicio, tamaño y fin | inicio = **posición estática**; tamaño automático; se despeja fin |
+| ninguno, con ambos márgenes `auto` | los márgenes se reparten el sobrante: **centrada** |
+| ninguno, sin márgenes `auto` | **error** (`OVERCONSTRAINED`): la posición se fija dos veces |
+| inicio y tamaño | tamaño automático; se despeja inicio (anclada al fin) |
+| inicio y fin | inicio = posición estática; se despeja fin |
+| tamaño y fin | tamaño automático; se despeja fin |
+| solo inicio | se despeja inicio |
+| solo tamaño | se despeja: la caja **se estira** entre inicio y fin |
+| solo fin | se despeja fin |
+
+Un margen `auto` solo tiene sentido cuando inicio, tamaño y fin están declarados (centra la caja o, si solo es `auto` uno
+de los dos, absorbe el sobrante); en los demás casos es un error. El **tamaño automático** es el ajuste al contenido
+(`fit-content`) en horizontal y la altura del contenido en vertical. La **posición estática** es donde habría quedado la
+caja si estuviera en flujo:
+
+- en flujo de bloque, el cursor vertical más los márgenes colapsados de las cajas anteriores, sin colapsar con el margen
+  superior de la propia caja, que se suma después según la ecuación;
+- dentro de un `Flex` o un `Grid`, la esquina superior izquierda de su caja de contenido.
+
+Las cajas posicionadas fuera de flujo se resuelven cuando su contenedor de referencia ya conoce su tamaño, después del
+layout en flujo. Un `Absolute` se pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia
+esté más arriba ([Capas y giro](../comun/capas-y-giro.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
+su posición, y si su contenedor de referencia está partido, se resuelve contra el fragmento de esa página
+([Cortes](../comun/cortes.md#lo-que-no-se-parte)). Puede ocupar los márgenes de la página, pero no salirse de ella
+(`BOX_OVERFLOW`).
+
+## `Fixed`
+
+Como `Absolute`, pero su contenedor de referencia es el área útil de la página, y **se pinta en las páginas que dice
+`Pages`**, todas por defecto (cabeceras, pies, marcas de agua). Un `Fixed` hijo de `Document` sale en todas las secciones que
+lo heredan, y uno hijo de una `Section`, solo en las suyas ([Document](document.md#fixed-del-documento-y-de-la-sección)).
+Los `Fixed` no reservan espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de la
+página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de su posición estática
+(desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
+todas en las que sale. Todo lo que hay dentro de un `Fixed` es un *artifact* del PDF etiquetado: no forma parte del
+contenido, así que no puede tener encabezados (`HEADING_IN_FIXED`) ni ser el destino de un enlace o una referencia.
+
+> **Decisión:** un `Fixed` se admite en cualquier contenedor, no solo como hijo de `Document` o de una sección: su posición
+> estática es la de su sitio en el documento. *Alternativa descartada:* solo como hijo de `Document` y de `Section`, que es
+> donde tiene sentido una cabecera o un pie.
+
+### `Pages`
+
+Propiedad solo del `Fixed` (en otro elemento es un error del schema, y un valor que no está en la lista, también). Cuenta
+las páginas desde la 1 **dentro de su alcance**: las del documento entero, en orden físico, si el `Fixed` es hijo de
+`Document`, y las de su sección, si es hijo de una `Section` (`first` es la primera página de la sección). No es el número
+impreso de `{page}`, que puede reiniciarse o no existir ([Document](document.md#numeración-de-las-páginas)):
+
+| Valor | Páginas |
+|---|---|
+| `all` | todas (por defecto) |
+| `first` | solo la primera |
+| `not-first` | todas menos la primera |
+| `odd` / `even` | las impares / las pares |
+| `last` | solo la última |
+
+Es una condición de pintado, no de espacio: un `Fixed` no reserva sitio ni donde sale ni donde no, así que el flujo es el
+mismo con él o sin él. Una portada a sangre, con otro margen y sin numeración, es una sección. Un `Fixed` que no sale en
+ninguna página (`not-first` en un documento de una sola) es válido y no se comprueba (`BOX_OVERFLOW` solo mira los que
+salen). Si un `Fixed` contiene otro, el de dentro sale solo donde salen los dos, cada uno con su `Pages`.
+
+> **Decisión:** `Pages` es una propiedad del `Fixed`, no un sistema de páginas con nombre: cuenta las páginas desde la 1 de
+> su alcance, y en un documento de una sola página `first` y `last` coinciden. *Alternativa descartada:* páginas con nombre
+> y reglas por tipo de página, más general y más pesado.
+
+> **Decisión:** un `Fixed` con `Pages` no reserva sitio donde sale ni donde no: el flujo es el mismo con él o sin él. Uno que
+> no sale en ninguna página es válido, y uno dentro de otro sale solo donde salen los dos. *Alternativa descartada:* que
+> empuje el flujo, que rompe el modelo de `Fixed` como caja fuera de flujo.
+
+## Lo que no hay
+
+- Cajas que se queden pegadas al borde mientras se pasa de página dentro de su contenedor, ni que floten a un lado del
+  texto.
+- Posicionar un `Flex` o un `Grid` sin un posicionado alrededor.

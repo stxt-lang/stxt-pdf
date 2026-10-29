@@ -1,0 +1,116 @@
+# Valores
+
+## Tipos de valor
+
+| Sintaxis | Significado | Ejemplo |
+|---|---|---|
+| Número | Puntos. Punto decimal, nunca coma. Puede ser negativo donde se indique. | `12`, `12.5`, `-30` |
+| Porcentaje | Porcentaje de una base (ver [bases de los porcentajes](#bases-de-los-porcentajes)). | `50%` |
+| Fracción | Fracción del espacio libre. Solo en pistas de grid. | `1fr`, `2.5fr` |
+| `auto` | El motor calcula el valor según el contexto. | `auto` |
+| `min-content` | El menor tamaño posible sin desbordar (la palabra más larga). | `min-content` |
+| `max-content` | El tamaño sin ningún salto de línea. | `max-content` |
+| `fit-content` | `min(max-content, max(min-content, disponible))`. | `fit-content` |
+| `minmax(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `minmax(100, 1fr)` |
+| `min(a, b, …)` | El menor de los valores. | `min(300, 50%)` |
+| `max(a, b, …)` | El mayor de los valores. | `max(200, 30%)` |
+| `clamp(a, b, c)` | `b`, pero nunca menos que `a` ni más que `c`. | `clamp(200, 50%, 400)` |
+
+Cada propiedad admite solo algunas de estas formas (la columna *Valores* de su tabla); cualquier otra es un error:
+`Width: 1fr`, `Max width: max-content`, `Gap: auto`. Los argumentos de `min()`, `max()` y `clamp()` son números o
+porcentajes. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos.
+
+> **Decisión:** cada propiedad admite solo las formas de su columna *Valores*: `Width: 1fr`, `Max width: max-content`,
+> `Gap: auto`, un `minmax()` fuera de las pistas o un número negativo fuera de `Margin` y `Offset` son
+> `VALUE_NOT_ALLOWED`, no un `auto` silencioso.
+
+Un porcentaje cuya base es un alto que no es definido (por ejemplo, el `Height: 50%` de una caja cuyo padre tiene alto
+`auto`) es un error. Ver [alto definido](#alto-definido).
+
+## Listas y `repeat`
+
+Algunas propiedades admiten varios valores separados por espacios (`Columns`, `Rows`, `Margin`…). En las listas de
+pistas, `repeat(n, patrón)` repite un patrón:
+
+```
+Columns: 150 repeat(3, 1fr) minmax(100, 2fr)
+```
+
+equivale a `150 1fr 1fr 1fr minmax(100, 2fr)`.
+
+## Abreviados de cuatro lados
+
+`Margin`, `Padding`, `Border` y `Offset` aceptan de 1 a 4 valores en el orden **arriba, derecha, abajo, izquierda**:
+
+| Valor | Arriba | Derecha | Abajo | Izquierda |
+|---|---|---|---|---|
+| `10` | 10 | 10 | 10 | 10 |
+| `10 20` | 10 | 20 | 10 | 20 |
+| `10 20 5` | 10 | 20 | 5 | 20 |
+| `10 20 5 0` | 10 | 20 | 5 | 0 |
+
+`Border color` admite también de 1 a 4 colores con este orden. `Radius` admite de 1 a 4 valores con el mismo convenio,
+pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la derecha y abajo a la izquierda
+(`Radius: 0 20` redondea solo la esquina de arriba a la derecha y la de abajo a la izquierda).
+
+## Colores
+
+`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA` en hexadecimal: `#000`, `#A32D2D`, `#12315A80`. El último dígito o par es la
+**opacidad** (`FF` o `F`, opaco; `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
+color (`Color`, `Border color`, `Background`, `Rule color`).
+
+> **Decisión:** los colores llevan su opacidad (`#RGBA`, `#RRGGBBAA`) en todas las propiedades de color, también en el
+> texto y en `Rule color`; no hay una propiedad `Opacity` de la caja. *Alternativa descartada:* `Opacity` por caja, que
+> afectaría también a todo lo que contiene.
+
+El fondo también admite un **degradado lineal**: `linear(ángulo, color, color…)`, con el ángulo en grados (`0` va hacia
+arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores, repartidos a partes iguales:
+`linear(180, #12315A00, #12315A)`. Cómo se pinta está en [La caja](caja.md#degradado).
+
+> **Decisión:** `linear(ángulo, color, color…)` reparte los colores a partes iguales; no hay paradas con posición, ni
+> degradados radiales, cónicos o repetidos. *Alternativa descartada:* solo dos colores, o paradas con posición.
+
+No hay colores con nombre (`red`) ni funciones de color (`rgb()`).
+
+## Booleanos y enteros
+
+Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: -1`, `Widows: 3`.
+
+## Bases de los porcentajes
+
+| Propiedad | Porcentaje de… |
+|---|---|
+| `Width`, `Min width`, `Max width` | el ancho del contenedor de referencia |
+| `Height`, `Min height`, `Max height` | el alto del contenedor de referencia, que **debe ser definido** |
+| `Margin`, `Padding` (los cuatro lados) | el **ancho** del contenedor de referencia, también arriba y abajo |
+| `Offset` arriba/abajo | el alto del contenedor de referencia, que **debe ser definido** |
+| `Offset` izquierda/derecha | el ancho del contenedor de referencia |
+| `Basis` (ítem de `Flex`) | el tamaño del `Flex` en el eje principal (en `column`, su alto, que debe ser definido) |
+| `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
+| Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
+| `Line height` | el `Size` de la propia caja |
+| `Radius` | el ancho de la caja de borde en horizontal y su alto en vertical ([La caja](caja.md#esquinas)) |
+
+`Border` no admite porcentajes. El contenedor de referencia de cada caja está en [La caja](caja.md#el-contenedor-de-referencia).
+
+## Alto definido
+
+Los anchos se conocen siempre al maquetar; los altos, no. Un porcentaje vertical es un error
+(`INDEFINITE_PERCENTAGE`) si su base no es un **alto definido**, que se decide al leer el documento:
+
+- el área útil;
+- el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
+- el de una caja con `Height: auto` y `Aspect ratio`;
+- el de un `Absolute` o un `Fixed` con `Height: auto` estirado entre arriba y abajo;
+- el de un ítem de grid con `Height: auto` estirado en su área (`Vertical: stretch`).
+
+La base de `Height`, `Min height` y `Max height` de un `Absolute` o un `Fixed` es su contenedor de referencia, y la de un
+ítem de grid, su área: las dos son siempre definidas. Un ítem de `Flex` estirado **no** da un alto definido a sus hijos:
+si lo necesitan, declara su `Height`. El alto de las columnas de un `Multicol` tampoco es definido
+([Multicol](../componentes/multicol.md#contenido)).
+
+> **Decisión:** el alto definido se decide al leer el documento, con esta regla fija, y no al maquetar. Es más estricta
+> que lo que el motor sabe al maquetar: un ítem de `Flex` estirado no da un alto definido a sus hijos aunque el motor sí
+> lo conozca en ese momento. A cambio, el error sale siempre, en la línea de la propiedad, y no depende de por qué
+> camino se maquetó la caja. *Alternativa descartada:* detectar los porcentajes sin base durante el layout final,
+> distinguiéndolo de las pasadas de medida (un `Grid` mide sus ítems sin base y luego los maqueta con el alto del área).
