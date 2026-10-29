@@ -206,10 +206,10 @@ final class PropertyReader {
             String name = p.getCanonicalName();
             s.declared(PropertyKey.internal(name), p.getLine());
             switch (name) {
-                case "before" -> s.breakBefore = enumValue(Break.class, p);
-                case "after" -> s.breakAfter = enumValue(Break.class, p);
-                case "inside" -> s.avoidBreakInside = breakInside(p);
-                case "decoration" -> s.decoration = enumValue(Decoration.class, p);
+                case "before" -> s.breaks().setBefore(enumValue(Break.class, p));
+                case "after" -> s.breaks().setAfter(enumValue(Break.class, p));
+                case "inside" -> s.breaks().setAvoidInside(breakInside(p));
+                case "decoration" -> s.breaks().setDecoration(enumValue(Decoration.class, p));
                 default -> throw unread(p);
             }
         }

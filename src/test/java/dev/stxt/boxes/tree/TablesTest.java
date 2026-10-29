@@ -123,13 +123,13 @@ class TablesTest {
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tInside: avoid",
                 "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
-        assertEquals(Break.AUTO, table.children().get(1).style().breakBefore);
+        assertEquals(Break.AUTO, table.children().get(1).style().breaks().before());
         for (Box cell : table.children().subList(2, 4)) {
-            assertEquals(Break.PAGE, cell.style().breakBefore);
-            assertTrue(cell.style().avoidBreakInside);
+            assertEquals(Break.PAGE, cell.style().breaks().before());
+            assertTrue(cell.style().breaks().avoidInside());
             assertEquals(21, cell.style().line("break-before"));
         }
-        assertFalse(table.children().get(0).style().avoidBreakInside);
+        assertFalse(table.children().get(0).style().breaks().avoidInside());
     }
 
     @Test

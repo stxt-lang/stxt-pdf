@@ -128,7 +128,7 @@ public final class BreakRules {
 
     /** Calidad del corte entre dos cajas hermanas en flujo: {@code avoid} en cualquiera lo empeora. */
     public static int between(Box before, Box after) {
-        return before.style().breakAfter() == Break.AVOID || after.style().breakBefore() == Break.AVOID
+        return before.style().breaks().after() == Break.AVOID || after.style().breaks().before() == Break.AVOID
                 ? BreakAppeal.VIOLATES_AVOID_BETWEEN : BreakAppeal.PERFECT_BREAK;
     }
 
@@ -150,14 +150,14 @@ public final class BreakRules {
      * @return {@code PAGE}, {@code COLUMN} o {@code AUTO}
      */
     public static Break forcedBefore(Box box) {
-        Break own = forced(box.style().breakBefore());
+        Break own = forced(box.style().breaks().before());
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own : stronger(own, fromInside(box, forcedBefore(children.get(0))));
     }
 
     /** El corte forzado después de la caja o, si es un bloque, de su último hijo en flujo (ver {@link #forcedBefore}). */
     public static Break forcedAfter(Box box) {
-        Break own = forced(box.style().breakAfter());
+        Break own = forced(box.style().breaks().after());
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own
                 : stronger(own, fromInside(box, forcedAfter(children.get(children.size() - 1))));
@@ -228,7 +228,7 @@ public final class BreakRules {
 
     /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link BreakAppeal#FORCED}. */
     public static int inside(Box box, int appeal) {
-        return box.style().avoidBreakInside() ? BreakAppeal.FORCED : appeal;
+        return box.style().breaks().avoidInside() ? BreakAppeal.FORCED : appeal;
     }
 
     // --- Elección del corte -----------------------------------------------------------------------

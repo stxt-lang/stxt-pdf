@@ -228,7 +228,7 @@ public final class StackingContext {
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
         Radii radii = Radii.resolve(s.radius(), p.f().width(), p.f().height());
-        if (s.decoration() == Decoration.CLONE) {
+        if (s.breaks().decoration() == Decoration.CLONE) {
             return radii;
         }
         return radii.forFragment(p.f().first(), p.f().last());

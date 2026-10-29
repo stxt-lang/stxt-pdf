@@ -64,8 +64,8 @@ class MulticolTest {
     void columnBreaksInsideAMulticol() {
         Box flow = root("\tMulticol:", "\t\tCount: 2", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tAfter: column",
                 "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: column").children().get(0).children().get(0);
-        assertEquals(Break.COLUMN, flow.children().get(0).style().breakAfter);
-        assertEquals(Break.COLUMN, flow.children().get(1).style().breakBefore);
+        assertEquals(Break.COLUMN, flow.children().get(0).style().breaks().after());
+        assertEquals(Break.COLUMN, flow.children().get(1).style().breaks().before());
     }
 
     /** Los casos de error están en el catálogo; aquí, el que solo se da con una regla de {@code Styles}. */

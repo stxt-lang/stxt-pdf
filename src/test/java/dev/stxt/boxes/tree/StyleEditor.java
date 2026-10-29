@@ -38,12 +38,12 @@ public final class StyleEditor {
     }
 
     public StyleEditor breakBefore(Break v) {
-        style.breakBefore = v;
+        style.breaks().setBefore(v);
         return this;
     }
 
     public StyleEditor breakAfter(Break v) {
-        style.breakAfter = v;
+        style.breaks().setAfter(v);
         return this;
     }
 

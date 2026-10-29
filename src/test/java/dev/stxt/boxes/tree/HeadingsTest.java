@@ -33,9 +33,9 @@ class HeadingsTest {
     @Test
     void theEngineAvoidsBreaksInsideAndAfterAHeading() {
         Box h = root("\tHeading 1:", "\t\tText: Título").children().get(0);
-        assertEquals(Break.AVOID, h.style().breakAfter);
-        assertTrue(h.style().avoidBreakInside);
-        assertEquals(Break.AUTO, h.style().breakBefore);
+        assertEquals(Break.AVOID, h.style().breaks().after());
+        assertTrue(h.style().breaks().avoidInside());
+        assertEquals(Break.AUTO, h.style().breaks().before());
     }
 
     @Test

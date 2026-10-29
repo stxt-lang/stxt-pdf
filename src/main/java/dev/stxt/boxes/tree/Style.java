@@ -141,14 +141,10 @@ public final class Style {
     boolean inContents = true;
 
     // --- Fragmentación ---------------------------------------------------------------------------
-    Break breakBefore = Break.AUTO;
-    Break breakAfter = Break.AUTO;
-    boolean avoidBreakInside;
     /** Heredable. */
     int widows = 2;
     /** Heredable. */
     int orphans = 2;
-    Decoration decoration = Decoration.SLICE;
 
     private final FlexStyle flex = new FlexStyle();
 
@@ -164,10 +160,16 @@ public final class Style {
 
     private final MulticolStyle multicol = new MulticolStyle();
 
+    private final BreakStyle breaks = new BreakStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public MulticolStyle multicol() {
+    public BreakStyle breaks() {
+            return breaks;
+        }
+
+        public MulticolStyle multicol() {
             return multicol;
         }
 
@@ -362,28 +364,12 @@ public final class Style {
     }
 
     // --- Fragmentación ---------------------------------------------------------------------------
-    public Break breakBefore() {
-        return breakBefore;
-    }
-
-    public Break breakAfter() {
-        return breakAfter;
-    }
-
-    public boolean avoidBreakInside() {
-        return avoidBreakInside;
-    }
-
     public int widows() {
         return widows;
     }
 
     public int orphans() {
         return orphans;
-    }
-
-    public Decoration decoration() {
-        return decoration;
     }
 
     /**
@@ -484,6 +470,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        breaks.close();
         multicol.close();
         image.close();
         contents.close();

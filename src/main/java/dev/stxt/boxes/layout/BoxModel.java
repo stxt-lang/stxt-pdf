@@ -97,7 +97,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 height = OptionalDouble.of(Sizing.constrain(height.getAsDouble(), minHeight, maxHeight));
             }
         }
-        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.decoration());
+        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.breaks().decoration());
     }
 
     /**
@@ -151,7 +151,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             }
         }
         return new BoxModel(margin, border, padding, width, OptionalDouble.of(height), minHeight, maxHeight,
-                s.decoration());
+                s.breaks().decoration());
     }
 
     /**

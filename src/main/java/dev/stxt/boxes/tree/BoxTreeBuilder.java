@@ -227,8 +227,8 @@ public final class BoxTreeBuilder {
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
-            s.breakAfter = Break.AVOID;
-            s.avoidBreakInside = true;
+            s.breaks().setAfter(Break.AVOID);
+            s.breaks().setAvoidInside(true);
         }
 
         Box box = new Box(id, kind, s, false, n.getLine());

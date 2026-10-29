@@ -146,8 +146,8 @@ final class ModelValidator {
         if (ctx.insideMulticol) {
             return;
         }
-        String property = s.breakBefore == Break.COLUMN ? BREAK_BEFORE
-                : s.breakAfter == Break.COLUMN ? BREAK_AFTER : null;
+        String property = s.breaks().before() == Break.COLUMN ? BREAK_BEFORE
+                : s.breaks().after() == Break.COLUMN ? BREAK_AFTER : null;
         if (property != null) {
             throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, (property.equals(BREAK_BEFORE)
                     ? "Before" : "After") + ": column solo tiene efecto dentro de un Multicol: usa page para "
