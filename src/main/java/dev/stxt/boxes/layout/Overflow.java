@@ -83,14 +83,14 @@ public final class Overflow {
         double y = oy + f.y();
         Style s = f.box().style;
         Rect borderBox = new Rect(x, y, f.width(), f.height());
-        if (s.rotation != null) {
+        if (s.rotation() != null) {
             turn = new AffineTransform(turn);
-            turn.concatenate(s.rotation.transform(borderBox));
+            turn.concatenate(s.rotation().transform(borderBox));
         }
-        if (s.rotation != null || (s.isOutOfFlow() && !turn.isIdentity())) {
+        if (s.rotation() != null || (s.isOutOfFlow() && !turn.isIdentity())) {
             // Lo girado se comprueba como se pinta: el rectángulo que lo envuelve, en la página.
             if (!inside(Rotation.envelope(turn, borderBox), page)) {
-                boolean own = s.rotation != null;
+                boolean own = s.rotation() != null;
                 throw new InvalidModelException(own ? s.line(ROTATE) : f.box().line, ErrorCode.BOX_OVERFLOW,
                         "La caja " + name(f.box()) + (own ? " girada" : ", dentro de una caja girada,")
                                 + " se sale de la página: revisa su " + (own ? "Rotate, su Rotate origin, " : "")
@@ -247,7 +247,7 @@ public final class Overflow {
     private static InvalidModelException pageOverflow(Fragment c, double x, double y, double bottom,
                                                       double pageHeight) {
         while (true) {
-            if (c.box().style.rotation != null) {
+            if (c.box().style.rotation() != null) {
                 // Lo que impide partirla es el giro: lo que contiene se partiría.
                 return new InvalidModelException(c.box().style.line(ROTATE), ErrorCode.PAGE_OVERFLOW, "La caja "
                         + name(c.box()) + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
@@ -293,7 +293,7 @@ public final class Overflow {
         // No está en el texto si la ha cambiado el layout, como un número de página.
         int index = box.text.indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine;
-        if (box.style.whiteSpace == Style.WhiteSpace.PRE) {
+        if (box.style.whiteSpace() == Style.WhiteSpace.PRE) {
             return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: pre "
                     + "('" + excerpt(word) + "'…) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
                     + pt(width) + "; ensancha la caja, reduce el Size o usa White space: pre-wrap, que parte las líneas");

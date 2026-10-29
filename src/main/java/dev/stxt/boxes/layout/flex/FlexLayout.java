@@ -69,7 +69,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style;
         // Sin containing block, un hueco en porcentaje cuenta como 0.
-        double gap = s.columnGap.resolve(OptionalDouble.empty()).orElse(0);
+        double gap = s.columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<Box> items = box.inFlowChildren();
         double maxMin = 0;
         double maxMax = 0;
@@ -84,9 +84,9 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
-        if (s.flexDirection == Style.Direction.COLUMN) {
+        if (s.flexDirection() == Style.Direction.COLUMN) {
             content = new IntrinsicSizes(maxMin, maxMax);
-        } else if (s.flexWrap) {
+        } else if (s.flexWrap()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
         } else {
             content = new IntrinsicSizes(sumMin + gaps, sumMax + gaps);
@@ -151,15 +151,15 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.box = box;
             this.s = box.style;
             this.model = model;
-            this.row = s.flexDirection == Style.Direction.ROW;
-            this.multiLine = s.flexWrap;
+            this.row = s.flexDirection() == Style.Direction.ROW;
+            this.multiLine = s.flexWrap();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
             // Base de los porcentajes: la caja de contenido en el eje de cada hueco (§3.6).
-            double columnGap = s.columnGap.resolve(contentWidth).orElse(0);
-            double rowGap = s.rowGap.resolve(contentHeight).orElse(0);
+            double columnGap = s.columnGap().resolve(contentWidth).orElse(0);
+            double rowGap = s.rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
             this.crossGap = row ? rowGap : columnGap;
             this.atStart = space.atFragmentainerStart();
@@ -205,7 +205,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (multiLine && crossSize.isPresent()) {
                 crossFree = crossSize.getAsDouble() - Sizing.sum(lineCross) - crossGap * Math.max(0, n - 1);
             }
-            if (s.flexLines == Style.Distribution.STRETCH && crossFree > 0) {
+            if (s.flexLines() == Style.Distribution.STRETCH && crossFree > 0) {
                 for (int l = 0; l < n; l++) {
                     lineCross[l] += crossFree / n;
                 }
@@ -234,7 +234,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
             List<Span> spans = new ArrayList<>();
-            double[] lineDistribution = distribute(multiLine ? s.flexLines : Style.Distribution.START, cross.free(), n);
+            double[] lineDistribution = distribute(multiLine ? s.flexLines() : Style.Distribution.START, cross.free(), n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
             for (int l = 0; l < n; l++) {
@@ -245,7 +245,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 mainExtent = Math.max(mainExtent, used);
                 double free = mainSize.isPresent() ? mainSize.getAsDouble() - used : 0;
-                double[] d = distribute(s.flexMainAxis, free, line.size());
+                double[] d = distribute(s.flexMainAxis(), free, line.size());
                 double mainPos = d[0];
                 if (row) {
                     spans.add(new Span(crossPos, crossPos + lineCross[l], line.stream().map(it -> it.box).toList()));
@@ -290,41 +290,41 @@ public final class FlexLayout implements LayoutAlgorithm {
 
         Item rowItem(Box b) {
             Style is = b.style;
-            Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
+            Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.horizontal();
             BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
             double extra = probe.border().horizontal() + probe.padding().horizontal();
             IntrinsicSizes intrinsic = engine.intrinsic(b);
 
-            OptionalDouble declared = is.width.isAuto() ? OptionalDouble.empty() : OptionalDouble.of(probe.width());
+            OptionalDouble declared = is.width().isAuto() ? OptionalDouble.empty() : OptionalDouble.of(probe.width());
             OptionalDouble basis = declaredBasis(is);
             double base = basis.isPresent() ? basis.getAsDouble() + margins
                     : declared.isPresent() ? declared.getAsDouble() + margins
                     : intrinsic.maxContent();
-            double max = is.maxWidth == null ? Double.POSITIVE_INFINITY
-                    : is.maxWidth.resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
+            double max = is.maxWidth() == null ? Double.POSITIVE_INFINITY
+                    : is.maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
-            if (is.minWidth.isAuto()) {
+            if (is.minWidth().isAuto()) {
                 // Mínimo automático (§5.7): el min-content de su contenido, sin pasar de Max width,
                 // y nunca más que el ancho declarado.
                 double content = Math.min(engine.contentIntrinsic(b).minContent() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
-                min = is.minWidth.resolve(contentWidth).orElse(0) + margins;
+                min = is.minWidth().resolve(contentWidth).orElse(0) + margins;
             }
-            it.flex = new FlexItem(base, is.itemGrow, is.itemShrink, min, max);
+            it.flex = new FlexItem(base, is.itemGrow(), is.itemShrink(), min, max);
             return it;
         }
 
         Item columnItem(Box b) {
             Style is = b.style;
-            Item it = new Item(b, Insets.resolve(is.margin, contentWidth), alignment(is));
+            Item it = new Item(b, Insets.resolve(is.margin(), contentWidth), alignment(is));
             double margins = it.margin.vertical();
             BoxModel probe = BoxModel.resolve(b, probeSpace(), engine);
 
             // Ancho con el que se mide: el declarado, el del contenedor (stretch) o el ajuste al contenido.
             double width;
-            if (!is.width.isAuto()) {
+            if (!is.width().isAuto()) {
                 width = probe.width();
             } else if (it.align == Style.Alignment.STRETCH && !multiLine) {
                 width = Math.max(0, contentWidth - it.margin.horizontal());
@@ -340,7 +340,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             OptionalDouble basis = declaredBasis(is);
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
             double min;
-            if (is.minHeight.isAuto()) {
+            if (is.minHeight().isAuto()) {
                 // Mínimo automático (§5.7): el alto de su contenido, sin pasar de Max height, y
                 // nunca más que el alto declarado.
                 double content = sized.height().isPresent()
@@ -348,21 +348,21 @@ public final class FlexLayout implements LayoutAlgorithm {
                         : contentSize;
                 min = Math.min(contentSize, content) + margins;
             } else {
-                min = is.minHeight.resolve(contentHeight).orElse(0) + margins;
+                min = is.minHeight().resolve(contentHeight).orElse(0) + margins;
             }
-            double max = is.maxHeight == null ? Double.POSITIVE_INFINITY
-                    : is.maxHeight.resolve(contentHeight).orElse(Double.POSITIVE_INFINITY) + margins;
-            it.flex = new FlexItem(base, is.itemGrow, is.itemShrink, min, max);
+            double max = is.maxHeight() == null ? Double.POSITIVE_INFINITY
+                    : is.maxHeight().resolve(contentHeight).orElse(Double.POSITIVE_INFINITY) + margins;
+            it.flex = new FlexItem(base, is.itemGrow(), is.itemShrink(), min, max);
             return it;
         }
 
         /** {@code Basis} en caja de borde; vacío si es {@code auto} o un porcentaje de un tamaño indefinido. */
         OptionalDouble declaredBasis(Style is) {
-            return is.itemBasis.resolve(mainSize);
+            return is.itemBasis().resolve(mainSize);
         }
 
         Style.Alignment alignment(Style is) {
-            return is.itemCrossAxis != null ? is.itemCrossAxis : s.flexCrossAxis;
+            return is.itemCrossAxis() != null ? is.itemCrossAxis() : s.flexCrossAxis();
         }
 
         // --- Pasos 4 a 7 ----------------------------------------------------------------------------
@@ -438,7 +438,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 target = Sizing.constrain(Math.max(0, lineCross - it.margin.vertical()), m.minHeight(), m.maxHeight());
             } else {
-                if (!is.width.isAuto()) {
+                if (!is.width().isAuto()) {
                     return;
                 }
                 target = BoxModel.constrainWidth(is, Math.max(0, lineCross - it.margin.horizontal()), contentWidth);

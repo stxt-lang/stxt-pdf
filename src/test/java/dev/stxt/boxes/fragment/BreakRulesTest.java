@@ -3,6 +3,7 @@ package dev.stxt.boxes.fragment;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -146,11 +147,7 @@ class BreakRulesTest {
     // --- Cortes forzados de página y de columna ----------------------------------------------------
 
     private static Box box(Element element, Style.Break before, Style.Break after) {
-        Style s = new Style();
-        s.layout = element.layout();
-        s.breakBefore = before;
-        s.breakAfter = after;
-        return new Box(null, element, s, false, 1);
+        return new StyleEditor().layout(element.layout()).breakBefore(before).breakAfter(after).box(null, element);
     }
 
     @Test

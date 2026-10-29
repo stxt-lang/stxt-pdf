@@ -50,7 +50,7 @@ final class PdfDestinations {
                              Map<Box, PDPageXYZDestination> targets) {
         Box box = f.box();
         Rect borderBox = new Rect(x, y, f.width(), f.height());
-        Rotation rotation = box.style.rotation;
+        Rotation rotation = box.style.rotation();
         if (rotation != null) {
             turn = new AffineTransform(turn);
             turn.concatenate(rotation.transform(borderBox));

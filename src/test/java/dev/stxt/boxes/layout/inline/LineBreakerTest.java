@@ -8,6 +8,7 @@ import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -100,19 +101,19 @@ class LineBreakerTest {
 
     @Test
     void placeMeasuresAlignsAndJustifies() {
-        Style s = new Style();
-        s.font = "F";
-        s.fontSize = 1;
-        s.textAlign = Style.TextAlign.JUSTIFY;
+        StyleEditor s = new StyleEditor();
+        s.font("F");
+        s.fontSize(1);
+        s.textAlign(Style.TextAlign.JUSTIFY);
         // "uno dos tres" mide 12 en 20: 8 de sobrante entre 2 espacios, 4 por espacio.
-        TextLine l = LineBreaker.place("uno dos tres", measurer, s, 20, true, 30, 12);
+        TextLine l = LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 30, 12);
         assertEquals(new TextLine(0, 30, 20, 12, "uno dos tres", 4), l);
         // La última línea del párrafo no se justifica.
         assertEquals(new TextLine(0, 30, 12, 12, "uno dos tres", 0),
-                LineBreaker.place("uno dos tres", measurer, s, 20, false, 30, 12));
-        s.textAlign = Style.TextAlign.CENTER;
+                LineBreaker.place("uno dos tres", measurer, s.style(), 20, false, 30, 12));
+        s.textAlign(Style.TextAlign.CENTER);
         assertEquals(new TextLine(4, 0, 12, 12, "uno dos tres", 0),
-                LineBreaker.place("uno dos tres", measurer, s, 20, true, 0, 12));
+                LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 0, 12));
     }
 
     @Test
@@ -178,12 +179,12 @@ class LineBreakerTest {
 
     @Test
     void placePositionsEachRunAndSpreadsTheJustification() {
-        Style s = new Style();
-        s.font = "F";
-        s.fontSize = 1;
-        s.textAlign = Style.TextAlign.JUSTIFY;
+        StyleEditor s = new StyleEditor();
+        s.font("F");
+        s.fontSize(1);
+        s.textAlign(Style.TextAlign.JUSTIFY);
         // "uno " (4) + "dos" en negrita (6) + " tres" (5) = 15 en 20: 2,5 más por espacio.
-        TextLine l = LineBreaker.place(List.of(run("uno "), run("dos", "b"), run(" tres")), boldIsWider, s, 20,
+        TextLine l = LineBreaker.place(List.of(run("uno "), run("dos", "b"), run(" tres")), boldIsWider, s.style(), 20,
                 true, 0, 12);
         assertEquals(List.of(new TextLine.Run(0, 6.5, "uno ", TextFormat.PLAIN),
                         new TextLine.Run(6.5, 6, "dos", run("dos", "b").format()),
@@ -231,12 +232,12 @@ class LineBreakerTest {
 
     @Test
     void aPlacedLineDropsTheLastLetterSpacingAndAlignsWithIt() {
-        Style s = new Style();
-        s.font = "F";
-        s.fontSize = 1;
-        s.letterSpacing = 2;
-        s.textAlign = Style.TextAlign.RIGHT;
-        TextLine line = LineBreaker.place("ab", measurer, s, 20, false, 0, 1);
+        StyleEditor s = new StyleEditor();
+        s.font("F");
+        s.fontSize(1);
+        s.letterSpacing(2);
+        s.textAlign(Style.TextAlign.RIGHT);
+        TextLine line = LineBreaker.place("ab", measurer, s.style(), 20, false, 0, 1);
         // a (1) + 2 + b (1) = 4, a la derecha de 20.
         assertEquals(4, line.width(), 1e-9);
         assertEquals(16, line.x(), 1e-9);
@@ -245,13 +246,13 @@ class LineBreakerTest {
 
     @Test
     void justifyDistributesWhatLetterSpacingLeaves() {
-        Style s = new Style();
-        s.font = "F";
-        s.fontSize = 1;
-        s.letterSpacing = 1;
-        s.textAlign = Style.TextAlign.JUSTIFY;
+        StyleEditor s = new StyleEditor();
+        s.font("F");
+        s.fontSize(1);
+        s.letterSpacing(1);
+        s.textAlign(Style.TextAlign.JUSTIFY);
         // «ab cd» mide 5 + 4 = 9; en 15 sobran 6 para un solo espacio.
-        TextLine line = LineBreaker.place("ab cd", measurer, s, 15, true, 0, 1);
+        TextLine line = LineBreaker.place("ab cd", measurer, s.style(), 15, true, 0, 1);
         assertEquals(6, line.wordSpacing(), 1e-9);
         assertEquals(15, line.width(), 1e-9);
     }

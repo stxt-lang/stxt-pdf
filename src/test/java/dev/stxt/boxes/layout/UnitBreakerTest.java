@@ -10,6 +10,7 @@ import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
 import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -32,19 +33,17 @@ class UnitBreakerTest {
     private static final int PERFECT = BreakAppeal.PERFECT_BREAK;
 
     private final Engine engine = new Engine();
-    private final Box container = new Box("C", Element.FLEX, new Style(), false, 1);
+    private final Box container = new StyleEditor().box("C", Element.FLEX);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
             Style.Decoration.SLICE);
 
     private static Box item(String id, double height) {
-        Style s = new Style();
-        s.height = Value.pt(height);
-        return new Box(id, Element.BLOCK, s, false, 1);
+        return new StyleEditor().height(Value.pt(height)).box(id, Element.BLOCK);
     }
 
     /** Ítem ya maquetado sin fragmentar, en {@code y} de la caja de contenido del contenedor. */
     private static UnitBreaker.Placed placed(Box item, double y, int unit) {
-        double h = ((Value.Points) item.style.height).pt();
+        double h = ((Value.Points) item.style.height()).pt();
         LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
                 Insets.ZERO, List.of(), List.of(), true, true));
         return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit,

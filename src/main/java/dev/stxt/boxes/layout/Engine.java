@@ -235,7 +235,7 @@ public final class Engine {
      * coloca aunque no quepa, y el desbordamiento lo señala {@link Overflow}.</p>
      */
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        if (space.fragmenting() && box.style.rotation != null) {
+        if (space.fragmenting() && box.style.rotation() != null) {
             // Una caja girada no se parte (§5.10): entera o, si no cabe, en la página siguiente.
             LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
             if (!space.atFragmentainerStart()
@@ -276,7 +276,7 @@ public final class Engine {
     }
 
     private LayoutAlgorithm algorithm(Box box) {
-        return switch (box.style.layout) {
+        return switch (box.style.layout()) {
             case BLOCK -> block;
             case INLINE -> inline;
             case FLEX -> flex;

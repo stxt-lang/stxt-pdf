@@ -83,11 +83,11 @@ public final class MulticolLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = engine.intrinsic(flow(box));
         Style s = box.style;
-        int count = s.multicolCount != null ? s.multicolCount : 1;
-        int narrowest = s.multicolWidth == null ? count : 1;
-        double width = s.multicolWidth != null ? s.multicolWidth : 0;
-        return new IntrinsicSizes(narrowest * content.minContent() + (narrowest - 1) * s.multicolGap,
-                count * Math.max(content.maxContent(), width) + (count - 1) * s.multicolGap);
+        int count = s.multicolCount() != null ? s.multicolCount() : 1;
+        int narrowest = s.multicolWidth() == null ? count : 1;
+        double width = s.multicolWidth() != null ? s.multicolWidth() : 0;
+        return new IntrinsicSizes(narrowest * content.minContent() + (narrowest - 1) * s.multicolGap(),
+                count * Math.max(content.maxContent(), width) + (count - 1) * s.multicolGap());
     }
 
     @Override
@@ -150,7 +150,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
             this.resume = first ? null : from.childToken();
             this.contentDone = !first && from.nextChild() > 0;
             Style s = box.style;
-            this.columns = Columns.of(s.multicolCount, s.multicolWidth, s.multicolGap, model.contentWidth());
+            this.columns = Columns.of(s.multicolCount(), s.multicolWidth(), s.multicolGap(), model.contentWidth());
         }
 
         LayoutResult layOut() {
@@ -180,7 +180,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
                 // El Multicol termina en esta página y su contenido no.
                 throw tooTall(limit);
             }
-            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style.multicolFill == Style.Fill.BALANCE) {
+            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style.multicolFill() == Style.Fill.BALANCE) {
                 fill = balance(fill, limit, atStart);
             }
             return result(fill);

@@ -75,7 +75,7 @@ public final class AbsoluteLayout {
     }
 
     private static boolean resolvesHere(PendingAbsolute p, Box box) {
-        return p.box().style.position == Style.Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
+        return p.box().style.position() == Style.Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
     }
 
     /**
@@ -103,14 +103,14 @@ public final class AbsoluteLayout {
         BoxModel model = BoxModel.resolve(box, probe, intrinsic);
         Insets margin = model.margin();
 
-        OptionalDouble left = s.offset.left().resolve(cbWidth);
-        OptionalDouble right = s.offset.right().resolve(cbWidth);
-        OptionalDouble width = s.width.isAuto() ? OptionalDouble.empty() : OptionalDouble.of(model.width());
-        OptionalDouble marginLeft = term(s.margin.left(), margin.left());
-        OptionalDouble marginRight = term(s.margin.right(), margin.right());
+        OptionalDouble left = s.offset().left().resolve(cbWidth);
+        OptionalDouble right = s.offset().right().resolve(cbWidth);
+        OptionalDouble width = s.width().isAuto() ? OptionalDouble.empty() : OptionalDouble.of(model.width());
+        OptionalDouble marginLeft = term(s.margin().left(), margin.left());
+        OptionalDouble marginRight = term(s.margin().right(), margin.right());
         // Tamaños intrínsecos de la caja de borde: los de la caja de margen sin sus márgenes.
         IntrinsicSizes content = width.isPresent()
-                ? IntrinsicSizes.ZERO : intrinsic.get().plus(-Insets.resolve(s.margin, 0).horizontal());
+                ? IntrinsicSizes.ZERO : intrinsic.get().plus(-Insets.resolve(s.margin(), 0).horizontal());
         AbsoluteEquation.Solution h = AbsoluteEquation.horizontal(left, width, right, marginLeft, marginRight,
                 cbWidth, staticX, content);
         if (width.isEmpty()) {
@@ -121,10 +121,10 @@ public final class AbsoluteLayout {
             }
         }
 
-        OptionalDouble top = s.offset.top().resolve(cbHeightBase);
-        OptionalDouble bottom = s.offset.bottom().resolve(cbHeightBase);
-        OptionalDouble marginTop = term(s.margin.top(), margin.top());
-        OptionalDouble marginBottom = term(s.margin.bottom(), margin.bottom());
+        OptionalDouble top = s.offset().top().resolve(cbHeightBase);
+        OptionalDouble bottom = s.offset().bottom().resolve(cbHeightBase);
+        OptionalDouble marginTop = term(s.margin().top(), margin.top());
+        OptionalDouble marginBottom = term(s.margin().bottom(), margin.bottom());
         ConstraintSpace space = ConstraintSpace.fixed(h.size(), OptionalDouble.empty(), cbWidth, cbHeightBase, false);
         BoxModel sized = BoxModel.resolve(box, space, intrinsic);
         OptionalDouble height = sized.height();

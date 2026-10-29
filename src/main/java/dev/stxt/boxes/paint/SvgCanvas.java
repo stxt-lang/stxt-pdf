@@ -251,7 +251,7 @@ public final class SvgCanvas implements Canvas {
             return;
         }
         ImageFile file = resources.images().find(box.image);
-        Rect target = ImageFit.place(box.style.fit, content, file.width(), file.height());
+        Rect target = ImageFit.place(box.style.fit(), content, file.width(), file.height());
         String data;
         try {
             data = Base64.getEncoder().encodeToString(Files.readAllBytes(file.path()));

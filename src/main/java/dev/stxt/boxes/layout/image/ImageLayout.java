@@ -46,13 +46,13 @@ public final class ImageLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style;
         NaturalSize natural = engine.natural(box);
-        double ratio = s.aspectRatio != null ? s.aspectRatio : natural.ratio();
-        OptionalDouble height = s.height.resolve(OptionalDouble.empty());
+        double ratio = s.aspectRatio() != null ? s.aspectRatio() : natural.ratio();
+        OptionalDouble height = s.height().resolve(OptionalDouble.empty());
         double width = natural.width();
         if (height.isPresent()) {
-            OptionalDouble max = s.maxHeight == null ? OptionalDouble.empty() : s.maxHeight.resolve(OptionalDouble.empty());
-            double h = Sizing.constrain(height.getAsDouble(), s.minHeight.resolve(OptionalDouble.empty()).orElse(0), max);
-            double extra = Insets.resolve(s.border, 0).vertical() + Insets.resolve(s.padding, 0).vertical();
+            OptionalDouble max = s.maxHeight() == null ? OptionalDouble.empty() : s.maxHeight().resolve(OptionalDouble.empty());
+            double h = Sizing.constrain(height.getAsDouble(), s.minHeight().resolve(OptionalDouble.empty()).orElse(0), max);
+            double extra = Insets.resolve(s.border(), 0).vertical() + Insets.resolve(s.padding(), 0).vertical();
             width = Math.max(0, h - extra) * ratio;
         }
         return new IntrinsicSizes(width, width);

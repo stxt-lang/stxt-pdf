@@ -80,7 +80,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
 | PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
-| AR-02 | `Style`: 70 campos públicos mutables | Alta | L | pendiente |
+| AR-02 | `Style`: 70 campos públicos mutables | Alta | L | en curso |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | pendiente |
 | AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | pendiente |
 | AR-05 | `Canvas`: interfaz demasiado ancha (ISP) | Media | M | pendiente |
@@ -574,6 +574,13 @@ enorme. Rompe SRP e ISP.
 4. *Congelar*: tras construir el árbol, `Box`/`Style` ya no cambian (AR-03).
 **Aceptación:** ningún campo público no `final` en `Style`; `FlexLayout` depende de `FlexStyle` y `BoxStyle`, no
 del agregado; volcados y PNG sin cambios.
+
+**Sesión 7: hechas las etapas 1 y 2.** Los 80 campos son del package `tree` y cada uno tiene su método de lectura con
+el mismo nombre (`style.fontSize()`); el constructor, `inheriting` y `declared` también son del package. Las 233
+lecturas de fuera de `tree` se migraron con los errores de `javac` como guía (sin buscar y reemplazar a ciegas). Los
+cuatro tests de otros packages que escribían un estilo a mano (`BoxModelTest`, `LineBreakerTest`, `BreakRulesTest`,
+`UnitBreakerTest`) usan `StyleEditor`, un ayudante de los tests en el package `tree`. Quedan las etapas 3 y 4
+(sesión 10).
 
 ### AR-03 · `Box` · Media · M
 

@@ -3,6 +3,7 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,7 +25,7 @@ class TextTransformTest {
     @Test
     void withoutTransformNorSmallCapsTheRunsAreTheSame() {
         List<TextRun> runs = List.of(run("Hola"), run("mundo", "b"));
-        assertSame(runs, TextTransform.apply(runs, new Style()));
+        assertSame(runs, TextTransform.apply(runs, new StyleEditor().style()));
     }
 
     @Test

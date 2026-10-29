@@ -172,7 +172,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         /** Coloca un hijo en flujo; devuelve el resultado de la caja si hay que cortar aquí. */
         LayoutResult place(int i, Box child) {
             BreakToken childToken = i == start ? resume : null;
-            Insets margin = Insets.resolve(child.style.margin, contentWidth);
+            Insets margin = Insets.resolve(child.style.margin(), contentWidth);
             // El hijo que empieza un fragmento de continuación toca el corte: sus márgenes se
             // truncan, salvo si el corte fue forzado. Un hijo reanudado ya no tiene margen superior.
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
@@ -216,7 +216,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
-                    child.style.margin.left(), child.style.margin.right())[0];
+                    child.style.margin().left(), child.style.margin().right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera (§5.5).
             RelativeOffset offset = RelativeOffset.of(child.style, contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();

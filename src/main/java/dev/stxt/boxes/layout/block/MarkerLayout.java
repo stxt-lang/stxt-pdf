@@ -42,11 +42,11 @@ final class MarkerLayout {
         }
         Box marker = item.marker;
         Style s = marker.style;
-        double width = measurer.width(marker.text, s.fontFace(), s.fontSize);
+        double width = measurer.width(marker.text, s.fontFace(), s.fontSize());
         double height = s.usedLineHeight();
         // Su borde derecho, con el espacio final, toca la caja de borde del ítem.
         double x = -border.left() - padding.left() - width;
-        double y = baseline.getAsDouble() - measurer.vertical(s.fontFace()).baseline(0, height, s.fontSize);
+        double y = baseline.getAsDouble() - measurer.vertical(s.fontFace()).baseline(0, height, s.fontSize());
         // La caja del marcador es generada: sin margen, borde ni relleno.
         return Optional.of(new Fragment(marker, x, y, width, height, Insets.ZERO, Insets.ZERO, Insets.ZERO,
                 List.of(), List.of(new TextLine(0, 0, width, height, marker.text)), true, true));
@@ -66,7 +66,7 @@ final class MarkerLayout {
                 TextLine l = f.lines().get(0);
                 Style s = f.box().style;
                 return OptionalDouble.of(measurer.vertical(s.fontFace())
-                        .baseline(contentTop + l.y(), l.height(), s.fontSize));
+                        .baseline(contentTop + l.y(), l.height(), s.fontSize()));
             }
             top = contentTop;
             next = firstInFlow(f.children());

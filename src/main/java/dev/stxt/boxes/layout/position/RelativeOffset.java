@@ -23,13 +23,13 @@ public record RelativeOffset(double dx, double dy) {
      *                 entonces un porcentaje se comporta como {@code auto}
      */
     public static RelativeOffset of(Style s, double cbWidth, OptionalDouble cbHeight) {
-        if (s.position != Style.Position.RELATIVE) {
+        if (s.position() != Style.Position.RELATIVE) {
             return NONE;
         }
-        OptionalDouble left = s.offset.left().resolve(cbWidth);
-        OptionalDouble right = s.offset.right().resolve(cbWidth);
-        OptionalDouble top = s.offset.top().resolve(cbHeight);
-        OptionalDouble bottom = s.offset.bottom().resolve(cbHeight);
+        OptionalDouble left = s.offset().left().resolve(cbWidth);
+        OptionalDouble right = s.offset().right().resolve(cbWidth);
+        OptionalDouble top = s.offset().top().resolve(cbHeight);
+        OptionalDouble bottom = s.offset().bottom().resolve(cbHeight);
         double dx = left.isPresent() ? left.getAsDouble() : -right.orElse(0);
         double dy = top.isPresent() ? top.getAsDouble() : -bottom.orElse(0);
         return new RelativeOffset(dx, dy);

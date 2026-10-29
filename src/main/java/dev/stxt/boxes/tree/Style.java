@@ -28,6 +28,9 @@ import java.util.Map;
  * valores del documento: salen del elemento ({@code Text} es {@code INLINE}; {@code Absolute},
  * un {@code BLOCK} {@code ABSOLUTE}).</p>
  *
+ * <p>Cada propiedad se lee con el método del mismo nombre ({@code style.fontSize()}). Los campos son del
+ * package {@code tree}, el único que escribe: fuera de él un estilo solo se lee.</p>
+ *
  * <p><strong>Hilos:</strong> como {@link Box}, se escribe solo mientras {@link BoxTreeBuilder} construye el
  * árbol y después se lee.</p>
  */
@@ -113,120 +116,124 @@ public final class Style {
         }
     }
 
+    /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
+    Style() {
+    }
+
     // --- Caja --------------------------------------------------------------------------------
-    public Layout layout = Layout.BLOCK;
-    public Position position = Position.STATIC;
-    public Sides<Value> offset = Sides.all(Value.AUTO);
+    Layout layout = Layout.BLOCK;
+    Position position = Position.STATIC;
+    Sides<Value> offset = Sides.all(Value.AUTO);
     /** {@code null} = auto. */
-    public Integer layer;
+    Integer layer;
     /** Solo en un {@code Fixed}: las páginas en que sale. */
-    public Pages pages = Pages.ALL;
-    public boolean isolate;
+    Pages pages = Pages.ALL;
+    boolean isolate;
     /**
      * {@code Rotate} y {@code Rotate origin} (§5.6), solo en {@code Relative}, {@code Absolute},
      * {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
      */
-    public Rotation rotation;
+    Rotation rotation;
 
     // --- Dimensiones ---------------------------------------------------------------------------
-    public Value width = Value.AUTO;
-    public Value height = Value.AUTO;
-    public Value minWidth = Value.AUTO;
-    public Value minHeight = Value.AUTO;
+    Value width = Value.AUTO;
+    Value height = Value.AUTO;
+    Value minWidth = Value.AUTO;
+    Value minHeight = Value.AUTO;
     /** {@code null} = sin máximo. */
-    public Value maxWidth;
+    Value maxWidth;
     /** {@code null} = sin máximo. */
-    public Value maxHeight;
+    Value maxHeight;
     /** Ancho / alto; {@code null} = sin proporción. */
-    public Double aspectRatio;
+    Double aspectRatio;
 
     // --- Modelo de caja ------------------------------------------------------------------------
-    public Sides<Value> margin = Sides.all(Value.pt(0));
-    public Sides<Value> padding = Sides.all(Value.pt(0));
-    public Sides<Value> border = Sides.all(Value.pt(0));
+    Sides<Value> margin = Sides.all(Value.pt(0));
+    Sides<Value> padding = Sides.all(Value.pt(0));
+    Sides<Value> border = Sides.all(Value.pt(0));
 
     // --- Pintado (no afecta al layout) ---------------------------------------------------------
     /** {@code null} = transparente. */
-    public Paint background;
+    Paint background;
     /** Heredable. */
-    public String color = "#000000";
+    String color = "#000000";
     /** Un color por lado; {@code null} = igual que {@link #color}. */
-    public Sides<String> borderColor;
+    Sides<String> borderColor;
     /** Esquinas redondeadas, de la caja de borde; solo pintado. */
-    public Corners<Value> radius = Corners.all(Value.pt(0));
+    Corners<Value> radius = Corners.all(Value.pt(0));
 
     // --- Texto (heredables) ---------------------------------------------------------------------
     /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (§6). */
-    public String font;
-    public FontWeight fontWeight = FontWeight.NORMAL;
-    public FontStyle fontStyle = FontStyle.NORMAL;
+    String font;
+    FontWeight fontWeight = FontWeight.NORMAL;
+    FontStyle fontStyle = FontStyle.NORMAL;
     /** {@code NaN} = sin declarar, que es un error en una caja con texto (§6). */
-    public double fontSize = Double.NaN;
+    double fontSize = Double.NaN;
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
-    public Value lineHeight;
-    public TextAlign textAlign = TextAlign.LEFT;
-    public TextWrap textWrap = TextWrap.AUTO;
-    public Inline inline = Inline.NONE;
-    public Transform transform = Transform.NONE;
+    Value lineHeight;
+    TextAlign textAlign = TextAlign.LEFT;
+    TextWrap textWrap = TextWrap.AUTO;
+    Inline inline = Inline.NONE;
+    Transform transform = Transform.NONE;
     /** Separación entre letras, en puntos; puede ser negativa. */
-    public double letterSpacing;
-    public boolean smallCaps;
+    double letterSpacing;
+    boolean smallCaps;
     /** {@code Ligatures}: si el texto se mide y se pinta con las ligaduras de la fuente (§4.4). Se hereda. */
-    public boolean ligatures;
-    public WhiteSpace whiteSpace = WhiteSpace.NORMAL;
+    boolean ligatures;
+    WhiteSpace whiteSpace = WhiteSpace.NORMAL;
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
-    public int tabSize = 4;
+    int tabSize = 4;
     /** {@code Numbered}: si los encabezados se numeran (§5.13). Se hereda: la lee el encabezado. */
-    public boolean numbered;
+    boolean numbered;
     /**
      * Idioma y configuración regional del texto: el de {@code Language} de {@code Document} (§4.1) en
      * la raíz y, si una caja declara {@code Language} en {@code Typography} (§4.4), el suyo. Se hereda.
      */
-    public Locale locale = Locale.ROOT;
+    Locale locale = Locale.ROOT;
 
     // --- Flex ------------------------------------------------------------------------------------
-    public Direction flexDirection = Direction.ROW;
-    public boolean flexWrap;
-    public Distribution flexMainAxis = Distribution.START;
-    public Alignment flexCrossAxis = Alignment.STRETCH;
-    public Distribution flexLines = Distribution.STRETCH;
+    Direction flexDirection = Direction.ROW;
+    boolean flexWrap;
+    Distribution flexMainAxis = Distribution.START;
+    Alignment flexCrossAxis = Alignment.STRETCH;
+    Distribution flexLines = Distribution.STRETCH;
 
     // --- Hueco (flex y grid) -------------------------------------------------------------------
-    public Value rowGap = Value.pt(0);
-    public Value columnGap = Value.pt(0);
+    Value rowGap = Value.pt(0);
+    Value columnGap = Value.pt(0);
 
     // --- Grid ------------------------------------------------------------------------------------
-    public List<Value> gridColumns = List.of();
-    public List<Value> gridRows = List.of();
+    List<Value> gridColumns = List.of();
+    List<Value> gridRows = List.of();
     /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
-    public GridAreas gridAreas = GridAreas.NONE;
-    public Direction gridFlow = Direction.ROW;
-    public Alignment gridHorizontal = Alignment.STRETCH;
-    public Alignment gridVertical = Alignment.STRETCH;
+    GridAreas gridAreas = GridAreas.NONE;
+    Direction gridFlow = Direction.ROW;
+    Alignment gridHorizontal = Alignment.STRETCH;
+    Alignment gridVertical = Alignment.STRETCH;
 
     // --- Item (como hijo de flex o grid) -----------------------------------------------------
-    public double itemGrow = 0;
-    public double itemShrink = 1;
-    public Value itemBasis = Value.AUTO;
+    double itemGrow = 0;
+    double itemShrink = 1;
+    Value itemBasis = Value.AUTO;
     /** {@code null} = la del contenedor. */
-    public Alignment itemCrossAxis;
+    Alignment itemCrossAxis;
     /**
      * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
      * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
      */
-    public Cell itemArea = Cell.AUTO;
+    Cell itemArea = Cell.AUTO;
     /** {@code null} = la del contenedor. */
-    public Alignment itemHorizontal;
+    Alignment itemHorizontal;
     /** {@code null} = la del contenedor. */
-    public Alignment itemVertical;
+    Alignment itemVertical;
 
     // --- Lista ---------------------------------------------------------------------------------
     /** Marcador de los ítems de una {@code List}; {@code null} en el resto de cajas. */
-    public Marker listMarker;
+    Marker listMarker;
     /** Número del primer ítem de una {@code List}. */
-    public int listStart = 1;
+    int listStart = 1;
     /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
-    public Integer listNumber;
+    Integer listNumber;
 
     // --- Enlace ----------------------------------------------------------------------------------
     /**
@@ -234,46 +241,397 @@ public final class Style {
      * = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella,
      * pero no lleva enlace propio.
      */
-    public String link;
+    String link;
     /** {@code Header} de una {@code Cell}: es la cabecera de su fila (§5.15). No se hereda. */
-    public boolean header;
+    boolean header;
     /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
-    public boolean inContents = true;
+    boolean inContents = true;
 
     // --- Imagen ----------------------------------------------------------------------------------
     /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
-    public String alt;
-    public Fit fit = Fit.CONTAIN;
+    String alt;
+    Fit fit = Fit.CONTAIN;
 
     // --- Contents --------------------------------------------------------------------------------
     /** Primer y último nivel de encabezado que lista un {@code Contents} ({@code Levels}). */
-    public int contentsFrom = 1;
-    public int contentsTo = 3;
+    int contentsFrom = 1;
+    int contentsTo = 3;
     /** {@code Leader} de un {@code Contents}; también lo lleva la guía generada de cada entrada. */
-    public Leader contentsLeader = Leader.DOTS;
+    Leader contentsLeader = Leader.DOTS;
 
     // --- Multicol --------------------------------------------------------------------------------
     /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
-    public Integer multicolCount;
+    Integer multicolCount;
     /** {@code Column width}, en puntos; {@code null} = sin declarar. */
-    public Double multicolWidth;
+    Double multicolWidth;
     /** {@code Column gap}, en puntos. */
-    public double multicolGap = 0;
+    double multicolGap = 0;
     /** Grosor de la línea entre columnas ({@code Rule}); 0 = sin línea. */
-    public double multicolRule = 0;
+    double multicolRule = 0;
     /** {@code Rule color}; {@code null} = igual que {@link #color}. */
-    public String multicolRuleColor;
-    public Fill multicolFill = Fill.BALANCE;
+    String multicolRuleColor;
+    Fill multicolFill = Fill.BALANCE;
 
     // --- Fragmentación ---------------------------------------------------------------------------
-    public Break breakBefore = Break.AUTO;
-    public Break breakAfter = Break.AUTO;
-    public boolean avoidBreakInside;
+    Break breakBefore = Break.AUTO;
+    Break breakAfter = Break.AUTO;
+    boolean avoidBreakInside;
     /** Heredable. */
-    public int widows = 2;
+    int widows = 2;
     /** Heredable. */
-    public int orphans = 2;
-    public Decoration decoration = Decoration.SLICE;
+    int orphans = 2;
+    Decoration decoration = Decoration.SLICE;
+
+    // === Lectura: un método por propiedad, con el nombre del campo ===============================
+
+    // --- Caja ------------------------------------------------------------------------------------
+    public Layout layout() {
+        return layout;
+    }
+
+    public Position position() {
+        return position;
+    }
+
+    public Sides<Value> offset() {
+        return offset;
+    }
+
+    public Integer layer() {
+        return layer;
+    }
+
+    public Pages pages() {
+        return pages;
+    }
+
+    public boolean isolate() {
+        return isolate;
+    }
+
+    public Rotation rotation() {
+        return rotation;
+    }
+
+
+    // --- Dimensiones -----------------------------------------------------------------------------
+    public Value width() {
+        return width;
+    }
+
+    public Value height() {
+        return height;
+    }
+
+    public Value minWidth() {
+        return minWidth;
+    }
+
+    public Value minHeight() {
+        return minHeight;
+    }
+
+    public Value maxWidth() {
+        return maxWidth;
+    }
+
+    public Value maxHeight() {
+        return maxHeight;
+    }
+
+    public Double aspectRatio() {
+        return aspectRatio;
+    }
+
+
+    // --- Modelo de caja --------------------------------------------------------------------------
+    public Sides<Value> margin() {
+        return margin;
+    }
+
+    public Sides<Value> padding() {
+        return padding;
+    }
+
+    public Sides<Value> border() {
+        return border;
+    }
+
+
+    // --- Pintado (no afecta al layout) -----------------------------------------------------------
+    public Paint background() {
+        return background;
+    }
+
+    public String color() {
+        return color;
+    }
+
+    public Sides<String> borderColor() {
+        return borderColor;
+    }
+
+    public Corners<Value> radius() {
+        return radius;
+    }
+
+
+    // --- Texto (heredables) ----------------------------------------------------------------------
+    public String font() {
+        return font;
+    }
+
+    public FontWeight fontWeight() {
+        return fontWeight;
+    }
+
+    public FontStyle fontStyle() {
+        return fontStyle;
+    }
+
+    public double fontSize() {
+        return fontSize;
+    }
+
+    public Value lineHeight() {
+        return lineHeight;
+    }
+
+    public TextAlign textAlign() {
+        return textAlign;
+    }
+
+    public TextWrap textWrap() {
+        return textWrap;
+    }
+
+    public Inline inline() {
+        return inline;
+    }
+
+    public Transform transform() {
+        return transform;
+    }
+
+    public double letterSpacing() {
+        return letterSpacing;
+    }
+
+    public boolean smallCaps() {
+        return smallCaps;
+    }
+
+    public boolean ligatures() {
+        return ligatures;
+    }
+
+    public WhiteSpace whiteSpace() {
+        return whiteSpace;
+    }
+
+    public int tabSize() {
+        return tabSize;
+    }
+
+    public boolean numbered() {
+        return numbered;
+    }
+
+    public Locale locale() {
+        return locale;
+    }
+
+
+    // --- Flex ------------------------------------------------------------------------------------
+    public Direction flexDirection() {
+        return flexDirection;
+    }
+
+    public boolean flexWrap() {
+        return flexWrap;
+    }
+
+    public Distribution flexMainAxis() {
+        return flexMainAxis;
+    }
+
+    public Alignment flexCrossAxis() {
+        return flexCrossAxis;
+    }
+
+    public Distribution flexLines() {
+        return flexLines;
+    }
+
+
+    // --- Hueco (flex y grid) ---------------------------------------------------------------------
+    public Value rowGap() {
+        return rowGap;
+    }
+
+    public Value columnGap() {
+        return columnGap;
+    }
+
+
+    // --- Grid ------------------------------------------------------------------------------------
+    public List<Value> gridColumns() {
+        return gridColumns;
+    }
+
+    public List<Value> gridRows() {
+        return gridRows;
+    }
+
+    public GridAreas gridAreas() {
+        return gridAreas;
+    }
+
+    public Direction gridFlow() {
+        return gridFlow;
+    }
+
+    public Alignment gridHorizontal() {
+        return gridHorizontal;
+    }
+
+    public Alignment gridVertical() {
+        return gridVertical;
+    }
+
+
+    // --- Item (como hijo de flex o grid) ---------------------------------------------------------
+    public double itemGrow() {
+        return itemGrow;
+    }
+
+    public double itemShrink() {
+        return itemShrink;
+    }
+
+    public Value itemBasis() {
+        return itemBasis;
+    }
+
+    public Alignment itemCrossAxis() {
+        return itemCrossAxis;
+    }
+
+    public Cell itemArea() {
+        return itemArea;
+    }
+
+    public Alignment itemHorizontal() {
+        return itemHorizontal;
+    }
+
+    public Alignment itemVertical() {
+        return itemVertical;
+    }
+
+
+    // --- Lista -----------------------------------------------------------------------------------
+    public Marker listMarker() {
+        return listMarker;
+    }
+
+    public int listStart() {
+        return listStart;
+    }
+
+    public Integer listNumber() {
+        return listNumber;
+    }
+
+
+    // --- Enlace ----------------------------------------------------------------------------------
+    public String link() {
+        return link;
+    }
+
+    public boolean header() {
+        return header;
+    }
+
+    public boolean inContents() {
+        return inContents;
+    }
+
+
+    // --- Imagen ----------------------------------------------------------------------------------
+    public String alt() {
+        return alt;
+    }
+
+    public Fit fit() {
+        return fit;
+    }
+
+
+    // --- Contents --------------------------------------------------------------------------------
+    public int contentsFrom() {
+        return contentsFrom;
+    }
+
+    public int contentsTo() {
+        return contentsTo;
+    }
+
+    public Leader contentsLeader() {
+        return contentsLeader;
+    }
+
+
+    // --- Multicol --------------------------------------------------------------------------------
+    public Integer multicolCount() {
+        return multicolCount;
+    }
+
+    public Double multicolWidth() {
+        return multicolWidth;
+    }
+
+    public double multicolGap() {
+        return multicolGap;
+    }
+
+    public double multicolRule() {
+        return multicolRule;
+    }
+
+    public String multicolRuleColor() {
+        return multicolRuleColor;
+    }
+
+    public Fill multicolFill() {
+        return multicolFill;
+    }
+
+
+    // --- Fragmentación ---------------------------------------------------------------------------
+    public Break breakBefore() {
+        return breakBefore;
+    }
+
+    public Break breakAfter() {
+        return breakAfter;
+    }
+
+    public boolean avoidBreakInside() {
+        return avoidBreakInside;
+    }
+
+    public int widows() {
+        return widows;
+    }
+
+    public int orphans() {
+        return orphans;
+    }
+
+    public Decoration decoration() {
+        return decoration;
+    }
 
     /**
      * Línea del documento de cada propiedad declarada, por su clave ({@link PropertyKey}): el
@@ -292,7 +650,7 @@ public final class Style {
             PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT);
 
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
-    public static Style inheriting(Style parent) {
+    static Style inheriting(Style parent) {
         Style s = new Style();
         if (parent != null) {
             s.color = parent.color;
@@ -324,7 +682,7 @@ public final class Style {
     }
 
     /** Apunta la línea donde se declara una propiedad. */
-    public void declared(String property, int line) {
+    void declared(String property, int line) {
         lines.put(property, line);
     }
 

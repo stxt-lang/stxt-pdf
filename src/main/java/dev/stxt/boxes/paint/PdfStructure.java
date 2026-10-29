@@ -131,25 +131,25 @@ final class PdfStructure {
             box.children.forEach(child -> build(child, parent));
             return;
         }
-        if (box.isImage() && box.style.alt == null || box.element == Element.CONTENTS_LEADER) {
+        if (box.isImage() && box.style.alt() == null || box.element == Element.CONTENTS_LEADER) {
             // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
             return;
         }
         // Una imagen con enlace es el contenido de su Link: Link → Figure.
-        PDStructureNode owner = box.isImage() && box.style.link != null ? newLink(box, parent) : parent;
+        PDStructureNode owner = box.isImage() && box.style.link() != null ? newLink(box, parent) : parent;
         PDStructureElement e = new PDStructureElement(type(box), owner);
         owner.appendKid(e);
         elements.put(box, e);
         Box outer = box.element == Element.SECTION ? root : box.parent;
-        if (outer != null && !box.style.locale.equals(outer.style.locale)) {
+        if (outer != null && !box.style.locale().equals(outer.style.locale())) {
             // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
-            e.setLanguage(box.style.locale.toLanguageTag());
+            e.setLanguage(box.style.locale().toLanguageTag());
         }
         if (box.headingLevel() > 0) {
             headings.add(box);
         }
         if (box.isImage()) {
-            e.setAlternateDescription(box.style.alt);
+            e.setAlternateDescription(box.style.alt());
         }
         if (box.hasText() && TextTransform.applies(box.style) && !Reference.contains(box.text)
                 && !PageNumbers.contains(box.text)) {
@@ -159,7 +159,7 @@ final class PdfStructure {
         }
         if (box.element == Element.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();
-            numbering.setListNumbering(listNumbering(box.style.listMarker));
+            numbering.setListNumbering(listNumbering(box.style.listMarker()));
             e.addAttribute(numbering);
         }
         if (box.element == Element.TABLE) {
@@ -180,7 +180,7 @@ final class PdfStructure {
         }
         content = linked(box, content);
         for (Box child : box.children) {
-            if (child.style.position != Style.Position.FIXED) {
+            if (child.style.position() != Style.Position.FIXED) {
                 build(child, content);
             }
         }
@@ -192,7 +192,7 @@ final class PdfStructure {
      * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
      */
     private PDStructureNode linked(Box box, PDStructureNode content) {
-        if (box.style.link == null || box.isImage()) {
+        if (box.style.link() == null || box.isImage()) {
             return content;
         }
         PDStructureElement link = newLink(box, content);
@@ -213,10 +213,10 @@ final class PdfStructure {
 
     /** Si la caja o lo que contiene tiene algo que leer: texto, un marcador o una imagen con {@code Alt}. */
     private static boolean hasContent(Box box) {
-        if (box.hasText() || box.marker != null || box.isImage() && box.style.alt != null) {
+        if (box.hasText() || box.marker != null || box.isImage() && box.style.alt() != null) {
             return true;
         }
-        return box.children.stream().anyMatch(c -> c.style.position != Style.Position.FIXED && hasContent(c));
+        return box.children.stream().anyMatch(c -> c.style.position() != Style.Position.FIXED && hasContent(c));
     }
 
     /**
@@ -231,7 +231,7 @@ final class PdfStructure {
         PDStructureElement row = null;
         int rowIndex = -1;
         for (Box cell : table.children) {
-            Cell p = cell.style.itemArea;
+            Cell p = cell.style.itemArea();
             int group = group(cell);
             if (groups[group] == null) {
                 groups[group] = new PDStructureElement(TABLE_GROUPS[group], e);
@@ -245,11 +245,11 @@ final class PdfStructure {
             PDStructureElement c = new PDStructureElement(type(cell), row);
             row.appendKid(c);
             elements.put(cell, c);
-            if (group == 0 || cell.style.header || p.rows() > 1 || p.columns() > 1) {
+            if (group == 0 || cell.style.header() || p.rows() > 1 || p.columns() > 1) {
                 PDTableAttributeObject attributes = new PDTableAttributeObject();
                 if (group == 0) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_COLUMN);
-                } else if (cell.style.header) {
+                } else if (cell.style.header()) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_ROW);
                 }
                 if (p.rows() > 1) {
@@ -265,7 +265,7 @@ final class PdfStructure {
             }
             PDStructureNode content = linked(cell, c);
             for (Box child : cell.children) {
-                if (child.style.position != Style.Position.FIXED) {
+                if (child.style.position() != Style.Position.FIXED) {
                     build(child, content);
                 }
             }
@@ -285,11 +285,11 @@ final class PdfStructure {
     private static int group(Box cell) {
         Box table = cell.parent;
         // Fila desde 0 de la celda en el grid de la tabla; la colocación la da TableBuilder.
-        int row = cell.style.itemArea.row() - 1;
+        int row = cell.style.itemArea().row() - 1;
         if (row < table.headRows) {
             return 0;
         }
-        int rows = table.children.stream().mapToInt(c -> c.style.itemArea.row() - 1 + c.style.itemArea.rows())
+        int rows = table.children.stream().mapToInt(c -> c.style.itemArea().row() - 1 + c.style.itemArea().rows())
                 .max().orElse(0);
         return row >= rows - table.footRows ? 2 : 1;
     }
@@ -368,7 +368,7 @@ final class PdfStructure {
             case LIST -> "L";
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
-            case CELL -> group(box) == 0 || box.style.header ? "TH" : "TD";
+            case CELL -> group(box) == 0 || box.style.header() ? "TH" : "TD";
             case IMAGE -> "Figure";
             case CONTENTS -> "TOC";
             case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,

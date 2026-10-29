@@ -167,7 +167,7 @@ public final class Paginator {
         List<Fragment> fragments = new ArrayList<>();
         for (int q = 0; q < queue.size(); q++) {
             Queued item = queue.get(q);
-            if (!item.pending().box().style.pages.includes(item.number(), item.total())) {
+            if (!item.pending().box().style.pages().includes(item.number(), item.total())) {
                 continue;
             }
             if (numbered && printed == 0) {

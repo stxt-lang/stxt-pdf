@@ -127,7 +127,7 @@ public final class BreakRules {
 
     /** Calidad del corte entre dos cajas hermanas en flujo: {@code avoid} en cualquiera lo empeora. */
     public static int between(Box before, Box after) {
-        return before.style.breakAfter == Style.Break.AVOID || after.style.breakBefore == Style.Break.AVOID
+        return before.style.breakAfter() == Style.Break.AVOID || after.style.breakBefore() == Style.Break.AVOID
                 ? BreakAppeal.VIOLATES_AVOID_BETWEEN : BreakAppeal.PERFECT_BREAK;
     }
 
@@ -149,14 +149,14 @@ public final class BreakRules {
      * @return {@code PAGE}, {@code COLUMN} o {@code AUTO}
      */
     public static Style.Break forcedBefore(Box box) {
-        Style.Break own = forced(box.style.breakBefore);
+        Style.Break own = forced(box.style.breakBefore());
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own : stronger(own, fromInside(box, forcedBefore(children.get(0))));
     }
 
     /** El corte forzado después de la caja o, si es un bloque, de su último hijo en flujo (ver {@link #forcedBefore}). */
     public static Style.Break forcedAfter(Box box) {
-        Style.Break own = forced(box.style.breakAfter);
+        Style.Break own = forced(box.style.breakAfter());
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own
                 : stronger(own, fromInside(box, forcedAfter(children.get(children.size() - 1))));
@@ -177,12 +177,12 @@ public final class BreakRules {
 
     /** Los cortes forzados de un bloque y de un {@code Multicol} son también los de sus hijos de los extremos. */
     private static boolean propagates(Box box) {
-        return box.style.layout == Style.Layout.BLOCK || box.style.layout == Style.Layout.MULTICOL;
+        return box.style.layout() == Style.Layout.BLOCK || box.style.layout() == Style.Layout.MULTICOL;
     }
 
     /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Multicol}, solo el de página. */
     private static Style.Break fromInside(Box box, Style.Break forced) {
-        return box.style.layout == Style.Layout.MULTICOL && forced == Style.Break.COLUMN ? Style.Break.AUTO : forced;
+        return box.style.layout() == Style.Layout.MULTICOL && forced == Style.Break.COLUMN ? Style.Break.AUTO : forced;
     }
 
     private static Style.Break forced(Style.Break b) {
@@ -227,7 +227,7 @@ public final class BreakRules {
 
     /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link BreakAppeal#FORCED}. */
     public static int inside(Box box, int appeal) {
-        return box.style.avoidBreakInside ? BreakAppeal.FORCED : appeal;
+        return box.style.avoidBreakInside() ? BreakAppeal.FORCED : appeal;
     }
 
     // --- Elección del corte -----------------------------------------------------------------------

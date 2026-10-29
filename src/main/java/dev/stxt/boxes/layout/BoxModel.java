@@ -63,13 +63,13 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         Style s = box.style;
         double baseWidth = space.percentBaseWidth();
         OptionalDouble baseHeight = space.percentBaseHeight();
-        Insets margin = Insets.resolve(s.margin, baseWidth);
-        Insets border = Insets.resolve(s.border, baseWidth);
-        Insets padding = Insets.resolve(s.padding, baseWidth);
+        Insets margin = Insets.resolve(s.margin(), baseWidth);
+        Insets border = Insets.resolve(s.border(), baseWidth);
+        Insets padding = Insets.resolve(s.padding(), baseWidth);
 
-        double minHeight = s.minHeight.resolve(baseHeight).orElse(0);
-        OptionalDouble maxHeight = s.maxHeight == null
-                ? OptionalDouble.empty() : s.maxHeight.resolve(baseHeight);
+        double minHeight = s.minHeight().resolve(baseHeight).orElse(0);
+        OptionalDouble maxHeight = s.maxHeight() == null
+                ? OptionalDouble.empty() : s.maxHeight().resolve(baseHeight);
         if (natural != null) {
             return replaced(s, space, intrinsic, natural, margin, border, padding, minHeight, maxHeight);
         }
@@ -87,16 +87,16 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         } else if (space.contentHeight()) {
             height = OptionalDouble.empty();
         } else {
-            height = s.height.resolve(baseHeight);
-            if (height.isEmpty() && s.aspectRatio != null) {
+            height = s.height().resolve(baseHeight);
+            if (height.isEmpty() && s.aspectRatio() != null) {
                 // Simplificación: la proporción se aplica a la caja de borde.
-                height = OptionalDouble.of(width / s.aspectRatio);
+                height = OptionalDouble.of(width / s.aspectRatio());
             }
             if (height.isPresent()) {
                 height = OptionalDouble.of(Sizing.constrain(height.getAsDouble(), minHeight, maxHeight));
             }
         }
-        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.decoration);
+        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.decoration());
     }
 
     /**
@@ -111,7 +111,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     private static BoxModel replaced(Style s, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
                                      NaturalSize natural, Insets margin, Insets border, Insets padding,
                                      double minHeight, OptionalDouble maxHeight) {
-        double ratio = s.aspectRatio != null ? s.aspectRatio : natural.ratio();
+        double ratio = s.aspectRatio() != null ? s.aspectRatio() : natural.ratio();
         double extraWidth = border.horizontal() + padding.horizontal();
         double extraHeight = border.vertical() + padding.vertical();
         OptionalDouble declaredHeight;
@@ -120,14 +120,14 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         } else if (space.contentHeight()) {
             declaredHeight = OptionalDouble.empty();
         } else {
-            declaredHeight = s.height.resolve(space.percentBaseHeight());
+            declaredHeight = s.height().resolve(space.percentBaseHeight());
             if (declaredHeight.isPresent()) {
                 declaredHeight = OptionalDouble.of(Sizing.constrain(declaredHeight.getAsDouble(), minHeight, maxHeight));
             }
         }
 
         double baseWidth = space.percentBaseWidth();
-        boolean autoWidth = !space.fixedWidth() && s.width.isAuto();
+        boolean autoWidth = !space.fixedWidth() && s.width().isAuto();
         double width;
         if (space.fixedWidth()) {
             width = space.availableWidth();
@@ -150,7 +150,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             }
         }
         return new BoxModel(margin, border, padding, width, OptionalDouble.of(height), minHeight, maxHeight,
-                s.decoration);
+                s.decoration());
     }
 
     /**
@@ -160,18 +160,18 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
      */
     public static double constrainWidth(Style s, double width, double baseWidth) {
         return Sizing.constrain(width,
-                s.minWidth.resolve(baseWidth).orElse(0),
-                s.maxWidth == null ? OptionalDouble.empty() : s.maxWidth.resolve(baseWidth));
+                s.minWidth().resolve(baseWidth).orElse(0),
+                s.maxWidth() == null ? OptionalDouble.empty() : s.maxWidth().resolve(baseWidth));
     }
 
     /** Ancho de caja de borde antes de mínimo y máximo. */
     private static double specifiedWidth(Style s, ConstraintSpace space, Insets margin,
                                          Supplier<IntrinsicSizes> intrinsic) {
-        OptionalDouble declared = s.width.resolve(space.percentBaseWidth());
+        OptionalDouble declared = s.width().resolve(space.percentBaseWidth());
         if (declared.isPresent()) {
             return declared.getAsDouble();
         }
-        if (s.width instanceof Value.Keyword k && k != Value.Keyword.AUTO) {
+        if (s.width() instanceof Value.Keyword k && k != Value.Keyword.AUTO) {
             // Los intrínsecos son de la caja de margen.
             IntrinsicSizes i = intrinsic.get();
             double marginBox = switch (k) {
@@ -193,18 +193,18 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
      */
     public static IntrinsicSizes intrinsic(Box box, IntrinsicSizes content) {
         Style s = box.style;
-        Insets border = Insets.resolve(s.border, 0);
-        Insets padding = Insets.resolve(s.padding, 0);
+        Insets border = Insets.resolve(s.border(), 0);
+        Insets padding = Insets.resolve(s.padding(), 0);
         double extra = border.horizontal() + padding.horizontal();
-        OptionalDouble fixed = s.width.resolve(OptionalDouble.empty());
+        OptionalDouble fixed = s.width().resolve(OptionalDouble.empty());
         IntrinsicSizes r = fixed.isPresent()
                 ? new IntrinsicSizes(fixed.getAsDouble(), fixed.getAsDouble())
                 : content.plus(extra);
-        double min = s.minWidth.resolve(OptionalDouble.empty()).orElse(0);
-        OptionalDouble max = s.maxWidth == null
-                ? OptionalDouble.empty() : s.maxWidth.resolve(OptionalDouble.empty());
+        double min = s.minWidth().resolve(OptionalDouble.empty()).orElse(0);
+        OptionalDouble max = s.maxWidth() == null
+                ? OptionalDouble.empty() : s.maxWidth().resolve(OptionalDouble.empty());
         r = new IntrinsicSizes(Sizing.constrain(r.minContent(), min, max), Sizing.constrain(r.maxContent(), min, max));
-        return r.plus(Insets.resolve(s.margin, 0).horizontal());
+        return r.plus(Insets.resolve(s.margin(), 0).horizontal());
     }
 
     public double contentWidth() {
