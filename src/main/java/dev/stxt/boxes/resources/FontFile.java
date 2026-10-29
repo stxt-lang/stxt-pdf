@@ -42,6 +42,8 @@ public final class FontFile {
     private static final int MAX_LIGATURE_WORDS = 50_000;
     /** Avance aún sin calcular en {@link #bmpAdvance}. */
     private static final int UNKNOWN = -1;
+    private static final byte HAS = 1;
+    private static final byte LACKS = 2;
 
     private final Path path;
     private final FontFace face;
@@ -54,6 +56,8 @@ public final class FontFile {
     private final int[] glyphAdvance;
     /** Avance de cada carácter del plano básico, o {@link #UNKNOWN}. */
     private final int[] bmpAdvance = new int[BMP];
+    /** Si la fuente tiene un glifo para cada carácter del plano básico: 0 sin mirar, {@link #HAS} o {@link #LACKS}. */
+    private final byte[] bmpHas = new byte[BMP];
     /** Las palabras que ya se han medido con ligaduras, con su ancho en milésimas: aplicar GSUB es caro. */
     private final ConcurrentHashMap<String, Integer> ligatureWords = new ConcurrentHashMap<>();
     /** Lo mismo que aplica PDFBox al pintar; {@code null} hasta que se pide y si la fuente no tiene GSUB. */
@@ -121,9 +125,21 @@ public final class FontFile {
         return decoration;
     }
 
-    /** Si la fuente tiene un glifo para el carácter. */
+    /**
+     * Si la fuente tiene un glifo para el carácter. Los del plano básico se memorizan: se pregunta por cada carácter
+     * del documento antes de maquetar (PF-06). Como {@link #bmpAdvance}, varios hilos pueden escribir la misma
+     * respuesta a la vez.
+     */
     public boolean has(int codePoint) {
-        return cmap.getGlyphId(codePoint) != 0;
+        if (codePoint >= BMP) {
+            return cmap.getGlyphId(codePoint) != 0;
+        }
+        byte known = bmpHas[codePoint];
+        if (known == 0) {
+            known = cmap.getGlyphId(codePoint) != 0 ? HAS : LACKS;
+            bmpHas[codePoint] = known;
+        }
+        return known == HAS;
     }
 
     /** Ancho del texto en puntos, sin ligaduras. Los caracteres sin glifo miden lo que el glifo {@code .notdef}. */

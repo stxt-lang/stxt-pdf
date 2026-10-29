@@ -86,32 +86,37 @@ public final class PdfMetrics implements TextMeasurer {
             FontFile font = font(box, fonts, run.format().face(s.typography().fontFace()), start);
             String text = run.text();
             for (int i = 0; i < text.length(); ) {
-                String marker = text.startsWith(PageNumbers.PAGES, i) ? PageNumbers.PAGES
-                        : text.startsWith(PageNumbers.PAGE, i) ? PageNumbers.PAGE : null;
-                if (marker != null) {
-                    // Se pinta como cifras.
-                    for (char d : DIGITS.toCharArray()) {
-                        requireGlyph(box, font, d, start + i);
-                    }
-                    i += marker.length();
-                    continue;
-                }
-                Reference reference = Reference.at(text, i);
-                if (reference != null) {
-                    // Una página o un número, que se pintan con cifras (o letras, en las listas).
-                    for (char d : DIGITS.toCharArray()) {
-                        requireGlyph(box, font, d, start + i);
-                    }
-                    i = reference.end();
-                    continue;
-                }
                 int cp = text.codePointAt(i);
+                if (cp == '{') {
+                    // {page}, {pages} y las referencias empiezan por llave: solo entonces se buscan (PF-06).
+                    int end = markerEnd(text, i);
+                    if (end > i) {
+                        // Una página o un número, que se pintan con cifras (o letras, en las listas).
+                        for (char d : DIGITS.toCharArray()) {
+                            requireGlyph(box, font, d, start + i);
+                        }
+                        i = end;
+                        continue;
+                    }
+                }
                 // Los espacios en blanco del documento se pintan como espacios (§5.4).
                 requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
                 i += Character.charCount(cp);
             }
             start += text.length();
         }
+    }
+
+    /** Dónde acaba el {@code {page}}, el {@code {pages}} o la referencia que empieza en {@code i}; {@code i} si no hay. */
+    private static int markerEnd(String text, int i) {
+        if (text.startsWith(PageNumbers.PAGES, i)) {
+            return i + PageNumbers.PAGES.length();
+        }
+        if (text.startsWith(PageNumbers.PAGE, i)) {
+            return i + PageNumbers.PAGE.length();
+        }
+        Reference reference = Reference.at(text, i);
+        return reference != null ? reference.end() : i;
     }
 
     /**
