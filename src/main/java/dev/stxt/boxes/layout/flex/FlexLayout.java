@@ -73,7 +73,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
         // Sin containing block, un hueco en porcentaje cuenta como 0.
-        double gap = s.columnGap().resolve(OptionalDouble.empty()).orElse(0);
+        double gap = s.flex().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<Box> items = box.inFlowChildren();
         double maxMin = 0;
         double maxMax = 0;
@@ -88,9 +88,9 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
-        if (s.flexDirection() == Direction.COLUMN) {
+        if (s.flex().direction() == Direction.COLUMN) {
             content = new IntrinsicSizes(maxMin, maxMax);
-        } else if (s.flexWrap()) {
+        } else if (s.flex().wrap()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
         } else {
             content = new IntrinsicSizes(sumMin + gaps, sumMax + gaps);
@@ -155,15 +155,15 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.box = box;
             this.s = box.style();
             this.model = model;
-            this.row = s.flexDirection() == Direction.ROW;
-            this.multiLine = s.flexWrap();
+            this.row = s.flex().direction() == Direction.ROW;
+            this.multiLine = s.flex().wrap();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
             // Base de los porcentajes: la caja de contenido en el eje de cada hueco (§3.6).
-            double columnGap = s.columnGap().resolve(contentWidth).orElse(0);
-            double rowGap = s.rowGap().resolve(contentHeight).orElse(0);
+            double columnGap = s.flex().columnGap().resolve(contentWidth).orElse(0);
+            double rowGap = s.flex().rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
             this.crossGap = row ? rowGap : columnGap;
             this.atStart = space.atFragmentainerStart();
@@ -209,7 +209,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (multiLine && crossSize.isPresent()) {
                 crossFree = crossSize.getAsDouble() - Sizing.sum(lineCross) - crossGap * Math.max(0, n - 1);
             }
-            if (s.flexLines() == Distribution.STRETCH && crossFree > 0) {
+            if (s.flex().lines() == Distribution.STRETCH && crossFree > 0) {
                 for (int l = 0; l < n; l++) {
                     lineCross[l] += crossFree / n;
                 }
@@ -238,7 +238,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
             List<Span> spans = new ArrayList<>();
-            double[] lineDistribution = distribute(multiLine ? s.flexLines() : Distribution.START, cross.free(), n);
+            double[] lineDistribution = distribute(multiLine ? s.flex().lines() : Distribution.START, cross.free(), n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
             for (int l = 0; l < n; l++) {
@@ -249,7 +249,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 mainExtent = Math.max(mainExtent, used);
                 double free = mainSize.isPresent() ? mainSize.getAsDouble() - used : 0;
-                double[] d = distribute(s.flexMainAxis(), free, line.size());
+                double[] d = distribute(s.flex().mainAxis(), free, line.size());
                 double mainPos = d[0];
                 if (row) {
                     spans.add(new Span(crossPos, crossPos + lineCross[l], line.stream().map(it -> it.box).toList()));
@@ -366,7 +366,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
 
         Alignment alignment(Style is) {
-            return is.itemCrossAxis() != null ? is.itemCrossAxis() : s.flexCrossAxis();
+            return is.itemCrossAxis() != null ? is.itemCrossAxis() : s.flex().crossAxis();
         }
 
         // --- Pasos 4 a 7 ----------------------------------------------------------------------------

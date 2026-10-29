@@ -256,6 +256,7 @@ public final class Box {
         children = List.copyOf(children);
         inFlowChildren = children.stream().filter(h -> !h.style.isOutOfFlow()).toList();
         closed = true;
+        style.close();
         children.forEach(Box::close);
         if (marker != null) {
             marker.close();

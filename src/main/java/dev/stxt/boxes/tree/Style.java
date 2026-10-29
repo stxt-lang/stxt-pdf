@@ -128,13 +128,6 @@ public final class Style {
      */
     Locale locale = Locale.ROOT;
 
-    // --- Flex ------------------------------------------------------------------------------------
-    Direction flexDirection = Direction.ROW;
-    boolean flexWrap;
-    Distribution flexMainAxis = Distribution.START;
-    Alignment flexCrossAxis = Alignment.STRETCH;
-    Distribution flexLines = Distribution.STRETCH;
-
     // --- Hueco (flex y grid) -------------------------------------------------------------------
     Value rowGap = Value.pt(0);
     Value columnGap = Value.pt(0);
@@ -219,7 +212,14 @@ public final class Style {
     int orphans = 2;
     Decoration decoration = Decoration.SLICE;
 
+    private final FlexStyle flex = new FlexStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
+
+    // --- Grupos de propiedades ------------------------------------------------------------------
+    public FlexStyle flex() {
+        return flex;
+    }
 
     // --- Caja ------------------------------------------------------------------------------------
     public Layout layout() {
@@ -250,7 +250,6 @@ public final class Style {
         return rotation;
     }
 
-
     // --- Dimensiones -----------------------------------------------------------------------------
     public Value width() {
         return width;
@@ -280,7 +279,6 @@ public final class Style {
         return aspectRatio;
     }
 
-
     // --- Modelo de caja --------------------------------------------------------------------------
     public Sides<Value> margin() {
         return margin;
@@ -293,7 +291,6 @@ public final class Style {
     public Sides<Value> border() {
         return border;
     }
-
 
     // --- Pintado (no afecta al layout) -----------------------------------------------------------
     public Paint background() {
@@ -311,7 +308,6 @@ public final class Style {
     public Corners<Value> radius() {
         return radius;
     }
-
 
     // --- Texto (heredables) ----------------------------------------------------------------------
     public String font() {
@@ -378,29 +374,6 @@ public final class Style {
         return locale;
     }
 
-
-    // --- Flex ------------------------------------------------------------------------------------
-    public Direction flexDirection() {
-        return flexDirection;
-    }
-
-    public boolean flexWrap() {
-        return flexWrap;
-    }
-
-    public Distribution flexMainAxis() {
-        return flexMainAxis;
-    }
-
-    public Alignment flexCrossAxis() {
-        return flexCrossAxis;
-    }
-
-    public Distribution flexLines() {
-        return flexLines;
-    }
-
-
     // --- Hueco (flex y grid) ---------------------------------------------------------------------
     public Value rowGap() {
         return rowGap;
@@ -409,7 +382,6 @@ public final class Style {
     public Value columnGap() {
         return columnGap;
     }
-
 
     // --- Grid ------------------------------------------------------------------------------------
     public List<Value> gridColumns() {
@@ -435,7 +407,6 @@ public final class Style {
     public Alignment gridVertical() {
         return gridVertical;
     }
-
 
     // --- Item (como hijo de flex o grid) ---------------------------------------------------------
     public double itemGrow() {
@@ -466,7 +437,6 @@ public final class Style {
         return itemVertical;
     }
 
-
     // --- Lista -----------------------------------------------------------------------------------
     public Marker listMarker() {
         return listMarker;
@@ -479,7 +449,6 @@ public final class Style {
     public Integer listNumber() {
         return listNumber;
     }
-
 
     // --- Enlace ----------------------------------------------------------------------------------
     public String link() {
@@ -494,7 +463,6 @@ public final class Style {
         return inContents;
     }
 
-
     // --- Imagen ----------------------------------------------------------------------------------
     public String alt() {
         return alt;
@@ -503,7 +471,6 @@ public final class Style {
     public Fit fit() {
         return fit;
     }
-
 
     // --- Contents --------------------------------------------------------------------------------
     public int contentsFrom() {
@@ -517,7 +484,6 @@ public final class Style {
     public Leader contentsLeader() {
         return contentsLeader;
     }
-
 
     // --- Multicol --------------------------------------------------------------------------------
     public Integer multicolCount() {
@@ -543,7 +509,6 @@ public final class Style {
     public ColumnFill multicolFill() {
         return multicolFill;
     }
-
 
     // --- Fragmentación ---------------------------------------------------------------------------
     public Break breakBefore() {
@@ -664,5 +629,10 @@ public final class Style {
 
     public boolean isOutOfFlow() {
         return position == Position.ABSOLUTE || position == Position.FIXED;
+    }
+
+    /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
+    void close() {
+        flex.close();
     }
 }

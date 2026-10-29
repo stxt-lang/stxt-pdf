@@ -57,11 +57,11 @@ final class ModelValidator {
 
     /** {@code Main axis} y {@code Lines} de un {@code Flex}. */
     static void validateFlex(Style s) {
-        if (s.flexMainAxis == Distribution.STRETCH) {
+        if (s.flex().mainAxis() == Distribution.STRETCH) {
             throw error(s.line(FLEX_MAIN_AXIS), ErrorCode.VALUE_NOT_ALLOWED,
                     "Main axis no admite 'stretch'; usa Grow en los ítems");
         }
-        if (s.isDeclared(FLEX_LINES) && !s.flexWrap) {
+        if (s.isDeclared(FLEX_LINES) && !s.flex().wrap()) {
             throw error(s.line(FLEX_LINES), ErrorCode.LINES_WITHOUT_WRAP,
                     "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
         }
@@ -269,7 +269,7 @@ final class ModelValidator {
                 && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
-        boolean column = parent.style().flexDirection == Direction.COLUMN;
+        boolean column = parent.style().flex().direction() == Direction.COLUMN;
         if (flexItem && column && !parentDefinite) {
             if (hasPercentage(s.itemBasis)) {
                 throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
@@ -291,8 +291,9 @@ final class ModelValidator {
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
         boolean rowGapUsed = s.layout == Layout.GRID
-                || (s.layout == Layout.FLEX && (s.flexWrap || s.flexDirection == Direction.COLUMN));
-        if (rowGapUsed && hasPercentage(s.rowGap)) {
+                || (s.layout == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.COLUMN));
+        Value rowGap = s.layout == Layout.GRID ? s.rowGap : s.flex().rowGap();
+        if (rowGapUsed && hasPercentage(rowGap)) {
             String gap = s.layout == Layout.GRID ? GRID_GAP : FLEX_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
         }

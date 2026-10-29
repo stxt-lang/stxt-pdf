@@ -219,12 +219,15 @@ final class PropertyReader {
     static void flex(Node p, Style s) {
         s.declared(PropertyKey.flex(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "direction" -> s.flexDirection = enumValue(Direction.class, p);
-            case "wrap" -> s.flexWrap = bool(p);
-            case "gap" -> gap(p, s);
-            case "main-axis" -> s.flexMainAxis = enumValue(Distribution.class, p);
-            case "cross-axis" -> s.flexCrossAxis = enumValue(Alignment.class, p);
-            case "lines" -> s.flexLines = enumValue(Distribution.class, p);
+            case "direction" -> s.flex().setDirection(enumValue(Direction.class, p));
+            case "wrap" -> s.flex().setWrap(bool(p));
+            case "gap" -> {
+                List<Value> gap = gap(p);
+                s.flex().setGap(gap.get(0), gap.get(1));
+            }
+            case "main-axis" -> s.flex().setMainAxis(enumValue(Distribution.class, p));
+            case "cross-axis" -> s.flex().setCrossAxis(enumValue(Alignment.class, p));
+            case "lines" -> s.flex().setLines(enumValue(Distribution.class, p));
             default -> throw unread(p);
         }
     }
@@ -235,7 +238,11 @@ final class PropertyReader {
         switch (p.getCanonicalName()) {
             case "columns" -> s.gridColumns = tracks(p);
             case "rows" -> s.gridRows = tracks(p);
-            case "gap" -> gap(p, s);
+            case "gap" -> {
+                List<Value> gap = gap(p);
+                s.rowGap = gap.get(0);
+                s.columnGap = gap.get(1);
+            }
             case "areas" -> s.gridAreas = placement(p, () -> GridAreas.parse(p.getText()));
             case "flow" -> s.gridFlow = enumValue(Direction.class, p);
             case "horizontal" -> s.gridHorizontal = enumValue(Alignment.class, p);
@@ -295,13 +302,13 @@ final class PropertyReader {
         }
     }
 
-    private static void gap(Node p, Style s) {
+    /** {@code Gap} de {@code Flex} o {@code Grid}: el hueco entre filas y el hueco entre columnas. */
+    private static List<Value> gap(Node p) {
         List<Value> v = parse(p, () -> ValueParser.list(p.getText()));
         if (v.size() > 2) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap admite 1 o 2 valores (filas columnas): " + p.getText().trim());
         }
         v.forEach(x -> check(p, x, LENGTH, false));
-        s.rowGap = v.get(0);
-        s.columnGap = v.size() == 2 ? v.get(1) : v.get(0);
+        return List.of(v.get(0), v.size() == 2 ? v.get(1) : v.get(0));
     }
 }
