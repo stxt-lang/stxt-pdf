@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Árbol de contextos de apilamiento (módulo 4, ESPECIFICACION.md §5.6), construido sobre los
+ * Árbol de contextos de apilamiento (ESPECIFICACION.md §5.6), construido sobre los
  * fragmentos de una página. Es independiente del árbol de cajas.
  *
  * <p>Orden de pintado dentro de un contexto, de abajo arriba:</p>

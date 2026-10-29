@@ -5,7 +5,7 @@ import dev.stxt.boxes.model.Value;
 import java.util.OptionalDouble;
 
 /**
- * Pista de grid con su función mínima y máxima (módulo 6). {@code auto} equivale a
+ * Pista de grid con su función mínima y máxima (ESPECIFICACION.md §5.8). {@code auto} equivale a
  * {@code minmax(auto, auto)} y {@code 1fr} a {@code minmax(auto, 1fr)}: una fracción nunca baja
  * del min-content de su contenido.
  */

@@ -19,7 +19,7 @@ import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
- * Reparte un texto en líneas (módulo 2, ESPECIFICACION.md §5.4). Con {@code Text wrap: auto},
+ * Reparte un texto en líneas (ESPECIFICACION.md §5.4). Con {@code Text wrap: auto},
  * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code pretty}, con
  * Knuth-Plass ({@link #optimal}).
  *

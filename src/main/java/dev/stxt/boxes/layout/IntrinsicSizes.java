@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout;
 
 /**
- * Tamaños intrínsecos del ancho de una caja de margen (módulo 7, ESPECIFICACION.md §5.9).
+ * Tamaños intrínsecos del ancho de una caja de margen (ESPECIFICACION.md §5.9).
  */
 public record IntrinsicSizes(double minContent, double maxContent) {
 

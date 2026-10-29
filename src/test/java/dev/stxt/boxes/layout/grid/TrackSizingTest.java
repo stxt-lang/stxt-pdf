@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class TrackSizingTest {
 
-    /** Contenido por columna del simulador del módulo 6: (min, max). */
+    /** Contenido min-content y max-content de cada columna: (min, max). */
     private static final double[][] CONTENT = {{60, 140}, {50, 90}, {80, 220}, {40, 120}};
 
     private static double[] columns(String tracks, double available) {

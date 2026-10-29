@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout.flex;
 
 /**
- * Datos de un ítem para el reparto en el eje principal (módulo 5). Tamaños de caja de margen.
+ * Datos de un ítem para el reparto en el eje principal (ESPECIFICACION.md §5.7). Tamaños de caja de margen.
  *
  * @param basis  tamaño base ({@code Basis}, el tamaño declarado o el max-content)
  * @param grow   factor {@code Grow}

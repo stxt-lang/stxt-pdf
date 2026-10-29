@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Colocación de ítems en la rejilla (módulo 6, ESPECIFICACION.md §5.8).
+ * Colocación de ítems en la rejilla (ESPECIFICACION.md §5.8).
  *
  * <ol>
  *   <li>Los ítems con fila y columna explícitas se colocan primero.</li>

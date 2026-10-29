@@ -5,7 +5,7 @@ import java.util.List;
 import static dev.stxt.boxes.model.Tolerance.EPSILON;
 
 /**
- * Resuelve los tamaños flexibles de una línea flex (módulo 5, paso 5; Flexbox §9.7).
+ * Resuelve los tamaños flexibles de una línea flex (ESPECIFICACION.md §5.7; Flexbox §9.7).
  *
  * <p>Si sobra espacio se crece en proporción a {@code Grow}; si falta, se encoge en proporción a
  * {@code Shrink × Basis}. Los ítems que chocan con su mínimo o máximo se congelan y el reparto se

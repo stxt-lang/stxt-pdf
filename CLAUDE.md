@@ -586,8 +586,7 @@ dependencia nueva se decide y se apunta allí.
 - **Min y max:** primero se aplica el máximo y luego el mínimo; si chocan, gana el mínimo
   (`Sizing.constrain`).
 - **Comentarios y javadoc** en castellano, con referencias a la especificación del tipo
-  `ESPECIFICACION.md §5.8`. Las referencias "módulo N" que aparecen en algunos javadoc remiten a
-  un documento de diseño que no está en el repositorio; no las uses para trabajo nuevo.
+  `ESPECIFICACION.md §5.8` (nunca a un «módulo N» de un documento de diseño que no está en el repositorio).
 - Indentación de 4 espacios en Java; tabuladores en los ficheros `.stxt`.
 
 ## Tests

@@ -10,7 +10,7 @@ import static dev.stxt.boxes.model.Tolerance.EPSILON;
 import static dev.stxt.boxes.model.Tolerance.fits;
 
 /**
- * Dimensionado de pistas (módulo 6; simplificación de Grid §12). La misma función sirve para
+ * Dimensionado de pistas (ESPECIFICACION.md §5.8; simplificación de Grid §12). La misma función sirve para
  * columnas y filas: solo cambian las aportaciones de los ítems.
  *
  * <ol>

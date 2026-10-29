@@ -10,7 +10,7 @@ import java.util.OptionalDouble;
  * con {@link #resolve(OptionalDouble)}.
  *
  * <p>Se conservan separados los valores especificados de los usados porque flex y grid
- * necesitan saber si un valor era {@code auto} en origen (módulo 1).</p>
+ * necesitan saber si un valor era {@code auto} en origen (ESPECIFICACION.md §3).</p>
  */
 public sealed interface Value {
 
