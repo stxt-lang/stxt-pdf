@@ -229,7 +229,7 @@ public final class PdfCanvas implements Canvas {
         }
         io(() -> {
             ImageFile file = resources.images().find(box.image());
-            Rect target = ImageFit.place(box.style().fit(), content, file.width(), file.height());
+            Rect target = ImageFit.place(box.style().image().fit(), content, file.width(), file.height());
             tagging.beginImage(box, content);
             out.saveGraphicsState();
             Shapes.roundedRect(page.path(), content, radii);

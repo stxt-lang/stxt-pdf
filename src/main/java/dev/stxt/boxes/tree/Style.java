@@ -140,11 +140,6 @@ public final class Style {
     /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
     boolean inContents = true;
 
-    // --- Imagen ----------------------------------------------------------------------------------
-    /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
-    String alt;
-    Fit fit = Fit.CONTAIN;
-
     // --- Multicol --------------------------------------------------------------------------------
     /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
     Integer multicolCount;
@@ -178,10 +173,16 @@ public final class Style {
 
     private final ContentsStyle contents = new ContentsStyle();
 
+    private final ImageStyle image = new ImageStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public ContentsStyle contents() {
+    public ImageStyle image() {
+            return image;
+        }
+
+        public ContentsStyle contents() {
             return contents;
         }
 
@@ -367,15 +368,6 @@ public final class Style {
         return inContents;
     }
 
-    // --- Imagen ----------------------------------------------------------------------------------
-    public String alt() {
-        return alt;
-    }
-
-    public Fit fit() {
-        return fit;
-    }
-
     // --- Multicol --------------------------------------------------------------------------------
     public Integer multicolCount() {
         return multicolCount;
@@ -524,6 +516,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        image.close();
         contents.close();
         list.close();
         item.close();

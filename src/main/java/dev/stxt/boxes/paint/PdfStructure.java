@@ -132,7 +132,7 @@ final class PdfStructure {
             box.children().forEach(child -> build(child, parent));
             return;
         }
-        if (box.isImage() && box.style().alt() == null || box.role() == Role.LEADER) {
+        if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER) {
             // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
             return;
         }
@@ -180,7 +180,7 @@ final class PdfStructure {
             e.setLanguage(box.style().locale().toLanguageTag());
         }
         if (box.isImage()) {
-            e.setAlternateDescription(box.style().alt());
+            e.setAlternateDescription(box.style().image().alt());
         }
         if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
                 && !PageNumbers.contains(box.text())) {
@@ -222,7 +222,7 @@ final class PdfStructure {
 
     /** Si la caja o lo que contiene tiene algo que leer: texto, un marcador o una imagen con {@code Alt}. */
     private static boolean hasContent(Box box) {
-        if (box.hasText() || box.marker() != null || box.isImage() && box.style().alt() != null) {
+        if (box.hasText() || box.marker() != null || box.isImage() && box.style().image().alt() != null) {
             return true;
         }
         return box.children().stream().anyMatch(c -> c.style().position() != Position.FIXED && hasContent(c));

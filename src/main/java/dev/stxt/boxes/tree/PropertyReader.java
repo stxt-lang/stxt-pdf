@@ -119,8 +119,8 @@ final class PropertyReader {
             entry("link", (p, s) -> s.link = link(p)),
             entry("header", (p, s) -> s.header = bool(p)),
             entry("in-contents", (p, s) -> s.inContents = bool(p)),
-            entry("alt", (p, s) -> s.alt = alt(p)),
-            entry("fit", (p, s) -> s.fit = enumValue(Fit.class, p)),
+            entry("alt", (p, s) -> s.image().setAlt(alt(p))),
+            entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("levels", ContentsBuilder::levels),
             entry("leader", (p, s) -> s.contents().setLeader(enumValue(Leader.class, p))));
 

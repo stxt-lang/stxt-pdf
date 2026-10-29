@@ -300,8 +300,8 @@ public final class StackingContext {
      * índice); {@code null} si no tiene texto.
      */
     private static String describe(Box box) {
-        if (box.style().alt() != null) {
-            return box.style().alt();
+        if (box.style().image().alt() != null) {
+            return box.style().image().alt();
         }
         StringBuilder out = new StringBuilder();
         collectText(box, out);
