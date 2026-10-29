@@ -628,6 +628,10 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   `FixedMetrics`, cada carácter mide 5 pt con `Size: 10`. `layOutPaged(alto, …)` pagina
   (con 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran
   una página concreta; los tests `*FragmentationTest` lo usan.
+- **Propiedades y determinismo (QA-08):** `ValueParserPropertiesTest`, `LineBreakerPropertiesTest` y
+  `FragmentationPropertiesTest` prueban propiedades con miles de entradas al azar de un `Random` con semilla fija
+  (un fallo se repite; sin librerías nuevas), y `CrossJvmDeterminismTest`, que una JVM hija da el mismo PDF de
+  cada ejemplo y golden.
 - Para un caso nuevo, calcula el resultado esperado a mano siguiendo la especificación (como en
   el "Cómo se maqueta" del §10) y añade una carpeta numerada.
 

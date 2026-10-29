@@ -14,7 +14,7 @@ como *no verificado*. Los programas con que se midió están en [`tools/qa/`](..
 1. Lee el [resumen](#resumen), la [línea base](#línea-base-medida) y el [registro de sesiones](#registro-de-sesiones).
 2. Elige la siguiente [sesión del plan](#plan-de-sesiones). Cada una se puede hacer sola: sus tareas tienen
    evidencia, propuesta y criterio de aceptación.
-3. Ejecuta `mvn test` para partir de verde (1381 tests tras la sesión 5) y comprueba que `git status` queda limpio.
+3. Ejecuta `mvn test` para partir de verde (1388 tests tras la sesión 6) y comprueba que `git status` queda limpio.
 
 **Al terminar una sesión:**
 
@@ -66,7 +66,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
 | QA-06 | Límites y entradas hostiles | Media | M | hecho |
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | hecho |
-| QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
+| QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | en curso |
 | QA-09 | Integración continua | Alta | S | hecho |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | hecho |
 | TS-02 | Test de conversión concurrente | Alta | S | hecho |
@@ -314,6 +314,17 @@ cobertura no ve:
    asserts miden algo. Una pasada puntual, no en CI.
 6. **Documentos de la especificación**: `DocumentReaderTest` ya maqueta los ejemplos del §10; falta que lo haga con
    `PdfMetrics` y PDF/UA (los once ejemplos ya pasan veraPDF; los de la especificación no).
+
+**Sesión 6: hechos los puntos 3 y 4** (los 1 y 2 ya lo estaban; quedan el 5 y el 6, fuera del plan de la sesión).
+(3) `CrossJvmDeterminismTest`: el PDF de los 11 ejemplos y los 28 golden es el mismo en una JVM hija, donde cambian los
+`identityHashCode` (y con ellos el orden de los `IdentityHashMap`/`HashSet` de cajas); dentro de una JVM ya lo vigilaba
+`ConcurrentConversionTest`. (4) Propiedades con `Random` de semilla fija, sin dependencias nuevas:
+`ValueParserPropertiesTest` (50 000 textos al azar: `value` y `list` solo lanzan `IllegalArgumentException`; acepta
+unos 2200), `LineBreakerPropertiesTest` (3000 textos y anchos, `auto` y `pretty`: ninguna palabra se pierde, se repite
+ni cambia de orden, los párrafos son los del texto, ninguna línea vacía ni con espacios en los extremos y toda línea de
+más de una palabra cabe) y `FragmentationPropertiesTest` (150 documentos y alturas de página: los fragmentos de cada
+párrafo suman su alto entero y van en páginas seguidas). No han encontrado ningún fallo. Comprobado que detectan uno:
+perder la última línea de un párrafo y repetir una línea al cambiar de página hacen fallar el suyo.
 
 ### QA-09 · Integración continua · Alta · S
 
@@ -720,7 +731,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **3. Contrato público** (hecha) | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
 | **4. SVG y el estado global** (hecha) | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
 | **5. Caché de la paginación** (hecha) | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
-| **6. Tests de referencia** | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
+| **6. Tests de referencia** (hecha) | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
 | **7. Encapsulación del modelo** | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
 | **8. Constructor del árbol** | AR-01 | `BoxTreeBuilder.element` partido por familias |
 | **9. Algoritmos y lienzos** | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
@@ -753,3 +764,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 3 · Contrato público (terminada) | QA-06: `Limits` (2000 páginas, 25 Mpx, 20 000 elementos y 64 niveles de SVG, elegidos por el usuario tras medirlos con `BombsProbe`) en `Converter.builder().limits(…)`; `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX` antes de maquetar; JSVG con los mismos límites (corrige que rechazara SVG legítimos de más de 2000 elementos con una `IOException`); casos del catálogo, `LimitsTest`, §6.2 de la especificación; decisiones 303 a 307. | Sesión 4: SVG y estado global (QA-02, TS-03). Decidir antes la decisión abierta 4 (contornos hechos por el motor o JSVG con sus límites) |
 | 2026-10-29 | 4 · SVG y el estado global (hecha) | QA-02 y TS-03: causa aislada (AWT da `Dialog` para `IBM Plex Sans` en una JVM en turco); `SvgFonts` da a JSVG el fichero comprobado con una familia clave (huella SHA-256) y `PlatformSupport.customFont`, sin `registerFont`; `ImageFile.textFonts`, `FontFile.digest`; cerrojo para la caché global de JSVG; un texto de un `<use>` conserva la fuente de su sitio. `PdfImagesTest` (4 tests, 3 fallan sin el cambio) y `SvgImageTest`; §5.18, decisiones 308 a 310; la CI en turco comprueba el árbol. 1379 tests en verde con el idioma por defecto y en turco; ningún PNG ni volcado cambia. | Sesión 5: caché de la paginación (PF-03, PF-04, AR-11, AR-10) |
 | 2026-10-29 | 5 · Caché de la paginación (hecha) | PF-03: volver a paginar olvida solo los textos que cambian y sus antepasados (`Engine.forget`, decisión 311; `PaginationCacheTest`; `ScaleProbe` con fallos por página e índice): la mitad de layouts a partir de la página 100. PF-04: medido con JFR, sin cambios (< 1 %); de ahí sale PF-06 (el reparto en líneas, 71 % del layout). AR-10: `Tolerance.EPSILON` y `Tolerance.MODEL` con nombre (decisión 312). AR-11: `paginate` partido en `converge`, `pages` y `placeFixed`; `Numbering` en su fichero. El PDF de los ejemplos, los golden y dos documentos grandes es el mismo byte a byte que antes. 1381 tests en verde. | Sesión 6: tests de referencia (QA-07, QA-08). Decidir antes la decisión abierta 2 (¿falla el test si cambia un PNG?). PF-06 queda pendiente fuera del plan |
+| 2026-10-29 | 6 · Tests de referencia (hecha) | QA-07 con la decisión del usuario (un PNG que cambia hace fallar el test; decisión 313): imágenes y PDF en `target/reference/`, `ReferenceFiles.checkImages`, `-Dgolden.update`/`-Dexamples.update`, la CI sube `target/reference` si falla; `ReferenceFilesTest`. QA-08 puntos 3 y 4: `CrossJvmDeterminismTest` y las propiedades de `ValueParser`, `LineBreaker` y la fragmentación (sin fallos encontrados; comprobado con dos mutaciones a mano). 1388 tests en verde; `mvn test` no cambia ningún fichero versionado. | Sesión 7: encapsulación del modelo (AR-03, AR-02 etapas 1 y 2). QA-08 puntos 5 (PIT, una pasada) y 6 (documentos de la especificación con `PdfMetrics` y PDF/UA) pendientes |
