@@ -75,7 +75,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | TS-05 | Fachada reutilizable y segura entre hilos (`Converter`) | Media | M | hecho |
 | PF-01 | Coste del GSUB de PDFBox | Alta | M | hecho |
 | PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | hecho |
-| PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | pendiente |
+| PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | hecho |
 | PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | pendiente |
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
@@ -444,7 +444,7 @@ por fuente: mejor por bloques de 256 o un `HashMap<Character,Integer>`); quita e
 anchos son idénticos bit a bit (test que recorre todos los glifos de las 12 fuentes contra la implementación anterior
 una vez); `ScaleProbe`: layout −15 % o mejor.
 
-### PF-03 · Vaciar toda la caché al subir las cifras o las referencias · Media · M
+### PF-03 · Vaciar toda la caché al subir las cifras o las referencias · Media · M · hecho
 
 `Paginator.paginate` repite el layout del documento entero cuando (a) el total de páginas necesita más cifras de las
 reservadas (`PageNumbers.DIGITS = 2`: a partir de la página 100) o (b) cambia una página supuesta de `{page of: id}`;
@@ -457,6 +457,15 @@ cajas cuyo texto (o el de un descendiente) contiene `{page}`, `{pages}` o una `R
 cajas con marcadores suelen ser `Fixed`, que ya se colocan fuera del flujo: puede bastar con repetir solo esa parte.
 **Aceptación:** `ScaleProbe` con `{page}` y 153 páginas: los fallos de caché por página no se duplican al cruzar la
 página 100; los golden de los hitos 7, 22 y 32 no cambian.
+
+**Hecho (sesión 5).** La propuesta (1): el `Paginator` calcula una vez los textos con `{page}`/`{pages}` y, en cada
+pasada, los que tienen un `{page of}` cuyo valor cambia, y `Engine.reservePageDigits`/`assume` olvidan solo esas cajas y
+sus antepasados en la `LayoutCache` y en el reparto en líneas (`Engine.forget`, decisión 311). `ScaleProbe` (ahora con
+los fallos por página, 96 y 100 páginas a los dos lados de la frontera y dos documentos con índice): 2100 párrafos
+(100 páginas) de 46,0 a 23,0 fallos por página (96 páginas: 22,8); 153 páginas de 45,8 a 22,9; 657 de 43,0 a 21,5;
+índice de 163 páginas de 57,1 a 33,0. Layout: 657 páginas de 1459 a 794 ms, 153 de 394 a 283, índice de 364 a 225.
+Ningún golden, ejemplo ni PNG cambia. Test: `PaginationCacheTest` (con la caché vaciada entera calcula el doble de
+layouts y falla).
 
 ### PF-04 · Cálculos que se repiten · Baja · S
 

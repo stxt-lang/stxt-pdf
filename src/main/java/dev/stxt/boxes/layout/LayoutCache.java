@@ -6,6 +6,7 @@ import dev.stxt.boxes.tree.Box;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -63,6 +64,21 @@ public final class LayoutCache {
         intrinsics.clear();
         contents.clear();
         layouts.clear();
+    }
+
+    /**
+     * Olvida lo que se guardó de esas cajas: sus tamaños intrínsecos y todos sus layouts. Lo de las demás sigue
+     * valiendo, porque el resultado de una caja solo depende de su subárbol y de la clave.
+     */
+    public void forget(Set<Box> boxes) {
+        intrinsics.keySet().removeIf(boxes::contains);
+        contents.keySet().removeIf(boxes::contains);
+        layouts.keySet().removeIf(k -> boxes.contains(k.box()));
+    }
+
+    /** Layouts calculados porque no estaban guardados. */
+    int misses() {
+        return misses;
     }
 
     /** Cuántos resultados guarda ahora mismo. */

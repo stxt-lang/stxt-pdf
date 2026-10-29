@@ -1923,3 +1923,17 @@ interpretaciones que salieron al implementarlas.
      fichero se dibuja una vez por conversión. Medido con `ConcurrencyProbe` (8 hilos × 10 rondas × 11 ejemplos): el
      mismo tiempo que antes (7,8 a 10,1 s en los dos casos, en la misma máquina) y los mismos bytes que en secuencial.
      *Dónde:* `PdfImages.draw`. *Alternativa:* `FontResolver.resolveWithoutCache`, que JSVG no deja elegir.
+
+### Revisión de QA, sesión 5: la caché de la paginación (ROADMAP-QA-ARQ.md, PF-03, PF-04, AR-10 y AR-11)
+
+311. **Volver a paginar solo olvida lo que depende de los textos que cambian.** El `Paginator` repite la paginación
+     cuando el total necesita una cifra más (`{page}`/`{pages}` a partir de la página 100) o cuando cambia la página de
+     un `{page of: id}`, y antes vaciaba la caché entera: un documento de 100 páginas costaba el doble que uno de 99.
+     Ahora pasa al motor los textos que cambian de ancho (los que tienen los marcadores, o una referencia cuyo valor
+     cambia) y `Engine.forget` olvida en la `LayoutCache` y en el reparto en líneas solo esas cajas y sus antepasados.
+     Se apoya en que el resultado de una caja depende solo de su subárbol y de la clave (caja, espacio y token): los
+     algoritmos no leen nada de fuera, salvo el estilo, que no cambia. Si un algoritmo nuevo leyera algo de fuera del
+     subárbol, tendría que entrar en la clave. Medido con `ScaleProbe`: de 46 a 23 layouts por página con 100 a 657
+     páginas, y de 57 a 33 con un índice y una referencia por capítulo. *Dónde:* `Engine.forget`,
+     `LayoutCache.forget`, `InlineLayout.forget`, `Paginator.paginate`. *Alternativa:* repetir solo los `Fixed`
+     (no sirve para las referencias del cuerpo).

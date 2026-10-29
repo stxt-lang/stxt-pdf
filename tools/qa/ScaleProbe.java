@@ -1,5 +1,7 @@
-// Sonda de QA (ROADMAP-QA-ARQ.md, PF-*): documentos de texto largo de 200 a 12 800 párrafos; da el tiempo de
-// lectura, layout y pintado y los aciertos y fallos de la caché. Para el perfil: añade
+// Sonda de QA (ROADMAP-QA-ARQ.md, PF-*): documentos de texto largo de 200 a 12 800 párrafos, con {page} y {pages}
+// en un Fixed; da el tiempo de lectura, layout y pintado y los aciertos y fallos de la caché, también por página.
+// Los de 2000 y 2100 párrafos quedan a los dos lados de la página 100, donde {pages} necesita una cifra más (PF-03);
+// los "indice" llevan además un Contents y un {page of: …} por capítulo, que se repiten hasta converger. Para el perfil: añade
 // -XX:StartFlightRecording=filename=rec.jfr,settings=profile y mira "jfr print --events jdk.ExecutionSample".
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.layout.Engine;
@@ -21,8 +23,12 @@ public class ScaleProbe {
 
     static String big(int paras, boolean headings) {
         StringBuilder sb = new StringBuilder(head());
+        if (headings) sb.append("\t\tContents:\n");
         for (int i = 0; i < paras; i++) {
-            if (headings && i % 20 == 0) sb.append(i == 0 ? "\t\tHeading 1: Capitulo " + i + "\n\t\t\tId: h" + i + "\n" : "\t\tHeading 1: Capitulo " + i + "\n\t\t\tId: h" + i + "\n");
+            if (headings && i % 20 == 0) {
+                sb.append("\t\tHeading 1:\n\t\t\tId: h" + i + "\n\t\t\tText: Capitulo " + i + "\n");
+                sb.append("\t\tParagraph: Este capitulo empieza en la pagina {page of: h" + i + "}.\n");
+            }
             sb.append("\t\tParagraph: ").append(LOREM).append(' ').append(i).append("\n");
         }
         return sb.toString();
@@ -38,17 +44,22 @@ public class ScaleProbe {
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         PdfCanvas.write(lo, r, dev.stxt.boxes.model.Limits.DEFAULT, o, false);
         long t3 = System.nanoTime();
-        System.out.printf("%-28s paginas=%4d  leer=%5d ms  layout=%6d ms  pintar=%6d ms  pdf=%d KB  %s%n", label, lo.pages().size(),
-            (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000, (t3 - t2) / 1_000_000, o.size() / 1024, e);
+        String stats = e.toString();
+        long misses = Long.parseLong(stats.replaceAll(".*misses=(\\d+).*", "$1"));
+        System.out.printf("%-28s paginas=%4d  leer=%5d ms  layout=%6d ms  pintar=%6d ms  pdf=%d KB  %s  fallos/pagina=%.1f%n",
+            label, lo.pages().size(), (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000, (t3 - t2) / 1_000_000, o.size() / 1024,
+            stats, (double) misses / lo.pages().size());
     }
 
     public static void main(String[] a) throws Exception {
         Resources r = new Resources();
         run("calentar 50", big(50, false), r);
         run("calentar 50", big(50, false), r);
-        for (int n : new int[]{200, 800, 3200, 12800}) {
-            long used0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        for (int n : new int[]{200, 800, 2000, 2100, 3200, 12800}) {
             run("parrafos " + n, big(n, false), r);
+        }
+        for (int n : new int[]{800, 3200}) {
+            run("indice " + n, big(n, true), r);
         }
         System.out.println("max heap MB: " + Runtime.getRuntime().maxMemory() / 1048576);
     }

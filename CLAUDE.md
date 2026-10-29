@@ -346,8 +346,11 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso).
 - **Texto largo:** cada página maqueta el texto desde otra línea, así que la `LayoutCache` no
   ayuda; `InlineLayout` memoriza el reparto en líneas por caja y ancho disponible (si no, el
-  coste crece con el cuadrado de las páginas; lo vigila `LongTextTest`). Se vacía en
-  `reservePageDigits`, como la caché.
+  coste crece con el cuadrado de las páginas; lo vigila `LongTextTest`). **Volver a paginar no vacía la caché**
+  (PF-03): cuando el total de páginas necesita otra cifra (`Engine.reservePageDigits`) o cambia la página de una
+  referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo que la
+  `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`), porque el resultado de
+  una caja solo depende de su subárbol. Lo vigila `PaginationCacheTest`. Al terminar el documento se vacía todo.
 - **Numeración (`{page}`/`{pages}`):** `InlineLayout` mide los marcadores como `00` y las
   líneas los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que
   rehace solo esas líneas con los valores de cada página (`PageNumbers`).

@@ -67,7 +67,9 @@ public final class Paginator {
         // Cada caja fixed de una sección una sola vez, con la posición estática de la página donde aparece.
         List<Map<Box, PendingAbsolute>> fixed = new ArrayList<>();
         sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
-        boolean numbered = hasPageNumbers(root);
+        // Los textos con {page} o {pages}, que cambian de ancho si el total necesita más cifras.
+        List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
+        boolean numbered = !numberedTexts.isEmpty();
         List<References.Site> sites = References.sites(root);
         Set<String> targets = new LinkedHashSet<>();
         sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE)
@@ -79,10 +81,11 @@ public final class Paginator {
         for (String id : targets) {
             assumed.put(id, "0".repeat(PageNumbers.DIGITS));
         }
-        engine.assume(assumed, numbers);
+        engine.assume(assumed, numbers, List.of());
 
         // Se vuelve a paginar mientras algo cambie: las cifras del total de páginas (solo crecen) y
-        // las páginas referidas, que cambian el ancho de los textos que las escriben.
+        // las páginas referidas, que cambian el ancho de los textos que las escriben. Solo se vuelve a
+        // maquetar lo que depende de esos textos (PF-03): el resto sale de la caché.
         int digits = PageNumbers.DIGITS;
         int changes = 0;
         List<List<LayoutResult>> results;
@@ -94,7 +97,7 @@ public final class Paginator {
             boolean again = false;
             if (numbered && PageNumbers.digits(numbering.pages()) > digits) {
                 digits = PageNumbers.digits(numbering.pages());
-                engine.reservePageDigits(digits);
+                engine.reservePageDigits(digits, numberedTexts);
                 again = true;
             }
             Map<String, String> actual = pagesOf(results, numbering, targets, sites);
@@ -102,8 +105,8 @@ public final class Paginator {
                 if (++changes > MAX_REFERENCE_PASSES) {
                     throw unstable(sites, assumed, actual);
                 }
+                engine.assume(actual, numbers, changedTexts(sites, assumed, actual));
                 assumed = actual;
-                engine.assume(assumed, numbers);
                 again = true;
             }
             if (!again) {
@@ -334,9 +337,21 @@ public final class Paginator {
         return all;
     }
 
-    /** Algún texto del documento contiene {@code {page}} o {@code {pages}}. */
-    private static boolean hasPageNumbers(Box box) {
-        return PageNumbers.contains(box.text) || box.children.stream().anyMatch(Paginator::hasPageNumbers);
+    /** Los textos del árbol que contienen {@code {page}} o {@code {pages}}, en orden del documento. */
+    private static List<Box> withPageNumbers(Box box, List<Box> found) {
+        if (PageNumbers.contains(box.text)) {
+            found.add(box);
+        }
+        box.children.forEach(child -> withPageNumbers(child, found));
+        return found;
+    }
+
+    /** Los textos con una referencia {@code {page of: id}} cuya página no es la que se suponía. */
+    private static List<Box> changedTexts(List<References.Site> sites, Map<String, String> assumed,
+                                          Map<String, String> actual) {
+        return sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE)
+                .filter(s -> !actual.get(s.reference().id()).equals(assumed.get(s.reference().id())))
+                .map(References.Site::box).distinct().toList();
     }
 
     /**

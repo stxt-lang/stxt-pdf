@@ -23,8 +23,12 @@ import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static dev.stxt.boxes.model.Tolerance.fits;
 
@@ -122,7 +126,7 @@ public final class Engine {
     public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
         measurer.validate(tree.root());
         images.validate(tree.root());
-        reservePageDigits(PageNumbers.DIGITS);
+        release();
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
             Overflow.check(pages);
@@ -132,15 +136,23 @@ public final class Engine {
         }
     }
 
-    /** Suelta lo que el motor memoriza de un documento: la caché, el reparto en líneas y las páginas supuestas. */
+    /**
+     * Suelta lo que el motor memoriza de un documento: la caché, el reparto en líneas, las cifras reservadas y las
+     * páginas supuestas.
+     */
     private void release() {
         cache.clear();
-        inline.assume(Map.of(), Map.of());
+        inline.reset();
     }
 
     /** Los límites de este motor, que el {@link Paginator} aplica al número de páginas. */
     Limits limits() {
         return limits;
+    }
+
+    /** Layouts que ha calculado este motor desde que se creó, para medir lo que ahorra la caché (PF-03). */
+    int cacheMisses() {
+        return cache.misses();
     }
 
     /** Entradas de la caché ahora mismo, para comprobar que {@link #release} la vacía. */
@@ -149,22 +161,42 @@ public final class Engine {
     }
 
     /**
-     * Cifras que reservan {@code {page}} y {@code {pages}} al maquetar ({@link PageNumbers}).
-     * Vacía la caché, porque cambian las medidas del texto.
+     * Cifras que reservan {@code {page}} y {@code {pages}} al maquetar ({@link PageNumbers}). Cambian las medidas
+     * de {@code changed}, los textos con esos marcadores: se olvida lo que la caché guarda de ellos y de sus
+     * antepasados ({@link #forget}).
      */
-    void reservePageDigits(int digits) {
+    void reservePageDigits(int digits, Collection<Box> changed) {
         inline.reservePageDigits(digits);
-        cache.clear();
+        forget(changed);
     }
 
     /**
      * Lo que valen las referencias a otras cajas en los textos (§5.19): la página de cada caja
      * referida con {@code {page of: id}}, que el {@link Paginator} supone y comprueba, y su número
-     * con {@code {number of: id}}. Vacía la caché, porque cambian las medidas del texto.
+     * con {@code {number of: id}}. Cambian las medidas de {@code changed}, los textos cuyas referencias valen otra
+     * cosa que en la pasada anterior: se olvida lo que la caché guarda de ellos y de sus antepasados.
      */
-    void assume(Map<String, String> pages, Map<String, String> numbers) {
+    void assume(Map<String, String> pages, Map<String, String> numbers, Collection<Box> changed) {
         inline.assume(pages, numbers);
-        cache.clear();
+        forget(changed);
+    }
+
+    /**
+     * Olvida lo que la caché y el reparto en líneas guardan de esos textos y de sus antepasados, cuyo layout depende
+     * de lo que miden (PF-03). Lo demás sigue valiendo: el resultado de una caja solo depende de su subárbol, así que
+     * el cuerpo de un documento no se vuelve a maquetar porque cambie el número de su pie de página.
+     */
+    private void forget(Collection<Box> changed) {
+        Set<Box> stale = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Box box : changed) {
+            for (Box b = box; b != null && stale.add(b); b = b.parent) {
+                // Sube hasta la raíz, o hasta un antepasado ya apuntado.
+            }
+        }
+        if (!stale.isEmpty()) {
+            cache.forget(stale);
+            inline.forget(stale);
+        }
     }
 
     /** Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (§5.14). */

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Layout {@code inline}: texto repartido en line boxes (ESPECIFICACION.md §5.4).
@@ -65,30 +66,41 @@ public final class InlineLayout implements LayoutAlgorithm {
     public InlineLayout(Engine engine, TextMeasurer measurer) {
         this.engine = engine;
         this.real = measurer;
-        reservePageDigits(PageNumbers.DIGITS);
+        reset();
+    }
+
+    /** Vuelve al estado de antes de maquetar: las cifras de prueba por defecto, sin referencias ni reparto memorizado. */
+    public void reset() {
+        this.measurer = PageNumbers.probing(real, PageNumbers.DIGITS);
+        this.pages = Map.of();
+        this.numbers = Map.of();
+        broken.clear();
     }
 
     /**
-     * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia las medidas: hay
-     * que vaciar la caché antes de volver a maquetar ({@link Engine}); el reparto en líneas
-     * memorizado se vacía aquí.
+     * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia lo que miden los textos con esos
+     * marcadores: quien llama olvida su reparto memorizado ({@link #forget}) y lo que guarda de ellos la caché del
+     * {@link Engine}.
      */
     public void reservePageDigits(int digits) {
         this.measurer = PageNumbers.probing(real, digits);
-        broken.clear();
     }
 
     /**
      * Lo que valen las referencias a otras cajas del texto ({@code {page of: id}} y
      * {@code {number of: id}}, §5.19): se sustituyen antes de repartir el texto en líneas, así
      * que el texto mide lo que va a pintarse. Las páginas son una suposición que el
-     * {@link dev.stxt.boxes.layout.Paginator} repite hasta que se cumple. Vacía el reparto
-     * memorizado; la caché del {@link Engine} se vacía allí.
+     * {@link dev.stxt.boxes.layout.Paginator} repite hasta que se cumple. Como con
+     * {@link #reservePageDigits}, quien llama olvida los textos cuyo valor cambia.
      */
     public void assume(Map<String, String> pages, Map<String, String> numbers) {
         this.pages = Map.copyOf(pages);
         this.numbers = Map.copyOf(numbers);
-        broken.clear();
+    }
+
+    /** Olvida el reparto en líneas memorizado de esas cajas. */
+    public void forget(Set<Box> boxes) {
+        broken.keySet().removeIf(k -> boxes.contains(k.box()));
     }
 
     /**
