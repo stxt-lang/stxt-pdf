@@ -179,8 +179,12 @@ public enum ErrorCode {
     GLYPH_MISSING,
 
     // --- Límites ------------------------------------------------------------------------------
-    /** El documento ocupa más páginas que el máximo que admite el motor; no es de ninguna línea. */
-    PAGE_LIMIT(Kind.LIMIT);
+    /** El documento ocupa más páginas que {@code Limits.maxPages}; no es de ninguna línea. */
+    PAGE_LIMIT(Kind.LIMIT),
+    /** Una imagen PNG o JPEG con más píxeles que {@code Limits.maxImagePixels} (línea de la {@code Image}). */
+    IMAGE_TOO_LARGE(Kind.LIMIT),
+    /** Un SVG que dibuja más elementos o anida más niveles que {@code Limits.maxSvgElements} y {@code maxSvgDepth} (línea de la {@code Image}). */
+    SVG_TOO_COMPLEX(Kind.LIMIT);
 
     private final Kind kind;
 

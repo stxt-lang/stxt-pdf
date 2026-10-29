@@ -1859,3 +1859,37 @@ interpretaciones que salieron al implementarlas.
      `SchemaValidator` solo escribe campos en su constructor. Queda anotado en el `pom.xml` y en `DocumentSchema`
      que un cambio de versión obliga a repasarlo. *Alternativa:* una copia del schema por hilo.
 
+303. **`Limits` y sus valores por defecto, «conservadores»** (ROADMAP-QA-ARQ.md, QA-06; los valores los eligió el
+     usuario entre tres juegos medidos): 2000 páginas, 25 millones de píxeles por PNG o JPEG, 20 000 elementos y 64
+     niveles por SVG. Se miden con `tools/qa/BombsProbe.java`: un PNG con transparencia de 144 Mpx (547 KB en disco)
+     revienta un heap de 512 MB y tarda 13 s con 1,5 GB; un PNG de 900 Mpx de 106 KB tarda 23 s; un SVG de 300 000
+     rectángulos tarda 5,4 s; 20 000 niveles de SVG dan un `StackOverflowError` (un `Error` que ni el `Converter`
+     atrapa); una cadena de `use` de 10⁹ elementos agota un heap de 512 MB tras 51 s. Un valor por defecto más alto
+     (el juego «medidos» era 10 000 páginas, 100 Mpx, 100 000 elementos y 256 niveles) deja a un servicio expuesto a
+     cada una de estas entradas; el usuario prefirió pecar de estricto, y todo se sube con `Converter.builder().limits`.
+     *Dónde:* `model/Limits`. *Alternativa:* los límites como propiedades del sistema, o como constantes sin configurar.
+
+304. **Los límites son un parámetro de la conversión y no del recurso**: `Limits` llega a `Engine`, `Images`,
+     `Paginator` y `PdfCanvas.write` (cambia su firma), no a `Resources` ni a `ImageFile`, que se comparten y guardan en
+     caché por carpeta. `ImageFile` solo cuenta (píxeles de la cabecera, elementos y niveles del SVG) y `Images.validate`
+     compara con los límites de cada conversión. Dos `Converter` con límites distintos pueden compartir `Resources`.
+     *Alternativa:* los límites dentro de `Resources`, que ataría la caché de imágenes a un único juego de límites.
+
+305. **El recuento de elementos de un SVG cuenta lo que dibuja, no lo que pesa el fichero**: cada elemento cuenta 1 y un
+     `<use>` suma además todo lo que repite, de modo que un SVG de 1 KB con 5 niveles de `<use>` de 10 copias cada uno
+     son 111 111 elementos. Es un tope por exceso de lo que cuenta JSVG (cuenta también lo que está en `defs`), así que
+     lo que cumple el límite no falla al dibujar (`LimitsTest.anSvgAtItsLimitsIsDrawnByJsvg`). Se calcula sin recursión
+     (una pila explícita) porque un SVG hostil puede anidar o encadenar decenas de miles de niveles, satura en 2⁵⁰ y un
+     `<use>` circular es `IMAGE_FORMAT`. *Alternativa:* dejar que JSVG cuente al dibujar, que falla tarde, sin línea y sin
+     tipo.
+
+306. **JSVG trae límites ocultos que rechazaban SVG legítimos**: 2000 elementos y 30 niveles. Un SVG de 3000 rectángulos
+     pasaba la validación del motor y fallaba al pintar con una `IOException` genérica, con un volcado de pila en el
+     registro. Ahora `PdfImages` da a JSVG los `Limits` del motor y, si aun así no carga un SVG, lanza un
+     `ImageFormatException` (kind `RESOURCE`, ya no una `IOException`). Cambia el comportamiento: los SVG de entre 2000 y
+     20 000 elementos, que antes fallaban, ahora se dibujan. *Alternativa:* dejar los límites de JSVG.
+
+307. **Los límites del texto STXT no se vuelven a exponer**: 10 MB, 100 niveles y 10 000 caracteres por línea son los de
+     `stxt-core`, ya dan un error `LIMIT` desde `DocumentReader` y se pueden cambiar con sus propios métodos si hiciera
+     falta. `Limits` solo tiene lo que el motor comprueba por su cuenta. *Alternativa:* un `DocumentReader` con `Limits`.
+

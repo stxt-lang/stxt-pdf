@@ -1,0 +1,11 @@
+# Case: Un PNG de 6000 × 6000 píxeles, que pesa 35 KB, pasa del máximo de 25 millones de píxeles
+# Code: IMAGE_TOO_LARGE
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/limit-huge.png

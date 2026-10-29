@@ -5,6 +5,7 @@ import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.model.Colors;
 import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Radii;
@@ -134,24 +135,25 @@ public final class PdfCanvas implements Canvas {
      * idioma de sus metadatos, y escribe el PDF en {@code target}, que no se cierra. Para maquetar
      * y pintar en una llamada está {@link dev.stxt.boxes.convert.Converter}.
      *
+     * @param limits los de las imágenes SVG, que se dibujan con ellos (los comprobó antes el motor que maquetó)
      * @throws IOException un fallo de entrada y salida, también el de las primitivas del lienzo (que no pueden
      *         declararlo y lo lanzan como {@link UncheckedIOException}: aquí salen como lo que son)
      */
-    public static void write(LaidOutDocument document, Resources resources, OutputStream target, boolean debug)
-            throws IOException {
+    public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
+            boolean debug) throws IOException {
         try {
-            paintAndSave(document, resources, target, debug);
+            paintAndSave(document, resources, limits, target, debug);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
     }
 
-    private static void paintAndSave(LaidOutDocument document, Resources resources, OutputStream target,
-            boolean debug) throws IOException {
+    private static void paintAndSave(LaidOutDocument document, Resources resources, Limits limits,
+            OutputStream target, boolean debug) throws IOException {
         List<Page> pages = document.pages();
         try (PDDocument doc = new PDDocument()) {
             Map<FontFace, PDFont> fonts = new HashMap<>();
-            PdfImages images = new PdfImages(doc, resources);
+            PdfImages images = new PdfImages(doc, resources, limits);
             PdfStructure structure = new PdfStructure(doc, document.root());
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata());

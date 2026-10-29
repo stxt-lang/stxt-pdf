@@ -2063,6 +2063,12 @@ de contenido en la página). Sin `Alt` es decorativa y se pinta como un *artifac
 fondos. Dentro de un `Fixed` es siempre un *artifact*, y en las filas repetidas de una tabla, solo
 es contenido la primera vez.
 
+**Límites.** Una imagen no puede pedir más de lo que admiten los límites de [§6.2](#62-límites): un PNG o un
+JPEG, más píxeles que `maxImagePixels` (`IMAGE_TOO_LARGE`), y un SVG, más elementos o niveles que
+`maxSvgElements` y `maxSvgDepth` (`SVG_TOO_COMPLEX`), siempre con la línea de la `Image` y antes de maquetar. Un
+`<use>` cuenta todo lo que repite cada vez que se usa, y un `<use>` que apunta a un elemento que lo contiene es
+`IMAGE_FORMAT`.
+
 **Salida.** El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la
 resolución del fichero: el JPEG tal cual y el PNG sin pérdida y con su transparencia; un SVG, como
 un dibujo vectorial del tamaño del SVG que se escala a su caja. El SVG de depuración la incrusta
@@ -2405,7 +2411,9 @@ La validación se hace en cuatro niveles:
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |
-| `PAGE_LIMIT` | El documento no ocupa más de 10 000 páginas (no es de ninguna línea) | `El documento tiene más de 10000 páginas, el máximo que admite el motor` |
+| `PAGE_LIMIT` | El documento no ocupa más páginas que `Limits.maxPages`, 2000 por defecto ([§6.2](#62-límites); no es de ninguna línea) | `El documento tiene más de 2000 páginas, el máximo que admite el motor (Limits.maxPages lo cambia)` |
+| `IMAGE_TOO_LARGE` | Un PNG o un JPEG no tiene más píxeles que `Limits.maxImagePixels`, 25 millones por defecto (línea de la `Image`) | `La imagen test/limit-huge.png tiene 6000 × 6000 píxeles (36,0 Mpx) y el máximo es 25,0 Mpx: reduce su resolución…` |
+| `SVG_TOO_COMPLEX` | Un SVG no dibuja más elementos (contando lo que repite cada `<use>`) ni anida más niveles que `Limits.maxSvgElements` y `maxSvgDepth`, 20 000 y 64 por defecto (línea de la `Image`) | `El SVG test/limit-depth.svg anida 72 niveles y el máximo es 64: aplánalo…` |
 
 ### 6.1 Tipos de error y de quién es la culpa
 
@@ -2418,7 +2426,7 @@ cualquier fallo de una conversión. Cada uno lleva tres datos:
   |---|---|---|
   | `INVALID_DOCUMENT` | El documento o sus estilos no son válidos: sintaxis, schema, una regla del modelo, un desbordamiento, un recurso que el documento nombra y no existe | un error del cliente (4xx), con la línea |
   | `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas) o no se puede leer el fichero del documento | un fallo de su configuración (5xx) |
-  | `LIMIT` | El documento es válido pero pide más de lo que se admite: más páginas que el máximo (`PAGE_LIMIT`) o más anidado de lo que lee la librería | un error del cliente por exceso (413 o 422) |
+  | `LIMIT` | El documento es válido pero pide más de lo que se admite ([§6.2](#62-límites)): más páginas (`PAGE_LIMIT`), una imagen con demasiados píxeles (`IMAGE_TOO_LARGE`), un SVG con demasiados elementos o niveles (`SVG_TOO_COMPLEX`) o más anidado de lo que lee la librería | un error del cliente por exceso (413 o 422) |
   | `INTERNAL` | Un fallo del motor, no del documento ni del entorno; la causa original va en `getCause()` | un fallo del servidor (500), que conviene informar |
 
 - **`code()`**, el código estable en texto: el de esta tabla (`BOX_OVERFLOW`), el de la librería STXT de los errores
@@ -2432,6 +2440,29 @@ excepción de la librería como causa); los recursos de la carpeta, `ResourceExc
 `InternalException`. Un fallo de entrada y salida al escribir en el destino no es de esta familia: es la
 `IOException` que declaran los métodos que escriben. El `Converter` convierte cualquier otra excepción de ejecución
 que se le escape a las librerías en un `InternalException`.
+
+### 6.2 Límites
+
+Un documento válido puede pedir más de lo que se quiere pagar: una imagen de unos cientos de KB que declara
+miles de millones de píxeles, un SVG de 1 KB cuyos `<use>` se repiten 10⁹ veces. El motor lo rechaza **antes de
+maquetar**, con un error de tipo `LIMIT` ([§6.1](#61-tipos-de-error-y-de-quién-es-la-culpa)) y, si es de una
+`Image`, con su línea. Los límites son un objeto, `Limits`, que se cambia con
+`Converter.builder().limits(Limits.DEFAULT.withMaxPages(500))`:
+
+| Límite | Por defecto | Qué cuenta | Error |
+|---|---|---|---|
+| `maxPages` | 2000 | Las páginas de todo el documento | `PAGE_LIMIT` |
+| `maxImagePixels` | 25 000 000 | Ancho × alto de un PNG o un JPEG, leído de su cabecera sin decodificarlo | `IMAGE_TOO_LARGE` |
+| `maxSvgElements` | 20 000 | Los elementos que dibuja un SVG: los del fichero más los de lo que repite cada `<use>` | `SVG_TOO_COMPLEX` |
+| `maxSvgDepth` | 64 | Los niveles de anidado de un SVG, con el `<svg>` de la raíz | `SVG_TOO_COMPLEX` |
+
+Los valores por defecto son los de un servicio con poca memoria. Un PNG con transparencia necesita unos 4 bytes
+por píxel al decodificarse (25 Mpx son 100 MB), una página más tarda lo que su contenido, y un SVG de 300 000
+rectángulos tarda unos 5 s; subir los límites sube también la memoria que hay que reservar a cada conversión.
+Un SVG con más de 15 niveles de `<use>` anidados lo rechaza la librería de dibujo aunque cumpla estos límites.
+
+El texto STXT del documento tiene además los límites de `stxt-core`: 10 MB, 100 niveles de anidado y 10 000
+caracteres por línea. Los comprueba el lector (`DocumentReader`) y los da como error `LIMIT`.
 
 **Catálogo de errores.** [`test/errors/`](../test/errors) tiene un documento de ejemplo por
 regla (a veces varios), en un fichero cada uno y agrupados en carpetas por familia de errores,

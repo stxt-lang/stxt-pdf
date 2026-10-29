@@ -36,7 +36,7 @@ public class ScaleProbe {
         LaidOutDocument lo = e.layOutDocument(doc);
         long t2 = System.nanoTime();
         ByteArrayOutputStream o = new ByteArrayOutputStream();
-        PdfCanvas.write(lo, r, o, false);
+        PdfCanvas.write(lo, r, dev.stxt.boxes.model.Limits.DEFAULT, o, false);
         long t3 = System.nanoTime();
         System.out.printf("%-28s paginas=%4d  leer=%5d ms  layout=%6d ms  pintar=%6d ms  pdf=%d KB  %s%n", label, lo.pages().size(),
             (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000, (t3 - t2) / 1_000_000, o.size() / 1024, e);

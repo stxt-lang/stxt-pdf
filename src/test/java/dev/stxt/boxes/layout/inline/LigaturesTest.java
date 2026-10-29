@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.inline;
 
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.Engine;
@@ -76,7 +77,7 @@ class LigaturesTest {
     /** Los glifos (dos bytes cada uno, Identity-H) que el PDF escribe para el texto de la primera página. */
     private static int glyphs(LaidOutDocument document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(document, RESOURCES, out, false);
+        PdfCanvas.write(document, RESOURCES, Limits.DEFAULT, out, false);
         int glyphs = 0;
         try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
             List<Object> tokens = new PDFStreamParser(pdf.getPage(0)).parse();

@@ -46,8 +46,6 @@ import java.util.Set;
  */
 public final class Paginator {
 
-    /** Máximo de páginas de un documento ({@link ErrorCode#PAGE_LIMIT}); frena también un algoritmo que no acabase. */
-    private static final int MAX_PAGES = 10_000;
     /** Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables (§5.19). */
     static final int MAX_REFERENCE_PASSES = 10;
 
@@ -323,9 +321,11 @@ public final class Paginator {
                 int section0 = k;
                 r.pending().forEach(p -> fixed.get(section0).putIfAbsent(p.box(), p));
                 token = next;
-                if (pages + results.size() > MAX_PAGES) {
+                int maxPages = engine.limits().maxPages();
+                if (pages + results.size() > maxPages) {
                     throw new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT,
-                            "El documento tiene más de " + MAX_PAGES + " páginas, el máximo que admite el motor");
+                            "El documento tiene más de " + maxPages + " páginas, el máximo que admite el motor "
+                                    + "(Limits.maxPages lo cambia)");
                 }
             } while (token != null);
             pages += results.size();

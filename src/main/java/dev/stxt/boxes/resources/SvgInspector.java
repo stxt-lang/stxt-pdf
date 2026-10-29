@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -60,9 +61,18 @@ final class SvgInspector {
     record TextUse(int line, String family, boolean bold, boolean italic, String text) {
     }
 
-    /** Lo que se necesita saber de un SVG fuera de su dibujo. */
-    record Info(double widthPx, double heightPx, List<TextUse> texts) {
+    /**
+     * Lo que se necesita saber de un SVG fuera de su dibujo.
+     *
+     * @param elements los que dibuja: todos los del fichero y, además, cada vez que un {@code <use>} repite un
+     *                 trozo, los de ese trozo; es un tope de lo que cuenta el dibujo, saturado en {@link #SATURATED}
+     * @param depth    los niveles de anidado, contando el {@code <svg>} de la raíz
+     */
+    record Info(double widthPx, double heightPx, List<TextUse> texts, long elements, int depth) {
     }
+
+    /** Tope del recuento de elementos dibujados, para que las repeticiones de los {@code <use>} no desborden. */
+    static final long SATURATED = 1L << 50;
 
     private SvgInspector() {
     }
@@ -112,6 +122,10 @@ final class SvgInspector {
         private final List<TextUse> texts = new ArrayList<>();
         private Locator locator;
         private int depth;
+        private int maxDepth;
+        private final Deque<Element> open = new ArrayDeque<>();
+        private final Map<String, Element> byId = new HashMap<>();
+        private Element root;
         private boolean sawRoot;
         private double width = Double.NaN;
         private double height = Double.NaN;
@@ -161,6 +175,22 @@ final class SvgInspector {
                 throw error("un <svg> dentro de otro no está en el subconjunto que se admite");
             }
             depth++;
+            maxDepth = Math.max(maxDepth, depth);
+            String href = null;
+            if (local.equals("use")) {
+                href = attrs.getValue(XLINK_NS, "href");
+                href = href != null ? href : attrs.getValue("href");
+            }
+            Element element = new Element(attrs.getValue("id"), href);
+            if (open.isEmpty()) {
+                root = element;
+            } else {
+                open.peek().children.add(element);
+            }
+            if (element.id != null) {
+                byId.putIfAbsent(element.id, element);
+            }
+            open.push(element);
 
             String family = null;
             String weight = null;
@@ -239,6 +269,7 @@ final class SvgInspector {
         @Override
         public void endElement(String uri, String local, String qName) {
             depth--;
+            open.pop();
             fonts.pop();
             if (local.equals("text") || local.equals("tspan")) {
                 flushText();
@@ -355,6 +386,53 @@ final class SvgInspector {
             return px;
         }
 
+        /**
+         * Los elementos que dibuja el SVG: cada uno cuenta 1, y un {@code <use>} cuenta además todo lo que repite.
+         * Se calcula sin recursión, porque un SVG hostil puede anidar o encadenar decenas de miles de niveles.
+         */
+        private long drawn() {
+            Deque<Element> stack = new ArrayDeque<>();
+            stack.push(root);
+            while (!stack.isEmpty()) {
+                Element e = stack.peek();
+                if (e.state == Element.State.DONE) {
+                    stack.pop();
+                } else if (e.state == Element.State.NEW) {
+                    e.state = Element.State.ACTIVE;
+                    for (Element child : e.children) {
+                        visit(child, stack);
+                    }
+                    Element target = e.ref == null ? null : byId.get(e.ref);
+                    if (target != null) {
+                        visit(target, stack);
+                    }
+                } else {
+                    long total = 1;
+                    for (Element child : e.children) {
+                        total = Math.min(SATURATED, total + child.drawn);
+                    }
+                    Element target = e.ref == null ? null : byId.get(e.ref);
+                    if (target != null) {
+                        total = Math.min(SATURATED, total + target.drawn);
+                    }
+                    e.drawn = total;
+                    e.state = Element.State.DONE;
+                    stack.pop();
+                }
+            }
+            return root.drawn;
+        }
+
+        private void visit(Element e, Deque<Element> stack) {
+            if (e.state == Element.State.ACTIVE) {
+                throw new ImageFormatException("El SVG " + name + " se repite a sí mismo: un <use> apunta a un "
+                        + "elemento que lo contiene");
+            }
+            if (e.state == Element.State.NEW) {
+                stack.push(e);
+            }
+        }
+
         Info result() {
             double w = width;
             double h = height;
@@ -376,7 +454,24 @@ final class SvgInspector {
                     h = w * viewBox[3] / viewBox[2];
                 }
             }
-            return new Info(w, h, List.copyOf(texts));
+            return new Info(w, h, List.copyOf(texts), drawn(), maxDepth);
+        }
+    }
+
+    /** Un elemento del SVG, para contar cuántos elementos dibuja: lo que contiene y, si es un {@code <use>}, lo que repite. */
+    private static final class Element {
+        enum State { NEW, ACTIVE, DONE }
+
+        final String id;
+        /** El {@code id} al que apunta el {@code href} de un {@code <use>}, sin la almohadilla; si no, {@code null}. */
+        String ref;
+        final List<Element> children = new ArrayList<>();
+        State state = State.NEW;
+        long drawn;
+
+        Element(String id, String href) {
+            this.id = id;
+            this.ref = href != null && href.startsWith("#") ? href.substring(1) : null;
         }
     }
 

@@ -2,6 +2,7 @@ package dev.stxt.boxes.examples;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.golden.PdfUa;
 import dev.stxt.boxes.golden.ReferenceFiles;
 import dev.stxt.boxes.layout.Engine;
@@ -94,7 +95,7 @@ class ExamplesTest {
 
     private static void writePdfAndImages(Path dir, LaidOutDocument document, Resources resources) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(document, resources, out, false);
+        PdfCanvas.write(document, resources, Limits.DEFAULT, out, false);
         Files.write(dir.resolve("output.pdf"), out.toByteArray());
         ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
         accessibility(dir, out.toByteArray());

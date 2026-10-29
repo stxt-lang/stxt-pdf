@@ -1,5 +1,6 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.boxes.convert.Converter;
@@ -75,7 +76,7 @@ class PdfCanvasTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Resources resources = new Resources();
         PdfCanvas.write(new Engine(new PdfMetrics(resources)).layOutDocument(TextRuns.build(document, runs)),
-                resources, out, false);
+                resources, Limits.DEFAULT, out, false);
         Files.createDirectories(PDF_DIR);
         Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
         return out.toByteArray();

@@ -6,6 +6,7 @@ import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.model.InternalException;
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.model.StxtPdfException;
 import dev.stxt.boxes.paint.PdfCanvas;
 import dev.stxt.boxes.paint.SvgCanvas;
@@ -50,11 +51,13 @@ public final class Converter {
     private final Resources resources;
     private final InlineNode styles;
     private final boolean debug;
+    private final Limits limits;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
         this.styles = builder.styles;
         this.debug = builder.debug;
+        this.limits = builder.limits;
     }
 
     /** Un conversor con la configuración por defecto: recursos en {@code resources/}, sin estilos aparte ni depuración. */
@@ -71,13 +74,18 @@ public final class Converter {
         return resources;
     }
 
+    /** Lo máximo que acepta ({@link Limits}). */
+    public Limits limits() {
+        return limits;
+    }
+
     /**
      * Maqueta un documento ya validado ({@link DocumentReader}) con las métricas reales de las fuentes de la
      * carpeta de recursos. Falla con los errores del documento (§6) antes de que se escriba nada.
      */
     public LaidOutDocument layOut(InlineNode document) {
         Objects.requireNonNull(document, "document");
-        return guarded(() -> new Engine(new PdfMetrics(resources), resources).layOutDocument(document, styles));
+        return guarded(() -> new Engine(new PdfMetrics(resources), resources, limits).layOutDocument(document, styles));
     }
 
     /** Maqueta {@code document} y escribe el PDF en {@code target}, que no se cierra. */
@@ -93,7 +101,7 @@ public final class Converter {
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
-        guarded(() -> PdfCanvas.write(document, resources, target, debug));
+        guarded(() -> PdfCanvas.write(document, resources, limits, target, debug));
     }
 
     /** El SVG de cada página de un documento ya maquetado, en orden. */
@@ -144,6 +152,7 @@ public final class Converter {
         private Resources resources = new Resources();
         private InlineNode styles;
         private boolean debug;
+        private Limits limits = Limits.DEFAULT;
 
         private Builder() {
         }
@@ -171,6 +180,15 @@ public final class Converter {
         /** Como {@link #styles(InlineNode)}, leyéndolo de un fichero UTF-8. */
         public Builder styles(Path file) {
             return styles(new DocumentReader().readStyles(file));
+        }
+
+        /**
+         * Lo máximo que acepta la conversión (páginas, píxeles de una imagen, elementos y niveles de un SVG);
+         * por defecto {@link Limits#DEFAULT}. Un documento que lo supera falla con un error {@code LIMIT}.
+         */
+        public Builder limits(Limits limits) {
+            this.limits = Objects.requireNonNull(limits, "limits");
+            return this;
         }
 
         /** Dibuja el contorno de cada caja, para revisar un documento a mano; por defecto no. */

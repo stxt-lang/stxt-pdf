@@ -1,13 +1,16 @@
 package dev.stxt.boxes.paint;
 
 import com.github.weisj.jsvg.SVGDocument;
+import com.github.weisj.jsvg.parser.DocumentLimits;
 import com.github.weisj.jsvg.parser.LoaderContext;
 import com.github.weisj.jsvg.parser.SVGLoader;
 import com.github.weisj.jsvg.parser.resources.ResourcePolicy;
 import com.github.weisj.jsvg.view.ViewBox;
 import de.rototor.pdfbox.graphics2d.PdfBoxGraphics2D;
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.resources.FontFile;
 import dev.stxt.boxes.resources.ImageFile;
+import dev.stxt.boxes.resources.ImageFormatException;
 import dev.stxt.boxes.resources.Resources;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
@@ -45,12 +48,14 @@ final class PdfImages {
 
     private final PDDocument doc;
     private final Resources resources;
+    private final Limits limits;
     private final Map<Path, PDImageXObject> bitmaps = new HashMap<>();
     private final Map<Path, PDFormXObject> drawings = new HashMap<>();
 
-    PdfImages(PDDocument doc, Resources resources) {
+    PdfImages(PDDocument doc, Resources resources, Limits limits) {
         this.doc = doc;
         this.resources = resources;
+        this.limits = limits;
     }
 
     /** El PNG o el JPEG, incrustado la primera vez. */
@@ -80,11 +85,18 @@ final class PdfImages {
         if (file.hasText()) {
             registerFonts();
         }
-        LoaderContext context = LoaderContext.builder().externalResourcePolicy(ResourcePolicy.DENY_ALL).build();
+        // Los límites de JSVG son los de Limits (por defecto solo admite 2000 elementos y 30 niveles); el motor ya
+        // comprobó los suyos antes de maquetar (Images), así que aquí no deberían saltar.
+        LoaderContext context = LoaderContext.builder().externalResourcePolicy(ResourcePolicy.DENY_ALL)
+                .documentLimits(new DocumentLimits(limits.maxSvgDepth(), DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH,
+                        limits.maxSvgElements()))
+                .build();
         SVGDocument svg = new SVGLoader().load(new ByteArrayInputStream(Files.readAllBytes(file.path())),
                 URI.create("about:blank"), context);
         if (svg == null) {
-            throw new IOException("No se puede dibujar el SVG " + file.path().getFileName());
+            throw new ImageFormatException("No se puede dibujar el SVG " + file.path().getFileName()
+                    + ": JSVG no lo carga (por ejemplo, anida más <use> que su límite de "
+                    + DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH + " niveles)");
         }
         PdfBoxGraphics2D graphics = new PdfBoxGraphics2D(doc, (float) file.width(), (float) file.height());
         try {

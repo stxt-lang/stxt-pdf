@@ -1,0 +1,11 @@
+# Case: Un SVG con 70 grupos anidados pasa de los 64 niveles que se admiten
+# Code: SVG_TOO_COMPLEX
+# Line: 11
+Document (dev.stxt.boxes):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/limit-depth.svg

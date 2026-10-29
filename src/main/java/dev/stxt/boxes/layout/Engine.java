@@ -17,6 +17,7 @@ import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.layout.multicol.MulticolLayout;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.layout.table.TableLayout;
+import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
@@ -48,6 +49,7 @@ public final class Engine {
     private final LayoutCache cache = new LayoutCache();
     private final TextMeasurer measurer;
     private final Images images;
+    private final Limits limits;
     private final BlockLayout block;
     private final InlineLayout inline;
     private final FlexLayout flex;
@@ -72,10 +74,16 @@ public final class Engine {
         this(measurer, new Resources());
     }
 
-    /** Motor con esas métricas del texto y las imágenes de {@code resources} (§5.18). */
+    /** Motor con esas métricas del texto y las imágenes de {@code resources} (§5.18), con los {@link Limits#DEFAULT}. */
     public Engine(TextMeasurer measurer, Resources resources) {
+        this(measurer, resources, Limits.DEFAULT);
+    }
+
+    /** Motor con esas métricas, esas imágenes y esos {@link Limits} (§6.2). */
+    public Engine(TextMeasurer measurer, Resources resources, Limits limits) {
         this.measurer = measurer;
-        this.images = new Images(resources);
+        this.limits = limits;
+        this.images = new Images(resources, limits);
         this.block = new BlockLayout(this);
         this.inline = new InlineLayout(this, measurer);
         this.flex = new FlexLayout(this);
@@ -128,6 +136,11 @@ public final class Engine {
     private void release() {
         cache.clear();
         inline.assume(Map.of(), Map.of());
+    }
+
+    /** Los límites de este motor, que el {@link Paginator} aplica al número de páginas. */
+    Limits limits() {
+        return limits;
     }
 
     /** Entradas de la caché ahora mismo, para comprobar que {@link #release} la vacía. */

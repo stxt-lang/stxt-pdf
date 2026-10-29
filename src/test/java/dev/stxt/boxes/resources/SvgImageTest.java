@@ -192,4 +192,67 @@ class SvgImageTest {
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\">Hola <tspan font-family=\"Nope\">x</tspan></text></svg>")
                 .contains("Fuente desconocida: Nope"));
     }
+
+    // --- Cuánto dibuja un SVG (ROADMAP-QA-ARQ.md, QA-06) ---------------------------------------------------
+
+    @Test
+    void anSvgCountsItsElementsAndItsDepth() throws IOException {
+        ImageFile f = read("<svg " + NS + " width=\"10\" height=\"10\"><g><rect/><rect/></g><circle/></svg>");
+        assertEquals(5, f.svgElements());
+        assertEquals(3, f.svgDepth());
+        // Un PNG o un JPEG no tienen elementos y un SVG no tiene píxeles.
+        assertEquals(0, f.pixels());
+    }
+
+    @Test
+    void everyUseCountsWhatItRepeats() throws IOException {
+        // svg (1) + defs con un g de dos rect (1 + 3) + tres use de ese g (cada uno 1 + 3).
+        ImageFile f = read("<svg " + NS + " width=\"10\" height=\"10\"><defs><g id=\"a\"><rect/><rect/></g></defs>"
+                + "<use href=\"#a\"/><use href=\"#a\"/><use href=\"#a\"/></svg>");
+        assertEquals(1 + 4 + 3 * 4, f.svgElements());
+    }
+
+    @Test
+    void aReferenceDefinedAfterItsUseCounts() throws IOException {
+        ImageFile f = read("<svg " + NS + " width=\"10\" height=\"10\"><use href=\"#a\"/><g id=\"a\"><rect/></g></svg>");
+        assertEquals(1 + (1 + 2) + 2, f.svgElements());
+    }
+
+    @Test
+    void aSelfRepeatingSvgIsRejected() throws IOException {
+        String message = error("<svg " + NS + " width=\"10\" height=\"10\"><g id=\"a\"><use href=\"#a\"/></g></svg>");
+        assertTrue(message.contains("se repite a sí mismo"), message);
+    }
+
+    /** Diez multiplicado nueve veces no cabe en un entero ni se puede recorrer: el recuento satura y no desborda. */
+    @Test
+    void theCountSaturatesInsteadOfOverflowing() throws IOException {
+        StringBuilder svg = new StringBuilder("<svg " + NS + " width=\"10\" height=\"10\"><defs><g id=\"l0\"><rect/></g>");
+        for (int k = 1; k <= 30; k++) {
+            svg.append("<g id=\"l").append(k).append("\">");
+            for (int j = 0; j < 10; j++) {
+                svg.append("<use href=\"#l").append(k - 1).append("\"/>");
+            }
+            svg.append("</g>");
+        }
+        svg.append("</defs><use href=\"#l30\"/></svg>");
+        assertEquals(SvgInspector.SATURATED, read(svg.toString()).svgElements());
+    }
+
+    /** Un SVG hostil con decenas de miles de niveles, anidados o encadenados, no agota la pila del inspector. */
+    @Test
+    void veryDeepOrLongChainsDoNotOverflowTheStack() throws IOException {
+        StringBuilder nested = new StringBuilder("<svg " + NS + " width=\"10\" height=\"10\">");
+        nested.append("<g>".repeat(30_000)).append("<rect/>").append("</g>".repeat(30_000)).append("</svg>");
+        ImageFile deep = read(nested.toString());
+        assertEquals(30_002, deep.svgDepth());
+        assertEquals(30_002, deep.svgElements());
+
+        StringBuilder chain = new StringBuilder("<svg " + NS + " width=\"10\" height=\"10\"><defs><rect id=\"u0\"/>");
+        for (int k = 1; k <= 30_000; k++) {
+            chain.append("<use id=\"u").append(k).append("\" href=\"#u").append(k - 1).append("\"/>");
+        }
+        chain.append("</defs><use href=\"#u30000\"/></svg>");
+        assertTrue(read(chain.toString()).svgElements() > 30_000);
+    }
 }

@@ -40,13 +40,18 @@ public final class ImageFile {
     private final double pixelWidth;
     private final double pixelHeight;
     private final boolean text;
+    private final long svgElements;
+    private final int svgDepth;
 
-    private ImageFile(Path path, Format format, double pixelWidth, double pixelHeight, boolean text) {
+    private ImageFile(Path path, Format format, double pixelWidth, double pixelHeight, boolean text,
+            long svgElements, int svgDepth) {
         this.path = path;
         this.format = format;
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
         this.text = text;
+        this.svgElements = svgElements;
+        this.svgDepth = svgDepth;
     }
 
     /**
@@ -80,7 +85,7 @@ public final class ImageFile {
             if (width <= 0 || height <= 0) {
                 throw new ImageFormatException("La imagen " + name + " no tiene píxeles");
             }
-            return new ImageFile(path, format, width, height, false);
+            return new ImageFile(path, format, width, height, false, 0, 0);
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
@@ -112,7 +117,8 @@ public final class ImageFile {
         for (SvgInspector.TextUse use : info.texts()) {
             checkText(use, name, resources);
         }
-        return new ImageFile(path, Format.SVG, info.widthPx(), info.heightPx(), !info.texts().isEmpty());
+        return new ImageFile(path, Format.SVG, info.widthPx(), info.heightPx(), !info.texts().isEmpty(),
+                info.elements(), info.depth());
     }
 
     /** Que la fuente de un texto del SVG exista en {@code fonts/} y tenga todos sus caracteres: no hay sustitución. */
@@ -178,6 +184,21 @@ public final class ImageFile {
     /** Alto en píxeles; el de un SVG, en píxeles CSS (no tiene por qué ser entero). */
     public double pixelHeight() {
         return pixelHeight;
+    }
+
+    /** Píxeles de un PNG o JPEG (ancho × alto, leídos de la cabecera); 0 en un SVG, que no tiene. */
+    public long pixels() {
+        return format == Format.SVG ? 0 : (long) pixelWidth * (long) pixelHeight;
+    }
+
+    /** Elementos que dibuja un SVG, contando cada repetición de un {@code <use>} (saturado); 0 si no es un SVG. */
+    public long svgElements() {
+        return svgElements;
+    }
+
+    /** Niveles de anidado de un SVG, con su {@code <svg>} raíz; 0 si no es un SVG. */
+    public int svgDepth() {
+        return svgDepth;
     }
 
     /** Si es un SVG con texto, que se dibuja con las fuentes de {@code fonts/}. */

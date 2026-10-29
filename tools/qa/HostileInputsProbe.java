@@ -49,7 +49,7 @@ public class HostileInputsProbe {
             Engine e = new Engine(new PdfMetrics(r), r);
             var lo = e.layOutDocument(doc);
             ByteArrayOutputStream o = new ByteArrayOutputStream();
-            PdfCanvas.write(lo, r, o, false);
+            PdfCanvas.write(lo, r, dev.stxt.boxes.model.Limits.DEFAULT, o, false);
             return "OK paginas=" + lo.pages().size() + " pdf=" + o.size() / 1024 + "KB";
         });
         String res;

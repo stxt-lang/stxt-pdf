@@ -103,6 +103,26 @@ try {
 Los fallos de entrada y salida al escribir en el destino siguen siendo la `IOException` de `toPdf`. El detalle está en
 el §6.1 de la especificación.
 
+## Límites
+
+Un documento válido puede pedir más de lo que se quiere pagar (una imagen pequeña en bytes con miles de millones de
+píxeles, un SVG que se repite a sí mismo). El `Converter` lo rechaza antes de maquetar con un error `LIMIT` y la línea de
+la `Image`. Los valores por defecto son conservadores y se cambian con un objeto `Limits`:
+
+| Límite | Por defecto |
+|---|---|
+| `maxPages` | 2000 páginas |
+| `maxImagePixels` | 25 millones de píxeles por PNG o JPEG |
+| `maxSvgElements` | 20 000 elementos dibujados por SVG (cada `<use>` cuenta lo que repite) |
+| `maxSvgDepth` | 64 niveles de anidado por SVG |
+
+```java
+Converter converter = Converter.builder().limits(Limits.DEFAULT.withMaxPages(500).withMaxImagePixels(60_000_000)).build();
+```
+
+El texto del documento tiene además los límites de `stxt-core` (10 MB, 100 niveles, 10 000 caracteres por línea).
+Cómo se midieron y qué cuesta subirlos está en el §6.2 de la especificación.
+
 ## Uso desde varios hilos
 
 La forma recomendada es crear **un `Converter` y compartirlo**: es inmutable y cada conversión crea su propio

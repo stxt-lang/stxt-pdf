@@ -64,7 +64,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-03 | PDFBox aplica GSUB (ligaduras) y el motor mide sin ellas | Alta | M | hecho |
 | QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | hecho |
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
-| QA-06 | Límites y entradas hostiles | Media | M | pendiente |
+| QA-06 | Límites y entradas hostiles | Media | M | hecho |
 | QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
 | QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
 | QA-09 | Integración continua | Alta | S | hecho |
@@ -111,6 +111,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | Reparto de tiempo con `{page}` en un `Fixed` | al pasar de 99 a 100 páginas el layout se hace dos veces (PF-03): 23 → 46 fallos de caché por página |
 | Tras la sesión 2, texto largo | 153 páginas: layout 386 ms, pintar 232 ms (antes 954 y 2275); 657 páginas: layout 1,5 s, pintar 0,8 s (antes 3,2 y 9,3). Con `Ligatures: true`: layout 588 ms, pintar ≈ 2 s. 8 hilos × 10 rondas × 11 ejemplos: 6,8 a 7,0 s (antes 13,4 a 16,2 s) |
 | Entradas hostiles | anidado > 100 niveles y línea > 10 000 caracteres: `LimitException` de `stxt-core` (bien); `Columns: repeat(100000, 1fr)`: 182 ms; 2000 páginas: 0,5 s |
+| Bombas de imagen (`BombsProbe`, JVM de 512 MB) | PNG sin transparencia: 64 Mpx en 4,6 s, 144 Mpx en 4,3 s, 900 Mpx (106 KB) en 23 s; con transparencia: 64 Mpx en 5,3 s, 144 Mpx (547 KB) `OutOfMemoryError` (13 s con 1,5 GB); JPEG de 400 Mpx: 0,5 s. SVG con los límites de JSVG subidos: 300 000 rectángulos 5,4 s (PDF de 4 MB), 100 000 `<use>` 1,8 s, 2000 niveles bien, **20 000 niveles `StackOverflowError`**, 10⁹ elementos por `<use>` `OutOfMemoryError` a los 51 s. Con los límites por defecto de JSVG (2000 elementos y 30 niveles) falla incluso un SVG legítimo de 3000 rectángulos |
 
 ## QA
 
@@ -214,7 +215,7 @@ caracteres 'xxxxxxxx…' no cabe…»), en `Messages`. **Hecho (sesión 1):** `M
 **Aceptación:** el caso del catálogo de errores correspondiente
 sigue pasando y un test comprueba que el mensaje no crece con la palabra.
 
-### QA-06 · Límites y entradas hostiles · Media · M
+### QA-06 · Límites y entradas hostiles · Media · M · hecho
 
 **Lo verificado** (`HostileInputsProbe`): anidar más de 100 niveles y las líneas de más de 10 000 caracteres los
 rechaza `stxt-core` con `LimitException` (no con `StackOverflowError`); `repeat(100000, 1fr)` se resuelve en 182 ms;
@@ -235,6 +236,31 @@ rechaza `stxt-core` con `LimitException` (no con `StackOverflowError`); `repeat(
 
 **Aceptación.** `Limits` con valores por defecto razonables; un caso del catálogo de errores por cada límite;
 `HostileInputsProbe` ampliada con la bomba de píxeles y el SVG enorme.
+
+**Hecho (sesión 3), decisiones 303 a 307.** Se midió primero con una sonda nueva, `tools/qa/BombsProbe.java` (cada caso en
+una JVM de 512 MB), y los valores por defecto los eligió el usuario entre tres juegos medidos («conservadores»).
+
+*Lo medido* (ver la línea base): (1) **PNG y JPEG**: PDFBox incrusta casi todos los PNG sin decodificarlos, así que no
+siempre hay una bomba de memoria, pero sí de tiempo (900 Mpx en 23 s) y, con transparencia y 144 Mpx, un `OutOfMemoryError`
+en 512 MB (con 1,5 GB tarda 13 s); el JPEG se incrusta tal cual. (2) **SVG**: no era una bomba sino un **defecto**: JSVG
+trae límites ocultos (2000 elementos, 30 niveles) y un SVG legítimo de 3000 rectángulos pasaba la validación del
+motor y fallaba al pintar con una `IOException` genérica; además 20 000 niveles dan `StackOverflowError`, que ni el
+`Converter` atrapa, y una cadena de `use` de 10⁹ elementos agota un heap de 512 MB tras 51 s.
+
+*Lo hecho:* `model/Limits` (`maxPages` 2000, `maxImagePixels` 25 Mpx, `maxSvgElements` 20 000, `maxSvgDepth` 64, con
+`withMax…`) en `Converter.builder().limits(…)`, que llega a `Engine`, `Images`, `Paginator` y `PdfCanvas.write`. Códigos
+nuevos `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX` (`Kind.LIMIT`, con la línea de la `Image`), comprobados **antes de
+maquetar** con la cabecera (`ImageFile.pixels()`) y con el recuento de `SvgInspector` (sin recursión; cada `<use>` cuenta
+lo que repite; satura; un `<use>` circular es `IMAGE_FORMAT`). `PdfImages` da a JSVG los mismos límites, de modo que lo que
+el motor acepta se dibuja (`LimitsTest` lo comprueba justo en el límite) y un SVG que JSVG no carga sale como
+`ImageFormatException`, no como `IOException`. Casos nuevos en `test/errors/limits/` (con `limit-huge.png`, de 35 KB, y
+`limit-uses.svg` y `limit-depth.svg` en `resources/images/test/`), `LimitsTest` (9 casos) y los de recuento en
+`SvgImageTest`. Cambia el comportamiento: los SVG de entre 2000 y 20 000 elementos, que antes fallaban, ahora se dibujan;
+una conversión de más de 2000 páginas (antes 10 000) falla. §6.2 de la especificación y apartado «Límites» del README.
+
+*Sin hacer:* un límite de **tiempo** (una conversión sigue sin tener tope de segundos; para un servicio, un
+`Future.get(timeout)` y cancelar), el tamaño del texto del documento (ya lo limita `stxt-core` a 10 MB) y la ampliación de
+`HostileInputsProbe` (la cubre `BombsProbe`).
 
 ### QA-07 · Los tests de referencia ensucian el árbol · Media · M · decidir
 
@@ -370,7 +396,7 @@ Ver AR-08: un `Converter` inmutable (con `Resources`, estilos opcionales y lími
 `Engine` y es seguro entre hilos por construcción; sustituye a «hay que saber que no se comparte el `Engine`». Es
 la base del servicio HTTP de `TODO.md`. **Hecho (sesión 3)** junto con AR-08: `convert/Converter` (decisión 294 de
 `DECISIONES.md`). `ConcurrentConversionTest.threadsSharingTheConvertersGetTheSamePdf` comparte un mismo `Converter`
-por ejemplo entre 4 hilos. Los `Limits` de QA-06 se añadirán al `Builder` cuando se hagan.
+por ejemplo entre 4 hilos. Los `Limits` de QA-06 están ya en el `Builder` (`limits(…)`).
 
 ## Rendimiento
 
@@ -628,7 +654,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 |---|---|---|
 | **1. Correcciones y red de seguridad** | QA-01, QA-04, QA-05, QA-09, TS-02 | Fallo del idioma corregido; CI con matriz de idiomas; test de hilos |
 | **2. Ligaduras y rendimiento del pintado** (hecha) | QA-03 + PF-01, PF-02, TS-04 | Mide = pinta; pintar ≈ 9,5 veces más rápido por defecto; sin cerrojos calientes |
-| **3. Contrato público** | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
+| **3. Contrato público** (hecha) | TS-01, AR-09, AR-08 + TS-05, QA-06 | `Converter`, errores con tipo común, límites, README de hilos |
 | **4. SVG y el estado global** | QA-02, TS-03 | Sin `registerFont`; el idioma de la JVM no cambia el PDF |
 | **5. Caché de la paginación** | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
 | **6. Tests de referencia** | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
@@ -660,3 +686,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-28 | 3 · Contrato público (en curso) | AR-08 y TS-05 (commit `a25b014`): `Converter` (inmutable, seguro entre hilos, `layOut`/`toPdf`/`toSvg`) en el package `convert`; `PdfWriter` eliminado y sus llamadores migrados; decisión 294. Nuevos `ConverterTest` (9) y un test de `Converter` compartido entre hilos. | Resto de la sesión 3: TS-01 (contrato de hilos en javadoc/README y `Engine` sin protocolo público), AR-09 (`StxtPdfException`), QA-06 (`Limits` en el `Builder`) |
 | 2026-10-28 | 3 · Contrato público (en curso) | AR-09: `StxtPdfException` con `kind`/`code`/`line` para todos los errores del motor; `DocumentSyntaxException` para los de `stxt-core`; `PAGE_LIMIT` (primera parte de QA-06); `Converter` como frontera (`INTERNAL`); §6.1 de la especificación, README, decisiones 295 a 299. Tests nuevos: `ConverterErrorsTest` y el caso `PAGE_LIMIT`. | Resto de la sesión 3: TS-01 (contrato de hilos y `Engine` sin protocolo público) y QA-06 (`Limits` configurable, píxeles de imagen, elementos de SVG) |
 | 2026-10-28 | 3 · Contrato público (en curso) | TS-01: contrato de hilos en javadoc y README, protocolo de la paginación de `Engine` de package, `layOutDocument` suelta su estado al terminar; `EngineContractTest`; decisiones 300 a 302. | Último punto de la sesión 3: QA-06 (`Limits` configurable en el `Builder` del `Converter`, píxeles por imagen y elementos de SVG) |
+| 2026-10-29 | 3 · Contrato público (terminada) | QA-06: `Limits` (2000 páginas, 25 Mpx, 20 000 elementos y 64 niveles de SVG, elegidos por el usuario tras medirlos con `BombsProbe`) en `Converter.builder().limits(…)`; `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX` antes de maquetar; JSVG con los mismos límites (corrige que rechazara SVG legítimos de más de 2000 elementos con una `IOException`); casos del catálogo, `LimitsTest`, §6.2 de la especificación; decisiones 303 a 307. | Sesión 4: SVG y estado global (QA-02, TS-03). Decidir antes la decisión abierta 4 (contornos hechos por el motor o JSVG con sus límites) |
