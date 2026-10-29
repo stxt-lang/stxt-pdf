@@ -13,7 +13,7 @@ algoritmo, para usar la `LayoutCache` (sin ella, flex y grid anidados crecen de 
 
 `Engine.layOutDocument` es la entrada: valida las fuentes y las imágenes, pagina con el `Paginator`, comprueba los
 desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
-El protocolo con el `Paginator` (`reservePageDigits`, `assume`, `number`, `absolute()`) es de package.
+El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `absolute()`) es de package.
 
 > **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`; el protocolo de la
 > paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia.
@@ -155,12 +155,16 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 ## Paginación
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
-`Numbering` el número impreso de cada página (el contador, `restart` y `none`) y el último de su tanda (`{pages}`); `Page`
-lleva su `Media`, su sección y su `printed` (0 = sin número). Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)`
+`Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
+(`{pages}`) y su `Page style`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `Media`, su sección, su
+`printed` (0 = sin número) y su estilo. Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
-**`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como `00` y las líneas los conservan; al terminar de paginar, el
-`Paginator` llama a `Engine.number`, que rehace solo esas líneas con los valores de cada página (`PageNumbers`).
+**`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio) y las líneas
+los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
+valores de cada página ya escritos (`PageNumbers`). Si algún número impreso no cabe en el de prueba (`Numbering.probe`:
+tantos caracteres como el más largo, con `M` o `m` si hay romanos), se vuelve a paginar con uno que lo cubre
+(`PageNumbers.cover`), que solo crece.
 
 **Referencias.** `Engine.assume` fija las páginas supuestas (la primera vez, `00`), se pagina, se mira en qué página ha
 quedado el primer fragmento de cada caja referida (`Box.key()`) y se vuelve a paginar si alguna difiere, hasta 10 pasadas que
@@ -176,10 +180,12 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 > (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura; la
 > de una caja que cae en una página sin número, al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
 
-> **Decisión:** con `{pages}` y 100 páginas o más se vuelve a paginar reservando las cifras del total, en lugar de dejar
-> que el número real se salga del hueco reservado.
+> **Decisión:** con `{pages}` y 100 páginas o más, o con números romanos, se vuelve a paginar reservando el ancho del
+> número más largo, en lugar de dejar que el número real se salga del hueco reservado. En romanos se reserva una `M` por
+> letra, la más ancha de las que escriben un romano. *Alternativa descartada:* medir cada número real en su línea, que
+> cambiaría los saltos de línea de una página a otra.
 
-**Volver a paginar no vacía la caché.** Cuando el total de páginas necesita otra cifra (`Engine.reservePageDigits`) o cambia
+**Volver a paginar no vacía la caché.** Cuando el número de prueba crece (`Engine.reservePageNumbers`) o cambia
 la página de una referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo
 que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`). Lo vigila
 `PaginationCacheTest`.

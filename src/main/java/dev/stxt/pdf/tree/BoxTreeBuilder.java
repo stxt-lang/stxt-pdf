@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
 
@@ -35,6 +36,7 @@ import static dev.stxt.pdf.tree.TableBuilder.table;
 import static dev.stxt.pdf.tree.ValueReader.angle;
 import static dev.stxt.pdf.tree.ValueReader.bool;
 import static dev.stxt.pdf.tree.ValueReader.enumValue;
+import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 
 /**
  * Construye el árbol de cajas a partir del documento (referencia/comun/estructura.md): traduce cada
@@ -168,16 +170,37 @@ public final class BoxTreeBuilder {
         String id = null;
         MediaReader.Spec media = documentMedia;
         Section.PageNumbering numbering = Section.PageNumbering.CONTINUE;
+        NumberStyle pageStyle = NumberStyle.DECIMAL;
+        Node pageStyleNode = null;
+        Node startNode = null;
+        int start = 1;
         boolean inheritFixed = true;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
                 case "media" -> media = MediaReader.media(inline(p), documentMedia);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
+                case "page-style" -> {
+                    pageStyle = enumValue(NumberStyle.class, p);
+                    pageStyleNode = p;
+                }
+                case "start" -> {
+                    start = positiveInteger(p);
+                    startNode = p;
+                }
                 case "inherit-fixed" -> inheritFixed = bool(p);
                 default -> {
                 }
             }
+        }
+        // Lo que no tendría efecto (referencia/componentes/document.md#numeración-de-las-páginas).
+        if (startNode != null && numbering != Section.PageNumbering.RESTART) {
+            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start solo tiene efecto con Page numbering: "
+                    + "restart, que es cuando la numeración vuelve a empezar: decláralo o quita Start");
+        }
+        if (pageStyleNode != null && numbering == Section.PageNumbering.NONE) {
+            throw error(pageStyleNode, ErrorCode.PAGE_STYLE_WITHOUT_NUMBERS, "Page style no tiene efecto con Page "
+                    + "numbering: none, porque las páginas de la sección no tienen número: quítalo");
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
@@ -186,7 +209,7 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
-        return new Section(box, media.media(), numbering, inheritFixed);
+        return new Section(box, media.media(), numbering, pageStyle, start, inheritFixed);
     }
 
     /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */

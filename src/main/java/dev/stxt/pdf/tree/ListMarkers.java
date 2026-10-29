@@ -1,8 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Marker;
-
-import java.util.Locale;
+import dev.stxt.pdf.model.NumberStyle;
 
 /**
  * Texto del marcador de un ítem de lista (referencia/componentes/list.md): un símbolo ({@code •},
@@ -13,9 +12,6 @@ final class ListMarkers {
 
     /** El mayor número romano que se escribe sin símbolos especiales. */
     static final int MAX_ROMAN = 3999;
-
-    private static final int[] ROMAN_VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-    private static final String[] ROMAN_DIGITS = {"m", "cm", "d", "cd", "c", "xc", "l", "xl", "x", "ix", "v", "iv", "i"};
 
     private ListMarkers() {
     }
@@ -39,14 +35,7 @@ final class ListMarkers {
      * lo que da {@code {number of: id}} (referencia/comun/referencias.md); {@code null} si el marcador no numera.
      */
     static String number(Marker marker, int number) {
-        return switch (marker) {
-            case DECIMAL -> Integer.toString(number);
-            case LOWER_ALPHA -> alpha(number);
-            case UPPER_ALPHA -> alpha(number).toUpperCase(Locale.ROOT);
-            case LOWER_ROMAN -> roman(number);
-            case UPPER_ROMAN -> roman(number).toUpperCase(Locale.ROOT);
-            default -> null;
-        };
+        return marker.numbered() ? NumberStyle.valueOf(marker.name()).format(number) : null;
     }
 
     /** Si la numeración puede escribir el número: {@code decimal} desde 0, letras desde 1, romanos de 1 a 3999. */
@@ -66,25 +55,5 @@ final class ListMarkers {
             case LOWER_ALPHA, UPPER_ALPHA -> "desde 1";
             default -> "de 1 a " + MAX_ROMAN;
         };
-    }
-
-    /** Letras como en CSS: 1 → a, 26 → z, 27 → aa. */
-    private static String alpha(int number) {
-        StringBuilder s = new StringBuilder();
-        for (int n = number; n > 0; n = (n - 1) / 26) {
-            s.insert(0, (char) ('a' + (n - 1) % 26));
-        }
-        return s.toString();
-    }
-
-    private static String roman(int number) {
-        StringBuilder s = new StringBuilder();
-        int n = number;
-        for (int i = 0; i < ROMAN_VALUES.length; i++) {
-            for (; n >= ROMAN_VALUES[i]; n -= ROMAN_VALUES[i]) {
-                s.append(ROMAN_DIGITS[i]);
-            }
-        }
-        return s.toString();
     }
 }

@@ -143,6 +143,10 @@ public enum ErrorCode {
     OVERCONSTRAINED,
     /** Un margen {@code auto} donde no centra ni absorbe nada. */
     MARGIN_AUTO_WITHOUT_EFFECT,
+    /** {@code Start} en una {@code Section} sin {@code Page numbering: restart}. */
+    START_WITHOUT_RESTART,
+    /** {@code Page style} en una {@code Section} con {@code Page numbering: none}. */
+    PAGE_STYLE_WITHOUT_NUMBERS,
     /** {@code Lines} sin {@code Wrap: true}. */
     LINES_WITHOUT_WRAP,
     /** {@code Gap} de dos valores en un {@code Flex} sin {@code Wrap: true}. */

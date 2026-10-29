@@ -75,26 +75,26 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     /** Vuelve al estado de antes de maquetar: las cifras de prueba por defecto, sin referencias ni reparto memorizado. */
     public void reset() {
-        this.measurer = PageNumbers.probing(real, PageNumbers.DIGITS);
+        this.measurer = PageNumbers.probing(real, PageNumbers.firstProbe());
         this.pages = Map.of();
         this.numbers = Map.of();
         broken.clear();
     }
 
     /**
-     * Cifras del número de prueba de {@code {page}} y {@code {pages}}. Cambia lo que miden los textos con esos
-     * marcadores: quien llama olvida su reparto memorizado ({@link #forget}) y lo que guarda de ellos la caché del
+     * El número de prueba de {@code {page}} y {@code {pages}} ({@link PageNumbers}). Cambia lo que miden los textos con
+     * esos marcadores: quien llama olvida su reparto memorizado ({@link #forget}) y lo que guarda de ellos la caché del
      * {@link LayoutContext}.
      */
-    public void reservePageDigits(int digits) {
-        this.measurer = PageNumbers.probing(real, digits);
+    public void reservePageNumbers(String probe) {
+        this.measurer = PageNumbers.probing(real, probe);
     }
 
     /**
      * Lo que valen las referencias a otras cajas del texto ({@code {page of: id}} y {@code {number of: id}},
      * referencia/comun/referencias.md): se sustituyen antes de repartir el texto en líneas, así que el texto mide lo
      * que va a pintarse. Las páginas son una suposición que el {@link dev.stxt.pdf.layout.Paginator} repite hasta que
-     * se cumple. Como con {@link #reservePageDigits}, quien llama olvida los textos cuyo valor cambia.
+     * se cumple. Como con {@link #reservePageNumbers}, quien llama olvida los textos cuyo valor cambia.
      */
     public void assume(Map<String, String> pages, Map<String, String> numbers) {
         this.pages = Map.copyOf(pages);
@@ -129,7 +129,7 @@ public final class InlineLayout implements LayoutAlgorithm {
      * marcador vuelve a medirse y a alinearse; con {@code justify}, solo se justifica si ya lo
      * estaba. Devuelve el mismo fragmento si no cambia nada.
      */
-    public Fragment number(Fragment f, int page, int pages) {
+    public Fragment number(Fragment f, String page, String pages) {
         List<Fragment> children = new ArrayList<>();
         boolean changed = false;
         for (Fragment child : f.children()) {

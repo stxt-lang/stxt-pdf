@@ -48,7 +48,7 @@ final class HeadingNumbers {
         for (int l = 1; l <= level; l++) {
             // Los antecesores sin número no aportan: su contador no existe.
             if (l == level || numbered[l]) {
-                parts.add(ListMarkers.number(styles[l].marker(), counters[l]));
+                parts.add(styles[l].format(counters[l]));
             }
         }
         return String.join(".", parts);

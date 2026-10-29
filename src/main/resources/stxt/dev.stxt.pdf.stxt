@@ -52,6 +52,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Page numbering
 				Max: 1
+			Child: Page style
+				Max: 1
+			Child: Start
+				Max: 1
 			Child: Inherit fixed
 				Max: 1
 			Child: Block
@@ -991,6 +995,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: continue
 			Value: restart
 			Value: none
+	Node: Page style
+		Type: ENUM
+		Description: Cómo se escriben los números de las páginas de una Section: decimal (1, por defecto), lower-roman (i) o upper-roman (I), en {page}, {pages}, {page of: id}, los índices y el visor. No vale con Page numbering: none.
+		Values:
+			Value: decimal
+			Value: lower-roman
+			Value: upper-roman
 	Node: Inherit fixed
 		Type: BOOLEAN
 		Description: Si la Section lleva los Fixed del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
@@ -1268,7 +1279,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: upper-roman
 	Node: Start
 		Type: INTEGER
-		Description: Número del primer ítem de una lista numerada. Por defecto, 1.
+		Description: Número con que empieza una numeración: el del primer ítem de una lista numerada o, en una Section con Page numbering: restart, el de su primera página. Por defecto, 1.
 	Node: Number
 		Type: INTEGER
 		Description: Número de este ítem de una lista numerada; los siguientes continúan desde él.

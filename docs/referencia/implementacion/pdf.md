@@ -6,9 +6,9 @@ escribe el código, en [El pintado](pintado.md#el-pdf).
 
 ## Páginas, fuentes y metadatos
 
-- Cada página tiene el tamaño del `Media` de su sección. Las etiquetas de página (`PageLabels`) llevan el número impreso,
-  o ninguno en las páginas sin número, y solo se escriben si alguna página no es su número físico: un documento que
-  numera como siempre no las lleva.
+- Cada página tiene el tamaño del `Media` de su sección. Las etiquetas de página (`PageLabels`) llevan el número impreso
+  con su estilo (`D`, `r` o `R`), o ninguno en las páginas sin número, y solo se escriben si alguna página no es su
+  número físico en cifras: un documento que numera como siempre no las lleva.
 - Las fuentes son las TTF de la carpeta de recursos, incrustadas como subconjunto (Type 0, Identity-H) con los glifos que
   se usan.
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre;

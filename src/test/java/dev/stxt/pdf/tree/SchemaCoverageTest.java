@@ -37,6 +37,7 @@ class SchemaCoverageTest {
             Map.entry("Language", "Language: es"),
             // Section
             Map.entry("Page numbering", "Page numbering: restart"),
+            Map.entry("Page style", "Page style: lower-roman"),
             Map.entry("Inherit fixed", "Inherit fixed: false"),
             // Elementos
             Map.entry("Id", "Id: x"),
@@ -163,8 +164,9 @@ class SchemaCoverageTest {
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
         t.put("Document", new Template(HEADER + "\t{}\n\tSection:\n\t\tBlock:", Set.of("Title", "Language")));
-        // Una sección: lo que admite además de su contenido.
-        t.put("Section", new Template(HEADER + "\tSection:\n\t\t{}\n\t\tBlock:"));
+        // Una sección: lo que admite además de su contenido. Start necesita restart.
+        t.put("Section", new Template(HEADER + "\tSection:\n\t\tPage numbering: restart\n\t\t{}\n\t\tBlock:",
+                Set.of("Page numbering")));
         // Paper excluye Width y Height, que leen todos los documentos (la cabecera).
         t.put("Media", new Template("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n\t\t{}\n\tSection:\n\t\tBlock:",
                 Set.of("Paper", "Width", "Height")));

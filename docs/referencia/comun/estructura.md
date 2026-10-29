@@ -173,7 +173,7 @@ vez; los elementos, las veces que se quiera.
 | Nodo | Hijos |
 |---|---|
 | `Document` | `Media`, `Title` y `Language` (exactamente uno de cada), `Styles`; `Fixed`, `Section` (al menos una) |
-| `Section` | `Id`, `Class`, `Media`, `Page numbering`, `Inherit fixed`; elementos |
+| `Section` | `Id`, `Class`, `Media`, `Page numbering`, `Page style`, `Start`, `Inherit fixed`; elementos |
 | `Media` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
 | `Styles` | `Element`, `For class`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `Box`, `Typography`, `Break` |

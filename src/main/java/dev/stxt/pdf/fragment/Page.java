@@ -1,5 +1,6 @@
 package dev.stxt.pdf.fragment;
 
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.tree.Media;
 
 import java.util.List;
@@ -14,8 +15,10 @@ import java.util.List;
  * @param section posición de su sección en el documento, desde 0
  * @param printed número impreso de la página (lo que dicen {@code {page}} y los índices), desde 1;
  *                0 si la página no se numera ({@code Page numbering: none})
+ * @param style   cómo se escribe su número ({@code Page style} de su sección)
  */
-public record Page(int number, Fragment content, List<Fragment> fixed, Media media, int section, int printed) {
+public record Page(int number, Fragment content, List<Fragment> fixed, Media media, int section, int printed,
+                   NumberStyle style) {
 
     public Page {
         fixed = List.copyOf(fixed);

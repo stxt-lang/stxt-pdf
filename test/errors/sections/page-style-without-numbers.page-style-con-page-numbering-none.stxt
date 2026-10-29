@@ -1,0 +1,18 @@
+# Case: Page style en una sección sin números de página
+# Code: PAGE_STYLE_WITHOUT_NUMBERS
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page numbering: none
+		Page style: lower-roman
+		Paragraph: Uno

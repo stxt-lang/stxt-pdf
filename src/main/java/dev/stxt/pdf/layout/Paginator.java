@@ -97,16 +97,17 @@ public final class Paginator {
         }
         engine.assume(assumed, numbers, List.of());
 
-        int digits = PageNumbers.DIGITS;
+        String probe = PageNumbers.firstProbe();
         int changes = 0;
         while (true) {
             fixed.forEach(Map::clear);
             List<List<LayoutResult>> results = flow(sections, fixed);
             Numbering numbering = Numbering.of(sections, results);
             boolean again = false;
-            if (!numberedTexts.isEmpty() && PageNumbers.digits(numbering.pages()) > digits) {
-                digits = PageNumbers.digits(numbering.pages());
-                engine.reservePageDigits(digits, numberedTexts);
+            String covering = PageNumbers.cover(probe, numbering.probe());
+            if (!numberedTexts.isEmpty() && !covering.equals(probe)) {
+                probe = covering;
+                engine.reservePageNumbers(probe, numberedTexts);
                 again = true;
             }
             Map<String, String> actual = pagesOf(results, numbering, targets, sites);
@@ -150,13 +151,16 @@ public final class Paginator {
                 for (PendingAbsolute p : fixed.get(k).values()) {
                     queue.add(new Queued(p, i + 1, own.size()));
                 }
-                List<Fragment> fixedFragments = placeFixed(queue, section, numbered, printed, numbering.total(number));
+                List<Fragment> fixedFragments = placeFixed(queue, section, numbered, printed, numbering.label(number),
+                        numbering.totalLabel(number));
                 if (numbered && printed == 0) {
                     unavailable(section.box());
                 }
                 Fragment content = numbered && printed > 0
-                        ? engine.number(own.get(i).fragment(), printed, numbering.total(number)) : own.get(i).fragment();
-                pages.add(new Page(number, content, fixedFragments, section.media(), k, printed));
+                        ? engine.number(own.get(i).fragment(), numbering.label(number), numbering.totalLabel(number))
+                        : own.get(i).fragment();
+                pages.add(new Page(number, content, fixedFragments, section.media(), k, printed,
+                        numbering.style(number)));
             }
         }
         return pages;
@@ -167,7 +171,8 @@ public final class Paginator {
      * (referencia/componentes/relative-absolute-fixed.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
      * sale en su resultado y se coloca después.
      */
-    private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, int tanda) {
+    private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, String page,
+                                      String tanda) {
         Rect area = section.media().pageArea();
         List<Fragment> fragments = new ArrayList<>();
         for (int q = 0; q < queue.size(); q++) {
@@ -179,7 +184,7 @@ public final class Paginator {
                 unavailable(item.pending().box());
             }
             LayoutResult f = engine.absolute().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
-            fragments.add(numbered ? engine.number(f.fragment(), printed, tanda) : f.fragment());
+            fragments.add(numbered ? engine.number(f.fragment(), page, tanda) : f.fragment());
             f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
         }
         return fragments;
@@ -268,7 +273,7 @@ public final class Paginator {
                 throw new InvalidModelException(line, ErrorCode.REFERENCE_NOT_PLACEABLE, "La caja " + id
                         + " está en una sección sin números de página (Page numbering: none): no tiene página que dar");
             }
-            pages.put(id, Integer.toString(numbering.printed(number)));
+            pages.put(id, numbering.label(number));
         }
         f.children().forEach(child -> firstPages(child, number, targets, pages, numbering, sites));
     }

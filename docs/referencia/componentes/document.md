@@ -104,6 +104,8 @@ contenido está en alguna.
 | `Class` | nombres separados por espacios | — | Le aplican las reglas `For class` con esos nombres; como `For id` y `Element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
 | `Media` | como el del documento | el del documento | Ver [abajo](#el-media-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
+| `Page style` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_STYLE_WITHOUT_NUMBERS`. |
+| `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit fixed` | booleano | `true` | Si lleva los `Fixed` del documento. Con `false`, solo salen los suyos. |
 
 Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
@@ -162,16 +164,38 @@ cae en una página sin número (el `Fixed` del documento en una portada que lo h
 deja en blanco. Los marcadores, los enlaces y `Pages` siguen la página física. Un encabezado de una sección `none` no puede
 estar en un índice (`In contents: false`).
 
-Como el contador no avanza en una sección `none`, una sección `continue` detrás de una portada empieza en 1. El visor
-muestra también el número impreso ([El PDF](../comun/pdf.md#páginas)).
+Como el contador no avanza en una sección `none`, una sección `continue` detrás de una portada empieza en 1. Con
+`Page numbering: restart`, `Start` da el número de la primera página de la sección (`Start: 5`: un documento repartido
+en varios ficheros). El visor muestra también el número impreso ([El PDF](../comun/pdf.md#páginas)).
+
+**Cómo se escribe.** `Page style` escribe los números de las páginas de la sección en cifras (`decimal`), en romanos en
+minúscula (`lower-roman`: `i`, `ii`, `iv`) o en mayúscula (`upper-roman`). Lo que se imprime sigue mandando: `{page}` y
+`{pages}` se escriben con el estilo de la página donde salen, y `{page of: id}` y las entradas de un índice, con el de
+la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a empezar en 1:
+
+```
+Section:
+	Id: preface
+	Page style: lower-roman
+	Paragraph: El prefacio: sus páginas son i, ii, iii…
+Section:
+	Page numbering: restart
+	Paragraph: El cuerpo empieza en la página 1.
+```
+
+Un `Page style` en una sección `none`, que no tiene números, es `PAGE_STYLE_WITHOUT_NUMBERS`; un `Start` sin `restart`,
+que no tendría efecto porque la sección sigue la cuenta de la anterior, `START_WITHOUT_RESTART`.
+
+> **Decisión:** el estilo es de la sección, no del contador: una sección `continue` en romanos sigue la cuenta de la
+> anterior y la escribe en romanos. Solo cifras y romanos, que son los de las páginas de los libros. *Alternativa
+> descartada:* letras (`a`, `b`), que no se usan para numerar páginas.
 
 > **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan; lo que no tiene número es un error, nunca
 > un hueco vacío. *Alternativa descartada:* dejar el hueco vacío.
 
 ## Lo que no hay
 
-- Empezar una sección en página impar con una página en blanco (impresión a doble cara), un número inicial de la
-  numeración (`Start: 5`) u otros formatos de número de página (romanos en el prefacio).
+- Empezar una sección en página impar con una página en blanco (impresión a doble cara).
 - Un fondo de página propio de la sección (una portada a sangre pinta un bloque del tamaño de la página) y una página
   apaisada que no sea una sección entera.
 - Páginas con nombre o reglas de página: lo que cambia de una parte a otra es una sección.

@@ -3,6 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
@@ -106,7 +107,7 @@ public final class PdfDocumentWriter {
      * añaden nada. Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
      */
     private static void labels(PDDocument doc, List<Page> pages) {
-        if (pages.stream().allMatch(p -> p.printed() == p.number())) {
+        if (pages.stream().allMatch(p -> p.printed() == p.number() && p.style() == NumberStyle.DECIMAL)) {
             return;
         }
         PDPageLabels labels = new PDPageLabels(doc);
@@ -114,11 +115,16 @@ public final class PdfDocumentWriter {
         for (int i = 0; i < pages.size(); i++) {
             Page p = pages.get(i);
             boolean follows = previous != null
-                    && (p.numbered() ? previous.numbered() && p.printed() == previous.printed() + 1 : !previous.numbered());
+                    && (p.numbered() ? previous.numbered() && p.printed() == previous.printed() + 1
+                    && p.style() == previous.style() : !previous.numbered());
             if (!follows) {
                 PDPageLabelRange range = new PDPageLabelRange();
                 if (p.numbered()) {
-                    range.setStyle(PDPageLabelRange.STYLE_DECIMAL);
+                    range.setStyle(switch (p.style()) {
+                        case LOWER_ROMAN -> PDPageLabelRange.STYLE_ROMAN_LOWER;
+                        case UPPER_ROMAN -> PDPageLabelRange.STYLE_ROMAN_UPPER;
+                        default -> PDPageLabelRange.STYLE_DECIMAL;
+                    });
                     range.setStart(p.printed());
                 }
                 labels.setLabelItem(i, range);

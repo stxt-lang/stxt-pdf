@@ -1006,6 +1006,19 @@ class PdfCanvasTest {
         }
     }
 
+    /** Con {@code Page style} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda. */
+    @Test
+    void pageLabelsKeepThePageStyleAndTheStart() throws Exception {
+        InlineNode doc = reader.read(SECTIONS_HEAD
+                + "\tSection:\n\t\tPage style: lower-roman\n\t\tText: Prefacio\n\t\tText: Más\n\t\t\tBreak:\n\t\t\t\tBefore: page\n"
+                + "\tSection:\n\t\tPage numbering: restart\n\t\tStart: 5\n\t\tText: Cuerpo\n"
+                + "\tSection:\n\t\tPage style: upper-roman\n\t\tText: Anexo\n");
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "page-labels-styles"))) {
+            assertArrayEquals(new String[] {"i", "ii", "5", "VI"},
+                    pdf.getDocumentCatalog().getPageLabels().getLabelsByPageIndices());
+        }
+    }
+
     /** Cada página del PDF mide lo que su sección, y cada sección es un {@code Sect} con su idioma. */
     @Test
     void eachSectionIsASectWithItsOwnPageSizeAndLanguage() throws Exception {

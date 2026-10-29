@@ -34,9 +34,8 @@ saliendo al trabajar y solo toca ese.
 
 ### Encabezados y secciones
 
-- Numeración de los encabezados: número colgado a la izquierda.
-- Secciones: empezar en página impar con una página en blanco (doble cara), un número inicial (`Start: 5`), otros formatos
-  de número (romanos en el prefacio), un `Background` de página y una página apaisada que no sea una sección entera.
+- Secciones: empezar en página impar con una página en blanco (doble cara): decidir si la página en blanco cuenta para
+  el número, si lleva los `Fixed` y si cuenta en `Pages`.
 
 ### Tablas
 

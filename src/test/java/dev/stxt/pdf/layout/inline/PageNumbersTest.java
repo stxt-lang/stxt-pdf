@@ -32,7 +32,7 @@ class PageNumbersTest {
 
     @Test
     void replacesTheMarkers() {
-        assertEquals("Página 2 de 3", PageNumbers.apply("Página {page} de {pages}", 2, 3));
+        assertEquals("Página 2 de 3", PageNumbers.apply("Página {page} de {pages}", "2", "3"));
         assertTrue(PageNumbers.contains("{pages}"));
         assertFalse(PageNumbers.contains("{página}"));
     }
@@ -40,11 +40,19 @@ class PageNumbersTest {
     @Test
     void probeReservesTheDigits() {
         assertEquals("Página 00".length(),
-                PageNumbers.probing(new FixedMetrics(1), 2).width("Página {page}", F, 1), 1e-9);
+                PageNumbers.probing(new FixedMetrics(1), "00").width("Página {page}", F, 1), 1e-9);
         assertEquals("Página 000".length(),
-                PageNumbers.probing(new FixedMetrics(1), 3).width("Página {page}", F, 1), 1e-9);
-        assertEquals(2, PageNumbers.digits(99));
-        assertEquals(3, PageNumbers.digits(100));
+                PageNumbers.probing(new FixedMetrics(1), "000").width("Página {page}", F, 1), 1e-9);
+    }
+
+    /** El número de prueba solo crece: el más largo de los dos, con la letra más ancha ({@code 0}, {@code m}, {@code M}). */
+    @Test
+    void theProbeCoversTheWidestNumber() {
+        assertEquals("000", PageNumbers.cover("00", "000"));
+        assertEquals("00", PageNumbers.cover("00", "0"));
+        assertEquals("mmmm", PageNumbers.cover("00", "mmmm"));
+        assertEquals("MMM", PageNumbers.cover("mmm", "M"));
+        assertEquals("00", PageNumbers.cover("00", ""));
     }
 
     @Test
@@ -61,6 +69,20 @@ class PageNumbersTest {
             assertEquals(List.of("Hoja", Integer.toString(page)), lines.stream().map(TextLine::text).toList());
             assertTrue(lines.get(1).width() <= 35);
         }
+    }
+
+    @Test
+    void romanNumbersRepaginateWithTheWidestOne() {
+        // A ocupa 8 páginas, numeradas en romanos. El pie mide 35 pt (7 caracteres): "Hoja 00" cabe, pero "Hoja viii"
+        // no. Al repaginar reservando cuatro letras (las de viii), el número pasa a su propia línea.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tFixed:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
+                "\t\tText: Hoja {page}", "\t\t\tId: footer",
+                "\tSection:", "\t\tPage style: lower-roman",
+                "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 800");
+        assertEquals(8, l.pages());
+        assertEquals(List.of("Hoja", "viii"), l.fragment(8, "footer").lines().stream().map(TextLine::text).toList());
+        assertEquals(List.of("Hoja", "i"), l.fragment(1, "footer").lines().stream().map(TextLine::text).toList());
     }
 
     @Test

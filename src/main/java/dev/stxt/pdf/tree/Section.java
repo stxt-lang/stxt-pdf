@@ -1,5 +1,7 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.NumberStyle;
+
 /**
  * Una sección del documento (referencia/componentes/document.md): su caja, que es la raíz de su layout (una
  * {@code Box} sin padre, como la raíz anónima de un documento de una sola sección), su medio y lo
@@ -8,9 +10,13 @@ package dev.stxt.pdf.tree;
  * @param box          la caja: el área útil de cada una de sus páginas; es {@link Element#SECTION}
  * @param media        su medio: el del documento con lo que ella declara encima
  * @param numbering    cómo numera sus páginas
+ * @param pageStyle    cómo se escriben sus números de página ({@code Page style})
+ * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
+ *                     declara
  * @param inheritFixed si lleva los {@code Fixed} del documento
  */
-public record Section(Box box, Media media, PageNumbering numbering, boolean inheritFixed) {
+public record Section(Box box, Media media, PageNumbering numbering, NumberStyle pageStyle, int start,
+                      boolean inheritFixed) {
 
     /** {@code Page numbering} (referencia/componentes/document.md): qué hace la sección con el contador de páginas. */
     public enum PageNumbering {

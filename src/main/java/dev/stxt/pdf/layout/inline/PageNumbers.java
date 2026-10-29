@@ -6,14 +6,15 @@ package dev.stxt.pdf.layout.inline;
  *
  * <ol>
  *   <li>Se pagina midiendo cada marcador como un número de prueba de {@value #DIGITS} cifras
- *       (o más, ver abajo); las líneas conservan los marcadores.</li>
+ *       (o más ancho, ver abajo); las líneas conservan los marcadores.</li>
  *   <li>Con el total de páginas ya conocido, {@link InlineLayout#number} sustituye los valores
  *       reales en las líneas que los contienen y vuelve a calcular su ancho, su alineación y su
  *       justificación. Los saltos de línea no cambian.</li>
  * </ol>
  *
- * <p>Si el total tiene más cifras que el número de prueba, el {@link dev.stxt.pdf.layout.Paginator}
- * vuelve a paginar reservando las cifras del total, hasta que basten.</p>
+ * <p>Si algún número impreso es más ancho que el de prueba (más cifras, o romanos), el {@link
+ * dev.stxt.pdf.layout.Paginator} vuelve a paginar con un número de prueba que lo cubre, hasta que basta: tantos
+ * caracteres como el más largo, con la letra más ancha de su estilo ({@code M} en romanos).</p>
  */
 public final class PageNumbers {
 
@@ -29,19 +30,36 @@ public final class PageNumbers {
         return text != null && (text.contains(PAGE) || text.contains(PAGES));
     }
 
-    /** El texto con los valores de una página. */
-    public static String apply(String text, int page, int pages) {
-        return text.replace(PAGES, Integer.toString(pages)).replace(PAGE, Integer.toString(page));
+    /** El texto con los valores de una página, ya escritos con su estilo. */
+    public static String apply(String text, String page, String pages) {
+        return text.replace(PAGES, pages).replace(PAGE, page);
     }
 
-    /** Cifras de un número de páginas. */
-    public static int digits(int pages) {
-        return Integer.toString(pages).length();
+    /** El número de prueba de la primera paginación. */
+    public static String firstProbe() {
+        return "0".repeat(DIGITS);
     }
 
-    /** Mide los marcadores como un número de prueba de {@code digits} cifras (primera fase). */
-    public static TextMeasurer probing(TextMeasurer measurer, int digits) {
-        String probe = "0".repeat(digits);
+    /** El carácter más ancho de dos de los que forman un número de prueba: {@code 0} < {@code m} < {@code M}. */
+    public static char wider(char a, char b) {
+        String order = "0mM";
+        return order.indexOf(a) >= order.indexOf(b) ? a : b;
+    }
+
+    /**
+     * El número de prueba que cubre a {@code current} y a {@code needed}: el más largo de los dos, con el carácter más
+     * ancho. Solo crece, para que la paginación converja.
+     */
+    public static String cover(String current, String needed) {
+        if (needed.isEmpty()) {
+            return current;
+        }
+        char c = wider(current.charAt(0), needed.charAt(0));
+        return String.valueOf(c).repeat(Math.max(current.length(), needed.length()));
+    }
+
+    /** Mide los marcadores como el número de prueba {@code probe} (primera fase). */
+    public static TextMeasurer probing(TextMeasurer measurer, String probe) {
         return (text, font, fontSize) -> measurer.width(
                 contains(text) ? text.replace(PAGES, probe).replace(PAGE, probe) : text, font, fontSize);
     }

@@ -170,8 +170,8 @@ public final class Engine implements LayoutContext {
      * de {@code changed}, los textos con esos marcadores: se olvida lo que la caché guarda de ellos y de sus
      * antepasados ({@link #forget}).
      */
-    void reservePageDigits(int digits, Collection<Box> changed) {
-        inline.reservePageDigits(digits);
+    void reservePageNumbers(String probe, Collection<Box> changed) {
+        inline.reservePageNumbers(probe);
         forget(changed);
     }
 
@@ -269,7 +269,7 @@ public final class Engine implements LayoutContext {
      * Sustituye {@code {page}} y {@code {pages}} en las líneas de un fragmento ya maquetado y en
      * las de sus descendientes; el {@link Paginator} lo usa al terminar de paginar.
      */
-    Fragment number(Fragment fragment, int page, int pages) {
+    Fragment number(Fragment fragment, String page, String pages) {
         return inline.number(fragment, page, pages);
     }
 

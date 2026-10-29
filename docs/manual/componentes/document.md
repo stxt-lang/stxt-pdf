@@ -94,6 +94,8 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 |---|---|
 | `Media` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Media` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado; con solo `Margin`, el mismo papel con otros márgenes |
 | `Page numbering` | `continue` (por defecto): sigue la cuenta de páginas; `restart`: vuelve a empezar en 1; `none`: sus páginas no tienen número ni cuentan |
+| `Page style` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`…) o `upper-roman` (`I`, `II`…) |
+| `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
 | `Inherit fixed` | `true` (por defecto): lleva las cabeceras y los pies del documento; `false`: solo los suyos |
 | `Id`, `Class` | Para enlazarla (`#id`, su primera página) y darle tipografía con una regla (`Typography` y nada más: un anexo en otro idioma) |
 
@@ -106,7 +108,9 @@ ninguna página.
 sección con `Page numbering: restart`. Una página de una sección `none` no tiene número: si un texto con `{page}` cae en ella
 (un pie del documento en la portada), es un error, así que esa sección declara `Inherit fixed: false`.
 
-Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie de la página: el impreso.
+Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie de la página: el impreso, también en
+romanos si su sección tiene `Page style: lower-roman`. Para un prefacio en romanos, su sección declara `Page style` y la
+del cuerpo, `Page numbering: restart`; con `Start`, la numeración empieza en otro número.
 
 ## Recetas
 
@@ -117,7 +121,7 @@ Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie
 
 ## Lo que no hay
 
-- Empezar una sección en página impar (imprimir a doble cara), empezar la numeración en otro número o con números romanos.
+- Empezar una sección en página impar (imprimir a doble cara).
 - Un fondo de página propio: se pinta con un bloque del tamaño de la página o con un `Fixed` detrás de todo
   ([Capas y giro](../comun/capas-y-giro.md)).
 

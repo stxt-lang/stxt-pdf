@@ -2,6 +2,7 @@ package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
@@ -172,6 +173,29 @@ class SectionsTest {
         assertEquals("Página 1 de 2", text(d.pages().get(1), "num"));
         assertEquals("Página 2 de 2", text(d.pages().get(2), "num"));
         assertEquals("Página 1 de 1", text(d.pages().get(3), "num"));
+    }
+
+    /**
+     * Un prefacio en romanos y un cuerpo que vuelve a empezar en 5: {@code {page}}, {@code {pages}} y {@code {page of:
+     * id}} se escriben con el {@code Page style} de la página donde salen o a la que se refieren
+     * (referencia/componentes/document.md).
+     */
+    @Test
+    void romanPagesAndARestartThatStartsAtFive() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
+                join(new String[] {"\tSection:", "\t\tPage style: lower-roman", "\t\tText: El cuerpo empieza en la "
+                        + "{page of: b1} y el prefacio en la {page of: p1}.", "\t\t\tId: ref"}, fullPage("p1"),
+                        fullPage("p2")),
+                join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tStart: 5"}, fullPage("b1"),
+                        fullPage("b2")));
+        assertEquals(List.of(1, 2, 3, 5, 6), d.pages().stream().map(Page::printed).toList());
+        assertEquals(List.of(NumberStyle.LOWER_ROMAN, NumberStyle.LOWER_ROMAN, NumberStyle.LOWER_ROMAN,
+                NumberStyle.DECIMAL, NumberStyle.DECIMAL), d.pages().stream().map(Page::style).toList());
+        assertEquals("Página i de iii", text(d.pages().get(0), "num"));
+        assertEquals("Página iii de iii", text(d.pages().get(2), "num"));
+        assertEquals("Página 5 de 6", text(d.pages().get(3), "num"));
+        assertEquals("El cuerpo empieza en la 5 y el prefacio en la i.", text(d.pages().get(0), "ref"));
     }
 
     @Test

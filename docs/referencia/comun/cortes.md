@@ -130,9 +130,11 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../componente
 ## Números de página: `{page}` y `{pages}`
 
 `{page}` y `{pages}` en un texto se sustituyen por el número impreso de la página y el último número de su tanda, según
-el `Page numbering` de cada sección ([Document](../componentes/document.md#numeración-de-las-páginas)). El reparto en
-líneas y en páginas se hace con el ancho de un número de dos cifras (`00`), o de tantas como tenga el total si son más;
-el número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus saltos.
+el `Page numbering` y el `Page style` de cada sección
+([Document](../componentes/document.md#numeración-de-las-páginas)). El reparto en líneas y en páginas se hace con el
+ancho de un número de dos cifras (`00`), o de tantas como tenga el más largo si son más (en romanos, tantas `M` como
+letras tenga el más largo); el número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus
+saltos.
 
 `{page of: id}`, en cambio, se mide con la página escrita, así que puede cambiar el reparto
 ([Referencias](referencias.md)).

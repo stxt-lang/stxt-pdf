@@ -1,36 +1,43 @@
 package dev.stxt.pdf.layout;
 
+import dev.stxt.pdf.layout.inline.PageNumbers;
+import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.tree.Section;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * El número impreso de cada página física y el último de su tanda (referencia/componentes/document.md): las páginas
- * desde el último {@code Page numbering: restart}; {@code none} no numera ni avanza el contador.
+ * El número impreso de cada página física, el último de su tanda y cómo se escriben
+ * (referencia/componentes/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
+ * empieza en su {@code Start}; {@code none} no numera ni avanza el contador. Cada página se escribe con el {@code Page
+ * style} de su sección.
  */
-record Numbering(int[] printed, int[] totals) {
+record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
 
     static Numbering of(List<Section> sections, List<List<LayoutResult>> results) {
         int pages = results.stream().mapToInt(List::size).sum();
         int[] printed = new int[pages];
         int[] totals = new int[pages];
+        NumberStyle[] styles = new NumberStyle[pages];
         int counter = 0;
         int tandaFirst = 0;
         int i = 0;
         for (int k = 0; k < sections.size(); k++) {
-            Section.PageNumbering mode = sections.get(k).numbering();
+            Section section = sections.get(k);
+            Section.PageNumbering mode = section.numbering();
             if (mode == Section.PageNumbering.RESTART) {
                 Arrays.fill(totals, tandaFirst, i, counter);
-                counter = 0;
+                counter = section.start() - 1;
                 tandaFirst = i;
             }
             for (int j = 0; j < results.get(k).size(); j++) {
+                styles[i] = section.pageStyle();
                 printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
             }
         }
         Arrays.fill(totals, tandaFirst, i, counter);
-        return new Numbering(printed, totals);
+        return new Numbering(printed, totals, styles);
     }
 
     int pages() {
@@ -45,5 +52,41 @@ record Numbering(int[] printed, int[] totals) {
     /** Último número de la tanda de la página física {@code number}. */
     int total(int number) {
         return totals[number - 1];
+    }
+
+    /** Cómo se escribe el número de la página física {@code number}. */
+    NumberStyle style(int number) {
+        return styles[number - 1];
+    }
+
+    /** El número impreso de la página física {@code number}, escrito con su estilo ({@code {page}}, {@code iv}). */
+    String label(int number) {
+        return style(number).format(printed(number));
+    }
+
+    /** El último número de su tanda, escrito con el estilo de la página ({@code {pages}}). */
+    String totalLabel(int number) {
+        return style(number).format(total(number));
+    }
+
+    /**
+     * El número de prueba que mide al menos lo que cualquier número impreso de las páginas numeradas: tantos caracteres
+     * como el más largo, en cifras ({@code 0}) o, si hay romanos, con la letra más ancha ({@code M} o {@code m}).
+     */
+    String probe() {
+        int length = 0;
+        char widest = '0';
+        for (int n = 1; n <= pages(); n++) {
+            if (printed(n) == 0) {
+                continue;
+            }
+            length = Math.max(length, Math.max(label(n).length(), totalLabel(n).length()));
+            widest = PageNumbers.wider(widest, switch (style(n)) {
+                case UPPER_ROMAN -> 'M';
+                case LOWER_ROMAN -> 'm';
+                default -> '0';
+            });
+        }
+        return String.valueOf(widest).repeat(length);
     }
 }
