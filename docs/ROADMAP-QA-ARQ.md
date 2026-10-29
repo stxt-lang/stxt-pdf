@@ -79,7 +79,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | hecho |
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
 | PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
-| AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | pendiente |
+| AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | hecho |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | en curso |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | hecho |
 | AR-04 | `Engine`: algoritmos atados a la clase concreta (DIP, OCP) | Media | M | pendiente |
@@ -552,6 +552,18 @@ y privado del builder. **Hacer por pasos**, un commit por cada familia de elemen
 **ningún PNG ni volcado cambiado** en cada uno. **Aceptación:** ningún método de `tree` con más de 60 líneas ni
 complejidad > 20; `BoxTreeBuilder` < 350 líneas.
 
+**Sesión 8: hecho**, en cuatro commits verdes y sin ningún PNG, volcado ni PDF cambiado (byte a byte, sin fechas ni ID):
+(a) `MediaReader` lee `Media`, `Title` y `Language` (`media`, complejidad 22, partido en `media` y `paper`);
+(b) las propiedades sueltas de los elementos y el grupo `Typography` (un `switch` de complejidad 21) son tablas
+`Map<String, Property>` de `PropertyReader`, y `BoxTreeBuilder.properties` las lee y pone el giro en el estilo (el
+`ElementProps` propuesto no hizo falta: las variables quedan dentro de ese método); (c) `ElementReader`, un enum con una
+constante por familia en lugar de una interfaz y una clase por familia (las familias son pocas y cerradas, y un enum
+se elige con un `switch` sin registro aparte), con `layout`, `wrapper`, `property`, `check` y `content`; (d) para
+cumplir la aceptación en todo `tree`, `TableBuilder.table` (80 líneas, complejidad 21) se parte en `table`, `rows`,
+`freeColumn` y `occupy`, y `ModelValidator.validateMargins` (21) saca `validateOutOfFlowMargins`. Resultado:
+`element` 42 líneas y complejidad 8 (antes 162 y 67), `BoxTreeBuilder` 347 líneas (antes 617), el método más largo
+de `tree` 44 líneas y la complejidad más alta 18. Decisión 315.
+
 ### AR-02 · `Style` · Alta · L
 
 **Evidencia (medida).** 363 líneas, **70 campos `public` no `final`** de todas las familias (caja, tipografía, flex, grid,
@@ -748,7 +760,7 @@ más riesgo vaya primero y el refactor grande se haga con red de seguridad.
 | **5. Caché de la paginación** (hecha) | PF-03, PF-04, AR-11, AR-10 | Documentos de más de 99 páginas sin trabajo doble |
 | **6. Tests de referencia** (hecha) | QA-07, QA-08 (propiedades, determinismo) | `mvn test` no ensucia el árbol y vigila los PNG |
 | **7. Encapsulación del modelo** (hecha) | AR-03, AR-02 (etapas 1 y 2) | `Box`/`Style` con accesores y sin campos públicos |
-| **8. Constructor del árbol** | AR-01 | `BoxTreeBuilder.element` partido por familias |
+| **8. Constructor del árbol** (hecha) | AR-01 | `BoxTreeBuilder.element` partido por familias |
 | **9. Algoritmos y lienzos** | AR-04, AR-12, AR-05, AR-06, AR-07 | `LayoutContext`, `Canvas` estrecho, `PdfCanvas` partido |
 | **10. Partir `Style`** | AR-02 (etapas 3 y 4), AR-13 | Registros inmutables por familia; árbol congelado |
 
@@ -781,3 +793,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 5 · Caché de la paginación (hecha) | PF-03: volver a paginar olvida solo los textos que cambian y sus antepasados (`Engine.forget`, decisión 311; `PaginationCacheTest`; `ScaleProbe` con fallos por página e índice): la mitad de layouts a partir de la página 100. PF-04: medido con JFR, sin cambios (< 1 %); de ahí sale PF-06 (el reparto en líneas, 71 % del layout). AR-10: `Tolerance.EPSILON` y `Tolerance.MODEL` con nombre (decisión 312). AR-11: `paginate` partido en `converge`, `pages` y `placeFixed`; `Numbering` en su fichero. El PDF de los ejemplos, los golden y dos documentos grandes es el mismo byte a byte que antes. 1381 tests en verde. | Sesión 6: tests de referencia (QA-07, QA-08). Decidir antes la decisión abierta 2 (¿falla el test si cambia un PNG?). PF-06 queda pendiente fuera del plan |
 | 2026-10-29 | 6 · Tests de referencia (hecha) | QA-07 con la decisión del usuario (un PNG que cambia hace fallar el test; decisión 313): imágenes y PDF en `target/reference/`, `ReferenceFiles.checkImages`, `-Dgolden.update`/`-Dexamples.update`, la CI sube `target/reference` si falla; `ReferenceFilesTest`. QA-08 puntos 3 y 4: `CrossJvmDeterminismTest` y las propiedades de `ValueParser`, `LineBreaker` y la fragmentación (sin fallos encontrados; comprobado con dos mutaciones a mano). 1388 tests en verde; `mvn test` no cambia ningún fichero versionado. | Sesión 7: encapsulación del modelo (AR-03, AR-02 etapas 1 y 2). QA-08 puntos 5 (PIT, una pasada) y 6 (documentos de la especificación con `PdfMetrics` y PDF/UA) pendientes |
 | 2026-10-29 | 7 · Encapsulación del modelo (hecha) | AR-02 etapas 1 y 2 (commit `84a461c`): los 80 campos de `Style` son del package `tree` y se leen con un método del mismo nombre; 233 lecturas migradas siguiendo los errores de `javac`; `StyleEditor` para los tests de otros packages. AR-03: `Box` con campos privados, escritura del package y el árbol cerrado al construirlo (`Box.close`, decisión 314); 827 lecturas migradas igual; `BoxTest` (4). 1392 tests en verde; el PDF de los ejemplos y los golden es el mismo byte a byte (sin fechas ni ID). | Sesión 8: constructor del árbol (AR-01) |
+| 2026-10-29 | 8 · Constructor del árbol (hecha) | AR-01 en cuatro commits: `MediaReader`; tablas de propiedades en `PropertyReader` y `BoxTreeBuilder.properties`; `ElementReader` (una constante por familia: layout, envoltorio, propiedades del tipo, comprobaciones y contenido) con `element` como el orden común; `TableBuilder.table` y `ModelValidator.validateMargins` partidos. `element` de 162 a 42 líneas y de complejidad 67 a 8; `BoxTreeBuilder` de 617 a 347 líneas; ningún método de `tree` pasa de 44 líneas ni de complejidad 18. Decisión 315. 1392 tests en verde; el PDF de los ejemplos y los golden, el mismo byte a byte. | Sesión 9: algoritmos y lienzos (AR-04, AR-12, AR-05, AR-06, AR-07) |

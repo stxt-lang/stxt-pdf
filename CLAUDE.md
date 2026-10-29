@@ -123,7 +123,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `model` | Tipos puros: `StxtPdfException` (la raíz de los errores del motor, con su `Kind`), `InternalException` y `Limits` (páginas, píxeles de una imagen, elementos y niveles de un SVG); `Rotation` (`Rotate` y `Rotate origin`: el giro, su centro y el rectángulo que envuelve lo girado), `Value` (valor *especificado*, sealed), `ValueParser`, `Sides`, `Insets`, `Rect`, `VerticalMetrics`, `DecorationMetrics`, `FontFace` (con `FontWeight` y `FontStyle`), `TextRun` y `TextFormat` (tramos con formato), `Reference` (`{page of: id}` y `{number of: id}` dentro de un texto), `Links` (los destinos de un enlace: qué es válido), `GridAreas`, `Area` y `Cell` (la colocación de grid ya interpretada), `Tolerance` (la épsilon de redondeo), `Colors` (los colores `#RGB`…`#RRGGBBAA` y su opacidad), `Corners` y `Radii` (`Radius`: el abreviado por esquina y los radios ya resueltos) y `Paint` (el fondo: un color o un `linear(…)`) |
 | `stxt` | `DocumentReader`: parsea con `stxt-core`, valida contra el schema y exige una única raíz `Document` con el namespace `dev.stxt.boxes` |
 | `resources` | `Resources` (carpeta de recursos y rutas seguras), `FontLibrary` (índice de `fonts/`), `FontFile` (un TTF con sus métricas), `ImageLibrary` e `ImageFile` (las imágenes de `images/`, con su formato y su tamaño), `SvgInspector` (lee un SVG y comprueba el subconjunto), `ResourceException` e `ImageFormatException` |
-| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
+| `tree` | `Box`, `Element` (los elementos de caja), `Style` (propiedades y enums), `Media`, `DocumentSchema` (el schema compilado), `InvalidModelException`; `BoxTreeBuilder` (documento → árbol) y sus piezas: `ElementReader` (lo propio de cada familia de elementos), `MediaReader` (`Media`, `Title` y `Language`), `ValueReader`, `PropertyReader`, `StyleRules`, `TableBuilder`, `ListBuilder`, `MarkdownBuilder`, `ContentsBuilder`, `ModelValidator`, `HeadingNumbers`, `BuildContext`, `Nodes`; `References` (las referencias del árbol y su comprobación), `LinkTargets` (la comprobación de los enlaces `#id`); `PropertyKey` (las claves de `Style.line`) |
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `Numbering` (el número impreso de cada página), `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
@@ -160,11 +160,18 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   errores son `InvalidModelException` con un **código** (`ErrorCode`) y la **línea del nodo
   culpable**: la de la propiedad (`Style.line(HEIGHT)`, `GRID_ROWS`, `ITEM_GROW`…, con las
   claves de `PropertyKey`), no la de su caja. La raíz que devuelve es una `Box` anónima que representa el área útil.
-  `BoxTreeBuilder` es el orquestador (elementos, encabezados y texto) y no guarda estado: lo de
-  cada llamada va en un `BuildContext`. Los valores los interpreta `ValueReader`; los grupos y
-  las propiedades de `Flex`, `Grid` e `Item`, `PropertyReader`; las reglas de `Styles`,
-  `StyleRules`; tablas y listas, `TableBuilder` y `ListBuilder`; y las reglas del §6 que miran
-  la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
+  `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`.
+  `BoxTreeBuilder.element` es el orden común a todos los elementos (el sitio, la herencia, las reglas, las
+  propiedades y sus comprobaciones, la caja y el contenido) y lo propio de cada uno lo hace su familia,
+  `ElementReader` (un enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`, `GRID`, `FLEX`, `LIST`, `MULTICOL`, `MARKDOWN`,
+  `CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la caja, lo que le da su envoltorio, las
+  propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un elemento nuevo sin nada
+  propio es un `CONTAINER`; con algo propio, una familia nueva, sin tocar `element`. El medio y los metadatos los
+  lee `MediaReader`; los valores, `ValueReader`; los grupos, las propiedades de `Flex`, `Grid` e `Item` y las
+  sueltas de los elementos (con tablas `Map<String, Property>` para `Typography` y las sueltas),
+  `PropertyReader`; las reglas de `Styles`, `StyleRules`; tablas y listas, `TableBuilder` y `ListBuilder`; y las
+  reglas del §6 que miran la caja ya leída, `ModelValidator`. `Nodes` tiene el acceso a los nodos y los errores.
+  Ningún método de `tree` pasa de 60 líneas ni de complejidad 20 (AR-01).
 - **Documento de estilos aparte (§4.10):** las reglas de `Styles` pueden estar también en un documento de
   raíz `Styles` (`DocumentReader.readStyles`) que se pasa al maquetar (`BoxTreeBuilder.build(documento,
   estilos)`, `Engine.layOutDocument(documento, estilos)`, `Converter.builder().styles(estilos)`); es

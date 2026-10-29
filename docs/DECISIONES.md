@@ -1973,3 +1973,19 @@ interpretaciones que salieron al implementarlas.
      `test/…/tree/StyleEditor`, `BoxTest`. *Alternativa:* accesores sin cierre (la garantía seguiría siendo una
      convención dentro de `tree`) o un `StyleBuilder` aparte (más código para el mismo efecto mientras `Style` no
      se parta).
+
+### Revisión de QA, sesión 8: el constructor del árbol (ROADMAP-QA-ARQ.md, AR-01)
+
+315. **Las familias de elementos son un enum, no una interfaz con una clase por familia.** `BoxTreeBuilder.element`
+     es el orden común a todos los elementos y delega lo propio en `ElementReader`, un enum con una constante por
+     familia (`TEXT`, `IMAGE`, `CELL`, `TABLE`, `GRID`, `FLEX`, `LIST`, `MULTICOL`, `MARKDOWN`, `CONTENTS` y
+     `CONTAINER`) que sobrescribe solo lo que necesita: `layout`, `wrapper`, `property`, `check` y `content`. Las
+     familias son pocas, están cerradas (las da el schema) y comparten casi todo, así que un enum con métodos por
+     defecto es más corto que seis clases y un registro, y `ElementReader.of` las elige con un `switch` sobre
+     `Element`. El orden de las comprobaciones y los mensajes no cambian (el catálogo de errores lo vigila); solo se
+     mueven dos pasos sin efecto: un `Contents` se apunta en el contexto al rellenar su contenido, y el contexto de
+     `Fixed` envuelve también el contenido de los textos, las imágenes y las celdas, que nunca son `Fixed`. Las
+     propiedades sueltas y el grupo `Typography` son tablas `Map<String, Property>` en lugar de `switch`. *Dónde:*
+     `tree/ElementReader`, `BoxTreeBuilder.element` y `properties`, `PropertyReader.single`, `tree/MediaReader`.
+     *Alternativa:* la interfaz `ElementReader` con una clase por familia de la propuesta de AR-01, o dejar las
+     familias como métodos privados del builder (no baja de 350 líneas ni separa lo propio de cada familia).

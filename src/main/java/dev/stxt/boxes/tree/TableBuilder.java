@@ -53,9 +53,9 @@ final class TableBuilder {
      * las reglas de {@code Styles} y el {@code Column align} de su columna.
      */
     static void table(InlineNode n, Box table, Cells cells) {
-        int columns = table.style().gridColumns.size();
-        List<Style.TextAlign> aligns = columnAlign(n, columns);
-        int alignLine = child(n, "column-align").map(Node::getLine).orElse(0);
+        int count = table.style().gridColumns.size();
+        Columns columns = new Columns(count, columnAlign(n, count),
+                child(n, "column-align").map(Node::getLine).orElse(0));
         int last = -1;
         int firstRow = 0;
         for (Node g : n.getChildren()) {
@@ -68,68 +68,97 @@ final class TableBuilder {
                         + label(TABLE_GROUPS.get(last)) + ": los grupos de una Table van en el orden Head, Body, Foot");
             }
             last = group;
-            List<InlineNode> rows = inline(g).getChildren().stream().map(Nodes::inline).toList();
-            boolean[][] taken = new boolean[rows.size()][columns];
-            for (int r = 0; r < rows.size(); r++) {
-                InlineNode row = rows.get(r);
-                if (group != 1) {
-                    child(row, "break").ifPresent(b -> {
-                        throw error(b, ErrorCode.TABLE_ROW_BREAK, "Las filas de " + g.getName() + " se repiten en "
-                                + "cada página de la tabla y no se cortan: quita el Break");
-                    });
-                }
-                int c = 0;
-                for (Node h : row.getChildren()) {
-                    if (!is(h, "cell")) {
-                        continue;
-                    }
-                    InlineNode cell = inline(h);
-                    while (c < columns && taken[r][c]) {
-                        c++;
-                    }
-                    if (c == columns) {
-                        throw error(cell, ErrorCode.TABLE_ROW_CELLS, "No queda columna libre para esta Cell: la tabla "
-                                + "tiene " + columns + " (Columns), contando las que ocupan los Span de las filas de arriba");
-                    }
-                    Span span = span(cell);
-                    if (c + span.columns() > columns) {
-                        throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa de la columna " + (c + 1)
-                                + " a la " + (c + span.columns()) + ", y la tabla tiene " + columns + " (Columns)");
-                    }
-                    if (r + span.rows() > rows.size()) {
-                        throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa " + span.rows() + " filas y en su "
-                                + g.getName() + " quedan " + (rows.size() - r) + ": un Span no pasa de un grupo a otro");
-                    }
-                    for (int rr = r; rr < r + span.rows(); rr++) {
-                        for (int cc = c; cc < c + span.columns(); cc++) {
-                            if (taken[rr][cc]) {
-                                throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda se solapa en la columna "
-                                        + (cc + 1) + " con otra que ocupa varias filas");
-                            }
-                            taken[rr][cc] = true;
-                        }
-                    }
-                    Style.TextAlign align = aligns.isEmpty() ? null : aligns.get(c);
-                    Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, alignLine,
-                            child(row, "class").orElse(null)));
-                    box.style().declared(ITEM_AREA, cell.getLine());
-                    box.style().itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
-                    table.addChild(box);
-                    c += span.columns();
-                }
-                for (int cc = 0; cc < columns; cc++) {
-                    if (!taken[r][cc]) {
-                        throw error(row, ErrorCode.TABLE_ROW_CELLS, "La fila deja libre la columna " + (cc + 1)
-                                + " de " + columns + " (Columns): añade una Cell, vacía si hace falta, o usa Span");
-                    }
-                }
-            }
+            int rows = rows(g, group, firstRow, columns, table, cells);
             if (group == 0) {
-                table.setHeadRows(rows.size());
+                table.setHeadRows(rows);
             } else if (group == 2) {
-                table.setFootRows(rows.size());
+                table.setFootRows(rows);
             }
-            firstRow += rows.size();
+            firstRow += rows;
+        }
+    }
+
+    /** Las columnas de la tabla: cuántas hay ({@code Columns}) y su {@code Column align}, con su línea (0 sin él). */
+    private record Columns(int count, List<Style.TextAlign> aligns, int alignLine) {
+    }
+
+    /**
+     * Las filas de un grupo ({@code g}, el {@code group}-ésimo de {@link #TABLE_GROUPS}), cuya primera es la fila
+     * {@code firstRow} de la tabla (desde 0). Construye sus celdas y devuelve cuántas filas tiene.
+     */
+    private static int rows(Node g, int group, int firstRow, Columns columns, Box table, Cells cells) {
+        List<InlineNode> rows = inline(g).getChildren().stream().map(Nodes::inline).toList();
+        boolean[][] taken = new boolean[rows.size()][columns.count()];
+        for (int r = 0; r < rows.size(); r++) {
+            InlineNode row = rows.get(r);
+            if (group != 1) {
+                child(row, "break").ifPresent(b -> {
+                    throw error(b, ErrorCode.TABLE_ROW_BREAK, "Las filas de " + g.getName() + " se repiten en "
+                            + "cada página de la tabla y no se cortan: quita el Break");
+                });
+            }
+            int c = 0;
+            for (Node h : row.getChildren()) {
+                if (!is(h, "cell")) {
+                    continue;
+                }
+                InlineNode cell = inline(h);
+                c = freeColumn(taken[r], c, cell);
+                Span span = span(cell);
+                occupy(taken, r, c, span, g.getName());
+                Style.TextAlign align = columns.aligns().isEmpty() ? null : columns.aligns().get(c);
+                Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, columns.alignLine(),
+                        child(row, "class").orElse(null)));
+                box.style().declared(ITEM_AREA, cell.getLine());
+                box.style().itemArea = new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns());
+                table.addChild(box);
+                c += span.columns();
+            }
+            for (int cc = 0; cc < columns.count(); cc++) {
+                if (!taken[r][cc]) {
+                    throw error(row, ErrorCode.TABLE_ROW_CELLS, "La fila deja libre la columna " + (cc + 1)
+                            + " de " + columns.count() + " (Columns): añade una Cell, vacía si hace falta, o usa Span");
+                }
+            }
+        }
+        return rows.size();
+    }
+
+    /** La primera columna libre de la fila desde {@code from}, contando las que ocupan los {@code Span} de arriba. */
+    private static int freeColumn(boolean[] taken, int from, InlineNode cell) {
+        int c = from;
+        while (c < taken.length && taken[c]) {
+            c++;
+        }
+        if (c == taken.length) {
+            throw error(cell, ErrorCode.TABLE_ROW_CELLS, "No queda columna libre para esta Cell: la tabla "
+                    + "tiene " + taken.length + " (Columns), contando las que ocupan los Span de las filas de arriba");
+        }
+        return c;
+    }
+
+    /**
+     * Marca como ocupadas las filas y columnas de la celda que empieza en la fila {@code r} y la columna {@code c}
+     * de su grupo ({@code group}, su nombre): un {@code Span} no sale de la tabla ni del grupo, ni se solapa.
+     */
+    private static void occupy(boolean[][] taken, int r, int c, Span span, String group) {
+        int columns = taken[r].length;
+        if (c + span.columns() > columns) {
+            throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa de la columna " + (c + 1)
+                    + " a la " + (c + span.columns()) + ", y la tabla tiene " + columns + " (Columns)");
+        }
+        if (r + span.rows() > taken.length) {
+            throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa " + span.rows() + " filas y en su "
+                    + group + " quedan " + (taken.length - r) + ": un Span no pasa de un grupo a otro");
+        }
+        for (int rr = r; rr < r + span.rows(); rr++) {
+            for (int cc = c; cc < c + span.columns(); cc++) {
+                if (taken[rr][cc]) {
+                    throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda se solapa en la columna "
+                            + (cc + 1) + " con otra que ocupa varias filas");
+                }
+                taken[rr][cc] = true;
+            }
         }
     }
 

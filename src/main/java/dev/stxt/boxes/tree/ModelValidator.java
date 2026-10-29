@@ -193,15 +193,7 @@ final class ModelValidator {
                     + "grid; alinea con Main axis, Cross axis, Horizontal o Vertical");
         }
         if (s.isOutOfFlow()) {
-            Sides<Value> o = s.offset;
-            if (horizontalAuto && (o.left().isAuto() || s.width.isAuto() || o.right().isAuto())) {
-                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
-                        + position(s) + " con izquierda, Width y derecha declarados");
-            }
-            if (verticalAuto && (o.top().isAuto() || s.height.isAuto() || o.bottom().isAuto())) {
-                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
-                        + position(s) + " con arriba, Height y abajo declarados");
-            }
+            validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);
             return;
         }
         if (parentLayout == Style.Layout.BLOCK) {
@@ -214,6 +206,19 @@ final class ModelValidator {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }
+        }
+    }
+
+    /** Un {@code Absolute} o un {@code Fixed} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
+    private static void validateOutOfFlowMargins(Style s, int line, boolean horizontalAuto, boolean verticalAuto) {
+        Sides<Value> o = s.offset;
+        if (horizontalAuto && (o.left().isAuto() || s.width.isAuto() || o.right().isAuto())) {
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
+                    + position(s) + " con izquierda, Width y derecha declarados");
+        }
+        if (verticalAuto && (o.top().isAuto() || s.height.isAuto() || o.bottom().isAuto())) {
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
+                    + position(s) + " con arriba, Height y abajo declarados");
         }
     }
 
