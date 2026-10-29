@@ -65,7 +65,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | QA-04 | `Rotation.CENTER` es un array público mutable | Baja | S | hecho |
 | QA-05 | Mensaje de «la palabra no cabe» vuelca la palabra entera | Baja | S | hecho |
 | QA-06 | Límites y entradas hostiles | Media | M | hecho |
-| QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | decidir |
+| QA-07 | Los tests de referencia ensucian el árbol y no fallan si cambia un PNG | Media | M | hecho |
 | QA-08 | Tests que faltan: hilos, idioma, determinismo, propiedades, mutación | Media | M | pendiente |
 | QA-09 | Integración continua | Alta | S | hecho |
 | TS-01 | Contrato de hilos documentado y comprobable | Alta | S | hecho |
@@ -274,7 +274,7 @@ una conversión de más de 2000 páginas (antes 10 000) falla. §6.2 de la espec
 `Future.get(timeout)` y cancelar), el tamaño del texto del documento (ya lo limita `stxt-core` a 10 MB) y la ampliación de
 `HostileInputsProbe` (la cubre `BombsProbe`).
 
-### QA-07 · Los tests de referencia ensucian el árbol · Media · M · decidir
+### QA-07 · Los tests de referencia ensucian el árbol · Media · M · hecho
 
 **Evidencia (verificada).** `GoldenTest` y `ExamplesTest` escriben `output.pdf` y los `page-N.png` **dentro de
 `test/`** (versionado): un test que pasa deja `git status` sucio si cambian los píxeles (pasó con `tr`, QA-02). La
@@ -288,6 +288,13 @@ solo lectura.
 `-Dgolden.update=true` (ya existe el primero para `expected.stxt`). Así el CI vigila los PNG y el árbol queda limpio.
 **Aceptación:** `mvn test` no modifica ningún fichero versionado; un cambio de layout hace fallar el test con un
 mensaje que dice cómo aceptarlo.
+
+**Hecho (sesión 6).** La propuesta, con la decisión del usuario (decisión 313): `ReferenceFiles.writeActual` escribe el
+PDF y las imágenes en `target/reference/{golden,examples}/<caso>/` y `checkImages` las compara con las versionadas; una
+que cambia, falta o sobra hace fallar el caso con la ruta de las nuevas y la propiedad que lo acepta
+(`-Dgolden.update=true`, `-Dexamples.update=true`). Probado a mano (un PNG de `01-block-flow` sustituido por el de
+otro caso: «page-1.png cambia en 3120 píxeles…») y con `ReferenceFilesTest`. Ya no se escribe ningún PDF en `test/`
+(fuera del `.gitignore`), y la CI sube `target/reference` si falla.
 
 ### QA-08 · Tests que faltan · Media · M
 
@@ -726,8 +733,8 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 
 1. ~~**Ligaduras (QA-03/PF-01)**~~ **Resuelta (sesión 2):** las dos, con `Ligatures` en `Typography`, heredable, sin
    ligaduras por defecto.
-2. **Política de los PNG de referencia (QA-07):** ¿falla el test cuando cambia un PNG, salvo con `-D…update=true`?
-   Hoy es una convención humana.
+2. ~~**Política de los PNG de referencia (QA-07)**~~ **Resuelta (sesión 6):** falla el test cuando cambia un PNG,
+   salvo con `-Dgolden.update=true` o `-Dexamples.update=true`.
 3. ~~**Fachada (AR-08)**~~ **Resuelta (sesión 3):** `PdfWriter` se eliminó y lo sustituye `Converter` (sin código externo
    que migrar, no se dejó nada obsoleto).
 4. ~~**SVG con texto (QA-02/TS-03)**~~ **Resuelta (sesión 4):** ni lo uno ni lo otro: JSVG sigue dibujando, pero con el

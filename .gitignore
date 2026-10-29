@@ -5,7 +5,3 @@ target/
 .vscode/
 salida/
 
-# PDF de los casos golden y de los ejemplos: se regeneran en cada ejecución; las imágenes
-# page-N.png sí se versionan.
-test/golden/**/*.pdf
-test/examples/**/*.pdf

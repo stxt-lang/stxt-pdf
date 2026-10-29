@@ -1944,3 +1944,15 @@ interpretaciones que salieron al implementarlas.
      estricto: una caja que se sale 0,005 pt (un `Width` con decimales, lo que acumulan las medidas de las fuentes en
      milésimas) pasaría a ser un error. *Dónde:* `model/Tolerance`, `Overflow`, `Leaders` (que tenía su propio `1e-9`).
      *Alternativa:* una sola tolerancia, `EPSILON`, con ese cambio de comportamiento.
+
+### Revisión de QA, sesión 6: los tests de referencia (ROADMAP-QA-ARQ.md, QA-07 y QA-08)
+
+313. **Un PNG de referencia que cambia hace fallar el test** (lo decidió el usuario). Antes `GoldenTest` y
+     `ExamplesTest` reescribían las imágenes versionadas dentro de `test/` y un cambio solo se veía si alguien miraba
+     `git status`; en la CI no fallaba nada. Ahora el PDF y las imágenes nuevas van siempre a `target/reference/`, se
+     comparan con las versionadas (con la tolerancia del antialiasing, `PIXEL_TOLERANCE`) y una que cambia, falta o
+     sobra hace fallar el caso con la ruta de las nuevas. `-Dgolden.update=true` y `-Dexamples.update=true` aceptan el
+     cambio (reescriben solo lo que cambia; la segunda, también el `expected.stxt`). `mvn test` no modifica ningún
+     fichero versionado y la CI sube `target/reference` cuando falla. *Dónde:* `golden/ReferenceFiles` (`writeActual`,
+     `checkImages`), `GoldenTest`, `ExamplesTest`. *Alternativa:* seguir reescribiéndolas y que la CI compruebe el
+     árbol, que avisa pero no dice qué página ni deja las imágenes a mano.

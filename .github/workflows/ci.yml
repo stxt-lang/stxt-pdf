@@ -26,8 +26,8 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test
-      # Los tests no deben modificar nada versionado (ROADMAP-QA-ARQ.md, QA-07): un PNG de referencia
-      # reescrito es un cambio de resultado.
+      # Los tests no deben modificar nada versionado (ROADMAP-QA-ARQ.md, QA-07): escriben en target/ y fallan
+      # si cambia un PNG de referencia.
       - name: El árbol sigue limpio
         run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
       - name: Informes
@@ -38,6 +38,14 @@ jobs:
           path: |
             target/surefire-reports
             target/site/jacoco
+          if-no-files-found: ignore
+      # Si cambia una imagen de referencia, el PDF y las imágenes nuevas, para mirarlas (QA-07).
+      - name: Imágenes nuevas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: referencia-jdk${{ matrix.java }}
+          path: target/reference
           if-no-files-found: ignore
 
   # El resultado no debe depender del idioma de la JVM (QA-01, QA-02): en turco tampoco cambia ningún PNG.
@@ -55,6 +63,13 @@ jobs:
         run: mvn -B test -DargLine="-Duser.language=tr -Duser.country=TR"
       - name: El árbol sigue limpio
         run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
+      - name: Imágenes nuevas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: referencia-turco
+          path: target/reference
+          if-no-files-found: ignore
 
   # Medidas de rendimiento (@Tag("perf")), a diario y a mano; no bloquean los cambios.
   perf:

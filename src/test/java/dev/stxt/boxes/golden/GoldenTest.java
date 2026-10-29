@@ -14,6 +14,7 @@ import dev.stxt.runtime.STXT;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,15 +32,17 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el schema; el
  * volcado no tiene namespace y se lee sin validación.
  *
- * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/} y, en su propia
- * carpeta de {@code test/golden/}, el PDF y una imagen por página (ver
- * {@link #writePdfAndImages}).</p>
+ * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/}, y el PDF y una imagen por página en
+ * {@code target/reference/golden/}, que se comparan con los {@code page-N.png} versionados en su carpeta de
+ * {@code test/golden/}: si cambian, el caso falla; {@code -Dgolden.update=true} los acepta (ver
+ * {@link #writePdfAndImages}). El volcado esperado, que se calcula a mano, no se actualiza nunca.</p>
  */
 class GoldenTest {
 
     private static final Path SVG_DIR = Path.of("target", "golden-svg");
-    /** Carpeta de los casos en el código fuente, donde se escriben el PDF y sus imágenes. */
+    /** Carpeta de los casos en el código fuente, con las imágenes versionadas. */
     private static final Path SOURCE_DIR = Path.of("test", "golden");
+    private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("golden");
     private static final float IMAGE_DPI = 100;
 
     /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
@@ -61,9 +64,10 @@ class GoldenTest {
                 Node expected = STXT.rawParser().parseFile(dir.resolve("expected.stxt").toFile()).get(0);
                 LaidOutDocument document = new Engine().layOutDocument(input, styles);
                 writeSvg(name, document);
-                writePdfAndImages(SOURCE_DIR.resolve(name), input, styles);
+                List<BufferedImage> images = writePdfAndImages(ACTUAL_DIR.resolve(name), input, styles);
                 String dump = StxtDump.dump(document.pages(), false);
                 ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), name + "/");
+                ReferenceFiles.checkImages(SOURCE_DIR.resolve(name), ACTUAL_DIR.resolve(name), images, "golden.update");
             }));
         }
     }
@@ -77,24 +81,19 @@ class GoldenTest {
     }
 
     /**
-     * Escribe en la carpeta del caso, en el código fuente, {@code output.pdf} (ignorado por git)
-     * y un {@code page-N.png} por página (versionados): así un cambio en el resultado se ve en el
-     * diff ({@link ReferenceFiles#writePageImages}). El PDF lleva los contornos de depuración de
-     * las cajas y se maqueta con las métricas reales de las fuentes de {@code resources/fonts},
-     * que se incrustan ({@link Converter}),
-     * no con las de la comparación.
+     * Escribe en {@code dir} ({@code target/reference/golden/<caso>/}) {@code output.pdf} y un {@code page-N.png} por
+     * página ({@link ReferenceFiles#writeActual}), y devuelve las imágenes para compararlas con las versionadas. El PDF
+     * lleva los contornos de depuración de las cajas y se maqueta con las métricas reales de las fuentes de
+     * {@code resources/fonts}, que se incrustan ({@link Converter}), no con las de la comparación.
      */
-    private static void writePdfAndImages(Path dir, InlineNode input, InlineNode styles) throws IOException {
-        if (!Files.isDirectory(dir)) {
-            return;
-        }
+    private static List<BufferedImage> writePdfAndImages(Path dir, InlineNode input, InlineNode styles)
+            throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Converter.Builder converter = Converter.builder().debug(true);
         if (styles != null) {
             converter.styles(styles);
         }
         converter.build().toPdf(input, out);
-        Files.write(dir.resolve("output.pdf"), out.toByteArray());
-        ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
+        return ReferenceFiles.writeActual(dir, out.toByteArray(), IMAGE_DPI);
     }
 }

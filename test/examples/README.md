@@ -11,20 +11,20 @@ Cada carpeta tiene:
 |---|---|
 | `input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
 | `styles.stxt` | Las reglas de `Styles` y la tipografía base (`Element: Document`), en un [documento de estilos aparte](../../docs/ESPECIFICACION.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
-| `output.pdf` | El PDF (etiquetado, con marcadores y las fuentes incrustadas). **No se versiona**: se regenera con `mvn test` (está en `.gitignore`). |
 | `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
 | `expected.stxt` | El volcado ([§7](../../docs/ESPECIFICACION.md#7-formato-de-resultados)) de las cajas con `Id`, con las métricas reales. |
 
 Los ejemplos los ejecuta `ExamplesTest` con `mvn test`: comprueba que el documento se lee y se
-maqueta y que el volcado no cambia (tolerancia de 0,01 pt). Las imágenes solo se
-reescriben si cambian sus píxeles, así que si aparecen modificadas en git, el resultado ha
-cambiado: míralas antes de dar el cambio por bueno. El volcado esperado no se
-calcula a mano, es una instantánea de lo que da el motor, que se revisa mirando las imágenes.
+maqueta, que el volcado no cambia (tolerancia de 0,01 pt) y que las imágenes de las páginas son las
+versionadas (salvo el antialiasing). El PDF (etiquetado, con marcadores y las fuentes incrustadas) y
+las imágenes nuevas se escriben en `target/reference/examples/NN-nombre/`: si una imagen cambia, el
+test falla; míralas y, si el cambio es bueno, acéptalo con `-Dexamples.update=true`. El volcado esperado
+no se calcula a mano, es una instantánea de lo que da el motor, que se revisa mirando las imágenes.
 
 ```bash
 mvn test -Dtest=ExamplesTest                                   # todos
 mvn test -Dtest=ExamplesTest -Dexamples.only=01-invoice        # uno
-mvn test -Dtest=ExamplesTest -Dexamples.update=true            # regenera los expected.stxt
+mvn test -Dtest=ExamplesTest -Dexamples.update=true            # acepta los cambios: expected.stxt y page-N.png
 ```
 
 Las imágenes están en [`resources/images/examples/`](../../resources/images/examples) y las

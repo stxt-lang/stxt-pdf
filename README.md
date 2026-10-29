@@ -217,16 +217,17 @@ fuentes incrustadas, etiquetado y con marcadores. Los hitos 1 a 35 están termin
 | Ejemplos de documentos completos (`test/examples/`): once documentos con una imagen por página versionada, comprobados por `ExamplesTest` | Hecho y probado |
 
 Los tests de referencia (`GoldenTest`) están activos y no se salta ninguno. Cada
-caso deja un SVG de depuración en `target/golden-svg/` y, en su propia carpeta de
-`test/golden/`, el PDF (`output.pdf`, ignorado por git) y una imagen por página
-(`page-N.png`, versionada): si un cambio altera el resultado, la imagen aparece modificada en
-git. Como las fuentes van incrustadas, las imágenes no dependen de las fuentes del sistema;
+caso deja un SVG de depuración en `target/golden-svg/`, y el PDF y una imagen por página en
+`target/reference/golden/`, que se comparan con las imágenes versionadas de su carpeta de
+`test/golden/` (`page-N.png`): si un cambio altera el resultado, el test falla y dice dónde están
+las imágenes nuevas; `-Dgolden.update=true` acepta el cambio. `mvn test` no modifica ningún
+fichero versionado. Como las fuentes van incrustadas, las imágenes no dependen de las fuentes del sistema;
 aún pueden variar detalles del suavizado con otra versión de Java. `PdfCanvasTest` deja sus PDF
 en `target/pdf/`.
 
 Los [ejemplos](test/examples) (`ExamplesTest`) funcionan igual, pero son documentos completos
-maquetados con las fuentes y las imágenes reales y sin contornos. Dejan el PDF (`output.pdf`,
-ignorado por git) y una imagen por página (`page-N.png`, versionada) en su carpeta.
+maquetados con las fuentes y las imágenes reales y sin contornos; el PDF y las imágenes nuevas van a
+`target/reference/examples/` y `-Dexamples.update=true` acepta los cambios (el volcado y las imágenes).
 
 ## Hoja de ruta
 

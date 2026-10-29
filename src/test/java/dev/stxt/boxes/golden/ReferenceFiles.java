@@ -13,17 +13,25 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Lo que comparten los tests de referencia ({@link GoldenTest}) y los de los ejemplos
- * ({@code ExamplesTest}): comparar un volcado (ESPECIFICACION.md §7) con el esperado y dejar en
- * la carpeta del caso una imagen por página del PDF.
+ * ({@code ExamplesTest}): comparar un volcado (ESPECIFICACION.md §7) con el esperado, y las imágenes de cada página
+ * del PDF con las versionadas en la carpeta del caso (ROADMAP-QA-ARQ.md, QA-07).
+ *
+ * <p>El PDF y las imágenes nuevas se escriben siempre en {@code target/reference/} ({@link #writeActual}), nunca en
+ * {@code test/}: {@code mvn test} no cambia ningún fichero versionado. Si una imagen nueva no es la versionada (más
+ * allá del antialiasing, {@link #PIXEL_TOLERANCE}), o hay páginas de más o de menos, el test falla
+ * ({@link #checkImages}) y dice cómo aceptar el cambio: con la propiedad de actualizar de su test
+ * ({@code -Dgolden.update=true} o {@code -Dexamples.update=true}), que reescribe las versionadas.</p>
  */
 public final class ReferenceFiles {
 
@@ -37,68 +45,122 @@ public final class ReferenceFiles {
      */
     public static final int PIXEL_TOLERANCE = 16;
 
+    /** Donde se escriben el PDF y las imágenes de cada caso: {@code target/reference/<grupo>/<caso>/}. */
+    public static final Path ACTUAL_ROOT = Path.of("target", "reference");
+
     private static final Pattern PAGE_IMAGE = Pattern.compile("page-(\\d+)\\.png");
 
     private ReferenceFiles() {
     }
 
     /**
-     * Escribe en {@code dir} un {@code page-N.png} por página del PDF a la resolución dada y
-     * borra los de páginas que ya no existen. Un PNG solo se reescribe si cambian sus píxeles
-     * más allá del antialiasing ({@link #PIXEL_TOLERANCE}), de modo que git solo ve cambios reales.
+     * Escribe en {@code dir} (de {@code target/}) el PDF como {@code output.pdf} y un {@code page-N.png} por página a la
+     * resolución dada, y borra los de páginas que ya no existen.
      *
-     * @return si se escribió o se borró alguna imagen
+     * @return las imágenes de las páginas, en orden
      */
-    public static boolean writePageImages(Path dir, byte[] pdfBytes, float dpi) throws IOException {
-        boolean changed = false;
-        int pages;
+    public static List<BufferedImage> writeActual(Path dir, byte[] pdfBytes, float dpi) throws IOException {
+        Files.createDirectories(dir);
+        Files.write(dir.resolve("output.pdf"), pdfBytes);
+        List<BufferedImage> images = new ArrayList<>();
         try (PDDocument pdf = Loader.loadPDF(pdfBytes)) {
             PDFRenderer renderer = new PDFRenderer(pdf);
-            pages = pdf.getNumberOfPages();
-            for (int i = 0; i < pages; i++) {
-                changed |= writeIfChanged(renderer.renderImageWithDPI(i, dpi, ImageType.RGB),
-                        dir.resolve("page-" + (i + 1) + ".png"));
+            for (int i = 0; i < pdf.getNumberOfPages(); i++) {
+                images.add(renderer.renderImageWithDPI(i, dpi, ImageType.RGB));
             }
         }
-        try (Stream<Path> files = Files.list(dir)) {
-            for (Path f : files.toList()) {
-                Matcher m = PAGE_IMAGE.matcher(f.getFileName().toString());
-                if (m.matches() && Integer.parseInt(m.group(1)) > pages) {
-                    Files.delete(f);
-                    changed = true;
+        for (Path old : pageImages(dir)) {
+            Files.delete(old);
+        }
+        for (int i = 0; i < images.size(); i++) {
+            ImageIO.write(images.get(i), "png", dir.resolve(page(i + 1)).toFile());
+        }
+        return images;
+    }
+
+    /**
+     * Compara las imágenes de un caso con los {@code page-N.png} versionados en {@code reference}. Con la propiedad
+     * {@code update} a {@code true} los reescribe en su lugar: solo los que cambian (para que git solo vea cambios
+     * reales) y borra los de páginas que ya no existen.
+     *
+     * @param actual donde {@link #writeActual} dejó las imágenes nuevas, para el mensaje
+     * @throws AssertionError si alguna página cambia, falta o sobra, y no se pide actualizar
+     */
+    public static void checkImages(Path reference, Path actual, List<BufferedImage> images, String update)
+            throws IOException {
+        boolean updating = Boolean.getBoolean(update);
+        List<String> problems = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            Path file = reference.resolve(page(i + 1));
+            BufferedImage old = Files.exists(file) ? ImageIO.read(file.toFile()) : null;
+            int differences = old == null ? -1 : differences(old, images.get(i));
+            if (differences == 0) {
+                continue;
+            }
+            if (updating) {
+                ImageIO.write(images.get(i), "png", file.toFile());
+            } else {
+                problems.add(page(i + 1) + (old == null ? " no está versionada"
+                        : differences < 0 ? " cambia de tamaño" : " cambia en " + differences + " píxeles"));
+            }
+        }
+        for (Path extra : pageImages(reference)) {
+            if (pageNumber(extra) > images.size()) {
+                if (updating) {
+                    Files.delete(extra);
+                } else {
+                    problems.add(extra.getFileName() + " sobra: el PDF tiene " + images.size() + " páginas");
                 }
             }
         }
-        return changed;
-    }
-
-    private static boolean writeIfChanged(BufferedImage image, Path file) throws IOException {
-        if (Files.exists(file)) {
-            BufferedImage old = ImageIO.read(file.toFile());
-            if (old != null && samePixels(old, image)) {
-                return false;
-            }
+        if (!problems.isEmpty()) {
+            fail(reference + ": " + String.join("; ", problems) + ". Las imágenes nuevas están en " + actual
+                    + ". Si el cambio es el que se busca, míralas y acéptalo con -D" + update + "=true");
         }
-        ImageIO.write(image, "png", file.toFile());
-        return true;
     }
 
-    private static boolean samePixels(BufferedImage a, BufferedImage b) {
+    private static String page(int number) {
+        return "page-" + number + ".png";
+    }
+
+    /** Los {@code page-N.png} de una carpeta. */
+    private static List<Path> pageImages(Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return List.of();
+        }
+        try (Stream<Path> files = Files.list(dir)) {
+            return files.filter(f -> PAGE_IMAGE.matcher(f.getFileName().toString()).matches()).sorted().toList();
+        }
+    }
+
+    private static int pageNumber(Path image) {
+        Matcher m = PAGE_IMAGE.matcher(image.getFileName().toString());
+        m.matches();
+        return Integer.parseInt(m.group(1));
+    }
+
+    /**
+     * Píxeles que difieren en algún canal más que {@link #PIXEL_TOLERANCE}; -1 si las imágenes no tienen el mismo
+     * tamaño.
+     */
+    static int differences(BufferedImage a, BufferedImage b) {
         if (a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
-            return false;
+            return -1;
         }
         int w = a.getWidth();
         int h = a.getHeight();
         int[] p = a.getRGB(0, 0, w, h, null, 0, w);
         int[] q = b.getRGB(0, 0, w, h, null, 0, w);
+        int count = 0;
         for (int i = 0; i < p.length; i++) {
             for (int shift = 0; shift < 24; shift += 8) {
                 if (Math.abs((p[i] >> shift & 0xff) - (q[i] >> shift & 0xff)) > PIXEL_TOLERANCE) {
-                    return false;
+                    count++;
+                    break;
                 }
             }
         }
-        return true;
+        return count;
     }
 
     /** Compara dos volcados: nombres y valores iguales y los {@code Rect} dentro de {@link #TOLERANCE}. */

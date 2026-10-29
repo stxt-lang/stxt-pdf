@@ -16,6 +16,7 @@ import dev.stxt.runtime.STXT;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -40,17 +41,17 @@ import static org.junit.jupiter.api.Assertions.fail;
  * tener {@code styles.stxt}, el documento de estilos aparte que se pasa junto a él (ESPECIFICACION.md
  * §4.10); el volcado
  * de las cajas con {@code Id} ({@code expected.stxt}, §7), que se compara con tolerancia de
- * 0.01 pt; el PDF ({@code output.pdf}, ignorado por git, se regenera en cada ejecución) y una
- * imagen por página ({@code page-N.png}, versionadas, que solo se reescriben si cambian sus
- * píxeles).</p>
+ * 0.01 pt; y una imagen por página ({@code page-N.png}, versionadas). El PDF y las imágenes nuevas se escriben en
+ * {@code target/reference/examples/}, y si alguna imagen no es la versionada el ejemplo falla.</p>
  *
  * <p>El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que el
- * autor revisa mirando las imágenes. Se regenera con {@code -Dexamples.update=true}, y se puede
- * probar un solo ejemplo con {@code -Dexamples.only=01-invoice}.</p>
+ * autor revisa mirando las imágenes. {@code -Dexamples.update=true} acepta los cambios (reescribe el volcado y las
+ * imágenes que cambian), y se puede probar un solo ejemplo con {@code -Dexamples.only=01-invoice}.</p>
  */
 class ExamplesTest {
 
     private static final Path ROOT = Path.of("test", "examples");
+    private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("examples");
     private static final float IMAGE_DPI = 110;
 
     /**
@@ -80,6 +81,9 @@ class ExamplesTest {
         Resources resources = new Resources();
         LaidOutDocument document = new Engine(new PdfMetrics(resources), resources).layOutDocument(input, styles);
         String dump = StxtDump.dump(document.pages(), false);
+        Path actual = ACTUAL_DIR.resolve(dir.getFileName());
+        byte[] pdf = pdf(document, resources);
+        List<BufferedImage> images = ReferenceFiles.writeActual(actual, pdf, IMAGE_DPI);
 
         Path expectedFile = dir.resolve("expected.stxt");
         if (Boolean.getBoolean("examples.update")) {
@@ -90,15 +94,14 @@ class ExamplesTest {
             Node expected = STXT.rawParser().parseFile(expectedFile.toFile()).get(0);
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), dir.getFileName() + "/");
         }
-        writePdfAndImages(dir, document, resources);
+        ReferenceFiles.checkImages(dir, actual, images, "examples.update");
+        accessibility(dir, pdf);
     }
 
-    private static void writePdfAndImages(Path dir, LaidOutDocument document, Resources resources) throws IOException {
+    private static byte[] pdf(LaidOutDocument document, Resources resources) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfCanvas.write(document, resources, Limits.DEFAULT, out, false);
-        Files.write(dir.resolve("output.pdf"), out.toByteArray());
-        ReferenceFiles.writePageImages(dir, out.toByteArray(), IMAGE_DPI);
-        accessibility(dir, out.toByteArray());
+        return out.toByteArray();
     }
 
     /** El PDF etiquetado cumple PDF/UA-1 salvo en {@link #KNOWN_UA_FAILURES}. */

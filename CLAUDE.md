@@ -596,20 +596,24 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   §7); los `Rect` se comparan con tolerancia de 0.01 pt. Solo se vuelcan las cajas con `Id`.
   Los casos que necesitan un hito pendiente están en `GoldenTest.PENDING` y se saltan con el
   motivo: al completar el hito, quítalos de ahí. Cada caso escribe un SVG de depuración en
-  `target/golden-svg/` y, en su carpeta del código fuente, `output.pdf` (ignorado por git) y
-  `page-N.png` por página (versionados, con los contornos de las cajas y las métricas reales).
-  Un PNG solo se reescribe si cambian sus píxeles más allá del antialiasing, que varía entre
-  máquinas (`ReferenceFiles.PIXEL_TOLERANCE`, 16 por canal): si aparece modificado en git, el
-  resultado ha cambiado; míralo antes de dar el cambio por bueno.
+  `target/golden-svg/`, y `output.pdf` y un `page-N.png` por página (con los contornos de las cajas y las
+  métricas reales) en `target/reference/golden/NN-nombre/`. **`mvn test` no escribe nada en `test/`
+  (QA-07):** cada imagen se compara con el `page-N.png` versionado en la carpeta del caso, y si cambia más
+  allá del antialiasing, que varía entre máquinas (`ReferenceFiles.PIXEL_TOLERANCE`, 16 por canal), o hay
+  páginas de más o de menos, el caso **falla** con la ruta de las imágenes nuevas. Míralas y, si el cambio
+  es el que se busca, acéptalo con `-Dgolden.update=true`, que reescribe solo las que cambian (el
+  `expected.stxt` de un golden se calcula a mano y no se actualiza nunca). La CI sube `target/reference`
+  cuando falla.
 - **Ejemplos** (`examples/ExamplesTest`): cada carpeta de `test/examples/NN-nombre/` es un
-  documento completo (`input.stxt`) con su `output.pdf` (ignorado por git, como el de los
-  golden), un `page-N.png` por página (versionados, sin contornos de depuración, a 110 ppp) y un
-  `expected.stxt` con el volcado de las cajas con `Id`.
+  documento completo (`input.stxt`) con un `page-N.png` por página (versionados, sin contornos de
+  depuración, a 110 ppp) y un `expected.stxt` con el volcado de las cajas con `Id`; su `output.pdf` y
+  sus imágenes nuevas van a `target/reference/examples/`, como las de los golden.
   Se maquetan con las **métricas reales** y la carpeta `resources/` (no con `FixedMetrics`). El
-  volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true` y
-  se revisa mirando las imágenes; sin esa opción, un `expected.stxt` que falta es un error. Con
-  `-Dexamples.only=NN-nombre` se prueba un solo ejemplo. Un PNG solo se reescribe si cambian
-  sus píxeles (`golden/ReferenceFiles`, que comparten con `GoldenTest`). Un ejemplo nuevo se escribe como un documento real, con sentido, y se
+  volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que
+  también acepta las imágenes que cambian, y se revisa mirando las imágenes; sin esa opción, un
+  `expected.stxt` que falta o una imagen que cambia es un error. Con `-Dexamples.only=NN-nombre` se
+  prueba un solo ejemplo. Las imágenes las comparan las mismas funciones que en `GoldenTest`
+  (`golden/ReferenceFiles`). Un ejemplo nuevo se escribe como un documento real, con sentido, y se
   añade con su índice en `test/examples/README.md`. Las imágenes de los ejemplos están en
   `resources/images/examples/` y las genera `java tools/ExampleImages.java` (Java2D, sin
   ficheros de terceros); si necesitas una, añádela al generador en vez de subir un binario.
