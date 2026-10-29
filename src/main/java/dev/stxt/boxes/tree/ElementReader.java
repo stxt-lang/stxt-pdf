@@ -270,7 +270,7 @@ enum ElementReader {
      * bloque: sus errores señalan la línea donde empieza.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style().inline != Inline.MARKDOWN || ctx.insideMarkdown) {
+        if (box.style().typography().inline() != Inline.MARKDOWN || ctx.insideMarkdown) {
             return;
         }
         int first = box.textBlock() ? box.textLine() + 1 : box.textLine();

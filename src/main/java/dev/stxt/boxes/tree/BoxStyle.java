@@ -26,7 +26,7 @@ public final class BoxStyle extends StyleGroup {
     private Sides<Value> border = Sides.all(Value.pt(0));
     /** {@code null} = transparente. */
     private Paint background;
-    /** Un color por lado; {@code null} = igual que {@link #color}. */
+    /** Un color por lado; {@code null} = el {@code Color} del texto ({@link TypographyStyle#color()}). */
     private Sides<String> borderColor;
     /** Esquinas redondeadas, de la caja de borde; solo pintado. */
     private Corners<Value> radius = Corners.all(Value.pt(0));

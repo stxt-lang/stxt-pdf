@@ -109,12 +109,12 @@ class TablesTest {
                 .children().get(0);
         Box a = table.children().get(0);
         Box b = table.children().get(1);
-        assertEquals("#333333", a.style().color);
-        assertEquals(FontWeight.BOLD, a.style().fontWeight);
+        assertEquals("#333333", a.style().typography().color());
+        assertEquals(FontWeight.BOLD, a.style().typography().fontWeight());
         // La regla gana a lo heredado de la fila; lo propio de la celda, a los dos.
-        assertEquals(8, a.style().fontSize);
+        assertEquals(8, a.style().typography().fontSize());
         assertEquals(Value.pt(3), a.style().box().padding().top());
-        assertEquals(FontWeight.NORMAL, b.style().fontWeight);
+        assertEquals(FontWeight.NORMAL, b.style().typography().fontWeight());
     }
 
     @Test

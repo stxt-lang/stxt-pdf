@@ -130,7 +130,7 @@ public final class BoxTreeBuilder {
 
         // La tipografía de Element: Document la heredan todas las cajas.
         Style rootStyle = new Style();
-        rootStyle.locale = Locale.forLanguageTag(metadata.language());
+        rootStyle.typography().setLocale(Locale.forLanguageTag(metadata.language()));
         ctx.rules.applyDocument(rootStyle);
         Box root = new Box(null, null, rootStyle, true, document.getLine());
         ctx.definiteHeight.put(root, true);
@@ -243,7 +243,7 @@ public final class BoxTreeBuilder {
         ctx.insideFixed = outerFixed;
         if (kind.headingLevel() > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
-            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.numbered);
+            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered());
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, headingNumber);
             }

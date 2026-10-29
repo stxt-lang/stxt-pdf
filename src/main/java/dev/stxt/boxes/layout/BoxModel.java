@@ -186,7 +186,6 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return Sizing.autoWidthInFlow(space.availableWidth(), margin);
     }
 
-
     /**
      * Tamaños intrínsecos de la caja de margen a partir de los de su contenido (§5.9). Una caja
      * con {@code Width} fijo tiene ese valor como min-content y max-content. Los porcentajes no

@@ -276,26 +276,26 @@ public final class LineBreaker {
      */
     public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available,
                                  boolean justify, double y, double height) {
-        FontFace font = s.fontFace();
+        FontFace font = s.typography().fontFace();
         double[] widths = new double[runs.size()];
         double natural = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            widths[i] = advance(r.text(), r.format(), measurer, font, s.fontSize(), s.letterSpacing());
+            widths[i] = advance(r.text(), r.format(), measurer, font, s.typography().fontSize(), s.typography().letterSpacing());
             natural += widths[i];
         }
         // El último carácter de la línea no lleva interletraje (una línea vacía, de un texto preformateado, no tiene).
         if (!runs.isEmpty()) {
-            natural -= s.letterSpacing();
+            natural -= s.typography().letterSpacing();
         }
         String text = TextRun.text(runs);
-        double x = offset(natural, available, s.textAlign());
-        double spacing = wordSpacing(text, natural, available, s.textAlign(), !justify);
+        double x = offset(natural, available, s.typography().textAlign());
+        double spacing = wordSpacing(text, natural, available, s.typography().textAlign(), !justify);
         List<TextLine.Run> placed = new ArrayList<>(runs.size());
         double at = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            double w = widths[i] + spacing * spaces(r.text()) - (i == widths.length - 1 ? s.letterSpacing() : 0);
+            double w = widths[i] + spacing * spaces(r.text()) - (i == widths.length - 1 ? s.typography().letterSpacing() : 0);
             placed.add(new TextLine.Run(at, w, r.text(), r.format()));
             at += w;
         }

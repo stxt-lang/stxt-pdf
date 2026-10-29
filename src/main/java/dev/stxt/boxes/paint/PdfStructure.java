@@ -175,9 +175,9 @@ final class PdfStructure {
      */
     private void attributes(Box box, PDStructureElement e) {
         Box outer = box.role() == Role.SECTION ? root : box.parent();
-        if (outer != null && !box.style().locale().equals(outer.style().locale())) {
+        if (outer != null && !box.style().typography().locale().equals(outer.style().typography().locale())) {
             // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
-            e.setLanguage(box.style().locale().toLanguageTag());
+            e.setLanguage(box.style().typography().locale().toLanguageTag());
         }
         if (box.isImage()) {
             e.setAlternateDescription(box.style().image().alt());

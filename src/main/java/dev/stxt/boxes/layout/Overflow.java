@@ -293,7 +293,7 @@ public final class Overflow {
         // No está en el texto si la ha cambiado el layout, como un número de página.
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
-        if (box.style().whiteSpace() == WhiteSpace.PRE) {
+        if (box.style().typography().whiteSpace() == WhiteSpace.PRE) {
             return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: pre "
                     + "('" + excerpt(word) + "'…) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
                     + pt(width) + "; ensancha la caja, reduce el Size o usa White space: pre-wrap, que parte las líneas");

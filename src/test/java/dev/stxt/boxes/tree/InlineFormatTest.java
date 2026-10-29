@@ -75,7 +75,7 @@ class InlineFormatTest {
         Box root = buildInline("\tBlock:", "\t\tText: Uno **dos**",
                 "\t\tText: Tres **cuatro**", "\t\t\tTypography:", "\t\t\t\tInline: none");
         Box block = root.children().get(0);
-        assertEquals(Inline.MARKDOWN, block.style().inline);
+        assertEquals(Inline.MARKDOWN, block.style().typography().inline());
         assertEquals("Uno dos", block.children().get(0).text());
         assertEquals(List.of(run("Uno "), run("dos", "b")), block.children().get(0).formattedRuns());
         assertEquals("Tres **cuatro**", block.children().get(1).text());

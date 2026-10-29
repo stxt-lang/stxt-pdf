@@ -270,7 +270,7 @@ final class StyleRules {
         if (position != null) {
             if (position.columnAlign() != null) {
                 // Es el valor por defecto de la columna: lo declara la tabla, en la línea de su Column align.
-                s.textAlign = position.columnAlign();
+                s.typography().setTextAlign(position.columnAlign());
                 s.declared(PropertyKey.internal("align"), position.columnAlignLine());
             }
             // Dentro de este nivel van antes las del documento de estilos aparte, y en cada origen, por posición.

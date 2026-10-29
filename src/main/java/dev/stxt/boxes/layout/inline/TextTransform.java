@@ -30,12 +30,12 @@ public final class TextTransform {
 
     /** Si hay algo que transformar. */
     public static boolean applies(Style s) {
-        return s.transform() != Transform.NONE || s.smallCaps();
+        return s.typography().transform() != Transform.NONE || s.typography().smallCaps();
     }
 
     /** Los tramos con la transformación y las versalitas de {@code s}; los mismos si no se piden. */
     public static List<TextRun> apply(List<TextRun> runs, Style s) {
-        return applies(s) ? apply(runs, s.transform(), s.smallCaps(), s.locale()) : runs;
+        return applies(s) ? apply(runs, s.typography().transform(), s.typography().smallCaps(), s.typography().locale()) : runs;
     }
 
     /** Los tramos transformados, con los seguidos del mismo formato unidos. */

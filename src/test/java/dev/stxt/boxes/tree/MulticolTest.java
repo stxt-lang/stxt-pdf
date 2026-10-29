@@ -46,7 +46,7 @@ class MulticolTest {
         assertEquals(List.of(Element.PARAGRAPH, Element.BLOCK), flow.children().stream().map(b -> b.element()).toList());
         assertSame(flow, flow.children().get(1).parent());
         // La tipografía del Multicol llega a su contenido a través del flujo.
-        assertEquals(9, flow.children().get(0).style().fontSize);
+        assertEquals(9, flow.children().get(0).style().typography().fontSize());
     }
 
     @Test

@@ -87,25 +87,25 @@ final class PropertyReader {
 
     /** Grupo {@code Typography}, por nombre canónico. */
     private static final Map<String, Property> TYPOGRAPHY = Map.ofEntries(
-            entry("font", (p, s) -> s.font = fontFamily(p)),
-            entry("weight", (p, s) -> s.fontWeight = enumValue(FontWeight.class, p)),
-            entry("style", (p, s) -> s.fontStyle = enumValue(FontStyle.class, p)),
-            entry("size", (p, s) -> s.fontSize = positive(p)),
-            entry("line-height", (p, s) -> s.lineHeight = value(p, LENGTH, false)),
-            entry("align", (p, s) -> s.textAlign = enumValue(TextAlign.class, p)),
-            entry("color", (p, s) -> s.color = color(p)),
-            entry("text-wrap", (p, s) -> s.textWrap = enumValue(TextWrap.class, p)),
-            entry("inline", (p, s) -> s.inline = enumValue(Inline.class, p)),
-            entry("transform", (p, s) -> s.transform = enumValue(Transform.class, p)),
-            entry("letter-spacing", (p, s) -> s.letterSpacing = signedPoints(p)),
-            entry("small-caps", (p, s) -> s.smallCaps = bool(p)),
-            entry("ligatures", (p, s) -> s.ligatures = bool(p)),
-            entry("white-space", (p, s) -> s.whiteSpace = enumValue(WhiteSpace.class, p)),
-            entry("tab-size", (p, s) -> s.tabSize = positiveInteger(p)),
-            entry("numbered", (p, s) -> s.numbered = bool(p)),
-            entry("widows", (p, s) -> s.widows = positiveInteger(p)),
-            entry("orphans", (p, s) -> s.orphans = positiveInteger(p)),
-            entry("language", (p, s) -> s.locale = Locale.forLanguageTag(language(p))));
+            entry("font", (p, s) -> s.typography().setFont(fontFamily(p))),
+            entry("weight", (p, s) -> s.typography().setFontWeight(enumValue(FontWeight.class, p))),
+            entry("style", (p, s) -> s.typography().setFontStyle(enumValue(FontStyle.class, p))),
+            entry("size", (p, s) -> s.typography().setFontSize(positive(p))),
+            entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
+            entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
+            entry("color", (p, s) -> s.typography().setColor(color(p))),
+            entry("text-wrap", (p, s) -> s.typography().setTextWrap(enumValue(TextWrap.class, p))),
+            entry("inline", (p, s) -> s.typography().setInline(enumValue(Inline.class, p))),
+            entry("transform", (p, s) -> s.typography().setTransform(enumValue(Transform.class, p))),
+            entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
+            entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
+            entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
+            entry("white-space", (p, s) -> s.typography().setWhiteSpace(enumValue(WhiteSpace.class, p))),
+            entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
+            entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
+            entry("widows", (p, s) -> s.typography().setWidows(positiveInteger(p))),
+            entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
+            entry("language", (p, s) -> s.typography().setLocale(Locale.forLanguageTag(language(p)))));
 
     /** Propiedades sueltas de los elementos ({@link #single}), por nombre canónico. */
     private static final Map<String, Property> SINGLE = Map.ofEntries(

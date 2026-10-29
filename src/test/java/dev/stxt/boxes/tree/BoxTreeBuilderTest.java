@@ -94,10 +94,10 @@ class BoxTreeBuilderTest {
                 "\t\t\tSize: 14", "\t\t\tWidows: 3", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tText: x")).sections().get(0).box().children().get(0).children().get(0);
         assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.ITALIC),
-                child.style().fontFace());
-        assertEquals(14, child.style().fontSize, 1e-9);
-        assertEquals(3, child.style().widows);
-        assertEquals(16.8, child.style().usedLineHeight(), 1e-9);
+                child.style().typography().fontFace());
+        assertEquals(14, child.style().typography().fontSize(), 1e-9);
+        assertEquals(3, child.style().typography().widows());
+        assertEquals(16.8, child.style().typography().usedLineHeight(), 1e-9);
         assertEquals(Sides.all(Value.pt(0)), child.style().box().padding()); // Padding no se hereda
     }
 
@@ -189,11 +189,11 @@ class BoxTreeBuilderTest {
                 + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n\t\t\t\tColor: #333\n\t\t\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: x";
         Box text = build(doc).sections().get(0).box().children().get(0).children().get(0);
-        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style().fontFace());
-        assertEquals(12, text.style().fontSize, 1e-9);
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style().typography().fontFace());
+        assertEquals(12, text.style().typography().fontSize(), 1e-9);
         // Document admite todo Typography, no solo la fuente.
-        assertEquals("#333", text.style().color);
-        assertEquals(20, text.style().usedLineHeight(), 1e-9);
+        assertEquals("#333", text.style().typography().color());
+        assertEquals(20, text.style().typography().usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
         assertEquals(10, text.style().line("font"));
     }

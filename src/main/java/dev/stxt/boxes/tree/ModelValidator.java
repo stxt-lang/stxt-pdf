@@ -329,7 +329,7 @@ final class ModelValidator {
 
     /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
     static void font(InlineNode n, Node source, Box box) {
-        if (box.style().font == null) {
+        if (box.style().typography().font() == null) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
                     + n.getName() + ", de un antecesor o de Styles (Element: Document)");
         }

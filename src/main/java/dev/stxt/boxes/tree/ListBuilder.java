@@ -51,7 +51,7 @@ final class ListBuilder {
      * ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
      */
     static Box marker(InlineNode n, Box item, String text) {
-        if (item.style().font == null) {
+        if (item.style().typography().font() == null) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
                     + "el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }

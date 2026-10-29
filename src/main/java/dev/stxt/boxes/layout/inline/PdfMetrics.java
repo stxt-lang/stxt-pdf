@@ -83,7 +83,7 @@ public final class PdfMetrics implements TextMeasurer {
         Style s = box.style();
         int start = 0;
         for (TextRun run : box.runs()) {
-            FontFile font = font(box, fonts, run.format().face(s.fontFace()), start);
+            FontFile font = font(box, fonts, run.format().face(s.typography().fontFace()), start);
             String text = run.text();
             for (int i = 0; i < text.length(); ) {
                 String marker = text.startsWith(PageNumbers.PAGES, i) ? PageNumbers.PAGES
@@ -125,7 +125,7 @@ public final class PdfMetrics implements TextMeasurer {
             return fonts.find(face);
         } catch (ResourceException e) {
             if (!fonts.families().contains(face.family())) {
-                if (!face.family().equals(s.font())) {
+                if (!face.family().equals(s.typography().font())) {
                     // La familia de un tramo (el código de un Markdown): el error es del texto, que no tiene
                     // la línea de Code font.
                     throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_UNKNOWN,
@@ -134,7 +134,7 @@ public final class PdfMetrics implements TextMeasurer {
                 // El culpable es la declaración de Font, aunque esté en una antecesora.
                 throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }
-            if (!face.equals(s.fontFace())) {
+            if (!face.equals(s.typography().fontFace())) {
                 throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_VARIANT_MISSING,
                         e.getMessage() + " (texto con formato " + face.variant() + ")");
             }

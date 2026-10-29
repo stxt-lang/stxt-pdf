@@ -27,9 +27,9 @@ class TextCaseTest {
     @Test
     void defaultsDoNothing() {
         Style s = build("\tText: Hola").children().get(0).style();
-        assertEquals(Transform.NONE, s.transform);
-        assertEquals(0, s.letterSpacing);
-        assertFalse(s.smallCaps);
+        assertEquals(Transform.NONE, s.typography().transform());
+        assertEquals(0, s.typography().letterSpacing());
+        assertFalse(s.typography().smallCaps());
     }
 
     @Test
@@ -37,9 +37,9 @@ class TextCaseTest {
         Box block = build("\tBlock:", "\t\tTypography:", "\t\t\tTransform: capitalize", "\t\t\tLetter spacing: -0.5",
                 "\t\t\tSmall caps: true", "\t\tText: Hola").children().get(0);
         Box text = block.children().get(0);
-        assertEquals(Transform.CAPITALIZE, text.style().transform);
-        assertEquals(-0.5, text.style().letterSpacing, 1e-9);
-        assertTrue(text.style().smallCaps);
+        assertEquals(Transform.CAPITALIZE, text.style().typography().transform());
+        assertEquals(-0.5, text.style().typography().letterSpacing(), 1e-9);
+        assertTrue(text.style().typography().smallCaps());
         assertEquals(15, block.style().line("transform"));
         assertEquals(16, block.style().line("letter-spacing"));
         assertEquals(17, block.style().line("small-caps"));
@@ -54,20 +54,20 @@ class TextCaseTest {
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
         Style heading = root.children().get(0).children().get(0).style();
-        assertEquals(Transform.UPPERCASE, heading.transform);
-        assertTrue(heading.smallCaps);
-        assertEquals(1, heading.letterSpacing, 1e-9);
-        assertEquals(1, root.children().get(1).style().letterSpacing, 1e-9);
-        assertEquals(Transform.NONE, root.children().get(1).style().transform);
+        assertEquals(Transform.UPPERCASE, heading.typography().transform());
+        assertTrue(heading.typography().smallCaps());
+        assertEquals(1, heading.typography().letterSpacing(), 1e-9);
+        assertEquals(1, root.children().get(1).style().typography().letterSpacing(), 1e-9);
+        assertEquals(Transform.NONE, root.children().get(1).style().typography().transform());
     }
 
     @Test
     void theLocaleIsTheOneOfLanguageAndIsInherited() {
         Box root = new BoxTreeBuilder().build(new DocumentReader()
                 .read(Docs.sectioned(header("tr") + "\tBlock:\n\t\tText: iğne\n"))).sections().get(0).box();
-        assertEquals(Locale.forLanguageTag("tr"), root.children().get(0).children().get(0).style().locale);
+        assertEquals(Locale.forLanguageTag("tr"), root.children().get(0).children().get(0).style().typography().locale());
         Box es = build("\tText: Hola");
-        assertEquals(Locale.forLanguageTag("es"), es.children().get(0).style().locale);
+        assertEquals(Locale.forLanguageTag("es"), es.children().get(0).style().typography().locale());
     }
 
     /** {@code Language} en {@code Typography} cambia el idioma de la caja y de lo que hay dentro (§4.4). */
@@ -75,9 +75,9 @@ class TextCaseTest {
     void aBoxCanDeclareItsOwnLanguageAndItIsInherited() {
         Box root = build("\tBlock:", "\t\tTypography:", "\t\t\tLanguage: tr", "\t\tText: iğne", "\tText: Hola");
         Box turkish = root.children().get(0);
-        assertEquals(Locale.forLanguageTag("tr"), turkish.style().locale);
-        assertEquals(Locale.forLanguageTag("tr"), turkish.children().get(0).style().locale);
-        assertEquals(Locale.forLanguageTag("es"), root.children().get(1).style().locale);
+        assertEquals(Locale.forLanguageTag("tr"), turkish.style().typography().locale());
+        assertEquals(Locale.forLanguageTag("tr"), turkish.children().get(0).style().typography().locale());
+        assertEquals(Locale.forLanguageTag("es"), root.children().get(1).style().typography().locale());
         assertEquals(15, turkish.style().line("language"));
     }
 
@@ -86,8 +86,8 @@ class TextCaseTest {
     void aStylesRuleCanDeclareTheLanguage() {
         Box root = build("\tStyles:", "\t\tFor class: english", "\t\t\tTypography:", "\t\t\t\tLanguage: en-GB",
                 "\tText: Hola", "\tText: Hello", "\t\tClass: english");
-        assertEquals(Locale.forLanguageTag("es"), root.children().get(0).style().locale);
-        assertEquals(Locale.forLanguageTag("en-GB"), root.children().get(1).style().locale);
+        assertEquals(Locale.forLanguageTag("es"), root.children().get(0).style().typography().locale());
+        assertEquals(Locale.forLanguageTag("en-GB"), root.children().get(1).style().typography().locale());
     }
 
     @Test

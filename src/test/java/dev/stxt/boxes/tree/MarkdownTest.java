@@ -55,9 +55,9 @@ class MarkdownTest {
                 "\t\t\tTexto.");
         Box md = root.children().get(0);
         Box title = md.children().get(0).children().get(0);
-        assertEquals(20, title.style().fontSize, 1e-9);
-        assertEquals("#336699", title.style().color);
-        assertEquals("#336699", md.children().get(1).style().color);
+        assertEquals(20, title.style().typography().fontSize(), 1e-9);
+        assertEquals("#336699", title.style().typography().color());
+        assertEquals("#336699", md.children().get(1).style().typography().color());
     }
 
     @Test
@@ -100,12 +100,12 @@ class MarkdownTest {
         Box paragraph = md.children().get(0);
         assertEquals("Usa ls  -l así.", paragraph.text());
         assertEquals("IBM Plex Mono", paragraph.formattedRuns().get(1).format().family());
-        assertEquals("IBM Plex Sans", paragraph.style().font);
+        assertEquals("IBM Plex Sans", paragraph.style().typography().font());
         Box code = md.children().get(1);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals("a  b\n  c", code.text());
-        assertEquals(WhiteSpace.PRE, code.style().whiteSpace);
-        assertEquals("IBM Plex Mono", code.style().font);
+        assertEquals(WhiteSpace.PRE, code.style().typography().whiteSpace());
+        assertEquals("IBM Plex Mono", code.style().typography().font());
     }
 
     /** §4.10: la regla {@code Element: Code block} da estilo al código y no a los demás textos, ni al revés. */
@@ -121,13 +121,13 @@ class MarkdownTest {
         Box code = md.children().get(1);
         // El Text del encabezado sigue alcanzándolo Element: Text; el bloque de código, solo Code block.
         assertEquals(Element.TEXT, title.element());
-        assertEquals("#FF0000", title.style().color);
+        assertEquals("#FF0000", title.style().typography().color());
         assertEquals(Element.CODE_BLOCK, code.element());
-        assertEquals(8, code.style().fontSize, 1e-9);
+        assertEquals(8, code.style().typography().fontSize(), 1e-9);
         assertEquals(new Paint.Solid("#EEEEEE"), code.style().box().background());
         assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
-        assertEquals(WhiteSpace.PRE, code.style().whiteSpace);
-        assertEquals("IBM Plex Mono", code.style().font);
+        assertEquals(WhiteSpace.PRE, code.style().typography().whiteSpace());
+        assertEquals("IBM Plex Mono", code.style().typography().font());
         // Y el Text del encabezado no recibe lo del bloque de código.
         assertNull(title.style().box().background());
     }

@@ -237,14 +237,14 @@ public final class StackingContext {
     /** El color de cada lado del borde: el suyo o, si no lo declara, el del texto. */
     private static Sides<String> borderColors(Style s) {
         if (s.box().borderColor() == null) {
-            return Sides.all(s.color());
+            return Sides.all(s.typography().color());
         }
         return new Sides<>(orText(s.box().borderColor().top(), s), orText(s.box().borderColor().right(), s),
                 orText(s.box().borderColor().bottom(), s), orText(s.box().borderColor().left(), s));
     }
 
     private static String orText(String color, Style s) {
-        return color != null ? color : s.color();
+        return color != null ? color : s.typography().color();
     }
 
     /**
@@ -257,7 +257,7 @@ public final class StackingContext {
         List<Fragment> columns = p.f().children();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double height = columns.stream().mapToDouble(Fragment::height).max().orElse(0);
-        String color = s.multicol().ruleColor() != null ? s.multicol().ruleColor() : s.color();
+        String color = s.multicol().ruleColor() != null ? s.multicol().ruleColor() : s.typography().color();
         for (int i = 1; i < columns.size(); i++) {
             Fragment left = columns.get(i - 1);
             double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
@@ -331,9 +331,9 @@ public final class StackingContext {
     private static void paintLeader(Canvas canvas, Piece p) {
         Style s = p.f().box().style();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
-        double baseline = canvas.vertical(s.fontFace()).baseline(content.y(), s.usedLineHeight(), s.fontSize());
-        for (Rect shape : Leaders.shapes(s.contents().leader(), content, baseline, s.fontSize())) {
-            canvas.background(shape, s.color());
+        double baseline = canvas.vertical(s.typography().fontFace()).baseline(content.y(), s.typography().usedLineHeight(), s.typography().fontSize());
+        for (Rect shape : Leaders.shapes(s.contents().leader(), content, baseline, s.typography().fontSize())) {
+            canvas.background(shape, s.typography().color());
         }
     }
 
@@ -354,7 +354,7 @@ public final class StackingContext {
         }
         Box box = p.f().box();
         Style s = box.style();
-        FontFace font = s.fontFace();
+        FontFace font = s.typography().fontFace();
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
@@ -366,8 +366,8 @@ public final class StackingContext {
             TextLine l = lines.get(n);
             // El corte de línea se come el espacio: se escribe invisible tras la última palabra, para que quien
             // une el texto de las líneas (lector de pantalla, extracción, búsqueda) no pegue las palabras.
-            boolean spaceAfter = n < lines.size() - 1 && s.whiteSpace() == WhiteSpace.NORMAL;
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize());
+            boolean spaceAfter = n < lines.size() - 1 && s.typography().whiteSpace() == WhiteSpace.NORMAL;
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {
                 TextLine.Run r = runs.get(i);
@@ -389,7 +389,7 @@ public final class StackingContext {
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
                 canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
-                        s.fontSize() * r.format().scale(), s.color(), l.wordSpacing(), s.letterSpacing());
+                        s.typography().fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
             }
         }
         if (open) {
@@ -421,15 +421,15 @@ public final class StackingContext {
                                          boolean underline) {
         Style s = p.f().box().style();
         for (TextLine l : p.f().lines()) {
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize());
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
             for (TextLine.Run r : l.runs()) {
                 if (underline ? !r.format().underline() : !r.format().strike()) {
                     continue;
                 }
-                DecorationMetrics d = canvas.decoration(r.format().face(s.fontFace()));
+                DecorationMetrics d = canvas.decoration(r.format().face(s.typography().fontFace()));
                 double x = content.x() + l.x() + r.x();
-                canvas.background(underline ? d.underline(x, baseline, r.width(), s.fontSize())
-                        : d.strikeout(x, baseline, r.width(), s.fontSize()), s.color());
+                canvas.background(underline ? d.underline(x, baseline, r.width(), s.typography().fontSize())
+                        : d.strikeout(x, baseline, r.width(), s.typography().fontSize()), s.typography().color());
             }
         }
     }

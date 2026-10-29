@@ -74,11 +74,11 @@ class HeadingsTest {
                 "\tHeading 2:", "\t\tText: B",
                 "\tParagraph: C");
         Box h2 = root.children().get(1);
-        assertEquals(14, h2.style().fontSize, 1e-9);
+        assertEquals(14, h2.style().typography().fontSize(), 1e-9);
         // El Typography del encabezado lo heredan sus Text.
-        assertEquals(14, h2.children().get(0).style().fontSize, 1e-9);
-        assertEquals(10, root.children().get(0).style().fontSize, 1e-9);
-        assertEquals(TextAlign.JUSTIFY, root.children().get(2).style().textAlign);
+        assertEquals(14, h2.children().get(0).style().typography().fontSize(), 1e-9);
+        assertEquals(10, root.children().get(0).style().typography().fontSize(), 1e-9);
+        assertEquals(TextAlign.JUSTIFY, root.children().get(2).style().typography().textAlign());
     }
 
     @Test

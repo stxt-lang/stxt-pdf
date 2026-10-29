@@ -43,16 +43,16 @@ class StylesFileTest {
     @Test
     void theBaseTypographyAndTheRulesCanComeFromTheStylesDocument() {
         Box text = root(BASE + "\tElement: Text\n\t\tTypography:\n\t\t\tWeight: bold\n", "\tText: hola").children().get(0);
-        assertEquals("IBM Plex Sans", text.style().font);
-        assertEquals(10, text.style().fontSize, 1e-9);
-        assertEquals(FontWeight.BOLD, text.style().fontWeight);
+        assertEquals("IBM Plex Sans", text.style().typography().font());
+        assertEquals(10, text.style().typography().fontSize(), 1e-9);
+        assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
     }
 
     @Test
     void theStylesDocumentIsOptional() {
         Box text = root(null, "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 9", "\tText: hola").children().get(0);
-        assertEquals(9, text.style().fontSize, 1e-9);
+        assertEquals(9, text.style().typography().fontSize(), 1e-9);
     }
 
     @Test
@@ -60,9 +60,9 @@ class StylesFileTest {
         Box text = root(BASE + "\tElement: Text\n\t\tTypography:\n\t\t\tSize: 12\n\t\t\tWeight: bold\n",
                 "\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tSize: 14",
                 "\tText: hola").children().get(0);
-        assertEquals(14, text.style().fontSize, 1e-9);
+        assertEquals(14, text.style().typography().fontSize(), 1e-9);
         // Lo que el documento no declara lo pone el documento de estilos.
-        assertEquals(FontWeight.BOLD, text.style().fontWeight);
+        assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
         // Cada propiedad guarda la línea de su regla, también en el documento aparte.
         assertEquals(10, text.style().line("font-size"));
         assertEquals(9, text.style().line("font-weight"));
@@ -72,8 +72,8 @@ class StylesFileTest {
     void theBaseTypographyOfTheDocumentWinsOverTheStylesDocument() {
         Box text = root(BASE, "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\tText: hola").children().get(0);
-        assertEquals(8, text.style().fontSize, 1e-9);
-        assertEquals("IBM Plex Sans", text.style().font);
+        assertEquals(8, text.style().typography().fontSize(), 1e-9);
+        assertEquals("IBM Plex Sans", text.style().typography().font());
     }
 
     @Test

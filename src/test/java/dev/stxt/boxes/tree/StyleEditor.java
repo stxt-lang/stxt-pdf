@@ -48,22 +48,22 @@ public final class StyleEditor {
     }
 
     public StyleEditor font(String v) {
-        style.font = v;
+        style.typography().setFont(v);
         return this;
     }
 
     public StyleEditor fontSize(double v) {
-        style.fontSize = v;
+        style.typography().setFontSize(v);
         return this;
     }
 
     public StyleEditor letterSpacing(double v) {
-        style.letterSpacing = v;
+        style.typography().setLetterSpacing(v);
         return this;
     }
 
     public StyleEditor textAlign(TextAlign v) {
-        style.textAlign = v;
+        style.typography().setTextAlign(v);
         return this;
     }
 

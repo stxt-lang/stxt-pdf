@@ -44,8 +44,8 @@ class StylesTest {
         Box text = root(
                 "\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tWeight: bold",
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 14").children().get(0);
-        assertEquals(14, text.style().fontSize, 1e-9);
-        assertEquals(FontWeight.BOLD, text.style().fontWeight);
+        assertEquals(14, text.style().typography().fontSize(), 1e-9);
+        assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
         assertEquals(19, text.style().line("font-size"));
         assertEquals(15, text.style().line("font-weight"));
     }
@@ -55,9 +55,9 @@ class StylesTest {
         Box block = root(
                 "\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tSize: 12",
                 "\tBlock:", "\t\tTypography:", "\t\t\tSize: 20", "\t\tText: hola", "\t\tBlock:").children().get(0);
-        assertEquals(12, block.children().get(0).style().fontSize, 1e-9);
+        assertEquals(12, block.children().get(0).style().typography().fontSize(), 1e-9);
         // Lo que la regla no declara se sigue heredando.
-        assertEquals(20, block.children().get(1).style().fontSize, 1e-9);
+        assertEquals(20, block.children().get(1).style().typography().fontSize(), 1e-9);
     }
 
     @Test
@@ -94,7 +94,7 @@ class StylesTest {
         Box root = root(
                 "\tStyles:", "\t\tElement: text", "\t\t\tTypography:", "\t\t\t\tAlign: center",
                 "\tText: hola");
-        assertEquals(TextAlign.CENTER, root.children().get(0).style().textAlign);
+        assertEquals(TextAlign.CENTER, root.children().get(0).style().typography().textAlign());
     }
 
     @Test

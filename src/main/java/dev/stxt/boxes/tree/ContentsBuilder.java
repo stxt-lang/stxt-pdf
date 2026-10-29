@@ -84,7 +84,7 @@ final class ContentsBuilder {
 
     private static void fill(BuildContext ctx, Box contents, List<Box> headings) {
         Style s = contents.style();
-        if (s.font == null) {
+        if (s.typography().font() == null) {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
                     + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
         }
@@ -126,7 +126,7 @@ final class ContentsBuilder {
             Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Layout.BLOCK, heading.line());
             guide.style().contents().setLeader(contents.style().contents().leader());
             guide.style().item().setGrow(1);
-            guide.style().box().setHeight(Value.pt(es.usedLineHeight()));
+            guide.style().box().setHeight(Value.pt(es.typography().usedLineHeight()));
             guide.style().box().setMargin(new Sides<>(Value.pt(0), Value.pt(LEADER_GAP), Value.pt(0), Value.pt(LEADER_GAP)));
             entry.addChild(guide);
         }
