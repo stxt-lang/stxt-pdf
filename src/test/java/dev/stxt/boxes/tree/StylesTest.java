@@ -1,9 +1,10 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
-import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -93,7 +94,7 @@ class StylesTest {
         Box root = root(
                 "\tStyles:", "\t\tElement: text", "\t\t\tTypography:", "\t\t\t\tAlign: center",
                 "\tText: hola");
-        assertEquals(Style.TextAlign.CENTER, root.children().get(0).style().textAlign);
+        assertEquals(TextAlign.CENTER, root.children().get(0).style().textAlign);
     }
 
     @Test

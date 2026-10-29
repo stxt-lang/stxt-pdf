@@ -2,13 +2,28 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Alignment;
+import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.ColumnFill;
+import dev.stxt.boxes.model.Decoration;
+import dev.stxt.boxes.model.Direction;
+import dev.stxt.boxes.model.Distribution;
+import dev.stxt.boxes.model.Fit;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.GridAreas;
+import dev.stxt.boxes.model.Inline;
+import dev.stxt.boxes.model.Leader;
 import dev.stxt.boxes.model.Links;
+import dev.stxt.boxes.model.Marker;
+import dev.stxt.boxes.model.Pages;
+import dev.stxt.boxes.model.TextAlign;
+import dev.stxt.boxes.model.TextWrap;
+import dev.stxt.boxes.model.Transform;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
+import dev.stxt.boxes.model.WhiteSpace;
 
 import java.util.List;
 import java.util.Locale;
@@ -77,15 +92,15 @@ final class PropertyReader {
             entry("style", (p, s) -> s.fontStyle = enumValue(FontStyle.class, p)),
             entry("size", (p, s) -> s.fontSize = positive(p)),
             entry("line-height", (p, s) -> s.lineHeight = value(p, LENGTH, false)),
-            entry("align", (p, s) -> s.textAlign = enumValue(Style.TextAlign.class, p)),
+            entry("align", (p, s) -> s.textAlign = enumValue(TextAlign.class, p)),
             entry("color", (p, s) -> s.color = color(p)),
-            entry("text-wrap", (p, s) -> s.textWrap = enumValue(Style.TextWrap.class, p)),
-            entry("inline", (p, s) -> s.inline = enumValue(Style.Inline.class, p)),
-            entry("transform", (p, s) -> s.transform = enumValue(Style.Transform.class, p)),
+            entry("text-wrap", (p, s) -> s.textWrap = enumValue(TextWrap.class, p)),
+            entry("inline", (p, s) -> s.inline = enumValue(Inline.class, p)),
+            entry("transform", (p, s) -> s.transform = enumValue(Transform.class, p)),
             entry("letter-spacing", (p, s) -> s.letterSpacing = signedPoints(p)),
             entry("small-caps", (p, s) -> s.smallCaps = bool(p)),
             entry("ligatures", (p, s) -> s.ligatures = bool(p)),
-            entry("white-space", (p, s) -> s.whiteSpace = enumValue(Style.WhiteSpace.class, p)),
+            entry("white-space", (p, s) -> s.whiteSpace = enumValue(WhiteSpace.class, p)),
             entry("tab-size", (p, s) -> s.tabSize = positiveInteger(p)),
             entry("numbered", (p, s) -> s.numbered = bool(p)),
             entry("widows", (p, s) -> s.widows = positiveInteger(p)),
@@ -96,8 +111,8 @@ final class PropertyReader {
     private static final Map<String, Property> SINGLE = Map.ofEntries(
             entry("offset", (p, s) -> s.offset = sides(p, LENGTH_OR_AUTO, true)),
             entry("layer", (p, s) -> s.layer = integer(p)),
-            entry("pages", (p, s) -> s.pages = enumValue(Style.Pages.class, p)),
-            entry("marker", (p, s) -> s.listMarker = enumValue(Style.Marker.class, p)),
+            entry("pages", (p, s) -> s.pages = enumValue(Pages.class, p)),
+            entry("marker", (p, s) -> s.listMarker = enumValue(Marker.class, p)),
             entry("start", (p, s) -> s.listStart = integer(p)),
             entry("number", (p, s) -> s.listNumber = integer(p)),
             entry("isolate", (p, s) -> s.isolate = bool(p)),
@@ -105,9 +120,9 @@ final class PropertyReader {
             entry("header", (p, s) -> s.header = bool(p)),
             entry("in-contents", (p, s) -> s.inContents = bool(p)),
             entry("alt", (p, s) -> s.alt = alt(p)),
-            entry("fit", (p, s) -> s.fit = enumValue(Style.Fit.class, p)),
+            entry("fit", (p, s) -> s.fit = enumValue(Fit.class, p)),
             entry("levels", ContentsBuilder::levels),
-            entry("leader", (p, s) -> s.contentsLeader = enumValue(Style.Leader.class, p)));
+            entry("leader", (p, s) -> s.contentsLeader = enumValue(Leader.class, p)));
 
     private PropertyReader() {
     }
@@ -191,10 +206,10 @@ final class PropertyReader {
             String name = p.getCanonicalName();
             s.declared(PropertyKey.internal(name), p.getLine());
             switch (name) {
-                case "before" -> s.breakBefore = enumValue(Style.Break.class, p);
-                case "after" -> s.breakAfter = enumValue(Style.Break.class, p);
+                case "before" -> s.breakBefore = enumValue(Break.class, p);
+                case "after" -> s.breakAfter = enumValue(Break.class, p);
                 case "inside" -> s.avoidBreakInside = breakInside(p);
-                case "decoration" -> s.decoration = enumValue(Style.Decoration.class, p);
+                case "decoration" -> s.decoration = enumValue(Decoration.class, p);
                 default -> throw unread(p);
             }
         }
@@ -204,12 +219,12 @@ final class PropertyReader {
     static void flex(Node p, Style s) {
         s.declared(PropertyKey.flex(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "direction" -> s.flexDirection = enumValue(Style.Direction.class, p);
+            case "direction" -> s.flexDirection = enumValue(Direction.class, p);
             case "wrap" -> s.flexWrap = bool(p);
             case "gap" -> gap(p, s);
-            case "main-axis" -> s.flexMainAxis = enumValue(Style.Distribution.class, p);
-            case "cross-axis" -> s.flexCrossAxis = enumValue(Style.Alignment.class, p);
-            case "lines" -> s.flexLines = enumValue(Style.Distribution.class, p);
+            case "main-axis" -> s.flexMainAxis = enumValue(Distribution.class, p);
+            case "cross-axis" -> s.flexCrossAxis = enumValue(Alignment.class, p);
+            case "lines" -> s.flexLines = enumValue(Distribution.class, p);
             default -> throw unread(p);
         }
     }
@@ -222,9 +237,9 @@ final class PropertyReader {
             case "rows" -> s.gridRows = tracks(p);
             case "gap" -> gap(p, s);
             case "areas" -> s.gridAreas = placement(p, () -> GridAreas.parse(p.getText()));
-            case "flow" -> s.gridFlow = enumValue(Style.Direction.class, p);
-            case "horizontal" -> s.gridHorizontal = enumValue(Style.Alignment.class, p);
-            case "vertical" -> s.gridVertical = enumValue(Style.Alignment.class, p);
+            case "flow" -> s.gridFlow = enumValue(Direction.class, p);
+            case "horizontal" -> s.gridHorizontal = enumValue(Alignment.class, p);
+            case "vertical" -> s.gridVertical = enumValue(Alignment.class, p);
             default -> throw unread(p);
         }
     }
@@ -241,7 +256,7 @@ final class PropertyReader {
             case "column-gap" -> s.multicolGap = nonNegative(p);
             case "rule" -> s.multicolRule = positive(p);
             case "rule-color" -> s.multicolRuleColor = color(p);
-            case "fill" -> s.multicolFill = enumValue(Style.Fill.class, p);
+            case "fill" -> s.multicolFill = enumValue(ColumnFill.class, p);
             default -> throw unread(p);
         }
     }
@@ -272,9 +287,9 @@ final class PropertyReader {
                 case "grow" -> s.itemGrow = nonNegative(p);
                 case "shrink" -> s.itemShrink = nonNegative(p);
                 case "basis" -> s.itemBasis = value(p, LENGTH_OR_AUTO, false);
-                case "cross-axis" -> s.itemCrossAxis = enumValue(Style.Alignment.class, p);
-                case "horizontal" -> s.itemHorizontal = enumValue(Style.Alignment.class, p);
-                case "vertical" -> s.itemVertical = enumValue(Style.Alignment.class, p);
+                case "cross-axis" -> s.itemCrossAxis = enumValue(Alignment.class, p);
+                case "horizontal" -> s.itemHorizontal = enumValue(Alignment.class, p);
+                case "vertical" -> s.itemVertical = enumValue(Alignment.class, p);
                 default -> throw unread(p);
             }
         }

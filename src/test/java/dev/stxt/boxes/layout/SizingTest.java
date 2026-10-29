@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.model.Alignment;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
@@ -44,13 +44,13 @@ class SizingTest {
     @Test
     void alignInOneAxis() {
         // Una caja de 30 en un espacio de 100; con stretch ya mide 100 y empieza al principio.
-        assertEquals(0, Sizing.align(Style.Alignment.START, 100, 30), 1e-9);
-        assertEquals(0, Sizing.align(Style.Alignment.STRETCH, 100, 100), 1e-9);
-        assertEquals(70, Sizing.align(Style.Alignment.END, 100, 30), 1e-9);
-        assertEquals(35, Sizing.align(Style.Alignment.CENTER, 100, 30), 1e-9);
+        assertEquals(0, Sizing.align(Alignment.START, 100, 30), 1e-9);
+        assertEquals(0, Sizing.align(Alignment.STRETCH, 100, 100), 1e-9);
+        assertEquals(70, Sizing.align(Alignment.END, 100, 30), 1e-9);
+        assertEquals(35, Sizing.align(Alignment.CENTER, 100, 30), 1e-9);
         // Si no cabe, se sale por los dos lados (center) o por el principio (end).
-        assertEquals(-10, Sizing.align(Style.Alignment.CENTER, 100, 120), 1e-9);
-        assertEquals(-20, Sizing.align(Style.Alignment.END, 100, 120), 1e-9);
+        assertEquals(-10, Sizing.align(Alignment.CENTER, 100, 120), 1e-9);
+        assertEquals(-20, Sizing.align(Alignment.END, 100, 120), 1e-9);
     }
 
     @Test

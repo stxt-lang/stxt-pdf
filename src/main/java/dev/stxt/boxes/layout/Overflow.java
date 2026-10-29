@@ -5,8 +5,9 @@ import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
-import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.model.Rotation;
+import dev.stxt.boxes.model.Tolerance;
+import dev.stxt.boxes.model.WhiteSpace;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.ErrorCode;
@@ -292,7 +293,7 @@ public final class Overflow {
         // No está en el texto si la ha cambiado el layout, como un número de página.
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
-        if (box.style().whiteSpace() == Style.WhiteSpace.PRE) {
+        if (box.style().whiteSpace() == WhiteSpace.PRE) {
             return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: pre "
                     + "('" + excerpt(word) + "'…) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
                     + pt(width) + "; ensancha la caja, reduce el Size o usa White space: pre-wrap, que parte las líneas");

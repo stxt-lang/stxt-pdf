@@ -1,6 +1,7 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Transform;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class TextCaseTest {
     @Test
     void defaultsDoNothing() {
         Style s = build("\tText: Hola").children().get(0).style();
-        assertEquals(Style.Transform.NONE, s.transform);
+        assertEquals(Transform.NONE, s.transform);
         assertEquals(0, s.letterSpacing);
         assertFalse(s.smallCaps);
     }
@@ -36,7 +37,7 @@ class TextCaseTest {
         Box block = build("\tBlock:", "\t\tTypography:", "\t\t\tTransform: capitalize", "\t\t\tLetter spacing: -0.5",
                 "\t\t\tSmall caps: true", "\t\tText: Hola").children().get(0);
         Box text = block.children().get(0);
-        assertEquals(Style.Transform.CAPITALIZE, text.style().transform);
+        assertEquals(Transform.CAPITALIZE, text.style().transform);
         assertEquals(-0.5, text.style().letterSpacing, 1e-9);
         assertTrue(text.style().smallCaps);
         assertEquals(15, block.style().line("transform"));
@@ -53,11 +54,11 @@ class TextCaseTest {
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
         Style heading = root.children().get(0).children().get(0).style();
-        assertEquals(Style.Transform.UPPERCASE, heading.transform);
+        assertEquals(Transform.UPPERCASE, heading.transform);
         assertTrue(heading.smallCaps);
         assertEquals(1, heading.letterSpacing, 1e-9);
         assertEquals(1, root.children().get(1).style().letterSpacing, 1e-9);
-        assertEquals(Style.Transform.NONE, root.children().get(1).style().transform);
+        assertEquals(Transform.NONE, root.children().get(1).style().transform);
     }
 
     @Test

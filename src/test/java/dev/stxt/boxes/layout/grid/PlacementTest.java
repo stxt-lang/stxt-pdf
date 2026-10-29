@@ -2,7 +2,7 @@ package dev.stxt.boxes.layout.grid;
 
 import dev.stxt.boxes.model.Area;
 import dev.stxt.boxes.model.Cell;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.Direction;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -81,6 +81,6 @@ class PlacementTest {
         // Con Flow: column, la columna fija es la que no crece: dos filas, las dos ocupadas.
         assertInstanceOf(Placement.NoRoom.class, Placement.place(
                 List.of(new Cell(1, 1, 1, 1), new Cell(2, 1, 1, 1), new Cell(null, 1, 1, 1)), 1, 2,
-                Style.Direction.COLUMN));
+                Direction.COLUMN));
     }
 }

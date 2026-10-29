@@ -1,6 +1,7 @@
 package dev.stxt.boxes.layout;
 
 import dev.stxt.boxes.layout.image.NaturalSize;
+import dev.stxt.boxes.model.Decoration;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
@@ -30,7 +31,7 @@ import java.util.function.Supplier;
  */
 public record BoxModel(Insets margin, Insets border, Insets padding, double width,
                        OptionalDouble height, double minHeight, OptionalDouble maxHeight,
-                       Style.Decoration decoration) {
+                       Decoration decoration) {
 
     /**
      * Resuelve el modelo de caja de una caja con los tamaños intrínsecos del motor y, si es una
@@ -228,7 +229,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
 
     /** Cada fragmento lleva borde y relleno completos ({@code Decoration: clone}). */
     public boolean clones() {
-        return decoration == Style.Decoration.CLONE;
+        return decoration == Decoration.CLONE;
     }
 
     /** Nada separa el borde superior de la caja de su contenido: ni borde ni relleno. */

@@ -2,6 +2,12 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Alignment;
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Direction;
+import dev.stxt.boxes.model.Distribution;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.model.Value;
@@ -51,7 +57,7 @@ final class ModelValidator {
 
     /** {@code Main axis} y {@code Lines} de un {@code Flex}. */
     static void validateFlex(Style s) {
-        if (s.flexMainAxis == Style.Distribution.STRETCH) {
+        if (s.flexMainAxis == Distribution.STRETCH) {
             throw error(s.line(FLEX_MAIN_AXIS), ErrorCode.VALUE_NOT_ALLOWED,
                     "Main axis no admite 'stretch'; usa Grow en los ítems");
         }
@@ -104,7 +110,7 @@ final class ModelValidator {
             }
             return;
         }
-        if (s.position != Style.Position.RELATIVE) {
+        if (s.position != Position.RELATIVE) {
             return;
         }
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
@@ -117,11 +123,11 @@ final class ModelValidator {
 
     /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
-        Style.Layout parentLayout = parent.style().layout;
+        Layout parentLayout = parent.style().layout;
         // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
         // de una Table, ítems de su grid.
-        boolean flexItem = !s.isOutOfFlow() && parentLayout == Style.Layout.FLEX;
-        boolean gridItem = !s.isOutOfFlow() && parentLayout == Style.Layout.GRID;
+        boolean flexItem = !s.isOutOfFlow() && parentLayout == Layout.FLEX;
+        boolean gridItem = !s.isOutOfFlow() && parentLayout == Layout.GRID;
 
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
@@ -140,8 +146,8 @@ final class ModelValidator {
         if (ctx.insideMulticol) {
             return;
         }
-        String property = s.breakBefore == Style.Break.COLUMN ? BREAK_BEFORE
-                : s.breakAfter == Style.Break.COLUMN ? BREAK_AFTER : null;
+        String property = s.breakBefore == Break.COLUMN ? BREAK_BEFORE
+                : s.breakAfter == Break.COLUMN ? BREAK_AFTER : null;
         if (property != null) {
             throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, (property.equals(BREAK_BEFORE)
                     ? "Before" : "After") + ": column solo tiene efecto dentro de un Multicol: usa page para "
@@ -155,7 +161,7 @@ final class ModelValidator {
         }
         int line = s.line(OFFSET);
         Sides<Value> o = s.offset;
-        if (s.position == Style.Position.RELATIVE) {
+        if (s.position == Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
                 throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
                         + "desde arriba y desde abajo: deja uno de los dos en auto");
@@ -180,7 +186,7 @@ final class ModelValidator {
     }
 
     /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Absolute y Fixed, con inicio, tamaño y fin. */
-    private static void validateMargins(Style s, Style.Layout parentLayout, boolean flexItem, boolean gridItem) {
+    private static void validateMargins(Style s, Layout parentLayout, boolean flexItem, boolean gridItem) {
         Sides<Value> m = s.margin;
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
         boolean verticalAuto = m.top().isAuto() || m.bottom().isAuto();
@@ -196,13 +202,13 @@ final class ModelValidator {
             validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);
             return;
         }
-        if (parentLayout == Style.Layout.BLOCK) {
+        if (parentLayout == Layout.BLOCK) {
             if (verticalAuto) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
                         "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
             }
             // Una imagen con Width auto mide su ancho natural, no todo el ancho: se puede centrar.
-            if (s.width.isAuto() && s.maxWidth == null && s.layout != Style.Layout.IMAGE) {
+            if (s.width.isAuto() && s.maxWidth == null && s.layout != Layout.IMAGE) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }
@@ -259,11 +265,11 @@ final class ModelValidator {
             }
         }
         boolean parentDefinite = ctx.isDefinite(parent);
-        if (s.position == Style.Position.RELATIVE && !parentDefinite
+        if (s.position == Position.RELATIVE && !parentDefinite
                 && (hasPercentage(s.offset.top()) || hasPercentage(s.offset.bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
-        boolean column = parent.style().flexDirection == Style.Direction.COLUMN;
+        boolean column = parent.style().flexDirection == Direction.COLUMN;
         if (flexItem && column && !parentDefinite) {
             if (hasPercentage(s.itemBasis)) {
                 throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
@@ -284,10 +290,10 @@ final class ModelValidator {
             throw indefinite(s.line(GRID_ROWS), "Rows");
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
-        boolean rowGapUsed = s.layout == Style.Layout.GRID
-                || (s.layout == Style.Layout.FLEX && (s.flexWrap || s.flexDirection == Style.Direction.COLUMN));
+        boolean rowGapUsed = s.layout == Layout.GRID
+                || (s.layout == Layout.FLEX && (s.flexWrap || s.flexDirection == Direction.COLUMN));
         if (rowGapUsed && hasPercentage(s.rowGap)) {
-            String gap = s.layout == Style.Layout.GRID ? GRID_GAP : FLEX_GAP;
+            String gap = s.layout == Layout.GRID ? GRID_GAP : FLEX_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
         }
     }
@@ -299,7 +305,7 @@ final class ModelValidator {
      * estirado ({@code Vertical: stretch}) en su área.
      */
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
-        boolean gridItem = !s.isOutOfFlow() && parent.style().layout == Style.Layout.GRID;
+        boolean gridItem = !s.isOutOfFlow() && parent.style().layout == Layout.GRID;
         boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         Value h = s.height;
         if (!h.isAuto() && !h.isIntrinsic()) {
@@ -311,8 +317,8 @@ final class ModelValidator {
         if (h.isAuto() && s.isOutOfFlow() && !s.offset.top().isAuto() && !s.offset.bottom().isAuto()) {
             return true;
         }
-        Style.Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().gridVertical;
-        return h.isAuto() && gridItem && vertical == Style.Alignment.STRETCH;
+        Alignment vertical = s.itemVertical != null ? s.itemVertical : parent.style().gridVertical;
+        return h.isAuto() && gridItem && vertical == Alignment.STRETCH;
     }
 
     private static InvalidModelException indefinite(int line, String what) {

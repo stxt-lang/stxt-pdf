@@ -1,15 +1,18 @@
 package dev.stxt.boxes.tree;
 
-import dev.stxt.boxes.Docs;
 import dev.stxt.InlineNode;
-import dev.stxt.runtime.STXT;
+import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Alignment;
 import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
+import dev.stxt.runtime.STXT;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -42,7 +45,7 @@ class BoxTreeBuilderTest {
         Box parent = r.sections().get(0).box().children().get(0);
         assertEquals(2, parent.children().size());
         assertFalse(parent.children().get(0).anonymous());
-        assertEquals(Style.Layout.INLINE, parent.children().get(0).style().layout);
+        assertEquals(Layout.INLINE, parent.children().get(0).style().layout);
         assertEquals("antes", parent.children().get(0).text());
         assertEquals("child", parent.children().get(1).id());
     }
@@ -52,10 +55,10 @@ class BoxTreeBuilderTest {
         Box root = build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tFlex:", "\tGrid:", "\tRelative:", "\tAbsolute:", "\tFixed:")).sections().get(0).box();
-        assertEquals(List.of(Style.Layout.INLINE, Style.Layout.FLEX, Style.Layout.GRID, Style.Layout.BLOCK,
-                Style.Layout.BLOCK, Style.Layout.BLOCK), root.children().stream().map(b -> b.style().layout).toList());
-        assertEquals(List.of(Style.Position.STATIC, Style.Position.STATIC, Style.Position.STATIC,
-                Style.Position.RELATIVE, Style.Position.ABSOLUTE, Style.Position.FIXED),
+        assertEquals(List.of(Layout.INLINE, Layout.FLEX, Layout.GRID, Layout.BLOCK,
+                Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout).toList());
+        assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
+                Position.RELATIVE, Position.ABSOLUTE, Position.FIXED),
                 root.children().stream().map(b -> b.style().position).toList());
         assertEquals("hola", root.children().get(0).text());
     }
@@ -79,7 +82,7 @@ class BoxTreeBuilderTest {
         assertEquals(1, a.style().layer);
         Box b = root.children().get(1).children().get(0);
         assertEquals(new Cell(1, 2, 1, 1), b.style().itemArea);
-        assertEquals(Style.Alignment.CENTER, b.style().itemVertical);
+        assertEquals(Alignment.CENTER, b.style().itemVertical);
         assertEquals(17, b.style().line("item.area"));
         assertEquals(Cell.AUTO, root.children().get(1).children().get(1).style().itemArea);
     }

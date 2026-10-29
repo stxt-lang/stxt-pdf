@@ -1,7 +1,7 @@
 package dev.stxt.boxes.tree;
 
-import dev.stxt.boxes.tree.Style.Layout;
-import dev.stxt.boxes.tree.Style.Position;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 
 import java.util.Arrays;
 import java.util.List;

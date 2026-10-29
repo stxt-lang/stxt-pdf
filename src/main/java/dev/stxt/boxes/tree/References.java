@@ -1,5 +1,6 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Reference;
 
 import java.util.ArrayList;
@@ -108,7 +109,7 @@ public final class References {
     /** Si la caja es un {@code Fixed} o está dentro de uno. */
     static boolean insideFixed(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
-            if (b.style().position == Style.Position.FIXED) {
+            if (b.style().position == Position.FIXED) {
                 return true;
             }
         }

@@ -2,7 +2,7 @@ package dev.stxt.boxes.layout.grid;
 
 import dev.stxt.boxes.model.Area;
 import dev.stxt.boxes.model.Cell;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +59,8 @@ public final class Placement {
      * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija (la
      *         columna, en {@code column}) no cabe en ella
      */
-    public static Result place(List<Cell> cells, int columns, int rows, Style.Direction flow) {
-        if (flow == Style.Direction.ROW) {
+    public static Result place(List<Cell> cells, int columns, int rows, Direction flow) {
+        if (flow == Direction.ROW) {
             return place(cells, columns);
         }
         List<Cell> transposed = cells.stream()

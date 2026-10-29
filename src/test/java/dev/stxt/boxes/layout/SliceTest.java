@@ -1,7 +1,7 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.model.Decoration;
 import dev.stxt.boxes.model.Insets;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
@@ -17,10 +17,10 @@ class SliceTest {
     private static final Insets BORDER = Insets.all(1);
     private static final Insets PADDING = Insets.all(4);
     private static final OptionalDouble NONE = OptionalDouble.empty();
-    private static final BoxModel AUTO = model(NONE, 0, NONE, Style.Decoration.SLICE);
-    private static final BoxModel AUTO_CLONE = model(NONE, 0, NONE, Style.Decoration.CLONE);
+    private static final BoxModel AUTO = model(NONE, 0, NONE, Decoration.SLICE);
+    private static final BoxModel AUTO_CLONE = model(NONE, 0, NONE, Decoration.CLONE);
 
-    private static BoxModel model(OptionalDouble height, double min, OptionalDouble max, Style.Decoration d) {
+    private static BoxModel model(OptionalDouble height, double min, OptionalDouble max, Decoration d) {
         return new BoxModel(Insets.ZERO, BORDER, PADDING, 100, height, min, max, d);
     }
 
@@ -60,7 +60,7 @@ class SliceTest {
 
     @Test
     void definiteHeightIsTheTotalOfAllFragments() {
-        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Style.Decoration.SLICE);
+        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Decoration.SLICE);
         // El contenido termina, pero el alto propio no cabe: la página se llena y sigue.
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, false, false, 100);
@@ -71,7 +71,7 @@ class SliceTest {
 
     @Test
     void definiteHeightCutInsideTheContentFillsThePage() {
-        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Style.Decoration.SLICE);
+        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Decoration.SLICE);
         assertSlice(Slice.of(m, true, 0, 50, false, page(100)), 100, true, false, false, 100);
         // Sin pasar de lo que le queda a la caja.
         assertSlice(Slice.of(m, false, 250, 10, false, page(100)), 50, false, false, false, 300);
@@ -79,7 +79,7 @@ class SliceTest {
 
     @Test
     void minHeightAppliesToTheTotal() {
-        BoxModel m = model(NONE, 200, NONE, Style.Decoration.SLICE);
+        BoxModel m = model(NONE, 200, NONE, Decoration.SLICE);
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, false, false, 100);
         Slice last = Slice.of(m, false, first.consumed(), 0, true, page(762));
@@ -88,7 +88,7 @@ class SliceTest {
 
     @Test
     void maxHeightAppliesToTheTotal() {
-        BoxModel m = model(NONE, 0, OptionalDouble.of(50), Style.Decoration.SLICE);
+        BoxModel m = model(NONE, 0, OptionalDouble.of(50), Decoration.SLICE);
         assertSlice(Slice.of(m, true, 0, 80, true, page(200)), 50, true, true, true, 50);
     }
 
@@ -105,7 +105,7 @@ class SliceTest {
     @Test
     void cloneWithDefiniteHeightSplitsTheContentBoxHeight() {
         // Height 250: 240 de caja de contenido, repartidos en 90 + 90 + 60.
-        BoxModel m = model(OptionalDouble.of(250), 0, NONE, Style.Decoration.CLONE);
+        BoxModel m = model(OptionalDouble.of(250), 0, NONE, Decoration.CLONE);
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, true, false, 90);
         Slice second = Slice.of(m, false, first.consumed(), 0, true, page(100));

@@ -3,6 +3,7 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.TextAlign;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ final class TableBuilder {
     }
 
     /** Las columnas de la tabla: cuántas hay ({@code Columns}) y su {@code Column align}, con su línea (0 sin él). */
-    private record Columns(int count, List<Style.TextAlign> aligns, int alignLine) {
+    private record Columns(int count, List<TextAlign> aligns, int alignLine) {
     }
 
     /**
@@ -106,7 +107,7 @@ final class TableBuilder {
                 c = freeColumn(taken[r], c, cell);
                 Span span = span(cell);
                 occupy(taken, r, c, span, g.getName());
-                Style.TextAlign align = columns.aligns().isEmpty() ? null : columns.aligns().get(c);
+                TextAlign align = columns.aligns().isEmpty() ? null : columns.aligns().get(c);
                 Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, columns.alignLine(),
                         child(row, "class").orElse(null)));
                 box.style().declared(ITEM_AREA, cell.getLine());
@@ -166,16 +167,16 @@ final class TableBuilder {
      * El {@code Column align} de una {@code Table}: una alineación por columna, en el orden de
      * {@code Columns}. Vacío si no lo declara.
      */
-    private static List<Style.TextAlign> columnAlign(InlineNode table, int columns) {
+    private static List<TextAlign> columnAlign(InlineNode table, int columns) {
         Optional<Node> node = child(table, "column-align");
         if (node.isEmpty()) {
             return List.of();
         }
         String[] t = node.get().getText().trim().split("\\s+");
-        List<Style.TextAlign> aligns = new ArrayList<>();
+        List<TextAlign> aligns = new ArrayList<>();
         for (String word : t) {
             try {
-                aligns.add(Style.TextAlign.valueOf(word.toUpperCase(Locale.ROOT)));
+                aligns.add(TextAlign.valueOf(word.toUpperCase(Locale.ROOT)));
             } catch (IllegalArgumentException ex) {
                 throw error(node.get(), ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en Column align: " + word
                         + " (left, center, right o justify)");

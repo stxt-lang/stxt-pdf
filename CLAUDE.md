@@ -77,11 +77,11 @@ actualízala.
 
 | 23 | ~~Enlaces: `Link` en las cajas y `[texto](destino)` en Markdown, a una URL o a otra caja~~ (hecho; caso 16) | `model/Links`, `model/TextFormat`, `tree/LinkTargets`, `tree/MarkdownBuilder`, `paint/StackingContext`, `paint/PdfLinks`, `paint/PdfDestinations`, `paint/PdfStructure` |
 
-| 24 | ~~Primera página distinta: `Pages` en `Fixed` (`all`, `first`, `not-first`, `odd`, `even`, `last`)~~ (hecho; caso 17) | schema, `tree/Style.Pages`, `tree/BoxTreeBuilder`, `layout/Paginator` |
+| 24 | ~~Primera página distinta: `Pages` en `Fixed` (`all`, `first`, `not-first`, `odd`, `even`, `last`)~~ (hecho; caso 17) | schema, `model/Pages`, `tree/BoxTreeBuilder`, `layout/Paginator` |
 
 | 25 | ~~Estilo de las tablas: `Element` por posición de la celda (`Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell`), `For column` y `Column align`~~ (hecho; caso 18) | schema, `tree/StyleRules`, `tree/CellPosition`, `tree/CellSelector`, `tree/TableBuilder`, `tree/BoxTreeBuilder` |
 
-| 26 | ~~Formato en línea fuera de `Markdown`: `Inline: markdown` en `Typography` (se hereda), con la sintaxis en línea y los enlaces de `Markdown`~~ (hecho; caso 19) | schema, `tree/Style.Inline`, `tree/PropertyReader`, `tree/MarkdownBuilder.inline`, `tree/BoxTreeBuilder.inlineFormat` |
+| 26 | ~~Formato en línea fuera de `Markdown`: `Inline: markdown` en `Typography` (se hereda), con la sintaxis en línea y los enlaces de `Markdown`~~ (hecho; caso 19) | schema, `model/Inline`, `tree/PropertyReader`, `tree/MarkdownBuilder.inline`, `tree/BoxTreeBuilder.inlineFormat` |
 
 | 27 | ~~Mayúsculas, interletraje y versalitas: `Transform`, `Letter spacing` y `Small caps` en `Typography` (se heredan); `Language` obligatorio~~ (hecho; caso 20) | schema, `tree/Style`, `tree/PropertyReader`, `layout/inline/TextTransform`, `layout/inline/LineBreaker`, `model/TextFormat`, `paint/PdfCanvas`, `paint/PdfStructure` |
 
@@ -292,7 +292,8 @@ dependencia nueva se decide y se apunta allí.
   busca en el resultado ya paginado y señala al culpable más interior. `Font` y `Size` no
   tienen valor por defecto y se suelen declarar en la regla `Element: Document` de `Styles`. No
   generalices una regla nueva sin comentarlo con el usuario.
-- **Enums de `Style`** (y `FontWeight` y `FontStyle`, que están en `model`): los valores STXT se convierten con `Enum.valueOf` sobre el texto en
+- **Enums de los valores** (`model`: `TextAlign`, `Marker`, `Break`, `FontWeight`…, uno por fichero; `Fill` de `Multicol`
+  es `ColumnFill`): los valores STXT se convierten con `Enum.valueOf` sobre el texto en
   mayúsculas y con el guion como guion bajo, así que **cada constante debe llamarse igual que
   su valor en el documento** (`TextAlign.JUSTIFY` ↔ `justify`, `Marker.LOWER_ALPHA` ↔
   `lower-alpha`). Si cambias un valor, cambia la constante y el schema.
@@ -339,7 +340,7 @@ dependencia nueva se decide y se apunta allí.
   `AbsoluteLayout` las `absolute` cuyo containing block es la caja recién maquetada (sus
   fragmentos cuelgan del de esa caja); las `fixed` suben hasta la raíz y el `Paginator` las
   coloca en `Page.fixed` de cada página, solo en las que incluye su `Style.pages`
-  (`Style.Pages.includes(página, total)`: `Pages` en el documento, `all` por defecto; la página es
+  (`Pages.includes(página, total)`: `Pages` en el documento, `all` por defecto; la página es
   la física, la misma de `{page}`). Lo filtra el `Paginator` al colocarlas: el resto del motor
   (`Overflow`, `StxtDump`, el pintado y el PDF) recorre lo que hay en `Page.fixed`.
 - **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya
@@ -473,7 +474,7 @@ dependencia nueva se decide y se apunta allí.
   pintarse exactamente igual que una cadena: los PNG golden lo vigilan. El documento escribe
   tramos con `Markdown` o con `Inline: markdown` (ver abajo); los tests de layout los ponen en el
   árbol antes de cerrarlo con `TextRuns` y `Engine.layOutDocument(BoxTreeBuilder.Result)` (`LayoutFixture.layOutRuns`).
-- **Formato en línea (§5.4):** `Inline` (`Style.Inline`, `none` o `markdown`) es una propiedad de
+- **Formato en línea (§5.4):** `Inline` (`model/Inline`, `none` o `markdown`) es una propiedad de
   `Typography` que se hereda y se admite en `Styles`. Con `markdown`, `BoxTreeBuilder.inlineFormat`
   pasa el texto de un `Text`, un `Paragraph` o una `Cell` con valor por `MarkdownBuilder.inline`
   (el mismo parser y el mismo `Translator` que `Markdown`, en modo `inlineOnly`: solo párrafos con
@@ -498,7 +499,7 @@ dependencia nueva se decide y se apunta allí.
   `pre-wrap`), porque el corte se come el espacio y quien une las líneas pegaría las palabras.
   `PdfStructure` da `ActualText` (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva
   `{page}` ni referencias.
-- **Texto preformateado (§4.4, §5.4):** `White space` (`Style.WhiteSpace`: `normal`, `pre`, `pre-wrap`) y
+- **Texto preformateado (§4.4, §5.4):** `White space` (`model/WhiteSpace`: `normal`, `pre`, `pre-wrap`) y
   `Tab size` (columnas de una tabulación, 4 por defecto) son propiedades de `Typography` (se heredan y
   valen en `Styles`). Con `pre` o `pre-wrap`, `InlineLayout` no usa `LineBreaker.breakParagraphs` sino
   `PreformattedText`: cada línea del texto (con las tabulaciones ya llevadas a la siguiente columna

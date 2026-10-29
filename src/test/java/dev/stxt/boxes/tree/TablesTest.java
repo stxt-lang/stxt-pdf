@@ -1,7 +1,9 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.Layout;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -35,7 +37,7 @@ class TablesTest {
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Ventas", "\t\t\t\tCell: 100", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
         assertEquals(Element.TABLE, table.element());
-        assertEquals(Style.Layout.GRID, table.style().layout);
+        assertEquals(Layout.GRID, table.style().layout);
         assertEquals(List.of(Value.pt(120), new Value.Fraction(1), new Value.Fraction(1)), table.style().gridColumns);
         assertEquals(Value.pt(2), table.style().rowGap);
         assertEquals(Value.pt(4), table.style().columnGap);
@@ -45,7 +47,7 @@ class TablesTest {
         assertEquals(1, table.footRows());
         Box cell = table.children().get(3);
         assertEquals(Element.CELL, cell.element());
-        assertEquals(Style.Layout.INLINE, cell.style().layout);
+        assertEquals(Layout.INLINE, cell.style().layout);
         assertEquals("Ventas", cell.text().trim());
     }
 
@@ -89,11 +91,11 @@ class TablesTest {
                 "\t\t\t\t\t\tList item:", "\t\t\t\t\t\t\tText: dos",
                 "\t\t\t\tCell:").children().get(0);
         Box full = table.children().get(0);
-        assertEquals(Style.Layout.BLOCK, full.style().layout);
+        assertEquals(Layout.BLOCK, full.style().layout);
         assertNull(full.text());
         assertEquals(List.of(Element.PARAGRAPH, Element.LIST), full.children().stream().map(b -> b.element()).toList());
         Box empty = table.children().get(1);
-        assertEquals(Style.Layout.BLOCK, empty.style().layout);
+        assertEquals(Layout.BLOCK, empty.style().layout);
         assertTrue(empty.children().isEmpty());
     }
 
@@ -121,9 +123,9 @@ class TablesTest {
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tInside: avoid",
                 "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
-        assertEquals(Style.Break.AUTO, table.children().get(1).style().breakBefore);
+        assertEquals(Break.AUTO, table.children().get(1).style().breakBefore);
         for (Box cell : table.children().subList(2, 4)) {
-            assertEquals(Style.Break.PAGE, cell.style().breakBefore);
+            assertEquals(Break.PAGE, cell.style().breakBefore);
             assertTrue(cell.style().avoidBreakInside);
             assertEquals(21, cell.style().line("break-before"));
         }

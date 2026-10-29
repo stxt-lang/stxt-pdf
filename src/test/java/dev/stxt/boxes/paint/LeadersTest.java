@@ -1,7 +1,7 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.Leader;
 import dev.stxt.boxes.model.Rect;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,7 +15,7 @@ class LeadersTest {
 
     @Test
     void dotsStickToTheRightAndSitOnTheBaseline() {
-        List<Rect> dots = Leaders.shapes(Style.Leader.DOTS, CONTENT, 29, 10);
+        List<Rect> dots = Leaders.shapes(Leader.DOTS, CONTENT, 29, 10);
         // Cuerpo 10: puntos de 0,9 pt cada 5 pt, desde el borde derecho.
         assertEquals(10, dots.size());
         Rect last = dots.get(0);
@@ -28,13 +28,13 @@ class LeadersTest {
 
     @Test
     void aRuleFillsTheWidth() {
-        List<Rect> rule = Leaders.shapes(Style.Leader.RULE, CONTENT, 29, 10);
+        List<Rect> rule = Leaders.shapes(Leader.RULE, CONTENT, 29, 10);
         assertEquals(List.of(new Rect(100, 28.5, 50, 0.5)), rule);
     }
 
     @Test
     void aBoxTooNarrowForADotHasNone() {
-        assertTrue(Leaders.shapes(Style.Leader.DOTS, new Rect(100, 20, 0, 12), 29, 10).isEmpty());
-        assertTrue(Leaders.shapes(Style.Leader.NONE, CONTENT, 29, 10).isEmpty());
+        assertTrue(Leaders.shapes(Leader.DOTS, new Rect(100, 20, 0, 12), 29, 10).isEmpty());
+        assertTrue(Leaders.shapes(Leader.NONE, CONTENT, 29, 10).isEmpty());
     }
 }

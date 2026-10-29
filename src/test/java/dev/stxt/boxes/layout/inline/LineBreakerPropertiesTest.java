@@ -3,7 +3,7 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.TextWrap;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ class LineBreakerPropertiesTest {
         for (int i = 0; i < 3000; i++) {
             String text = randomText(random);
             double available = 5 + random.nextInt(400);
-            for (Style.TextWrap wrap : Style.TextWrap.values()) {
+            for (TextWrap wrap : TextWrap.values()) {
                 String where = wrap + ", " + available + " pt: \"" + text.replace("\n", "\\n") + "\"";
                 List<List<String>> lines = LineBreaker.breakParagraphs(text, available, METRICS, FONT, 10, wrap);
                 List<List<String>> expected = paragraphs(text);

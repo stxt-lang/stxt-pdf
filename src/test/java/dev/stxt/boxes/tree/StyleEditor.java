@@ -1,6 +1,9 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Layout;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.model.Value;
 
 /**
@@ -29,17 +32,17 @@ public final class StyleEditor {
         }
     }
 
-    public StyleEditor layout(Style.Layout v) {
+    public StyleEditor layout(Layout v) {
         style.layout = v;
         return this;
     }
 
-    public StyleEditor breakBefore(Style.Break v) {
+    public StyleEditor breakBefore(Break v) {
         style.breakBefore = v;
         return this;
     }
 
-    public StyleEditor breakAfter(Style.Break v) {
+    public StyleEditor breakAfter(Break v) {
         style.breakAfter = v;
         return this;
     }
@@ -59,7 +62,7 @@ public final class StyleEditor {
         return this;
     }
 
-    public StyleEditor textAlign(Style.TextAlign v) {
+    public StyleEditor textAlign(TextAlign v) {
         style.textAlign = v;
         return this;
     }

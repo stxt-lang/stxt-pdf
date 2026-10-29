@@ -2,6 +2,7 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Position;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -59,7 +60,7 @@ final class Nodes {
 
     /** Nombre del elemento posicionado: {@code Absolute} o {@code Fixed}. */
     static String position(Style s) {
-        return s.position == Style.Position.FIXED ? "Fixed" : "Absolute";
+        return s.position == Position.FIXED ? "Fixed" : "Absolute";
     }
 
     /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */

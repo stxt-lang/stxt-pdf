@@ -6,11 +6,12 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.Slice;
+import dev.stxt.boxes.model.ColumnFill;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.ErrorCode;
 import dev.stxt.boxes.tree.InvalidModelException;
@@ -179,7 +180,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
                 // El Multicol termina en esta página y su contenido no.
                 throw tooTall(limit);
             }
-            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicolFill() == Style.Fill.BALANCE) {
+            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicolFill() == ColumnFill.BALANCE) {
                 fill = balance(fill, limit, atStart);
             }
             return result(fill);

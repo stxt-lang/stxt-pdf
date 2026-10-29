@@ -5,9 +5,10 @@ import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.TextWrap;
 import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
@@ -46,17 +47,17 @@ class LineBreakerTest {
         // Knuth-Plass prefiere una línea con la máxima y otra con 100 × (1/1)³ = 100.
         String text = "a bbb c ddddd e fff";
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, Style.TextWrap.AUTO).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, TextWrap.AUTO).get(0));
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, Style.TextWrap.PRETTY).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, TextWrap.PRETTY).get(0));
     }
 
     @Test
     void prettyKeepsParagraphsAndOverflowingWords() {
         assertEquals(List.of(List.of("a", "larguísima", "b"), List.of("uno", "dos")),
-                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, F, 1, Style.TextWrap.PRETTY));
+                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, F, 1, TextWrap.PRETTY));
         assertEquals(List.of(List.of("uno dos tres")),
-                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, F, 1, Style.TextWrap.PRETTY));
+                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, F, 1, TextWrap.PRETTY));
     }
 
     @Test
@@ -80,23 +81,23 @@ class LineBreakerTest {
 
     @Test
     void alignment() {
-        assertEquals(15, LineBreaker.offset(70, 100, Style.TextAlign.CENTER), 1e-9);
-        assertEquals(30, LineBreaker.offset(70, 100, Style.TextAlign.RIGHT), 1e-9);
-        assertEquals(0, LineBreaker.offset(70, 100, Style.TextAlign.JUSTIFY), 1e-9);
+        assertEquals(15, LineBreaker.offset(70, 100, TextAlign.CENTER), 1e-9);
+        assertEquals(30, LineBreaker.offset(70, 100, TextAlign.RIGHT), 1e-9);
+        assertEquals(0, LineBreaker.offset(70, 100, TextAlign.JUSTIFY), 1e-9);
     }
 
     @Test
     void justifySpreadsTheRemainderBetweenSpaces() {
-        assertEquals(10, LineBreaker.wordSpacing("uno dos tres", 70, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
+        assertEquals(10, LineBreaker.wordSpacing("uno dos tres", 70, 90, TextAlign.JUSTIFY, false), 1e-9);
     }
 
     @Test
     void justifyLeavesSomeLinesAlone() {
         // Última línea del párrafo, una sola palabra, línea que desborda y otra alineación.
-        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, Style.TextAlign.JUSTIFY, true), 1e-9);
-        assertEquals(0, LineBreaker.wordSpacing("palabra", 70, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
-        assertEquals(0, LineBreaker.wordSpacing("uno dos", 100, 90, Style.TextAlign.JUSTIFY, false), 1e-9);
-        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, Style.TextAlign.LEFT, false), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, TextAlign.JUSTIFY, true), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("palabra", 70, 90, TextAlign.JUSTIFY, false), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 100, 90, TextAlign.JUSTIFY, false), 1e-9);
+        assertEquals(0, LineBreaker.wordSpacing("uno dos", 70, 90, TextAlign.LEFT, false), 1e-9);
     }
 
     @Test
@@ -104,14 +105,14 @@ class LineBreakerTest {
         StyleEditor s = new StyleEditor();
         s.font("F");
         s.fontSize(1);
-        s.textAlign(Style.TextAlign.JUSTIFY);
+        s.textAlign(TextAlign.JUSTIFY);
         // "uno dos tres" mide 12 en 20: 8 de sobrante entre 2 espacios, 4 por espacio.
         TextLine l = LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 30, 12);
         assertEquals(new TextLine(0, 30, 20, 12, "uno dos tres", 4), l);
         // La última línea del párrafo no se justifica.
         assertEquals(new TextLine(0, 30, 12, 12, "uno dos tres", 0),
                 LineBreaker.place("uno dos tres", measurer, s.style(), 20, false, 30, 12));
-        s.textAlign(Style.TextAlign.CENTER);
+        s.textAlign(TextAlign.CENTER);
         assertEquals(new TextLine(4, 0, 12, 12, "uno dos tres", 0),
                 LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 0, 12));
     }
@@ -134,9 +135,9 @@ class LineBreakerTest {
         // Sin formato, "aa bb" (5) cabe en 6; con "bb cc" en negrita, "aa bb" mide 7.
         List<TextRun> runs = List.of(run("aa "), run("bb cc", "b"));
         assertEquals(List.of("aa bb", "cc"),
-                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, Style.TextWrap.AUTO).get(0)));
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, TextWrap.AUTO).get(0)));
         List<LineBreaker.Line> lines = LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1,
-                Style.TextWrap.AUTO).get(0);
+                TextWrap.AUTO).get(0);
         assertEquals(List.of("aa", "bb", "cc"), texts(lines));
         assertEquals(List.of(run("bb", "b")), lines.get(1).runs());
     }
@@ -146,8 +147,8 @@ class LineBreakerTest {
         // "a bb c": con bb en negrita, la palabra mide 4 y no cabe con las otras en 6.
         List<TextRun> runs = List.of(run("a "), run("bb", "b"), run(" c"));
         assertEquals(List.of("a bb c"),
-                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, Style.TextWrap.PRETTY).get(0)));
-        assertEquals(2, LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1, Style.TextWrap.PRETTY)
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, TextWrap.PRETTY).get(0)));
+        assertEquals(2, LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1, TextWrap.PRETTY)
                 .get(0).size());
     }
 
@@ -156,22 +157,22 @@ class LineBreakerTest {
         TextFormat underline = new TextFormat(false, false, true, false);
         // Dentro de un tramo subrayado, el espacio también lo está.
         assertEquals(List.of(new TextRun("a b", underline)),
-                LineBreaker.breakParagraphs(List.of(run("a b", "u")), 100, measurer, F, 1, Style.TextWrap.AUTO)
+                LineBreaker.breakParagraphs(List.of(run("a b", "u")), 100, measurer, F, 1, TextWrap.AUTO)
                         .get(0).get(0).runs());
         // Entre dos tramos subrayados separados por un espacio sin formato, no.
         assertEquals(List.of(run("a", "u"), run(" "), run("b c", "u")),
                 LineBreaker.breakParagraphs(List.of(run("a", "u"), run(" "), run("b c", "u")), 100, measurer, F, 1,
-                        Style.TextWrap.AUTO).get(0).get(0).runs());
+                        TextWrap.AUTO).get(0).get(0).runs());
         // Los espacios seguidos valen uno, con el formato del primero.
         assertEquals(List.of(run("a ", "u"), run("b")),
                 LineBreaker.breakParagraphs(List.of(run("a  ", "u"), run("\n b")), 100, measurer, F, 1,
-                        Style.TextWrap.AUTO).get(0).get(0).runs());
+                        TextWrap.AUTO).get(0).get(0).runs());
     }
 
     @Test
     void aBlankLineAcrossRunsSeparatesParagraphs() {
         List<List<LineBreaker.Line>> p = LineBreaker.breakParagraphs(List.of(run("uno\n", "b"), run("\ndos")), 100,
-                measurer, F, 1, Style.TextWrap.AUTO);
+                measurer, F, 1, TextWrap.AUTO);
         assertEquals(2, p.size());
         assertEquals(List.of(run("uno", "b")), p.get(0).get(0).runs());
         assertEquals(List.of(run("dos")), p.get(1).get(0).runs());
@@ -182,7 +183,7 @@ class LineBreakerTest {
         StyleEditor s = new StyleEditor();
         s.font("F");
         s.fontSize(1);
-        s.textAlign(Style.TextAlign.JUSTIFY);
+        s.textAlign(TextAlign.JUSTIFY);
         // "uno " (4) + "dos" en negrita (6) + " tres" (5) = 15 en 20: 2,5 más por espacio.
         TextLine l = LineBreaker.place(List.of(run("uno "), run("dos", "b"), run(" tres")), boldIsWider, s.style(), 20,
                 true, 0, 12);
@@ -208,16 +209,16 @@ class LineBreakerTest {
     void letterSpacingChangesTheBreaks() {
         // Ancho 8: «uno dos» cabe (7), pero con interletraje 1 mide 13.
         assertEquals(List.of(List.of("uno dos")),
-                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 0, Style.TextWrap.AUTO)));
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 0, TextWrap.AUTO)));
         assertEquals(List.of(List.of("uno", "dos")),
-                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 1, Style.TextWrap.AUTO)));
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 1, TextWrap.AUTO)));
     }
 
     @Test
     void letterSpacingWorksWithKnuthPlass() {
         // Con interletraje 1 y ancho 9, entran dos palabras de dos letras (2+1 + 1+1 + 2... = 8) y no tres.
         List<List<LineBreaker.Line>> l = LineBreaker.breakParagraphs(List.of(run("ab cd ef gh")), 9, measurer, F, 1, 1,
-                Style.TextWrap.PRETTY);
+                TextWrap.PRETTY);
         assertEquals(List.of(List.of("ab cd", "ef gh")), paragraphs(l));
     }
 
@@ -236,7 +237,7 @@ class LineBreakerTest {
         s.font("F");
         s.fontSize(1);
         s.letterSpacing(2);
-        s.textAlign(Style.TextAlign.RIGHT);
+        s.textAlign(TextAlign.RIGHT);
         TextLine line = LineBreaker.place("ab", measurer, s.style(), 20, false, 0, 1);
         // a (1) + 2 + b (1) = 4, a la derecha de 20.
         assertEquals(4, line.width(), 1e-9);
@@ -250,7 +251,7 @@ class LineBreakerTest {
         s.font("F");
         s.fontSize(1);
         s.letterSpacing(1);
-        s.textAlign(Style.TextAlign.JUSTIFY);
+        s.textAlign(TextAlign.JUSTIFY);
         // «ab cd» mide 5 + 4 = 9; en 15 sobran 6 para un solo espacio.
         TextLine line = LineBreaker.place("ab cd", measurer, s.style(), 15, true, 0, 1);
         assertEquals(6, line.wordSpacing(), 1e-9);

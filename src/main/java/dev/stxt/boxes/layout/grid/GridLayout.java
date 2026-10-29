@@ -6,16 +6,19 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.layout.UnitBreaker;
 import dev.stxt.boxes.layout.position.RelativeOffset;
+import dev.stxt.boxes.model.Alignment;
 import dev.stxt.boxes.model.Area;
+import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.Direction;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
@@ -82,8 +85,8 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /** El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco (§5.8). */
-    private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Style.Direction flow) {
-        boolean row = flow == Style.Direction.ROW;
+    private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
+        boolean row = flow == Direction.ROW;
         String track = row ? "fila" : "columna";
         String across = row ? "columna" : "fila";
         String hole = e.span() == 1 ? "1 " + across + " libre" : e.span() + " " + across + "s libres";
@@ -193,7 +196,7 @@ public final class GridLayout implements LayoutAlgorithm {
             Area a = g.areas().get(i);
             Insets margin = margins[i];
             double areaHeight = span(rows, a.row() - 1, a.rows(), rowGap);
-            Style.Alignment vertical = vertical(item, s);
+            Alignment vertical = vertical(item, s);
             ConstraintSpace finalSpace = finalSpace(item, spaces[i], itemWidths[i], areaWidths[i],
                     areaHeight, margin, vertical, atStart);
             LayoutResult r = context.layout(item, finalSpace, null);
@@ -219,7 +222,7 @@ public final class GridLayout implements LayoutAlgorithm {
     private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
         List<Unit> units = new ArrayList<>();
         for (int r = 0; r < rows.length; r++) {
-            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, Style.Break.AUTO) : rowUnit(g, r, y[r], y[r] + rows[r]));
+            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, Break.AUTO) : rowUnit(g, r, y[r], y[r] + rows[r]));
         }
         return new UnitBreaker.Units(units, extent, true);
     }
@@ -241,20 +244,20 @@ public final class GridLayout implements LayoutAlgorithm {
             }
         }
         if (spanned) {
-            return new Unit(start, end, -1, Style.Break.AUTO);
+            return new Unit(start, end, -1, Break.AUTO);
         }
         return new Unit(start, end, BreakRules.between(before, after), BreakRules.forcedBetween(before, after));
     }
 
     /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */
-    private double itemWidth(Box item, double areaWidth, Insets margin, Style.Alignment horizontal, boolean atStart) {
+    private double itemWidth(Box item, double areaWidth, Insets margin, Alignment horizontal, boolean atStart) {
         Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
         BoxModel probe = BoxModel.resolve(item, free, context);
         if (!is.width().isAuto()) {
             return probe.width();
         }
-        double width = horizontal == Style.Alignment.STRETCH
+        double width = horizontal == Alignment.STRETCH
                 ? areaWidth - margin.horizontal()
                 : context.intrinsic(item).fitContent(areaWidth) - margin.horizontal();
         return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth);
@@ -266,12 +269,12 @@ public final class GridLayout implements LayoutAlgorithm {
      * no se estira ni declara su alto en porcentaje.
      */
     private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, double width,
-                                       double areaWidth, double areaHeight, Insets margin, Style.Alignment vertical,
+                                       double areaWidth, double areaHeight, Insets margin, Alignment vertical,
                                        boolean atStart) {
         Style is = item.style();
         OptionalDouble base = OptionalDouble.of(areaHeight);
         OptionalDouble fixedHeight = OptionalDouble.empty();
-        if (vertical == Style.Alignment.STRETCH) {
+        if (vertical == Alignment.STRETCH) {
             ConstraintSpace probe = ConstraintSpace.fixed(width, OptionalDouble.empty(), areaWidth, base, atStart);
             BoxModel m = BoxModel.resolve(item, probe, context);
             if (m.height().isEmpty()) {
@@ -296,11 +299,11 @@ public final class GridLayout implements LayoutAlgorithm {
         return v.resolve(OptionalDouble.empty()).isEmpty() && v.resolve(1).isPresent();
     }
 
-    private static Style.Alignment horizontal(Box item, Style container) {
+    private static Alignment horizontal(Box item, Style container) {
         return item.style().itemHorizontal() != null ? item.style().itemHorizontal() : container.gridHorizontal();
     }
 
-    private static Style.Alignment vertical(Box item, Style container) {
+    private static Alignment vertical(Box item, Style container) {
         return item.style().itemVertical() != null ? item.style().itemVertical() : container.gridVertical();
     }
 

@@ -1,15 +1,32 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Alignment;
+import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.ColumnFill;
 import dev.stxt.boxes.model.Corners;
+import dev.stxt.boxes.model.Decoration;
+import dev.stxt.boxes.model.Direction;
+import dev.stxt.boxes.model.Distribution;
+import dev.stxt.boxes.model.Fit;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.GridAreas;
+import dev.stxt.boxes.model.Inline;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Leader;
+import dev.stxt.boxes.model.Marker;
+import dev.stxt.boxes.model.Pages;
 import dev.stxt.boxes.model.Paint;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.TextAlign;
+import dev.stxt.boxes.model.TextWrap;
+import dev.stxt.boxes.model.Transform;
 import dev.stxt.boxes.model.Value;
+import dev.stxt.boxes.model.WhiteSpace;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +39,11 @@ import java.util.Map;
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>heredan</strong> las
  * marcadas como heredables (texto y fragmentación), igual que en CSS; ver {@link #inheriting}.</p>
  *
- * <p>Los nombres de las constantes de los enums coinciden con los valores del documento en
- * mayúsculas y con el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}): así los
- * interpreta {@code BoxTreeBuilder}. {@link Layout} y {@link Position} no son
- * valores del documento: salen del elemento ({@code Text} es {@code INLINE}; {@code Absolute},
- * un {@code BLOCK} {@code ABSOLUTE}).</p>
+ * <p>Los valores de las propiedades con un conjunto cerrado son enums de {@code model} ({@link TextAlign},
+ * {@link Marker}…): los nombres de sus constantes coinciden con los valores del documento en mayúsculas y con
+ * el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}), que es como los interpreta
+ * {@link PropertyReader}. {@link Layout} y {@link Position} no son valores del documento: salen del elemento
+ * ({@code Text} es {@code INLINE}; {@code Absolute}, un {@code BLOCK} {@code ABSOLUTE}).</p>
  *
  * <p>Cada propiedad se lee con el método del mismo nombre ({@code style.fontSize()}). Los campos son del
  * package {@code tree}, el único que escribe: fuera de él un estilo solo se lee.</p>
@@ -35,86 +52,6 @@ import java.util.Map;
  * árbol y después se lee.</p>
  */
 public final class Style {
-
-    /** Cómo coloca la caja a sus hijos: lo da el elemento. Una {@code IMAGE} no tiene hijos. */
-    public enum Layout { BLOCK, INLINE, FLEX, GRID, MULTICOL, IMAGE }
-
-    /** Cómo participa la caja en el flujo de su padre: {@code Relative}, {@code Absolute} y {@code Fixed}; el resto, {@code STATIC}. */
-    public enum Position { STATIC, RELATIVE, ABSOLUTE, FIXED }
-
-    public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }
-
-    /** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
-    public enum TextWrap { AUTO, PRETTY }
-
-    /** Formato dentro de la línea: el texto literal ({@code none}) o escrito en Markdown ({@code markdown}). */
-    public enum Inline { NONE, MARKDOWN }
-
-    /** Transformación de las mayúsculas del texto (§4.4): {@code none}, {@code uppercase}, {@code lowercase} o {@code capitalize}. */
-    public enum Transform { NONE, UPPERCASE, LOWERCASE, CAPITALIZE }
-
-    /**
-     * Tratamiento del espacio en blanco (§4.4, §5.4): {@code normal} lo colapsa; {@code pre} conserva
-     * los espacios y los saltos de línea y no parte las líneas; {@code pre-wrap} también, pero parte
-     * las líneas demasiado anchas entre palabras.
-     */
-    public enum WhiteSpace {
-        NORMAL, PRE, PRE_WRAP;
-
-        /** Si conserva los espacios y los saltos de línea del texto. */
-        public boolean preformatted() {
-            return this != NORMAL;
-        }
-    }
-
-    public enum Direction { ROW, COLUMN }
-
-    /** Reparto en un eje: {@code Main axis} y {@code Lines}. */
-    public enum Distribution { START, END, CENTER, BETWEEN, AROUND, EVENLY, STRETCH }
-
-    /** Alineación de un ítem dentro de su línea o celda. */
-    public enum Alignment { START, END, CENTER, STRETCH }
-
-    /** {@code column} solo dentro de un {@code Multicol}: pasa a la columna siguiente. */
-    public enum Break { AUTO, PAGE, COLUMN, AVOID }
-
-    public enum Decoration { SLICE, CLONE }
-
-    /** Reparto entre las columnas de un {@code Multicol}: equilibrado o en orden. */
-    public enum Fill { BALANCE, AUTO }
-
-    /** Guía entre el título y el número de página de las entradas de un {@code Contents} (§5.19). */
-    public enum Leader { DOTS, RULE, NONE }
-
-    /** Las páginas en que sale un {@code Fixed} (§5.5); la página 1 es la primera del documento. */
-    public enum Pages {
-        ALL, FIRST, NOT_FIRST, ODD, EVEN, LAST;
-
-        /** Si un {@code Fixed} con este valor sale en la página {@code page} de un documento de {@code total}. */
-        public boolean includes(int page, int total) {
-            return switch (this) {
-                case ALL -> true;
-                case FIRST -> page == 1;
-                case NOT_FIRST -> page != 1;
-                case ODD -> page % 2 == 1;
-                case EVEN -> page % 2 == 0;
-                case LAST -> page == total;
-            };
-        }
-    }
-
-    /** Cómo llena una imagen su caja si tienen proporciones distintas (§5.18). */
-    public enum Fit { CONTAIN, COVER, FILL }
-
-    /** Marcador de los ítems de una lista: un símbolo, ninguno o una numeración. */
-    public enum Marker {
-        DISC, DASH, NONE, DECIMAL, LOWER_ALPHA, UPPER_ALPHA, LOWER_ROMAN, UPPER_ROMAN;
-
-        /** Si numera los ítems: solo entonces tienen efecto {@code Start} y {@code Number}. */
-        public boolean numbered() {
-            return compareTo(DECIMAL) >= 0;
-        }
-    }
 
     /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
     Style() {
@@ -270,7 +207,7 @@ public final class Style {
     double multicolRule = 0;
     /** {@code Rule color}; {@code null} = igual que {@link #color}. */
     String multicolRuleColor;
-    Fill multicolFill = Fill.BALANCE;
+    ColumnFill multicolFill = ColumnFill.BALANCE;
 
     // --- Fragmentación ---------------------------------------------------------------------------
     Break breakBefore = Break.AUTO;
@@ -603,7 +540,7 @@ public final class Style {
         return multicolRuleColor;
     }
 
-    public Fill multicolFill() {
+    public ColumnFill multicolFill() {
         return multicolFill;
     }
 

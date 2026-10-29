@@ -3,6 +3,8 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
+import dev.stxt.boxes.model.Inline;
+import dev.stxt.boxes.model.Layout;
 import dev.stxt.boxes.model.TextRun;
 
 import java.util.List;
@@ -63,8 +65,8 @@ enum ElementReader {
      */
     CELL {
         @Override
-        Style.Layout layout(InlineNode n, Element kind) {
-            return n.getText().isBlank() ? kind.layout() : Style.Layout.INLINE;
+        Layout layout(InlineNode n, Element kind) {
+            return n.getText().isBlank() ? kind.layout() : Layout.INLINE;
         }
 
         @Override
@@ -85,7 +87,7 @@ enum ElementReader {
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            if (box.style().layout == Style.Layout.INLINE) {
+            if (box.style().layout == Layout.INLINE) {
                 cellText(n, box);
                 box.setRuns(ctx.runs.get(n));
                 inlineFormat(ctx, box);
@@ -233,7 +235,7 @@ enum ElementReader {
     }
 
     /** El layout de la caja: el del elemento, salvo en una {@code Cell}. */
-    Style.Layout layout(InlineNode n, Element kind) {
+    Layout layout(InlineNode n, Element kind) {
         return kind.layout();
     }
 
@@ -268,7 +270,7 @@ enum ElementReader {
      * bloque: sus errores señalan la línea donde empieza.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style().inline != Style.Inline.MARKDOWN || ctx.insideMarkdown) {
+        if (box.style().inline != Inline.MARKDOWN || ctx.insideMarkdown) {
             return;
         }
         int first = box.textBlock() ? box.textLine() + 1 : box.textLine();

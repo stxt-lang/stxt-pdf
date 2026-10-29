@@ -7,18 +7,18 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.MarginStrut;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.layout.Slice;
 import dev.stxt.boxes.layout.position.RelativeOffset;
+import dev.stxt.boxes.model.Break;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +155,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                     continue;
                 }
                 if (fragmenting && progress) {
-                    Style.Break forced = BreakRules.forcedBetween(previous, child);
+                    Break forced = BreakRules.forcedBetween(previous, child);
                     if (BreakRules.isForced(forced)) {
                         return broken(mark(i, BreakRules.forcedAppeal(forced)));
                     }

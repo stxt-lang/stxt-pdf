@@ -1,7 +1,7 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.Fit;
 import dev.stxt.boxes.model.Rect;
-import dev.stxt.boxes.tree.Style;
 
 /**
  * Dónde se dibuja una imagen en su caja de contenido según {@code Fit} (ESPECIFICACION.md
@@ -20,13 +20,13 @@ final class ImageFit {
      * @param width  ancho natural de la imagen (solo cuenta su proporción)
      * @param height alto natural de la imagen
      */
-    static Rect place(Style.Fit fit, Rect content, double width, double height) {
-        if (fit == Style.Fit.FILL) {
+    static Rect place(Fit fit, Rect content, double width, double height) {
+        if (fit == Fit.FILL) {
             return content;
         }
         double sx = content.width() / width;
         double sy = content.height() / height;
-        double scale = fit == Style.Fit.CONTAIN ? Math.min(sx, sy) : Math.max(sx, sy);
+        double scale = fit == Fit.CONTAIN ? Math.min(sx, sy) : Math.max(sx, sy);
         double w = width * scale;
         double h = height * scale;
         return new Rect(content.x() + (content.width() - w) / 2, content.y() + (content.height() - h) / 2, w, h);

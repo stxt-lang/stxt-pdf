@@ -1,6 +1,8 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Leader;
 import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
@@ -103,7 +105,7 @@ final class ContentsBuilder {
 
     private static Box entry(BuildContext ctx, Box contents, Box heading) {
         Style es = Style.inheriting(contents.style());
-        es.layout = Style.Layout.FLEX;
+        es.layout = Layout.FLEX;
         ctx.rules.apply(Element.contentsEntry(heading.headingLevel()), es);
         ModelValidator.validateBox(ctx, es, contents);
         Box entry = new Box(null, Element.contentsEntry(heading.headingLevel()), es, false, heading.line());
@@ -111,17 +113,17 @@ final class ContentsBuilder {
         // La entrada lleva a su encabezado (§5.20): toda ella es clicable.
         es.link = Links.to(heading.key());
 
-        boolean leader = contents.style().contentsLeader != Style.Leader.NONE;
+        boolean leader = contents.style().contentsLeader != Leader.NONE;
         int line = heading.children().isEmpty() ? heading.line() : heading.children().get(0).textLine();
 
         // Sin guía, el título llena el hueco y deja el número a la derecha.
-        Box title = generated(ctx, entry, Element.CONTENTS_TITLE, Style.Layout.INLINE, heading.line());
+        Box title = generated(ctx, entry, Element.CONTENTS_TITLE, Layout.INLINE, heading.line());
         title.setText(heading.headingText(), line, false);
         title.style().itemGrow = leader ? 0 : 1;
         entry.addChild(title);
 
         if (leader) {
-            Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Style.Layout.BLOCK, heading.line());
+            Box guide = generated(ctx, entry, Element.CONTENTS_LEADER, Layout.BLOCK, heading.line());
             guide.style().contentsLeader = contents.style().contentsLeader;
             guide.style().itemGrow = 1;
             guide.style().height = Value.pt(es.usedLineHeight());
@@ -129,7 +131,7 @@ final class ContentsBuilder {
             entry.addChild(guide);
         }
 
-        Box page = generated(ctx, entry, Element.CONTENTS_PAGE, Style.Layout.INLINE, heading.line());
+        Box page = generated(ctx, entry, Element.CONTENTS_PAGE, Layout.INLINE, heading.line());
         page.setText("{page of: " + heading.key() + "}", line, false);
         page.style().itemShrink = 0;
         entry.addChild(page);
@@ -137,7 +139,7 @@ final class ContentsBuilder {
     }
 
     /** Una caja generada de una entrada: hereda la tipografía de la entrada, y el layout lo da su tipo. */
-    private static Box generated(BuildContext ctx, Box entry, Element kind, Style.Layout layout, int line) {
+    private static Box generated(BuildContext ctx, Box entry, Element kind, Layout layout, int line) {
         Style s = Style.inheriting(entry.style());
         s.layout = layout;
         Box box = new Box(null, kind, s, false, line);

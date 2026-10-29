@@ -3,8 +3,10 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.fragment.TextLine;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.model.FontFace;
+import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
+import dev.stxt.boxes.model.TextWrap;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -76,15 +78,15 @@ public final class LineBreaker {
         return lines;
     }
 
-    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}). */
+    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}). */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
                                                      FontFace font, double fontSize) {
-        return breakParagraphs(text, available, measurer, font, fontSize, Style.TextWrap.AUTO);
+        return breakParagraphs(text, available, measurer, font, fontSize, TextWrap.AUTO);
     }
 
-    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}, para un texto sin formato. */
+    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}, para un texto sin formato. */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     FontFace font, double fontSize, Style.TextWrap wrap) {
+                                                     FontFace font, double fontSize, TextWrap wrap) {
         return breakParagraphs(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
                 .map(p -> p.stream().map(Line::text).toList()).toList();
     }
@@ -94,17 +96,17 @@ public final class LineBreaker {
      * párrafo). {@code font} es la fuente de la caja; cada tramo la cambia con su formato.
      */
     public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
-                                                   FontFace font, double fontSize, Style.TextWrap wrap) {
+                                                   FontFace font, double fontSize, TextWrap wrap) {
         return breakParagraphs(runs, available, measurer, font, fontSize, 0, wrap);
     }
 
-    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, Style.TextWrap)}, con interletraje. */
+    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}, con interletraje. */
     public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
                                                    FontFace font, double fontSize, double letterSpacing,
-                                                   Style.TextWrap wrap) {
+                                                   TextWrap wrap) {
         List<List<Line>> result = new ArrayList<>();
         for (List<Word> paragraph : paragraphs(runs)) {
-            if (wrap == Style.TextWrap.PRETTY) {
+            if (wrap == TextWrap.PRETTY) {
                 result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
                 continue;
             }
@@ -229,7 +231,7 @@ public final class LineBreaker {
     }
 
     /** Desplazamiento horizontal de una línea según la alineación. */
-    public static double offset(double lineWidth, double available, Style.TextAlign textAlign) {
+    public static double offset(double lineWidth, double available, TextAlign textAlign) {
         double remaining = Math.max(0, available - lineWidth);
         return switch (textAlign) {
             case LEFT, JUSTIFY -> 0;
@@ -248,9 +250,9 @@ public final class LineBreaker {
      * @param lineWidth ancho natural de la línea
      * @param last      es la última línea de su párrafo
      */
-    public static double wordSpacing(String line, double lineWidth, double available, Style.TextAlign textAlign,
+    public static double wordSpacing(String line, double lineWidth, double available, TextAlign textAlign,
                                      boolean last) {
-        if (textAlign != Style.TextAlign.JUSTIFY || last) {
+        if (textAlign != TextAlign.JUSTIFY || last) {
             return 0;
         }
         long spaces = spaces(line);

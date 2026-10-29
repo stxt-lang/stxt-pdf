@@ -3,11 +3,12 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.layout.inline.PageNumbers;
 import dev.stxt.boxes.layout.inline.TextTransform;
 import dev.stxt.boxes.model.Cell;
+import dev.stxt.boxes.model.Marker;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Reference;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.Metadata;
-import dev.stxt.boxes.tree.Style;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -162,7 +163,7 @@ final class PdfStructure {
         }
         content = linked(box, content);
         for (Box child : box.children()) {
-            if (child.style().position() != Style.Position.FIXED) {
+            if (child.style().position() != Position.FIXED) {
                 build(child, content);
             }
         }
@@ -224,7 +225,7 @@ final class PdfStructure {
         if (box.hasText() || box.marker() != null || box.isImage() && box.style().alt() != null) {
             return true;
         }
-        return box.children().stream().anyMatch(c -> c.style().position() != Style.Position.FIXED && hasContent(c));
+        return box.children().stream().anyMatch(c -> c.style().position() != Position.FIXED && hasContent(c));
     }
 
     /**
@@ -273,7 +274,7 @@ final class PdfStructure {
             }
             PDStructureNode content = linked(cell, c);
             for (Box child : cell.children()) {
-                if (child.style().position() != Style.Position.FIXED) {
+                if (child.style().position() != Position.FIXED) {
                     build(child, content);
                 }
             }
@@ -303,7 +304,7 @@ final class PdfStructure {
     }
 
     /** {@code ListNumbering} de una lista; {@code dash} no tiene equivalente y es {@code None}. */
-    private static String listNumbering(Style.Marker marker) {
+    private static String listNumbering(Marker marker) {
         return switch (marker) {
             case DISC -> PDListAttributeObject.LIST_NUMBERING_DISC;
             case DASH, NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;

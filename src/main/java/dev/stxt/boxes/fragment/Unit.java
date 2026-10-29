@@ -1,6 +1,6 @@
 package dev.stxt.boxes.fragment;
 
-import dev.stxt.boxes.tree.Style;
+import dev.stxt.boxes.model.Break;
 
 /**
  * Una unidad de la fragmentación de un contenedor (ESPECIFICACION.md §5.10): una línea de un
@@ -15,7 +15,7 @@ import dev.stxt.boxes.tree.Style;
  * @param forcedBefore corte forzado delante de la unidad: {@code PAGE}, {@code COLUMN} o {@code AUTO}
  *                     si no hay ({@link BreakRules#forcedBetween(java.util.List, java.util.List)})
  */
-public record Unit(double start, double end, int appealBefore, Style.Break forcedBefore) {
+public record Unit(double start, double end, int appealBefore, Break forcedBefore) {
 
     /** Si se puede cortar delante de la unidad. */
     public boolean breakableBefore() {

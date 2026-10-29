@@ -1,5 +1,7 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Marker;
+
 import java.util.Locale;
 
 /**
@@ -22,7 +24,7 @@ final class ListMarkers {
      * Texto del marcador, con el espacio final; {@code null} con {@code none}. El número solo
      * cuenta en las numeraciones, y debe estar en su rango ({@link #inRange}).
      */
-    static String text(Style.Marker marker, int number) {
+    static String text(Marker marker, int number) {
         String label = switch (marker) {
             case NONE -> null;
             case DISC -> "•";
@@ -37,7 +39,7 @@ final class ListMarkers {
      * {@code III}), que es lo que da {@code {number of: id}} (§5.19); {@code null} si el marcador
      * no numera.
      */
-    static String number(Style.Marker marker, int number) {
+    static String number(Marker marker, int number) {
         return switch (marker) {
             case DECIMAL -> Integer.toString(number);
             case LOWER_ALPHA -> alpha(number);
@@ -49,7 +51,7 @@ final class ListMarkers {
     }
 
     /** Si la numeración puede escribir el número: {@code decimal} desde 0, letras desde 1, romanos de 1 a 3999. */
-    static boolean inRange(Style.Marker marker, int number) {
+    static boolean inRange(Marker marker, int number) {
         return switch (marker) {
             case DECIMAL -> number >= 0;
             case LOWER_ALPHA, UPPER_ALPHA -> number >= 1;
@@ -59,7 +61,7 @@ final class ListMarkers {
     }
 
     /** El rango de una numeración, para los mensajes. */
-    static String range(Style.Marker marker) {
+    static String range(Marker marker) {
         return switch (marker) {
             case DECIMAL -> "desde 0";
             case LOWER_ALPHA, UPPER_ALPHA -> "desde 1";

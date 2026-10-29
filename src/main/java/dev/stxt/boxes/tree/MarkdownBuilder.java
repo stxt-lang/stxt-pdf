@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.boxes.model.Links;
+import dev.stxt.boxes.model.Marker;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 import org.commonmark.ext.gfm.strikethrough.Strikethrough;
@@ -441,9 +442,9 @@ final class MarkdownBuilder {
                 if (token.isEmpty()) {
                     continue;
                 }
-                Style.Marker marker = null;
+                Marker marker = null;
                 try {
-                    marker = Enum.valueOf(Style.Marker.class, token.toUpperCase(Locale.ROOT).replace('-', '_'));
+                    marker = Enum.valueOf(Marker.class, token.toUpperCase(Locale.ROOT).replace('-', '_'));
                 } catch (IllegalArgumentException e) {
                     // Se informa abajo, con los valores admitidos.
                 }

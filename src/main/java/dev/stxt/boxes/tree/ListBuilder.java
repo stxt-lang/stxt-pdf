@@ -1,6 +1,8 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Marker;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +26,7 @@ final class ListBuilder {
      * anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
-        Style.Marker marker = list.style().listMarker;
+        Marker marker = list.style().listMarker;
         if (!marker.numbered()) {
             if (s.isDeclared(NUMBER)) {
                 throw error(s.line(NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number no tiene efecto: la lista "
@@ -58,7 +60,7 @@ final class ListBuilder {
                     + "en el Typography del List item, de un antecesor o de Styles (Element: Document)");
         }
         Style s = Style.inheriting(item.style());
-        s.layout = Style.Layout.INLINE;
+        s.layout = Layout.INLINE;
         Box marker = new Box(null, Element.MARKER, s, false, n.getLine());
         marker.setText(text, n.getLine(), false);
         return marker;
@@ -70,9 +72,9 @@ final class ListBuilder {
      */
     static void markerLine(Box item) {
         Box b = item;
-        while (b.style().layout != Style.Layout.INLINE) {
+        while (b.style().layout != Layout.INLINE) {
             String problem = null;
-            if (b.style().layout == Style.Layout.FLEX || b.style().layout == Style.Layout.GRID) {
+            if (b.style().layout == Layout.FLEX || b.style().layout == Layout.GRID) {
                 problem = "empieza con un " + b.element().label();
             } else if (b.isImage()) {
                 problem = "empieza con una Image";
@@ -105,7 +107,7 @@ final class ListBuilder {
     }
 
     /** Un marcador como se escribe: {@code LOWER_ALPHA} → {@code lower-alpha}. */
-    private static String markerName(Style.Marker marker) {
+    private static String markerName(Marker marker) {
         return marker.name().toLowerCase(Locale.ROOT).replace('_', '-');
     }
 }

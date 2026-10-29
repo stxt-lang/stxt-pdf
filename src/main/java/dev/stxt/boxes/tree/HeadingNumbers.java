@@ -1,6 +1,5 @@
 package dev.stxt.boxes.tree;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

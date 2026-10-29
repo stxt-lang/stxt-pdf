@@ -5,11 +5,12 @@ import dev.stxt.boxes.fragment.BreakToken;
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.position.RelativeOffset;
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Decoration;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element;
-import dev.stxt.boxes.tree.Style;
 import dev.stxt.boxes.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class UnitBreakerTest {
     private final Engine engine = new Engine();
     private final Box container = new StyleEditor().box("C", Element.FLEX);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
-            Style.Decoration.SLICE);
+            Decoration.SLICE);
 
     private static Box item(String id, double height) {
         return new StyleEditor().height(Value.pt(height)).box(id, Element.BLOCK);
@@ -59,7 +60,7 @@ class UnitBreakerTest {
     private static UnitBreaker.Units units(int[] appeal, boolean[] forced, boolean splittable) {
         List<Unit> units = new ArrayList<>();
         for (int u = 0; u < 3; u++) {
-            units.add(new Unit(40 * u, 40 * u + 40, appeal[u], forced[u] ? Style.Break.PAGE : Style.Break.AUTO));
+            units.add(new Unit(40 * u, 40 * u + 40, appeal[u], forced[u] ? Break.PAGE : Break.AUTO));
         }
         return new UnitBreaker.Units(units, 120, splittable);
     }
@@ -156,7 +157,7 @@ class UnitBreakerTest {
         Box a = item("A", 150);
         Box b = item("B", 60);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0), placed(b, 0, 0));
-        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, Style.Break.AUTO)), 150, true);
+        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, Break.AUTO)), 150, true);
 
         LayoutResult first = fragment(page(100, true), null, placed, one, UnitBreaker.Repeat.NONE);
         BreakToken.Container token = assertInstanceOf(BreakToken.Container.class, first.breakToken());
@@ -180,7 +181,7 @@ class UnitBreakerTest {
         UnitBreaker.Units all = units(new int[]{PERFECT, BreakAppeal.FORCED, -1}, new boolean[]{false, true, false},
                 true);
         UnitBreaker.Units body = all.slice(1, 3, 40);
-        assertEquals(List.of(new Unit(0, 40, BreakAppeal.FORCED, Style.Break.PAGE), new Unit(40, 80, -1, Style.Break.AUTO)), body.list());
+        assertEquals(List.of(new Unit(0, 40, BreakAppeal.FORCED, Break.PAGE), new Unit(40, 80, -1, Break.AUTO)), body.list());
         assertEquals(80, body.extent(), 1e-9);
         assertEquals(true, body.splittable());
     }
@@ -189,7 +190,7 @@ class UnitBreakerTest {
     void unsplittableUnitsAreNotSplitInParallel() {
         Box a = item("A", 150);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0));
-        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, Style.Break.AUTO)), 150, false);
+        UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, Break.AUTO)), 150, false);
         // Se coloca entera, desbordando (garantía de progreso).
         LayoutResult r = fragment(page(100, true), null, placed, one, UnitBreaker.Repeat.NONE);
         assertNull(r.breakToken());

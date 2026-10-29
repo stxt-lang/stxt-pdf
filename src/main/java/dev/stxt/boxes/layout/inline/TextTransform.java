@@ -2,6 +2,7 @@ package dev.stxt.boxes.layout.inline;
 
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
+import dev.stxt.boxes.model.Transform;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public final class TextTransform {
 
     /** Si hay algo que transformar. */
     public static boolean applies(Style s) {
-        return s.transform() != Style.Transform.NONE || s.smallCaps();
+        return s.transform() != Transform.NONE || s.smallCaps();
     }
 
     /** Los tramos con la transformación y las versalitas de {@code s}; los mismos si no se piden. */
@@ -38,7 +39,7 @@ public final class TextTransform {
     }
 
     /** Los tramos transformados, con los seguidos del mismo formato unidos. */
-    public static List<TextRun> apply(List<TextRun> runs, Style.Transform transform, boolean smallCaps,
+    public static List<TextRun> apply(List<TextRun> runs, Transform transform, boolean smallCaps,
                                       Locale locale) {
         TextRun.Joiner out = new TextRun.Joiner();
         // Para capitalize: si el carácter anterior (aunque sea de otro tramo) separa palabras.
@@ -67,7 +68,7 @@ public final class TextTransform {
         return out.build();
     }
 
-    private static String transform(String text, Style.Transform transform, boolean wordStart, Locale locale) {
+    private static String transform(String text, Transform transform, boolean wordStart, Locale locale) {
         return switch (transform) {
             case NONE -> text;
             case UPPERCASE -> text.toUpperCase(locale);

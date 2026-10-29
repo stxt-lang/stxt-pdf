@@ -17,12 +17,12 @@ import dev.stxt.boxes.layout.inline.TextMeasurer;
 import dev.stxt.boxes.layout.multicol.MulticolLayout;
 import dev.stxt.boxes.layout.position.AbsoluteLayout;
 import dev.stxt.boxes.layout.table.TableLayout;
+import dev.stxt.boxes.model.Layout;
 import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.BoxTreeBuilder;
 import dev.stxt.boxes.tree.Element;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -61,7 +61,7 @@ public final class Engine implements LayoutContext {
     private final TableLayout table;
     private final AbsoluteLayout absolute;
     /** El algoritmo de cada {@code Layout}; una tabla, que es un grid, tiene el suyo ({@link #algorithm}). */
-    private final Map<Style.Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Style.Layout.class);
+    private final Map<Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Layout.class);
 
     /**
      * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
@@ -92,12 +92,12 @@ public final class Engine implements LayoutContext {
         GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
         this.absolute = new AbsoluteLayout(this);
-        algorithms.put(Style.Layout.BLOCK, new BlockLayout(this));
-        algorithms.put(Style.Layout.INLINE, inline);
-        algorithms.put(Style.Layout.FLEX, new FlexLayout(this));
-        algorithms.put(Style.Layout.GRID, grid);
-        algorithms.put(Style.Layout.MULTICOL, new MulticolLayout(this));
-        algorithms.put(Style.Layout.IMAGE, new ImageLayout(this));
+        algorithms.put(Layout.BLOCK, new BlockLayout(this));
+        algorithms.put(Layout.INLINE, inline);
+        algorithms.put(Layout.FLEX, new FlexLayout(this));
+        algorithms.put(Layout.GRID, grid);
+        algorithms.put(Layout.MULTICOL, new MulticolLayout(this));
+        algorithms.put(Layout.IMAGE, new ImageLayout(this));
     }
 
     /**

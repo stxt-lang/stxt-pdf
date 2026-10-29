@@ -1,9 +1,12 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Marker;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.Value;
+import dev.stxt.boxes.model.WhiteSpace;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +35,7 @@ class MarkdownTest {
                 "\t\t\t| *1* |");
         Box md = root.children().get(0);
         assertEquals(Element.MARKDOWN, md.element());
-        assertEquals(Style.Layout.BLOCK, md.style().layout);
+        assertEquals(Layout.BLOCK, md.style().layout);
         assertEquals(List.of(Element.HEADING_1, Element.PARAGRAPH, Element.LIST, Element.TABLE),
                 md.children().stream().map(b -> b.element()).toList());
         Box paragraph = md.children().get(1);
@@ -42,7 +45,7 @@ class MarkdownTest {
         assertNull(md.children().get(0).children().get(0).formattedRuns());
         Box cell = md.children().get(3).children().get(1);
         assertEquals(List.of(run("1", "i")), cell.formattedRuns());
-        assertEquals(Style.Marker.DISC, md.children().get(2).style().listMarker);
+        assertEquals(Marker.DISC, md.children().get(2).style().listMarker);
     }
 
     @Test
@@ -101,7 +104,7 @@ class MarkdownTest {
         Box code = md.children().get(1);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals("a  b\n  c", code.text());
-        assertEquals(Style.WhiteSpace.PRE, code.style().whiteSpace);
+        assertEquals(WhiteSpace.PRE, code.style().whiteSpace);
         assertEquals("IBM Plex Mono", code.style().font);
     }
 
@@ -123,7 +126,7 @@ class MarkdownTest {
         assertEquals(8, code.style().fontSize, 1e-9);
         assertEquals(new Paint.Solid("#EEEEEE"), code.style().background);
         assertEquals(Sides.all(Value.pt(6)), code.style().padding);
-        assertEquals(Style.WhiteSpace.PRE, code.style().whiteSpace);
+        assertEquals(WhiteSpace.PRE, code.style().whiteSpace);
         assertEquals("IBM Plex Mono", code.style().font);
         // Y el Text del encabezado no recibe lo del bloque de código.
         assertNull(title.style().background);

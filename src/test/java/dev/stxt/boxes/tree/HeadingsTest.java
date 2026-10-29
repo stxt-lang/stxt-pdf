@@ -1,6 +1,9 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +24,7 @@ class HeadingsTest {
         Box h = root("\tHeading 1:", "\t\tId: title", "\t\tText: Resultados", "\t\tText: del trimestre").children().get(0);
         assertEquals(Element.HEADING_1, h.element());
         assertEquals(1, h.headingLevel());
-        assertEquals(Style.Layout.BLOCK, h.style().layout);
+        assertEquals(Layout.BLOCK, h.style().layout);
         assertEquals(2, h.children().size());
         assertEquals(Element.TEXT, h.children().get(0).element());
         assertEquals("Resultados del trimestre", h.headingText());
@@ -30,16 +33,16 @@ class HeadingsTest {
     @Test
     void theEngineAvoidsBreaksInsideAndAfterAHeading() {
         Box h = root("\tHeading 1:", "\t\tText: Título").children().get(0);
-        assertEquals(Style.Break.AVOID, h.style().breakAfter);
+        assertEquals(Break.AVOID, h.style().breakAfter);
         assertTrue(h.style().avoidBreakInside);
-        assertEquals(Style.Break.AUTO, h.style().breakBefore);
+        assertEquals(Break.AUTO, h.style().breakBefore);
     }
 
     @Test
     void paragraphIsATextWithMeaning() {
         Box p = root("\tParagraph: Hola.").children().get(0);
         assertEquals(Element.PARAGRAPH, p.element());
-        assertEquals(Style.Layout.INLINE, p.style().layout);
+        assertEquals(Layout.INLINE, p.style().layout);
         assertEquals("Hola.", p.text());
         assertEquals(0, p.headingLevel());
     }
@@ -75,7 +78,7 @@ class HeadingsTest {
         // El Typography del encabezado lo heredan sus Text.
         assertEquals(14, h2.children().get(0).style().fontSize, 1e-9);
         assertEquals(10, root.children().get(0).style().fontSize, 1e-9);
-        assertEquals(Style.TextAlign.JUSTIFY, root.children().get(2).style().textAlign);
+        assertEquals(TextAlign.JUSTIFY, root.children().get(2).style().textAlign);
     }
 
     @Test

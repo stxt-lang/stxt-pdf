@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.model.Alignment;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.OptionalDouble;
 
@@ -57,7 +57,7 @@ public final class Sizing {
      * Desplazamiento de una caja de tamaño {@code size} alineada en un espacio {@code space}
      * (§5.7, §5.8). Con {@code stretch} la caja ya ocupa el espacio y empieza al principio.
      */
-    public static double align(Style.Alignment alignment, double space, double size) {
+    public static double align(Alignment alignment, double space, double size) {
         return switch (alignment) {
             case START, STRETCH -> 0;
             case END -> space - size;

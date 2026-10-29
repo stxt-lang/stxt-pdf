@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout.position;
 
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.OptionalDouble;
@@ -23,7 +24,7 @@ public record RelativeOffset(double dx, double dy) {
      *                 entonces un porcentaje se comporta como {@code auto}
      */
     public static RelativeOffset of(Style s, double cbWidth, OptionalDouble cbHeight) {
-        if (s.position() != Style.Position.RELATIVE) {
+        if (s.position() != Position.RELATIVE) {
             return NONE;
         }
         OptionalDouble left = s.offset().left().resolve(cbWidth);

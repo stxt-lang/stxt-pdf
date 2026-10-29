@@ -4,12 +4,13 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.layout.AdjoiningMargins;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
@@ -75,7 +76,7 @@ public final class AbsoluteLayout {
     }
 
     private static boolean resolvesHere(PendingAbsolute p, Box box) {
-        return p.box().style().position() == Style.Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
+        return p.box().style().position() == Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
     }
 
     /**

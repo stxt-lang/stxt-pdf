@@ -1,8 +1,8 @@
 package dev.stxt.boxes.layout.flex;
 
 import dev.stxt.boxes.layout.LayoutFixture;
+import dev.stxt.boxes.model.Distribution;
 import dev.stxt.boxes.model.Rect;
-import dev.stxt.boxes.tree.Style;
 import org.junit.jupiter.api.Test;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
@@ -288,13 +288,13 @@ class FlexLayoutTest {
 
     @Test
     void distribution() {
-        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Style.Distribution.START, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{30, 0}, FlexLayout.distribute(Style.Distribution.END, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{0, 15}, FlexLayout.distribute(Style.Distribution.BETWEEN, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{5, 10}, FlexLayout.distribute(Style.Distribution.AROUND, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{7.5, 7.5}, FlexLayout.distribute(Style.Distribution.EVENLY, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Distribution.START, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{30, 0}, FlexLayout.distribute(Distribution.END, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{0, 15}, FlexLayout.distribute(Distribution.BETWEEN, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{5, 10}, FlexLayout.distribute(Distribution.AROUND, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{7.5, 7.5}, FlexLayout.distribute(Distribution.EVENLY, 30, 3), 1e-9);
         // Sin sitio: between al principio, evenly centrado.
-        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Style.Distribution.BETWEEN, -30, 3), 1e-9);
-        assertArrayEquals(new double[]{-15, 0}, FlexLayout.distribute(Style.Distribution.EVENLY, -30, 3), 1e-9);
+        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Distribution.BETWEEN, -30, 3), 1e-9);
+        assertArrayEquals(new double[]{-15, 0}, FlexLayout.distribute(Distribution.EVENLY, -30, 3), 1e-9);
     }
 }

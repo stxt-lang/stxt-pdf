@@ -2,6 +2,9 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Rotation;
 
 import java.util.ArrayList;
@@ -34,7 +37,7 @@ import static dev.stxt.boxes.tree.ValueReader.enumValue;
 
 /**
  * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
- * elemento a una caja con el {@link Style.Layout} y la {@link Style.Position} de su
+ * elemento a una caja con el {@link Layout} y la {@link Position} de su
  * {@link Element}, pasa las propiedades de {@code Item} y {@code Area} al elemento que envuelven,
  * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
  * puede expresar (§6).
@@ -157,8 +160,8 @@ public final class BoxTreeBuilder {
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia) {
         Style s = Style.inheriting(documentRoot.style());
-        s.layout = Style.Layout.BLOCK;
-        s.position = Style.Position.STATIC;
+        s.layout = Layout.BLOCK;
+        s.position = Position.STATIC;
         ctx.rules.applySection(n, s);
         String id = null;
         MediaReader.Spec media = documentMedia;
@@ -177,7 +180,7 @@ public final class BoxTreeBuilder {
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
-        if (box.children().stream().allMatch(c -> c.style().position == Style.Position.FIXED)) {
+        if (box.children().stream().allMatch(c -> c.style().position == Position.FIXED)) {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
@@ -224,7 +227,7 @@ public final class BoxTreeBuilder {
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
-            s.breakAfter = Style.Break.AVOID;
+            s.breakAfter = Break.AVOID;
             s.avoidBreakInside = true;
         }
 
@@ -235,7 +238,7 @@ public final class BoxTreeBuilder {
             listItem(ctx, n, box, parent, number);
         }
         boolean outerFixed = ctx.insideFixed;
-        ctx.insideFixed |= s.position == Style.Position.FIXED;
+        ctx.insideFixed |= s.position == Position.FIXED;
         reader.content(this, ctx, n, box);
         ctx.insideFixed = outerFixed;
         if (kind.headingLevel() > 0) {
@@ -256,7 +259,7 @@ public final class BoxTreeBuilder {
      * {@code Multicol} (§5.16) y un encabezado respeta la jerarquía (§5.13).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
-        if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
+        if (ctx.insideMulticol && kind.position() != Position.STATIC && kind.position() != Position.RELATIVE) {
             throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
                     + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
         }

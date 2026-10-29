@@ -2,6 +2,8 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Marker;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -28,12 +30,12 @@ class ListsTest {
         Box list = root("\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tParagraph: Uno",
                 "\t\tList item:", "\t\t\tText: Dos", "\t\t\tText: y más").children().get(0);
         assertEquals(Element.LIST, list.element());
-        assertEquals(Style.Layout.BLOCK, list.style().layout);
-        assertEquals(Style.Marker.DISC, list.style().listMarker);
+        assertEquals(Layout.BLOCK, list.style().layout);
+        assertEquals(Marker.DISC, list.style().listMarker);
         assertEquals(2, list.children().size());
         Box item = list.children().get(1);
         assertEquals(Element.LIST_ITEM, item.element());
-        assertEquals(Style.Layout.BLOCK, item.style().layout);
+        assertEquals(Layout.BLOCK, item.style().layout);
         assertEquals(2, item.children().size());
         assertEquals(List.of("• ", "• "), markers(list));
     }
@@ -52,7 +54,7 @@ class ListsTest {
     void markersWithAHyphen() {
         Box list = root("\tList:", "\t\tMarker: upper-roman", "\t\tStart: 4",
                 "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b").children().get(0);
-        assertEquals(Style.Marker.UPPER_ROMAN, list.style().listMarker);
+        assertEquals(Marker.UPPER_ROMAN, list.style().listMarker);
         assertEquals(List.of("IV. ", "V. "), markers(list));
     }
 

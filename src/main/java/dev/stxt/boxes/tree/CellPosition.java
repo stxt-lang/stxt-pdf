@@ -1,6 +1,7 @@
 package dev.stxt.boxes.tree;
 
 import dev.stxt.Node;
+import dev.stxt.boxes.model.TextAlign;
 
 /**
  * Dónde está una {@code Cell} en su tabla (ESPECIFICACION.md §5.15), para las reglas de
@@ -14,7 +15,7 @@ import dev.stxt.Node;
  * @param rowClass        el {@code Class} de su {@code Row}, cuyas reglas {@code For class} se aplican a la celda;
  *                        {@code null} si la fila no lo declara
  */
-record CellPosition(int group, int row, int column, Style.TextAlign columnAlign, int columnAlignLine,
+record CellPosition(int group, int row, int column, TextAlign columnAlign, int columnAlignLine,
                     Node rowClass) {
 
     static final int HEAD = 0;

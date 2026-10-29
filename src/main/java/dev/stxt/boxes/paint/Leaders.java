@@ -1,8 +1,8 @@
 package dev.stxt.boxes.paint;
 
+import dev.stxt.boxes.model.Leader;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Tolerance;
-import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ final class Leaders {
      * base {@code baseline}. Los puntos van pegados al número, a la derecha, cada medio cuerpo, y
      * se quedan los que caben; la línea ocupa todo el ancho.
      */
-    static List<Rect> shapes(Style.Leader leader, Rect content, double baseline, double fontSize) {
+    static List<Rect> shapes(Leader leader, Rect content, double baseline, double fontSize) {
         List<Rect> shapes = new ArrayList<>();
         switch (leader) {
             case DOTS -> {

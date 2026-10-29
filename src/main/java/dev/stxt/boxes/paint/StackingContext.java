@@ -2,14 +2,18 @@ package dev.stxt.boxes.paint;
 
 import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.TextLine;
+import dev.stxt.boxes.model.Decoration;
 import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
+import dev.stxt.boxes.model.WhiteSpace;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Element.Role;
 import dev.stxt.boxes.tree.Style;
@@ -120,14 +124,14 @@ public final class StackingContext {
 
     private static boolean createsContext(Fragment f) {
         Style s = f.box().style();
-        if (s.position() == Style.Position.FIXED) {
+        if (s.position() == Position.FIXED) {
             return true;
         }
         if (s.layer() == null) {
             return false;
         }
-        Style.Layout parent = f.box().parent() != null ? f.box().parent().style().layout() : null;
-        boolean item = parent == Style.Layout.FLEX || parent == Style.Layout.GRID;
+        Layout parent = f.box().parent() != null ? f.box().parent().style().layout() : null;
+        boolean item = parent == Layout.FLEX || parent == Layout.GRID;
         return s.isPositioned() || item;
     }
 
@@ -224,7 +228,7 @@ public final class StackingContext {
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
         Radii radii = Radii.resolve(s.radius(), p.f().width(), p.f().height());
-        if (s.decoration() == Style.Decoration.CLONE) {
+        if (s.decoration() == Decoration.CLONE) {
             return radii;
         }
         return radii.forFragment(p.f().first(), p.f().last());
@@ -362,7 +366,7 @@ public final class StackingContext {
             TextLine l = lines.get(n);
             // El corte de línea se come el espacio: se escribe invisible tras la última palabra, para que quien
             // une el texto de las líneas (lector de pantalla, extracción, búsqueda) no pegue las palabras.
-            boolean spaceAfter = n < lines.size() - 1 && s.whiteSpace() == Style.WhiteSpace.NORMAL;
+            boolean spaceAfter = n < lines.size() - 1 && s.whiteSpace() == WhiteSpace.NORMAL;
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {

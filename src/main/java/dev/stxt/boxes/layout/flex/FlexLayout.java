@@ -6,14 +6,18 @@ import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.fragment.Unit;
 import dev.stxt.boxes.layout.BoxModel;
 import dev.stxt.boxes.layout.ConstraintSpace;
-import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.IntrinsicSizes;
 import dev.stxt.boxes.layout.LayoutAlgorithm;
+import dev.stxt.boxes.layout.LayoutContext;
 import dev.stxt.boxes.layout.LayoutResult;
 import dev.stxt.boxes.layout.PendingAbsolute;
 import dev.stxt.boxes.layout.Sizing;
 import dev.stxt.boxes.layout.UnitBreaker;
 import dev.stxt.boxes.layout.position.RelativeOffset;
+import dev.stxt.boxes.model.Alignment;
+import dev.stxt.boxes.model.Break;
+import dev.stxt.boxes.model.Direction;
+import dev.stxt.boxes.model.Distribution;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.Style;
@@ -84,7 +88,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
-        if (s.flexDirection() == Style.Direction.COLUMN) {
+        if (s.flexDirection() == Direction.COLUMN) {
             content = new IntrinsicSizes(maxMin, maxMax);
         } else if (s.flexWrap()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
@@ -104,7 +108,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     private static final class Item {
         final Box box;
         final Insets margin;
-        final Style.Alignment align;
+        final Alignment align;
         FlexItem flex;
         /** En column: ancho de caja de borde con el que se mide el ítem. */
         double crossWidth;
@@ -116,7 +120,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         /** Espacio de {@link #result}. */
         ConstraintSpace space;
 
-        Item(Box box, Insets margin, Style.Alignment align) {
+        Item(Box box, Insets margin, Alignment align) {
             this.box = box;
             this.margin = margin;
             this.align = align;
@@ -151,7 +155,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.box = box;
             this.s = box.style();
             this.model = model;
-            this.row = s.flexDirection() == Style.Direction.ROW;
+            this.row = s.flexDirection() == Direction.ROW;
             this.multiLine = s.flexWrap();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
@@ -205,7 +209,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (multiLine && crossSize.isPresent()) {
                 crossFree = crossSize.getAsDouble() - Sizing.sum(lineCross) - crossGap * Math.max(0, n - 1);
             }
-            if (s.flexLines() == Style.Distribution.STRETCH && crossFree > 0) {
+            if (s.flexLines() == Distribution.STRETCH && crossFree > 0) {
                 for (int l = 0; l < n; l++) {
                     lineCross[l] += crossFree / n;
                 }
@@ -218,7 +222,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         void stretchItems(List<List<Item>> lines, double[] lineCross) {
             for (int l = 0; l < lines.size(); l++) {
                 for (Item it : lines.get(l)) {
-                    if (it.align == Style.Alignment.STRETCH) {
+                    if (it.align == Alignment.STRETCH) {
                         stretch(it, lineCross[l]);
                     }
                 }
@@ -234,7 +238,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
             List<Span> spans = new ArrayList<>();
-            double[] lineDistribution = distribute(multiLine ? s.flexLines() : Style.Distribution.START, cross.free(), n);
+            double[] lineDistribution = distribute(multiLine ? s.flexLines() : Distribution.START, cross.free(), n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
             for (int l = 0; l < n; l++) {
@@ -276,7 +280,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             for (int u = 0; u < spans.size(); u++) {
                 Span span = spans.get(u);
                 if (u == 0) {
-                    units.add(new Unit(span.start(), span.end(), 0, Style.Break.AUTO));
+                    units.add(new Unit(span.start(), span.end(), 0, Break.AUTO));
                     continue;
                 }
                 List<Box> before = spans.get(u - 1).boxes();
@@ -326,7 +330,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double width;
             if (!is.width().isAuto()) {
                 width = probe.width();
-            } else if (it.align == Style.Alignment.STRETCH && !multiLine) {
+            } else if (it.align == Alignment.STRETCH && !multiLine) {
                 width = Math.max(0, contentWidth - it.margin.horizontal());
             } else {
                 width = Math.max(0, context.intrinsic(b).fitContent(contentWidth) - it.margin.horizontal());
@@ -361,7 +365,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             return is.itemBasis().resolve(mainSize);
         }
 
-        Style.Alignment alignment(Style is) {
+        Alignment alignment(Style is) {
             return is.itemCrossAxis() != null ? is.itemCrossAxis() : s.flexCrossAxis();
         }
 
@@ -480,14 +484,14 @@ public final class FlexLayout implements LayoutAlgorithm {
      *
      * @return {antes del primero, extra entre elementos}
      */
-    static double[] distribute(Style.Distribution d, double free, int n) {
+    static double[] distribute(Distribution d, double free, int n) {
         if (n == 0) {
             return new double[]{0, 0};
         }
         if (free < 0) {
             d = switch (d) {
-                case BETWEEN -> Style.Distribution.START;
-                case AROUND, EVENLY -> Style.Distribution.CENTER;
+                case BETWEEN -> Distribution.START;
+                case AROUND, EVENLY -> Distribution.CENTER;
                 default -> d;
             };
         }

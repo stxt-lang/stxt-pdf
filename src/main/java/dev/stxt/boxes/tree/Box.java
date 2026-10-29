@@ -1,5 +1,7 @@
 package dev.stxt.boxes.tree;
 
+import dev.stxt.boxes.model.Layout;
+import dev.stxt.boxes.model.Position;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 
@@ -302,8 +304,8 @@ public final class Box {
         if (parent == null || style.isolate || style.isOutOfFlow()) {
             return true;
         }
-        Style.Layout l = parent.style.layout;
-        return l == Style.Layout.FLEX || l == Style.Layout.GRID;
+        Layout l = parent.style.layout;
+        return l == Layout.FLEX || l == Layout.GRID;
     }
 
     /**
@@ -313,7 +315,7 @@ public final class Box {
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
-        boolean fixed = style.position == Style.Position.FIXED;
+        boolean fixed = style.position == Position.FIXED;
         while (b.parent != null && (fixed || !b.style.isPositioned())) {
             b = b.parent;
         }
