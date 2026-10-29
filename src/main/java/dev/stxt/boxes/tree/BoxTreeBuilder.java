@@ -3,13 +3,9 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
-import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Rotation;
-import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.TextRun;
-import dev.stxt.boxes.model.Value;
-import dev.stxt.boxes.model.ValueParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +33,6 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
 import static dev.stxt.boxes.tree.Nodes.is;
 import static dev.stxt.boxes.tree.Nodes.isElement;
-import static dev.stxt.boxes.tree.Nodes.parse;
 import static dev.stxt.boxes.tree.Nodes.unread;
 import static dev.stxt.boxes.tree.PropertyReader.FLEX;
 import static dev.stxt.boxes.tree.PropertyReader.GRID;
@@ -56,7 +51,6 @@ import static dev.stxt.boxes.tree.ValueReader.angle;
 import static dev.stxt.boxes.tree.ValueReader.bool;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
 import static dev.stxt.boxes.tree.ValueReader.integer;
-import static dev.stxt.boxes.tree.ValueReader.points;
 import static dev.stxt.boxes.tree.ValueReader.sides;
 
 /**
@@ -150,9 +144,9 @@ public final class BoxTreeBuilder {
             }
             DocumentSchema.validate(styles);
         }
-        MediaSpec documentMedia = media(inline(child(document, "media").orElseThrow()), null);
+        MediaReader.Spec documentMedia = MediaReader.media(inline(child(document, "media").orElseThrow()), null);
         Media media = documentMedia.media();
-        Metadata metadata = metadata(document);
+        Metadata metadata = MediaReader.metadata(document);
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
         // La tipografía de Element: Document la heredan todas las cajas.
@@ -185,19 +179,19 @@ public final class BoxTreeBuilder {
      * Una {@code Section} (§5.21): su caja, que es la raíz de su layout y tiene el alto de la página
      * menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
      */
-    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaSpec documentMedia) {
+    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia) {
         Style s = Style.inheriting(documentRoot.style());
         s.layout = Style.Layout.BLOCK;
         s.position = Style.Position.STATIC;
         ctx.rules.applySection(n, s);
         String id = null;
-        MediaSpec media = documentMedia;
+        MediaReader.Spec media = documentMedia;
         Section.PageNumbering numbering = Section.PageNumbering.CONTINUE;
         boolean inheritFixed = true;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
-                case "media" -> media = media(inline(p), documentMedia);
+                case "media" -> media = MediaReader.media(inline(p), documentMedia);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
                 case "inherit-fixed" -> inheritFixed = bool(p);
                 default -> {
@@ -212,93 +206,6 @@ public final class BoxTreeBuilder {
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
         return new Section(box, media.media(), numbering, inheritFixed);
-    }
-
-    /** Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo (§5.21). */
-    private record MediaSpec(Media media, Media.Paper paper) {
-    }
-
-    /** {@code Title} y {@code Language} de {@code Document}: un título no vacío y una etiqueta BCP 47. */
-    private static Metadata metadata(InlineNode document) {
-        String title = child(document, "title").map(n -> {
-            String t = n.getText().trim();
-            if (t.isEmpty()) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Title necesita un texto");
-            }
-            return t;
-        }).orElse(null);
-        String language = child(document, "language").map(ValueReader::language).orElse(null);
-        return new Metadata(title, language);
-    }
-
-    /**
-     * El medio (§4.1): su tamaño es un {@code Paper} con su {@code Orientation} o un {@code Width}
-     * y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez.
-     */
-    private static MediaSpec media(InlineNode n, MediaSpec base) {
-        Optional<Node> paper = child(n, "paper");
-        Optional<Node> orientation = child(n, "orientation");
-        Optional<Node> widthNode = child(n, "width");
-        Optional<Node> heightNode = child(n, "height");
-        double width;
-        double height;
-        Media.Paper named = null;
-        if (paper.isPresent()) {
-            Optional<Node> both = widthNode.isPresent() ? widthNode : heightNode;
-            if (both.isPresent()) {
-                throw error(both.get(), ErrorCode.MEDIA_SIZE, "El medio declara Paper y " + both.get().getName()
-                        + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
-            }
-            named = enumValue(Media.Paper.class, paper.get());
-        } else if (base != null && orientation.isPresent() && widthNode.isEmpty() && heightNode.isEmpty()) {
-            // Una sección que solo gira el papel del documento.
-            if (base.paper() == null) {
-                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "documento no lo declara (da Width y Height): declara Paper en la sección o en el documento");
-            }
-            named = base.paper();
-        }
-        if (named != null) {
-            boolean landscape = orientation.map(o -> enumValue(Media.Orientation.class, o))
-                    .orElse(Media.Orientation.PORTRAIT) == Media.Orientation.LANDSCAPE;
-            width = landscape ? named.height : named.width;
-            height = landscape ? named.width : named.height;
-        } else if (base != null && widthNode.isEmpty() && heightNode.isEmpty() && orientation.isEmpty()) {
-            // El tamaño es el del documento.
-            width = base.media().width();
-            height = base.media().height();
-            named = base.paper();
-        } else {
-            if (orientation.isPresent()) {
-                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "medio no lo declara: usa Paper o cambia el Width por el Height");
-            }
-            if (widthNode.isEmpty() || heightNode.isEmpty()) {
-                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.MEDIA_SIZE, "El medio necesita "
-                        + "su tamaño: un Paper (A4, Letter…) o un Width y un Height");
-            }
-            width = points(widthNode.get());
-            height = points(heightNode.get());
-        }
-        Optional<Node> marginNode = child(n, "margin");
-        Insets margin = marginNode.map(BoxTreeBuilder::mediaMargin)
-                .orElse(base != null ? base.media().margin() : Insets.ZERO);
-        Media media = new Media(width, height, margin);
-        if (media.pageArea().width() <= 0 || media.pageArea().height() <= 0) {
-            throw error(marginNode.orElse(n), ErrorCode.MEDIA_SIZE, "Los márgenes del medio no dejan área útil");
-        }
-        return new MediaSpec(media, named);
-    }
-
-    private static Insets mediaMargin(Node n) {
-        List<Double> v = parse(n, () -> ValueParser.list(n.getText())).stream().map(x -> {
-            if (!(x instanceof Value.Points p)) {
-                throw error(n, ErrorCode.MEDIA_SIZE, "El margen del medio solo admite puntos: " + n.getText().trim());
-            }
-            return p.pt();
-        }).toList();
-        Sides<Double> s = parse(n, () -> Sides.shorthand(v));
-        return new Insets(s.top(), s.right(), s.bottom(), s.left());
     }
 
     /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */

@@ -240,7 +240,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
   `parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con
   `parent`) y no se maquetan en el flujo: los coloca el `Paginator`. `Media` de una sección sale de
-  `BoxTreeBuilder.media(n, base)`, que hereda por grupos (tamaño y `Margin`) y recuerda el `Paper` para
+  `MediaReader.media(n, base)`, que hereda por grupos (tamaño y `Margin`) y recuerda el `Paper` para
   `Orientation` sola (`MediaSpec`). `Paginator` hace una pasada de flujo por sección (`flow`) con **una
   sola convergencia** de las referencias, y calcula con `Numbering` el número impreso de cada página (el
   contador, `restart` y `none`) y el último de su tanda (`{pages}`); `Page` lleva su `Media`, su sección y su
@@ -421,7 +421,7 @@ Un tipo que necesitan `tree` y `layout` va en `model`.
   página, con la y hacia abajo: un ángulo positivo gira en el sentido de las agujas del reloj (en el PDF,
   con el origen abajo, el ángulo cambia de signo).
 - **Papel (§4.1):** `Media` es `Paper` (`Media.Paper`, en vertical) con `Orientation`, o `Width` y
-  `Height`; `BoxTreeBuilder.media` exige una sola de las dos formas (`MEDIA_SIZE`).
+  `Height`; `MediaReader.media` exige una sola de las dos formas (`MEDIA_SIZE`).
 - **`Fragment`**: posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa
   a coordenadas absolutas de página. Lleva su propio `border` y `padding`, que en un fragmento
   partido no son los de la caja: usa siempre los del fragmento para llegar a su caja de contenido.
