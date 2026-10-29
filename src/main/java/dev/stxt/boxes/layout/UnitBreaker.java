@@ -161,6 +161,18 @@ public final class UnitBreaker {
         final double remaining;
         /** Ítem de cada índice de {@code placed} colocado en este fragmento. */
         final Piece[] pieces;
+        /** Primera unidad que queda por colocar. */
+        int next;
+        /**
+         * Posición en el fragmento = posición sin fragmentar − origin. El primer fragmento conserva
+         * el hueco inicial (alineación); los siguientes empiezan en su primera unidad o, si solo
+         * queda el alto propio de la caja, al final del contenido.
+         */
+        double origin;
+        /** Final de la continuación del grupo partido en la página anterior; 0 si no la hay. */
+        double top;
+        /** El fragmento empieza con la continuación de un grupo partido. */
+        boolean continued;
 
         Run(LayoutContext context, Box box, ConstraintSpace space, BreakToken.Container from, Arranged arranged,
             Repeat repeat) {
@@ -182,56 +194,69 @@ public final class UnitBreaker {
         }
 
         LayoutResult layOut() {
-            int next = first ? 0 : from.nextLine();
-            // Posición en el fragmento = posición sin fragmentar − origin. El primer fragmento
-            // conserva el hueco inicial (alineación); los siguientes empiezan en su primera unidad
-            // o, si solo queda el alto propio de la caja, al final del contenido.
-            double origin = first ? 0 : next < n ? units.get(next).start() : units.extent();
-            double top = 0;
-            boolean continued = false;
+            next = first ? 0 : from.nextLine();
+            origin = first ? 0 : next < n ? units.get(next).start() : units.extent();
             if (!first && !from.itemTokens().isEmpty()) {
-                // El grupo partido en la página anterior continúa desde arriba.
-                int end = groupEnd(next);
-                Split s = split(next, end, from.itemTokens(), 0);
-                if (s == null) {
-                    return LayoutResult.before(box);
+                LayoutResult r = continueGroup();
+                if (r != null) {
+                    return r;
                 }
-                commit(s);
-                if (s.broken()) {
+            }
+            if (!space.fragmenting() || next == n) {
+                return place(n, BreakAppeal.PERFECT_BREAK);
+            }
+            return cut();
+        }
+
+        /**
+         * El grupo partido en la página anterior continúa desde arriba, y las unidades siguientes
+         * van detrás del ítem más largo. El resultado si el fragmento acaba con el grupo (o no cabe
+         * nada); {@code null} si sigue con las unidades siguientes.
+         */
+        LayoutResult continueGroup() {
+            int end = groupEnd(next);
+            Split s = split(next, end, from.itemTokens(), 0);
+            if (s == null) {
+                return LayoutResult.before(box);
+            }
+            commit(s);
+            if (s.broken()) {
+                return result(s.bottom(), false, next, s.tokens(), s.appeal());
+            }
+            origin = bottom(next, end) - s.bottom();
+            top = s.bottom();
+            next = end;
+            continued = true;
+            return null;
+        }
+
+        /**
+         * Las unidades desde {@code next} que caben en lo que queda de página. Si el primer grupo
+         * no cabe ni al principio de página, sus ítems se parten en paralelo.
+         */
+        LayoutResult cut() {
+            boolean mustPlace = space.atFragmentainerStart() && !continued;
+            int groupEnd = groupEnd(next);
+            if (mustPlace && units.splittable() && !fits(bottom(next, groupEnd) - origin, remaining)) {
+                Split s = split(next, groupEnd, null, origin);
+                if (s != null && s.broken()) {
+                    commit(s);
                     return result(s.bottom(), false, next, s.tokens(), s.appeal());
                 }
-                // Las unidades siguientes, detrás del ítem más largo.
-                origin = bottom(next, end) - s.bottom();
-                top = s.bottom();
-                next = end;
-                continued = true;
             }
+            BreakRules.Cut cut = BreakRules.cutUnits(units.list(), next,
+                    remaining - (units.get(next).start() - origin), mustPlace);
+            if (cut.end() == next) {
+                // Solo cabe la continuación del grupo, si la hay: se corta detrás de ella.
+                return continued
+                        ? result(top, false, next, List.of(), units.get(next).appealBefore())
+                        : LayoutResult.before(box);
+            }
+            return place(cut.end(), cut.appeal());
+        }
 
-            int end = n;
-            int appeal = BreakAppeal.PERFECT_BREAK;
-            if (space.fragmenting() && next < n) {
-                boolean mustPlace = space.atFragmentainerStart() && !continued;
-                int groupEnd = groupEnd(next);
-                if (mustPlace && units.splittable() && !fits(bottom(next, groupEnd) - origin, remaining)) {
-                    // No cabe ni al principio de página: sus ítems se parten en paralelo.
-                    Split s = split(next, groupEnd, null, origin);
-                    if (s != null && s.broken()) {
-                        commit(s);
-                        return result(s.bottom(), false, next, s.tokens(), s.appeal());
-                    }
-                }
-                BreakRules.Cut cut = BreakRules.cutUnits(units.list(), next,
-                        remaining - (units.get(next).start() - origin), mustPlace);
-                if (cut.end() == next) {
-                    if (!continued) {
-                        return LayoutResult.before(box);
-                    }
-                    // Solo cabe la continuación del grupo: se corta detrás de ella.
-                    return result(top, false, next, List.of(), units.get(next).appealBefore());
-                }
-                end = cut.end();
-                appeal = cut.appeal();
-            }
+        /** Coloca enteras las unidades {@code [next, end)} y cierra el fragmento. */
+        LayoutResult place(int end, int appeal) {
             for (int k = 0; k < placed.size(); k++) {
                 Placed p = placed.get(k);
                 if (p.unit() >= next && p.unit() < end) {
@@ -251,7 +276,7 @@ public final class UnitBreaker {
          *
          * @param tokens token de cada ítem para reanudarlos desde arriba; {@code null} si el grupo
          *               empieza en esta página, cada ítem en su posición
-         * @param origin ver {@link #layOut}; solo si el grupo empieza en esta página
+         * @param origin ver {@link #origin}; solo si el grupo empieza en esta página
          */
         Split split(int start, int end, List<BreakToken> tokens, double origin) {
             Piece[] split = new Piece[placed.size()];
