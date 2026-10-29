@@ -403,6 +403,27 @@ del marcador de una lista por dentro (`fragment(c, …)` de un marcador: solo ca
 `MulticolLayout`, la frontera de la búsqueda binaria, `own <= page` y `atStart` (con fragmentación y al principio de
 página, o sin fragmentación, que solo cambiaría el error con que acaba un contenido que no cabe).
 
+**Después: `FlexLayout` (con `FlexResolver`) y `Paginator`.** Flex pasa de 210/251 (84 %) a 229/251 (91 %) y el
+`Paginator` de 83/97 (86 %) a 88/97 (91 %); en total, 89,2 % (fuerza 90 %), y dos supervivientes más muertos después de
+la pasada y comprobados a mano (el hueco del `Wrap` con cuatro ítems y la tercera cifra de `{page}`). Solo tests, sin
+cambios en el motor:
+- Flex: tres líneas con `Lines: between`, `Wrap` que cabe justo y con cuatro ítems, el mínimo automático con borde y
+  relleno, `Max width`, `Max height` y `Min height` con márgenes (en columna, también el mínimo automático), ítems de
+  columna que no se estiran, las líneas de una columna con `Wrap`, estirar con márgenes distintos en cada eje y una
+  columna con `Wrap` como una sola unidad al cortar; `FlexResolver` con un ítem que llega a su máximo y otro a su mínimo.
+- `Paginator`: una portada sin números y sin `{page}`; el mensaje de `PAGE_NUMBER_UNAVAILABLE` con y sin `Id`; un
+  `{number of}` de una caja sin página (no la necesita); la línea de `REFERENCE_NOT_PLACEABLE` con varias referencias;
+  el culpable de `REFERENCE_UNSTABLE` con un `{number of}` antes; el límite de páginas con varias secciones; y un texto
+  del flujo con `{page}` que, con 101 páginas, se vuelve a medir con tres cifras (la caché tiene que olvidarlo).
+
+Lo que queda: en `FlexResolver`, fronteras (`<` frente a `<=` con la épsilon o con 1) y el congelado inicial de los
+ítems que no crecen, que el bucle de violaciones vuelve a dar igual; en `FlexLayout`, fronteras, el mínimo con `Width`
+menor que el contenido y el ancho de un ítem de columna que se estira (los dos solo cambiarían un documento que ya
+desborda o lo que el estirado vuelve a calcular), dos `return` sin cobertura que no se alcanzan, y si una columna con
+`Wrap` se puede partir en paralelo; en el `Paginator`, fronteras, vaciar los `Fixed` de la pasada anterior y qué textos
+se olvidan al cambiar una referencia (los dos solo cambian el trabajo, no el resultado), y el mensaje de «sin progreso»,
+que no se alcanza.
+
 ### QA-09 · Integración continua · Alta · S
 
 No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
@@ -973,3 +994,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · CI en Windows | Trabajo `windows` (`windows-latest`) solo en la ejecución diaria y a mano; el árbol limpio, sin `tee` (con `pipefail`, `tee /dev/stderr` fallaba en Windows) y con anotaciones. En verde. | — |
 | 2026-10-29 | Fuera del plan · QA-08 (5) | Perfil `pit`; dos pasadas (80,7 % → 85,5 % de mutantes detectados, `layout.position` de 56 a 92 %, `layout.grid` de 81 a 90 %). Tests nuevos de `AbsoluteEquation`, `TrackSizing`, flex, grid y posición estática; dos fallos encontrados y corregidos con el usuario: el max-content de un ítem de varias pistas (decisión 323) y el encogimiento flex con márgenes (decisión 324). Ningún golden ni ejemplo cambia; 1428 tests en verde. QA-08 terminada. | Revisión QA y arquitectura terminada; lo que queda de PIT, por clases cuando se toquen |
 | 2026-10-29 | Fuera del plan · PIT: `MulticolLayout` y `Overflow` | `OverflowTest` (el culpable y las medidas de cada mensaje) y tests de Multicol; `Overflow` de 62 a 83 % de mutantes detectados y `MulticolLayout` de 74 a 96 % (total 88,1 %). Un mensaje con «su su» corregido y tres trozos de código sin efecto quitados. 1447 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
+| 2026-10-29 | Fuera del plan · PIT: `FlexLayout` y `Paginator` | Tests de flex (huecos, márgenes en los límites, columnas con `Wrap`, estirado) y del `Paginator` (portadas, mensajes, `{number of}`, líneas y culpables de los errores, límite de páginas entre secciones, tercera cifra de `{page}`); Flex de 84 a 91 % y `Paginator` de 86 a 91 % (total 89,2 %). Sin cambios en el motor. 1465 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |

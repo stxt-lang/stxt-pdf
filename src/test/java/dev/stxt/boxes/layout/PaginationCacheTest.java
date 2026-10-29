@@ -1,5 +1,6 @@
 package dev.stxt.boxes.layout;
 
+import dev.stxt.boxes.fragment.Fragment;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -53,5 +54,25 @@ class PaginationCacheTest {
         int[] plain = layOut(document("Pie de página", "El final está en la página " + referred[0], 600));
         assertEquals(plain[0], referred[0]);
         assertTrue(referred[1] < plain[1] * 1.25, referred[1] + " layouts frente a " + plain[1]);
+    }
+
+    /**
+     * Con 101 páginas, el texto con {page} del flujo se vuelve a medir con tres cifras: «Página 000» (50) no cabe en su
+     * caja de 48 y ocupa dos líneas; medido con dos (45) cabría en una. La caché tiene que olvidarlo (QA-08, mutación).
+     */
+    @Test
+    void aThirdDigitIsMeasuredInTheTextsThatWriteIt() {
+        StringBuilder sb = new StringBuilder("Document (dev.stxt.boxes):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n"
+                + "\tTitle: Cifras\n\tLanguage: es\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n"
+                + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tSection:\n"
+                + "\t\tText: Página {page}\n\t\t\tId: P\n\t\t\tBox:\n\t\t\t\tWidth: 48\n");
+        for (int i = 0; i < 100; i++) {
+            sb.append("\t\tBlock:\n\t\t\tBox:\n\t\t\t\tHeight: 10\n\t\t\tBreak:\n\t\t\t\tBefore: page\n");
+        }
+        LaidOutDocument d = new Engine().layOutDocument(new DocumentReader().read(sb.toString()));
+        assertEquals(101, d.pages().size());
+        Fragment text = d.pages().get(0).content().children().get(0);
+        assertEquals("P", text.box().id());
+        assertEquals(2, text.lines().size());
     }
 }

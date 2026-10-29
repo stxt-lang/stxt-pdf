@@ -512,4 +512,16 @@ class FlexLayoutTest {
                 "\t\tItem:", block("B", "Width: 50", "Height: 40"));
         assertRect(45, 50, 50, 20, l.rect("A"));
     }
+
+    @Test
+    void wrapCountsOneGapLessThanItems() {
+        // 100 + 10 + 100 + 10 + 100 = 320; con el cuarto (190) y su hueco, 520: pasa a otra línea.
+        LayoutFixture l = layOut(
+                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\t\tItem:", block("A", "Width: 100", "Height: 20"),
+                "\t\tItem:", block("B", "Width: 100", "Height: 20"),
+                "\t\tItem:", block("C", "Width: 100", "Height: 20"),
+                "\t\tItem:", block("D", "Width: 190", "Height: 20"));
+        assertRect(40, 70, 190, 20, l.rect("D"));
+    }
 }
