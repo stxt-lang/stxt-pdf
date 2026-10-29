@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Los documentos completos de la documentación (cada bloque de código del manual y de la referencia que empieza por
+ * Los documentos completos de la documentación (cada bloque de código del README, el manual y la referencia que empieza por
  * {@code Document (dev.stxt.boxes):}) y {@code test/spec/report.stxt} se tratan como los de {@code test/examples/}: se
  * maquetan con las métricas reales y la carpeta {@code resources/}, se escriben en PDF y el PDF cumple PDF/UA-1 según
  * veraPDF. Así ningún ejemplo del manual ni de la referencia deja de funcionar sin que se note. No tienen imágenes ni
@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 class DocumentationExamplesTest {
 
+    private static final Path README = Path.of("README.md");
     private static final Path DOCS = Path.of("docs");
     private static final Path MANUAL = DOCS.resolve("manual");
     private static final Path REFERENCE = DOCS.resolve("referencia");
@@ -57,7 +58,10 @@ class DocumentationExamplesTest {
     @TestFactory
     Stream<DynamicTest> documentationDocuments() throws IOException {
         List<DocDocument> documents = new ArrayList<>();
-        for (Path page : concat(pages(MANUAL), pages(REFERENCE))) {
+        List<Path> pages = new ArrayList<>(List.of(README));
+        pages.addAll(pages(MANUAL));
+        pages.addAll(pages(REFERENCE));
+        for (Path page : pages) {
             documents.addAll(examples(page));
         }
         documents.add(new DocDocument("report", Files.readString(REPORT)));
@@ -83,12 +87,6 @@ class DocumentationExamplesTest {
         assertEquals(examples.get(0).text(), report);
     }
 
-    private static List<Path> concat(List<Path> a, List<Path> b) {
-        List<Path> all = new ArrayList<>(a);
-        all.addAll(b);
-        return all;
-    }
-
     /** Las páginas Markdown de una carpeta y sus subcarpetas, en orden. */
     private static List<Path> pages(Path folder) throws IOException {
         try (Stream<Path> walk = Files.walk(folder)) {
@@ -105,7 +103,7 @@ class DocumentationExamplesTest {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        String name = DOCS.relativize(page).toString().replace('\\', '/').replace(".md", "").replace('/', '-');
+        String name = (page.startsWith(DOCS) ? DOCS.relativize(page) : page).toString().replace('\\', '/').replace(".md", "").replace('/', '-');
         Matcher m = EXAMPLE.matcher(text);
         List<DocDocument> examples = new ArrayList<>();
         while (m.find()) {

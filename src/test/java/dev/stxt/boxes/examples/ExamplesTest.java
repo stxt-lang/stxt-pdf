@@ -41,12 +41,14 @@ import static org.junit.jupiter.api.Assertions.fail;
  * tener {@code styles.stxt}, el documento de estilos aparte que se pasa junto a él (ESPECIFICACION.md
  * §4.10); el volcado
  * de las cajas con {@code Id} ({@code expected.stxt}, §7), que se compara con tolerancia de
- * 0.01 pt; y una imagen por página ({@code page-N.png}, versionadas). El PDF y las imágenes nuevas se escriben en
- * {@code target/reference/examples/}, y si alguna imagen no es la versionada el ejemplo falla.</p>
+ * 0.01 pt; una imagen por página ({@code page-N.png}, versionadas) y el PDF ({@code output.pdf}, versionado para
+ * poder abrirlo desde el repositorio, pero no se compara: lleva la fecha y un identificador que cambian en cada
+ * ejecución). El PDF y las imágenes nuevas se escriben en {@code target/reference/examples/}, y si alguna imagen no
+ * es la versionada el ejemplo falla.</p>
  *
  * <p>El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que el
- * autor revisa mirando las imágenes. {@code -Dexamples.update=true} acepta los cambios (reescribe el volcado y las
- * imágenes que cambian), y se puede probar un solo ejemplo con {@code -Dexamples.only=01-invoice}.</p>
+ * autor revisa mirando las imágenes. {@code -Dexamples.update=true} acepta los cambios (reescribe el volcado, el PDF
+ * y las imágenes que cambian), y se puede probar un solo ejemplo con {@code -Dexamples.only=01-invoice}.</p>
  */
 class ExamplesTest {
 
@@ -86,10 +88,12 @@ class ExamplesTest {
         List<BufferedImage> images = ReferenceFiles.writeActual(actual, pdf, IMAGE_DPI);
 
         Path expectedFile = dir.resolve("expected.stxt");
+        Path pdfFile = dir.resolve("output.pdf");
         if (Boolean.getBoolean("examples.update")) {
             Files.writeString(expectedFile, dump, StandardCharsets.UTF_8);
-        } else if (!Files.exists(expectedFile)) {
-            fail(dir + ": falta expected.stxt; genéralo con -Dexamples.update=true y revisa las imágenes");
+            Files.write(pdfFile, pdf);
+        } else if (!Files.exists(expectedFile) || !Files.exists(pdfFile)) {
+            fail(dir + ": falta expected.stxt u output.pdf; genéralos con -Dexamples.update=true y revisa las imágenes");
         } else {
             Node expected = STXT.rawParser().parseFile(expectedFile.toFile()).get(0);
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), dir.getFileName() + "/");
