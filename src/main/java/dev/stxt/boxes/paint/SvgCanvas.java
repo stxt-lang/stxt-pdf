@@ -5,11 +5,13 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.Colors;
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.resources.ImageFile;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.tree.Box;
@@ -212,6 +214,18 @@ public final class SvgCanvas implements Canvas {
             }
         }
         outline(r);
+    }
+
+    /** Sin la fuente: la aproximación 0,8/0,2 del tamaño. */
+    @Override
+    public VerticalMetrics vertical(FontFace font) {
+        return VerticalMetrics.APPROXIMATE;
+    }
+
+    /** Sin la fuente: la aproximación de las rayas. */
+    @Override
+    public DecorationMetrics decoration(FontFace font) {
+        return DecorationMetrics.APPROXIMATE;
     }
 
     @Override

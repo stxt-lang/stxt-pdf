@@ -286,7 +286,7 @@ public final class StackingContext {
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
         if (box.style().link() != null && p.f().width() > 0 && p.f().height() > 0) {
-            canvas.link(box, p.borderBox(), box.style().link(), describe(box));
+            Tagging.of(canvas).link(box, p.borderBox(), box.style().link(), describe(box));
         }
     }
 
@@ -354,6 +354,7 @@ public final class StackingContext {
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
+        Tagging tags = Tagging.of(canvas);
         boolean open = false;
         String current = null;
         List<TextLine> lines = p.f().lines();
@@ -369,18 +370,18 @@ public final class StackingContext {
                 String link = r.format().link();
                 if (!open || !Objects.equals(link, current)) {
                     if (open) {
-                        canvas.endText();
+                        tags.endText();
                     }
                     if (link == null) {
-                        canvas.beginText(box);
+                        tags.beginText(box);
                     } else {
-                        canvas.beginLinkText(box);
+                        tags.beginLinkText(box);
                     }
                     open = true;
                     current = link;
                 }
                 if (link != null && (i == 0 || !link.equals(runs.get(i - 1).format().link()))) {
-                    paintLinkZone(canvas, box, content, l, i, link);
+                    paintLinkZone(tags, box, content, l, i, link);
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
                 canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
@@ -388,7 +389,7 @@ public final class StackingContext {
             }
         }
         if (open) {
-            canvas.endText();
+            tags.endText();
         }
         paintDecorations(canvas, p, content, metrics, false);
     }
@@ -397,7 +398,7 @@ public final class StackingContext {
      * La zona clicable (§5.20) de los tramos de la línea {@code l} que empiezan en {@code first} y van
      * seguidos con el mismo destino (una parte en negrita dentro de un enlace es una sola zona).
      */
-    private static void paintLinkZone(Canvas canvas, Box box, Rect content, TextLine l, int first,
+    private static void paintLinkZone(Tagging tags, Box box, Rect content, TextLine l, int first,
                                       String destination) {
         List<TextLine.Run> runs = l.runs();
         StringBuilder text = new StringBuilder();
@@ -407,7 +408,7 @@ public final class StackingContext {
             end++;
         }
         TextLine.Run last = runs.get(end - 1);
-        canvas.link(box, linkArea(content, l, runs.get(first).x(), last.x() + last.width()), destination,
+        tags.link(box, linkArea(content, l, runs.get(first).x(), last.x() + last.width()), destination,
                 text.toString());
     }
 

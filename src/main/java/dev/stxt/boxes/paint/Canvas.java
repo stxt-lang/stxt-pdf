@@ -10,7 +10,11 @@ import dev.stxt.boxes.model.Sides;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
 
-/** Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. */
+/**
+ * Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. Solo
+ * dibuja; lo que dice qué es lo dibujado (el texto marcado del PDF etiquetado y los enlaces) lo hace, si el
+ * lienzo lo entiende, su {@link Tagging} (AR-05).
+ */
 public interface Canvas {
 
     /** Un rectángulo liso de un color: fondos de las columnas, guías, rayas de texto. */
@@ -32,9 +36,8 @@ public interface Canvas {
      */
     void border(Rect r, Insets w, Radii radii, Sides<String> colors);
 
-    /** Contorno de depuración de una caja de borde. Por defecto no pinta nada. */
-    default void outline(Rect borderBox) {
-    }
+    /** Contorno de depuración de una caja de borde, si el lienzo pinta en modo de depuración. */
+    void outline(Rect borderBox);
 
     /**
      * Texto con la línea base en {@code baselineY}.
@@ -46,66 +49,32 @@ public interface Canvas {
               double wordSpacing, double letterSpacing);
 
     /**
-     * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},
-     * son su contenido (el PDF etiquetado lo marca, §5.13). Por defecto no hace nada.
-     */
-    default void beginText(Box box) {
-    }
-
-    /**
-     * Empieza el texto de un enlace dentro del texto de la caja (ESPECIFICACION.md §5.20): como
-     * {@link #beginText(Box)}, pero lo que sigue, hasta {@link #endText()}, es el contenido de un
-     * {@code Link} del PDF etiquetado. Las zonas clicables de ese texto ({@link #link}) se piden
-     * después de empezarlo. Por defecto no hace nada.
-     */
-    default void beginLinkText(Box box) {
-    }
-
-    /**
      * La imagen de una {@code Image} (ESPECIFICACION.md §5.18) en su caja de contenido
      * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja con
-     * las esquinas {@code radii} (las de la caja de contenido). Por defecto no pinta nada.
+     * las esquinas {@code radii} (las de la caja de contenido).
      */
-    default void image(Box box, Rect content, Radii radii) {
-    }
-
-    /**
-     * Una zona clicable (ESPECIFICACION.md §5.20): el área {@code area} de la página lleva a
-     * {@code destination} ({@link dev.stxt.boxes.model.Links}). {@code box} es la caja a la que
-     * pertenece (el PDF etiquetado cuelga el enlace de ella) y {@code description} el texto que
-     * se lee en su lugar, que puede ser {@code null}. No cambia lo que se ve. Por defecto no hace
-     * nada.
-     */
-    default void link(Box box, Rect area, String destination, String description) {
-    }
+    void image(Box box, Rect content, Radii radii);
 
     /**
      * Empieza a pintar girado (ESPECIFICACION.md §5.6): todo lo que se pinte hasta
      * {@link #endRotation()}, también las zonas de los enlaces, gira {@code degrees} grados en el
      * sentido de las agujas del reloj alrededor del punto ({@code x}, {@code y}) de la página. Los
-     * giros se anidan: uno dentro de otro se suma al de fuera. Por defecto no hace nada.
+     * giros se anidan: uno dentro de otro se suma al de fuera.
      */
-    default void beginRotation(double degrees, double x, double y) {
-    }
+    void beginRotation(double degrees, double x, double y);
 
     /** Termina el giro empezado con {@link #beginRotation}. */
-    default void endRotation() {
-    }
-
-    /** Termina el texto empezado con {@link #beginText(Box)}. */
-    default void endText() {
-    }
+    void endRotation();
 
     /**
      * Ascendente y descendente con que se pinta la fuente, para colocar la línea base
-     * (ESPECIFICACION.md §5.4). Por defecto, la aproximación sin fuente.
+     * (ESPECIFICACION.md §5.4); sin la fuente, {@link VerticalMetrics#APPROXIMATE}.
      */
-    default VerticalMetrics vertical(FontFace font) {
-        return VerticalMetrics.APPROXIMATE;
-    }
+    VerticalMetrics vertical(FontFace font);
 
-    /** Posición y grosor del subrayado y del tachado de la fuente (§5.4). Por defecto, la aproximación sin fuente. */
-    default DecorationMetrics decoration(FontFace font) {
-        return DecorationMetrics.APPROXIMATE;
-    }
+    /**
+     * Posición y grosor del subrayado y del tachado de la fuente (§5.4); sin la fuente,
+     * {@link DecorationMetrics#APPROXIMATE}.
+     */
+    DecorationMetrics decoration(FontFace font);
 }

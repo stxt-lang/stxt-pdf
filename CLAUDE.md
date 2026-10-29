@@ -127,7 +127,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `Numbering` (el número impreso de cada página), `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas`, `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores) y `SvgFonts` (las fuentes de `fonts/` con que JSVG dibuja el texto de un SVG), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
+| `paint` | `Canvas` (solo dibuja) y `Tagging` (el texto marcado del PDF etiquetado y los enlaces, que solo implementa `PdfCanvas`; `Tagging.of(canvas)` da `NONE` a los demás, AR-05), `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores) y `SvgFonts` (las fuentes de `fonts/` con que JSVG dibuja el texto de un SVG), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 | `convert` | `Converter`: la entrada del motor. Reúne la carpeta de recursos, los estilos aparte y la depuración en un objeto inmutable y seguro entre hilos (`builder()`), y da `layOut`, `toPdf` y `toSvg`; cada conversión crea su propio `Engine`. Es la capa de arriba: nada del motor depende de ella (`ArchitectureTest`) |
 
@@ -209,7 +209,7 @@ dependencia nueva se decide y se apunta allí.
   índice (`headingText`), los marcadores y el PDF etiquetado sin tratarlo aparte. `Box.number` guarda el número
   completo (`4.2`) para `{number of: id}`. Los niveles sin numerar no aportan al número (un título `Heading 1` sin número deja a los `Heading 2` como `1`, `2`…). En el PDF etiquetado un `Text` es un `P` (un `Span` si es hijo de un
   encabezado) y una caja que declara otro `Language` lleva su `Lang`. `PdfStructure` construye el árbol de estructura del PDF etiquetado
-  (contenido marcado con `Canvas.beginText`/`endText`; fondos, bordes y `Fixed` son
+  (contenido marcado con `Tagging.beginText`/`endText`; fondos, bordes y `Fixed` son
   *artifacts*) y los marcadores.
 - **Listas (§5.14):** `List` (con `Marker` obligatorio y `Start`) y `List item` (con `Number`)
   son cajas de bloque. El builder numera los ítems y crea en `Box.marker` la caja del marcador,
@@ -391,16 +391,16 @@ dependencia nueva se decide y se apunta allí.
   es el destino mal escrito, al leerlo. Cada entrada de un `Contents` lleva `Link` a su encabezado
   (`Box.key()`). El layout no sabe nada de los enlaces: `StackingContext.paintLinks` calcula las
   zonas al pintar (la caja de borde de cada fragmento con `Link`; el rectángulo de cada tramo con
-  enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Canvas.link`.
+  enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`.
   `PdfCanvas.write` crea todas las páginas antes de pintar, `PdfLinks` crea las anotaciones
   (`URI`, o el destino que resuelve `PdfDestinations` al final: la esquina del primer fragmento
   de la caja, la misma de los marcadores). El `Link` del PDF etiquetado envuelve lo que se pulsa:
   `PdfStructure.build` crea el de una caja con `Link` como hijo de su elemento y padre de su contenido
   (una `Image`, al revés: `Link → Figure`), y `PdfStructure.link` le cuelga la `OBJR` de cada
   fragmento. Un enlace de texto es otra secuencia de contenido marcado: `StackingContext.paintText`
-  parte el texto en secuencias de tramos con el mismo destino, `Canvas.beginLinkText` abre la de un
+  parte el texto en secuencias de tramos con el mismo destino, `Tagging.beginLinkText` abre la de un
   enlace (`PdfStructure.markLink` crea su `Link`, hijo del elemento de la caja, con un `MCID` aunque
-  ocupe varias líneas) y las zonas de cada línea (`Canvas.link`, dentro de la secuencia) le cuelgan una
+  ocupe varias líneas) y las zonas de cada línea (`Tagging.link`, dentro de la secuencia) le cuelgan una
   `OBJR` (`inlineLink`). Un `Link` con algo que leer no lleva `Alt`. Lo que no es contenido (un `Fixed`,
   una imagen decorativa, las filas repetidas de una tabla) tiene un `Link` suelto, hijo del `Document`,
   con el texto como `Alt` (`PdfStructure.outside`): PDF/UA exige que toda anotación esté en un `Link`.

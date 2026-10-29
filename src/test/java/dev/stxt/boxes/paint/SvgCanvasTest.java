@@ -8,6 +8,7 @@ import dev.stxt.boxes.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Las imágenes en la salida SVG (ESPECIFICACION.md §5.18). */
@@ -66,5 +67,11 @@ class SvgCanvasTest {
         // La caja va de (120, 120) a (160, 130): el centro de abajo es (140, 130).
         assertTrue(svg.contains("<g transform=\"rotate(-12.5 140.00 130.00)\">\n<rect x=\"120.00\" y=\"120.00\""), svg);
         assertTrue(svg.contains("</g>"), svg);
+    }
+
+    /** El SVG solo dibuja (AR-05): no marca el texto ni crea enlaces, y lo dice no implementando {@link Tagging}. */
+    @Test
+    void theSvgCanvasOnlyDraws() {
+        assertSame(Tagging.NONE, Tagging.of(new SvgCanvas(false)));
     }
 }

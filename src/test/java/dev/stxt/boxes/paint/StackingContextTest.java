@@ -3,12 +3,14 @@ package dev.stxt.boxes.paint;
 import dev.stxt.boxes.Docs;
 import dev.stxt.boxes.fragment.Page;
 import dev.stxt.boxes.layout.Engine;
+import dev.stxt.boxes.model.DecorationMetrics;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Paint;
 import dev.stxt.boxes.model.Radii;
 import dev.stxt.boxes.model.Rect;
 import dev.stxt.boxes.model.Sides;
+import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.boxes.tree.Box;
 import dev.stxt.boxes.tree.TextRuns;
@@ -28,7 +30,7 @@ class StackingContextTest {
     private static final DocumentReader READER = new DocumentReader();
 
     /** Lienzo que solo apunta los colores de fondo, en orden. */
-    private static final class Recorder implements Canvas {
+    private static final class Recorder implements Canvas, Tagging {
         final List<String> backgrounds = new ArrayList<>();
         final List<Rect> rects = new ArrayList<>();
         /** Fondos y textos en el orden en que se pintan. */
@@ -103,6 +105,20 @@ class StackingContextTest {
         @Override
         public void endText() {
             sequences.add("]");
+        }
+
+        @Override
+        public void outline(Rect borderBox) {
+        }
+
+        @Override
+        public VerticalMetrics vertical(FontFace font) {
+            return VerticalMetrics.APPROXIMATE;
+        }
+
+        @Override
+        public DecorationMetrics decoration(FontFace font) {
+            return DecorationMetrics.APPROXIMATE;
         }
 
         @Override

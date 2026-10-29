@@ -89,7 +89,7 @@ import java.util.Map;
  * Una instancia es de una página y no se comparte. La única salvedad es global a la JVM: los SVG con texto
  * dan de alta las fuentes en AWT ({@link PdfImages}).</p>
  */
-public final class PdfCanvas implements Canvas {
+public final class PdfCanvas implements Canvas, Tagging {
 
     private final PDDocument doc;
     private final PDPageContentStream out;
