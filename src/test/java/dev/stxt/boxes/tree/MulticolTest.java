@@ -31,12 +31,12 @@ class MulticolTest {
                 "\t\tParagraph: Uno", "\t\tBlock:", "\t\t\tId: b").children().get(0);
         assertEquals(Element.MULTICOL, multicol.element());
         assertEquals(Layout.MULTICOL, multicol.style().layout);
-        assertEquals(3, multicol.style().multicolCount);
-        assertNull(multicol.style().multicolWidth);
-        assertEquals(12, multicol.style().multicolGap);
-        assertEquals(0.5, multicol.style().multicolRule);
-        assertEquals("#999999", multicol.style().multicolRuleColor);
-        assertEquals(ColumnFill.AUTO, multicol.style().multicolFill);
+        assertEquals(3, multicol.style().multicol().count());
+        assertNull(multicol.style().multicol().columnWidth());
+        assertEquals(12, multicol.style().multicol().columnGap());
+        assertEquals(0.5, multicol.style().multicol().rule());
+        assertEquals("#999999", multicol.style().multicol().ruleColor());
+        assertEquals(ColumnFill.AUTO, multicol.style().multicol().fill());
 
         assertEquals(1, multicol.children().size());
         Box flow = multicol.children().get(0);
@@ -52,12 +52,12 @@ class MulticolTest {
     @Test
     void defaults() {
         Style s = root("\tMulticol:", "\t\tColumn width: 150", "\t\tText: Hola").children().get(0).style();
-        assertNull(s.multicolCount);
-        assertEquals(150, s.multicolWidth);
-        assertEquals(0, s.multicolGap);
-        assertEquals(0, s.multicolRule);
-        assertNull(s.multicolRuleColor);
-        assertEquals(ColumnFill.BALANCE, s.multicolFill);
+        assertNull(s.multicol().count());
+        assertEquals(150, s.multicol().columnWidth());
+        assertEquals(0, s.multicol().columnGap());
+        assertEquals(0, s.multicol().rule());
+        assertNull(s.multicol().ruleColor());
+        assertEquals(ColumnFill.BALANCE, s.multicol().fill());
     }
 
     @Test

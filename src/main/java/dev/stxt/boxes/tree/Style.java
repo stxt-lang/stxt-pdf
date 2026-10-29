@@ -140,19 +140,6 @@ public final class Style {
     /** {@code In contents} de un encabezado: si tiene entrada en los índices (§5.19). No se hereda. */
     boolean inContents = true;
 
-    // --- Multicol --------------------------------------------------------------------------------
-    /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
-    Integer multicolCount;
-    /** {@code Column width}, en puntos; {@code null} = sin declarar. */
-    Double multicolWidth;
-    /** {@code Column gap}, en puntos. */
-    double multicolGap = 0;
-    /** Grosor de la línea entre columnas ({@code Rule}); 0 = sin línea. */
-    double multicolRule = 0;
-    /** {@code Rule color}; {@code null} = igual que {@link #color}. */
-    String multicolRuleColor;
-    ColumnFill multicolFill = ColumnFill.BALANCE;
-
     // --- Fragmentación ---------------------------------------------------------------------------
     Break breakBefore = Break.AUTO;
     Break breakAfter = Break.AUTO;
@@ -175,10 +162,16 @@ public final class Style {
 
     private final ImageStyle image = new ImageStyle();
 
+    private final MulticolStyle multicol = new MulticolStyle();
+
     // === Lectura: un método por propiedad, con el nombre del campo ===============================
 
     // --- Grupos de propiedades ------------------------------------------------------------------
-    public ImageStyle image() {
+    public MulticolStyle multicol() {
+            return multicol;
+        }
+
+        public ImageStyle image() {
             return image;
         }
 
@@ -368,31 +361,6 @@ public final class Style {
         return inContents;
     }
 
-    // --- Multicol --------------------------------------------------------------------------------
-    public Integer multicolCount() {
-        return multicolCount;
-    }
-
-    public Double multicolWidth() {
-        return multicolWidth;
-    }
-
-    public double multicolGap() {
-        return multicolGap;
-    }
-
-    public double multicolRule() {
-        return multicolRule;
-    }
-
-    public String multicolRuleColor() {
-        return multicolRuleColor;
-    }
-
-    public ColumnFill multicolFill() {
-        return multicolFill;
-    }
-
     // --- Fragmentación ---------------------------------------------------------------------------
     public Break breakBefore() {
         return breakBefore;
@@ -516,6 +484,7 @@ public final class Style {
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
     void close() {
+        multicol.close();
         image.close();
         contents.close();
         list.close();

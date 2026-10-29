@@ -257,12 +257,12 @@ final class PropertyReader {
     static void multicol(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
         switch (p.getCanonicalName()) {
-            case "count" -> s.multicolCount = positiveInteger(p);
-            case "column-width" -> s.multicolWidth = positive(p);
-            case "column-gap" -> s.multicolGap = nonNegative(p);
-            case "rule" -> s.multicolRule = positive(p);
-            case "rule-color" -> s.multicolRuleColor = color(p);
-            case "fill" -> s.multicolFill = enumValue(ColumnFill.class, p);
+            case "count" -> s.multicol().setCount(positiveInteger(p));
+            case "column-width" -> s.multicol().setColumnWidth(positive(p));
+            case "column-gap" -> s.multicol().setColumnGap(nonNegative(p));
+            case "rule" -> s.multicol().setRule(positive(p));
+            case "rule-color" -> s.multicol().setRuleColor(color(p));
+            case "fill" -> s.multicol().setFill(enumValue(ColumnFill.class, p));
             default -> throw unread(p);
         }
     }

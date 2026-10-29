@@ -215,7 +215,7 @@ public final class StackingContext {
             canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.background());
         }
         canvas.border(borderBox, p.f().border(), radii, borderColors(s));
-        if (s.multicolRule() > 0) {
+        if (s.multicol().rule() > 0) {
             paintRules(canvas, p);
         }
     }
@@ -257,11 +257,11 @@ public final class StackingContext {
         List<Fragment> columns = p.f().children();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double height = columns.stream().mapToDouble(Fragment::height).max().orElse(0);
-        String color = s.multicolRuleColor() != null ? s.multicolRuleColor() : s.color();
+        String color = s.multicol().ruleColor() != null ? s.multicol().ruleColor() : s.color();
         for (int i = 1; i < columns.size(); i++) {
             Fragment left = columns.get(i - 1);
             double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
-            canvas.background(new Rect(content.x() + middle - s.multicolRule() / 2, content.y(), s.multicolRule(), height),
+            canvas.background(new Rect(content.x() + middle - s.multicol().rule() / 2, content.y(), s.multicol().rule(), height),
                     color);
         }
     }

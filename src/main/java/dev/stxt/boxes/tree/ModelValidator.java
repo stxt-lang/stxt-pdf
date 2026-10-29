@@ -72,11 +72,11 @@ final class ModelValidator {
      * su línea entre columnas cabe en el hueco (§5.16).
      */
     static void validateMulticol(Style s, int line) {
-        if (s.multicolCount == null && s.multicolWidth == null) {
+        if (s.multicol().count() == null && s.multicol().columnWidth() == null) {
             throw error(line, ErrorCode.MULTICOL_COLUMNS, "Un Multicol necesita Count, Column width o los dos: "
                     + "Count fija el número de columnas y Column width su ancho mínimo");
         }
-        if (s.multicolRule > s.multicolGap + Tolerance.EPSILON) {
+        if (s.multicol().rule() > s.multicol().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (línea " + s.line(COLUMN_GAP) + ")"
                     : "Column gap, que sin declarar es 0";
             throw error(s.line(RULE), ErrorCode.COLUMN_RULE_WIDTH, "Rule es más ancha que " + gap
