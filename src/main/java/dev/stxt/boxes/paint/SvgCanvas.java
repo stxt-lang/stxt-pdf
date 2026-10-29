@@ -216,6 +216,12 @@ public final class SvgCanvas implements Canvas {
         outline(r);
     }
 
+    /** El SVG de depuración solo dibuja: no marca el texto ni crea enlaces. */
+    @Override
+    public Tagging tagging() {
+        return Tagging.NONE;
+    }
+
     /** Sin la fuente: la aproximación 0,8/0,2 del tamaño. */
     @Override
     public VerticalMetrics vertical(FontFace font) {

@@ -108,6 +108,11 @@ class StackingContextTest {
         }
 
         @Override
+        public Tagging tagging() {
+            return this;
+        }
+
+        @Override
         public void outline(Rect borderBox) {
         }
 

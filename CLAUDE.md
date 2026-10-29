@@ -127,7 +127,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core) ──BoxTreeBui
 | `layout` | `Engine`, `LayoutAlgorithm`, `ConstraintSpace`, `LayoutResult`, `LayoutCache`, `IntrinsicSizes`, `BoxModel`, `MarginStrut`, `AdjoiningMargins`, `Sizing`, `PendingAbsolute`, `Slice`, `UnitBreaker`, `Paginator`, `Numbering` (el número impreso de cada página), `LaidOutDocument`, `Messages` (piezas de los mensajes de error) |
 | `layout.block` / `inline` / `flex` / `grid` / `table` / `multicol` / `position` / `image` | Un algoritmo por `Layout` y sus piezas puras (`LineBreaker`, `FlexResolver`, `TrackSizing`, `Placement`, `Columns`, `AbsoluteEquation`…) |
 | `fragment` | `Fragment`, `BreakToken`, `BreakAppeal` (calidades de corte), `Unit` (unidad de corte de flex y grid), `Page`, `BreakRules`, `TextLine` |
-| `paint` | `Canvas` (solo dibuja) y `Tagging` (el texto marcado del PDF etiquetado y los enlaces, que solo implementa `PdfCanvas`; `Tagging.of(canvas)` da `NONE` a los demás, AR-05), `StackingContext`, `SvgCanvas`, `PdfCanvas` (PDFBox), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores) y `SvgFonts` (las fuentes de `fonts/` con que JSVG dibuja el texto de un SVG), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
+| `paint` | `Canvas` (solo dibuja) y `Tagging` (el texto marcado del PDF etiquetado y los enlaces: cada lienzo da la suya con `Canvas.tagging()`, `PdfTagging` en el PDF y `Tagging.NONE` en el SVG, AR-05), `StackingContext`, `SvgCanvas`; el PDF (PDFBox, AR-06): `PdfDocumentWriter` (el documento: páginas, etiquetas, destinos, estructura y guardado; su `write` es la entrada), `PdfCanvas` (el dibujo de una página), `PdfContent` (el flujo de una página con el origen abajo: caminos, color, giros y `io`, el único punto que convierte las `IOException`), `PdfTagging` (el contenido marcado y las anotaciones de una página), `PdfFonts` (las fuentes incrustadas y los argumentos de `TJ`), `PdfGradients` (sombreados y máscaras suaves), `PdfImages` (las imágenes que lleva un PDF: PNG y JPEG incrustados, SVG dibujados como vectores) y `SvgFonts` (las fuentes de `fonts/` con que JSVG dibuja el texto de un SVG), `PdfStructure` (PDF etiquetado y marcadores), `ImageFit` (dónde se dibuja una imagen según `Fit`), `Leaders` (la guía de las entradas de un índice), `PdfLinks` (las anotaciones de enlace) y `PdfDestinations` (la esquina de cada caja con nombre, para marcadores y enlaces) y `Shapes` (los caminos de las cajas redondeadas y de los lados de un borde, que dibujan los dos lienzos) |
 | `output` | `StxtDump` (formato de los tests de referencia, §7) |
 | `convert` | `Converter`: la entrada del motor. Reúne la carpeta de recursos, los estilos aparte y la depuración en un objeto inmutable y seguro entre hilos (`builder()`), y da `layOut`, `toPdf` y `toSvg`; cada conversión crea su propio `Engine`. Es la capa de arriba: nada del motor depende de ella (`ArchitectureTest`) |
 
@@ -275,7 +275,7 @@ dependencia nueva se decide y se apunta allí.
   estos tipos.
 - **Límites (§6.2):** `Limits` (`model`, inmutable; `DEFAULT`: 2000 páginas, 25 Mpx por imagen, 20 000 elementos y 64
   niveles por SVG; `withMax…`) se da con `Converter.builder().limits(…)` y llega al `Engine` (que lo pasa a `Images` y
-  al `Paginator`) y a `PdfCanvas.write` (los límites del dibujo de JSVG). `Images.validate` los comprueba antes de
+  al `Paginator`) y a `PdfDocumentWriter.write` (los límites del dibujo de JSVG). `Images.validate` los comprueba antes de
   maquetar con lo que `ImageFile` leyó sin decodificar nada: `pixels()` de la cabecera y, en un SVG, `svgElements()`
   y `svgDepth()` de `SvgInspector`, que cuenta sin recursión lo que dibuja (cada `<use>` repite lo que referencia; satura
   en `SvgInspector.SATURATED`; un `<use>` circular es `IMAGE_FORMAT`). JSVG trae sus propios límites (2000 elementos y
@@ -392,7 +392,7 @@ dependencia nueva se decide y se apunta allí.
   (`Box.key()`). El layout no sabe nada de los enlaces: `StackingContext.paintLinks` calcula las
   zonas al pintar (la caja de borde de cada fragmento con `Link`; el rectángulo de cada tramo con
   enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`.
-  `PdfCanvas.write` crea todas las páginas antes de pintar, `PdfLinks` crea las anotaciones
+  `PdfDocumentWriter.write` crea todas las páginas antes de pintar, `PdfLinks` crea las anotaciones
   (`URI`, o el destino que resuelve `PdfDestinations` al final: la esquina del primer fragmento
   de la caja, la misma de los marcadores). El `Link` del PDF etiquetado envuelve lo que se pulsa:
   `PdfStructure.build` crea el de una caja con `Link` como hijo de su elemento y padre de su contenido
@@ -456,7 +456,7 @@ dependencia nueva se decide y se apunta allí.
   **Ligaduras:** `Ligatures` (`Style.ligatures`, de `Typography`, se hereda; `false` por defecto) va en `FontFace.ligatures`
   (`Style.fontFace()` lo apaga con `Letter spacing` distinto de 0). `FontLibrary.find` identifica el fichero con
   `FontFace.base()`; `FontFile.width(texto, tamaño, ligaturas)` mide cada palabra con el `GsubWorker` de fontbox, el mismo que
-  PDFBox aplica al pintar, y `PdfCanvas.pdfFont` incrusta una fuente por combinación con
+  PDFBox aplica al pintar, y `PdfFonts.font` incrusta una fuente por combinación con
   `TrueTypeFont.setEnableGsub(font.ligatures())`: sin la opción PDFBox no aplica `GSUB` (un glifo por carácter,
   17 a 30 veces más rápido) y lo medido es lo pintado.
 - **Tramos (§5.4):** `Box.text()` es siempre el texto entero y `Box.formattedRuns()` (`null` sin formato) lo
@@ -489,7 +489,7 @@ dependencia nueva se decide y se apunta allí.
   tamaño): `LineBreaker.advance` mide cada tramo con `fontSize × format.scale()` más el
   interletraje de cada carácter, y el ancho de una línea resta el del último
   (`LineBreaker.width`). `StackingContext` pasa el tamaño del tramo y `Style.letterSpacing` a
-  `Canvas.text`; `PdfCanvas.spaced` lo escribe con ajustes de `TJ`. `StackingContext.paintText` añade un
+  `Canvas.text`; `PdfFonts.spaced` lo escribe con ajustes de `TJ`. `StackingContext.paintText` añade un
   espacio invisible a la última palabra de cada línea que no es la última del fragmento (salvo con `pre` y
   `pre-wrap`), porque el corte se come el espacio y quien une las líneas pegaría las palabras.
   `PdfStructure` da `ActualText` (el texto escrito) a los elementos con `Transform` o `Small caps` cuyo texto no lleva

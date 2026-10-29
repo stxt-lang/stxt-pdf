@@ -5,9 +5,9 @@ import dev.stxt.boxes.tree.Box;
 
 /**
  * Lo que un lienzo hace con el significado de lo que pinta, aparte de dibujarlo (AR-05): las secuencias de texto
- * del PDF etiquetado (ESPECIFICACION.md §5.13) y las zonas de los enlaces (§5.20). Lo implementa un
- * {@link Canvas} que lo entiende ({@link PdfCanvas}); para los demás, {@link #of} da {@link #NONE}, que no hace
- * nada. No cambia lo que se ve.
+ * del PDF etiquetado (ESPECIFICACION.md §5.13) y las zonas de los enlaces (§5.20). Cada {@link Canvas} da la
+ * suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que solo dibuja,
+ * {@link #NONE}, que no hace nada. No cambia lo que se ve.
  */
 public interface Tagging {
 
@@ -29,11 +29,6 @@ public interface Tagging {
         public void link(Box box, Rect area, String destination, String description) {
         }
     };
-
-    /** La del lienzo, si la tiene; si no, {@link #NONE}. */
-    static Tagging of(Canvas canvas) {
-        return canvas instanceof Tagging tagging ? tagging : NONE;
-    }
 
     /**
      * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},

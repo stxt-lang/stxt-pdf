@@ -12,8 +12,8 @@ import dev.stxt.boxes.tree.Box;
 
 /**
  * Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. Solo
- * dibuja; lo que dice qué es lo dibujado (el texto marcado del PDF etiquetado y los enlaces) lo hace, si el
- * lienzo lo entiende, su {@link Tagging} (AR-05).
+ * dibuja; lo que dice qué es lo dibujado (el texto marcado del PDF etiquetado y los enlaces) lo hace su
+ * {@link #tagging()}, que en un lienzo que no lo entiende es {@link Tagging#NONE} (AR-05).
  */
 public interface Canvas {
 
@@ -35,6 +35,12 @@ public interface Canvas {
      * @param colors el color de cada lado, ya resuelto
      */
     void border(Rect r, Insets w, Radii radii, Sides<String> colors);
+
+    /**
+     * Lo que hace el lienzo con el significado de lo que pinta: el texto marcado del PDF etiquetado y los
+     * enlaces; {@link Tagging#NONE} si solo dibuja.
+     */
+    Tagging tagging();
 
     /** Contorno de depuración de una caja de borde, si el lienzo pinta en modo de depuración. */
     void outline(Rect borderBox);

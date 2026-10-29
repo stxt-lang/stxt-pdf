@@ -8,7 +8,7 @@ import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.model.InternalException;
 import dev.stxt.boxes.model.Limits;
 import dev.stxt.boxes.model.StxtPdfException;
-import dev.stxt.boxes.paint.PdfCanvas;
+import dev.stxt.boxes.paint.PdfDocumentWriter;
 import dev.stxt.boxes.paint.SvgCanvas;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
@@ -101,7 +101,7 @@ public final class Converter {
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
-        guarded(() -> PdfCanvas.write(document, resources, limits, target, debug));
+        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug));
     }
 
     /** El SVG de cada página de un documento ya maquetado, en orden. */

@@ -286,7 +286,7 @@ public final class StackingContext {
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
         if (box.style().link() != null && p.f().width() > 0 && p.f().height() > 0) {
-            Tagging.of(canvas).link(box, p.borderBox(), box.style().link(), describe(box));
+            canvas.tagging().link(box, p.borderBox(), box.style().link(), describe(box));
         }
     }
 
@@ -354,7 +354,7 @@ public final class StackingContext {
         VerticalMetrics metrics = canvas.vertical(font);
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
-        Tagging tags = Tagging.of(canvas);
+        Tagging tags = canvas.tagging();
         boolean open = false;
         String current = null;
         List<TextLine> lines = p.f().lines();

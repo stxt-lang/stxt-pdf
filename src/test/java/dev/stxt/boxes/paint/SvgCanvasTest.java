@@ -69,9 +69,9 @@ class SvgCanvasTest {
         assertTrue(svg.contains("</g>"), svg);
     }
 
-    /** El SVG solo dibuja (AR-05): no marca el texto ni crea enlaces, y lo dice no implementando {@link Tagging}. */
+    /** El SVG solo dibuja (AR-05): no marca el texto ni crea enlaces, y lo dice con {@link Tagging#NONE}. */
     @Test
     void theSvgCanvasOnlyDraws() {
-        assertSame(Tagging.NONE, Tagging.of(new SvgCanvas(false)));
+        assertSame(Tagging.NONE, new SvgCanvas(false).tagging());
     }
 }

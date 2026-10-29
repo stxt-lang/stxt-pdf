@@ -8,7 +8,7 @@ import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
-import dev.stxt.boxes.paint.PdfCanvas;
+import dev.stxt.boxes.paint.PdfDocumentWriter;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
@@ -77,7 +77,7 @@ class LigaturesTest {
     /** Los glifos (dos bytes cada uno, Identity-H) que el PDF escribe para el texto de la primera página. */
     private static int glyphs(LaidOutDocument document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(document, RESOURCES, Limits.DEFAULT, out, false);
+        PdfDocumentWriter.write(document, RESOURCES, Limits.DEFAULT, out, false);
         int glyphs = 0;
         try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
             List<Object> tokens = new PDFStreamParser(pdf.getPage(0)).parse();

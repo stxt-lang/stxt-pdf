@@ -75,7 +75,7 @@ class PdfCanvasTest {
             throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Resources resources = new Resources();
-        PdfCanvas.write(new Engine(new PdfMetrics(resources)).layOutDocument(TextRuns.build(document, runs)),
+        PdfDocumentWriter.write(new Engine(new PdfMetrics(resources)).layOutDocument(TextRuns.build(document, runs)),
                 resources, Limits.DEFAULT, out, false);
         Files.createDirectories(PDF_DIR);
         Files.write(PDF_DIR.resolve(name + ".pdf"), out.toByteArray());
@@ -120,18 +120,18 @@ class PdfCanvasTest {
     @Test
     void letterSpacingIsATjShiftBetweenCharactersButNotAfterTheLast() {
         // 1,5 pt en un cuerpo de 10: 150 milésimas; un número positivo en TJ acerca, uno negativo separa.
-        assertArrayEquals(new Object[]{"a", -150f, "b", -150f, "c"}, PdfCanvas.spaced("abc", 0, 1.5, 10));
+        assertArrayEquals(new Object[]{"a", -150f, "b", -150f, "c"}, PdfFonts.spaced("abc", 0, 1.5, 10));
         // Con justify, tras un espacio se suma el espacio extra.
-        assertArrayEquals(new Object[]{"a", -150f, " ", -650f, "b"}, PdfCanvas.spaced("a b", 5, 1.5, 10));
+        assertArrayEquals(new Object[]{"a", -150f, " ", -650f, "b"}, PdfFonts.spaced("a b", 5, 1.5, 10));
         // Sin interletraje es el TJ de siempre.
-        assertArrayEquals(PdfCanvas.justified("uno dos", 5, 10), PdfCanvas.spaced("uno dos", 5, 0, 10));
+        assertArrayEquals(PdfFonts.justified("uno dos", 5, 10), PdfFonts.spaced("uno dos", 5, 0, 10));
     }
 
     @Test
     void justifiedTextUsesTj() {
         assertArrayEquals(new Object[]{"uno ", -500f, "dos ", -500f, "tres"},
-                PdfCanvas.justified("uno dos tres", 5, 10));
-        assertArrayEquals(new Object[]{"palabra"}, PdfCanvas.justified("palabra", 5, 10));
+                PdfFonts.justified("uno dos tres", 5, 10));
+        assertArrayEquals(new Object[]{"palabra"}, PdfFonts.justified("palabra", 5, 10));
     }
 
     @Test

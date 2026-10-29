@@ -9,7 +9,7 @@ import dev.stxt.boxes.layout.Engine;
 import dev.stxt.boxes.layout.LaidOutDocument;
 import dev.stxt.boxes.layout.inline.PdfMetrics;
 import dev.stxt.boxes.output.StxtDump;
-import dev.stxt.boxes.paint.PdfCanvas;
+import dev.stxt.boxes.paint.PdfDocumentWriter;
 import dev.stxt.boxes.resources.Resources;
 import dev.stxt.boxes.stxt.DocumentReader;
 import dev.stxt.runtime.STXT;
@@ -100,7 +100,7 @@ class ExamplesTest {
 
     private static byte[] pdf(LaidOutDocument document, Resources resources) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfCanvas.write(document, resources, Limits.DEFAULT, out, false);
+        PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false);
         return out.toByteArray();
     }
 
