@@ -83,4 +83,35 @@ class PlacementTest {
                 List.of(new Cell(1, 1, 1, 1), new Cell(2, 1, 1, 1), new Cell(null, 1, 1, 1)), 1, 2,
                 Direction.COLUMN));
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08).
+
+    @Test
+    void aFixedRowItemMayEndInTheLastColumn() {
+        // La columna 1 de la fila 1 está ocupada: el ítem de dos columnas va de la 2 a la 3, justo hasta el final.
+        List<Area> r = place(List.of(new Cell(1, 1, 1, 1), new Cell(1, null, 1, 2)), 3);
+        assertEquals(new Area(1, 2, 1, 2), r.get(1));
+    }
+
+    @Test
+    void aFixedColumnAtTheCursorStaysInItsRow() {
+        // El automático deja el cursor en la columna 2: el de la columna 2 sigue en la fila 1.
+        List<Area> r = place(List.of(Cell.AUTO, new Cell(null, 2, 1, 1)), 3);
+        assertEquals(new Area(1, 2, 1, 1), r.get(1));
+    }
+
+    @Test
+    void theCursorGoesOnAfterAFixedColumnItem() {
+        // El de la columna 1, de dos columnas, deja el cursor en la 3: el automático va a (1, 3).
+        List<Area> r = place(List.of(new Cell(null, 1, 1, 2), Cell.AUTO), 3);
+        assertEquals(new Area(1, 3, 1, 1), r.get(1));
+    }
+
+    @Test
+    void anExplicitCellInsideTheGridAddsNoColumns() {
+        // Con dos columnas y una celda explícita en la 2, los automáticos siguen en dos columnas.
+        List<Area> r = place(List.of(new Cell(1, 2, 1, 1), Cell.AUTO, Cell.AUTO), 2);
+        assertEquals(new Area(1, 1, 1, 1), r.get(1));
+        assertEquals(new Area(2, 1, 1, 1), r.get(2));
+    }
 }

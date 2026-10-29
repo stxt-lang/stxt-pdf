@@ -194,4 +194,22 @@ class PreformattedTextTest {
         assertEquals(35, pre.minContent(), 1e-9);
         assertTrue(pre.maxContent() >= pre.minContent());
     }
+
+    @Test
+    void severalTabsInALine() {
+        // «a» llega a la columna 4, «bb» a la 6 y el segundo tabulador a la 8.
+        assertEquals(List.of("a   bb  c"), lines(100, List.of("White space: pre"), "a\tbb\tc"));
+    }
+
+    @Test
+    void minContentOfPreAndPreWrap() {
+        // pre no parte: su min-content es la línea entera (45); pre-wrap, la palabra más larga (25).
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tWhite space: pre",
+                "\tBlock:", "\t\tId: W", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tWhite space: pre-wrap");
+        assertEquals(45, l.rect("P").width(), 1e-9);
+        assertEquals(25, l.rect("W").width(), 1e-9);
+    }
 }

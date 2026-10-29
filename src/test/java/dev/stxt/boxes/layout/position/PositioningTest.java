@@ -214,4 +214,51 @@ class PositioningTest {
                 "\t\t\t\tHeight: 20");
         assertRect(0, 0, 20, 20, l.rect("A"));
     }
+
+    @Test
+    void staticPositionInsideAContainingBlockWithPadding() {
+        // Sin Offset, A va en la caja de contenido de R: (40 + 3 + 7, 40 + 3 + 7).
+        LayoutFixture l = layOut("\tRelative:", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
+                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tText: aaa");
+        assertRect(50, 50, 15, 12, l.rect("A"));
+    }
+
+    @Test
+    void staticPositionAfterABottomMargin() {
+        // Detrás de un bloque de 10 con 6 de margen inferior: (40, 40 + 10 + 6).
+        LayoutFixture l = layOut("\tRelative:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
+                "\t\t\t\tMargin: 0 0 6 0", "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tText: aaa");
+        assertRect(40, 56, 15, 12, l.rect("A"));
+    }
+
+    @Test
+    void shrinkToFitAndStretchLeaveTheMargins() {
+        // F: el texto mide 30 (max-content), entre 10 de margen a cada lado. S: 100 − 10 − 20 − 5 − 7 de alto.
+        LayoutFixture l = layOut("\tRelative:", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\tAbsolute:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tMargin: 0 10",
+                "\t\t\tText: aaa bb",
+                "\t\tAbsolute:", "\t\t\tId: S", "\t\t\tOffset: 10 auto 20 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\t\t\t\tMargin: 5 0 7 0");
+        assertRect(50, 40, 30, 12, l.rect("F"));
+        assertRect(40, 55, 50, 58, l.rect("S"));
+    }
+
+    @Test
+    void aFixedInsideABorderedAbsoluteStartsInItsContentBox() {
+        // A, en (50, 50), tiene 3 de borde y 7 de relleno: F, sin Offset, empieza en (60, 60).
+        LayoutFixture l = layOut("\tAbsolute:", "\t\tOffset: 10 auto auto 10", "\t\tBox:", "\t\t\tWidth: 100",
+                "\t\t\tHeight: 50", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
+                "\t\tFixed:", "\t\t\tId: F", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
+        assertRect(60, 60, 10, 10, l.rect("F"));
+    }
+
+    @Test
+    void autoMarginOnOneSide() {
+        // A: 10 a la izquierda y el resto a la derecha. B: 10 a la derecha y el resto (305) a la izquierda.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 10", "\t\t\tMargin: 0 auto 0 10",
+                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 10", "\t\t\tMargin: 0 10 0 auto");
+        assertRect(50, 40, 200, 10, l.rect("A"));
+        assertRect(345, 50, 200, 10, l.rect("B"));
+    }
 }

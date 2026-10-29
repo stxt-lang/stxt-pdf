@@ -103,4 +103,14 @@ class InlineFragmentationTest {
         assertEquals(List.of(new TextLine.Run(0, 25, "aaaaa", run("aaaaa", "b").format())), lines.get(0).runs());
         assertEquals(List.of(new TextLine.Run(0, 25, "aaaaa", TextFormat.PLAIN)), lines.get(1).runs());
     }
+
+    /** Un texto con Height: 150 es el total: 100 en la página 1 y 50 en la 2, con las líneas que quedan. */
+    @Test
+    void theHeightOfATextIsTheTotal() {
+        LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(10), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30",
+                "\t\t\tHeight: 150");
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 30, 100, l.rect(1, "P"));
+        assertRect(40, 40, 30, 50, l.rect(2, "P"));
+    }
 }

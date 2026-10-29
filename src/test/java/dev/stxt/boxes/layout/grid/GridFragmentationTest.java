@@ -114,4 +114,24 @@ class GridFragmentationTest {
         assertEquals(3, l.pages());
         assertRect(40, 150, 515, 15, l.rect(1, "R"));
     }
+
+    /**
+     * La segunda fila (20 líneas de 12 en una columna de 30) no cabe en ninguna página: empieza en la 2, donde se
+     * parte en paralelo desde arriba aunque en el grid entero empiece en 30 (QA-08, mutación). T no se estira (8, 8 y
+     * 4 líneas); B se estira a la fila y se parte con ella: 100, 100 y 40.
+     */
+    @Test
+    void aTallRowAfterTheFirstPageIsSplitFromTheTop() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumns: 30 100",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
+                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tText: " + text, "\t\t\t\tId: T",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B");
+        assertEquals(4, l.pages());
+        assertFalse(l.has(1, "T"));
+        assertRect(40, 40, 30, 96, l.rect(2, "T"));
+        assertRect(70, 40, 100, 100, l.rect(2, "B"));
+        assertRect(70, 40, 100, 40, l.rect(4, "B"));
+    }
 }

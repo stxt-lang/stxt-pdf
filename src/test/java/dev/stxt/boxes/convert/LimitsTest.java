@@ -182,4 +182,11 @@ class LimitsTest {
             }
         }
     }
+
+    @Test
+    void theImageMessageGivesTheMegapixels() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> convert(converter(Limits.DEFAULT.withMaxImagePixels(1_000)), image("test/wide.png")));
+        assertTrue(e.getMessage().contains("(0.0 Mpx) y el máximo es 0.0 Mpx"), e.getMessage());
+    }
 }

@@ -3,10 +3,13 @@ package dev.stxt.boxes.layout.grid;
 import dev.stxt.boxes.layout.LayoutFixture;
 import dev.stxt.boxes.model.Insets;
 import dev.stxt.boxes.model.Rect;
+import dev.stxt.boxes.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
 import static dev.stxt.boxes.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GridLayoutTest {
 
@@ -233,5 +236,39 @@ class GridLayoutTest {
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumns: auto auto auto",
                 "\t\tGap: 10", "\t\tArea:", "\t\t\tText: a", "\t\tArea:", "\t\t\tText: bb", "\t\tArea:", "\t\t\tText: ccc");
         assertEquals(50, l.rect("G").width(), 1e-9);
+    }
+
+    @Test
+    void percentageLimitsOfAnItemThatDoesNotStretch() {
+        // Áreas de 200 × 100 sin estirar: Min height: 50% da 50 a M, y Max height: 50% deja a X en 50 (no en 80).
+        LayoutFixture l = layOut(
+                "\tGrid:", "\t\tColumns: 200 200", "\t\tRows: 100",
+                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:",
+                "\t\t\t\t\tMin height: 50%",
+                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tBlock:", "\t\t\t\tId: X", "\t\t\t\tBox:",
+                "\t\t\t\t\tHeight: 80", "\t\t\t\t\tMax height: 50%");
+        assertRect(40, 40, 200, 50, l.rect("M"));
+        assertRect(240, 40, 200, 50, l.rect("X"));
+    }
+
+    @Test
+    void theMessageOfAnItemWithoutRoomInItsRow() {
+        String two = assertThrows(InvalidModelException.class, () -> layOut(
+                "\tGrid:", "\t\tColumns: 100 100",
+                "\t\tArea: 1 1", "\t\t\tBlock:",
+                "\t\tArea: 1 auto 1 2", "\t\t\tBlock:")).getMessage();
+        assertTrue(two.contains("En la fila 1 no queda un hueco de 2 columnas libres para este ítem (la rejilla tiene "
+                + "2 columnas): elige otra fila"), two);
+        String one = assertThrows(InvalidModelException.class, () -> layOut(
+                "\tGrid:", "\t\tColumns: 100",
+                "\t\tArea: 1 1", "\t\t\tBlock:",
+                "\t\tArea: 1 auto", "\t\t\tBlock:")).getMessage();
+        assertTrue(one.contains("no queda un hueco de 1 columna libre para este ítem (la rejilla tiene 1 columna)"), one);
+        String column = assertThrows(InvalidModelException.class, () -> layOut(
+                "\tGrid:", "\t\tFlow: column", "\t\tRows: 100", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\tArea: 1 1", "\t\t\tBlock:",
+                "\t\tArea: auto 1", "\t\t\tBlock:")).getMessage();
+        assertTrue(column.contains("En la columna 1 no queda un hueco de 1 fila libre para este ítem (la rejilla tiene "
+                + "1 fila): elige otra columna"), column);
     }
 }

@@ -190,4 +190,28 @@ class OverflowTest {
         assertContains("La caja T (línea", e);
         assertContains("llega 30 más allá del área útil", e);
     }
+
+    @Test
+    void theContentBoxLeavesBorderAndPadding() {
+        // 50 − 2 − 2 − 8 − 8 = 30 para la palabra de 35.
+        InvalidModelException wide = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tText: aaaaaaa", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tBorder: 2", "\t\t\tPadding: 0 8")));
+        assertContains("la línea mide 35 y la caja deja 30", wide);
+        // Dos líneas (24) en 30 − 2 − 2 − 5 − 5 = 16.
+        InvalidModelException tall = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tText: aaaa bbbb cccc", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 30",
+                        "\t\t\tBorder: 2", "\t\t\tPadding: 5 0")));
+        assertContains("su texto llega a 24 y la caja deja 16", tall);
+    }
+
+    @Test
+    void headAndFootThatLeaveNoRoomForTheBody() {
+        // Cabecera de 60 y pie de 50 en un área útil de 100.
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOutPaged(PAGE,
+                "\tTable:", "\t\tId: X", "\t\tColumns: 1fr",
+                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 60",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b",
+                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));
+        assertContains("miden 110 y no dejan sitio al cuerpo", e);
+    }
 }

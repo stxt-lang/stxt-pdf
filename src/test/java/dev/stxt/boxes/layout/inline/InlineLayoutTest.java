@@ -129,4 +129,16 @@ class InlineLayoutTest {
                 new TextLine.Run(35, 5, "1", run("1", "b").format()),
                 new TextLine.Run(40, 25, " de 1", TextFormat.PLAIN)), l.runs());
     }
+
+    @Test
+    void theLastLineOfAParagraphIsNotJustifiedEvenWithSeveralWords() {
+        // «aa bb» (25) se justifica a 30; «cc dd», la última del primer párrafo, no.
+        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:",
+                "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\taa bb cc dd", "", "\t\t\tee ff");
+        List<TextLine> lines = l.fragment("T").lines();
+        assertEquals(List.of("aa bb", "cc dd", "ee ff"), lines.stream().map(TextLine::text).toList());
+        assertEquals(5, lines.get(0).wordSpacing(), 1e-9);
+        assertEquals(0, lines.get(1).wordSpacing(), 1e-9);
+        assertEquals(0, lines.get(2).wordSpacing(), 1e-9);
+    }
 }

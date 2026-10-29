@@ -132,4 +132,13 @@ class ListLayoutTest {
         assertTrue(f.has(2, "A"));
         assertFalse(f.hasMarker(2, "A"));
     }
+
+    @Test
+    void markerFollowsTheFirstLineInsideABorderedChild() {
+        // La primera línea está en el contenido de un bloque con 3 de borde y 5 de relleno: en 40 + 8.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 3",
+                "\t\t\t\t\tPadding: 5", "\t\t\t\tText: Uno"));
+        assertRect(f.marker("A"), 45, 48, 15, 12);
+    }
 }

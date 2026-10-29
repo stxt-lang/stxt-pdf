@@ -145,4 +145,26 @@ class TrackSizingTest {
         assertArrayEquals(new double[]{237.5, 62.5}, spanning("auto auto", Double.POSITIVE_INFINITY,
                 new ItemContribution(0, 1, 50, 200), new ItemContribution(0, 2, 100, 300)), 1e-9);
     }
+
+    /** minmax(50, 200) crece hasta su máximo antes que la fracción, que se queda con el resto. */
+    @Test
+    void aFixedMaximumIsALimitToGrowTo() {
+        assertArrayEquals(new double[]{200, 295}, spanning("minmax(50, 200) 1fr", 495), 1e-9);
+    }
+
+    /** Sin ancho, las fracciones miden en proporción: 1fr y 2fr con contenido de 100 son 100 y 200. */
+    @Test
+    void fractionsOfAnIndefiniteSizeKeepTheirProportion() {
+        assertArrayEquals(new double[]{100, 200}, spanning("1fr 2fr", Double.POSITIVE_INFINITY,
+                new ItemContribution(0, 1, 100, 100), new ItemContribution(1, 1, 100, 100)), 1e-9);
+    }
+
+    /** Un ítem que cruza tres fracciones con huecos de 10: le faltan 300 − 20, 93,33 por fracción. */
+    @Test
+    void itemCrossingFractionsCountsItsGaps() {
+        List<Track> t = ValueParser.list("1fr 1fr 1fr").stream().map(Track::of).toList();
+        double third = 280.0 / 3;
+        assertArrayEquals(new double[]{third, third, third},
+                TrackSizing.size(t, List.of(new ItemContribution(0, 3, 300, 300)), 200, 10), 1e-9);
+    }
 }

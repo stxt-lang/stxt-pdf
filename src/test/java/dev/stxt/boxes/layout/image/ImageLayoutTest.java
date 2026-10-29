@@ -350,4 +350,27 @@ class ImageLayoutTest {
         assertEquals(60, r.fragment().height(), 1e-9);
         assertEquals(new IntrinsicSizes(120, 120), new ImageLayout(context).contentIntrinsic(image));
     }
+
+    // Casos que faltaban según las pruebas de mutación (ROADMAP-QA-ARQ.md, QA-08): la proporción es la de la caja de
+    // contenido, sin el borde (2) ni el relleno (3).
+
+    @Test
+    void aHeightKeepsTheRatioOfTheContentBox() {
+        // Height: 50 deja 40 al contenido, que mide 80 de ancho: 90 con borde y relleno, también como ítem flex.
+        LayoutFixture f = layOut(
+                "\tImage: test/wide.png", "\t\tId: I", "\t\tBox:", "\t\t\tHeight: 50", "\t\t\tBorder: 2", "\t\t\tPadding: 3",
+                "\tFlex:", "\t\tItem:", "\t\t\tImage: test/wide.png", "\t\t\t\tId: F", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 50",
+                "\t\t\t\t\tBorder: 2", "\t\t\t\t\tPadding: 3");
+        assertRect(40, 40, 90, 50, f.rect("I"));
+        assertRect(40, 90, 90, 50, f.rect("F"));
+    }
+
+    @Test
+    void aMaxHeightNarrowsTheImage() {
+        // Natural: 150 + 10 de ancho y 85 de alto; Max height: 30 deja 20 al contenido, que mide 40: 50 de ancho.
+        LayoutFixture f = layOut(
+                "\tImage: test/wide.png", "\t\tId: I", "\t\tBox:", "\t\t\tMax height: 30", "\t\t\tBorder: 2",
+                "\t\t\tPadding: 3");
+        assertRect(40, 40, 50, 30, f.rect("I"));
+    }
 }

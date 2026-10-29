@@ -90,4 +90,24 @@ class EngineContractTest {
         Path file = dir.resolve("styles.stxt");
         return Files.exists(file) ? new DocumentReader().readStyles(file) : null;
     }
+
+    /**
+     * Un motor reutilizado olvida las cifras que reservó el documento anterior: tras uno de 101 páginas, «Página
+     * {page}» se vuelve a medir con dos cifras (45) y cabe en una línea de su caja de 48 (QA-08, mutación).
+     */
+    @Test
+    void aReusedEngineForgetsTheReservedDigits() {
+        String head = "Document (dev.stxt.boxes):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: Cifras\n"
+                + "\tLanguage: es\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
+                + "\t\t\t\tSize: 10\n\tSection:\n\t\tText: Página {page}\n\t\t\tId: P\n\t\t\tBox:\n\t\t\t\tWidth: 48\n";
+        StringBuilder big = new StringBuilder(head);
+        for (int i = 0; i < 100; i++) {
+            big.append("\t\tBlock:\n\t\t\tBox:\n\t\t\t\tHeight: 10\n\t\t\tBreak:\n\t\t\t\tBefore: page\n");
+        }
+        DocumentReader reader = new DocumentReader();
+        Engine engine = new Engine();
+        assertEquals(101, engine.layOutDocument(reader.read(big.toString())).pages().size());
+        LaidOutDocument small = engine.layOutDocument(reader.read(head));
+        assertEquals(1, small.pages().get(0).content().children().get(0).lines().size());
+    }
 }
