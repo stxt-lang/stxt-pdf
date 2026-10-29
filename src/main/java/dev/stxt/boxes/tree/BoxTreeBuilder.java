@@ -2,47 +2,31 @@ package dev.stxt.boxes.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
-import dev.stxt.TextNode;
 import dev.stxt.boxes.model.Rotation;
-import dev.stxt.boxes.model.TextRun;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static dev.stxt.boxes.tree.ListBuilder.itemNumber;
 import static dev.stxt.boxes.tree.ListBuilder.marker;
 import static dev.stxt.boxes.tree.ListBuilder.markerLine;
-import static dev.stxt.boxes.tree.ListBuilder.validateList;
 import static dev.stxt.boxes.tree.ModelValidator.definiteHeight;
 import static dev.stxt.boxes.tree.ModelValidator.font;
 import static dev.stxt.boxes.tree.ModelValidator.validateBox;
 import static dev.stxt.boxes.tree.ModelValidator.validateContainer;
-import static dev.stxt.boxes.tree.ModelValidator.validateFlex;
-import static dev.stxt.boxes.tree.ModelValidator.validateImage;
-import static dev.stxt.boxes.tree.ModelValidator.validateMulticol;
 import static dev.stxt.boxes.tree.ModelValidator.validateRotation;
 import static dev.stxt.boxes.tree.Nodes.child;
 import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
 import static dev.stxt.boxes.tree.Nodes.is;
 import static dev.stxt.boxes.tree.Nodes.isElement;
-import static dev.stxt.boxes.tree.PropertyReader.FLEX;
-import static dev.stxt.boxes.tree.PropertyReader.GRID;
-import static dev.stxt.boxes.tree.PropertyReader.MULTICOL;
 import static dev.stxt.boxes.tree.PropertyReader.box;
-import static dev.stxt.boxes.tree.PropertyReader.flex;
 import static dev.stxt.boxes.tree.PropertyReader.fragmentation;
-import static dev.stxt.boxes.tree.PropertyReader.grid;
 import static dev.stxt.boxes.tree.PropertyReader.item;
-import static dev.stxt.boxes.tree.PropertyReader.multicol;
 import static dev.stxt.boxes.tree.PropertyReader.typography;
-import static dev.stxt.boxes.tree.TableBuilder.cellText;
 import static dev.stxt.boxes.tree.TableBuilder.table;
 import static dev.stxt.boxes.tree.ValueReader.angle;
 import static dev.stxt.boxes.tree.ValueReader.bool;
@@ -86,9 +70,6 @@ public final class BoxTreeBuilder {
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
             "foot", "span", "bullet", "numbering", "table-columns", "code-font", "column-align");
-
-    /** Una línea en blanco dentro del texto: separa párrafos (§5.4). */
-    private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
     /**
      * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus
@@ -204,7 +185,7 @@ public final class BoxTreeBuilder {
     }
 
     /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */
-    private void buildContent(BuildContext ctx, InlineNode node, Box box) {
+    void buildContent(BuildContext ctx, InlineNode node, Box box) {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
             if (isElement(h)) {
@@ -224,53 +205,24 @@ public final class BoxTreeBuilder {
     /**
      * Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem, o
      * la {@code Row} de una {@code Cell}, y {@code position} es entonces el sitio de la celda en su tabla.
+     * El orden es el mismo para todos: el sitio, la herencia, las reglas, las propiedades y sus
+     * comprobaciones, la caja y el contenido; lo propio de cada elemento lo hace su {@link ElementReader}.
      */
-    private Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
+    Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
         Element kind = ctx.codeBlocks.contains(n) ? Element.CODE_BLOCK : Element.of(n.getCanonicalName()).orElseThrow();
-        if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
-            throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
-                    + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
-        }
-        int level = kind.headingLevel();
-        if (level > 0) {
-            heading(ctx, n, level);
-        }
+        ElementReader reader = ElementReader.of(kind);
+        place(ctx, n, kind);
         Style s = Style.inheriting(parent.style());
-        // Con valor, la celda es una caja de texto; sin valor, un bloque.
-        s.layout = kind == Element.CELL && !n.getText().isBlank() ? Style.Layout.INLINE : kind.layout();
+        s.layout = reader.layout(n, kind);
         s.position = kind.position();
-        if (kind == Element.CELL) {
-            // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
-            child(wrapper, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
-        } else if (wrapper != null) {
-            item(wrapper, s, parent.style().gridAreas);
-        }
+        reader.wrapper(wrapper, s, parent);
         ctx.rules.apply(n, kind, s, parent, position);
-        String id = properties(ctx, n, kind, s, parent);
-        if (kind == Element.CELL) {
-            // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
-            child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
-        }
-        if (kind == Element.CELL && s.header && position != null && position.group() == CellPosition.HEAD) {
-            throw error(s.line("header"), ErrorCode.TABLE_HEADER, "Header no tiene efecto en una celda de Head: "
-                    + "las celdas de la cabecera ya son cabeceras de columna");
-        }
-        if (kind == Element.FLEX) {
-            validateFlex(s);
-        }
-        if (kind == Element.LIST) {
-            validateList(s);
-        }
-        if (kind == Element.MULTICOL) {
-            validateMulticol(s, n.getLine());
-        }
-        if (kind == Element.IMAGE) {
-            validateImage(s);
-        }
+        String id = properties(ctx, n, reader, s, parent);
+        reader.check(n, wrapper, s, position);
         validateRotation(s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
-        if (level > 0) {
+        if (kind.headingLevel() > 0) {
             // El motor evita cortar dentro del encabezado y después de él (§5.13); no se declara.
             s.breakAfter = Style.Break.AVOID;
             s.avoidBreakInside = true;
@@ -280,44 +232,15 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(box, definiteHeight(ctx, s, parent));
         validateContainer(ctx, s, box);
         if (number != null) {
-            ctx.itemNumbers.put(box, number);
-            if (n.getChildren().stream().noneMatch(Nodes::isElement)) {
-                throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
-                        + "un Paragraph, un Text, un Block…");
-            }
-            box.setNumber(ListMarkers.number(parent.style().listMarker, number));
-            String marker = ListMarkers.text(parent.style().listMarker, number);
-            if (marker != null) {
-                box.setMarker(marker(n, box, marker));
-            }
+            listItem(ctx, n, box, parent, number);
         }
-        if (kind.hasText()) {
-            text(n, box);
-            box.setRuns(ctx.runs.get(n));
-            inlineFormat(ctx, box);
-        } else if (kind == Element.IMAGE) {
-            image(n, box);
-        } else if (kind == Element.CELL && s.layout == Style.Layout.INLINE) {
-            cellText(n, box);
-            box.setRuns(ctx.runs.get(n));
-            inlineFormat(ctx, box);
-        } else {
-            boolean outerFixed = ctx.insideFixed;
-            ctx.insideFixed |= s.position == Style.Position.FIXED;
-            if (kind == Element.TABLE) {
-                table(n, box, (cell, row, at) -> element(ctx, cell, box, row, at));
-            } else if (kind == Element.MULTICOL) {
-                columns(ctx, n, box);
-            } else if (kind == Element.MARKDOWN) {
-                markdown(ctx, n, box);
-            } else {
-                buildContent(ctx, n, box);
-            }
-            ctx.insideFixed = outerFixed;
-        }
-        if (level > 0) {
+        boolean outerFixed = ctx.insideFixed;
+        ctx.insideFixed |= s.position == Style.Position.FIXED;
+        reader.content(this, ctx, n, box);
+        ctx.insideFixed = outerFixed;
+        if (kind.headingLevel() > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
-            String headingNumber = ctx.headingNumbers.next(level, s.numbered);
+            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.numbered);
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, headingNumber);
             }
@@ -325,23 +248,51 @@ public final class BoxTreeBuilder {
         if (box.marker() != null) {
             markerLine(box);
         }
-        if (kind == Element.CONTENTS) {
-            ctx.contents.add(box);
-        }
         return box;
+    }
+
+    /**
+     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un
+     * {@code Multicol} (§5.16) y un encabezado respeta la jerarquía (§5.13).
+     */
+    private static void place(BuildContext ctx, InlineNode n, Element kind) {
+        if (ctx.insideMulticol && kind.position() != Style.Position.STATIC && kind.position() != Style.Position.RELATIVE) {
+            throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
+                    + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
+        }
+        if (kind.headingLevel() > 0) {
+            heading(ctx, n, kind.headingLevel());
+        }
+    }
+
+    /**
+     * Un {@code List item} (§5.14): su número, que no puede ser de un ítem vacío, y la caja de su
+     * marcador, si la lista lo lleva.
+     */
+    private static void listItem(BuildContext ctx, InlineNode n, Box box, Box list, int number) {
+        ctx.itemNumbers.put(box, number);
+        if (n.getChildren().stream().noneMatch(Nodes::isElement)) {
+            throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
+                    + "un Paragraph, un Text, un Block…");
+        }
+        box.setNumber(ListMarkers.number(list.style().listMarker, number));
+        String marker = ListMarkers.text(list.style().listMarker, number);
+        if (marker != null) {
+            box.setMarker(marker(n, box, marker));
+        }
     }
 
     /**
      * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Flex}, {@code Grid} y
      * {@code Table}, {@code Multicol}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
      */
-    private String properties(BuildContext ctx, InlineNode n, Element kind, Style s, Box parent) {
+    private String properties(BuildContext ctx, InlineNode n, ElementReader reader, Style s, Box parent) {
         String id = null;
         Double rotate = null;
         double[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            if (isElement(p) || NOT_PROPERTIES.contains(name) || ownProperty(kind, p, s)) {
+            if (isElement(p) || NOT_PROPERTIES.contains(name) || reader.property(p, s)) {
                 continue;
             }
             switch (name) {
@@ -375,70 +326,6 @@ public final class BoxTreeBuilder {
         return id;
     }
 
-    /** Lee una propiedad propia del tipo del elemento: las de {@code Flex}, {@code Grid} y {@code Table}, o {@code Multicol}. */
-    private static boolean ownProperty(Element kind, Node p, Style s) {
-        String name = p.getCanonicalName();
-        if (kind == Element.FLEX && FLEX.contains(name)) {
-            flex(p, s);
-        } else if ((kind == Element.GRID || kind == Element.TABLE) && GRID.contains(name)) {
-            grid(p, s);
-        } else if (kind == Element.MULTICOL && MULTICOL.contains(name)) {
-            multicol(p, s);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * El contenido de un {@code Multicol} (§5.16) va en su flujo de columnas, una caja de bloque
-     * generada que es su único hijo: cada columna es un fragmento suyo. Crea un contexto de
-     * formato de bloque, para que los márgenes no salgan de las columnas, y su alto no es
-     * definido: lo decide el reparto en columnas.
-     */
-    private void columns(BuildContext ctx, InlineNode n, Box multicol) {
-        Style s = Style.inheriting(multicol.style());
-        s.isolate = true;
-        Box flow = new Box(null, Element.COLUMNS, s, false, n.getLine());
-        multicol.addChild(flow);
-        ctx.definiteHeight.put(flow, false);
-        boolean outer = ctx.insideMulticol;
-        ctx.insideMulticol = true;
-        buildContent(ctx, n, flow);
-        ctx.insideMulticol = outer;
-    }
-
-    /**
-     * El contenido de un {@code Markdown} (§5.17): los elementos que genera {@link MarkdownBuilder},
-     * construidos como si los hubiera escrito el autor; sus textos con formato llevan sus tramos.
-     */
-    private void markdown(BuildContext ctx, InlineNode n, Box box) {
-        MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
-        ctx.runs.putAll(t.runs());
-        ctx.codeBlocks.addAll(t.codeBlocks());
-        ctx.insideMarkdown = true;
-        for (InlineNode e : t.elements()) {
-            box.addChild(element(ctx, e, box, null, null));
-        }
-        ctx.insideMarkdown = false;
-    }
-
-    /**
-     * Con {@code Inline: markdown} (§5.4), el texto de la caja es Markdown en línea: pasa a ser el texto
-     * seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro de un
-     * {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un
-     * bloque: sus errores señalan la línea donde empieza.
-     */
-    private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style().inline != Style.Inline.MARKDOWN || ctx.insideMarkdown) {
-            return;
-        }
-        int first = box.textBlock() ? box.textLine() + 1 : box.textLine();
-        List<TextRun> runs = MarkdownBuilder.inline(box.text(), first);
-        box.setText(TextRun.text(runs), first, false);
-        box.setRuns(TextRun.formatted(runs) ? runs : null);
-    }
-
     /**
      * Comprueba que un encabezado está en su sitio (§5.13): fuera de un {@code Fixed} y sin
      * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
@@ -456,47 +343,5 @@ public final class BoxTreeBuilder {
                             + "; como mucho, Heading " + (ctx.headingLevel + 1));
         }
         ctx.headingLevel = level;
-    }
-
-    /**
-     * La ruta de una {@code Image} (§5.18), relativa a {@code images/}. Que el fichero exista y
-     * sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
-     */
-    private static void image(InlineNode n, Box box) {
-        String path = n.getText().trim();
-        if (path.isEmpty()) {
-            throw error(n, ErrorCode.IMAGE_UNKNOWN, "Image necesita la ruta de la imagen, relativa a la carpeta "
-                    + "images/ de los recursos: Image: logos/acme.png");
-        }
-        box.setImage(path);
-    }
-
-    /** El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos. */
-    private static void text(InlineNode n, Box box) {
-        Optional<Node> content = child(n, "content");
-        boolean value = !n.getText().isBlank();
-        if (value && content.isPresent()) {
-            throw error(content.get(), ErrorCode.TEXT_CONTENT, n.getName() + " tiene el texto en el valor y en Content "
-                    + "(línea " + n.getLine() + "): deja solo uno");
-        }
-        if (!value && content.isEmpty()) {
-            throw error(n, ErrorCode.TEXT_CONTENT, n.getName() + " necesita su texto: en el valor ("
-                    + n.getName() + ": …) o en un bloque Content >>");
-        }
-        Node source = content.orElse(n);
-        font(n, source, box);
-        if (box.element() == Element.PARAGRAPH) {
-            // Las líneas en blanco al principio o al final no separan nada.
-            String text = source.getText();
-            Matcher blank = BLANK_LINE.matcher(text)
-                    .region(text.length() - text.stripLeading().length(), text.stripTrailing().length());
-            if (blank.find()) {
-                // El bloque empieza en la línea siguiente a Content; la línea en blanco, tras el salto encontrado.
-                int line = source.getLine() + 2 + (int) text.substring(0, blank.start()).chars().filter(c -> c == '\n').count();
-                throw error(line, ErrorCode.PARAGRAPH_BLANK_LINE, "Un Paragraph es un solo párrafo: quita la línea "
-                        + "en blanco o usa un Paragraph para cada uno");
-            }
-        }
-        box.setText(source.getText(), source.getLine(), source instanceof TextNode);
     }
 }
