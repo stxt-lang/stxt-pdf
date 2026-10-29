@@ -383,6 +383,26 @@ contenido de un `Multicol` con `Decoration: clone`), muchas en caminos de error;
 informe HTML
 (`target/pit-reports/index.html`) las lista por línea; se pueden atacar por clases cuando se toque cada una.
 
+**Después: `MulticolLayout` y `Overflow`.** Las dos clases con más supervivientes tras la segunda pasada. `Overflow`
+pasa de 103/166 (62 %) a 130/156 (83 %) y `MulticolLayout` (con `Columns`) de 72/97 (74 %) a 88/92 (96 %); en total,
+del 85,5 % al **88,1 %** (fuerza 89 %). Lo que se hizo:
+- `OverflowTest` (nuevo): el culpable y las medidas del mensaje de cada desbordamiento, que el catálogo de errores no
+  mira (solo código y línea): a lo ancho (desde un contenedor con relleno, sin el desplazamiento de un `Relative`), en su
+  alto, en la página (desde donde empieza la caja, y si es el borde o el relleno), girado y preformateado; y unos
+  márgenes negativos que no desbordan. Encontró un **fallo en un mensaje**: una caja dentro de una caja girada decía
+  «revisa su su posición».
+- Código que no decidía nada: `tooWide` arrastraba la `y` y `pageOverflow` la `x`, sin usarlas; y en
+  `MulticolLayout.ownRemaining` la rama de `clone` daba lo mismo que la general (con `clone`, `Slice.top` ya cuenta lo de
+  arriba en cada fragmento). Quitados: sus mutantes eran equivalentes.
+- Multicol: tamaños intrínsecos con tres columnas y con `Column width`, el alto propio con borde y relleno, `clone` con
+  `Height` en dos páginas, el alto que sigue tras el contenido (una rama que ningún test ejecutaba), el alto que queda
+  como límite de la última página y los mensajes en singular y plural; `Columns` con un hueco ancho.
+
+Quedan, en `Overflow`, solo fronteras con la tolerancia (`<` frente a `<=`, y `± Tolerance.MODEL`) y la comprobación
+del marcador de una lista por dentro (`fragment(c, …)` de un marcador: solo cambiaría algo en una lista girada); en
+`MulticolLayout`, la frontera de la búsqueda binaria, `own <= page` y `atStart` (con fragmentación y al principio de
+página, o sin fragmentación, que solo cambiaría el error con que acaba un contenido que no cabe).
+
 ### QA-09 · Integración continua · Alta · S
 
 No existe `.github/`. **Propuesta:** `.github/workflows/ci.yml` con JDK 17 (y 21 como matriz), `mvn -B test`, y una
@@ -952,3 +972,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · PF-05 | `ColdStartProbe` mide el arranque en frío por partes y la carga de las fuentes por documento: leer el fichero era ≈ 1 % de una conversión, el resto es carga de clases y JIT. `FontFile.content()` (los bytes de fontbox, sin copia) para `PdfFonts`, `SvgFonts` y `digest`: cada TTF se lee una vez, y el PDF lleva la fuente que se midió aunque el fichero cambie o desaparezca (antes, `NoSuchFileException`). Decisión 322. 1410 tests en verde; los 72 PDF y los 54 SVG, iguales salvo fechas e `ID`. | Quedan QA-08 (5, PIT) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · CI en Windows | Trabajo `windows` (`windows-latest`) solo en la ejecución diaria y a mano; el árbol limpio, sin `tee` (con `pipefail`, `tee /dev/stderr` fallaba en Windows) y con anotaciones. En verde. | — |
 | 2026-10-29 | Fuera del plan · QA-08 (5) | Perfil `pit`; dos pasadas (80,7 % → 85,5 % de mutantes detectados, `layout.position` de 56 a 92 %, `layout.grid` de 81 a 90 %). Tests nuevos de `AbsoluteEquation`, `TrackSizing`, flex, grid y posición estática; dos fallos encontrados y corregidos con el usuario: el max-content de un ítem de varias pistas (decisión 323) y el encogimiento flex con márgenes (decisión 324). Ningún golden ni ejemplo cambia; 1428 tests en verde. QA-08 terminada. | Revisión QA y arquitectura terminada; lo que queda de PIT, por clases cuando se toquen |
+| 2026-10-29 | Fuera del plan · PIT: `MulticolLayout` y `Overflow` | `OverflowTest` (el culpable y las medidas de cada mensaje) y tests de Multicol; `Overflow` de 62 a 83 % de mutantes detectados y `MulticolLayout` de 74 a 96 % (total 88,1 %). Un mensaje con «su su» corregido y tres trozos de código sin efecto quitados. 1447 tests en verde; los 72 PDF y los 54 SVG, iguales. | Lo que queda de PIT, por clases cuando se toquen |
