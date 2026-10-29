@@ -23,7 +23,8 @@ también `Break` e `Isolate`.
 > se leería peor en el caso habitual (un sello, una cabecera).
 
 > **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página. Sus
-> descendientes sí lo admiten, aunque tampoco se parten, y `Widows` y `Orphans`, que se heredan, también.
+> descendientes sí lo admiten aunque tampoco se parten, para que una regla como `Element: Paragraph` con `After: avoid`
+> no dé un error en cada párrafo de un pie.
 
 ## `Relative`
 

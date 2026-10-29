@@ -99,8 +99,8 @@ superiores): el hueco que dejan las líneas o los hijos al final de la página n
 una caja con `Height` igual al alto de su contenido no desborda al partirse, y el alto que se ve puede pasar del `Height`
 en lo que suman esos huecos.
 
-> **Decisión:** así una caja (o un ítem de grid estirado) no desborda por partirse, a cambio de que el alto que se ve
-> pueda pasar del `Height`. *Alternativa descartada:* un fragmento que mide solo lo que ocupa su contenido (no llega al
+> **Decisión:** un fragmento cortado consume solo lo que ocupa su contenido, para que una caja (o un ítem de grid
+> estirado) no desborde por partirse, a cambio de que el alto que se ve pueda pasar del `Height`. *Alternativa descartada:* un fragmento que mide solo lo que ocupa su contenido (no llega al
 > final de la página), o dejar que el contenido desborde el último fragmento.
 
 ## Cortes en `Flex`, `Grid` y `Table`

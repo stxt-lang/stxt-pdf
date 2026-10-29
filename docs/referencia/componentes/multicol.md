@@ -90,8 +90,8 @@ Si el alto propio del `Multicol` (`Height`, `Max height`) termina en una página
 esa página, es un error (`BOX_OVERFLOW`), en la línea de esa propiedad; lo mismo si, sin página ni alto que llenar, sus
 cortes de columna necesitan más columnas de las que tiene, en la línea de `Count` ([Desbordamiento](../comun/desbordamiento.md)).
 
-> **Decisión:** es un error. *Alternativa descartada:* columnas de desbordamiento a un lado, o una última columna sin
-> límite.
+> **Decisión:** el contenido que no cabe en las columnas es un error. *Alternativa descartada:* columnas de desbordamiento
+> a un lado, o una última columna sin límite.
 
 ## Línea entre columnas
 
