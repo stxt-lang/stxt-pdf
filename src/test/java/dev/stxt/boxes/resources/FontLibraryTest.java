@@ -9,9 +9,13 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,6 +81,21 @@ class FontLibraryTest {
         // La negrita tiene la raya más gruesa.
         assertEquals(0.1, new Resources().fonts().find(plex(FontWeight.BOLD, FontStyle.NORMAL)).decoration()
                 .underlineThickness(), 1e-9);
+    }
+
+    /**
+     * El fichero se lee una vez, al indexar la carpeta (PF-05): el contenido y la huella son los de entonces aunque el
+     * fichero cambie o desaparezca.
+     */
+    @Test
+    void theContentIsTheOneIndexed() throws Exception {
+        FontFile font = copy("Plex", "Regular").fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL));
+        byte[] original = Files.readAllBytes(PLEX.resolve("IBMPlexSans-Regular.ttf"));
+        Files.copy(PLEX.resolve("IBMPlexSans-Bold.ttf"), font.path(), StandardCopyOption.REPLACE_EXISTING);
+        assertArrayEquals(original, font.content().readAllBytes());
+        Files.delete(font.path());
+        assertArrayEquals(original, font.content().readAllBytes());
+        assertEquals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(original)), font.digest());
     }
 
     @Test

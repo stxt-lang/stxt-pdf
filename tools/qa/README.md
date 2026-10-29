@@ -16,6 +16,7 @@ java -Djava.awt.headless=true -cp "target/qa:$CP" ScaleProbe           # PF-*: t
 java -Djava.awt.headless=true -cp "target/qa:$CP" GsubCostProbe        # QA-03/PF-01: coste de GSUB en PDFBox
 java -Djava.awt.headless=true -cp "target/qa:$CP" GsubGlyphsProbe      # QA-03: qué cadenas cambian con GSUB
 java -Djava.awt.headless=true -cp "target/qa:$CP" HostileInputsProbe   # QA-06: entradas patológicas
+java -Djava.awt.headless=true -cp "target/qa:$CP" ColdStartProbe       # PF-05: arranque en frío por partes y fuentes por documento
 # QA-02: la fuente que da AWT por su familia; en turco, Dialog (lo que dibujaba JSVG antes de la sesión 4)
 java -Djava.awt.headless=true -Duser.language=tr -Duser.country=TR -cp target/qa AwtFontProbe
 # QA-06: imágenes y SVG pequeños que dibujan muchísimo; cada caso en una JVM aparte con la memoria limitada

@@ -77,7 +77,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-02 | Medir el texto sin pasar por `TrueTypeFont` en cada carácter | Media | S | hecho |
 | PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | hecho |
 | PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | hecho |
-| PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
+| PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | hecho |
 | PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | hecho |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | hecho |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | hecho |
@@ -116,6 +116,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | Tras la sesión 4, SVG con texto | Formulario PDF de los 10 SVG con texto idéntico en `en` y en `tr` (antes, en `tr`, de 1 a 19 KB menos: dibujados con `Dialog`; `AwtFontProbe` muestra la causa); `mvn test` en turco deja el árbol limpio. `ConcurrencyProbe` en la misma máquina, antes y después: 7,7 a 10,0 s y 7,8 a 10,1 s, 0 diferencias de bytes; 1.ª ronda en frío 2,1 a 2,2 s y 1,9 a 2,1 s |
 | Tras la sesión 5, paginación | `ScaleProbe`, layouts por página: 96 páginas 22,8; 100 páginas de 46,0 a 23,0; 153 de 45,8 a 22,9; 657 de 43,0 a 21,5; índice de 163 páginas de 57,1 a 33,0. Layout: 657 páginas de 1459 a 794 ms; 153 de 394 a 283; índice de 364 a 225. Perfil del layout (JFR, pilas enteras): `LineBreaker.breakParagraphs` 71,5 %, `FontFile.width` 21,6 %, `TextRun.Joiner` ≈ 19 %, `PdfMetrics.validate` ≈ 8 % (PF-06) |
 | Tras PF-06, layout | `ScaleProbe`, medianas de tres: 657 páginas de 743 a 430 ms, 153 de 197 a 96, 100 de 167 a 103, índice de 163 páginas de 246 a 164; 15 layouts seguidos de las 657 páginas, de ≈ 575 a ≈ 235 ms en caliente. El reparto en líneas pasa del 71,5 % a ≈ 24 % del perfil |
+| PF-05, arranque en frío (`ColdStartProbe`) | Leer el primer documento ≈ 150 ms, indexar `fonts/` ≈ 200 ms, primer layout ≈ 250 ms, primer PDF ≈ 420 ms; 1.ª ronda de los 11 ejemplos ≈ 1 s, en caliente ≈ 400 ms. Por fuente y documento: leer 0,15 ms, parsear 0,4 ms, cargar en PDFBox 0,1 ms, subconjunto 0,2 ms |
 
 ## QA
 
@@ -518,6 +519,26 @@ PDFBox (`PDType0Font.load(doc, InputStream, true)`) ahorra la lectura de disco, 
 de los 11 ejemplos es 2,6 s (frente a 0,6 s en caliente): JIT, escaneo de `fonts/`, AWT para los SVG. Para un servicio,
 calentar al arrancar con un documento mínimo. **No verificado** cuánto aporta cada parte.
 
+**Hecho (fuera del plan): medido con `ColdStartProbe` y las fuentes leídas una vez.** Cada TTF se leía hasta cuatro
+veces: al indexar `fonts/`, en cada conversión al incrustarlo (`PdfFonts.font`), al cargarlo en AWT para el texto de un
+SVG (`SvgFonts`) y para su huella (`FontFile.digest`). Por fuente y documento, en caliente: leer el fichero 0,13 a
+0,17 ms, parsearlo 0,35 a 0,44 ms, `PDType0Font.load` 0,1 ms y el subconjunto 0,2 ms; un documento de los ejemplos usa
+unas pocas fuentes y tarda ≈ 35 ms, así que leer de disco es ≈ 1 %. El análisis no se puede ahorrar: `TrueTypeFont` no es
+seguro entre hilos y PDFBox lo cambia al incrustarlo (`setEnableGsub`, el subconjunto), así que cada documento parsea el
+suyo. **Cambio:** `FontFile.content()` da los bytes que fontbox ya guarda (`TrueTypeFont.getOriginalData()`: un
+`ByteArrayInputStream` nuevo sobre su array, sin copiarlo ni memoria extra) y de ahí salen `PdfFonts`, `SvgFonts` y
+`digest`; el fichero solo se lee al indexar. Parsear desde ellos cuesta 0,42 a 0,52 ms frente a ≈ 0,55 de leer y
+parsear: la ganancia de tiempo es ruido. Lo que importa es que **lo que se incrusta y se dibuja es lo que se midió**:
+antes, si un fichero de `fonts/` cambiaba o desaparecía con el `Resources` ya indexado (un servicio), el PDF llevaba otra
+fuente que la medida, o fallaba con una `NoSuchFileException` que `Converter` dejaba pasar como si fuera del destino
+(`ConverterTest.theFontsAreReadOnce` falla sin el cambio; `FontLibraryTest.theContentIsTheOneIndexed`). Decisión 322.
+
+**El arranque en frío, por partes** (JVM nueva, mediana de tres): leer el primer documento (schema y `stxt-core`)
+≈ 150 ms, indexar `fonts/` (12 TTF, con los avances de todos los glifos) ≈ 200 ms, maquetar el primer ejemplo ≈ 250 ms
+y escribir su PDF ≈ 420 ms (carga de clases de PDFBox); la primera ronda de los 11 ejemplos después aún tarda ≈ 1 s frente
+a ≈ 400 ms en caliente (JIT). No hay trabajo que el motor pueda ahorrarse: es carga de clases y compilación. Para un
+servicio, la recomendación sigue siendo convertir un documento pequeño al arrancar.
+
 ### PF-06 · El reparto en líneas vuelve a construir y medir la línea entera por cada palabra · Media · M
 
 **Evidencia (medida en la sesión 5, PF-04).** En el perfil de 40 layouts de 153 y 163 páginas, `LineBreaker.breakParagraphs`
@@ -875,3 +896,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | Fuera del plan · PF-06 | El reparto voraz suma los avances de las palabras y mide la línea entera solo cerca del límite; las palabras sin expresión regular; `validate` sin buscar marcadores en cada carácter y con los glifos memorizados; la última fuente recordada. Decisión 321. 1402 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte. Layout de 33 a 51 % más rápido en `ScaleProbe` (657 páginas: de 743 a 430 ms). | Quedan PF-05, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · QA-08 (6) | `SpecificationDocumentsTest`: los cuatro ejemplos de la especificación y `report.stxt`, con las métricas reales, en PDF y con veraPDF (PDF/UA-1); los cinco ya lo cumplían. `report.stxt` vuelve a ser el ejemplo del §10 (el título se había separado) y un test lo vigila. 1408 tests en verde. | `UnitBreaker.Run.layOut` (complejidad 22) y PF-05; quedan QA-08 (5) y `windows-latest` en la CI |
 | 2026-10-29 | Fuera del plan · `UnitBreaker.Run.layOut` | Partido en sus fases: `layOut` (de complejidad 22 a 9) elige; `continueGroup` (4) sigue el grupo partido en la página anterior, `cut` (9) busca el corte en lo que queda de página o parte el primer grupo en paralelo, y `place` (5) coloca las unidades y cierra el fragmento. El cursor (`next`, `origin`, `top`, `continued`) son campos de `Run`, que ya era el estado de un fragmento. 1408 tests en verde; los 72 PDF y los 54 SVG, iguales salvo fechas e `ID`. | PF-05; quedan QA-08 (5) y `windows-latest` en la CI |
+| 2026-10-29 | Fuera del plan · PF-05 | `ColdStartProbe` mide el arranque en frío por partes y la carga de las fuentes por documento: leer el fichero era ≈ 1 % de una conversión, el resto es carga de clases y JIT. `FontFile.content()` (los bytes de fontbox, sin copia) para `PdfFonts`, `SvgFonts` y `digest`: cada TTF se lee una vez, y el PDF lleva la fuente que se midió aunque el fichero cambie o desaparezca (antes, `NoSuchFileException`). Decisión 322. 1410 tests en verde; los 72 PDF y los 54 SVG, iguales salvo fechas e `ID`. | Quedan QA-08 (5, PIT) y `windows-latest` en la CI |

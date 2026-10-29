@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +39,10 @@ final class PdfFonts {
         PDFont f = fonts.get(font);
         if (f == null) {
             // Sin ligaduras se quita la tabla GSUB: PDFBox escribe un glifo por carácter, que es lo que se midió.
+            // Desde los bytes que se midieron, sin volver a leer el fichero (PF-05). Se parsea de nuevo porque
+            // TrueTypeFont no es seguro entre hilos y PDFBox lo cambia al incrustarlo.
             TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(
-                    Files.readAllBytes(resources.fonts().find(font).path())));
+                    resources.fonts().find(font).content()));
             ttf.setEnableGsub(font.ligatures());
             f = PDType0Font.load(doc, ttf, true);
             fonts.put(font, f);

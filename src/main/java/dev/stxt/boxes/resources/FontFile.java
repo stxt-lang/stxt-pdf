@@ -10,8 +10,8 @@ import org.apache.fontbox.ttf.gsub.GsubWorkerFactory;
 import org.apache.fontbox.ttf.model.GsubData;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * cada glifo y el de cada carácter se memoriza al pedirlo en una tabla de enteros, cuyas escrituras
  * son idempotentes (dos hilos escriben el mismo valor en la misma casilla, y un entero se escribe
  * entero).</p>
+ *
+ * <p>El fichero se lee una sola vez, al indexar la carpeta (PF-05): {@link #content()} da esos bytes a quien incrusta
+ * la fuente en el PDF o la carga en AWT para un SVG, y {@link #digest()} sale de ellos. Lo que se incrusta y se dibuja
+ * es lo que se midió aunque el fichero cambie o desaparezca después.</p>
  */
 public final class FontFile {
 
@@ -94,18 +98,29 @@ public final class FontFile {
     }
 
     /**
+     * El contenido del fichero tal como se leyó al indexar la carpeta, sin volver a leerlo. Cada llamada da un flujo
+     * nuevo sobre los bytes que guarda fontbox, sin copiarlos ({@link TrueTypeFont#getOriginalData()}), así que se
+     * puede pedir desde varios hilos.
+     */
+    public InputStream content() {
+        try {
+            return ttf.getOriginalData();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /**
      * La huella del contenido del fichero (SHA-256 en hexadecimal, en minúsculas): dos ficheros con los mismos bytes
      * tienen la misma, estén donde estén, y dos distintos no. Se calcula la primera vez que se pide.
-     *
-     * @throws ResourceException si el fichero ya no se puede leer
      */
     public String digest() {
         String value = digest;
         if (value == null) {
-            try {
-                value = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(path)));
+            try (InputStream in = content()) {
+                value = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()));
             } catch (IOException e) {
-                throw new ResourceException("No se puede leer la fuente " + path + ": " + e.getMessage(), e);
+                throw new UncheckedIOException(e);
             } catch (NoSuchAlgorithmException e) {
                 throw new IllegalStateException("La JVM no tiene SHA-256", e);
             }

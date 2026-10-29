@@ -69,6 +69,17 @@ class ConverterTest {
         assertArrayEquals(fromText, pdf(Converter.builder().styles(file).build(), document()));
     }
 
+    /** Las fuentes se leen al indexar la carpeta (PF-05): el PDF no cambia aunque después desaparezca el fichero. */
+    @Test
+    void theFontsAreReadOnce(@org.junit.jupiter.api.io.TempDir Path folder) throws IOException {
+        Path fonts = Files.createDirectories(folder.resolve("fonts"));
+        Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("a.ttf"));
+        Converter converter = Converter.builder().resources(new Resources(folder)).styles(BASE).build();
+        byte[] before = pdf(converter, document());
+        Files.delete(fonts.resolve("a.ttf"));
+        assertArrayEquals(before, pdf(converter, document()));
+    }
+
     @Test
     void layingOutFirstGivesTheSameBytes() throws IOException {
         Converter converter = Converter.builder().styles(BASE).build();

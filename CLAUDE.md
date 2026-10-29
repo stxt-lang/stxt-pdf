@@ -458,7 +458,9 @@ dependencia nueva se decide y se apunta allí.
   `Resources.resolve`, que **nunca va hacia atrás** (rechaza absolutas, `..` y enlaces que
   salen). Las fuentes se identifican por familia, peso (400/700) y estilo leídos del TTF
   (`FontLibrary`); no hay fuente por defecto ni de sustitución: `Font` es obligatoria en el
-  texto. El repositorio incluye IBM Plex Sans, Serif y Mono (OFL).
+  texto. El repositorio incluye IBM Plex Sans, Serif y Mono (OFL). Cada TTF se lee **una vez**, al indexar la
+  carpeta: `FontFile.content()` da esos bytes (los que guarda fontbox, sin copia) a `PdfFonts`, `SvgFonts` y
+  `FontFile.digest`, así que lo que se incrusta es lo que se midió aunque el fichero cambie después (PF-05).
 - **Pintado del texto:** `Canvas.text` recibe un `FontFace`; la línea base la calcula
   `StackingContext` con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en
   SVG). En PDF las fuentes son Type 0 Identity-H, así que `justify` usa `TJ`, no `Tw`.

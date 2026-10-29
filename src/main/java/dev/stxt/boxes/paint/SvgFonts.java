@@ -12,9 +12,7 @@ import dev.stxt.boxes.resources.ImageFormatException;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.image.ImageObserver;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -114,8 +112,8 @@ final class SvgFonts implements PlatformSupport {
         return created.computeIfAbsent(family, key -> {
             try {
                 // Desde los bytes y no desde el fichero: AWT deja abierto el fichero que se le pasa mientras viva la
-                // fuente, y en Windows no se podría borrar ni sustituir.
-                return Font.createFont(Font.TRUETYPE_FONT, new ByteArrayInputStream(Files.readAllBytes(font.path())));
+                // fuente, y en Windows no se podría borrar ni sustituir. Son los que se midieron (PF-05).
+                return Font.createFont(Font.TRUETYPE_FONT, font.content());
             } catch (FontFormatException | IOException e) {
                 failure = "AWT no carga la fuente " + font.face() + " (" + e.getMessage() + ")";
                 return null;

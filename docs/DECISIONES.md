@@ -2055,3 +2055,15 @@ interpretaciones que salieron al implementarlas.
      justo en el límite cambiaba. Así el reparto es exactamente el de antes. *Dónde:* `layout/inline/LineBreaker.greedy`,
      `layout/inline/TextMeasurer`, `LineBreakerPropertiesTest`. *Alternativa:* fiarse de la suma (cambia cortes en el
      límite, y con ellos PNG) o medir en milésimas enteras, que ataría `TextMeasurer` a la forma de `FontFile`.
+
+### PF-05: las fuentes, leídas una vez
+
+322. **Cada fichero de `fonts/` se lee una vez, al indexar la carpeta, y todo sale de esos bytes.** `FontFile.content()`
+     da un flujo nuevo sobre los bytes que fontbox guarda al parsear la fuente (`TrueTypeFont.getOriginalData()`, que
+     no los copia ni cambia ningún estado, así que vale desde varios hilos), y de ahí salen la fuente que `PdfFonts`
+     incrusta (parseada de nuevo en cada documento, porque `TrueTypeFont` no es seguro entre hilos y PDFBox lo cambia),
+     la que `SvgFonts` da a AWT y la huella de `digest`. El ahorro de tiempo es despreciable (leer de disco era ≈ 1 % de
+     una conversión); el motivo es que lo que se incrusta y se dibuja sea lo que se midió aunque el fichero cambie o
+     desaparezca con el `Resources` ya indexado, y que pintar no pueda fallar con una `IOException` de una fuente.
+     *Dónde:* `resources/FontFile`, `paint/PdfFonts`, `paint/SvgFonts`. *Alternativa:* guardar una copia propia de los
+     bytes en `FontFile` (duplica la memoria de las fuentes) o seguir leyendo el fichero en cada conversión.
