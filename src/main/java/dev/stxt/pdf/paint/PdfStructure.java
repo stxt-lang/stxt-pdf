@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Significado del documento en el PDF (referencia/comun/pdf.md): el árbol de estructura del PDF
+ * Significado del documento en el PDF (referencia/implementacion/pdf.md): el árbol de estructura del PDF
  * etiquetado y los marcadores (<em>outline</em>) de los encabezados.
  *
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
@@ -68,9 +68,9 @@ import java.util.Set;
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
- * <p>Un enlace (referencia/comun/enlaces.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación del
- * PDF como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del elemento de
- * la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de texto ({@code
+ * <p>Un enlace (referencia/implementacion/pdf.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación
+ * del PDF como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del elemento
+ * de la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de texto ({@code
  * [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto, uno por enlace y fragmento
  * aunque ocupe varias líneas.</p>
  *
@@ -195,9 +195,9 @@ final class PdfStructure {
     }
 
     /**
-     * Si la caja tiene {@code Link} (referencia/comun/enlaces.md), el {@code Link} que envuelve su contenido (su texto
-     * y sus hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción: su
-     * {@code Link} envuelve a su {@code Figure} ({@link #build}).
+     * Si la caja tiene {@code Link} (referencia/implementacion/pdf.md), el {@code Link} que envuelve su contenido (su
+     * texto y sus hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción:
+     * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
      */
     private PDStructureNode linked(Box box, PDStructureNode content) {
         if (box.style().link() == null || box.isImage()) {
@@ -443,7 +443,7 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta la zona de una caja con {@code Link} (referencia/comun/enlaces.md, decisión 171): la
+     * Etiqueta la zona de una caja con {@code Link} (referencia/implementacion/pdf.md): la
      * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
      * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. En un
      * {@code Fixed}, en una imagen decorativa o en las filas repetidas de una tabla, donde la caja no

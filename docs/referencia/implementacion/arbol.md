@@ -145,6 +145,13 @@ Los elementos generados que se nombran en `Styles` sin escribirse en el document
 
 ## Markdown
 
+> **Decisión:** el Markdown se traduce a nodos STXT, no a cajas: lo generado se construye como cualquier otro elemento, así
+> que las reglas de `Styles`, la validación, el PDF etiquetado y los marcadores no tienen ningún caso especial, y lo generado
+> se valida además contra el schema. *Alternativa descartada:* construir las cajas desde el árbol del parser.
+
+commonmark-java no conserva las celdas que sobran de una fila de tabla ni da la línea de cada celda: los errores de una
+celda señalan la de su fila.
+
 `MarkdownBuilder` parsea el `Content` con commonmark-java 0.30.1 (con las extensiones de tablas, tachado y subrayado) y lo
 traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema; los tramos de cada texto van aparte,
 por nodo (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos con `element(...)` como

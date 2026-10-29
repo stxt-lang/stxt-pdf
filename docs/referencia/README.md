@@ -29,7 +29,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [Referencias](comun/referencias.md) | `{page of: id}` y `{number of: id}`, y cómo converge la paginación |
 | [Enlaces](comun/enlaces.md) | `Link` y los enlaces de Markdown: destinos, zonas y PDF etiquetado |
 | [Recursos y fuentes](comun/recursos.md) | La carpeta de recursos, las rutas seguras y cómo se identifican y se comprueban las fuentes |
-| [El PDF](comun/pdf.md) | Lo que lleva todo PDF: fuentes incrustadas, PDF etiquetado, marcadores, título, idioma y PDF/UA-1 |
+| [El PDF](comun/pdf.md) | Lo que lleva todo PDF: fuentes incrustadas, accesibilidad, marcadores, título y PDF/UA-1 |
 | [Desbordamiento](comun/desbordamiento.md) | Nada puede desbordar: qué se comprueba y a quién se señala |
 | [Errores](comun/errores.md) | La política de errores, los niveles de validación, los códigos y sus tipos |
 | [Límites](comun/limites.md) | Páginas, píxeles y complejidad de los SVG que admite una conversión |
@@ -61,6 +61,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [Arquitectura](arquitectura.md) | Los packages, el flujo de datos y las clases principales |
 | [El árbol de cajas](implementacion/arbol.md) | Cómo se construye y se cierra el árbol: `BoxTreeBuilder`, `Style`, el schema |
 | [El layout](implementacion/layout.md) | `Engine`, `LayoutContext`, la caché, los tokens de corte y la paginación |
-| [El pintado](implementacion/pintado.md) | `StackingContext`, los lienzos y lo que escribe el PDF |
+| [El pintado](implementacion/pintado.md) | `StackingContext`, los lienzos, el texto, los bordes y las imágenes |
+| [El PDF por dentro](implementacion/pdf.md) | El árbol de estructura del PDF etiquetado, los *artifacts*, las anotaciones de enlace, los marcadores y los metadatos |
 | [Uso desde Java](implementacion/api.md) | `Converter`, `DocumentReader`, los tipos de error, los límites y los hilos |
 | [Pruebas](implementacion/pruebas.md) | Tests de referencia, ejemplos, catálogo de errores, el volcado de resultados y las pruebas de mutación |

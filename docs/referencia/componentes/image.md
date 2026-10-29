@@ -45,7 +45,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG o SVG: `Image: logos/acme.png`. |
-| `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura del PDF etiquetado; sin él, es decorativa. |
+| `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Rotate`, `Rotate origin` | ver [Capas y giro](../comun/capas-y-giro.md#giro-rotate) | — | Gira la imagen al pintarla (un sello, una etiqueta en diagonal). |
 
@@ -57,16 +57,11 @@ El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo ([Re
 `Image: logos/acme.png` es `resources/images/logos/acme.png`. Se admiten PNG (con transparencia), JPEG y SVG, y el formato
 se reconoce por el contenido, no por la extensión (un SVG es un fichero que empieza por `<`). Una `Image` sin ruta, un
 fichero que no existe o una ruta que sale de `images/` son un error (`IMAGE_UNKNOWN`); un fichero que no es PNG, JPEG ni un
-SVG admitido (GIF, WebP…) o que no se puede leer, también (`IMAGE_FORMAT`). Los ficheros se comprueban antes de maquetar,
-con las fuentes, y los errores señalan la línea de la `Image`.
+SVG admitido (GIF, WebP…) o que no se puede leer, también (`IMAGE_FORMAT`). Los errores señalan la línea de la `Image`.
 
-> **Decisión:** una `Image` sin ruta es un error al construir el árbol; que el fichero exista y sea legible se comprueba
-> antes de maquetar, con cualquier medidor de texto, porque el tamaño natural hace falta para el layout. Un `Alt` vacío es
-> `VALUE_NOT_ALLOWED`. *Alternativa descartada:* comprobar los ficheros solo al escribir el PDF, o aceptar el `Alt` vacío
-> como decorativa.
+Un XML que no es un SVG es también `IMAGE_FORMAT`. Un `Alt` vacío es `VALUE_NOT_ALLOWED`.
 
-> **Decisión:** el formato se reconoce por el contenido; un XML que no es SVG (otra raíz, o sin el espacio de nombres de
-> SVG) es `IMAGE_FORMAT` con un mensaje propio. *Alternativa descartada:* exigir la extensión `.svg`.
+> **Decisión:** el formato se reconoce por el contenido. *Alternativa descartada:* exigir la extensión `.svg`.
 
 ## Tamaño natural
 
@@ -75,9 +70,6 @@ Cada píxel mide 0,75 pt (96 píxeles por pulgada), sin mirar la resolución que
 `height` (en `px`, `pt`, `pc`, `in`, `cm` o `mm`; sin unidad, píxeles) o, si faltan, de su `viewBox`, también a 96 píxeles
 por pulgada; con solo uno de los dos lados y un `viewBox`, el otro sale de su proporción. Sin tamaño, o con medidas
 relativas (`%`, `em`), un SVG no tiene tamaño natural y es un error (`IMAGE_FORMAT`).
-
-> **Decisión:** el tamaño natural de un SVG sale de `width` y `height` con unidad absoluta o, si faltan, del `viewBox`; en
-> `%` o `em` no hay tamaño natural. *Alternativa descartada:* exigir `width`, `height` y `viewBox`.
 
 ## Dimensionado
 
@@ -98,22 +90,13 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
   él con la proporción. Es un mínimo de verdad: en una pista `1fr` de grid o en un ítem de `Flex` sin `Min width`, la imagen
   no encoge por debajo de él.
 
-> **Decisión:** la proporción es la de la caja de contenido, así que el relleno y el borde no deforman la imagen; un
-> `Aspect ratio` declarado sustituye a la del fichero. *Alternativa descartada:* la caja de borde, como en las demás cajas.
+Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.
 
-> **Decisión:** el alto de una imagen es siempre definido, porque sale de la proporción: no se estira en el eje cruzado de
-> un `Flex` en fila ni en vertical en un `Grid`. *Alternativa descartada:* estirarla y dejar que `Fit` la coloque.
+> **Decisión:** el alto de una imagen sale siempre de la proporción. *Alternativa descartada:* estirarla y dejar que `Fit`
+> la coloque.
 
-> **Decisión:** con los dos ejes `auto`, los mínimos y los máximos se aplican al ancho, el alto sale de la proporción y se
-> limita, y si ha cambiado, el ancho se vuelve a deducir de él; si no se pueden cumplir a la vez con la proporción, gana el
-> ancho y `Fit` coloca la imagen. *Alternativa descartada:* una tabla completa de casos para cada combinación de límites.
-
-> **Decisión:** los tamaños intrínsecos de una imagen son un mínimo de verdad, también con un `Width` en porcentaje: la
-> imagen no encoge por debajo de su ancho natural y, si no cabe, es un desbordamiento. *Alternativa descartada:* un
-> min-content de 0 con `Width` en porcentaje, que deja encoger la imagen.
-
-> **Decisión:** `Margin: 0 auto` centra una `Image` sin `Width`, porque mide su ancho natural y no ocupa todo el ancho: es
-> la excepción a `MARGIN_AUTO_WITHOUT_EFFECT` en flujo de bloque.
+> **Decisión:** los tamaños intrínsecos son un mínimo de verdad, también con un `Width` en porcentaje. *Alternativa
+> descartada:* un min-content de 0, que deja encoger la imagen.
 
 ## `Fit`
 
@@ -153,31 +136,18 @@ El texto de un SVG (`text`, `tspan`) usa solo las fuentes de `fonts/`, sin susti
 primera de la lista, y no puede ser una genérica como `sans-serif`), su `font-weight` (`normal` o `bold`) y su `font-style`
 (`normal` o `italic`), propios o heredados de sus antepasados en el fichero (un `g`, o el `text` de un `tspan`), deben ser
 una variante que exista, con todos los caracteres del texto. Esa variante es la que lo dibuja, siempre: un texto que repite
-un `use` conserva la fuente de su sitio en el fichero y no hereda la del `use`, y el resultado no depende del idioma de la
-JVM ni de otras carpetas de recursos con una familia del mismo nombre. Se dibuja con los contornos de la fuente: se ve como
-cualquier texto del documento, pero no se puede seleccionar ni se extrae del PDF.
+un `use` conserva la fuente de su sitio en el fichero y no hereda la del `use`. Se dibuja con los contornos de la fuente: se
+ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 
-> **Decisión:** el subconjunto de SVG es cerrado y estricto, con la línea del SVG en el mensaje: nada se ignora en silencio.
-> El precio es que un SVG exportado de un editor suele necesitar limpiarse. *Alternativa descartada:* ignorar lo que no se
-> dibuja, o admitir los metadatos y los atributos de los editores como inertes.
+> **Decisión:** el subconjunto de SVG es cerrado y estricto: nada se ignora en silencio, a cambio de que un SVG exportado
+> de un editor suela necesitar limpiarse. *Alternativa descartada:* ignorar lo que no se dibuja, o los metadatos de los
+> editores.
 
-> **Decisión:** las referencias de un SVG son solo internas: un `href` o un `url(…)` que no empiece por `#`, un DTD, una
-> entidad o una inclusión son errores, y además la librería de dibujo carga sin acceso a nada de fuera.
+> **Decisión:** el texto de un SVG usa la primera familia de `font-family`, sin sustitución; sin `font-family` es un error.
+> *Alternativa descartada:* probar las familias de la lista en orden.
 
-> **Decisión:** el texto de un SVG usa la primera familia de `font-family`, sin sustitución, y no puede ser una genérica;
-> sin `font-family` es un error, porque no hay fuente por defecto. *Alternativa descartada:* probar las familias de la
-> lista en orden.
-
-> **Decisión:** el texto de un SVG no es texto del PDF: la librería de dibujo lo pinta como contornos con la fuente de
-> `fonts/`, así que se ve igual pero no se puede seleccionar. Lo habitual en un documento accesible es que el texto vaya en
-> el documento, el SVG sea un dibujo y `Alt` dé el texto alternativo. *Alternativa descartada:* escribirlo como texto del PDF,
-> que la librería de dibujo no permite.
-
-> **Decisión:** el texto de un SVG se dibuja con el fichero de fuente que se comprobó, sin darlo de alta en el sistema: así
-> no depende del idioma de la JVM ni de otra carpeta de recursos con una familia del mismo nombre. Un texto que repite un
-> `<use>` conserva la fuente de su sitio en el fichero, de modo que lo que se dibuja es lo que se comprobó.
-> *Alternativa descartada:* que el motor dibujara el texto de los SVG con sus propias fuentes, que obligaba a reimplementar
-> la disposición del texto de SVG.
+> **Decisión:** el texto de un SVG no es texto del PDF: se ve igual, pero no se puede seleccionar. En un documento
+> accesible, el texto va en el documento, el SVG es un dibujo y `Alt` da el texto alternativo.
 
 ## Límites
 
@@ -188,24 +158,18 @@ que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORM
 
 ## Accesibilidad
 
-Con `Alt`, un texto no vacío, la imagen es un elemento `Figure` del PDF etiquetado con ese texto alternativo y su `BBox` (su
-caja de contenido en la página). Sin `Alt` es decorativa y se pinta como un *artifact*, igual que los fondos. Dentro de un
-`Fixed` es siempre un *artifact*, y en las filas repetidas de una tabla, solo es contenido la primera vez.
-
-> **Decisión:** el `BBox` de la `Figure` es la caja de contenido de la imagen, no la parte visible con `contain`.
-> *Alternativa descartada:* el rectángulo dibujado.
+Con `Alt`, un texto no vacío, la imagen es una figura que un lector de pantalla anuncia con ese texto. Sin `Alt` es
+decorativa y no se lee, igual que los fondos; dentro de un `Fixed`, siempre, y en las filas repetidas de una tabla, solo
+la primera vez.
 
 > **Decisión:** una `Image` sin `Alt` es decorativa, sin aviso. *Alternativa descartada:* hacer `Alt` obligatorio, con un
 > `Alt` vacío para las decorativas, si un olvido del autor resulta ser un problema.
 
 ## Salida
 
-El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal cual
-y el PNG sin pérdida y con su transparencia; un SVG, como un dibujo vectorial del tamaño del SVG que se escala a su caja. El
-SVG de depuración la incrusta como `data:`. En el volcado es una caja más.
-
-> **Decisión:** un SVG es un formulario del PDF de su tamaño natural, dibujado una vez por fichero, que se escala a su caja
-> con `Fit` como un PNG (`fill` deforma el dibujo).
+El PDF lleva cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal cual y
+el PNG sin pérdida y con su transparencia. Un SVG se escala a su caja como un PNG, pero sigue siendo un dibujo vectorial
+nítido a cualquier tamaño (`fill` deforma el dibujo).
 
 ## Lo que no hay
 

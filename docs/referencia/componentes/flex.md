@@ -62,9 +62,6 @@ demás propiedades van en ese elemento. El `Item` solo añade cómo participa en
 
 Con tamaño cruzado `auto`, el contenedor mide la suma de sus líneas más los huecos.
 
-> **Decisión:** el mínimo automático de un ítem es el tamaño de su contenido, nunca mayor que su `Width` (o `Height`)
-> declarado: un ítem con `Width: 400` y poco contenido encoge si no cabe.
-
 ### Reparto del espacio
 
 Espacio libre = disponible − suma de tamaños hipotéticos − huecos.
@@ -74,9 +71,8 @@ Espacio libre = disponible − suma de tamaños hipotéticos − huecos.
 - Un ítem que choca con su mínimo o máximo se **congela** en ese límite y el reparto se repite entre los demás.
 - Si la suma de factores de los ítems no congelados es menor que 1, solo se reparte esa fracción del espacio libre.
 
-> **Decisión:** al encoger, cada ítem cede en proporción a `Shrink × Basis` sin sus márgenes: dos ítems con `Basis: 300`,
-> uno con 10 de margen a cada lado, en 515, ceden lo mismo (52,5 cada uno). *Alternativa descartada:* ponderar con la base
-> más los márgenes, que hacía que un ítem con márgenes cediera de más.
+> **Decisión:** los márgenes no cuentan al encoger: dos ítems con `Basis: 300`, uno con 10 de margen a cada lado, en 515,
+> ceden lo mismo (52,5 cada uno). *Alternativa descartada:* ponderar con la base más los márgenes.
 
 ### Alineación en el eje principal
 

@@ -17,8 +17,6 @@ saliendo al trabajar y solo toca ese.
 
 ### Documentación
 
-- **Reducir los detalles técnicos de la referencia**, para que el manual baste para crear documentos y la referencia
-  quede para las reglas exactas.
 - **Repasar las decisiones de la referencia** (los bloques «Decisión»): están todas aplicadas, pero solo las de los hitos
   1 a 7 se repasaron juntas; las demás se tomaron al implementar cada hito.
 

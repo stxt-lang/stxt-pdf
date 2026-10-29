@@ -21,32 +21,25 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 ## Entradas
 
-Cada entrada es una caja `Flex` generada, en una fila, con tres cajas: el **título**, que es el texto del encabezado, con su
-número si lo lleva ([Encabezados](heading.md#numeración-numbered)), sus `Text` unidos por un espacio y sin formato en línea;
-la **guía**, que crece hasta llenar el hueco, con 4 pt a cada lado; y el **número de página**, que es un `{page of: …}` del
-encabezado, y se resuelve igual que el de cualquier otra referencia (paginando hasta que converja,
-[Referencias](../comun/referencias.md)). Un encabezado sin `Id` se refiere con un nombre generado. Sin guía
-(`Leader: none`), el título llena el hueco. Si el título no cabe en una línea, se parte, y el número queda en la primera
-línea.
+Cada entrada es una fila con tres partes: el **título**, que es el texto del encabezado, con su número si lo lleva
+([Encabezados](heading.md#numeración-numbered)), sus `Text` unidos por un espacio y sin formato en línea; la **guía**, que
+crece hasta llenar el hueco, con 4 pt a cada lado; y el **número de página**, que funciona como un `{page of: …}` del
+encabezado ([Referencias](../comun/referencias.md)), también si el encabezado no tiene `Id`. Sin guía (`Leader: none`), el
+título llena el hueco. Si el título no cabe en una línea, se parte, y el número queda en la primera línea.
 
-> **Decisión:** las entradas son cajas generadas al final de la construcción del árbol, cuando se conocen todos los
-> encabezados (también los de un `Markdown` y los posteriores al índice); el número es un `{page of: …}` como el que
-> escribiría el autor, así que no hay un mecanismo aparte para las páginas del índice. *Alternativa descartada:* dar `Id` a
-> lo generado, que saldría en los volcados.
+Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id` ([Enlaces](../comun/enlaces.md)).
 
-> **Decisión:** con un título largo, el número queda en la primera línea: la entrada es un `Flex` sin alineación por línea
-> base, y el título se parte. *Alternativa descartada:* alinear el número con la última línea, que pediría una alineación
-> por línea base que no existe.
+> **Decisión:** con un título largo, el número queda en la primera línea. *Alternativa descartada:* alinearlo con la
+> última, que pediría alinear por la línea base.
 
 ## Guía
 
 Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al número; con `rule`, una línea de 0,05
-veces el cuerpo, de un lado al otro del hueco. Se pintan sobre la línea base de la entrada y con el color del texto, como
-fondos (*artifacts*).
+veces el cuerpo, de un lado al otro del hueco. Se pintan sobre la línea base de la entrada y con el color del texto. Son
+dibujo, no texto: no se seleccionan ni se leen.
 
-> **Decisión:** la guía se pinta con rectángulos rellenos, sin texto: llena exactamente el hueco, sin caracteres
-> seleccionables ni puntos que contar en el texto del PDF, y es un *artifact*. *Alternativa descartada:* una guía de texto,
-> la letra «.» repetida, con un ancho que habría que calcular al maquetar.
+> **Decisión:** la guía es un dibujo que llena exactamente el hueco. *Alternativa descartada:* el carácter «.» repetido,
+> que se copiaría con el texto.
 
 ## Estilo
 
@@ -55,9 +48,7 @@ La entrada hereda la tipografía del `Contents`; sus cajas, la de la entrada. La
 izquierdo, y el espacio entre entradas, su `Margin` o su `Padding` vertical. Las propias entradas no llevan `Id` ni
 `Class`.
 
-> **Decisión:** las entradas se nombran en `Styles` con `Element: Contents entry N` aunque no se escriban: un elemento
-> generado que solo existe para las reglas. Los títulos, las guías y los números son cajas de la entrada y heredan de ella.
-> *Alternativa descartada:* una regla por parte (`Contents title`…), más fina y más larga de escribir.
+> **Decisión:** una regla por nivel, no por parte (`Contents title`…), que sería más fina y más larga de escribir.
 
 ## Errores
 
@@ -66,23 +57,12 @@ dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`); un `Contents` sin `Font` o 
 (`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Contents`). Un encabezado de una sección sin números de
 página no puede estar en un índice: se declara con `In contents: false`.
 
-> **Decisión:** un `Contents` sin ningún encabezado de sus niveles es un error, porque un índice sin entradas no tiene
-> efecto. `Levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2». *Alternativa descartada:* un
-> índice vacío, o `Levels: 2` como «hasta el 2».
+> **Decisión:** `Levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2».
 
-## PDF etiquetado
+## Accesibilidad
 
-Un `TOC` con un `TOCI` por entrada, cada uno con dos `Span` (el título y el número); la guía no es contenido. Los marcadores
-no cambian ([El PDF](../comun/pdf.md#marcadores)).
-
-## Enlace
-
-Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id` ([Enlaces](../comun/enlaces.md)); en el PDF
-etiquetado, el `Link` de cada `TOCI` envuelve el título y el número.
-
-## Volcado
-
-Solo sale el `Contents`, si tiene `Id`: sus entradas no.
+Un lector de pantalla lo anuncia como un índice, con cada entrada como un enlace a su encabezado. Los marcadores del PDF no
+cambian ([El PDF](../comun/pdf.md#marcadores)).
 
 ## Lo que no hay
 

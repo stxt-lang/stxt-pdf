@@ -42,9 +42,8 @@ Document (dev.stxt.pdf):
 		Paragraph: El anexo, apaisado, vuelve a la página 1.
 ```
 
-> **Decisión:** el medio es siempre una secuencia de páginas: no hay un modo continuo para pantalla, y por eso el área útil
-> tiene siempre alto definido y un porcentaje vertical en una caja de primer nivel es válido. *Alternativa descartada:*
-> conservar un modo continuo, a costa de un caso especial en la paginación, el desbordamiento y el alto definido.
+> **Decisión:** el medio es siempre una secuencia de páginas, así que el área útil tiene siempre alto definido.
+> *Alternativa descartada:* un modo continuo para pantalla.
 
 ## `Media`
 
@@ -83,23 +82,16 @@ es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer
 nivel de cada sección y de los `Fixed`, y su alto es siempre definido.
 
-> **Decisión:** el papel se llama `Paper` y no `Size`, que ya es el tamaño de la fuente (cada nombre tiene una sola
-> definición en el namespace). Los tamaños son los de ISO 216 redondeados a puntos enteros, como se usan siempre
-> (A4 = 595 × 842), y Letter y Legal, exactos. *Alternativa descartada:* los valores exactos con decimales
-> (A4 = 595,28 × 841,89), que no coinciden con los documentos que escriben 595 × 842.
-
-> **Decisión:** el tamaño se declara de una sola forma y los errores son todos `MEDIA_SIZE`, que es el tamaño del medio.
-> *Alternativa descartada:* un código propio para el papel, o que `Paper` sustituya a `Width` y `Height` en silencio.
+> **Decisión:** los tamaños ISO 216 van redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842); Letter y
+> Legal son exactos. *Alternativa descartada:* los valores con decimales (A4 = 595,28 × 841,89).
 
 ## `Title` y `Language`
 
 `Document` exige exactamente un `Title` (un texto no vacío; si no, `VALUE_NOT_ALLOWED`) y exactamente un `Language` (una
 etiqueta BCP 47: `es`, `en-US`, `ca`…; si no, `VALUE_NOT_ALLOWED`); si falta cualquiera de los dos, `TOO_FEW_CHILDREN`. No
 afectan al layout, salvo que `Language` da las reglas de las mayúsculas de `Transform`
-([Formato del texto](../comun/formato-del-texto.md#mayúsculas-transform)). Van al PDF ([El PDF](../comun/pdf.md)) como
-título del documento (información, metadatos XMP y el que muestra el visor) e idioma del contenido etiquetado. Los dos son
-obligatorios porque son características de accesibilidad: un lector de pantalla necesita el idioma para leer el contenido,
-y el visor muestra el título en lugar del nombre del fichero (PDF/UA-1, 7.1).
+([Formato del texto](../comun/formato-del-texto.md#mayúsculas-transform)). El título es el que muestra el visor, y el idioma,
+el que usa un lector de pantalla; los dos son obligatorios para que el PDF sea accesible ([El PDF](../comun/pdf.md)).
 
 ## `Section`
 
@@ -108,7 +100,7 @@ contenido está en alguna.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Id` | texto | — | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). No se vuelca como caja. |
+| `Id` | texto | — | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). |
 | `Class` | nombres separados por espacios | — | Le aplican las reglas `For class` con esos nombres; como `For id` y `Element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
 | `Media` | como el del documento | el del documento | Ver [abajo](#el-media-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
@@ -130,22 +122,9 @@ Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
   secciones, en orden), `Styles`, los `Id` (únicos en todo el documento) y la convergencia de las referencias son del
   documento, no de la sección.
 
-> **Decisión:** `Section` es el único contenido de `Document`: el flujo y los elementos posicionados van dentro, y no hay
-> sección implícita para el contenido suelto. Así la separación está siempre a la vista. *Alternativa descartada:* aceptar
-> contenido suelto como una sección implícita.
+> **Decisión:** no hay sección implícita para el contenido suelto: la separación está siempre a la vista.
 
-> **Decisión:** el `Id` de una sección es un hijo `Id`, no el valor: en este schema el valor de un elemento es su contenido
-> (la ruta de `Image`, la colocación de `Area`) y `Id` es una sola definición en todo el namespace. *Alternativa
-> descartada:* `Section: nombre`.
-
-> **Decisión:** las reglas que llegan a una sección solo pueden dar `Typography`. No hay `Background` de página ni número
-> inicial (`Start`).
-
-> **Decisión:** una sección sin contenido es un error: una página en blanco que nadie escribió es un valor por defecto
-> silencioso. *Alternativa descartada:* una página en blanco.
-
-> **Decisión:** el documento sigue siendo uno para la jerarquía de encabezados, los índices y `Styles`: se comprueban en el
-> orden del documento, atravesando las secciones (un `Heading 1` en cada sección es correcto).
+> **Decisión:** una sección sin contenido es un error, no una página en blanco que nadie escribió.
 
 ### El `Media` de una sección
 
@@ -154,9 +133,8 @@ entero o se declara entero, y `Margin` se hereda o se declara. Una sección que 
 del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado); si el documento declara `Width` y
 `Height` no hay papel que girar y es `MEDIA_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `MEDIA_SIZE`.
 
-> **Decisión:** el `Media` de una sección hereda por grupos: el tamaño es un grupo y `Margin` otro, cada uno heredado entero
-> o declarado entero, así que `Orientation: landscape` sola da el papel del documento apaisado. *Alternativa descartada:*
-> un `Media` completo en cada sección.
+> **Decisión:** herencia por grupos, para que `Orientation: landscape` sola dé el papel del documento apaisado.
+> *Alternativa descartada:* un `Media` completo en cada sección.
 
 ### `Fixed` del documento y de la sección
 
@@ -166,12 +144,10 @@ una `Section`, solo en las suyas. `Pages` cuenta dentro del alcance donde se dec
 Los del documento se pintan antes que los de la sección. `Inherit fixed: false` en un documento sin `Fixed`, que no tiene
 efecto, no es un error: una plantilla puede ponerlos después.
 
-> **Decisión:** un `Fixed` del documento sale en todas las secciones que lo heredan y `Pages` cuenta dentro del alcance
-> donde se declara; `Inherit fixed: false` sin `Fixed` en el documento no es un error. *Alternativa descartada:* `Pages`
-> contado siempre en páginas físicas del documento.
+Un `Fixed` del documento no está en ningún flujo: su posición estática es la esquina del área útil.
 
-> **Decisión:** un `Fixed` del documento se coloca, en cada página, como si su posición estática fuera la esquina del área
-> útil (no está en ningún flujo), y se pinta antes que los de la sección: los dos no tienen un árbol común que los ordene.
+> **Decisión:** `Pages` cuenta dentro del alcance donde se declara. *Alternativa descartada:* contar siempre las páginas
+> físicas del documento.
 
 ### Numeración de las páginas
 
@@ -186,31 +162,11 @@ cae en una página sin número (el `Fixed` del documento en una portada que lo h
 deja en blanco. Los marcadores, los enlaces y `Pages` siguen la página física. Un encabezado de una sección `none` no puede
 estar en un índice (`In contents: false`).
 
-> **Decisión:** la numeración es un contador por documento con `continue`, `restart` y `none`, y `{pages}` es el último
-> número de la tanda. El nombre no puede ser `Numbering`, que ya es una propiedad de `Markdown`. *Alternativa descartada:*
-> un `Start` para empezar en otro número (pendiente).
+Como el contador no avanza en una sección `none`, una sección `continue` detrás de una portada empieza en 1. El visor
+muestra también el número impreso ([El PDF](../comun/pdf.md#páginas)).
 
-> **Decisión:** lo que se imprime manda: `{page of: id}` y las entradas de los índices dan el número del contador, no el de
-> la página física, para que el índice y el pie coincidan; lo que no tiene número es un error, nunca un hueco vacío. Los
-> marcadores y los enlaces siguen la página física, y las etiquetas de página del PDF llevan la numeración impresa.
-> *Alternativa descartada:* dejar el hueco vacío.
-
-> **Decisión:** el contador no avanza en una sección `none`, así que una sección `continue` detrás de una portada empieza
-> en 1; un `Fixed` de una sección cuenta sus `Pages` con las páginas de la sección, aunque sean las 4 a 6 del documento.
-
-### PDF
-
-Cada página tiene el tamaño del `Media` de su sección. El PDF etiquetado agrupa cada sección en un `Sect` (con `Lang`, si
-cambia su idioma), y las etiquetas de página (`PageLabels`) llevan el número impreso, o ninguno en las páginas sin número;
-solo se escriben si alguna página no es su número físico ([El PDF](../comun/pdf.md)).
-
-### Volcado
-
-Una sección no se vuelca como caja, aunque tenga `Id`; sus cajas con `Id` sí, con las coordenadas de la página de su
-sección ([Pruebas](../implementacion/pruebas.md#el-volcado)).
-
-> **Decisión:** una sección no se vuelca como caja: es la página, no una caja. Su `Id` sí es un destino de `Link` y de
-> `{page of: id}`. *Alternativa descartada:* volcar el rango de páginas.
+> **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan; lo que no tiene número es un error, nunca
+> un hueco vacío. *Alternativa descartada:* dejar el hueco vacío.
 
 ## Lo que no hay
 

@@ -52,9 +52,8 @@ de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Mul
 |---|---|---|---|
 | `Isolate` | booleano | `false` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Solo en `Block` y `Relative`. |
 
-> **Decisión:** `Isolate` solo está en `Block` y `Relative`: en los demás no tendría efecto (`Absolute`, `Fixed` y los ítems
-> ya crean un contexto de formato de bloque; `Flex`, `Grid` y `Text` no tienen hijos en flujo de bloque). Un `Block` que es
-> ítem lo admite aunque no tenga efecto, porque el schema no sabe si está en un `Item`.
+> **Decisión:** `Isolate` solo está donde puede tener efecto: `Absolute`, `Fixed` y los ítems ya aíslan, y `Flex`, `Grid`
+> y `Text` no tienen hijos en flujo de bloque. Un `Block` que es ítem lo admite aunque no tenga efecto.
 
 ## Tamaños intrínsecos
 
@@ -65,9 +64,9 @@ El min-content de un `Block` es el máximo del min-content de sus hijos, y su ma
 
 Un `Block` se parte entre sus hijos, o dentro del hijo que no cabe ([Cortes](../comun/cortes.md)).
 
-## Salida PDF
+## Accesibilidad
 
-Un `Block` es un `Div` del PDF etiquetado ([El PDF](../comun/pdf.md#accesibilidad)).
+Un `Block` agrupa su contenido sin anunciarse: un lector de pantalla lee lo que contiene ([El PDF](../comun/pdf.md#accesibilidad)).
 
 ## Lo que no hay
 

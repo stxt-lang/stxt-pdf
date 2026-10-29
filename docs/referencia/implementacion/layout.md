@@ -57,6 +57,12 @@ Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que 
 deja pasar los suyos); el padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
 guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockFormattingContext()` dice qué cajas lo cortan.
 
+## Grid
+
+> **Decisión:** un ítem de grid estirado se maqueta siempre otra vez con su alto fijado, aunque mida lo mismo que al
+> medirlo, para que sus hijos tengan la base definida que promete la regla del alto definido. Cuesta un layout más por ítem
+> estirado. *Alternativa descartada:* repetirlo solo si algún descendiente usa porcentajes verticales.
+
 ## Cajas posicionadas
 
 Los algoritmos no maquetan los hijos `Absolute` y `Fixed`; los devuelven como `PendingAbsolute` con su posición estática, y
@@ -104,9 +110,18 @@ cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (gar
 cabecera y pie con `UnitBreaker.Repeat`. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
 tipo); el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
+El contenido de un `Multicol` va en una caja generada, el flujo de columnas (`Element.COLUMNS`), su único hijo: cada
+columna es un fragmento de esa caja, maquetado con los algoritmos de siempre. Las columnas solo están al principio del
+contenedor de fragmentos (`atFragmentainerStart`) si lo está el `Multicol`, y los cortes entre columnas no cuentan para el
+padre: el corte de página tiene la calidad del de la última columna.
+
+> **Decisión:** el flujo de columnas es una caja generada. *Alternativa descartada:* que el `Multicol` apile los hijos él
+> mismo, repitiendo el flujo de bloque.
+
 `MulticolLayout` maqueta el flujo de columnas una vez por columna con `context.layout`, con el alto de la columna como
 `fragmentainerRemaining` y el token de la columna anterior como `from`; cada columna es un fragmento suyo. El equilibrado es
-una búsqueda binaria del alto mínimo.
+una búsqueda binaria del alto mínimo, con precisión de 0,001 pt, que rechaza los altos con cortes entre columnas peores
+que los del reparto en orden.
 
 ## Texto
 

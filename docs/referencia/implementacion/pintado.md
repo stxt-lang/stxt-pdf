@@ -120,6 +120,10 @@ de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de si
 `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde manda `ImageFit` y restablece los guiones antes de
 dibujarlo. JSVG dibuja el texto como contornos.
 
+> **Decisión:** el texto de un SVG son contornos, no texto del PDF, porque JSVG no permite otra cosa. *Alternativa
+> descartada:* que el motor dibujara el texto de los SVG con sus propias fuentes, que obligaba a reimplementar la
+> disposición del texto de SVG.
+
 > **Decisión:** un formulario hereda el estado gráfico, y el modo de depuración deja activo el patrón de guiones de los
 > contornos: `PdfCanvas.image` restablece los guiones (`[] 0 d`) dentro de su `q … Q` antes de dibujar el formulario.
 

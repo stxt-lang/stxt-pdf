@@ -439,7 +439,7 @@ class PdfCanvasTest {
      * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
      * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
      * lleva la {@code OBJR} de la anotación; el de un {@code Fixed}, que no es contenido, es un
-     * {@code Link} suelto del {@code Document} con su {@code Alt} (referencia/comun/enlaces.md).
+     * {@code Link} suelto del {@code Document} con su {@code Alt} (referencia/implementacion/pdf.md).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -509,7 +509,7 @@ class PdfCanvasTest {
 
     /**
      * Un enlace de texto que ocupa varias líneas es un solo {@code Link} con un contenido marcado y una
-     * {@code OBJR} por línea; las zonas son una por línea (referencia/comun/enlaces.md).
+     * {@code OBJR} por línea; las zonas son una por línea (referencia/implementacion/pdf.md).
      */
     @Test
     void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
@@ -614,7 +614,7 @@ class PdfCanvasTest {
     /**
      * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
      * solo es contenido (y envuelve el texto de la celda) en la primera; en las demás es un {@code Link}
-     * suelto del {@code Document} (referencia/comun/enlaces.md).
+     * suelto del {@code Document} (referencia/implementacion/pdf.md).
      */
     @Test
     void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {

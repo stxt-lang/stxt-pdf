@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las anotaciones de enlace del PDF (referencia/comun/enlaces.md): una por zona clicable, sin borde
+ * Las anotaciones de enlace del PDF (referencia/implementacion/pdf.md): una por zona clicable, sin borde
  * visible. Un enlace a una URL lleva su acción {@code URI}; uno a una caja del documento ({@code
  * #id}) lleva un destino con la página y la posición de esa caja, que no se conoce hasta que se
  * han pintado todas las páginas (el enlace puede ir hacia delante): se apunta aquí y

@@ -22,9 +22,8 @@ también `Break` e `Isolate`.
 > (`Absolute` > `Flex`), con una caja más. *Alternativa descartada:* que fueran envoltorios de un elemento, como `Area`, que
 > se leería peor en el caso habitual (un sello, una cabecera).
 
-> **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página; `Widows` y
-> `Orphans` van en `Typography` y se admiten, porque se heredan. Sus descendientes sí admiten `Break` (el schema no
-> distingue dónde está un `Block`), aunque tampoco se parten.
+> **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página. Sus
+> descendientes sí lo admiten, aunque tampoco se parten, y `Widows` y `Orphans`, que se heredan, también.
 
 ## `Relative`
 
@@ -68,8 +67,7 @@ caja si estuviera en flujo:
   superior de la propia caja, que se suma después según la ecuación;
 - dentro de un `Flex` o un `Grid`, la esquina superior izquierda de su caja de contenido.
 
-Las cajas posicionadas fuera de flujo se resuelven cuando su contenedor de referencia ya conoce su tamaño, después del
-layout en flujo. Un `Absolute` se pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia
+Un `Absolute` se coloca cuando su contenedor de referencia ya tiene su tamaño, con el contenido en flujo colocado. Se pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia
 esté más arriba ([Capas y giro](../comun/capas-y-giro.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
 su posición, y si su contenedor de referencia está partido, se resuelve contra el fragmento de esa página
 ([Cortes](../comun/cortes.md#lo-que-no-se-parte)). Puede ocupar los márgenes de la página, pero no salirse de ella
@@ -83,8 +81,8 @@ lo heredan, y uno hijo de una `Section`, solo en las suyas ([Document](document.
 Los `Fixed` no reservan espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de la
 página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de su posición estática
 (desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
-todas en las que sale. Todo lo que hay dentro de un `Fixed` es un *artifact* del PDF etiquetado: no forma parte del
-contenido, así que no puede tener encabezados (`HEADING_IN_FIXED`) ni ser el destino de un enlace o una referencia.
+todas en las que sale. Lo que hay dentro de un `Fixed` es decoración de la página, no contenido: un lector de pantalla no
+lo lee, y no puede tener encabezados (`HEADING_IN_FIXED`) ni ser el destino de un enlace o una referencia.
 
 > **Decisión:** un `Fixed` se admite en cualquier contenedor, no solo como hijo de `Document` o de una sección: su posición
 > estática es la de su sitio en el documento. *Alternativa descartada:* solo como hijo de `Document` y de `Section`, que es
@@ -110,13 +108,11 @@ mismo con él o sin él. Una portada a sangre, con otro margen y sin numeración
 ninguna página (`not-first` en un documento de una sola) es válido y no se comprueba (`BOX_OVERFLOW` solo mira los que
 salen). Si un `Fixed` contiene otro, el de dentro sale solo donde salen los dos, cada uno con su `Pages`.
 
-> **Decisión:** `Pages` es una propiedad del `Fixed`, no un sistema de páginas con nombre: cuenta las páginas desde la 1 de
-> su alcance, y en un documento de una sola página `first` y `last` coinciden. *Alternativa descartada:* páginas con nombre
-> y reglas por tipo de página, más general y más pesado.
+> **Decisión:** `Pages` es una propiedad del `Fixed`, no un sistema de páginas con nombre. En un documento de una sola
+> página, `first` y `last` coinciden. *Alternativa descartada:* páginas con nombre y reglas por tipo de página.
 
-> **Decisión:** un `Fixed` con `Pages` no reserva sitio donde sale ni donde no: el flujo es el mismo con él o sin él. Uno que
-> no sale en ninguna página es válido, y uno dentro de otro sale solo donde salen los dos. *Alternativa descartada:* que
-> empuje el flujo, que rompe el modelo de `Fixed` como caja fuera de flujo.
+> **Decisión:** un `Fixed` no empuja el flujo en las páginas donde sale. *Alternativa descartada:* que reservara su sitio,
+> que rompe el modelo de caja fuera de flujo.
 
 ## Lo que no hay
 

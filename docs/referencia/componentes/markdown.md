@@ -1,8 +1,8 @@
 # `Markdown`
 
-Un `Markdown` es un bloque cuyo contenido se escribe en Markdown, en su `Content`. Al construir el árbol, ese contenido se
-**traduce a los elementos que ya existen**, y lo generado se trata como si lo hubiera escrito el autor: pasa por el schema,
-por las reglas de `Styles`, por la validación ([Errores](../comun/errores.md)) y por el PDF etiquetado y los marcadores. El
+Un `Markdown` es un bloque cuyo contenido se escribe en Markdown, en su `Content`. Ese contenido se **traduce a los
+elementos que ya existen**, y lo generado se trata como si lo hubiera escrito el autor: las mismas reglas de `Styles`, los
+mismos errores ([Errores](../comun/errores.md)), los marcadores y la accesibilidad. El
 `Markdown` es la caja que lo contiene, un bloque como un `Block`: admite `Id`, `Class`, `Box`, `Typography` y `Break`, y lo
 generado hereda su `Typography`. No admite `Link`: su contenido lleva sus propios enlaces.
 
@@ -60,15 +60,9 @@ Document (dev.stxt.pdf):
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
-> **Decisión:** el Markdown se traduce a nodos STXT, no a cajas: lo generado (`Heading N`, `Paragraph`, `List`, `Table`…)
-> se construye como cualquier otro elemento, así que las reglas de `Styles`, la validación, el PDF etiquetado y los
-> marcadores no tienen ningún caso especial, y lo generado se valida además contra el schema. *Alternativa descartada:*
-> construir las cajas directamente desde el árbol del parser de Markdown.
-
-> **Decisión:** las propiedades que no se usan no son un error: un `Bullet` sin listas con viñetas, o un `Table columns`
-> sin tablas, se aceptan, aunque en general lo que no tiene efecto es un error. El contenido de un Markdown cambia a menudo
-> y obligaría a quitar y poner las propiedades; su valor sí se comprueba siempre. *Alternativa descartada:* el error de
-> siempre de lo que no tiene efecto.
+> **Decisión:** las propiedades que no se usan no son un error (un `Bullet` sin listas), aunque en general lo que no tiene
+> efecto lo es: el contenido de un Markdown cambia a menudo y obligaría a quitar y poner las propiedades. Su valor sí se
+> comprueba siempre.
 
 ## El subconjunto
 
@@ -98,19 +92,11 @@ final de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: 
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
 la cabecera. Un `Markdown` sin contenido, o un encabezado o un párrafo sin texto, es `TEXT_CONTENT`.
 
-> **Decisión:** el tachado exige dos tildes (`~x~` queda como texto), como el resto de la sintaxis, que dobla el
-> delimitador. *Alternativa descartada:* el tachado con una tilde.
+Un `Bullet` o un `Numbering` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
+`Link`.
 
-> **Decisión:** lo vacío usa `TEXT_CONTENT` y lo que el subconjunto no puede traducir, `MARKDOWN_UNSUPPORTED`, también un
-> encabezado dentro de un ítem de lista y una tabla sin filas debajo de la cabecera; un `Bullet` o un `Numbering` con un
-> marcador del otro tipo es `VALUE_NOT_ALLOWED`. *Alternativa descartada:* un código para cada caso.
-
-> **Decisión:** la etiqueta de lenguaje de un bloque de código es un error: no hay resaltado y no tendría efecto, como el
-> título de un enlace o de una imagen. *Alternativa descartada:* ignorarla.
-
-> **Decisión:** los enlaces con título y las definiciones de enlaces aparte son errores: el destino se escribe en el propio
-> enlace, y una imagen dentro de un enlace también lo es, porque una imagen va sola en su párrafo; una imagen clicable es
-> una `Image` con `Link`. *Alternativa descartada:* admitir las definiciones.
+> **Decisión:** lo que no tendría efecto (la etiqueta de lenguaje de un bloque de código, el título de un enlace) es un
+> error, no se ignora.
 
 ## Texto
 
@@ -139,19 +125,11 @@ así que las líneas con código en línea no cambian de alto.
 `FONT_UNKNOWN`, con la línea de `Code font` para un bloque y la del párrafo para el código en línea. Un texto con
 `Inline: markdown` no tiene `Code font`, así que su código sigue siendo `MARKDOWN_UNSUPPORTED`.
 
-> **Decisión:** `Code font` es una propiedad del `Markdown`, como `Bullet` (obligatoria solo si hay código), no de
-> `Typography`: por eso un texto con `Inline: markdown` no tiene código. *Alternativa descartada:* `Code font` en
-> `Typography`, heredable, que valdría también en `Inline: markdown`.
+> **Decisión:** `Code font` es del `Markdown`, no de `Typography`: por eso un texto con `Inline: markdown` no tiene
+> código. *Alternativa descartada:* `Code font` en `Typography`, heredable.
 
-> **Decisión:** el código en línea es un tramo con otra familia, no un elemento: se suma a la negrita y la cursiva que lo
-> rodean, puede ir dentro de un enlace y no cambia el alto de la línea ni la línea base, que son los de la fuente de la
-> caja. *Alternativa descartada:* un código en línea que conserve los espacios, o con la altura de línea de su fuente.
-
-> **Decisión:** el bloque de código es el elemento generado `Code block`, que las reglas `Element` nombran como las entradas
-> de un `Contents` y que no se escribe en el documento. Sigue siendo un texto (un `P` en el PDF etiquetado), sin caja
-> envoltorio: su fondo y su relleno los da `Element: Code block`, y `Element: Text` ya no lo alcanza. *Alternativa
-> descartada:* un `Code block` también escribible, o una clase automática `code`, que reservaría un nombre de clase al
-> autor.
+> **Decisión:** el bloque de código es un elemento generado que solo nombran las reglas. *Alternativa descartada:* un
+> `Code block` también escribible, o una clase automática `code`, que reservaría un nombre de clase al autor.
 
 ## Listas
 
@@ -162,9 +140,8 @@ una `List` dentro del `List item`. Las listas compactas y las separadas por lín
 entre ítems lo dan las reglas de `Styles`. Como cualquier lista, la sangría que deja sitio al marcador es su `Padding`
 izquierdo, que se suele declarar en la regla `Element: List` ([List](list.md)).
 
-> **Decisión:** el nivel de una lista se cuenta por tipo: una lista numerada dentro de una con viñetas usa el primer marcador
-> de `Numbering`, y `Start` solo se genera si el primer número no es 1. *Alternativa descartada:* un nivel común a los dos
-> tipos.
+> **Decisión:** el nivel se cuenta por tipo: una lista numerada dentro de una con viñetas usa el primer marcador de
+> `Numbering`. *Alternativa descartada:* un nivel común a los dos tipos.
 
 ## Tablas
 
@@ -173,9 +150,8 @@ la de la caja. Una celda con texto es una `Cell` con valor; una vacía, una `Cel
 cabecera se le añaden celdas vacías y las que sobran se descartan. Las celdas reciben las reglas de las celdas de cualquier
 tabla ([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Header`).
 
-> **Decisión:** las filas con celdas de menos o de más siguen a GFM: se completan con celdas vacías y las que sobran se
-> descartan, sin error, a diferencia de una `Table` escrita en STXT. El parser no conserva las celdas que sobran.
-> *Alternativa descartada:* contar las celdas de cada línea en el texto y dar el error.
+> **Decisión:** las filas con celdas de menos o de más siguen a GFM, sin error, a diferencia de una `Table` escrita en
+> STXT.
 
 ## Estilo
 
@@ -202,17 +178,11 @@ la tabla); los del marcador de una lista, la de `Bullet` o `Numbering`, y los de
 `Table columns`. Una lista o una tabla sin su propiedad, o código sin `Code font`, es un error con la línea de la lista, la
 tabla o el código (`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es.
 
-> **Decisión:** las líneas de los errores son las del principio de cada bloque: los de un párrafo de varias líneas señalan
-> la primera, y los de una celda, la de su fila, porque el parser no da la línea de cada celda. *Alternativa descartada:*
-> posiciones dentro del bloque.
+Los errores de un párrafo de varias líneas señalan la primera; los de una celda, la de su fila.
 
-## Salida
+## Accesibilidad
 
-En el PDF etiquetado, el `Markdown` es un `Div` y lo generado cuelga de él con sus etiquetas (`H1`, `P`, `L`, `Table`…); sus
-encabezados son marcadores. En el volcado solo sale el `Markdown`, si tiene `Id`: lo generado no lo tiene.
-
-> **Decisión:** el `Markdown` es un `Div` en el PDF etiquetado, como un `Block`, y lo generado cuelga de él. *Alternativa
-> descartada:* que no tenga elemento propio y lo generado cuelgue de su padre.
+Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tablas, y sus encabezados son marcadores.
 
 ## Lo que no hay
 

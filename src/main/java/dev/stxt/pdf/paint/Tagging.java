@@ -5,9 +5,9 @@ import dev.stxt.pdf.tree.Box;
 
 /**
  * Lo que un lienzo hace con el significado de lo que pinta, aparte de dibujarlo: las secuencias de texto del PDF
- * etiquetado (referencia/comun/pdf.md) y las zonas de los enlaces (referencia/comun/enlaces.md). Cada {@link Canvas} da
- * la suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que solo dibuja,
- * {@link #NONE}, que no hace nada. No cambia lo que se ve.
+ * etiquetado (referencia/implementacion/pdf.md) y las zonas de los enlaces (referencia/comun/enlaces.md). Cada {@link
+ * Canvas} da la suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que
+ * solo dibuja, {@link #NONE}, que no hace nada. No cambia lo que se ve.
  */
 public interface Tagging {
 
@@ -32,12 +32,12 @@ public interface Tagging {
 
     /**
      * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},
-     * son su contenido (el PDF etiquetado lo marca, referencia/comun/pdf.md).
+     * son su contenido (el PDF etiquetado lo marca, referencia/implementacion/pdf.md).
      */
     void beginText(Box box);
 
     /**
-     * Empieza el texto de un enlace dentro del texto de la caja (referencia/comun/enlaces.md): como
+     * Empieza el texto de un enlace dentro del texto de la caja (referencia/implementacion/pdf.md): como
      * {@link #beginText(Box)}, pero lo que sigue, hasta {@link #endText()}, es el contenido de un
      * {@code Link} del PDF etiquetado. Las zonas clicables de ese texto ({@link #link}) se piden
      * después de empezarlo.

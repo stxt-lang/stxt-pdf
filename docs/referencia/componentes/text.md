@@ -22,20 +22,15 @@ Text:
 
 `Font` y `Size` son obligatorios, propios o heredados ([Tipografía](../comun/tipografia.md)).
 
-> **Decisión:** el texto va en el valor o en `Content >>`, uno de los dos. `Content` es un bloque, así que `Content: algo`
-> es un error del schema: el texto corto va en el valor. Un `Text` vacío es un error. *Alternativa descartada:* `Content`
-> en línea o en bloque, que da dos formas de escribir el texto corto.
+> **Decisión:** `Content` va siempre en bloque (`Content: algo` es un error): el texto corto va en el valor. Un `Text`
+> vacío es un error. *Alternativa descartada:* `Content` también en línea, dos formas de escribir lo mismo.
 
 ## `Paragraph`
 
 Un `Text` con significado: admite lo mismo (`Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y el texto en el valor o
 en `Content`) y se maqueta igual. Es **un solo párrafo**: una línea en blanco en su `Content` es un error
 (`PARAGRAPH_BLANK_LINE`, en la línea de la línea en blanco); para varios párrafos se usan varios `Paragraph`. `Text` sigue
-existiendo como caja de texto sin significado. Su significado se ve en las reglas `Element: Paragraph` y en el PDF
-etiquetado.
-
-> **Decisión:** `Paragraph` es un solo párrafo: una línea en blanco en su `Content` es un error, aunque en un `Text` separa
-> párrafos. *Alternativa descartada:* permitirlo, con un elemento del PDF etiquetado que contiene varios párrafos.
+existiendo como caja de texto sin significado. El significado se usa en las reglas `Element: Paragraph`.
 
 ## Dónde va el texto
 
@@ -52,10 +47,10 @@ min-content = la palabra más ancha; max-content = el párrafo más largo en una
 
 Un texto se parte entre líneas, respetando `Widows` y `Orphans` de cada párrafo ([Cortes](../comun/cortes.md)).
 
-## Salida PDF
+## Accesibilidad
 
-Un `Text` y un `Paragraph` son un `P` del PDF etiquetado; el `Text` de un encabezado es un `Span` del texto del encabezado
-([El PDF](../comun/pdf.md#accesibilidad)). Un `Text` con varios párrafos es un solo `P`.
+Un lector de pantalla lee un `Text` y un `Paragraph` como un párrafo, también un `Text` con varios párrafos; los `Text` de
+un encabezado son el texto del encabezado ([El PDF](../comun/pdf.md#accesibilidad)).
 
 ## Lo que no hay
 

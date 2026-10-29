@@ -20,7 +20,8 @@ documentos se maquetan en páginas de tamaño fijo y se escriben en un PDF con l
 
 - **Léete la [arquitectura](docs/referencia/arquitectura.md)** antes de tocar el código, y la página de implementación de la
   parte que vayas a cambiar ([árbol](docs/referencia/implementacion/arbol.md), [layout](docs/referencia/implementacion/layout.md),
-  [pintado](docs/referencia/implementacion/pintado.md), [uso desde Java](docs/referencia/implementacion/api.md),
+  [pintado](docs/referencia/implementacion/pintado.md), [el PDF por dentro](docs/referencia/implementacion/pdf.md),
+  [uso desde Java](docs/referencia/implementacion/api.md),
   [pruebas](docs/referencia/implementacion/pruebas.md)).
 - **El manual no menciona CSS ni HTML**: explica los conceptos como si no existieran. La referencia tampoco: el modelo se
   inspiró en CSS, pero no lo es ni lo pretende. Todo debe ser claro, definido y sencillo, sin interpretaciones.

@@ -94,13 +94,11 @@ contenedor; las columnas en porcentaje se comportan como `auto` solo al calcular
 cuando todavía no hay ancho. Los márgenes `auto` de un ítem son un error: la alineación se hace con `Horizontal` y
 `Vertical`.
 
-> **Decisión:** lo que le falta a un ítem que cruza alguna fracción se reparte entre las fracciones que ocupa, en proporción
-> a su `fr`, y solo crecen las fracciones con mínimo intrínseco: así un ítem que cruza columnas `1fr` no desborda su área.
+> **Decisión:** lo que le falta a un ítem que cruza alguna fracción solo lo reciben las fracciones, en proporción a su
+> `fr`: así un ítem que cruza columnas `1fr` no desborda su área.
 
-> **Decisión:** el max-content de un ítem de varias pistas se reparte contando las bases ya subidas por su min-content: con
-> columnas `50 auto 1fr`, hueco 10 y un ítem de max-content 400 en las dos primeras, la `auto` mide 340 y el área del ítem
-> 400. *Alternativa descartada:* calcularlo con las bases de antes, que daba otra vez lo ya dado (la `auto` llegaba a 480 y
-> el área a 540).
+> **Decisión:** el max-content se reparte contando las bases ya subidas: con columnas `50 auto 1fr`, hueco 10 y un ítem de
+> max-content 400 en las dos primeras, la `auto` mide 340 y el área del ítem, 400 (y no 480 y 540).
 
 ## Alineación en el área
 
@@ -109,10 +107,6 @@ declarado, ocupa toda el área y se repite su layout. Con `start`, `end` o `cent
 desplaza. Los porcentajes de alto de un ítem se resuelven contra el alto de su área en el layout final; al dimensionar las
 filas, todavía sin área, cuentan como `auto`. Un ítem estirado en vertical tiene un alto definido
 ([Valores](../comun/valores.md#alto-definido)).
-
-> **Decisión:** un ítem estirado se maqueta siempre con su alto fijado, aunque mida lo mismo que al medirlo, para que sus
-> hijos tengan la base definida que promete la regla del alto definido. Cuesta un layout más por ítem estirado.
-> *Alternativa descartada:* repetirlo solo si algún descendiente usa porcentajes verticales.
 
 ## Tamaños intrínsecos
 

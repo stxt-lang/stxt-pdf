@@ -37,7 +37,7 @@ Table:
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Columns` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
-| `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila: en el PDF etiquetado, `TH` con `Scope: Row`. No vale en `Head` (`TABLE_HEADER`). |
+| `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`TABLE_HEADER`). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -51,12 +51,7 @@ arriba con un `Span` de varias filas. Cada fila llena **exactamente** todas las 
 vacía se escribe `Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo a otro (de `Head` a `Body`, de `Body` a
 `Foot`) ni se solapa con otra celda (`TABLE_SPAN`).
 
-> **Decisión:** el envoltorio de los ítems de `Grid` se llama `Area`, para dejar `Cell` a la celda de tabla, que sí es una
-> caja y se puede nombrar en `Element`. *Alternativa descartada:* `Cell` en `Grid` y `Table cell` en la tabla, más largo en
-> lo que más se repite de una tabla y con dos «celdas» distintas en el namespace.
-
-> **Decisión:** `Span: 1 1` explícito se admite aunque no tenga efecto: es el valor por defecto escrito, no una
-> contradicción, como `Start: 1` en una lista.
+`Span: 1 1` explícito se admite: es el valor por defecto escrito, no una contradicción.
 
 ## Celdas
 
@@ -66,14 +61,9 @@ un bloque con elementos (cualquiera salvo los encabezados), o vacía si no tiene
 `Header`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
 Los márgenes de una celda la separan de su área, como en un `Grid`.
 
-> **Decisión:** los márgenes de una `Cell` son los de un ítem de grid: separan la caja de la celda de su área.
-> *Alternativa descartada:* un error si una celda declara `Margin`.
-
-> **Decisión:** `Header: true` se escribe en cada celda que es cabecera de su fila (el concepto de una factura, la hora de
-> un horario), no en la tabla: es lo más flexible (la etiqueta de un pie de totales, la tercera columna de una agenda) a
-> costa de repetirlo. Es del elemento y no va en `Styles`. En `Head` es un error porque no tendría efecto: sus celdas ya son
-> cabeceras de columna. *Alternativa descartada:* `Header columns: N` en la `Table`, que no repite pero solo sirve para
-> columnas enteras.
+> **Decisión:** `Header: true` va en cada celda que es cabecera de su fila (el concepto de una factura, la hora de un
+> horario): sirve también para la etiqueta de un pie de totales o la tercera columna de una agenda. *Alternativa
+> descartada:* `Header columns: N` en la `Table`, que solo sirve para columnas enteras.
 
 ## Estilo de las celdas
 
@@ -96,25 +86,13 @@ La prioridad de todas ellas está en [Styles](../comun/estilos.md#prioridad). La
 reciben estas mismas reglas; su `Align` sale de la fila de separación de la tabla (`:--`, `--:`), que lo declara cada celda
 y gana a todo lo demás.
 
-> **Decisión:** las reglas de posición son valores de `Element`, no elementos nuevos: el elemento de la caja sigue siendo
-> `Cell` y se aplican además de la regla `Element: Cell`. La cebra cuenta solo las filas del cuerpo, y la fila de una celda
-> con `Span` de varias filas es la primera de las que ocupa. *Alternativa descartada:* que `Row` admita `Box` y una regla
-> `Element: Row`, que no cubre el `Typography` de la celda.
-
-> **Decisión:** `For column` es una columna o un rango de menor a mayor, ambas incluidas (no una lista), y se aplica a las
-> celdas que empiezan en una de ellas. Si dos se solapan, se aplican en el orden de `Styles`, como las clases; una regla que
-> no se aplica a ninguna celda no es un error. *Alternativa descartada:* `n m` como lista de columnas sueltas.
-
-> **Decisión:** `Column align` es una propiedad de `Table`, no un hijo de `Columns`, que es un nodo compartido con `Grid`.
-> Es el valor por defecto más bajo de `Align` en las celdas, pero por encima de la regla `Element: Cell` (el tipo es más
-> general que una columna concreta): así una cabecera centrada con `Head cell` gana a la alineación de su columna, y un
-> `Element: Cell` con `Align` no deja la propiedad sin efecto. *Alternativa descartada:* por debajo también de
-> `Element: Cell`, o por encima de todas las reglas.
+Si dos `For column` se solapan, se aplican en el orden de `Styles`, como las clases.
 
 > **Decisión:** dentro de una celda, de menos a más fuerte: `Element: Cell`, `Column align`, las reglas de posición (grupo y
-> luego fila), `For column`, las clases de la `Row`, las clases de la celda, `For id` y lo propio de la celda. La fila de
-> totales gana a la cebra y a la columna, y una celda suelta lo puede romper con su clase. *Alternativa descartada:* que la
-> posición gane a la columna, o la clase de la fila por debajo de `For column`.
+> luego fila), `For column`, las clases de la `Row`, las clases de la celda, `For id` y lo propio de la celda. Así la fila de
+> totales gana a la cebra y a la columna, una cabecera centrada gana a la alineación de su columna y una celda suelta lo
+> puede romper con su clase. *Alternativa descartada:* que la posición gane a la columna, o `Column align` por debajo de
+> `Element: Cell`.
 
 ## Filas
 
@@ -125,18 +103,9 @@ dentro de ella. Una celda no declara `Break`, ni siquiera desde una regla (`STYL
 su `Row`: el `Break` de la fila lo declara la `Row`). Las filas de la tabla no tienen propiedad de tamaño: miden lo que su
 celda más alta.
 
-> **Decisión:** el `Break` de una `Row` es el de sus celdas, porque la fila no es una caja: los cortes entre filas salen de
-> las reglas de corte del grid. Su `Typography` se aplica como herencia, así que `Element: Cell` le gana. *Alternativa
-> descartada:* que la `Row` sea una caja con su `Box` (fondo de fila), pintada detrás de sus celdas.
-
-> **Decisión:** el `Class` de una `Row` aplica sus reglas `For class` a cada una de sus celdas, y la fila no pasa a ser una
-> caja: no tiene `Box` ni `Id`. *Alternativa descartada:* que `Row` admita un `Box`, que se repetiría en cada celda (un
-> `Border` o un `Padding` de fila saldría entre celdas), o selectores por posición de la fila (`Last row cell`), que
-> identifican la fila de totales por su sitio y no por lo que es.
-
-> **Decisión:** una regla de la clase de una `Row` no da `Break` a sus celdas: los cortes de una fila los declara la `Row`.
-> *Alternativa descartada:* tomarlo como el `Break` de la fila, el único caso en que una regla daría `Break` a algo que no
-> lo admite.
+> **Decisión:** la fila no es una caja. *Alternativa descartada:* que `Row` admita un `Box`, que se repetiría en cada celda
+> (un `Border` de fila saldría entre celdas), o selectores por posición de la fila (`Last row cell`), que identifican la
+> fila de totales por su sitio y no por lo que es.
 
 ## Cortes
 
@@ -153,29 +122,17 @@ cabe en el sitio que dejan se parte en paralelo, como cualquier fila, y si no se
 (`PAGE_OVERFLOW`). Las cajas `Absolute` y `Fixed` de las celdas de la cabecera y el pie solo van en el primer fragmento de
 la tabla.
 
-> **Decisión:** `TABLE_REPEAT_OVERFLOW` es solo cuando la cabecera y el pie no dejan sitio al cuerpo al principio de una
-> página, no cuando no caben con una fila entera: una fila más alta que el sitio que dejan se parte en paralelo, así que una
-> celda con un párrafo largo en una tabla con cabecera no es un error. *Alternativa descartada:* exigir una fila entera del
-> cuerpo en cada página.
+> **Decisión:** una celda con un párrafo largo en una tabla con cabecera no es un error: se parte. *Alternativa
+> descartada:* exigir una fila entera del cuerpo en cada página.
 
-> **Decisión:** el pie va detrás de la última fila del cuerpo de cada página, no pegado al final del área útil: el fragmento
-> de la tabla mide lo que su contenido. *Alternativa descartada:* estirar el último fragmento de cada página hasta el final
-> del área útil.
+> **Decisión:** el pie va detrás de la última fila del cuerpo, no pegado al final del área útil. *Alternativa descartada:*
+> estirar la tabla hasta el final de cada página.
 
-> **Decisión:** las cajas `Absolute` y `Fixed` de las celdas que se repiten solo van en el primer fragmento de la tabla.
-> *Alternativa descartada:* repetirlas con su fila.
+## Accesibilidad
 
-## Salida PDF
-
-Una `Table` es `Table`; `Head`, `Body` y `Foot` son `THead`, `TBody` y `TFoot`; cada fila, `TR`, y cada celda, `TH` en `Head`
-(con `Scope: Column`), `TH` con `Scope: Row` si declara `Header: true` en `Body` o `Foot` (la cabecera de su fila: un lector
-de pantalla la anuncia con cada celda de la fila) y `TD` en el resto, con los atributos `RowSpan` y `ColSpan` si ocupa más
-de una fila o columna. La cabecera y el pie son contenido en la primera página en que salen; donde se repiten, son
-*artifacts*, como los `Fixed`, y el texto de la tabla se lee una sola vez.
-
-> **Decisión:** la cabecera y el pie repetidos son *artifacts* salvo en la primera página en que sale cada celda: el árbol
-> de estructura tiene una sola `THead` y una sola `TFoot`, y un lector de pantalla no lee la cabecera en cada página.
-> *Alternativa descartada:* marcar cada repetición como contenido de la misma celda.
+Un lector de pantalla lee la tabla como tabla: las celdas de `Head` son las cabeceras de su columna y las que declaran
+`Header: true`, las de su fila, y las anuncia con cada celda. La cabecera y el pie repetidos se leen una sola vez, en la
+primera página en que salen.
 
 ## Lo que no hay
 
