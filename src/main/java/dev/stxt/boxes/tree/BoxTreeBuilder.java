@@ -3,7 +3,6 @@ package dev.stxt.boxes.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
-import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Rotation;
 import dev.stxt.boxes.model.TextRun;
 
@@ -33,7 +32,6 @@ import static dev.stxt.boxes.tree.Nodes.error;
 import static dev.stxt.boxes.tree.Nodes.inline;
 import static dev.stxt.boxes.tree.Nodes.is;
 import static dev.stxt.boxes.tree.Nodes.isElement;
-import static dev.stxt.boxes.tree.Nodes.unread;
 import static dev.stxt.boxes.tree.PropertyReader.FLEX;
 import static dev.stxt.boxes.tree.PropertyReader.GRID;
 import static dev.stxt.boxes.tree.PropertyReader.MULTICOL;
@@ -46,12 +44,9 @@ import static dev.stxt.boxes.tree.PropertyReader.multicol;
 import static dev.stxt.boxes.tree.PropertyReader.typography;
 import static dev.stxt.boxes.tree.TableBuilder.cellText;
 import static dev.stxt.boxes.tree.TableBuilder.table;
-import static dev.stxt.boxes.tree.ValueReader.LENGTH_OR_AUTO;
 import static dev.stxt.boxes.tree.ValueReader.angle;
 import static dev.stxt.boxes.tree.ValueReader.bool;
 import static dev.stxt.boxes.tree.ValueReader.enumValue;
-import static dev.stxt.boxes.tree.ValueReader.integer;
-import static dev.stxt.boxes.tree.ValueReader.sides;
 
 /**
  * Construye el árbol de cajas a partir del documento (ESPECIFICACION.md §5.1): traduce cada
@@ -251,61 +246,7 @@ public final class BoxTreeBuilder {
             item(wrapper, s, parent.style().gridAreas);
         }
         ctx.rules.apply(n, kind, s, parent, position);
-        String id = null;
-        Double rotate = null;
-        double[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
-        for (Node p : n.getChildren()) {
-            String name = p.getCanonicalName();
-            if (isElement(p) || NOT_PROPERTIES.contains(name)) {
-                continue;
-            }
-            if (kind == Element.FLEX && FLEX.contains(name)) {
-                flex(p, s);
-                continue;
-            }
-            if ((kind == Element.GRID || kind == Element.TABLE) && GRID.contains(name)) {
-                grid(p, s);
-                continue;
-            }
-            if (kind == Element.MULTICOL && MULTICOL.contains(name)) {
-                multicol(p, s);
-                continue;
-            }
-            switch (name) {
-                case "box" -> box(inline(p), s);
-                case "typography" -> typography(inline(p), s);
-                case "break" -> {
-                    if (parent.headingLevel() > 0) {
-                        throw error(p, ErrorCode.BREAK_IN_HEADING, "Un Text de un encabezado no admite Break: "
-                                + "el motor ya evita cortar dentro del encabezado y después de él");
-                    }
-                    fragmentation(inline(p), s);
-                }
-                default -> {
-                    s.declared(name, p.getLine());
-                    switch (name) {
-                        case "id" -> id = ctx.id(p);
-                        case "offset" -> s.offset = sides(p, LENGTH_OR_AUTO, true);
-                        case "layer" -> s.layer = integer(p);
-                        case "pages" -> s.pages = enumValue(Style.Pages.class, p);
-                        case "rotate" -> rotate = angle(p);
-                        case "rotate-origin" -> rotateOrigin = ValueReader.rotateOrigin(p);
-                        case "marker" -> s.listMarker = enumValue(Style.Marker.class, p);
-                        case "start" -> s.listStart = integer(p);
-                        case "number" -> s.listNumber = integer(p);
-                        case "isolate" -> s.isolate = bool(p);
-                        case "link" -> s.link = link(p);
-                        case "header" -> s.header = bool(p);
-                        case "in-contents" -> s.inContents = bool(p);
-                        case "alt" -> s.alt = alt(p);
-                        case "fit" -> s.fit = enumValue(Style.Fit.class, p);
-                        case "levels" -> ContentsBuilder.levels(p, s);
-                        case "leader" -> s.contentsLeader = enumValue(Style.Leader.class, p);
-                        default -> throw unread(p);
-                    }
-                }
-            }
-        }
+        String id = properties(ctx, n, kind, s, parent);
         if (kind == Element.CELL) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
@@ -325,9 +266,6 @@ public final class BoxTreeBuilder {
         }
         if (kind == Element.IMAGE) {
             validateImage(s);
-        }
-        if (rotate != null) {
-            s.rotation = new Rotation(rotate, rotateOrigin[0], rotateOrigin[1]);
         }
         validateRotation(s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
@@ -391,6 +329,65 @@ public final class BoxTreeBuilder {
             ctx.contents.add(box);
         }
         return box;
+    }
+
+    /**
+     * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Flex}, {@code Grid} y
+     * {@code Table}, {@code Multicol}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
+     */
+    private String properties(BuildContext ctx, InlineNode n, Element kind, Style s, Box parent) {
+        String id = null;
+        Double rotate = null;
+        double[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
+        for (Node p : n.getChildren()) {
+            String name = p.getCanonicalName();
+            if (isElement(p) || NOT_PROPERTIES.contains(name) || ownProperty(kind, p, s)) {
+                continue;
+            }
+            switch (name) {
+                case "box" -> box(inline(p), s);
+                case "typography" -> typography(inline(p), s);
+                case "break" -> {
+                    if (parent.headingLevel() > 0) {
+                        throw error(p, ErrorCode.BREAK_IN_HEADING, "Un Text de un encabezado no admite Break: "
+                                + "el motor ya evita cortar dentro del encabezado y después de él");
+                    }
+                    fragmentation(inline(p), s);
+                }
+                case "id" -> {
+                    s.declared(name, p.getLine());
+                    id = ctx.id(p);
+                }
+                case "rotate" -> {
+                    s.declared(name, p.getLine());
+                    rotate = angle(p);
+                }
+                case "rotate-origin" -> {
+                    s.declared(name, p.getLine());
+                    rotateOrigin = ValueReader.rotateOrigin(p);
+                }
+                default -> PropertyReader.single(p, s);
+            }
+        }
+        if (rotate != null) {
+            s.rotation = new Rotation(rotate, rotateOrigin[0], rotateOrigin[1]);
+        }
+        return id;
+    }
+
+    /** Lee una propiedad propia del tipo del elemento: las de {@code Flex}, {@code Grid} y {@code Table}, o {@code Multicol}. */
+    private static boolean ownProperty(Element kind, Node p, Style s) {
+        String name = p.getCanonicalName();
+        if (kind == Element.FLEX && FLEX.contains(name)) {
+            flex(p, s);
+        } else if ((kind == Element.GRID || kind == Element.TABLE) && GRID.contains(name)) {
+            grid(p, s);
+        } else if (kind == Element.MULTICOL && MULTICOL.contains(name)) {
+            multicol(p, s);
+        } else {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -472,25 +469,6 @@ public final class BoxTreeBuilder {
                     + "images/ de los recursos: Image: logos/acme.png");
         }
         box.setImage(path);
-    }
-
-    /** El destino de un {@code Link} (§5.20): una URL admitida o {@code #id}; que el {@code Id} exista se comprueba al final. */
-    private static String link(Node p) {
-        String destination = p.getText().trim();
-        Links.problem(destination).ifPresent(problem -> {
-            throw error(p, ErrorCode.LINK_SCHEME, "Link: " + problem);
-        });
-        return destination;
-    }
-
-    /** El texto alternativo de una {@code Image}: no vacío; para una imagen decorativa, no se declara. */
-    private static String alt(Node p) {
-        String alt = p.getText().trim();
-        if (alt.isEmpty()) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto; si la imagen es decorativa, "
-                    + "quita Alt");
-        }
-        return alt;
     }
 
     /** El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos. */

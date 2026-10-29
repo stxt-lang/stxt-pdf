@@ -6,11 +6,13 @@ import dev.stxt.boxes.model.Cell;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
 import dev.stxt.boxes.model.GridAreas;
+import dev.stxt.boxes.model.Links;
 import dev.stxt.boxes.model.Value;
 import dev.stxt.boxes.model.ValueParser;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static dev.stxt.boxes.tree.Nodes.error;
@@ -18,6 +20,7 @@ import static dev.stxt.boxes.tree.Nodes.isItemElement;
 import static dev.stxt.boxes.tree.Nodes.parse;
 import static dev.stxt.boxes.tree.Nodes.placement;
 import static dev.stxt.boxes.tree.Nodes.unread;
+import static java.util.Map.entry;
 import static dev.stxt.boxes.tree.ValueReader.LENGTH;
 import static dev.stxt.boxes.tree.ValueReader.LENGTH_OR_AUTO;
 import static dev.stxt.boxes.tree.ValueReader.SIZE;
@@ -48,7 +51,8 @@ import static dev.stxt.boxes.tree.ValueReader.value;
  * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Multicol} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
- * <p>Los {@code switch} no tienen una rama {@code default} que asigne: lo que el schema admite
+ * <p>Los {@code switch} no tienen una rama {@code default} que asigne, y las tablas
+ * ({@code Typography} y las propiedades sueltas) no tienen entrada por defecto: lo que el schema admite
  * y no se lee es un error del motor ({@code SchemaCoverageTest}).</p>
  */
 final class PropertyReader {
@@ -59,6 +63,51 @@ final class PropertyReader {
     static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
     /** Propiedades del elemento {@code Multicol}. */
     static final Set<String> MULTICOL = Set.of("count", "column-width", "column-gap", "rule", "rule-color", "fill");
+
+    /** Lee una propiedad en el estilo; su línea ya está apuntada. */
+    @FunctionalInterface
+    private interface Property {
+        void read(Node p, Style s);
+    }
+
+    /** Grupo {@code Typography}, por nombre canónico. */
+    private static final Map<String, Property> TYPOGRAPHY = Map.ofEntries(
+            entry("font", (p, s) -> s.font = fontFamily(p)),
+            entry("weight", (p, s) -> s.fontWeight = enumValue(FontWeight.class, p)),
+            entry("style", (p, s) -> s.fontStyle = enumValue(FontStyle.class, p)),
+            entry("size", (p, s) -> s.fontSize = positive(p)),
+            entry("line-height", (p, s) -> s.lineHeight = value(p, LENGTH, false)),
+            entry("align", (p, s) -> s.textAlign = enumValue(Style.TextAlign.class, p)),
+            entry("color", (p, s) -> s.color = color(p)),
+            entry("text-wrap", (p, s) -> s.textWrap = enumValue(Style.TextWrap.class, p)),
+            entry("inline", (p, s) -> s.inline = enumValue(Style.Inline.class, p)),
+            entry("transform", (p, s) -> s.transform = enumValue(Style.Transform.class, p)),
+            entry("letter-spacing", (p, s) -> s.letterSpacing = signedPoints(p)),
+            entry("small-caps", (p, s) -> s.smallCaps = bool(p)),
+            entry("ligatures", (p, s) -> s.ligatures = bool(p)),
+            entry("white-space", (p, s) -> s.whiteSpace = enumValue(Style.WhiteSpace.class, p)),
+            entry("tab-size", (p, s) -> s.tabSize = positiveInteger(p)),
+            entry("numbered", (p, s) -> s.numbered = bool(p)),
+            entry("widows", (p, s) -> s.widows = positiveInteger(p)),
+            entry("orphans", (p, s) -> s.orphans = positiveInteger(p)),
+            entry("language", (p, s) -> s.locale = Locale.forLanguageTag(language(p))));
+
+    /** Propiedades sueltas de los elementos ({@link #single}), por nombre canónico. */
+    private static final Map<String, Property> SINGLE = Map.ofEntries(
+            entry("offset", (p, s) -> s.offset = sides(p, LENGTH_OR_AUTO, true)),
+            entry("layer", (p, s) -> s.layer = integer(p)),
+            entry("pages", (p, s) -> s.pages = enumValue(Style.Pages.class, p)),
+            entry("marker", (p, s) -> s.listMarker = enumValue(Style.Marker.class, p)),
+            entry("start", (p, s) -> s.listStart = integer(p)),
+            entry("number", (p, s) -> s.listNumber = integer(p)),
+            entry("isolate", (p, s) -> s.isolate = bool(p)),
+            entry("link", (p, s) -> s.link = link(p)),
+            entry("header", (p, s) -> s.header = bool(p)),
+            entry("in-contents", (p, s) -> s.inContents = bool(p)),
+            entry("alt", (p, s) -> s.alt = alt(p)),
+            entry("fit", (p, s) -> s.fit = enumValue(Style.Fit.class, p)),
+            entry("levels", ContentsBuilder::levels),
+            entry("leader", (p, s) -> s.contentsLeader = enumValue(Style.Leader.class, p)));
 
     private PropertyReader() {
     }
@@ -94,29 +143,46 @@ final class PropertyReader {
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
             s.declared(PropertyKey.internal(name), p.getLine());
-            switch (name) {
-                case "font" -> s.font = fontFamily(p);
-                case "weight" -> s.fontWeight = enumValue(FontWeight.class, p);
-                case "style" -> s.fontStyle = enumValue(FontStyle.class, p);
-                case "size" -> s.fontSize = positive(p);
-                case "line-height" -> s.lineHeight = value(p, LENGTH, false);
-                case "align" -> s.textAlign = enumValue(Style.TextAlign.class, p);
-                case "color" -> s.color = color(p);
-                case "text-wrap" -> s.textWrap = enumValue(Style.TextWrap.class, p);
-                case "inline" -> s.inline = enumValue(Style.Inline.class, p);
-                case "transform" -> s.transform = enumValue(Style.Transform.class, p);
-                case "letter-spacing" -> s.letterSpacing = signedPoints(p);
-                case "small-caps" -> s.smallCaps = bool(p);
-                case "ligatures" -> s.ligatures = bool(p);
-                case "white-space" -> s.whiteSpace = enumValue(Style.WhiteSpace.class, p);
-                case "tab-size" -> s.tabSize = positiveInteger(p);
-                case "numbered" -> s.numbered = bool(p);
-                case "widows" -> s.widows = positiveInteger(p);
-                case "orphans" -> s.orphans = positiveInteger(p);
-                case "language" -> s.locale = Locale.forLanguageTag(language(p));
-                default -> throw unread(p);
-            }
+            read(TYPOGRAPHY, p, s);
         }
+    }
+
+    /**
+     * Una propiedad suelta de un elemento, fuera de los grupos (§4.2 y siguientes): {@code Offset}, {@code Marker},
+     * {@code Link}, {@code Alt}… Su línea se guarda con su nombre. {@code Id}, {@code Rotate} y
+     * {@code Rotate origin} no van en el estilo de la misma forma y los lee {@link BoxTreeBuilder}.
+     */
+    static void single(Node p, Style s) {
+        s.declared(p.getCanonicalName(), p.getLine());
+        read(SINGLE, p, s);
+    }
+
+    /** Lee la propiedad con su entrada de la tabla; si no la tiene, es una propiedad del schema que no se lee. */
+    private static void read(Map<String, Property> table, Node p, Style s) {
+        Property property = table.get(p.getCanonicalName());
+        if (property == null) {
+            throw unread(p);
+        }
+        property.read(p, s);
+    }
+
+    /** El destino de un {@code Link} (§5.20): una URL admitida o {@code #id}; que el {@code Id} exista se comprueba al final. */
+    private static String link(Node p) {
+        String destination = p.getText().trim();
+        Links.problem(destination).ifPresent(problem -> {
+            throw error(p, ErrorCode.LINK_SCHEME, "Link: " + problem);
+        });
+        return destination;
+    }
+
+    /** El texto alternativo de una {@code Image}: no vacío; para una imagen decorativa, no se declara. */
+    private static String alt(Node p) {
+        String alt = p.getText().trim();
+        if (alt.isEmpty()) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto; si la imagen es decorativa, "
+                    + "quita Alt");
+        }
+        return alt;
     }
 
     /** Grupo {@code Break}: los cortes de página, que no se heredan. */
