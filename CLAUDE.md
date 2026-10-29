@@ -363,7 +363,10 @@ dependencia nueva se decide y se apunta allí.
   ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso).
 - **Texto largo:** cada página maqueta el texto desde otra línea, así que la `LayoutCache` no
   ayuda; `InlineLayout` memoriza el reparto en líneas por caja y ancho disponible (si no, el
-  coste crece con el cuadrado de las páginas; lo vigila `LongTextTest`). **Volver a paginar no vacía la caché**
+  coste crece con el cuadrado de las páginas; lo vigila `LongTextTest`). El reparto voraz (`LineBreaker.greedy`) suma
+  los avances de las palabras y los espacios de la línea en curso y solo mide la línea entera cuando la suma queda a
+  menos de `Tolerance.MODEL` del ancho disponible (PF-06): el reparto es el mismo que midiéndola siempre
+  (`LineBreakerPropertiesTest` lo compara con ese algoritmo). **Volver a paginar no vacía la caché**
   (PF-03): cuando el total de páginas necesita otra cifra (`Engine.reservePageDigits`) o cambia la página de una
   referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo que la
   `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`), porque el resultado de
@@ -446,7 +449,8 @@ dependencia nueva se decide y se apunta allí.
   de `Relative` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo existe en los fragmentos: `Box` no guarda posición ni tamaño.
 - **`TextMeasurer`**: `FixedMetrics` (cada carácter = `0.5 × tamaño`) es el de `new Engine()` y
   el de todos los tests de layout, y no necesita fuentes; `PdfMetrics` da las métricas reales de
-  las fuentes TTF de `Resources` y es el que usa `Converter`.
+  las fuentes TTF de `Resources` y es el que usa `Converter`. Un medidor tiene que ser **aditivo entre palabras** (el
+  ancho de un texto es la suma de los de sus palabras y espacios): los dos repartos en líneas suman.
   `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics` comprueba que
   existen las fuentes y tienen todos los caracteres (errores con línea).
 - **Recursos (§5.11):** carpeta fija, por defecto `resources/` del directorio de trabajo, con

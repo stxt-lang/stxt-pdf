@@ -78,7 +78,7 @@ casi nada de código copiado (ver [DRY](#dry)) y un modelo inmutable en el layou
 | PF-03 | Vaciar toda la caché al subir las cifras de `{pages}` o las referencias | Media | M | hecho |
 | PF-04 | Listas y recorridos que se recalculan por llamada | Baja | S | hecho |
 | PF-05 | Fuentes leídas dos veces y arranque en frío | Baja | S | pendiente |
-| PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | pendiente |
+| PF-06 | El reparto en líneas mide la línea entera por cada palabra | Media | M | hecho |
 | AR-01 | `BoxTreeBuilder.element` (SRP, OCP, KISS) | Alta | L | hecho |
 | AR-02 | `Style`: 70 campos públicos mutables | Alta | L | hecho |
 | AR-03 | `Box` mutable y con campos públicos | Media | M | hecho |
@@ -115,6 +115,7 @@ a otra; lo que importa son las proporciones. Repetir con `tools/qa/`.
 | Bombas de imagen (`BombsProbe`, JVM de 512 MB) | PNG sin transparencia: 64 Mpx en 4,6 s, 144 Mpx en 4,3 s, 900 Mpx (106 KB) en 23 s; con transparencia: 64 Mpx en 5,3 s, 144 Mpx (547 KB) `OutOfMemoryError` (13 s con 1,5 GB); JPEG de 400 Mpx: 0,5 s. SVG con los límites de JSVG subidos: 300 000 rectángulos 5,4 s (PDF de 4 MB), 100 000 `<use>` 1,8 s, 2000 niveles bien, **20 000 niveles `StackOverflowError`**, 10⁹ elementos por `<use>` `OutOfMemoryError` a los 51 s. Con los límites por defecto de JSVG (2000 elementos y 30 niveles) falla incluso un SVG legítimo de 3000 rectángulos |
 | Tras la sesión 4, SVG con texto | Formulario PDF de los 10 SVG con texto idéntico en `en` y en `tr` (antes, en `tr`, de 1 a 19 KB menos: dibujados con `Dialog`; `AwtFontProbe` muestra la causa); `mvn test` en turco deja el árbol limpio. `ConcurrencyProbe` en la misma máquina, antes y después: 7,7 a 10,0 s y 7,8 a 10,1 s, 0 diferencias de bytes; 1.ª ronda en frío 2,1 a 2,2 s y 1,9 a 2,1 s |
 | Tras la sesión 5, paginación | `ScaleProbe`, layouts por página: 96 páginas 22,8; 100 páginas de 46,0 a 23,0; 153 de 45,8 a 22,9; 657 de 43,0 a 21,5; índice de 163 páginas de 57,1 a 33,0. Layout: 657 páginas de 1459 a 794 ms; 153 de 394 a 283; índice de 364 a 225. Perfil del layout (JFR, pilas enteras): `LineBreaker.breakParagraphs` 71,5 %, `FontFile.width` 21,6 %, `TextRun.Joiner` ≈ 19 %, `PdfMetrics.validate` ≈ 8 % (PF-06) |
+| Tras PF-06, layout | `ScaleProbe`, medianas de tres: 657 páginas de 743 a 430 ms, 153 de 197 a 96, 100 de 167 a 103, índice de 163 páginas de 246 a 164; 15 layouts seguidos de las 657 páginas, de ≈ 575 a ≈ 235 ms en caliente. El reparto en líneas pasa del 71,5 % a ≈ 24 % del perfil |
 
 ## QA
 
@@ -520,6 +521,22 @@ del 19 %. Con `Text wrap: normal`, por cada palabra que se añade a la línea se
 suma queda a menos de `Tolerance.MODEL` del ancho disponible, para que las decisiones sean exactamente las de hoy.
 **Aceptación.** El mismo reparto (ningún PNG ni volcado cambia) y `ScaleProbe` con el layout al menos un 30 % más rápido.
 
+**Hecho (después de la sesión 10), en cuatro commits.** (1) `LineBreaker.greedy` lleva la suma de los avances de las
+palabras y los espacios de la línea en curso, cada uno medido una vez, y construye y mide la línea entera solo cuando la
+suma queda a menos de `Tolerance.MODEL` del ancho disponible (la propuesta). Hace falta: sin esa medida exacta, el
+redondeo de la suma cambia algún corte justo en el límite (lo detecta el test). `TextMeasurer` dice ahora que su ancho es
+aditivo entre palabras, que `pretty` ya suponía (decisión 321). (2) `LineBreaker.paragraphs` recorre el texto en vez de
+buscar `\S+` y cortar cada hueco, y una palabra de un solo tramo no pasa por `TextRun.Joiner`. (3) `PdfMetrics.validate`
+busca `{page}`, `{pages}` y las referencias solo donde hay una llave, y `FontFile.has` memoriza los caracteres del plano
+básico. (4) `PdfMetrics` recuerda la última fuente (buscarla en cada palabra era el 12 %) y un texto sin formato no busca
+su tramo. Tests nuevos en `LineBreakerPropertiesTest`: el reparto es el del algoritmo de antes (3000 textos con formato,
+métricas reales, ligaduras, interletraje y anchos justo en el límite) y las palabras, las de la expresión regular (20 000
+textos con todos los espacios en blanco). Ningún PDF, PNG, SVG ni volcado cambia. **Medido** (`ScaleProbe`, tres veces
+alternando con el código de antes; medianas del layout): 657 páginas de 743 a 430 ms (−42 %), 153 de 197 a 96 (−51 %),
+100 de 167 a 103 (−38 %), índice de 163 páginas de 246 a 164 (−33 %); en caliente (15 layouts seguidos de las 657
+páginas), de unos 575 a unos 235 ms. Lo que queda del layout de texto largo en el perfil: el reparto (≈ 24 %, ya
+lineal), `FontFile.width` (≈ 10 %), construir las líneas (`LineBreaker.line`) y `PdfMetrics.validate` (≈ 4 %).
+
 ## Arquitectura
 
 ### Lo que está bien (no tocar)
@@ -846,3 +863,4 @@ Las sesiones 7 a 10 son refactorizaciones grandes: cada tarea puede ocupar una s
 | 2026-10-29 | 9 · Algoritmos y lienzos (hecha) | AR-04 (`LayoutContext`, despacho con `EnumMap`, un doble en `ImageLayoutTest`), AR-12 (reglas de dirección como datos en `ArchitectureTest`), AR-05 (`Canvas` solo dibuja; `Tagging` aparte, `Canvas.tagging()`), AR-06 (`PdfCanvas` de 788 a 318 líneas: `PdfDocumentWriter`, `PdfContent`, `PdfTagging`, `PdfFonts`, `PdfGradients`; un solo `io`) y AR-07 (`Element.Role`; solo el despacho de `Engine` nombra un elemento fuera de `tree`). Decisión 316. 1398 tests en verde; los PDF de los ejemplos y los golden, iguales byte a byte, y los 54 SVG de los golden, iguales. | Sesión 10: partir `Style` (AR-02 etapas 3 y 4) y AR-13. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6) y `UnitBreaker.Run.layOut` (complejidad 22) |
 | 2026-10-29 | Fuera del plan · Tests en Windows | `mvn test` fallaba en Windows (1 fallo y 4 errores) y no en la CI, que es solo Linux: `SvgCanvas` con `%n` (ahora `\n`), `SvgFonts` dejaba abierto el TTF (ahora crea la fuente con su contenido) y `LimitsTest` usaba un enlace simbólico (ahora copia la fuente). Decisión 317. | Valorar `windows-latest` en la CI |
 | 2026-10-29 | 10 · Partir `Style` (hecha) | AR-13 (tres commits: el javadoc remite a la especificación; `Placement.place` devuelve `Placed` o `NoRoom`; `Box.describe()` es la única forma de nombrar una caja, sin `Messages.name`). AR-02 etapa 3: los enums a `model` y `Style` partido en diez grupos, uno por commit; etapa 4: `Style` y sus grupos se cierran con la caja (`StyleGroup`). Decisiones 318 a 320. 1400 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte; `ScaleProbe` dentro del ruido. | Plan terminado. Fuera del plan: PF-05, PF-06, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |
+| 2026-10-29 | Fuera del plan · PF-06 | El reparto voraz suma los avances de las palabras y mide la línea entera solo cerca del límite; las palabras sin expresión regular; `validate` sin buscar marcadores en cada carácter y con los glifos memorizados; la última fuente recordada. Decisión 321. 1402 tests en verde; los 39 PDF y los 54 SVG, iguales byte a byte. Layout de 33 a 51 % más rápido en `ScaleProbe` (657 páginas: de 743 a 430 ms). | Quedan PF-05, QA-08 (5 y 6), `UnitBreaker.Run.layOut` (complejidad 22) y `windows-latest` en la CI |

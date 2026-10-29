@@ -2043,3 +2043,15 @@ interpretaciones que salieron al implementarlas.
      de lanzar una excepción que `GridLayout` capturaba. *Dónde:* `tree/Box`, `output/StxtDump`, `layout/Overflow`,
      `layout/grid/Placement`, `layout/grid/GridLayout`. *Alternativa:* mantener `Messages.name` y quitar
      `describe()`, que obligaba a `output` a depender de `layout`.
+
+### PF-06: el reparto en líneas
+
+321. **El ancho de un texto es aditivo entre palabras, y el reparto voraz suma.** `TextMeasurer` lo exige: el ancho de
+     un texto es la suma de los de sus palabras y de los espacios que las separan (sin kerning entre ellos; las
+     ligaduras, dentro de cada palabra). Lo cumplen `FixedMetrics` y `PdfMetrics` (`FontFile` suma milésimas enteras y
+     aplica GSUB palabra a palabra), y `pretty` ya lo suponía. El reparto voraz lleva la suma de la línea en curso y,
+     cuando queda a menos de `Tolerance.MODEL` del ancho disponible, construye la línea y la mide entera, como antes: la
+     suma en coma flotante puede diferir en unos 10⁻¹³ pt de la medida de la línea, y sin esa comprobación algún corte
+     justo en el límite cambiaba. Así el reparto es exactamente el de antes. *Dónde:* `layout/inline/LineBreaker.greedy`,
+     `layout/inline/TextMeasurer`, `LineBreakerPropertiesTest`. *Alternativa:* fiarse de la suma (cambia cortes en el
+     límite, y con ellos PNG) o medir en milésimas enteras, que ataría `TextMeasurer` a la forma de `FontFile`.
