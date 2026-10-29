@@ -3,7 +3,10 @@ package dev.stxt.boxes.layout.inline;
 import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.FontStyle;
 import dev.stxt.boxes.model.FontWeight;
+import dev.stxt.boxes.model.TextFormat;
+import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.TextWrap;
+import dev.stxt.boxes.resources.Resources;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -88,6 +91,85 @@ class LineBreakerPropertiesTest {
                     assertEquals(expected.get(p), words, "palabras del párrafo " + p + " con " + where);
                 }
             }
+        }
+    }
+
+    /** Formatos de los tramos de {@link #theGreedyBreakIsTheSameAsMeasuringEveryLine}: cada uno mide distinto. */
+    private static final TextFormat[] FORMATS = {TextFormat.PLAIN, TextFormat.PLAIN,
+            new TextFormat(true, false, false, false), new TextFormat(false, true, false, false),
+            new TextFormat(true, true, false, false), TextFormat.PLAIN.withSmallCaps(true)};
+    /** Trozos de palabra: con {@code fi}, {@code fl} y {@code ff}, que son ligaduras de IBM Plex Sans. */
+    private static final String[] SYLLABLES = {"a", "ma", "fi", "fl", "ff", "ffi", "ti", "on", "W", "AV", "é", "ñ"};
+
+    /** Un texto de tramos con formato: los cambios de formato caen dentro de las palabras y en los espacios. */
+    private static List<TextRun> randomRuns(Random random) {
+        TextRun.Joiner runs = new TextRun.Joiner();
+        int words = 1 + random.nextInt(40);
+        for (int i = 0; i < words; i++) {
+            if (i > 0) {
+                runs.add(random.nextInt(15) == 0 ? "\n\n" : " ", FORMATS[random.nextInt(FORMATS.length)]);
+            }
+            int parts = 1 + random.nextInt(4);
+            for (int k = 0; k < parts; k++) {
+                TextFormat format = random.nextInt(3) == 0 ? FORMATS[random.nextInt(FORMATS.length)] : TextFormat.PLAIN;
+                runs.add(SYLLABLES[random.nextInt(SYLLABLES.length)], format);
+            }
+        }
+        return runs.build();
+    }
+
+    /** El reparto voraz de antes de PF-06: con cada palabra, la línea se construye y se mide entera. */
+    private static List<List<LineBreaker.Line>> measuringEveryLine(List<TextRun> runs, double available,
+            TextMeasurer metrics, FontFace font, double size, double spacing) {
+        List<List<LineBreaker.Line>> result = new ArrayList<>();
+        for (List<LineBreaker.Word> paragraph : LineBreaker.paragraphs(runs)) {
+            List<LineBreaker.Line> lines = new ArrayList<>();
+            List<LineBreaker.Word> current = new ArrayList<>();
+            for (LineBreaker.Word word : paragraph) {
+                current.add(word);
+                if (current.size() > 1 && !fits(LineBreaker.width(LineBreaker.line(current).runs(), metrics, font,
+                        size, spacing), available)) {
+                    current.remove(current.size() - 1);
+                    lines.add(LineBreaker.line(current));
+                    current.clear();
+                    current.add(word);
+                }
+            }
+            lines.add(LineBreaker.line(current));
+            result.add(lines);
+        }
+        return result;
+    }
+
+    /**
+     * El reparto voraz suma los avances de las palabras y los espacios (PF-06) y da las mismas líneas que midiendo la
+     * línea entera con cada palabra, como antes: con las métricas reales (negrita, cursiva, versalitas y ligaduras),
+     * con interletraje y con anchos que son justo el de una línea, donde el redondeo de la suma podría decidir.
+     */
+    @Test
+    void theGreedyBreakIsTheSameAsMeasuringEveryLine() {
+        PdfMetrics metrics = new PdfMetrics(new Resources());
+        Random random = new Random(20261030);
+        double[] nudges = {0, 0, 1e-12, -1e-12, 1e-9, -1e-9, 0.004, -0.004};
+        for (int i = 0; i < 3000; i++) {
+            List<TextRun> runs = randomRuns(random);
+            FontFace font = new FontFace("IBM Plex Sans", FontWeight.NORMAL, FontStyle.NORMAL, random.nextBoolean());
+            double size = 6 + random.nextInt(9) + (random.nextBoolean() ? 0.5 : 0);
+            double spacing = random.nextInt(3) == 0 ? (random.nextInt(9) - 4) * 0.25 : 0;
+            double available;
+            if (random.nextBoolean()) {
+                available = 20 + random.nextInt(300);
+            } else {
+                // El ancho de las primeras palabras de un párrafo, justo en el límite.
+                List<List<LineBreaker.Word>> paragraphs = LineBreaker.paragraphs(runs);
+                List<LineBreaker.Word> words = paragraphs.get(random.nextInt(paragraphs.size()));
+                List<LineBreaker.Word> first = words.subList(0, 1 + random.nextInt(words.size()));
+                available = LineBreaker.width(LineBreaker.line(first).runs(), metrics, font, size, spacing)
+                        + nudges[random.nextInt(nudges.length)];
+            }
+            assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
+                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, TextWrap.AUTO),
+                    available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
         }
     }
 }

@@ -7,6 +7,7 @@ import dev.stxt.boxes.model.TextAlign;
 import dev.stxt.boxes.model.TextFormat;
 import dev.stxt.boxes.model.TextRun;
 import dev.stxt.boxes.model.TextWrap;
+import dev.stxt.boxes.model.Tolerance;
 import dev.stxt.boxes.tree.Style;
 
 import java.util.ArrayList;
@@ -110,24 +111,49 @@ public final class LineBreaker {
                 result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
                 continue;
             }
-            List<Line> lines = new ArrayList<>();
-            result.add(lines);
-            List<Word> current = new ArrayList<>();
-            for (Word word : paragraph) {
-                current.add(word);
-                if (current.size() > 1
-                        && !fits(width(line(current).runs(), measurer, font, fontSize, letterSpacing), available)) {
-                    current.remove(current.size() - 1);
-                    lines.add(line(current));
-                    current.clear();
-                    current.add(word);
-                }
-            }
-            if (!current.isEmpty()) {
-                lines.add(line(current));
-            }
+            result.add(greedy(paragraph, available, measurer, font, fontSize, letterSpacing));
         }
         return result;
+    }
+
+    /**
+     * El reparto voraz de un párrafo: cada palabra va a la línea en curso si cabe y, si no, empieza otra. El ancho de
+     * la línea en curso se lleva sumando los avances de sus palabras y espacios, cada uno medido una vez (PF-06); solo
+     * cuando la suma queda a menos de {@link Tolerance#MODEL} del ancho disponible se construye la línea y se mide
+     * entera, así que la decisión es la misma que midiéndola siempre, sin que importe el redondeo de la suma.
+     */
+    private static List<Line> greedy(List<Word> words, double available, TextMeasurer measurer, FontFace font,
+                                     double fontSize, double letterSpacing) {
+        Map<TextFormat, Double> spaces = new HashMap<>();
+        List<Line> lines = new ArrayList<>();
+        int start = 0;
+        // Avance de las palabras start..i-1 y de sus espacios, con el interletraje de todos sus caracteres.
+        double advance = 0;
+        for (int i = 0; i < words.size(); i++) {
+            Word word = words.get(i);
+            double own = advance(word.parts(), measurer, font, fontSize, letterSpacing);
+            if (i == start) {
+                advance = own;
+                continue;
+            }
+            double candidate = advance + spaces.computeIfAbsent(words.get(i - 1).gap(),
+                    f -> advance(" ", f, measurer, font, fontSize, letterSpacing)) + own;
+            double width = candidate - letterSpacing;
+            if (Math.abs(width - available) <= Tolerance.MODEL) {
+                width = width(line(words.subList(start, i + 1)).runs(), measurer, font, fontSize, letterSpacing);
+            }
+            if (fits(width, available)) {
+                advance = candidate;
+            } else {
+                lines.add(line(words.subList(start, i)));
+                start = i;
+                advance = own;
+            }
+        }
+        if (start < words.size()) {
+            lines.add(line(words.subList(start, words.size())));
+        }
+        return lines;
     }
 
     /**
@@ -396,7 +422,7 @@ public final class LineBreaker {
     }
 
     /** Las palabras en una línea, separadas por un espacio con el formato de la palabra anterior. */
-    private static Line line(List<Word> words) {
+    static Line line(List<Word> words) {
         TextRun.Joiner runs = new TextRun.Joiner();
         for (int i = 0; i < words.size(); i++) {
             if (i > 0) {

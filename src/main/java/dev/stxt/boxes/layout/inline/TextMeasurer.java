@@ -4,7 +4,14 @@ import dev.stxt.boxes.model.FontFace;
 import dev.stxt.boxes.model.VerticalMetrics;
 import dev.stxt.boxes.tree.Box;
 
-/** Mide el ancho de un texto en puntos. */
+/**
+ * Mide el ancho de un texto en puntos.
+ *
+ * <p>El ancho tiene que ser aditivo entre palabras: el de un texto es la suma de los de sus palabras y de los
+ * espacios que las separan (sin kerning entre ellos, y las ligaduras dentro de cada palabra). {@link LineBreaker}
+ * reparte las líneas sumándolos, y solo mide la línea entera cuando la suma queda muy cerca del ancho
+ * disponible.</p>
+ */
 public interface TextMeasurer {
 
     double width(String text, FontFace font, double fontSize);
