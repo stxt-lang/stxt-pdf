@@ -44,7 +44,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     /**
      * Resuelve el modelo de caja de una caja que no es una {@code Image}.
      *
-     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: min-content} y
+     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: narrowest} y
      *                  similares; solo se calculan si hacen falta
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic) {
@@ -54,7 +54,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     /**
      * Resuelve el modelo de caja de una caja.
      *
-     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: min-content} y
+     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: narrowest} y
      *                  similares; solo se calculan si hacen falta
      * @param natural   tamaño natural de una {@code Image}, que se dimensiona como un elemento
      *                  reemplazado ({@link #replaced}); {@code null} en el resto de cajas
@@ -175,9 +175,9 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             // Los intrínsecos son de la caja de margen.
             IntrinsicSizes i = intrinsic.get();
             double marginBox = switch (k) {
-                case MIN_CONTENT -> i.minContent();
-                case MAX_CONTENT -> i.maxContent();
-                default -> i.fitContent(space.availableWidth());
+                case NARROWEST -> i.narrowest();
+                case NATURAL -> i.natural();
+                default -> i.fit(space.availableWidth());
             };
             return Math.max(0, marginBox - margin.horizontal());
         }
@@ -187,7 +187,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
 
     /**
      * Tamaños intrínsecos de la caja de margen a partir de los de su contenido (referencia/comun/caja.md). Una caja
-     * con {@code Width} fijo tiene ese valor como min-content y max-content. Los porcentajes no
+     * con {@code Width} fijo tiene ese valor como ancho más estrecho y ancho natural. Los porcentajes no
      * se pueden resolver sin containing block y cuentan como 0 (o como {@code auto}).
      */
     public static IntrinsicSizes intrinsic(Box box, IntrinsicSizes content) {
@@ -202,7 +202,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         double min = s.box().minWidth().resolve(OptionalDouble.empty()).orElse(0);
         OptionalDouble max = s.box().maxWidth() == null
                 ? OptionalDouble.empty() : s.box().maxWidth().resolve(OptionalDouble.empty());
-        r = new IntrinsicSizes(Sizing.constrain(r.minContent(), min, max), Sizing.constrain(r.maxContent(), min, max));
+        r = new IntrinsicSizes(Sizing.constrain(r.narrowest(), min, max), Sizing.constrain(r.natural(), min, max));
         return r.plus(Insets.resolve(s.box().margin(), 0).horizontal());
     }
 

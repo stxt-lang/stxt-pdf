@@ -7,9 +7,9 @@
 | un número | puntos; con punto decimal, nunca coma | `Width: 120`, `Size: 10.5` |
 | un porcentaje | una parte de otra medida (abajo) | `Width: 50%` |
 | `auto` | lo calcula el motor | `Width: auto` |
-| `min-content` | lo más estrecho que puede ser sin que nada se salga: la palabra más larga | `Width: min-content` |
-| `max-content` | lo que mide sin partir ninguna línea | `Width: max-content` |
-| `fit-content` | lo que necesita su contenido, sin pasar del espacio disponible | `Width: fit-content` |
+| `narrowest` | lo más estrecho que puede ser sin que nada se salga: la palabra más larga | `Width: narrowest` |
+| `natural` | lo que mide sin partir ninguna línea | `Width: natural` |
+| `fit` | lo que necesita su contenido, sin pasar del espacio disponible | `Width: fit` |
 
 Cada propiedad admite solo algunas de estas formas, y su tabla lo dice; cualquier otra es un error. Solo los márgenes, los
 desplazamientos de las cajas posicionadas y el interletraje pueden ser negativos. Un tamaño entre dos límites se escribe

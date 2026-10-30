@@ -233,7 +233,7 @@ class PositioningTest {
 
     @Test
     void shrinkToFitAndStretchLeaveTheMargins() {
-        // F: el texto mide 30 (max-content), entre 10 de margen a cada lado. S: 100 − 10 − 20 − 5 − 7 de alto.
+        // F: el texto mide 30 (ancho natural), entre 10 de margen a cada lado. S: 100 − 10 − 20 − 5 − 7 de alto.
         LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tOverlay:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tMargin: 0 10",
                 "\t\t\tText: aaa bb",

@@ -5,7 +5,7 @@ import dev.stxt.pdf.model.Value;
 /**
  * Pista de grid con su función mínima y máxima (referencia/componentes/grid.md). {@code auto} equivale a
  * {@code between(auto, auto)} y {@code *} a {@code between(auto, *)}: una fracción nunca baja
- * del min-content de su contenido.
+ * del ancho más estrecho de su contenido.
  */
 public record Track(Value min, Value max) {
 

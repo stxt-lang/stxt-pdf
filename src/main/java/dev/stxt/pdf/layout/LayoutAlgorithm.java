@@ -9,7 +9,7 @@ import dev.stxt.pdf.tree.Box;
 public interface LayoutAlgorithm {
 
     /**
-     * min-content y max-content del contenido de la caja, sin su borde, su relleno, su margen ni
+     * Ancho más estrecho y ancho natural del contenido de la caja, sin su borde, su relleno, su margen ni
      * su {@code Width}. No depende del espacio disponible. Los de la caja de margen los da
      * {@link Engine#intrinsic} con {@link BoxModel#intrinsic}.
      */

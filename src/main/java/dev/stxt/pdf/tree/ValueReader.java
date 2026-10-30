@@ -63,12 +63,12 @@ final class ValueReader {
         }
     }
 
-    /** Pistas de grid: longitudes, {@code auto}, {@code min-content}, {@code max-content}, fracciones y {@code between}. */
+    /** Pistas de grid: longitudes, {@code auto}, {@code narrowest}, {@code natural}, fracciones y {@code between}. */
     static List<Value> tracks(Node p) {
         List<Value> list = parse(p, () -> ValueParser.list(p.getText()));
         for (Value v : list) {
-            if (v == Value.Keyword.FIT_CONTENT) {
-                throw error(p, ErrorCode.FIT_CONTENT_TRACK, "fit-content no es una pista de grid: usa auto, "
+            if (v == Value.Keyword.FIT) {
+                throw error(p, ErrorCode.FIT_TRACK, "fit no es una pista de grid: usa auto, "
                         + "que ya se ajusta al contenido");
             }
             boolean valid = v instanceof Value.Between b
@@ -76,7 +76,7 @@ final class ValueReader {
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: usa "
-                        + "números, porcentajes, fracciones (*), auto, min-content, max-content o between(a, b)");
+                        + "números, porcentajes, fracciones (*), auto, narrowest, natural o between(a, b)");
             }
             if (isNegative(v)) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite pistas negativas: " + p.getText().trim());
@@ -87,7 +87,7 @@ final class ValueReader {
 
     private static boolean track(Value v) {
         Kind k = kind(v);
-        return k == Kind.LENGTH || k == Kind.AUTO || (k == Kind.INTRINSIC && v != Value.Keyword.FIT_CONTENT);
+        return k == Kind.LENGTH || k == Kind.AUTO || (k == Kind.INTRINSIC && v != Value.Keyword.FIT);
     }
 
     /** Clase de un valor. */
@@ -108,7 +108,7 @@ final class ValueReader {
         return allowed.stream().map(k -> switch (k) {
             case LENGTH -> "un número o un porcentaje";
             case AUTO -> "auto";
-            case INTRINSIC -> "min-content, max-content o fit-content";
+            case INTRINSIC -> "narrowest, natural o fit";
             case FRACTION -> "una fracción";
             case BETWEEN -> "between(a, b)";
         }).collect(Collectors.joining("; "));

@@ -18,11 +18,11 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  *   <li>Aportaciones intrínsecas: primero ítems de una pista, después los que ocupan varias sin
  *       cruzar ninguna fracción y, al final, los que cruzan alguna (solo crecen las fracciones).</li>
  *   <li>Maximizar: repartir el espacio libre hasta el límite de cada pista no flexible.</li>
- *   <li>Expandir fracciones, con bucle de congelación por min-content.</li>
+ *   <li>Expandir fracciones, con bucle de congelación por el ancho más estrecho.</li>
  *   <li>Si no hay fracciones, estirar las pistas {@code auto} con el sobrante.</li>
  * </ol>
  *
- * <p>Simplificación: {@code fit-content} se trata como {@code auto}.</p>
+ * <p>Simplificación: {@code fit} se trata como {@code auto}.</p>
  */
 public final class TrackSizing {
 
@@ -69,17 +69,17 @@ public final class TrackSizing {
             }
             int i = it.track();
             Track t = tracks.get(i);
-            if (t.min().isAuto() || t.min() == Value.Keyword.MIN_CONTENT || t.min() == Value.Keyword.FIT_CONTENT) {
-                base[i] = Math.max(base[i], it.minContent());
-            } else if (t.min() == Value.Keyword.MAX_CONTENT) {
-                base[i] = Math.max(base[i], it.maxContent());
+            if (t.min().isAuto() || t.min() == Value.Keyword.NARROWEST || t.min() == Value.Keyword.FIT) {
+                base[i] = Math.max(base[i], it.narrowest());
+            } else if (t.min() == Value.Keyword.NATURAL) {
+                base[i] = Math.max(base[i], it.natural());
             }
             if (!t.flexible()) {
-                if (t.max() == Value.Keyword.MIN_CONTENT) {
-                    limit[i] = Math.max(limit[i], it.minContent());
-                } else if (t.max().isAuto() || t.max() == Value.Keyword.MAX_CONTENT
-                        || t.max() == Value.Keyword.FIT_CONTENT) {
-                    limit[i] = Math.max(limit[i], it.maxContent());
+                if (t.max() == Value.Keyword.NARROWEST) {
+                    limit[i] = Math.max(limit[i], it.narrowest());
+                } else if (t.max().isAuto() || t.max() == Value.Keyword.NATURAL
+                        || t.max() == Value.Keyword.FIT) {
+                    limit[i] = Math.max(limit[i], it.natural());
                 }
             }
         }
@@ -218,7 +218,7 @@ public final class TrackSizing {
                 intrinsicMax++;
             }
         }
-        double excess = it.minContent() - baseSum;
+        double excess = it.narrowest() - baseSum;
         if (excess > 0 && intrinsicMin > 0) {
             for (int i = from; i < to; i++) {
                 if (tracks.get(i).minIntrinsic()) {
@@ -232,7 +232,7 @@ public final class TrackSizing {
         for (int i = from; i < to; i++) {
             limitSum += Math.max(limit[i], base[i]);
         }
-        double limitExcess = it.maxContent() - limitSum;
+        double limitExcess = it.natural() - limitSum;
         if (limitExcess > 0 && intrinsicMax > 0) {
             for (int i = from; i < to; i++) {
                 if (tracks.get(i).maxIntrinsic()) {
@@ -244,7 +244,7 @@ public final class TrackSizing {
 
     /**
      * Ítems de varias pistas que cruzan alguna fracción (Grid §12.5, paso 4): lo que les falta
-     * hasta su min-content se reparte solo entre las fracciones con mínimo intrínseco que ocupan,
+     * hasta su ancho más estrecho se reparte solo entre las fracciones con mínimo intrínseco que ocupan,
      * en proporción a su peso (si los pesos suman menos de 1, esa parte en proporción y
      * el resto a partes iguales). Se calcula con las bases de antes del paso, y cada pista crece
      * lo que pida el ítem que más le pida.
@@ -258,7 +258,7 @@ public final class TrackSizing {
             if (it.span() < 2 || tracks.subList(from, to).stream().noneMatch(Track::flexible)) {
                 continue;
             }
-            double excess = it.minContent() - gap * (it.span() - 1);
+            double excess = it.narrowest() - gap * (it.span() - 1);
             double frSum = 0;
             int count = 0;
             for (int i = from; i < to; i++) {

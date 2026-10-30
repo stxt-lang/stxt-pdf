@@ -1,5 +1,5 @@
-# Case: fit-content como pista
-# Code: FIT_CONTENT_TRACK
+# Case: fit como pista
+# Code: FIT_TRACK
 # Line: 12
 Document (dev.stxt.pdf):
 	Language: es
@@ -9,4 +9,4 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Grid:
-			Column sizes: fit-content *
+			Column sizes: fit *

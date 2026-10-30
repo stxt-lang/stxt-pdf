@@ -74,9 +74,9 @@ class LineBreakerTest {
     @Test
     void intrinsics() {
         IntrinsicSizes s = LineBreaker.intrinsics("uno dos tres", measurer, F, 1);
-        assertEquals(4, s.minContent(), 1e-9);
-        assertEquals(12, s.maxContent(), 1e-9);
-        assertEquals(8, s.fitContent(8), 1e-9);
+        assertEquals(4, s.narrowest(), 1e-9);
+        assertEquals(12, s.natural(), 1e-9);
+        assertEquals(8, s.fit(8), 1e-9);
     }
 
     @Test
@@ -126,8 +126,8 @@ class LineBreakerTest {
         assertEquals(List.of(run("ne"), run("gri", "b"), run("ta")), words.get(1).parts());
         // Cada parte con su fuente: ne (2) + gri (6) + ta (2).
         IntrinsicSizes s = LineBreaker.intrinsics(runs, boldIsWider, F, 1);
-        assertEquals(10, s.minContent(), 1e-9);
-        assertEquals(3 + 1 + 10 + 1 + 3, s.maxContent(), 1e-9);
+        assertEquals(10, s.narrowest(), 1e-9);
+        assertEquals(3 + 1 + 10 + 1 + 3, s.natural(), 1e-9);
     }
 
     @Test

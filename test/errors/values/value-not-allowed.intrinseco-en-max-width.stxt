@@ -10,4 +10,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Block:
 			Box:
-				Max width: max-content
+				Max width: natural

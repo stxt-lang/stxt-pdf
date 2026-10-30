@@ -62,7 +62,7 @@ donde *inicio/fin* son izquierda/derecha o arriba/abajo del `Offset`. Según qu�
 
 Un margen `auto` solo tiene sentido cuando inicio, tamaño y fin están declarados (centra la caja o, si solo es `auto` uno
 de los dos, absorbe el sobrante); en los demás casos es un error. El **tamaño automático** es el ajuste al contenido
-(`fit-content`) en horizontal y la altura del contenido en vertical. La **posición estática** es donde habría quedado la
+(`fit`) en horizontal y la altura del contenido en vertical. La **posición estática** es donde habría quedado la
 caja si estuviera en flujo:
 
 - en flujo de bloque, el cursor vertical más los márgenes colapsados de las cajas anteriores, sin colapsar con el margen

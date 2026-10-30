@@ -25,8 +25,8 @@ Grid:
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
 
-Pistas válidas: número, %, `auto`, `min-content`, `max-content`, fracción, `between(a, b)` y `repeat(n, patrón)`.
-`fit-content` no es una pista (`FIT_CONTENT_TRACK`), porque `auto` ya se ajusta al contenido.
+Pistas válidas: número, %, `auto`, `narrowest`, `natural`, fracción, `between(a, b)` y `repeat(n, patrón)`.
+`fit` no es una pista (`FIT_TRACK`), porque `auto` ya se ajusta al contenido.
 
 ## `Area`
 
@@ -68,23 +68,23 @@ cursor detrás de sí. Con `Flow: vertical` se intercambian filas y columnas. Es
 ## Dimensionado de pistas
 
 Cada pista tiene una función mínima y una máxima: `150` es fija en ambas; `auto` equivale a
-`between(min-content, max-content)`; `*` equivale a `between(auto, *)`, de modo que **una fracción no baja del
-min-content de su contenido**.
+`between(narrowest, natural)`; `*` equivale a `between(auto, *)`, de modo que **una fracción no baja del
+ancho más estrecho de su contenido**.
 
 1. **Inicializar:** cada pista recibe una base (su mínimo) y un límite (su máximo; infinito en las fracciones).
-2. **Aportaciones del contenido:** las pistas intrínsecas toman el min-content o el max-content de sus ítems; el exceso de
+2. **Aportaciones del contenido:** las pistas intrínsecas toman el ancho más estrecho o el ancho natural de sus ítems; el exceso de
    los ítems que ocupan varias pistas se reparte entre las pistas intrínsecas que ocupan: primero lo que le falta hasta su
-   min-content, a las bases, y después, contando las bases ya subidas, lo que le falta hasta su max-content, a los límites
-   (el área del ítem no pasa de su max-content por repartirlo). Si alguna de ellas es una fracción, lo que le falta al ítem
-   hasta su min-content se reparte solo entre las fracciones, en proporción a su peso: un ítem que cruza columnas `*` no
+   ancho más estrecho, a las bases, y después, contando las bases ya subidas, lo que le falta hasta su ancho natural, a los límites
+   (el área del ítem no pasa de su ancho natural por repartirlo). Si alguna de ellas es una fracción, lo que le falta al ítem
+   hasta su ancho más estrecho se reparte solo entre las fracciones, en proporción a su peso: un ítem que cruza columnas `*` no
    desborda su área.
 3. **Maximizar:** el espacio libre se reparte a partes iguales entre las pistas no flexibles hasta su límite. Una pista
-   `auto` alcanza su max-content antes de que las fracciones reciban nada.
+   `auto` alcanza su ancho natural antes de que las fracciones reciban nada.
 4. **Fracciones:** el resto se divide entre las fracciones de forma proporcional. Si una fracción necesita más que su parte
-   por su min-content, se fija en su base y se repite el reparto.
+   por su ancho más estrecho, se fija en su base y se repite el reparto.
 5. **Estirar:** si no hay fracciones y sobra espacio, se reparte entre las pistas `auto`.
 
-Las **columnas** se dimensionan primero, con los anchos min-content y max-content de los ítems. Las **filas** después, con
+Las **columnas** se dimensionan primero, con el ancho más estrecho y el natural de los ítems. Las **filas** después, con
 la altura de cada ítem maquetado al ancho de sus columnas. Con `Height: auto` en el contenedor, las filas en fracción no
 tienen espacio que repartir y miden en proporción a su contenido: todas las filas `*` miden lo que la más alta.
 
@@ -97,8 +97,8 @@ cuando todavía no hay ancho. Los márgenes `auto` de un ítem son un error: la 
 > **Decisión:** lo que le falta a un ítem que cruza alguna fracción solo lo reciben las fracciones, en proporción a su
 > peso: así un ítem que cruza columnas `*` no desborda su área.
 
-> **Decisión:** el max-content se reparte contando las bases ya subidas: con columnas `50 auto *`, hueco 10 y un ítem de
-> max-content 400 en las dos primeras, la `auto` mide 340 y el área del ítem, 400 (y no 480 y 540).
+> **Decisión:** el ancho natural se reparte contando las bases ya subidas: con columnas `50 auto *`, hueco 10 y un ítem de
+> ancho natural 400 en las dos primeras, la `auto` mide 340 y el área del ítem, 400 (y no 480 y 540).
 
 ## Alineación en el área
 
@@ -110,8 +110,8 @@ filas, todavía sin área, cuentan como `auto`. Un ítem estirado en vertical ti
 
 ## Tamaños intrínsecos
 
-El min-content de un `Grid` es la suma de las columnas dimensionadas sin espacio libre, más los huecos; el max-content, la
-suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los
+El ancho más estrecho de un `Grid` es la suma de las columnas dimensionadas sin espacio libre, más los huecos; el ancho natural, la
+suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su ancho natural también como mínimo, más los
 huecos ([La caja](../comun/caja.md#tamaños-intrínsecos)).
 
 ## Cortes
@@ -126,6 +126,6 @@ contenido ([posicionados](frame-and-overlays.md#overlay)).
 
 ## Lo que no hay
 
-- Colocación densa (que vuelva atrás a llenar huecos), rejillas anidadas que compartan pistas con su padre y `fit-content`
+- Colocación densa (que vuelva atrás a llenar huecos), rejillas anidadas que compartan pistas con su padre y `fit`
   como pista.
 - Márgenes `auto` en los ítems: son errores.

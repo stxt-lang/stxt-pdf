@@ -2,6 +2,7 @@
 
 | Término | Definición |
 |---|---|
+| **Ancho más estrecho / ancho natural** | El menor ancho sin que nada se salga / el ancho sin ningún salto de línea ([La caja](caja.md#tamaños-intrínsecos)). |
 | **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Page overlay`. Cada sección tiene la suya ([Document](../componentes/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](caja.md#las-cuatro-cajas)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([Recursos](recursos.md)). |
@@ -25,7 +26,6 @@
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../componentes/image.md)). |
 | **Índice** | Elemento `Table of contents`: una entrada por encabezado con su título, una guía y su página ([Table of contents](../componentes/table-of-contents.md)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas, bloques de código e imágenes ([Markdown](../componentes/markdown.md)). |
-| **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea ([La caja](caja.md#tamaños-intrínsecos)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4`, `Letter`…), en vertical o, con `Orientation: landscape`, apaisado. |
 | **Pista** | Columna o fila de un `Grid` o una `Table`. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo ([posicionados](../componentes/frame-and-overlays.md#overlay)). |

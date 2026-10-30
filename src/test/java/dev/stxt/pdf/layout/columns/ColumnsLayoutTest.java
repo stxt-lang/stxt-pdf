@@ -168,7 +168,7 @@ class ColumnsLayoutTest {
         assertRect(40, 50, 250, 30, l.rect("A"));
     }
 
-    /** En un ítem de flex no hay página que llenar: se equilibra. El ancho es el max-content: 2 × 50 + 10. */
+    /** En un ítem de flex no hay página que llenar: se equilibra. El ancho es el ancho natural: 2 × 50 + 10. */
     @Test
     void flexItemIsBalancedAndSizedByItsColumns() {
         List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tVertical: start", "\t\tItem:"));
@@ -214,20 +214,20 @@ class ColumnsLayoutTest {
     // Casos que faltaban según las pruebas de mutación.
 
     /**
-     * El texto mide 20 (min-content, «aaaa») y 35 (max-content). Con Count: 3 y huecos de 10, tres columnas de
+     * El texto mide 20 (ancho más estrecho, «aaaa») y 35 (ancho natural). Con Count: 3 y huecos de 10, tres columnas de
      * cada uno; con Min column width el mínimo es una columna y el máximo, columnas de al menos ese ancho.
      */
     @Test
     void intrinsicWidthsWithThreeColumns() {
         LayoutFixture l = layOut(
-                "\tColumns:", "\t\tId: min", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\tColumns:", "\t\tId: min", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaaa bb",
-                "\tColumns:", "\t\tId: max", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: max-content",
+                "\tColumns:", "\t\tId: max", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: natural",
                 "\t\tText: aaaa bb",
                 "\tColumns:", "\t\tId: wmin", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
-                "\t\t\tWidth: min-content", "\t\tText: aaaa bb",
+                "\t\t\tWidth: narrowest", "\t\tText: aaaa bb",
                 "\tColumns:", "\t\tId: wmax", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
-                "\t\t\tWidth: max-content", "\t\tText: aaaa bb");
+                "\t\t\tWidth: natural", "\t\tText: aaaa bb");
         assertEquals(80, l.rect("min").width(), 1e-9);
         assertEquals(125, l.rect("max").width(), 1e-9);
         assertEquals(20, l.rect("wmin").width(), 1e-9);

@@ -154,12 +154,12 @@ class BlockLayoutTest {
     void intrinsicWidths() {
         // FixedMetrics: 5 pt por carácter con Size 10.
         LayoutFixture l = layOut(
-                "\tText: aaa bbbbbb", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\t\tPadding: 5",
-                "\tText: aaa bbbbbb", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content",
-                "\tBlock:", "\t\tId: block", "\t\tBox:", "\t\t\tWidth: max-content",
+                "\tText: aaa bbbbbb", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\t\tPadding: 5",
+                "\tText: aaa bbbbbb", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural",
+                "\tBlock:", "\t\tId: block", "\t\tBox:", "\t\t\tWidth: natural",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tWidth: 120", "\t\t\t\tMargin: 0 10",
                 "\t\tText: aaa bbbbbb");
-        // min-content: la palabra más larga (30) + relleno; el texto ocupa dos líneas.
+        // Ancho más estrecho: la palabra más larga (30) + relleno; el texto ocupa dos líneas.
         assertEquals(40, l.rect("min").width(), 1e-9);
         assertEquals(34, l.rect("min").height(), 1e-9);
         assertEquals(50, l.rect("max").width(), 1e-9);

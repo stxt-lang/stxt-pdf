@@ -33,7 +33,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * Layout {@code flex} (referencia/componentes/flex.md). Los ocho pasos:
  * <ol>
  *   <li>Espacio disponible en el eje principal.</li>
- *   <li>Base de cada ítem: {@code Basis}, el tamaño declarado o el max-content.</li>
+ *   <li>Base de cada ítem: {@code Basis}, el tamaño declarado o el ancho natural.</li>
  *   <li>Tamaño hipotético: base limitada por el mínimo (con {@code Min width: auto}, el tamaño
  *       del contenido, sin pasar del declarado).</li>
  *   <li>Repartir en líneas si {@code Wrap}.</li>
@@ -81,10 +81,10 @@ public final class FlexLayout implements LayoutAlgorithm {
         double sumMax = 0;
         for (Box item : items) {
             IntrinsicSizes i = context.intrinsic(item);
-            maxMin = Math.max(maxMin, i.minContent());
-            maxMax = Math.max(maxMax, i.maxContent());
-            sumMin += i.minContent();
-            sumMax += i.maxContent();
+            maxMin = Math.max(maxMin, i.narrowest());
+            maxMax = Math.max(maxMax, i.natural());
+            sumMin += i.narrowest();
+            sumMax += i.natural();
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
@@ -304,14 +304,14 @@ public final class FlexLayout implements LayoutAlgorithm {
             OptionalDouble basis = declaredBasis(is);
             double base = basis.isPresent() ? basis.getAsDouble() + margins
                     : declared.isPresent() ? declared.getAsDouble() + margins
-                    : intrinsic.maxContent();
+                    : intrinsic.natural();
             double max = is.box().maxWidth() == null ? Double.POSITIVE_INFINITY
                     : is.box().maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.box().minWidth().isAuto()) {
-                // Mínimo automático (referencia/componentes/flex.md): el min-content de su contenido, sin pasar de Max
+                // Mínimo automático (referencia/componentes/flex.md): el ancho más estrecho de su contenido, sin pasar de Max
                 // width, y nunca más que el ancho declarado.
-                double content = Math.min(context.contentIntrinsic(b).minContent() + extra + margins, max);
+                double content = Math.min(context.contentIntrinsic(b).narrowest() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
                 min = is.box().minWidth().resolve(contentWidth).orElse(0) + margins;
@@ -333,7 +333,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             } else if (it.align == Alignment.STRETCH && !multiLine) {
                 width = Math.max(0, contentWidth - it.margin.horizontal());
             } else {
-                width = Math.max(0, context.intrinsic(b).fitContent(contentWidth) - it.margin.horizontal());
+                width = Math.max(0, context.intrinsic(b).fit(contentWidth) - it.margin.horizontal());
             }
             it.crossWidth = BoxModel.constrainWidth(is, width, contentWidth);
 

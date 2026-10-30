@@ -52,7 +52,7 @@ Además de `Text` y `Paragraph`, tienen texto una `Cell` con valor ([Table](tabl
 
 ## Tamaños intrínsecos
 
-min-content = la palabra más ancha; max-content = el párrafo más largo en una sola línea
+ancho más estrecho = la palabra más ancha; ancho natural = el párrafo más largo en una sola línea
 ([Tipografía](../comun/tipografia.md#tamaños-intrínsecos)).
 
 ## Cortes

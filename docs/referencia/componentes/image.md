@@ -89,8 +89,8 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
   alto choca con su mínimo o su máximo, el ancho se vuelve a deducir del alto limitado: la proporción se conserva.
 - Su alto es siempre definido, así que un `Flex` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical; en
   horizontal sí se estira, y el alto sigue a la proporción.
-- **Tamaños intrínsecos:** min-content y max-content son el ancho natural o, si declara `Height` en puntos, el que sale de
-  él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un ítem de `Flex` sin `Min width`, la imagen
+- **Tamaños intrínsecos:** el ancho más estrecho y el natural son los dos el ancho de su tamaño natural o, si declara
+  `Height` en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un ítem de `Flex` sin `Min width`, la imagen
   no encoge por debajo de él.
 
 Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.
@@ -99,7 +99,7 @@ Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción,
 > la coloque.
 
 > **Decisión:** los tamaños intrínsecos son un mínimo de verdad, también con un `Width` en porcentaje. *Alternativa
-> descartada:* un min-content de 0, que deja encoger la imagen.
+> descartada:* un ancho más estrecho de 0, que deja encoger la imagen.
 
 ## `Fit`
 

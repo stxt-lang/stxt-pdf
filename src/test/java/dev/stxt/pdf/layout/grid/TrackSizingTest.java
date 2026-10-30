@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class TrackSizingTest {
 
-    /** Contenido min-content y max-content de cada columna: (min, max). */
+    /** Ancho más estrecho y ancho natural del contenido de cada columna. */
     private static final double[][] CONTENT = {{60, 140}, {50, 90}, {80, 220}, {40, 120}};
 
     private static double[] columns(String tracks, double available) {
@@ -24,12 +24,12 @@ class TrackSizingTest {
 
     @Test
     void fixedAutoAndFraction() {
-        // 475 para pistas: 150 fija, auto llega a su max-content (90), * recibe 235.
+        // 475 para pistas: 150 fija, auto llega a su ancho natural (90), * recibe 235.
         assertArrayEquals(new double[]{150, 90, 235}, columns("150 auto *", 515), 1e-9);
     }
 
     @Test
-    void fractionNeverBelowItsMinContent() {
+    void fractionNeverBelowItsNarrowest() {
         // 210 para pistas: 70 por fracción; la tercera (min 80) se congela.
         assertArrayEquals(new double[]{65, 65, 80}, columns("* * *", 250), 1e-9);
     }
@@ -42,8 +42,8 @@ class TrackSizingTest {
 
     @Test
     void percentagesWithoutBaseAreAuto() {
-        // Sin base, 50% es auto (max-content 140, como la auto de al lado, 90) y between(100, 50%)
-        // pasa a between(100, auto) (max-content 220); 120 es fija.
+        // Sin base, 50% es auto (ancho natural 140, como la auto de al lado, 90) y between(100, 50%)
+        // pasa a between(100, auto) (ancho natural 220); 120 es fija.
         assertArrayEquals(new double[]{140, 90, 220, 120},
                 columns("50% auto between(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
     }
@@ -113,9 +113,9 @@ class TrackSizingTest {
     }
 
     /**
-     * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su min-content va solo a la auto, y su
-     * max-content se cuenta con las bases ya subidas (como en CSS, referencia/componentes/grid.md): el área del ítem
-     * mide su max-content (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (pruebas de mutación).
+     * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su ancho más estrecho va solo a la auto, y su
+     * ancho natural se cuenta con las bases ya subidas (como en CSS, referencia/componentes/grid.md): el área del ítem
+     * mide su ancho natural (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (pruebas de mutación).
      */
     @Test
     void itemSpanningAFixedAndAnAutoTrack() {
@@ -137,8 +137,8 @@ class TrackSizingTest {
     }
 
     /**
-     * Un ítem de dos pistas sobre una que ya tiene un ítem propio: el min-content que falta se reparte entre las dos,
-     * y el max-content que falta se suma a lo que ya tienen (237.5 + 62.5 = 300).
+     * Un ítem de dos pistas sobre una que ya tiene un ítem propio: el ancho más estrecho que falta se reparte entre las dos,
+     * y el ancho natural que falta se suma a lo que ya tienen (237.5 + 62.5 = 300).
      */
     @Test
     void itemSpanningTracksThatAlreadyHaveContent() {

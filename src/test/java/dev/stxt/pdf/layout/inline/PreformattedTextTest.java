@@ -188,11 +188,11 @@ class PreformattedTextTest {
     void preWrapIntrinsicsAreTheWidestWordAndTheWidestLine() {
         List<TextRun> runs = TextRun.plain("ab cdef\ngh");
         IntrinsicSizes wrap = PreformattedText.intrinsics(runs, 4, true, new FixedMetrics(), FONT, 10, 0);
-        assertEquals(20, wrap.minContent(), 1e-9);
-        assertEquals(35, wrap.maxContent(), 1e-9);
+        assertEquals(20, wrap.narrowest(), 1e-9);
+        assertEquals(35, wrap.natural(), 1e-9);
         IntrinsicSizes pre = PreformattedText.intrinsics(runs, 4, false, new FixedMetrics(), FONT, 10, 0);
-        assertEquals(35, pre.minContent(), 1e-9);
-        assertTrue(pre.maxContent() >= pre.minContent());
+        assertEquals(35, pre.narrowest(), 1e-9);
+        assertTrue(pre.natural() >= pre.narrowest());
     }
 
     @Test
@@ -202,12 +202,12 @@ class PreformattedTextTest {
     }
 
     @Test
-    void minContentOfPreAndPreWrap() {
-        // pre no parte: su min-content es la línea entera (45); pre-wrap, la palabra más larga (25).
+    void narrowestOfPreserveAndPreserveWrap() {
+        // pre no parte: su ancho más estrecho es la línea entera (45); pre-wrap, la palabra más larga (25).
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tWhite space: preserve",
-                "\tBlock:", "\t\tId: W", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\tBlock:", "\t\tId: W", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tWhite space: preserve-wrap");
         assertEquals(45, l.rect("P").width(), 1e-9);
         assertEquals(25, l.rect("W").width(), 1e-9);

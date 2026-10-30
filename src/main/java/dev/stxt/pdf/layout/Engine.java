@@ -231,7 +231,7 @@ public final class Engine implements LayoutContext {
      * {@inheritDoc}
      *
      * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría
-     * sin contenedor: su {@code Width} o, si no lo tiene, su max-content (referencia/comun/capas-y-giro.md). Los
+     * sin contenedor: su {@code Width} o, si no lo tiene, su ancho natural (referencia/comun/capas-y-giro.md). Los
      * porcentajes cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
      */
     @Override
@@ -242,7 +242,7 @@ public final class Engine implements LayoutContext {
                 return own;
             }
             double margins = Insets.resolve(box.style().box().margin(), 0).horizontal();
-            ConstraintSpace space = ConstraintSpace.fixed(own.maxContent() - margins, OptionalDouble.empty(), 0,
+            ConstraintSpace space = ConstraintSpace.fixed(own.natural() - margins, OptionalDouble.empty(), 0,
                     OptionalDouble.empty(), false);
             double width = turned(box, layoutOnce(box, space, null).fragment()).width() + margins;
             return new IntrinsicSizes(width, width);
@@ -316,7 +316,7 @@ public final class Engine implements LayoutContext {
 
     /**
      * El ancho de la caja de borde de una caja girada en flujo: el que da su {@code Width} o, si es {@code auto}, su
-     * max-content, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de
+     * ancho natural, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de
      * siempre.
      */
     private double turnedWidth(Box box, ConstraintSpace space) {
@@ -327,7 +327,7 @@ public final class Engine implements LayoutContext {
         Insets border = Insets.resolve(box.style().box().border(), space.percentBaseWidth());
         Insets padding = Insets.resolve(box.style().box().padding(), space.percentBaseWidth());
         return BoxModel.constrainWidth(box.style(),
-                contentIntrinsic(box).maxContent() + border.horizontal() + padding.horizontal(),
+                contentIntrinsic(box).natural() + border.horizontal() + padding.horizontal(),
                 space.percentBaseWidth());
     }
 

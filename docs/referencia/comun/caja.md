@@ -28,7 +28,7 @@ El modelo de caja. No se hereda.
 |---|---|---|---|
 | `Width` | número, %, `auto`, intrínsecos | `auto` | |
 | `Height` | número, %, `auto`, intrínsecos | `auto` | |
-| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = min-content en ítems de `Flex` y `Grid`; 0 en el resto. |
+| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Flex` y `Grid`; 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
 | `Aspect ratio` | `ancho/alto` o número | — | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
 | `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra (ver [márgenes `auto`](#márgenes-auto)). |
@@ -60,24 +60,24 @@ con `Horizontal` y `Vertical`) son errores.
 
 ### Tamaños intrínsecos
 
-Los anchos de la caja de margen que una caja necesita sin que nada desborde (**min-content**) y sin ningún salto de
-línea (**max-content**):
+Los anchos de la caja de margen que una caja necesita sin que nada desborde (**ancho más estrecho**) y sin ningún salto de
+línea (**ancho natural**):
 
-| Elemento | min-content | max-content |
+| Elemento | Ancho más estrecho | Ancho natural |
 |---|---|---|
 | `Text` | palabra más ancha | párrafo más largo en una línea |
 | `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
-| `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del min-content de los hijos | máximo del max-content de los hijos |
-| `Flex` horizontal, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
-| `Flex` horizontal, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
+| `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del ancho más estrecho de los hijos | máximo del ancho natural de los hijos |
+| `Flex` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
+| `Flex` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
 | `Flex` vertical | máximo de los ítems | máximo de los ítems |
-| `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
+| `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su ancho natural también como mínimo, más los huecos |
 | `Columns` | ver [Columns](../componentes/columns.md#tamaños-intrínsecos) | |
 
-Una caja con `Width` fijo tiene ese valor como min-content y max-content (el mínimo automático de un ítem de `Flex` mira
+Una caja con `Width` fijo tiene ese valor como ancho más estrecho y ancho natural (el mínimo automático de un ítem de `Flex` mira
 en cambio su contenido, [Flex](../componentes/flex.md#algoritmo)). `Overlay` y `Page overlay` no aportan nada a sus ancestros.
 En `Flex` se usan los tamaños intrínsecos de cada ítem tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En
-`Grid`, el max-content hace que las fracciones lleguen al max-content de su contenido.
+`Grid`, el ancho natural hace que las fracciones lleguen al ancho natural de su contenido.
 
 ### Definido e indefinido
 

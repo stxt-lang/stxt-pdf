@@ -239,7 +239,7 @@ public final class LineBreaker {
         return intrinsics(TextRun.plain(text), measurer, font, fontSize);
     }
 
-    /** min-content (palabra más ancha) y max-content (párrafo más largo sin partir). */
+    /** Ancho más estrecho (palabra más ancha) y ancho natural (párrafo más largo sin partir). */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize) {
         return intrinsics(runs, measurer, font, fontSize, 0);

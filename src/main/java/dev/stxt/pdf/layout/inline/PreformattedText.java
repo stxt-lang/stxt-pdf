@@ -42,7 +42,7 @@ final class PreformattedText {
     }
 
     /**
-     * min-content y max-content: con {@code preserve}, la línea más ancha; con {@code preserve-wrap}, la
+     * Ancho más estrecho y ancho natural: con {@code preserve}, la línea más ancha; con {@code preserve-wrap}, la
      * palabra más ancha y la línea más ancha.
      */
     static IntrinsicSizes intrinsics(List<TextRun> runs, int tabSize, boolean wrap, TextMeasurer measurer,

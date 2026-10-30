@@ -18,11 +18,11 @@ public interface LayoutContext {
      */
     LayoutResult layout(Box box, ConstraintSpace space, BreakToken from);
 
-    /** min-content y max-content de la caja de margen (referencia/comun/caja.md). */
+    /** Ancho más estrecho y ancho natural de la caja de margen (referencia/comun/caja.md). */
     IntrinsicSizes intrinsic(Box box);
 
     /**
-     * min-content y max-content del contenido de la caja, sin su {@code Width}: el mínimo automático de un ítem
+     * Ancho más estrecho y ancho natural del contenido de la caja, sin su {@code Width}: el mínimo automático de un ítem
      * flex depende de ellos (referencia/componentes/flex.md).
      */
     IntrinsicSizes contentIntrinsic(Box box);

@@ -28,8 +28,8 @@ public enum ErrorCode {
     VALUE_SYNTAX,
     /** Un valor bien escrito que la propiedad no admite ({@code Width: *}, {@code Padding: -2}…). */
     VALUE_NOT_ALLOWED,
-    /** {@code fit-content} como pista de grid. */
-    FIT_CONTENT_TRACK,
+    /** {@code fit} como pista de grid. */
+    FIT_TRACK,
 
     // --- Estructura ---------------------------------------------------------------------------
     /** Dos cajas con el mismo {@code Id}. */

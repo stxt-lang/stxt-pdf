@@ -29,7 +29,7 @@ class OverlayEquationTest {
     }
 
     @Test
-    void allAutoUsesStaticPositionAndFitContent() {
+    void allAutoUsesStaticPositionAndFit() {
         OverlayEquation.Solution s = OverlayEquation.horizontal(AUTO, AUTO, AUTO, AUTO, AUTO, 400, 20, CONTENT);
         assertEquals(20, s.start(), 1e-9);
         assertEquals(180, s.size(), 1e-9);

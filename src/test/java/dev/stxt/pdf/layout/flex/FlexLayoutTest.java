@@ -47,7 +47,7 @@ class FlexLayoutTest {
     }
 
     @Test
-    void autoMinWidthIsTheMinContent() {
+    void autoMinWidthIsTheNarrowest() {
         // La palabra de A mide 300: A no encoge por debajo y B cede el resto.
         LayoutFixture l = layOut(
                 "\tFlex:", "\t\tItem:", "\t\t\tBasis: 500",
@@ -246,16 +246,16 @@ class FlexLayoutTest {
         String a = "\t\tItem:\n\t\t\tText: aa aa\n\t\t\t\tId: %s";
         String b = "\t\tItem:\n\t\t\tText: bbb\n\t\t\t\tId: %s";
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tGap: 10",
+                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10",
                 a.formatted("maxA"), b.formatted("maxB"),
-                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tGap: 10",
+                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10",
                 a.formatted("minA"), b.formatted("minB"),
-                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tGap: 10", "\t\tWrap: true",
+                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", "\t\tWrap: true",
                 a.formatted("wrapA"), b.formatted("wrapB"));
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(35, l.rect("min").width(), 1e-9);
         assertEquals(15, l.rect("wrap").width(), 1e-9);
-        // En min-content falta sitio: B se congela en su mínimo (15) y A baja al suyo (10).
+        // En su ancho más estrecho falta sitio: B se congela en su mínimo (15) y A baja al suyo (10).
         assertEquals(10, l.rect("minA").width(), 1e-9);
         assertEquals(15, l.rect("minB").width(), 1e-9);
     }
@@ -339,13 +339,13 @@ class FlexLayoutTest {
 
     @Test
     void intrinsicWidthsWithThreeItems() {
-        // max-content de 5 + 10 + 15 y dos huecos de 10, con y sin Wrap; min-content sin Wrap, igual con 5 + 10 + 15.
+        // Ancho natural de 5 + 10 + 15 y dos huecos de 10, con y sin Wrap; ancho más estrecho sin Wrap, igual con 5 + 10 + 15.
         String items = "\t\tItem:\n\t\t\tText: a\n\t\tItem:\n\t\t\tText: bb\n\t\tItem:\n\t\t\tText: ccc";
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tGap: 10", items,
-                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tGap: 10", "\t\tWrap: true",
+                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", items,
+                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", "\t\tWrap: true",
                 items,
-                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tGap: 10", items);
+                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", items);
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(50, l.rect("wrap").width(), 1e-9);
         assertEquals(50, l.rect("min").width(), 1e-9);

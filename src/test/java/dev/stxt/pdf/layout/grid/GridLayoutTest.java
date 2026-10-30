@@ -23,7 +23,7 @@ class GridLayoutTest {
 
     @Test
     void columnsAndRowsSizing() {
-        // auto llega al max-content de B (45) y la fracción recibe el resto: 515 - 100 - 45.
+        // auto llega al ancho natural de B (45) y la fracción recibe el resto: 515 - 100 - 45.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 100 auto *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
@@ -142,20 +142,20 @@ class GridLayoutTest {
     @Test
     void percentageColumnsInIntrinsicWidthsAreAuto() {
         // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto. Con
-        // min-content (25) cada columna mediría 12.5 y B desbordaría: es un error.
+        // ancho más estrecho (25) cada columna mediría 12.5 y B desbordaría: es un error.
         String items = "\t\tArea:\n\t\t\tText: aa aa\n\t\tArea:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: 50% 50%", items);
+                "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: 50% 50%", items);
         assertEquals(40, l.rect("max").width(), 1e-9);
     }
 
     // Un ítem que cruza fracciones y no cabe en el contenedor (las columnas no bajan de su
-    // min-content) es un desbordamiento: está en el catálogo de errores.
+    // ancho más estrecho) es un desbordamiento: está en el catálogo de errores.
 
     @Test
     void itemCrossingFractionsInIntrinsicWidths() {
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tColumn sizes: * *",
+                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tColumn sizes: * *",
                 "\t\tArea: 1 1 1 2", "\t\t\tText: " + "a".repeat(60));
         assertEquals(300, l.rect("G").width(), 1e-9);
     }
@@ -165,11 +165,11 @@ class GridLayoutTest {
         // A: min 10, max 25. B: min y max 15. Hueco 10.
         String items = "\t\tArea:\n\t\t\tText: aa aa\n\t\tArea:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: auto auto",
+                "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: auto auto",
                 "\t\tGap: 10", items,
-                "\tGrid:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tColumn sizes: auto auto",
+                "\tGrid:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tColumn sizes: auto auto",
                 "\t\tGap: 10", items,
-                "\tGrid:", "\t\tId: fr", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: 150 *",
+                "\tGrid:", "\t\tId: fr", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: 150 *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
                 "\t\tArea:", "\t\t\tText: aaa");
         assertEquals(50, l.rect("max").width(), 1e-9);
@@ -233,7 +233,7 @@ class GridLayoutTest {
     void intrinsicWidthsWithThreeColumns() {
         // 5 + 10 + 15 y dos huecos de 10.
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: auto auto auto",
+                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: auto auto auto",
                 "\t\tGap: 10", "\t\tArea:", "\t\t\tText: a", "\t\tArea:", "\t\t\tText: bb", "\t\tArea:", "\t\t\tText: ccc");
         assertEquals(50, l.rect("G").width(), 1e-9);
     }

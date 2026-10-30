@@ -58,9 +58,9 @@ demás propiedades van en ese elemento. El `Item` solo añade cómo participa en
 
 1. Espacio disponible: la caja de contenido del contenedor en el eje principal.
 2. **Base** de cada ítem: `Basis` si tiene valor; si es `auto`, el tamaño declarado en el eje principal; si tampoco lo
-   hay, su max-content.
+   hay, su ancho natural.
 3. **Tamaño hipotético:** la base limitada por el mínimo y el máximo del ítem. Con `Min width: auto` (`Min height: auto` en
-   vertical), el mínimo es el **tamaño de su contenido**: el min-content en horizontal y el alto del contenido en vertical, sin
+   vertical), el mínimo es el **tamaño de su contenido**: el ancho más estrecho en horizontal y el alto del contenido en vertical, sin
    pasar del máximo del ítem y nunca mayor que su `Width` (o `Height`) declarado.
 4. **Líneas:** sin `Wrap`, una sola. Con `Wrap`, los ítems se añaden a la línea mientras sus tamaños hipotéticos y los
    huecos quepan.
@@ -110,7 +110,7 @@ Un sobrante negativo después de encoger significa que los ítems no caben: es u
   no, no hay espacio libre que repartir y es un error (`GROW_WITHOUT_EFFECT`).
 - `Basis: 0` con `Grow: 1` reparte todo el espacio (columnas iguales); `Basis: auto` con `Grow: 1` solo reparte el
   sobrante sobre el tamaño del contenido.
-- Un ítem no encoge por debajo del min-content de su contenido salvo que declare `Min width: 0`. Un `Width` declarado no
+- Un ítem no encoge por debajo del ancho más estrecho de su contenido salvo que declare `Min width: 0`. Un `Width` declarado no
   lo frena: un ítem con `Width: 400` y poco contenido encoge si no cabe.
 - Un ítem estirado **no** da un alto definido a sus hijos ([Valores](../comun/valores.md#alto-definido)).
 - Una `Image` no se estira en el eje cruzado de una fila: su alto sale de su proporción
@@ -118,8 +118,8 @@ Un sobrante negativo después de encoger significa que los ítems no caben: es u
 
 ## Tamaños intrínsecos
 
-En horizontal y sin `Wrap`, el min-content es la suma del min-content de los ítems más los huecos, y con `Wrap`, el máximo de
-ellos; el max-content es la suma del max-content más los huecos. En vertical, los dos son el máximo de los ítems. Se usan
+En horizontal y sin `Wrap`, el ancho más estrecho es la suma del ancho más estrecho de los ítems más los huecos, y con `Wrap`, el máximo de
+ellos; el ancho natural es la suma del ancho natural más los huecos. En vertical, los dos son el máximo de los ítems. Se usan
 los intrínsecos de cada ítem tal cual, sin `Basis`, `Grow` ni `Shrink` ([La caja](../comun/caja.md#tamaños-intrínsecos)).
 
 ## Cortes

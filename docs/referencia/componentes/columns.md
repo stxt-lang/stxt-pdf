@@ -103,12 +103,12 @@ texto. Se pinta con el fondo del `Columns`, debajo del contenido, y no puede ser
 
 ## Tamaños intrínsecos
 
-Con `Count` y sin `Min column width`, el min-content es `Count` columnas del min-content del contenido más los huecos; con
-`Min column width`, una columna, porque el número de columnas se adapta al ancho. El max-content es `Count` columnas (o una, sin
-`Count`) del max-content del contenido, o de `Min column width` si es mayor, más los huecos.
+Con `Count` y sin `Min column width`, el ancho más estrecho es `Count` columnas del ancho más estrecho del contenido más los huecos; con
+`Min column width`, una columna, porque el número de columnas se adapta al ancho. El ancho natural es `Count` columnas (o una, sin
+`Count`) del ancho natural del contenido, o de `Min column width` si es mayor, más los huecos.
 
-> **Decisión:** con `Min column width`, el min-content es el de una sola columna. *Alternativa descartada:* el menor entre
-> `Min column width` y el min-content del contenido.
+> **Decisión:** con `Min column width`, el ancho más estrecho es el de una sola columna. *Alternativa descartada:* el menor entre
+> `Min column width` y el ancho más estrecho del contenido.
 
 ## Accesibilidad
 

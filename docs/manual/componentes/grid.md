@@ -76,7 +76,7 @@ Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de
 | `150` | 150 puntos |
 | `25%` | una parte del ancho del `Grid` (sin descontar los huecos) |
 | `auto` | lo que pida su contenido |
-| `min-content`, `max-content` | lo mínimo o lo máximo de su contenido |
+| `narrowest`, `natural` | lo más estrecho que puede ser su contenido, o lo que mide sin partir ninguna línea |
 | `*`, `2*` | una parte de lo que sobra; nunca menos que la palabra más larga de su contenido |
 | `between(100, *)` | entre 100 y una parte de lo que sobra |
 | `repeat(3, *)` | tres columnas `*` |

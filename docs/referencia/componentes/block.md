@@ -58,8 +58,8 @@ de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Col
 
 ## Tamaños intrínsecos
 
-El min-content de un `Block` es el máximo del min-content de sus hijos, y su max-content, el máximo de sus max-content
-([La caja](../comun/caja.md#tamaños-intrínsecos)).
+El ancho más estrecho de un `Block` es el máximo de los anchos más estrechos de sus hijos, y su ancho natural, el máximo de
+sus anchos naturales ([La caja](../comun/caja.md#tamaños-intrínsecos)).
 
 ## Cortes
 

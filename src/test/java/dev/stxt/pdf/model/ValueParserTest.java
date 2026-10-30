@@ -20,7 +20,7 @@ class ValueParserTest {
         assertEquals(new Value.Fraction(2.5), ValueParser.value("2.5*"));
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("1fr"));
         assertEquals(Value.AUTO, ValueParser.value("auto"));
-        assertEquals(Value.Keyword.MIN_CONTENT, ValueParser.value("min-content"));
+        assertEquals(Value.Keyword.NARROWEST, ValueParser.value("narrowest"));
     }
 
     @Test

@@ -1,7 +1,7 @@
 # Hito 27: mayúsculas, interletraje y versalitas (referencia/comun/tipografia.md). Página de 200 × 200 con
 # márgenes de 20: área útil de 160 × 160 desde (20, 20). Líneas de 12 (Size 10); con las métricas
 # de prueba cada carácter mide 5 pt. Language es: Case sigue las reglas del castellano.
-#   row:     Flex en (20, 20), de 160 × 12; sus ítems miden su max-content y están seguidos:
+#   row:     Flex en (20, 20), de 160 × 12; sus ítems miden su ancho natural y están seguidos:
 #     spaced   "abcd" con Letter spacing 2: 4 × 5 + 3 × 2 (el último no lo lleva) = 26. x = 20.
 #     small    "Ab" con Small caps: la A mide 5 y la b, pasada a B, el 80 % de 5 = 4: 9. x = 46.
 #     upper    "straße" con Case uppercase: STRASSE son 7 caracteres: 35. x = 55.

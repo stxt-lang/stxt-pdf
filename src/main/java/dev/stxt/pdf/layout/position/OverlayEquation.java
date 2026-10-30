@@ -31,7 +31,7 @@ public final class OverlayEquation {
                                       double containingBlockWidth, double staticLeft,
                                       IntrinsicSizes content) {
         return solve(left, width, right, marginLeft, marginRight, containingBlockWidth,
-                staticLeft, content::fitContent);
+                staticLeft, content::fit);
     }
 
     /**

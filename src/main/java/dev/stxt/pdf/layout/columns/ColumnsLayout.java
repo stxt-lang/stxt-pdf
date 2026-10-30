@@ -75,7 +75,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Con {@code Count}, ese número de columnas del min-content o el max-content del contenido,
+     * Con {@code Count}, ese número de columnas del ancho más estrecho o del natural del contenido,
      * más los huecos; con {@code Min column width} el mínimo es una columna, porque el número de
      * columnas se adapta al ancho, y el máximo, columnas de al menos ese ancho.
      */
@@ -84,10 +84,10 @@ public final class ColumnsLayout implements LayoutAlgorithm {
         IntrinsicSizes content = context.intrinsic(flow(box));
         Style s = box.style();
         int count = s.columns().count() != null ? s.columns().count() : 1;
-        int narrowest = s.columns().minColumnWidth() == null ? count : 1;
+        int fewest = s.columns().minColumnWidth() == null ? count : 1;
         double width = s.columns().minColumnWidth() != null ? s.columns().minColumnWidth() : 0;
-        return new IntrinsicSizes(narrowest * content.minContent() + (narrowest - 1) * s.columns().columnGap(),
-                count * Math.max(content.maxContent(), width) + (count - 1) * s.columns().columnGap());
+        return new IntrinsicSizes(fewest * content.narrowest() + (fewest - 1) * s.columns().columnGap(),
+                count * Math.max(content.natural(), width) + (count - 1) * s.columns().columnGap());
     }
 
     @Override

@@ -87,7 +87,7 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 ## Tamaños intrínsecos
 
-min-content = la palabra más ancha; max-content = el párrafo más largo en una sola línea (con `preserve` y `preserve-wrap`, ver
+ancho más estrecho = la palabra más ancha; ancho natural = el párrafo más largo en una sola línea (con `preserve` y `preserve-wrap`, ver
 [Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
 
 ## Idioma (`Language`)

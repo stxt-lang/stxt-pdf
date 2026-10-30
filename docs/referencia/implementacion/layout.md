@@ -27,7 +27,7 @@ El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `abso
 
 ## `LayoutAlgorithm`
 
-`contentIntrinsic(box)` (min/max-content del contenido, sin borde, relleno, margen ni `Width`; independiente del espacio) y
+`contentIntrinsic(box)` (anchos más estrecho y natural del contenido, sin borde, relleno, margen ni `Width`; independiente del espacio) y
 `layout(box, space, from)`. Los de la caja de margen los da `context.intrinsic(box)` con `BoxModel.intrinsic`; los del
 contenido, `context.contentIntrinsic(box)` (el mínimo automático de un ítem de `Flex`).
 
@@ -74,13 +74,13 @@ que incluye su `Pages`.
 ## Cajas giradas en flujo
 
 `Engine.layout` maqueta aparte una caja con `Style.rotatesInFlow()` (un `Block`, `Text`, `Paragraph` o `Image` con
-`Rotate`): con `ConstraintSpace.fixed` y el ancho de `turnedWidth` (su `Width` resuelto o, con `auto`, su max-content más
+`Rotate`): con `ConstraintSpace.fixed` y el ancho de `turnedWidth` (su `Width` resuelto o, con `auto`, su ancho natural más
 borde y relleno), sin fragmentación y sin `from`. El resultado se envuelve con `Fragment.turned`: el fragmento mide el
 rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` guarda esa caja sin girar, centrada en él. Los
 algoritmos de los padres no saben nada del giro: ven una caja del tamaño del rectángulo, que no se parte (`BEFORE` si no
 cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`; además es un
-contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su min-content y su
-max-content son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
+contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su ancho más estrecho y su
+ancho natural son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
 (`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
 
 ## Fragmentos

@@ -36,7 +36,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * Layout {@code grid} (referencia/componentes/grid.md). Pasos:
  * <ol>
  *   <li>Colocación: {@link GridAreas}, {@link Cell} y {@link Placement}.</li>
- *   <li>Columnas: {@link TrackSizing} con min/max-content en ancho.</li>
+ *   <li>Columnas: {@link TrackSizing} con los anchos más estrecho y natural.</li>
  *   <li>Filas: {@link TrackSizing} con la altura de cada ítem al ancho de sus columnas.</li>
  *   <li>Alinear cada ítem en su área ({@code Horizontal}, {@code Vertical}); estirar = re-layout.</li>
  * </ol>
@@ -108,8 +108,8 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Suma de las columnas dimensionadas con restricción min-content (sin espacio libre) y con
-     * restricción max-content (espacio infinito y los ítems aportando su max-content), referencia/comun/caja.md.
+     * Suma de las columnas dimensionadas para el ancho más estrecho (sin espacio libre) y para el natural (espacio
+     * infinito y los ítems aportando su ancho natural), referencia/comun/caja.md.
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
@@ -121,8 +121,8 @@ public final class GridLayout implements LayoutAlgorithm {
         for (int i = 0; i < g.items().size(); i++) {
             IntrinsicSizes is = context.intrinsic(g.items().get(i));
             Area a = g.areas().get(i);
-            minContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.minContent(), is.maxContent()));
-            maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.maxContent(), is.maxContent()));
+            minContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.narrowest(), is.natural()));
+            maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.natural(), is.natural()));
         }
         double gaps = gap * Math.max(0, g.columns().size() - 1);
         // Sin containing block, las columnas en porcentaje cuentan como auto (referencia/comun/valores.md).
@@ -157,7 +157,7 @@ public final class GridLayout implements LayoutAlgorithm {
         for (int i = 0; i < n; i++) {
             IntrinsicSizes is = context.intrinsic(g.items().get(i));
             Area a = g.areas().get(i);
-            widths.add(new ItemContribution(a.column() - 1, a.columns(), is.minContent(), is.maxContent()));
+            widths.add(new ItemContribution(a.column() - 1, a.columns(), is.narrowest(), is.natural()));
         }
         double[] columns = TrackSizing.size(g.columns(), widths, contentWidth, columnGap);
         double[] x = offsets(columns, columnGap);
@@ -267,7 +267,7 @@ public final class GridLayout implements LayoutAlgorithm {
         }
         double width = horizontal == Alignment.STRETCH
                 ? areaWidth - margin.horizontal()
-                : context.intrinsic(item).fitContent(areaWidth) - margin.horizontal();
+                : context.intrinsic(item).fit(areaWidth) - margin.horizontal();
         return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth);
     }
 

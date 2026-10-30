@@ -52,7 +52,7 @@ Text: Lunes
 ```
 
 - **Su tamaño sin girar no depende del contenedor.** Su ancho es el de su `Width` o, si es `auto`, lo que mide su
-  contenido sin partir líneas (max-content), limitado por `Min width` y `Max width`; una `Image`, el suyo de siempre. Su
+  contenido sin partir líneas (ancho natural), limitado por `Min width` y `Max width`; una `Image`, el suyo de siempre. Su
   alto sale de ese ancho, como siempre. Un párrafo largo girado necesita un `Width` que reparta sus líneas.
 - **Gira sobre su centro** y ocupa el rectángulo que envuelve su caja de borde girada, con ella centrada dentro. Por eso
   `Rotate origin` no tiene sentido en flujo y no lo admite el schema: cualquier origen daría el mismo resultado.

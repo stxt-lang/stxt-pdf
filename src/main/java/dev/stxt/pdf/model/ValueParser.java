@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * <ul>
  *   <li>Números en puntos con punto decimal: {@code 12}, {@code 12.5}, {@code -4}.</li>
  *   <li>Porcentajes ({@code 50%}) y fracciones ({@code *}, {@code 2*}; {@code *} solo es {@code 1*}).</li>
- *   <li>Palabras: {@code auto}, {@code min-content}, {@code max-content}, {@code fit-content}.</li>
+ *   <li>Palabras: {@code auto}, {@code narrowest}, {@code natural}, {@code fit}.</li>
  *   <li>Pistas entre dos tamaños: {@code between(a, b)}.</li>
  *   <li>Listas separadas por espacios, con {@code repeat(n, patrón)}.</li>
  * </ul>
@@ -31,12 +31,12 @@ public final class ValueParser {
         switch (t) {
             case "auto":
                 return Value.AUTO;
-            case "min-content":
-                return Value.Keyword.MIN_CONTENT;
-            case "max-content":
-                return Value.Keyword.MAX_CONTENT;
-            case "fit-content":
-                return Value.Keyword.FIT_CONTENT;
+            case "narrowest":
+                return Value.Keyword.NARROWEST;
+            case "natural":
+                return Value.Keyword.NATURAL;
+            case "fit":
+                return Value.Keyword.FIT;
             default:
                 break;
         }

@@ -8,18 +8,22 @@
 | Porcentaje | Porcentaje de una base (ver [bases de los porcentajes](#bases-de-los-porcentajes)). | `50%` |
 | Fracción | Una parte del espacio libre, con su peso delante (`*` solo es `1*`). Solo en pistas de grid. | `*`, `2*`, `2.5*` |
 | `auto` | El motor calcula el valor según el contexto. | `auto` |
-| `min-content` | El menor tamaño posible sin desbordar (la palabra más larga). | `min-content` |
-| `max-content` | El tamaño sin ningún salto de línea. | `max-content` |
-| `fit-content` | `min(max-content, max(min-content, disponible))`. | `fit-content` |
+| `narrowest` | El menor tamaño posible sin desbordar (la palabra más larga). | `narrowest` |
+| `natural` | El tamaño sin ningún salto de línea. | `natural` |
+| `fit` | El ancho natural, sin pasar del disponible ni bajar del más estrecho. | `fit` |
 | `between(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `between(100, *)` |
 
 Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: *`,
-`Max width: max-content`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
+`Max width: natural`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
 silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
 [definido](#alto-definido) es un error.
 
 > **Decisión:** una fracción se escribe con un asterisco y su peso: `120 * 2*` da a la tercera pista el doble de lo que
 > sobra que a la segunda. *Alternativa descartada:* `1fr`, una unidad que solo conoce quien ya la ha usado.
+
+> **Decisión:** las palabras que miden el contenido dicen qué medida dan: `narrowest` (lo más estrecho), `natural` (sin
+> partir líneas) y `fit` (ajustado al espacio). *Alternativa descartada:* `min-content`, `max-content` y `fit-content`,
+> nombres del mecanismo de la maquetación web.
 
 > **Decisión:** una pista entre dos tamaños se escribe `between(a, b)`, que se lee tal cual: `between(100, *)`.
 > *Alternativa descartada:* `minmax(a, b)`, que nombra las dos funciones de la pista y no lo que mide.

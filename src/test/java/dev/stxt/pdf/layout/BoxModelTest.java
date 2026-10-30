@@ -77,12 +77,12 @@ class BoxModelTest {
         style.margin(Sides.all(pt(10)));
         Supplier<IntrinsicSizes> intrinsic = () -> new IntrinsicSizes(60, 200);
         ConstraintSpace space = ConstraintSpace.free(150, 400, NONE, false);
-        style.width(Value.Keyword.MIN_CONTENT);
+        style.width(Value.Keyword.NARROWEST);
         assertEquals(40, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
-        style.width(Value.Keyword.MAX_CONTENT);
+        style.width(Value.Keyword.NATURAL);
         assertEquals(180, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
-        // fit-content: el disponible (150) entre min-content y max-content.
-        style.width(Value.Keyword.FIT_CONTENT);
+        // fit: el disponible (150) entre el ancho más estrecho y el natural.
+        style.width(Value.Keyword.FIT);
         assertEquals(130, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
     }
 
@@ -157,7 +157,7 @@ class BoxModelTest {
         style.minWidth(pt(50));
         style.maxWidth(pt(60));
         assertEquals(new IntrinsicSizes(60, 70), BoxModel.intrinsic(box, content));
-        // Un Width fijo es a la vez min-content y max-content, también limitado.
+        // Un Width fijo es a la vez el ancho más estrecho y el natural, también limitado.
         style.width(pt(100));
         assertEquals(new IntrinsicSizes(70, 70), BoxModel.intrinsic(box, content));
         style.maxWidth(null);
@@ -188,7 +188,7 @@ class BoxModelTest {
     void intrinsicSizesAreOnlyComputedWhenNeeded() {
         style.width(pt(10));
         resolve(ConstraintSpace.free(100, 100, NONE, false));
-        style.width(Value.Keyword.MIN_CONTENT);
+        style.width(Value.Keyword.NARROWEST);
         assertThrows(AssertionError.class, () -> resolve(ConstraintSpace.free(100, 100, NONE, false)));
     }
 }

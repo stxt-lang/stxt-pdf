@@ -133,8 +133,8 @@ Un salto de línea al final del texto no añade una línea vacía.
 
 ### Tamaños intrínsecos
 
-Con `preserve`, min-content y max-content son la línea más ancha; con `preserve-wrap`, min-content es la palabra más ancha y
-max-content, la línea más ancha.
+Con `preserve`, el ancho más estrecho y el natural son la línea más ancha; con `preserve-wrap`, el ancho más estrecho es la
+palabra más ancha y el natural, la línea más ancha.
 
 > **Decisión:** el texto preformateado es una propiedad heredable, no un elemento `Preformatted`, que no cabría en una
 > `Cell` con valor.

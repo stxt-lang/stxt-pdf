@@ -3,7 +3,7 @@ package dev.stxt.pdf.layout.flex;
 /**
  * Datos de un ítem para el reparto en el eje principal (referencia/componentes/flex.md). Tamaños de caja de margen.
  *
- * @param basis   tamaño base ({@code Basis}, el tamaño declarado o el max-content)
+ * @param basis   tamaño base ({@code Basis}, el tamaño declarado o el ancho natural)
  * @param grow    factor {@code Grow}
  * @param shrink  factor {@code Shrink}
  * @param min     mínimo; con {@code Min width: auto} es el tamaño de su contenido, sin pasar del

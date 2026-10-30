@@ -25,7 +25,7 @@ public sealed interface Value {
     record Between(Value min, Value max) implements Value {}
 
     /** Palabras clave que dependen del contenido. */
-    enum Keyword implements Value { AUTO, MIN_CONTENT, MAX_CONTENT, FIT_CONTENT }
+    enum Keyword implements Value { AUTO, NARROWEST, NATURAL, FIT }
 
     Value AUTO = Keyword.AUTO;
 
@@ -37,7 +37,7 @@ public sealed interface Value {
         return this == Keyword.AUTO;
     }
 
-    /** {@code min-content}, {@code max-content} o {@code fit-content}. */
+    /** {@code narrowest}, {@code natural} o {@code fit}. */
     default boolean isIntrinsic() {
         return this instanceof Keyword k && k != Keyword.AUTO;
     }
