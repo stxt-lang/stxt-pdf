@@ -139,7 +139,8 @@ final class PropertyReader {
             s.declared(p.getCanonicalName(), p.getLine());
             switch (p.getCanonicalName()) {
                 case "width" -> s.box().setWidth(value(p, SIZE, false));
-                case "height" -> s.box().setHeight(value(p, SIZE, false));
+                // Las palabras del contenido solo miden anchos: en un alto serían otra forma de escribir auto (referencia/comun/caja.md).
+                case "height" -> s.box().setHeight(value(p, LENGTH_OR_AUTO, false));
                 case "min-width" -> s.box().setMinWidth(value(p, LENGTH_OR_AUTO, false));
                 case "max-width" -> s.box().setMaxWidth(value(p, LENGTH, false));
                 case "min-height" -> s.box().setMinHeight(value(p, LENGTH_OR_AUTO, false));

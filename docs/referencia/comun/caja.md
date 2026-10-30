@@ -26,8 +26,8 @@ El modelo de caja. No se hereda.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Width` | número, %, `auto`, intrínsecos | `auto` | |
-| `Height` | número, %, `auto`, intrínsecos | `auto` | |
+| `Width` | número, %, `auto`, `narrowest`, `natural`, `fit` | `auto` | |
+| `Height` | número, %, `auto` | `auto` | `auto` es el alto del contenido. |
 | `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Flex` y `Grid`; 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
 | `Aspect ratio` | `ancho/alto` o número | — | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
@@ -37,6 +37,10 @@ El modelo de caja. No se hereda.
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](valores.md#abreviados-de-cuatro-lados)). No afecta al layout. |
 | `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(…)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
+
+> **Decisión:** `narrowest`, `natural` y `fit` solo valen en `Width` (y en las pistas de `Grid` y `Table`): un alto
+> `auto` ya es el de su contenido, y en `Height` serían otra forma de escribir `auto`. *Alternativa descartada:*
+> admitirlas también en `Height`, como sinónimos de `auto`.
 
 > **Decisión:** lo que se hereda va en `Typography` y lo que no, en `Box` o `Break`: por eso `Background` y
 > `Border color` van en `Box`, y `Widows` y `Orphans`, en `Typography`. *Alternativa descartada:* un grupo de pintado.

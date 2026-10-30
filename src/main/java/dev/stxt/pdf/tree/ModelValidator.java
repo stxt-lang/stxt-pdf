@@ -399,7 +399,7 @@ final class ModelValidator {
         boolean gridItem = !s.isOutOfFlow() && parent.style().layout() == Layout.GRID;
         boolean base = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         Value h = s.box().height();
-        if (!h.isAuto() && !h.isIntrinsic()) {
+        if (!h.isAuto()) {
             return base || !hasPercentage(h);
         }
         if (h.isAuto() && s.box().aspectRatio() != null) {

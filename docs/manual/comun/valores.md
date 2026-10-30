@@ -11,7 +11,9 @@
 | `natural` | lo que mide sin partir ninguna línea | `Width: natural` |
 | `fit` | lo que necesita su contenido, sin pasar del espacio disponible | `Width: fit` |
 
-Cada propiedad admite solo algunas de estas formas, y su tabla lo dice; cualquier otra es un error. Solo los márgenes, los
+`narrowest`, `natural` y `fit` son anchos: valen en `Width` y en las columnas y filas de un `Grid`, no en `Height`, donde
+`auto` ya es el alto del contenido. Cada propiedad admite solo algunas de estas formas, y su tabla lo dice; cualquier otra
+es un error. Solo los márgenes, los
 desplazamientos de las cajas posicionadas y el interletraje pueden ser negativos. Un tamaño entre dos límites se escribe
 con su mínimo y su máximo: `Width: 50%`, `Min width: 200` y `Max width: 400`.
 
