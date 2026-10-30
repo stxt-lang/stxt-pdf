@@ -86,6 +86,13 @@ Text: Resultados del trimestre
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
 > `Line breaking` y no `Wrap`, que es de `Flex` y es otra cosa, porque un nombre es el mismo nodo en todo el schema.
 
+> **Decisión:** un nombre dice qué es la cosa en el documento, no el algoritmo que la maqueta (`Columns`, `Balance`), y
+> cuando el mundo editorial o un procesador de textos ya tiene uno conocido, se usa ese (`Style` para un estilo con nombre,
+> `Table of contents` y `TOC 1`…`6`, `Row header`, `Corner radius`). Los ejes se nombran por su dirección en la página
+> (`Horizontal`, `Vertical`) y no por su papel, y no hay dos nombres casi iguales con significados distintos (por eso
+> `Table of contents` y no `Contents`, que se confundía con `Content`). *Alternativa descartada:* nombres del
+> mecanismo (`Multicol`, `Relative`, `Absolute`, `Fixed`, `Main axis`…), que solo entiende quien ya lo conoce.
+
 ### Propiedades del elemento
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |

@@ -16,6 +16,13 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
+### Nombres
+
+- Segunda vuelta: los valores que vienen de la maquetación web (`fr`, `minmax`, `min-content`, `max-content`,
+  `fit-content`, `min`, `max`, `clamp`, `repeat`).
+- Pendiente de decidir si `Paragraph` y `Text` se quedan los dos: hoy solo se diferencian en que `Paragraph` no admite
+  líneas en blanco y en que las reglas `For element` los distinguen.
+
 ### PDF como imagen
 
 - De las reglas de PDF/UA sobre las fuentes de la página solo se comprueban dos: incrustadas y con `ToUnicode`
