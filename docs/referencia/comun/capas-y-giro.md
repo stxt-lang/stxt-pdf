@@ -33,7 +33,7 @@ mayores. Los `Fixed` del documento se pintan antes que los de la sección
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Rotate` | número entre −360 y 360, sin `0` | — | Gira la caja al pintarla, en grados en el sentido de las agujas del reloj. |
-| `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center` | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`…). Solo con `Rotate` (`ROTATE_ORIGIN_WITHOUT_ROTATE`). |
+| `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center`, o dos medidas (número o %) | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`, `20 50%`…). Solo con `Rotate` (`ROTATE_ORIGIN_WITHOUT_ROTATE`). |
 
 Una caja con `Rotate` se pinta girada tantos grados como dice alrededor de su `Rotate origin` (el centro de su caja de
 borde por defecto). Gira **todo lo que se pinta de la caja**: fondo, borde, texto, imagen, sus descendientes (también los
@@ -54,8 +54,19 @@ suma al de fuera.
   una caja girada se pulsa en la zona girada.
 
 `Rotate` va entre −360 y 360 grados, sin incluirlos; `0`, `360` y `−360`, que no giran nada, son `VALUE_NOT_ALLOWED`.
-`Rotate origin` son una o dos palabras clave en cualquier orden (`top left` = `left top`); el eje que no se nombra es
-`center`. Dos del mismo eje, o algo que no es una palabra clave, es `VALUE_NOT_ALLOWED`.
+`Rotate origin` se escribe de una de dos formas:
+
+- **Palabras clave:** una o dos, en cualquier orden (`top left` = `left top`); el eje que no se nombra es `center`.
+- **Dos medidas:** la horizontal y la vertical, desde la esquina de arriba a la izquierda de la caja de borde, en puntos o
+  en porcentaje de su ancho y de su alto (`Rotate origin: 20 50%`). Pueden ser negativas o pasar del tamaño de la caja:
+  el centro del giro puede estar fuera de ella.
+
+Dos palabras del mismo eje, una sola medida, una palabra clave con una medida, o algo que no es ni una cosa ni la otra,
+es `VALUE_NOT_ALLOWED`.
+
+> **Decisión:** las medidas van siempre de dos en dos y sin mezclarse con palabras clave: `left 20` tendría que decir si
+> el 20 es la otra coordenada o una distancia desde la izquierda. *Alternativa descartada:* combinar palabras clave y
+> medidas.
 
 > **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni se hereda (aunque lo que
 > contiene la caja gira con ella). Un `Text` no gira: se gira el bloque que lo contiene. *Alternativa descartada:* `Rotate`
@@ -68,5 +79,5 @@ suma al de fuera.
 
 - Opacidad de una caja entera (solo de los colores, [Valores](valores.md#colores)), otras transformaciones que el giro
   (escala, inclinación) y cajas que floten a un lado del texto.
-- `Rotate origin` con medidas (puntos o porcentajes), girar un `Text` o un `Block` directamente, que una caja girada ocupe
+- Girar un `Text` o un `Block` directamente, que una caja girada ocupe
   en el layout el rectángulo que la envuelve y que un `Relative` girado se parta.

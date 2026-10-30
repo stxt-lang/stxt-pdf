@@ -242,8 +242,8 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * {@code Rotate} y {@code Rotate origin} (referencia/comun/estructura.md): el giro y la fracción de la caja; sin
-     * origen, el centro.
+     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md): el giro y su origen, con palabras
+     * clave o con medidas; sin origen, el centro.
      */
     @Test
     void rotateAndItsOrigin() {
@@ -252,12 +252,15 @@ class BoxTreeBuilderTest {
                 "\tAbsolute:", "\t\tRotate: 90", "\t\tRotate origin: bottom right",
                 "\tFixed:", "\t\tRotate: 359.5", "\t\tRotate origin: top",
                 "\tImage: test/square.png", "\t\tRotate: -359",
-                "\tRelative:")).sections().get(0).box();
+                "\tRelative:",
+                "\tRelative:", "\t\tRotate: 30", "\t\tRotate origin: 10 25%")).sections().get(0).box();
         assertEquals(new dev.stxt.pdf.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation());
         assertEquals(new dev.stxt.pdf.model.Rotation(90, 1, 1), root.children().get(1).style().rotation());
         assertEquals(new dev.stxt.pdf.model.Rotation(359.5, 0.5, 0), root.children().get(2).style().rotation());
         assertEquals(-359, root.children().get(3).style().rotation().degrees(), 1e-9);
         assertEquals(null, root.children().get(4).style().rotation());
+        assertEquals(new dev.stxt.pdf.model.Rotation(30, dev.stxt.pdf.model.Value.pt(10),
+                new dev.stxt.pdf.model.Value.Percentage(25)), root.children().get(5).style().rotation());
     }
 
     /**

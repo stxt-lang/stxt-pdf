@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.NumberStyle;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -370,7 +371,7 @@ public final class BoxTreeBuilder {
     private String properties(BuildContext ctx, InlineNode n, ElementReader reader, Style s, Box parent) {
         String id = null;
         Double rotate = null;
-        double[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
+        Value[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
             if (isElement(p) || NOT_PROPERTIES.contains(name) || reader.property(p, s)) {

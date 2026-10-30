@@ -46,7 +46,8 @@ Absolute:
 ```
 
 - **`Rotate origin`** es el punto alrededor del que gira: una o dos de `top`, `bottom`, `left`, `right` y `center` (por
-  defecto, el centro). `Rotate origin: top left` gira sobre la esquina de arriba a la izquierda.
+  defecto, el centro), o dos medidas desde la esquina de arriba a la izquierda de la caja. `Rotate origin: top left` gira
+  sobre esa esquina; `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
 - **Girar no mueve nada.** La caja ocupa su sitio como si no estuviera girada, y lo de alrededor no se entera.
 - **Lo girado tiene que caber en la página**: si una esquina girada se sale del papel, es un error.
 - **Un `Relative` girado no se parte**: si no cabe en lo que queda de página, pasa entero a la siguiente.

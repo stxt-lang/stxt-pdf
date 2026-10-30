@@ -202,9 +202,10 @@ final class ValueReader {
     }
 
     /**
-     * {@code Rotate origin} (referencia/comun/estructura.md): la fracción del ancho y la del alto de la caja de borde.
+     * {@code Rotate origin} (referencia/comun/capas-y-giro.md): el origen horizontal y el vertical, desde la esquina de
+     * arriba a la izquierda de la caja de borde.
      */
-    static double[] rotateOrigin(Node n) {
+    static Value[] rotateOrigin(Node n) {
         try {
             return Rotation.origin(n.getText());
         } catch (IllegalArgumentException ex) {

@@ -1017,7 +1017,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: NUMBER
 		Description: Giro de la caja al pintarla, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0), alrededor de Rotate origin. No cambia el layout: la caja ocupa su sitio sin girar; lo girado debe caber en la página.
 	Node: Rotate origin
-		Description: Punto alrededor del que gira la caja de borde con Rotate: una o dos palabras clave de top, bottom, left, right y center (top left, bottom…). Por defecto, center.
+		Description: Punto alrededor del que gira la caja de borde con Rotate: una o dos palabras clave de top, bottom, left, right y center (top left, bottom…), o dos medidas desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto (20 50%). Por defecto, center.
 	Node: Paper
 		Type: ENUM
 		Description: Tamaño de papel con nombre del medio, en vertical: A3 (842 × 1191), A4 (595 × 842), A5 (420 × 595), A6 (298 × 420), B4 (709 × 1001), B5 (499 × 709), Letter (612 × 792) o Legal (612 × 1008). No se declara con Width ni Height.

@@ -16,24 +16,47 @@ class RotationTest {
 
     @Test
     void originKeywordsInAnyOrder() {
-        assertArrayEquals(new double[] {0.5, 0.5}, Rotation.origin("center"), E);
-        assertArrayEquals(new double[] {0, 0}, Rotation.origin("top left"), E);
-        assertArrayEquals(new double[] {0, 0}, Rotation.origin("left top"), E);
-        assertArrayEquals(new double[] {1, 1}, Rotation.origin("bottom   right"), E);
+        assertOrigin(50, 50, "center");
+        assertOrigin(0, 0, "top left");
+        assertOrigin(0, 0, "left top");
+        assertOrigin(100, 100, "bottom   right");
         // El eje que no se nombra queda en el centro.
-        assertArrayEquals(new double[] {0.5, 1}, Rotation.origin("bottom"), E);
-        assertArrayEquals(new double[] {1, 0.5}, Rotation.origin("right center"), E);
-        assertArrayEquals(new double[] {0.5, 0.5}, Rotation.origin("center center"), E);
+        assertOrigin(50, 100, "bottom");
+        assertOrigin(100, 50, "right center");
+        assertOrigin(50, 50, "center center");
+    }
+
+    /** Dos medidas: la horizontal y la vertical, en puntos o en porcentaje, también negativas. */
+    @Test
+    void originMeasures() {
+        assertArrayEquals(new Value[] {Value.pt(20), new Value.Percentage(30)}, Rotation.origin("20 30%"));
+        assertArrayEquals(new Value[] {new Value.Percentage(0), Value.pt(-5.5)}, Rotation.origin("0% -5.5"));
     }
 
     @Test
-    void originRejectsWhatIsNotTwoKeywordsOnDifferentAxes() {
+    void originRejectsWhatIsNotKeywordsOnDifferentAxesOrTwoMeasures() {
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("left right"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("top bottom"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("top left center"));
-        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("20 30"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("50%"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("left 20"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("20 auto"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("1fr 20"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("arriba 20"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("10 20 30"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin(" "));
+    }
+
+    private static void assertOrigin(double x, double y, String text) {
+        assertArrayEquals(new Value[] {new Value.Percentage(x), new Value.Percentage(y)}, Rotation.origin(text));
+    }
+
+    @Test
+    void pivotInPointsAndPercentages() {
+        Rotation r = new Rotation(30, Value.pt(15), new Value.Percentage(25));
+        Rect box = new Rect(10, 20, 100, 40);
+        assertEquals(25, r.pivotX(box), E);
+        assertEquals(30, r.pivotY(box), E);
     }
 
     @Test

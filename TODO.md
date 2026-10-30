@@ -53,5 +53,5 @@ saliendo al trabajar y solo toca ese.
 
 ### Giro
 
-- Girar un `Text` o un `Block` directamente, `Rotate origin` con medidas, que una caja girada ocupe en el layout su
-  rectángulo envolvente y que un `Relative` girado se pueda partir.
+- Girar un `Text` o un `Block` directamente, que una caja girada ocupe en el layout su rectángulo envolvente y que un
+  `Relative` girado se pueda partir.
