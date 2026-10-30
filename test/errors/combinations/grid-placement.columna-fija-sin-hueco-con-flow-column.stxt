@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Grid:
-			Flow: column
+			Flow: vertical
 			Row sizes: 10 10
 			Area: 1 1
 				Block:

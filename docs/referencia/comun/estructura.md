@@ -165,8 +165,8 @@ después se desplaza.
 
 El schema es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../../src/main/resources/stxt/dev.stxt.pdf.stxt), con el
 namespace `dev.stxt.pdf`. Define cada nodo una sola vez y los hijos que admite; un mismo nombre es el mismo nodo en todo
-el schema (el `Width` de `Page` y el de `Box`), así que `Gap`, `Cross axis`, `Horizontal` y `Vertical` tienen los mismos
-valores en el contenedor y en el ítem.
+el schema (el `Width` de `Page` y el de `Box`), así que `Gap`, `Horizontal` y `Vertical` tienen los mismos
+valores en todos los sitios donde van; lo que no vale en uno de ellos es un error del motor.
 
 Este resumen da los hijos de cada nodo con hijos; si difiere del fichero, manda el fichero. Cada propiedad va como mucho una
 vez; los elementos, las veces que se quiera.
@@ -179,7 +179,7 @@ vez; los elementos, las veces que se quiera.
 | `Styles` | `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins`, `Rotate`; elementos |
-| `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Overlay`, `Page overlay` |
+| `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Lines`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
 | `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
@@ -196,7 +196,7 @@ vez; los elementos, las veces que se quiera.
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
-| `Item` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
+| `Item` | `Grow`, `Shrink`, `Basis`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
 | `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |

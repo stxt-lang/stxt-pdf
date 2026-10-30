@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 			Border: 0.5 0 0 0
 			Border color: #DCCFB8
 		Flex:
-			Main axis: between
+			Horizontal: between
 			Item:
 				Text: Taller Nogal · Catálogo 2026 · tallernogal.example
 					Link: https://tallernogal.example
@@ -154,8 +154,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -165,8 +165,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Roble macizo con asiento de anea, ensamblada sin un solo clavo.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -191,8 +191,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -202,8 +202,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Nogal macizo con tablero de una pieza y patas con ensamble de cola de milano.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -235,8 +235,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -246,8 +246,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Pie de nogal torneado y pantalla de lino natural. Cable textil de dos metros.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -272,8 +272,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -283,8 +283,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Asiento circular de roble con tres patas abiertas. Se apila de dos en dos.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -321,8 +321,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -332,8 +332,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Nogal con cinco baldas regulables y laterales con ranura. Se fija a la pared.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -358,8 +358,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -369,8 +369,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Banco de recibidor con asiento tapizado en lana de oveja de la comarca.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -395,8 +395,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -406,8 +406,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Espejo ovalado con marco de nogal macizo y herraje de colgar oculto.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -439,8 +439,8 @@ Document (dev.stxt.pdf):
 						Block:
 							Style: body
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Item:
 									Heading 2:
 										Style: product
@@ -450,8 +450,8 @@ Document (dev.stxt.pdf):
 										Style: ref
 							Paragraph: Roble con cajonera de tres cajones y pasacables. Cantos redondeados.
 							Flex:
-								Main axis: between
-								Cross axis: end
+								Horizontal: between
+								Vertical: end
 								Box:
 									Margin: 6 0 0 0
 								Item:
@@ -552,7 +552,7 @@ Document (dev.stxt.pdf):
 					Color: #FFFFFF
 				Flex:
 					Gap: 24
-					Cross axis: center
+					Vertical: center
 					Item:
 						Image: examples/brand/nogal-mark-white.svg
 							Box:

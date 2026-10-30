@@ -20,7 +20,7 @@ Document (dev.stxt.pdf):
 				Size: 7
 				Color: #6B635C
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Item:
 					Text: Gaceta del Valle
 						Typography:
@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
 				Border: 0.5 0 0 0
 				Border color: #CFC8C0
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Item:
 					Text: Gaceta del Valle · Octubre de 2025 · Nº 87
 						Link: https://gacetadelvalle.example
@@ -58,7 +58,7 @@ Document (dev.stxt.pdf):
 					Bold: true
 					Align: center
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Box:
 					Padding: 4 0 0 0
 					Border: 0.5 0 0 0

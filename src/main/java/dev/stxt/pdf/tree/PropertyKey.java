@@ -58,13 +58,16 @@ public final class PropertyKey {
     public static final String DECORATION = "decoration";
 
     // Flex, Grid e Item
-    public static final String FLEX_MAIN_AXIS = "flex.main-axis";
+    public static final String FLEX_HORIZONTAL = "flex.horizontal";
+    public static final String FLEX_VERTICAL = "flex.vertical";
     public static final String FLEX_LINES = "flex.lines";
     public static final String FLEX_GAP = "flex.gap";
     public static final String GRID_ROWS = "grid.row-sizes";
     public static final String GRID_GAP = "grid.gap";
     public static final String ITEM_GROW = "item.grow";
     public static final String ITEM_BASIS = "item.basis";
+    public static final String ITEM_HORIZONTAL = "item.horizontal";
+    public static final String ITEM_VERTICAL = "item.vertical";
     /** La colocación de un ítem de grid: el valor de su {@code Area}, o la que calcula una {@code Table}. */
     public static final String ITEM_AREA = "item.area";
 

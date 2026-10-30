@@ -13,6 +13,7 @@ import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.Value;
 
 import java.util.List;
+import java.util.Locale;
 
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.label;
@@ -27,13 +28,14 @@ import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_LINES;
-import static dev.stxt.pdf.tree.PropertyKey.FLEX_MAIN_AXIS;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_ROWS;
 import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_BASIS;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_GROW;
+import static dev.stxt.pdf.tree.PropertyKey.ITEM_HORIZONTAL;
+import static dev.stxt.pdf.tree.PropertyKey.ITEM_VERTICAL;
 import static dev.stxt.pdf.tree.PropertyKey.MARGIN;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_WIDTH;
@@ -57,19 +59,33 @@ final class ModelValidator {
     private ModelValidator() {
     }
 
-    /** {@code Main axis}, {@code Lines} y {@code Gap} de un {@code Flex}. */
+    /**
+     * {@code Horizontal} y {@code Vertical}, {@code Lines} y {@code Gap} de un {@code Flex}: la del eje principal reparte
+     * y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code between}, {@code around} ni {@code
+     * evenly} (referencia/componentes/flex.md).
+     */
     static void validateFlex(Style s) {
+        String main = s.flex().isHorizontal() ? "Horizontal" : "Vertical";
+        String cross = s.flex().isHorizontal() ? "Vertical" : "Horizontal";
+        String direction = "Direction: " + (s.flex().isHorizontal() ? "horizontal" : "vertical");
         if (s.flex().mainAxis() == Distribution.STRETCH) {
-            throw error(s.line(FLEX_MAIN_AXIS), ErrorCode.VALUE_NOT_ALLOWED,
-                    "Main axis no admite 'stretch'; usa Grow en los ítems");
+            throw error(s.line(s.flex().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " es el eje principal de "
+                    + "este Flex (" + direction + ") y reparte el espacio sobrante: no admite stretch; usa Grow en los "
+                    + "ítems");
+        }
+        String spread = crossSpread(s);
+        if (spread != null) {
+            throw error(s.line(s.flex().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " es el eje cruzado de "
+                    + "este Flex (" + direction + ") y alinea los ítems: admite start, end, center o stretch, no "
+                    + spread + ", que reparte el eje principal (" + main + ")");
         }
         if (s.isDeclared(FLEX_LINES) && !s.flex().wrap()) {
             throw error(s.line(FLEX_LINES), ErrorCode.LINES_WITHOUT_WRAP,
                     "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
         }
-        // Sin Wrap hay una sola línea: no hay hueco entre filas en row ni entre columnas en column.
+        // Sin Wrap hay una sola línea: no hay hueco entre filas en horizontal ni entre columnas en vertical.
         if (s.flex().gapPair() && !s.flex().wrap()) {
-            String unused = s.flex().direction() == Direction.ROW
+            String unused = s.flex().direction() == Direction.HORIZONTAL
                     ? "primero, el hueco entre filas," : "segundo, el hueco entre columnas,";
             throw error(s.line(FLEX_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
                     + " línea y el " + unused + " no tiene efecto: escribe un solo valor, el hueco entre ítems");
@@ -164,6 +180,9 @@ final class ModelValidator {
                     + "Block con la caja girada dentro)");
         }
 
+        if (flexItem) {
+            validateFlexItem(s, parent);
+        }
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
@@ -174,6 +193,30 @@ final class ModelValidator {
         validateMinMax(s, HEIGHT, s.box().height(), MIN_HEIGHT, s.box().minHeight(), MAX_HEIGHT, s.box().maxHeight());
         validatePercentages(ctx, s, parent, flexItem, gridItem);
         validateColumnBreaks(ctx, s);
+    }
+
+    /** El valor del eje cruzado de un {@code Flex} si es un reparto ({@code between}…), que no vale ahí; si no, {@code null}. */
+    private static String crossSpread(Style s) {
+        Distribution v = s.flex().crossDeclared();
+        return v == Distribution.BETWEEN || v == Distribution.AROUND || v == Distribution.EVENLY
+                ? v.name().toLowerCase(Locale.ROOT) : null;
+    }
+
+    /**
+     * En un ítem de {@code Flex}, {@code Horizontal} o {@code Vertical} solo en el eje cruzado: en el principal reparte
+     * el {@code Flex}, con su propia propiedad, y el ítem crece o se encoge con {@code Grow} y {@code Shrink}
+     * (referencia/componentes/flex.md).
+     */
+    private static void validateFlexItem(Style s, Box parent) {
+        boolean horizontal = parent.style().flex().isHorizontal();
+        String key = horizontal ? ITEM_HORIZONTAL : ITEM_VERTICAL;
+        if (s.isDeclared(key)) {
+            String main = horizontal ? "Horizontal" : "Vertical";
+            String cross = horizontal ? "Vertical" : "Horizontal";
+            throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " no tiene efecto en un ítem de un Flex con "
+                    + "Direction: " + main.toLowerCase(Locale.ROOT) + ", porque es su eje principal: el reparto "
+                    + "lo da el " + main + " del Flex y el tamaño, Grow y Shrink; alinea el ítem con " + cross);
+        }
     }
 
     /** {@code Before} y {@code After: column} solo dentro de un {@code Columns}, que es quien tiene columnas. */
@@ -231,7 +274,7 @@ final class ModelValidator {
         SourceLine line = s.line(MARGIN);
         if (flexItem || gridItem) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de flex o "
-                    + "grid; alinea con Main axis, Cross axis, Horizontal o Vertical");
+                    + "grid; alinea con Horizontal y Vertical");
         }
         if (s.isOutOfFlow()) {
             validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);
@@ -307,14 +350,14 @@ final class ModelValidator {
                 && (hasPercentage(s.offset().top()) || hasPercentage(s.offset().bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
-        boolean column = parent.style().flex().direction() == Direction.COLUMN;
+        boolean column = parent.style().flex().direction() == Direction.VERTICAL;
         if (flexItem && column && !parentDefinite) {
             if (hasPercentage(s.item().basis())) {
-                throw indefinite(s.line(ITEM_BASIS), "Basis en un flex column");
+                throw indefinite(s.line(ITEM_BASIS), "Basis en un flex vertical");
             }
             if (s.item().grow() > 0) {
                 throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
-                        + "column del padre no tiene un alto definido que repartir; declara su Height");
+                        + "vertical del padre no tiene un alto definido que repartir; declara su Height");
             }
         }
     }
@@ -327,9 +370,9 @@ final class ModelValidator {
         if (s.grid().rows().stream().anyMatch(ValueReader::hasPercentage)) {
             throw indefinite(s.line(GRID_ROWS), "Row sizes");
         }
-        // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
+        // En flex, el hueco entre filas solo cuenta en vertical o con varias líneas.
         boolean rowGapUsed = s.layout() == Layout.GRID
-                || (s.layout() == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.COLUMN));
+                || (s.layout() == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.VERTICAL));
         Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.flex().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
             String gap = s.layout() == Layout.GRID ? GRID_GAP : FLEX_GAP;

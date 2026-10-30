@@ -40,7 +40,7 @@ public sealed interface BreakToken {
     }
 
     /**
-     * Flex o grid: siguiente línea o fila (en flex {@code column}, siguiente ítem) y alto de los
+     * Flex o grid: siguiente línea o fila (en un flex vertical, siguiente ítem) y alto de los
      * fragmentos anteriores.
      *
      * @param itemTokens vacía si el corte es antes de {@code nextLine}. Si es dentro (una fila que

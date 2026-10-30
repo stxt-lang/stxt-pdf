@@ -21,7 +21,7 @@ import java.util.List;
  * sin mover el cursor; si no queda ninguna, no hay colocación ({@link NoRoom}): la fila no crece. Con
  * la columna fija y la fila automática, va a la primera fila libre desde el cursor.</p>
  *
- * <p>{@code Flow: column} es el mismo algoritmo con los ejes intercambiados: se trasponen la
+ * <p>{@code Flow: vertical} es el mismo algoritmo con los ejes intercambiados: se trasponen la
  * rejilla y las celdas, se coloca por filas y se deshace la trasposición.</p>
  */
 public final class Placement {
@@ -41,7 +41,7 @@ public final class Placement {
     }
 
     /**
-     * Un ítem con la fila fija (la columna, con {@code Flow: column}) no cabe en ella.
+     * Un ítem con la fila fija (la columna, con {@code Flow: vertical}) no cabe en ella.
      *
      * @param item   índice del ítem
      * @param track  la fila (o la columna) que pide
@@ -54,13 +54,13 @@ public final class Placement {
     /**
      * @param cells   celdas pedidas, en orden del árbol
      * @param columns columnas de la rejilla explícita
-     * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: column})
+     * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: vertical})
      * @param flow    dirección de la colocación automática
      * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija (la
      *         columna, en {@code column}) no cabe en ella
      */
     public static Result place(List<Cell> cells, int columns, int rows, Direction flow) {
-        if (flow == Direction.ROW) {
+        if (flow == Direction.HORIZONTAL) {
             return place(cells, columns);
         }
         List<Cell> transposed = cells.stream()

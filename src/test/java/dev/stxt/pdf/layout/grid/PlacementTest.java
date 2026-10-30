@@ -78,10 +78,10 @@ class PlacementTest {
 
     @Test
     void fixedColumnWithoutRoomInColumnFlow() {
-        // Con Flow: column, la columna fija es la que no crece: dos filas, las dos ocupadas.
+        // Con Flow: vertical, la columna fija es la que no crece: dos filas, las dos ocupadas.
         assertInstanceOf(Placement.NoRoom.class, Placement.place(
                 List.of(new Cell(1, 1, 1, 1), new Cell(2, 1, 1, 1), new Cell(null, 1, 1, 1)), 1, 2,
-                Direction.COLUMN));
+                Direction.VERTICAL));
     }
 
     // Casos que faltaban según las pruebas de mutación.

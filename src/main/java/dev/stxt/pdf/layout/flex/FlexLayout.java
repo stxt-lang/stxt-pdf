@@ -45,7 +45,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  *
  * <p>Los tamaños de {@link FlexItem} son de caja de margen; los márgenes {@code auto} valen 0.
  * En un contenedor de una sola línea (sin {@code Wrap}) con tamaño cruzado definido, la línea
- * mide lo que el contenedor. En {@code column}, los ítems con {@code stretch} de un contenedor
+ * mide lo que el contenedor. En vertical, los ítems con {@code stretch} de un contenedor
  * de una sola línea se miden ya con el ancho del contenedor; en el resto de casos, con su ajuste
  * al contenido.</p>
  *
@@ -53,12 +53,12 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
  *
- * <p>Simplificación: en {@code column}, el mínimo automático de un ítem con {@code Height}
+ * <p>Simplificación: en vertical, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
  *
- * <p>Entre páginas (referencia/comun/cortes.md) se corta entre líneas en {@code row} y entre ítems en
- * {@code column}, con {@link UnitBreaker}; una línea (en {@code column}, un ítem) que no cabe en
- * una página se parte en paralelo. Un contenedor {@code column} con {@code Wrap} no se parte.</p>
+ * <p>Entre páginas (referencia/comun/cortes.md) se corta entre líneas en horizontal y entre ítems en
+ * vertical, con {@link UnitBreaker}; una línea (en vertical, un ítem) que no cabe en
+ * una página se parte en paralelo. Un contenedor vertical con {@code Wrap} no se parte.</p>
  */
 public final class FlexLayout implements LayoutAlgorithm {
 
@@ -88,7 +88,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
-        if (s.flex().direction() == Direction.COLUMN) {
+        if (s.flex().direction() == Direction.VERTICAL) {
             content = new IntrinsicSizes(maxMin, maxMax);
         } else if (s.flex().wrap()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
@@ -110,7 +110,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         final Insets margin;
         final Alignment align;
         FlexItem flex;
-        /** En column: ancho de caja de borde con el que se mide el ítem. */
+        /** En vertical: ancho de caja de borde con el que se mide el ítem. */
         double crossWidth;
         /** Tamaño principal final, de caja de margen. */
         double main;
@@ -155,7 +155,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.box = box;
             this.s = box.style();
             this.model = model;
-            this.row = s.flex().direction() == Direction.ROW;
+            this.row = s.flex().direction() == Direction.HORIZONTAL;
             this.multiLine = s.flex().wrap();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
@@ -230,8 +230,8 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Paso 8: alinear. Las unidades de la fragmentación son las líneas en row y los ítems en
-         * column (con Wrap, el contenedor entero).
+         * Paso 8: alinear. Las unidades de la fragmentación son las líneas en horizontal y los ítems en
+         * vertical (con Wrap, el contenedor entero).
          */
         UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingAbsolute> pending) {
             int n = lines.size();
@@ -366,7 +366,8 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
 
         Alignment alignment(Style is) {
-            return is.item().crossAxis() != null ? is.item().crossAxis() : s.flex().crossAxis();
+            Alignment own = s.flex().isHorizontal() ? is.item().vertical() : is.item().horizontal();
+            return own != null ? own : s.flex().crossAxis();
         }
 
         // --- Pasos 4 a 7 ----------------------------------------------------------------------------
@@ -478,7 +479,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Reparto del sobrante {@code free} entre {@code n} elementos (tabla de {@code Main axis},
+     * Reparto del sobrante {@code free} entre {@code n} elementos (tabla del eje principal,
      * referencia/componentes/flex.md). Si falta sitio, {@code between} se alinea al principio y {@code around} y
      * {@code evenly} se centran, como en CSS.
      *

@@ -75,7 +75,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Margin`, `Padding` (los cuatro lados) | el **ancho** del contenedor de referencia, también arriba y abajo |
 | `Offset` arriba/abajo | el alto del contenedor de referencia, que **debe ser definido** |
 | `Offset` izquierda/derecha | el ancho del contenedor de referencia |
-| `Basis` (ítem de `Flex`) | el tamaño del `Flex` en el eje principal (en `column`, su alto, que debe ser definido) |
+| `Basis` (ítem de `Flex`) | el tamaño del `Flex` en el eje principal (en un `Flex` vertical, su alto, que debe ser definido) |
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
 | Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
 | `Line height` | el `Size` de la propia caja |

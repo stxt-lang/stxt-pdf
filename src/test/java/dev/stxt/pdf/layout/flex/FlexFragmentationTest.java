@@ -55,7 +55,7 @@ class FlexFragmentationTest {
     @Test
     void columnBreaksBetweenItems() {
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: column"},
+                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
                 item("A"), item("B"), item("C")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "F"));
@@ -68,7 +68,7 @@ class FlexFragmentationTest {
     void columnRespectsAvoidBetweenItems() {
         // Cortar antes de C incumple su avoid: se corta antes de B.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: column"},
+                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
                 item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tBefore: avoid"}));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
@@ -98,7 +98,7 @@ class FlexFragmentationTest {
     @Test
     void columnItemTallerThanAPageIsBroken() {
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: column"},
+                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
                 new String[]{"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 150"}, item("B")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
@@ -127,7 +127,7 @@ class FlexFragmentationTest {
     void aWrappedColumnIsASingleUnit() {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tBox:", "\t\t\tHeight: 50"},
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: column",
+                new String[]{"\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical",
                         "\t\tWrap: true", "\t\tLines: start"},
                 item("A", "Width: 50"), item("B", "Width: 50")));
         assertRect(40, 90, 50, 40, l.rect(1, "A"));

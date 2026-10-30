@@ -213,12 +213,12 @@ class ImageLayoutTest {
     void flexColumnStretchesTheWidth() {
         LayoutFixture f = layOut(
                 "\tFlex:",
-                "\t\tDirection: column",
+                "\t\tDirection: vertical",
                 "\t\tItem:",
                 "\t\t\tImage: test/wide.png",
                 "\t\t\t\tId: I",
                 "\t\tItem:",
-                "\t\t\tCross axis: start",
+                "\t\t\tHorizontal: start",
                 "\t\t\tImage: test/wide.png",
                 "\t\t\t\tId: J");
         assertRect(40, 40, 515, 257.5, f.rect("I"));

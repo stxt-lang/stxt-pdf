@@ -107,7 +107,7 @@ en lo que suman esos huecos.
 
 ## Cortes en `Flex`, `Grid` y `Table`
 
-En un `Flex` en `column`, el corte se hace entre ítems. En `row` y en un `Grid`, entre líneas o filas. Una línea, fila o
+En un `Flex` vertical, el corte se hace entre ítems. En uno horizontal y en un `Grid`, entre líneas o filas. Una línea, fila o
 ítem que no cabe en lo que queda de página pasa entero a la siguiente. Si tampoco cabe al principio de una página, sus
 ítems se parten **en paralelo**: cada uno se parte por su cuenta y la fila continúa en la página siguiente con los ítems
 que no han terminado, todos desde arriba, y con la altura del más largo de ellos; las filas siguientes van detrás, con el
@@ -115,7 +115,7 @@ hueco que las separaba. Las filas que ocupa un mismo ítem se parten juntas, cad
 reparte entre las páginas el alto que le impone su línea o su área, así que puede terminar antes o después que el texto de
 sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte, y si no cabe es un error.
 
-Al elegir el corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un `Flex` en `column` con `Wrap` no
+Al elegir el corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un `Flex` vertical con `Wrap` no
 se parte. Las tablas repiten además su cabecera y su pie ([Table](../componentes/table.md#cortes)).
 
 ## Lo que no se parte

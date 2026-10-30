@@ -14,14 +14,14 @@ Document (dev.stxt.pdf):
 			Id: footer
 			Offset: auto 0 -30 0
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Item:
 					Text: CEIP Pla de les Eres · Olot
 				Item:
 					Text: Horario válido del 8 de septiembre de 2025 al 19 de junio de 2026
 		Flex:
 			Id: masthead
-			Cross axis: center
+			Vertical: center
 			Gap: 14
 			Box:
 				Margin: 0 0 16 0
@@ -161,7 +161,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot math
@@ -173,7 +173,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot lang
@@ -185,7 +185,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot eng
@@ -197,7 +197,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot sci
@@ -209,7 +209,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot music
@@ -221,7 +221,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot art
@@ -233,7 +233,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot pe
@@ -245,7 +245,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot lab
@@ -257,7 +257,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot tutor
@@ -269,7 +269,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Flex:
 					Gap: 5
-					Cross axis: center
+					Vertical: center
 					Item:
 						Block:
 							Style: slot proj

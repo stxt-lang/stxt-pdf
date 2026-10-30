@@ -105,11 +105,9 @@ class SchemaCoverageTest {
             Map.entry("Inside", "Inside: avoid"),
             Map.entry("Decoration", "Decoration: clone"),
             // Flex e Item
-            Map.entry("Direction", "Direction: column"),
+            Map.entry("Direction", "Direction: vertical"),
             Map.entry("Wrap", "Wrap: true"),
             Map.entry("Gap", "Gap: 5"),
-            Map.entry("Main axis", "Main axis: center"),
-            Map.entry("Cross axis", "Cross axis: center"),
             Map.entry("Lines", "Lines: center"),
             Map.entry("Grow", "Grow: 1"),
             Map.entry("Shrink", "Shrink: 0"),
@@ -118,7 +116,7 @@ class SchemaCoverageTest {
             Map.entry("Column sizes", "Column sizes: 100"),
             Map.entry("Row sizes", "Row sizes: 20"),
             Map.entry("Areas", "Areas >>\n\ta"),
-            Map.entry("Flow", "Flow: column"),
+            Map.entry("Flow", "Flow: vertical"),
             Map.entry("Horizontal", "Horizontal: center"),
             Map.entry("Vertical", "Vertical: center"),
             // Listas
@@ -202,6 +200,9 @@ class SchemaCoverageTest {
         t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
+        // Un ítem solo se alinea en el eje cruzado: Horizontal, en un Flex vertical.
+        t.put("Item > Horizontal", new Template(HEADER + "\tFlex:\n\t\tDirection: vertical\n\t\tItem:\n\t\t\t{}\n"
+                + "\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
         String table = HEADER + "\tTable:\n\t\tColumn sizes: 100\n";
         t.put("Table", new Template(table + "\t\t{}\n\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Column sizes")));
@@ -222,7 +223,8 @@ class SchemaCoverageTest {
     Stream<DynamicTest> everyPropertyOfTheSchemaIsRead() {
         DocumentReader reader = new DocumentReader();
         return pairs().stream().map(pair -> DynamicTest.dynamicTest(pair.parent() + " > " + pair.child(), () -> {
-            Template template = TEMPLATES.get(pair.parent());
+            Template template = TEMPLATES.getOrDefault(pair.parent() + " > " + pair.child(),
+                    TEMPLATES.get(pair.parent()));
             assertNotNull(template, () -> "Añade a SchemaCoverageTest la plantilla de " + pair.parent());
             String sample = SAMPLES.get(pair.child());
             assertNotNull(sample, () -> "Añade a SchemaCoverageTest un valor de ejemplo de " + pair.child());

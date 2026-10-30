@@ -28,8 +28,8 @@ Document (dev.stxt.pdf):
 		Overlay:
 			Offset: 40 72 auto 72
 			Flex:
-				Main axis: between
-				Cross axis: end
+				Horizontal: between
+				Vertical: end
 				Box:
 					Padding: 0 0 12 0
 					Border: 0 0 1.5 0

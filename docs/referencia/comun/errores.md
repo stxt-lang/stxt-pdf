@@ -108,7 +108,8 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un 
 | `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` no va en la primera `Section`, que ya empieza en la página 1 ([Document](../componentes/document.md#empezar-en-página-impar)) | `Begin on: odd no tiene efecto en la primera sección…` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Flex`, solo con `Wrap: true` ([Flex](../componentes/flex.md#propiedades-del-flex)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: escribe un solo valor…` |
-| `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |
+| `GROW_WITHOUT_EFFECT` | `Grow` en un `Flex` vertical necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex vertical del padre no tiene un alto definido…` |
+| `ITEM_MAIN_AXIS` | Un `Item` solo se alinea en el eje cruzado de su `Flex`: `Vertical` en uno horizontal y `Horizontal` en uno vertical ([Flex](../componentes/flex.md#item)) | `Horizontal no tiene efecto en un ítem de un Flex con Direction: horizontal, porque es su eje principal…` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([La caja](caja.md#mínimos-y-máximos)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([Valores](valores.md#alto-definido)) | `Height usa un porcentaje de un alto que no es definido…` |

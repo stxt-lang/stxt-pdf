@@ -25,8 +25,8 @@ Document (dev.stxt.pdf):
 				Border: 0 0 0.75 0
 				Border color: #3F3D8F
 			Flex:
-				Main axis: between
-				Cross axis: end
+				Horizontal: between
+				Vertical: end
 				Item:
 					Image: examples/contract/lumen.svg
 						Alt: Lumen, estudio de diseño
@@ -42,11 +42,11 @@ Document (dev.stxt.pdf):
 				Border: 0.5 0 0 0
 				Border color: #B9B8D9
 			Flex:
-				Main axis: between
-				Cross axis: end
+				Horizontal: between
+				Vertical: end
 				Item:
 					Flex:
-						Cross axis: end
+						Vertical: end
 						Item:
 							Text: Rúbricas:
 						Item:

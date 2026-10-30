@@ -80,7 +80,7 @@ class GridLayoutTest {
     @Test
     void flowColumn() {
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tColumn sizes: 100 100", "\t\tRow sizes: 20 20", "\t\tFlow: column", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: C");
+                "\tGrid:", "\t\tColumn sizes: 100 100", "\t\tRow sizes: 20 20", "\t\tFlow: vertical", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: C");
         assertRect(40, 40, 100, 20, l.rect("A"));
         assertRect(40, 60, 100, 20, l.rect("B"));
         assertRect(140, 40, 100, 20, l.rect("C"));
@@ -265,7 +265,7 @@ class GridLayoutTest {
                 "\t\tArea: 1 auto", "\t\t\tBlock:")).getMessage();
         assertTrue(one.contains("no queda un hueco de 1 columna libre para este ítem (la rejilla tiene 1 columna)"), one);
         String column = assertThrows(InvalidModelException.class, () -> layOut(
-                "\tGrid:", "\t\tFlow: column", "\t\tRow sizes: 100", "\t\tBox:", "\t\t\tHeight: 100",
+                "\tGrid:", "\t\tFlow: vertical", "\t\tRow sizes: 100", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: auto 1", "\t\t\tBlock:")).getMessage();
         assertTrue(column.contains("En la columna 1 no queda un hueco de 1 fila libre para este ítem (la rejilla tiene "

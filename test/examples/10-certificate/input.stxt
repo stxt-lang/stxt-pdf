@@ -94,8 +94,8 @@ Document (dev.stxt.pdf):
 				Margin: 0 auto 18 auto
 		Flex:
 			Id: signatures
-			Main axis: between
-			Cross axis: end
+			Horizontal: between
+			Vertical: end
 			Item:
 				Block:
 					Box:

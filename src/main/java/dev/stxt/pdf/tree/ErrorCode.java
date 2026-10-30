@@ -160,8 +160,10 @@ public enum ErrorCode {
     LINES_WITHOUT_WRAP,
     /** {@code Gap} de dos valores en un {@code Flex} sin {@code Wrap: true}. */
     GAP_WITHOUT_WRAP,
-    /** {@code Grow} en un contenedor {@code column} sin alto definido. */
+    /** {@code Grow} en un {@code Flex} vertical sin alto definido. */
     GROW_WITHOUT_EFFECT,
+    /** {@code Horizontal} o {@code Vertical} de un {@code Item} en el eje principal de su {@code Flex}. */
+    ITEM_MAIN_AXIS,
     /** {@code Aspect ratio} con {@code Width} y {@code Height} declarados. */
     ASPECT_RATIO_CONFLICT,
     /** Mínimo mayor que el máximo, o un tamaño fuera de su mínimo y su máximo. */

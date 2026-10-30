@@ -17,7 +17,7 @@ public final class GridStyle extends StyleGroup {
     private List<Value> rows = List.of();
     /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
     private GridAreas areas = GridAreas.NONE;
-    private Direction flow = Direction.ROW;
+    private Direction flow = Direction.HORIZONTAL;
     private Alignment horizontal = Alignment.STRETCH;
     private Alignment vertical = Alignment.STRETCH;
     /** {@code Gap}: entre filas ({@code row}) y entre columnas ({@code column}). */

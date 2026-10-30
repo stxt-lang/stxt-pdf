@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Flex:
-			Direction: column
+			Direction: vertical
 			Gap: 7 13
 			Item:
 				Block:

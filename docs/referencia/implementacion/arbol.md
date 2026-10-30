@@ -29,7 +29,7 @@ jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Head`, `Bo
 vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema como lo que
 escribe el autor.
 
-> **Decisión:** lo que ya rechaza el schema no tiene código propio del motor: `Main axis: stretch`, `Inside: page` o un
+> **Decisión:** lo que ya rechaza el schema no tiene código propio del motor: `Direction: row`, `Inside: page` o un
 > bloque `>>` donde van hijos son errores del schema, con su código de `stxt-core`.
 
 > **Decisión:** `BoxTreeBuilder` valida contra el schema al empezar, aunque el documento venga de `DocumentReader`: un árbol

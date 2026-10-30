@@ -15,8 +15,8 @@ Document (dev.stxt.pdf):
 				Link: https://tallernogal.example
 		Flex:
 			Id: letterhead
-			Main axis: between
-			Cross axis: end
+			Horizontal: between
+			Vertical: end
 			Box:
 				Margin: 0 0 24 0
 				Padding: 0 0 12 0

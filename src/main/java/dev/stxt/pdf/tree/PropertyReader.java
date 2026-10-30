@@ -75,7 +75,7 @@ final class PropertyReader {
     /**
      * Propiedades del elemento {@code Flex} (la estructura completa está en el schema, referencia/comun/estructura.md).
      */
-    static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
+    static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "lines");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
     /** Propiedades del elemento {@code Columns}. */
@@ -234,8 +234,8 @@ final class PropertyReader {
                 List<Value> gap = gap(p);
                 s.flex().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
             }
-            case "main-axis" -> s.flex().setMainAxis(enumValue(Distribution.class, p));
-            case "cross-axis" -> s.flex().setCrossAxis(enumValue(Alignment.class, p));
+            case "horizontal" -> s.flex().setHorizontal(enumValue(Distribution.class, p));
+            case "vertical" -> s.flex().setVertical(enumValue(Distribution.class, p));
             case "lines" -> s.flex().setLines(enumValue(Distribution.class, p));
             default -> throw unread(p);
         }
@@ -253,8 +253,8 @@ final class PropertyReader {
             }
             case "areas" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
             case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
-            case "horizontal" -> s.grid().setHorizontal(enumValue(Alignment.class, p));
-            case "vertical" -> s.grid().setVertical(enumValue(Alignment.class, p));
+            case "horizontal" -> s.grid().setHorizontal(alignment(p));
+            case "vertical" -> s.grid().setVertical(alignment(p));
             default -> throw unread(p);
         }
     }
@@ -302,12 +302,24 @@ final class PropertyReader {
                 case "grow" -> s.item().setGrow(nonNegative(p));
                 case "shrink" -> s.item().setShrink(nonNegative(p));
                 case "basis" -> s.item().setBasis(value(p, LENGTH_OR_AUTO, false));
-                case "cross-axis" -> s.item().setCrossAxis(enumValue(Alignment.class, p));
-                case "horizontal" -> s.item().setHorizontal(enumValue(Alignment.class, p));
-                case "vertical" -> s.item().setVertical(enumValue(Alignment.class, p));
+                case "horizontal" -> s.item().setHorizontal(alignment(p));
+                case "vertical" -> s.item().setVertical(alignment(p));
                 default -> throw unread(p);
             }
         }
+    }
+
+    /**
+     * {@code Horizontal} o {@code Vertical} de un {@code Grid}, un {@code Area} o un {@code Item}: una alineación. {@code
+     * between}, {@code around} y {@code evenly} reparten el eje principal de un {@code Flex} y solo valen en él.
+     */
+    private static Alignment alignment(Node p) {
+        Distribution d = enumValue(Distribution.class, p);
+        if (d == Distribution.BETWEEN || d == Distribution.AROUND || d == Distribution.EVENLY) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " alinea en su sitio: admite start, end, center o "
+                    + "stretch; " + p.getText().trim() + " reparte el eje principal de un Flex y solo vale en él");
+        }
+        return Alignment.valueOf(d.name());
     }
 
     /** {@code Number label}: una plantilla con {@code {number}} una sola vez (referencia/componentes/heading.md). */

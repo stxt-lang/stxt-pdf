@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 				Text: 98 % de clientes satisfechos
 					Style: figure
 		Flex:
-			Main axis: between
+			Horizontal: between
 			Box:
 				Margin: 20 0 0 0
 			Item:
@@ -62,18 +62,18 @@ Cada hijo de un `Flex` va dentro de un `Item`, que envuelve **exactamente un ele
 | `Grow` | `0` | Qué parte del espacio que sobra recibe. Con `Grow: 1` en todos, se reparte a partes iguales |
 | `Shrink` | `1` | Qué parte del espacio que falta cede |
 | `Basis` | `auto` | El tamaño de partida: `auto` es su tamaño (el declarado o el de su contenido); `0` hace que todo el espacio se reparta según `Grow` |
-| `Cross axis` | el del `Flex` | Su alineación en el otro eje |
+| `Horizontal`, `Vertical` | el del `Flex` | Su alineación en el otro eje: `Vertical` en un `Flex` en fila, `Horizontal` en uno en columna. En la dirección del `Flex` es un error: ahí el ítem crece o encoge con `Grow` y `Shrink` |
 | `Layer` | `auto` | Qué se pinta encima ([Capas y giro](../comun/capas-y-giro.md)) |
 
 ## Propiedades del `Flex`
 
 | Propiedad | Valores | Por defecto | Qué hace |
 |---|---|---|---|
-| `Direction` | `row`, `column` | `row` | En fila o en columna |
+| `Direction` | `horizontal`, `vertical` | `horizontal` | En fila (`horizontal`) o en columna (`vertical`) |
 | `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap`, puede tener dos: entre filas y entre columnas |
 | `Wrap` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
-| `Main axis` | `start`, `end`, `center`, `between`, `around`, `evenly` | `start` | Dónde va lo que sobra en la dirección del `Flex`: al final, al principio, a los dos lados, entre los ítems… |
-| `Cross axis` | `start`, `end`, `center`, `stretch` | `stretch` | Cómo se alinean los ítems en el otro eje: `stretch` los estira al alto de la fila |
+| `Horizontal` | `start`, `end`, `center`, `between`, `around`, `evenly`; en columna, `start`, `end`, `center`, `stretch` | `start`; en columna, `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados, entre los ítems (`between`)… En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Flex` |
+| `Vertical` | `start`, `end`, `center`, `stretch`; en columna, `start`, `end`, `center`, `between`, `around`, `evenly` | `stretch`; en columna, `start` | Al revés que `Horizontal`: en fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila); en columna, dónde va lo que sobra |
 | `Lines` | `start`, `end`, `center`, `between`, `around`, `stretch` | `stretch` | Con `Wrap`, cómo se reparten las líneas |
 
 ## Cómo se reparte el espacio
@@ -84,13 +84,13 @@ Cada hijo de un `Flex` va dentro de un `Item`, que envuelve **exactamente un ele
 3. Un ítem nunca se estrecha más que su palabra más larga, salvo que declare `Min width: 0`.
 4. Si aun así no caben, es un error.
 
-`Main axis` solo actúa si ningún ítem crece. En fila, los ítems se estiran al alto de la fila (`Cross axis: stretch`), salvo
-las imágenes, que conservan su proporción.
+El reparto de lo que sobra solo actúa si ningún ítem crece. En fila, los ítems se estiran al alto de la fila
+(`Vertical: stretch`), salvo las imágenes, que conservan su proporción.
 
 ## Cosas a tener en cuenta
 
 - `Grow` en un `Flex` en columna necesita que el `Flex` tenga un alto en puntos; si no, no hay nada que repartir y es un error.
-- Los ítems no admiten `Margin: auto`: se alinean con `Main axis` y `Cross axis`.
+- Los ítems no admiten `Margin: auto`: se alinean con `Horizontal` y `Vertical`.
 - Entre páginas, un `Flex` en columna se corta entre ítems, y uno en fila, entre líneas; una fila que no cabe en una página
   entera se parte con sus ítems a la vez.
 

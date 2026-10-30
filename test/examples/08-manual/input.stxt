@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 			Id: header
 			Offset: -34 0 auto 0
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Item:
 					Text: Aire+ T2 · Guía rápida
 				Item:
@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
 				Border: 0.5 0 0 0
 				Border color: #BFD9D7
 			Flex:
-				Main axis: between
+				Horizontal: between
 				Item:
 					Text: ¿Necesitas ayuda? Escríbenos a soporte@airemas.example
 						Link: mailto:soporte@airemas.example

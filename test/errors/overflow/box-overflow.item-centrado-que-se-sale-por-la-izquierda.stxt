@@ -11,7 +11,7 @@ Document (dev.stxt.pdf):
 		Flex:
 			Box:
 				Width: 100
-			Main axis: center
+			Horizontal: center
 			Item:
 				Shrink: 0
 				Block:

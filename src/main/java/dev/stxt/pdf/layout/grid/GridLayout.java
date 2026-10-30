@@ -85,11 +85,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * El ítem pide una fila (una columna, con {@code Flow: column}) en la que no queda hueco
+     * El ítem pide una fila (una columna, con {@code Flow: vertical}) en la que no queda hueco
      * (referencia/componentes/grid.md).
      */
     private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
-        boolean row = flow == Direction.ROW;
+        boolean row = flow == Direction.HORIZONTAL;
         String track = row ? "fila" : "columna";
         String across = row ? "columna" : "fila";
         String hole = e.span() == 1 ? "1 " + across + " libre" : e.span() + " " + across + "s libres";

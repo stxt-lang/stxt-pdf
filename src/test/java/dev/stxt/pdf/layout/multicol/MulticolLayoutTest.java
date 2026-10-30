@@ -173,7 +173,7 @@ class MulticolLayoutTest {
     /** En un ítem de flex no hay página que llenar: se equilibra. El ancho es el max-content: 2 × 50 + 10. */
     @Test
     void flexItemIsBalancedAndSizedByItsColumns() {
-        List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tCross axis: start", "\t\tItem:"));
+        List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tVertical: start", "\t\tItem:"));
         for (String line : multicol(List.of("Count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {

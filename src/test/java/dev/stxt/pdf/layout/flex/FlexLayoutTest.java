@@ -83,7 +83,7 @@ class FlexLayoutTest {
     void columnItemWithHeightShrinksToItsContent() {
         // En 100 de alto faltan 60: los dos ceden 30. Su contenido mide 12 (una línea).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: a", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 80",
                 "\t\tItem:", "\t\t\tText: b", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 80");
         assertRect(40, 40, 515, 50, l.rect("A"));
@@ -94,7 +94,7 @@ class FlexLayoutTest {
     void columnItemWithHeightDoesNotShrinkBelowItsContent() {
         // A cedería 30, pero sus tres líneas miden 36 (con 10 de ancho, una palabra por línea).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 50", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 50", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: aa bb cc", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40",
                 "\t\t\t\t\tWidth: 10",
                 "\t\tItem:", "\t\t\tText: d", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40");
@@ -118,17 +118,17 @@ class FlexLayoutTest {
     void mainAxisDistribution() {
         // Dos ítems de 100 en 515: sobran 315.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tMain axis: center",
+                "\tFlex:", "\t\tHorizontal: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: c1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: c2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
-                "\tFlex:", "\t\tMain axis: between",
+                "\tFlex:", "\t\tHorizontal: between",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: b1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: b2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
-                "\tFlex:", "\t\tMain axis: evenly",
+                "\tFlex:", "\t\tHorizontal: evenly",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: e1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: e2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
@@ -147,11 +147,11 @@ class FlexLayoutTest {
         LayoutFixture l = layOut(
                 "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
-                "\t\tItem:", "\t\t\tCross axis: start",
+                "\t\tItem:", "\t\t\tVertical: start",
                 "\t\t\tBlock:", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
-                "\t\tItem:", "\t\t\tCross axis: center",
+                "\t\tItem:", "\t\t\tVertical: center",
                 "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
-                "\t\tItem:", "\t\t\tCross axis: end",
+                "\t\tItem:", "\t\t\tVertical: end",
                 "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20");
         assertRect(40, 40, 50, 100, l.rect("S"));
         assertRect(90, 40, 50, 20, l.rect("T"));
@@ -217,11 +217,11 @@ class FlexLayoutTest {
     @Test
     void columnDirection() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tDirection: column", "\t\tGap: 5",
+                "\tFlex:", "\t\tId: F", "\t\tDirection: vertical", "\t\tGap: 5",
                 "\t\tItem:", "\t\t\tText: aaa", "\t\t\t\tId: A",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 20",
-                "\t\tItem:", "\t\t\tCross axis: center",
+                "\t\tItem:", "\t\t\tHorizontal: center",
                 "\t\t\tText: aaaa", "\t\t\t\tId: C");
         assertRect(40, 40, 515, 54, l.rect("F"));
         assertRect(40, 40, 515, 12, l.rect("A"));
@@ -233,7 +233,7 @@ class FlexLayoutTest {
     void columnGrowsWithADefiniteHeight() {
         // Sin Height en el contenedor, Grow es un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tGrow: 1",
                 "\t\t\tBlock:", "\t\t\t\tId: G");
@@ -327,7 +327,7 @@ class FlexLayoutTest {
         // En columna, el hueco entre ítems es el de las filas (7) y entre líneas, el de las columnas (13): 40 + 7 + 40
         // = 87 caben en 100; el tercero pasa a la línea siguiente, 100 + 13 a la derecha.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column", "\t\tWrap: true",
+                "\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
                 "\t\tLines: start", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 40"),
@@ -405,7 +405,7 @@ class FlexLayoutTest {
                 "\tFlex:",
                 "\t\tItem:", block("A", "Width: 50", "Margin: 5"),
                 "\t\tItem:", block("B", "Width: 50", "Height: 30"),
-                "\tFlex:", "\t\tDirection: column",
+                "\tFlex:", "\t\tDirection: vertical",
                 "\t\tItem:", block("C", "Height: 10", "Margin: 5"));
         assertRect(45, 45, 50, 20, l.rect("A"));
         assertRect(45, 75, 505, 10, l.rect("C"));
@@ -468,13 +468,13 @@ class FlexLayoutTest {
         // Columnas de 100. Max height 30 (40 con márgenes): B se queda con 60. Min height 70 (80): D, con 20.
         // Mínimo automático: el texto de E, en cuatro líneas, mide 48 (58 con márgenes): F, con 42.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("A", "Max height: 30", "Margin: 5 0"),
                 "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("B"),
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBasis: 80", block("C", "Min height: 70", "Margin: 5 0"),
                 "\t\tItem:", "\t\t\tBasis: 80", block("D"),
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: column",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBasis: 80", "\t\t\tText: aa aa aa aa", "\t\t\t\tId: E", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tMargin: 5 0",
                 "\t\tItem:", "\t\t\tBasis: 80", block("F"));
@@ -489,8 +489,8 @@ class FlexLayoutTest {
     @Test
     void columnItemsThatDoNotStretchFitTheirContentInsideTheirMargins() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tDirection: column",
-                "\t\tItem:", "\t\t\tCross axis: start", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\tFlex:", "\t\tDirection: vertical",
+                "\t\tItem:", "\t\t\tHorizontal: start", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tMargin: 0 10");
         assertRect(50, 40, 15, 12, l.rect("A"));
     }
@@ -500,7 +500,7 @@ class FlexLayoutTest {
         // Columna con Wrap en 60 de alto: A (50 de ancho y 5 de margen a cada lado) y B, en otra línea. La primera
         // línea mide 60, así que B empieza en 40 + 60.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: column", "\t\tWrap: true", "\t\tLines: start",
+                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLines: start",
                 "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
                 "\t\tItem:", block("B", "Width: 80", "Height: 40"));
         assertRect(45, 40, 50, 40, l.rect("A"));

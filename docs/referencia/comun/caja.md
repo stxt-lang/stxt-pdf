@@ -51,7 +51,7 @@ El modelo de caja. No se hereda.
 - **en un `Overlay` o un `Page overlay`**, con inicio, tamaño y fin declarados ([posicionados](../componentes/frame-and-overlays.md#overlay)).
 
 Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Flex` y `Grid` (que se alinean
-con `Main axis`, `Cross axis`, `Horizontal` y `Vertical`) son errores.
+con `Horizontal` y `Vertical`) son errores.
 
 > **Decisión:** un margen `auto` que no centraría nada es un error, no un 0 silencioso: con ancho `auto` la caja ocupa
 > toda la línea y no hay sobrante que repartir.
@@ -68,9 +68,9 @@ línea (**max-content**):
 | `Text` | palabra más ancha | párrafo más largo en una línea |
 | `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del min-content de los hijos | máximo del max-content de los hijos |
-| `Flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
-| `Flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
-| `Flex` en `column` | máximo de los ítems | máximo de los ítems |
+| `Flex` horizontal, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
+| `Flex` horizontal, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
+| `Flex` vertical | máximo de los ítems | máximo de los ítems |
 | `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
 | `Columns` | ver [Columns](../componentes/columns.md#tamaños-intrínsecos) | |
 

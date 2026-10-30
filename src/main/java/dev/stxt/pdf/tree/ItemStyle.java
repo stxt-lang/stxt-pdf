@@ -15,8 +15,6 @@ public final class ItemStyle extends StyleGroup {
     private double grow = 0;
     private double shrink = 1;
     private Value basis = Value.AUTO;
-    /** {@code null} = la del contenedor. */
-    private Alignment crossAxis;
     /**
      * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
      * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
@@ -55,15 +53,6 @@ public final class ItemStyle extends StyleGroup {
     void setBasis(Value v) {
         writable();
         basis = v;
-    }
-
-    public Alignment crossAxis() {
-        return crossAxis;
-    }
-
-    void setCrossAxis(Alignment v) {
-        writable();
-        crossAxis = v;
     }
 
     public Cell area() {
