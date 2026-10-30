@@ -26,16 +26,18 @@ class ValueParserTest {
     }
 
     @Test
-    void functions() {
-        Value clamp = ValueParser.value("clamp(200, 50%, 400)");
-        assertEquals(300, clamp.resolve(600).getAsDouble(), 1e-9);
-        assertEquals(200, clamp.resolve(100).getAsDouble(), 1e-9);
-        assertEquals(400, clamp.resolve(1000).getAsDouble(), 1e-9);
-        assertTrue(clamp.resolve(OptionalDouble.empty()).isEmpty());
-
+    void minmax() {
         Value mm = ValueParser.value("minmax(100, 1fr)");
         assertEquals(new Value.MinMax(new Value.Points(100), new Value.Fraction(1)), mm);
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("minmax(1fr, 100)"));
+    }
+
+    @Test
+    void minMaxAndClampAreNotValues() {
+        // Lo hacen Min width y Max width (referencia/comun/valores.md).
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("min(300, 50%)"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("max(200, 30%)"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("clamp(200, 50%, 400)"));
     }
 
     @Test

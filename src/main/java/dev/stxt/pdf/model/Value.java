@@ -1,7 +1,5 @@
 package dev.stxt.pdf.model;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.OptionalDouble;
 
 /**
@@ -26,13 +24,8 @@ public sealed interface Value {
     /** {@code minmax(min, max)} en pistas de grid. */
     record MinMax(Value min, Value max) implements Value {}
 
-    /** Funciones {@code min()}, {@code max()} y {@code clamp()}. */
-    record Function(FunctionType type, List<Value> arguments) implements Value {}
-
     /** Palabras clave que dependen del contenido. */
     enum Keyword implements Value { AUTO, MIN_CONTENT, MAX_CONTENT, FIT_CONTENT }
-
-    enum FunctionType { MIN, MAX, CLAMP }
 
     Value AUTO = Keyword.AUTO;
 
@@ -64,21 +57,6 @@ public sealed interface Value {
             return base.isPresent()
                     ? OptionalDouble.of(base.getAsDouble() * p.percent() / 100.0)
                     : OptionalDouble.empty();
-        }
-        if (this instanceof Function f) {
-            double[] v = new double[f.arguments().size()];
-            for (int i = 0; i < v.length; i++) {
-                OptionalDouble r = f.arguments().get(i).resolve(base);
-                if (r.isEmpty()) {
-                    return OptionalDouble.empty();
-                }
-                v[i] = r.getAsDouble();
-            }
-            return switch (f.type()) {
-                case MIN -> OptionalDouble.of(Arrays.stream(v).min().orElseThrow());
-                case MAX -> OptionalDouble.of(Arrays.stream(v).max().orElseThrow());
-                case CLAMP -> OptionalDouble.of(Math.max(v[0], Math.min(v[1], v[2])));
-            };
         }
         return OptionalDouble.empty();
     }

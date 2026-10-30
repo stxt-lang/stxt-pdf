@@ -26,8 +26,8 @@ El modelo de caja. No se hereda.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Width` | número, %, `auto`, intrínsecos, funciones | `auto` | |
-| `Height` | número, %, `auto`, intrínsecos, funciones | `auto` | |
+| `Width` | número, %, `auto`, intrínsecos | `auto` | |
+| `Height` | número, %, `auto`, intrínsecos | `auto` | |
 | `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = min-content en ítems de `Flex` y `Grid`; 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
 | `Aspect ratio` | `ancho/alto` o número | — | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |

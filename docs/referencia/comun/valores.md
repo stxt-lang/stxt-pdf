@@ -12,14 +12,16 @@
 | `max-content` | El tamaño sin ningún salto de línea. | `max-content` |
 | `fit-content` | `min(max-content, max(min-content, disponible))`. | `fit-content` |
 | `minmax(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `minmax(100, 1fr)` |
-| `min(a, b, …)` | El menor de los valores. | `min(300, 50%)` |
-| `max(a, b, …)` | El mayor de los valores. | `max(200, 30%)` |
-| `clamp(a, b, c)` | `b`, pero nunca menos que `a` ni más que `c`. | `clamp(200, 50%, 400)` |
 
 Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: 1fr`,
 `Max width: max-content`, `Gap: auto`, un `minmax()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
-silencioso. Los argumentos de `min()`, `max()` y `clamp()` son números o porcentajes. Solo `Margin`, `Offset` y
-`Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es [definido](#alto-definido) es un error.
+silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
+[definido](#alto-definido) es un error.
+
+> **Decisión:** no hay funciones que elijan entre medidas (el menor, el mayor o uno entre dos límites): un tamaño entre
+> dos límites se escribe con `Min width` y `Max width` (`Width: 50%`, `Min width: 200`, `Max width: 400`), y cada cosa
+> se dice de una sola forma. *Alternativa descartada:* `min()`, `max()` y `clamp()`, que repetían lo que ya hacen los
+> mínimos y los máximos.
 
 ## Listas y `repeat`
 

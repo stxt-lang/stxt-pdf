@@ -90,13 +90,10 @@ final class ValueReader {
         return k == Kind.LENGTH || k == Kind.AUTO || (k == Kind.INTRINSIC && v != Value.Keyword.FIT_CONTENT);
     }
 
-    /** Clase de un valor; {@code null} si es una función con argumentos que no son longitudes. */
+    /** Clase de un valor. */
     private static Kind kind(Value v) {
         if (v instanceof Value.Points || v instanceof Value.Percentage) {
             return Kind.LENGTH;
-        }
-        if (v instanceof Value.Function f) {
-            return f.arguments().stream().allMatch(a -> kind(a) == Kind.LENGTH) ? Kind.LENGTH : null;
         }
         if (v instanceof Value.Fraction) {
             return Kind.FRACTION;
@@ -109,7 +106,7 @@ final class ValueReader {
 
     private static String describe(Set<Kind> allowed) {
         return allowed.stream().map(k -> switch (k) {
-            case LENGTH -> "un número, un porcentaje o min()/max()/clamp()";
+            case LENGTH -> "un número o un porcentaje";
             case AUTO -> "auto";
             case INTRINSIC -> "min-content, max-content o fit-content";
             case FRACTION -> "una fracción";
@@ -127,17 +124,14 @@ final class ValueReader {
         return parts(v).stream().anyMatch(ValueReader::isNegative);
     }
 
-    /** El valor depende de una base de porcentajes (directamente o dentro de una función). */
+    /** El valor depende de una base de porcentajes (directamente o dentro de {@code minmax}). */
     static boolean hasPercentage(Value v) {
         return v instanceof Value.Percentage || parts(v).stream().anyMatch(ValueReader::hasPercentage);
     }
 
-    /** Argumentos de una función o de {@code minmax}. */
+    /** Los dos extremos de {@code minmax}. */
     private static List<Value> parts(Value v) {
-        if (v instanceof Value.MinMax m) {
-            return List.of(m.min(), m.max());
-        }
-        return v instanceof Value.Function f ? f.arguments() : List.of();
+        return v instanceof Value.MinMax m ? List.of(m.min(), m.max()) : List.of();
     }
 
     static boolean comparable(Value a, Value b) {

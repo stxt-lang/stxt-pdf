@@ -19,7 +19,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | Página | Contenido |
 |---|---|
 | [Estructura de un documento](comun/estructura.md) | Convenciones, elementos y envoltorios, el árbol de cajas, quién coloca a quién y el resumen del schema |
-| [Valores](comun/valores.md) | Números, porcentajes, fracciones, funciones, abreviados de cuatro lados, colores y las bases de los porcentajes (alto definido) |
+| [Valores](comun/valores.md) | Números, porcentajes, fracciones, abreviados de cuatro lados, colores y las bases de los porcentajes (alto definido) |
 | [La caja: `Box`](comun/caja.md) | Las cuatro cajas, el contenedor de referencia, el grupo `Box`, el dimensionado (intrínsecos, mínimos y máximos, proporción) y el aspecto (fondo, borde, esquinas) |
 | [Tipografía: `Typography`](comun/tipografia.md) | La herencia, la fuente, el interlineado y la línea base, el reparto en líneas, la alineación y el idioma |
 | [Formato del texto](comun/formato-del-texto.md) | Tramos con formato, `Markup: markdown`, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado, subrayado y tachado |

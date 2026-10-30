@@ -10,11 +10,10 @@
 | `min-content` | lo más estrecho que puede ser sin que nada se salga: la palabra más larga | `Width: min-content` |
 | `max-content` | lo que mide sin partir ninguna línea | `Width: max-content` |
 | `fit-content` | lo que necesita su contenido, sin pasar del espacio disponible | `Width: fit-content` |
-| `min(a, b)`, `max(a, b)` | el menor o el mayor de varios valores | `Width: min(300, 50%)` |
-| `clamp(a, b, c)` | `b`, pero nunca menos que `a` ni más que `c` | `Width: clamp(200, 50%, 400)` |
 
 Cada propiedad admite solo algunas de estas formas, y su tabla lo dice; cualquier otra es un error. Solo los márgenes, los
-desplazamientos de las cajas posicionadas y el interletraje pueden ser negativos.
+desplazamientos de las cajas posicionadas y el interletraje pueden ser negativos. Un tamaño entre dos límites se escribe
+con su mínimo y su máximo: `Width: 50%`, `Min width: 200` y `Max width: 400`.
 
 Las columnas de un `Grid` admiten además **fracciones** (`1fr`, `2fr`: partes del espacio que sobra), `minmax(a, b)` y
 `repeat(n, …)` ([Grid](../componentes/grid.md)).

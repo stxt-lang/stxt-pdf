@@ -2,8 +2,6 @@ package dev.stxt.pdf.layout.grid;
 
 import dev.stxt.pdf.model.Value;
 
-import java.util.OptionalDouble;
-
 /**
  * Pista de grid con su función mínima y máxima (referencia/componentes/grid.md). {@code auto} equivale a
  * {@code minmax(auto, auto)} y {@code 1fr} a {@code minmax(auto, 1fr)}: una fracción nunca baja
@@ -30,16 +28,15 @@ public record Track(Value min, Value max) {
     }
 
     /**
-     * La misma pista sin base para los porcentajes: las funciones que dependen de ella se
-     * comportan como {@code auto} (referencia/comun/valores.md).
+     * La misma pista sin base para los porcentajes: los porcentajes se comportan como {@code auto}
+     * (referencia/componentes/grid.md).
      */
     Track withoutPercentBase() {
         return new Track(definiteOrAuto(min), definiteOrAuto(max));
     }
 
     private static Value definiteOrAuto(Value v) {
-        boolean length = v instanceof Value.Percentage || v instanceof Value.Function;
-        return length && v.resolve(OptionalDouble.empty()).isEmpty() ? Value.AUTO : v;
+        return v instanceof Value.Percentage ? Value.AUTO : v;
     }
 
     /** La función mínima depende del contenido. */

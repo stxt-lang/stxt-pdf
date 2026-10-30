@@ -42,10 +42,10 @@ class TrackSizingTest {
 
     @Test
     void percentagesWithoutBaseAreAuto() {
-        // Sin base, 50% y min(300, 50%) son auto (max-content 140 y 90); minmax(100, 50%)
+        // Sin base, 50% es auto (max-content 140, como la auto de al lado, 90) y minmax(100, 50%)
         // pasa a minmax(100, auto) (max-content 220); 120 es fija.
         assertArrayEquals(new double[]{140, 90, 220, 120},
-                columns("50% min(300, 50%) minmax(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
+                columns("50% auto minmax(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
     }
 
     @Test

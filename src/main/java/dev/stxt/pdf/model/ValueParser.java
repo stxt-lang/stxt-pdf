@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  *   <li>Números en puntos con punto decimal: {@code 12}, {@code 12.5}, {@code -4}.</li>
  *   <li>Porcentajes ({@code 50%}) y fracciones ({@code 1fr}).</li>
  *   <li>Palabras: {@code auto}, {@code min-content}, {@code max-content}, {@code fit-content}.</li>
- *   <li>Funciones: {@code minmax(a, b)}, {@code min(...)}, {@code max(...)}, {@code clamp(a, b, c)}.</li>
+ *   <li>Pistas entre dos tamaños: {@code minmax(a, b)}.</li>
  *   <li>Listas separadas por espacios, con {@code repeat(n, patrón)}.</li>
  * </ul>
  */
@@ -89,15 +89,6 @@ public final class ValueParser {
                 require(args.size() == 2, "minmax necesita 2 argumentos: " + original);
                 require(!(args.get(0) instanceof Value.Fraction), "El mínimo de minmax no puede ser fr: " + original);
                 return new Value.MinMax(args.get(0), args.get(1));
-            case "min":
-                require(!args.isEmpty(), "min necesita argumentos: " + original);
-                return new Value.Function(Value.FunctionType.MIN, args);
-            case "max":
-                require(!args.isEmpty(), "max necesita argumentos: " + original);
-                return new Value.Function(Value.FunctionType.MAX, args);
-            case "clamp":
-                require(args.size() == 3, "clamp necesita 3 argumentos: " + original);
-                return new Value.Function(Value.FunctionType.CLAMP, args);
             default:
                 throw new IllegalArgumentException("Función desconocida: " + name);
         }
