@@ -15,14 +15,6 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
-### Accesibilidad
-
-- Verificar los PDF con lectores de pantalla reales (NVDA, JAWS, VoiceOver): hoy los comprueba veraPDF (PDF/UA-1) y un
-  lector simulado.
-- Idioma por tramo dentro de una línea (una palabra en inglés en un párrafo español): hoy el idioma es de la caja.
-- `Alt` de las imágenes: hoy una `Image` sin `Alt` es decorativa sin aviso. Si los olvidos resultan un problema, hacer
-  `Alt` obligatorio con `Alt:` vacío para las decorativas.
-
 ### Aspecto de las cajas
 
 - Sombras (descartadas: PDFBox no desenfoca y habría que aproximar con capas), degradados con paradas con posición,
