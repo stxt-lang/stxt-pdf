@@ -45,7 +45,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 ## Una tabla es un grid
 
-`Column sizes` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones, `minmax`…, y
+`Column sizes` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones, `between`…, y
 `Gap` separa las celdas. Las filas son pistas `auto`: cada una mide lo que su celda más alta, y las celdas se estiran a su
 fila. Cada celda es un ítem del grid colocado explícitamente: va en la primera columna libre de su fila, y ocupa las filas
 y columnas de su `Span` (`Span: 1 3` ocupa tres columnas). Una columna está ocupada si la ocupa una celda de una fila de

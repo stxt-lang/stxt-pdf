@@ -15,7 +15,7 @@ Cada propiedad admite solo algunas de estas formas, y su tabla lo dice; cualquie
 desplazamientos de las cajas posicionadas y el interletraje pueden ser negativos. Un tamaño entre dos límites se escribe
 con su mínimo y su máximo: `Width: 50%`, `Min width: 200` y `Max width: 400`.
 
-Las columnas de un `Grid` admiten además **fracciones** (`*`, `2*`: partes del espacio que sobra), `minmax(a, b)` y
+Las columnas de un `Grid` admiten además **fracciones** (`*`, `2*`: partes del espacio que sobra), `between(a, b)` y
 `repeat(n, …)` ([Grid](../componentes/grid.md)).
 
 ## Porcentajes

@@ -4,14 +4,14 @@ import dev.stxt.pdf.model.Value;
 
 /**
  * Pista de grid con su función mínima y máxima (referencia/componentes/grid.md). {@code auto} equivale a
- * {@code minmax(auto, auto)} y {@code *} a {@code minmax(auto, *)}: una fracción nunca baja
+ * {@code between(auto, auto)} y {@code *} a {@code between(auto, *)}: una fracción nunca baja
  * del min-content de su contenido.
  */
 public record Track(Value min, Value max) {
 
     public static Track of(Value v) {
-        if (v instanceof Value.MinMax mm) {
-            return new Track(mm.min(), mm.max());
+        if (v instanceof Value.Between b) {
+            return new Track(b.min(), b.max());
         }
         if (v instanceof Value.Fraction) {
             return new Track(Value.AUTO, v);

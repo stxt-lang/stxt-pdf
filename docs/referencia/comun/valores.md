@@ -11,15 +11,18 @@
 | `min-content` | El menor tamaño posible sin desbordar (la palabra más larga). | `min-content` |
 | `max-content` | El tamaño sin ningún salto de línea. | `max-content` |
 | `fit-content` | `min(max-content, max(min-content, disponible))`. | `fit-content` |
-| `minmax(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `minmax(100, *)` |
+| `between(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `between(100, *)` |
 
 Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: *`,
-`Max width: max-content`, `Gap: auto`, un `minmax()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
+`Max width: max-content`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
 silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
 [definido](#alto-definido) es un error.
 
 > **Decisión:** una fracción se escribe con un asterisco y su peso: `120 * 2*` da a la tercera pista el doble de lo que
 > sobra que a la segunda. *Alternativa descartada:* `1fr`, una unidad que solo conoce quien ya la ha usado.
+
+> **Decisión:** una pista entre dos tamaños se escribe `between(a, b)`, que se lee tal cual: `between(100, *)`.
+> *Alternativa descartada:* `minmax(a, b)`, que nombra las dos funciones de la pista y no lo que mide.
 
 > **Decisión:** no hay funciones que elijan entre medidas (el menor, el mayor o uno entre dos límites): un tamaño entre
 > dos límites se escribe con `Min width` y `Max width` (`Width: 50%`, `Min width: 200`, `Max width: 400`), y cada cosa
@@ -32,10 +35,10 @@ Algunas propiedades admiten varios valores separados por espacios (`Column sizes
 pistas, `repeat(n, patrón)` repite un patrón:
 
 ```
-Column sizes: 150 repeat(3, *) minmax(100, 2*)
+Column sizes: 150 repeat(3, *) between(100, 2*)
 ```
 
-equivale a `150 * * * minmax(100, 2*)`.
+equivale a `150 * * * between(100, 2*)`.
 
 ## Abreviados de cuatro lados
 

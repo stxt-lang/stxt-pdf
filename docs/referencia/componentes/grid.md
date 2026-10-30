@@ -25,7 +25,7 @@ Grid:
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
 
-Pistas válidas: número, %, `auto`, `min-content`, `max-content`, fracción, `minmax(a, b)` y `repeat(n, patrón)`.
+Pistas válidas: número, %, `auto`, `min-content`, `max-content`, fracción, `between(a, b)` y `repeat(n, patrón)`.
 `fit-content` no es una pista (`FIT_CONTENT_TRACK`), porque `auto` ya se ajusta al contenido.
 
 ## `Area`
@@ -68,7 +68,7 @@ cursor detrás de sí. Con `Flow: vertical` se intercambian filas y columnas. Es
 ## Dimensionado de pistas
 
 Cada pista tiene una función mínima y una máxima: `150` es fija en ambas; `auto` equivale a
-`minmax(min-content, max-content)`; `*` equivale a `minmax(auto, *)`, de modo que **una fracción no baja del
+`between(min-content, max-content)`; `*` equivale a `between(auto, *)`, de modo que **una fracción no baja del
 min-content de su contenido**.
 
 1. **Inicializar:** cada pista recibe una base (su mínimo) y un límite (su máximo; infinito en las fracciones).

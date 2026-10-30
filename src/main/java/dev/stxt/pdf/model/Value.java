@@ -21,8 +21,8 @@ public sealed interface Value {
     /** Fracción de espacio libre en pistas de grid ({@code *}, {@code 2*}), con su peso. */
     record Fraction(double weight) implements Value {}
 
-    /** {@code minmax(min, max)} en pistas de grid. */
-    record MinMax(Value min, Value max) implements Value {}
+    /** {@code between(min, max)} en pistas de grid. */
+    record Between(Value min, Value max) implements Value {}
 
     /** Palabras clave que dependen del contenido. */
     enum Keyword implements Value { AUTO, MIN_CONTENT, MAX_CONTENT, FIT_CONTENT }

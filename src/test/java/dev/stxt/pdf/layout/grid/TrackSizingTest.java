@@ -42,10 +42,10 @@ class TrackSizingTest {
 
     @Test
     void percentagesWithoutBaseAreAuto() {
-        // Sin base, 50% es auto (max-content 140, como la auto de al lado, 90) y minmax(100, 50%)
-        // pasa a minmax(100, auto) (max-content 220); 120 es fija.
+        // Sin base, 50% es auto (max-content 140, como la auto de al lado, 90) y between(100, 50%)
+        // pasa a between(100, auto) (max-content 220); 120 es fija.
         assertArrayEquals(new double[]{140, 90, 220, 120},
-                columns("50% auto minmax(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
+                columns("50% auto between(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
     }
 
     @Test
@@ -146,10 +146,10 @@ class TrackSizingTest {
                 new ItemContribution(0, 1, 50, 200), new ItemContribution(0, 2, 100, 300)), 1e-9);
     }
 
-    /** minmax(50, 200) crece hasta su máximo antes que la fracción, que se queda con el resto. */
+    /** between(50, 200) crece hasta su máximo antes que la fracción, que se queda con el resto. */
     @Test
     void aFixedMaximumIsALimitToGrowTo() {
-        assertArrayEquals(new double[]{200, 295}, spanning("minmax(50, 200) *", 495), 1e-9);
+        assertArrayEquals(new double[]{200, 295}, spanning("between(50, 200) *", 495), 1e-9);
     }
 
     /** Sin ancho, las fracciones miden en proporción: * y 2* con contenido de 100 son 100 y 200. */

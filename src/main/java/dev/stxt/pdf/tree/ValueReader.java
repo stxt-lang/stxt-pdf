@@ -30,7 +30,7 @@ final class ValueReader {
      * Clases de valor, para comprobar lo que admite cada propiedad (referencia/comun/valores.md y
      * referencia/comun/estructura.md).
      */
-    enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, MINMAX }
+    enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, BETWEEN }
 
     static final Set<Kind> SIZE = EnumSet.of(Kind.LENGTH, Kind.AUTO, Kind.INTRINSIC);
     static final Set<Kind> LENGTH_OR_AUTO = EnumSet.of(Kind.LENGTH, Kind.AUTO);
@@ -63,7 +63,7 @@ final class ValueReader {
         }
     }
 
-    /** Pistas de grid: longitudes, {@code auto}, {@code min-content}, {@code max-content}, fracciones y {@code minmax}. */
+    /** Pistas de grid: longitudes, {@code auto}, {@code min-content}, {@code max-content}, fracciones y {@code between}. */
     static List<Value> tracks(Node p) {
         List<Value> list = parse(p, () -> ValueParser.list(p.getText()));
         for (Value v : list) {
@@ -71,12 +71,12 @@ final class ValueReader {
                 throw error(p, ErrorCode.FIT_CONTENT_TRACK, "fit-content no es una pista de grid: usa auto, "
                         + "que ya se ajusta al contenido");
             }
-            boolean valid = v instanceof Value.MinMax mm
-                    ? track(mm.min()) && (track(mm.max()) || kind(mm.max()) == Kind.FRACTION)
+            boolean valid = v instanceof Value.Between b
+                    ? track(b.min()) && (track(b.max()) || kind(b.max()) == Kind.FRACTION)
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: usa "
-                        + "números, porcentajes, fracciones (*), auto, min-content, max-content o minmax(a, b)");
+                        + "números, porcentajes, fracciones (*), auto, min-content, max-content o between(a, b)");
             }
             if (isNegative(v)) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite pistas negativas: " + p.getText().trim());
@@ -98,8 +98,8 @@ final class ValueReader {
         if (v instanceof Value.Fraction) {
             return Kind.FRACTION;
         }
-        if (v instanceof Value.MinMax) {
-            return Kind.MINMAX;
+        if (v instanceof Value.Between) {
+            return Kind.BETWEEN;
         }
         return v.isAuto() ? Kind.AUTO : Kind.INTRINSIC;
     }
@@ -110,7 +110,7 @@ final class ValueReader {
             case AUTO -> "auto";
             case INTRINSIC -> "min-content, max-content o fit-content";
             case FRACTION -> "una fracción";
-            case MINMAX -> "minmax(a, b)";
+            case BETWEEN -> "between(a, b)";
         }).collect(Collectors.joining("; "));
     }
 
@@ -124,14 +124,14 @@ final class ValueReader {
         return parts(v).stream().anyMatch(ValueReader::isNegative);
     }
 
-    /** El valor depende de una base de porcentajes (directamente o dentro de {@code minmax}). */
+    /** El valor depende de una base de porcentajes (directamente o dentro de {@code between}). */
     static boolean hasPercentage(Value v) {
         return v instanceof Value.Percentage || parts(v).stream().anyMatch(ValueReader::hasPercentage);
     }
 
-    /** Los dos extremos de {@code minmax}. */
+    /** Los dos extremos de {@code between}. */
     private static List<Value> parts(Value v) {
-        return v instanceof Value.MinMax m ? List.of(m.min(), m.max()) : List.of();
+        return v instanceof Value.Between m ? List.of(m.min(), m.max()) : List.of();
     }
 
     static boolean comparable(Value a, Value b) {

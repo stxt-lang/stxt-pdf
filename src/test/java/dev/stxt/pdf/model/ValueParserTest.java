@@ -29,10 +29,11 @@ class ValueParserTest {
     }
 
     @Test
-    void minmax() {
-        Value mm = ValueParser.value("minmax(100, *)");
-        assertEquals(new Value.MinMax(new Value.Points(100), new Value.Fraction(1)), mm);
-        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("minmax(*, 100)"));
+    void between() {
+        Value between = ValueParser.value("between(100, *)");
+        assertEquals(new Value.Between(new Value.Points(100), new Value.Fraction(1)), between);
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("between(*, 100)"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("minmax(100, *)"));
     }
 
     @Test
@@ -45,7 +46,7 @@ class ValueParserTest {
 
     @Test
     void listsWithRepeat() {
-        List<Value> v = ValueParser.list("150 repeat(2, * auto) minmax(100, 2*)");
+        List<Value> v = ValueParser.list("150 repeat(2, * auto) between(100, 2*)");
         assertEquals(6, v.size());
         assertEquals(new Value.Fraction(1), v.get(1));
         assertEquals(Value.AUTO, v.get(4));

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  *   <li>Números en puntos con punto decimal: {@code 12}, {@code 12.5}, {@code -4}.</li>
  *   <li>Porcentajes ({@code 50%}) y fracciones ({@code *}, {@code 2*}; {@code *} solo es {@code 1*}).</li>
  *   <li>Palabras: {@code auto}, {@code min-content}, {@code max-content}, {@code fit-content}.</li>
- *   <li>Pistas entre dos tamaños: {@code minmax(a, b)}.</li>
+ *   <li>Pistas entre dos tamaños: {@code between(a, b)}.</li>
  *   <li>Listas separadas por espacios, con {@code repeat(n, patrón)}.</li>
  * </ul>
  */
@@ -86,10 +86,10 @@ public final class ValueParser {
     private static Value function(String name, String inner, String original) {
         List<Value> args = arguments(inner).stream().map(ValueParser::value).toList();
         switch (name) {
-            case "minmax":
-                require(args.size() == 2, "minmax necesita 2 argumentos: " + original);
-                require(!(args.get(0) instanceof Value.Fraction), "El mínimo de minmax no puede ser una fracción: " + original);
-                return new Value.MinMax(args.get(0), args.get(1));
+            case "between":
+                require(args.size() == 2, "between necesita 2 argumentos: " + original);
+                require(!(args.get(0) instanceof Value.Fraction), "El mínimo de between no puede ser una fracción: " + original);
+                return new Value.Between(args.get(0), args.get(1));
             default:
                 throw new IllegalArgumentException("Función desconocida: " + name);
         }
