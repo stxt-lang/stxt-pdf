@@ -117,7 +117,7 @@ class LinksTest {
 
     @Test
     void everyContentsEntryLinksToItsHeading() {
-        Box root = build("\tContents:", "\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
+        Box root = build("\tTable of contents:", "\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
                 "\tMarkdown:", "\t\tContent >>", "\t\t\t# Dos", "", "\t\t\t## Dos punto uno");
         Box contents = root.children().get(0);
         assertEquals(3, contents.children().size());

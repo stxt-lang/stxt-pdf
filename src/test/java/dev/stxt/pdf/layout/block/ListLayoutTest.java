@@ -56,7 +56,7 @@ class ListLayoutTest {
     void markerSharesTheBaselineOfABiggerFirstLine() {
         // Paragraph de 20 pt: línea de 24 y línea base en 40 + 2 + 16 = 58. El marcador, de
         // 10 pt, tiene su línea base 9 pt por debajo de su parte superior: empieza en 49.
-        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: disc",
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: bullet",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tParagraph: Grande",
                 "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20"));
         assertRect(f.marker("A"), 50, 49, 10, 12);
@@ -86,7 +86,7 @@ class ListLayoutTest {
     void nestedListMarkersShareTheFirstLine() {
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A",
-                "\t\t\tList:", "\t\t\t\tMarker: disc",
+                "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tId: B", "\t\t\t\t\tText: Dentro"));
         assertRect(f.marker("A"), 45, 40, 15, 12);
         assertRect(f.rect("B"), 80, 40, 475, 12);
@@ -95,7 +95,7 @@ class ListLayoutTest {
 
     @Test
     void firstLineIsFoundThroughBlocks() {
-        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: disc",
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: bullet",
                 "\t\tList item:", "\t\t\tId: A",
                 "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tPadding: 6 0 0 0",
                 "\t\t\t\tText: Uno"));

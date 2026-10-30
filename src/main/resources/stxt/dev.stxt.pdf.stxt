@@ -73,7 +73,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -113,7 +113,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -234,7 +234,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -252,7 +252,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -270,7 +270,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -288,7 +288,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -306,7 +306,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -324,7 +324,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Link
 				Max: 1
-			Child: In contents
+			Child: In table of contents
 				Max: 1
 			Child: Box
 				Max: 1
@@ -380,7 +380,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Paragraph
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -428,7 +428,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -472,7 +472,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -514,7 +514,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -558,7 +558,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -604,7 +604,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: List
 			Child: Markdown
 				Max: 1
-			Child: Contents
+			Child: Table of contents
 				Max: 1
 			Child: Image
 				Max: 1
@@ -649,7 +649,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: List
 			Child: Markdown
 				Max: 1
-			Child: Contents
+			Child: Table of contents
 				Max: 1
 			Child: Image
 				Max: 1
@@ -748,7 +748,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Paragraph
 			Child: List
 			Child: Markdown
-			Child: Contents
+			Child: Table of contents
 			Child: Image
 			Child: Table
 			Child: Multicol
@@ -770,18 +770,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Bullet
+			Child: Bullet markers
 				Max: 1
-			Child: Numbering
+			Child: Number markers
 				Max: 1
 			Child: Table columns
 				Max: 1
 			Child: Content
 				Min: 1
 				Max: 1
-	Node: Contents
+	Node: Table of contents
 		Type: GROUP
-		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas For element 'Contents entry 1' a 'Contents entry 6'.
+		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas For element 'TOC 1' a 'TOC 6'.
 		Children:
 			Child: Id
 				Max: 1
@@ -832,7 +832,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: For element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; Contents entry 1 a 6, las entradas de un Contents), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; TOC 1 a 6, las entradas de un Table of contents), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
 		Children:
 			Child: Box
 				Max: 1
@@ -979,9 +979,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Estilos con nombre del elemento, separados por espacios: le aplican las reglas For style con esos nombres. En una Row, a cada una de sus celdas.
 	Node: Link
 		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
-	Node: In contents
+	Node: In table of contents
 		Type: BOOLEAN
-		Description: Si el encabezado tiene entrada en los índices (Contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
+		Description: Si el encabezado tiene entrada en los índices (Table of contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
 	Node: Isolate
 		Type: BOOLEAN
 		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
@@ -1279,9 +1279,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Marker
 		Type: ENUM
-		Description: Marcador de los ítems: disc (•), dash (–) o none, o una numeración (1., a., A., i., I.).
+		Description: Marcador de los ítems: bullet (•), dash (–) o none, o una numeración (1., a., A., i., I.).
 		Values:
-			Value: disc
+			Value: bullet
 			Value: dash
 			Value: none
 			Value: decimal
@@ -1341,9 +1341,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	# Markdown
 
-	Node: Bullet
-		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): disc, dash o none.
-	Node: Numbering
+	Node: Bullet markers
+		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): bullet, dash o none.
+	Node: Number markers
 		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
 	Node: Column align
 		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
@@ -1354,14 +1354,14 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: equal
 			Value: auto
 
-	# Contents
+	# Table of contents
 
 	Node: Levels
-		Description: Niveles de encabezado que lista un Contents: el primero y el último, de 1 a 6 (por defecto, 1 3).
+		Description: Niveles de encabezado que lista un Table of contents: el primero y el último, de 1 a 6 (por defecto, 1 3).
 	Node: Leader
 		Type: ENUM
-		Description: Guía entre el título y la página de las entradas de un Contents: dots (puntos, por defecto), rule (una línea) o none.
+		Description: Guía entre el título y la página de las entradas de un Table of contents: dots (puntos, por defecto), line (una línea) o none.
 		Values:
 			Value: dots
-			Value: rule
+			Value: line
 			Value: none

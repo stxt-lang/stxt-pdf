@@ -36,8 +36,8 @@ Document (dev.stxt.pdf):
 		Markdown:
 			Typography:
 				Code font: IBM Plex Mono
-			Bullet: disc dash
-			Numbering: decimal
+			Bullet markers: bullet dash
+			Number markers: decimal
 			Table columns: auto
 			Content >>
 				# Condiciones de pago
@@ -65,8 +65,8 @@ Document (dev.stxt.pdf):
 | Propiedad | Qué hace |
 |---|---|
 | `Content` | El Markdown, en un bloque `>>`. Obligatorio |
-| `Bullet` | El marcador de las listas con viñetas, uno por nivel: `disc dash` usa `•` en el primer nivel y `–` en los siguientes. Obligatorio si hay listas con viñetas |
-| `Numbering` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas |
+| `Bullet markers` | El marcador de las listas con viñetas, uno por nivel: `bullet dash` usa `•` en el primer nivel y `–` en los siguientes. Obligatorio si hay listas con viñetas |
+| `Number markers` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas |
 | `Table columns` | Las columnas de las tablas: `equal` (todas iguales) o `auto` (según su contenido). Obligatorio si hay tablas |
 
 Admite además `Id`, `Style`, `Box`, `Typography` (que hereda todo lo de dentro) y `Break`. La fuente del código es la

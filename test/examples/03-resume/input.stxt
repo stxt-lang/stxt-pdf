@@ -146,7 +146,7 @@ Document (dev.stxt.pdf):
 								Text: Cobalto · tecnología financiera · Barcelona
 									Style: place
 								List:
-									Marker: disc
+									Marker: bullet
 									Box:
 										Margin: 0
 									List item:
@@ -165,7 +165,7 @@ Document (dev.stxt.pdf):
 								Text: Estudio Pimienta · Girona
 									Style: place
 								List:
-									Marker: disc
+									Marker: bullet
 									List item:
 										Text: Proyectos para museos, ayuntamientos y comercio local.
 									List item:
@@ -184,7 +184,7 @@ Document (dev.stxt.pdf):
 								Text: Cooperativa La Fàbrica · Olot
 									Style: place
 								List:
-									Marker: disc
+									Marker: bullet
 									List item:
 										Text: Identidad, cartelería y web para pequeñas cooperativas.
 					Heading 2:

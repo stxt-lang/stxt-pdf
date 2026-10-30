@@ -44,7 +44,7 @@ class SchemaCoverageTest {
             Map.entry("Id", "Id: x"),
             Map.entry("Style", "Style: c"),
             Map.entry("Link", "Link: https://example.com/a"),
-            Map.entry("In contents", "In contents: false"),
+            Map.entry("In table of contents", "In table of contents: false"),
             Map.entry("Isolate", "Isolate: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
@@ -133,13 +133,13 @@ class SchemaCoverageTest {
             Map.entry("Rule color", "Rule color: #999999"),
             Map.entry("Fill", "Fill: auto"),
             // Markdown
-            Map.entry("Bullet", "Bullet: disc dash"),
-            Map.entry("Numbering", "Numbering: decimal lower-alpha"),
+            Map.entry("Bullet markers", "Bullet markers: bullet dash"),
+            Map.entry("Number markers", "Number markers: decimal lower-alpha"),
             Map.entry("Table columns", "Table columns: auto"),
             Map.entry("Column align", "Column align: right"),
-            // Contents
+            // Table of contents
             Map.entry("Levels", "Levels: 1 2"),
-            Map.entry("Leader", "Leader: rule"),
+            Map.entry("Leader", "Leader: line"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
             Map.entry("Fit", "Fit: cover"),
@@ -200,7 +200,7 @@ class SchemaCoverageTest {
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
         // Un índice necesita algún encabezado que listar.
-        t.put("Contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tContents:\n\t\t{}"));
+        t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));

@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Markdown:
-			Bullet: disc
+			Bullet markers: bullet
 			Content >>
 				- Uno
 				- # Dos

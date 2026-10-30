@@ -280,7 +280,7 @@ Document (dev.stxt.pdf):
 						Text: Proyecto
 		Markdown:
 			Id: notes
-			Bullet: disc
+			Bullet markers: bullet
 			Typography:
 				Size: 8.5
 			Content >>

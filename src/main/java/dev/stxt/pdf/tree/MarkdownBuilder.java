@@ -71,8 +71,8 @@ import static dev.stxt.pdf.tree.Nodes.error;
  *
  * <p>Solo se admite un subconjunto cerrado; el resto es un error
  * ({@link ErrorCode#MARKDOWN_UNSUPPORTED}). Cada nodo generado lleva la línea del documento donde
- * empieza su bloque de Markdown; el marcador de una lista, la de {@code Bullet} o
- * {@code Numbering}, y las columnas de una tabla, la de {@code Table columns}.</p>
+ * empieza su bloque de Markdown; el marcador de una lista, la de {@code Bullet markers} o
+ * {@code Number markers}, y las columnas de una tabla, la de {@code Table columns}.</p>
  */
 final class MarkdownBuilder {
 
@@ -177,8 +177,8 @@ final class MarkdownBuilder {
             this.source = source;
             this.firstLine = firstLine;
             this.inlineOnly = inlineOnly;
-            this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet");
-            this.numbering = markdown == null ? Optional.empty() : child(markdown, "numbering");
+            this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet-markers");
+            this.numbering = markdown == null ? Optional.empty() : child(markdown, "number-markers");
             this.tableColumns = markdown == null ? Optional.empty() : child(markdown, "table-columns");
             this.bullets = bullet.map(n -> markers(n, false)).orElse(List.of());
             this.numberings = numbering.map(n -> markers(n, true)).orElse(List.of());
@@ -280,9 +280,9 @@ final class MarkdownBuilder {
             Optional<Node> property = numbered ? numbering : bullet;
             if (property.isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, (numbered ? "La lista numerada" : "La lista")
-                        + " necesita " + (numbered ? "Numbering" : "Bullet") + " en su Markdown (línea "
+                        + " necesita " + (numbered ? "Number markers" : "Bullet markers") + " en su Markdown (línea "
                         + markdown.getLine() + "): el marcador de cada nivel, como "
-                        + (numbered ? "Numbering: decimal lower-alpha" : "Bullet: disc dash"));
+                        + (numbered ? "Number markers: decimal lower-alpha" : "Bullet markers: bullet dash"));
             }
             List<String> markers = numbered ? numberings : bullets;
             int depth = numbered ? numberingDepth++ : bulletDepth++;
@@ -488,7 +488,7 @@ final class MarkdownBuilder {
             return new TextFormat(f.bold(), f.italic(), true, f.strike(), destination);
         }
 
-        /** Marcadores de {@code Bullet} (sin numerar) o de {@code Numbering} (numerados), uno por nivel. */
+        /** Marcadores de {@code Bullet markers} (sin numerar) o de {@code Number markers} (numerados), uno por nivel. */
         private static List<String> markers(Node n, boolean numbered) {
             List<String> markers = new ArrayList<>();
             for (String token : n.getText().trim().split("\\s+")) {
@@ -504,7 +504,7 @@ final class MarkdownBuilder {
                 if (marker == null || marker.numbered() != numbered) {
                     throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en " + n.getName() + ": " + token
                             + (numbered ? " (decimal, lower-alpha, upper-alpha, lower-roman o upper-roman)"
-                                    : " (disc, dash o none)"));
+                                    : " (bullet, dash o none)"));
                 }
                 markers.add(token.toLowerCase(Locale.ROOT));
             }

@@ -28,7 +28,7 @@ class LeadersTest {
 
     @Test
     void aRuleFillsTheWidth() {
-        List<Rect> rule = Leaders.shapes(Leader.RULE, CONTENT, 29, 10);
+        List<Rect> rule = Leaders.shapes(Leader.LINE, CONTENT, 29, 10);
         assertEquals(List.of(new Rect(100, 28.5, 50, 0.5)), rule);
     }
 

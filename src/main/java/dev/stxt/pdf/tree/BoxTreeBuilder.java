@@ -76,7 +76,7 @@ public final class BoxTreeBuilder {
      * y lo que lee {@link MarkdownBuilder}.
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "head", "body",
-            "foot", "span", "bullet", "numbering", "table-columns", "column-align");
+            "foot", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
 
     /**
      * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus secciones

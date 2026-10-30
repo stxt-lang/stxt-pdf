@@ -400,7 +400,7 @@ public final class StackingContext {
     }
 
     /**
-     * La guía de una entrada de índice (referencia/componentes/contents.md): puntos o una línea sobre la línea base del
+     * La guía de una entrada de índice (referencia/componentes/table-of-contents.md): puntos o una línea sobre la línea base del
      * texto de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
      */
     private static void paintLeader(Canvas canvas, Piece p) {

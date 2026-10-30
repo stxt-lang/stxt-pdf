@@ -2,7 +2,7 @@
 # con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
 #
 # For element: Document activa Numbered en todos los encabezados y For element: Heading 3 lo quita en el
-# nivel 3. cover (Numbered: false) no se numera ni cuenta, y In contents: false lo deja fuera del
+# nivel 3. cover (Numbered: false) no se numera ni cuenta, y In table of contents: false lo deja fuera del
 # índice. Los números salen: intro es el 1, method el 1.1, data el 1.2, fine no lleva (nivel 3) y
 # results es el 2.
 #
@@ -33,11 +33,11 @@ Document (dev.stxt.pdf):
 	Section:
 		Heading 1:
 			Id: cover
-			In contents: false
+			In table of contents: false
 			Text: Portada
 			Typography:
 				Numbered: false
-		Contents:
+		Table of contents:
 			Id: toc
 			Levels: 1 2
 			Box:

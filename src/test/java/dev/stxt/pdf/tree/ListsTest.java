@@ -27,11 +27,11 @@ class ListsTest {
 
     @Test
     void listAndItemsAreBlocks() {
-        Box list = root("\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tParagraph: Uno",
+        Box list = root("\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tParagraph: Uno",
                 "\t\tList item:", "\t\t\tText: Dos", "\t\t\tText: y más").children().get(0);
         assertEquals(Element.LIST, list.element());
         assertEquals(Layout.BLOCK, list.style().layout());
-        assertEquals(Marker.DISC, list.style().list().marker());
+        assertEquals(Marker.BULLET, list.style().list().marker());
         assertEquals(2, list.children().size());
         Box item = list.children().get(1);
         assertEquals(Element.LIST_ITEM, item.element());
@@ -82,7 +82,7 @@ class ListsTest {
         Box list = root("\tList:", "\t\tMarker: dash",
                 "\t\tList item:", "\t\t\tBlock:", "\t\t\t\tAbsolute:", "\t\t\t\t\tText: fuera",
                 "\t\t\t\tRelative:", "\t\t\t\t\tText: dentro",
-                "\t\tList item:", "\t\t\tList:", "\t\t\t\tMarker: disc",
+                "\t\tList item:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: anidado").children().get(0);
         assertEquals(List.of("– ", "– "), markers(list));
     }
@@ -92,14 +92,14 @@ class ListsTest {
         Box list = root("\tStyles:",
                 "\t\tFor element: List", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 18",
                 "\t\tFor element: List item", "\t\t\tTypography:", "\t\t\t\tBold: true",
-                "\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tText: a").children().get(0);
+                "\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tText: a").children().get(0);
         assertEquals(18, ((dev.stxt.pdf.model.Value.Points) list.style().box().padding().left()).pt());
         assertEquals(FontWeight.BOLD, list.children().get(0).style().typography().fontWeight());
     }
 
     @Test
     void aListCanBeAFlexItem() {
-        Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: disc",
+        Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: a").children().get(0);
         assertEquals(Element.LIST, flex.children().get(0).element());
     }

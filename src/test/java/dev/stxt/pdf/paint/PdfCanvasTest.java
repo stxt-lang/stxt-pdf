@@ -264,7 +264,7 @@ class PdfCanvasTest {
                 + "\tList:\n\t\tMarker: decimal\n\t\tBox:\n\t\t\tPadding: 0 0 0 20\n"
                 + "\t\tList item:\n\t\t\tText: Uno\n"
                 + "\t\tList item:\n\t\t\tText: Dos\n"
-                + "\t\t\tList:\n\t\t\t\tMarker: disc\n\t\t\t\tBox:\n\t\t\t\t\tPadding: 0 0 0 20\n"
+                + "\t\t\tList:\n\t\t\t\tMarker: bullet\n\t\t\t\tBox:\n\t\t\t\t\tPadding: 0 0 0 20\n"
                 + "\t\t\t\tList item:\n\t\t\t\t\tText: Dentro\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "lists"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
@@ -362,13 +362,13 @@ class PdfCanvasTest {
 
     /**
      * Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador
-     * (referencia/componentes/heading.md y referencia/componentes/contents.md).
+     * (referencia/componentes/heading.md y referencia/componentes/table-of-contents.md).
      */
     @Test
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
-                + "\tHeading 1:\n\t\tIn contents: false\n\t\tText: Portada\n"
-                + "\tContents:\n\t\tLevels: 1 1\n"
+                + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n"
+                + "\tTable of contents:\n\t\tLevels: 1 1\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "out-of-contents"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
@@ -391,8 +391,8 @@ class PdfCanvasTest {
         InlineNode doc = reader.read(Docs.mergeStyles(LINKS
                 + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
                 + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
-                + "\tHeading 1:\n\t\tIn contents: false\n\t\tText: Portada\n\t\tTypography:\n\t\t\tNumbered: false\n"
-                + "\tContents:\n\t\tLevels: 1 2\n"
+                + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n\t\tTypography:\n\t\t\tNumbered: false\n"
+                + "\tTable of contents:\n\t\tLevels: 1 2\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tHeading 2:\n\t\tText: Dos\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "numbered-headings"))) {
@@ -585,12 +585,12 @@ class PdfCanvasTest {
 
     /**
      * Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link}
-     * (referencia/componentes/contents.md y referencia/comun/enlaces.md).
+     * (referencia/componentes/table-of-contents.md y referencia/comun/enlaces.md).
      */
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
-                + "\tContents:\n\t\tLevels: 1 1\n"
+                + "\tTable of contents:\n\t\tLevels: 1 1\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tBlock:\n\t\tBreak:\n\t\t\tAfter: page\n"
                 + "\tHeading 1:\n\t\tText: Dos\n"));
@@ -773,7 +773,7 @@ class PdfCanvasTest {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\t\tFor element: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 15\n"
-                + "\tMarkdown:\n\t\tBullet: disc\n\t\tTable columns: equal\n\t\tContent >>\n"
+                + "\tMarkdown:\n\t\tBullet markers: bullet\n\t\tTable columns: equal\n\t\tContent >>\n"
                 + "\t\t\t# Informe\n\n\t\t\tCon **negrita** y ++subrayado++.\n\n\t\t\t## Datos\n\n"
                 + "\t\t\t- uno\n\t\t\t- dos\n\n\t\t\t| A | B |\n\t\t\t|---|---|\n\t\t\t| 1 | 2 |\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "markdown"))) {
@@ -838,7 +838,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un índice (referencia/componentes/contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título y
+     * Un índice (referencia/componentes/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título y
      * número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada encabezado,
      * también la de un encabezado de un Markdown.
      */
@@ -846,11 +846,11 @@ class PdfCanvasTest {
     void contentsIsATocWithOneTociPerEntry() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tContents:\n\t\tLevels: 1 2\n"
+                + "\tTable of contents:\n\t\tLevels: 1 2\n"
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\t# Uno\n\n\t\t\tTexto.\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 250\n"
                 + "\tHeading 1:\n\t\tText: Dos\n\tHeading 2:\n\t\tText: Dos punto uno\n"));
-        try (PDDocument pdf = Loader.loadPDF(render(doc, "contents"))) {
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "table-of-contents"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
             assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));

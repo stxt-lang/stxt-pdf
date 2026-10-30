@@ -102,7 +102,7 @@ Document (dev.stxt.pdf):
 			Text: Cláusulas
 		Markdown:
 			Id: clauses
-			Numbering: decimal lower-alpha lower-roman
+			Number markers: decimal lower-alpha lower-roman
 			Typography:
 				Text wrap: pretty
 			Content >>

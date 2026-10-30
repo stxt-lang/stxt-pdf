@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 				Padding: 300 56 0 56
 				Background: #12315A
 			Heading 1:
-				In contents: false
+				In table of contents: false
 				Text: Informe anual
 				Typography:
 					Color: #FFFFFF
@@ -153,7 +153,7 @@ Document (dev.stxt.pdf):
 - **Portada a sangre:** una sección con `Page` de `Margin: 0`, `Page numbering: none` e `Inherit fixed: false`, y un bloque
   de `Height: 100%` con su fondo.
 - **Una página apaisada en medio:** una sección con `Orientation: landscape`.
-- **Un título que no va al índice:** `In contents: false` en el encabezado ([Encabezados](heading.md)).
+- **Un título que no va al índice:** `In table of contents: false` en el encabezado ([Encabezados](heading.md)).
 
 ## Lo que no hay
 

@@ -25,7 +25,7 @@ import java.util.Map;
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/relative-absolute-fixed.md: el layout y la posición, que
  * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate}, el giro, {@code Link}, {@code
- * Header} e {@code In contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
+ * Header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
  * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
@@ -77,7 +77,7 @@ public final class Style extends StyleGroup {
      */
     private boolean header;
     /**
-     * {@code In contents} de un encabezado: si tiene entrada en los índices (referencia/componentes/contents.md). No se
+     * {@code In table of contents} de un encabezado: si tiene entrada en los índices (referencia/componentes/table-of-contents.md). No se
      * hereda.
      */
     private boolean inContents = true;
@@ -135,7 +135,7 @@ public final class Style extends StyleGroup {
         return image;
     }
 
-    /** Las de {@code Contents} (referencia/componentes/contents.md). */
+    /** Las de {@code Table of contents} (referencia/componentes/table-of-contents.md). */
     public ContentsStyle contents() {
         return contents;
     }

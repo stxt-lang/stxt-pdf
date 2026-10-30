@@ -45,8 +45,8 @@ Document (dev.stxt.pdf):
 				con ~~pérdidas~~ beneficios.
 		Markdown:
 			Id: points
-			Bullet: disc dash
-			Numbering: decimal
+			Bullet markers: bullet dash
+			Number markers: decimal
 			Content >>
 				## Puntos clave
 

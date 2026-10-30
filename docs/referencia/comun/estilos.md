@@ -11,7 +11,7 @@ puede sobrescribir.
 |---|---|---|
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `For element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
-| `For element` | un elemento generado por el motor: `Code block` o `Contents entry 1` … `Contents entry 6` | los bloques de código de un `Markdown` ([Markdown](../componentes/markdown.md#código)) o las entradas de un `Contents` ([Contents](../componentes/contents.md#estilo)); no se escriben en el documento |
+| `For element` | un elemento generado por el motor: `Code block` o `TOC 1` … `TOC 6` | los bloques de código de un `Markdown` ([Markdown](../componentes/markdown.md#código)) o las entradas de un `Table of contents` ([Table of contents](../componentes/table-of-contents.md#estilo)); no se escriben en el documento |
 | `For element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../componentes/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style` y las celdas de una `Row` con él en su `Style` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |

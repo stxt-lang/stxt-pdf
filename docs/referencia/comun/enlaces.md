@@ -34,7 +34,7 @@ encabezado de un `Markdown` es un destino si lleva `{#id}` ([Markdown](../compon
 
 ## Dónde se admite `Link`
 
-En todos los elementos salvo `Markdown` (su contenido lleva sus propios enlaces) y `Contents` (sus entradas ya llevan el
+En todos los elementos salvo `Markdown` (su contenido lleva sus propios enlaces) y `Table of contents` (sus entradas ya llevan el
 suyo). Es del elemento, como `Id`: no va en `Box`, `Typography` ni `Break`, ni en las reglas de `Styles`, y no se hereda. Lo
 que hay dentro de una caja con enlace es clicable por ella; si además lleva enlace propio, las dos zonas se solapan y el
 visor decide cuál se activa.

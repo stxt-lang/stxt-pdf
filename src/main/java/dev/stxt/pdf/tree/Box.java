@@ -126,8 +126,8 @@ public final class Box {
     }
 
     /**
-     * Nombre con que se refiere a la caja un índice (referencia/componentes/contents.md) cuando no tiene {@code Id}: el
-     * de un encabezado que lista un {@code Contents}. {@code null} en el resto.
+     * Nombre con que se refiere a la caja un índice (referencia/componentes/table-of-contents.md) cuando no tiene {@code Id}: el
+     * de un encabezado que lista un {@code Table of contents}. {@code null} en el resto.
      */
     public String anchor() {
         return anchor;

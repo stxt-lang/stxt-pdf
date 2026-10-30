@@ -41,9 +41,9 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `códig
   de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no
   admitido, como en un `Markdown`.
 - No actúa dentro de un `Markdown`, aunque se herede (lo escapado sigue siendo literal), ni en las entradas de un
-  `Contents`. `Alt` y los demás valores son siempre literales.
+  `Table of contents`. `Alt` y los demás valores son siempre literales.
 - Las referencias (`{page}`, `{page of: id}`) funcionan igual.
-- El texto de la caja es el texto sin marcas: es el que lee un lector de pantalla y el que copia un `Contents`. Un error
+- El texto de la caja es el texto sin marcas: es el que lee un lector de pantalla y el que copia un `Table of contents`. Un error
   del texto (un carácter que la fuente no tiene, una referencia desconocida) señala la línea donde empieza el texto.
 
 > **Decisión:** el formato en línea se pide con una propiedad heredable: el texto es literal salvo que se pida, y se pide

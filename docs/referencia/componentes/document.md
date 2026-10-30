@@ -121,7 +121,7 @@ Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
   ninguna página. Un `Absolute` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
 - **Tipografía por sección.** Las reglas que llegan a una sección solo pueden dar `Typography` (`Language` incluido: un
   anexo en inglés), que hereda todo su contenido.
-- **Un solo documento.** La jerarquía de encabezados, los índices (`Contents`, que listan los encabezados de todas las
+- **Un solo documento.** La jerarquía de encabezados, los índices (`Table of contents`, que listan los encabezados de todas las
   secciones, en orden), `Styles`, los `Id` (únicos en todo el documento) y la convergencia de las referencias son del
   documento, no de la sección.
 
@@ -163,7 +163,7 @@ con una portada `none` y 6 páginas de cuerpo, la primera página interior es «
 referencia a algo que está en una página sin número es `REFERENCE_NOT_PLACEABLE`, y un texto con `{page}` o `{pages}` que
 cae en una página sin número (el `Fixed` del documento en una portada que lo hereda) es `PAGE_NUMBER_UNAVAILABLE`: nunca se
 deja en blanco. Los marcadores, los enlaces y `Pages` siguen la página física. Un encabezado de una sección `none` no puede
-estar en un índice (`In contents: false`).
+estar en un índice (`In table of contents: false`).
 
 Como el contador no avanza en una sección `none`, una sección `continue` detrás de una portada empieza en 1. Con
 `Page numbering: restart`, `Start` da el número de la primera página de la sección (`Start: 5`: un documento repartido

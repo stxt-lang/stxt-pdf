@@ -19,14 +19,14 @@ List:
 		Number: 10
 		Paragraph: Segundo punto
 		List:
-			Marker: disc
+			Marker: bullet
 			List item:
 				Text: Subpunto
 ```
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Marker` | `disc`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — (obligatorio) | `List` | Marcador de los ítems: `•`, `–`, ninguno, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker` | `bullet`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — (obligatorio) | `List` | Marcador de los ítems: `•`, `–`, ninguno, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
 | `Start` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
 | `Number` | entero | — | `List item` | Número de este ítem; los siguientes continúan desde él. Solo en las numeraciones. |
 
@@ -39,7 +39,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 ## Marcadores
 
 `Marker` es obligatorio: si la lista es numerada lo decide el autor. El marcador es texto en la tipografía del
-`List item` (propia, heredada o de `For element: List item`): `•` (`disc`), `–` (`dash`), ninguno (`none`), o el número del
+`List item` (propia, heredada o de `For element: List item`): `•` (`bullet`), `–` (`dash`), ninguno (`none`), o el número del
 ítem con un punto: `3.`, `c.`, `C.`, `iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido.
 
 > **Decisión:** el marcador es texto en la fuente del ítem, sin círculo hueco ni cuadrado, que IBM Plex Sans no tiene.

@@ -230,7 +230,7 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Contents} (referencia/componentes/contents.md): sus entradas las genera {@link ContentsBuilder} al
+     * Un {@code Table of contents} (referencia/componentes/table-of-contents.md): sus entradas las genera {@link ContentsBuilder} al
      * final, con todos los encabezados.
      */
     CONTENTS {

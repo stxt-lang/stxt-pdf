@@ -31,7 +31,7 @@ class ListMarkersTest {
 
     @Test
     void symbolsEndWithASpace() {
-        assertEquals("• ", ListMarkers.text(Marker.DISC, 0));
+        assertEquals("• ", ListMarkers.text(Marker.BULLET, 0));
         assertEquals("– ", ListMarkers.text(Marker.DASH, 0));
         assertNull(ListMarkers.text(Marker.NONE, 0));
     }
@@ -66,7 +66,7 @@ class ListMarkersTest {
         assertEquals("AA", ListMarkers.number(Marker.UPPER_ALPHA, 27));
         assertEquals("iv", ListMarkers.number(Marker.LOWER_ROMAN, 4));
         assertEquals("XIV", ListMarkers.number(Marker.UPPER_ROMAN, 14));
-        assertNull(ListMarkers.number(Marker.DISC, 1));
+        assertNull(ListMarkers.number(Marker.BULLET, 1));
         assertNull(ListMarkers.number(Marker.NONE, 1));
     }
 

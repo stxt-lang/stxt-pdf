@@ -51,7 +51,7 @@ Cada página de componente tiene un documento completo que puedes copiar, conver
 | [`Relative`, `Absolute` y `Fixed`](componentes/relative-absolute-fixed.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
 | [`Image`](componentes/image.md) | Imágenes PNG, JPEG y SVG |
 | [`Markdown`](componentes/markdown.md) | Escribir contenido largo en Markdown |
-| [`Contents`](componentes/contents.md) | El índice automático |
+| [`Table of contents`](componentes/table-of-contents.md) | El índice automático |
 
 Los [ejemplos](../../test/examples/README.md) son once documentos reales (una factura, un currículum, un informe anual…)
 con su PDF.

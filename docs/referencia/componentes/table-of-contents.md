@@ -1,13 +1,13 @@
-# `Contents`
+# `Table of contents`
 
-Un `Contents` es un índice automático: un bloque en flujo, sin hijos, que genera una **entrada por encabezado** de los
+Un `Table of contents` es un índice automático: un bloque en flujo, sin hijos, que genera una **entrada por encabezado** de los
 niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los de un `Markdown` y los que están después del
-propio índice, salvo los que declaran `In contents: false` ([Encabezados](heading.md#fuera-del-índice)). Admite `Id`,
+propio índice, salvo los que declaran `In table of contents: false` ([Encabezados](heading.md#fuera-del-índice)). Admite `Id`,
 `Style`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un `Markdown`. No admite `Link`: sus entradas ya
 llevan el suyo.
 
 ```
-Contents:
+Table of contents:
 	Levels: 1 2
 	Leader: dots
 ```
@@ -15,7 +15,7 @@ Contents:
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. |
-| `Leader` | `dots`, `rule`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, una línea o nada. |
+| `Leader` | `dots`, `line`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, una línea o nada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -34,7 +34,7 @@ Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id` ([E
 
 ## Guía
 
-Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al número; con `rule`, una línea de 0,05
+Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al número; con `line`, una línea de 0,05
 veces el cuerpo, de un lado al otro del hueco. Se pintan sobre la línea base de la entrada y con el color del texto. Son
 dibujo, no texto: no se seleccionan ni se leen.
 
@@ -43,19 +43,19 @@ dibujo, no texto: no se seleccionan ni se leen.
 
 ## Estilo
 
-La entrada hereda la tipografía del `Contents`; sus cajas, la de la entrada. Las reglas `For element: Contents entry 1` …
-`Contents entry 6` dan `Box`, `Typography` y `Break` a las entradas de un nivel: la sangría de cada nivel es su `Padding`
+La entrada hereda la tipografía del `Table of contents`; sus cajas, la de la entrada. Las reglas `For element: TOC 1` …
+`TOC 6` dan `Box`, `Typography` y `Break` a las entradas de un nivel: la sangría de cada nivel es su `Padding`
 izquierdo, y el espacio entre entradas, su `Margin` o su `Padding` vertical. Las propias entradas no llevan `Id` ni
 `Style`.
 
-> **Decisión:** una regla por nivel, no por parte (`Contents title`…), que sería más fina y más larga de escribir.
+> **Decisión:** una regla por nivel, no por parte (`TOC title`…), que sería más fina y más larga de escribir.
 
 ## Errores
 
-Un `Contents` sin ningún encabezado en sus niveles (`CONTENTS_EMPTY`, con la línea del `Contents`); un `Levels` que no son
-dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`); un `Contents` sin `Font` o sin `Size` propios o heredados
-(`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Contents`). Un encabezado de una sección sin números de
-página no puede estar en un índice: se declara con `In contents: false`.
+Un `Table of contents` sin ningún encabezado en sus niveles (`TABLE_OF_CONTENTS_EMPTY`, con la línea del `Table of contents`); un `Levels` que no son
+dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`); un `Table of contents` sin `Font` o sin `Size` propios o heredados
+(`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Table of contents`). Un encabezado de una sección sin números de
+página no puede estar en un índice: se declara con `In table of contents: false`.
 
 > **Decisión:** `Levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2».
 

@@ -1,4 +1,4 @@
-# Case: Levels con el último nivel menor que el primero
+# Case: Levels con un solo número
 # Code: VALUE_NOT_ALLOWED
 # Line: 19
 Document (dev.stxt.pdf):
@@ -15,5 +15,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Heading 1:
 			Text: Uno
-		Contents:
-			Levels: 3 1
+		Table of contents:
+			Levels: 2

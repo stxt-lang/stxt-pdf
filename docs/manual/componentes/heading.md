@@ -55,7 +55,7 @@ El título del documento no lleva número y los apartados sí: «1 Antes de empe
 
 ## Propiedades
 
-Admiten `Id`, `Style`, `Link`, `Box`, `Typography` (que heredan sus `Text`) e `In contents`. No admiten `Break`: el motor ya
+Admiten `Id`, `Style`, `Link`, `Box`, `Typography` (que heredan sus `Text`) e `In table of contents`. No admiten `Break`: el motor ya
 evita cortar dentro de un encabezado y justo después de él, para que un título no se quede solo al final de una página.
 
 ## Sin estilos por defecto
@@ -99,10 +99,10 @@ Heading 2:
 	Text: Honorarios        # «Anexo A. Honorarios»
 ```
 
-## Fuera del índice (`In contents`)
+## Fuera del índice (`In table of contents`)
 
-Con `In contents: false`, un encabezado sigue siendo un título (para el PDF, los marcadores y los niveles) pero no sale en
-el índice ([Contents](contents.md)). Es lo normal para el título de la portada o el del propio índice.
+Con `In table of contents: false`, un encabezado sigue siendo un título (para el PDF, los marcadores y los niveles) pero no sale en
+el índice ([Table of contents](table-of-contents.md)). Es lo normal para el título de la portada o el del propio índice.
 
 ## Dónde va
 

@@ -49,7 +49,7 @@ final class BuildContext {
      * (referencia/componentes/markdown.md).
      */
     boolean insideMarkdown;
-    /** Los {@code Contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
+    /** Los {@code Table of contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
     final List<Box> contents = new ArrayList<>();
     /**
      * Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo

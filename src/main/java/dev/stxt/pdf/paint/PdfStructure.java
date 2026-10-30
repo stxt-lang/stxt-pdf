@@ -389,7 +389,7 @@ final class PdfStructure {
      */
     private static String listNumbering(Marker marker, int ua) {
         return switch (marker) {
-            case DISC -> PDListAttributeObject.LIST_NUMBERING_DISC;
+            case BULLET -> PDListAttributeObject.LIST_NUMBERING_DISC;
             case DASH -> ua == 2 ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
             case NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
             case DECIMAL -> PDListAttributeObject.LIST_NUMBERING_DECIMAL;
@@ -593,7 +593,7 @@ final class PdfStructure {
 
     /**
      * El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. Con PDF/UA-2, la
-     * anotación no lleva además su texto ({@code Contents}): lo que se lee es el {@code Alt}, y los dos tendrían que
+     * anotación no lleva además su texto ({@code Table of contents}): lo que se lee es el {@code Alt}, y los dos tendrían que
      * coincidir.
      */
     private void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {

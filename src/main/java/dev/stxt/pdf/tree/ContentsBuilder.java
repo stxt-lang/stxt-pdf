@@ -13,8 +13,8 @@ import java.util.List;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 /**
- * El índice automático (referencia/componentes/contents.md): lee {@code Levels} y {@code Leader} de un
- * {@code Contents} y, cuando el árbol está construido y se conocen todos los encabezados, genera
+ * El índice automático (referencia/componentes/table-of-contents.md): lee {@code Levels} y {@code Leader} de un
+ * {@code Table of contents} y, cuando el árbol está construido y se conocen todos los encabezados, genera
  * sus entradas.
  *
  * <p>Cada entrada es una caja {@code Flex} generada ({@link Element#CONTENTS_ENTRY_1} … según el
@@ -22,7 +22,7 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * hasta llenar el hueco, y el número de página, que es un {@code {page of: …}} del encabezado: el
  * mismo mecanismo que escribe el autor, así que se resuelve paginando hasta que converja. Como un
  * encabezado de un {@code Markdown} no tiene {@code Id}, se le da un {@link Box#anchor()} para
- * poder referirlo. Las entradas se estilan con las reglas {@code For element: Contents entry N}.</p>
+ * poder referirlo. Las entradas se estilan con las reglas {@code For element: TOC N}.</p>
  */
 final class ContentsBuilder {
 
@@ -55,7 +55,7 @@ final class ContentsBuilder {
         s.contents().setTo(levels[1]);
     }
 
-    /** Genera las entradas de todos los {@code Contents} del documento. */
+    /** Genera las entradas de todos los {@code Table of contents} del documento. */
     static void build(BuildContext ctx, Box root) {
         if (ctx.contents.isEmpty()) {
             return;
@@ -74,7 +74,7 @@ final class ContentsBuilder {
         }
     }
 
-    /** Los encabezados del árbol con entrada en los índices ({@code In contents}), en orden del documento. */
+    /** Los encabezados del árbol con entrada en los índices ({@code In table of contents}), en orden del documento. */
     private static void collect(Box box, List<Box> headings) {
         if (box.headingLevel() > 0 && box.style().inContents()) {
             headings.add(box);
@@ -86,16 +86,16 @@ final class ContentsBuilder {
         Style s = contents.style();
         if (s.typography().font() == null) {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
-                    + "Typography del Contents, de un antecesor o de Styles (For element: Document)");
+                    + "Typography del Table of contents, de un antecesor o de Styles (For element: Document)");
         }
         if (!s.isDeclared(PropertyKey.FONT_SIZE)) {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
-                    + "Typography del Contents, de un antecesor o de Styles (For element: Document)");
+                    + "Typography del Table of contents, de un antecesor o de Styles (For element: Document)");
         }
         List<Box> listed = headings.stream()
                 .filter(h -> h.headingLevel() >= s.contents().from() && h.headingLevel() <= s.contents().to()).toList();
         if (listed.isEmpty()) {
-            throw error(contents.line(), ErrorCode.CONTENTS_EMPTY, "El índice no tiene ningún encabezado de los niveles "
+            throw error(contents.line(), ErrorCode.TABLE_OF_CONTENTS_EMPTY, "El índice no tiene ningún encabezado de los niveles "
                     + s.contents().from() + " a " + s.contents().to() + " (Levels): no tendría entradas");
         }
         for (Box heading : listed) {

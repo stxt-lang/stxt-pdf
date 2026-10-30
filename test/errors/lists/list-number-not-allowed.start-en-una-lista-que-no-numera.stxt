@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		List:
-			Marker: disc
+			Marker: bullet
 			Start: 2
 			List item:
 				Text: Uno

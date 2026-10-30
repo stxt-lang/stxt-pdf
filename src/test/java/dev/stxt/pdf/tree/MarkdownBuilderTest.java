@@ -98,10 +98,10 @@ class MarkdownBuilderTest {
 
     @Test
     void listsTakeTheirMarkerFromTheLevel() {
-        MarkdownBuilder.Translation t = translate(List.of("Bullet: disc dash", "Numbering: lower-roman"),
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet dash", "Number markers: lower-roman"),
                 "- a", "  - b", "    - c", "", "3. x");
         assertEquals(List.of("List @17",
-                "  Marker: disc @14",
+                "  Marker: bullet @14",
                 "  List item @17",
                 "    Paragraph: a @17",
                 "    List @18",
@@ -119,7 +119,7 @@ class MarkdownBuilderTest {
 
     @Test
     void anItemCanHaveSeveralParagraphs() {
-        MarkdownBuilder.Translation t = translate(List.of("Numbering: decimal"), "1. uno", "", "   sigue");
+        MarkdownBuilder.Translation t = translate(List.of("Number markers: decimal"), "1. uno", "", "   sigue");
         assertEquals(List.of("List @16", "  Marker: decimal @14", "  List item @16", "    Paragraph: uno @16",
                 "    Paragraph: sigue @18"), outline(t.elements().get(0)));
     }
@@ -172,8 +172,8 @@ class MarkdownBuilderTest {
 
     @Test
     void unusedPropertiesAreAllowed() {
-        // Bullet, Numbering y Table columns solo son obligatorias si hay listas o tablas (K6).
-        MarkdownBuilder.Translation t = translate(List.of("Bullet: disc", "Table columns: auto"), "Hola.");
+        // Bullet markers, Number markers y Table columns solo son obligatorias si hay listas o tablas (K6).
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table columns: auto"), "Hola.");
         assertEquals(1, t.elements().size());
         assertNull(t.runs().get(t.elements().get(0)));
     }
@@ -330,7 +330,7 @@ class MarkdownBuilderTest {
 
     @Test
     void codeInATableCellAndInAListItem() {
-        MarkdownBuilder.Translation t = translate(List.of("Bullet: disc", "Table columns: auto"),
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table columns: auto"),
                 "| A |", "|---|", "| `x` |", "", "- uno", "", "  ```", "  y", "  ```");
         InlineNode cell = (InlineNode) ((InlineNode) ((InlineNode) t.elements().get(0).getChild("body")).getChildren()
                 .get(0)).getChildren().get(0);

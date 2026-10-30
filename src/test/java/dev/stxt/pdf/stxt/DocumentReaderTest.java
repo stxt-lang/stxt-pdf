@@ -47,7 +47,7 @@ class DocumentReaderTest {
                 "test/golden/12-multicol/input.stxt",
                 "test/golden/13-markdown/input.stxt",
                 "test/golden/14-images/input.stxt",
-                "test/golden/15-contents/input.stxt",
+                "test/golden/15-table-of-contents/input.stxt",
                 "test/golden/16-links/input.stxt",
                 "test/golden/17-page-types/input.stxt",
                 "test/golden/18-table-styles/input.stxt",

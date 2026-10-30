@@ -251,8 +251,8 @@ class StylesFileTest {
 
     @Test
     void theGeneratedEntriesOfAContentsTakeTheRulesOfTheStylesDocument() {
-        String styles = BASE + "\tFor element: Contents entry 1\n\t\tBox:\n\t\t\tPadding: 6\n";
-        Box contents = root(styles, "\tHeading 1:", "\t\tText: Uno", "\tContents:").children().get(1);
+        String styles = BASE + "\tFor element: TOC 1\n\t\tBox:\n\t\t\tPadding: 6\n";
+        Box contents = root(styles, "\tHeading 1:", "\t\tText: Uno", "\tTable of contents:").children().get(1);
         assertEquals(Sides.all(Value.pt(6)), contents.children().get(0).style().box().padding());
     }
 

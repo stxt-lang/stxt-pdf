@@ -59,7 +59,7 @@ Document (dev.stxt.pdf):
 			Style: subject
 		Markdown:
 			Id: body
-			Bullet: dash
+			Bullet markers: dash
 			Typography:
 				Align: justify
 				Text wrap: pretty

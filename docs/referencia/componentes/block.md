@@ -16,7 +16,7 @@ Block:
 ## El flujo de bloque
 
 Es como colocan a sus hijos en flujo un `Block`, cada sección (el área útil), `Relative`, `Absolute`, `Fixed`, los
-encabezados, `List`, `List item`, `Markdown`, `Contents`, una `Cell` con elementos y cada columna de un `Multicol`. Los hijos
+encabezados, `List`, `List item`, `Markdown`, `Table of contents`, una `Cell` con elementos y cada columna de un `Multicol`. Los hijos
 en flujo se apilan en vertical:
 
 1. **Ancho.** Con `Width: auto`, la caja ocupa el ancho del contenedor de referencia menos sus márgenes horizontales. Con

@@ -64,7 +64,7 @@ class HeadingNumberingTest {
     @Test
     void theContentsEntriesCarryTheNumber() {
         LayoutFixture l = layOut(document(
-                "\tContents:", "\t\tId: toc", "\t\tLevels: 1 2",
+                "\tTable of contents:", "\t\tId: toc", "\t\tLevels: 1 2",
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 2:", "\t\tText: Dos"));
         List<Fragment> entries = l.fragment("toc").children();

@@ -30,7 +30,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `Text`, `Paragraph` | `P`; un `Text` con varios párrafos es un solo `P` |
 | `List`, `List item` | `L` y `LI`, con el marcador en `Lbl` y el contenido en `LBody` |
 | `Table` y sus partes | `Table`, `THead`, `TBody`, `TFoot`, `TR`, y `TH` o `TD` |
-| `Contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
+| `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
 | `Image` con `Alt` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
 | El resto (`Block`, `Flex`, `Grid`, `Multicol`, `Markdown`, los posicionados…) | `Div` |
@@ -115,7 +115,7 @@ y todo lo que hay dentro de un `Fixed`.
 
 ## Enlaces
 
-Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la página, y como texto (`Contents`) lo
+Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la página, y como texto (`Table of contents`) lo
 que dice la caja o el tramo: el texto de la caja y de lo que contiene unido por espacios, o el `Alt` de una imagen; sin
 texto, el propio destino. Las referencias y los marcadores de página del texto salen sin sustituir. Los destinos internos
 se resuelven después de pintar todas las páginas, así que un enlace puede ir hacia delante. Las páginas con anotaciones
@@ -175,7 +175,7 @@ estas diferencias:
   caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición; `D`, con la página, queda para los
   visores que no entienden `SD`.
 - **Listas:** `dash` es `ListNumbering: Unordered`.
-- **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
+- **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Table of contents`, porque lo que se lee es el `Alt`.
 
 veraPDF lo valida con su perfil de PDF/UA-2, que añade las reglas de ISO/TS 32005 sobre qué elemento puede contener a
 cuál.
@@ -183,7 +183,7 @@ cuál.
 > **Decisión:** PDF/UA-2 es una opción y PDF/UA-1 lo de siempre: PDF 2.0 aún no lo abre bien cualquier visor.
 > *Alternativa descartada:* pasar todo a PDF/UA-2.
 
-> **Decisión:** los enlaces con `Alt` no llevan `Contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
+> **Decisión:** los enlaces con `Alt` no llevan `Table of contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
 > mismo, y lo dicen; pero veraPDF compara el `Alt` sin descodificar cuando el texto tiene acentos y lo da por distinto.
 > *Alternativa descartada:* quitar el `Alt`, que es lo que lee un lector de pantalla en un `Link` vacío.
 

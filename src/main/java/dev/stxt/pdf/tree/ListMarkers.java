@@ -23,7 +23,7 @@ final class ListMarkers {
     static String text(Marker marker, int number) {
         String label = switch (marker) {
             case NONE -> null;
-            case DISC -> "•";
+            case BULLET -> "•";
             case DASH -> "–";
             default -> number(marker, number) + ".";
         };

@@ -324,7 +324,7 @@ class SectionsTest {
     void headingsAndContentsGoAcrossSections() {
         LaidOutDocument d = lay(
                 "\tSection:", "\t\tHeading 1:", "\t\t\tId: h1", "\t\t\tText: Uno",
-                join(new String[] {"\tSection:", "\t\tHeading 1:", "\t\t\tId: h2", "\t\t\tText: Dos", "\t\tContents:", "\t\t\tId: toc"}));
+                join(new String[] {"\tSection:", "\t\tHeading 1:", "\t\t\tId: h2", "\t\t\tText: Dos", "\t\tTable of contents:", "\t\t\tId: toc"}));
         assertEquals(2, d.pages().size());
         assertTrue(on(d.pages().get(1), "toc").children().size() >= 2);
     }
@@ -344,12 +344,12 @@ class SectionsTest {
     void aHeadingOfAnUnnumberedSectionCannotBeListedInAContents() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tText: Portada",
-                "\tSection:", "\t\tContents:"));
+                "\tSection:", "\t\tTable of contents:"));
         assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.errorCode());
-        // Con In contents: false, el encabezado sigue siéndolo pero no se lista; el índice necesita otro.
+        // Con In table of contents: false, el encabezado sigue siéndolo pero no se lista; el índice necesita otro.
         LaidOutDocument d = lay(
-                "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tIn contents: false", "\t\t\tText: Portada",
-                "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", "\t\tContents:", "\t\t\tId: toc");
+                "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tIn table of contents: false", "\t\t\tText: Portada",
+                "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", "\t\tTable of contents:", "\t\t\tId: toc");
         assertEquals(2, d.pages().size());
     }
 

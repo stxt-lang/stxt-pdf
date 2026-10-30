@@ -2,9 +2,9 @@
 # portada, a sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit fixed: false),
 # y el cuerpo, que numera desde 1 («Página 1 de 6» en la primera interior). Muestra además cifras clave
 # en un grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
-# cabecera y pie, y capítulos que empiezan siempre en página nueva. El contenido es un Contents:
+# cabecera y pie, y capítulos que empiezan siempre en página nueva. El contenido es un Table of contents:
 # lista los capítulos con su página impresa, que el motor calcula. El título de la portada y el de la
-# página de contenido son un Heading 1 con In contents: false, para que no salgan en el índice, y con
+# página de contenido son un Heading 1 con In table of contents: false, para que no salgan en el índice, y con
 # Numbered: false, para que no cuenten. Los capítulos son Heading 1 numerados (Numbered: true en
 # styles.stxt: 1 a 6) y sus apartados, Heading 2 (1.1, 2.1…); el índice y los marcadores del PDF llevan el
 # número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
@@ -65,7 +65,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Margin: 0 0 10 0
 				Heading 1:
-					In contents: false
+					In table of contents: false
 					Box:
 						Margin: 0 0 14 0
 						Padding: 0
@@ -144,11 +144,11 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: contents
 			Heading 1:
-				In contents: false
+				In table of contents: false
 				Text: Contenido
 				Typography:
 					Numbered: false
-			Contents:
+			Table of contents:
 				Id: toc
 				Levels: 1 1
 		Block:
@@ -295,7 +295,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 14 0
 				Markdown:
-					Bullet: disc
+					Bullet markers: bullet
 					Content >>
 						## Hogares
 
@@ -380,7 +380,7 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Dónde ha ido la inversión
 			Markdown:
-				Numbering: decimal
+				Number markers: decimal
 				Table columns: auto
 				Content >>
 					| Proyecto | Inversión (k€) | Potencia |
@@ -504,8 +504,8 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Qué viene ahora
 			Markdown:
-				Bullet: dash
-				Numbering: lower-alpha
+				Bullet markers: dash
+				Number markers: lower-alpha
 				Content >>
 					La **Asamblea General** del 21 de marzo aprobó estas líneas de trabajo para el próximo ejercicio:
 

@@ -52,7 +52,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [`Relative`, `Absolute` y `Fixed`](componentes/relative-absolute-fixed.md) | Los elementos posicionados |
 | [`Image`](componentes/image.md) | `Image`: PNG, JPEG y SVG |
 | [`Markdown`](componentes/markdown.md) | `Markdown` y el elemento generado `Code block` |
-| [`Contents`](componentes/contents.md) | `Contents` y las entradas que genera |
+| [`Table of contents`](componentes/table-of-contents.md) | `Table of contents` y las entradas que genera |
 
 ## Implementación
 

@@ -136,7 +136,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Grow: 1
 					Markdown:
-						Bullet: dash
+						Bullet markers: dash
 						Content >>
 							Octubre es el mes del hayedo. Estas son tres salidas para disfrutarlo sin multitudes, de la más corta a la más exigente:
 

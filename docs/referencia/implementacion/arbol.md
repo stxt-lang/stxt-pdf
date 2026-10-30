@@ -18,7 +18,7 @@ La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `Doc
 
 En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `Text`, `Paragraph`, `Cell`, `Image`,
 `Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Isolate`, `Wrap`, `Header` e
-`In contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
+`In table of contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
 valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
 `ValueReader`.
 

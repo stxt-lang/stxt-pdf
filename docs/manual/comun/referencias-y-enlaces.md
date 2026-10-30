@@ -58,7 +58,7 @@ Paragraph: Ver las especificaciones
 - Un enlace no cambia el aspecto de lo que enlaza: el color y el subrayado se los das tú con su estilo. El enlace de Markdown
   es la excepción: sale subrayado.
 - `Link` no se hereda ni va en `Styles`: es de cada elemento.
-- Las entradas de un índice ya llevan a su encabezado ([Contents](../componentes/contents.md)).
+- Las entradas de un índice ya llevan a su encabezado ([Table of contents](../componentes/table-of-contents.md)).
 - En el PDF, cada enlace lleva como texto lo que dice la caja, para quien no lo ve.
 
 Más detalle en la referencia: [referencias](../../referencia/comun/referencias.md) y [enlaces](../../referencia/comun/enlaces.md).

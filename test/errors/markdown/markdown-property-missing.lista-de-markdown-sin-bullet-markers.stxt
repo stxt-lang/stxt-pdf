@@ -1,6 +1,6 @@
-# Case: Lista numerada de Markdown sin Numbering
+# Case: Lista de Markdown sin Bullet markers
 # Code: MARKDOWN_PROPERTY_MISSING
-# Line: 19
+# Line: 20
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -14,6 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Markdown:
-			Bullet: disc
 			Content >>
-				1. uno
+				Párrafo.
+
+				- uno

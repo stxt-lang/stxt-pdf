@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Contents} (referencia/componentes/contents.md). Páginas de 180 pt con márgenes de 40: área útil de
+ * {@code Table of contents} (referencia/componentes/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área útil de
  * 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
  */
 class ContentsTest {
@@ -21,7 +21,7 @@ class ContentsTest {
     /** El índice y, detrás, tres encabezados separados por 100 pt: caen en las páginas 1, 2 y 3. */
     private static String[] document(String contents, String... before) {
         String[] body = {
-                "\tContents:", "\t\tId: toc", contents,
+                "\tTable of contents:", "\t\tId: toc", contents,
                 "\tHeading 1:", "\t\tText: Intro",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tHeading 2:", "\t\tText: Detalle",
@@ -40,13 +40,13 @@ class ContentsTest {
     }
 
     /**
-     * Un encabezado con {@code In contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y las
-     * páginas no cambian) pero no tiene entrada (referencia/componentes/contents.md).
+     * Un encabezado con {@code In table of contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y las
+     * páginas no cambian) pero no tiene entrada (referencia/componentes/table-of-contents.md).
      */
     @Test
     void aHeadingWithInContentsFalseHasNoEntry() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
-                "\tHeading 1:", "\t\tIn contents: false", "\t\tText: Portada"));
+                "\tHeading 1:", "\t\tIn table of contents: false", "\t\tText: Portada"));
         List<Fragment> entries = entries(l);
         assertEquals(3, entries.size());
         assertEquals(List.of("Intro", "Detalle", "Final"), entries.stream().map(e -> text(e.children().get(0))).toList());
@@ -110,7 +110,7 @@ class ContentsTest {
     @Test
     void entryRulesStyleEachLevel() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
-                "\tStyles:", "\t\tFor element: Contents entry 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
+                "\tStyles:", "\t\tFor element: TOC 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
                 "\t\t\tTypography:", "\t\t\t\tSize: 10"));
         List<Fragment> entries = entries(l);
         // Solo el nivel 2 lleva sangría: sus hijos, relativos a su caja de contenido, quedan 20 pt más
@@ -126,7 +126,7 @@ class ContentsTest {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\tContents:", "\t\tId: toc");
+                "\tTable of contents:", "\t\tId: toc");
         // El encabezado está en la página 1; el índice, que no cabe, en la 2.
         assertTrue(l.has(2, "toc"));
         assertEquals("1", text(l.fragment(2, "toc").children().get(0).children().get(2)));

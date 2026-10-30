@@ -43,7 +43,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([Multicol](../componentes/multicol.md)) | Elementos en flujo |
 | `Markdown` | Contenido escrito en Markdown ([Markdown](../componentes/markdown.md)) | Su texto en `Content` |
 | `Image` | Imagen PNG, JPEG o SVG, o una página de un PDF ([Image](../componentes/image.md)) | Nada: la ruta va en el valor |
-| `Contents` | Índice automático ([Contents](../componentes/contents.md)) | Nada: las entradas las genera el motor |
+| `Table of contents` | Índice automático ([Table of contents](../componentes/table-of-contents.md)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza sin mover a sus hermanos ([posicionados](../componentes/relative-absolute-fixed.md)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado en su contenedor de referencia | Elementos |
 | `Fixed` | Bloque fuera de flujo, colocado en el área útil de las páginas que dice `Pages` | Elementos |
@@ -92,8 +92,8 @@ Text: Resultados del trimestre
 |---|---|---|---|---|
 | `Id` | texto | — | Elementos y `Section` | Identificador para referencias, enlaces, reglas `For id` y mensajes. Único en el documento (`DUPLICATE_ID`). |
 | `Style` | nombres separados por espacios | — | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
-| `In contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
-| `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Elementos salvo `Markdown` y `Contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
+| `In table of contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
+| `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
 | `Isolate` | booleano | `false` | `Block`, `Relative` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
 
 ## Orden y texto
@@ -150,7 +150,7 @@ Cada elemento decide **cómo coloca a sus hijos**:
 
 | Elemento | Coloca a sus hijos en flujo |
 |---|---|
-| `Section` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed`, encabezados, `List`, `List item`, `Markdown`, `Contents`, `Cell` con elementos | En flujo de bloque ([Block](../componentes/block.md#el-flujo-de-bloque)) |
+| `Section` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed`, encabezados, `List`, `List item`, `Markdown`, `Table of contents`, `Cell` con elementos | En flujo de bloque ([Block](../componentes/block.md#el-flujo-de-bloque)) |
 | `Flex` | En líneas ([Flex](../componentes/flex.md)) |
 | `Grid`, `Table` | En una rejilla ([Grid](../componentes/grid.md), [Table](../componentes/table.md)) |
 | `Multicol` | En columnas, cada una en flujo de bloque ([Multicol](../componentes/multicol.md)) |
@@ -182,7 +182,7 @@ vez; los elementos, las veces que se quiera.
 | `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
-| `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In contents`, `Box`, `Typography`; `Text` (al menos uno) |
+| `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
@@ -190,8 +190,8 @@ vez; los elementos, las veces que se quiera.
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
 | `Multicol` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
-| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
-| `Contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
+| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
+| `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
 | `Relative` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Absolute` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
@@ -203,7 +203,7 @@ vez; los elementos, las veces que se quiera.
 | `Break` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`,
-`Contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
+`Table of contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`;
 `Block: algo` es un error. `Content` va siempre en bloque `>>`, y `Areas`, en línea o en bloque. Lo que el schema no puede

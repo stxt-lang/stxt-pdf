@@ -30,7 +30,7 @@ class MarkdownTest {
 
     @Test
     void aBlockWithTheGeneratedElements() {
-        Box root = build("\tMarkdown:", "\t\tId: M", "\t\tBullet: disc", "\t\tTable columns: auto", "\t\tContent >>",
+        Box root = build("\tMarkdown:", "\t\tId: M", "\t\tBullet markers: bullet", "\t\tTable columns: auto", "\t\tContent >>",
                 "\t\t\t# Título", "", "\t\t\tUn **párrafo**.", "", "\t\t\t- ítem", "", "\t\t\t| A |", "\t\t\t|---|",
                 "\t\t\t| *1* |");
         Box md = root.children().get(0);
@@ -45,7 +45,7 @@ class MarkdownTest {
         assertNull(md.children().get(0).children().get(0).formattedRuns());
         Box cell = md.children().get(3).children().get(1);
         assertEquals(List.of(run("1", "i")), cell.formattedRuns());
-        assertEquals(Marker.DISC, md.children().get(2).style().list().marker());
+        assertEquals(Marker.BULLET, md.children().get(2).style().list().marker());
     }
 
     @Test
@@ -73,7 +73,7 @@ class MarkdownTest {
     @Test
     void allowedWhereAFlowElementGoes() {
         // En un ítem de lista, una celda, un Multicol y un Item de Flex (K1).
-        assertDoesNotThrow(() -> build("\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tMarkdown:",
+        assertDoesNotThrow(() -> build("\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tMarkdown:",
                 "\t\t\t\tContent >>", "\t\t\t\t\tUno **dos**"));
         assertDoesNotThrow(() -> build("\tTable:", "\t\tColumns: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell:",
                 "\t\t\t\t\tMarkdown:", "\t\t\t\t\t\tContent >>", "\t\t\t\t\t\t\tUno"));

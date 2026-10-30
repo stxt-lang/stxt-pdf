@@ -88,7 +88,7 @@ class TablesTest {
     @Test
     void cellWithoutValueIsABlockOfElements() {
         Box table = root("\tTable:", "\t\tColumns: 1fr 1fr", "\t\tBody:", "\t\t\tRow:",
-                "\t\t\t\tCell:", "\t\t\t\t\tParagraph: Uno", "\t\t\t\t\tList:", "\t\t\t\t\t\tMarker: disc",
+                "\t\t\t\tCell:", "\t\t\t\t\tParagraph: Uno", "\t\t\t\t\tList:", "\t\t\t\t\t\tMarker: bullet",
                 "\t\t\t\t\t\tList item:", "\t\t\t\t\t\t\tText: dos",
                 "\t\t\t\tCell:").children().get(0);
         Box full = table.children().get(0);

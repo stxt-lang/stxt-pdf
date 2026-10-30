@@ -54,7 +54,7 @@ public enum ErrorCode {
     // --- Listas ----------------------------------------------------------------------------------
     /** Un {@code List item} sin ningún elemento. */
     LIST_ITEM_EMPTY,
-    /** {@code Start} o {@code Number} en una lista que no numera ({@code disc}, {@code dash}, {@code none}). */
+    /** {@code Start} o {@code Number} en una lista que no numera ({@code bullet}, {@code dash}, {@code none}). */
     LIST_NUMBER_NOT_ALLOWED,
     /** Un número que la numeración no puede escribir: negativo, 0 en letras o romanos, o más de 3999 en romanos. */
     LIST_NUMBER_RANGE,
@@ -90,7 +90,7 @@ public enum ErrorCode {
     // --- Markdown ------------------------------------------------------------------------------
     /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes dentro de un texto, código, citas, HTML… */
     MARKDOWN_UNSUPPORTED,
-    /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet}, {@code Numbering} o {@code Table columns}. */
+    /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet markers}, {@code Number markers} o {@code Table columns}. */
     MARKDOWN_PROPERTY_MISSING,
     /** Código, en línea o en un bloque, sin {@code Code font} en {@code Typography}, propia o heredada. */
     CODE_WITHOUT_FONT,
@@ -125,8 +125,8 @@ public enum ErrorCode {
     LINK_UNKNOWN,
 
     // --- Índice -------------------------------------------------------------------------------
-    /** Un {@code Contents} sin ningún encabezado en los niveles de {@code Levels}. */
-    CONTENTS_EMPTY,
+    /** Un {@code Table of contents} sin ningún encabezado en los niveles de {@code Levels}. */
+    TABLE_OF_CONTENTS_EMPTY,
 
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
     /** {@code For element} con un nombre que no es un elemento de caja. */

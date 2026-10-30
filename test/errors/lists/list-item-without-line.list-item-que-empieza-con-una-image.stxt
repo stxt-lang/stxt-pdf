@@ -14,6 +14,6 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		List:
-			Marker: disc
+			Marker: bullet
 			List item:
 				Image: test/square.png

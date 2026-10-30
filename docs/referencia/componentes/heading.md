@@ -1,7 +1,7 @@
 # Encabezados: `Heading 1` … `Heading 6`
 
 Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados como en un `Block`; además admite `Id`,
-`Style`, `Link`, `In contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
+`Style`, `Link`, `In table of contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
 flujo de bloque de siempre; su significado se ve en las reglas `For element`, en los cortes, en la numeración, en los índices,
 en los marcadores del PDF y en lo que anuncia un lector de pantalla.
 
@@ -58,7 +58,7 @@ se repite en cada página y no forma parte del contenido, ni dentro de un `List 
 
 ## Fuera del índice
 
-`In contents: false` deja un encabezado fuera de los índices (`Contents`) sin dejar de ser un encabezado: sigue teniendo
+`In table of contents: false` deja un encabezado fuera de los índices (`Table of contents`) sin dejar de ser un encabezado: sigue teniendo
 marcador, contando en la jerarquía y siendo destino de `#id`. Es lo normal para el título de la portada o el del propio
 índice. Es una propiedad del elemento, por defecto `true`, que no se hereda ni va en `Styles`.
 

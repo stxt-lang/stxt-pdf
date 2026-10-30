@@ -1,6 +1,6 @@
-# Case: Un índice en un documento sin encabezados
-# Code: CONTENTS_EMPTY
-# Line: 16
+# Case: Bullet markers con una numeración
+# Code: VALUE_NOT_ALLOWED
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,4 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Contents:
+		Markdown:
+			Bullet markers: bullet decimal
+			Content >>
+				- uno

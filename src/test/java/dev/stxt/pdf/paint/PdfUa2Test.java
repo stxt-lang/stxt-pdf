@@ -37,7 +37,7 @@ class PdfUa2Test {
     private static final String DOCUMENT = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n"
             + "\t\tWidth: 300\n\t\tHeight: 300\n\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
             + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-            + "\tContents:\n"
+            + "\tTable of contents:\n"
             + "\tHeading 1:\n\t\tText: Uno\n"
             + "\tList:\n\t\tMarker: dash\n\t\tBox:\n\t\t\tPadding: 0 0 0 16\n\t\tList item:\n\t\t\tText: Un ítem\n"
             + "\tText: Vuelve al principio\n\t\tLink: #uno\n"

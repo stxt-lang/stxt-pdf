@@ -21,7 +21,7 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
 
 - **Orden de lectura:** el del documento. Cada caja es un elemento: los encabezados se anuncian como encabezados de su
   nivel, las listas como listas con su número de ítems, las tablas como tablas con sus cabeceras, las imágenes con `Alt`
-  como figuras y un `Contents` como un índice.
+  como figuras y un `Table of contents` como un índice.
 - **Decoración:** los fondos, los bordes, las rayas del texto, las guías de un índice, las líneas entre columnas, las
   imágenes sin `Alt`, las filas repetidas de una tabla y todo lo que hay en un `Fixed` no se leen.
 - **Idioma:** el `Language` de `Document` es el de todo el contenido; una caja que declara otro se lee con ese

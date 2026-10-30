@@ -63,7 +63,7 @@ public enum Element {
      * Índice automático (referencia/comun/referencias.md): un bloque cuyos hijos, generados al construir el árbol, son
      * una entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
      */
-    CONTENTS("Contents", Layout.BLOCK, Position.STATIC, true, false, 0),
+    CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
     RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
     ABSOLUTE("Absolute", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
     FIXED("Fixed", Layout.BLOCK, Position.FIXED, false, false, 0),
@@ -88,14 +88,14 @@ public enum Element {
     /**
      * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el título, la
      * guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las nombran ({@code
-     * Contents entry 2}) para darles estilo (referencia/componentes/contents.md).
+     * TOC 2}) para darles estilo (referencia/componentes/table-of-contents.md).
      */
-    CONTENTS_ENTRY_1("Contents entry 1", Layout.FLEX),
-    CONTENTS_ENTRY_2("Contents entry 2", Layout.FLEX),
-    CONTENTS_ENTRY_3("Contents entry 3", Layout.FLEX),
-    CONTENTS_ENTRY_4("Contents entry 4", Layout.FLEX),
-    CONTENTS_ENTRY_5("Contents entry 5", Layout.FLEX),
-    CONTENTS_ENTRY_6("Contents entry 6", Layout.FLEX),
+    CONTENTS_ENTRY_1("TOC 1", Layout.FLEX),
+    CONTENTS_ENTRY_2("TOC 2", Layout.FLEX),
+    CONTENTS_ENTRY_3("TOC 3", Layout.FLEX),
+    CONTENTS_ENTRY_4("TOC 4", Layout.FLEX),
+    CONTENTS_ENTRY_5("TOC 5", Layout.FLEX),
+    CONTENTS_ENTRY_6("TOC 6", Layout.FLEX),
     /** El título de una entrada del índice: el texto del encabezado. */
     CONTENTS_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /** La guía (puntos o línea) entre el título y el número de una entrada: una caja vacía que se pinta. */
@@ -224,7 +224,7 @@ public enum Element {
         CELL,
         /** Una imagen. */
         FIGURE,
-        /** Un índice ({@code Contents}, referencia/componentes/contents.md). */
+        /** Un índice ({@code Table of contents}, referencia/componentes/table-of-contents.md). */
         CONTENTS,
         CONTENTS_ENTRY,
         /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
@@ -232,7 +232,7 @@ public enum Element {
         /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
         PAGE_NUMBER,
         /**
-         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/contents.md) y no es
+         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/table-of-contents.md) y no es
          * contenido.
          */
         LEADER,

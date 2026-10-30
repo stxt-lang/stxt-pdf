@@ -12,9 +12,9 @@
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color…)` ([La caja](caja.md#degradado)). |
-| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
+| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Table of contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
-| **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `Contents entry 1` … `6`. |
+| **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `TOC 1` … `6`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
 | **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([Enlaces](enlaces.md)). |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
@@ -23,7 +23,7 @@
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve; posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](capas-y-giro.md#giro-rotate)). |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../componentes/image.md)). |
-| **Índice** | Elemento `Contents`: una entrada por encabezado con su título, una guía y su página ([Contents](../componentes/contents.md)). |
+| **Índice** | Elemento `Table of contents`: una entrada por encabezado con su título, una guía y su página ([Table of contents](../componentes/table-of-contents.md)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas, bloques de código e imágenes ([Markdown](../componentes/markdown.md)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea ([La caja](caja.md#tamaños-intrínsecos)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4`, `Letter`…), en vertical o, con `Orientation: landscape`, apaisado. |

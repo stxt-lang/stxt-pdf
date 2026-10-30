@@ -1,6 +1,6 @@
-# Case: Levels con un solo número
-# Code: VALUE_NOT_ALLOWED
-# Line: 19
+# Case: Levels pide niveles que no tiene ningún encabezado
+# Code: TABLE_OF_CONTENTS_EMPTY
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -15,5 +15,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Heading 1:
 			Text: Uno
-		Contents:
-			Levels: 2
+		Table of contents:
+			Levels: 2 3

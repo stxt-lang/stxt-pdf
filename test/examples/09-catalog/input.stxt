@@ -1,11 +1,11 @@
 # Catálogo de producto de un taller de muebles, de cinco páginas. Son dos secciones: la portada, a
 # sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit fixed: false), y el
-# cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Contents, que el
+# cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Table of contents, que el
 # motor rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
 # (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Absolute con Rotate), y una página
 # final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
 # solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
-# In contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
+# In table of contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
 # ponen en mayúsculas (Transform).
 Document (dev.stxt.pdf):
 	Page:
@@ -59,7 +59,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Margin: 0 0 8 0
 				Heading 1:
-					In contents: false
+					In table of contents: false
 					Box:
 						Margin: 0 0 14 0
 					Typography:
@@ -119,11 +119,11 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: index
 			Heading 1:
-				In contents: false
+				In table of contents: false
 				Text: Índice
 			Paragraph: Cada pieza, con la página de su ficha.
 				Style: lead
-			Contents:
+			Table of contents:
 				Id: toc
 				Levels: 1 2
 		Block:

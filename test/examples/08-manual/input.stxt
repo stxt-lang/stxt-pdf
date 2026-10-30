@@ -163,7 +163,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 8 0
 			Markdown:
-				Numbering: decimal
+				Number markers: decimal
 				Content >>
 					1. Retira el termostato anterior y anota a qué borne va cada cable.
 					2. Separa la base de pared del termostato, haciendo palanca suavemente por la parte inferior.
@@ -268,7 +268,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Grow: 1
 					Markdown:
-						Numbering: decimal
+						Number markers: decimal
 						Content >>
 							1. Descarga la aplicación **Aire+** desde la tienda de tu móvil.
 							2. Crea una cuenta o entra con la que ya tengas.

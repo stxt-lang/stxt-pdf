@@ -40,7 +40,7 @@ Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` p
 ## Dónde hay texto
 
 Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../componentes/text.md)), y lo generan los encabezados
-(sus `Text`), las entradas de un `Contents` y lo que traduce un `Markdown`. El texto de un `Text` va en su valor
+(sus `Text`), las entradas de un `Table of contents` y lo que traduce un `Markdown`. El texto de un `Text` va en su valor
 (`Text: Un título`) o en un hijo `Content >>` con un bloque indentado, que admite párrafos.
 
 ## Espacios y párrafos

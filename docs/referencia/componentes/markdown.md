@@ -28,8 +28,8 @@ Document (dev.stxt.pdf):
 		Markdown:
 			Typography:
 				Code font: IBM Plex Mono
-			Bullet: disc dash
-			Numbering: decimal
+			Bullet markers: bullet dash
+			Number markers: decimal
 			Table columns: equal
 			Content >>
 				# Resultados
@@ -54,13 +54,13 @@ Document (dev.stxt.pdf):
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Content` | bloque `>>` | — | El Markdown. Obligatorio. |
-| `Bullet` | lista de `disc`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
-| `Numbering` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
+| `Bullet markers` | lista de `bullet`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
+| `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
 | `Table columns` | `equal`, `auto` | — | Las `Columns` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
-> **Decisión:** las propiedades que no se usan no son un error (un `Bullet` sin listas), aunque en general lo que no tiene
+> **Decisión:** las propiedades que no se usan no son un error (un `Bullet markers` sin listas), aunque en general lo que no tiene
 > efecto lo es: el contenido de un Markdown cambia a menudo y obligaría a quitar y poner las propiedades. Su valor sí se
 > comprueba siempre.
 
@@ -73,8 +73,8 @@ así:
 |---|---|
 | `#` … `######` (y los subrayados con `===` y `---`) | `Heading 1` … `Heading 6`, con un `Text`; con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
-| `-`, `*`, `+` | `List` con el `Marker` de `Bullet` para su nivel; un `List item` por ítem |
-| `1.`, `1)` | `List` con el `Marker` de `Numbering` para su nivel y `Start`, el primer número si no es 1 |
+| `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel; un `List item` por ítem |
+| `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `Start`, el primer número si no es 1 |
 | Tabla | `Table` con las `Columns` de `Table columns`; la fila de cabecera en `Head` y el resto en `Body` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../comun/formato-del-texto.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
@@ -92,7 +92,7 @@ final de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: 
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
 la cabecera. Un `Markdown` sin contenido, o un encabezado o un párrafo sin texto, es `TEXT_CONTENT`.
 
-Un `Bullet` o un `Numbering` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
+Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
 `Link`.
 
 > **Decisión:** lo que no tendría efecto (la etiqueta de lenguaje de un bloque de código, el título de un enlace) es un
@@ -139,14 +139,14 @@ con la línea de `Code font`.
 ## Listas
 
 El nivel de una lista es el número de listas de su mismo tipo que la contienen: la primera lista con viñetas usa el primer
-marcador de `Bullet`; una con viñetas dentro de esa, el segundo, y así hasta el último, que sirve para los niveles más
-profundos. Las numeradas cuentan aparte, con `Numbering`. Cada párrafo de un ítem es un `Paragraph`, y una lista anidada,
+marcador de `Bullet markers`; una con viñetas dentro de esa, el segundo, y así hasta el último, que sirve para los niveles más
+profundos. Las numeradas cuentan aparte, con `Number markers`. Cada párrafo de un ítem es un `Paragraph`, y una lista anidada,
 una `List` dentro del `List item`. Las listas compactas y las separadas por líneas en blanco se traducen igual: el espacio
 entre ítems lo dan las reglas de `Styles`. Como cualquier lista, la sangría que deja sitio al marcador es su `Padding`
 izquierdo, que se suele declarar en la regla `For element: List` ([List](list.md)).
 
 > **Decisión:** el nivel se cuenta por tipo: una lista numerada dentro de una con viñetas usa el primer marcador de
-> `Numbering`. *Alternativa descartada:* un nivel común a los dos tipos.
+> `Number markers`. *Alternativa descartada:* un nivel común a los dos tipos.
 
 ## Tablas
 
@@ -190,7 +190,7 @@ como elemento de un `Item` o un `Area`.
 ## Errores
 
 Los errores de lo generado señalan la línea del documento donde empieza su bloque de Markdown (la del ítem, la de la fila de
-la tabla); los del marcador de una lista, la de `Bullet` o `Numbering`, y los de las columnas de una tabla, la de
+la tabla); los del marcador de una lista, la de `Bullet markers` o `Number markers`, y los de las columnas de una tabla, la de
 `Table columns`. Una lista o una tabla sin su propiedad es un error con la línea de la lista o la tabla
 (`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es. El código sin `Code font` es `CODE_WITHOUT_FONT`
 ([Código](#código)).

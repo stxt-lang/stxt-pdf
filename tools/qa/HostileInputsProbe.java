@@ -35,7 +35,7 @@ public class HostileInputsProbe {
     }
     static String refs(int n) { // n encabezados + indice
         StringBuilder sb = new StringBuilder(head(""));
-        sb.append("\t\tContents:\n");
+        sb.append("\t\tTable of contents:\n");
         for (int i = 0; i < n; i++) sb.append("\t\tBlock:\n\t\t\tBreak:\n\t\t\t\tBefore: page\n\t\t\tHeading 1:\n\t\t\t\tId: h").append(i).append("\n\t\t\t\tText: Capitulo ").append(i).append("\n\t\t\tParagraph: Ver pagina {page of: h").append(i).append("} y texto de relleno para el capitulo.\n");
         return sb.toString();
     }

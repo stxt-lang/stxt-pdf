@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 
 | Propiedad | Dónde | Qué hace |
 |---|---|---|
-| `Marker` | `List` | **Obligatorio.** `disc` (•), `dash` (–), `none`, `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Obligatorio.** `bullet` (•), `dash` (–), `none`, `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Start` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Number` | `List item` | El número de este ítem; los siguientes siguen desde él |
 

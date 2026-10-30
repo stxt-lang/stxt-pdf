@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La guía de las entradas de un índice (referencia/componentes/contents.md): lo que se pinta en la caja
+ * La guía de las entradas de un índice (referencia/componentes/table-of-contents.md): lo que se pinta en la caja
  * vacía entre el título y el número de página. Son rectángulos rellenos con el color del texto,
  * sobre la línea base de la entrada.
  */
@@ -41,7 +41,7 @@ final class Leaders {
                     shapes.add(new Rect(x, baseline - dot, dot, dot));
                 }
             }
-            case RULE -> {
+            case LINE -> {
                 double thickness = Math.max(MIN, fontSize * RULE);
                 shapes.add(new Rect(content.x(), baseline - thickness, content.width(), thickness));
             }

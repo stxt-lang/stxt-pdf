@@ -124,7 +124,7 @@ final class PropertyReader {
             entry("isolate", (p, s) -> s.setIsolate(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("header", (p, s) -> s.setHeader(bool(p))),
-            entry("in-contents", (p, s) -> s.setInContents(bool(p))),
+            entry("in-table-of-contents", (p, s) -> s.setInContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPage(positiveInteger(p))),
