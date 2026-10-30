@@ -53,8 +53,9 @@ Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: 
 
 ## Propiedades
 
-Admiten `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`. Necesitan `Font` y `Size`, propios o heredados
-([Tipografía](../comun/tipografia.md)).
+Admiten `Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesitan `Font` y `Size`, propios o heredados
+([Tipografía](../comun/tipografia.md)). Con `Rotate: -90`, el texto va en vertical y ocupa su sitio girado
+([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)).
 
 ## Cómo se comportan
 

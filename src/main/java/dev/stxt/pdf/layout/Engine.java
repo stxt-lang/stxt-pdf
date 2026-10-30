@@ -17,8 +17,11 @@ import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.layout.multicol.MulticolLayout;
 import dev.stxt.pdf.layout.position.AbsoluteLayout;
 import dev.stxt.pdf.layout.table.TableLayout;
+import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.BoxTreeBuilder;
@@ -30,6 +33,7 @@ import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 
 import static dev.stxt.pdf.model.Tolerance.fits;
@@ -214,9 +218,26 @@ public final class Engine implements LayoutContext {
         return images.natural(box);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría sin
+     * contenedor: su {@code Width} o, si no lo tiene, su max-content (referencia/comun/capas-y-giro.md). Los porcentajes
+     * cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
+     */
     @Override
     public IntrinsicSizes intrinsic(Box box) {
-        return cache.intrinsic(box, () -> BoxModel.intrinsic(box, contentIntrinsic(box)));
+        return cache.intrinsic(box, () -> {
+            IntrinsicSizes own = BoxModel.intrinsic(box, contentIntrinsic(box));
+            if (!box.style().rotatesInFlow()) {
+                return own;
+            }
+            double margins = Insets.resolve(box.style().box().margin(), 0).horizontal();
+            ConstraintSpace space = ConstraintSpace.fixed(own.maxContent() - margins, OptionalDouble.empty(), 0,
+                    OptionalDouble.empty(), false);
+            double width = turned(box, layoutOnce(box, space, null).fragment()).width() + margins;
+            return new IntrinsicSizes(width, width);
+        });
     }
 
     @Override
@@ -238,6 +259,9 @@ public final class Engine implements LayoutContext {
      */
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        if (box.style().rotatesInFlow()) {
+            return rotatedInFlow(box, space);
+        }
         if (space.fragmenting() && box.style().rotation() != null) {
             // Una caja girada no se parte (referencia/comun/cortes.md): entera o, si no cabe, en la página siguiente.
             LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
@@ -258,6 +282,52 @@ public final class Engine implements LayoutContext {
             return layoutOnce(box, space.withRemaining(remaining - bottom, space.atFragmentainerStart()), from);
         }
         return r;
+    }
+
+    /**
+     * Una caja girada en flujo (referencia/comun/capas-y-giro.md): se maqueta sin girar con su ancho, que no depende
+     * del contenedor ({@link #turnedWidth}), y ocupa el rectángulo que envuelve su caja de borde girada sobre su
+     * centro. No se parte: entera o, si no cabe en lo que queda de página, en la siguiente. Es un contexto de formato
+     * de bloque: no salen de ella los márgenes de sus hijos.
+     */
+    private LayoutResult rotatedInFlow(Box box, ConstraintSpace space) {
+        ConstraintSpace own = ConstraintSpace.fixed(turnedWidth(box, space), OptionalDouble.empty(),
+                space.percentBaseWidth(), space.percentBaseHeight(), space.atFragmentainerStart());
+        LayoutResult r = layoutOnce(box, own, null);
+        Fragment f = turned(box, r.fragment());
+        if (space.fragmenting() && !space.atFragmentainerStart()
+                && !fits(f.height(), space.fragmentainerRemaining().getAsDouble())) {
+            return LayoutResult.before(box);
+        }
+        // Lo que sube de dentro (los Fixed) tiene su posición estática en la caja sin girar.
+        List<PendingAbsolute> pending = r.pending().stream()
+                .map(p -> p.translated(f.turned().x(), f.turned().y())).toList();
+        return LayoutResult.finished(f, pending, AdjoiningMargins.NONE);
+    }
+
+    /**
+     * El ancho de la caja de borde de una caja girada en flujo: el que da su {@code Width} o, si es {@code auto}, su
+     * max-content, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de siempre.
+     */
+    private double turnedWidth(Box box, ConstraintSpace space) {
+        if (box.isImage() || !box.style().box().width().isAuto()) {
+            return BoxModel.resolve(box, ConstraintSpace.free(space.availableWidth(), space.percentBaseWidth(),
+                    space.percentBaseHeight(), space.atFragmentainerStart()), this).width();
+        }
+        Insets border = Insets.resolve(box.style().box().border(), space.percentBaseWidth());
+        Insets padding = Insets.resolve(box.style().box().padding(), space.percentBaseWidth());
+        return BoxModel.constrainWidth(box.style(),
+                contentIntrinsic(box).maxContent() + border.horizontal() + padding.horizontal(),
+                space.percentBaseWidth());
+    }
+
+    /** El fragmento sin girar de una caja girada en flujo, con el rectángulo que la envuelve girada sobre su centro. */
+    private static Fragment turned(Box box, Fragment f) {
+        Rect border = new Rect(0, 0, f.width(), f.height());
+        Rotation rotation = box.style().rotation();
+        Rect envelope = Rotation.envelope(rotation.transform(border), border);
+        return f.turned(new Rect(-envelope.x(), -envelope.y(), f.width(), f.height()), envelope.width(),
+                envelope.height());
     }
 
     private LayoutResult layoutOnce(Box box, ConstraintSpace space, BreakToken from) {

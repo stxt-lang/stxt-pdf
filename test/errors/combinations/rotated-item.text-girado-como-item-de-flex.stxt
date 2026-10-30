@@ -1,0 +1,19 @@
+# Case: Un Text girado que es un ítem de Flex: el ítem ocupa el sitio que le da el Flex
+# Code: ROTATED_ITEM
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Flex:
+			Item:
+				Text: Lunes
+					Rotate: -90

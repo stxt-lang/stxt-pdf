@@ -154,7 +154,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             return f;
         }
         return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.margin(), f.border(), f.padding(),
-                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY());
+                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned());
     }
 
     private Broken breakText(Box box, double available) {

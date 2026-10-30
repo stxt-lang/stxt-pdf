@@ -329,7 +329,7 @@ public final class BoxTreeBuilder {
             case ABSOLUTE -> "un Absolute";
             case FIXED -> "un Fixed";
             case RELATIVE -> s.rotation() != null ? "un Relative girado" : null;
-            default -> null;
+            default -> s.rotatesInFlow() ? "una caja girada" : null;
         };
     }
 

@@ -71,6 +71,18 @@ los hijos `Relative` se desplazan con `RelativeOffset` después de colocarlos. `
 del de esa caja); los `Fixed` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
 que incluye su `Pages`.
 
+## Cajas giradas en flujo
+
+`Engine.layout` maqueta aparte una caja con `Style.rotatesInFlow()` (un `Block`, `Text`, `Paragraph` o `Image` con
+`Rotate`): con `ConstraintSpace.fixed` y el ancho de `turnedWidth` (su `Width` resuelto o, con `auto`, su max-content más
+borde y relleno), sin fragmentación y sin `from`. El resultado se envuelve con `Fragment.turned`: el fragmento mide el
+rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` guarda esa caja sin girar, centrada en él. Los
+algoritmos de los padres no saben nada del giro: ven una caja del tamaño del rectángulo, que no se parte (`BEFORE` si no
+cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`; además es un
+contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su min-content y su
+max-content son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Absolute`
+(`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
+
 ## Fragmentos
 
 Un **`Fragment`** tiene su posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa a coordenadas absolutas
@@ -78,6 +90,10 @@ de página. Lleva su propio `border` y `padding`, que en un fragmento partido no
 fragmento para llegar a su caja de contenido. Lleva también el `margin` usado (con la base de porcentajes de su layout) y el
 desplazamiento de `Relative` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo
 existe en los fragmentos: `Box` no guarda posición ni tamaño.
+
+En una caja girada en flujo, `x`, `y`, `width` y `height` son los del rectángulo que ocupa, y `turned`, su caja de borde
+sin girar relativa a él. Sus hijos y sus líneas se refieren a la caja sin girar: quien baja a ellos usa
+`Fragment.borderBox(x, y)`, `contentWidth()` y `contentHeight()`, que la tienen en cuenta, nunca `width` y `height`.
 
 > **Decisión:** la geometría usada solo existe en los fragmentos: una caja se maqueta muchas veces (sondas, medidas,
 > estirado, cada página) y la caché devuelve resultados sin volver a escribirla, así que «el último layout» de una caja no

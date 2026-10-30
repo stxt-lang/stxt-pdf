@@ -18,6 +18,6 @@ Result:
 			Fragment: b2
 				Rect: 20 60 380 50
 		Fragment: badge
-			Rect: 20 110 30 30
+			Rect: 20 110 42.43 42.43
 		Fragment: side
 			Rect: 3 249 200 14

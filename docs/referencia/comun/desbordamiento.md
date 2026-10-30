@@ -12,13 +12,16 @@
 - **algo del flujo que no cabe en el área útil de una página y no se puede partir** (`PAGE_OVERFLOW`), en la línea de lo
   que impide partirlo: su `Padding` o su `Border` si el relleno y el borde del fragmento ya no caben en la página; si no,
   su `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no, su `Height` (en una
-  `Image` sin él, su `Width`, del que sale el alto); en un `Relative` girado, que no se parte, su `Rotate`;
+  `Image` sin él, su `Width`, del que sale el alto); en una caja girada, que no se parte, su `Rotate`;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
   ocupar los márgenes del medio, pero no salir de la página;
 - **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Rotate`: lo que se comprueba es
   el rectángulo que envuelve lo que se pinta, con los giros de sus ancestros ([Capas y giro](capas-y-giro.md#giro-rotate)).
   Un `Absolute` o un `Fixed` girado se comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro
   de una caja girada, también, en la línea del elemento;
+- **una caja girada en flujo más ancha que su contenedor** (`BOX_OVERFLOW`): el rectángulo que la envuelve, con sus
+  márgenes, no cabe en su caja de contenido. Se señala su `Width` o, sin él, su `Rotate`: sin `Width` no parte su texto en
+  líneas;
 - **el marcador de una lista que no cabe en su sangría** (`LIST_MARKER_OVERFLOW`, [List](../componentes/list.md#posición));
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página (`TABLE_REPEAT_OVERFLOW`,
   [Table](../componentes/table.md#cortes)), en la línea de la `Table`;
@@ -38,7 +41,9 @@ también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale 
 padre (un ítem estirado a una fila fija) se señala a sí misma, no las `Rows` del `Grid`.
 
 Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Relative` incluido.
-Las cajas en flujo de dentro de una girada se comprueban contra su padre sin girar.
+Una caja girada en flujo se comprueba en su contenedor con ese rectángulo, que es lo que ocupa. Las cajas en flujo de
+dentro de una girada se comprueban contra su padre sin girar, y no se baja a ellas para buscar al culpable de lo que se
+sale a lo ancho de la girada.
 
 > **Decisión:** el error señala la propiedad que hay que cambiar (el `Width`, el `Height`, el `Line height`), no la caja.
 > *Alternativa descartada:* la línea de la caja, o comparar siempre con el padre inmediato, que en una caja `auto` señala

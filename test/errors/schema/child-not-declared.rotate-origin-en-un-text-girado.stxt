@@ -1,6 +1,6 @@
-# Case: Rotate en un Text: se gira el bloque que lo contiene
+# Case: Rotate origin en un Text girado: en flujo, gira siempre sobre su centro
 # Code: CHILD_NOT_DECLARED
-# Line: 17
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -15,3 +15,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Text: Certificado n.º 2026-0147
 			Rotate: -90
+			Rotate origin: top left

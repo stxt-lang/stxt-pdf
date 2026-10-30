@@ -42,8 +42,10 @@ import java.util.Objects;
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
  * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
  *
- * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) es siempre posicionada o una {@code Image}: se
- * pinta girada con todo lo que contiene ({@link #paint}).</p>
+ * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene ({@link
+ * #paint}). Si es posicionada, crea un contexto, que se gira entero; si gira en flujo, sus descendientes se reparten
+ * entre los pasos del contexto que la contiene, y cada uno se pinta con los giros de sus ancestros girados en flujo
+ * ({@code Piece.turners}).</p>
  *
  * <p>El "orden del árbol" es el del documento, no el de los fragmentos: las cajas
  * {@code absolute} cuelgan del fragmento de su containing block, detrás de sus hijos en flujo, y
@@ -51,10 +53,13 @@ import java.util.Objects;
  */
 public final class StackingContext {
 
-    /** Fragmento con su origen absoluto ya calculado. */
-    private record Piece(Fragment f, double x, double y) {
+    /**
+     * Fragmento con su origen absoluto ya calculado y sus ancestros girados en flujo dentro del contexto, de fuera
+     * adentro, cuyos giros se le aplican al pintarlo.
+     */
+    private record Piece(Fragment f, double x, double y, List<Piece> turners) {
         Rect borderBox() {
-            return new Rect(x, y, f.width(), f.height());
+            return f.borderBox(x, y);
         }
     }
 
@@ -80,10 +85,10 @@ public final class StackingContext {
      * raíz; sus posiciones son relativas al área útil.
      */
     public static StackingContext build(Fragment root, List<Fragment> fixed, double originX, double originY) {
-        StackingContext sc = new StackingContext(new Piece(root, originX, originY), 0);
-        sc.walkChildren(sc.root);
+        StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
+        sc.walkChildren(sc.root, List.of());
         for (Fragment f : fixed) {
-            sc.addContext(new Piece(f, originX + f.x(), originY + f.y()));
+            sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()));
         }
         sc.sort();
         return sc;
@@ -92,7 +97,7 @@ public final class StackingContext {
     private void addContext(Piece p) {
         Style s = p.f().box().style();
         StackingContext child = new StackingContext(p, s.layer() != null ? s.layer() : 0);
-        child.walkChildren(p);
+        child.walkChildren(p, List.of());
         child.sort();
         if (child.layer < 0) {
             negative.add(child);
@@ -103,21 +108,28 @@ public final class StackingContext {
         }
     }
 
-    private void walkChildren(Piece parent) {
+    /** Reparte los descendientes de {@code parent}, que heredan los giros en flujo {@code turners}. */
+    private void walkChildren(Piece parent, List<Piece> turners) {
         Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
         for (Fragment h : parent.f().children()) {
-            Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y());
+            Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), turners);
             Style s = h.box().style();
             if (createsContext(h)) {
                 addContext(p);
             } else if (s.isPositioned()) {
                 StackingContext pseudo = new StackingContext(p, 0);
-                pseudo.walkChildren(p);
+                pseudo.walkChildren(p, List.of());
                 pseudo.sort();
                 positionedZero.add(pseudo);
             } else {
                 inFlow.add(p);
-                walkChildren(p);
+                if (s.rotatesInFlow()) {
+                    List<Piece> inner = new ArrayList<>(turners);
+                    inner.add(p);
+                    walkChildren(p, List.copyOf(inner));
+                } else {
+                    walkChildren(p, turners);
+                }
             }
         }
     }
@@ -179,8 +191,8 @@ public final class StackingContext {
 
     /**
      * Pinta el contexto. Si su caja está girada ({@code Rotate}, referencia/comun/capas-y-giro.md), lo pinta todo
-     * girado: la caja y lo que contiene, también los contextos hijos. Una caja en flujo solo puede girar si es una
-     * {@code Image}, que se gira en cada uno de sus dos pasos.
+     * girado: la caja y lo que contiene, también los contextos hijos. Una caja girada en flujo, y lo que contiene, se
+     * gira en cada uno de los pasos en que se pinta.
      */
     public void paint(Canvas canvas) {
         turning(canvas, root, () -> {
@@ -194,17 +206,28 @@ public final class StackingContext {
         });
     }
 
-    /** Pinta {@code body} girado como la caja de {@code p}, si tiene {@code Rotate}. */
+    /** Pinta {@code body} con los giros de los ancestros girados en flujo de {@code p} y el suyo, si tiene {@code Rotate}. */
     private static void turning(Canvas canvas, Piece p, Runnable body) {
+        int turns = 0;
+        for (Piece t : p.turners()) {
+            turns += beginRotation(canvas, t);
+        }
+        turns += beginRotation(canvas, p);
+        body.run();
+        for (int i = 0; i < turns; i++) {
+            canvas.endRotation();
+        }
+    }
+
+    /** Empieza el giro de la caja de {@code p}, si tiene {@code Rotate}; devuelve cuántos giros ha empezado. */
+    private static int beginRotation(Canvas canvas, Piece p) {
         Rotation rotation = p.f().box().style().rotation();
         if (rotation == null) {
-            body.run();
-            return;
+            return 0;
         }
         Rect borderBox = p.borderBox();
         canvas.beginRotation(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
-        body.run();
-        canvas.endRotation();
+        return 1;
     }
 
     private static void paintBackgroundAndBorder(Canvas canvas, Piece p) {
@@ -227,7 +250,7 @@ public final class StackingContext {
      */
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
-        Radii radii = Radii.resolve(s.box().radius(), p.f().width(), p.f().height());
+        Radii radii = Radii.resolve(s.box().radius(), p.borderBox().width(), p.borderBox().height());
         if (s.breaks().decoration() == Decoration.CLONE) {
             return radii;
         }

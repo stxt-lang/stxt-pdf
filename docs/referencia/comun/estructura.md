@@ -177,10 +177,10 @@ vez; los elementos, las veces que se quiera.
 | `Media` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
 | `Styles` | `Element`, `For class`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `Element`, `For class`, `For id`, `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`; elementos |
+| `Block` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Rotate`; elementos |
 | `Flex` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
 | `Grid` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
-| `Text`, `Paragraph` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content` |
+| `Text`, `Paragraph` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
 | `Heading 1` … `Heading 6` | `Id`, `Class`, `Link`, `In contents`, `Box`, `Typography`; `Text` (al menos uno) |
 | `List` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
@@ -191,7 +191,7 @@ vez; los elementos, las veces que se quiera.
 | `Multicol` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
 | `Contents` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Rotate`, `Rotate origin` |
+| `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Rotate` |
 | `Relative` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Absolute` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Fixed` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |

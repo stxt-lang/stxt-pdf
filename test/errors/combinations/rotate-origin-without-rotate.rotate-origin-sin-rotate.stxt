@@ -8,5 +8,5 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Image: test/square.png
+		Absolute:
 			Rotate origin: top left

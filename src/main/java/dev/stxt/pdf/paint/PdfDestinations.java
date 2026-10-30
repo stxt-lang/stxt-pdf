@@ -49,7 +49,7 @@ final class PdfDestinations {
     private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double pageHeight,
                              Map<Box, PDPageXYZDestination> targets) {
         Box box = f.box();
-        Rect borderBox = new Rect(x, y, f.width(), f.height());
+        Rect borderBox = f.borderBox(x, y);
         Rotation rotation = box.style().rotation();
         if (rotation != null) {
             turn = new AffineTransform(turn);

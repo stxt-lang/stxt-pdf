@@ -962,14 +962,15 @@ class PdfCanvasTest {
             assertEquals(140, target.getLeft());
             assertEquals(240, target.getTop());
 
-            // La imagen, de 150 × 75 en (40, 40), girada alrededor de (115, 77.5): de (77.5, 2.5) a (152.5, 152.5).
+            // La imagen, de 150 × 75 y girada 90 en flujo, ocupa 75 × 150 en (40, 40): con el origen abajo, de y = 110
+            // a y = 260.
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
             PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
             assertEquals("Figure", figure.getStructureType());
             PDRectangle box = ((PDLayoutAttributeObject) figure.getAttributes().getObject(0)).getBBox();
-            assertEquals(77.5, box.getLowerLeftX(), 0.01);
-            assertEquals(147.5, box.getLowerLeftY(), 0.01);
+            assertEquals(40, box.getLowerLeftX(), 0.01);
+            assertEquals(110, box.getLowerLeftY(), 0.01);
             assertEquals(75, box.getWidth(), 0.01);
             assertEquals(150, box.getHeight(), 0.01);
 

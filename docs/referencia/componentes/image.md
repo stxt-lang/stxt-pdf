@@ -47,7 +47,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG o SVG: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
-| `Rotate`, `Rotate origin` | ver [Capas y giro](../comun/capas-y-giro.md#giro-rotate) | — | Gira la imagen al pintarla (un sello, una etiqueta en diagonal). |
+| `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | — | Gira la imagen sobre su centro (un sello); ocupa el rectángulo que la envuelve girada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 

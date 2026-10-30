@@ -137,7 +137,8 @@ public final class LayoutFixture {
                 fragments.put(f.box().id(), f);
                 rects.put(f.box().id(), border);
             }
-            Rect content = border.shrink(f.border()).shrink(f.padding());
+            // En una caja girada en flujo, el rectángulo es el que ocupa y sus hijos van en su caja sin girar.
+            Rect content = f.borderBox(x + f.x(), y + f.y()).shrink(f.border()).shrink(f.padding());
             walk(f.children(), content.x(), content.y(), fragments, rects);
         }
     }

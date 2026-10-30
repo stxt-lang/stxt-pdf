@@ -171,10 +171,14 @@ public enum ErrorCode {
     RULE_COLOR_WITHOUT_RULE,
     /** {@code Isolate: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
     ISOLATE_IN_ITEM,
-    /** Un {@code Break} propio dentro de un {@code Absolute}, un {@code Fixed} o un {@code Relative} girado. */
+    /** Un {@code Break} propio dentro de un {@code Absolute}, un {@code Fixed}, un {@code Relative} girado o una caja girada en flujo. */
     BREAK_IN_UNBREAKABLE,
-    /** {@code Inside} o {@code Decoration} en un {@code Relative} girado, que no se parte. */
+    /** {@code Inside} o {@code Decoration} en un {@code Relative} girado o en una caja girada en flujo, que no se parten. */
     BREAK_IN_ROTATED,
+    /** {@code Isolate: true} en una caja girada en flujo, que ya aísla. */
+    ISOLATE_IN_ROTATED,
+    /** {@code Rotate} en un {@code Block}, un {@code Text}, un {@code Paragraph} o una {@code Image} que es un ítem de {@code Flex} o {@code Grid}. */
+    ROTATED_ITEM,
 
     // --- Desbordamientos (al maquetar) -------------------------------------------------------
     /** Una palabra más ancha que su línea. */

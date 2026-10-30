@@ -1,8 +1,9 @@
 # Certificado de un curso, en una página A4 apaisada (Paper y Orientation: 842 × 595). Un fondo crema y tres marcos
 # concéntricos con cuatro adornos en las esquinas, todos Fixed con Layer negativa; el contenido
 # centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
-# lados de un sello con cintas, ligeramente girado (Rotate). El número del certificado va en vertical
-# en el margen izquierdo: un Fixed girado −90 grados alrededor de su esquina de arriba a la izquierda.
+# lados de un sello con cintas, ligeramente girado (una Image con Rotate, que ocupa el cuadrado que la
+# envuelve). El número del certificado va en vertical en el margen izquierdo: un Fixed girado −90 grados
+# alrededor de su esquina de arriba a la izquierda.
 # El nombre de la escuela se escribe en minúscula y la regla de su clase lo pone en mayúsculas,
 # separadas (Transform y Letter spacing).
 Document (dev.stxt.pdf):
@@ -111,12 +112,13 @@ Document (dev.stxt.pdf):
 								Weight: bold
 						Text: Directora de la Escuela
 			Item:
-				Image: examples/certificate/seal.svg
-					Id: seal
-					Alt: Sello de excelencia de la escuela
-					Rotate: -8
-					Box:
-						Width: 100
+				Block:
+					Image: examples/certificate/seal.svg
+						Id: seal
+						Alt: Sello de excelencia de la escuela
+						Rotate: -8
+						Box:
+							Width: 100
 			Item:
 				Block:
 					Box:

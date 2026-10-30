@@ -3,7 +3,9 @@
 ## `Text`
 
 Una caja de texto, sin hijos: reparte su texto en líneas ([Tipografía](../comun/tipografia.md#el-reparto-en-líneas)).
-Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y `Content`, y va donde va un elemento en flujo.
+Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content` y `Rotate`, y va donde va un elemento en flujo. Con
+`Rotate` se escribe girado (un texto en vertical) y ocupa el rectángulo que lo envuelve; sin `Width`, no parte sus
+líneas ([Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)).
 
 El texto va en su valor (`Text: Un título`) o en un hijo `Content >>` con un bloque indentado, que admite párrafos
 separados por una línea en blanco. Uno de los dos es obligatorio, y no se admiten ambos (`TEXT_CONTENT`). Por defecto el
@@ -27,8 +29,8 @@ Text:
 
 ## `Paragraph`
 
-Un `Text` con significado: admite lo mismo (`Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y el texto en el valor o
-en `Content`) y se maqueta igual. Es **un solo párrafo**: una línea en blanco en su `Content` es un error
+Un `Text` con significado: admite lo mismo (`Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Rotate` y el texto en
+el valor o en `Content`) y se maqueta igual. Es **un solo párrafo**: una línea en blanco en su `Content` es un error
 (`PARAGRAPH_BLANK_LINE`, en la línea de la línea en blanco); para varios párrafos se usan varios `Paragraph`. `Text` sigue
 existiendo como caja de texto sin significado. El significado se usa en las reglas `Element: Paragraph`.
 

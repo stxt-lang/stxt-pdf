@@ -305,10 +305,10 @@ public final class Box {
     /**
      * Crea un contexto de formato de bloque, que aísla el colapso de márgenes
      * (referencia/componentes/block.md): el área útil (la raíz), las cajas {@code absolute} y
-     * {@code fixed}, los ítems de flex y grid y las cajas con {@code Isolate: true}.
+     * {@code fixed}, los ítems de flex y grid, las cajas con {@code Isolate: true} y las giradas en flujo.
      */
     public boolean establishesBlockFormattingContext() {
-        if (parent == null || style.isolate() || style.isOutOfFlow()) {
+        if (parent == null || style.isolate() || style.isOutOfFlow() || style.rotatesInFlow()) {
             return true;
         }
         Layout l = parent.style.layout();
@@ -323,7 +323,8 @@ public final class Box {
     public Box outOfFlowContainingBlock() {
         Box b = parent;
         boolean fixed = style.position() == Position.FIXED;
-        while (b.parent != null && (fixed || !b.style.isPositioned())) {
+        // Una caja girada en flujo también lo es, como las posicionadas (referencia/comun/capas-y-giro.md).
+        while (b.parent != null && (fixed || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;
         }
         return b;

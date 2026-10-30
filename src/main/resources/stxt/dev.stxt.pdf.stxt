@@ -98,6 +98,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Isolate
 				Max: 1
+			Child: Rotate
+				Max: 1
 			Child: Block
 			Child: Flex
 			Child: Grid
@@ -200,6 +202,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Content
 				Max: 1
+			Child: Rotate
+				Max: 1
 	Node: Paragraph
 		Type: INLINE
 		Description: Párrafo: un Text con significado (etiqueta P en el PDF). Un solo párrafo, sin líneas en blanco en Content.
@@ -217,6 +221,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Content
+				Max: 1
+			Child: Rotate
 				Max: 1
 	Node: Heading 1
 		Type: GROUP
@@ -807,8 +813,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
-			Child: Rotate origin
-				Max: 1
 
 	# Reglas reutilizables
 
@@ -1015,7 +1019,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: odd
 	Node: Rotate
 		Type: NUMBER
-		Description: Giro de la caja al pintarla, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0), alrededor de Rotate origin. No cambia el layout: la caja ocupa su sitio sin girar; lo girado debe caber en la página.
+		Description: Giro de la caja, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0). En Block, Text, Paragraph e Image, que están en flujo, gira sobre su centro y la caja ocupa el rectángulo que la envuelve girada; sin Width, mide su contenido sin partir líneas. En Relative, Absolute y Fixed gira al pintar, alrededor de Rotate origin, y no cambia el layout. Lo girado debe caber en la página y no se parte entre páginas.
 	Node: Rotate origin
 		Description: Punto alrededor del que gira la caja de borde con Rotate: una o dos palabras clave de top, bottom, left, right y center (top left, bottom…), o dos medidas desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto (20 50%). Por defecto, center.
 	Node: Paper

@@ -82,7 +82,7 @@ public final class Overflow {
         double x = ox + f.x();
         double y = oy + f.y();
         Style s = f.box().style();
-        Rect borderBox = new Rect(x, y, f.width(), f.height());
+        Rect borderBox = f.borderBox(x, y);
         if (s.rotation() != null) {
             turn = new AffineTransform(turn);
             turn.concatenate(s.rotation().transform(borderBox));
@@ -101,8 +101,8 @@ public final class Overflow {
                     ErrorCode.BOX_OVERFLOW, "La caja " + f.box().describe() + " se sale de la página: revisa su "
                     + "Offset y su tamaño");
         }
-        double cx = x + f.border().left() + f.padding().left();
-        double cy = y + f.border().top() + f.padding().top();
+        double cx = borderBox.x() + f.border().left() + f.padding().left();
+        double cy = borderBox.y() + f.border().top() + f.padding().top();
         content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn);
     }
 
@@ -185,6 +185,16 @@ public final class Overflow {
      */
     private static InvalidModelException tooWide(Fragment c, double x, double left, double right) {
         while (true) {
+            Style s = c.box().style();
+            if (s.rotatesInFlow()) {
+                // Lo de dentro está girado: lo que se sale es el rectángulo que la envuelve.
+                String property = s.isDeclared(WIDTH) ? WIDTH : ROTATE;
+                return new InvalidModelException(s.line(property), ErrorCode.BOX_OVERFLOW, "La caja "
+                        + c.box().describe() + " girada no cabe a lo ancho: el rectángulo que la envuelve mide "
+                        + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left) + "; "
+                        + (s.isDeclared(WIDTH) ? "reduce su Width" : "dale un Width, que reparte su texto en líneas,")
+                        + " o cambia su Rotate");
+            }
             double cx = x + c.border().left() + c.padding().left();
             // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
             for (TextLine l : c.lines()) {
@@ -192,7 +202,6 @@ public final class Overflow {
                     throw textOverflow(c.box(), l, c.contentWidth());
                 }
             }
-            Style s = c.box().style();
             boolean sized = s.isDeclared(WIDTH) || s.isDeclared(MIN_WIDTH);
             Fragment inner = null;
             for (Fragment d : c.children()) {

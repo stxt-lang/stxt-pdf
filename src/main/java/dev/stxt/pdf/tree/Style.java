@@ -199,6 +199,14 @@ public final class Style extends StyleGroup {
         return rotation;
     }
 
+    /**
+     * Si la caja gira en flujo (referencia/comun/capas-y-giro.md): un {@code Block}, un {@code Text}, un {@code
+     * Paragraph} o una {@code Image} con {@code Rotate}, que ocupa el rectángulo que la envuelve girada.
+     */
+    public boolean rotatesInFlow() {
+        return rotation != null && position == Position.STATIC;
+    }
+
     void setRotation(Rotation v) {
         writable();
         rotation = v;

@@ -1,7 +1,8 @@
 # Giro y papel con nombre (referencia/componentes/document.md, referencia/comun/capas-y-giro.md, referencia/comun/cortes.md y referencia/comun/desbordamiento.md).
 #
 # Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
-# El giro solo cambia el pintado: los Rect son los de las cajas sin girar.
+# El giro de un posicionado solo cambia el pintado: sus Rect son los de las cajas sin girar. Una caja girada en
+# flujo ocupa el rectángulo que la envuelve: su Rect es ese.
 #   tag (Absolute):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
 #                     Girado 45 grados alrededor de su centro (360, 50), lo envuelve un cuadrado de
 #                     (80 + 20) × cos 45 = 70,7: de y = 14,6 a 85,4 y de x = 324,6 a 395,4; cabe.
@@ -11,7 +12,8 @@
 #   big (Relative):   girado 180, mide 40 + 50 = 90 y en la página 1 quedan 278 − 230 = 48. Sin girar
 #                     se partiría entre b1 (40, que cabe) y b2; girado no se parte y pasa entero a la
 #                     página 2: (20, 20), con b1 en y = 20 y b2 en y = 60.
-#   badge (Image):    test/square.png, 30 × 30, girada 45: en flujo detrás de big, en (20, 110).
+#   badge (Image):    test/square.png, 30 × 30, girada 45 sobre su centro: en flujo detrás de big, ocupa el
+#                     cuadrado que la envuelve, de 30 × √2 = 42,43 de lado, en (20, 110).
 #   side (Fixed):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
 #                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Girado −90 alrededor de su esquina
 #                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.

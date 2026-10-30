@@ -132,10 +132,11 @@ Los volcados no tienen namespace y se leen con `STXT.rawParser()`.
   salen antes que los de la sección.
 - Las cajas sin `Id` pueden incluirse para depurar.
 - No se vuelcan las líneas de texto, los tramos, los enlaces, el tipo de elemento, el aspecto (fondos, bordes, esquinas) ni
-  el giro: no cambian el layout, y el `Rect` de una caja girada es el de sin girar.
+  el giro. El `Rect` de un posicionado girado es el de sin girar; el de una caja girada en flujo, el rectángulo que ocupa,
+  y los de sus descendientes, sin girar.
 
 > **Decisión:** los tramos no se vuelcan: se prueban con tests de layout y de pintado. *Alternativa descartada:* volcar las
 > líneas con sus tramos.
 
-> **Decisión:** el `Rect` de una caja girada es el de sin girar, como el de un enlace o un fondo, porque el giro no cambia el
-> layout.
+> **Decisión:** el `Rect` de un posicionado girado es el de sin girar, como el de un enlace o un fondo, porque su giro no
+> cambia el layout; el de una caja girada en flujo es el rectángulo que ocupa, que es lo que su giro cambia en el layout.

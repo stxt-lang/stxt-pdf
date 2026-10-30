@@ -1,0 +1,21 @@
+# Case: After en un Text dentro de un Block girado, que no se parte
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Rotate: 90
+			Text: Uno
+				Break:
+					After: page
+			Text: Dos

@@ -462,7 +462,7 @@ class StackingContextTest {
 
     /**
      * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Absolute} de dentro, alrededor
-     * de su origen (referencia/comun/capas-y-giro.md); una {@code Image} en flujo, en sus dos pasos.
+     * de su origen (referencia/comun/capas-y-giro.md); una {@code Image} en flujo, sobre su centro y en sus dos pasos.
      */
     @Test
     void rotatedBoxesWrapEverythingTheyPaint() {
@@ -474,10 +474,32 @@ class StackingContextTest {
                 "\t\t\t\tBackground: #222",
                 "\tImage: test/square.png", "\t\tRotate: 45", "\t\tBox:", "\t\t\tBackground: #333",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
-        // Primero el flujo (la imagen de 30 × 30 en (40, 140), con su centro en (55, 155), girada en
-        // el paso de los fondos y en el del contenido) y después el posicionado, girado entero.
-        assertEquals(List.of("rotate 45 55.0 155.0", "background #333", "end rotate", "background #444",
-                "rotate 45 55.0 155.0", "end rotate",
+        // Primero el flujo (la imagen de 30 × 30 ocupa el cuadrado que la envuelve, de 42,43 de lado, en (40, 140), con
+        // su centro en (61,2, 161,2), girada en el paso de los fondos y en el del contenido) y después el posicionado,
+        // girado entero.
+        assertEquals(List.of("rotate 45 61.2 161.2", "background #333", "end rotate", "background #444",
+                "rotate 45 61.2 161.2", "end rotate",
                 "rotate 8 40.0 40.0", "background #000", "background #111", "background #222", "end rotate"), r.events);
+    }
+
+    /**
+     * Un {@code Block} girado en flujo: sus descendientes se pintan en los pasos del contexto que lo contiene, cada uno
+     * con el giro del bloque, y el {@code Absolute} de dentro, que lo tiene de contenedor de referencia, también
+     * (referencia/comun/capas-y-giro.md).
+     */
+    @Test
+    void aBlockRotatedInFlowTurnsItsDescendantsInEveryStep() {
+        Recorder r = record(
+                "\tBlock:", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 20",
+                "\t\t\tBackground: #555",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #666",
+                "\t\tAbsolute:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
+                "\t\t\t\tBackground: #777",
+                "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #888");
+        // El bloque de 100 × 20 ocupa, girado, 20 × 100 en (40, 40): su centro es (50, 90).
+        String rotate = "rotate 90 50.0 90.0";
+        assertEquals(List.of(rotate, "background #555", "end rotate", rotate, "background #666", "end rotate",
+                "background #888", rotate, "end rotate", rotate, "end rotate",
+                rotate, "background #777", "end rotate"), r.events);
     }
 }

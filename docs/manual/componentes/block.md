@@ -36,7 +36,8 @@ Document (dev.stxt.pdf):
 		Paragraph: Después, retira la tapa con cuidado.
 ```
 
-Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break` e `Isolate`, y dentro cualquier elemento.
+Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y `Rotate` (girarlo con todo lo que contiene,
+[Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)), y dentro cualquier elemento.
 
 ## Cómo coloca a sus hijos
 

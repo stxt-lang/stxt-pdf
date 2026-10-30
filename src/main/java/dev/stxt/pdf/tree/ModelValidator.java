@@ -40,6 +40,7 @@ import static dev.stxt.pdf.tree.PropertyKey.MAX_WIDTH;
 import static dev.stxt.pdf.tree.PropertyKey.MIN_HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MIN_WIDTH;
 import static dev.stxt.pdf.tree.PropertyKey.OFFSET;
+import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE_ORIGIN;
 import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
 import static dev.stxt.pdf.tree.ValueReader.amount;
@@ -121,8 +122,9 @@ final class ModelValidator {
 
     /**
      * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
-     * y un {@code Relative} girado no se parte entre páginas, así que {@code Inside} y {@code Decoration} tampoco
-     * (también si los da una regla de {@code Styles}).
+     * y un {@code Relative} girado o una caja girada en flujo no se parten entre páginas, así que {@code Inside} y {@code
+     * Decoration} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla el colapso
+     * de márgenes: {@code Isolate} no tiene efecto en ella.
      */
     static void validateRotation(Style s) {
         if (s.rotation() == null) {
@@ -132,14 +134,19 @@ final class ModelValidator {
             }
             return;
         }
-        if (s.position() != Position.RELATIVE) {
+        if (s.position() != Position.RELATIVE && !s.rotatesInFlow()) {
             return;
         }
+        String what = s.rotatesInFlow() ? "una caja girada" : "un Relative girado";
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
-                        + " no tiene efecto en un Relative girado, que no se parte entre páginas: quítalo");
+                        + " no tiene efecto en " + what + ", que no se parte entre páginas: quítalo");
             }
+        }
+        if (s.rotatesInFlow() && s.isolate()) {
+            throw error(s.line("isolate"), ErrorCode.ISOLATE_IN_ROTATED, "Isolate no tiene efecto en una caja girada, "
+                    + "que ya corta el colapso de márgenes con sus hijos: quítalo");
         }
     }
 
@@ -150,6 +157,12 @@ final class ModelValidator {
         // de una Table, ítems de su grid.
         boolean flexItem = !s.isOutOfFlow() && parentLayout == Layout.FLEX;
         boolean gridItem = !s.isOutOfFlow() && parentLayout == Layout.GRID;
+        if ((flexItem || gridItem) && s.rotatesInFlow()) {
+            // Un ítem ocupa el sitio que le da su contenedor (referencia/comun/capas-y-giro.md).
+            throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (flexItem ? "Flex" : "Grid")
+                    + " no puede girar: ocupa el sitio que le da su contenedor; gira una caja dentro del ítem (un "
+                    + "Block con la caja girada dentro)");
+        }
 
         validateOffset(s);
         validateMargins(s, parentLayout, flexItem, gridItem);
@@ -229,8 +242,10 @@ final class ModelValidator {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
                         "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
             }
-            // Una imagen con Width auto mide su ancho natural, no todo el ancho: se puede centrar.
-            if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout() != Layout.IMAGE) {
+            // Una imagen con Width auto mide su ancho natural, y una caja girada en flujo, su contenido: no todo el
+            // ancho, así que se pueden centrar.
+            if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout() != Layout.IMAGE
+                    && !s.rotatesInFlow()) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
                         + "todo el ancho: declara Width o Max width");
             }

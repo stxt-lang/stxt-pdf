@@ -50,8 +50,3 @@ saliendo al trabajar y solo toca ese.
 - El SVG de depuración incrusta el SVG como `data:`, y un navegador no tiene las fuentes de `fonts/`.
 - En el subconjunto de SVG no hay `pattern`, `mask`, `filter`, `marker`, `image` ni hojas de estilo, y un SVG no puede
   enlazar a otro fichero.
-
-### Giro
-
-- Girar un `Text` o un `Block` directamente, que una caja girada ocupe en el layout su rectángulo envolvente y que un
-  `Relative` girado se pueda partir.

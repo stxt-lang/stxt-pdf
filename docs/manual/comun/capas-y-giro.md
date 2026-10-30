@@ -27,9 +27,77 @@ dentro tenga una `Layer` mayor.
 
 ## Girar una caja (`Rotate`)
 
-`Relative`, `Absolute`, `Fixed` e `Image` admiten `Rotate`: un ángulo en grados, en el sentido de las agujas del reloj
-(entre −360 y 360, sin 0 ni las vueltas enteras, que no giran nada). Gira todo lo que tiene la caja: fondo, borde, texto,
-imágenes y lo que contiene.
+`Rotate` gira una caja: un ángulo en grados, en el sentido de las agujas del reloj (entre −360 y 360, sin 0 ni las
+vueltas enteras, que no giran nada). Gira todo lo que tiene la caja: fondo, borde, texto, imágenes y lo que contiene. El
+texto girado sigue siendo texto en el PDF: se puede seleccionar y se lee igual. Lo girado tiene que caber en la página, y
+una caja girada no se parte entre páginas: si no cabe en lo que queda, pasa entera a la siguiente.
+
+Hay dos formas de girar, según la caja.
+
+### En su sitio: `Block`, `Text`, `Paragraph` e `Image`
+
+Una caja del flujo girada **ocupa el rectángulo que la envuelve girada**, y lo de alrededor se aparta. Es lo que hace
+falta para un texto en vertical, como las cabeceras de unas columnas estrechas:
+
+```
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Turnos de la semana
+	Media:
+		Paper: A5
+		Orientation: landscape
+		Margin: 40
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		Element: Cell
+			Box:
+				Padding: 4 6
+				Border: 0 0 0.5 0
+				Border color: #C8C4BA
+		Element: Head cell
+			Typography:
+				Weight: bold
+	Section:
+		Table:
+			Columns: 1fr auto auto auto
+			Column align: left center center center
+			Head:
+				Row:
+					Cell: Persona
+					Cell:
+						Text: Mañana
+							Rotate: -90
+					Cell:
+						Text: Tarde
+							Rotate: -90
+					Cell:
+						Text: Noche
+							Rotate: -90
+			Body:
+				Row:
+					Cell: Ana Ruiz
+					Cell: sí
+					Cell: no
+					Cell: no
+				Row:
+					Cell: Pau Vidal
+					Cell: no
+					Cell: sí
+					Cell: sí
+```
+
+- **Sin `Width`, mide su texto en una línea**: no lo parte por el ancho de su columna. Para girar un párrafo largo, dale
+  un `Width`, que es el ancho de sus líneas antes de girar.
+- **Gira sobre su centro.** Con `Margin: 0 auto` se centra.
+- **No puede ser directamente un ítem de un `Flex` o un `Grid`**, que le dan su tamaño: gira una caja dentro del ítem.
+
+### Solo al pintar: `Relative`, `Absolute` y `Fixed`
+
+Un posicionado girado **no mueve nada**: la caja ocupa su sitio como si no estuviera girada, y lo de alrededor no se
+entera. Es para lo que va encima de todo, como un sello o una etiqueta en diagonal:
 
 ```
 Absolute:
@@ -48,11 +116,6 @@ Absolute:
 - **`Rotate origin`** es el punto alrededor del que gira: una o dos de `top`, `bottom`, `left`, `right` y `center` (por
   defecto, el centro), o dos medidas desde la esquina de arriba a la izquierda de la caja. `Rotate origin: top left` gira
   sobre esa esquina; `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
-- **Girar no mueve nada.** La caja ocupa su sitio como si no estuviera girada, y lo de alrededor no se entera.
-- **Lo girado tiene que caber en la página**: si una esquina girada se sale del papel, es un error.
-- **Un `Relative` girado no se parte**: si no cabe en lo que queda de página, pasa entero a la siguiente.
-- El texto girado sigue siendo texto en el PDF: se puede seleccionar y se lee igual.
-
-Para un texto en vertical en el margen, gira un `Fixed` o un `Absolute` que lo contiene: un `Text` no se gira solo.
+- Para un texto en vertical en el margen de la página, gira un `Fixed` que lo contiene.
 
 Más detalle en la [referencia](../../referencia/comun/capas-y-giro.md).

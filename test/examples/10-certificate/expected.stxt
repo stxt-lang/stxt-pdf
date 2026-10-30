@@ -3,9 +3,9 @@ Result:
 		Fragment: recipient
 			Rect: 186 168 470 51
 		Fragment: signatures
-			Rect: 80 334 682 126.67
+			Rect: 80 334 682 139.35
 			Fragment: seal
-				Rect: 371 334 100 126.67
+				Rect: 362.67 334 116.66 139.35
 		Fragment: paper
 			Rect: 0 0 842 595
 		Fragment: frame-outer
