@@ -6,7 +6,7 @@ El `Grid` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va dond
 
 ```
 Grid:
-	Column sizes: 1fr 1fr
+	Column sizes: * *
 	Area: 1 2
 		Text: Fila 1, columna 2
 	Area:
@@ -68,7 +68,7 @@ cursor detrás de sí. Con `Flow: vertical` se intercambian filas y columnas. Es
 ## Dimensionado de pistas
 
 Cada pista tiene una función mínima y una máxima: `150` es fija en ambas; `auto` equivale a
-`minmax(min-content, max-content)`; `1fr` equivale a `minmax(auto, 1fr)`, de modo que **una fracción no baja del
+`minmax(min-content, max-content)`; `*` equivale a `minmax(auto, *)`, de modo que **una fracción no baja del
 min-content de su contenido**.
 
 1. **Inicializar:** cada pista recibe una base (su mínimo) y un límite (su máximo; infinito en las fracciones).
@@ -76,7 +76,7 @@ min-content de su contenido**.
    los ítems que ocupan varias pistas se reparte entre las pistas intrínsecas que ocupan: primero lo que le falta hasta su
    min-content, a las bases, y después, contando las bases ya subidas, lo que le falta hasta su max-content, a los límites
    (el área del ítem no pasa de su max-content por repartirlo). Si alguna de ellas es una fracción, lo que le falta al ítem
-   hasta su min-content se reparte solo entre las fracciones, en proporción a su `fr`: un ítem que cruza columnas `1fr` no
+   hasta su min-content se reparte solo entre las fracciones, en proporción a su peso: un ítem que cruza columnas `*` no
    desborda su área.
 3. **Maximizar:** el espacio libre se reparte a partes iguales entre las pistas no flexibles hasta su límite. Una pista
    `auto` alcanza su max-content antes de que las fracciones reciban nada.
@@ -86,7 +86,7 @@ min-content de su contenido**.
 
 Las **columnas** se dimensionan primero, con los anchos min-content y max-content de los ítems. Las **filas** después, con
 la altura de cada ítem maquetado al ancho de sus columnas. Con `Height: auto` en el contenedor, las filas en fracción no
-tienen espacio que repartir y miden en proporción a su contenido: todas las filas `1fr` miden lo que la más alta.
+tienen espacio que repartir y miden en proporción a su contenido: todas las filas `*` miden lo que la más alta.
 
 Los porcentajes de las pistas son de la caja de contenido del contenedor, sin descontar los huecos
 ([Valores](../comun/valores.md#bases-de-los-porcentajes)). Las filas en porcentaje necesitan un alto definido en el
@@ -95,9 +95,9 @@ cuando todavía no hay ancho. Los márgenes `auto` de un ítem son un error: la 
 `Vertical`.
 
 > **Decisión:** lo que le falta a un ítem que cruza alguna fracción solo lo reciben las fracciones, en proporción a su
-> `fr`: así un ítem que cruza columnas `1fr` no desborda su área.
+> peso: así un ítem que cruza columnas `*` no desborda su área.
 
-> **Decisión:** el max-content se reparte contando las bases ya subidas: con columnas `50 auto 1fr`, hueco 10 y un ítem de
+> **Decisión:** el max-content se reparte contando las bases ya subidas: con columnas `50 auto *`, hueco 10 y un ítem de
 > max-content 400 en las dos primeras, la `auto` mide 340 y el área del ítem, 400 (y no 480 y 540).
 
 ## Alineación en el área

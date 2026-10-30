@@ -21,7 +21,7 @@ class GridFragmentationTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumn sizes: 1fr 1fr"};
+    private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumn sizes: * *"};
 
     private static String[] cell(String id, String cell) {
         return new String[]{"\t\tArea: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",

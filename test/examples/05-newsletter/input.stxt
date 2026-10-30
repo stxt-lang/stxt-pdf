@@ -177,7 +177,7 @@ Document (dev.stxt.pdf):
 						Letter spacing: 0.6
 			Table:
 				Id: agenda
-				Column sizes: 70 52 1fr 120
+				Column sizes: 70 52 * 120
 				Box:
 					Margin: 0 0 14 0
 				Head:
@@ -224,7 +224,7 @@ Document (dev.stxt.pdf):
 						Letter spacing: 0.6
 			Grid:
 				Id: classifieds
-				Column sizes: repeat(4, 1fr)
+				Column sizes: repeat(4, *)
 				Gap: 10
 				Area:
 					Block:

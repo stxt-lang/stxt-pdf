@@ -41,7 +41,7 @@ class RotationTest {
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("50%"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("left 20"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("20 auto"));
-        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("1fr 20"));
+        assertThrows(IllegalArgumentException.class, () -> Rotation.origin("* 20"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("arriba 20"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin("10 20 30"));
         assertThrows(IllegalArgumentException.class, () -> Rotation.origin(" "));

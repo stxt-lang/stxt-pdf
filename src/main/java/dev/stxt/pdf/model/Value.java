@@ -18,8 +18,8 @@ public sealed interface Value {
     /** Porcentaje del containing block (o del tamaño de fuente en {@code Line height}). */
     record Percentage(double percent) implements Value {}
 
-    /** Fracción de espacio libre en pistas de grid ({@code 1fr}). */
-    record Fraction(double fr) implements Value {}
+    /** Fracción de espacio libre en pistas de grid ({@code *}, {@code 2*}), con su peso. */
+    record Fraction(double weight) implements Value {}
 
     /** {@code minmax(min, max)} en pistas de grid. */
     record MinMax(Value min, Value max) implements Value {}
@@ -47,7 +47,7 @@ public sealed interface Value {
      *
      * @param base tamaño de referencia (normalmente del containing block); vacío si es indefinido
      * @return los puntos, o vacío si el valor depende del contenido ({@code auto}, intrínsecos,
-     *         {@code fr}) o es un porcentaje sobre una base indefinida (referencia/comun/caja.md)
+     *         fracciones) o es un porcentaje sobre una base indefinida (referencia/comun/caja.md)
      */
     default OptionalDouble resolve(OptionalDouble base) {
         if (this instanceof Points p) {

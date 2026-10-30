@@ -24,14 +24,14 @@ class TrackSizingTest {
 
     @Test
     void fixedAutoAndFraction() {
-        // 475 para pistas: 150 fija, auto llega a su max-content (90), 1fr recibe 235.
-        assertArrayEquals(new double[]{150, 90, 235}, columns("150 auto 1fr", 515), 1e-9);
+        // 475 para pistas: 150 fija, auto llega a su max-content (90), * recibe 235.
+        assertArrayEquals(new double[]{150, 90, 235}, columns("150 auto *", 515), 1e-9);
     }
 
     @Test
     void fractionNeverBelowItsMinContent() {
         // 210 para pistas: 70 por fracción; la tercera (min 80) se congela.
-        assertArrayEquals(new double[]{65, 65, 80}, columns("1fr 1fr 1fr", 250), 1e-9);
+        assertArrayEquals(new double[]{65, 65, 80}, columns("* * *", 250), 1e-9);
     }
 
     @Test
@@ -70,30 +70,30 @@ class TrackSizingTest {
     void itemCrossingFractionsGrowsThem() {
         // El ítem necesita 300 en dos fracciones: 150 cada una, aunque solo haya 200.
         assertArrayEquals(new double[]{150, 150},
-                spanning("1fr 1fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+                spanning("* *", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
         assertArrayEquals(new double[]{150, 150},
-                spanning("1fr 1fr", Double.POSITIVE_INFINITY, new ItemContribution(0, 2, 300, 300)), 1e-9);
+                spanning("* *", Double.POSITIVE_INFINITY, new ItemContribution(0, 2, 300, 300)), 1e-9);
     }
 
     @Test
     void itemCrossingFractionsInProportionToFr() {
         assertArrayEquals(new double[]{200, 100},
-                spanning("2fr 1fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
-        // Con fr que suman 0.75: 0.75 del exceso en proporción y el resto a partes iguales.
+                spanning("2* *", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+        // Con pesos que suman 0.75: 0.75 del exceso en proporción y el resto a partes iguales.
         assertArrayEquals(new double[]{187.5, 112.5},
-                spanning("0.5fr 0.25fr", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
+                spanning("0.5* 0.25*", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
     }
 
     @Test
     void itemCrossingFractionsOnlyGrowsTheFractions() {
         // La auto se queda con su ítem (50); la fracción toma los 250 que faltan.
-        assertArrayEquals(new double[]{50, 250}, spanning("auto 1fr", 200,
+        assertArrayEquals(new double[]{50, 250}, spanning("auto *", 200,
                 new ItemContribution(0, 1, 50, 50), new ItemContribution(0, 2, 300, 300)), 1e-9);
     }
 
     @Test
     void module6Exercise() {
-        List<Track> t = ValueParser.list("auto 1fr 1fr").stream().map(Track::of).toList();
+        List<Track> t = ValueParser.list("auto * *").stream().map(Track::of).toList();
         List<ItemContribution> items = List.of(
                 new ItemContribution(0, 1, 60, 100),
                 new ItemContribution(1, 1, 40, 300),
@@ -119,7 +119,7 @@ class TrackSizingTest {
      */
     @Test
     void itemSpanningAFixedAndAnAutoTrack() {
-        List<Track> t = ValueParser.list("50 auto 1fr").stream().map(Track::of).toList();
+        List<Track> t = ValueParser.list("50 auto *").stream().map(Track::of).toList();
         assertArrayEquals(new double[]{50, 340, 590},
                 TrackSizing.size(t, List.of(new ItemContribution(0, 2, 200, 400)), 1000, 10), 1e-9);
         List<Track> intrinsic = ValueParser.list("50 auto").stream().map(Track::of).toList();
@@ -149,20 +149,20 @@ class TrackSizingTest {
     /** minmax(50, 200) crece hasta su máximo antes que la fracción, que se queda con el resto. */
     @Test
     void aFixedMaximumIsALimitToGrowTo() {
-        assertArrayEquals(new double[]{200, 295}, spanning("minmax(50, 200) 1fr", 495), 1e-9);
+        assertArrayEquals(new double[]{200, 295}, spanning("minmax(50, 200) *", 495), 1e-9);
     }
 
-    /** Sin ancho, las fracciones miden en proporción: 1fr y 2fr con contenido de 100 son 100 y 200. */
+    /** Sin ancho, las fracciones miden en proporción: * y 2* con contenido de 100 son 100 y 200. */
     @Test
     void fractionsOfAnIndefiniteSizeKeepTheirProportion() {
-        assertArrayEquals(new double[]{100, 200}, spanning("1fr 2fr", Double.POSITIVE_INFINITY,
+        assertArrayEquals(new double[]{100, 200}, spanning("* 2*", Double.POSITIVE_INFINITY,
                 new ItemContribution(0, 1, 100, 100), new ItemContribution(1, 1, 100, 100)), 1e-9);
     }
 
     /** Un ítem que cruza tres fracciones con huecos de 10: le faltan 300 − 20, 93,33 por fracción. */
     @Test
     void itemCrossingFractionsCountsItsGaps() {
-        List<Track> t = ValueParser.list("1fr 1fr 1fr").stream().map(Track::of).toList();
+        List<Track> t = ValueParser.list("* * *").stream().map(Track::of).toList();
         double third = 280.0 / 3;
         assertArrayEquals(new double[]{third, third, third},
                 TrackSizing.size(t, List.of(new ItemContribution(0, 3, 300, 300)), 200, 10), 1e-9);

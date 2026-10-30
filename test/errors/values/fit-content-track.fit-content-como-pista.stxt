@@ -9,4 +9,4 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Grid:
-			Column sizes: fit-content 1fr
+			Column sizes: fit-content *

@@ -90,7 +90,7 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
 - Su alto es siempre definido, así que un `Flex` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical; en
   horizontal sí se estira, y el alto sigue a la proporción.
 - **Tamaños intrínsecos:** min-content y max-content son el ancho natural o, si declara `Height` en puntos, el que sale de
-  él con la proporción. Es un mínimo de verdad: en una pista `1fr` de grid o en un ítem de `Flex` sin `Min width`, la imagen
+  él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un ítem de `Flex` sin `Min width`, la imagen
   no encoge por debajo de él.
 
 Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.

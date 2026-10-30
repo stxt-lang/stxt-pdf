@@ -9,4 +9,4 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Flex:
-			Column sizes: 1fr 1fr
+			Column sizes: * *

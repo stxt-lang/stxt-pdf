@@ -178,7 +178,7 @@ Document (dev.stxt.pdf):
 				Text: Hitos del año
 			Grid:
 				Id: milestones
-				Column sizes: repeat(4, 1fr)
+				Column sizes: repeat(4, *)
 				Gap: 14
 				Area:
 					Block:
@@ -211,7 +211,7 @@ Document (dev.stxt.pdf):
 				Text: Un año en cifras
 			Grid:
 				Id: tiles
-				Column sizes: repeat(3, 1fr)
+				Column sizes: repeat(3, *)
 				Gap: 12
 				Box:
 					Margin: 0 0 18 0
@@ -328,7 +328,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Table:
 				Id: accounts
-				Column sizes: 1fr 80 80 80
+				Column sizes: * 80 80 80
 				Column align: left right right right
 				Box:
 					Margin: 0 0 18 0
@@ -424,7 +424,7 @@ Document (dev.stxt.pdf):
 				Text: Indicadores ambientales
 			Table:
 				Id: indicators
-				Column sizes: 1fr 70 70 70
+				Column sizes: * 70 70 70
 				Column align: left right right right
 				Head:
 					Row:
@@ -466,7 +466,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Table:
 				Id: board
-				Column sizes: 1fr 1fr 104
+				Column sizes: * * 104
 				Column align: left left right
 				Box:
 					Margin: 0 0 18 0
@@ -518,7 +518,7 @@ Document (dev.stxt.pdf):
 				Text: Calendario 2026
 			Table:
 				Id: calendar
-				Column sizes: 170 1fr 1fr 1fr 1fr
+				Column sizes: 170 * * * *
 				Column align: left right right right right
 				Box:
 					Margin: 0 0 6 0

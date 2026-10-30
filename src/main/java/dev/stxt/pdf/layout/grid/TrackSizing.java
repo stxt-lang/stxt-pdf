@@ -101,7 +101,7 @@ public final class TrackSizing {
 
         if (!finite) {
             // Tamaño indefinido: las pistas no flexibles llegan a su límite y las fracciones
-            // toman el mayor base/fr (simplificación de "find the size of an fr").
+            // toman el mayor base/peso (simplificación de "find the size of an fr").
             double frSize = 0;
             for (int i = 0; i < n; i++) {
                 Track t = tracks.get(i);
@@ -245,7 +245,7 @@ public final class TrackSizing {
     /**
      * Ítems de varias pistas que cruzan alguna fracción (Grid §12.5, paso 4): lo que les falta
      * hasta su min-content se reparte solo entre las fracciones con mínimo intrínseco que ocupan,
-     * en proporción a su {@code fr} (si los {@code fr} suman menos de 1, esa parte en proporción y
+     * en proporción a su peso (si los pesos suman menos de 1, esa parte en proporción y
      * el resto a partes iguales). Se calcula con las bases de antes del paso, y cada pista crece
      * lo que pida el ítem que más le pida.
      */

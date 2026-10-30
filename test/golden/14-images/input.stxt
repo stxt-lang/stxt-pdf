@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 				Margin: 0 0 8 0
 		Grid:
 			Id: fits
-			Column sizes: 1fr 1fr
+			Column sizes: * *
 			Gap: 10
 			Box:
 				Margin: 0 0 8 0

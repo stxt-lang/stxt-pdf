@@ -129,7 +129,7 @@ class MarkdownBuilderTest {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: equal"),
                 "| Mes | Total |", "|-----|------:|", "| Ene | **120** |", "| Feb |");
         assertEquals(List.of("Table @16",
-                "  Column sizes: repeat(2, 1fr) @14",
+                "  Column sizes: repeat(2, *) @14",
                 "  Head @16",
                 "    Row @16",
                 "      Cell: Mes @16",

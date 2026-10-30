@@ -298,7 +298,7 @@ class ImageLayoutTest {
     void anImageInATableCell() {
         LayoutFixture f = layOut(
                 "\tTable:",
-                "\t\tColumn sizes: 100 1fr",
+                "\t\tColumn sizes: 100 *",
                 "\t\tBody:",
                 "\t\t\tRow:",
                 "\t\t\t\tCell:",

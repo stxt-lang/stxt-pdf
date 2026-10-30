@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 				Background: #F1EFE8
 	Section:
 		Grid:
-			Column sizes: 150 1fr
+			Column sizes: 150 *
 			Gap: 20
 			Areas >>
 				head head
@@ -77,9 +77,9 @@ Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de
 | `25%` | una parte del ancho del `Grid` (sin descontar los huecos) |
 | `auto` | lo que pida su contenido |
 | `min-content`, `max-content` | lo mínimo o lo máximo de su contenido |
-| `1fr`, `2fr` | una parte de lo que sobra; nunca menos que la palabra más larga de su contenido |
-| `minmax(100, 1fr)` | entre 100 y una parte de lo que sobra |
-| `repeat(3, 1fr)` | tres columnas `1fr` |
+| `*`, `2*` | una parte de lo que sobra; nunca menos que la palabra más larga de su contenido |
+| `minmax(100, *)` | entre 100 y una parte de lo que sobra |
+| `repeat(3, *)` | tres columnas `*` |
 
 Primero se colocan las columnas fijas y las `auto`, y lo que sobra se reparte entre las fracciones. Las filas miden lo que su
 ítem más alto, salvo que declares `Row sizes`; las filas en porcentaje necesitan un `Height` en el `Grid`.

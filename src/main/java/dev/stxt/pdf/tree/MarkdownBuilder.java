@@ -328,7 +328,7 @@ final class MarkdownBuilder {
                 columns++;
             }
             Node mode = tableColumns.get();
-            String track = mode.getText().trim().equals("equal") ? "1fr" : "auto";
+            String track = mode.getText().trim().equals("equal") ? "*" : "auto";
             InlineNode table = node("Table", "", line);
             table.addChild(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()));
             table.addChild(rows("Head", head));

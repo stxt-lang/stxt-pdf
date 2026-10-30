@@ -76,7 +76,7 @@ final class ValueReader {
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: usa "
-                        + "números, porcentajes, fracciones (1fr), auto, min-content, max-content o minmax(a, b)");
+                        + "números, porcentajes, fracciones (*), auto, min-content, max-content o minmax(a, b)");
             }
             if (isNegative(v)) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite pistas negativas: " + p.getText().trim());

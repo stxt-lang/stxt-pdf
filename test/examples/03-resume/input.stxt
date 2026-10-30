@@ -11,8 +11,8 @@ Document (dev.stxt.pdf):
 	Section:
 		Grid:
 			Id: page
-			Column sizes: 190 1fr
-			Row sizes: 1fr
+			Column sizes: 190 *
+			Row sizes: *
 			Box:
 				Height: 100%
 			Area:
@@ -134,7 +134,7 @@ Document (dev.stxt.pdf):
 						Text: Experiencia
 					Grid:
 						Id: jobs
-						Column sizes: 70 1fr
+						Column sizes: 70 *
 						Gap: 14 12
 						Area:
 							Text: 2022 – hoy
@@ -191,7 +191,7 @@ Document (dev.stxt.pdf):
 						Text: Formación
 					Grid:
 						Id: education
-						Column sizes: 70 1fr
+						Column sizes: 70 *
 						Gap: 8 12
 						Area:
 							Text: 2016

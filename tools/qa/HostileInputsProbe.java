@@ -25,7 +25,7 @@ public class HostileInputsProbe {
         return sb.toString();
     }
     static String gridRepeat(int n) {
-        return head("") + "\t\tGrid:\n\t\t\tColumn sizes: repeat(" + n + ", 1fr)\n\t\t\tArea:\n\t\t\t\tText: hola\n";
+        return head("") + "\t\tGrid:\n\t\t\tColumn sizes: repeat(" + n + ", *)\n\t\t\tArea:\n\t\t\t\tText: hola\n";
     }
     static String longWord(int n) { return head("") + "\t\tText: " + "x".repeat(n) + "\n"; }
     static String manyPages(int n) { // n bloques con salto de pagina forzado

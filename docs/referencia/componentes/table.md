@@ -12,7 +12,7 @@ Styles:
 			Padding: 2 4
 			Border: 0 0 0.5 0
 Table:
-	Column sizes: 120 1fr 1fr
+	Column sizes: 120 * *
 	Head:
 		Row:
 			Typography:

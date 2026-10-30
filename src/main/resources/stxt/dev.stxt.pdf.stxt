@@ -1334,7 +1334,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
 	Node: Table columns
 		Type: ENUM
-		Description: Columnas de las tablas de un Markdown: equal, todas del mismo ancho (repeat(n, 1fr)); auto, cada una según su contenido (repeat(n, auto)).
+		Description: Columnas de las tablas de un Markdown: equal, todas del mismo ancho (repeat(n, *)); auto, cada una según su contenido (repeat(n, auto)).
 		Values:
 			Value: equal
 			Value: auto

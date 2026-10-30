@@ -16,6 +16,6 @@ Document (dev.stxt.pdf):
 		Grid:
 			Box:
 				Width: 200
-			Column sizes: 1fr 1fr
+			Column sizes: * *
 			Area: 1 1 1 2
 				Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

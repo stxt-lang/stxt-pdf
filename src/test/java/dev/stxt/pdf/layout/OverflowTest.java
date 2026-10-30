@@ -209,7 +209,7 @@ class OverflowTest {
     void headAndFootThatLeaveNoRoomForTheBody() {
         // Cabecera de 60 y pie de 50 en un área útil de 100.
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOutPaged(PAGE,
-                "\tTable:", "\t\tId: X", "\t\tColumn sizes: 1fr",
+                "\tTable:", "\t\tId: X", "\t\tColumn sizes: *",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 60",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));

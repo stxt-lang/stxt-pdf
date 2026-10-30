@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  *
  * <ul>
  *   <li>Números en puntos con punto decimal: {@code 12}, {@code 12.5}, {@code -4}.</li>
- *   <li>Porcentajes ({@code 50%}) y fracciones ({@code 1fr}).</li>
+ *   <li>Porcentajes ({@code 50%}) y fracciones ({@code *}, {@code 2*}; {@code *} solo es {@code 1*}).</li>
  *   <li>Palabras: {@code auto}, {@code min-content}, {@code max-content}, {@code fit-content}.</li>
  *   <li>Pistas entre dos tamaños: {@code minmax(a, b)}.</li>
  *   <li>Listas separadas por espacios, con {@code repeat(n, patrón)}.</li>
@@ -48,12 +48,13 @@ public final class ValueParser {
         if (t.endsWith("%")) {
             return new Value.Percentage(number(t.substring(0, t.length() - 1), text));
         }
-        if (t.endsWith("fr")) {
-            double fr = number(t.substring(0, t.length() - 2), text);
-            if (fr < 0) {
+        if (t.endsWith("*")) {
+            String weight = t.substring(0, t.length() - 1);
+            double fraction = weight.isEmpty() ? 1 : number(weight, text);
+            if (fraction < 0) {
                 throw new IllegalArgumentException("Una fracción no puede ser negativa: " + text);
             }
-            return new Value.Fraction(fr);
+            return new Value.Fraction(fraction);
         }
         return new Value.Points(number(t, text));
     }
@@ -87,7 +88,7 @@ public final class ValueParser {
         switch (name) {
             case "minmax":
                 require(args.size() == 2, "minmax necesita 2 argumentos: " + original);
-                require(!(args.get(0) instanceof Value.Fraction), "El mínimo de minmax no puede ser fr: " + original);
+                require(!(args.get(0) instanceof Value.Fraction), "El mínimo de minmax no puede ser una fracción: " + original);
                 return new Value.MinMax(args.get(0), args.get(1));
             default:
                 throw new IllegalArgumentException("Función desconocida: " + name);

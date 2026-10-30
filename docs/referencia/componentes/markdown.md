@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 | `Content` | bloque `>>` | — | El Markdown. Obligatorio. |
 | `Bullet markers` | lista de `bullet`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
 | `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
-| `Table columns` | `equal`, `auto` | — | Las `Column sizes` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+| `Table columns` | `equal`, `auto` | — | Las `Column sizes` de las tablas: `equal`, `repeat(n, *)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 

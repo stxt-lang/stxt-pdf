@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 				After: avoid
 	Section:
 		Table:
-			Column sizes: 1fr
+			Column sizes: *
 			Head:
 				Row:
 					Cell: a

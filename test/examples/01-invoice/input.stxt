@@ -53,7 +53,7 @@ Document (dev.stxt.pdf):
 							Align: right
 		Grid:
 			Id: parties
-			Column sizes: 1fr 1fr
+			Column sizes: * *
 			Gap: 18
 			Box:
 				Margin: 0 0 18 0
@@ -83,7 +83,7 @@ Document (dev.stxt.pdf):
 						Link: mailto:compras@miradordelvalle.example
 		Grid:
 			Id: strip
-			Column sizes: repeat(4, 1fr)
+			Column sizes: repeat(4, *)
 			Box:
 				Margin: 0 0 22 0
 				Padding: 9 14
@@ -111,7 +111,7 @@ Document (dev.stxt.pdf):
 					Text: PO-2025-311
 		Table:
 			Id: lines
-			Column sizes: 54 1fr 38 64 94
+			Column sizes: 54 * 38 64 94
 			Column align: left left right right right
 			Box:
 				Margin: 0 0 24 0
@@ -191,7 +191,7 @@ Document (dev.stxt.pdf):
 					Cell: 13.360,82 €
 		Grid:
 			Id: payment
-			Column sizes: 1fr 1fr
+			Column sizes: * *
 			Gap: 18
 			Area:
 				Block:

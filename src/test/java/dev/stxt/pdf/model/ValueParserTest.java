@@ -15,7 +15,10 @@ class ValueParserTest {
     void numbersPercentagesAndFractions() {
         assertEquals(new Value.Points(12.5), ValueParser.value("12.5"));
         assertEquals(new Value.Percentage(50), ValueParser.value(" 50% "));
-        assertEquals(new Value.Fraction(2), ValueParser.value("2fr"));
+        assertEquals(new Value.Fraction(2), ValueParser.value("2*"));
+        assertEquals(new Value.Fraction(1), ValueParser.value("*"));
+        assertEquals(new Value.Fraction(2.5), ValueParser.value("2.5*"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("1fr"));
         assertEquals(Value.AUTO, ValueParser.value("auto"));
         assertEquals(Value.Keyword.MIN_CONTENT, ValueParser.value("min-content"));
     }
@@ -27,9 +30,9 @@ class ValueParserTest {
 
     @Test
     void minmax() {
-        Value mm = ValueParser.value("minmax(100, 1fr)");
+        Value mm = ValueParser.value("minmax(100, *)");
         assertEquals(new Value.MinMax(new Value.Points(100), new Value.Fraction(1)), mm);
-        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("minmax(1fr, 100)"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("minmax(*, 100)"));
     }
 
     @Test
@@ -42,7 +45,7 @@ class ValueParserTest {
 
     @Test
     void listsWithRepeat() {
-        List<Value> v = ValueParser.list("150 repeat(2, 1fr auto) minmax(100, 2fr)");
+        List<Value> v = ValueParser.list("150 repeat(2, * auto) minmax(100, 2*)");
         assertEquals(6, v.size());
         assertEquals(new Value.Fraction(1), v.get(1));
         assertEquals(Value.AUTO, v.get(4));

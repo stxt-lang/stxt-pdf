@@ -15,7 +15,7 @@ class ValueParserPropertiesTest {
 
     /** Trozos con que se escriben los valores: números, unidades, funciones, separadores y algo de basura. */
     private static final String[] PIECES = {"0", "1", "7", "12", "250", ".", ".5", "-", "+", "e", "e3", " ", "  ", ",",
-            "(", ")", "%", "pt", "px", "em", "fr", "auto", "min-content", "max-content", "repeat", "repeat(",
+            "(", ")", "%", "pt", "px", "em", "*", "auto", "min-content", "max-content", "repeat", "repeat(",
             "minmax(", "fit-content(", "x", "#", "linear(", "deg", "\t", "1e400", "-0", "NaN", "Infinity"};
 
     private static String randomValue(Random random) {

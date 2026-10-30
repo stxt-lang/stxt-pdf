@@ -33,7 +33,7 @@ class TablesTest {
 
     @Test
     void tableIsAGridWithExplicitPlacement() {
-        Box table = root("\tTable:", "\t\tColumn sizes: 120 1fr 1fr", "\t\tGap: 2 4",
+        Box table = root("\tTable:", "\t\tColumn sizes: 120 * *", "\t\tGap: 2 4",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Ventas", "\t\t\t\tCell: 100", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
@@ -75,7 +75,7 @@ class TablesTest {
 
     @Test
     void spansFromAboveTakeTheirColumns() {
-        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr 1fr", "\t\tBody:",
+        Box table = root("\tTable:", "\t\tColumn sizes: * * *", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tSpan: 2 1", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
                 "\t\t\t\t\tSpan: 3 1",
                 "\t\t\tRow:", "\t\t\t\tCell: d",
@@ -87,7 +87,7 @@ class TablesTest {
 
     @Test
     void cellWithoutValueIsABlockOfElements() {
-        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr", "\t\tBody:", "\t\t\tRow:",
+        Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody:", "\t\t\tRow:",
                 "\t\t\t\tCell:", "\t\t\t\t\tParagraph: Uno", "\t\t\t\t\tList:", "\t\t\t\t\t\tMarker: bullet",
                 "\t\t\t\t\t\tList item:", "\t\t\t\t\t\t\tText: dos",
                 "\t\t\t\tCell:").children().get(0);
@@ -104,7 +104,7 @@ class TablesTest {
     void rowTypographyIsInheritedAndRulesWin() {
         Box table = root("\tStyles:", "\t\tFor element: Cell", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tTable:", "\t\tTypography:", "\t\t\tColor: #333333", "\t\tColumn sizes: 1fr 1fr",
+                "\tTable:", "\t\tTypography:", "\t\t\tColor: #333333", "\t\tColumn sizes: * *",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true", "\t\t\t\t\tSize: 12",
                 "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tBold: false")
                 .children().get(0);
@@ -160,7 +160,7 @@ class TablesTest {
         Box table = root("\tStyles:", "\t\tFor style: small", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\tFor id: total", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tBold: true",
                 "\t\tFor id: grand", "\t\t\tTypography:", "\t\t\t\tSize: 14",
-                "\tTable:", "\t\tColumn sizes: 1fr 1fr 1fr", "\t\tBody:",
+                "\tTable:", "\t\tColumn sizes: * * *", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tId: total", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\t\t\tStyle: small", "\t\t\t\tCell: c", "\t\t\t\t\tId: grand").children().get(0);
         assertEquals(List.of(12.0, 12.0, 14.0),
@@ -188,7 +188,7 @@ class TablesTest {
 
     @Test
     void rowBreakGoesToItsCells() {
-        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr", "\t\tBody:",
+        Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tInside: avoid",
                 "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);

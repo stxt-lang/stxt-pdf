@@ -26,7 +26,7 @@ public enum ErrorCode {
     // --- Valores ------------------------------------------------------------------------------
     /** Sintaxis de un valor (referencia/comun/valores.md): número, porcentaje, función, lista… */
     VALUE_SYNTAX,
-    /** Un valor bien escrito que la propiedad no admite ({@code Width: 1fr}, {@code Padding: -2}…). */
+    /** Un valor bien escrito que la propiedad no admite ({@code Width: *}, {@code Padding: -2}…). */
     VALUE_NOT_ALLOWED,
     /** {@code fit-content} como pista de grid. */
     FIT_CONTENT_TRACK,

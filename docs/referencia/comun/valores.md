@@ -6,17 +6,20 @@
 |---|---|---|
 | Número | Puntos. Punto decimal, nunca coma. Puede ser negativo donde se indique. | `12`, `12.5`, `-30` |
 | Porcentaje | Porcentaje de una base (ver [bases de los porcentajes](#bases-de-los-porcentajes)). | `50%` |
-| Fracción | Fracción del espacio libre. Solo en pistas de grid. | `1fr`, `2.5fr` |
+| Fracción | Una parte del espacio libre, con su peso delante (`*` solo es `1*`). Solo en pistas de grid. | `*`, `2*`, `2.5*` |
 | `auto` | El motor calcula el valor según el contexto. | `auto` |
 | `min-content` | El menor tamaño posible sin desbordar (la palabra más larga). | `min-content` |
 | `max-content` | El tamaño sin ningún salto de línea. | `max-content` |
 | `fit-content` | `min(max-content, max(min-content, disponible))`. | `fit-content` |
-| `minmax(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `minmax(100, 1fr)` |
+| `minmax(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `minmax(100, *)` |
 
-Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: 1fr`,
+Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: *`,
 `Max width: max-content`, `Gap: auto`, un `minmax()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
 silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
 [definido](#alto-definido) es un error.
+
+> **Decisión:** una fracción se escribe con un asterisco y su peso: `120 * 2*` da a la tercera pista el doble de lo que
+> sobra que a la segunda. *Alternativa descartada:* `1fr`, una unidad que solo conoce quien ya la ha usado.
 
 > **Decisión:** no hay funciones que elijan entre medidas (el menor, el mayor o uno entre dos límites): un tamaño entre
 > dos límites se escribe con `Min width` y `Max width` (`Width: 50%`, `Min width: 200`, `Max width: 400`), y cada cosa
@@ -29,10 +32,10 @@ Algunas propiedades admiten varios valores separados por espacios (`Column sizes
 pistas, `repeat(n, patrón)` repite un patrón:
 
 ```
-Column sizes: 150 repeat(3, 1fr) minmax(100, 2fr)
+Column sizes: 150 repeat(3, *) minmax(100, 2*)
 ```
 
-equivale a `150 1fr 1fr 1fr minmax(100, 2fr)`.
+equivale a `150 * * * minmax(100, 2*)`.
 
 ## Abreviados de cuatro lados
 

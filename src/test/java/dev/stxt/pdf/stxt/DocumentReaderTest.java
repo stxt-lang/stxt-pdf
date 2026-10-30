@@ -107,7 +107,7 @@ class DocumentReaderTest {
     @Test
     void tablesValidateAgainstTheSchema() {
         InlineNode root = reader.read(doc(
-                "\tTable:", "\t\tId: t", "\t\tColumn sizes: 120 1fr 1fr", "\t\tGap: 2",
+                "\tTable:", "\t\tId: t", "\t\tColumn sizes: 120 * *", "\t\tGap: 2",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true",
                 "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
@@ -124,9 +124,9 @@ class DocumentReaderTest {
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tColumn sizes: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
+                "\tTable:", "\t\tColumn sizes: *", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         DocumentSyntaxException row = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tColumn sizes: 1fr", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
+                "\tTable:", "\t\tColumn sizes: *", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
         assertEquals("CHILD_NOT_DECLARED", row.code());
         assertEquals(10, row.line());
         assertEquals("CHILD_NOT_DECLARED", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(

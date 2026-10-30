@@ -75,7 +75,7 @@ class BoxTreeBuilderTest {
     @Test
     void itemAndAreaPropertiesGoToTheirElement() {
         Box root = build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumn sizes: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
+                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumn sizes: * *", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
         Box a = root.children().get(0).children().get(0);
         assertEquals("a", a.id());
         assertEquals(2, a.style().item().grow(), 1e-9);

@@ -82,7 +82,7 @@ Document (dev.stxt.pdf):
 						Margin: 0 0 56 0
 				Grid:
 					Id: cover-products
-					Column sizes: repeat(4, 1fr)
+					Column sizes: repeat(4, *)
 					Gap: 8
 					Area:
 						Image: examples/catalog/silla.jpg
@@ -136,7 +136,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Grid:
 				Id: grid-dining
-				Column sizes: 1fr 1fr
+				Column sizes: * *
 				Gap: 18
 				Area:
 					Block:
@@ -303,7 +303,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Grid:
 				Id: grid-rest
-				Column sizes: 1fr 1fr
+				Column sizes: * *
 				Gap: 18
 				Area:
 					Block:
@@ -470,7 +470,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Table:
 				Id: wood-table
-				Column sizes: 70 1fr 90 1fr
+				Column sizes: 70 * 90 *
 				Box:
 					Margin: 0 0 22 0
 				Head:
@@ -518,7 +518,7 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 10 0
 			Grid:
 				Id: steps
-				Column sizes: repeat(3, 1fr)
+				Column sizes: repeat(3, *)
 				Gap: 20
 				Box:
 					Margin: 0 0 26 0

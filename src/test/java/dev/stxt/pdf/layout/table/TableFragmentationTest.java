@@ -28,8 +28,8 @@ class TableFragmentationTest {
 
     private static String[] table(String gap) {
         return gap == null
-                ? new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: 1fr"}
-                : new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: 1fr", "\t\tGap: " + gap};
+                ? new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: *"}
+                : new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tGap: " + gap};
     }
 
     private static String[] group(String name) {

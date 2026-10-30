@@ -25,7 +25,7 @@ class GridLayoutTest {
     void columnsAndRowsSizing() {
         // auto llega al max-content de B (45) y la fracción recibe el resto: 515 - 100 - 45.
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tColumn sizes: 100 auto 1fr",
+                "\tGrid:", "\t\tColumn sizes: 100 auto *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
                 "\t\tArea:", "\t\t\tText: aaaa bbbb", "\t\t\t\tId: B",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10");
@@ -36,10 +36,10 @@ class GridLayoutTest {
 
     @Test
     void tableCellsAreGridItems() {
-        // Columnas 100 y 1fr con 5 de hueco: 515 - 100 - 5 = 410. La fila del cuerpo mide lo que
+        // Columnas 100 y * con 5 de hueco: 515 - 100 - 5 = 410. La fila del cuerpo mide lo que
         // la celda con relleno (12 + 8) y estira a la otra.
         LayoutFixture l = layOut(
-                "\tTable:", "\t\tColumn sizes: 100 1fr", "\t\tGap: 0 5",
+                "\tTable:", "\t\tColumn sizes: 100 *", "\t\tGap: 0 5",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: aaa", "\t\t\t\t\tId: H1", "\t\t\t\tCell: bbb", "\t\t\t\t\tId: H2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: ccc", "\t\t\t\t\tId: B1", "\t\t\t\t\tBox:",
                 "\t\t\t\t\t\tPadding: 4", "\t\t\t\tCell:", "\t\t\t\t\tId: B2");
@@ -89,7 +89,7 @@ class GridLayoutTest {
     @Test
     void fractionRowsWithAutoHeightMeasureTheTallest() {
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: G", "\t\tRow sizes: 1fr 1fr",
+                "\tGrid:", "\t\tId: G", "\t\tRow sizes: * *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30");
         assertRect(40, 40, 515, 60, l.rect("G"));
@@ -100,7 +100,7 @@ class GridLayoutTest {
     @Test
     void fractionRowsWithDefiniteHeight() {
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tRow sizes: 1fr 3fr",
+                "\tGrid:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tRow sizes: * 3*",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B");
         assertRect(40, 40, 515, 25, l.rect("A"));
@@ -155,7 +155,7 @@ class GridLayoutTest {
     @Test
     void itemCrossingFractionsInIntrinsicWidths() {
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tColumn sizes: 1fr 1fr",
+                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tColumn sizes: * *",
                 "\t\tArea: 1 1 1 2", "\t\t\tText: " + "a".repeat(60));
         assertEquals(300, l.rect("G").width(), 1e-9);
     }
@@ -169,7 +169,7 @@ class GridLayoutTest {
                 "\t\tGap: 10", items,
                 "\tGrid:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: min-content", "\t\tColumn sizes: auto auto",
                 "\t\tGap: 10", items,
-                "\tGrid:", "\t\tId: fr", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: 150 1fr",
+                "\tGrid:", "\t\tId: fr", "\t\tBox:", "\t\t\tWidth: max-content", "\t\tColumn sizes: 150 *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
                 "\t\tArea:", "\t\t\tText: aaa");
         assertEquals(50, l.rect("max").width(), 1e-9);
@@ -196,7 +196,7 @@ class GridLayoutTest {
         // El 10 % es del área (200), no del contenedor (515): 20 por lado. El fragmento lleva el
         // margen usado, que es el que comprueba Overflow.
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tColumn sizes: 200 1fr",
+                "\tGrid:", "\t\tColumn sizes: 200 *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10%",
                 "\t\t\t\t\tHeight: 10");
         assertRect(60, 60, 160, 10, l.rect("M"));

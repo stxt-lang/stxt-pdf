@@ -62,7 +62,7 @@ Document (dev.stxt.pdf):
 				Bold: true
 	Section:
 		Table:
-			Column sizes: 1fr auto auto auto
+			Column sizes: * auto auto auto
 			Column align: left center center center
 			Head:
 				Row:

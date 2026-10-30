@@ -59,7 +59,7 @@ Document (dev.stxt.pdf):
 			Id: title
 		Grid:
 			Id: body
-			Column sizes: 150 1fr
+			Column sizes: 150 *
 			Gap: 20
 			Area:
 				Text:
