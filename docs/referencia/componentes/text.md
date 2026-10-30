@@ -57,7 +57,7 @@ ancho más estrecho = la palabra más ancha; ancho natural = el párrafo más la
 
 ## Cortes
 
-Un texto se parte entre líneas, respetando `Widows` y `Orphans` de cada párrafo ([Cortes](../comun/cortes.md)).
+Un texto, que es un solo párrafo, se parte entre líneas respetando `Widows` y `Orphans` ([Cortes](../comun/cortes.md)).
 
 ## Accesibilidad
 

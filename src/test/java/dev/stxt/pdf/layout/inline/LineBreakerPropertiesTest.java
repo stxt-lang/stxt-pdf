@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Propiedades del reparto en líneas con textos y anchos al azar, con los dos algoritmos:
- * no se pierde ni se duplica ninguna palabra y quedan en orden, los párrafos son los del texto (una línea en blanco
- * los separa), ninguna línea está vacía y toda línea de más de una palabra cabe. Con {@link FixedMetrics} cada
+ * no se pierde ni se duplica ninguna palabra y quedan en orden (todos los huecos valen un espacio, también los que tienen
+ * una línea en blanco: el texto es un solo párrafo), ninguna línea está vacía y toda línea de más de una palabra cabe. Con {@link FixedMetrics} cada
  * carácter mide 5 pt con {@code Size: 10}. La semilla es fija: un fallo se repite.
  */
 class LineBreakerPropertiesTest {
@@ -49,22 +49,14 @@ class LineBreakerPropertiesTest {
         return sb.toString();
     }
 
-    /** Las palabras de cada párrafo: un hueco con dos saltos de línea o más los separa. */
-    private static List<List<String>> paragraphs(String text) {
-        List<List<String>> paragraphs = new ArrayList<>();
-        List<String> current = new ArrayList<>();
+    /** Las palabras del texto. */
+    private static List<String> words(String text) {
+        List<String> words = new ArrayList<>();
         Matcher m = WORD.matcher(text);
-        int previousEnd = -1;
         while (m.find()) {
-            if (previousEnd >= 0 && text.substring(previousEnd, m.start()).chars().filter(c -> c == '\n').count() > 1) {
-                paragraphs.add(current);
-                current = new ArrayList<>();
-            }
-            current.add(m.group());
-            previousEnd = m.end();
+            words.add(m.group());
         }
-        paragraphs.add(current);
-        return paragraphs;
+        return words;
     }
 
     @Test
@@ -75,21 +67,16 @@ class LineBreakerPropertiesTest {
             double available = 5 + random.nextInt(400);
             for (LineBreaking wrap : LineBreaking.values()) {
                 String where = wrap + ", " + available + " pt: \"" + text.replace("\n", "\\n") + "\"";
-                List<List<String>> lines = LineBreaker.breakParagraphs(text, available, METRICS, FONT, 10, wrap);
-                List<List<String>> expected = paragraphs(text);
-                assertEquals(expected.size(), lines.size(), "párrafos con " + where);
-                for (int p = 0; p < expected.size(); p++) {
-                    List<String> words = new ArrayList<>();
-                    for (String line : lines.get(p)) {
-                        assertFalse(line.isEmpty(), "línea vacía con " + where);
-                        assertEquals(line.strip(), line, "espacios en los extremos con " + where);
-                        List<String> inLine = Arrays.asList(line.split(" "));
-                        assertTrue(inLine.size() == 1 || fits(line.length() * 5.0, available),
-                                "«" + line + "» no cabe con " + where);
-                        words.addAll(inLine);
-                    }
-                    assertEquals(expected.get(p), words, "palabras del párrafo " + p + " con " + where);
+                List<String> words = new ArrayList<>();
+                for (String line : LineBreaker.breakLines(text, available, METRICS, FONT, 10, wrap)) {
+                    assertFalse(line.isEmpty(), "línea vacía con " + where);
+                    assertEquals(line.strip(), line, "espacios en los extremos con " + where);
+                    List<String> inLine = Arrays.asList(line.split(" "));
+                    assertTrue(inLine.size() == 1 || fits(line.length() * 5.0, available),
+                            "«" + line + "» no cabe con " + where);
+                    words.addAll(inLine);
                 }
+                assertEquals(words(text), words, "palabras con " + where);
             }
         }
     }
@@ -119,26 +106,22 @@ class LineBreakerPropertiesTest {
     }
 
     /** El reparto voraz de antes de sumar los avances: con cada palabra, la línea se construye y se mide entera. */
-    private static List<List<LineBreaker.Line>> measuringEveryLine(List<TextRun> runs, double available,
+    private static List<LineBreaker.Line> measuringEveryLine(List<TextRun> runs, double available,
             TextMeasurer metrics, FontFace font, double size, double spacing) {
-        List<List<LineBreaker.Line>> result = new ArrayList<>();
-        for (List<LineBreaker.Word> paragraph : LineBreaker.paragraphs(runs)) {
-            List<LineBreaker.Line> lines = new ArrayList<>();
-            List<LineBreaker.Word> current = new ArrayList<>();
-            for (LineBreaker.Word word : paragraph) {
+        List<LineBreaker.Line> lines = new ArrayList<>();
+        List<LineBreaker.Word> current = new ArrayList<>();
+        for (LineBreaker.Word word : LineBreaker.words(runs)) {
+            current.add(word);
+            if (current.size() > 1 && !fits(LineBreaker.width(LineBreaker.line(current).runs(), metrics, font,
+                    size, spacing), available)) {
+                current.remove(current.size() - 1);
+                lines.add(LineBreaker.line(current));
+                current.clear();
                 current.add(word);
-                if (current.size() > 1 && !fits(LineBreaker.width(LineBreaker.line(current).runs(), metrics, font,
-                        size, spacing), available)) {
-                    current.remove(current.size() - 1);
-                    lines.add(LineBreaker.line(current));
-                    current.clear();
-                    current.add(word);
-                }
             }
-            lines.add(LineBreaker.line(current));
-            result.add(lines);
         }
-        return result;
+        lines.add(LineBreaker.line(current));
+        return lines;
     }
 
     /**
@@ -160,41 +143,33 @@ class LineBreakerPropertiesTest {
             if (random.nextBoolean()) {
                 available = 20 + random.nextInt(300);
             } else {
-                // El ancho de las primeras palabras de un párrafo, justo en el límite.
-                List<List<LineBreaker.Word>> paragraphs = LineBreaker.paragraphs(runs);
-                List<LineBreaker.Word> words = paragraphs.get(random.nextInt(paragraphs.size()));
+                // El ancho de las primeras palabras, justo en el límite.
+                List<LineBreaker.Word> words = LineBreaker.words(runs);
                 List<LineBreaker.Word> first = words.subList(0, 1 + random.nextInt(words.size()));
                 available = LineBreaker.width(LineBreaker.line(first).runs(), metrics, font, size, spacing)
                         + nudges[random.nextInt(nudges.length)];
             }
             assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
-                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE),
+                    LineBreaker.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE),
                     available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
         }
     }
 
     /** Las palabras de antes, con {@code \\S+}: la referencia de {@link #theWordsAreTheSameAsWithTheRegex}. */
-    private static List<List<LineBreaker.Word>> paragraphsWithTheRegex(List<TextRun> runs) {
+    private static List<LineBreaker.Word> wordsWithTheRegex(List<TextRun> runs) {
         String text = TextRun.text(runs);
         int[] starts = new int[runs.size() + 1];
         for (int i = 0; i < runs.size(); i++) {
             starts[i + 1] = starts[i] + runs.get(i).text().length();
         }
         LineBreaker.RunCursor cursor = new LineBreaker.RunCursor(runs, starts);
-        List<List<LineBreaker.Word>> result = new ArrayList<>();
-        List<LineBreaker.Word> paragraph = new ArrayList<>();
+        List<LineBreaker.Word> result = new ArrayList<>();
         List<TextRun> previous = null;
         int previousEnd = 0;
         Matcher m = WORD.matcher(text);
         while (m.find()) {
             if (previous != null) {
-                String gap = text.substring(previousEnd, m.start());
-                boolean blankLine = gap.indexOf('\n') != gap.lastIndexOf('\n');
-                paragraph.add(new LineBreaker.Word(previous, blankLine ? TextFormat.PLAIN : cursor.format(previousEnd)));
-                if (blankLine) {
-                    result.add(paragraph);
-                    paragraph = new ArrayList<>();
-                }
+                result.add(new LineBreaker.Word(previous, cursor.format(previousEnd)));
             }
             TextRun.Joiner parts = new TextRun.Joiner();
             for (int i = m.start(); i < m.end(); ) {
@@ -211,14 +186,13 @@ class LineBreakerPropertiesTest {
             previousEnd = m.end();
         }
         if (previous != null) {
-            paragraph.add(new LineBreaker.Word(previous, TextFormat.PLAIN));
-            result.add(paragraph);
+            result.add(new LineBreaker.Word(previous, TextFormat.PLAIN));
         }
         return result;
     }
 
     /**
-     * Las palabras y los párrafos se sacan recorriendo el texto y son los mismos que con la expresión regular
+     * Las palabras se sacan recorriendo el texto y son las mismas que con la expresión regular
      * de antes: con todos los espacios en blanco de {@code \\s}, otros que no lo son ({@code U+00A0}) y cambios de
      * formato dentro de las palabras y de los huecos.
      */
@@ -234,7 +208,7 @@ class LineBreakerPropertiesTest {
                 runs.add(pieces[random.nextInt(pieces.length)], FORMATS[random.nextInt(FORMATS.length)]);
             }
             List<TextRun> text = runs.build();
-            assertEquals(paragraphsWithTheRegex(text), LineBreaker.paragraphs(text), text.toString());
+            assertEquals(wordsWithTheRegex(text), LineBreaker.words(text), text.toString());
         }
     }
 }

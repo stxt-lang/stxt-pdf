@@ -56,34 +56,33 @@ class BreakRulesTest {
     }
 
     @Test
-    void cutLinesInsideTheSecondParagraph() {
-        assertEquals(new BreakRules.Cut(7, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutLines(new int[]{5, 10}, 0, 7, 2, 2, false));
+    void cutLinesPlacesEverythingThatFits() {
+        assertEquals(new BreakRules.Cut(5, BreakAppeal.PERFECT_BREAK), BreakRules.cutLines(5, 0, 7, 2, 2, false));
+        assertEquals(new BreakRules.Cut(0, BreakAppeal.PERFECT_BREAK), BreakRules.cutLines(0, 0, 0, 2, 2, false));
     }
 
     @Test
-    void cutLinesBetweenParagraphs() {
-        // En el segundo párrafo solo cabría una línea huérfana.
-        assertEquals(new BreakRules.Cut(5, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutLines(new int[]{5, 10}, 0, 6, 2, 2, false));
+    void cutLinesKeepsTheWidows() {
+        // Caben 9 de 10, pero entonces pasaría una sola línea: pasan 2.
+        assertEquals(new BreakRules.Cut(8, BreakAppeal.PERFECT_BREAK), BreakRules.cutLines(10, 0, 9, 2, 2, false));
     }
 
     @Test
     void cutLinesRelaxesWhenNothingElseIsPlaced() {
         assertEquals(new BreakRules.Cut(1, BreakAppeal.VIOLATES_WIDOWS),
-                BreakRules.cutLines(new int[]{9}, 0, 1, 2, 2, false));
+                BreakRules.cutLines(9, 0, 1, 2, 2, false));
     }
 
     @Test
     void cutLinesWithoutRoom() {
-        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, false));
-        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED), BreakRules.cutLines(new int[]{3}, 0, 0, 2, 2, true));
+        assertEquals(new BreakRules.Cut(0, BreakAppeal.FORCED), BreakRules.cutLines(3, 0, 0, 2, 2, false));
+        assertEquals(new BreakRules.Cut(1, BreakAppeal.FORCED), BreakRules.cutLines(3, 0, 0, 2, 2, true));
     }
 
     @Test
     void cutLinesResumesInTheMiddle() {
         assertEquals(new BreakRules.Cut(9, BreakAppeal.PERFECT_BREAK),
-                BreakRules.cutLines(new int[]{9}, 7, 8, 2, 2, true));
+                BreakRules.cutLines(9, 7, 8, 2, 2, true));
     }
 
     @Test

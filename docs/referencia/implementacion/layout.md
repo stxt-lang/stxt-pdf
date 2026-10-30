@@ -146,6 +146,8 @@ que los del reparto en orden.
 ## Texto
 
 `InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `preserve` y `preserve-wrap`, con `PreformattedText`.
+El texto de una caja es siempre un solo párrafo (las líneas en blanco son un error al leerlo, salvo en uno preformateado,
+donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
 `InlineLayout.runs` sustituye las referencias por su valor y aplica `TextTransform` a los tramos **antes** de repartirlos.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`).

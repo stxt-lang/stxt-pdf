@@ -24,9 +24,10 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code balanced}, con
  * Knuth-Plass ({@link #optimal}).
  *
- * <p>Tratamiento del espacio en blanco: los saltos de línea simples del bloque {@code Text} y
- * las secuencias de espacios valen un espacio; una línea en blanco separa párrafos y fuerza un
- * salto. Una palabra más ancha que la línea ocupa una línea propia y desborda.</p>
+ * <p>Tratamiento del espacio en blanco: los saltos de línea del bloque {@code Text} y las secuencias de espacios valen
+ * un espacio, y el texto es un solo párrafo (una línea en blanco es un error al leerlo, salvo en un texto
+ * preformateado, que reparte {@link PreformattedText}). Una palabra más ancha que la línea ocupa una línea propia y
+ * desborda.</p>
  *
  * <p>El texto es una lista de tramos con formato ({@link TextRun}). Una palabra puede tener
  * partes de varios tramos ({@code **neg**rita}) y mide lo que suman sus partes, cada una con su
@@ -71,56 +72,39 @@ public final class LineBreaker {
     /** Líneas del texto para un ancho disponible, con el algoritmo voraz. */
     public static List<String> breakLines(String text, double available, TextMeasurer measurer,
                                           FontFace font, double fontSize) {
-        List<String> lines = new ArrayList<>();
-        breakParagraphs(text, available, measurer, font, fontSize).forEach(lines::addAll);
-        return lines;
+        return breakLines(text, available, measurer, font, fontSize, LineBreaking.SIMPLE);
+    }
+
+    /** Como {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, para un texto sin formato. */
+    public static List<String> breakLines(String text, double available, TextMeasurer measurer,
+                                          FontFace font, double fontSize, LineBreaking wrap) {
+        return breakLines(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
+                .map(Line::text).toList();
     }
 
     /**
-     * Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace,
-     * double, LineBreaking)}).
-     */
-    public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     FontFace font, double fontSize) {
-        return breakParagraphs(text, available, measurer, font, fontSize, LineBreaking.SIMPLE);
-    }
-
-    /**
-     * Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, LineBreaking)}, para un texto sin
+     * Líneas del texto para un ancho disponible. {@code font} es la fuente de la caja; cada tramo la cambia con su
      * formato.
      */
-    public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     FontFace font, double fontSize, LineBreaking wrap) {
-        return breakParagraphs(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
-                .map(p -> p.stream().map(Line::text).toList()).toList();
+    public static List<Line> breakLines(List<TextRun> runs, double available, TextMeasurer measurer,
+                                        FontFace font, double fontSize, LineBreaking wrap) {
+        return breakLines(runs, available, measurer, font, fontSize, 0, wrap);
     }
 
-    /**
-     * Líneas de cada párrafo del texto para un ancho disponible (las viudas y huérfanas son por
-     * párrafo). {@code font} es la fuente de la caja; cada tramo la cambia con su formato.
-     */
-    public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
-                                                   FontFace font, double fontSize, LineBreaking wrap) {
-        return breakParagraphs(runs, available, measurer, font, fontSize, 0, wrap);
-    }
-
-    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, LineBreaking)}, con interletraje. */
-    public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
-                                                   FontFace font, double fontSize, double letterSpacing,
-                                                   LineBreaking wrap) {
-        List<List<Line>> result = new ArrayList<>();
-        for (List<Word> paragraph : paragraphs(runs)) {
-            if (wrap == LineBreaking.BALANCED) {
-                result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
-                continue;
-            }
-            result.add(greedy(paragraph, available, measurer, font, fontSize, letterSpacing));
+    /** Como {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, con interletraje. */
+    public static List<Line> breakLines(List<TextRun> runs, double available, TextMeasurer measurer,
+                                        FontFace font, double fontSize, double letterSpacing, LineBreaking wrap) {
+        List<Word> words = words(runs);
+        if (words.isEmpty()) {
+            return List.of();
         }
-        return result;
+        return wrap == LineBreaking.BALANCED
+                ? optimal(words, available, measurer, font, fontSize, letterSpacing)
+                : greedy(words, available, measurer, font, fontSize, letterSpacing);
     }
 
     /**
-     * El reparto voraz de un párrafo: cada palabra va a la línea en curso si cabe y, si no, empieza otra. El ancho de
+     * El reparto voraz: cada palabra va a la línea en curso si cabe y, si no, empieza otra. El ancho de
      * la línea en curso se lleva sumando los avances de sus palabras y espacios, cada uno medido una vez; solo
      * cuando la suma queda a menos de {@link Tolerance#MODEL} del ancho disponible se construye la línea y se mide
      * entera, así que la decisión es la misma que midiéndola siempre, sin que importe el redondeo de la suma.
@@ -160,7 +144,7 @@ public final class LineBreaker {
     }
 
     /**
-     * Knuth-Plass simplificado: los saltos de un párrafo que minimizan la suma de los deméritos
+     * Knuth-Plass simplificado: los saltos del texto que minimizan la suma de los deméritos
      * de sus líneas, por programación dinámica. Sin guiones ni encogimiento de los espacios
      * (las líneas justificadas no se comprimen):
      *
@@ -168,7 +152,7 @@ public final class LineBreaker {
      *   <li>{@code badness = 100 × r³}, con {@code r} = sobrante / estiramiento de la línea
      *       (cada espacio se estira hasta la mitad de su ancho), hasta {@value #MAX_BADNESS}.
      *       Una línea sin espacios que no llena el ancho, o una palabra que desborda, tiene la
-     *       badness máxima. La última línea del párrafo no tiene badness.</li>
+     *       badness máxima. La última línea no tiene badness.</li>
      *   <li>{@code deméritos = (penalización por línea + badness)²}.</li>
      * </ul>
      *
@@ -239,7 +223,7 @@ public final class LineBreaker {
         return intrinsics(TextRun.plain(text), measurer, font, fontSize);
     }
 
-    /** Ancho más estrecho (palabra más ancha) y ancho natural (párrafo más largo sin partir). */
+    /** Ancho más estrecho (palabra más ancha) y ancho natural (todo el texto sin partir). */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize) {
         return intrinsics(runs, measurer, font, fontSize, 0);
@@ -248,15 +232,15 @@ public final class LineBreaker {
     /** Como {@link #intrinsics(List, TextMeasurer, FontFace, double)}, con interletraje. */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize, double letterSpacing) {
-        double min = 0;
-        double max = 0;
-        for (List<Word> paragraph : paragraphs(runs)) {
-            for (Word word : paragraph) {
-                min = Math.max(min, width(word.parts(), measurer, font, fontSize, letterSpacing));
-            }
-            max = Math.max(max, width(line(paragraph).runs(), measurer, font, fontSize, letterSpacing));
+        List<Word> words = words(runs);
+        if (words.isEmpty()) {
+            return IntrinsicSizes.ZERO;
         }
-        return new IntrinsicSizes(min, max);
+        double min = 0;
+        for (Word word : words) {
+            min = Math.max(min, width(word.parts(), measurer, font, fontSize, letterSpacing));
+        }
+        return new IntrinsicSizes(min, width(line(words).runs(), measurer, font, fontSize, letterSpacing));
     }
 
     /** Desplazamiento horizontal de una línea según la alineación. */
@@ -271,13 +255,13 @@ public final class LineBreaker {
 
     /**
      * Espacio extra por cada espacio entre palabras con {@code justify}: el sobrante de la línea
-     * repartido entre sus espacios. La última línea de cada párrafo y las líneas de una sola
+     * repartido entre sus espacios. La última línea del texto y las líneas de una sola
      * palabra no se justifican (se alinean a la izquierda), y una línea que desborda no se
      * comprime.
      *
      * @param line      texto de la línea, con las palabras separadas por un espacio
      * @param lineWidth ancho natural de la línea
-     * @param last      es la última línea de su párrafo
+     * @param last      es la última línea del texto
      */
     public static double wordSpacing(String line, double lineWidth, double available, TextAlign textAlign,
                                      boolean last) {
@@ -300,7 +284,7 @@ public final class LineBreaker {
      * entre palabras sumado a su ancho y al de cada tramo.
      *
      * @param runs    tramos de la línea, con las palabras separadas por un espacio
-     * @param justify si la línea se puede justificar: no es la última de su párrafo (al numerar
+     * @param justify si la línea se puede justificar: no es la última del texto (al numerar
      *                las páginas, si ya estaba justificada)
      */
     public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available,
@@ -358,10 +342,10 @@ public final class LineBreaker {
     }
 
     /**
-     * Las palabras de cada párrafo del texto (ver la descripción de la clase): lo que hay entre los espacios en blanco
-     * ({@link #isSpace}, el {@code \s} de las expresiones regulares), con un recorrido del texto.
+     * Las palabras del texto (ver la descripción de la clase): lo que hay entre los espacios en blanco ({@link #isSpace},
+     * el {@code \s} de las expresiones regulares), con un recorrido del texto.
      */
-    static List<List<Word>> paragraphs(List<TextRun> runs) {
+    static List<Word> words(List<TextRun> runs) {
         String text = TextRun.text(runs);
         // starts[i]: posición en el texto donde empieza el tramo i.
         int[] starts = new int[runs.size() + 1];
@@ -369,18 +353,13 @@ public final class LineBreaker {
             starts[i + 1] = starts[i] + runs.get(i).text().length();
         }
         RunCursor cursor = new RunCursor(runs, starts);
-        List<List<Word>> result = new ArrayList<>();
-        List<Word> paragraph = new ArrayList<>();
+        List<Word> result = new ArrayList<>();
         List<TextRun> previous = null;
         int previousEnd = 0;
         int n = text.length();
         int i = 0;
         while (true) {
-            int newlines = 0;
             while (i < n && isSpace(text.charAt(i))) {
-                if (text.charAt(i) == '\n') {
-                    newlines++;
-                }
                 i++;
             }
             if (i == n) {
@@ -391,20 +370,13 @@ public final class LineBreaker {
                 i++;
             }
             if (previous != null) {
-                // Una línea en blanco: dos saltos de línea con solo espacio en blanco entre ellos.
-                boolean blankLine = newlines > 1;
-                paragraph.add(new Word(previous, blankLine ? TextFormat.PLAIN : cursor.format(previousEnd)));
-                if (blankLine) {
-                    result.add(paragraph);
-                    paragraph = new ArrayList<>();
-                }
+                result.add(new Word(previous, cursor.format(previousEnd)));
             }
             previous = cursor.parts(text, start, i);
             previousEnd = i;
         }
         if (previous != null) {
-            paragraph.add(new Word(previous, TextFormat.PLAIN));
-            result.add(paragraph);
+            result.add(new Word(previous, TextFormat.PLAIN));
         }
         return result;
     }

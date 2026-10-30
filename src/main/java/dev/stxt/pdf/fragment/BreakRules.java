@@ -68,49 +68,31 @@ public final class BreakRules {
     }
 
     /**
-     * Corte entre las líneas de un texto: las que caben desde {@code start}, respetando viudas y
-     * huérfanas en cada párrafo. Entre dos párrafos siempre se puede cortar sin incumplir nada.
-     * Si ningún corte respeta las reglas y no se ha colocado nada, se incumplen
-     * ({@link #relaxedLines}) para que el padre pueda comparar ese corte con cortar antes de la
-     * caja.
+     * Corte entre las líneas de un texto, que es un solo párrafo: las que caben desde {@code start}, respetando viudas
+     * y huérfanas. Si ningún corte respeta las reglas, se incumplen ({@link #relaxedLines}) para que el padre pueda
+     * comparar ese corte con cortar antes de la caja.
      *
-     * @param paragraphEnds índice de la primera línea siguiente a cada párrafo, en orden
-     * @param start         primera línea de este fragmento
-     * @param capacity      líneas que caben en lo que queda de página
+     * @param lines    líneas del texto
+     * @param start    primera línea de este fragmento
+     * @param capacity líneas que caben en lo que queda de página
      * @return primera línea que pasa al fragmento siguiente (igual a {@code start} si no se
      *         coloca ninguna: cortar antes de la caja) y la calidad del corte
      */
-    public static Cut cutLines(int[] paragraphEnds, int start, int capacity, int widows, int orphans,
+    public static Cut cutLines(int lines, int start, int capacity, int widows, int orphans,
                                boolean atFragmentainerStart) {
-        int placed = 0;
-        int paragraphStart = 0;
-        for (int end : paragraphEnds) {
-            int from = Math.max(paragraphStart, start);
-            paragraphStart = end;
-            if (end <= start) {
-                continue;
-            }
-            int pending = end - from;
-            int left = capacity - placed;
-            if (pending <= left) {
-                placed += pending;
-                continue;
-            }
-            int k = linesThatFit(pending, left, widows, orphans, false);
-            if (k > 0) {
-                return new Cut(from + k, BreakAppeal.PERFECT_BREAK);
-            }
-            if (placed > 0) {
-                // Todo el párrafo a la página siguiente: el corte queda entre dos párrafos.
-                return new Cut(from, BreakAppeal.PERFECT_BREAK);
-            }
-            if (left > 0) {
-                return new Cut(from + relaxedLines(pending, left, widows), BreakAppeal.VIOLATES_WIDOWS);
-            }
-            // No cabe ni una línea: al principio de página se coloca igualmente (garantía de progreso).
-            return new Cut(atFragmentainerStart ? from + 1 : from, BreakAppeal.FORCED);
+        int pending = lines - start;
+        if (pending <= capacity) {
+            return new Cut(lines, BreakAppeal.PERFECT_BREAK);
         }
-        return new Cut(paragraphStart, BreakAppeal.PERFECT_BREAK);
+        int k = linesThatFit(pending, capacity, widows, orphans, false);
+        if (k > 0) {
+            return new Cut(start + k, BreakAppeal.PERFECT_BREAK);
+        }
+        if (capacity > 0) {
+            return new Cut(start + relaxedLines(pending, capacity, widows), BreakAppeal.VIOLATES_WIDOWS);
+        }
+        // No cabe ni una línea: al principio de página se coloca igualmente (garantía de progreso).
+        return new Cut(atFragmentainerStart ? start + 1 : start, BreakAppeal.FORCED);
     }
 
     /** Capacidad en líneas de un espacio vertical. */

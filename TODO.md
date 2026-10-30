@@ -16,12 +16,6 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
-### Nombres
-
-- Un `Text` ya no tiene varios párrafos (solo uno preformateado tiene líneas en blanco, y esas son contenido), pero
-  `InlineLayout` y `LineBreaker.breakParagraphs` siguen partiendo el texto en párrafos por las líneas en blanco y
-  respetando `Widows` y `Orphans` en cada uno: se puede simplificar a un solo párrafo por caja.
-
 ### PDF como imagen
 
 - De las reglas de PDF/UA sobre las fuentes de la página solo se comprueban dos: incrustadas y con `ToUnicode`
