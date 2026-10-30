@@ -43,6 +43,18 @@ class PageReferencesTest {
         return l.fragment(page, id).lines().stream().map(x -> x.text()).reduce((a, b) -> a + "|" + b).orElse("");
     }
 
+    /** Una fila con {@code Id} se puede referir: su página es la de su franja (referencia/componentes/table.md#filas). */
+    @Test
+    void aReferenceToARowGivesThePageOfItsBand() {
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tText: La fila está en la página {page of: row}.", "\t\tId: ref", "\t\tLink: #row"},
+                fullPages(1),
+                new String[]{"\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tId: row",
+                        "\t\t\t\tCell: Total"}));
+        assertTrue(l.has(2, "row"));
+        assertEquals("La fila está en la página 2.", text(l, 1, "ref"));
+    }
+
     @Test
     void aReferenceToALaterBoxGivesItsPage() {
         LayoutFixture l = layOutPaged(PAGE, concat(

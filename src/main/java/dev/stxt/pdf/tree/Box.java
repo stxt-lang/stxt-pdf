@@ -51,6 +51,7 @@ public final class Box {
     private Box marker;
     private int headRows;
     private int footRows;
+    private List<Box> rows = new ArrayList<>();
     private boolean closed;
 
     Box(String id, Element element, Style style, boolean anonymous, int line) {
@@ -174,6 +175,15 @@ public final class Box {
         return footRows;
     }
 
+    /**
+     * Las cajas de las filas de una {@code Table} que tienen {@code Id} o {@code Box} (referencia/componentes/table.md),
+     * en orden; la fila de cada una es la de su {@code Area}. No son hijas de la tabla, que solo tiene celdas, pero la
+     * tienen de padre. Vacía en el resto de cajas.
+     */
+    public List<Box> rows() {
+        return rows;
+    }
+
     // --- Escritura, solo en tree mientras se construye -------------------------------------------------
 
     void addChild(Box child) {
@@ -248,6 +258,12 @@ public final class Box {
         this.footRows = rows;
     }
 
+    void addRow(Box row) {
+        writable();
+        row.parent = this;
+        rows.add(row);
+    }
+
     /**
      * Cierra la caja, su marcador y todo su subárbol: los hijos pasan a una lista inmutable, los que están en
      * flujo se calculan una vez y ya no se puede escribir en ellos.
@@ -258,9 +274,11 @@ public final class Box {
         }
         children = List.copyOf(children);
         inFlowChildren = children.stream().filter(h -> !h.style.isOutOfFlow()).toList();
+        rows = List.copyOf(rows);
         closed = true;
         style.close();
         children.forEach(Box::close);
+        rows.forEach(Box::close);
         if (marker != null) {
             marker.close();
         }

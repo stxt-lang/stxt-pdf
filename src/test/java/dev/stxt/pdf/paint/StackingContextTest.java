@@ -436,6 +436,20 @@ class StackingContextTest {
         assertEquals(List.of(), r.backgrounds);
     }
 
+    /**
+     * La franja de una fila se pinta debajo de sus celdas: su fondo va antes que los de ellas, y su borde con el color
+     * del texto de la fila (referencia/componentes/table.md#filas).
+     */
+    @Test
+    void theBandOfARowIsPaintedUnderItsCells() {
+        Recorder r = record("\tTable:", "\t\tColumns: 100 100", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEE", "\t\t\t\tCell:",
+                "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tBackground: #111", "\t\t\t\tCell:",
+                "\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10",
+                "\t\t\t\t\t\tBackground: #222", "\t\t\t\tCell:");
+        assertEquals(List.of("background #EEE", "background #111", "background #222"), r.events);
+    }
+
     /** Una caja partida con {@code slice} solo redondea las esquinas de arriba en el primer fragmento y las de abajo en el último. */
     @Test
     void aSlicedBoxRoundsOnlyItsOuterCorners() {

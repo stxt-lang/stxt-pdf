@@ -55,7 +55,8 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 salen del flujo, y `List item` y `Cell`, que solo van en una `List` y en una `Row`.
 
 `Item` y `Area` no son cajas: son **envoltorios** que añaden al elemento lo que solo tiene sentido dentro de su
-contenedor. `Head`, `Body`, `Foot` y `Row` tampoco: agrupan las celdas, que sí lo son.
+contenedor. `Head`, `Body`, `Foot` y `Row` tampoco: agrupan las celdas, que sí lo son. Una `Row` con `Id` o `Box` tiene
+además una franja que se pinta debajo de sus celdas ([Table](../componentes/table.md#filas)), pero no ocupa sitio.
 
 > **Decisión:** `Item` y `Area` son envoltorios con exactamente un elemento en flujo (`SINGLE_ELEMENT`): el tamaño, los
 > márgenes y el `Id` van en el elemento, y cada ítem es una sola caja. Todo hijo en flujo de un `Flex` es un `Item`, y de
@@ -186,7 +187,7 @@ vez; los elementos, las veces que se quiera.
 | `List item` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `Row` (al menos una) |
-| `Row` | `Class`, `Typography`, `Break`; `Cell` (al menos una) |
+| `Row` | `Id`, `Class`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
 | `Multicol` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |

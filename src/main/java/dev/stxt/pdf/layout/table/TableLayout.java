@@ -1,6 +1,8 @@
 package dev.stxt.pdf.layout.table;
 
 import dev.stxt.pdf.fragment.BreakToken;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Unit;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.IntrinsicSizes;
@@ -80,9 +82,24 @@ public final class TableLayout implements LayoutAlgorithm {
                         p.unit(), p.relative()));
             }
         }
+        // Las franjas de las filas: las de la cabecera y el pie, ya colocadas; las del cuerpo, en su unidad.
+        List<Fragment> headBands = new ArrayList<>();
+        List<UnitBreaker.Band> bodyBands = new ArrayList<>();
+        List<Fragment> footBands = new ArrayList<>();
+        for (UnitBreaker.Band b : a.bands()) {
+            Unit u = all.get(b.unit());
+            if (b.unit() < head) {
+                headBands.add(b.fragment(u.start(), u.end() - u.start(), true, true));
+            } else if (b.unit() < bodyEnd) {
+                bodyBands.add(b.inUnit(b.unit() - head));
+            } else {
+                footBands.add(b.fragment(u.start() - bodyBottom, u.end() - u.start(), true, true));
+            }
+        }
         UnitBreaker.Arranged bodyOnly = new UnitBreaker.Arranged(a.model(), body, a.outOfFlow(),
-                all.slice(head, bodyEnd, bodyStart));
-        UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight);
+                all.slice(head, bodyEnd, bodyStart), bodyBands);
+        UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight, headBands,
+                footBands);
         return UnitBreaker.fragment(context, box, space, from, bodyOnly, repeat);
     }
 }

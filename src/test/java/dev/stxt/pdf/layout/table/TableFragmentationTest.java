@@ -66,6 +66,72 @@ class TableFragmentationTest {
         assertRect(40, 120, 515, 10, l.rect(2, "F"));
     }
 
+    /**
+     * La franja de una fila con {@code Id} o {@code Box} (referencia/componentes/table.md#filas) va de la primera
+     * columna a la última, con el hueco entre ellas, y tiene el alto de su fila; el hueco entre filas no es de
+     * ninguna.
+     */
+    @Test
+    void theBandOfARowSpansItsColumnsAndItsHeight() {
+        LayoutFixture l = LayoutFixture.layOut("\tTable:", "\t\tId: T", "\t\tColumns: 100 100", "\t\tGap: 10",
+                "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tId: R1", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 20",
+                "\t\t\t\tCell:",
+                "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\tId: R2",
+                "\t\t\t\tCell:", "\t\t\t\t\tId: C", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 30",
+                "\t\t\t\tCell:");
+        assertRect(40, 40, 210, 20, l.rect("R1"));
+        assertRect(40, 70, 210, 30, l.rect("R2"));
+        assertRect(40, 70, 100, 30, l.rect("C"));
+        // Va delante de sus celdas en el fragmento de la tabla, para pintarse debajo.
+        assertEquals("R2", firstChildWithId(l, "R2", "C"));
+    }
+
+    /** El primero de los dos Id que sale entre los hijos del fragmento de la tabla. */
+    private static String firstChildWithId(LayoutFixture l, String a, String b) {
+        return l.fragment(1, "T").children().stream().map(f -> f.box().id())
+                .filter(id -> a.equals(id) || b.equals(id)).findFirst().orElseThrow();
+    }
+
+    /** Las franjas de la cabecera y del pie se repiten en cada página, como sus celdas. */
+    @Test
+    void bandsOfHeadAndFootRepeat() {
+        LayoutFixture l = layOutPaged(PAGE, concat(table(null),
+                group("Head"), row("H", 20, "\t\t\t\tId: HR"),
+                group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tId: R2"), row("B3", 30, "\t\t\t\tId: R3"),
+                row("B4", 30),
+                group("Foot"), row("F", 10, "\t\t\t\tId: FR")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 20, l.rect(1, "HR"));
+        assertRect(40, 90, 515, 30, l.rect(1, "R2"));
+        assertRect(40, 120, 515, 10, l.rect(1, "FR"));
+        assertFalse(l.has(1, "R3"));
+        assertRect(40, 40, 515, 20, l.rect(2, "HR"));
+        assertRect(40, 60, 515, 30, l.rect(2, "R3"));
+        assertRect(40, 120, 515, 10, l.rect(2, "FR"));
+    }
+
+    /**
+     * Una fila que no cabe en una página se parte, y su franja con ella: hasta el final de su celda en la primera, que
+     * llega al final del área útil, y desde arriba en la siguiente, sin el borde del corte (con {@code Decoration:
+     * slice}).
+     */
+    @Test
+    void theBandOfASplitRowIsSplitToo() {
+        LayoutFixture l = layOutPaged(PAGE, concat(table(null), group("Body"),
+                new String[]{"\t\t\tRow:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 1",
+                        "\t\t\t\tCell:", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 60",
+                        "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 60"}));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "R"));
+        assertEquals(0, l.fragment(1, "R").border().bottom());
+        assertEquals(1, l.fragment(1, "R").border().top());
+        // La celda pone 60 + 40 en la primera página y los 20 que faltan en la segunda.
+        assertRect(40, 40, 515, 20, l.rect(2, "R"));
+        assertEquals(0, l.fragment(2, "R").border().top());
+        assertEquals(1, l.fragment(2, "R").border().bottom());
+    }
+
     @Test
     void gapsSeparateHeadAndFootFromTheBody() {
         // Con 5 de hueco, la cabecera ocupa 25 y el pie 15: quedan 60, y B1 (30) y B2 (que acaba

@@ -97,8 +97,66 @@ Sin repetir una clase en cada celda:
 | `For class: total` con `Class: total` en la `Row` | Las de esa fila |
 | `Column align` en la `Table` | Una alineación por columna, la más débil de todas |
 
-La `Row` admite `Class`, `Typography` (que heredan sus celdas) y `Break` (el de la fila), pero no `Box`: un fondo o un borde
-de fila se da a sus celdas. Una celda no admite `Break`: los cortes son de la fila.
+La `Row` admite `Class` e `Id` (sus reglas `For class` y `For id` se aplican a sus celdas), `Typography` (que heredan sus
+celdas) y `Break` (el de la fila). Una celda no admite `Break`: los cortes son de la fila.
+
+## El aspecto de una fila
+
+Con `Box`, una fila tiene un fondo y un borde propios: una **franja** de la primera columna a la última, debajo de sus
+celdas. Un borde de fila es una línea entera, también por encima del hueco entre columnas, y el fondo de una celda tapa el
+de su fila. El `Box` de una `Row` solo admite `Background`, `Border`, `Border color` y `Radius`: la fila mide lo que sus
+celdas, así que un `Padding` o un `Height` en ella es un error. El `Id` de una fila sirve también para enlazarla
+(`Link: #total`) o para citar su página (`{page of: total}`).
+
+```
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Presupuesto
+	Media:
+		Paper: A5
+		Margin: 40
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		Element: Cell
+			Box:
+				Padding: 4 6
+		For class: total
+			Typography:
+				Weight: bold
+	Section:
+		Table:
+			Columns: 1fr 80
+			Column align: left right
+			Gap: 0 8
+			Head:
+				Row:
+					Box:
+						Border: 0 0 1 0
+					Typography:
+						Weight: bold
+					Cell: Concepto
+					Cell: Importe
+			Body:
+				Row:
+					Cell: Diseño
+					Cell: 1200,00
+				Row:
+					Cell: Maquetación
+					Cell: 800,00
+			Foot:
+				Row:
+					Id: total
+					Class: total
+					Box:
+						Background: #F4F2EC
+						Border: 1 0 0 0
+						Radius: 0 0 4 4
+					Cell: Total
+					Cell: 2000,00
+```
 
 ## Entre páginas
 

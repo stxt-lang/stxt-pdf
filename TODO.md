@@ -32,11 +32,6 @@ saliendo al trabajar y solo toca ese.
 - Los errores que se detectan después de construir el árbol (una fuente que no existe, un desbordamiento) señalan la línea
   de una regla del documento de estilos aparte sin decir que es de ese fichero.
 
-### Tablas
-
-- Una fila no tiene `Box` (un borde o un fondo de fila se da a cada celda, y un `Border` se repite entre celdas) ni `Id`
-  (no se puede enlazar a una fila ni darle estilo con `For id`).
-
 ### Aspecto de las cajas
 
 - Sombras (descartadas: PDFBox no desenfoca y habría que aproximar con capas), degradados con paradas con posición,

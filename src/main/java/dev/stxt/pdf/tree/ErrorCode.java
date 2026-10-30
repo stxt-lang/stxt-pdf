@@ -145,6 +145,8 @@ public enum ErrorCode {
     MARGIN_AUTO_WITHOUT_EFFECT,
     /** {@code Start} en una {@code Section} sin {@code Page numbering: restart}. */
     START_WITHOUT_RESTART,
+    /** Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Radius}) en el {@code Box} de una {@code Row}. */
+    ROW_BOX,
     /** {@code Page style} en una {@code Section} con {@code Page numbering: none}. */
     PAGE_STYLE_WITHOUT_NUMBERS,
     /** {@code Begin on: odd} en la primera {@code Section}, que ya empieza en la página 1. */

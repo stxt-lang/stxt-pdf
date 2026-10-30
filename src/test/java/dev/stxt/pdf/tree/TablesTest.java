@@ -4,6 +4,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -115,6 +116,74 @@ class TablesTest {
         assertEquals(8, a.style().typography().fontSize());
         assertEquals(Value.pt(3), a.style().box().padding().top());
         assertEquals(FontWeight.NORMAL, b.style().typography().fontWeight());
+    }
+
+    /**
+     * Una {@code Row} con {@code Id} o {@code Box} tiene su caja, que cuelga de la tabla sin ser su hija y sabe su fila
+     * (referencia/componentes/table.md#filas); sin ninguno de los dos, no.
+     */
+    @Test
+    void aRowWithAnIdOrABoxHasItsOwnBox() {
+        Box table = root("\tTable:", "\t\tColumns: 100 100", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tId: first", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #C0392B",
+                "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\t\tBorder: 0 0 1 0",
+                "\t\t\t\tCell: a", "\t\t\t\tCell: b",
+                "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d",
+                "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #DDDDDD", "\t\t\t\tCell: e",
+                "\t\t\t\tCell: f").children().get(0);
+        assertEquals(6, table.children().size());
+        assertEquals(2, table.rows().size());
+        Box first = table.rows().get(0);
+        assertEquals("first", first.id());
+        assertEquals(Element.ROW, first.element());
+        assertEquals(Element.Role.ROW, first.role());
+        assertEquals(table, first.parent());
+        assertEquals(1, first.style().item().area().row());
+        assertEquals(new Paint.Solid("#EEEEEE"), first.style().box().background());
+        assertEquals(Value.pt(1), first.style().box().border().bottom());
+        // Su Typography es el de sus celdas y el suyo: el color de su borde por defecto.
+        assertEquals("#C0392B", first.style().typography().color());
+        assertEquals("#C0392B", table.children().get(0).style().typography().color());
+        // Su Box no llega a las celdas.
+        assertNull(table.children().get(0).style().box().background());
+        Box third = table.rows().get(1);
+        assertNull(third.id());
+        assertEquals(3, third.style().item().area().row());
+    }
+
+    /**
+     * El {@code For id} de una fila da estilo a sus celdas: más que las clases de la celda, menos que su propio
+     * {@code For id} (referencia/componentes/table.md#estilo-de-las-celdas).
+     */
+    @Test
+    void theForIdOfARowStylesItsCells() {
+        Box table = root("\tStyles:", "\t\tFor class: small", "\t\t\tTypography:", "\t\t\t\tSize: 8",
+                "\t\tFor id: total", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tWeight: bold",
+                "\t\tFor id: grand", "\t\t\tTypography:", "\t\t\t\tSize: 14",
+                "\tTable:", "\t\tColumns: 1fr 1fr 1fr", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tId: total", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
+                "\t\t\t\t\tClass: small", "\t\t\t\tCell: c", "\t\t\t\t\tId: grand").children().get(0);
+        assertEquals(List.of(12.0, 12.0, 14.0),
+                table.children().stream().map(c -> c.style().typography().fontSize()).toList());
+        assertEquals(FontWeight.BOLD, table.children().get(2).style().typography().fontWeight());
+    }
+
+    @Test
+    void theBoxOfARowOnlyAdmitsItsLook() {
+        InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
+                () -> root("\tTable:", "\t\tColumns: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBox:",
+                        "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\t\tHeight: 40", "\t\t\t\tCell: a"));
+        assertEquals(ErrorCode.ROW_BOX, e.errorCode());
+        // La línea de Height.
+        assertEquals(19, e.line());
+    }
+
+    @Test
+    void theIdOfARowIsADocumentId() {
+        InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
+                () -> root("\tParagraph: a", "\t\tId: x", "\tTable:", "\t\tColumns: 100", "\t\tBody:",
+                        "\t\t\tRow:", "\t\t\t\tId: x", "\t\t\t\tCell: a"));
+        assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
     }
 
     @Test

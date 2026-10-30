@@ -6,6 +6,8 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Unit;
 import dev.stxt.pdf.layout.position.RelativeOffset;
+import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.tree.Box;
 
 import java.util.ArrayList;
@@ -31,7 +33,9 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * juntas, como un <em>grupo</em>. La calidad del corte es la peor de los ítems que se parten.</p>
  *
  * <p>Una tabla repite su cabecera y su pie en cada fragmento ({@link Repeat}): van fuera de
- * las unidades, enteros, y las unidades se cortan en lo que dejan.</p>
+ * las unidades, enteros, y las unidades se cortan en lo que dejan. Las filas de una tabla con aspecto o
+ * {@code Id} son franjas ({@link Band}) que siguen a su unidad: entera, recortada al final de la página si su grupo
+ * se parte, y en la continuación del grupo, la de su última unidad.</p>
  */
 public final class UnitBreaker {
 
@@ -94,7 +98,47 @@ public final class UnitBreaker {
      * @param outOfFlow cajas {@code absolute} y {@code fixed} del contenedor; van con el primer fragmento
      * @param units     las unidades en que se agrupan los ítems
      */
-    public record Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units) {
+    public record Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units,
+                           List<Band> bands) {
+
+        public Arranged {
+            bands = List.copyOf(bands);
+        }
+
+        /** Un contenedor sin franjas: los de flex y grid. */
+        public Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units) {
+            this(model, placed, outOfFlow, units, List.of());
+        }
+    }
+
+    /**
+     * La franja de una unidad: la fila de una tabla con {@code Id} o {@code Box} (referencia/componentes/table.md#filas),
+     * que se pinta debajo de sus celdas con el alto de la unidad en cada fragmento.
+     *
+     * @param box    la caja de la fila
+     * @param unit   su unidad
+     * @param x      su borde izquierdo, desde la caja de contenido del contenedor: el de la primera columna
+     * @param width  su ancho: de la primera columna a la última
+     * @param border su borde
+     */
+    public record Band(Box box, int unit, double x, double width, Insets border) {
+
+        /**
+         * El fragmento de la franja en {@code y}, con {@code height} de alto. Partida, con {@code Decoration: slice} (la
+         * de su {@code Break}), el primer trozo no lleva borde inferior y los siguientes no llevan superior.
+         */
+        public Fragment fragment(double y, double height, boolean first, boolean last) {
+            boolean clone = box.style().breaks().decoration() == Decoration.CLONE;
+            Insets sliced = clone ? border : new Insets(first ? border.top() : 0, border.right(),
+                    last ? border.bottom() : 0, border.left());
+            return new Fragment(box, x, y, width, height, Insets.ZERO, sliced, Insets.ZERO, List.of(), List.of(),
+                    first, last);
+        }
+
+        /** La misma franja en otra unidad. */
+        public Band inUnit(int unit) {
+            return new Band(box, unit, x, width, border);
+        }
     }
 
     /**
@@ -106,9 +150,17 @@ public final class UnitBreaker {
      * @param headHeight alto de la cabecera, con el hueco que la separa de las unidades
      * @param foot       ítems del pie, con su posición desde el final de las unidades
      * @param footHeight alto del pie, con el hueco que lo separa de las unidades
+     * @param headBands  franjas de las filas de la cabecera, colocadas como sus ítems
+     * @param footBands  franjas de las filas del pie, colocadas como sus ítems
      */
-    public record Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight) {
+    public record Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight,
+                         List<Fragment> headBands, List<Fragment> footBands) {
         public static final Repeat NONE = new Repeat(List.of(), 0, List.of(), 0);
+
+        /** Sin franjas. */
+        public Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight) {
+            this(head, headHeight, foot, footHeight, List.of(), List.of());
+        }
     }
 
     /**
@@ -155,12 +207,15 @@ public final class UnitBreaker {
         final List<Placed> placed;
         final List<PendingAbsolute> outOfFlow;
         final Units units;
+        final List<Band> bands;
         final Repeat repeat;
         final int n;
         /** Lo que queda de página para las unidades; sin fragmentación no hay límite. */
         final double remaining;
         /** Ítem de cada índice de {@code placed} colocado en este fragmento. */
         final Piece[] pieces;
+        /** Fragmento de cada franja de {@code bands} en este fragmento. */
+        final Fragment[] bandPieces;
         /** Primera unidad que queda por colocar. */
         int next;
         /**
@@ -185,12 +240,14 @@ public final class UnitBreaker {
             this.placed = arranged.placed();
             this.outOfFlow = arranged.outOfFlow();
             this.units = arranged.units();
+            this.bands = arranged.bands();
             this.repeat = repeat;
             this.n = units.size();
             this.remaining = space.fragmenting()
                     ? Slice.contentRemaining(model, first, space) - repeat.headHeight() - repeat.footHeight()
                     : Double.POSITIVE_INFINITY;
             this.pieces = new Piece[placed.size()];
+            this.bandPieces = new Fragment[bands.size()];
         }
 
         LayoutResult layOut() {
@@ -220,6 +277,12 @@ public final class UnitBreaker {
                 return LayoutResult.before(box);
             }
             commit(s);
+            // La continuación del grupo lleva la franja de su última unidad.
+            for (int b = 0; b < bands.size(); b++) {
+                if (bands.get(b).unit() == end - 1) {
+                    bandPieces[b] = bands.get(b).fragment(repeat.headHeight(), s.bottom(), false, !s.broken());
+                }
+            }
             if (s.broken()) {
                 return result(s.bottom(), false, next, s.tokens(), s.appeal());
             }
@@ -241,6 +304,7 @@ public final class UnitBreaker {
                 Split s = split(next, groupEnd, null, origin);
                 if (s != null && s.broken()) {
                     commit(s);
+                    splitBands(next, groupEnd, s.bottom());
                     return result(s.bottom(), false, next, s.tokens(), s.appeal());
                 }
             }
@@ -261,6 +325,14 @@ public final class UnitBreaker {
                 Placed p = placed.get(k);
                 if (p.unit() >= next && p.unit() < end) {
                     pieces[k] = piece(p, p.result(), p.y() - origin + repeat.headHeight());
+                }
+            }
+            for (int b = 0; b < bands.size(); b++) {
+                int u = bands.get(b).unit();
+                if (u >= next && u < end) {
+                    Unit unit = units.get(u);
+                    bandPieces[b] = bands.get(b).fragment(unit.start() - origin + repeat.headHeight(),
+                            unit.end() - unit.start(), true, true);
                 }
             }
             boolean contentFinished = end == n;
@@ -312,6 +384,26 @@ public final class UnitBreaker {
                 bottom = Math.max(bottom, y + r.fragment().height());
             }
             return new Split(split, next, appeal, bottom, broken);
+        }
+
+        /**
+         * Las franjas de las unidades {@code [start, end)} de un grupo que se parte en esta página y acaba en {@code
+         * bottom}: cada una desde su principio, recortada en {@code bottom}.
+         */
+        void splitBands(int start, int end, double bottom) {
+            for (int b = 0; b < bands.size(); b++) {
+                int u = bands.get(b).unit();
+                if (u < start || u >= end) {
+                    continue;
+                }
+                double top = units.get(u).start() - origin;
+                double unitBottom = units.get(u).end() - origin;
+                if (fits(bottom, top)) {
+                    continue;
+                }
+                bandPieces[b] = bands.get(b).fragment(top + repeat.headHeight(), Math.min(unitBottom, bottom) - top,
+                        true, fits(unitBottom, bottom));
+            }
         }
 
         void commit(Split s) {
@@ -370,14 +462,24 @@ public final class UnitBreaker {
             List<Fragment> fragments = new ArrayList<>();
             List<PendingAbsolute> pending = new ArrayList<>(first ? outOfFlow : List.of());
             double units = Math.max(0, contentHeight);
+            // Las franjas de las filas, delante de las celdas de su grupo para pintarse debajo.
+            fragments.addAll(repeat.headBands());
             for (Placed p : repeat.head()) {
                 repeated(piece(p, p.result(), p.y()), fragments, pending);
+            }
+            for (Fragment band : bandPieces) {
+                if (band != null) {
+                    fragments.add(band);
+                }
             }
             for (Piece piece : pieces) {
                 if (piece != null) {
                     fragments.add(piece.fragment());
                     pending.addAll(piece.pending());
                 }
+            }
+            for (Fragment band : repeat.footBands()) {
+                fragments.add(band.moved(band.x(), repeat.headHeight() + units + band.y()));
             }
             for (Placed p : repeat.foot()) {
                 repeated(piece(p, p.result(), repeat.headHeight() + units + p.y()), fragments, pending);

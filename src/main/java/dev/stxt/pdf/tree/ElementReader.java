@@ -135,7 +135,7 @@ enum ElementReader {
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            table(n, box, (cell, row, at) -> builder.element(ctx, cell, box, row, at));
+            table(ctx, n, box, (cell, row, at) -> builder.element(ctx, cell, box, row, at));
         }
     },
 

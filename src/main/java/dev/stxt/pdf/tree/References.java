@@ -56,6 +56,7 @@ public final class References {
             boxes.put(box.key(), box);
         }
         box.children().forEach(child -> index(child, boxes));
+        box.rows().forEach(row -> index(row, boxes));
     }
 
     /**

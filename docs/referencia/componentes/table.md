@@ -38,6 +38,8 @@ Table:
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`TABLE_HEADER`). |
+| `Id` | texto | — | `Row` | Destino de enlaces y de `{page of: id}`; su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
+| `Box` | `Background`, `Border`, `Border color`, `Radius` | — | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -80,7 +82,7 @@ una:
   `Columns`). Es solo el valor por defecto del `Align` de las celdas: lo sobrescriben las reglas de posición, de columna,
   de clase y de `Id`, y lo que declara la propia celda.
 - **Por fila.** El `Class` de una `Row` da a cada una de sus celdas las reglas `For class` de esas clases (el pie de
-  totales de una factura: `Class: total` en la `Row`, no en cada celda).
+  totales de una factura: `Class: total` en la `Row`, no en cada celda), y la regla `For id` de su `Id`, la suya.
 
 La prioridad de todas ellas está en [Styles](../comun/estilos.md#prioridad). Las celdas de las tablas de un `Markdown`
 reciben estas mismas reglas; su `Align` sale de la fila de separación de la tabla (`:--`, `--:`), que lo declara cada celda
@@ -89,29 +91,75 @@ y gana a todo lo demás.
 Si dos `For column` se solapan, se aplican en el orden de `Styles`, como las clases.
 
 > **Decisión:** dentro de una celda, de menos a más fuerte: `Element: Cell`, `Column align`, las reglas de posición (grupo y
-> luego fila), `For column`, las clases de la `Row`, las clases de la celda, `For id` y lo propio de la celda. Así la fila de
+> luego fila), `For column`, las clases de la `Row`, las clases de la celda, el `For id` de la `Row`, el `For id` de la
+> celda y lo propio de la celda. Así la fila de
 > totales gana a la cebra y a la columna, una cabecera centrada gana a la alineación de su columna y una celda suelta lo
 > puede romper con su clase. *Alternativa descartada:* que la posición gane a la columna, o `Column align` por debajo de
 > `Element: Cell`.
 
 ## Filas
 
-Una `Row` no es una caja: no tiene `Box` ni `Id` ni se nombra en `Element`, como `Head`, `Body` y `Foot`. Su `Class` da a
-sus celdas las reglas de sus clases. Su `Typography` lo heredan sus celdas (las reglas `Styles` de la celda le ganan, como
-a cualquier herencia), y su `Break` es el de sus celdas: con él se fuerza o se evita el corte antes o después de la fila, o
-dentro de ella. Una celda no declara `Break`, ni siquiera desde una regla (`STYLE_NOT_ALLOWED`, también la de la clase de
-su `Row`: el `Break` de la fila lo declara la `Row`). Las filas de la tabla no tienen propiedad de tamaño: miden lo que su
-celda más alta.
+Una `Row` no es una caja del layout: no ocupa sitio propio ni se nombra en `Element`, como `Head`, `Body` y `Foot`; las
+filas de la tabla no tienen propiedad de tamaño y miden lo que su celda más alta. Lo que declara la fila es para sus celdas
+o para su **franja**:
 
-> **Decisión:** la fila no es una caja. *Alternativa descartada:* que `Row` admita un `Box`, que se repetiría en cada celda
-> (un `Border` de fila saldría entre celdas), o selectores por posición de la fila (`Last row cell`), que identifican la
-> fila de totales por su sitio y no por lo que es.
+- **`Class` e `Id`.** Las reglas `For class` de sus clases y la regla `For id` de su `Id` se aplican a cada una de sus
+  celdas ([Estilo de las celdas](#estilo-de-las-celdas)).
+- **`Typography`.** Lo heredan sus celdas (las reglas `Styles` de la celda le ganan, como a cualquier herencia).
+- **`Break`.** Es el de sus celdas: con él se fuerza o se evita el corte antes o después de la fila, o dentro de ella. Una
+  celda no declara `Break`, ni siquiera desde una regla (`STYLE_NOT_ALLOWED`, también la de la clase o el `Id` de su
+  `Row`: el `Break` de la fila lo declara la `Row`).
+- **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color` y `Radius`. Cualquier otra propiedad
+  (`Padding`, `Margin`, `Height`…) no tendría efecto en una fila y es `ROW_BOX`.
+
+Una fila con `Box` o `Id` tiene una **franja**: un rectángulo que va de la primera columna a la última, con el `Gap` entre
+ellas, y del principio de la fila a su final; el `Gap` entre filas no es de ninguna. Se pinta **debajo de sus celdas**: el
+fondo de una celda tapa el de la fila, y una celda que ocupa varias filas, las franjas de todas. El color de su borde, si
+no declara `Border color`, es el del texto de la fila (su `Typography`, o el de la tabla). La franja de una fila de `Head`
+o `Foot` se repite con ella.
+
+```
+Foot:
+	Row:
+		Id: total
+		Class: total
+		Box:
+			Background: #F4F2EC
+			Border: 1 0 0 0
+		Cell: Total
+			Span: 1 3
+		Cell: 2630,00
+```
+
+El `Id` de una fila es un `Id` del documento, único como cualquier otro: es destino de `Link: #id` y de `{page of: id}`
+([Referencias](../comun/referencias.md)), que llevan a su franja; la de una fila repetida, a la primera de sus páginas.
+
+> **Decisión:** la fila no es una caja del layout, pero su aspecto es suyo: una franja debajo de sus celdas. Así un
+> `Border` de fila es una línea entera, no un borde en cada celda, y un fondo cubre también el `Gap`. *Alternativa
+> descartada:* que el `Box` de la `Row` se repita en cada celda (un `Border` de fila saldría entre celdas), o una fila
+> con `Padding` y tamaño, que contradiría las columnas.
+
+> **Decisión:** el `Id` de una fila da estilo a sus celdas, como su `Class`: el aspecto de la franja solo lo da su `Box`.
+> *Alternativa descartada:* que `For id` con el `Id` de una fila diera el aspecto de la franja, que haría distinto el
+> `For id` de la fila y su `Class`.
+
+> **Decisión:** nada de selectores por posición de la fila (`Last row cell`), que identifican la fila de totales por su
+> sitio y no por lo que es: para eso están su `Class` y su `Id`.
 
 ## Cortes
 
 Una tabla se corta entre filas, como un grid ([Cortes](../comun/cortes.md#cortes-en-flex-grid-y-table)): una fila que no
 cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus celdas en paralelo, si no cabe ni en una
 página vacía.
+
+Una fila que se parte entre páginas parte también su franja: en cada página va del principio al final de lo que hay de
+la fila, y su borde se corta como el de cualquier caja, según el `Decoration` de su `Break` ([Cortes](../comun/cortes.md)).
+Si se parte un grupo de filas que una celda ocupa a la vez, cada franja se recorta en la primera página, y en la siguiente
+la continuación lleva la franja de la última fila del grupo.
+
+> **Decisión:** la continuación de un grupo de filas partido lleva la franja de su última fila: lo que sigue en la
+> página siguiente no se reparte entre las filas del grupo. *Alternativa descartada:* repartirlo por las alturas sin
+> partir, que no corresponden a lo que se coloca.
 
 Las filas de `Head` y `Foot` se **repiten** en cada página de la tabla: la cabecera arriba y el pie justo detrás de la
 última fila del cuerpo de esa página, cada uno con el `Gap` que lo separa del cuerpo. No se parten nunca y no admiten
@@ -137,7 +185,6 @@ primera página en que salen.
 ## Lo que no hay
 
 - Bordes fusionados entre celdas: cada celda tiene el suyo.
-- `Box` en una fila (un fondo o un borde de fila se da a cada celda) o en una columna, `Id` en una fila (no se puede
-  enlazar a una fila ni darle estilo con `For id`) y un título de tabla aparte (un encabezado o un `Paragraph` antes de la
-  tabla).
+- `Box` en una columna, una fila con tamaño o relleno propios y un título de tabla aparte (un encabezado o un `Paragraph`
+  antes de la tabla).
 - Filas con menos celdas que columnas, o `Span` que pasan de un grupo a otro: son errores.

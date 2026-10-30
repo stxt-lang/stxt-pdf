@@ -289,6 +289,10 @@ final class StyleRules {
             rules.addAll(classRules(position.rowClass()));
         }
         child(n, "class").ifPresent(c -> rules.addAll(classRules(c)));
+        // El For id de la fila vale más que las clases y menos que el For id de la propia celda.
+        if (position != null && position.rowId() != null) {
+            Optional.ofNullable(idRules.get(position.rowId().getText().trim())).ifPresent(rules::addAll);
+        }
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
         applyAll(rules, noBreak, s);
     }

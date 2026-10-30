@@ -19,13 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ElementTest {
 
     /**
-     * Los elementos de caja del schema son los nodos que admiten {@code Class} e {@code Id}: una
-     * {@code Row} admite {@code Class} para sus celdas, pero no es una caja.
+     * Los elementos de caja del schema son los nodos que admiten {@code Class} e {@code Id}, salvo la {@code Row}:
+     * admite {@code Class} e {@code Id} para sus celdas y su franja, pero no es un elemento que se maquete.
      */
     @Test
     void writtenElementsAreTheBoxElementsOfTheSchema() {
         Set<String> schema = SchemaNodes.children().entrySet().stream()
                 .filter(e -> e.getValue().contains("Class") && e.getValue().contains("Id"))
+                .filter(e -> !e.getKey().equals("Row"))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
         assertEquals(schema, Element.written().stream().map(Element::label).collect(Collectors.toSet()));
@@ -56,9 +57,9 @@ class ElementTest {
         assertTrue(Element.of("item").isEmpty());
         // Ni el flujo de columnas de un Multicol, que también es generado.
         assertTrue(Element.of("columns").isEmpty());
-        // Generados: el marcador, el flujo de columnas, el bloque de código de un Markdown y, del índice,
-        // seis entradas, el título, la guía y el número de página.
-        assertEquals(Element.values().length - 12, Element.written().size());
+        // Generados: el marcador, la franja de una fila, el flujo de columnas, el bloque de código de un Markdown y,
+        // del índice, seis entradas, el título, la guía y el número de página.
+        assertEquals(Element.values().length - 13, Element.written().size());
         // El bloque de código lo nombran las reglas Element, pero no se escribe.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK));

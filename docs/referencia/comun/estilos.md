@@ -52,7 +52,8 @@ Cada propiedad toma, de más a menos fuerte:
 2. la regla `For id` de su `Id`;
 3. las reglas `For class` de sus clases; si varias declaran la misma propiedad, gana la que va **después en `Styles`**, no
    el orden de `Class`;
-4. las reglas `For class` de las clases de la `Row` de una celda, con el mismo criterio de orden;
+4. las reglas `For class` de las clases de la `Row` de una celda, con el mismo criterio de orden; entre los puntos 2 y 3,
+   la regla `For id` del `Id` de su `Row`;
 5. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
 6. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después `Odd row cell` o
    `Even row cell`);
@@ -66,8 +67,8 @@ Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table` ([Tab
 Una regla gana a la herencia: con `Element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare `Size: 20`. Las
 reglas se mezclan **propiedad a propiedad**, no por grupo: si la regla declara `Size` y el elemento `Weight`, se aplican
 las dos. Lo que una regla da a un elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
-`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Class` de una `Row` aplica sus reglas a
-cada una de sus celdas. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en `Element` (para dar estilo a las celdas de
+`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Class` y el `Id` de una `Row` aplican
+sus reglas a cada una de sus celdas, no a la franja de la fila. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en `Element` (para dar estilo a las celdas de
 cada grupo están las reglas de posición); `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../componentes/document.md#section)).
 

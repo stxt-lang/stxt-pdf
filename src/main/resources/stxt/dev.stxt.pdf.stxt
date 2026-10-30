@@ -709,9 +709,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Row
 		Type: GROUP
-		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja; su Typography lo heredan sus celdas y las reglas For class de su Class se aplican a cada una de ellas.
+		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For class de su Class y For id de su Id se aplican a cada una de ellas.
 		Children:
+			Child: Id
+				Max: 1
 			Child: Class
+				Max: 1
+			Child: Box
 				Max: 1
 			Child: Typography
 				Max: 1

@@ -3,12 +3,15 @@ package dev.stxt.pdf.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Cell;
+import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.TextAlign;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import static dev.stxt.pdf.tree.ModelValidator.font;
 import static dev.stxt.pdf.tree.Nodes.child;
@@ -17,6 +20,9 @@ import static dev.stxt.pdf.tree.Nodes.inline;
 import static dev.stxt.pdf.tree.Nodes.is;
 import static dev.stxt.pdf.tree.Nodes.label;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
+import static dev.stxt.pdf.tree.PropertyReader.box;
+import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
+import static dev.stxt.pdf.tree.PropertyReader.typography;
 
 /**
  * Las filas de una {@code Table} (referencia/componentes/table.md) como ítems de un grid con colocación
@@ -26,6 +32,9 @@ final class TableBuilder {
 
     /** Grupos de filas de una {@code Table}, en el orden en que van. */
     private static final List<String> TABLE_GROUPS = List.of("head", "body", "foot");
+
+    /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (referencia/componentes/table.md#filas). */
+    private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "radius");
 
     private TableBuilder() {
     }
@@ -50,9 +59,10 @@ final class TableBuilder {
      * las columnas de {@code Columns}, y un {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code Head}
      * y {@code Foot} se repiten en cada página y no admiten {@code Break}. {@code cells} construye la caja de cada
      * celda, con la tabla como padre. Cada celda lleva su posición ({@link CellPosition}) para las reglas de {@code
-     * Styles} y el {@code Column align} de su columna.
+     * Styles} y el {@code Column align} de su columna. Una fila con {@code Id} o {@code Box} tiene además su caja
+     * ({@link #row}).
      */
-    static void table(InlineNode n, Box table, Cells cells) {
+    static void table(BuildContext ctx, InlineNode n, Box table, Cells cells) {
         int count = table.style().grid().columns().size();
         Columns columns = new Columns(count, columnAlign(n, count),
                 child(n, "column-align").map(Node::getLine).orElse(0));
@@ -68,7 +78,7 @@ final class TableBuilder {
                         + label(TABLE_GROUPS.get(last)) + ": los grupos de una Table van en el orden Head, Body, Foot");
             }
             last = group;
-            int rows = rows(g, group, firstRow, columns, table, cells);
+            int rows = rows(ctx, g, group, firstRow, columns, table, cells);
             if (group == 0) {
                 table.setHeadRows(rows);
             } else if (group == 2) {
@@ -86,7 +96,8 @@ final class TableBuilder {
      * Las filas de un grupo ({@code g}, el {@code group}-ésimo de {@link #TABLE_GROUPS}), cuya primera es la fila
      * {@code firstRow} de la tabla (desde 0). Construye sus celdas y devuelve cuántas filas tiene.
      */
-    private static int rows(Node g, int group, int firstRow, Columns columns, Box table, Cells cells) {
+    private static int rows(BuildContext ctx, Node g, int group, int firstRow, Columns columns, Box table,
+                            Cells cells) {
         List<InlineNode> rows = inline(g).getChildren().stream().map(Nodes::inline).toList();
         boolean[][] taken = new boolean[rows.size()][columns.count()];
         for (int r = 0; r < rows.size(); r++) {
@@ -97,6 +108,7 @@ final class TableBuilder {
                             + "cada página de la tabla y no se cortan: quita el Break");
                 });
             }
+            row(ctx, row, table, firstRow + r + 1, columns.count());
             int c = 0;
             for (Node h : row.getChildren()) {
                 if (!is(h, "cell")) {
@@ -108,7 +120,7 @@ final class TableBuilder {
                 occupy(taken, r, c, span, g.getName());
                 TextAlign align = columns.aligns().isEmpty() ? null : columns.aligns().get(c);
                 Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, columns.alignLine(),
-                        child(row, "class").orElse(null)));
+                        child(row, "class").orElse(null), child(row, "id").orElse(null)));
                 box.style().declared(ITEM_AREA, cell.getLine());
                 box.style().item().setArea(new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns()));
                 table.addChild(box);
@@ -122,6 +134,39 @@ final class TableBuilder {
             }
         }
         return rows.size();
+    }
+
+    /**
+     * La caja de una {@code Row} con {@code Id} o {@code Box} (referencia/componentes/table.md#filas): la franja de la
+     * fila {@code tableRow} de la tabla (desde 1), de la primera columna a la última, que se pinta debajo de sus
+     * celdas. Su {@code Box} solo admite el aspecto ({@code ROW_BOX}); lee también su {@code Typography} (el color de
+     * su borde por defecto) y su {@code Break} (su {@code Decoration}). Sin {@code Id} ni {@code Box}, la fila no tiene
+     * caja.
+     */
+    private static void row(BuildContext ctx, InlineNode row, Box table, int tableRow, int columns) {
+        Optional<Node> id = child(row, "id");
+        Optional<Node> look = child(row, "box");
+        if (id.isEmpty() && look.isEmpty()) {
+            return;
+        }
+        Style s = Style.inheriting(table.style());
+        s.setLayout(Layout.BLOCK);
+        s.setPosition(Position.STATIC);
+        child(row, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
+        child(row, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
+        look.map(Nodes::inline).ifPresent(b -> {
+            for (Node p : b.getChildren()) {
+                if (!ROW_LOOK.contains(p.getCanonicalName())) {
+                    throw error(p, ErrorCode.ROW_BOX, p.getName() + " no tiene efecto en una Row, que no es una caja "
+                            + "del layout: su Box solo admite Background, Border, Border color y Radius; dáselo a sus "
+                            + "celdas");
+                }
+            }
+            box(b, s);
+        });
+        Box box = new Box(id.map(ctx::id).orElse(null), Element.ROW, s, false, row.getLine());
+        s.item().setArea(new Cell(tableRow, 1, 1, columns));
+        table.addRow(box);
     }
 
     /** La primera columna libre de la fila desde {@code from}, contando las que ocupan los {@code Span} de arriba. */

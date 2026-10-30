@@ -60,7 +60,7 @@ Las piezas:
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Flex`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
-| `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas y su posición para las reglas |
+| `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
 | `MarkdownBuilder` | Traduce un `Markdown` (y el texto con `Inline: markdown`) a nodos STXT |
 | `ContentsBuilder` | Las entradas de los índices, al final de la construcción |

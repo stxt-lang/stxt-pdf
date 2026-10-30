@@ -370,6 +370,7 @@ final class PdfStructure {
             case LIST -> "L";
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
+            case ROW -> "TR";
             case CELL -> group(box) == 0 || box.style().header() ? "TH" : "TD";
             case FIGURE -> "Figure";
             case CONTENTS -> "TOC";

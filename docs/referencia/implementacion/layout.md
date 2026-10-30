@@ -123,7 +123,11 @@ maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Uni
 que cabe en la página. Una unidad que no cabe ni al principio de página parte sus ítems en paralelo, repitiendo su layout con
 `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de
 cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso). Las tablas repiten
-cabecera y pie con `UnitBreaker.Repeat`. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
+cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`, `Element.ROW`) son `UnitBreaker.Band`:
+`GridLayout.arrange` las crea con el ancho de las columnas, `TableLayout` coloca las de la cabecera y el pie en el
+`Repeat` y deja las del cuerpo en su unidad, y `UnitBreaker` las pone en cada fragmento delante de los ítems (enteras,
+recortadas con `splitBands` si su grupo se parte, o la de la última unidad en la continuación del grupo). Son fragmentos
+sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
 tipo); el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
 El contenido de un `Multicol` va en una caja generada, el flujo de columnas (`Element.COLUMNS`), su único hijo: cada

@@ -70,6 +70,11 @@ public enum Element {
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
+     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (referencia/componentes/table.md): una franja que
+     * se pinta debajo de sus celdas. No se nombra en las reglas {@code Element}.
+     */
+    ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
+    /**
      * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos del {@code Multicol},
      * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/multicol.md).
      */
@@ -214,6 +219,8 @@ public enum Element {
         LIST,
         LIST_ITEM,
         TABLE,
+        /** La franja de una fila de una tabla: no tiene contenido, solo se pinta. */
+        ROW,
         CELL,
         /** Una imagen. */
         FIGURE,
@@ -247,6 +254,7 @@ public enum Element {
             case LIST -> Role.LIST;
             case LIST_ITEM -> Role.LIST_ITEM;
             case TABLE -> Role.TABLE;
+            case ROW -> Role.ROW;
             case CELL -> Role.CELL;
             case IMAGE -> Role.FIGURE;
             case CONTENTS -> Role.CONTENTS;

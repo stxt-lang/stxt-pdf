@@ -14,9 +14,11 @@ import dev.stxt.pdf.model.TextAlign;
  * @param columnAlignLine línea de ese {@code Column align}
  * @param rowClass        el {@code Class} de su {@code Row}, cuyas reglas {@code For class} se aplican a la celda;
  *                        {@code null} si la fila no lo declara
+ * @param rowId           el {@code Id} de su {@code Row}, cuya regla {@code For id} se aplica a la celda; {@code null}
+ *                        si la fila no lo declara
  */
 record CellPosition(int group, int row, int column, TextAlign columnAlign, int columnAlignLine,
-                    Node rowClass) {
+                    Node rowClass, Node rowId) {
 
     static final int HEAD = 0;
     static final int BODY = 1;

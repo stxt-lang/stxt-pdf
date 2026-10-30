@@ -58,7 +58,8 @@ class SchemaCoverageTest {
             Map.entry("Span", "Span: 1 1"),
             Map.entry("Header", "Header: true"),
             // Grupos
-            Map.entry("Box", "Box:\n\tPadding: 1"),
+            // El Box de una Row solo admite el aspecto.
+            Map.entry("Box", "Box:\n\tBackground: #EEEEEE"),
             Map.entry("Typography", "Typography:\n\tColor: #333333"),
             // Inside no se admite en una Image, que no se parte.
             Map.entry("Break", "Break:\n\tAfter: avoid"),

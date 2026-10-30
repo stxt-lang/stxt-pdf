@@ -214,7 +214,12 @@ public final class GridLayout implements LayoutAlgorithm {
         }
 
         double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent));
+        // Las franjas de las filas de una tabla, de la primera columna a la última (referencia/componentes/table.md).
+        double width = Sizing.sum(columns) + columnGap * Math.max(0, columns.length - 1);
+        List<UnitBreaker.Band> bands = box.rows().stream().map(r -> new UnitBreaker.Band(r,
+                r.style().item().area().row() - 1, 0, width, Insets.resolve(r.style().box().border(), contentWidth)))
+                .toList();
+        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent), bands);
     }
 
     /**
