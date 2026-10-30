@@ -23,6 +23,7 @@ import java.util.Map;
 import static dev.stxt.pdf.tree.TextRuns.link;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Orden de pintado (referencia/comun/caja.md), visto por los colores de fondo que se pintan. */
 class StackingContextTest {
@@ -70,6 +71,7 @@ class StackingContextTest {
         @Override
         public void image(Box box, Rect content, Radii radii) {
             imageRadii.add(corners(radii));
+            events.add("image");
         }
 
         @Override
@@ -148,6 +150,17 @@ class StackingContextTest {
         public void endRotation() {
             events.add("end rotate");
         }
+
+        @Override
+        public void beginClip(Rect r, Radii radii) {
+            events.add(String.format(java.util.Locale.ROOT, "clip %.0f %.0f %.0f %.0f %s", r.x(), r.y(), r.width(),
+                    r.height(), corners(radii)));
+        }
+
+        @Override
+        public void endClip() {
+            events.add("end clip");
+        }
     }
 
     private static String corners(Radii r) {
@@ -165,6 +178,10 @@ class StackingContextTest {
         StackingContext.build(page.content(), page.fixed(), 10, 10).paint(canvas);
         return canvas;
     }
+
+    /** La fuente base, para los documentos con texto. */
+    private static final String FONT = "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n"
+            + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10";
 
     private static List<String> paint(String... boxLines) {
         return record(boxLines).backgrounds;
@@ -489,11 +506,13 @@ class StackingContextTest {
                 "\tImage: test/square.png", "\t\tRotate: 45", "\t\tBox:", "\t\t\tBackground: #333",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
         // Primero el flujo (la imagen de 30 × 30 ocupa el cuadrado que la envuelve, de 42,43 de lado, en (40, 140), con
-        // su centro en (61,2, 161,2), girada en el paso de los fondos y en el del contenido) y después el posicionado,
-        // girado entero.
+        // su centro en (61,2, 161,2), girada en el paso de los fondos y en el del contenido) y después el posicionado:
+        // cada paso suyo y de lo que contiene (también el Absolute), girado.
+        String turn = "rotate 8 40.0 40.0";
         assertEquals(List.of("rotate 45 61.2 161.2", "background #333", "end rotate", "background #444",
-                "rotate 45 61.2 161.2", "end rotate",
-                "rotate 8 40.0 40.0", "background #000", "background #111", "background #222", "end rotate"), r.events);
+                "rotate 45 61.2 161.2", "image", "end rotate",
+                turn, "background #000", "end rotate", turn, "background #111", "end rotate", turn, "end rotate",
+                turn, "end rotate", turn, "background #222", "end rotate", turn, "end rotate"), r.events);
     }
 
     /**
@@ -514,6 +533,46 @@ class StackingContextTest {
         String rotate = "rotate 90 50.0 90.0";
         assertEquals(List.of(rotate, "background #555", "end rotate", rotate, "background #666", "end rotate",
                 "background #888", rotate, "end rotate", rotate, "end rotate",
-                rotate, "background #777", "end rotate"), r.events);
+                rotate, "background #777", "end rotate", rotate, "end rotate"), r.events);
+    }
+
+    /**
+     * Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los fondos, los bordes y las
+     * imágenes de su flujo, también de un {@code Relative}, pero no su texto ni un {@code Absolute}
+     * (referencia/comun/caja.md).
+     */
+    @Test
+    void roundedCornersClipTheBackgroundsOfTheFlowButNotTheText() {
+        Recorder r = record(FONT,
+                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tRadius: 12", "\t\t\tBorder: 2",
+                "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tBackground: #111", "\t\t\tText: hola",
+                "\t\tRelative:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
+                "\t\tAbsolute:", "\t\t\tOffset: -5 -5 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #333");
+        // La caja de relleno: la de borde (en 40, 40, de 100 de ancho y con 22 de contenido) menos el borde de 2, con
+        // radios de 10.
+        String clip = "clip 42 42 96 22 10/10 10/10 10/10 10/10";
+        // El texto se pinta sin recorte, y el Absolute, que asoma por la esquina, tampoco se recorta.
+        assertEquals(List.of("background #000", clip, "background #111", "end clip", "text 'hola' normal",
+                clip, "background #222", "end clip", "background #333"),
+                r.events.stream().filter(e -> !e.startsWith("background #FFF")).toList());
+    }
+
+    @Test
+    void squareCornersDoNotClip() {
+        Recorder r = record(FONT, "\tBlock:", "\t\tBox:", "\t\t\tBackground: #000", "\t\tBlock:", "\t\t\tBox:",
+                "\t\t\t\tBackground: #111", "\t\t\tText: hola");
+        assertTrue(r.events.stream().noneMatch(e -> e.startsWith("clip")), r.events.toString());
+    }
+
+    /** Una imagen dentro de una caja redondeada se recorta por la curva; su texto alternativo no cambia nada. */
+    @Test
+    void anImageInsideARoundedBoxIsClipped() {
+        Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tRadius: 8", "\t\tImage: test/wide.png", "\t\t\tBox:",
+                "\t\t\t\tWidth: 50");
+        int image = r.events.indexOf("image");
+        assertTrue(image > 0 && r.events.get(image - 1).startsWith("clip "), r.events.toString());
+        assertEquals("end clip", r.events.get(image + 1));
     }
 }

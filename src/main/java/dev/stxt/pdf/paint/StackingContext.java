@@ -42,10 +42,11 @@ import java.util.Objects;
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
  * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
  *
- * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene ({@link
- * #paint}). Si es posicionada, crea un contexto, que se gira entero; si gira en flujo, sus descendientes se reparten
- * entre los pasos del contexto que la contiene, y cada uno se pinta con los giros de sus ancestros girados en flujo
- * ({@code Piece.turners}).</p>
+ * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene, y una
+ * caja con {@code Radius} recorta por su curva los fondos, los bordes y las imágenes de lo que tiene en flujo
+ * (referencia/comun/caja.md). Cada pieza lleva la cadena de giros y recortes de sus ancestros, de la página hacia
+ * dentro ({@code Piece.frames}), y cada paso del pintado se la aplica: el fondo, el borde y la imagen, entera; el
+ * texto, solo los giros.</p>
  *
  * <p>El "orden del árbol" es el del documento, no el de los fragmentos: las cajas
  * {@code absolute} cuelgan del fragmento de su containing block, detrás de sus hijos en flujo, y
@@ -54,13 +55,34 @@ import java.util.Objects;
 public final class StackingContext {
 
     /**
-     * Fragmento con su origen absoluto ya calculado y sus ancestros girados en flujo dentro del contexto, de fuera
-     * adentro, cuyos giros se le aplican al pintarlo.
+     * Fragmento con su origen absoluto ya calculado y los giros y recortes de sus ancestros, de la página hacia dentro,
+     * que se le aplican al pintarlo. Su propio giro no está: se aplica después.
      */
-    private record Piece(Fragment f, double x, double y, List<Piece> turners) {
+    private record Piece(Fragment f, double x, double y, List<Frame> frames) {
         Rect borderBox() {
             return f.borderBox(x, y);
         }
+
+        /** Los marcos de lo que contiene: los suyos, su giro y, si tiene esquinas redondeadas, su recorte. */
+        List<Frame> inner() {
+            List<Frame> inner = new ArrayList<>(frames);
+            if (f.box().style().rotation() != null) {
+                inner.add(new Frame(this, false));
+            }
+            if (!radii(this).isSquare()) {
+                inner.add(new Frame(this, true));
+            }
+            return List.copyOf(inner);
+        }
+    }
+
+    /** El giro ({@code clip} falso) o el recorte por la curva de su caja de relleno de la pieza de un ancestro. */
+    private record Frame(Piece piece, boolean clip) {
+    }
+
+    /** Los marcos sin los recortes: lo que hereda un {@code Absolute}, que no recortan las cajas de fuera. */
+    private static List<Frame> turnsOnly(List<Frame> frames) {
+        return frames.stream().filter(f -> !f.clip()).toList();
     }
 
     private final Piece root;
@@ -86,7 +108,7 @@ public final class StackingContext {
      */
     public static StackingContext build(Fragment root, List<Fragment> fixed, double originX, double originY) {
         StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
-        sc.walkChildren(sc.root, List.of());
+        sc.walkChildren(sc.root);
         for (Fragment f : fixed) {
             sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()));
         }
@@ -97,7 +119,7 @@ public final class StackingContext {
     private void addContext(Piece p) {
         Style s = p.f().box().style();
         StackingContext child = new StackingContext(p, s.layer() != null ? s.layer() : 0);
-        child.walkChildren(p, List.of());
+        child.walkChildren(p);
         child.sort();
         if (child.layer < 0) {
             negative.add(child);
@@ -108,28 +130,28 @@ public final class StackingContext {
         }
     }
 
-    /** Reparte los descendientes de {@code parent}, que heredan los giros en flujo {@code turners}. */
-    private void walkChildren(Piece parent, List<Piece> turners) {
+    /**
+     * Reparte los descendientes de {@code parent}. Los de su flujo, también un {@code Relative} o un ítem con {@code
+     * Layer}, heredan sus giros y sus recortes; un {@code Absolute}, solo sus giros; un {@code Fixed}, nada.
+     */
+    private void walkChildren(Piece parent) {
         Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
+        List<Frame> inner = parent.inner();
         for (Fragment h : parent.f().children()) {
-            Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), turners);
             Style s = h.box().style();
+            List<Frame> frames = s.position() == Position.FIXED ? List.of()
+                    : s.position() == Position.ABSOLUTE ? turnsOnly(inner) : inner;
+            Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), frames);
             if (createsContext(h)) {
                 addContext(p);
             } else if (s.isPositioned()) {
                 StackingContext pseudo = new StackingContext(p, 0);
-                pseudo.walkChildren(p, List.of());
+                pseudo.walkChildren(p);
                 pseudo.sort();
                 positionedZero.add(pseudo);
             } else {
                 inFlow.add(p);
-                if (s.rotatesInFlow()) {
-                    List<Piece> inner = new ArrayList<>(turners);
-                    inner.add(p);
-                    walkChildren(p, List.copyOf(inner));
-                } else {
-                    walkChildren(p, turners);
-                }
+                walkChildren(p);
             }
         }
     }
@@ -190,32 +212,59 @@ public final class StackingContext {
     }
 
     /**
-     * Pinta el contexto. Si su caja está girada ({@code Rotate}, referencia/comun/capas-y-giro.md), lo pinta todo
-     * girado: la caja y lo que contiene, también los contextos hijos. Una caja girada en flujo, y lo que contiene, se
-     * gira en cada uno de los pasos en que se pinta.
+     * Pinta el contexto. Cada paso se pinta con los giros y los recortes de su pieza ({@link #framed}): una caja girada
+     * ({@code Rotate}, referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene, y una caja con
+     * esquinas redondeadas recorta los fondos, los bordes y las imágenes de su flujo (referencia/comun/caja.md).
      */
     public void paint(Canvas canvas) {
-        turning(canvas, root, () -> {
-            paintBackgroundAndBorder(canvas, root);
-            negative.forEach(s -> s.paint(canvas));
-            inFlow.forEach(p -> turning(canvas, p, () -> paintBackgroundAndBorder(canvas, p)));
-            paintContent(canvas, root);
-            inFlow.forEach(p -> turning(canvas, p, () -> paintContent(canvas, p)));
-            positionedZero.forEach(s -> s.paint(canvas));
-            positive.forEach(s -> s.paint(canvas));
-        });
+        box(canvas, root);
+        negative.forEach(s -> s.paint(canvas));
+        inFlow.forEach(p -> box(canvas, p));
+        framed(canvas, root, root.f().box().isImage(), () -> paintContent(canvas, root));
+        inFlow.forEach(p -> framed(canvas, p, p.f().box().isImage(), () -> paintContent(canvas, p)));
+        positionedZero.forEach(s -> s.paint(canvas));
+        positive.forEach(s -> s.paint(canvas));
     }
 
-    /** Pinta {@code body} con los giros de los ancestros girados en flujo de {@code p} y el suyo, si tiene {@code Rotate}. */
-    private static void turning(Canvas canvas, Piece p, Runnable body) {
-        int turns = 0;
-        for (Piece t : p.turners()) {
-            turns += beginRotation(canvas, t);
+    /** El fondo y el borde de la pieza, con sus recortes, y su contorno de depuración, sin ellos. */
+    private static void box(Canvas canvas, Piece p) {
+        framed(canvas, p, paintsBox(p), () -> paintBackgroundAndBorder(canvas, p));
+        if (canvas.outlines()) {
+            framed(canvas, p, false, () -> canvas.outline(p.borderBox()));
         }
-        turns += beginRotation(canvas, p);
+    }
+
+    /** Si la caja pinta algo en el paso de los fondos: su fondo, su borde o la línea entre columnas. */
+    private static boolean paintsBox(Piece p) {
+        Style s = p.f().box().style();
+        Insets border = p.f().border();
+        return s.box().background() != null || border.top() > 0 || border.right() > 0 || border.bottom() > 0
+                || border.left() > 0 || s.multicol().rule() > 0;
+    }
+
+    /**
+     * Pinta {@code body} con los giros de los ancestros de {@code p} y el suyo, si tiene {@code Rotate}, y, si {@code
+     * clipped}, con los recortes de sus ancestros redondeados; el texto se pinta sin recortes.
+     */
+    private static void framed(Canvas canvas, Piece p, boolean clipped, Runnable body) {
+        List<Runnable> ends = new ArrayList<>();
+        for (Frame frame : p.frames()) {
+            if (!frame.clip()) {
+                if (beginRotation(canvas, frame.piece()) > 0) {
+                    ends.add(canvas::endRotation);
+                }
+            } else if (clipped) {
+                Piece c = frame.piece();
+                canvas.beginClip(c.borderBox().shrink(c.f().border()), radii(c).inset(c.f().border()));
+                ends.add(canvas::endClip);
+            }
+        }
+        if (beginRotation(canvas, p) > 0) {
+            ends.add(canvas::endRotation);
+        }
         body.run();
-        for (int i = 0; i < turns; i++) {
-            canvas.endRotation();
+        for (int i = ends.size() - 1; i >= 0; i--) {
+            ends.get(i).run();
         }
     }
 

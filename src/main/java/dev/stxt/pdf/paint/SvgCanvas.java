@@ -77,6 +77,19 @@ public final class SvgCanvas implements Canvas {
         svg.append("</g>\n");
     }
 
+    /** Un grupo {@code <g>} con un {@code clipPath}, que se cierra en {@link #endClip()}. */
+    @Override
+    public void beginClip(Rect r, Radii radii) {
+        String id = "c" + ids++;
+        svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(path(r, radii))
+                .append("\"/></clipPath>\n<g clip-path=\"url(#").append(id).append(")\">\n");
+    }
+
+    @Override
+    public void endClip() {
+        svg.append("</g>\n");
+    }
+
     /** Un número sin ceros de más: {@code -8}, {@code 12.5}. */
     private static String number(double v) {
         return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v);
@@ -213,7 +226,6 @@ public final class SvgCanvas implements Canvas {
                 }
             }
         }
-        outline(r);
     }
 
     /** El SVG de depuración solo dibuja: no marca el texto ni crea enlaces. */
@@ -232,6 +244,11 @@ public final class SvgCanvas implements Canvas {
     @Override
     public DecorationMetrics decoration(FontFace font) {
         return DecorationMetrics.APPROXIMATE;
+    }
+
+    @Override
+    public boolean outlines() {
+        return debug;
     }
 
     @Override

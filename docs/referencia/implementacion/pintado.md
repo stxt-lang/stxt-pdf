@@ -13,9 +13,13 @@ antes que texto) y llama a un `Canvas`. Resuelve los radios de cada fragmento (`
 línea base la calcula con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en SVG). `Shapes` da el camino de
 una caja redondeada (cuartos de elipse como Bézier) y el trapecio de cada lado del borde.
 
-El giro envuelve el contexto de la caja girada en `Canvas.beginRotation`/`endRotation`. Una caja girada en flujo no crea
-contexto: sus descendientes se reparten entre los pasos del contexto que la contiene, y cada `Piece` lleva en `turners` sus
-ancestros girados en flujo, cuyos giros se aplican, de fuera adentro, en cada paso en que se pinta. Las zonas de los enlaces las calcula
+Cada `Piece` lleva en `frames` la cadena de giros y recortes de sus ancestros, de la página hacia dentro, y cada paso del
+pintado se la aplica con `Canvas.beginRotation`/`endRotation` y `beginClip`/`endClip`, y después el giro de la propia caja:
+una caja girada se pinta girada con todo lo que contiene, sea un contexto o gire en flujo. Una caja con esquinas
+redondeadas añade a lo que tiene en flujo (también a un `Relative`) el recorte por la curva de su caja de relleno; un
+`Absolute` hereda solo los giros, y un `Fixed`, nada. El fondo, el borde y la imagen se pintan con los recortes; el texto,
+solo con los giros; y el contorno de depuración (`Canvas.outlines()`), sin recortes, para que se vea la caja entera. El paso
+de los fondos de una caja que no pinta nada no recorta. Las zonas de los enlaces las calcula
 `StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`; el rectángulo de cada tramo con enlace
 de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`. `StackingContext.paintText` parte el
 texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas.

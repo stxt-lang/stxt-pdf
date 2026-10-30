@@ -158,7 +158,6 @@ public final class PdfCanvas implements Canvas {
                 io(() -> ringBorder(r, w, radii, color, widths, sideColors));
             }
         }
-        outline(r);
     }
 
     /**
@@ -265,6 +264,26 @@ public final class PdfCanvas implements Canvas {
     @Override
     public void endRotation() {
         io(page::unrotate);
+    }
+
+    /** Un recorte dentro de un estado gráfico propio ({@code q}/{@code Q}), con el camino de la forma ({@code W n}). */
+    @Override
+    public void beginClip(Rect r, Radii radii) {
+        io(() -> {
+            out.saveGraphicsState();
+            Shapes.roundedRect(page.path(), r, radii);
+            out.clip();
+        });
+    }
+
+    @Override
+    public void endClip() {
+        io(out::restoreGraphicsState);
+    }
+
+    @Override
+    public boolean outlines() {
+        return debug;
     }
 
     @Override

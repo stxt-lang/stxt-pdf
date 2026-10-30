@@ -19,7 +19,6 @@ saliendo al trabajar y solo toca ese.
 
 - Sombras (descartadas: PDFBox no desenfoca y habría que aproximar con capas), degradados con paradas con posición,
   radiales o repetidos, y dos radios por esquina.
-- Las esquinas redondeadas no recortan a los hijos que no son una `Image`.
 
 ### Imágenes
 

@@ -76,8 +76,9 @@ comprueba, porque no se sabe qué hay debajo. Quien convierte puede desactivar l
 
 `Radius: 6` redondea las cuatro esquinas con un radio de 6 puntos; con cuatro valores, cada esquina tiene el suyo.
 `Radius: 50%` en una caja cuadrada es un círculo (una foto de perfil, una insignia). El fondo y el borde siguen la curva.
-Una imagen se recorta con las esquinas de su caja, pero el resto del contenido no: si un hijo con fondo toca una esquina
-redondeada, redondéalo también.
+Una imagen se recorta con las esquinas de su caja. Lo que hay dentro de una caja redondeada también sigue su curva: el
+fondo, el borde o la imagen de un hijo que llega a la esquina se recorta, sin tener que redondearlo. El texto no se recorta,
+ni un `Absolute`, que puede asomar por la esquina a propósito.
 
 ## Lo que no cambia el tamaño
 

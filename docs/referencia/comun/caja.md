@@ -117,11 +117,23 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
 
 - **Dentro de la caja.** El fondo, que va en la caja de relleno, tiene los radios de la caja de borde menos el grosor del
   borde de cada lado, y una esquina que se queda sin radio es cuadrada. Una `Image` se recorta con los radios de su caja
-  de contenido (la de borde menos el borde y el relleno). Los hijos de una caja redondeada no se recortan: un hijo con
-  fondo en la esquina se sale de la curva, y se redondea también.
+  de contenido (la de borde menos el borde y el relleno).
+- **Lo que contiene.** Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los **fondos, los
+  bordes y las imágenes** de lo que tiene en su flujo, a cualquier profundidad (también un `Relative` y un ítem con
+  `Layer`): un hijo con fondo que llega a la esquina sigue la curva sin redondearlo. El **texto no se recorta**, ni un
+  `Absolute` o un `Fixed`, que se colocan a propósito y pueden sobresalir (una insignia que asoma por la esquina). Varias
+  cajas redondeadas una dentro de otra suman sus recortes. Como nada del flujo se sale de su caja (sería un
+  [desbordamiento](desbordamiento.md)), el recorte solo cambia lo que toca las esquinas.
 - **Cajas partidas.** Con `Decoration: slice`, solo el primer fragmento de una caja tiene las esquinas de arriba y solo
   el último, las de abajo; con `clone`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
   fragmento, no sobre el de la caja entera.
+
+> **Decisión:** la caja redondeada recorta siempre lo que contiene, sin propiedad que lo pida, porque lo que se sale de
+> la curva nunca es lo que se quiere. *Alternativa descartada:* que no recorte y haya que redondear también cada hijo que
+> toca una esquina; o una propiedad `Clip`.
+
+> **Decisión:** el recorte no alcanza al texto: un texto cortado a medias se leería mal y no avisaría. Tampoco a un
+> `Absolute`, que sale del flujo para colocarse donde quiera. *Alternativa descartada:* recortarlo todo, como una ventana.
 
 > **Decisión:** un radio por esquina; la elipse se pide con %. Los % de una caja partida son de cada fragmento: uno muy
 > bajo reduce sus radios. *Alternativa descartada:* dos radios por esquina (`10 / 20`).
@@ -153,5 +165,6 @@ las esquinas no se pintan dos veces.
 
 - Sombras: el PDF no desenfoca y habría que aproximarlas con capas semitransparentes.
 - Estilos de borde (punteado, doble…), varias capas de fondo ni imágenes de fondo.
-- Recorte del contenido por el contorno de la caja: lo que se sale de la caja es un
-  [desbordamiento](desbordamiento.md), y las esquinas redondeadas solo recortan una `Image`.
+- Recorte del contenido por el contorno de una caja cuadrada: lo que se sale de la caja es un
+  [desbordamiento](desbordamiento.md); las esquinas redondeadas solo recortan los fondos, los bordes y las imágenes
+  ([arriba](#esquinas)).

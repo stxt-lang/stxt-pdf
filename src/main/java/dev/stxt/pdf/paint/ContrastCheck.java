@@ -117,6 +117,15 @@ public final class ContrastCheck implements Canvas {
         turn = turns.pop();
     }
 
+    /** Un recorte solo quita lo que queda fuera de él: lo que hay debajo del texto, que está dentro, no cambia. */
+    @Override
+    public void beginClip(Rect r, Radii radii) {
+    }
+
+    @Override
+    public void endClip() {
+    }
+
     @Override
     public VerticalMetrics vertical(FontFace font) {
         return VerticalMetrics.APPROXIMATE;

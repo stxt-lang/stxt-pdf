@@ -29,8 +29,7 @@ public interface Canvas {
     /**
      * El borde alrededor de la caja de borde {@code r}: el anillo entre ella (con las esquinas
      * {@code radii}) y la caja de relleno, que se reparte entre los lados con ancho en {@code w}
-     * (uno con su color, en la diagonal de cada esquina); después, el {@link #outline contorno} de
-     * depuración.
+     * (uno con su color, en la diagonal de cada esquina).
      *
      * @param colors el color de cada lado, ya resuelto
      */
@@ -42,8 +41,16 @@ public interface Canvas {
      */
     Tagging tagging();
 
-    /** Contorno de depuración de una caja de borde, si el lienzo pinta en modo de depuración. */
+    /** Contorno de depuración de una caja de borde, si el lienzo pinta en modo de depuración ({@link #outlines()}). */
     void outline(Rect borderBox);
+
+    /**
+     * Si pinta los contornos de depuración: el pintado los pide aparte, sin los recortes de las esquinas redondeadas,
+     * para que se vea la caja entera.
+     */
+    default boolean outlines() {
+        return false;
+    }
 
     /**
      * Texto con la línea base en {@code baselineY}.
@@ -71,6 +78,16 @@ public interface Canvas {
 
     /** Termina el giro empezado con {@link #beginRotation}. */
     void endRotation();
+
+    /**
+     * Empieza a recortar (referencia/comun/caja.md): lo que se pinte hasta {@link #endClip()} solo se ve dentro de
+     * {@code r} con las esquinas {@code radii}, con los giros en curso. Los recortes se anidan con los giros: cada uno
+     * termina antes que lo que empezó antes que él.
+     */
+    void beginClip(Rect r, Radii radii);
+
+    /** Termina el recorte empezado con {@link #beginClip}. */
+    void endClip();
 
     /**
      * Ascendente y descendente con que se pinta la fuente, para colocar la línea base
