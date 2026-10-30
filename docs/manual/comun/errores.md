@@ -29,7 +29,8 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 | `CLASS_WITHOUT_RULE` | Una clase sin su regla `For class` | Añade la regla o corrige la errata |
 | `HEADING_LEVEL` | Un salto de nivel (`Heading 3` después de `Heading 1`) | Usa el nivel siguiente |
 | `TABLE_ROW_CELLS` | Una fila con celdas de más o de menos | Añade `Cell:` vacías o usa `Span` |
-| `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG ni un SVG admitido | Revisa la ruta o convierte el fichero |
+| `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG, PDF ni un SVG admitido | Revisa la ruta o convierte el fichero |
+| `IMAGE_PAGE` | `Page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quita `Page` o corrige el número |
 | `REFERENCE_UNKNOWN`, `LINK_UNKNOWN` | Un `{page of: id}` o un `#id` a un `Id` que no existe | Revisa el `Id` |
 | `DUPLICATE_ID` | Dos cajas con el mismo `Id` | Cambia uno |
 

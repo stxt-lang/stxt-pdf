@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * {@code resources/images/test/}: {@code wide.png} de 200 × 100 píxeles (150 × 75 pt, proporción
  * 2), {@code tall.jpg} de 120 × 160 (90 × 120 pt) y {@code square.png} de 40 × 40 (30 × 30 pt), y los SVG
  * {@code shapes.svg} (200 × 100 px: 150 × 75 pt) y {@code label.svg}, sin {@code width} ni {@code height}
- * y con {@code viewBox="0 0 160 48"} (120 × 36 pt).
+ * y con {@code viewBox="0 0 160 48"} (120 × 36 pt), y {@code pages.pdf}.
  */
 class ImageLayoutTest {
 
@@ -60,6 +60,28 @@ class ImageLayoutTest {
         assertRect(40, 40, 150, 75, f.rect("S"));
         assertRect(40, 115, 120, 36, f.rect("L"));
         assertRect(40, 151, 60, 18, f.rect("H"));
+    }
+
+    /**
+     * Un PDF mide lo que su página, ya en puntos: la de {@code Page}, recortada y girada ({@code pages.pdf}: 200 × 100,
+     * 150 × 50 y 100 × 200), o la primera.
+     */
+    @Test
+    void pdfHasTheSizeOfItsPage() {
+        LayoutFixture f = layOut(
+                "\tImage: test/pages.pdf",
+                "\t\tId: A",
+                "\tImage: test/pages.pdf",
+                "\t\tId: B",
+                "\t\tPage: 2",
+                "\tImage: test/pages.pdf",
+                "\t\tId: C",
+                "\t\tPage: 3",
+                "\t\tBox:",
+                "\t\t\tWidth: 50");
+        assertRect(40, 40, 200, 100, f.rect("A"));
+        assertRect(40, 140, 150, 50, f.rect("B"));
+        assertRect(40, 190, 50, 100, f.rect("C"));
     }
 
     @Test

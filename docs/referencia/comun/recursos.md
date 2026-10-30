@@ -9,7 +9,7 @@ subcarpetas fijas, que pueden organizarse a su vez en subcarpetas:
 ```
 resources/
 	fonts/      fuentes TTF
-	images/     imágenes PNG, JPEG y SVG
+	images/     imágenes PNG, JPEG, SVG y PDF
 ```
 
 Los recursos se buscan **siempre hacia abajo**, desde la raíz de su subcarpeta. Una ruta de recurso es relativa a esa

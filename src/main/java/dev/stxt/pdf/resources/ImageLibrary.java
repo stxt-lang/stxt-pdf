@@ -19,7 +19,7 @@ public final class ImageLibrary {
     /**
      * La imagen de esa ruta, relativa a {@code images/}.
      *
-     * @throws ImageFormatException si no es PNG, JPEG ni un SVG admitido, o no se puede leer
+     * @throws ImageFormatException si no es PNG, JPEG, PDF ni un SVG admitido, o no se puede leer
      * @throws ResourceException    si la ruta sale de la carpeta o no existe
      */
     public ImageFile find(String path) {

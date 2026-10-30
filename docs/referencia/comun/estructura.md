@@ -42,7 +42,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Cell` | Celda: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Multicol` | Bloque cuyo contenido fluye por varias columnas ([Multicol](../componentes/multicol.md)) | Elementos en flujo |
 | `Markdown` | Contenido escrito en Markdown ([Markdown](../componentes/markdown.md)) | Su texto en `Content` |
-| `Image` | Imagen PNG, JPEG o SVG ([Image](../componentes/image.md)) | Nada: la ruta va en el valor |
+| `Image` | Imagen PNG, JPEG o SVG, o una página de un PDF ([Image](../componentes/image.md)) | Nada: la ruta va en el valor |
 | `Contents` | Índice automático ([Contents](../componentes/contents.md)) | Nada: las entradas las genera el motor |
 | `Relative` | Bloque que se desplaza sin mover a sus hermanos ([posicionados](../componentes/relative-absolute-fixed.md)) | Elementos |
 | `Absolute` | Bloque fuera de flujo, colocado en su contenedor de referencia | Elementos |
@@ -192,7 +192,7 @@ vez; los elementos, las veces que se quiera.
 | `Multicol` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
 | `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
 | `Contents` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Rotate` |
+| `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Page`, `Rotate` |
 | `Relative` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Absolute` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Fixed` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |

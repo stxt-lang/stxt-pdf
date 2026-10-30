@@ -22,7 +22,7 @@
 | **Fragmento** | Parte de una caja que cae en un contenedor de fragmentos. |
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve; posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](capas-y-giro.md#giro-rotate)). |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
-| **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG o un SVG de la carpeta de recursos, su tamaño natural y su proporción ([Image](../componentes/image.md)). |
+| **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../componentes/image.md)). |
 | **Índice** | Elemento `Contents`: una entrada por encabezado con su título, una guía y su página ([Contents](../componentes/contents.md)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas, bloques de código e imágenes ([Markdown](../componentes/markdown.md)). |
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea ([La caja](caja.md#tamaños-intrínsecos)). |

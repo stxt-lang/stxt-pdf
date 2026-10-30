@@ -127,6 +127,7 @@ final class PropertyReader {
             entry("in-contents", (p, s) -> s.setInContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
+            entry("page", (p, s) -> s.image().setPage(positiveInteger(p))),
             entry("levels", ContentsBuilder::levels),
             entry("leader", (p, s) -> s.contents().setLeader(enumValue(Leader.class, p))));
 

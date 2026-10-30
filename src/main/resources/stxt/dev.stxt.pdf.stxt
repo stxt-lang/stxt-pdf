@@ -799,7 +799,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Image
 		Type: INLINE
-		Description: Imagen PNG o JPEG de la carpeta images/ de los recursos; el valor es su ruta, relativa a images/ (logos/acme.png). Una caja sin hijos con el tamaño y la proporción del fichero; no se parte entre páginas.
+		Description: Imagen PNG, JPEG, SVG o PDF de la carpeta images/ de los recursos; el valor es su ruta, relativa a images/ (logos/acme.png). Una caja sin hijos con el tamaño y la proporción del fichero (de un PDF, de su página); no se parte entre páginas.
 		Children:
 			Child: Id
 				Max: 1
@@ -814,6 +814,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Alt
 				Max: 1
 			Child: Fit
+				Max: 1
+			Child: Page
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -1339,6 +1341,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: contain
 			Value: cover
 			Value: fill
+	Node: Page
+		Type: INTEGER
+		Description: Página que dibuja una Image de un PDF, desde 1 (por defecto, la primera). En una imagen que no es un PDF, o una página que el PDF no tiene, es un error.
 
 	# Markdown
 

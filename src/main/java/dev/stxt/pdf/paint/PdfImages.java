@@ -11,11 +11,14 @@ import de.rototor.pdfbox.graphics2d.PdfBoxGraphics2D;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -34,8 +37,12 @@ import java.util.Map;
  * de la fuente de {@code fonts/} que se comprobó al leer el SVG ({@link SvgFonts}, sin estado de la JVM): se
  * ve bien a cualquier tamaño, pero no se puede seleccionar. Las referencias externas están
  * prohibidas ({@link ResourcePolicy#DENY_ALL}), aunque el SVG ya las ha rechazado al leerlo.</p>
+ *
+ * <p>La página de un PDF también es un {@link PDFormXObject}: su contenido y sus recursos, copiados con
+ * {@link LayerUtility}, sin sus anotaciones ni su etiquetado ({@link PdfPages}). Los PDF de origen se abren una vez
+ * y se cierran con {@link #close()}.</p>
  */
-final class PdfImages {
+final class PdfImages implements Closeable {
 
     /**
      * JSVG guarda las fuentes del texto en una caché de toda la JVM que no está sincronizada ({@code FontResolver}),
@@ -47,10 +54,14 @@ final class PdfImages {
     private final Limits limits;
     private final Map<Path, PDImageXObject> bitmaps = new HashMap<>();
     private final Map<Path, PDFormXObject> drawings = new HashMap<>();
+    private final Map<Path, PDDocument> sources = new HashMap<>();
+    private final Map<Path, Map<Integer, PDFormXObject>> pages = new HashMap<>();
+    private final PdfPages imports;
 
     PdfImages(PDDocument doc, Limits limits) {
         this.doc = doc;
         this.limits = limits;
+        this.imports = new PdfPages(doc);
     }
 
     /** El PNG o el JPEG, incrustado la primera vez. */
@@ -74,6 +85,43 @@ final class PdfImages {
             drawings.put(file.path(), form);
         }
         return form;
+    }
+
+    /**
+     * La página {@code number} (desde 1) del PDF en un formulario de {@code file.width(number)} ×
+     * {@code file.height(number)} puntos, con el origen en su esquina de abajo a la izquierda, como {@link #drawing}.
+     * Cada página se copia una sola vez.
+     */
+    PDFormXObject page(ImageFile file, int number) throws IOException {
+        Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file.path(), p -> new HashMap<>());
+        PDFormXObject form = forms.get(number);
+        if (form == null) {
+            PDDocument source = sources.get(file.path());
+            if (source == null) {
+                source = Loader.loadPDF(file.path().toFile());
+                sources.put(file.path(), source);
+            }
+            form = imports.page(source, number);
+            forms.put(number, form);
+        }
+        return form;
+    }
+
+    /** Cierra los PDF de origen; lo copiado ya está en el documento. */
+    @Override
+    public void close() throws IOException {
+        IOException failure = null;
+        for (PDDocument source : sources.values()) {
+            try {
+                source.close();
+            } catch (IOException e) {
+                failure = e;
+            }
+        }
+        sources.clear();
+        if (failure != null) {
+            throw failure;
+        }
     }
 
     private PDFormXObject draw(ImageFile file) throws IOException {

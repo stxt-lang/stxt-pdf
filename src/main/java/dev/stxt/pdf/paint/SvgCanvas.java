@@ -17,6 +17,12 @@ import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Media;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import javax.imageio.ImageIO;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -280,7 +286,8 @@ public final class SvgCanvas implements Canvas {
      * {@inheritDoc}
      *
      * <p>Un {@code <svg>} anidado del tamaño de la caja de contenido recorta la imagen, que va
-     * dentro sin conservar su proporción: la colocación ya la da {@link ImageFit}.</p>
+     * dentro sin conservar su proporción: la colocación ya la da {@link ImageFit}. Un navegador no dibuja un PDF dentro
+     * de un SVG: la página va como PNG, a 144 píxeles por pulgada.</p>
      */
     @Override
     public void image(Box box, Rect content, Radii radii) {
@@ -288,15 +295,18 @@ public final class SvgCanvas implements Canvas {
             return;
         }
         ImageFile file = resources.images().find(box.image());
-        Rect target = ImageFit.place(box.style().image().fit(), content, file.width(), file.height());
+        int number = box.style().image().page();
+        Rect target = ImageFit.place(box.style().image().fit(), content, file.width(number), file.height(number));
         String data;
         try {
-            data = Base64.getEncoder().encodeToString(Files.readAllBytes(file.path()));
+            byte[] bytes = file.format() == ImageFile.Format.PDF ? pageAsPng(file, number)
+                    : Files.readAllBytes(file.path());
+            data = Base64.getEncoder().encodeToString(bytes);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
         String mime = switch (file.format()) {
-            case PNG -> "image/png";
+            case PNG, PDF -> "image/png";
             case JPEG -> "image/jpeg";
             case SVG -> "image/svg+xml";
         };
@@ -313,6 +323,15 @@ public final class SvgCanvas implements Canvas {
                 target.y() - content.y(), target.width(), target.height(), mime, data));
         if (rounded) {
             svg.append("</g>\n");
+        }
+    }
+
+    /** La página {@code number} (desde 1) de un PDF, dibujada en un PNG. */
+    private static byte[] pageAsPng(ImageFile file, int number) throws IOException {
+        try (PDDocument doc = Loader.loadPDF(file.path().toFile())) {
+            ByteArrayOutputStream png = new ByteArrayOutputStream();
+            ImageIO.write(new PDFRenderer(doc).renderImageWithDPI(number - 1, 144), "png", png);
+            return png.toByteArray();
         }
     }
 

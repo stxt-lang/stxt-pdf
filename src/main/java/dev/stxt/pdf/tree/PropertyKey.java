@@ -43,6 +43,7 @@ public final class PropertyKey {
     public static final String ROTATE_ORIGIN = "rotate-origin";
     public static final String START = "start";
     public static final String NUMBER = "number";
+    public static final String PAGE = "page";
 
     // Multicol
     public static final String COUNT = "count";

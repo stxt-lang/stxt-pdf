@@ -142,7 +142,8 @@ class SchemaCoverageTest {
             Map.entry("Leader", "Leader: rule"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
-            Map.entry("Fit", "Fit: cover"));
+            Map.entry("Fit", "Fit: cover"),
+            Map.entry("Page", "Page: 2"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"

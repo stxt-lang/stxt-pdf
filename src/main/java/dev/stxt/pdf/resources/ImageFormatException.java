@@ -1,7 +1,7 @@
 package dev.stxt.pdf.resources;
 
 /**
- * Un fichero de {@code images/} que no es PNG, JPEG ni un SVG admitido, o que no se puede leer
+ * Un fichero de {@code images/} que no es PNG, JPEG, PDF ni un SVG admitido, o que no se puede leer
  * (referencia/componentes/image.md).
  */
 public class ImageFormatException extends ResourceException {

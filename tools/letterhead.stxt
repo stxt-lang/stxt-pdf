@@ -1,0 +1,65 @@
+# Papel de carta de Taller Nogal: el PDF que usan como fondo los documentos de la documentación
+# (referencia/componentes/image.md). La página 1 es la de la primera hoja de una carta, con el membrete
+# completo; la página 2, la de las siguientes, con el logotipo pequeño. Las dos llevan el pie legal.
+# Se convierte con tools/ExamplePdfs.java en resources/images/examples/letterhead/letterhead.pdf.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Papel de carta de Taller Nogal
+	Media:
+		Paper: A4
+		Margin: 0
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 8
+				Line height: 12
+				Color: #6B5B4E
+		For class: legal
+			Box:
+				Padding: 6 0 0 0
+				Border: 0.5 0 0 0
+				Border color: #B5651D
+			Typography:
+				Size: 7
+				Align: center
+	Section:
+		Id: first
+		Absolute:
+			Offset: 40 72 auto 72
+			Flex:
+				Main axis: between
+				Cross axis: end
+				Box:
+					Padding: 0 0 12 0
+					Border: 0 0 1.5 0
+					Border color: #3B2A1E
+				Item:
+					Image: examples/brand/nogal.svg
+						Alt: Nogal, taller de mobiliario
+						Box:
+							Width: 150
+				Item:
+					Block:
+						Text: Carrer de la Farga, 14 · 17800 Olot
+							Typography:
+								Align: right
+						Text: 972 00 11 22 · tallernogal.example
+							Typography:
+								Align: right
+		Absolute:
+			Offset: auto 72 28 72
+			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
+				Class: legal
+	Section:
+		Id: next
+		Absolute:
+			Offset: 30 72 auto auto
+			Image: examples/brand/nogal.svg
+				Alt: Nogal, taller de mobiliario
+				Box:
+					Width: 80
+		Absolute:
+			Offset: auto 72 28 72
+			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
+				Class: legal

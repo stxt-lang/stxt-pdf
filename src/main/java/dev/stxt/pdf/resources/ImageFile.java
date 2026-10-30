@@ -20,13 +20,13 @@ import java.util.Locale;
 
 /**
  * Una imagen de la carpeta {@code images/} (referencia/componentes/image.md): su formato, reconocido por
- * el contenido y no por la extensión, y su tamaño en píxeles. Se admiten PNG, JPEG y SVG (el
- * subconjunto de {@link SvgInspector}).
+ * el contenido y no por la extensión, y su tamaño en píxeles. Se admiten PNG, JPEG, SVG (el
+ * subconjunto de {@link SvgInspector}) y PDF ({@link PdfInspector}).
  *
  * <p>El tamaño natural en puntos cuenta cada píxel como en CSS, a 96 por pulgada
  * ({@link #POINTS_PER_PIXEL}), sin mirar la resolución que declare el fichero. El de un SVG es
  * el de su {@code width} y {@code height} o, si faltan, el de su {@code viewBox}, también en
- * píxeles CSS.</p>
+ * píxeles CSS. Un PDF ya está en puntos y cada página tiene el suyo.</p>
  */
 public final class ImageFile {
 
@@ -35,8 +35,9 @@ public final class ImageFile {
 
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
     private static final byte[] JPEG = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+    private static final byte[] PDF = {'%', 'P', 'D', 'F', '-'};
 
-    public enum Format { PNG, JPEG, SVG }
+    public enum Format { PNG, JPEG, SVG, PDF }
 
     private final Path path;
     private final Format format;
@@ -46,9 +47,10 @@ public final class ImageFile {
     private final long svgElements;
     private final int svgDepth;
     private final List<FontFile> textFonts;
+    private final List<PdfInspector.PdfPage> pages;
 
     private ImageFile(Path path, Format format, double pixelWidth, double pixelHeight, boolean text,
-            long svgElements, int svgDepth, List<FontFile> textFonts) {
+            long svgElements, int svgDepth, List<FontFile> textFonts, List<PdfInspector.PdfPage> pages) {
         this.path = path;
         this.format = format;
         this.pixelWidth = pixelWidth;
@@ -57,13 +59,14 @@ public final class ImageFile {
         this.svgElements = svgElements;
         this.svgDepth = svgDepth;
         this.textFonts = textFonts;
+        this.pages = pages;
     }
 
     /**
      * Lee el formato y el tamaño de una imagen; {@code name} es su ruta en el documento, para los
-     * mensajes. Un SVG se comprueba entero, también sus fuentes en {@code resources}.
+     * mensajes. Un SVG se comprueba entero, también sus fuentes en {@code resources}; de un PDF se leen sus páginas.
      *
-     * @throws ImageFormatException si no es PNG, JPEG ni un SVG del subconjunto, o no se puede leer
+     * @throws ImageFormatException si no es PNG, JPEG, PDF ni un SVG del subconjunto, o no se puede leer
      */
     static ImageFile read(Path path, String name, Resources resources) {
         byte[] head = new byte[12];
@@ -77,9 +80,14 @@ public final class ImageFile {
         if (format == null && looksLikeXml(head, n)) {
             return readSvg(path, name, resources);
         }
+        if (format == null && startsWith(head, n, PDF)) {
+            List<PdfInspector.PdfPage> pages = PdfInspector.inspect(path, name);
+            return new ImageFile(path, Format.PDF, pages.get(0).width() / POINTS_PER_PIXEL,
+                    pages.get(0).height() / POINTS_PER_PIXEL, false, 0, 0, List.of(), pages);
+        }
         if (format == null) {
-            throw new ImageFormatException("La imagen " + name + " no es PNG, JPEG ni SVG" + guess(head, n)
-                    + ": conviértela a uno de los tres");
+            throw new ImageFormatException("La imagen " + name + " no es PNG, JPEG, SVG ni PDF" + guess(head, n)
+                    + ": conviértela a uno de los cuatro");
         }
         Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName(format.name());
         ImageReader reader = readers.next();
@@ -90,7 +98,7 @@ public final class ImageFile {
             if (width <= 0 || height <= 0) {
                 throw new ImageFormatException("La imagen " + name + " no tiene píxeles");
             }
-            return new ImageFile(path, format, width, height, false, 0, 0, List.of());
+            return new ImageFile(path, format, width, height, false, 0, 0, List.of(), List.of());
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
@@ -129,7 +137,7 @@ public final class ImageFile {
             fonts.add(face == null ? null : resources.fonts().lookup(face));
         }
         return new ImageFile(path, Format.SVG, info.widthPx(), info.heightPx(), !info.texts().isEmpty(),
-                info.elements(), info.depth(), Collections.unmodifiableList(fonts));
+                info.elements(), info.depth(), Collections.unmodifiableList(fonts), List.of());
     }
 
     /** Que la fuente de un texto del SVG exista en {@code fonts/} y tenga todos sus caracteres: no hay sustitución. */
@@ -167,7 +175,7 @@ public final class ImageFile {
         return n >= signature.length && Arrays.equals(head, 0, signature.length, signature, 0, signature.length);
     }
 
-    /** El formato que parece tener un fichero que no es PNG, JPEG ni SVG, para el mensaje. */
+    /** El formato que parece tener un fichero que no es PNG, JPEG, SVG ni PDF, para el mensaje. */
     private static String guess(byte[] head, int n) {
         String text = new String(head, 0, n, java.nio.charset.StandardCharsets.ISO_8859_1);
         if (text.startsWith("GIF8")) {
@@ -187,19 +195,19 @@ public final class ImageFile {
         return format;
     }
 
-    /** Ancho en píxeles; el de un SVG, en píxeles CSS (no tiene por qué ser entero). */
+    /** Ancho en píxeles; el de un SVG o un PDF (su primera página), en píxeles CSS (no tiene por qué ser entero). */
     public double pixelWidth() {
         return pixelWidth;
     }
 
-    /** Alto en píxeles; el de un SVG, en píxeles CSS (no tiene por qué ser entero). */
+    /** Alto en píxeles; el de un SVG o un PDF (su primera página), en píxeles CSS (no tiene por qué ser entero). */
     public double pixelHeight() {
         return pixelHeight;
     }
 
-    /** Píxeles de un PNG o JPEG (ancho × alto, leídos de la cabecera); 0 en un SVG, que no tiene. */
+    /** Píxeles de un PNG o JPEG (ancho × alto, leídos de la cabecera); 0 en un SVG o un PDF, que no tienen. */
     public long pixels() {
-        return format == Format.SVG ? 0 : (long) pixelWidth * (long) pixelHeight;
+        return isVector() ? 0 : (long) pixelWidth * (long) pixelHeight;
     }
 
     /** Elementos que dibuja un SVG, contando cada repetición de un {@code <use>} (saturado); 0 si no es un SVG. */
@@ -227,19 +235,49 @@ public final class ImageFile {
         return textFonts;
     }
 
-    /** Si es un dibujo vectorial, que se pinta sin perder nitidez a ningún tamaño. */
+    /** Si es un dibujo vectorial (un SVG o un PDF), que se pinta sin perder nitidez a ningún tamaño. */
     public boolean isVector() {
-        return format == Format.SVG;
+        return format == Format.SVG || format == Format.PDF;
     }
 
-    /** Ancho natural en puntos. */
+    /** Las páginas de un PDF; 1 en el resto, que son una sola imagen. */
+    public int pages() {
+        return format == Format.PDF ? pages.size() : 1;
+    }
+
+    /**
+     * Por qué no se puede dibujar esa página de un PDF (una fuente sin incrustar, una anotación que se ve), para el
+     * mensaje; {@code null} si se puede, y en el resto de formatos.
+     *
+     * @param page desde 1, hasta {@link #pages()}
+     */
+    public String problem(int page) {
+        return format == Format.PDF ? pages.get(page - 1).problem() : null;
+    }
+
+    /** Ancho natural en puntos; el de un PDF, el de su primera página. */
     public double width() {
-        return pixelWidth * POINTS_PER_PIXEL;
+        return width(1);
     }
 
-    /** Alto natural en puntos. */
+    /** Alto natural en puntos; el de un PDF, el de su primera página. */
     public double height() {
-        return pixelHeight * POINTS_PER_PIXEL;
+        return height(1);
+    }
+
+    /**
+     * Ancho natural en puntos de esa página: el de un PDF, el de su recorte ya girado; el del resto, que tienen una
+     * sola página, el de la imagen.
+     *
+     * @param page desde 1, hasta {@link #pages()}
+     */
+    public double width(int page) {
+        return format == Format.PDF ? pages.get(page - 1).width() : pixelWidth * POINTS_PER_PIXEL;
+    }
+
+    /** Alto natural en puntos de esa página, como {@link #width(int)}. */
+    public double height(int page) {
+        return format == Format.PDF ? pages.get(page - 1).height() : pixelHeight * POINTS_PER_PIXEL;
     }
 
     @Override

@@ -45,7 +45,8 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 | `PdfTagging` | El contenido marcado y las anotaciones de una página |
 | `PdfFonts` | Las fuentes incrustadas y los argumentos de `TJ` |
 | `PdfGradients` | Los sombreados de los degradados y sus máscaras suaves |
-| `PdfImages` | Las imágenes: PNG y JPEG incrustados, SVG dibujados como vectores |
+| `PdfImages` | Las imágenes: PNG y JPEG incrustados, SVG dibujados como vectores, páginas de PDF copiadas |
+| `PdfPages` | La copia de una página de otro PDF en un formulario, sin su etiquetado |
 | `SvgFonts` | Las fuentes de `fonts/` con que se dibuja el texto de un SVG |
 | `PdfStructure` | El PDF etiquetado y los marcadores |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
@@ -133,6 +134,23 @@ dibujarlo. JSVG dibuja el texto como contornos.
 > **Decisión:** un formulario hereda el estado gráfico, y el modo de depuración deja activo el patrón de guiones de los
 > contornos: `PdfCanvas.image` restablece los guiones (`[] 0 d`) dentro de su `q … Q` antes de dibujar el formulario.
 
+La página de un PDF la copia `PdfPages` con `LayerUtility.importPageAsForm` de PDFBox, que copia su contenido y sus
+recursos (los compartidos entre páginas, una vez) y no sus anotaciones. El formulario lleva el recorte de la página como
+`BBox` y una matriz propia que lo gira según `Rotate` y lo lleva al origen (`PdfPages.placement`), así que mide lo que
+`ImageFile.width(page)` y se coloca igual que un SVG. Después se le quita el etiquetado del PDF de origen: las marcas de
+contenido (`BMC`, `BDC`, `EMC`, `MP`, `DP`) de su contenido y del de los formularios que usa, salvo las de contenido
+opcional (`/OC`), y las entradas `StructParent` y `StructParents`. Los PDF de origen se abren una vez por fichero y se
+cierran después de guardar. `PdfInspector` (`resources`) lee al cargar el documento el tamaño de cada página, con el
+mismo giro (`PdfInspector.rotation`), y lo que impide dibujarla: una anotación que se ve que no es un enlace y una fuente
+sin incrustar en sus recursos, los de sus formularios o los de sus patrones.
+
+> **Decisión:** el etiquetado del PDF de origen se quita del contenido copiado: sus `MCID` no son de este documento, y un
+> *artifact* o un contenido marcado dentro de la figura de la `Image` incumple PDF/UA. Las marcas de contenido opcional se
+> conservan porque deciden lo que se ve. *Alternativa descartada:* copiar el contenido tal cual.
+
+> **Decisión:** la matriz del giro es propia, no la de `LayerUtility`, que conserva el tamaño sin girar y deforma una
+> página girada 90°.
+
 > **Decisión:** JSVG y `pdfbox-graphics2d` para los SVG, sin dependencias propias. *Alternativa descartada:* Apache Batik, que
 > arrastra decenas de jars.
 
@@ -175,7 +193,8 @@ color posible de debajo, una imagen lo deja sin conocer hasta que un color opaco
 ## El SVG de depuración
 
 `SvgCanvas` escribe el SVG de los tests: `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para
-lo liso y cuadrado; un `<g transform>` para el giro; las imágenes, como `data:`. No pinta enlaces ni distingue las ligaduras.
+lo liso y cuadrado; un `<g transform>` para el giro; las imágenes, como `data:` (la página de un PDF, dibujada en un PNG a
+144 ppp con `PDFRenderer`, porque un navegador no dibuja un PDF dentro de un SVG). No pinta enlaces ni distingue las ligaduras.
 
 > **Decisión:** el SVG conserva los espacios con `xml:space="preserve"` cuando un texto tiene dos espacios seguidos o empieza
 > o acaba en espacio, y escribe las líneas con `\n` en cualquier sistema.

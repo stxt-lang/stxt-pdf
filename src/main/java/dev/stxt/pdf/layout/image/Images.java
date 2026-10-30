@@ -8,14 +8,17 @@ import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import dev.stxt.pdf.tree.PropertyKey;
 
 /**
  * Las imágenes del documento en la carpeta de recursos (referencia/componentes/image.md): el fichero y
  * el tamaño natural de cada {@code Image}. Los errores del fichero son del documento y llevan la
  * línea de la {@code Image}: {@code IMAGE_UNKNOWN} si la ruta no existe o sale de la carpeta, e
- * {@code IMAGE_FORMAT} si no es PNG, JPEG ni un SVG admitido. Una imagen que supera los {@link Limits} es
+ * {@code IMAGE_FORMAT} si no es PNG, JPEG, PDF ni un SVG admitido. Una imagen que supera los {@link Limits} es
  * {@code IMAGE_TOO_LARGE} (los píxeles de un PNG o JPEG) o {@code SVG_TOO_COMPLEX} (los elementos y los
- * niveles de un SVG), también con la línea de la {@code Image}.
+ * niveles de un SVG), también con la línea de la {@code Image}. La página de un PDF tiene que existir, y {@code Page}
+ * en otro formato es un error ({@code IMAGE_PAGE}, con la línea de {@code Page}); una página que no se puede dibujar
+ * igual que en su PDF es {@code IMAGE_FORMAT}.
  */
 public final class Images {
 
@@ -34,7 +37,9 @@ public final class Images {
      */
     public void validate(Box box) {
         if (box.isImage()) {
-            checkLimits(file(box), box);
+            ImageFile file = file(box);
+            checkLimits(file, box);
+            checkPage(file, box);
         }
         box.children().forEach(this::validate);
     }
@@ -60,6 +65,27 @@ public final class Images {
         }
     }
 
+    /** Que {@code Page} sea de un PDF y la página exista, y que se pueda dibujar. */
+    private static void checkPage(ImageFile file, Box box) {
+        int page = box.style().image().page();
+        if (box.style().isDeclared(PropertyKey.PAGE)) {
+            if (file.format() != ImageFile.Format.PDF) {
+                throw new InvalidModelException(box.style().line(PropertyKey.PAGE), ErrorCode.IMAGE_PAGE, "Page solo "
+                        + "tiene efecto en un PDF, y la imagen " + box.image() + " es " + file.format() + ": quítalo");
+            }
+            if (page > file.pages()) {
+                throw new InvalidModelException(box.style().line(PropertyKey.PAGE), ErrorCode.IMAGE_PAGE, "El PDF "
+                        + box.image() + " tiene " + file.pages() + (file.pages() == 1 ? " página" : " páginas")
+                        + " y no tiene la " + page);
+            }
+        }
+        String problem = file.problem(page);
+        if (problem != null) {
+            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "La página " + page + " del PDF "
+                    + box.image() + " " + problem);
+        }
+    }
+
     private static String megapixels(long pixels) {
         return String.format(java.util.Locale.ROOT, "%.1f Mpx", pixels / 1_000_000.0);
     }
@@ -76,9 +102,10 @@ public final class Images {
         }
     }
 
-    /** Tamaño natural de una {@code Image}, en puntos. */
+    /** Tamaño natural de una {@code Image}, en puntos: el de un PDF, el de su página. */
     public NaturalSize natural(Box box) {
         ImageFile f = file(box);
-        return new NaturalSize(f.width(), f.height());
+        int page = box.style().image().page();
+        return new NaturalSize(f.width(page), f.height(page));
     }
 }

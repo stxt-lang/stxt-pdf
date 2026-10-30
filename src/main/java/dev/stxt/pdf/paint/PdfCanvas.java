@@ -228,19 +228,21 @@ public final class PdfCanvas implements Canvas {
         }
         io(() -> {
             ImageFile file = resources.images().find(box.image());
-            Rect target = ImageFit.place(box.style().image().fit(), content, file.width(), file.height());
+            int number = box.style().image().page();
+            double width = file.width(number);
+            double height = file.height(number);
+            Rect target = ImageFit.place(box.style().image().fit(), content, width, height);
             tagging.beginImage(box, content);
             out.saveGraphicsState();
             Shapes.roundedRect(page.path(), content, radii);
             out.clip();
             if (file.isVector()) {
-                // El dibujo mide lo que el SVG: se escala a donde va (Fit) y vuelve a ser vectorial.
-                out.transform(new Matrix((float) (target.width() / file.width()), 0, 0,
-                        (float) (target.height() / file.height()), (float) target.x(),
-                        (float) (pageHeight - target.bottom())));
+                // El dibujo mide lo que el SVG o la página: se escala a donde va (Fit) y sigue siendo vectorial.
+                out.transform(new Matrix((float) (target.width() / width), 0, 0, (float) (target.height() / height),
+                        (float) target.x(), (float) (pageHeight - target.bottom())));
                 // Un formulario hereda el estado gráfico y el dibujo no fija los guiones: sin guiones.
                 out.setLineDashPattern(new float[0], 0);
-                out.drawForm(images.drawing(file));
+                out.drawForm(file.format() == ImageFile.Format.PDF ? images.page(file, number) : images.drawing(file));
             } else {
                 out.drawImage(images.bitmap(file), (float) target.x(), (float) (pageHeight - target.bottom()),
                         (float) target.width(), (float) target.height());

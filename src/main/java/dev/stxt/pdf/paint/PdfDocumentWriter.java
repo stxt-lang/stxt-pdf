@@ -72,14 +72,13 @@ public final class PdfDocumentWriter {
     private static void paintAndSave(LaidOutDocument document, Resources resources, Limits limits,
             OutputStream target, boolean debug, int ua) throws IOException {
         List<Page> pages = document.pages();
-        try (PDDocument doc = new PDDocument()) {
+        try (PDDocument doc = new PDDocument(); PdfImages images = new PdfImages(doc, limits)) {
             if (ua == 2) {
                 // La cabecera del fichero y la versión del catálogo.
                 doc.getDocument().setVersion(2.0f);
                 doc.getDocumentCatalog().setVersion("2.0");
             }
             PdfFonts fonts = new PdfFonts(doc, resources);
-            PdfImages images = new PdfImages(doc, limits);
             PdfStructure structure = new PdfStructure(doc, document.root(), ua);
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata(), ua);

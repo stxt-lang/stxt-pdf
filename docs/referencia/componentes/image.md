@@ -1,6 +1,6 @@
 # `Image`
 
-Una `Image` pone en el documento una imagen PNG, JPEG o SVG de la carpeta `images/` de los recursos
+Una `Image` pone en el documento una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos
 ([Recursos](../comun/recursos.md)). Es una caja sin hijos, como un `Text`, cuyo contenido es la imagen: se coloca, se
 dimensiona, se corta entre páginas y se pinta como cualquier caja, con su `Box` (márgenes, relleno, borde, fondo y
 esquinas) y su `Break` (sin `Inside` ni `Decoration`, porque no se parte). Admite además `Id`, `Class` y `Link`; no admite
@@ -44,9 +44,10 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG o SVG: `Image: logos/acme.png`. |
+| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | — | Gira la imagen sobre su centro (un sello); ocupa el rectángulo que la envuelve girada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
@@ -54,10 +55,11 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 ## Fichero
 
 El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo ([Recursos](../comun/recursos.md)):
-`Image: logos/acme.png` es `resources/images/logos/acme.png`. Se admiten PNG (con transparencia), JPEG y SVG, y el formato
-se reconoce por el contenido, no por la extensión (un SVG es un fichero que empieza por `<`). Una `Image` sin ruta, un
-fichero que no existe o una ruta que sale de `images/` son un error (`IMAGE_UNKNOWN`); un fichero que no es PNG, JPEG ni un
-SVG admitido (GIF, WebP…) o que no se puede leer, también (`IMAGE_FORMAT`). Los errores señalan la línea de la `Image`.
+`Image: logos/acme.png` es `resources/images/logos/acme.png`. Se admiten PNG (con transparencia), JPEG, SVG y PDF, y el
+formato se reconoce por el contenido, no por la extensión (un SVG es un fichero que empieza por `<`, y un PDF, uno que
+empieza por `%PDF-`). Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son un error
+(`IMAGE_UNKNOWN`); un fichero que no es PNG, JPEG, PDF ni un SVG admitido (GIF, WebP…) o que no se puede leer, también
+(`IMAGE_FORMAT`). Los errores señalan la línea de la `Image`.
 
 Un XML que no es un SVG es también `IMAGE_FORMAT`. Un `Alt` vacío es `VALUE_NOT_ALLOWED`.
 
@@ -69,7 +71,8 @@ Cada píxel mide 0,75 pt (96 píxeles por pulgada), sin mirar la resolución que
 200 × 100 píxeles mide 150 × 75 pt. Para otro tamaño se declara `Width` o `Height`. El de un SVG sale de su `width` y
 `height` (en `px`, `pt`, `pc`, `in`, `cm` o `mm`; sin unidad, píxeles) o, si faltan, de su `viewBox`, también a 96 píxeles
 por pulgada; con solo uno de los dos lados y un `viewBox`, el otro sale de su proporción. Sin tamaño, o con medidas
-relativas (`%`, `em`), un SVG no tiene tamaño natural y es un error (`IMAGE_FORMAT`).
+relativas (`%`, `em`), un SVG no tiene tamaño natural y es un error (`IMAGE_FORMAT`). Un PDF ya está en puntos: su tamaño
+natural es el de la página que se dibuja, el de su recorte (lo que enseña un visor) y girado si la página lo está ([PDF](#pdf)).
 
 ## Dimensionado
 
@@ -149,6 +152,83 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 > **Decisión:** el texto de un SVG no es texto del PDF: se ve igual, pero no se puede seleccionar. En un documento
 > accesible, el texto va en el documento, el SVG es un dibujo y `Alt` da el texto alternativo.
 
+## PDF
+
+Una `Image` de un PDF dibuja **una de sus páginas**, la de `Page` (la primera, si no se declara), como una imagen más: se
+dimensiona, se coloca, se recorta y se gira como cualquier otra. Sirve para poner en el documento un plano, un gráfico o
+una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF; y como
+**fondo de página**: un papel con membrete, un formulario preimpreso, en un `Fixed` detrás del contenido.
+
+La página va como dibujo vectorial, con su contenido tal cual: sus trazados, sus imágenes y su texto, que se ve nítido a
+cualquier tamaño y **se puede seleccionar y copiar**, con sus fuentes. Cada página se copia una vez en el PDF, aunque se
+use en varias páginas del documento. Lo que no es contenido de la página no se copia:
+
+- **Las anotaciones.** Un enlace de la página no se copia (lo que se ve de él, el texto, sí). Una anotación que se ve, como
+  un campo de formulario relleno, un comentario o un sello, no se dibujaría, así que es un error (`IMAGE_FORMAT`): el PDF
+  se aplana antes de usarlo, por ejemplo imprimiéndolo a PDF.
+- **El etiquetado.** La página es una imagen: con `Alt` es una figura y un lector de pantalla anuncia ese texto, no el de
+  la página; sin `Alt` es decoración, como un fondo ([Accesibilidad](#accesibilidad)). Tampoco se copian sus marcadores.
+
+`Page` es la página física, desde 1, no el número que lleva impreso. Una página que el PDF no tiene es un error
+(`IMAGE_PAGE`, con la línea de `Page`), y `Page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
+(`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página que usa una
+fuente sin incrustar: el visor la sustituiría por otra y el documento no sería accesible.
+
+Un papel de carta con el membrete completo en la primera página y el logotipo pequeño en las demás (las páginas 1 y 2 de
+`letterhead.pdf`), detrás del contenido y a sangre: un `Fixed` con `Layer` negativa que sale del área útil con un
+`Offset` negativo igual al margen, y una imagen de `Width` y `Height` al 100 % de él. Los márgenes del documento dejan el
+sitio del membrete y del pie, que el contenido no puede pisar:
+
+```
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Carta
+	Media:
+		Paper: A4
+		Margin: 140 72 80 72
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Serif
+				Size: 10.5
+				Line height: 16
+		For class: letterhead
+			Box:
+				Width: 100%
+				Height: 100%
+	Section:
+		Fixed:
+			Pages: first
+			Offset: -140 -72 -80 -72
+			Layer: -1
+			Image: examples/letterhead/letterhead.pdf
+				Class: letterhead
+		Fixed:
+			Pages: not-first
+			Offset: -140 -72 -80 -72
+			Layer: -1
+			Image: examples/letterhead/letterhead.pdf
+				Page: 2
+				Class: letterhead
+		Paragraph: Olot, 20 de octubre de 2025
+		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor.
+		Paragraph: Las condiciones generales van en la página siguiente.
+			Break:
+				After: page
+		Paragraph: Condiciones generales de la propuesta.
+```
+
+> **Decisión:** una página de un PDF es una imagen, con todo lo de una imagen, y un papel con membrete es un `Fixed` con
+> esa imagen. *Alternativa descartada:* un elemento propio para insertar páginas enteras de otro PDF en el documento, o un
+> fondo de página propio de la sección.
+
+> **Decisión:** se copia el contenido de la página, sin su etiquetado: la `Image` lo etiqueta como figura o como
+> decoración. *Alternativa descartada:* injertar el árbol de estructura del PDF de origen, que no siempre existe ni encaja
+> en el del documento.
+
+> **Decisión:** una anotación que se ve es un error, no se dibuja su apariencia. *Alternativa descartada:* aplanarla al
+> copiarla, que obliga a interpretar cada tipo de anotación; ignorarla en silencio.
+
 ## Límites
 
 Una imagen no puede pedir más de lo que admiten los [límites](../comun/limites.md): un PNG o un JPEG, más píxeles que
@@ -160,7 +240,8 @@ que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORM
 
 Con `Alt`, un texto no vacío, la imagen es una figura que un lector de pantalla anuncia con ese texto. Sin `Alt` es
 decorativa y no se lee, igual que los fondos; dentro de un `Fixed`, siempre, y en las filas repetidas de una tabla, solo
-la primera vez.
+la primera vez. Una página de un PDF, igual: su texto se puede seleccionar, pero el lector de pantalla anuncia el `Alt`,
+no lo lee.
 
 > **Decisión:** una `Image` sin `Alt` es decorativa, sin aviso. *Alternativa descartada:* hacer `Alt` obligatorio, con un
 > `Alt` vacío para las decorativas, si un olvido del autor resulta ser un problema.
@@ -168,11 +249,14 @@ la primera vez.
 ## Salida
 
 El PDF lleva cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal cual y
-el PNG sin pérdida y con su transparencia. Un SVG se escala a su caja como un PNG, pero sigue siendo un dibujo vectorial
-nítido a cualquier tamaño (`fill` deforma el dibujo).
+el PNG sin pérdida y con su transparencia. Un SVG o una página de un PDF se escalan a su caja como un PNG, pero siguen
+siendo un dibujo vectorial nítido a cualquier tamaño (`fill` deforma el dibujo); una página de un PDF se copia una vez,
+aunque salga en varias páginas.
 
 ## Lo que no hay
 
 - GIF, WebP, TIFF y otros formatos; imágenes dentro de una línea de texto; varias resoluciones de una imagen.
 - Colocar la imagen dentro de su caja en otro sitio que el centro, o a su tamaño natural sin escalar.
 - En los SVG: patrones, máscaras, filtros, marcadores, imágenes, hojas de estilo y enlaces a otros ficheros.
+- En los PDF: insertar sus páginas como páginas del documento, con su tamaño; sus enlaces, campos de formulario,
+  comentarios, marcadores y etiquetado.

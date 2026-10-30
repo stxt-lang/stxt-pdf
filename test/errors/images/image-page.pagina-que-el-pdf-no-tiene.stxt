@@ -1,0 +1,13 @@
+# Case: Una página que el PDF no tiene
+# Code: IMAGE_PAGE
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/pages.pdf
+			Alt: Prueba
+			Page: 4

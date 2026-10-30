@@ -191,4 +191,5 @@ cuál.
 
 El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal
 cual y el PNG sin pérdida y con su transparencia. Un SVG es un formulario (*XObject*) de su tamaño natural, dibujado una vez
-por fichero, que se escala a su caja con `Fit` como un PNG ([El pintado](pintado.md#imágenes)).
+por fichero, que se escala a su caja con `Fit` como un PNG ([El pintado](pintado.md#imágenes)). La página de un PDF también
+es un formulario, copiado una vez por página: su contenido y sus recursos, sin sus anotaciones ni su etiquetado.
