@@ -15,11 +15,6 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
-### Aspecto de las cajas
-
-- Sombras (descartadas: PDFBox no desenfoca y habría que aproximar con capas), degradados con paradas con posición,
-  radiales o repetidos, y dos radios por esquina.
-
 ### Imágenes
 
 - El texto de un SVG se dibuja como contornos y no se puede seleccionar: haría falta una salida propia de JSVG que escriba
