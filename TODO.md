@@ -15,14 +15,6 @@ saliendo al trabajar y solo toca ese.
 
 ## Notas de Claude
 
-### Imágenes
-
-- El texto de un SVG se dibuja como contornos y no se puede seleccionar: haría falta una salida propia de JSVG que escriba
-  el texto con `drawString` en el `PdfBoxGraphics2D`.
-- El SVG de depuración incrusta el SVG como `data:`, y un navegador no tiene las fuentes de `fonts/`.
-- En el subconjunto de SVG no hay `pattern`, `mask`, `filter`, `marker`, `image` ni hojas de estilo, y un SVG no puede
-  enlazar a otro fichero.
-
 ### PDF como imagen
 
 - Solo se comprueba que las fuentes de la página estén incrustadas. Las demás reglas de PDF/UA sobre las fuentes (un
