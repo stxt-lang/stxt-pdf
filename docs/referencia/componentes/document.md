@@ -1,19 +1,19 @@
 # `Document`
 
-La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Media`, un `Title` y un
+La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Page`, un `Title` y un
 `Language`, un `Styles` opcional ([Styles](../comun/estilos.md)), los `Fixed` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
-`Element: Document`.
+`For element: Document`.
 
 ```
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 56
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -25,7 +25,7 @@ Document (dev.stxt.pdf):
 		Id: front-cover
 		Page numbering: none
 		Inherit fixed: false
-		Media:
+		Page:
 			Margin: 0
 		Block:
 			Box:
@@ -37,18 +37,18 @@ Document (dev.stxt.pdf):
 	Section:
 		Id: annex
 		Page numbering: restart
-		Media:
+		Page:
 			Orientation: landscape
 		Paragraph: El anexo, apaisado, vuelve a la página 1.
 ```
 
-> **Decisión:** el medio es siempre una secuencia de páginas, así que el área útil tiene siempre alto definido.
+> **Decisión:** el documento es siempre una secuencia de páginas, así que el área útil tiene siempre alto definido.
 > *Alternativa descartada:* un modo continuo para pantalla.
 
-## `Media`
+## `Page`
 
-Obligatorio, exactamente uno, hijo de `Document`: es el medio de las secciones que no declaran el suyo. Una `Section`
-puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-media-de-una-sección)).
+Obligatorio, exactamente uno, hijo de `Document`: es el formato de página de las secciones que no declaran el suyo. Una `Section`
+puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-page-de-una-sección)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -60,7 +60,7 @@ puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-med
 
 El tamaño de la página se declara **de una sola forma**: un `Paper` (con su `Orientation`, si es apaisada) o un `Width` y
 un `Height`. Declarar `Paper` con `Width` o `Height`, `Orientation` sin `Paper`, solo uno de `Width` y `Height`, o ninguna
-de las dos formas, es `MEDIA_SIZE`; también unos márgenes que no dejan área útil. Los tamaños con nombre, en puntos
+de las dos formas, es `PAGE_SIZE`; también unos márgenes que no dejan área útil. Los tamaños con nombre, en puntos
 enteros:
 
 | `Paper` | Ancho × alto (pt) | | `Paper` | Ancho × alto (pt) |
@@ -71,7 +71,7 @@ enteros:
 | `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
 
 ```
-Media:
+Page:
 	Paper: A4
 	Orientation: landscape
 	Margin: 40
@@ -101,10 +101,10 @@ contenido está en alguna.
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Id` | texto | — | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). |
-| `Class` | nombres separados por espacios | — | Le aplican las reglas `For class` con esos nombres; como `For id` y `Element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
-| `Media` | como el del documento | el del documento | Ver [abajo](#el-media-de-una-sección). |
+| `Style` | nombres separados por espacios | — | Le aplican las reglas `For style` con esos nombres; como `For id` y `For element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
+| `Page` | como el del documento | el del documento | Ver [abajo](#el-page-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
-| `Page style` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_STYLE_WITHOUT_NUMBERS`. |
+| `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit fixed` | booleano | `true` | Si lleva los `Fixed` del documento. Con `false`, solo salen los suyos. |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
@@ -114,7 +114,7 @@ Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
 - **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página; y la siguiente empieza otra. El
   contenido de una sección no se mezcla con el de otra.
 - **Cada sección es la raíz de su layout.** Su caja es el área útil de cada una de sus páginas (el contenedor de referencia
-  de sus elementos de primer nivel): sus márgenes y su alto salen de su `Media`, y cada página lleva el suyo. Una
+  de sus elementos de primer nivel): sus márgenes y su alto salen de su `Page`, y cada página lleva el suyo. Una
   `Section` no es una caja con `Box` propio: no tiene `Margin`, `Padding` ni fondo, y es un contexto de formato de bloque
   que no colapsa con nada.
 - **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Fixed`, que no ocupan sitio, no tendría
@@ -129,15 +129,15 @@ Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
 
 > **Decisión:** una sección sin contenido es un error, no una página en blanco que nadie escribió.
 
-### El `Media` de una sección
+### El `Page` de una sección
 
-Hereda del `Media` del documento **por grupos**: el tamaño (`Paper` con su `Orientation`, o `Width` y `Height`) se hereda
+Hereda del `Page` del documento **por grupos**: el tamaño (`Paper` con su `Orientation`, o `Width` y `Height`) se hereda
 entero o se declara entero, y `Margin` se hereda o se declara. Una sección que solo declara `Orientation` gira el `Paper`
 del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado); si el documento declara `Width` y
-`Height` no hay papel que girar y es `MEDIA_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `MEDIA_SIZE`.
+`Height` no hay papel que girar y es `PAGE_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `PAGE_SIZE`.
 
 > **Decisión:** herencia por grupos, para que `Orientation: landscape` sola dé el papel del documento apaisado.
-> *Alternativa descartada:* un `Media` completo en cada sección.
+> *Alternativa descartada:* un `Page` completo en cada sección.
 
 ### `Fixed` del documento y de la sección
 
@@ -169,7 +169,7 @@ Como el contador no avanza en una sección `none`, una sección `continue` detr�
 `Page numbering: restart`, `Start` da el número de la primera página de la sección (`Start: 5`: un documento repartido
 en varios ficheros). El visor muestra también el número impreso ([El PDF](../comun/pdf.md#páginas)).
 
-**Cómo se escribe.** `Page style` escribe los números de las páginas de la sección en cifras (`decimal`), en romanos en
+**Cómo se escribe.** `Page number format` escribe los números de las páginas de la sección en cifras (`decimal`), en romanos en
 minúscula (`lower-roman`: `i`, `ii`, `iv`) o en mayúscula (`upper-roman`). Lo que se imprime sigue mandando: `{page}` y
 `{pages}` se escriben con el estilo de la página donde salen, y `{page of: id}` y las entradas de un índice, con el de
 la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a empezar en 1:
@@ -177,14 +177,14 @@ la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a
 ```
 Section:
 	Id: preface
-	Page style: lower-roman
+	Page number format: lower-roman
 	Paragraph: El prefacio: sus páginas son i, ii, iii…
 Section:
 	Page numbering: restart
 	Paragraph: El cuerpo empieza en la página 1.
 ```
 
-Un `Page style` en una sección `none`, que no tiene números, es `PAGE_STYLE_WITHOUT_NUMBERS`; un `Start` sin `restart`,
+Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`; un `Start` sin `restart`,
 que no tendría efecto porque la sección sigue la cuenta de la anterior, `START_WITHOUT_RESTART`.
 
 > **Decisión:** el estilo es de la sección, no del contador: una sección `continue` en romanos sigue la cuenta de la
@@ -202,7 +202,7 @@ primera es la 1), no el número impreso. Con `any` (por defecto), la sección em
 
 La página en blanco es **una página más de la sección anterior**:
 
-- Tiene su `Media`, su `Page style` y su numeración: si la sección numera, avanza el contador y cuenta para `{pages}`
+- Tiene su `Page`, su `Page number format` y su numeración: si la sección numera, avanza el contador y cuenta para `{pages}`
   como cualquier otra, aunque no se imprima; si es `none`, no tiene número.
 - No tiene contenido ni `Fixed`, ni los de la sección ni los del documento.
 - No cuenta para el `Pages` de los `Fixed` de su sección (`Pages: last` es su última página con contenido). Para los del

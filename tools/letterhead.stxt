@@ -5,17 +5,17 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Papel de carta de Taller Nogal
-	Media:
+	Page:
 		Paper: A4
 		Margin: 0
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 8
 				Line height: 12
 				Color: #6B5B4E
-		For class: legal
+		For style: legal
 			Box:
 				Padding: 6 0 0 0
 				Border: 0.5 0 0 0
@@ -50,7 +50,7 @@ Document (dev.stxt.pdf):
 		Absolute:
 			Offset: auto 72 28 72
 			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
-				Class: legal
+				Style: legal
 	Section:
 		Id: next
 		Absolute:
@@ -62,4 +62,4 @@ Document (dev.stxt.pdf):
 		Absolute:
 			Offset: auto 72 28 72
 			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
-				Class: legal
+				Style: legal

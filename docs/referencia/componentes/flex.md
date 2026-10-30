@@ -2,7 +2,7 @@
 
 Un `Flex` coloca sus ítems en líneas: en el **eje principal** (`Direction`) uno tras otro y alineados en el **eje
 cruzado**. Cada hijo en flujo es un `Item`, que envuelve al elemento que hace de ítem; además admite `Absolute` y `Fixed`.
-El `Flex` admite `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
+El `Flex` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
 
 ```
 Flex:

@@ -1,18 +1,17 @@
-# Case: Una sección gira un medio que no tiene papel
-# Code: MEDIA_SIZE
-# Line: 17
+# Case: For element: Document con Language, que ya es el de Document
+# Code: STYLE_NOT_ALLOWED
+# Line: 15
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
+				Language: en
 	Section:
-		Media:
-			Orientation: landscape
 		Text: Hola

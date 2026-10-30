@@ -4,7 +4,7 @@
 # con el precio y la nota final en negrita dentro de la línea (Inline: markdown). Los rótulos de las
 # secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Width: 420
 		Height: 700
 		Margin: 50 54 52 54
@@ -54,7 +54,7 @@ Document (dev.stxt.pdf):
 				Text: Carta
 			Text: Cocina de mercado y de mar
 				Typography:
-					Style: italic
+					Italic: true
 					Size: 11
 					Align: center
 					Color: #14365C
@@ -67,139 +67,139 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Para empezar
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Pan de cristal con tomate de colgar
-							Class: name
+							Style: name
 						Text: Con anchoas del Cantábrico, aceite de Empordà
-							Class: desc
+							Style: desc
 				Item:
 					Text: 9
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Ensaladilla rusa de la casa
-							Class: name
+							Style: name
 						Text: Con ventresca de atún de almadraba
-							Class: desc
+							Style: desc
 				Item:
 					Text: 11
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Croquetas de gamba roja
-							Class: name
+							Style: name
 						Text: Seis unidades, con alioli de azafrán
-							Class: desc
+							Style: desc
 				Item:
 					Text: 13
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Alcachofas confitadas
-							Class: name
+							Style: name
 						Text: Con jamón ibérico y yema de huevo a baja temperatura
-							Class: desc
+							Style: desc
 				Item:
 					Text: 14
-						Class: price
+						Style: price
 			Heading 2:
 				Text: Del mar
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Arroz caldoso de cigalas y calamar
-							Class: name
+							Style: name
 						Text: Precio por persona, mínimo dos. Se prepara al momento: unos 25 minutos
-							Class: desc
+							Style: desc
 				Item:
 					Text: 26
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Suquet de pescado de roca
-							Class: name
+							Style: name
 						Text: Con patata y picada de almendra, como en las barcas
-							Class: desc
+							Style: desc
 				Item:
 					Text: 24
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Lubina salvaje al horno
-							Class: name
+							Style: name
 						Text: Con hinojo, limón y patatas panadera
-							Class: desc
+							Style: desc
 				Item:
 					Text: 27
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Pulpo a la brasa
-							Class: name
+							Style: name
 						Text: Con puré de patata y pimentón de la Vera
-							Class: desc
+							Style: desc
 				Item:
 					Text: 22
-						Class: price
+						Style: price
 			Heading 2:
 				Text: De la tierra
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Presa ibérica a la brasa
-							Class: name
+							Style: name
 						Text: Con setas de temporada y salsa de vino tinto
-							Class: desc
+							Style: desc
 				Item:
 					Text: 21
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Canelones de la abuela
-							Class: name
+							Style: name
 						Text: Receta de Sant Esteve, con bechamel de nuez moscada
-							Class: desc
+							Style: desc
 				Item:
 					Text: 15
-						Class: price
+						Style: price
 		Block:
 			Id: back
 			Break:
@@ -209,57 +209,57 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 9 0
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Crema catalana
-							Class: name
+							Style: name
 						Text: Quemada al momento, con canela de Ceilán
-							Class: desc
+							Style: desc
 				Item:
 					Text: 7
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Tarta de queso cremosa
-							Class: name
+							Style: name
 						Text: Con confitura de higos de la casa
-							Class: desc
+							Style: desc
 				Item:
 					Text: 8
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Helado artesano de leche de oveja
-							Class: name
+							Style: name
 						Text: Tres bolas a elegir entre vainilla, miel o limón
-							Class: desc
+							Style: desc
 				Item:
 					Text: 7
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Pera al vino tinto
-							Class: name
+							Style: name
 						Text: Con helado de canela
-							Class: desc
+							Style: desc
 				Item:
 					Text: 8
-						Class: price
+						Style: price
 			Image: examples/menu/ornament.svg
 				Box:
 					Width: 100%
@@ -267,57 +267,57 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Vinos y bebidas por copa
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Blanc de la casa
-							Class: name
+							Style: name
 						Text: Garnatxa blanca, D. O. Empordà
-							Class: desc
+							Style: desc
 				Item:
 					Text: 4,50
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Cava brut nature reserva
-							Class: name
+							Style: name
 						Text: Penedès, fermentado en botella
-							Class: desc
+							Style: desc
 				Item:
 					Text: 5,00
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Tinto joven
-							Class: name
+							Style: name
 						Text: Garnatxa y cariñena, D. O. Empordà
-							Class: desc
+							Style: desc
 				Item:
 					Text: 4,50
-						Class: price
+						Style: price
 			Flex:
-				Class: dish
+				Style: dish
 				Gap: 12
 				Item:
 					Grow: 1
 					Block:
 						Text: Vermut de la casa
-							Class: name
+							Style: name
 						Text: Con soda, aceituna y una rodaja de naranja
-							Class: desc
+							Style: desc
 				Item:
 					Text: 4,00
-						Class: price
+						Style: price
 			Block:
 				Id: tasting
 				Box:
@@ -331,7 +331,7 @@ Document (dev.stxt.pdf):
 					Typography:
 						Font: IBM Plex Sans
 						Size: 8
-						Weight: bold
+						Bold: true
 						Color: #926829
 						Transform: uppercase
 						Letter spacing: 2
@@ -339,14 +339,14 @@ Document (dev.stxt.pdf):
 				Text: Siete pasos, del mercado a la mesa
 					Typography:
 						Size: 12
-						Weight: bold
+						Bold: true
 						Align: center
 						Color: #14365C
 					Box:
 						Margin: 3 0 3 0
 				Text: Seleccionado cada día por la cocina según el pescado y la verdura que llegan al puerto. Mesa completa.
 					Typography:
-						Style: italic
+						Italic: true
 						Size: 8.5
 						Align: center
 						Color: #6E675C

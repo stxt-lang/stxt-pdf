@@ -192,7 +192,7 @@ class ArchitectureTest {
 
     /**
      * El layout y el pintado preguntan a la caja lo que significa ({@code Box.role()}), no qué elemento es:
-     * fuera de {@code tree} no se nombra ninguna constante de {@code Element} salvo en el despacho de
+     * fuera de {@code tree} no se nombra ninguna constante de {@code For element} salvo en el despacho de
      * {@code Engine} (la tabla tiene su algoritmo). Un elemento nuevo con un papel que ya existe no toca nada fuera
      * de {@code tree}.
      */

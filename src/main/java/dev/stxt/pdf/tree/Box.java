@@ -71,7 +71,7 @@ public final class Box {
 
     /**
      * Elemento del que procede; {@code null} en la raíz. Da el significado: reglas
-     * {@code Element}, marcadores y etiquetas del PDF.
+     * {@code For element}, marcadores y etiquetas del PDF.
      */
     public Element element() {
         return element;

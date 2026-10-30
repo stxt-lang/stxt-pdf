@@ -120,7 +120,7 @@ final class TableBuilder {
                 occupy(taken, r, c, span, g.getName());
                 TextAlign align = columns.aligns().isEmpty() ? null : columns.aligns().get(c);
                 Box box = cells.build(cell, row, new CellPosition(group, r + 1, c + 1, align, columns.alignLine(),
-                        child(row, "class").orElse(null), child(row, "id").orElse(null)));
+                        child(row, "style").orElse(null), child(row, "id").orElse(null)));
                 box.style().declared(ITEM_AREA, cell.getLine());
                 box.style().item().setArea(new Cell(firstRow + r + 1, c + 1, span.rows(), span.columns()));
                 table.addChild(box);

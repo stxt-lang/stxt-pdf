@@ -7,15 +7,15 @@ poner cosas una al lado de otra: un logotipo y unos datos, tres cifras, un preci
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Cifras
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For class: figure
+		For style: figure
 			Box:
 				Padding: 10
 				Background: #F1EFE8
@@ -29,17 +29,17 @@ Document (dev.stxt.pdf):
 				Grow: 1
 				Basis: 0
 				Text: 12 % más de ventas
-					Class: figure
+					Style: figure
 			Item:
 				Grow: 1
 				Basis: 0
 				Text: 3 tiendas nuevas
-					Class: figure
+					Style: figure
 			Item:
 				Grow: 1
 				Basis: 0
 				Text: 98 % de clientes satisfechos
-					Class: figure
+					Style: figure
 		Flex:
 			Main axis: between
 			Box:

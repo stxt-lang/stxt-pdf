@@ -1,10 +1,10 @@
-# Case: Typography directamente en el Document: va en Styles, en Element: Document
+# Case: Typography directamente en el Document: va en Styles, en For element: Document
 # Code: CHILD_NOT_DECLARED
 # Line: 11
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Section:

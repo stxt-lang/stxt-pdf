@@ -78,7 +78,7 @@ class PageNumbersTest {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tFixed:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
                 "\t\tText: Hoja {page}", "\t\t\tId: footer",
-                "\tSection:", "\t\tPage style: lower-roman",
+                "\tSection:", "\t\tPage number format: lower-roman",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 800");
         assertEquals(8, l.pages());
         assertEquals(List.of("Hoja", "viii"), l.fragment(8, "footer").lines().stream().map(TextLine::text).toList());

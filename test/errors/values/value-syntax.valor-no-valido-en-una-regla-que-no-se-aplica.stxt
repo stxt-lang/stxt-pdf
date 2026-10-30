@@ -4,11 +4,11 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Grid
+		For element: Grid
 			Box:
 				Background: rojo
 	Section:

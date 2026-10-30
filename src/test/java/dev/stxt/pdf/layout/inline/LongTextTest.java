@@ -50,8 +50,8 @@ class LongTextTest {
 
     /** Un {@code Text} con {@code paragraphs} párrafos de cuatro frases. */
     private static String document(int paragraphs, String wrap) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tMedia:", "\t\tWidth: 595",
-                "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
+                "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\t\t\t\tText wrap: " + wrap, "\tText:", "\t\tContent >>"));
         for (int p = 0; p < paragraphs; p++) {
             if (p > 0) {

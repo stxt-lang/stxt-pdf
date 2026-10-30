@@ -5,7 +5,7 @@
 # font: el IBAN y el BIC, como código en línea, en la fuente monoespaciada. Los rótulos se escriben como
 # una frase normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 44 44 60 44
 	Title: Factura 2025-0147
@@ -40,7 +40,7 @@ Document (dev.stxt.pdf):
 					Text: Factura
 						Typography:
 							Size: 28
-							Weight: bold
+							Bold: true
 							Color: #3B2A1E
 							Align: right
 							Line height: 30
@@ -59,11 +59,11 @@ Document (dev.stxt.pdf):
 				Margin: 0 0 18 0
 			Area:
 				Block:
-					Class: party
+					Style: party
 					Text: Emisor
-						Class: label
+						Style: label
 					Text: Taller Nogal S.L.
-						Class: strong
+						Style: strong
 					Text: CIF B-17482930
 					Text: Carrer de la Farga, 14 · Polígono Les Torres
 					Text: 17800 Olot (Girona)
@@ -71,11 +71,11 @@ Document (dev.stxt.pdf):
 						Link: mailto:administracion@tallernogal.example
 			Area:
 				Block:
-					Class: party
+					Style: party
 					Text: Cliente
-						Class: label
+						Style: label
 					Text: Hotel Mirador del Valle, S.A.
-						Class: strong
+						Style: strong
 					Text: CIF A-08827416
 					Text: Camí del Mirador, s/n
 					Text: 17850 Besalú (Girona)
@@ -92,22 +92,22 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Text: Fecha de emisión
-						Class: label
+						Style: label
 					Text: 14 de octubre de 2025
 			Area:
 				Block:
 					Text: Vencimiento
-						Class: label
+						Style: label
 					Text: 13 de noviembre de 2025
 			Area:
 				Block:
 					Text: Forma de pago
-						Class: label
+						Style: label
 					Text: Transferencia a 30 días
 			Area:
 				Block:
 					Text: Pedido
-						Class: label
+						Style: label
 					Text: PO-2025-311
 		Table:
 			Id: lines
@@ -184,7 +184,7 @@ Document (dev.stxt.pdf):
 						Span: 1 4
 					Cell: 2.318,82 €
 				Row:
-					Class: total
+					Style: total
 					Cell: Total a pagar
 						Header: true
 						Span: 1 4
@@ -199,14 +199,14 @@ Document (dev.stxt.pdf):
 						Inline: markdown
 						Code font: IBM Plex Mono
 					Text: Datos para el pago
-						Class: label
+						Style: label
 					Paragraph: **`ES91 2100 0418 4502 0005 1332`**
 					Paragraph: Caixa Girona · BIC `CAIXESBBXXX`
 					Paragraph: Indica el **número de factura** en el concepto.
 			Area:
 				Block:
 					Text: Condiciones
-						Class: label
+						Style: label
 					Paragraph: Los muebles son propiedad del taller hasta el pago íntegro de la factura. Garantía de **cinco años** sobre estructura y herrajes; la madera maciza puede variar ligeramente de tono, como corresponde a un material vivo.
 						Typography:
 							Size: 8

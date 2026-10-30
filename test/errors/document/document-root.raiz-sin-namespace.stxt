@@ -2,7 +2,7 @@
 # Code: DOCUMENT_ROOT
 # Line: 4
 Document:
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Section:

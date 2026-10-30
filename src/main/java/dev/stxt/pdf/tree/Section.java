@@ -10,7 +10,7 @@ import dev.stxt.pdf.model.NumberStyle;
  * @param box          la caja: el área útil de cada una de sus páginas; es {@link Element#SECTION}
  * @param media        su medio: el del documento con lo que ella declara encima
  * @param numbering    cómo numera sus páginas
- * @param pageStyle    cómo se escriben sus números de página ({@code Page style})
+ * @param pageStyle    cómo se escriben sus números de página ({@code Page number format})
  * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
  *                     declara
  * @param inheritFixed si lleva los {@code Fixed} del documento

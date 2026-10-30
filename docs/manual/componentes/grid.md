@@ -7,15 +7,15 @@ varias. Sirve para composiciones de página: una barra lateral y el cuerpo, fich
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Ficha
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For class: panel
+		For style: panel
 			Box:
 				Padding: 10
 				Background: #F1EFE8
@@ -30,10 +30,10 @@ Document (dev.stxt.pdf):
 				Text: Silla de nogal
 					Typography:
 						Size: 18
-						Weight: bold
+						Bold: true
 			Area: side
 				Text: Ref. 0412
-					Class: panel
+					Style: panel
 			Area: main
 				Paragraph:
 					Content >>

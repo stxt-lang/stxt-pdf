@@ -3,25 +3,25 @@
 Un `Markdown` es un bloque cuyo contenido se escribe en Markdown, en su `Content`. Ese contenido se **traduce a los
 elementos que ya existen**, y lo generado se trata como si lo hubiera escrito el autor: las mismas reglas de `Styles`, los
 mismos errores ([Errores](../comun/errores.md)), los marcadores y la accesibilidad. El
-`Markdown` es la caja que lo contiene, un bloque como un `Block`: admite `Id`, `Class`, `Box`, `Typography` y `Break`, y lo
+`Markdown` es la caja que lo contiene, un bloque como un `Block`: admite `Id`, `Style`, `Box`, `Typography` y `Break`, y lo
 generado hereda su `Typography`. No admite `Link`: su contenido lleva sus propios enlaces.
 
 ```
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Heading 1
+		For element: Heading 1
 			Typography:
 				Size: 18
-		Element: List
+		For element: List
 			Box:
 				Padding: 0 0 0 20
 	Section:
@@ -114,17 +114,17 @@ código en línea se colapsa como en cualquier párrafo; lo que conserva los esp
 
 Un bloque de código es un `Text` con `White space: pre` ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space))
 cuya fuente es su `Code font`, así que se parte entre líneas entre páginas y una línea más ancha que la caja es un error
-(`TEXT_OVERFLOW`); no tiene `Id` ni `Class`, pero es el elemento generado `Code block` y lo nombra la regla
-`Element: Code block` ([Styles](../comun/estilos.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
-tamaño menor, `Inside: avoid`…). No lo alcanza `Element: Text` (que sigue valiendo para los `Text` de los encabezados de
+(`TEXT_OVERFLOW`); no tiene `Id` ni `Style`, pero es el elemento generado `Code block` y lo nombra la regla
+`For element: Code block` ([Styles](../comun/estilos.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
+tamaño menor, `Inside: avoid`…). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
 un Markdown y para los que se escriben); un `Text` escrito a mano con `White space: pre` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown`, así que `Size`, `Color`, `Tab size` o `Code font` se declaran en el `Typography` del
-`Markdown`, de un antecesor o en `Element: Code block`, que puede darle otra `Code font` que al código en línea; un
-`Font` de `Element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja,
+`Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea; un
+`Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja,
 no el de la fuente del código, así que las líneas con código en línea no cambian de alto.
 
 `Code font` es de `Typography` ([Tipografía](../comun/tipografia.md)) y se hereda: se declara una vez, en
-`Element: Document`, y vale para el código de los `Markdown` y de los textos con `Inline: markdown`. Sin ella, el código
+`For element: Document`, y vale para el código de los `Markdown` y de los textos con `Inline: markdown`. Sin ella, el código
 es un error (`CODE_WITHOUT_FONT`), con la línea del párrafo o la del bloque; si la familia no existe, `FONT_UNKNOWN`,
 con la línea de `Code font`.
 
@@ -134,7 +134,7 @@ con la línea de `Code font`.
 > solo para escribir el IBAN y el BIC).
 
 > **Decisión:** el bloque de código es un elemento generado que solo nombran las reglas. *Alternativa descartada:* un
-> `Code block` también escribible, o una clase automática `code`, que reservaría un nombre de clase al autor.
+> `Code block` también escribible, o un estilo automático `code`, que reservaría un nombre de estilo al autor.
 
 ## Listas
 
@@ -143,7 +143,7 @@ marcador de `Bullet`; una con viñetas dentro de esa, el segundo, y así hasta e
 profundos. Las numeradas cuentan aparte, con `Numbering`. Cada párrafo de un ítem es un `Paragraph`, y una lista anidada,
 una `List` dentro del `List item`. Las listas compactas y las separadas por líneas en blanco se traducen igual: el espacio
 entre ítems lo dan las reglas de `Styles`. Como cualquier lista, la sangría que deja sitio al marcador es su `Padding`
-izquierdo, que se suele declarar en la regla `Element: List` ([List](list.md)).
+izquierdo, que se suele declarar en la regla `For element: List` ([List](list.md)).
 
 > **Decisión:** el nivel se cuenta por tipo: una lista numerada dentro de una con viñetas usa el primer marcador de
 > `Numbering`. *Alternativa descartada:* un nivel común a los dos tipos.
@@ -162,8 +162,8 @@ escapada no separa celdas). Las celdas reciben las reglas de las celdas de cualq
 
 ## Estilo
 
-Lo generado no tiene `Class`, ni `Id` salvo los encabezados que lo escriben ([abajo](#encabezados)): se le da estilo con
-las reglas `Element` de `Styles` (`Element: Heading 1`, `Element: Paragraph`, `Element: Code block`…), que se aplican a
+Lo generado no tiene `Style`, ni `Id` salvo los encabezados que lo escriben ([abajo](#encabezados)): se le da estilo con
+las reglas `For element` de `Styles` (`For element: Heading 1`, `For element: Paragraph`, `For element: Code block`…), que se aplican a
 todo el documento, y con el `Typography` del `Markdown`, que hereda.
 
 ## Encabezados
@@ -205,4 +205,4 @@ Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tabl
 
 - Citas, HTML, líneas horizontales, saltos de línea forzados, notas al pie, listas de tareas y resaltado de código.
 - Imágenes dentro de un texto y enlaces con título o con definición aparte.
-- `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Class`.
+- `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Style`.

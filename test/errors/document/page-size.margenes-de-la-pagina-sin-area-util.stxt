@@ -1,10 +1,10 @@
-# Case: Márgenes del medio sin área útil
-# Code: MEDIA_SIZE
+# Case: Márgenes de la página sin área útil
+# Code: PAGE_SIZE
 # Line: 10
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 		Margin: 300

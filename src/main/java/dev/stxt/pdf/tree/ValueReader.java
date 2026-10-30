@@ -238,7 +238,7 @@ final class ValueReader {
     static double points(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p) || p.pt() <= 0) {
-            throw error(n, ErrorCode.MEDIA_SIZE, n.getName() + " del medio debe ser un número de puntos positivo: "
+            throw error(n, ErrorCode.PAGE_SIZE, n.getName() + " del medio debe ser un número de puntos positivo: "
                     + n.getText().trim());
         }
         return p.pt();

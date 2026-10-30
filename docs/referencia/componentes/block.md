@@ -1,6 +1,6 @@
 # `Block`
 
-Una caja que apila sus hijos en vertical. Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y
+Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y
 `Rotate`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
 y ocupa el rectángulo que la envuelve ([Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)).
 

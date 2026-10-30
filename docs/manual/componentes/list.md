@@ -6,18 +6,18 @@ Una lista con viñetas o numerada. Cada `List item` es un ítem, con un marcador
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Pasos
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: List
+		For element: List
 			Box:
 				Padding: 0 0 0 18
-		Element: List item
+		For element: List item
 			Box:
 				Margin: 0 0 4 0
 	Section:
@@ -45,13 +45,13 @@ Document (dev.stxt.pdf):
 | `Start` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Number` | `List item` | El número de este ítem; los siguientes siguen desde él |
 
-`List` y `List item` admiten además `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
+`List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
 elementos (un `Paragraph`, un `Text`, otra `List`…), pero no encabezados.
 
 ## La sangría
 
 El marcador cuelga **a la izquierda del ítem**, en el hueco que deja el `Padding` izquierdo de la `List`. Sin ese relleno no
-hay sitio para el marcador y es un error, así que lo normal es darlo en una regla `Element: List`, como en el ejemplo. Los
+hay sitio para el marcador y es un error, así que lo normal es darlo en una regla `For element: List`, como en el ejemplo. Los
 marcadores quedan alineados a la derecha, pegados al texto con un espacio.
 
 ## Cómo se comporta

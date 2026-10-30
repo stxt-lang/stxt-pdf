@@ -21,8 +21,8 @@ import java.util.Set;
  * {@code IMAGE_FORMAT} si no es PNG, JPEG, PDF ni un SVG admitido. Una imagen que supera los {@link Limits} es
  * {@code IMAGE_TOO_LARGE} (los píxeles de un PNG o JPEG) o {@code SVG_TOO_COMPLEX} (los elementos y los
  * niveles de un SVG), también con la línea de la {@code Image}; un PDF de más bytes que los {@link Limits},
- * {@code PDF_TOO_LARGE}, antes de abrirlo. La página de un PDF tiene que existir, y {@code Page} en otro formato es un
- * error ({@code IMAGE_PAGE}, con la línea de {@code Page}); una página que no se dibujaría igual que en su PDF es
+ * {@code PDF_TOO_LARGE}, antes de abrirlo. La página de un PDF tiene que existir, y {@code Pdf page} en otro formato es un
+ * error ({@code IMAGE_PAGE}, con la línea de {@code Pdf page}); una página que no se dibujaría igual que en su PDF es
  * {@code IMAGE_FORMAT}, salvo que se quite su comprobación ({@link Check#PDF_IMAGE_FONTS},
  * {@link Check#PDF_IMAGE_ANNOTATIONS}).
  */
@@ -95,16 +95,16 @@ public final class Images {
         return String.format(java.util.Locale.ROOT, "%.1f MB", bytes / 1_000_000.0);
     }
 
-    /** Que {@code Page} sea de un PDF y la página exista, y que se pueda dibujar con las comprobaciones que se hacen. */
+    /** Que {@code Pdf page} sea de un PDF y la página exista, y que se pueda dibujar con las comprobaciones que se hacen. */
     private void checkPage(ImageFile file, Box box) {
         int page = box.style().image().page();
-        if (box.style().isDeclared(PropertyKey.PAGE)) {
+        if (box.style().isDeclared(PropertyKey.PDF_PAGE)) {
             if (file.format() != ImageFile.Format.PDF) {
-                throw new InvalidModelException(box.style().line(PropertyKey.PAGE), ErrorCode.IMAGE_PAGE, "Page solo "
+                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "Pdf page solo "
                         + "tiene efecto en un PDF, y la imagen " + box.image() + " es " + file.format() + ": quítalo");
             }
             if (page > file.pages()) {
-                throw new InvalidModelException(box.style().line(PropertyKey.PAGE), ErrorCode.IMAGE_PAGE, "El PDF "
+                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "El PDF "
                         + box.image() + " tiene " + file.pages() + (file.pages() == 1 ? " página" : " páginas")
                         + " y no tiene la " + page);
             }

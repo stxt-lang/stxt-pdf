@@ -43,23 +43,23 @@ falta para un texto en vertical, como las cabeceras de unas columnas estrechas:
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Turnos de la semana
-	Media:
+	Page:
 		Paper: A5
 		Orientation: landscape
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Cell
+		For element: Cell
 			Box:
 				Padding: 4 6
 				Border: 0 0 0.5 0
 				Border color: #C8C4BA
-		Element: Head cell
+		For element: Head cell
 			Typography:
-				Weight: bold
+				Bold: true
 	Section:
 		Table:
 			Columns: 1fr auto auto auto
@@ -110,7 +110,7 @@ Absolute:
 	Text: BORRADOR
 		Typography:
 			Color: #A32D2D
-			Weight: bold
+			Bold: true
 ```
 
 - **`Rotate origin`** es el punto alrededor del que gira: una o dos de `top`, `bottom`, `left`, `right` y `center` (por

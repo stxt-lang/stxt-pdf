@@ -33,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConverterTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
+    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
+    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
             + "\t\t\tSize: 10\n";
 
     /** Un documento de una sola caja con texto, que necesita la tipografía de {@link #BASE}. */

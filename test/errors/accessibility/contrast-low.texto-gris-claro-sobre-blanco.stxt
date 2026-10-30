@@ -1,14 +1,14 @@
-# Case: Texto gris claro sobre la página blanca, con el Color heredado de Element: Document
+# Case: Texto gris claro sobre la página blanca, con el Color heredado de For element: Document
 # Code: CONTRAST_LOW
 # Line: 15
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10

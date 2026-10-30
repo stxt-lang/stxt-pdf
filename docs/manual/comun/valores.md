@@ -68,4 +68,4 @@ pinta un azul que aparece de arriba abajo, desde transparente.
 
 - **Booleanos:** `true` o `false`.
 - **Enteros:** sin decimales (`Widows: 3`).
-- **Listas de nombres:** separadas por espacios (`Class: note wide`).
+- **Listas de nombres:** separadas por espacios (`Style: note wide`).

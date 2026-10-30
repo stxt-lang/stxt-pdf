@@ -4,14 +4,14 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Block
+		For element: Block
 			Box:
 				Padding: 4
-		Element: block
+		For element: block
 			Box:
 				Margin: 4
 	Section:

@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SectionsTest {
 
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n"
-            + "\tMedia:\n\t\tWidth: 300\n\t\tHeight: 200\n\t\tMargin: 20\n"
-            + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
+            + "\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n\t\tMargin: 20\n"
+            + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static LaidOutDocument lay(Object... lines) {
         return layWith(HEADER, lines);
@@ -87,14 +87,14 @@ class SectionsTest {
 
     @Test
     void eachSectionStartsANewPageWithItsOwnMedia() {
-        LaidOutDocument d = layWith("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n"
-                + "\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n",
+        LaidOutDocument d = layWith("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tPaper: A4\n"
+                + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n",
                 "\tSection:", "\t\tBlock:", "\t\t\tId: a",
-                "\tSection:", "\t\tMedia:", "\t\t\tOrientation: landscape", "\t\tBlock:", "\t\t\tId: b",
-                "\tSection:", "\t\tMedia:", "\t\t\tMargin: 10", "\t\tBlock:", "\t\t\tId: c",
-                "\tSection:", "\t\tMedia:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
+                "\tSection:", "\t\tPage:", "\t\t\tOrientation: landscape", "\t\tBlock:", "\t\t\tId: b",
+                "\tSection:", "\t\tPage:", "\t\t\tMargin: 10", "\t\tBlock:", "\t\t\tId: c",
+                "\tSection:", "\t\tPage:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
         assertEquals(4, d.pages().size());
-        // Sin Media propio, el del documento.
+        // Sin Page propio, el del documento.
         assertEquals(595, d.pages().get(0).media().width(), 1e-9);
         assertEquals(842, d.pages().get(0).media().height(), 1e-9);
         // Solo Orientation: el papel del documento girado, con sus márgenes.
@@ -177,14 +177,14 @@ class SectionsTest {
 
     /**
      * Un prefacio en romanos y un cuerpo que vuelve a empezar en 5: {@code {page}}, {@code {pages}} y {@code {page of:
-     * id}} se escriben con el {@code Page style} de la página donde salen o a la que se refieren
+     * id}} se escriben con el {@code Page number format} de la página donde salen o a la que se refieren
      * (referencia/componentes/document.md).
      */
     @Test
     void romanPagesAndARestartThatStartsAtFive() {
         LaidOutDocument d = lay(
                 "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
-                join(new String[] {"\tSection:", "\t\tPage style: lower-roman", "\t\tText: El cuerpo empieza en la "
+                join(new String[] {"\tSection:", "\t\tPage number format: lower-roman", "\t\tText: El cuerpo empieza en la "
                         + "{page of: b1} y el prefacio en la {page of: p1}.", "\t\t\tId: ref"}, fullPage("p1"),
                         fullPage("p2")),
                 join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tStart: 5"}, fullPage("b1"),
@@ -280,9 +280,9 @@ class SectionsTest {
     @Test
     void theBlankPageFollowsTheNumberingOfItsSection() {
         LaidOutDocument d = lay(
-                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tMedia:", "\t\t\tMargin: 0"},
+                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tPage:", "\t\t\tMargin: 0"},
                         new String[] {"\t\tBlock:", "\t\t\tId: cover"}),
-                join(new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tPage style: lower-roman"},
+                join(new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tPage number format: lower-roman"},
                         fullPage("p")),
                 join(new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tPage numbering: restart"},
                         fullPage("b")));
@@ -305,9 +305,9 @@ class SectionsTest {
 
     @Test
     void theClassOfASectionGivesItsContentATypography() {
-        LaidOutDocument d = layWith(HEADER + "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tSize: 20\n",
+        LaidOutDocument d = layWith(HEADER + "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tSize: 20\n",
                 "\tSection:", "\t\tText: ab", "\t\t\tId: normal",
-                "\tSection:", "\t\tClass: annex", "\t\tText: ab", "\t\t\tId: big");
+                "\tSection:", "\t\tStyle: annex", "\t\tText: ab", "\t\t\tId: big");
         // Cada carácter mide la mitad del tamaño: 5 pt con Size 10 y 10 pt con Size 20.
         assertEquals(5, on(d.pages().get(0), "normal").lines().get(0).width() / 2, 1e-9);
         assertEquals(10, on(d.pages().get(1), "big").lines().get(0).width() / 2, 1e-9);
@@ -331,11 +331,11 @@ class SectionsTest {
 
     @Test
     void elementAndIdRulesReachASectionToo() {
-        LaidOutDocument d = layWith(HEADER + "\t\tElement: Section\n\t\t\tTypography:\n\t\t\t\tSize: 20\n"
+        LaidOutDocument d = layWith(HEADER + "\t\tFor element: Section\n\t\t\tTypography:\n\t\t\t\tSize: 20\n"
                         + "\t\tFor id: small\n\t\t\tTypography:\n\t\t\t\tSize: 10\n",
                 "\tSection:", "\t\tText: ab", "\t\t\tId: t1",
                 "\tSection:", "\t\tId: small", "\t\tText: ab", "\t\t\tId: t2");
-        // Element: Section da 10 pt por carácter; la regla del Id de la segunda, que gana, vuelve a 5.
+        // For element: Section da 10 pt por carácter; la regla del Id de la segunda, que gana, vuelve a 5.
         assertEquals(10, on(d.pages().get(0), "t1").lines().get(0).width() / 2, 1e-9);
         assertEquals(5, on(d.pages().get(1), "t2").lines().get(0).width() / 2, 1e-9);
     }

@@ -8,11 +8,11 @@ posicionado.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Catálogo
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -48,10 +48,10 @@ Document (dev.stxt.pdf):
 | *(valor)* | La ruta del fichero dentro de `images/`: `Image: logos/acme.png`. Obligatoria |
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
 | `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `contain` (entera, con espacio a los lados), `cover` (llena la caja y recorta lo que sobra) o `fill` (se deforma) |
-| `Page` | La página de un PDF que se dibuja, desde 1. Sin `Page`, la primera. Solo en un PDF |
+| `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro; ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 
-Admite además `Id`, `Class`, `Link`, `Box` y `Break` (sin `Inside` ni `Decoration`: no se parte). No admite `Typography`.
+Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Inside` ni `Decoration`: no se parte). No admite `Typography`.
 
 ## El tamaño
 
@@ -79,13 +79,13 @@ de un SVG tiene que usar una fuente de `fonts/`, y se dibuja como contorno: se v
 
 ## Una página de un PDF
 
-Una `Image` de un PDF dibuja una de sus páginas, la de `Page`, como cualquier otra imagen: un plano, un gráfico o un dibujo
+Una `Image` de un PDF dibuja una de sus páginas, la de `Pdf page`, como cualquier otra imagen: un plano, un gráfico o un dibujo
 que vienen en PDF, o un SVG que el motor no admite, convertido a PDF con otro programa. Va como dibujo vectorial, nítido a
 cualquier tamaño, y su texto se puede seleccionar.
 
 ```
 Image: planos/sala.pdf
-	Page: 2
+	Pdf page: 2
 	Alt: Plano de la sala de reuniones
 	Box:
 		Width: 100%
@@ -99,11 +99,11 @@ También sirve de **papel preimpreso**: un membrete, un formulario, un fondo. Se
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Carta
-	Media:
+	Page:
 		Paper: A4
 		Margin: 140 72 80 72
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Serif
 				Size: 10.5
@@ -120,7 +120,7 @@ Document (dev.stxt.pdf):
 		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor, con el detalle de cada pieza y su plazo de entrega.
 ```
 
-Con dos `Fixed`, uno con `Pages: first` y otro con `Pages: not-first` y `Page: 2`, la primera hoja lleva un membrete y las
+Con dos `Fixed`, uno con `Pages: first` y otro con `Pages: not-first` y `Pdf page: 2`, la primera hoja lleva un membrete y las
 siguientes, otro.
 
 Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Sus capas, sí. Un PDF con un

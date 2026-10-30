@@ -22,8 +22,8 @@ class LinksTest {
 
     /** Un documento con estas líneas de elementos, sin sangrar, tras la cabecera (línea 8 en adelante). */
     private static InlineNode document(String... body) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tMedia:", "\t\tWidth: 595",
-                "\t\tHeight: 842", "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
+                "\t\tHeight: 842", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
         lines.addAll(List.of(body));
         return READER.read(Docs.sectioned(Docs.mergeStyles(String.join("\n", lines))));
     }

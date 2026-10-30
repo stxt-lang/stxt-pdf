@@ -57,5 +57,5 @@ de Markdown, no, porque no lleva `Id`.
 
 ## Lo que no hay
 
-- Contadores propios del autor, ni otros formatos de número que los de los marcadores y los de `Number style`.
+- Contadores propios del autor, ni otros formatos de número que los de los marcadores y los de `Number format`.
 - Referir los elementos generados por un `Markdown`, salvo sus encabezados con `{#id}`.

@@ -30,8 +30,8 @@ class MarkdownBuilderTest {
 
     /** Un {@code Markdown} con estas propiedades y este contenido, traducido. */
     private static MarkdownBuilder.Translation translate(List<String> properties, String... content) {
-        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tMedia:", "\t\tWidth: 595",
-                "\t\tHeight: 842", "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\tMarkdown:"));
+        List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
+                "\t\tHeight: 842", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\tMarkdown:"));
         properties.forEach(p -> lines.add("\t\t" + p));
         lines.add("\t\tContent >>");
         for (String c : content) {

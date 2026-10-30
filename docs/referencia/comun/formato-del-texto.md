@@ -21,7 +21,7 @@ combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (aba
 - Un tramo puede llevar el destino de un enlace ([Enlaces](enlaces.md)), que no cambia cómo se mide ni cómo se ve.
 
 > **Decisión:** un tramo es un conjunto de marcas, no un peso y un estilo propios: así `Styles` puede cambiar la fuente
-> de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Weight` y `Style` explícitos, que podrían deshacer
+> de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` y `Italic` explícitos, que podrían deshacer
 > el estilo de la caja.
 
 ## Formato en línea (`Inline`)
@@ -34,7 +34,7 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `códig
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
 - Cada párrafo de `Content`, separado por una línea en blanco, es un párrafo; el salto de línea simple vale un espacio.
-- **Se hereda**: se declara una vez en `Element: Document` o en una regla, y un texto vuelve al literal con `Inline: none`.
+- **Se hereda**: se declara una vez en `For element: Document` o en una regla, y un texto vuelve al literal con `Inline: none`.
 - Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
   `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
   escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen, HTML o un salto
@@ -63,7 +63,7 @@ tramo con la familia de `Code font`, que conserva el peso y el estilo de la caja
 (``**`x`**`` es código en negrita). El tamaño, el color y `Line height` son los de la caja, así que las líneas no
 cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
 
-`Code font` es de `Typography` ([Tipografía](tipografia.md)) y se hereda: se declara una vez, en `Element: Document`,
+`Code font` es de `Typography` ([Tipografía](tipografia.md)) y se hereda: se declara una vez, en `For element: Document`,
 para todo el documento. Sin ella, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en
 un `Markdown`, la del párrafo); si la familia no existe, `FONT_UNKNOWN`, con la línea de `Code font`.
 

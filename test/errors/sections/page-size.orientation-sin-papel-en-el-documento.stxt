@@ -1,17 +1,18 @@
-# Case: Element: Document con Language, que ya es el de Document
-# Code: STYLE_NOT_ALLOWED
-# Line: 15
+# Case: Una sección gira una página que no tiene papel
+# Code: PAGE_SIZE
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Language: en
 	Section:
+		Page:
+			Orientation: landscape
 		Text: Hola

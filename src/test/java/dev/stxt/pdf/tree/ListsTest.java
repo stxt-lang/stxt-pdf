@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class ListsTest {
 
     private static Box root(String... lines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
     }
 
@@ -90,8 +90,8 @@ class ListsTest {
     @Test
     void rulesNameListsAndItems() {
         Box list = root("\tStyles:",
-                "\t\tElement: List", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 18",
-                "\t\tElement: List item", "\t\t\tTypography:", "\t\t\t\tWeight: bold",
+                "\t\tFor element: List", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 18",
+                "\t\tFor element: List item", "\t\t\tTypography:", "\t\t\t\tBold: true",
                 "\tList:", "\t\tMarker: disc", "\t\tList item:", "\t\t\tText: a").children().get(0);
         assertEquals(18, ((dev.stxt.pdf.model.Value.Points) list.style().box().padding().left()).pt());
         assertEquals(FontWeight.BOLD, list.children().get(0).style().typography().fontWeight());

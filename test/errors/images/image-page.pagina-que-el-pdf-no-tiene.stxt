@@ -4,10 +4,10 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Section:
 		Image: test/pages.pdf
 			Alt: Prueba
-			Page: 4
+			Pdf page: 4

@@ -6,11 +6,11 @@
 # bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
 # de styles.stxt los ponen en mayúsculas (Transform). Los apartados (Reunidos, Exponen, Cláusulas) son
 # Heading 2 numerados (Numbered: true en styles.stxt) y el título del contrato declara Numbered: false.
-# El anexo es un Heading 1 de la clase annex, numerado en romanos con su etiqueta (Number style y Number
+# El anexo es un Heading 1 de el estilo annex, numerado en romanos con su etiqueta (Number format y Number
 # label: «Anexo I · …»), al que remiten las cláusulas con {number of: annex-title}; el considerando III
 # remite al apartado de las cláusulas con {number of: terms}.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 92 70 80 70
 	Title: Contrato de prestación de servicios de diseño · LUM-2025-044
@@ -51,10 +51,10 @@ Document (dev.stxt.pdf):
 							Text: Rúbricas:
 						Item:
 							Block:
-								Class: initials
+								Style: initials
 						Item:
 							Block:
-								Class: initials
+								Style: initials
 				Item:
 					Text: Página {page} de {pages}
 		Heading 1:
@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 		Text: En Olot, a 3 de noviembre de 2025
 			Typography:
 				Align: center
-				Style: italic
+				Italic: true
 				Color: #6C6B8A
 			Box:
 				Margin: 0 0 14 0
@@ -75,14 +75,14 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 8 0
 			Block:
-				Class: party
+				Style: party
 				Box:
 					Margin: 0 0 8 0
 				Paragraph:
 					Content >>
 						De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora (en adelante, «el Estudio»).
 			Block:
-				Class: party
+				Style: party
 				Paragraph:
 					Content >>
 						De otra, **Cooperativa Solvent, S. Coop. Ltda.**, con CIF F-17482211 y domicilio en el polígono de la Canya, nave 6, de Olot (Girona), representada por doña Carme Vidal i Roca, presidenta de su Consejo Rector (en adelante, «la Cliente»).
@@ -142,7 +142,7 @@ Document (dev.stxt.pdf):
 				Before: page
 			Heading 1:
 				Id: annex-title
-				Class: annex
+				Style: annex
 				Text: Calendario y honorarios
 			Table:
 				Id: fees
@@ -177,7 +177,7 @@ Document (dev.stxt.pdf):
 						Cell: 5.520 €
 				Foot:
 					Row:
-						Class: total
+						Style: total
 						Cell: Total sin IVA
 							Header: true
 							Span: 1 3
@@ -194,10 +194,10 @@ Document (dev.stxt.pdf):
 					Margin: 10 0 0 0
 				Area:
 					Block:
-						Class: sign
+						Style: sign
 						Text: Por el estudio
 							Typography:
-								Weight: bold
+								Bold: true
 								Color: #3F3D8F
 								Transform: uppercase
 								Letter spacing: 0.6
@@ -215,10 +215,10 @@ Document (dev.stxt.pdf):
 							Text: Administradora, Lumen Estudio de Diseño, S.L.P.
 				Area:
 					Block:
-						Class: sign
+						Style: sign
 						Text: Por la cliente
 							Typography:
-								Weight: bold
+								Bold: true
 								Color: #3F3D8F
 								Transform: uppercase
 								Letter spacing: 0.6

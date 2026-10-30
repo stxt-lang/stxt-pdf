@@ -17,12 +17,12 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 200
 		Height: 300
 		Margin: 20
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Mono
 				Size: 10

@@ -9,32 +9,32 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 300
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Heading 1
+		For element: Heading 1
 			Typography:
 				Size: 20
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 0 0 10 0
-		Element: Heading 2
+		For element: Heading 2
 			Typography:
 				Size: 14
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 6 0 4 0
-		Element: Heading 3
+		For element: Heading 3
 			Typography:
 				Size: 12
-				Style: italic
-		Element: Paragraph
+				Italic: true
+		For element: Paragraph
 			Box:
 				Margin: 0 0 6 0
 	Section:

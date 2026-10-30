@@ -1,38 +1,38 @@
 # Estilos del ejemplo «letter»: las reglas reutilizables y la tipografía base. Se pasan junto a
 # input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
 Styles (dev.stxt.pdf):
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Serif
 			Size: 10.5
 			Line height: 16
 			Color: #2A2623
-	Element: Paragraph
+	For element: Paragraph
 		Box:
 			Margin: 0 0 9 0
-	Element: List
+	For element: List
 		Box:
 			Padding: 0 0 0 22
 			Margin: 0 0 9 0
-	Element: List item
+	For element: List item
 		Box:
 			Margin: 0 0 3 0
-	For class: small
+	For style: small
 		Typography:
 			Font: IBM Plex Sans
 			Size: 8
 			Line height: 12
 			Color: #6B5B4E
-	For class: subject
+	For style: subject
 		Typography:
-			Weight: bold
+			Bold: true
 			Color: #3B2A1E
 		Box:
 			Margin: 0 0 14 0
 			Padding: 8 0
 			Border: 0.5 0 0.5 0
 			Border color: #B5651D
-	Element: Fixed
+	For element: Fixed
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5

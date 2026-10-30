@@ -17,7 +17,7 @@ import static dev.stxt.pdf.tree.ValueReader.enumValue;
 import static dev.stxt.pdf.tree.ValueReader.points;
 
 /**
- * Lo que el documento dice de sí mismo y de sus páginas: el {@code Media} del documento y de cada {@code Section}
+ * Lo que el documento dice de sí mismo y de sus páginas: el {@code Page} del documento y de cada {@code Section}
  * (referencia/componentes/document.md) y el {@code Title} y el {@code Language} (referencia/componentes/document.md).
  */
 final class MediaReader {
@@ -69,11 +69,11 @@ final class MediaReader {
             named = base.paper();
         } else {
             if (orientation.isPresent()) {
-                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "medio no lo declara: usa Paper o cambia el Width por el Height");
+                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
+                        + "documento no lo declara: usa Paper o cambia el Width por el Height");
             }
             if (widthNode.isEmpty() || heightNode.isEmpty()) {
-                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.MEDIA_SIZE, "El medio necesita "
+                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.PAGE_SIZE, "Page necesita "
                         + "su tamaño: un Paper (A4, Letter…) o un Width y un Height");
             }
             width = points(widthNode.get());
@@ -84,7 +84,7 @@ final class MediaReader {
                 .orElse(base != null ? base.media().margin() : Insets.ZERO);
         Media media = new Media(width, height, margin);
         if (media.pageArea().width() <= 0 || media.pageArea().height() <= 0) {
-            throw error(marginNode.orElse(n), ErrorCode.MEDIA_SIZE, "Los márgenes del medio no dejan área útil");
+            throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "Los márgenes de la página no dejan área útil");
         }
         return new Spec(media, named);
     }
@@ -101,7 +101,7 @@ final class MediaReader {
         if (paper.isPresent()) {
             Optional<Node> both = widthNode.isPresent() ? widthNode : heightNode;
             if (both.isPresent()) {
-                throw error(both.get(), ErrorCode.MEDIA_SIZE, "El medio declara Paper y " + both.get().getName()
+                throw error(both.get(), ErrorCode.PAGE_SIZE, "Page declara Paper y " + both.get().getName()
                         + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
             }
             return enumValue(Media.Paper.class, paper.get());
@@ -109,7 +109,7 @@ final class MediaReader {
         if (base != null && orientation.isPresent() && widthNode.isEmpty() && heightNode.isEmpty()) {
             // Una sección que solo gira el papel del documento.
             if (base.paper() == null) {
-                throw error(orientation.get(), ErrorCode.MEDIA_SIZE, "Orientation gira el papel de Paper, y el "
+                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
                         + "documento no lo declara (da Width y Height): declara Paper en la sección o en el documento");
             }
             return base.paper();
@@ -120,7 +120,7 @@ final class MediaReader {
     private static Insets margin(Node n) {
         List<Double> v = parse(n, () -> ValueParser.list(n.getText())).stream().map(x -> {
             if (!(x instanceof Value.Points p)) {
-                throw error(n, ErrorCode.MEDIA_SIZE, "El margen del medio solo admite puntos: " + n.getText().trim());
+                throw error(n, ErrorCode.PAGE_SIZE, "El margen de la página solo admite puntos: " + n.getText().trim());
             }
             return p.pt();
         }).toList();

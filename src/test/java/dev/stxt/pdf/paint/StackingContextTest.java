@@ -171,7 +171,7 @@ class StackingContextTest {
 
     /** Lo que se pinta en la página {@code index} de un documento de 100 × 100 con márgenes de 10 (área útil de 80). */
     private static Recorder recordSmallPage(int index, String... boxLines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(READER.read(Docs.sectioned(doc))).pages().get(index);
         Recorder canvas = new Recorder();
@@ -180,7 +180,7 @@ class StackingContextTest {
     }
 
     /** La fuente base, para los documentos con texto. */
-    private static final String FONT = "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n"
+    private static final String FONT = "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
             + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10";
 
     private static List<String> paint(String... boxLines) {
@@ -192,7 +192,7 @@ class StackingContextTest {
     }
 
     private static Recorder record(Map<String, List<dev.stxt.pdf.model.TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n"
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(doc)), runs)).pages().get(0);
         Recorder canvas = new Recorder();
@@ -272,7 +272,7 @@ class StackingContextTest {
     @Test
     void runsWithTheirFontAndDecorations() {
         Recorder r = record(Map.of("T", List.of(run("uno ", "u"), run("dos", "bs"), run(" tres"))),
-                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\t\t\t\tColor: #112233",
+                "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\t\t\t\tColor: #112233",
                 "\tText: uno dos tres", "\t\tId: T");
         assertEquals(List.of("background #112233", "text 'uno ' normal", "text 'dos' bold", "text ' tres' normal",
                 "background #112233"), r.events);
@@ -286,7 +286,7 @@ class StackingContextTest {
      */
     @Test
     void smallCapsAreSmallerAndLetterSpacingIsPassedOn() {
-        Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\t\t\t\tSmall caps: true",
+        Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\t\t\t\tSmall caps: true",
                 "\t\t\t\tLetter spacing: 1.5",
                 "\tText: Ab c", "\t\tId: T");
         assertEquals(List.of("'A' 10.0/1.5", "'B' 8.0/1.5", "' ' 10.0/1.5", "'C' 8.0/1.5"), r.drawn);
@@ -298,7 +298,7 @@ class StackingContextTest {
      */
     @Test
     void aBoxWithLinkIsClickableWholeAndBeforeItsChildren() {
-        Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+        Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tBlock:", "\t\tLink: #fin", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tText: uno   dos", "\tText: fin", "\t\tId: fin");
         assertEquals(List.of("#fin " + new Rect(40, 40, 515, 22) + " uno dos"), r.links);
@@ -313,7 +313,7 @@ class StackingContextTest {
     void linkedRunsAreOneZonePerLineAndDestination() {
         Recorder r = record(Map.of("T", List.of(run("uno "), link("dos", "b", "https://a.example"),
                         link(" tres", "", "https://a.example"), link(" cuatro", "u", "mailto:a@b.c"))),
-                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: uno dos tres cuatro", "\t\tId: T");
         // "uno " son 20 pt; "dos tres" (8 caracteres, 40 pt) es una zona; " cuatro" (35 pt), otra.
         assertEquals(List.of("https://a.example " + new Rect(60, 40, 40, 12) + " dos tres",
@@ -330,7 +330,7 @@ class StackingContextTest {
     @Test
     void aLinkOverSeveralLinesHasAZoneInEach() {
         Recorder r = record(Map.of("T", List.of(link("aaaa bbbb cccc dddd", "", "https://a.example"))),
-                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30",
                 "\t\tText: aaaa bbbb cccc dddd", "\t\t\tId: T");
         assertEquals(List.of("https://a.example " + new Rect(40, 40, 20, 12) + " aaaa",
@@ -348,7 +348,7 @@ class StackingContextTest {
      */
     @Test
     void aWrappedLineEndsWithASpaceExceptTheLastAndPreformatted() {
-        String[] head = {"\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
+        String[] head = {"\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 10", "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30"};
         Recorder normal = record(concat(head, "\t\tText: aaaa bbbb cccc"));
         assertEquals(List.of("[texto", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
@@ -368,7 +368,7 @@ class StackingContextTest {
     /** El texto propio de una caja con {@code Link} va antes que su zona (el {@code Link} lo envuelve). */
     @Test
     void theOwnTextOfALinkedBoxPrecedesItsZone() {
-        Recorder r = record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+        Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: uno dos", "\t\tLink: https://a.example");
         assertEquals(List.of("text 'uno dos' normal", "link https://a.example"), r.events);
         assertEquals(List.of("[texto", "'uno dos'", "]"), r.sequences);
@@ -378,7 +378,7 @@ class StackingContextTest {
     @Test
     void textAroundALinkIsOtherSequences() {
         Recorder r = record(Map.of("T", List.of(run("ver "), link("la web", "", "https://a.example"), run(" hoy"))),
-                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ver la web hoy", "\t\tId: T");
         assertEquals(List.of("[texto", "'ver '", "]", "[enlace", "'la web'", "]", "[texto", "' hoy'", "]"), r.sequences);
     }
@@ -391,7 +391,7 @@ class StackingContextTest {
     void letterSpacedRunsShareOneActualTextPerLinkSequenceAndLine() {
         Recorder r = record(Map.of("T", List.of(run("ver "), run("la", "b"), run(" "), link("web", "", "https://a.example"),
                         run(" hoy y mañana"))),
-                "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ver la web hoy y mañana", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 90",
                 "\t\tTypography:", "\t\t\tLetter spacing: 1");
         assertEquals(List.of("[texto", "(actual 'ver la '", "'ver '", "'la'", "' '", ")", "]",
@@ -401,7 +401,7 @@ class StackingContextTest {
 
     @Test
     void noLinkMeansNoZone() {
-        assertEquals(List.of(), record("\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+        assertEquals(List.of(), record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: sin enlace").links);
     }
 

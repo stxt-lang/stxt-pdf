@@ -3,7 +3,7 @@
 ## Páginas y puntos
 
 Un documento se maqueta siempre en **páginas** de tamaño fijo, como un PDF impreso. El tamaño y los márgenes de la página
-los da `Media` ([Document](../componentes/document.md)). Lo que queda dentro de los márgenes es el **área útil**: el sitio
+los da `Page` ([Document](../componentes/document.md)). Lo que queda dentro de los márgenes es el **área útil**: el sitio
 donde va el contenido.
 
 Todas las medidas están en **puntos** (pt): 1 pt = 1/72 de pulgada, unos 0,35 mm. Un A4 mide 595 × 842 pt; con
@@ -48,16 +48,16 @@ Paragraph: Resultados del trimestre
 		Margin: 0 0 16 0
 	Typography:
 		Size: 20
-		Weight: bold
+		Bold: true
 	Break:
 		After: avoid
 ```
 
-Fuera de los grupos van las propiedades que definen el propio elemento: su `Id`, su `Class`, las columnas de una tabla, el
+Fuera de los grupos van las propiedades que definen el propio elemento: su `Id`, su `Style`, las columnas de una tabla, el
 desplazamiento de una caja posicionada…
 
 **Herencia.** Solo se hereda `Typography`. Si una caja dice `Size: 12`, todo el texto de dentro mide 12 salvo lo que diga
-otra cosa. Por eso la fuente del documento se declara una vez, en la regla `Element: Document` de `Styles`, y cada elemento
+otra cosa. Por eso la fuente del documento se declara una vez, en la regla `For element: Document` de `Styles`, y cada elemento
 declara solo lo que cambia.
 
 ## Cómo se colocan las cajas

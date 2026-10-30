@@ -83,8 +83,8 @@ public class BombsProbe {
     }
 
     static void run(Path dir, String image) throws Exception {
-        String document = "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+        String document = "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tSection:\n\t\tImage: " + image + "\n\t\t\tBox:\n\t\t\t\tWidth: 100\n";
         long t0 = System.nanoTime();
         String result;

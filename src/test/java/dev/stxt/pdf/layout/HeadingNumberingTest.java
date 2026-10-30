@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HeadingNumberingTest {
 
     private static final String[] NUMBERED = {
-            "\tStyles:", "\t\tElement: Heading 1", "\t\t\tTypography:", "\t\t\t\tNumbered: true",
-            "\t\tElement: Heading 2", "\t\t\tTypography:", "\t\t\t\tNumbered: true"};
+            "\tStyles:", "\t\tFor element: Heading 1", "\t\t\tTypography:", "\t\t\t\tNumbered: true",
+            "\t\tFor element: Heading 2", "\t\t\tTypography:", "\t\t\t\tNumbered: true"};
 
     private static String[] document(String... body) {
         return java.util.stream.Stream.concat(java.util.Arrays.stream(NUMBERED), java.util.Arrays.stream(body))

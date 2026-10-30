@@ -1,7 +1,7 @@
 # Numeración de los encabezados (referencia/componentes/heading.md). Área útil de 260 × 260 desde (20, 20);
 # con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
 #
-# Element: Document activa Numbered en todos los encabezados y Element: Heading 3 lo quita en el
+# For element: Document activa Numbered en todos los encabezados y For element: Heading 3 lo quita en el
 # nivel 3. cover (Numbered: false) no se numera ni cuenta, y In contents: false lo deja fuera del
 # índice. Los números salen: intro es el 1, method el 1.1, data el 1.2, fine no lleva (nivel 3) y
 # results es el 2.
@@ -15,19 +15,19 @@
 # caracteres, 90 pt) cabría en una línea; con él, «2 Resultados del año» son 20 caracteres (100 pt) y
 # «año» pasa a una segunda línea: results mide 2 × 12 = 24 y empieza en 148.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Width: 300
 		Height: 300
 		Margin: 20
 	Title: Numeración
 	Language: es
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
 				Numbered: true
-		Element: Heading 3
+		For element: Heading 3
 			Typography:
 				Numbered: false
 	Section:

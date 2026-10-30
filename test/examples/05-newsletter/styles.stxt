@@ -1,67 +1,67 @@
 # Estilos del ejemplo «newsletter»: las reglas reutilizables y la tipografía base. Se pasan junto a
 # input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
 Styles (dev.stxt.pdf):
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Serif
 			Size: 9
 			Line height: 13
 			Color: #1C1A19
-	Element: Heading 1
+	For element: Heading 1
 		Typography:
 			Size: 27
 			Line height: 30
-			Weight: bold
+			Bold: true
 		Box:
 			Margin: 2 0 8 0
-	Element: Heading 2
+	For element: Heading 2
 		Typography:
 			Size: 10.5
 			Line height: 13
-			Weight: bold
+			Bold: true
 			Color: #A4301F
 		Box:
 			Margin: 8 0 3 0
-	Element: Paragraph
+	For element: Paragraph
 		Typography:
 			Align: justify
 		Box:
 			Margin: 0 0 6 0
-	Element: List
+	For element: List
 		Box:
 			Padding: 0 0 0 12
 			Margin: 0 0 6 0
-	Element: Cell
+	For element: Cell
 		Box:
 			Padding: 5 6
 			Border: 0 0 0.5 0
 			Border color: #CFC8C0
-	Element: Fixed
+	For element: Fixed
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5
 			Color: #7A726B
-	For class: kicker
+	For style: kicker
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5
-			Weight: bold
+			Bold: true
 			Color: #A4301F
 			Transform: uppercase
 			Letter spacing: 0.8
-	For class: caption
+	For style: caption
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5
-			Style: italic
+			Italic: true
 			Color: #6B635C
 		Box:
 			Margin: 3 0 10 0
-	For class: quote
+	For style: quote
 		Typography:
 			Size: 15
 			Line height: 19
-			Style: italic
+			Italic: true
 			Color: #A4301F
 			Align: center
 		Box:
@@ -69,18 +69,18 @@ Styles (dev.stxt.pdf):
 			Padding: 10 30
 			Border: 1 0 1 0
 			Border color: #A4301F
-	Element: Head cell
+	For element: Head cell
 		Typography:
 			Font: IBM Plex Sans
-			Weight: bold
+			Bold: true
 			Size: 7.5
 			Color: #FFFFFF
 		Box:
 			Background: #1C1A19
-	Element: Even row cell
+	For element: Even row cell
 		Box:
 			Background: #F1EDE8
-	For class: ad
+	For style: ad
 		Box:
 			Padding: 8 10
 			Border: 0.75
@@ -88,10 +88,10 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 8.5
 			Line height: 12
-	For class: ad-title
+	For style: ad-title
 		Typography:
 			Font: IBM Plex Sans
-			Weight: bold
+			Bold: true
 			Size: 7
 			Color: #A4301F
 			Transform: uppercase

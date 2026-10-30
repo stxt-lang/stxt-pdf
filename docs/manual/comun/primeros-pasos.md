@@ -6,21 +6,21 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe del trimestre
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Heading 1
+		For element: Heading 1
 			Typography:
 				Size: 18
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 0 0 12 0
-		Element: Paragraph
+		For element: Paragraph
 			Box:
 				Margin: 0 0 8 0
 	Section:
@@ -38,9 +38,9 @@ Línea a línea:
 - **`Document (dev.stxt.pdf):`** es la raíz. El namespace `dev.stxt.pdf` dice que es un documento de stxt-pdf.
 - **`Language`** es el idioma del documento y **`Title`**, su título. Los dos son obligatorios: el visor de PDF muestra el
   título, y un lector de pantalla necesita el idioma para leer el texto en voz alta.
-- **`Media`** es el papel: un A4 con 50 puntos de margen por los cuatro lados. Todas las medidas están en
+- **`Page`** es el papel: un A4 con 50 puntos de margen por los cuatro lados. Todas las medidas están en
   **puntos** (un punto es 1/72 de pulgada, unos 0,35 mm); un A4 mide 595 × 842.
-- **`Styles`** tiene las reglas de estilo. `Element: Document` da la fuente y el tamaño a todo el documento: no hay fuente
+- **`Styles`** tiene las reglas de estilo. `For element: Document` da la fuente y el tamaño a todo el documento: no hay fuente
   por defecto, así que se declara siempre. Las otras dos reglas dan tamaño a los títulos y separación a los párrafos.
 - **`Section`** tiene el contenido. Todo lo que se ve va dentro de una sección.
 - **`Heading 1`** es un título y **`Paragraph`**, un párrafo. Un texto corto va en el valor (`Paragraph: Los costes…`) y

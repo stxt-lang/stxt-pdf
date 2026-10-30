@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ContrastCheckTest {
 
     /** Cabecera y base tipográfica en 12 líneas, y la sección en la 13: su contenido empieza en la línea 14. */
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n"
-            + "\t\tWidth: 400\n\t\tHeight: 300\n\t\tMargin: 20\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n"
+    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n"
+            + "\t\tWidth: 400\n\t\tHeight: 300\n\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
             + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
 
     private static void layOut(String... lines) {
@@ -65,9 +65,9 @@ class ContrastCheckTest {
         // #949494 sobre blanco: 3,03:1.
         error("\tText: hola", "\t\tTypography:", "\t\t\tColor: #949494", "\t\t\tSize: 17");
         assertDoesNotThrow(() -> layOut("\tText: hola", "\t\tTypography:", "\t\t\tColor: #949494", "\t\t\tSize: 18"));
-        error("\tText: hola", "\t\tTypography:", "\t\t\tColor: #949494", "\t\t\tSize: 13", "\t\t\tWeight: bold");
+        error("\tText: hola", "\t\tTypography:", "\t\t\tColor: #949494", "\t\t\tSize: 13", "\t\t\tBold: true");
         assertDoesNotThrow(() -> layOut("\tText: hola", "\t\tTypography:", "\t\t\tColor: #949494", "\t\t\tSize: 14",
-                "\t\t\tWeight: bold"));
+                "\t\t\tBold: true"));
     }
 
     @Test

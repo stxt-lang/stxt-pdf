@@ -1,53 +1,53 @@
 # Estilos del ejemplo «menu»: las reglas reutilizables y la tipografía base. Se pasan junto a
 # input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
 Styles (dev.stxt.pdf):
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Serif
 			Size: 9.5
 			Line height: 13
 			Color: #2B2B2B
-	Element: Heading 1
+	For element: Heading 1
 		Typography:
 			Size: 22
 			Line height: 26
-			Weight: bold
+			Bold: true
 			Align: center
 			Color: #14365C
 		Box:
 			Margin: 0
-	Element: Heading 2
+	For element: Heading 2
 		Typography:
 			Font: IBM Plex Sans
 			Size: 8
-			Weight: bold
+			Bold: true
 			Color: #926829
 			Align: center
 			Transform: uppercase
 			Letter spacing: 2
 		Box:
 			Margin: 16 0 9 0
-	Element: Fixed
+	For element: Fixed
 		Typography:
 			Color: #776F64
-	For class: name
+	For style: name
 		Typography:
-			Weight: bold
+			Bold: true
 			Size: 10.5
-	For class: desc
+	For style: desc
 		Typography:
-			Style: italic
+			Italic: true
 			Size: 8.5
 			Color: #6E675C
 		Box:
 			Margin: 1 0 0 0
-	For class: price
+	For style: price
 		Typography:
 			Font: IBM Plex Sans
-			Weight: bold
+			Bold: true
 			Size: 9.5
 			Color: #14365C
 			Align: right
-	For class: dish
+	For style: dish
 		Box:
 			Margin: 0 0 7 0

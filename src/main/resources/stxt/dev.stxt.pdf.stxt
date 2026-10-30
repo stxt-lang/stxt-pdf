@@ -1,7 +1,7 @@
 # Schema del modelo de cajas (referencia/comun/estructura.md).
 # Primero los elementos, después las reglas reutilizables (Styles), los grupos (Box, Typography,
 # Break) y al final las propiedades.
-# Cada nombre tiene una única definición en todo el namespace: el Width de Media y el de Box son
+# Cada nombre tiene una única definición en todo el namespace: el Width de Page y el de Box son
 # el mismo nodo.
 Schema (@stxt.schema): dev.stxt.pdf
 	Description: Documentos de stxt-pdf, el motor de layout y generación de PDF. Manual en docs/manual y referencia completa en docs/referencia.
@@ -10,9 +10,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con Element: Document), los Fixed de todas las secciones y una o más Section con el contenido, en orden.
+		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con For element: Document), los Fixed de todas las secciones y una o más Section con el contenido, en orden.
 		Children:
-			Child: Media
+			Child: Page
 				Min: 1
 				Max: 1
 			Child: Title
@@ -26,9 +26,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Fixed
 			Child: Section
 				Min: 1
-	Node: Media
+	Node: Page
 		Type: GROUP
-		Description: Medio de salida: el tamaño de las páginas, con Paper (y Orientation) o con Width y Height. Define el área útil, que es el containing block inicial.
+		Description: La página: su tamaño, con Paper (y Orientation) o con Width y Height, y sus márgenes. Define el área útil, que es el containing block inicial.
 		Children:
 			Child: Paper
 				Max: 1
@@ -42,17 +42,17 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Section
 		Type: GROUP
-		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Media (que hereda del documento por grupos), sus propios Fixed y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
+		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Page (que hereda del documento por grupos), sus propios Fixed y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
-			Child: Media
+			Child: Page
 				Max: 1
 			Child: Page numbering
 				Max: 1
-			Child: Page style
+			Child: Page number format
 				Max: 1
 			Child: Start
 				Max: 1
@@ -86,7 +86,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -126,7 +126,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -157,7 +157,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -190,7 +190,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -210,7 +210,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -230,7 +230,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -248,7 +248,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -266,7 +266,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -284,7 +284,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -302,7 +302,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -320,7 +320,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -338,7 +338,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -361,7 +361,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -393,7 +393,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -439,7 +439,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -485,7 +485,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -527,7 +527,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -665,7 +665,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -709,11 +709,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Row
 		Type: GROUP
-		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For class de su Class y For id de su Id se aplican a cada una de ellas.
+		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For style de su Style y For id de su Id se aplican a cada una de ellas.
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Box
 				Max: 1
@@ -729,7 +729,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -762,7 +762,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Box
 				Max: 1
@@ -781,11 +781,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Contents
 		Type: GROUP
-		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas Element 'Contents entry 1' a 'Contents entry 6'.
+		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas For element 'Contents entry 1' a 'Contents entry 6'.
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Box
 				Max: 1
@@ -803,7 +803,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Id
 				Max: 1
-			Child: Class
+			Child: Style
 				Max: 1
 			Child: Link
 				Max: 1
@@ -815,7 +815,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
-			Child: Page
+			Child: Pdf page
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -824,13 +824,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Styles
 		Type: GROUP
-		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, de una clase o con un Id. Es hijo de Document o la raíz de un documento de estilos aparte, que se pasa junto al documento y vale menos que él.
+		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, con un estilo con nombre o con un Id. Es hijo de Document o la raíz de un documento de estilos aparte, que se pasa junto al documento y vale menos que él.
 		Children:
-			Child: Element
-			Child: For class
+			Child: For element
+			Child: For style
 			Child: For id
 			Child: For column
-	Node: Element
+	Node: For element
 		Type: INLINE
 		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; Contents entry 1 a 6, las entradas de un Contents), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
 		Children:
@@ -840,9 +840,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-	Node: For class
+	Node: For style
 		Type: INLINE
-		Description: Regla para los elementos con esa clase en su Class.
+		Description: Regla para los elementos que tienen ese estilo en su Style.
 		Children:
 			Child: Box
 				Max: 1
@@ -911,9 +911,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Code font
 				Max: 1
-			Child: Weight
+			Child: Bold
 				Max: 1
-			Child: Style
+			Child: Italic
 				Max: 1
 			Child: Size
 				Max: 1
@@ -947,7 +947,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Numbered
 				Max: 1
-			Child: Number style
+			Child: Number format
 				Max: 1
 			Child: Number label
 				Max: 1
@@ -969,14 +969,14 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Title
 		Description: Título del documento: el que muestra el visor del PDF. Obligatorio.
 	Node: Language
-		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Transform. No vale en Element: Document, que usa el de Document.
+		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Transform. No vale en For element: Document, que usa el de Document.
 
 	# Elemento
 
 	Node: Id
 		Description: Identificador para volcados, tests, mensajes y reglas For id. Único en el documento.
-	Node: Class
-		Description: Clases del elemento, separadas por espacios: le aplican las reglas For class con esos nombres. En una Row, a cada una de sus celdas.
+	Node: Style
+		Description: Estilos con nombre del elemento, separados por espacios: le aplican las reglas For style con esos nombres. En una Row, a cada una de sus celdas.
 	Node: Link
 		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
 	Node: In contents
@@ -1007,7 +1007,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: continue
 			Value: restart
 			Value: none
-	Node: Page style
+	Node: Page number format
 		Type: ENUM
 		Description: Cómo se escriben los números de las páginas de una Section: decimal (1, por defecto), lower-roman (i) o upper-roman (I), en {page}, {pages}, {page of: id}, los índices y el visor. No vale con Page numbering: none.
 		Values:
@@ -1053,9 +1053,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Box
 
 	Node: Width
-		Description: Ancho de la caja de borde (en Media, de la página).
+		Description: Ancho de la caja de borde (en Page, de la página).
 	Node: Height
-		Description: Alto de la caja de borde (en Media, de la página).
+		Description: Alto de la caja de borde (en Page, de la página).
 	Node: Min width
 		Description: Ancho mínimo.
 	Node: Max width
@@ -1085,18 +1085,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document).
 	Node: Code font
 		Description: Familia de la fuente del código (`código` en un texto con Inline: markdown o en un Markdown, y los bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si hay código, propia o heredada.
-	Node: Weight
-		Type: ENUM
-		Description: Peso: normal (por defecto) o bold.
-		Values:
-			Value: normal
-			Value: bold
-	Node: Style
-		Type: ENUM
-		Description: Estilo: normal (por defecto) o italic.
-		Values:
-			Value: normal
-			Value: italic
+	Node: Bold
+		Type: BOOLEAN
+		Description: Negrita: la variante de peso 700 de la fuente. Por defecto, false.
+	Node: Italic
+		Type: BOOLEAN
+		Description: Cursiva: la variante cursiva de la fuente. Por defecto, false.
 	Node: Size
 		Description: Cuerpo de la fuente, en puntos. Obligatorio en el texto, propio o heredado (también de Document).
 	Node: Line height
@@ -1151,8 +1145,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Con White space pre o pre-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
 	Node: Numbered
 		Type: BOOLEAN
-		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: Element: Document lo activa en todos, una regla Element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
-	Node: Number style
+		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: For element: Document lo activa en todos, una regla For element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
+	Node: Number format
 		Type: ENUM
 		Description: Cómo se escribe el número del nivel de un encabezado numerado: decimal (1, por defecto), lower-alpha (a), upper-alpha (A), lower-roman (i) o upper-roman (I). Cada nivel del número completo se escribe con el de su encabezado (II.a). Se hereda.
 		Values:
@@ -1341,7 +1335,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: contain
 			Value: cover
 			Value: fill
-	Node: Page
+	Node: Pdf page
 		Type: INTEGER
 		Description: Página que dibuja una Image de un PDF, desde 1 (por defecto, la primera). En una imagen que no es un PDF, o una página que el PDF no tiene, es un error.
 

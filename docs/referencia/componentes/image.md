@@ -3,14 +3,14 @@
 Una `Image` pone en el documento una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos
 ([Recursos](../comun/recursos.md)). Es una caja sin hijos, como un `Text`, cuyo contenido es la imagen: se coloca, se
 dimensiona, se corta entre páginas y se pinta como cualquier caja, con su `Box` (márgenes, relleno, borde, fondo y
-esquinas) y su `Break` (sin `Inside` ni `Decoration`, porque no se parte). Admite además `Id`, `Class` y `Link`; no admite
+esquinas) y su `Break` (sin `Inside` ni `Decoration`, porque no se parte). Admite además `Id`, `Style` y `Link`; no admite
 `Typography`, porque no tiene texto.
 
 ```
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Section:
@@ -47,7 +47,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
-| `Page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
+| `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | — | Gira la imagen sobre su centro (un sello); ocupa el rectángulo que la envuelve girada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
@@ -154,7 +154,7 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 
 ## PDF
 
-Una `Image` de un PDF dibuja **una de sus páginas**, la de `Page` (la primera, si no se declara), como una imagen más: se
+Una `Image` de un PDF dibuja **una de sus páginas**, la de `Pdf page` (la primera, si no se declara), como una imagen más: se
 dimensiona, se coloca, se recorta y se gira como cualquier otra. Sirve para poner en el documento un plano, un gráfico o
 una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF; y como
 **fondo de página**: un papel con membrete, un formulario preimpreso, en un `Fixed` detrás del contenido.
@@ -175,8 +175,8 @@ Las **capas** de la página (su contenido opcional) sí se copian, porque decide
 apagada, y el visor las enseña en su lista de capas. Una configuración de las capas sin nombre recibe el del fichero
 (`planos.pdf`), que PDF/UA pide.
 
-`Page` es la página física, desde 1, no el número que lleva impreso. Una página que el PDF no tiene es un error
-(`IMAGE_PAGE`, con la línea de `Page`), y `Page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
+`Pdf page` es la página física, desde 1, no el número que lleva impreso. Una página que el PDF no tiene es un error
+(`IMAGE_PAGE`, con la línea de `Pdf page`), y `Pdf page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
 (`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página que usa una
 fuente sin incrustar, o sin `ToUnicode` (lo que dice qué carácter es cada glifo; una fuente simple que no es simbólica no
 lo necesita): el visor la sustituiría por otra, o su texto no se podría copiar ni leer en voz alta, y el documento no
@@ -192,16 +192,16 @@ sitio del membrete y del pie, que el contenido no puede pisar:
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Carta
-	Media:
+	Page:
 		Paper: A4
 		Margin: 140 72 80 72
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Serif
 				Size: 10.5
 				Line height: 16
-		For class: letterhead
+		For style: letterhead
 			Box:
 				Width: 100%
 				Height: 100%
@@ -211,14 +211,14 @@ Document (dev.stxt.pdf):
 			Offset: -140 -72 -80 -72
 			Layer: -1
 			Image: examples/letterhead/letterhead.pdf
-				Class: letterhead
+				Style: letterhead
 		Fixed:
 			Pages: not-first
 			Offset: -140 -72 -80 -72
 			Layer: -1
 			Image: examples/letterhead/letterhead.pdf
-				Page: 2
-				Class: letterhead
+				Pdf page: 2
+				Style: letterhead
 		Paragraph: Olot, 20 de octubre de 2025
 		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor.
 		Paragraph: Las condiciones generales van en la página siguiente.

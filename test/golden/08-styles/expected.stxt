@@ -1,4 +1,4 @@
-# Cada Block deja 10 de margen inferior (Element: Block). b mide la mitad de 515 = 257.5.
+# Cada Block deja 10 de margen inferior (For element: Block). b mide la mitad de 515 = 257.5.
 # t y u: una línea de 1.2 × 12 = 14.4; t no tiene margen, así que p empieza justo debajo.
 Result:
 	Page: 1

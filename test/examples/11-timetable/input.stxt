@@ -1,9 +1,9 @@
 # Horario escolar semanal en una página A4 apaisada (Paper: A4 y Orientation: landscape, 842 × 595): una tabla con las celdas
 # separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
 # recreo y comedor que ocupan los cinco días con Span, una leyenda en un Flex con salto de línea
-# y unas notas en Markdown. Cada color es una clase de styles.stxt.
+# y unas notas en Markdown. Cada color es un estilo de styles.stxt.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Orientation: landscape
 		Margin: 40 46 46 46
@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 				Block:
 					Text: Entrada 9:00 · Salida 16:00
 						Typography:
-							Weight: bold
+							Bold: true
 							Align: right
 					Text: Recreo de 11:00 a 11:30
 						Typography:
@@ -68,87 +68,87 @@ Document (dev.stxt.pdf):
 				Row:
 					Cell: 9:00 – 10:00
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Matemáticas
-						Class: slot math
+						Style: slot math
 					Cell: Lengua
-						Class: slot lang
+						Style: slot lang
 					Cell: Inglés
-						Class: slot eng
+						Style: slot eng
 					Cell: Matemáticas
-						Class: slot math
+						Style: slot math
 					Cell: Ciencias
-						Class: slot sci
+						Style: slot sci
 				Row:
 					Cell: 10:00 – 11:00
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Lengua
-						Class: slot lang
+						Style: slot lang
 					Cell: Matemáticas
-						Class: slot math
+						Style: slot math
 					Cell: Ciencias
-						Class: slot sci
+						Style: slot sci
 					Cell: Lengua
-						Class: slot lang
+						Style: slot lang
 					Cell: Inglés
-						Class: slot eng
+						Style: slot eng
 				Row:
 					Cell:
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Recreo · 11:00 – 11:30
 						Span: 1 5
-						Class: break
+						Style: break
 				Row:
 					Cell: 11:30 – 12:30
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Ciencias
-						Class: slot sci
+						Style: slot sci
 					Cell: Música
-						Class: slot music
+						Style: slot music
 					Cell: Matemáticas
-						Class: slot math
+						Style: slot math
 					Cell: Plástica
-						Class: slot art
+						Style: slot art
 					Cell: Lengua
-						Class: slot lang
+						Style: slot lang
 				Row:
 					Cell: 12:30 – 13:30
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Educación física
-						Class: slot pe
+						Style: slot pe
 					Cell: Inglés
-						Class: slot eng
+						Style: slot eng
 					Cell: Lengua
-						Class: slot lang
+						Style: slot lang
 					Cell: Ciencias
-						Class: slot sci
+						Style: slot sci
 					Cell: Matemáticas
-						Class: slot math
+						Style: slot math
 				Row:
 					Cell:
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Comedor y patio · 13:30 – 15:00
 						Span: 1 5
-						Class: break
+						Style: break
 				Row:
 					Cell: 15:00 – 16:00
 						Header: true
-						Class: hour
+						Style: hour
 					Cell: Taller
-						Class: slot lab
+						Style: slot lab
 					Cell: Educación física
-						Class: slot pe
+						Style: slot pe
 					Cell: Tutoría
-						Class: slot tutor
+						Style: slot tutor
 					Cell: Taller
-						Class: slot lab
+						Style: slot lab
 					Cell: Proyecto
-						Class: slot proj
+						Style: slot proj
 		Flex:
 			Id: legend
 			Wrap: true
@@ -164,7 +164,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot math
+							Style: slot math
 							Box:
 								Width: 11
 								Height: 11
@@ -176,7 +176,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot lang
+							Style: slot lang
 							Box:
 								Width: 11
 								Height: 11
@@ -188,7 +188,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot eng
+							Style: slot eng
 							Box:
 								Width: 11
 								Height: 11
@@ -200,7 +200,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot sci
+							Style: slot sci
 							Box:
 								Width: 11
 								Height: 11
@@ -212,7 +212,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot music
+							Style: slot music
 							Box:
 								Width: 11
 								Height: 11
@@ -224,7 +224,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot art
+							Style: slot art
 							Box:
 								Width: 11
 								Height: 11
@@ -236,7 +236,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot pe
+							Style: slot pe
 							Box:
 								Width: 11
 								Height: 11
@@ -248,7 +248,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot lab
+							Style: slot lab
 							Box:
 								Width: 11
 								Height: 11
@@ -260,7 +260,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot tutor
+							Style: slot tutor
 							Box:
 								Width: 11
 								Height: 11
@@ -272,7 +272,7 @@ Document (dev.stxt.pdf):
 					Cross axis: center
 					Item:
 						Block:
-							Class: slot proj
+							Style: slot proj
 							Box:
 								Width: 11
 								Height: 11

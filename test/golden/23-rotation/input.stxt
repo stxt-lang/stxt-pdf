@@ -20,12 +20,12 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Paper: A6
 		Orientation: landscape
 		Margin: 20
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 				Background: #C0392B
 			Text: Novedad
 				Typography:
-					Weight: bold
+					Bold: true
 					Align: center
 					Color: #FFFFFF
 		Block:
@@ -63,7 +63,7 @@ Document (dev.stxt.pdf):
 				Radius: 4
 			Text: Aprobado
 				Typography:
-					Weight: bold
+					Bold: true
 					Align: center
 					Color: #C0392B
 					Transform: uppercase

@@ -8,7 +8,7 @@
 # In contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
 # ponen en mayúsculas (Transform).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 54 50 64 50
 	Title: Catálogo 2026 · Taller Nogal
@@ -31,7 +31,7 @@ Document (dev.stxt.pdf):
 		Id: front-cover
 		Page numbering: none
 		Inherit fixed: false
-		Media:
+		Page:
 			Margin: 0
 		Relative:
 			Id: cover
@@ -52,7 +52,7 @@ Document (dev.stxt.pdf):
 				Text: Catálogo
 					Typography:
 						Size: 10
-						Weight: bold
+						Bold: true
 						Color: #F3C27C
 						Transform: uppercase
 						Letter spacing: 4
@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 						Margin: 0 0 14 0
 					Typography:
 						Font: IBM Plex Serif
-						Weight: bold
+						Bold: true
 						Size: 46
 						Line height: 50
 						Color: #FFFFFF
@@ -73,7 +73,7 @@ Document (dev.stxt.pdf):
 				Text: Madera maciza de la comarca, ensambles de carpintería y acabados al aceite. Piezas para toda la vida, hechas en Olot desde 1987.
 					Typography:
 						Font: IBM Plex Serif
-						Style: italic
+						Italic: true
 						Size: 13
 						Line height: 19
 						Color: #D8C7B0
@@ -122,7 +122,7 @@ Document (dev.stxt.pdf):
 				In contents: false
 				Text: Índice
 			Paragraph: Cada pieza, con la página de su ficha.
-				Class: lead
+				Style: lead
 			Contents:
 				Id: toc
 				Levels: 1 2
@@ -133,14 +133,14 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Text: Comedor y salón
 			Paragraph: Sillas, mesas y estantes para la casa que se vive. Cada pieza se fabrica por encargo; el plazo habitual es de seis semanas.
-				Class: lead
+				Style: lead
 			Grid:
 				Id: grid-dining
 				Columns: 1fr 1fr
 				Gap: 18
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -152,17 +152,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Silla Olot
 								Item:
 									Text: MN-022
-										Class: ref
+										Style: ref
 							Paragraph: Roble macizo con asiento de anea, ensamblada sin un solo clavo.
 							Flex:
 								Main axis: between
@@ -171,13 +171,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 46 × 44 × 86 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 118 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -189,17 +189,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Mesa Besalú
 								Item:
 									Text: MN-014
-										Class: ref
+										Style: ref
 							Paragraph: Nogal macizo con tablero de una pieza y patas con ensamble de cola de milano.
 							Flex:
 								Main axis: between
@@ -208,13 +208,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 180 × 90 × 75 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 640 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -228,22 +228,22 @@ Document (dev.stxt.pdf):
 							Absolute:
 								Offset: 18 -12 auto auto
 								Rotate: 40
-								Class: new
+								Style: new
 								Box:
 									Width: 96
 								Text: Novedad
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Lámpara Sol
 								Item:
 									Text: MN-063
-										Class: ref
+										Style: ref
 							Paragraph: Pie de nogal torneado y pantalla de lino natural. Cable textil de dos metros.
 							Flex:
 								Main axis: between
@@ -252,13 +252,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: Ø 38 × 52 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 139 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -270,17 +270,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Taburete Cal
 								Item:
 									Text: MN-049
-										Class: ref
+										Style: ref
 							Paragraph: Asiento circular de roble con tres patas abiertas. Se apila de dos en dos.
 							Flex:
 								Main axis: between
@@ -289,10 +289,10 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: Ø 34 × 46 / 62 / 74 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 64 €
-										Class: price
+										Style: price
 		Block:
 			Id: rest
 			Break:
@@ -300,14 +300,14 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Text: Descanso y despacho
 			Paragraph: Para el recibidor, el dormitorio y el rincón de trabajo. Todas las piezas se pueden pedir en nogal o en roble, con el acabado que prefiera.
-				Class: lead
+				Style: lead
 			Grid:
 				Id: grid-rest
 				Columns: 1fr 1fr
 				Gap: 18
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -319,17 +319,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Estantería Fageda
 								Item:
 									Text: MN-031
-										Class: ref
+										Style: ref
 							Paragraph: Nogal con cinco baldas regulables y laterales con ranura. Se fija a la pared.
 							Flex:
 								Main axis: between
@@ -338,13 +338,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 90 × 30 × 180 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 215 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -356,17 +356,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Banco Mirador
 								Item:
 									Text: MN-040
-										Class: ref
+										Style: ref
 							Paragraph: Banco de recibidor con asiento tapizado en lana de oveja de la comarca.
 							Flex:
 								Main axis: between
@@ -375,13 +375,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 120 × 40 × 46 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 189,50 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -393,17 +393,17 @@ Document (dev.stxt.pdf):
 									Height: 205
 									Radius: 5.5 5.5 0 0
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Espejo Lluna
 								Item:
 									Text: MN-057
-										Class: ref
+										Style: ref
 							Paragraph: Espejo ovalado con marco de nogal macizo y herraje de colgar oculto.
 							Flex:
 								Main axis: between
@@ -412,13 +412,13 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 70 × 100 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 96 €
-										Class: price
+										Style: price
 				Area:
 					Block:
-						Class: card
+						Style: card
 						Relative:
 							Box:
 								Height: 205
@@ -432,22 +432,22 @@ Document (dev.stxt.pdf):
 							Absolute:
 								Offset: 18 -12 auto auto
 								Rotate: 40
-								Class: new
+								Style: new
 								Box:
 									Width: 96
 								Text: Novedad
 						Block:
-							Class: body
+							Style: body
 							Flex:
 								Main axis: between
 								Cross axis: end
 								Item:
 									Heading 2:
-										Class: product
+										Style: product
 										Text: Escritorio Torre
 								Item:
 									Text: MN-071
-										Class: ref
+										Style: ref
 							Paragraph: Roble con cajonera de tres cajones y pasacables. Cantos redondeados.
 							Flex:
 								Main axis: between
@@ -456,10 +456,10 @@ Document (dev.stxt.pdf):
 									Margin: 6 0 0 0
 								Item:
 									Text: 130 × 60 × 75 cm
-										Class: dims
+										Style: dims
 								Item:
 									Text: 420 €
-										Class: price
+										Style: price
 		Block:
 			Id: woods
 			Break:
@@ -467,7 +467,7 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Text: Maderas y acabados
 			Paragraph: Trabajamos solo madera maciza de bosques gestionados de la comarca, secada al aire durante dos años como mínimo.
-				Class: lead
+				Style: lead
 			Table:
 				Id: wood-table
 				Columns: 70 1fr 90 1fr
@@ -484,7 +484,7 @@ Document (dev.stxt.pdf):
 						Cell: Nogal
 							Header: true
 							Typography:
-								Weight: bold
+								Bold: true
 						Cell: Oscura, de veta marcada y cálida
 						Cell: La Garrotxa
 						Cell: Aceite natural, cera de abeja, teñido nogal oscuro
@@ -492,7 +492,7 @@ Document (dev.stxt.pdf):
 						Cell: Roble
 							Header: true
 							Typography:
-								Weight: bold
+								Bold: true
 						Cell: Clara, de veta fina y muy resistente
 						Cell: Pirineo
 						Cell: Aceite blanco o natural, jabón
@@ -500,7 +500,7 @@ Document (dev.stxt.pdf):
 						Cell: Cerezo
 							Header: true
 							Typography:
-								Weight: bold
+								Bold: true
 						Cell: Rojiza, que se oscurece con la luz
 						Cell: Sierra del Cadí
 						Cell: Aceite natural
@@ -508,7 +508,7 @@ Document (dev.stxt.pdf):
 						Cell: Fresno
 							Header: true
 							Typography:
-								Weight: bold
+								Bold: true
 						Cell: Clara y elástica, ideal para piezas curvas
 						Cell: La Garrotxa
 						Cell: Aceite blanco, natural
@@ -525,21 +525,21 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Text: 01
-							Class: step-number
+							Style: step-number
 						Heading 3:
 							Text: Visita y medidas
 						Paragraph: Vamos a su casa, tomamos medidas y escuchamos qué necesita. La visita no tiene coste.
 				Area:
 					Block:
 						Text: 02
-							Class: step-number
+							Style: step-number
 						Heading 3:
 							Text: Diseño y presupuesto
 						Paragraph: En una semana le enviamos el diseño, la madera propuesta y un presupuesto cerrado.
 				Area:
 					Block:
 						Text: 03
-							Class: step-number
+							Style: step-number
 						Heading 3:
 							Text: Fabricación
 						Paragraph: Fabricamos en el taller y llevamos y montamos las piezas, sin que se tenga que ocupar de nada.
@@ -564,7 +564,7 @@ Document (dev.stxt.pdf):
 								Typography:
 									Font: IBM Plex Serif
 									Size: 15
-									Weight: bold
+									Bold: true
 							Text: Carrer de la Farga, 14 · Polígono Les Torres · 17800 Olot
 								Typography:
 									Color: #D8C7B0

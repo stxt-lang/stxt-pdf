@@ -39,8 +39,8 @@ suyo). Es del elemento, como `Id`: no va en `Box`, `Typography` ni `Break`, ni e
 que hay dentro de una caja con enlace es clicable por ella; si además lleva enlace propio, las dos zonas se solapan y el
 visor decide cuál se activa.
 
-> **Decisión:** el enlace es del elemento: por regla de clase, todas las cajas con esa clase llevarían al mismo sitio, y
-> heredado, un `Link` en `Element: Document` enlazaría todo el documento.
+> **Decisión:** el enlace es del elemento: por regla de estilo, todas las cajas con ese estilo llevarían al mismo sitio, y
+> heredado, un `Link` en `For element: Document` enlazaría todo el documento.
 
 ## Aspecto
 
@@ -50,7 +50,7 @@ línea; se puede combinar con negrita y cursiva (`[la **web**](…)`). El enlace
 ([Formato del texto](formato-del-texto.md#tramos)): no cambia cómo se miden las palabras ni las líneas.
 
 > **Decisión:** sin aspecto por defecto, salvo el subrayado del de Markdown. *Alternativa descartada:* azul y subrayado
-> siempre, o una regla `Element: Link`.
+> siempre, o una regla `For element: Link`.
 
 ## Zonas
 

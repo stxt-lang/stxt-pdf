@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * El documento de estilos aparte (referencia/comun/estilos.md): sus reglas valen menos que las del
  * propio documento, que las mezcla propiedad a propiedad, y la tipografía base va en
- * {@code Element: Document}.
+ * {@code For element: Document}.
  */
 class StylesFileTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
+    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n";
+    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
             + "\t\t\tSize: 10\n";
 
     /** El documento (cabecera y estas líneas) con el documento de estilos aparte, o sin él si es {@code null}. */
@@ -43,7 +43,7 @@ class StylesFileTest {
 
     @Test
     void theBaseTypographyAndTheRulesCanComeFromTheStylesDocument() {
-        Box text = root(BASE + "\tElement: Text\n\t\tTypography:\n\t\t\tWeight: bold\n", "\tText: hola").children().get(0);
+        Box text = root(BASE + "\tFor element: Text\n\t\tTypography:\n\t\t\tBold: true\n", "\tText: hola").children().get(0);
         assertEquals("IBM Plex Sans", text.style().typography().font());
         assertEquals(10, text.style().typography().fontSize(), 1e-9);
         assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
@@ -51,15 +51,15 @@ class StylesFileTest {
 
     @Test
     void theStylesDocumentIsOptional() {
-        Box text = root(null, "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
+        Box text = root(null, "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 9", "\tText: hola").children().get(0);
         assertEquals(9, text.style().typography().fontSize(), 1e-9);
     }
 
     @Test
     void theDocumentWinsAndMergesWithTheStylesDocumentOneByOne() {
-        Box text = root(BASE + "\tElement: Text\n\t\tTypography:\n\t\t\tSize: 12\n\t\t\tWeight: bold\n",
-                "\tStyles:", "\t\tElement: Text", "\t\t\tTypography:", "\t\t\t\tSize: 14",
+        Box text = root(BASE + "\tFor element: Text\n\t\tTypography:\n\t\t\tSize: 12\n\t\t\tBold: true\n",
+                "\tStyles:", "\t\tFor element: Text", "\t\t\tTypography:", "\t\t\t\tSize: 14",
                 "\tText: hola").children().get(0);
         assertEquals(14, text.style().typography().fontSize(), 1e-9);
         // Lo que el documento no declara lo pone el documento de estilos.
@@ -71,7 +71,7 @@ class StylesFileTest {
 
     @Test
     void theBaseTypographyOfTheDocumentWinsOverTheStylesDocument() {
-        Box text = root(BASE, "\tStyles:", "\t\tElement: Document", "\t\t\tTypography:", "\t\t\t\tSize: 8",
+        Box text = root(BASE, "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\tText: hola").children().get(0);
         assertEquals(8, text.style().typography().fontSize(), 1e-9);
         assertEquals("IBM Plex Sans", text.style().typography().font());
@@ -79,12 +79,12 @@ class StylesFileTest {
 
     @Test
     void thePriorityLevelsStayTheSameAcrossBothSources() {
-        // Un For class del documento aparte gana a un Element del documento, y a su vez pierde ante For class del documento.
-        String styles = BASE + "\tFor class: a\n\t\tBox:\n\t\t\tPadding: 2\n\t\t\tMargin: 2\n";
+        // Un For style del documento aparte gana a un For element del documento, y a su vez pierde ante For style del documento.
+        String styles = BASE + "\tFor style: a\n\t\tBox:\n\t\t\tPadding: 2\n\t\t\tMargin: 2\n";
         Box root = root(styles,
-                "\tStyles:", "\t\tElement: Block", "\t\t\tBox:", "\t\t\t\tPadding: 1", "\t\t\t\tMargin: 1",
-                "\t\tFor class: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tBlock:", "\t\tClass: a");
+                "\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tPadding: 1", "\t\t\t\tMargin: 1",
+                "\t\tFor style: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
+                "\tBlock:", "\t\tStyle: a");
         Box block = root.children().get(0);
         assertEquals(Sides.all(Value.pt(3)), block.style().box().padding());
         assertEquals(Sides.all(Value.pt(2)), block.style().box().margin());
@@ -93,21 +93,21 @@ class StylesFileTest {
     @Test
     void anIdRuleOfTheStylesDocumentBeatsAClassRuleOfTheDocument() {
         String styles = BASE + "\tFor id: x\n\t\tBox:\n\t\t\tPadding: 5\n";
-        Box block = root(styles, "\tStyles:", "\t\tFor class: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tBlock:", "\t\tId: x", "\t\tClass: a").children().get(0);
+        Box block = root(styles, "\tStyles:", "\t\tFor style: a", "\t\t\tBox:", "\t\t\t\tPadding: 3",
+                "\tBlock:", "\t\tId: x", "\t\tStyle: a").children().get(0);
         assertEquals(Sides.all(Value.pt(5)), block.style().box().padding());
     }
 
     @Test
     void aClassCanHaveItsRuleOnlyInTheStylesDocument() {
-        Box block = root(BASE + "\tFor class: a\n\t\tBox:\n\t\t\tPadding: 4\n", "\tBlock:", "\t\tClass: a").children().get(0);
+        Box block = root(BASE + "\tFor style: a\n\t\tBox:\n\t\t\tPadding: 4\n", "\tBlock:", "\t\tStyle: a").children().get(0);
         assertEquals(Sides.all(Value.pt(4)), block.style().box().padding());
     }
 
     @Test
     void rulesWithoutAnElementAreNeverAnError() {
         // Un documento de estilos sirve para varios documentos, y un elemento puede llegar después, de una plantilla.
-        String styles = BASE + "\tFor id: nobody\n\t\tBox:\n\t\t\tPadding: 4\n\tFor class: unused\n\t\tBox:\n\t\t\tPadding: 1\n";
+        String styles = BASE + "\tFor id: nobody\n\t\tBox:\n\t\t\tPadding: 4\n\tFor style: unused\n\t\tBox:\n\t\t\tPadding: 1\n";
         assertNotNull(root(styles, "\tText: hola"));
         // Tampoco las del propio documento.
         assertNotNull(root(BASE, "\tStyles:", "\t\tFor id: nobody", "\t\t\tBox:", "\t\t\t\tPadding: 4",
@@ -116,13 +116,13 @@ class StylesFileTest {
 
     @Test
     void theSameRuleInBothSourcesIsNotADuplicate() {
-        assertNotNull(root(BASE + "\tElement: Text\n\t\tBox:\n\t\t\tPadding: 1\n",
-                "\tStyles:", "\t\tElement: Text", "\t\t\tBox:", "\t\t\t\tPadding: 2", "\tText: hola"));
+        assertNotNull(root(BASE + "\tFor element: Text\n\t\tBox:\n\t\t\tPadding: 1\n",
+                "\tStyles:", "\t\tFor element: Text", "\t\t\tBox:", "\t\t\t\tPadding: 2", "\tText: hola"));
     }
 
     @Test
     void aRepeatedRuleInsideTheStylesDocumentIsAnErrorThatSaysWhere() {
-        InvalidModelException e = error(BASE + "\tElement: Text\n\t\tBox:\n\t\t\tPadding: 1\n\tElement: Text\n\t\tBox:\n\t\t\tPadding: 2\n",
+        InvalidModelException e = error(BASE + "\tFor element: Text\n\t\tBox:\n\t\t\tPadding: 1\n\tFor element: Text\n\t\tBox:\n\t\t\tPadding: 2\n",
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_DUPLICATE, e.errorCode());
         assertEquals(9, e.line());
@@ -131,21 +131,21 @@ class StylesFileTest {
 
     @Test
     void aBadValueInTheStylesDocumentPointsToItsLine() {
-        InvalidModelException e = error(BASE + "\tElement: Text\n\t\tBox:\n\t\t\tPadding: mucho\n", "\tText: hola");
+        InvalidModelException e = error(BASE + "\tFor element: Text\n\t\tBox:\n\t\t\tPadding: mucho\n", "\tText: hola");
         assertEquals(8, e.line());
         assertTrue(e.getMessage().startsWith("línea 8 de los estilos: "), e.getMessage());
     }
 
     @Test
     void aBadValueInTheDocumentDoesNotMentionTheStylesDocument() {
-        InvalidModelException e = error(BASE, "\tStyles:", "\t\tElement: Text", "\t\t\tBox:", "\t\t\t\tPadding: mucho",
+        InvalidModelException e = error(BASE, "\tStyles:", "\t\tFor element: Text", "\t\t\tBox:", "\t\t\t\tPadding: mucho",
                 "\tText: hola");
         assertTrue(e.getMessage().startsWith("línea 10: "), e.getMessage());
     }
 
     @Test
     void aRuleCheckedAfterBuildingTheTreePointsToTheStylesDocument() {
-        InvalidModelException e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tWidth: 10\n\t\t\tHeight: 10\n"
+        InvalidModelException e = error(BASE + "\tFor element: Block\n\t\tBox:\n\t\t\tWidth: 10\n\t\t\tHeight: 10\n"
                 + "\t\t\tAspect ratio: 2\n", "\tBlock:", "\t\tText: hola");
         assertEquals(ErrorCode.ASPECT_RATIO_CONFLICT, e.errorCode());
         assertEquals(10, e.line());
@@ -156,12 +156,12 @@ class StylesFileTest {
     @Test
     void aMessageNamesTheDocumentOfEachLine() {
         // Min width llega de los estilos y Max width es del documento: cada línea dice de dónde es.
-        InvalidModelException e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tMin width: 100\n",
+        InvalidModelException e = error(BASE + "\tFor element: Block\n\t\tBox:\n\t\t\tMin width: 100\n",
                 "\tBlock:", "\t\tBox:", "\t\t\tMax width: 50", "\t\tText: hola");
         assertEquals(ErrorCode.MIN_MAX_CONFLICT, e.errorCode());
         assertEquals("línea 8 de los estilos: Min width es mayor que Max width (línea 10)", e.getMessage());
         // Y al revés.
-        e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tMax width: 50\n",
+        e = error(BASE + "\tFor element: Block\n\t\tBox:\n\t\t\tMax width: 50\n",
                 "\tBlock:", "\t\tBox:", "\t\t\tMin width: 100", "\t\tText: hola");
         assertFalse(e.inStyles());
         assertEquals("línea 10: Min width es mayor que Max width (línea 8 de los estilos)", e.getMessage());
@@ -169,7 +169,7 @@ class StylesFileTest {
 
     @Test
     void aDeclarationOfTheDocumentAfterARuleOfTheStylesDocumentIsOfTheDocument() {
-        Box block = root(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tPadding: 1\n",
+        Box block = root(BASE + "\tFor element: Block\n\t\tBox:\n\t\t\tPadding: 1\n",
                 "\tBlock:", "\t\tBox:", "\t\t\tMargin: 2", "\t\tText: hola").children().get(0);
         assertEquals(SourceLine.inStyles(8), block.style().line("padding"));
         assertEquals(SourceLine.of(10), block.style().line("margin"));
@@ -179,14 +179,14 @@ class StylesFileTest {
 
     @Test
     void anUnknownElementInTheStylesDocumentIsAnError() {
-        InvalidModelException e = error(BASE + "\tElement: Nada\n\t\tBox:\n\t\t\tPadding: 1\n", "\tText: hola");
+        InvalidModelException e = error(BASE + "\tFor element: Nada\n\t\tBox:\n\t\t\tPadding: 1\n", "\tText: hola");
         assertEquals(ErrorCode.STYLE_UNKNOWN_ELEMENT, e.errorCode());
         assertTrue(e.getMessage().contains("de los estilos"), e.getMessage());
     }
 
     @Test
     void breakFromTheStylesDocumentCannotGoToAnAbsolute() {
-        InvalidModelException e = error(BASE + "\tElement: Absolute\n\t\tBreak:\n\t\t\tAfter: avoid\n",
+        InvalidModelException e = error(BASE + "\tFor element: Absolute\n\t\tBreak:\n\t\t\tAfter: avoid\n",
                 "\tAbsolute:", "\t\tText: a");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
         assertEquals(7, e.line());
@@ -195,14 +195,14 @@ class StylesFileTest {
 
     @Test
     void elementDocumentOnlyAdmitsTypography() {
-        // Dos Element: Document en el mismo origen son una regla repetida, como cualquier otra.
-        InvalidModelException repeated = error(BASE + "\tElement: Document\n\t\tTypography:\n\t\t\tSize: 9\n", "\tText: hola");
+        // Dos For element: Document en el mismo origen son una regla repetida, como cualquier otra.
+        InvalidModelException repeated = error(BASE + "\tFor element: Document\n\t\tTypography:\n\t\t\tSize: 9\n", "\tText: hola");
         assertEquals(ErrorCode.STYLE_DUPLICATE, repeated.errorCode());
-        InvalidModelException box = error("Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tBox:\n\t\t\tPadding: 1\n",
+        InvalidModelException box = error("Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tBox:\n\t\t\tPadding: 1\n",
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, box.errorCode());
         assertEquals(3, box.line());
-        InvalidModelException inDocument = error(null, "\tStyles:", "\t\tElement: Document", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
+        InvalidModelException inDocument = error(null, "\tStyles:", "\t\tFor element: Document", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, inDocument.errorCode());
         assertEquals(9, inDocument.line());
@@ -230,19 +230,19 @@ class StylesFileTest {
     @Test
     void theStylesDocumentIsValidatedAgainstTheSchema() {
         DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class,
-                () -> READER.readStyles("Styles (dev.stxt.pdf):\n\tElement: Text\n\t\tColour: red\n"));
+                () -> READER.readStyles("Styles (dev.stxt.pdf):\n\tFor element: Text\n\t\tColour: red\n"));
         assertEquals("NODE_NOT_DEFINED_IN_SCHEMA", e.code());
         assertTrue(e.inStyles());
         assertTrue(e.getMessage().startsWith("línea 3 de los estilos: "), e.getMessage());
-        // Un documento de estilos no tiene Media ni elementos.
+        // Un documento de estilos no tiene Page ni elementos.
         assertThrows(DocumentSyntaxException.class, () -> READER.readStyles("Styles (dev.stxt.pdf):\n\tText: a\n"));
     }
 
     @Test
     void tablePositionRulesOfTheStylesDocumentGoBeforeThoseOfTheDocument() {
         // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Head cell del documento.
-        String styles = BASE + "\tElement: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
-        Box table = root(styles, "\tStyles:", "\t\tElement: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
+        String styles = BASE + "\tFor element: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
+        Box table = root(styles, "\tStyles:", "\t\tFor element: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
         assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().box().padding());
@@ -251,7 +251,7 @@ class StylesFileTest {
 
     @Test
     void theGeneratedEntriesOfAContentsTakeTheRulesOfTheStylesDocument() {
-        String styles = BASE + "\tElement: Contents entry 1\n\t\tBox:\n\t\t\tPadding: 6\n";
+        String styles = BASE + "\tFor element: Contents entry 1\n\t\tBox:\n\t\t\tPadding: 6\n";
         Box contents = root(styles, "\tHeading 1:", "\t\tText: Uno", "\tContents:").children().get(1);
         assertEquals(Sides.all(Value.pt(6)), contents.children().get(0).style().box().padding());
     }
@@ -277,7 +277,7 @@ class StylesFileTest {
 
     @Test
     void anUnknownFontOfTheStylesDocumentPointsToItsLine() {
-        InvalidModelException e = conversionError("Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tTypography:\n"
+        InvalidModelException e = conversionError("Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n"
                 + "\t\t\tFont: Nada\n\t\t\tSize: 10\n", "\tText: hola");
         assertEquals(ErrorCode.FONT_UNKNOWN, e.errorCode());
         assertEquals(4, e.line());
@@ -288,7 +288,7 @@ class StylesFileTest {
     @Test
     void anOverflowCausedByTheStylesDocumentPointsToItsLine() {
         // La línea del error es la del Width, en los estilos; la caja se nombra por su línea en el documento.
-        InvalidModelException e = conversionError(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tWidth: 2000\n",
+        InvalidModelException e = conversionError(BASE + "\tFor element: Block\n\t\tBox:\n\t\t\tWidth: 2000\n",
                 "\tBlock:", "\t\tText: hola");
         assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
         assertTrue(e.inStyles());

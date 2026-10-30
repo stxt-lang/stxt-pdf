@@ -51,7 +51,7 @@ public final class TypographyStyle extends StyleGroup {
      * encabezado.
      */
     private boolean numbered;
-    /** {@code Number style}: cómo se escribe el número del nivel del encabezado. */
+    /** {@code Number format}: cómo se escribe el número del nivel del encabezado. */
     private NumberStyle numberStyle = NumberStyle.DECIMAL;
     /** {@code Number label}: lo que se escribe delante del título, con {@code {number}}; {@code null} = el número. */
     private String numberLabel;

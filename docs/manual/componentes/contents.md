@@ -7,33 +7,33 @@ la página donde está. Cada entrada es clicable y lleva a su encabezado.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
 				Numbered: true
-		Element: Heading 1
+		For element: Heading 1
 			Typography:
 				Size: 18
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 0 0 12 0
-		Element: Heading 2
+		For element: Heading 2
 			Typography:
 				Size: 12
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 10 0 6 0
-		Element: Contents entry 1
+		For element: Contents entry 1
 			Typography:
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 6 0 2 0
-		Element: Contents entry 2
+		For element: Contents entry 2
 			Box:
 				Padding: 0 0 0 16
 	Section:
@@ -65,7 +65,7 @@ Document (dev.stxt.pdf):
 | `Levels` | `1 3` | Los niveles de encabezado que lista, del primero al último: `Levels: 1 2` lista los `Heading 1` y `Heading 2` |
 | `Leader` | `dots` | Lo que llena el hueco entre el título y la página: `dots` (puntos), `rule` (una línea) o `none` |
 
-Admite además `Id`, `Class`, `Box`, `Typography` y `Break`. No tiene hijos: las entradas las genera el motor.
+Admite además `Id`, `Style`, `Box`, `Typography` y `Break`. No tiene hijos: las entradas las genera el motor.
 
 ## Las entradas
 
@@ -73,7 +73,7 @@ Admite además `Id`, `Class`, `Box`, `Typography` y `Break`. No tiene hijos: las
   Un encabezado con `In contents: false` no sale (el título de la portada, el del propio índice).
 - Cada entrada tiene el texto del encabezado, con su número si lo lleva, la guía y el número de la página, el mismo que lleva
   impreso esa página.
-- Se estilan con `Element: Contents entry 1` … `Contents entry 6`, una regla por nivel: la sangría de cada nivel es su
+- Se estilan con `For element: Contents entry 1` … `Contents entry 6`, una regla por nivel: la sangría de cada nivel es su
   `Padding` izquierdo, y la separación entre entradas, su `Margin`.
 - Si un título no cabe en una línea, se parte, y el número queda en la primera línea.
 - Un índice sin ningún encabezado en sus niveles es un error.

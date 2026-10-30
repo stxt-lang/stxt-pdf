@@ -92,8 +92,8 @@ final class PropertyReader {
     private static final Map<String, Property> TYPOGRAPHY = Map.ofEntries(
             entry("font", (p, s) -> s.typography().setFont(fontFamily(p))),
             entry("code-font", (p, s) -> s.typography().setCodeFont(fontFamily(p))),
-            entry("weight", (p, s) -> s.typography().setFontWeight(enumValue(FontWeight.class, p))),
-            entry("style", (p, s) -> s.typography().setFontStyle(enumValue(FontStyle.class, p))),
+            entry("bold", (p, s) -> s.typography().setFontWeight(bool(p) ? FontWeight.BOLD : FontWeight.NORMAL)),
+            entry("italic", (p, s) -> s.typography().setFontStyle(bool(p) ? FontStyle.ITALIC : FontStyle.NORMAL)),
             entry("size", (p, s) -> s.typography().setFontSize(positive(p))),
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
             entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
@@ -107,7 +107,7 @@ final class PropertyReader {
             entry("white-space", (p, s) -> s.typography().setWhiteSpace(enumValue(WhiteSpace.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
             entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
-            entry("number-style", (p, s) -> s.typography().setNumberStyle(enumValue(NumberStyle.class, p))),
+            entry("number-format", (p, s) -> s.typography().setNumberStyle(enumValue(NumberStyle.class, p))),
             entry("number-label", (p, s) -> s.typography().setNumberLabel(numberLabel(p))),
             entry("widows", (p, s) -> s.typography().setWidows(positiveInteger(p))),
             entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
@@ -127,7 +127,7 @@ final class PropertyReader {
             entry("in-contents", (p, s) -> s.setInContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
-            entry("page", (p, s) -> s.image().setPage(positiveInteger(p))),
+            entry("pdf-page", (p, s) -> s.image().setPage(positiveInteger(p))),
             entry("levels", ContentsBuilder::levels),
             entry("leader", (p, s) -> s.contents().setLeader(enumValue(Leader.class, p))));
 

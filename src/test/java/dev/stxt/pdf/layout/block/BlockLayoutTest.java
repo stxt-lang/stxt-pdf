@@ -34,10 +34,10 @@ class BlockLayoutTest {
     void stylesRulesShapeTheLayout() {
         // La regla da a cada Block 30 de alto y 10 de margen inferior; B la sobrescribe con 50.
         LayoutFixture l = layOut(
-                "\tStyles:", "\t\tElement: Block", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 0 0 10 0",
-                "\t\tFor class: narrow", "\t\t\tBox:", "\t\t\t\tWidth: 100",
+                "\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 0 0 10 0",
+                "\t\tFor style: narrow", "\t\t\tBox:", "\t\t\t\tWidth: 100",
                 "\tBlock:", "\t\tId: A",
-                "\tBlock:", "\t\tId: B", "\t\tClass: narrow", "\t\tBox:", "\t\t\tHeight: 50",
+                "\tBlock:", "\t\tId: B", "\t\tStyle: narrow", "\t\tBox:", "\t\t\tHeight: 50",
                 "\tBlock:", "\t\tId: C");
         assertRect(40, 40, 515, 30, l.rect("A"));
         assertRect(40, 80, 100, 50, l.rect("B"));

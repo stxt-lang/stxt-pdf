@@ -2,7 +2,7 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 300
 		Height: 300
 		Margin: 20

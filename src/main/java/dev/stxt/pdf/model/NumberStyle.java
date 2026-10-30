@@ -4,8 +4,8 @@ import java.util.Locale;
 
 /**
  * Cómo se escribe un número: en cifras, en letras o en números romanos. Es el de las numeraciones de las listas
- * ({@code Marker}, referencia/componentes/list.md), el de un nivel de los encabezados ({@code Number style},
- * referencia/componentes/heading.md) y el de las páginas de una sección ({@code Page style},
+ * ({@code Marker}, referencia/componentes/list.md), el de un nivel de los encabezados ({@code Number format},
+ * referencia/componentes/heading.md) y el de las páginas de una sección ({@code Page number format},
  * referencia/componentes/document.md), que solo admite cifras y romanos.
  */
 public enum NumberStyle {

@@ -9,23 +9,23 @@ comprueba cada medida de abajo.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Fixed
+		For element: Fixed
 			Box:
 				Height: 20
 			Typography:
 				Size: 8
-		Element: Text
+		For element: Text
 			Typography:
 				Align: justify
-		For class: panel
+		For style: panel
 			Box:
 				Background: #F1EFE8
 				Padding: 10
@@ -37,7 +37,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 16 0
 			Typography:
-				Weight: bold
+				Bold: true
 				Size: 20
 				Line height: 24
 			Break:
@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 			Area:
 				Text:
 					Id: side
-					Class: panel
+					Style: panel
 					Content >>
 						Resumen de las cifras clave
 						del trimestre.
@@ -94,14 +94,14 @@ Document (dev.stxt.pdf):
 
 - **Área útil:** `Paper: A4` mide 595 × 842, así que quedan 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
   (40, 40).
-- **Fuentes:** la regla `Element: Document` declara `Font` y `Size`, que heredan todas las cajas. El título
+- **Fuentes:** la regla `For element: Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
-- **Reglas** ([Styles](estilos.md)): `Element: Fixed` da a la cabecera y
-  al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `Element: Text` justifica todos los
+- **Reglas** ([Styles](estilos.md)): `For element: Fixed` da a la cabecera y
+  al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `For element: Text` justifica todos los
   textos; en los de una sola línea (título, cabecera) no se nota, porque la última línea de un
-  párrafo no se justifica. El pie y el sello lo sobrescriben con su propio `Align`, y la clase
-  `panel` de `side` lo devuelve a `left`: una regla `For class` gana a la de `Element`. La
+  párrafo no se justifica. El pie y el sello lo sobrescriben con su propio `Align`, y el estilo
+  `panel` de `side` lo devuelve a `left`: una regla `For style` gana a la de `For element`. La
   regla `For id: title` lleva todo el estilo del título, que en el documento solo declara su
   texto y su `Id`. El resultado es el mismo que si cada elemento declarase esas propiedades.
 - **`header`** (`Fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.

@@ -29,8 +29,8 @@ import java.util.stream.Stream;
  * leen la familia (la tipográfica, {@code nameID} 16, o si no la hay la 1), el peso
  * ({@code usWeightClass} de la tabla {@code OS/2}: 400 es {@code normal} y 700 {@code bold}) y
  * el estilo (el bit de cursiva de {@code fsSelection}). Los ficheros de otros pesos (300, 500…)
- * se leen pero no se pueden usar, porque {@code Weight} solo admite {@code normal} y
- * {@code bold}.</p>
+ * se leen pero no se pueden usar, porque {@code Bold} solo distingue el
+ * normal (400) y la negrita (700).</p>
  *
  * <p>Son errores: que no exista la carpeta, un fichero que no se puede leer, una fuente
  * variable, dos ficheros con la misma familia, peso y estilo, y un enlace que sale de la

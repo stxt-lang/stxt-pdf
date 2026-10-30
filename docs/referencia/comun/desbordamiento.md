@@ -14,7 +14,7 @@
   su `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no, su `Height` (en una
   `Image` sin él, su `Width`, del que sale el alto); en una caja girada, que no se parte, su `Rotate`;
 - **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
-  ocupar los márgenes del medio, pero no salir de la página;
+  ocupar los márgenes de la página, pero no salir de la página;
 - **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Rotate`: lo que se comprueba es
   el rectángulo que envuelve lo que se pinta, con los giros de sus ancestros ([Capas y giro](capas-y-giro.md#giro-rotate)).
   Un `Absolute` o un `Fixed` girado se comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro

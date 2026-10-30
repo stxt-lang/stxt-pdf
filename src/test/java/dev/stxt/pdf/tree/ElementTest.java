@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ElementTest {
 
     /**
-     * Los elementos de caja del schema son los nodos que admiten {@code Class} e {@code Id}, salvo la {@code Row}:
-     * admite {@code Class} e {@code Id} para sus celdas y su franja, pero no es un elemento que se maquete.
+     * Los elementos de caja del schema son los nodos que admiten {@code Style} e {@code Id}, salvo la {@code Row}:
+     * admite {@code Style} e {@code Id} para sus celdas y su franja, pero no es un elemento que se maquete.
      */
     @Test
     void writtenElementsAreTheBoxElementsOfTheSchema() {
         Set<String> schema = SchemaNodes.children().entrySet().stream()
-                .filter(e -> e.getValue().contains("Class") && e.getValue().contains("Id"))
+                .filter(e -> e.getValue().contains("Style") && e.getValue().contains("Id"))
                 .filter(e -> !e.getKey().equals("Row"))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
@@ -60,12 +60,12 @@ class ElementTest {
         // Generados: el marcador, la franja de una fila, el flujo de columnas, el bloque de código de un Markdown y,
         // del índice, seis entradas, el título, la guía y el número de página.
         assertEquals(Element.values().length - 13, Element.written().size());
-        // El bloque de código lo nombran las reglas Element, pero no se escribe.
+        // El bloque de código lo nombran las reglas For element, pero no se escribe.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK));
         assertTrue(!Element.written().contains(Element.CODE_BLOCK));
         assertTrue(Element.CODE_BLOCK.hasText());
-        // Las entradas del índice las nombran las reglas Element, pero no se escriben.
+        // Las entradas del índice las nombran las reglas For element, pero no se escriben.
         assertEquals(Optional.of(Element.CONTENTS_ENTRY_2), Element.of("contents-entry-2"));
         assertEquals(Element.CONTENTS_ENTRY_4, Element.contentsEntry(4));
         assertTrue(Element.of("contents-title").isEmpty());

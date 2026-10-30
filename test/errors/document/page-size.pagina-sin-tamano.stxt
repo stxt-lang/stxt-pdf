@@ -1,10 +1,10 @@
-# Case: Medio sin tamaño: ni Paper ni Width y Height
-# Code: MEDIA_SIZE
+# Case: Page sin tamaño: ni Paper ni Width y Height
+# Code: PAGE_SIZE
 # Line: 7
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Margin: 40
 	Section:
 		Block:

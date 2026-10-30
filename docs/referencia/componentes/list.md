@@ -1,13 +1,13 @@
 # `List` y `List item`
 
 Una `List` apila sus ítems (`List item`) en vertical, como un `Block`, y cada ítem lleva un **marcador** generado por el
-motor, que no está en el documento. Las dos son cajas de bloque y admiten `Id`, `Class`, `Link`, `Box`, `Typography` y
+motor, que no está en el documento. Las dos son cajas de bloque y admiten `Id`, `Style`, `Link`, `Box`, `Typography` y
 `Break`; un ítem contiene uno o varios elementos, cualquiera salvo los encabezados (`Paragraph`, `Text`, `Block`, otra
 `List`…). Un ítem vacío es `LIST_ITEM_EMPTY`. Una `List` va donde va un elemento en flujo, también dentro de otro ítem.
 
 ```
 Styles:
-	Element: List
+	For element: List
 		Box:
 			Padding: 0 0 0 18
 List:
@@ -39,7 +39,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 ## Marcadores
 
 `Marker` es obligatorio: si la lista es numerada lo decide el autor. El marcador es texto en la tipografía del
-`List item` (propia, heredada o de `Element: List item`): `•` (`disc`), `–` (`dash`), ninguno (`none`), o el número del
+`List item` (propia, heredada o de `For element: List item`): `•` (`disc`), `–` (`dash`), ninguno (`none`), o el número del
 ítem con un punto: `3.`, `c.`, `C.`, `iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido.
 
 > **Decisión:** el marcador es texto en la fuente del ítem, sin círculo hueco ni cuadrado, que IBM Plex Sans no tiene.

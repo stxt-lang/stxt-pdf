@@ -1,10 +1,10 @@
-# Case: Medio sin alto
-# Code: MEDIA_SIZE
+# Case: Page sin alto
+# Code: PAGE_SIZE
 # Line: 8
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 	Section:
 		Block:

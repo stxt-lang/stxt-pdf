@@ -12,7 +12,7 @@ import dev.stxt.pdf.model.TextAlign;
  * @param column          columna en que empieza, desde 1
  * @param columnAlign     {@code Column align} de su columna; {@code null} si la tabla no lo declara
  * @param columnAlignLine línea de ese {@code Column align}
- * @param rowClass        el {@code Class} de su {@code Row}, cuyas reglas {@code For class} se aplican a la celda;
+ * @param rowClass        el {@code Style} de su {@code Row}, cuyas reglas {@code For style} se aplican a la celda;
  *                        {@code null} si la fila no lo declara
  * @param rowId           el {@code Id} de su {@code Row}, cuya regla {@code For id} se aplica a la celda; {@code null}
  *                        si la fila no lo declara

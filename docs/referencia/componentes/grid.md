@@ -2,7 +2,7 @@
 
 En un `Grid`, cuyos ítems son el elemento de cada `Area`, el motor resuelve primero **dónde** va cada ítem y después
 **cuánto** mide cada pista (cada columna y cada fila). Cada hijo en flujo es un `Area`; además admite `Absolute` y `Fixed`.
-El `Grid` admite `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
+El `Grid` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
 
 ```
 Grid:

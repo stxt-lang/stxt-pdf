@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ListLayoutTest {
 
-    private static final String[] LIST_PADDING = {"\tStyles:", "\t\tElement: List", "\t\t\tBox:",
+    private static final String[] LIST_PADDING = {"\tStyles:", "\t\tFor element: List", "\t\t\tBox:",
             "\t\t\t\tPadding: 0 0 0 20"};
 
     private static String[] doc(String... lines) {

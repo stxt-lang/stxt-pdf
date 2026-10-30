@@ -1,14 +1,14 @@
-# Case: Element: Document con Box
+# Case: For element: Document con Box
 # Code: STYLE_NOT_ALLOWED
 # Line: 15
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10

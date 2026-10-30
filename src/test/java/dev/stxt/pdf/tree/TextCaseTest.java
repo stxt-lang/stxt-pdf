@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TextCaseTest {
 
     private static String header(String language) {
-        return "Document (dev.stxt.pdf):\n\tLanguage: " + language + "\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
+        return "Document (dev.stxt.pdf):\n\tLanguage: " + language + "\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
     }
 
     private static Box build(String... lines) {
@@ -49,9 +49,9 @@ class TextCaseTest {
 
     @Test
     void theyCanBeSetInTheDocumentAndInStylesRules() {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\t\t\t\tLetter spacing: 1\n"
-                + "\tStyles:\n\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tTransform: uppercase\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\t\t\t\tLetter spacing: 1\n"
+                + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tTransform: uppercase\n"
                 + "\t\t\t\tSmall caps: true\n"
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
@@ -89,8 +89,8 @@ class TextCaseTest {
     /** También en una regla de {@code Styles}: una clase para las palabras de otro idioma. */
     @Test
     void aStylesRuleCanDeclareTheLanguage() {
-        Box root = build("\tStyles:", "\t\tFor class: english", "\t\t\tTypography:", "\t\t\t\tLanguage: en-GB",
-                "\tText: Hola", "\tText: Hello", "\t\tClass: english");
+        Box root = build("\tStyles:", "\t\tFor style: english", "\t\t\tTypography:", "\t\t\t\tLanguage: en-GB",
+                "\tText: Hola", "\tText: Hello", "\t\tStyle: english");
         assertEquals(Locale.forLanguageTag("es"), root.children().get(0).style().typography().locale());
         assertEquals(Locale.forLanguageTag("en-GB"), root.children().get(1).style().typography().locale());
     }
@@ -103,11 +103,11 @@ class TextCaseTest {
         assertEquals(15, e.line());
     }
 
-    /** El idioma del documento es el {@code Language} de {@code Document}; la regla {@code Element: Document} no lo cambia. */
+    /** El idioma del documento es el {@code Language} de {@code Document}; la regla {@code For element: Document} no lo cambia. */
     @Test
     void elementDocumentCannotChangeTheLanguage() {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\t\t\t\tLanguage: en\n\tText: Hola\n";
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))));

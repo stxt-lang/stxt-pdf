@@ -4,15 +4,15 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		For class: photo
+		For style: photo
 			Break:
 				Decoration: clone
 	Section:
 		Block:
-			Class: photo
+			Style: photo
 		Image: test/wide.png
-			Class: photo
+			Style: photo

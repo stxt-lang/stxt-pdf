@@ -1,9 +1,9 @@
 # Secciones (referencia/componentes/document.md). Páginas de 300 × 200 con márgenes de 20 (área útil de 260 × 160 desde (20, 20)).
 #
-# Tres secciones, cinco páginas, cada una con su Media:
+# Tres secciones, cinco páginas, cada una con su Page:
 #   cover (1 página):  Margin 0, área útil de 300 × 200 desde (0, 0), sin números ni los Fixed del documento.
 #                      cover-box llena la página (0, 0, 300 × 200); stamp (Fixed de la sección) sale en (10, 10), 40 × 20.
-#   body (2 páginas):  el Media del documento. b1 (20, 20) y b2 (20, 80) caben en la página 2 (física); b3, no (60 + 60 + 60 > 160)
+#   body (2 páginas):  el Page del documento. b1 (20, 20) y b2 (20, 80) caben en la página 2 (física); b3, no (60 + 60 + 60 > 160)
 #                      (con Inside: avoid, que no se parte) y pasa a la 3, en (20, 20). head (Pages: first, de la sección) sale solo en la primera página
 #                      de la sección: la 2 física, en (20, 20), 260 × 12. foot (Fixed del documento) sale en las dos,
 #                      abajo: y = 20 + 160 - 12 = 168.
@@ -13,12 +13,12 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 300
 		Height: 200
 		Margin: 20
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -35,7 +35,7 @@ Document (dev.stxt.pdf):
 		Id: cover
 		Page numbering: none
 		Inherit fixed: false
-		Media:
+		Page:
 			Margin: 0
 		Block:
 			Id: cover-box
@@ -88,7 +88,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Id: wide
 		Page numbering: restart
-		Media:
+		Page:
 			Width: 400
 			Height: 150
 			Margin: 10

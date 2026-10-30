@@ -51,7 +51,7 @@ import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
  * {@link TableBuilder} y {@link ListBuilder} y valida con {@link ModelValidator}.</p>
  *
  * <p>Prioridad de cada propiedad, de menos a más: el valor por defecto, lo heredado, la regla
- * {@code Element} del tipo, las reglas {@code For class} de sus clases, la regla {@code For id}
+ * {@code For element} del tipo, las reglas {@code For style} de sus clases, la regla {@code For id}
  * y lo que declara el propio elemento. Lo que aporta una regla se valida como si lo declarara
  * el elemento, y sus errores señalan la línea de la regla.</p>
  *
@@ -75,7 +75,7 @@ public final class BoxTreeBuilder {
      * (aplicadas ya con sus reglas), los grupos de filas y el {@code Span}, que lee {@link TableBuilder},
      * y lo que lee {@link MarkdownBuilder}.
      */
-    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "class", "head", "body",
+    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "head", "body",
             "foot", "span", "bullet", "numbering", "table-columns", "column-align");
 
     /**
@@ -128,12 +128,12 @@ public final class BoxTreeBuilder {
             }
             DocumentSchema.validate(styles, true);
         }
-        MediaReader.Spec documentMedia = MediaReader.media(inline(child(document, "media").orElseThrow()), null);
+        MediaReader.Spec documentMedia = MediaReader.media(inline(child(document, "page").orElseThrow()), null);
         Media media = documentMedia.media();
         Metadata metadata = MediaReader.metadata(document);
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
-        // La tipografía de Element: Document la heredan todas las cajas.
+        // La tipografía de For element: Document la heredan todas las cajas.
         Style rootStyle = new Style();
         rootStyle.typography().setLocale(Locale.forLanguageTag(metadata.language()));
         ctx.rules.applyDocument(rootStyle);
@@ -181,9 +181,9 @@ public final class BoxTreeBuilder {
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
-                case "media" -> media = MediaReader.media(inline(p), documentMedia);
+                case "page" -> media = MediaReader.media(inline(p), documentMedia);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
-                case "page-style" -> {
+                case "page-number-format" -> {
                     pageStyle = enumValue(NumberStyle.class, p);
                     pageStyleNode = p;
                 }
@@ -210,7 +210,7 @@ public final class BoxTreeBuilder {
                     + "restart, que es cuando la numeración vuelve a empezar: decláralo o quita Start");
         }
         if (pageStyleNode != null && numbering == Section.PageNumbering.NONE) {
-            throw error(pageStyleNode, ErrorCode.PAGE_STYLE_WITHOUT_NUMBERS, "Page style no tiene efecto con Page "
+            throw error(pageStyleNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format no tiene efecto con Page "
                     + "numbering: none, porque las páginas de la sección no tienen número: quítalo");
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());

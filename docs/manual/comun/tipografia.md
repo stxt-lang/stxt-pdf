@@ -6,17 +6,17 @@ cambia solo lo suyo:
 
 ```
 Styles:
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Serif
 			Size: 10.5
 			Line height: 15
 			Align: justify
-	Element: Heading 1
+	For element: Heading 1
 		Typography:
 			Font: IBM Plex Sans
 			Size: 20
-			Weight: bold
+			Bold: true
 			Align: left
 ```
 
@@ -25,8 +25,8 @@ Styles:
 | `Font` | nombre de familia | — | La fuente. **Obligatoria** en todo texto, propia o heredada |
 | `Code font` | nombre de familia | — | La fuente del código ([Formato del texto](formato-del-texto.md#código)). **Obligatoria** si hay código |
 | `Size` | número > 0 | — | El tamaño de la letra, en puntos. **Obligatorio** en todo texto |
-| `Weight` | `normal`, `bold` | `normal` | Negrita |
-| `Style` | `normal`, `italic` | `normal` | Cursiva |
+| `Bold` | `true`, `false` | `false` | Negrita |
+| `Italic` | `true`, `false` | `false` | Cursiva |
 | `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos; `140%`, 1,4 veces el tamaño |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
 | `Color` | color | `#000000` | El color del texto |
@@ -34,7 +34,7 @@ Styles:
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | `es`, `en-GB`, `ca`… | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md)) |
-| `Number style`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
+| `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
 
 El resto (`Inline`, `Transform`, `Small caps`, `Letter spacing`, `Ligatures`, `White space` y `Tab size`) está en
 [Formato del texto](formato-del-texto.md).

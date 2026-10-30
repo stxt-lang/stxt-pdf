@@ -37,12 +37,12 @@ class SchemaCoverageTest {
             Map.entry("Language", "Language: es"),
             // Section
             Map.entry("Page numbering", "Page numbering: restart"),
-            Map.entry("Page style", "Page style: lower-roman"),
+            Map.entry("Page number format", "Page number format: lower-roman"),
             Map.entry("Inherit fixed", "Inherit fixed: false"),
             Map.entry("Begin on", "Begin on: any"),
             // Elementos
             Map.entry("Id", "Id: x"),
-            Map.entry("Class", "Class: c"),
+            Map.entry("Style", "Style: c"),
             Map.entry("Link", "Link: https://example.com/a"),
             Map.entry("In contents", "In contents: false"),
             Map.entry("Isolate", "Isolate: true"),
@@ -51,7 +51,7 @@ class SchemaCoverageTest {
             Map.entry("Pages", "Pages: not-first"),
             Map.entry("Rotate", "Rotate: -8"),
             Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
-            // Media
+            // Page
             Map.entry("Paper", "Paper: A4"),
             Map.entry("Orientation", "Orientation: landscape"),
             Map.entry("Content", "Content >>\n\tHola"),
@@ -79,8 +79,8 @@ class SchemaCoverageTest {
             Map.entry("Background", "Background: #FFFFFF"),
             // Typography
             Map.entry("Font", "Font: IBM Plex Sans"),
-            Map.entry("Weight", "Weight: bold"),
-            Map.entry("Style", "Style: italic"),
+            Map.entry("Bold", "Bold: true"),
+            Map.entry("Italic", "Italic: true"),
             Map.entry("Size", "Size: 12"),
             Map.entry("Line height", "Line height: 14"),
             Map.entry("Align", "Align: center"),
@@ -95,7 +95,7 @@ class SchemaCoverageTest {
             Map.entry("White space", "White space: pre-wrap"),
             Map.entry("Tab size", "Tab size: 8"),
             Map.entry("Numbered", "Numbered: true"),
-            Map.entry("Number style", "Number style: upper-roman"),
+            Map.entry("Number format", "Number format: upper-roman"),
             Map.entry("Number label", "Number label: Anexo {number}."),
             Map.entry("Widows", "Widows: 3"),
             Map.entry("Orphans", "Orphans: 3"),
@@ -143,12 +143,12 @@ class SchemaCoverageTest {
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
             Map.entry("Fit", "Fit: cover"),
-            Map.entry("Page", "Page: 2"));
+            Map.entry("Pdf page", "Pdf page: 2"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-            + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-            + "\t\tFor class: c\n\t\t\tTypography:\n\t\t\t\tColor: #000000\n";
+    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+            + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+            + "\t\tFor style: c\n\t\t\tTypography:\n\t\t\t\tColor: #000000\n";
 
     /**
      * Documento mínimo y válido de cada nodo; la línea {@code {}} es donde va la propiedad.
@@ -171,7 +171,7 @@ class SchemaCoverageTest {
         t.put("Section", new Template(HEADER + "\tSection:\n\t\tPage numbering: restart\n\t\t{}\n\t\tBlock:",
                 Set.of("Page numbering")));
         // Paper excluye Width y Height, que leen todos los documentos (la cabecera).
-        t.put("Media", new Template("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tPaper: A4\n\t\t{}\n\tSection:\n\t\tBlock:",
+        t.put("Page", new Template("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tPaper: A4\n\t\t{}\n\tSection:\n\t\tBlock:",
                 Set.of("Paper", "Width", "Height")));
         for (String element : List.of("Block", "Relative", "Absolute")) {
             t.put(element, new Template(HEADER + "\t" + element + ":\n\t\t{}"));
@@ -209,8 +209,8 @@ class SchemaCoverageTest {
         t.put("Row", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
         t.put("Cell", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
         // Las reglas van dentro del Styles de la cabecera.
-        t.put("Element", new Template(HEADER + "\t\tElement: Block\n\t\t\t{}\n\tBlock:"));
-        t.put("For class", new Template(HEADER + "\t\tFor class: d\n\t\t\t{}\n\tBlock:"));
+        t.put("For element", new Template(HEADER + "\t\tFor element: Block\n\t\t\t{}\n\tBlock:"));
+        t.put("For style", new Template(HEADER + "\t\tFor style: d\n\t\t\t{}\n\tBlock:"));
         t.put("For id", new Template(HEADER + "\t\tFor id: r\n\t\t\t{}\n\tBlock:\n\t\tId: r"));
         t.put("For column", new Template(HEADER + "\t\tFor column: 1\n\t\t\t{}\n\tBlock:"));
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));

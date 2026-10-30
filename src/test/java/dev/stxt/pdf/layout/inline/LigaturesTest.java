@@ -48,8 +48,8 @@ class LigaturesTest {
         for (String line : typography) {
             t.append("\t\t\t\t").append(line).append('\n');
         }
-        return "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Serif\n\t\t\t\tSize: 20\n" + t
+        return "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Serif\n\t\t\t\tSize: 20\n" + t
                 + "\tSection:\n\t\tText: " + text + "\n";
     }
 

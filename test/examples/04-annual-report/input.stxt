@@ -10,7 +10,7 @@
 # número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
 # interletraje (Transform).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 56 56 70 56
 	Title: Informe anual 2025 · Cooperativa Solvent
@@ -32,7 +32,7 @@ Document (dev.stxt.pdf):
 		Id: front-cover
 		Page numbering: none
 		Inherit fixed: false
-		Media:
+		Page:
 			Margin: 0
 		Relative:
 			Id: cover
@@ -58,7 +58,7 @@ Document (dev.stxt.pdf):
 				Text: Informe anual · Ejercicio 2025
 					Typography:
 						Size: 9
-						Weight: bold
+						Bold: true
 						Color: #F2A65A
 						Transform: uppercase
 						Letter spacing: 2
@@ -75,21 +75,21 @@ Document (dev.stxt.pdf):
 					Text: Un año de sol
 						Typography:
 							Font: IBM Plex Serif
-							Weight: bold
+							Bold: true
 							Size: 44
 							Line height: 48
 							Color: #FFFFFF
 					Text: y de viento
 						Typography:
 							Font: IBM Plex Serif
-							Weight: bold
+							Bold: true
 							Size: 44
 							Line height: 48
 							Color: #FFFFFF
 				Text: Cooperativa Solvent · Energía renovable de proximidad en la Garrotxa
 					Typography:
 						Font: IBM Plex Serif
-						Style: italic
+						Italic: true
 						Size: 14
 						Line height: 20
 						Color: #C9D5E3
@@ -104,7 +104,7 @@ Document (dev.stxt.pdf):
 								Typography:
 									Font: IBM Plex Serif
 									Size: 22
-									Weight: bold
+									Bold: true
 							Text: de energía limpia producida
 								Typography:
 									Size: 8.5
@@ -116,7 +116,7 @@ Document (dev.stxt.pdf):
 								Typography:
 									Font: IBM Plex Serif
 									Size: 22
-									Weight: bold
+									Bold: true
 							Text: clientes abastecidos
 								Typography:
 									Size: 8.5
@@ -128,7 +128,7 @@ Document (dev.stxt.pdf):
 								Typography:
 									Font: IBM Plex Serif
 									Size: 22
-									Weight: bold
+									Bold: true
 							Text: de resultado del ejercicio
 								Typography:
 									Size: 8.5
@@ -158,7 +158,7 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Text: Carta de la presidenta
 			Paragraph: Cuando fundamos Solvent, hace once años, teníamos tres tejados, un molino de viento prestado y más ganas que dinero. Hoy producimos energía para más de ocho mil hogares, comercios y empresas de la comarca, y lo hacemos sin salir de ella: lo que generamos aquí se consume aquí.
-				Class: lead
+				Style: lead
 			Paragraph: El 2025 ha sido el año de la **consolidación**. Hemos puesto en marcha el parque solar de Les Preses, ampliado el de Sant Joan y renovado los tres aerogeneradores más antiguos. Hemos producido un 11 % más que el año anterior y hemos cerrado el ejercicio con un resultado positivo por quinto año consecutivo.
 			Paragraph: Nada de esto es obra de una persona. Es el resultado del trabajo de las veintitrés personas de la plantilla, de las más de mil doscientas socias y socios que deciden en la asamblea y de una red de proveedores locales que han montado, cada kilovatio, con las manos y con criterio.
 			Paragraph: Este informe cuenta lo que hemos conseguido, también lo que nos ha costado y lo que nos queda por hacer. Les invitamos a leerlo con ojo crítico: una cooperativa se mejora preguntando.
@@ -166,7 +166,7 @@ Document (dev.stxt.pdf):
 			Text: Carme Vidal i Roca
 				Typography:
 					Font: IBM Plex Serif
-					Weight: bold
+					Bold: true
 					Size: 11
 				Box:
 					Margin: 14 0 0 0
@@ -182,31 +182,31 @@ Document (dev.stxt.pdf):
 				Gap: 14
 				Area:
 					Block:
-						Class: milestone
+						Style: milestone
 						Text: Marzo
-							Class: kicker
+							Style: kicker
 						Text: La asamblea aprueba las cuentas de 2024 con el 94 % de los votos.
 				Area:
 					Block:
-						Class: milestone
+						Style: milestone
 						Text: Junio
-							Class: kicker
+							Style: kicker
 						Text: Se conecta el parque solar de Les Preses, de 1,6 MWp.
 				Area:
 					Block:
-						Class: milestone
+						Style: milestone
 						Text: Septiembre
-							Class: kicker
+							Style: kicker
 						Text: Terminan las obras de renovación de los tres aerogeneradores.
 				Area:
 					Block:
-						Class: milestone
+						Style: milestone
 						Text: Noviembre
-							Class: kicker
+							Style: kicker
 						Text: Llegamos al cliente número 8.000, una panadería de Sant Feliu.
 		Block:
 			Id: figures
-			Class: section
+			Style: section
 			Heading 1:
 				Text: Un año en cifras
 			Grid:
@@ -217,56 +217,56 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 18 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 2.384 MWh
-							Class: figure
+							Style: figure
 						Text: de producción renovable, un 11 % más que en 2024
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 8.412
-							Class: figure
+							Style: figure
 						Text: clientes abastecidos entre hogares, comercios, industria y administración
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 15.900 t
-							Class: figure
+							Style: figure
 						Text: de CO₂ evitadas desde 2019, el año de la primera instalación
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 1.204
-							Class: figure
+							Style: figure
 						Text: socias y socios, ochenta y siete más que el año anterior
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 23
-							Class: figure
+							Style: figure
 						Text: personas en la plantilla, con un 48 % de mujeres
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 				Area:
 					Block:
-						Class: tile
+						Style: tile
 						Text: 1,35 M€
-							Class: figure
+							Style: figure
 						Text: invertidos en nueva generación y almacenamiento
-							Class: caption
+							Style: caption
 							Box:
 								Margin: 2 0 0 0
 			Heading 2:
@@ -277,15 +277,15 @@ Document (dev.stxt.pdf):
 				Box:
 					Width: 100%
 			Text: Producción mensual de energía renovable en 2025, en MWh. El máximo, en julio, con 306 MWh.
-				Class: caption
+				Style: caption
 			Paragraph: La producción sigue la curva del sol: de noviembre a enero cae por debajo de los 125 MWh y entre mayo y agosto supera los 250. El viento compensa en parte el invierno, y por eso la incorporación del cuarto aerogenerador, prevista para 2026, es una de nuestras prioridades.
 		Block:
 			Id: customers
-			Class: section
+			Style: section
 			Heading 1:
 				Text: Clientes y comunidad
 			Paragraph: Una cooperativa existe para quien la usa. Este año hemos atendido a 8.412 clientes, el 46 % de ellos hogares.
-				Class: lead
+				Style: lead
 			Multicol:
 				Id: community
 				Count: 2
@@ -318,14 +318,14 @@ Document (dev.stxt.pdf):
 				Box:
 					Width: 100%
 			Text: Distribución de los 8.412 clientes por tipo de cliente.
-				Class: caption
+				Style: caption
 		Block:
 			Id: results
-			Class: section
+			Style: section
 			Heading 1:
 				Text: Resultados económicos
 			Paragraph: Las cuentas del ejercicio, en miles de euros. Los ingresos crecen un 11,5 % y el resultado, un 33,9 %, después de absorber el aumento de las amortizaciones de las nuevas instalaciones.
-				Class: lead
+				Style: lead
 			Table:
 				Id: accounts
 				Columns: 1fr 80 80 80
@@ -371,7 +371,7 @@ Document (dev.stxt.pdf):
 						Cell: +23,9 %
 				Foot:
 					Row:
-						Class: total
+						Style: total
 						Cell: Resultado del ejercicio
 							Header: true
 						Cell: 312
@@ -390,12 +390,12 @@ Document (dev.stxt.pdf):
 					| Renovación de aerogeneradores | 190 | 0,9 MW |
 					| Baterías de la nave comunitaria | 70 | 0,2 MWh |
 			Text: El 100 % de la inversión se ha financiado con aportaciones de socias y socios, sin deuda con entidades financieras.
-				Class: caption
+				Style: caption
 				Box:
 					Margin: 8 0 0 0
 		Block:
 			Id: environment
-			Class: section
+			Style: section
 			Heading 1:
 				Text: Medio ambiente
 			Image: examples/report/chart-savings.svg
@@ -404,9 +404,9 @@ Document (dev.stxt.pdf):
 				Box:
 					Width: 100%
 			Text: Toneladas de CO₂ evitadas de forma acumulada desde 2019, en miles.
-				Class: caption
+				Style: caption
 			Block:
-				Class: quote
+				Style: quote
 				Text: Cada kilovatio hora que producimos aquí es uno que no hace falta traer de lejos, ni quemar.
 			Heading 2:
 				Text: Compromisos para 2026
@@ -459,11 +459,11 @@ Document (dev.stxt.pdf):
 						Cell: 540
 		Block:
 			Id: governance
-			Class: section
+			Style: section
 			Heading 1:
 				Text: Gobierno y próximos pasos
 			Paragraph: El Consejo Rector se elige cada cuatro años en asamblea. Está formado por siete personas, de las cuales cuatro son socias de trabajo y tres socias de consumo.
-				Class: lead
+				Style: lead
 			Table:
 				Id: board
 				Columns: 1fr 1fr 104
@@ -535,7 +535,7 @@ Document (dev.stxt.pdf):
 							Header: true
 						Cell: Obras y apertura
 							Span: 1 2
-							Class: bar
+							Style: bar
 						Cell:
 						Cell:
 					Row:
@@ -544,7 +544,7 @@ Document (dev.stxt.pdf):
 						Cell:
 						Cell: Diseño y pruebas
 							Span: 1 2
-							Class: bar
+							Style: bar
 						Cell:
 					Row:
 						Cell: Almacenamiento de la nave
@@ -553,16 +553,16 @@ Document (dev.stxt.pdf):
 						Cell:
 						Cell: Ampliación
 							Span: 1 2
-							Class: bar
+							Style: bar
 					Row:
 						Cell: Cuarto aerogenerador
 							Header: true
 						Cell: Tramitación, obra y puesta en marcha
 							Span: 1 3
-							Class: bar
+							Style: bar
 						Cell:
 			Text: Cooperativa Solvent, S. Coop. Ltda. · Polígono de la Canya, nave 6 · 17800 Olot · solvent.example
 				Link: https://solvent.example
-				Class: caption
+				Style: caption
 				Box:
 					Margin: 22 0 0 0

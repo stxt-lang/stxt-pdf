@@ -4,10 +4,10 @@
 # lados de un sello con cintas, ligeramente girado (una Image con Rotate, que ocupa el cuadrado que la
 # envuelve). El número del certificado va en vertical en el margen izquierdo: un Fixed girado −90 grados
 # alrededor de su esquina de arriba a la izquierda.
-# El nombre de la escuela se escribe en minúscula y la regla de su clase lo pone en mayúsculas,
+# El nombre de la escuela se escribe en minúscula y la regla de su estilo lo pone en mayúsculas,
 # separadas (Transform y Letter spacing).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Orientation: landscape
 		Margin: 64 80 56 80
@@ -45,22 +45,22 @@ Document (dev.stxt.pdf):
 			Offset: -45 auto auto -59
 			Layer: -1
 			Block:
-				Class: corner
+				Style: corner
 		Fixed:
 			Offset: -45 -59 auto auto
 			Layer: -1
 			Block:
-				Class: corner
+				Style: corner
 		Fixed:
 			Offset: auto auto -37 -59
 			Layer: -1
 			Block:
-				Class: corner
+				Style: corner
 		Fixed:
 			Offset: auto -59 -37 auto
 			Layer: -1
 			Block:
-				Class: corner
+				Style: corner
 		Fixed:
 			Id: footer
 			Offset: auto 0 -22 0
@@ -74,18 +74,18 @@ Document (dev.stxt.pdf):
 			Box:
 				Width: 260
 			Text: Certificado nº cer-2025-0412
-				Class: serial
+				Style: serial
 		Text: Escuela de cerámica del Valle
-			Class: school
+			Style: school
 		Heading 1:
 			Text: Certificado de finalización
 		Text: Se otorga a
-			Class: aside
+			Style: aside
 		Text: Elena Ruiz Navarro
 			Id: recipient
-			Class: name
+			Style: name
 		Text: por haber completado con aprovechamiento el curso
-			Class: aside
+			Style: aside
 		Heading 2:
 			Text: Cerámica a mano: del barro a la pieza
 		Text: Curso de 40 horas lectivas, impartido en Olot del 8 de septiembre al 24 de octubre de 2025, con una calificación final de sobresaliente.
@@ -106,10 +106,10 @@ Document (dev.stxt.pdf):
 							Width: 140
 							Margin: 0 auto
 					Block:
-						Class: line
+						Style: line
 						Text: Montserrat Puig Vila
 							Typography:
-								Weight: bold
+								Bold: true
 						Text: Directora de la Escuela
 			Item:
 				Block:
@@ -129,8 +129,8 @@ Document (dev.stxt.pdf):
 							Width: 140
 							Margin: 0 auto
 					Block:
-						Class: line
+						Style: line
 						Text: Martí Roca Font
 							Typography:
-								Weight: bold
+								Bold: true
 						Text: Profesor del curso

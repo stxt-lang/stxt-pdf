@@ -8,16 +8,16 @@ más, que puede tener varios párrafos.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Carta
-	Media:
+	Page:
 		Paper: A4
 		Margin: 60
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Serif
 				Size: 11
 				Line height: 16
-		Element: Paragraph
+		For element: Paragraph
 			Box:
 				Margin: 0 0 10 0
 			Typography:
@@ -53,7 +53,7 @@ Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: 
 
 ## Propiedades
 
-Admiten `Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesitan `Font` y `Size`, propios o heredados
+Admiten `Id`, `Style`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesitan `Font` y `Size`, propios o heredados
 ([Tipografía](../comun/tipografia.md)). Con `Rotate: -90`, el texto va en vertical y ocupa su sitio girado
 ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)).
 
@@ -68,7 +68,7 @@ Admiten `Id`, `Class`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesita
 ## ¿`Text` o `Paragraph`?
 
 Usa `Paragraph` para los párrafos del contenido y `Text` para lo demás: un rótulo, una cifra, una línea de una cabecera, el
-texto de un encabezado. Así el PDF etiquetado tiene la estructura correcta, y una regla `Element: Paragraph` estila todos los
+texto de un encabezado. Así el PDF etiquetado tiene la estructura correcta, y una regla `For element: Paragraph` estila todos los
 párrafos sin tocar el resto.
 
 Más detalle en la [referencia](../../referencia/componentes/text.md).

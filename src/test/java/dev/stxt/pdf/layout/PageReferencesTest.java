@@ -137,8 +137,8 @@ class PageReferencesTest {
                 return text.contains("7") ? 100 : new FixedMetrics().width(text, font, fontSize);
             }
         };
-        StringBuilder doc = new StringBuilder("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: "
-                + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
+        StringBuilder doc = new StringBuilder("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: "
+                + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
         // El primer bloque es un texto con {number of: n}: el culpable es la referencia de página que cambia, no la
         // primera referencia del documento (pruebas de mutación). Mide y ocupa lo mismo que los demás.
         doc.append("\tText: Punto {number of: n}\n\t\tBox:\n\t\t\tHeight: 100\n");

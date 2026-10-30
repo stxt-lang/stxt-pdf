@@ -63,7 +63,7 @@ class ImageLayoutTest {
     }
 
     /**
-     * Un PDF mide lo que su página, ya en puntos: la de {@code Page}, recortada y girada ({@code pages.pdf}: 200 × 100,
+     * Un PDF mide lo que su página, ya en puntos: la de {@code Pdf page}, recortada y girada ({@code pages.pdf}: 200 × 100,
      * 150 × 50 y 100 × 200), o la primera.
      */
     @Test
@@ -73,10 +73,10 @@ class ImageLayoutTest {
                 "\t\tId: A",
                 "\tImage: test/pages.pdf",
                 "\t\tId: B",
-                "\t\tPage: 2",
+                "\t\tPdf page: 2",
                 "\tImage: test/pages.pdf",
                 "\t\tId: C",
-                "\t\tPage: 3",
+                "\t\tPdf page: 3",
                 "\t\tBox:",
                 "\t\t\tWidth: 50");
         assertRect(40, 40, 200, 100, f.rect("A"));

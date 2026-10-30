@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class BoxLooksTest {
 
     private static Box block(String... boxLines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\t" + String.join("\n\t\t\t", boxLines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).sections().get(0).box().children().get(0);
     }
@@ -63,8 +63,8 @@ class BoxLooksTest {
 
     @Test
     void theRulesOfStylesCanSetThem() {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Block\n\t\t\tBox:\n\t\t\t\tRadius: 6\n\t\t\t\tBackground: linear(90, #000, #FFF)\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Block\n\t\t\tBox:\n\t\t\t\tRadius: 6\n\t\t\t\tBackground: linear(90, #000, #FFF)\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tBackground: #CCC\n\tBlock:\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).sections().get(0).box();
         // Lo propio gana a la regla propiedad a propiedad: el color, no el degradado; el radio de la regla se mantiene.

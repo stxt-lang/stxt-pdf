@@ -2,7 +2,7 @@
 
 El texto y cómo se reparte en líneas. **Es el único grupo que se hereda**: lo que declara un elemento vale para él y
 para todos sus descendientes que no lo cambien. La base que hereda todo el documento se declara en la regla
-`Element: Document` de `Styles` ([Styles](estilos.md#la-tipografía-base)), y cada elemento declara solo lo que cambia.
+`For element: Document` de `Styles` ([Styles](estilos.md#la-tipografía-base)), y cada elemento declara solo lo que cambia.
 Lo que una regla de `Styles` da a un elemento en `Typography` lo heredan sus descendientes como si lo hubiera declarado
 él.
 
@@ -13,8 +13,8 @@ celdas).
 |---|---|---|---|
 | `Font` | nombre de familia | — | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declara el fichero TTF de la carpeta de fuentes ([Recursos](recursos.md#fuentes)). |
 | `Code font` | nombre de familia | — | La familia del código, en línea y en bloques ([Formato del texto](formato-del-texto.md#código-en-línea)); suele ser una monoespaciada. **Obligatoria** si hay código, propia o heredada (`CODE_WITHOUT_FONT`). |
-| `Weight` | `normal`, `bold` | `normal` | Peso: `normal` es el 400 de la fuente y `bold`, el 700. |
-| `Style` | `normal`, `italic` | `normal` | |
+| `Bold` | `true`, `false` | `false` | Negrita: con `false`, el peso 400 de la fuente; con `true`, el 700. |
+| `Italic` | `true`, `false` | `false` | Cursiva: la variante cursiva de la fuente. |
 | `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
 | `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
@@ -28,8 +28,8 @@ celdas).
 | `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `pre` o `pre-wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md#numeración-numbered)). |
-| `Number style` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-style-number-label)). |
-| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-style-number-label)). |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
+| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente ([Cortes](cortes.md#elección-del-corte)). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 | `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`…) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |
@@ -92,8 +92,8 @@ min-content = la palabra más ancha; max-content = el párrafo más largo en una
 ## Idioma (`Language`)
 
 Una caja cuyo texto no está en el idioma del documento declara el suyo en `Typography` (`Language: en-GB`), también desde
-una regla de `Styles` (`For class: english`). Se hereda; un lector de pantalla cambia de voz al leer esa caja, y
-`Transform` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `Element: Document`
+una regla de `Styles` (`For style: english`). Se hereda; un lector de pantalla cambia de voz al leer esa caja, y
+`Transform` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `For element: Document`
 no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de `Document`
 ([Document](../componentes/document.md#title-y-language)).
 

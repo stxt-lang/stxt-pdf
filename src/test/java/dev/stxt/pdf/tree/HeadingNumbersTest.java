@@ -14,17 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** La numeración de los encabezados, {@code Numbered} (referencia/componentes/heading.md), al construir el árbol. */
 class HeadingNumbersTest {
 
-    /** Lo que {@code Element: Document} añade para numerar todos los encabezados. */
+    /** Lo que {@code For element: Document} añade para numerar todos los encabezados. */
     private static final String NUMBERED = "\t\t\t\tNumbered: true\n";
 
     /**
      * Construye el árbol de un documento. {@code documentTypography} son líneas más de la regla
-     * {@code Element: Document} (con cuatro tabuladores) y {@code rules}, reglas más de {@code Styles}
+     * {@code For element: Document} (con cuatro tabuladores) y {@code rules}, reglas más de {@code Styles}
      * (con dos); {@code lines}, el contenido.
      */
     private static BoxTreeBuilder.Result build(String documentTypography, String rules, String... lines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + documentTypography + rules + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc))));
     }
@@ -86,8 +86,8 @@ class HeadingNumbersTest {
     @Test
     void aRuleNumbersOnlyTheLevelsItNames() {
         BoxTreeBuilder.Result tree = build("",
-                "\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
-                        + "\t\tElement: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n",
+                "\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
+                        + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n",
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
                 "\tHeading 3:", "\t\tText: C",
@@ -109,9 +109,9 @@ class HeadingNumbersTest {
     @Test
     void aClassRuleCanTurnNumberingOff() {
         BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+                "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: Uno",
-                "\tHeading 1:", "\t\tClass: annex", "\t\tText: Anexo",
+                "\tHeading 1:", "\t\tStyle: annex", "\t\tText: Anexo",
                 "\tHeading 1:", "\t\tText: Dos");
         assertEquals(java.util.Arrays.asList("1", null, "2"), numbers(tree));
     }
@@ -119,10 +119,10 @@ class HeadingNumbersTest {
     @Test
     void anUnnumberedHeadingRestartsTheCountOfTheLevelsBelow() {
         BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor class: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+                "\t\tFor style: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
-                "\tHeading 2:", "\t\tClass: plain", "\t\tText: C",
+                "\tHeading 2:", "\t\tStyle: plain", "\t\tText: C",
                 "\tHeading 1:", "\t\tText: D",
                 "\tHeading 2:", "\t\tText: E");
         // Las secciones de C no se numeran, pero la E vuelve a ser 2.1 porque D abre el capítulo 2.
@@ -175,12 +175,12 @@ class HeadingNumbersTest {
     @Test
     void anUnnumberedLevelInTheMiddleDoesNotAddToTheNumber() {
         BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor class: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+                "\t\tFor style: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: A",
-                "\tHeading 2:", "\t\tClass: plain", "\t\tText: B",
+                "\tHeading 2:", "\t\tStyle: plain", "\t\tText: B",
                 "\tHeading 3:", "\t\tText: C",
                 "\tHeading 3:", "\t\tText: D",
-                "\tHeading 2:", "\t\tClass: plain", "\t\tText: E",
+                "\tHeading 2:", "\t\tStyle: plain", "\t\tText: E",
                 "\tHeading 3:", "\t\tText: F");
         // El Heading 3 cuenta dentro de su Heading 2, aunque este no tenga número, y empieza otra vez en cada uno.
         assertEquals(java.util.Arrays.asList("1", null, "1.1", "1.2", null, "1.1"), numbers(tree));
@@ -221,12 +221,12 @@ class HeadingNumbersTest {
         assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
     }
 
-    /** Cada nivel del número se escribe con el {@code Number style} de su encabezado. */
+    /** Cada nivel del número se escribe con el {@code Number format} de su encabezado. */
     @Test
     void eachLevelIsWrittenWithTheStyleOfItsHeading() {
         BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tElement: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumber style: upper-roman\n"
-                        + "\t\tElement: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumber style: lower-alpha\n",
+                "\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumber format: upper-roman\n"
+                        + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumber format: lower-alpha\n",
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 1:", "\t\tText: Dos",
                 "\tHeading 2:", "\t\tText: A",
@@ -243,11 +243,11 @@ class HeadingNumbersTest {
     @Test
     void aLabelGoesInFrontOfTheTitleWithTheNumberInside() {
         BoxTreeBuilder.Result tree = build("",
-                "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n\t\t\t\tNumber style: upper-alpha\n"
+                "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n\t\t\t\tNumber format: upper-alpha\n"
                         + "\t\t\t\tNumber label: Anexo {number}.\n",
                 "\tHeading 1:", "\t\tText: Anexos",
-                "\tHeading 2:", "\t\tId: fees", "\t\tClass: annex", "\t\tText: Honorarios",
-                "\tHeading 2:", "\t\tClass: annex", "\t\tText: Calendario");
+                "\tHeading 2:", "\t\tId: fees", "\t\tStyle: annex", "\t\tText: Honorarios",
+                "\tHeading 2:", "\t\tStyle: annex", "\t\tText: Calendario");
         assertEquals(java.util.Arrays.asList(null, "A", "B"), numbers(tree));
         assertEquals(List.of("Anexos", "Anexo A. Honorarios", "Anexo B. Calendario"), titles(tree));
     }

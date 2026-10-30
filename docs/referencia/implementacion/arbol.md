@@ -22,7 +22,7 @@ En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `
 valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
 `ValueReader`.
 
-Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Media` declare su tamaño de una sola forma, que
+Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que
 `Item` y `Area` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
 tenga su texto en un sitio y solo uno, que la raíz sea `Document`, que el `Text` de un encabezado no tenga `Break`, la
 jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Head`, `Body`, `Foot`, que una `Cell` no tenga a la
@@ -59,7 +59,7 @@ Las piezas:
 
 | Clase | Qué hace |
 |---|---|
-| `MediaReader` | `Media` (con la herencia por grupos de las secciones), `Title` y `Language` |
+| `MediaReader` | `Page` (con la herencia por grupos de las secciones), `Title` y `Language` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Flex`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
@@ -112,7 +112,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `Media`, `Page numbering`,
-`Page style`, `Start`, `Inherit fixed` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
+`Page number format`, `Start`, `Inherit fixed` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
 **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
 (referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
 `parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con `parent`) y no se

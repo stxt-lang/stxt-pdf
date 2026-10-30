@@ -12,8 +12,8 @@ import java.util.concurrent.*;
 
 public class HostileInputsProbe {
     static String head(String extraStyles) {
-        return "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
-             + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + extraStyles
+        return "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+             + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + extraStyles
              + "\tSection:\n";
     }
     static String tabs(int n) { return "\t".repeat(n); }

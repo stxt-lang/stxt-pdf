@@ -58,7 +58,7 @@ enum ElementReader {
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             if (s.typography().codeFont() == null) {
                 throw error(n, ErrorCode.CODE_WITHOUT_FONT, "El bloque de código necesita Code font: declárala en el "
-                        + "Typography del Markdown, de un antecesor o de Styles (Element: Document o Element: Code "
+                        + "Typography del Markdown, de un antecesor o de Styles (For element: Document o For element: Code "
                         + "block), como Code font: IBM Plex Mono");
             }
             s.typography().setFont(s.typography().codeFont());
@@ -330,7 +330,7 @@ enum ElementReader {
             if (r.format().code()) {
                 if (family == null) {
                     throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "El código necesita Code font: "
-                            + "declárala en el Typography del texto, de un antecesor o de Styles (Element: Document), "
+                            + "declárala en el Typography del texto, de un antecesor o de Styles (For element: Document), "
                             + "como Code font: IBM Plex Mono");
                 }
                 r = new TextRun(r.text(), r.format().withFamily(family));

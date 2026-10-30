@@ -5,7 +5,7 @@ está en [El PDF por dentro](../implementacion/pdf.md).
 
 ## Páginas
 
-Cada página tiene el tamaño del `Media` de su sección ([Document](../componentes/document.md#media)). El visor muestra el
+Cada página tiene el tamaño del `Page` de su sección ([Document](../componentes/document.md#page)). El visor muestra el
 número impreso de cada página (el de `{page}`, también en romanos), no su posición en el fichero, y ninguno en las
 páginas sin número. Una página en blanco de `Begin on: odd` muestra el número que le toca, aunque no lo imprima.
 

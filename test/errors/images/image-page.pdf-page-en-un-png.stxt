@@ -4,9 +4,9 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Section:
 		Image: test/wide.png
-			Page: 1
+			Pdf page: 1

@@ -4,7 +4,7 @@
 # Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase. Los
 # rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 	Title: Marta Ferrer Soler · Diseñadora de producto
 	Language: es
@@ -18,7 +18,7 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Id: sidebar
-					Class: side
+					Style: side
 					Image: examples/resume/photo.jpg
 						Alt: Retrato de Marta Ferrer
 						Box:
@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 							Radius: 50%
 							Margin: 0 0 4 0
 					Text: Contacto
-						Class: side-title
+						Style: side-title
 					Text: marta.ferrer@correo.example
 						Link: mailto:marta.ferrer@correo.example
 					Text: +34 600 112 233
@@ -34,49 +34,49 @@ Document (dev.stxt.pdf):
 					Text: martaferrer.example
 						Link: https://martaferrer.example
 					Text: Herramientas
-						Class: side-title
+						Style: side-title
 					Text: Figma
 					Block:
-						Class: track
+						Style: track
 						Block:
-							Class: fill
+							Style: fill
 							Box:
 								Width: 95%
 					Text: Investigación con usuarios
 					Block:
-						Class: track
+						Style: track
 						Block:
-							Class: fill
+							Style: fill
 							Box:
 								Width: 90%
 					Text: Sistemas de diseño
 					Block:
-						Class: track
+						Style: track
 						Block:
-							Class: fill
+							Style: fill
 							Box:
 								Width: 92%
 					Text: Accesibilidad (WCAG)
 					Block:
-						Class: track
+						Style: track
 						Block:
-							Class: fill
+							Style: fill
 							Box:
 								Width: 85%
 					Text: HTML y CSS
 					Block:
-						Class: track
+						Style: track
 						Block:
-							Class: fill
+							Style: fill
 							Box:
 								Width: 72%
 					Text: Idiomas
-						Class: side-title
+						Style: side-title
 					Text: Catalán y castellano · nativo
 					Text: Inglés · C1
 					Text: Francés · B1
 					Text: Intereses
-						Class: side-title
+						Style: side-title
 					Paragraph: Cerámica, carreras de montaña, ilustración botánica y cocina de temporada.
 			Area:
 				Block:
@@ -106,30 +106,30 @@ Document (dev.stxt.pdf):
 							Grow: 1
 							Block:
 								Text: +40
-									Class: figure
+									Style: figure
 								Text: proyectos entregados
-									Class: caption
+									Style: caption
 						Item:
 							Grow: 1
 							Block:
 								Text: 71 %
-									Class: figure
+									Style: figure
 								Text: conversión en el alta de clientes
-									Class: caption
+									Style: caption
 						Item:
 							Grow: 1
 							Block:
 								Text: 6
-									Class: figure
+									Style: figure
 								Text: equipos con un mismo sistema de diseño
-									Class: caption
+									Style: caption
 						Item:
 							Grow: 1
 							Block:
 								Text: 4
-									Class: figure
+									Style: figure
 								Text: diseñadoras mentoradas
-									Class: caption
+									Style: caption
 					Heading 2:
 						Text: Experiencia
 					Grid:
@@ -138,13 +138,13 @@ Document (dev.stxt.pdf):
 						Gap: 14 12
 						Area:
 							Text: 2022 – hoy
-								Class: dates
+								Style: dates
 						Area:
 							Block:
 								Text: Diseñadora de producto sénior
-									Class: role
+									Style: role
 								Text: Cobalto · tecnología financiera · Barcelona
-									Class: place
+									Style: place
 								List:
 									Marker: disc
 									Box:
@@ -157,13 +157,13 @@ Document (dev.stxt.pdf):
 										Text: Mentora de cuatro diseñadoras junior.
 						Area:
 							Text: 2018 – 2022
-								Class: dates
+								Style: dates
 						Area:
 							Block:
 								Text: Diseñadora UX
-									Class: role
+									Style: role
 								Text: Estudio Pimienta · Girona
-									Class: place
+									Style: place
 								List:
 									Marker: disc
 									List item:
@@ -176,13 +176,13 @@ Document (dev.stxt.pdf):
 												Inline: markdown
 						Area:
 							Text: 2016 – 2018
-								Class: dates
+								Style: dates
 						Area:
 							Block:
 								Text: Diseñadora gráfica
-									Class: role
+									Style: role
 								Text: Cooperativa La Fàbrica · Olot
-									Class: place
+									Style: place
 								List:
 									Marker: disc
 									List item:
@@ -195,22 +195,22 @@ Document (dev.stxt.pdf):
 						Gap: 8 12
 						Area:
 							Text: 2016
-								Class: dates
+								Style: dates
 						Area:
 							Block:
 								Text: Máster en Diseño de Interacción
-									Class: role
+									Style: role
 								Text: Escola Superior de Disseny d'Olot
-									Class: place
+									Style: place
 						Area:
 							Text: 2014
-								Class: dates
+								Style: dates
 						Area:
 							Block:
 								Text: Grado en Diseño y Desarrollo de Producto
-									Class: role
+									Style: role
 								Text: Escola Superior de Disseny d'Olot
-									Class: place
+									Style: place
 					Heading 2:
 						Text: Charlas y publicaciones
 					Paragraph: «*Diseñar para quien tiene prisa*», Barcelona UX Days (2024) · «*Accesibilidad sin florituras*», artículo en la revista *Interfaz* (2023) · Jurado de los Premios Sol Digital (2024).

@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TablesTest {
 
     private static Box root(String... lines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + String.join("\n", lines);
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
     }
 
@@ -102,11 +102,11 @@ class TablesTest {
 
     @Test
     void rowTypographyIsInheritedAndRulesWin() {
-        Box table = root("\tStyles:", "\t\tElement: Cell", "\t\t\tTypography:", "\t\t\t\tSize: 8",
+        Box table = root("\tStyles:", "\t\tFor element: Cell", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tTable:", "\t\tTypography:", "\t\t\tColor: #333333", "\t\tColumns: 1fr 1fr",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tWeight: bold", "\t\t\t\t\tSize: 12",
-                "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tWeight: normal")
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true", "\t\t\t\t\tSize: 12",
+                "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tBold: false")
                 .children().get(0);
         Box a = table.children().get(0);
         Box b = table.children().get(1);
@@ -157,12 +157,12 @@ class TablesTest {
      */
     @Test
     void theForIdOfARowStylesItsCells() {
-        Box table = root("\tStyles:", "\t\tFor class: small", "\t\t\tTypography:", "\t\t\t\tSize: 8",
-                "\t\tFor id: total", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tWeight: bold",
+        Box table = root("\tStyles:", "\t\tFor style: small", "\t\t\tTypography:", "\t\t\t\tSize: 8",
+                "\t\tFor id: total", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tBold: true",
                 "\t\tFor id: grand", "\t\t\tTypography:", "\t\t\t\tSize: 14",
                 "\tTable:", "\t\tColumns: 1fr 1fr 1fr", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tId: total", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
-                "\t\t\t\t\tClass: small", "\t\t\t\tCell: c", "\t\t\t\t\tId: grand").children().get(0);
+                "\t\t\t\t\tStyle: small", "\t\t\t\tCell: c", "\t\t\t\t\tId: grand").children().get(0);
         assertEquals(List.of(12.0, 12.0, 14.0),
                 table.children().stream().map(c -> c.style().typography().fontSize()).toList());
         assertEquals(FontWeight.BOLD, table.children().get(2).style().typography().fontWeight());

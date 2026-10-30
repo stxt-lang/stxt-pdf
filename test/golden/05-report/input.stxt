@@ -5,24 +5,24 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Fixed
+		For element: Fixed
 			Box:
 				Height: 20
 			Typography:
 				Size: 8
-		Element: Text
+		For element: Text
 			Typography:
 				Align: justify
-		For class: panel
+		For style: panel
 			Box:
 				Background: #F1EFE8
 				Padding: 10
@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 16 0
 			Typography:
-				Weight: bold
+				Bold: true
 				Size: 20
 				Line height: 24
 			Break:
@@ -61,7 +61,7 @@ Document (dev.stxt.pdf):
 			Area:
 				Text:
 					Id: side
-					Class: panel
+					Style: panel
 					Content >>
 						Resumen de las cifras clave
 						del trimestre.

@@ -8,27 +8,27 @@ en STXT. Es la forma cómoda de escribir texto largo con formato.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Condiciones
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Heading 1
+		For element: Heading 1
 			Typography:
 				Size: 16
-				Weight: bold
+				Bold: true
 			Box:
 				Margin: 0 0 10 0
-		Element: Paragraph
+		For element: Paragraph
 			Box:
 				Margin: 0 0 8 0
-		Element: List
+		For element: List
 			Box:
 				Padding: 0 0 0 18
-		Element: Code block
+		For element: Code block
 			Box:
 				Padding: 8
 				Background: #F1EFE8
@@ -69,9 +69,9 @@ Document (dev.stxt.pdf):
 | `Numbering` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas |
 | `Table columns` | Las columnas de las tablas: `equal` (todas iguales) o `auto` (según su contenido). Obligatorio si hay tablas |
 
-Admite además `Id`, `Class`, `Box`, `Typography` (que hereda todo lo de dentro) y `Break`. La fuente del código es la
+Admite además `Id`, `Style`, `Box`, `Typography` (que hereda todo lo de dentro) y `Break`. La fuente del código es la
 `Code font` de `Typography` ([Formato del texto](../comun/formato-del-texto.md#código)): se declara en el `Typography`
-del `Markdown` o, una vez para todo el documento, en `Element: Document`, y es obligatoria si hay código.
+del `Markdown` o, una vez para todo el documento, en `For element: Document`, y es obligatoria si hay código.
 
 ## Lo que se admite
 
@@ -84,7 +84,7 @@ del `Markdown` o, una vez para todo el documento, en `Element: Document`, y es o
 | `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` | Formato dentro de la línea |
 | `[texto](destino)` | Un enlace, subrayado ([Referencias y enlaces](../comun/referencias-y-enlaces.md)) |
 | `` `código` `` | Código en línea, con `Code font` |
-| Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `Element: Code block` |
+| Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `For element: Code block` |
 | `![texto alternativo](ruta)`, sola en su párrafo | Una `Image` |
 
 Lo demás es un error, para que nada se pierda en silencio: citas, HTML, líneas horizontales, saltos de línea forzados,
@@ -92,9 +92,9 @@ imágenes dentro de un párrafo, enlaces con título, la etiqueta de lenguaje de
 
 ## Estilo
 
-Lo que genera un `Markdown` no tiene `Class`, ni `Id` salvo los encabezados con `{#id}`: se le da estilo con las reglas
-`Element` de `Styles` (`Element: Heading 1`, `Element: Paragraph`, `Element: List`, `Element: Code block`), que valen
-para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo por defecto: sin `Element: List` con un
+Lo que genera un `Markdown` no tiene `Style`, ni `Id` salvo los encabezados con `{#id}`: se le da estilo con las reglas
+`For element` de `Styles` (`For element: Heading 1`, `For element: Paragraph`, `For element: List`, `For element: Code block`), que valen
+para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo por defecto: sin `For element: List` con un
 `Padding` izquierdo, las listas no tienen sitio para el marcador.
 
 ## Cosas a tener en cuenta

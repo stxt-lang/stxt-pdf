@@ -17,7 +17,7 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 | Código | Qué pasa | Qué hacer |
 |---|---|---|
 | `CHILD_NOT_DECLARED` | Una propiedad o un elemento donde no se admite (`Columns` en un `Flex`, `Typography` en una `Image`) | Mira la tabla de propiedades del elemento |
-| `TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE` | Un texto sin fuente o sin tamaño | Decláralos en `Element: Document` |
+| `TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE` | Un texto sin fuente o sin tamaño | Decláralos en `For element: Document` |
 | `FONT_UNKNOWN` | La fuente no está en `fonts/` | Revisa el nombre de la familia; el mensaje lista las que hay |
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usa otra fuente o quita el carácter |
 | `CONTRAST_LOW` | Un texto que apenas se distingue de su fondo: un gris claro sobre blanco | Oscurece su `Color` o cambia el fondo ([Caja](caja.md#contraste)) |
@@ -26,11 +26,11 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 | `PAGE_OVERFLOW` | Algo que no se puede partir no cabe ni en una página vacía | Hazlo más pequeño o permite partirlo |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje de un alto que no se conoce | Da un `Height` en puntos al contenedor ([Valores](valores.md#porcentajes)) |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | Un `Margin: auto` que no puede centrar | Da un `Width` a la caja, o quita el `auto` |
-| `CLASS_WITHOUT_RULE` | Una clase sin su regla `For class` | Añade la regla o corrige la errata |
+| `STYLE_WITHOUT_RULE` | Un estilo sin su regla `For style` | Añade la regla o corrige la errata |
 | `HEADING_LEVEL` | Un salto de nivel (`Heading 3` después de `Heading 1`) | Usa el nivel siguiente |
 | `TABLE_ROW_CELLS` | Una fila con celdas de más o de menos | Añade `Cell:` vacías o usa `Span` |
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG, PDF ni un SVG admitido | Revisa la ruta o convierte el fichero |
-| `IMAGE_PAGE` | `Page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quita `Page` o corrige el número |
+| `IMAGE_PAGE` | `Pdf page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quita `Pdf page` o corrige el número |
 | `REFERENCE_UNKNOWN`, `LINK_UNKNOWN` | Un `{page of: id}` o un `#id` a un `Id` que no existe | Revisa el `Id` |
 | `DUPLICATE_ID` | Dos cajas con el mismo `Id` | Cambia uno |
 
@@ -45,7 +45,7 @@ sale en el PDF. Un `Margin: auto` que no centra, un `Lines` o un `Gap` de dos me
 
 Hay excepciones pensadas para no estorbar: escribir el valor por defecto (`Span: 1 1`), lo que se hereda (una
 `Typography` vale para lo que hay dentro), un `Border color` sin `Border` o un `Radius` sin nada que redondear (suelen
-venir de una clase compartida), lo que llega de una regla a donde no puede actuar, una regla que todavía no se aplica a
+venir de un estilo compartido), lo que llega de una regla a donde no puede actuar, una regla que todavía no se aplica a
 nada y las propiedades de un `Markdown` que su contenido no usa. La lista completa está en la
 [referencia](../../referencia/comun/errores.md#lo-que-no-tiene-efecto).
 

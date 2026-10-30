@@ -20,14 +20,14 @@ Cada elemento solo admite los hijos que tienen sentido en él: sus propiedades y
 define el [schema](#schema), así que una propiedad fuera de su sitio (`Columns` en un `Flex`, `Offset` en un `Block`) es
 un error al leer el documento, también en el editor.
 
-La raíz es `Document`, con exactamente un `Media`, un `Title` y un `Language`, un `Styles` opcional con las reglas
+La raíz es `Document`, con exactamente un `Page`, un `Title` y un `Language`, un `Styles` opcional con las reglas
 reutilizables ([Styles](estilos.md)), los `Fixed` de todo el documento y una o más `Section` con el contenido
 ([Document](../componentes/document.md)). No hay contenido suelto: todo lo que se maqueta va dentro de una sección. Las
 reglas pueden venir también de un documento de estilos aparte ([Styles](estilos.md#documento-de-estilos-aparte)).
 
 | Elemento | Qué es | Contiene |
 |---|---|---|
-| `Section` | Parte del documento con su `Media`, sus `Fixed` y su numeración ([Document](../componentes/document.md#section)) | Elementos, y su `Media` |
+| `Section` | Parte del documento con su `Page`, sus `Fixed` y su numeración ([Document](../componentes/document.md#section)) | Elementos, y su `Page` |
 | `Block` | Caja que apila sus hijos en vertical ([Block](../componentes/block.md)) | Elementos |
 | `Flex` | Coloca sus ítems en líneas ([Flex](../componentes/flex.md)) | `Item`, `Absolute` y `Fixed` |
 | `Grid` | Coloca sus ítems en una rejilla ([Grid](../componentes/grid.md)) | `Area`, `Absolute` y `Fixed` |
@@ -77,7 +77,7 @@ Text: Resultados del trimestre
 	Box:
 		Margin: 0 0 16 0
 	Typography:
-		Weight: bold
+		Bold: true
 		Size: 20
 	Break:
 		After: avoid
@@ -91,7 +91,7 @@ Text: Resultados del trimestre
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
 | `Id` | texto | — | Elementos y `Section` | Identificador para referencias, enlaces, reglas `For id` y mensajes. Único en el documento (`DUPLICATE_ID`). |
-| `Class` | nombres separados por espacios | — | Elementos y `Section` | Le aplican las reglas `For class` con esos nombres ([Styles](estilos.md)). Cada clase necesita su regla y no se repite. |
+| `Style` | nombres separados por espacios | — | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
 | `In contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
 | `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Elementos salvo `Markdown` y `Contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
 | `Isolate` | booleano | `false` | `Block`, `Relative` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
@@ -110,11 +110,11 @@ respecto a los elementos, no importa.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -165,7 +165,7 @@ después se desplaza.
 
 El schema es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../../src/main/resources/stxt/dev.stxt.pdf.stxt), con el
 namespace `dev.stxt.pdf`. Define cada nodo una sola vez y los hijos que admite; un mismo nombre es el mismo nodo en todo
-el schema (el `Width` de `Media` y el de `Box`), así que `Gap`, `Cross axis`, `Horizontal` y `Vertical` tienen los mismos
+el schema (el `Width` de `Page` y el de `Box`), así que `Gap`, `Cross axis`, `Horizontal` y `Vertical` tienen los mismos
 valores en el contenedor y en el ítem.
 
 Este resumen da los hijos de cada nodo con hijos; si difiere del fichero, manda el fichero. Cada propiedad va como mucho una
@@ -173,33 +173,33 @@ vez; los elementos, las veces que se quiera.
 
 | Nodo | Hijos |
 |---|---|
-| `Document` | `Media`, `Title` y `Language` (exactamente uno de cada), `Styles`; `Fixed`, `Section` (al menos una) |
-| `Section` | `Id`, `Class`, `Media`, `Page numbering`, `Page style`, `Start`, `Inherit fixed`, `Begin on`; elementos |
-| `Media` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
-| `Styles` | `Element`, `For class`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
-| `Element`, `For class`, `For id`, `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Rotate`; elementos |
-| `Flex` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
-| `Grid` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
-| `Text`, `Paragraph` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
-| `Heading 1` … `Heading 6` | `Id`, `Class`, `Link`, `In contents`, `Box`, `Typography`; `Text` (al menos uno) |
-| `List` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
-| `List item` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
+| `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Styles`; `Fixed`, `Section` (al menos una) |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit fixed`, `Begin on`; elementos |
+| `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
+| `Styles` | `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
+| `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Rotate`; elementos |
+| `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
+| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
+| `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
+| `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In contents`, `Box`, `Typography`; `Text` (al menos uno) |
+| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
+| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `Row` (al menos una) |
-| `Row` | `Id`, `Class`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
-| `Cell` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
-| `Multicol` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
-| `Markdown` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
-| `Contents` | `Id`, `Class`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `Id`, `Class`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Page`, `Rotate` |
-| `Relative` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
-| `Absolute` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
-| `Fixed` | `Id`, `Class`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
+| `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
+| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
+| `Multicol` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
+| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet`, `Numbering`, `Table columns`, `Content` (obligatorio) |
+| `Contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
+| `Relative` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Absolute` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Fixed` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `Grow`, `Shrink`, `Basis`, `Cross axis`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `Font`, `Code font`, `Weight`, `Style`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number style`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Inside`, `Decoration` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`,
@@ -207,7 +207,7 @@ vez; los elementos, las veces que se quiera.
 
 Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`;
 `Block: algo` es un error. `Content` va siempre en bloque `>>`, y `Areas`, en línea o en bloque. Lo que el schema no puede
-expresar (que `Media` declare su tamaño de una sola forma, que un `Item` tenga exactamente un elemento, el orden de las
+expresar (que `Page` declare su tamaño de una sola forma, que un `Item` tenga exactamente un elemento, el orden de las
 partes de una tabla…) lo comprueba el motor, con los códigos de [Errores](errores.md).
 
 ## Lo que no hay

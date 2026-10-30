@@ -5,7 +5,7 @@
 # primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 38 44 58 44
 	Title: Gaceta del Valle · Octubre de 2025
@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: Gaceta del Valle
 						Typography:
-							Weight: bold
+							Bold: true
 							Color: #A4301F
 							Transform: uppercase
 							Letter spacing: 0.8
@@ -55,7 +55,7 @@ Document (dev.stxt.pdf):
 				Typography:
 					Size: 52
 					Line height: 56
-					Weight: bold
+					Bold: true
 					Align: center
 			Flex:
 				Main axis: between
@@ -66,7 +66,7 @@ Document (dev.stxt.pdf):
 				Typography:
 					Font: IBM Plex Sans
 					Size: 7.5
-					Weight: bold
+					Bold: true
 					Transform: uppercase
 					Letter spacing: 0.8
 				Item:
@@ -76,7 +76,7 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: lead
 			Text: Sociedad
-				Class: kicker
+				Style: kicker
 			Heading 1:
 				Text: La castañada llega con el mercado más grande de la década
 			Image: examples/newsletter/market.jpg
@@ -87,7 +87,7 @@ Document (dev.stxt.pdf):
 					Width: 100%
 					Height: 214
 			Text: Los puestos del mercado de otoño, durante el montaje del jueves en la plaza Mayor. Foto: archivo del Ayuntamiento.
-				Class: caption
+				Style: caption
 			Multicol:
 				Id: lead-text
 				Count: 3
@@ -108,13 +108,13 @@ Document (dev.stxt.pdf):
 
 						Quien quiera colaborar como voluntario o voluntaria puede apuntarse en la oficina de turismo hasta el 28 de octubre. Se necesitan manos para el montaje, la información y la recogida de residuos, y a quienes participen se les invitará a la comida de las organizadoras.
 			Text: «Lo que se vende aquí lo hemos visto crecer: desde el queso hasta la miel».
-				Class: quote
+				Style: quote
 		Block:
 			Id: trails
 			Break:
 				Before: page
 			Text: Naturaleza
-				Class: kicker
+				Style: kicker
 			Heading 1:
 				Text: Tres caminos para no perderse el hayedo
 			Flex:
@@ -132,7 +132,7 @@ Document (dev.stxt.pdf):
 							Box:
 								Width: 100%
 						Text: El sendero del Pla de les Eres, un domingo de octubre. Foto: Joan Casas.
-							Class: caption
+							Style: caption
 				Item:
 					Grow: 1
 					Markdown:
@@ -228,25 +228,25 @@ Document (dev.stxt.pdf):
 				Gap: 10
 				Area:
 					Block:
-						Class: ad
+						Style: ad
 						Text: Se vende
-							Class: ad-title
+							Style: ad-title
 						Text: Estufa de leña en buen estado, con tubos y sombrero. 180 €. Llamar por las tardes al 600 11 22 33.
 				Area:
 					Block:
-						Class: ad
+						Style: ad
 						Text: Se busca
-							Class: ad-title
+							Style: ad-title
 						Text: Persona de confianza para cuidar a dos niños de 4 y 7 años de lunes a viernes, de 4 a 8.
 				Area:
 					Block:
-						Class: ad
+						Style: ad
 						Text: Se ofrece
-							Class: ad-title
+							Style: ad-title
 						Text: Clases de refuerzo de matemáticas y física para ESO y Bachillerato. Primera clase gratuita.
 				Area:
 					Block:
-						Class: ad
+						Style: ad
 						Text: Perdido
-							Class: ad-title
+							Style: ad-title
 						Text: Perro mestizo marrón, con collar azul, cerca del campo de fútbol. Se gratifica.

@@ -1,19 +1,19 @@
 # Encabezados: `Heading 1` … `Heading 6`
 
 Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados como en un `Block`; además admite `Id`,
-`Class`, `Link`, `In contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
-flujo de bloque de siempre; su significado se ve en las reglas `Element`, en los cortes, en la numeración, en los índices,
+`Style`, `Link`, `In contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
+flujo de bloque de siempre; su significado se ve en las reglas `For element`, en los cortes, en la numeración, en los índices,
 en los marcadores del PDF y en lo que anuncia un lector de pantalla.
 
 ```
 Styles:
-	Element: Heading 1
+	For element: Heading 1
 		Typography:
 			Size: 20
-			Weight: bold
+			Bold: true
 		Box:
 			Margin: 0 0 10 0
-	Element: Paragraph
+	For element: Paragraph
 		Box:
 			Margin: 0 0 6 0
 Heading 1:
@@ -68,13 +68,13 @@ marcador, contando en la jerarquía y siendo destino de `#id`. Es lo normal para
 ## Numeración (`Numbered`)
 
 Con `Numbered: true` el encabezado lleva número: `1`, `1.1`, `1.1.1`… Como ningún estilo es implícito, se declara; es una
-propiedad de `Typography`, así que **se hereda** y se escribe donde convenga: en `Element: Document` numera todos los
-niveles, en una regla `Element: Heading 1` solo los de ese nivel, en una regla `For class` los de una clase, y en la
+propiedad de `Typography`, así que **se hereda** y se escribe donde convenga: en `For element: Document` numera todos los
+niveles, en una regla `For element: Heading 1` solo los de ese nivel, en una regla `For style` los de un estilo, y en la
 `Typography` de un encabezado, solo en él (`Numbered: false` lo deja sin número).
 
 ```
 Styles:
-	Element: Document
+	For element: Document
 		Typography:
 			Numbered: true
 Heading 1:
@@ -93,7 +93,7 @@ Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 - **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus encabezados `#`, `##`… se
   numeran como los demás), con un contador por nivel: sube con cada encabezado numerado de ese nivel y vuelve a 0 con
   cualquier encabezado de un nivel superior, esté numerado o no. El número es el de los niveles 1 a N unidos por puntos,
-  **sin los niveles que no tienen número**, cada uno escrito con el `Number style` de su encabezado (abajo). Un
+  **sin los niveles que no tienen número**, cada uno escrito con el `Number format` de su encabezado (abajo). Un
   encabezado sin numerar no cuenta ni lleva número.
 - **Un título sin número.** Lo normal: el título del documento es un `Heading 1` con `Numbered: false` y las secciones,
   `Heading 2` numerados, que son `1`, `2`, `3` (y sus `Heading 3`, `2.1`…) porque el título no aporta nivel. Un nuevo
@@ -105,39 +105,39 @@ Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 - **Se puede referir.** `{number of: id}` de un encabezado con `Id` y numerado da su número completo (`1.1`): «la sección
   {number of: ventas}» escribe «la sección 1.1» ([Referencias](../comun/referencias.md#number-of-id)).
 
-### Formato y etiqueta (`Number style`, `Number label`)
+### Formato y etiqueta (`Number format`, `Number label`)
 
-Dos propiedades de `Typography`, que se heredan y se dan como `Numbered`: en `Element: Heading N` para un nivel o en
-`For class` para unos encabezados.
+Dos propiedades de `Typography`, que se heredan y se dan como `Numbered`: en `For element: Heading N` para un nivel o en
+`For style` para unos encabezados.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Number style` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el contador del nivel del encabezado: `1`, `a`, `A`, `i`, `I`. Las letras siguen tras la `z` con `aa`; los romanos, tras 3999, con más `M`. |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el contador del nivel del encabezado: `1`, `a`, `A`, `i`, `I`. Las letras siguen tras la `z` con `aa`; los romanos, tras 3999, con más `M`. |
 | `Number label` | texto con `{number}` una vez | el número | Lo que va delante del título: `{number}` es el número completo (`Number label: Anexo {number}.` da `Anexo A.`). Sin `{number}`, o con él dos veces, es `VALUE_NOT_ALLOWED`. |
 
-Cada nivel del número completo se escribe con el `Number style` del último encabezado de ese nivel: capítulos
+Cada nivel del número completo se escribe con el `Number format` del último encabezado de ese nivel: capítulos
 `upper-roman` y apartados `decimal` dan `II.1`. `{number of: id}` da el número, sin la etiqueta: «el anexo
 {number of: fees}» escribe «el anexo A». Los anexos se numeran aparte con un encabezado sin número por encima, que
-reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` con `Number style: upper-alpha` son `A`,
+reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` con `Number format: upper-alpha` son `A`,
 `B`…
 
 ```
 Styles:
-	For class: annex
+	For style: annex
 		Typography:
 			Numbered: true
-			Number style: upper-alpha
+			Number format: upper-alpha
 			Number label: Anexo {number}.
 Heading 1:
 	Text: Anexos
 Heading 2:
 	Id: fees
-	Class: annex
+	Style: annex
 	Text: Honorarios            # «Anexo A. Honorarios»
 Paragraph: Los importes del anexo {number of: fees}.
 ```
 
-> **Decisión:** `Numbered`, `Number style` y `Number label` van en `Typography` para poder darlos en una regla y
+> **Decisión:** `Numbered`, `Number format` y `Number label` van en `Typography` para poder darlos en una regla y
 > heredarlos; el formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativa descartada:* una
 > plantilla con el número de cada nivel por separado (`{1}.{2}`), más difícil de escribir y de leer.
 

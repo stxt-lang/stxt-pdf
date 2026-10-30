@@ -43,7 +43,7 @@ public final class PropertyKey {
     public static final String ROTATE_ORIGIN = "rotate-origin";
     public static final String START = "start";
     public static final String NUMBER = "number";
-    public static final String PAGE = "page";
+    public static final String PDF_PAGE = "pdf-page";
 
     // Multicol
     public static final String COUNT = "count";
@@ -73,7 +73,7 @@ public final class PropertyKey {
      * documento es corto.
      */
     private static final Map<String, String> INTERNAL = Map.of(
-            "weight", FONT_WEIGHT, "style", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
+            "bold", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
             "before", BREAK_BEFORE, "after", BREAK_AFTER, "inside", BREAK_INSIDE);
 
     private PropertyKey() {

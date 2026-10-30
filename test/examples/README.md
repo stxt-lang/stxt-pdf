@@ -10,7 +10,7 @@ Cada carpeta tiene:
 | Fichero | Qué es |
 |---|---|
 | `input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
-| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`Element: Document`), en un [documento de estilos aparte](../../docs/referencia/comun/estilos.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
+| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`For element: Document`), en un [documento de estilos aparte](../../docs/referencia/comun/estilos.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
 | `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
 | `expected.stxt` | El [volcado](../../docs/referencia/implementacion/pruebas.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
 | `output.pdf` | El PDF, para abrirlo desde el repositorio. Se reescribe con `-Dexamples.update=true` y no se compara: lleva la fecha y un identificador. |
@@ -45,24 +45,24 @@ Open Font License). Los nombres, las empresas y los datos de los documentos son 
 | [![](04-annual-report/page-1.png)](04-annual-report) | **[04 · Informe anual](04-annual-report)**<br>7 páginas A4 | **Portada a sangre** con un **degradado** de transparente a azul (`linear(180, #12315A00, #12315A)`) que funde la foto con el panel, en una **sección propia** (`Margin: 0`, sin número de página ni el pie del documento: `Page numbering: none` e `Inherit fixed: false`) y un cuerpo que numera desde 1 («Página 1 de 6»), **capítulos y apartados numerados** (`Numbered`: `1`, `1.1`…, también en el índice), **índice automático** (`Contents`, con puntos guía, las páginas calculadas por el motor y cada entrada clicable), cifras clave, **gráficos** como imágenes, texto en **dos columnas** con filete, tabla financiera con cabecera y pie, calendario con celdas de varias columnas (`Span`) y secciones que empiezan en página nueva. |
 | [![](05-newsletter/page-1.png)](05-newsletter) | **[05 · Boletín](05-newsletter)**<br>2 páginas A4 | Aire de periódico: cabecera de portada, foto recortada con `Fit: cover`, artículos a **tres columnas** con cortes equilibrados, foto al lado del texto, agenda en tabla y anuncios en una rejilla, y la web de la gaceta en el pie. |
 | [![](06-menu/page-1.png)](06-menu) | **[06 · Carta de restaurante](06-menu)**<br>2 páginas, 420 × 700 | **Tamaño de página propio**, fondo y marco doble de **esquinas redondeadas** con `Fixed` de **`Layer` negativa** (detrás del contenido en todas las páginas), platos con precio en un `Flex`, adornos e imagen centrada. |
-| [![](07-contract/page-1.png)](07-contract) | **[07 · Contrato](07-contract)**<br>3 páginas A4 | Cabecera y pie fijos con rúbricas, apartados numerados (`Numbered`, con una referencia `{number of: …}`), `Exponen` con numeración romana, doce **cláusulas con tres niveles de numeración** escritas en Markdown, **anexo numerado en romanos con su etiqueta** («Anexo I», `Number style` y `Number label`, citado desde las cláusulas) con la tabla de honorarios y **bloque de firmas que no se parte**. |
+| [![](07-contract/page-1.png)](07-contract) | **[07 · Contrato](07-contract)**<br>3 páginas A4 | Cabecera y pie fijos con rúbricas, apartados numerados (`Numbered`, con una referencia `{number of: …}`), `Exponen` con numeración romana, doce **cláusulas con tres niveles de numeración** escritas en Markdown, **anexo numerado en romanos con su etiqueta** («Anexo I», `Number format` y `Number label`, citado desde las cláusulas) con la tabla de honorarios y **bloque de firmas que no se parte**. |
 | [![](08-manual/page-1.png)](08-manual) | **[08 · Manual](08-manual)**<br>4 páginas A4 | Figura con **números superpuestos** (un `Relative` con `Absolute` encima; cada número es una insignia **circular**), leyenda al lado, avisos con color y **esquinas redondeadas** a la derecha de la franja, pasos numerados, esquema de conexión, **bloque de terminal** preformateado (`White space: pre`) con **código en línea** (`Code font`), tablas de especificaciones y de averías, que remite al esquema con **`{page of: id}`** (también dentro de Markdown), con un **enlace de Markdown a la tabla de especificaciones** (`[la sección {number of: …}](#specs)`), **apartados y subapartados numerados** (`Numbered`: `1`…`8`, `3.1`…) y correos y web clicables, y marcadores en el PDF. |
 | [![](09-catalog/page-1.png)](09-catalog) | **[09 · Catálogo](09-catalog)**<br>5 páginas A4 | Portada a sangre, **índice de productos** (un `Contents` de dos niveles con su sangría, su página y cada entrada clicable), **fichas de producto** de esquinas redondeadas en una rejilla de dos columnas, con foto recortada (con las esquinas de arriba redondeadas) y etiqueta «Novedad» **en diagonal** en la esquina (un `Absolute` con `Rotate: 40`), tabla de maderas y página de pedidos; el papel es `Paper: A4`. |
 | [![](10-certificate/page-1.png)](10-certificate) | **[10 · Certificado](10-certificate)**<br>Una página A4 apaisada | `Paper: A4` con `Orientation: landscape`. Fondo y **tres marcos concéntricos** con adornos **circulares** en las esquinas, nombre como protagonista, dos firmas y un sello con cintas **ligeramente girado** (`Rotate: -8`), todo centrado; el **número del certificado en vertical** en el margen (un `Fixed` girado −90 grados alrededor de su esquina) y la dirección de verificación clicable en el pie. |
-| [![](11-timetable/page-1.png)](11-timetable) | **[11 · Horario](11-timetable)**<br>Una página A4 apaisada | `Paper: A4` con `Orientation: landscape`. Tabla con las celdas separadas por un `Gap` y **redondeadas** (`Radius` en `Element: Cell`), **colores por clase**, recreo y comedor que ocupan los cinco días con `Span`, leyenda en un `Flex` con salto de línea y notas en Markdown. |
+| [![](11-timetable/page-1.png)](11-timetable) | **[11 · Horario](11-timetable)**<br>Una página A4 apaisada | `Paper: A4` con `Orientation: landscape`. Tabla con las celdas separadas por un `Gap` y **redondeadas** (`Radius` en `For element: Cell`), **colores por estilo**, recreo y comedor que ocupan los cinco días con `Span`, leyenda en un `Flex` con salto de línea y notas en Markdown. |
 
 ## Lo que se aprende al escribirlos
 
 Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TODO.md`](../../TODO.md)):
 
-- **Una portada sin cabecera ni pie** es una `Section` (hito 32, ejemplos 04 y 09): con su `Media`
+- **Una portada sin cabecera ni pie** es una `Section` (hito 32, ejemplos 04 y 09): con su `Page`
   (`Margin: 0`, así que es a sangre sin ningún `Offset` negativo), `Page numbering: none` (no cuenta, y la
   primera página interior es la 1) e `Inherit fixed: false` (sin el pie, que es un `Fixed` del documento).
   Ya no hace falta el bloque de 1 pt con `Break: After: page` que forzaba el salto: una sección siempre
   empieza página. `Pages` sigue sirviendo dentro de una sección o cuando no hay portada: quita el
   logotipo de la primera hoja del contrato (07), el pie de la primera página de la carta (06) y
   pone un titulillo corrido desde la segunda página del boletín (05).
-- **El texto con formato** se escribe con `Inline: markdown` (una regla `Element: Paragraph` o el
+- **El texto con formato** se escribe con `Inline: markdown` (una regla `For element: Paragraph` o el
   `Typography` de un `Text`: se hereda) para una negrita o una cursiva dentro de una frase, y con
   `Markdown` cuando hay además listas, encabezados o tablas. Sin `Inline` los asteriscos son
   literales. Las cláusulas del contrato (07) y los pasos del manual (08) siguen siendo `Markdown`
@@ -77,10 +77,10 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   columnas alineadas del manual (08) es un solo `Text` en monoespaciada con los espacios escritos, y
   con `Code font` el código se escribe con comillas invertidas, en un texto con `Inline: markdown` (el
   IBAN y el BIC de la factura, 01) o en un `Markdown` (el borne `N` del manual, 08).
-- **Las tablas se estilan con reglas**, no con una clase en cada celda: `Element: Head cell` da la
+- **Las tablas se estilan con reglas**, no con un estilo en cada celda: `For element: Head cell` da la
   cabecera (también a las tablas de Markdown), `Even row cell` la cebra (ejemplo 05) y
   `Column align` o `For column` las columnas numéricas. Lo que es de una sola fila, como los
-  totales de la factura (ejemplos 01, 04 y 07), va en una clase en la `Row` (`Class: total`), que
+  totales de la factura (ejemplos 01, 04 y 07), va en un estilo en la `Row` (`Style: total`), que
   aplica sus reglas a todas sus celdas.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) es clicable entero,

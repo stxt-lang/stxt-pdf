@@ -8,11 +8,11 @@ fuentes incrustadas, accesible (PDF/UA-1, o PDF/UA-2 si se pide) y con marcadore
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe del trimestre
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
@@ -47,7 +47,7 @@ estilo oculto y lo que no tendría efecto, se contradice o no cabe es un error c
 | [![](test/examples/08-manual/page-1.png)](test/examples/08-manual/output.pdf) | **Manual**: figura con números superpuestos, avisos, terminal preformateado, «véase la página» | [PDF](test/examples/08-manual/output.pdf) (4 páginas) | [STXT](test/examples/08-manual/input.stxt) |
 | [![](test/examples/09-catalog/page-1.png)](test/examples/09-catalog/output.pdf) | **Catálogo**: fichas en rejilla, etiqueta en diagonal, índice de productos | [PDF](test/examples/09-catalog/output.pdf) (5 páginas) | [STXT](test/examples/09-catalog/input.stxt) |
 | [![](test/examples/10-certificate/page-1.png)](test/examples/10-certificate/output.pdf) | **Certificado**: A4 apaisado, marcos concéntricos, sello girado, texto en vertical | [PDF](test/examples/10-certificate/output.pdf) (1 página) | [STXT](test/examples/10-certificate/input.stxt) |
-| [![](test/examples/11-timetable/page-1.png)](test/examples/11-timetable/output.pdf) | **Horario**: tabla con celdas separadas y redondeadas, colores por clase | [PDF](test/examples/11-timetable/output.pdf) (1 página) | [STXT](test/examples/11-timetable/input.stxt) |
+| [![](test/examples/11-timetable/page-1.png)](test/examples/11-timetable/output.pdf) | **Horario**: tabla con celdas separadas y redondeadas, colores por estilo | [PDF](test/examples/11-timetable/output.pdf) (1 página) | [STXT](test/examples/11-timetable/input.stxt) |
 
 El estilo de cada ejemplo está en su `styles.stxt`; lo que enseña cada uno, en el [índice de los ejemplos](test/examples/README.md).
 

@@ -14,14 +14,14 @@
 # natural (30 × 30) y el párrafo va debajo: md mide 30 + 12.
 # logo: un Fixed en la esquina de arriba a la derecha, en el margen de la página, en las dos.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Width: 300
 		Height: 300
 		Margin: 20
 	Title: Imágenes
 	Language: es
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10

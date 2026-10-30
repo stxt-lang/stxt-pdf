@@ -16,7 +16,7 @@ métodos de test están en inglés y en camelCase (`autoMarginsCenter`).
 Los documentos de test se leen con `DocumentReader`, que valida contra el schema: un test de una regla del modelo comprueba
 así que el schema no la detecta antes. Los tests de un algoritmo maquetan documentos pequeños con `LayoutFixture` (A4: área
 útil de 515 × 762 pt desde (40, 40); `rect(id)` da la caja de borde en coordenadas de página). La fixture declara en
-`Element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese y envuelve el
+`For element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese y envuelve el
 contenido en una `Section`). Con `FixedMetrics`, cada carácter mide 5 pt con `Size: 10`. `layOutPaged(alto, …)` pagina (con
 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran una página concreta. Un test de
 layout no puede desbordar: los desbordamientos van al catálogo de errores.

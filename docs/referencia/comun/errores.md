@@ -22,9 +22,9 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 - **Lo que se hereda:** una propiedad de `Typography` vale para los descendientes, así que no se comprueba si la caja que
   la declara la usa (`Numbered` en un `Block`, `Small caps` con `Transform: uppercase`).
 - **El aspecto que depende de otra propiedad:** `Border color` sin `Border` y `Radius` sin fondo, borde ni imagen. Suelen
-  venir de una regla de clase que comparten cajas con y sin borde.
+  venir de una regla de estilo que comparten cajas con y sin borde.
 - **Un `Break` que llega de una regla** a un elemento dentro de una caja que no se parte: una regla por tipo
-  (`Element: Paragraph`) daría un error en cada párrafo de un pie ([Cortes](cortes.md#cortes-forzados)).
+  (`For element: Paragraph`) daría un error en cada párrafo de un pie ([Cortes](cortes.md#cortes-forzados)).
 - **Lo que puede llegar después:** una regla que no se aplica a ningún elemento e `Inherit fixed: false` sin `Fixed` en el
   documento. Una plantilla puede añadirlos.
 - **Lo que depende de la maquetación:** un mínimo y un máximo en unidades distintas que chocan (gana el mínimo,
@@ -48,7 +48,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | Código | Regla | Mensaje (ejemplo) |
 |---|---|---|
 | `DOCUMENT_ROOT` | Un único nodo raíz, `Document`, con el namespace `dev.stxt.pdf` (el schema acepta cualquier elemento como raíz); en un documento de estilos aparte, `Styles` | `El nodo raíz debe ser Document (dev.stxt.pdf):` |
-| `MEDIA_SIZE` | El tamaño del medio, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil; una `Section` que solo gira (`Orientation`) un documento con papel ([Document](../componentes/document.md#media)) | `Los márgenes del medio no dejan área útil` |
+| `PAGE_SIZE` | El tamaño de `Page`, con `Paper` (y `Orientation`) o con `Width` y `Height`, nunca las dos cosas; `Width` y `Height`, puntos positivos; `Margin`, solo puntos, y deja área útil; una `Section` que solo gira (`Orientation`) un documento con papel ([Document](../componentes/document.md#page)) | `Los márgenes de la página no dejan área útil` |
 | `SECTION_EMPTY` | Una `Section` tiene contenido: algún elemento que no sea un `Fixed` (línea de la sección) | `La sección no tiene contenido: sin elementos (los Fixed no cuentan…) no tiene ninguna página` |
 | `PAGE_NUMBER_UNAVAILABLE` | Un texto con `{page}` o `{pages}` no sale en una página sin número (`Page numbering: none`); línea del texto | `El texto de la caja pie tiene {page} o {pages} y sale en una página sin número…` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([Valores](valores.md)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio`, `For column` que no es un número | `Valor no válido: 12,5 (usa punto decimal…)` |
@@ -57,11 +57,11 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text tiene el texto en el valor y en Content (línea 9): deja solo uno` |
-| `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
-| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (Element: Document)` |
-| `STYLE_UNKNOWN_ELEMENT` | `Element` nombra un elemento de caja, un elemento generado o una posición en una tabla ([Styles](estilos.md)) | `Element: 'Item' no es un elemento de caja (Block, Flex…)` |
-| `STYLE_DUPLICATE` | Dos reglas del mismo origen no tienen el mismo selector | `Regla repetida: Element: block (ya está en la línea 6)` |
-| `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición, de columna o de la clase de una `Row`) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `Element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For class: page aplica Break a un Absolute (línea 11)…` |
+| `TEXT_WITHOUT_FONT` | El texto, y un `Contents`, necesitan `Font` en `Typography`, propia o heredada | `El texto necesita Font: declárala en el Typography del Text, de un antecesor o de Styles (For element: Document)` |
+| `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado | `El texto necesita Size: decláralo en el Typography del Text, de un antecesor o de Styles (For element: Document)` |
+| `STYLE_UNKNOWN_ELEMENT` | `For element` nombra un elemento de caja, un elemento generado o una posición en una tabla ([Styles](estilos.md)) | `For element: 'Item' no es un elemento de caja (Block, Flex…)` |
+| `STYLE_DUPLICATE` | Dos reglas del mismo origen no tienen el mismo selector | `Regla repetida: For element: block (ya está en la línea 6)` |
+| `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición, de columna o de el estilo de una `Row`) no da `Break` a un `Absolute`, un `Fixed`, un encabezado, un `Text` de un encabezado o una `Cell`; `For element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For style: page aplica Break a un Absolute (línea 11)…` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([Encabezados](../componentes/heading.md#jerarquía)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_FIXED` | Un encabezado no va dentro de un `Fixed` | `Un Heading 1 no puede estar dentro de un Fixed…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
@@ -85,26 +85,26 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
 | `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto de [Markdown](../componentes/markdown.md#el-subconjunto), y una fila de tabla no tiene más celdas que la cabecera; un texto con `Inline: markdown` no tiene, dentro de la línea, imágenes, HTML ni saltos de línea forzados ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)) (línea del bloque o del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas, bloques de código y…` |
 | `MARKDOWN_PROPERTY_MISSING` | Un `Markdown` con listas con viñetas declara `Bullet`; con listas numeradas, `Numbering`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet en su Markdown (línea 8): el marcador de cada nivel, como Bullet: disc dash` |
-| `CODE_WITHOUT_FONT` | El código, en línea o en un bloque, necesita `Code font` en `Typography`, propia o heredada ([Formato del texto](formato-del-texto.md#código-en-línea)); línea del texto, del párrafo o del bloque | `El código necesita Code font: declárala en el Typography del texto, de un antecesor o de Styles (Element: Document)…` |
+| `CODE_WITHOUT_FONT` | El código, en línea o en un bloque, necesita `Code font` en `Typography`, propia o heredada ([Formato del texto](formato-del-texto.md#código-en-línea)); línea del texto, del párrafo o del bloque | `El código necesita Code font: declárala en el Typography del texto, de un antecesor o de Styles (For element: Document)…` |
 | `LINK_SCHEME` | El destino de un enlace es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito ([Enlaces](enlaces.md)) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
 | `IMAGE_FORMAT` | Una `Image` es un PNG, un JPEG, un SVG del subconjunto admitido o un PDF sin cifrar, que se puede leer, y la página que dibuja de un PDF no tiene anotaciones que se vean ni fuentes sin incrustar o sin `ToUnicode`, salvo que quien convierte quite esas comprobaciones (línea de la `Image`) ([Image](../componentes/image.md#svg)) | `La imagen dibujo.gif no es PNG, JPEG, SVG ni PDF (es GIF): conviértela a uno de los cuatro` |
-| `IMAGE_PAGE` | `Page` va en la `Image` de un PDF y es una página que el PDF tiene (línea de `Page`) ([Image](../componentes/image.md#pdf)) | `El PDF planos.pdf tiene 3 páginas y no tiene la 4` |
+| `IMAGE_PAGE` | `Pdf page` va en la `Image` de un PDF y es una página que el PDF tiene (línea de `Pdf page`) ([Image](../componentes/image.md#pdf)) | `El PDF planos.pdf tiene 3 páginas y no tiene la 4` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
 | `REFERENCE_UNKNOWN` | Una referencia tiene `Id`, y es el de una caja del documento (línea de la referencia, [Referencias](referencias.md)) | `{page of: nada}: ninguna caja tiene el Id nada` |
 | `REFERENCE_NOT_PLACEABLE` | La página de una caja, que no está en un `Fixed` ni dentro de uno ni en una página sin número | `{page of: pie}: pie está en un Fixed, que se repite en todas las páginas` |
 | `REFERENCE_NOT_NUMBERED` | El número de una caja que lo tiene: un `List item` de una lista numerada o un encabezado con `Numbered: true` | `{number of: nota}: nota no tiene número (solo lo tienen los ítems de una lista numerada y los encabezados con Numbered: true)` |
 | `REFERENCE_UNSTABLE` | La página de las cajas referidas se estabiliza en 10 pasadas de paginación | `La página de x no se estabiliza: tras 10 pasadas sigue cambiando…` |
-| `CLASS_WITHOUT_RULE` | Cada clase de `Class` tiene su regla `For class` | `La clase aside no tiene regla: añade 'For class: aside' en Styles` |
+| `STYLE_WITHOUT_RULE` | Cada nombre de `Style` tiene su regla `For style` | `El estilo aside no tiene regla: añade 'For style: aside' en Styles` |
 | `OFFSET_CONFLICT` | Un `Relative` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Relative no puede desplazarse a la vez desde arriba y desde abajo…` |
 | `OVERCONSTRAINED` | Un `Absolute` o un `Fixed` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces…` |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([La caja](caja.md#márgenes-auto)) | `Margin auto no centra una caja que ocupa todo el ancho…` |
 | `ISOLATE_IN_ITEM` | `Isolate: true` no va en un ítem de `Flex` o `Grid`, que ya corta el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)) | `Isolate no tiene efecto en un ítem de Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo` |
 | `START_WITHOUT_RESTART` | `Start` en una `Section` solo con `Page numbering: restart` ([Document](../componentes/document.md#numeración-de-las-páginas)) | `Start solo tiene efecto con Page numbering: restart…` |
 | `ROW_BOX` | El `Box` de una `Row` solo da su aspecto: `Background`, `Border`, `Border color` y `Radius` ([Table](../componentes/table.md#filas)) | `Padding no tiene efecto en una Row, que no es una caja del layout…` |
-| `PAGE_STYLE_WITHOUT_NUMBERS` | `Page style` no va en una `Section` con `Page numbering: none` | `Page style no tiene efecto con Page numbering: none…` |
+| `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS` | `Page number format` no va en una `Section` con `Page numbering: none` | `Page number format no tiene efecto con Page numbering: none…` |
 | `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` no va en la primera `Section`, que ya empieza en la página 1 ([Document](../componentes/document.md#empezar-en-página-impar)) | `Begin on: odd no tiene efecto en la primera sección…` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Flex`, solo con `Wrap: true` ([Flex](../componentes/flex.md#propiedades-del-flex)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: escribe un solo valor…` |
@@ -119,7 +119,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `ROTATED_ITEM` | Un `Block`, `Text`, `Paragraph` o `Image` girado no es un ítem de `Flex` o `Grid` ([Capas y giro](capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)) | `Un ítem de Flex no puede girar: ocupa el sitio que le da su contenedor; gira una caja dentro del ítem…` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella ([Grid](../componentes/grid.md#colocación)) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` (línea de la `Code font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
-| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
+| `FONT_VARIANT_MISSING` | La familia tiene la variante de `Bold` y `Italic`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `CONTRAST_LOW` | El texto tiene un contraste de 4,5:1 con lo que tiene debajo, o de 3:1 si es grande ([El PDF](pdf.md#contraste)); línea del `Color` del texto, o de su caja si no lo tiene | `El texto de la caja de la línea 12 tiene un contraste de 2,84:1 con su fondo (#999999 sobre #FFFFFF) y necesita 4,5:1…` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |

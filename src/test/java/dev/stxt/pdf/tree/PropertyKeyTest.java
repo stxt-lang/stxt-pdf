@@ -34,7 +34,7 @@ class PropertyKeyTest {
     @Test
     void shortNamesUseTheInternalName() {
         assertEquals(PropertyKey.FONT_SIZE, PropertyKey.internal("size"));
-        assertEquals(PropertyKey.FONT_WEIGHT, PropertyKey.internal("weight"));
+        assertEquals(PropertyKey.FONT_WEIGHT, PropertyKey.internal("bold"));
         assertEquals("break-inside", PropertyKey.internal("inside"));
         assertEquals(PropertyKey.LINE_HEIGHT, PropertyKey.internal("line-height"));
         assertEquals(PropertyKey.GRID_ROWS, PropertyKey.grid("rows"));

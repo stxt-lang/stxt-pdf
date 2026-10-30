@@ -1,7 +1,7 @@
 # `Relative`, `Absolute` y `Fixed`
 
 Los tres **elementos posicionados** son bloques: apilan a sus hijos en flujo de bloque ([Block](block.md)). Para posicionar
-un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Class`, `Link`, `Box` y `Typography`; `Relative`
+un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`; `Relative`
 también `Break` e `Isolate`.
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
@@ -24,7 +24,7 @@ también `Break` e `Isolate`.
 
 > **Decisión:** `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo de la página. Un
 > `Break` escrito en un elemento de dentro es un error (`BREAK_IN_UNBREAKABLE`, [Cortes](../comun/cortes.md#cortes-forzados));
-> el que llega de una regla no, para que `Element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
+> el que llega de una regla no, para que `For element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
 > *Alternativa descartada:* comprobar también lo que llega de las reglas.
 
 ## `Relative`
@@ -80,7 +80,7 @@ su posición, y si su contenedor de referencia está partido, se resuelve contra
 Como `Absolute`, pero su contenedor de referencia es el área útil de la página, y **se pinta en las páginas que dice
 `Pages`**, todas por defecto (cabeceras, pies, marcas de agua). Un `Fixed` hijo de `Document` sale en todas las secciones que
 lo heredan, y uno hijo de una `Section`, solo en las suyas ([Document](document.md#fixed-del-documento-y-de-la-sección)).
-Los `Fixed` no reservan espacio: el autor debe dejar sitio con el `Margin` del medio. Para colocarlos en el margen de la
+Los `Fixed` no reservan espacio: el autor debe dejar sitio con el `Margin` de `Page`. Para colocarlos en el margen de la
 página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Fixed` depende de su posición estática
 (desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
 todas en las que sale. Lo que hay dentro de un `Fixed` es decoración de la página, no contenido: un lector de pantalla no

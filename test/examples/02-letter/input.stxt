@@ -2,7 +2,7 @@
 # en Markdown (justificado con el reparto de Knuth-Plass), firma escaneada y pie fijo. Todo el
 # cuerpo en serif; el membrete y el pie, en sans.
 Document (dev.stxt.pdf):
-	Media:
+	Page:
 		Paper: A4
 		Margin: 44 72 64 72
 	Title: Propuesta de mobiliario para el Mirador del Valle
@@ -30,12 +30,12 @@ Document (dev.stxt.pdf):
 			Item:
 				Block:
 					Text: Carrer de la Farga, 14 · 17800 Olot
-						Class: small
+						Style: small
 						Typography:
 							Align: right
 					Text: 972 00 11 22 · tallernogal.example
 						Link: https://tallernogal.example
-						Class: small
+						Style: small
 						Typography:
 							Align: right
 		Text: Olot, 20 de octubre de 2025
@@ -50,13 +50,13 @@ Document (dev.stxt.pdf):
 				Margin: 0 0 16 0
 			Text: Sr. Ramon Puig Casals
 				Typography:
-					Weight: bold
+					Bold: true
 			Text: Dirección del Hotel Mirador del Valle
 			Text: Camí del Mirador, s/n
 			Text: 17850 Besalú (Girona)
 		Text: Asunto: propuesta de renovación del mobiliario · Ref. P-2025-118
 			Id: subject
-			Class: subject
+			Style: subject
 		Markdown:
 			Id: body
 			Bullet: dash
@@ -87,19 +87,19 @@ Document (dev.stxt.pdf):
 		Text: Laia Soler Vidal
 			Id: name
 			Typography:
-				Weight: bold
+				Bold: true
 		Text: Directora comercial · Taller Nogal
-			Class: small
+			Style: small
 			Typography:
 				Font: IBM Plex Serif
-				Style: italic
+				Italic: true
 				Size: 9.5
 		Paragraph: P. D. Le adjuntamos el catálogo de acabados con muestras de las dos maderas; si lo prefiere, se las llevamos al hotel.
 			Id: postscript
-			Class: small
+			Style: small
 			Typography:
 				Font: IBM Plex Serif
-				Style: italic
+				Italic: true
 				Size: 9.5
 			Box:
 				Margin: 14 0 0 0

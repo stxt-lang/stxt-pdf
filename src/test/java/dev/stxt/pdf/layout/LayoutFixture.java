@@ -25,7 +25,7 @@ import java.util.Map;
 public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String FONT = "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
+    private static final String FONT = "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
     private static final String A4 = "\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n";
     /** Sufijo de la clave del marcador de un ítem. */
     private static final String MARKER = "#marker";
@@ -78,7 +78,7 @@ public final class LayoutFixture {
     }
 
     private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n" + media + FONT + String.join("\n", boxLines);
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n" + media + FONT + String.join("\n", boxLines);
         return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)).pages());
     }
 

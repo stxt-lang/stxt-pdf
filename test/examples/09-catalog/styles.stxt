@@ -1,53 +1,53 @@
 # Estilos del ejemplo «catalog»: las reglas reutilizables y la tipografía base. Se pasan junto a
 # input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
 Styles (dev.stxt.pdf):
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Sans
 			Size: 9
 			Line height: 13.5
 			Color: #2B2420
-	Element: Heading 1
+	For element: Heading 1
 		Typography:
 			Font: IBM Plex Serif
 			Size: 28
 			Line height: 32
-			Weight: bold
+			Bold: true
 			Color: #3B2A1E
 		Box:
 			Margin: 0 0 6 0
-	Element: Heading 2
+	For element: Heading 2
 		Typography:
 			Font: IBM Plex Serif
 			Size: 17
 			Line height: 22
-			Weight: bold
+			Bold: true
 			Color: #3B2A1E
 		Box:
 			Margin: 0 0 4 0
-	Element: Heading 3
+	For element: Heading 3
 		Typography:
 			Font: IBM Plex Serif
 			Size: 13
 			Line height: 17
-			Weight: bold
+			Bold: true
 			Color: #3B2A1E
-	Element: Paragraph
+	For element: Paragraph
 		Box:
 			Margin: 0 0 6 0
-	Element: Cell
+	For element: Cell
 		Box:
 			Padding: 6 8
 			Border: 0 0 0.5 0
 			Border color: #DCCFB8
-	Element: Fixed
+	For element: Fixed
 		Typography:
 			Size: 7.5
 			Color: #7D6F62
-	Element: Contents entry 1
+	For element: Contents entry 1
 		Typography:
 			Font: IBM Plex Serif
-			Weight: bold
+			Bold: true
 			Size: 13
 			Line height: 18
 			Color: #3B2A1E
@@ -56,54 +56,54 @@ Styles (dev.stxt.pdf):
 			Padding: 0 0 4 0
 			Border: 0 0 0.5 0
 			Border color: #DCCFB8
-	Element: Contents entry 2
+	For element: Contents entry 2
 		Typography:
 			Size: 10
 			Line height: 15
 			Color: #2B2420
 		Box:
 			Padding: 1 0 1 14
-	For class: lead
+	For style: lead
 		Typography:
 			Font: IBM Plex Serif
-			Style: italic
+			Italic: true
 			Size: 11.5
 			Line height: 17
 			Color: #6B5B4E
 		Box:
 			Margin: 0 0 16 0
-	For class: card
+	For style: card
 		Box:
 			Radius: 6
 			Background: #FBF8F3
 			Border: 0.5
 			Border color: #E6DAC6
-	For class: body
+	For style: body
 		Box:
 			Padding: 10 12 12 12
-	For class: product
+	For style: product
 		Typography:
 			Size: 13
 			Line height: 17
-	For class: ref
+	For style: ref
 		Typography:
 			Font: IBM Plex Mono
 			Size: 7.5
 			Color: #7D6F62
-	For class: dims
+	For style: dims
 		Typography:
 			Size: 7.5
 			Color: #6B5B4E
-	For class: price
+	For style: price
 		Typography:
 			Font: IBM Plex Serif
 			Size: 14
-			Weight: bold
+			Bold: true
 			Color: #A65C1B
-	For class: new
+	For style: new
 		Typography:
 			Size: 7
-			Weight: bold
+			Bold: true
 			Align: center
 			Color: #FFFFFF
 			Transform: uppercase
@@ -112,17 +112,17 @@ Styles (dev.stxt.pdf):
 			Radius: 3
 			Background: #A65C1B
 			Padding: 3 7
-	Element: Head cell
+	For element: Head cell
 		Typography:
-			Weight: bold
+			Bold: true
 			Size: 8
 			Color: #FFFFFF
 		Box:
 			Background: #3B2A1E
-	For class: step-number
+	For style: step-number
 		Typography:
 			Font: IBM Plex Serif
 			Size: 30
 			Line height: 32
-			Weight: bold
+			Bold: true
 			Color: #A65C1B

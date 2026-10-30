@@ -2,7 +2,7 @@
 
 | Término | Definición |
 |---|---|
-| **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Fixed`. Cada sección tiene la suya ([Document](../componentes/document.md#media)). |
+| **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Fixed`. Cada sección tiene la suya ([Document](../componentes/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](caja.md#las-cuatro-cajas)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([Recursos](recursos.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Multicol` reparte su contenido en una página ([Multicol](../componentes/multicol.md)). |
@@ -14,7 +14,7 @@
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color…)` ([La caja](caja.md#degradado)). |
 | **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
-| **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `Element` nombran: `Code block` y `Contents entry 1` … `6`. |
+| **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `Contents entry 1` … `6`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
 | **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([Enlaces](enlaces.md)). |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
@@ -30,7 +30,7 @@
 | **Pista** | Columna o fila de un `Grid` o una `Table`. |
 | **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo ([posicionados](../componentes/relative-absolute-fixed.md#absolute)). |
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([Referencias](referencias.md)). |
-| **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Media`, sus `Fixed` y su numeración ([Document](../componentes/document.md#section)). |
+| **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Fixed` y su numeración ([Document](../componentes/document.md#section)). |
 | **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya. |
 | **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([Formato del texto](formato-del-texto.md#tramos)). |

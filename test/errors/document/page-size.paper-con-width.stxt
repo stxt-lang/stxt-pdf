@@ -1,10 +1,10 @@
-# Case: Paper y Width a la vez en el medio
-# Code: MEDIA_SIZE
+# Case: Paper y Width a la vez en Page
+# Code: PAGE_SIZE
 # Line: 9
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Paper: A4
 		Width: 595
 	Section:

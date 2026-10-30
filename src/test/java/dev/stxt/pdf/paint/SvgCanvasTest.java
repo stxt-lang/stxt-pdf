@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Las imágenes en la salida SVG (referencia/componentes/image.md). */
 class SvgCanvasTest {
 
-    private static final String DOC = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+    private static final String DOC = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
             + "\t\tMargin: 20\n\tImage: test/wide.png\n\t\tFit: cover\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
 
     private final LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(DOC)));
@@ -31,7 +31,7 @@ class SvgCanvasTest {
     @Test
     void svgImagesAreEmbeddedAsSvg() {
         LaidOutDocument vector = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(
-                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 20\n\tImage: test/shapes.svg\n")));
         String svg = SvgCanvas.page(vector.pages().get(0), vector.media(), false, new Resources());
         assertTrue(svg.contains("<image x=\"0.00\" y=\"0.00\" width=\"150.00\" height=\"75.00\" "
@@ -41,8 +41,8 @@ class SvgCanvasTest {
     @Test
     void letterSpacingIsAnAttributeOfTheText() {
         LaidOutDocument spaced = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(
-                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
-                + "\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tText: Hola\n\t\tTypography:\n\t\t\tLetter spacing: 1.5\n"
                 + "\tText: Adiós\n")));
         String svg = SvgCanvas.page(spaced.pages().get(0), spaced.media(), false);
@@ -63,7 +63,7 @@ class SvgCanvasTest {
     @Test
     void rotationIsAGroupTransform() {
         LaidOutDocument turned = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(
-                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 20\n\tAbsolute:\n\t\tOffset: 100 auto auto 100\n\t\tRotate: -12.5\n"
                 + "\t\tRotate origin: bottom\n\t\tBox:\n\t\t\tWidth: 40\n\t\t\tHeight: 10\n\t\t\tBackground: #F00\n")));
         String svg = SvgCanvas.page(turned.pages().get(0), turned.media(), false);

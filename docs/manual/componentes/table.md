@@ -6,31 +6,31 @@ Una tabla de filas y columnas. Su cabecera y su pie se repiten en cada página p
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Factura
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Cell
+		For element: Cell
 			Box:
 				Padding: 4 6
 				Border: 0 0 0.5 0
 				Border color: #C8C4BA
-		Element: Head cell
+		For element: Head cell
 			Typography:
-				Weight: bold
+				Bold: true
 				Color: #FFFFFF
 			Box:
 				Background: #12315A
-		Element: Even row cell
+		For element: Even row cell
 			Box:
 				Background: #F4F2EC
-		For class: total
+		For style: total
 			Typography:
-				Weight: bold
+				Bold: true
 	Section:
 		Table:
 			Columns: 1fr 60 80 80
@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 					Cell: 890,00
 			Foot:
 				Row:
-					Class: total
+					Style: total
 					Cell: Total
 						Header: true
 						Span: 1 3
@@ -86,18 +86,18 @@ de pantalla la lee con cada celda de la fila. Las celdas de `Head` ya son cabece
 
 ## Estilo de las celdas
 
-Sin repetir una clase en cada celda:
+Sin repetir un estilo en cada celda:
 
 | Regla | Celdas |
 |---|---|
-| `Element: Cell` | Todas |
-| `Element: Head cell`, `Body cell`, `Foot cell` | Las de la cabecera, el cuerpo o el pie |
-| `Element: Odd row cell`, `Even row cell` | Las de las filas impares o pares del cuerpo (la cebra) |
+| `For element: Cell` | Todas |
+| `For element: Head cell`, `Body cell`, `Foot cell` | Las de la cabecera, el cuerpo o el pie |
+| `For element: Odd row cell`, `Even row cell` | Las de las filas impares o pares del cuerpo (la cebra) |
 | `For column: 3` o `For column: 2 4` | Las que empiezan en esas columnas |
-| `For class: total` con `Class: total` en la `Row` | Las de esa fila |
+| `For style: total` con `Style: total` en la `Row` | Las de esa fila |
 | `Column align` en la `Table` | Una alineación por columna, la más débil de todas |
 
-La `Row` admite `Class` e `Id` (sus reglas `For class` y `For id` se aplican a sus celdas), `Typography` (que heredan sus
+La `Row` admite `Style` e `Id` (sus reglas `For style` y `For id` se aplican a sus celdas), `Typography` (que heredan sus
 celdas) y `Break` (el de la fila). Una celda no admite `Break`: los cortes son de la fila.
 
 ## El aspecto de una fila
@@ -112,20 +112,20 @@ celdas, así que un `Padding` o un `Height` en ella es un error. El `Id` de una 
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Presupuesto
-	Media:
+	Page:
 		Paper: A5
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Cell
+		For element: Cell
 			Box:
 				Padding: 4 6
-		For class: total
+		For style: total
 			Typography:
-				Weight: bold
+				Bold: true
 	Section:
 		Table:
 			Columns: 1fr 80
@@ -136,7 +136,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Border: 0 0 1 0
 					Typography:
-						Weight: bold
+						Bold: true
 					Cell: Concepto
 					Cell: Importe
 			Body:
@@ -149,7 +149,7 @@ Document (dev.stxt.pdf):
 			Foot:
 				Row:
 					Id: total
-					Class: total
+					Style: total
 					Box:
 						Background: #F4F2EC
 						Border: 1 0 0 0

@@ -4,16 +4,16 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		For class: stamp
+		For style: stamp
 			Break:
 				Decoration: clone
 	Section:
 		Relative:
-			Class: stamp
+			Style: stamp
 			Rotate: -8
 			Block:
 				Box:

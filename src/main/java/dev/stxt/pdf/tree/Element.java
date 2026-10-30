@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Elementos de caja del documento (referencia/comun/estructura.md), el marcador que el motor genera para cada {@code
  * List item} (referencia/componentes/list.md) y el flujo de columnas de cada {@code Multicol}
  * (referencia/componentes/multicol.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
- * significado que usan las reglas {@code Element}, los marcadores y las etiquetas del PDF.
+ * significado que usan las reglas {@code For element}, los marcadores y las etiquetas del PDF.
  *
  * <p>La estructura (qué hijos admite cada elemento) está solo en el schema; {@code ElementTest}
  * comprueba que este enum tiene los mismos elementos que él.</p>
@@ -24,7 +24,7 @@ public enum Element {
 
     /**
      * Una sección del documento (referencia/componentes/document.md): un bloque que es la raíz de su propio layout, con
-     * su {@code Media}. Solo es hijo de la raíz del documento.
+     * su {@code Page}. Solo es hijo de la raíz del documento.
      */
     SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
     BLOCK("Block", Layout.BLOCK, Position.STATIC, true, false, 0),
@@ -71,7 +71,7 @@ public enum Element {
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
      * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (referencia/componentes/table.md): una franja que
-     * se pinta debajo de sus celdas. No se nombra en las reglas {@code Element}.
+     * se pinta debajo de sus celdas. No se nombra en las reglas {@code For element}.
      */
     ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
@@ -81,13 +81,13 @@ public enum Element {
     COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
      * Un bloque de código de un {@link #MARKDOWN} (referencia/componentes/markdown.md): un texto preformateado
-     * generado. No se escribe en el documento, pero las reglas {@code Element} lo nombran ({@code Code block}) para
+     * generado. No se escribe en el documento, pero las reglas {@code For element} lo nombran ({@code Code block}) para
      * darle estilo aparte de los {@code Text} (referencia/comun/estilos.md).
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
      * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el título, la
-     * guía y el número de página. No se escriben en el documento, pero las reglas {@code Element} las nombran ({@code
+     * guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las nombran ({@code
      * Contents entry 2}) para darles estilo (referencia/componentes/contents.md).
      */
     CONTENTS_ENTRY_1("Contents entry 1", Layout.FLEX),
@@ -114,19 +114,19 @@ public enum Element {
     private final boolean item;
     private final boolean text;
     private final int headingLevel;
-    /** Generado por el motor, pero con nombre para las reglas {@code Element}. */
+    /** Generado por el motor, pero con nombre para las reglas {@code For element}. */
     private final boolean selectorOnly;
 
     Element(String label, Layout layout, Position position, boolean item, boolean text, int headingLevel) {
         this(label, layout, position, item, text, headingLevel, false);
     }
 
-    /** Un elemento generado que las reglas {@code Element} pueden nombrar. */
+    /** Un elemento generado que las reglas {@code For element} pueden nombrar. */
     Element(String label, Layout layout) {
         this(label, layout, false);
     }
 
-    /** Un elemento generado que las reglas {@code Element} pueden nombrar; {@code text}: lleva texto. */
+    /** Un elemento generado que las reglas {@code For element} pueden nombrar; {@code text}: lleva texto. */
     Element(String label, Layout layout, boolean text) {
         this(label, layout, Position.STATIC, false, text, 0, true);
     }
@@ -152,7 +152,7 @@ public enum Element {
         return Arrays.stream(values()).filter(Element::isWritten).toList();
     }
 
-    /** Los elementos que una regla {@code Element} puede nombrar: los escritos, los bloques de código y las entradas del índice. */
+    /** Los elementos que una regla {@code For element} puede nombrar: los escritos, los bloques de código y las entradas del índice. */
     public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
     }

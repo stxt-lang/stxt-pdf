@@ -18,7 +18,7 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Inline: mark
 
 ```
 Styles:
-	Element: Paragraph
+	For element: Paragraph
 		Typography:
 			Inline: markdown
 Paragraph: El pago se hace en **30 días**, salvo *acuerdo* en contra.
@@ -40,7 +40,7 @@ vale también para el código de un [`Markdown`](../componentes/markdown.md).
 
 ```
 Styles:
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Sans
 			Size: 10
@@ -60,13 +60,13 @@ letra de cada palabra. El texto se escribe normal y la regla lo transforma, así
 
 ```
 Styles:
-	For class: label
+	For style: label
 		Typography:
 			Transform: uppercase
 			Letter spacing: 1
 			Size: 8
 Text: Datos del cliente
-	Class: label
+	Style: label
 ```
 
 ## Versalitas (`Small caps`)

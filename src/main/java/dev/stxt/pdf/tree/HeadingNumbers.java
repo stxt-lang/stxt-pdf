@@ -12,7 +12,7 @@ import java.util.List;
  * contador por nivel que sube con cada encabezado numerado de ese nivel y vuelve a 0 con cualquier
  * encabezado de un nivel superior (numerado o no). Un encabezado con {@code Numbered: false} no
  * cuenta ni lleva número. El número de un encabezado de nivel N son los contadores de los niveles
- * 1 a N que están numerados, cada uno escrito con el {@code Number style} de su encabezado: bajo un título sin número
+ * 1 a N que están numerados, cada uno escrito con el {@code Number format} de su encabezado: bajo un título sin número
  * (un {@code Heading 1}), los {@code Heading 2} numerados son 1, 2, 3…</p>
  */
 final class HeadingNumbers {
@@ -27,7 +27,7 @@ final class HeadingNumbers {
     private final int[] counters = new int[LEVELS + 1];
     /** Si el último encabezado de cada nivel está numerado: el de cada nivel anterior es un antecesor del siguiente. */
     private final boolean[] numbered = new boolean[LEVELS + 1];
-    /** Cómo se escribe el número de cada nivel: el {@code Number style} de su último encabezado. */
+    /** Cómo se escribe el número de cada nivel: el {@code Number format} de su último encabezado. */
     private final NumberStyle[] styles = new NumberStyle[LEVELS + 1];
 
     /**

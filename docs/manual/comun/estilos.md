@@ -5,35 +5,35 @@ Las reglas de `Styles` dan propiedades a muchos elementos a la vez, para no repe
 
 ```
 Styles:
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Sans
 			Size: 10
-	Element: Paragraph
+	For element: Paragraph
 		Box:
 			Margin: 0 0 8 0
-	For class: note
+	For style: note
 		Box:
 			Background: #F1EFE8
 			Padding: 8
 	For id: title
 		Typography:
 			Size: 20
-			Weight: bold
+			Bold: true
 ```
 
 ## Reglas
 
 | Regla | A qué se aplica |
 |---|---|
-| `Element: Document` | A todo el documento: aquí va la tipografía base. Solo admite `Typography` |
-| `Element: Paragraph` (o cualquier otro elemento) | A todos los elementos de ese tipo |
-| `For class: note` | A los elementos con `Class: note` (un elemento puede tener varias clases: `Class: note wide`) |
+| `For element: Document` | A todo el documento: aquí va la tipografía base. Solo admite `Typography` |
+| `For element: Paragraph` (o cualquier otro elemento) | A todos los elementos de ese tipo |
+| `For style: note` | A los elementos con `Style: note` (un elemento puede tener varios estilos: `Style: note wide`) |
 | `For id: title` | Al elemento con `Id: title` |
-| `Element: Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../componentes/table.md)) |
+| `For element: Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../componentes/table.md)) |
 | `For column: 3` (o `For column: 2 4`) | A las celdas que empiezan en esa columna (o columnas) de una tabla |
-| `Element: Code block` | A los bloques de código de un `Markdown` |
-| `Element: Contents entry 1` … `6` | A las entradas de un índice, por nivel ([Contents](../componentes/contents.md)) |
+| `For element: Code block` | A los bloques de código de un `Markdown` |
+| `For element: Contents entry 1` … `6` | A las entradas de un índice, por nivel ([Contents](../componentes/contents.md)) |
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`. Las propiedades propias de un elemento (las columnas de una
 tabla, el marcador de una lista, un enlace…) no van en reglas: se escriben en el elemento.
@@ -44,21 +44,21 @@ Si varias cosas dan la misma propiedad, gana, de más a menos fuerte:
 
 1. lo que declara el propio elemento;
 2. su regla `For id`;
-3. sus reglas `For class` (entre varias, la que va **después** en `Styles`);
+3. sus reglas `For style` (entre varias, la que va **después** en `Styles`);
 4. en las celdas de una tabla, las reglas de su fila, de su columna y de su posición;
-5. su regla `Element`;
+5. su regla `For element`;
 6. lo que hereda de su padre (solo `Typography`);
 7. el valor por defecto.
 
-Las reglas se mezclan propiedad a propiedad: si una regla da `Size` y el elemento declara `Weight`, se aplican las dos. Y
-una regla gana a la herencia: con `Element: Text` y `Size: 10`, un texto mide 10 aunque su padre diga `Size: 20`.
+Las reglas se mezclan propiedad a propiedad: si una regla da `Size` y el elemento declara `Bold`, se aplican las dos. Y
+una regla gana a la herencia: con `For element: Text` y `Size: 10`, un texto mide 10 aunque su padre diga `Size: 20`.
 
-Una clase de `Class` que no tiene su regla `For class` es un error, para que una errata no pase sin verse. En cambio, una
+Un nombre de `Style` que no tiene su regla `For style` es un error, para que una errata no pase sin verse. En cambio, una
 regla que no se aplica a nada no lo es: se puede reutilizar el mismo `Styles` en muchos documentos.
 
 ## La tipografía base
 
-`Font` y `Size` no tienen valor por defecto, así que todo documento los declara, normalmente en `Element: Document`. Todo
+`Font` y `Size` no tienen valor por defecto, así que todo documento los declara, normalmente en `For element: Document`. Todo
 lo demás lo hereda de ahí.
 
 ## Estilos en un fichero aparte
@@ -68,11 +68,11 @@ documento solo con el contenido:
 
 ```
 Styles (dev.stxt.pdf):
-	Element: Document
+	For element: Document
 		Typography:
 			Font: IBM Plex Sans
 			Size: 10
-	For class: panel
+	For style: panel
 		Box:
 			Padding: 10
 ```

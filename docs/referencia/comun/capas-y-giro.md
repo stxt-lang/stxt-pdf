@@ -116,7 +116,7 @@ es `VALUE_NOT_ALLOWED`.
 `Rotate` va entre −360 y 360 grados, sin incluirlos; `0`, `360` y `−360`, que no giran nada, son `VALUE_NOT_ALLOWED`.
 
 > **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni se hereda (aunque lo que
-> contiene la caja gira con ella). *Alternativa descartada:* `Rotate` en `Box`, para poder darlo con una clase.
+> contiene la caja gira con ella). *Alternativa descartada:* `Rotate` en `Box`, para poder darlo con un estilo.
 
 ## Lo que no hay
 

@@ -369,11 +369,11 @@ final class ModelValidator {
     static void font(InlineNode n, Node source, Box box) {
         if (box.style().typography().font() == null) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
-                    + n.getName() + ", de un antecesor o de Styles (Element: Document)");
+                    + n.getName() + ", de un antecesor o de Styles (For element: Document)");
         }
         if (!box.style().isDeclared(FONT_SIZE)) {
             throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
-                    + n.getName() + ", de un antecesor o de Styles (Element: Document)");
+                    + n.getName() + ", de un antecesor o de Styles (For element: Document)");
         }
     }
 }

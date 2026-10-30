@@ -7,16 +7,16 @@ y, al acabar las columnas de una página, continúa en la página siguiente.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Boletín
-	Media:
+	Page:
 		Paper: A4
 		Margin: 50
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Serif
 				Size: 10
 				Align: justify
-		Element: Paragraph
+		For element: Paragraph
 			Box:
 				Margin: 0 0 8 0
 	Section:
@@ -49,7 +49,7 @@ Document (dev.stxt.pdf):
 | `Rule color` | el del texto | El color de esa línea; solo con `Rule` |
 | `Fill` | `balance` | `balance`: en la última página, las columnas quedan igual de altas; `auto`: se llenan en orden |
 
-`Count`, `Column width` o los dos son obligatorios. Admite además `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`.
+`Count`, `Column width` o los dos son obligatorios. Admite además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`.
 
 ## Cómo se comporta
 

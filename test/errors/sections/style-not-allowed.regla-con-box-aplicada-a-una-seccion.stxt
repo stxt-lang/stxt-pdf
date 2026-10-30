@@ -4,17 +4,17 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 595
 		Height: 842
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For class: anexo
+		For style: anexo
 			Box:
 				Padding: 5
 	Section:
-		Class: anexo
+		Style: anexo
 		Text: Hola

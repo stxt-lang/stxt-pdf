@@ -25,7 +25,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [Formato del texto](comun/formato-del-texto.md) | Tramos con formato, `Inline: markdown`, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado, subrayado y tachado |
 | [Páginas y cortes: `Break`](comun/cortes.md) | La fragmentación: oportunidades y elección del corte, viudas y huérfanas, cortes forzados, bordes en los cortes, `{page}` y `{pages}` |
 | [Capas y giro](comun/capas-y-giro.md) | Los contextos de apilamiento, `Layer`, el orden de pintado y `Rotate` |
-| [Reglas reutilizables: `Styles`](comun/estilos.md) | `Element`, `For class`, `For id` y `For column`, la prioridad y el documento de estilos aparte |
+| [Reglas reutilizables: `Styles`](comun/estilos.md) | `For element`, `For style`, `For id` y `For column`, la prioridad y el documento de estilos aparte |
 | [Referencias](comun/referencias.md) | `{page of: id}` y `{number of: id}`, y cómo converge la paginación |
 | [Enlaces](comun/enlaces.md) | `Link` y los enlaces de Markdown: destinos, zonas y PDF etiquetado |
 | [Recursos y fuentes](comun/recursos.md) | La carpeta de recursos, las rutas seguras y cómo se identifican y se comprueban las fuentes |
@@ -40,7 +40,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 
 | Página | Elementos |
 |---|---|
-| [`Document`](componentes/document.md) | `Document`, `Media`, `Title`, `Language` y `Section` |
+| [`Document`](componentes/document.md) | `Document`, `Page`, `Title`, `Language` y `Section` |
 | [`Block`](componentes/block.md) | `Block` y el flujo de bloque, que comparten todos los bloques |
 | [`Text`](componentes/text.md) | `Text` y `Paragraph` |
 | [Encabezados](componentes/heading.md) | `Heading 1` … `Heading 6` y su numeración |

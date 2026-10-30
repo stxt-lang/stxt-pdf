@@ -110,7 +110,7 @@ class ContentsTest {
     @Test
     void entryRulesStyleEachLevel() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
-                "\tStyles:", "\t\tElement: Contents entry 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
+                "\tStyles:", "\t\tFor element: Contents entry 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
                 "\t\t\tTypography:", "\t\t\t\tSize: 10"));
         List<Fragment> entries = entries(l);
         // Solo el nivel 2 lleva sangría: sus hijos, relativos a su caja de contenido, quedan 20 pt más

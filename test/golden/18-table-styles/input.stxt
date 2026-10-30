@@ -12,32 +12,32 @@
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
-	Media:
+	Page:
 		Width: 300
 		Height: 200
 		Margin: 20
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		Element: Cell
+		For element: Cell
 			Box:
 				Padding: 2 4
-		Element: Head cell
+		For element: Head cell
 			Typography:
-				Weight: bold
+				Bold: true
 			Box:
 				Border: 0 0 1 0
-		Element: Foot cell
+		For element: Foot cell
 			Typography:
-				Weight: bold
+				Bold: true
 			Box:
 				Border: 1 0 0 0
-		Element: Odd row cell
+		For element: Odd row cell
 			Box:
 				Background: #F2EEE6
-		Element: Even row cell
+		For element: Even row cell
 			Box:
 				Padding: 4 4
 		For column: 3

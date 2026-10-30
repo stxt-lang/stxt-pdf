@@ -3,7 +3,7 @@
 Un `Contents` es un índice automático: un bloque en flujo, sin hijos, que genera una **entrada por encabezado** de los
 niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los de un `Markdown` y los que están después del
 propio índice, salvo los que declaran `In contents: false` ([Encabezados](heading.md#fuera-del-índice)). Admite `Id`,
-`Class`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un `Markdown`. No admite `Link`: sus entradas ya
+`Style`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un `Markdown`. No admite `Link`: sus entradas ya
 llevan el suyo.
 
 ```
@@ -43,10 +43,10 @@ dibujo, no texto: no se seleccionan ni se leen.
 
 ## Estilo
 
-La entrada hereda la tipografía del `Contents`; sus cajas, la de la entrada. Las reglas `Element: Contents entry 1` …
+La entrada hereda la tipografía del `Contents`; sus cajas, la de la entrada. Las reglas `For element: Contents entry 1` …
 `Contents entry 6` dan `Box`, `Typography` y `Break` a las entradas de un nivel: la sangría de cada nivel es su `Padding`
 izquierdo, y el espacio entre entradas, su `Margin` o su `Padding` vertical. Las propias entradas no llevan `Id` ni
-`Class`.
+`Style`.
 
 > **Decisión:** una regla por nivel, no por parte (`Contents title`…), que sería más fina y más larga de escribir.
 

@@ -22,7 +22,7 @@ class DocumentReaderTest {
     private static String doc(String... boxLines) {
         StringBuilder sb = new StringBuilder(String.join("\n",
                 "Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba",
-                "\tMedia:", "\t\tWidth: 595", "\t\tHeight: 842"));
+                "\tPage:", "\t\tWidth: 595", "\t\tHeight: 842"));
         for (String l : boxLines) {
             sb.append('\n').append(l);
         }
@@ -57,7 +57,7 @@ class DocumentReaderTest {
                 "test/golden/24-svg/input.stxt", "test/golden/25-sections/input.stxt",
                 "test/golden/26-heading-numbers/input.stxt",
                 "test/golden/27-code-block/input.stxt",
-                "test/golden/28-row-class/input.stxt"}) {
+                "test/golden/28-row-style/input.stxt"}) {
             InlineNode root = reader.read(Path.of(file));
             assertEquals("Document", root.getName(), file);
         }
@@ -108,7 +108,7 @@ class DocumentReaderTest {
     void tablesValidateAgainstTheSchema() {
         InlineNode root = reader.read(doc(
                 "\tTable:", "\t\tId: t", "\t\tColumns: 120 1fr 1fr", "\t\tGap: 2",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tWeight: bold",
+                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true",
                 "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
                 "\t\t\t\tCell: Ventas", "\t\t\t\tCell:", "\t\t\t\t\tParagraph: 100", "\t\t\t\tCell:",
@@ -142,7 +142,7 @@ class DocumentReaderTest {
     @Test
     void rootMustDeclareNamespace() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> reader.read("Document:\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842"));
+                () -> reader.read("Document:\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842"));
         assertEquals(1, e.line());
         InvalidModelException twoRoots = assertThrows(InvalidModelException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tId: a") + "\nOther:"));

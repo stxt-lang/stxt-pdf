@@ -22,7 +22,7 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * hasta llenar el hueco, y el número de página, que es un {@code {page of: …}} del encabezado: el
  * mismo mecanismo que escribe el autor, así que se resuelve paginando hasta que converja. Como un
  * encabezado de un {@code Markdown} no tiene {@code Id}, se le da un {@link Box#anchor()} para
- * poder referirlo. Las entradas se estilan con las reglas {@code Element: Contents entry N}.</p>
+ * poder referirlo. Las entradas se estilan con las reglas {@code For element: Contents entry N}.</p>
  */
 final class ContentsBuilder {
 
@@ -86,11 +86,11 @@ final class ContentsBuilder {
         Style s = contents.style();
         if (s.typography().font() == null) {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
-                    + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
+                    + "Typography del Contents, de un antecesor o de Styles (For element: Document)");
         }
         if (!s.isDeclared(PropertyKey.FONT_SIZE)) {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
-                    + "Typography del Contents, de un antecesor o de Styles (Element: Document)");
+                    + "Typography del Contents, de un antecesor o de Styles (For element: Document)");
         }
         List<Box> listed = headings.stream()
                 .filter(h -> h.headingLevel() >= s.contents().from() && h.headingLevel() <= s.contents().to()).toList();

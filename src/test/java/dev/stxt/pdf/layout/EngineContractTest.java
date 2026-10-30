@@ -97,8 +97,8 @@ class EngineContractTest {
      */
     @Test
     void aReusedEngineForgetsTheReservedDigits() {
-        String head = "Document (dev.stxt.pdf):\n\tMedia:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: Cifras\n"
-                + "\tLanguage: es\n\tStyles:\n\t\tElement: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
+        String head = "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: Cifras\n"
+                + "\tLanguage: es\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
                 + "\t\t\t\tSize: 10\n\tSection:\n\t\tText: Página {page}\n\t\t\tId: P\n\t\t\tBox:\n\t\t\t\tWidth: 48\n";
         StringBuilder big = new StringBuilder(head);
         for (int i = 0; i < 100; i++) {

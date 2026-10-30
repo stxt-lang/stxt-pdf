@@ -2,7 +2,7 @@
 
 Un `Multicol` reparte su contenido en **columnas** del mismo ancho, como en una revista: el contenido llena la primera
 columna, sigue en la segunda y, al acabar las columnas de una página, continúa en la primera columna de la página
-siguiente. Admite `Id`, `Class`, `Link`, `Box`, `Typography` y `Break`, como un bloque, y sus propiedades; va donde va un
+siguiente. Admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, como un bloque, y sus propiedades; va donde va un
 elemento en flujo, también dentro de otro `Multicol`.
 
 ```

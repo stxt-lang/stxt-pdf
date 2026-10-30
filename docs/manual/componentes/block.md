@@ -7,15 +7,15 @@ grupo no se parta entre páginas o para que sus hijos hereden una tipografía.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Aviso
-	Media:
+	Page:
 		Paper: A4
 		Margin: 40
 	Styles:
-		Element: Document
+		For element: Document
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For class: warning
+		For style: warning
 			Box:
 				Margin: 12 0
 				Padding: 10 14
@@ -28,15 +28,15 @@ Document (dev.stxt.pdf):
 	Section:
 		Paragraph: Antes de instalar el termostato, corta la corriente.
 		Block:
-			Class: warning
+			Style: warning
 			Paragraph: Atención
 				Typography:
-					Weight: bold
+					Bold: true
 			Paragraph: Trabajar con la corriente conectada puede causar una descarga eléctrica.
 		Paragraph: Después, retira la tapa con cuidado.
 ```
 
-Admite `Id`, `Class`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y `Rotate` (girarlo con todo lo que contiene,
+Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y `Rotate` (girarlo con todo lo que contiene,
 [Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)), y dentro cualquier elemento.
 
 ## Cómo coloca a sus hijos

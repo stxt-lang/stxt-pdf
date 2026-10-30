@@ -176,7 +176,7 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
 `Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
-(`{pages}`) y su `Page style`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `Media`, su sección, su
+(`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `Media`, su sección, su
 `printed` (0 = sin número) y su estilo. Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 

@@ -15,7 +15,7 @@ public enum ErrorCode {
     /** El documento no tiene un único nodo raíz {@code Document} con el namespace del modelo. */
     DOCUMENT_ROOT,
     /** Un tamaño o un margen del medio no válido, o márgenes que no dejan área útil. */
-    MEDIA_SIZE,
+    PAGE_SIZE,
     /** Una {@code Section} sin contenido (solo {@code Fixed}, que no ocupan sitio): no tendría ninguna página. */
     SECTION_EMPTY,
     /** Un texto con {@code {page}} o {@code {pages}} en una página que no tiene número ({@code Page numbering: none}). */
@@ -103,7 +103,7 @@ public enum ErrorCode {
      * puede dibujar.
      */
     IMAGE_FORMAT,
-    /** {@code Page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Page}). */
+    /** {@code Pdf page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Pdf page}). */
     IMAGE_PAGE,
     /** {@code Inside} o {@code Decoration} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,
@@ -129,7 +129,7 @@ public enum ErrorCode {
     CONTENTS_EMPTY,
 
     // --- Reglas reutilizables (Styles) ---------------------------------------------------------
-    /** {@code Element} con un nombre que no es un elemento de caja. */
+    /** {@code For element} con un nombre que no es un elemento de caja. */
     STYLE_UNKNOWN_ELEMENT,
     /** Dos reglas con el mismo selector. */
     STYLE_DUPLICATE,
@@ -138,8 +138,8 @@ public enum ErrorCode {
      * {@code Fixed}, un encabezado, un {@code Text} de un encabezado o una {@code Cell}.
      */
     STYLE_NOT_ALLOWED,
-    /** Una clase de {@code Class} sin regla {@code For class}. */
-    CLASS_WITHOUT_RULE,
+    /** Una clase de {@code Style} sin regla {@code For style}. */
+    STYLE_WITHOUT_RULE,
 
     // --- Combinaciones sin efecto o contradictorias --------------------------------------------
     /** Un {@code Relative} con arriba y abajo, o con izquierda y derecha. */
@@ -152,8 +152,8 @@ public enum ErrorCode {
     START_WITHOUT_RESTART,
     /** Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Radius}) en el {@code Box} de una {@code Row}. */
     ROW_BOX,
-    /** {@code Page style} en una {@code Section} con {@code Page numbering: none}. */
-    PAGE_STYLE_WITHOUT_NUMBERS,
+    /** {@code Page number format} en una {@code Section} con {@code Page numbering: none}. */
+    PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
     /** {@code Begin on: odd} en la primera {@code Section}, que ya empieza en la página 1. */
     BEGIN_ON_FIRST_SECTION,
     /** {@code Lines} sin {@code Wrap: true}. */
@@ -202,7 +202,7 @@ public enum ErrorCode {
     // --- Fuentes ------------------------------------------------------------------------------
     /** {@code Font} no está en la carpeta de fuentes. */
     FONT_UNKNOWN,
-    /** La familia no tiene la variante de {@code Weight} y {@code Style}. */
+    /** La familia no tiene la variante de {@code Bold} y {@code Italic}. */
     FONT_VARIANT_MISSING,
     /** La fuente no tiene un carácter del texto. */
     GLYPH_MISSING,
