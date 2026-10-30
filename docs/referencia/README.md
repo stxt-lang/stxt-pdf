@@ -48,7 +48,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [`Table`](componentes/table.md) | `Table`, `Head`, `Body`, `Foot`, `Row` y `Cell` |
 | [`Flex`](componentes/flex.md) | `Flex` e `Item` |
 | [`Grid`](componentes/grid.md) | `Grid` y `Area` |
-| [`Multicol`](componentes/multicol.md) | `Multicol` |
+| [`Columns`](componentes/columns.md) | `Columns` |
 | [`Relative`, `Absolute` y `Fixed`](componentes/relative-absolute-fixed.md) | Los elementos posicionados |
 | [`Image`](componentes/image.md) | `Image`: PNG, JPEG y SVG |
 | [`Markdown`](componentes/markdown.md) | `Markdown` y el elemento generado `Code block` |

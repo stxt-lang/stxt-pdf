@@ -1,5 +1,5 @@
-# Case: Corte de columna fuera de un Multicol
-# Code: COLUMN_BREAK_OUTSIDE_MULTICOL
+# Case: Línea entre columnas sin hueco
+# Code: SEPARATOR_WIDTH
 # Line: 18
 Document (dev.stxt.pdf):
 	Language: es
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Paragraph: Uno
-			Break:
-				After: column
-		Paragraph: Dos
+		Columns:
+			Count: 2
+			Separator: 0.5
+			Text: Hola

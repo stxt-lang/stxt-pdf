@@ -16,7 +16,7 @@ Document (dev.stxt.pdf):
 		Text: Cuerpo
 		Fixed:
 			Table:
-				Columns: 1fr
+				Column sizes: 1fr
 				Body:
 					Row:
 						Break:

@@ -32,7 +32,7 @@ Document (dev.stxt.pdf):
 				Height: 40
 		Table:
 			Id: t
-			Columns: 100 1fr
+			Column sizes: 100 1fr
 			Gap: 0 10
 			Head:
 				Row:

@@ -33,7 +33,7 @@ class TablesTest {
 
     @Test
     void tableIsAGridWithExplicitPlacement() {
-        Box table = root("\tTable:", "\t\tColumns: 120 1fr 1fr", "\t\tGap: 2 4",
+        Box table = root("\tTable:", "\t\tColumn sizes: 120 1fr 1fr", "\t\tGap: 2 4",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Ventas", "\t\t\t\tCell: 100", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
@@ -55,7 +55,7 @@ class TablesTest {
     /** {@code Header} es de la celda, no se hereda y por defecto es falso (referencia/componentes/table.md). */
     @Test
     void headerMarksTheRowHeaderCells() {
-        Box table = root("\tTable:", "\t\tColumns: 100 100",
+        Box table = root("\tTable:", "\t\tColumn sizes: 100 100",
                 "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: Importe",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120",
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120").children().get(0);
@@ -67,7 +67,7 @@ class TablesTest {
     @Test
     void headerInAHeadCellIsAnError() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tTable:", "\t\tColumns: 100", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
+                () -> root("\tTable:", "\t\tColumn sizes: 100", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
                         "\t\t\t\t\tHeader: true", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa"));
         assertEquals(ErrorCode.TABLE_HEADER, e.errorCode());
         assertEquals(18, e.line());
@@ -75,7 +75,7 @@ class TablesTest {
 
     @Test
     void spansFromAboveTakeTheirColumns() {
-        Box table = root("\tTable:", "\t\tColumns: 1fr 1fr 1fr", "\t\tBody:",
+        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr 1fr", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tSpan: 2 1", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
                 "\t\t\t\t\tSpan: 3 1",
                 "\t\t\tRow:", "\t\t\t\tCell: d",
@@ -87,7 +87,7 @@ class TablesTest {
 
     @Test
     void cellWithoutValueIsABlockOfElements() {
-        Box table = root("\tTable:", "\t\tColumns: 1fr 1fr", "\t\tBody:", "\t\t\tRow:",
+        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr", "\t\tBody:", "\t\t\tRow:",
                 "\t\t\t\tCell:", "\t\t\t\t\tParagraph: Uno", "\t\t\t\t\tList:", "\t\t\t\t\t\tMarker: bullet",
                 "\t\t\t\t\t\tList item:", "\t\t\t\t\t\t\tText: dos",
                 "\t\t\t\tCell:").children().get(0);
@@ -104,7 +104,7 @@ class TablesTest {
     void rowTypographyIsInheritedAndRulesWin() {
         Box table = root("\tStyles:", "\t\tFor element: Cell", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tTable:", "\t\tTypography:", "\t\t\tColor: #333333", "\t\tColumns: 1fr 1fr",
+                "\tTable:", "\t\tTypography:", "\t\t\tColor: #333333", "\t\tColumn sizes: 1fr 1fr",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true", "\t\t\t\t\tSize: 12",
                 "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tBold: false")
                 .children().get(0);
@@ -124,7 +124,7 @@ class TablesTest {
      */
     @Test
     void aRowWithAnIdOrABoxHasItsOwnBox() {
-        Box table = root("\tTable:", "\t\tColumns: 100 100", "\t\tBody:",
+        Box table = root("\tTable:", "\t\tColumn sizes: 100 100", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tId: first", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #C0392B",
                 "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\t\tBorder: 0 0 1 0",
                 "\t\t\t\tCell: a", "\t\t\t\tCell: b",
@@ -160,7 +160,7 @@ class TablesTest {
         Box table = root("\tStyles:", "\t\tFor style: small", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\tFor id: total", "\t\t\tTypography:", "\t\t\t\tSize: 12", "\t\t\t\tBold: true",
                 "\t\tFor id: grand", "\t\t\tTypography:", "\t\t\t\tSize: 14",
-                "\tTable:", "\t\tColumns: 1fr 1fr 1fr", "\t\tBody:",
+                "\tTable:", "\t\tColumn sizes: 1fr 1fr 1fr", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tId: total", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\t\t\tStyle: small", "\t\t\t\tCell: c", "\t\t\t\t\tId: grand").children().get(0);
         assertEquals(List.of(12.0, 12.0, 14.0),
@@ -171,7 +171,7 @@ class TablesTest {
     @Test
     void theBoxOfARowOnlyAdmitsItsLook() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tTable:", "\t\tColumns: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBox:",
+                () -> root("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBox:",
                         "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\t\tHeight: 40", "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.ROW_BOX, e.errorCode());
         // La línea de Height.
@@ -181,14 +181,14 @@ class TablesTest {
     @Test
     void theIdOfARowIsADocumentId() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tParagraph: a", "\t\tId: x", "\tTable:", "\t\tColumns: 100", "\t\tBody:",
+                () -> root("\tParagraph: a", "\t\tId: x", "\tTable:", "\t\tColumn sizes: 100", "\t\tBody:",
                         "\t\t\tRow:", "\t\t\t\tId: x", "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
     }
 
     @Test
     void rowBreakGoesToItsCells() {
-        Box table = root("\tTable:", "\t\tColumns: 1fr 1fr", "\t\tBody:",
+        Box table = root("\tTable:", "\t\tColumn sizes: 1fr 1fr", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tInside: avoid",
                 "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
@@ -203,9 +203,9 @@ class TablesTest {
 
     @Test
     void tablesNestAndGoInItems() {
-        Box root = root("\tFlex:", "\t\tItem:", "\t\t\tTable:", "\t\t\t\tId: t", "\t\t\t\tColumns: auto",
+        Box root = root("\tFlex:", "\t\tItem:", "\t\t\tTable:", "\t\t\t\tId: t", "\t\t\t\tColumn sizes: auto",
                 "\t\t\t\tBody:", "\t\t\t\t\tRow:", "\t\t\t\t\t\tCell:", "\t\t\t\t\t\t\tTable:",
-                "\t\t\t\t\t\t\t\tColumns: auto", "\t\t\t\t\t\t\t\tBody:", "\t\t\t\t\t\t\t\t\tRow:",
+                "\t\t\t\t\t\t\t\tColumn sizes: auto", "\t\t\t\t\t\t\t\tBody:", "\t\t\t\t\t\t\t\t\tRow:",
                 "\t\t\t\t\t\t\t\t\t\tCell: x");
         Box outer = root.children().get(0).children().get(0);
         assertEquals("t", outer.id());

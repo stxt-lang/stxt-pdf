@@ -15,7 +15,7 @@ se obtiene.
 ## Lo que no tiene efecto
 
 Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Lines` o un `Gap` de dos valores
-sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `auto` que no centra, un `Break` dentro de un
+sin `Wrap`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un margen `auto` que no centra, un `Break` dentro de un
 `Absolute`… No lo es, a propósito:
 
 - **Escribir el valor por defecto:** `Span: 1 1`, `Isolate: false`, `Start: 1`. No contradice nada.
@@ -28,7 +28,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 - **Lo que puede llegar después:** una regla que no se aplica a ningún elemento e `Inherit fixed: false` sin `Fixed` en el
   documento. Una plantilla puede añadirlos.
 - **Lo que depende de la maquetación:** un mínimo y un máximo en unidades distintas que chocan (gana el mínimo,
-  [La caja](caja.md#mínimos-y-máximos)) y `Fill: auto` en un `Multicol` sin alto que llenar.
+  [La caja](caja.md#mínimos-y-máximos)) y `Balance: false` en un `Columns` sin alto que llenar.
 - **Las propiedades de un `Markdown` que su contenido no usa** (`Bullet markers` sin listas): el contenido cambia a menudo
   ([Markdown](../componentes/markdown.md)).
 
@@ -36,7 +36,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 
 1. **Sintaxis STXT y schema** ([Estructura](estructura.md#schema)): qué hijos admite cada elemento, cuántos, valores
    vacíos, valores cerrados, enteros y booleanos. Es donde se detecta una propiedad fuera de su elemento (`Offset` en un
-   `Block`, `Columns` en un `Flex`), con los códigos de STXT (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`,
+   `Block`, `Column sizes` en un `Flex`), con los códigos de STXT (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`,
    `TOO_FEW_CHILDREN`, `INVALID_VALUE`…).
 2. **Modelo:** las reglas que el schema no puede expresar, con los códigos de abajo.
 3. **Recursos** ([Recursos](recursos.md)): las fuentes y las imágenes ([Image](../componentes/image.md)).
@@ -52,7 +52,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `SECTION_EMPTY` | Una `Section` tiene contenido: algún elemento que no sea un `Fixed` (línea de la sección) | `La sección no tiene contenido: sin elementos (los Fixed no cuentan…) no tiene ninguna página` |
 | `PAGE_NUMBER_UNAVAILABLE` | Un texto con `{page}` o `{pages}` no sale en una página sin número (`Page numbering: none`); línea del texto | `El texto de la caja pie tiene {page} o {pages} y sale en una página sin número…` |
 | `VALUE_SYNTAX` | Sintaxis de los valores ([Valores](valores.md)), colores (`#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA`), `linear(…)` mal escrito, más de cuatro colores en `Border color` o de cuatro valores en `Radius`, `Aspect ratio`, `For column` que no es un número | `Valor no válido: 12,5 (usa punto decimal…)` |
-| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([Valores](valores.md#tipos-de-valor)); `Gap` con 1 o 2 valores; `Size` > 0; `Count` ≥ 1; `Column width` y `Rule` > 0; `Letter spacing` en puntos; `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet markers` con marcadores sin numerar y `Number markers` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` entre −360 y 360, sin 0 ni las vueltas enteras; `Rotate origin` con una o dos palabras clave, como mucho una por eje; `For column` de menor a mayor; `Number label` con `{number}` una vez | `Width no admite 1fr: usa un número…` |
+| `VALUE_NOT_ALLOWED` | Formas y signos que admite cada propiedad ([Valores](valores.md#tipos-de-valor)); `Gap` con 1 o 2 valores (en `Columns`, 1); `Size` > 0; `Count` ≥ 1; `Min column width` y `Separator` > 0; `Letter spacing` en puntos; `Tab size` ≥ 1; `Title` y `Alt` no vacíos y `Language` una etiqueta BCP 47; `Bullet markers` con marcadores sin numerar y `Number markers` con numeraciones; `Levels` con dos niveles de 1 a 6, el primero no mayor que el último; `Rotate` entre −360 y 360, sin 0 ni las vueltas enteras; `Rotate origin` con una o dos palabras clave, como mucho una por eje; `For column` de menor a mayor; `Number label` con `{number}` una vez | `Width no admite 1fr: usa un número…` |
 | `FIT_CONTENT_TRACK` | `fit-content` no es una pista de grid | `fit-content no es una pista de grid: usa auto…` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Id repetido: a (ya se usa en la línea 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `Un Area contiene exactamente un elemento, y este tiene Block (línea 8) y Text (línea 10)` |
@@ -71,18 +71,18 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `LIST_NUMBER_RANGE` | El número cabe en la numeración: `decimal` desde 0, letras desde 1, romanos de 1 a 3999 (línea del `Start`, del `Number` o del ítem) | `El número 4000 no se puede escribir con Marker: upper-roman, que numera de 1 a 3999` |
 | `LIST_ITEM_WITHOUT_LINE` | Un ítem con marcador empieza con un texto con el que alinearlo (línea de la caja que lo impide) | `El marcador del List item de la línea 10 se alinea con su primera línea, y el ítem empieza con un Flex…` |
 | `TABLE_ORDER` | `Head`, `Body` y `Foot` van en ese orden ([Table](../componentes/table.md)) | `Body va después de Foot: los grupos de una Table van en el orden Head, Body, Foot` |
-| `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Columns`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): añade una Cell, vacía si hace falta, o usa Span` |
+| `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Column sizes`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): añade una Cell, vacía si hace falta, o usa Span` |
 | `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
-| `TABLE_COLUMN_ALIGN` | `Column align` da una alineación por columna de `Columns` (línea del `Column align`) | `Column align da 2 alineaciones y la tabla tiene 3 columnas (Columns): escribe una por columna` |
+| `TABLE_COLUMN_ALIGN` | `Column align` da una alineación por columna de `Column sizes` (línea del `Column align`) | `Column align da 2 alineaciones y la tabla tiene 3 columnas (Columns): escribe una por columna` |
 | `TABLE_HEADER` | `Header: true` no se declara en una celda de `Head`, cuyas celdas ya son cabeceras de columna (línea del `Header`) | `Header no tiene efecto en una celda de Head: las celdas de la cabecera ya son cabeceras de columna` |
 | `CELL_CONTENT` | Una `Cell` tiene texto en el valor o elementos, no las dos cosas | `Una Cell tiene texto en el valor (línea 12) o elementos, no las dos cosas: pon el texto en un Paragraph` |
 | `TABLE_ROW_BREAK` | Las filas de `Head` y `Foot`, que se repiten en cada página, no declaran `Break` | `Las filas de Head se repiten en cada página de la tabla y no se cortan: quita el Break` |
-| `MULTICOL_COLUMNS` | Un `Multicol` declara `Count`, `Column width` o los dos ([Multicol](../componentes/multicol.md)) | `Un Multicol necesita Count, Column width o los dos…` |
-| `COLUMN_RULE_WIDTH` | `Rule` no es más ancha que `Column gap` | `Rule es más ancha que Column gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
-| `SINGLE_COLUMN` | Un `Multicol` con `Count: 1` no declara `Column gap` ni `Rule`, que separan columnas ([Multicol](../componentes/multicol.md)) | `Column gap no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo` |
-| `RULE_COLOR_WITHOUT_RULE` | `Rule color` va con `Rule` | `Rule color no tiene efecto sin Rule, que es la que pinta la línea entre columnas…` |
-| `COLUMN_BREAK_OUTSIDE_MULTICOL` | `Before` y `After: column` solo dentro de un `Multicol` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Multicol: usa page para cortar la página` |
-| `POSITIONED_IN_MULTICOL` | Un `Absolute` o un `Fixed` no va dentro de un `Multicol` | `Un Fixed no puede estar dentro de un Multicol…` |
+| `COLUMNS_WITHOUT_COUNT` | Un `Columns` declara `Count`, `Min column width` o los dos ([Columns](../componentes/columns.md)) | `Un Columns necesita Count, Min column width o los dos…` |
+| `SEPARATOR_WIDTH` | `Separator` no es más ancho que `Gap` | `Separator es más ancho que Gap, que sin declarar es 0: la línea se pintaría sobre las columnas…` |
+| `SINGLE_COLUMN` | Un `Columns` con `Count: 1` no declara `Gap` ni `Separator`, que separan columnas ([Columns](../componentes/columns.md)) | `Gap no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo` |
+| `SEPARATOR_COLOR_WITHOUT_SEPARATOR` | `Separator color` va con `Separator` | `Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas…` |
+| `COLUMN_BREAK_OUTSIDE_COLUMNS` | `Before` y `After: column` solo dentro de un `Columns` (línea del `Before` o el `After`, también de una regla) | `After: column solo tiene efecto dentro de un Columns: usa page para cortar la página` |
+| `POSITIONED_IN_COLUMNS` | Un `Absolute` o un `Fixed` no va dentro de un `Columns` | `Un Fixed no puede estar dentro de un Columns…` |
 | `MARKDOWN_UNSUPPORTED` | El Markdown solo usa el subconjunto de [Markdown](../componentes/markdown.md#el-subconjunto), y una fila de tabla no tiene más celdas que la cabecera; un texto con `Inline: markdown` no tiene, dentro de la línea, imágenes, HTML ni saltos de línea forzados ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)) (línea del bloque o del párrafo) | `Markdown no admite imágenes dentro de un texto (una imagen va sola en su párrafo): solo admite encabezados, párrafos, listas, tablas, bloques de código y…` |
 | `MARKDOWN_PROPERTY_MISSING` | Un `Markdown` con listas con viñetas declara `Bullet markers`; con listas numeradas, `Number markers`; con tablas, `Table columns` (línea de la lista o la tabla) | `La lista necesita Bullet markers en su Markdown (línea 8): el marcador de cada nivel, como Bullet markers: bullet dash` |
 | `CODE_WITHOUT_FONT` | El código, en línea o en un bloque, necesita `Code font` en `Typography`, propia o heredada ([Formato del texto](formato-del-texto.md#código-en-línea)); línea del texto, del párrafo o del bloque | `El código necesita Code font: declárala en el Typography del texto, de un antecesor o de Styles (For element: Document)…` |
@@ -123,7 +123,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
 | `CONTRAST_LOW` | El texto tiene un contraste de 4,5:1 con lo que tiene debajo, o de 3:1 si es grande ([El PDF](pdf.md#contraste)); línea del `Color` del texto, o de su caja si no lo tiene | `El texto de la caja de la línea 12 tiene un contraste de 2,84:1 con su fondo (#999999 sobre #FFFFFF) y necesita 4,5:1…` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
-| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute`, los `Fixed` y lo girado en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Columns`), y los `Absolute`, los `Fixed` y lo girado en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `La cabecera y el pie de la tabla de la línea 8 miden 900 y no dejan sitio al cuerpo en una página vacía…` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `La caja de la línea 9 no cabe en la página y no se puede partir: mide 900 de alto…` |

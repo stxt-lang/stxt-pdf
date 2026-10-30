@@ -99,7 +99,7 @@ class InlineFormatTest {
     @Test
     void cellsAndHeadingTextsToo() {
         Box root = buildInline("\tHeading 1:", "\t\tText: Un *título*", "\tTable:",
-                "\t\tColumns: 100 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Una **celda**", "\t\t\t\tCell: Otra");
+                "\t\tColumn sizes: 100 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Una **celda**", "\t\t\t\tCell: Otra");
         Box heading = root.children().get(0).children().get(0);
         assertEquals("Un título", heading.text());
         assertEquals(List.of(run("Un "), run("título", "i")), heading.formattedRuns());

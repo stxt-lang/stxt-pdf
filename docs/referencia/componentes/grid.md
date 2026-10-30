@@ -6,7 +6,7 @@ El `Grid` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va dond
 
 ```
 Grid:
-	Columns: 1fr 1fr
+	Column sizes: 1fr 1fr
 	Area: 1 2
 		Text: Fila 1, columna 2
 	Area:
@@ -17,8 +17,8 @@ Grid:
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Columns` | lista de pistas | una columna `auto` | Ver [dimensionado de pistas](#dimensionado-de-pistas). |
-| `Rows` | lista de pistas | filas implícitas `auto` | |
+| `Column sizes` | lista de pistas | una columna `auto` | Ver [dimensionado de pistas](#dimensionado-de-pistas). |
+| `Row sizes` | lista de pistas | filas implícitas `auto` | |
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`. |
 | `Areas` | bloque de texto | — | Una fila por línea; nombres separados por espacios; `.` = celda vacía. |
 | `Flow` | `row`, `column` | `row` | Dirección de la colocación automática. |
@@ -46,7 +46,7 @@ automáticamente ocupando dos columnas. `Area:` sin valor equivale a `Area: auto
 
 ## Colocación
 
-1. Se construye la rejilla explícita con `Columns`, `Rows` y `Areas`. Cada nombre de `Areas` debe formar un rectángulo y
+1. Se construye la rejilla explícita con `Column sizes`, `Row sizes` y `Areas`. Cada nombre de `Areas` debe formar un rectángulo y
    todas las filas deben tener el mismo número de celdas.
 2. Se colocan los ítems cuyo `Area` tiene fila y columna, o nombre de área.
 3. Se colocan los demás en orden del árbol con un **cursor** que recorre la rejilla por filas (o por columnas, con

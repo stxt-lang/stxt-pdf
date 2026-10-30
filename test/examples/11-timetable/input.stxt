@@ -52,7 +52,7 @@ Document (dev.stxt.pdf):
 							Color: #55655D
 		Table:
 			Id: timetable
-			Columns: 92 repeat(5, 1fr)
+			Column sizes: 92 repeat(5, 1fr)
 			Gap: 3
 			Box:
 				Margin: 0 0 14 0

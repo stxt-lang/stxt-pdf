@@ -9,8 +9,8 @@ public final class BreakAppeal {
 
     /**
      * Corte forzado de página ({@code Before} o {@code After: page} de {@code Break}): mejor que
-     * cualquier otro, y distinto de un corte perfecto para que un {@code Multicol} no lo tome por
-     * el final de una columna y lo deje pasar hasta la página (referencia/componentes/multicol.md).
+     * cualquier otro, y distinto de un corte perfecto para que un {@code Columns} no lo tome por
+     * el final de una columna y lo deje pasar hasta la página (referencia/componentes/columns.md).
      */
     public static final int FORCED_PAGE = 4;
     /** Corte que no incumple ninguna regla; también el forzado de columna. */

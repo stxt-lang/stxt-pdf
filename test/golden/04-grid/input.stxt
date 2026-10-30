@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Grid:
 			Id: page
-			Columns: 150 1fr
+			Column sizes: 150 1fr
 			Gap: 10 20
 			Areas >>
 				head head
@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 			Id: cards
 			Box:
 				Margin: 20 0 0 0
-			Columns: repeat(3, 1fr)
+			Column sizes: repeat(3, 1fr)
 			Gap: 10
 			Area:
 				Block:

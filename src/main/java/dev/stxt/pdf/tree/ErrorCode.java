@@ -78,14 +78,14 @@ public enum ErrorCode {
     TABLE_HEADER,
 
     // --- Columnas ------------------------------------------------------------------------------
-    /** Un {@code Multicol} sin {@code Count} ni {@code Column width}. */
-    MULTICOL_COLUMNS,
-    /** {@code Rule} más ancha que {@code Column gap}: la línea se pintaría sobre las columnas. */
-    COLUMN_RULE_WIDTH,
-    /** {@code Before} o {@code After: column} fuera de un {@code Multicol}. */
-    COLUMN_BREAK_OUTSIDE_MULTICOL,
-    /** Un {@code Absolute} o un {@code Fixed} dentro de un {@code Multicol}. */
-    POSITIONED_IN_MULTICOL,
+    /** Un {@code Columns} sin {@code Count} ni {@code Min column width}. */
+    COLUMNS_WITHOUT_COUNT,
+    /** {@code Separator} más ancho que {@code Gap}: la línea se pintaría sobre las columnas. */
+    SEPARATOR_WIDTH,
+    /** {@code Before} o {@code After: column} fuera de un {@code Columns}. */
+    COLUMN_BREAK_OUTSIDE_COLUMNS,
+    /** Un {@code Absolute} o un {@code Fixed} dentro de un {@code Columns}. */
+    POSITIONED_IN_COLUMNS,
 
     // --- Markdown ------------------------------------------------------------------------------
     /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes dentro de un texto, código, citas, HTML… */
@@ -172,10 +172,10 @@ public enum ErrorCode {
     GRID_PLACEMENT,
     /** {@code Rotate origin} sin {@code Rotate}. */
     ROTATE_ORIGIN_WITHOUT_ROTATE,
-    /** {@code Column gap} o {@code Rule} en un {@code Multicol} con {@code Count: 1}. */
+    /** {@code Gap} o {@code Separator} en un {@code Columns} con {@code Count: 1}. */
     SINGLE_COLUMN,
-    /** {@code Rule color} sin {@code Rule}. */
-    RULE_COLOR_WITHOUT_RULE,
+    /** {@code Separator color} sin {@code Separator}. */
+    SEPARATOR_COLOR_WITHOUT_SEPARATOR,
     /** {@code Isolate: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
     ISOLATE_IN_ITEM,
     /** Un {@code Break} propio dentro de un {@code Absolute}, un {@code Fixed}, un {@code Relative} girado o una caja girada en flujo. */

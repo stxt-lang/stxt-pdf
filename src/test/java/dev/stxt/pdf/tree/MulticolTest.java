@@ -2,7 +2,6 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.ColumnFill;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -10,12 +9,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Bloques en columnas al construir el árbol (referencia/componentes/multicol.md): propiedades y flujo de columnas. */
+/** Bloques en columnas al construir el árbol (referencia/componentes/columns.md): propiedades y flujo de columnas. */
 class MulticolTest {
 
     private static Box root(String... lines) {
@@ -26,8 +26,8 @@ class MulticolTest {
 
     @Test
     void contentGoesInTheColumnFlow() {
-        Box multicol = root("\tMulticol:", "\t\tId: m", "\t\tCount: 3", "\t\tColumn gap: 12", "\t\tRule: 0.5",
-                "\t\tRule color: #999999", "\t\tFill: auto", "\t\tTypography:", "\t\t\tSize: 9",
+        Box multicol = root("\tColumns:", "\t\tId: m", "\t\tCount: 3", "\t\tGap: 12", "\t\tSeparator: 0.5",
+                "\t\tSeparator color: #999999", "\t\tBalance: false", "\t\tTypography:", "\t\t\tSize: 9",
                 "\t\tParagraph: Uno", "\t\tBlock:", "\t\t\tId: b").children().get(0);
         assertEquals(Element.MULTICOL, multicol.element());
         assertEquals(Layout.MULTICOL, multicol.style().layout());
@@ -36,7 +36,7 @@ class MulticolTest {
         assertEquals(12, multicol.style().multicol().columnGap());
         assertEquals(0.5, multicol.style().multicol().rule());
         assertEquals("#999999", multicol.style().multicol().ruleColor());
-        assertEquals(ColumnFill.AUTO, multicol.style().multicol().fill());
+        assertFalse(multicol.style().multicol().balance());
 
         assertEquals(1, multicol.children().size());
         Box flow = multicol.children().get(0);
@@ -45,24 +45,24 @@ class MulticolTest {
         assertTrue(flow.establishesBlockFormattingContext());
         assertEquals(List.of(Element.PARAGRAPH, Element.BLOCK), flow.children().stream().map(b -> b.element()).toList());
         assertSame(flow, flow.children().get(1).parent());
-        // La tipografía del Multicol llega a su contenido a través del flujo.
+        // La tipografía del Columns llega a su contenido a través del flujo.
         assertEquals(9, flow.children().get(0).style().typography().fontSize());
     }
 
     @Test
     void defaults() {
-        Style s = root("\tMulticol:", "\t\tColumn width: 150", "\t\tText: Hola").children().get(0).style();
+        Style s = root("\tColumns:", "\t\tMin column width: 150", "\t\tText: Hola").children().get(0).style();
         assertNull(s.multicol().count());
         assertEquals(150, s.multicol().columnWidth());
         assertEquals(0, s.multicol().columnGap());
         assertEquals(0, s.multicol().rule());
         assertNull(s.multicol().ruleColor());
-        assertEquals(ColumnFill.BALANCE, s.multicol().fill());
+        assertTrue(s.multicol().balance());
     }
 
     @Test
     void columnBreaksInsideAMulticol() {
-        Box flow = root("\tMulticol:", "\t\tCount: 2", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tAfter: column",
+        Box flow = root("\tColumns:", "\t\tCount: 2", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tAfter: column",
                 "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: column").children().get(0).children().get(0);
         assertEquals(Break.COLUMN, flow.children().get(0).style().breaks().after());
         assertEquals(Break.COLUMN, flow.children().get(1).style().breaks().before());
@@ -73,9 +73,9 @@ class MulticolTest {
     void columnBreakFromARuleOutsideAMulticol() {
         InvalidModelException ex = assertThrows(InvalidModelException.class, () -> root(
                 "\tStyles:", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tBefore: column",
-                "\tMulticol:", "\t\tCount: 2", "\t\tParagraph: Dentro",
+                "\tColumns:", "\t\tCount: 2", "\t\tParagraph: Dentro",
                 "\tParagraph: Fuera"));
-        assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, ex.errorCode());
+        assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_COLUMNS, ex.errorCode());
         assertEquals(14, ex.line());
     }
 }

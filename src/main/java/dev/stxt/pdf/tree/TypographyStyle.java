@@ -61,7 +61,7 @@ public final class TypographyStyle extends StyleGroup {
      * (referencia/comun/tipografia.md), el suyo. Se hereda.
      */
     private Locale locale = Locale.ROOT;
-    /** {@code Color} del texto; también el de los bordes y la línea de un {@code Multicol} que no declaran el suyo. */
+    /** {@code Color} del texto; también el de los bordes y la línea de un {@code Columns} que no declaran el suyo. */
     private String color = "#000000";
     private int widows = 2;
     private int orphans = 2;

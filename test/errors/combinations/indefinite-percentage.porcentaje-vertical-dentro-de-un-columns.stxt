@@ -1,6 +1,6 @@
-# Case: Línea entre columnas más ancha que el hueco
-# Code: COLUMN_RULE_WIDTH
-# Line: 19
+# Case: Porcentaje vertical dentro de un Columns
+# Code: INDEFINITE_PERCENTAGE
+# Line: 22
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,8 +13,10 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
+		Columns:
+			Box:
+				Height: 200
 			Count: 2
-			Column gap: 4
-			Rule: 6
-			Text: Hola
+			Block:
+				Box:
+					Height: 50%

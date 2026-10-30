@@ -3,12 +3,12 @@ package dev.stxt.pdf.layout.multicol;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Número y ancho de las columnas de un {@code Multicol} (referencia/componentes/multicol.md), con el
+ * Número y ancho de las columnas de un {@code Columns} (referencia/componentes/columns.md), con el
  * pseudoalgoritmo de CSS ({@code column-count} y {@code column-width}):
  *
  * <ul>
  *   <li>solo {@code Count}: ese número de columnas, que se reparten el ancho;</li>
- *   <li>solo {@code Column width}: tantas columnas de al menos ese ancho como quepan, y como
+ *   <li>solo {@code Min column width}: tantas columnas de al menos ese ancho como quepan, y como
  *       mínimo una;</li>
  *   <li>los dos: las que quepan, sin pasar de {@code Count}.</li>
  * </ul>
@@ -24,9 +24,9 @@ record Columns(int count, double width, double gap) {
 
     /**
      * @param count     {@code Count}; {@code null} si no se declara
-     * @param width     {@code Column width}; {@code null} si no se declara
-     * @param gap       {@code Column gap}
-     * @param available ancho de la caja de contenido del {@code Multicol}
+     * @param width     {@code Min column width}; {@code null} si no se declara
+     * @param gap       {@code Gap}
+     * @param available ancho de la caja de contenido del {@code Columns}
      */
     static Columns of(Integer count, Double width, double gap, double available) {
         int n;
@@ -41,7 +41,7 @@ record Columns(int count, double width, double gap) {
         return new Columns(n, Math.max(0, (available - (n - 1) * gap) / n), gap);
     }
 
-    /** Posición de la columna {@code column} (desde 0), desde la caja de contenido del {@code Multicol}. */
+    /** Posición de la columna {@code column} (desde 0), desde la caja de contenido del {@code Columns}. */
     double x(int column) {
         return column * (width + gap);
     }

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)),
- * referencia/componentes/multicol.md. Con {@code Count: 2} y {@code Column gap: 15}, las columnas miden 250 y la
+ * referencia/componentes/columns.md. Con {@code Count: 2} y {@code Gap: 15}, las columnas miden 250 y la
  * segunda empieza en x = 305.
  */
 class MulticolLayoutTest {
@@ -30,7 +30,7 @@ class MulticolLayoutTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    /** Un {@code Block} hijo del {@code Multicol} con su alto y, si {@code whole}, {@code Inside: avoid}. */
+    /** Un {@code Block} hijo del {@code Columns} con su alto y, si {@code whole}, {@code Inside: avoid}. */
     static List<String> block(String id, double height, boolean whole, String... more) {
         List<String> lines = new ArrayList<>(List.of("\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:",
                 "\t\t\t\tHeight: " + height));
@@ -41,7 +41,7 @@ class MulticolLayoutTest {
         return lines;
     }
 
-    /** Un {@code Block} hijo del {@code Multicol} con estas propiedades de {@code Box}. */
+    /** Un {@code Block} hijo del {@code Columns} con estas propiedades de {@code Box}. */
     static List<String> sized(String id, boolean whole, String... box) {
         List<String> lines = new ArrayList<>(List.of("\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:"));
         for (String p : box) {
@@ -53,10 +53,10 @@ class MulticolLayoutTest {
         return lines;
     }
 
-    /** Un {@code Multicol} con {@code M} de {@code Id}, sus propiedades y sus bloques. */
+    /** Un {@code Columns} con {@code M} de {@code Id}, sus propiedades y sus bloques. */
     @SafeVarargs
     static String[] multicol(List<String> properties, List<String>... blocks) {
-        List<String> lines = new ArrayList<>(List.of("\tMulticol:", "\t\tId: M"));
+        List<String> lines = new ArrayList<>(List.of("\tColumns:", "\t\tId: M"));
         properties.forEach(p -> lines.add("\t\t" + p));
         for (List<String> b : blocks) {
             lines.addAll(b);
@@ -64,7 +64,7 @@ class MulticolLayoutTest {
         return lines.toArray(String[]::new);
     }
 
-    private static final List<String> TWO = List.of("Count: 2", "Column gap: 15");
+    private static final List<String> TWO = List.of("Count: 2", "Gap: 15");
 
     @Test
     void balancedByDefault() {
@@ -79,7 +79,7 @@ class MulticolLayoutTest {
 
     @Test
     void fillAutoFillsInOrder() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto"), block("A", 30, false),
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
                 block("B", 30, false), block("C", 30, false), block("D", 30, false)));
         assertRect(40, 40, 515, 120, l.rect("M"));
         assertRect(40, 130, 250, 30, l.rect("D"));
@@ -106,7 +106,7 @@ class MulticolLayoutTest {
     @Test
     void columnWidthFitsAsManyColumnsAsPossible() {
         // Tres columnas de 165 con huecos de 10.
-        LayoutFixture l = layOut(multicol(List.of("Column width: 150", "Column gap: 10"), block("A", 30, true),
+        LayoutFixture l = layOut(multicol(List.of("Min column width: 150", "Gap: 10"), block("A", 30, true),
                 block("B", 30, true), block("C", 30, true)));
         assertRect(40, 40, 515, 30, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -116,7 +116,7 @@ class MulticolLayoutTest {
 
     @Test
     void columnBreak() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 3", "Column gap: 10", "Fill: auto"), block("A", 30, false),
+        LayoutFixture l = layOut(multicol(List.of("Count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
                 block("B", 30, false, "\t\t\tBreak:", "\t\t\t\tBefore: column"), block("C", 30, false)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -126,7 +126,7 @@ class MulticolLayoutTest {
 
     @Test
     void textIsBalancedBetweenParagraphs() {
-        LayoutFixture l = layOut("\tMulticol:", "\t\tId: M", "\t\tCount: 2", "\t\tColumn gap: 15", "\t\tText:",
+        LayoutFixture l = layOut("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15", "\t\tText:",
                 "\t\t\tId: T", "\t\t\tContent >>", "\t\t\t\tUno", "", "\t\t\t\tDos", "", "\t\t\t\tTres", "",
                 "\t\t\t\tCuatro");
         assertRect(40, 40, 515, 24, l.rect("M"));
@@ -137,7 +137,7 @@ class MulticolLayoutTest {
 
     @Test
     void heightIsFilledInOrderWithFillAuto() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:",
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
                 block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
@@ -147,7 +147,7 @@ class MulticolLayoutTest {
 
     @Test
     void heightIsBalanced() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Box:", "\tHeight: 100"),
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 100"),
                 block("A", 30, true), block("B", 30, true), block("C", 30, true), block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
         assertRect(305, 40, 250, 30, l.rect("C"));
@@ -155,7 +155,7 @@ class MulticolLayoutTest {
 
     @Test
     void borderAndPaddingSurroundTheColumns() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Box:", "\tPadding: 10",
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 10",
                 "\tBorder: 1"), block("A", 30, true), block("B", 30, true)));
         // Contenido de 493 de ancho: columnas de 239.
         assertRect(40, 40, 515, 52, l.rect("M"));
@@ -174,7 +174,7 @@ class MulticolLayoutTest {
     @Test
     void flexItemIsBalancedAndSizedByItsColumns() {
         List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tCross axis: start", "\t\tItem:"));
-        for (String line : multicol(List.of("Count: 2", "Column gap: 10", "Fill: auto"),
+        for (String line : multicol(List.of("Count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {
             lines.add("\t\t" + line);
@@ -187,7 +187,7 @@ class MulticolLayoutTest {
 
     /** Tres palabras de 40 caracteres (200 pt): una por línea en una columna de 250. */
     private static String[] threeLines(String... typography) {
-        List<String> lines = new ArrayList<>(List.of("\tMulticol:", "\t\tId: M", "\t\tCount: 2", "\t\tColumn gap: 15",
+        List<String> lines = new ArrayList<>(List.of("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15",
                 "\t\tText: " + "a".repeat(40) + " " + "b".repeat(40) + " " + "c".repeat(40), "\t\t\tId: T"));
         if (typography.length > 0) {
             lines.add("\t\t\tTypography:");
@@ -217,18 +217,18 @@ class MulticolLayoutTest {
 
     /**
      * El texto mide 20 (min-content, «aaaa») y 35 (max-content). Con Count: 3 y huecos de 10, tres columnas de
-     * cada uno; con Column width el mínimo es una columna y el máximo, columnas de al menos ese ancho.
+     * cada uno; con Min column width el mínimo es una columna y el máximo, columnas de al menos ese ancho.
      */
     @Test
     void intrinsicWidthsWithThreeColumns() {
         LayoutFixture l = layOut(
-                "\tMulticol:", "\t\tId: min", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tBox:", "\t\t\tWidth: min-content",
+                "\tColumns:", "\t\tId: min", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: min-content",
                 "\t\tText: aaaa bb",
-                "\tMulticol:", "\t\tId: max", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tBox:", "\t\t\tWidth: max-content",
+                "\tColumns:", "\t\tId: max", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: max-content",
                 "\t\tText: aaaa bb",
-                "\tMulticol:", "\t\tId: wmin", "\t\tCount: 3", "\t\tColumn width: 50", "\t\tColumn gap: 10", "\t\tBox:",
+                "\tColumns:", "\t\tId: wmin", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
                 "\t\t\tWidth: min-content", "\t\tText: aaaa bb",
-                "\tMulticol:", "\t\tId: wmax", "\t\tCount: 3", "\t\tColumn width: 50", "\t\tColumn gap: 10", "\t\tBox:",
+                "\tColumns:", "\t\tId: wmax", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
                 "\t\t\tWidth: max-content", "\t\tText: aaaa bb");
         assertEquals(80, l.rect("min").width(), 1e-9);
         assertEquals(125, l.rect("max").width(), 1e-9);
@@ -242,7 +242,7 @@ class MulticolLayoutTest {
      */
     @Test
     void heightWithBorderAndPaddingLeavesTheColumnsTheRest() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Column gap: 15", "Fill: auto", "Box:", "\tHeight: 60",
+        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
                         "\tBorder: 5", "\tPadding: 5"), block("A", 12, true), block("B", 12, true), block("C", 12, true),
                 block("D", 12, true), block("E", 12, true)));
         assertRect(50, 74, 240, 12, l.rect("C"));
@@ -261,7 +261,7 @@ class MulticolLayoutTest {
         assertTrue(two.contains("2 columnas de 30 no bastan"), two);
         // Sin página (un ítem flex no se parte) ni alto, los cortes de columna necesitan más columnas de las que hay.
         String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tFlex:", "\t\tItem:",
-                "\t\t\tMulticol:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
+                "\t\t\tColumns:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
                 "\t\t\t\t\t\tBefore: column")).getMessage();
         assertTrue(breaks.contains("tiene 1 columna y sus cortes"), breaks);
     }

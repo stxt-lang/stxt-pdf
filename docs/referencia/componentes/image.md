@@ -110,7 +110,7 @@ se recorta además con las esquinas redondeadas de su caja de contenido ([La caj
 
 ## Cortes de página
 
-Una imagen no se parte: si no cabe en lo que queda de la página (o de la columna de un `Multicol`), pasa entera a la
+Una imagen no se parte: si no cabe en lo que queda de la página (o de la columna de un `Columns`), pasa entera a la
 siguiente, como una línea de texto. Si no cabe ni en una página entera, es `PAGE_OVERFLOW`, con la línea de su `Height` (o,
 sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja; `Inside` y `Decoration`, que solo cuentan al
 partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla de `Styles`.
@@ -118,7 +118,7 @@ partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla d
 ## Dónde va
 
 Donde va un elemento en flujo: en una sección, `Block`, `Relative`, `Absolute`, `Fixed` (un logotipo que se repite en cada
-página), `Multicol`, `List item` (pero no al principio: el marcador necesita una línea con la que alinearse,
+página), `Columns`, `List item` (pero no al principio: el marcador necesita una línea con la que alinearse,
 `LIST_ITEM_WITHOUT_LINE`), `Cell` y como elemento de un `Item` o un `Area`. En un `Markdown`, una imagen sola en su párrafo
 (`![Alt](ruta)`) es una `Image` ([Markdown](markdown.md)).
 

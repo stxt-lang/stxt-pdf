@@ -54,7 +54,7 @@ class LinksTest {
         Box root = build("\tText: a", "\t\tLink: https://a.example", "\tParagraph: b", "\t\tLink: https://b.example",
                 "\tHeading 1:", "\t\tLink: https://c.example", "\t\tText: C",
                 "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tLink: https://d.example",
-                "\tTable:", "\t\tColumns: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: e", "\t\t\t\t\tLink: https://e.example");
+                "\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: e", "\t\t\t\t\tLink: https://e.example");
         assertEquals("https://a.example", root.children().get(0).style().link());
         assertEquals("https://b.example", root.children().get(1).style().link());
         assertEquals("https://c.example", root.children().get(2).style().link());

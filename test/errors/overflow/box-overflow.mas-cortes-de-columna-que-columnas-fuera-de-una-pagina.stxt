@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Flex:
 			Item:
-				Multicol:
+				Columns:
 					Count: 2
 					Text: A
 					Text: B

@@ -1,24 +1,24 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.model.ColumnFill;
 
 /**
- * Las propiedades de un {@code Multicol} (referencia/componentes/multicol.md): cuántas columnas y de qué ancho, el
+ * Las propiedades de un {@code Columns} (referencia/componentes/columns.md): cuántas columnas y de qué ancho, el
  * hueco y la línea entre ellas y cómo se llenan. No se heredan.
  */
 public final class MulticolStyle extends StyleGroup {
 
-    /** {@code Count}; {@code null} = sin declarar ({@code Column width} fija entonces las columnas). */
+    /** {@code Count}; {@code null} = sin declarar ({@code Min column width} fija entonces las columnas). */
     private Integer count;
-    /** {@code Column width}, en puntos; {@code null} = sin declarar. */
+    /** {@code Min column width}, en puntos; {@code null} = sin declarar. */
     private Double columnWidth;
-    /** {@code Column gap}, en puntos. */
+    /** {@code Gap}, en puntos. */
     private double columnGap = 0;
-    /** Grosor de la línea entre columnas ({@code Rule}); 0 = sin línea. */
+    /** Grosor de la línea entre columnas ({@code Separator}); 0 = sin línea. */
     private double rule = 0;
-    /** {@code Rule color}; {@code null} = el {@code Color} del texto. */
+    /** {@code Separator color}; {@code null} = el {@code Color} del texto. */
     private String ruleColor;
-    private ColumnFill fill = ColumnFill.BALANCE;
+    /** {@code Balance}: iguala las columnas del último fragmento. */
+    private boolean balance = true;
 
     MulticolStyle() {
     }
@@ -68,12 +68,12 @@ public final class MulticolStyle extends StyleGroup {
         ruleColor = v;
     }
 
-    public ColumnFill fill() {
-        return fill;
+    public boolean balance() {
+        return balance;
     }
 
-    void setFill(ColumnFill v) {
+    void setBalance(boolean v) {
         writable();
-        fill = v;
+        balance = v;
     }
 }

@@ -1,4 +1,4 @@
-# Case: Rule con Count: 1, sin columnas entre las que pintar la línea
+# Case: Separator con Count: 1, sin columnas entre las que pintar la línea
 # Code: SINGLE_COLUMN
 # Line: 18
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
+		Columns:
 			Count: 1
-			Rule: 0.5
+			Separator: 0.5
 			Text: Hola

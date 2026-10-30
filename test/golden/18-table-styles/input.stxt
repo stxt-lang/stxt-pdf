@@ -46,7 +46,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Id: t
-			Columns: 100 100 60
+			Column sizes: 100 100 60
 			Column align: left left right
 			Head:
 				Row:

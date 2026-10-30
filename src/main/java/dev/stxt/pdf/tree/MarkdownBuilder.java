@@ -330,7 +330,7 @@ final class MarkdownBuilder {
             Node mode = tableColumns.get();
             String track = mode.getText().trim().equals("equal") ? "1fr" : "auto";
             InlineNode table = node("Table", "", line);
-            table.addChild(node("Columns", "repeat(" + columns + ", " + track + ")", mode.getLine()));
+            table.addChild(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()));
             table.addChild(rows("Head", head));
             table.addChild(rows("Body", body));
             for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {

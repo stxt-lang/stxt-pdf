@@ -75,7 +75,7 @@ class BoxTreeBuilderTest {
     @Test
     void itemAndAreaPropertiesGoToTheirElement() {
         Box root = build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumns: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
+                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumn sizes: 1fr 1fr", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
         Box a = root.children().get(0).children().get(0);
         assertEquals("a", a.id());
         assertEquals(2, a.style().item().grow(), 1e-9);
@@ -266,7 +266,7 @@ class BoxTreeBuilderTest {
     /**
      * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
      * (referencia/comun/errores.md): {@code Isolate: false} en un ítem es el valor por defecto, un {@code Break} que
-     * llega de una regla no se mira, y en las columnas de un {@code Multicol} los cortes tienen efecto aunque esté
+     * llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque esté
      * dentro de un {@code Absolute}.
      */
     @Test
@@ -276,7 +276,7 @@ class BoxTreeBuilderTest {
                 "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
                 "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate: false",
                 "\tAbsolute:", "\t\tParagraph: Sello",
-                "\t\tMulticol:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
+                "\t\tColumns:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
                 "\t\t\tBlock:"));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tFixed:", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: page", "\tBlock:")));

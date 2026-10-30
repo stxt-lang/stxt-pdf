@@ -13,6 +13,6 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
+		Columns:
 			Count: 0
 			Text: Hola

@@ -32,7 +32,7 @@ no caben en lo que queda de página, pasan enteras a la siguiente, y si no caben
 | `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja |
 | `Decoration` | `slice`, `clone` | `slice` | Qué pasa con el borde y el relleno de una caja partida |
 
-`column` es lo mismo que `page` pero dentro de un [`Multicol`](../componentes/multicol.md): salta a la columna siguiente.
+`column` es lo mismo que `page` pero dentro de un [`Columns`](../componentes/columns.md): salta a la columna siguiente.
 
 ```
 Block:
@@ -48,7 +48,7 @@ Block:
 - `Inside: avoid` no impide partir una caja que no cabe ni en una página entera.
 - Los elementos posicionados `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo. Tampoco
   lo que hay dentro de ellos o de una caja girada: un `Break` escrito ahí es un error (salvo en las columnas de un
-  `Multicol`). El que llega de una regla de `Styles` simplemente no tiene efecto.
+  `Columns`). El que llega de una regla de `Styles` simplemente no tiene efecto.
 
 ## Cajas partidas
 

@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * <p>Orden de pintado dentro de un contexto, de abajo arriba:</p>
  * <ol>
- *   <li>Fondo y borde de la caja que crea el contexto (y, en un {@code Multicol}, la línea entre
+ *   <li>Fondo y borde de la caja que crea el contexto (y, en un {@code Columns}, la línea entre
  *       columnas).</li>
  *   <li>Contextos hijos con {@code Layer} negativa, de menor a mayor.</li>
  *   <li>Cajas en flujo en orden del árbol: primero fondos y bordes, después el texto y las
@@ -320,8 +320,8 @@ public final class StackingContext {
     }
 
     /**
-     * La línea entre cada dos columnas con contenido de un fragmento de un {@code Multicol}
-     * (referencia/componentes/multicol.md): centrada en el hueco, desde arriba de la caja de contenido y con el alto de
+     * La línea entre cada dos columnas con contenido de un fragmento de un {@code Columns}
+     * (referencia/componentes/columns.md): centrada en el hueco, desde arriba de la caja de contenido y con el alto de
      * la columna más alta. Sus hijos son las columnas, en orden.
      */
     private static void paintRules(Canvas canvas, Piece p) {

@@ -128,7 +128,7 @@ Los volcados no tienen namespace y se leen con `STXT.rawParser()`.
 - Solo se vuelcan las cajas con `Id`; las descendientes con `Id` se anidan dentro.
 - El marcador de un `List item` con `Id` se vuelca dentro del ítem como `Marker: 3.`, con su `Rect`.
 - Un `Absolute` se anida dentro de su contenedor de referencia, detrás de sus hijos en flujo, y no dentro de su padre.
-- Las columnas de un `Multicol` no tienen fragmento: sus hijos se anidan dentro del `Multicol`, y una caja partida entre dos
+- Las columnas de un `Columns` no tienen fragmento: sus hijos se anidan dentro del `Columns`, y una caja partida entre dos
   columnas sale dos veces en la misma página.
 - Las coordenadas son las de la página de su sección; una `Section` no se vuelca como caja, y los `Fixed` del documento
   salen antes que los de la sección.

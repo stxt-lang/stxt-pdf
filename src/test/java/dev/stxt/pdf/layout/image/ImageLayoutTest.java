@@ -230,7 +230,7 @@ class ImageLayoutTest {
         LayoutFixture f = layOut(
                 "\tGrid:",
                 "\t\tId: G",
-                "\t\tColumns: 200 100",
+                "\t\tColumn sizes: 200 100",
                 "\t\tArea:",
                 "\t\t\tImage: test/wide.png",
                 "\t\t\t\tId: I",
@@ -298,7 +298,7 @@ class ImageLayoutTest {
     void anImageInATableCell() {
         LayoutFixture f = layOut(
                 "\tTable:",
-                "\t\tColumns: 100 1fr",
+                "\t\tColumn sizes: 100 1fr",
                 "\t\tBody:",
                 "\t\t\tRow:",
                 "\t\t\t\tCell:",
@@ -314,10 +314,10 @@ class ImageLayoutTest {
     @Test
     void anImageThatDoesNotFitInAColumnMovesToTheNext() {
         LayoutFixture f = layOut(
-                "\tMulticol:",
+                "\tColumns:",
                 "\t\tId: M",
                 "\t\tCount: 2",
-                "\t\tFill: auto",
+                "\t\tBalance: false",
                 "\t\tBox:",
                 "\t\t\tHeight: 100",
                 "\t\tImage: test/wide.png",

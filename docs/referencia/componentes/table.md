@@ -12,7 +12,7 @@ Styles:
 			Padding: 2 4
 			Border: 0 0 0.5 0
 Table:
-	Columns: 120 1fr 1fr
+	Column sizes: 120 1fr 1fr
 	Head:
 		Row:
 			Typography:
@@ -33,8 +33,8 @@ Table:
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Columns` | lista de pistas | — (obligatorio) | `Table` | Las columnas, como en `Grid` ([Grid](grid.md#dimensionado-de-pistas)). |
-| `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Columns` (`TABLE_COLUMN_ALIGN`). |
+| `Column sizes` | lista de pistas | — (obligatorio) | `Table` | Las columnas, como en `Grid` ([Grid](grid.md#dimensionado-de-pistas)). |
+| `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`TABLE_HEADER`). |
@@ -45,7 +45,7 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 ## Una tabla es un grid
 
-`Columns` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones, `minmax`…, y
+`Column sizes` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones, `minmax`…, y
 `Gap` separa las celdas. Las filas son pistas `auto`: cada una mide lo que su celda más alta, y las celdas se estiran a su
 fila. Cada celda es un ítem del grid colocado explícitamente: va en la primera columna libre de su fila, y ocupa las filas
 y columnas de su `Span` (`Span: 1 3` ocupa tres columnas). Una columna está ocupada si la ocupa una celda de una fila de
@@ -79,7 +79,7 @@ una:
 - **Por columna.** `For column: 3` (o `For column: 2 4`, de la 2 a la 4) se aplica a las celdas que **empiezan** en esas
   columnas, en cualquier grupo: una celda con `Span` de varias columnas es de la columna donde empieza.
 - **`Column align`.** Un `Column align: left right right` de la `Table` da una alineación a cada columna (tantas como
-  `Columns`). Es solo el valor por defecto del `Align` de las celdas: lo sobrescriben las reglas de posición, de columna,
+  `Column sizes`). Es solo el valor por defecto del `Align` de las celdas: lo sobrescriben las reglas de posición, de columna,
   de estilo y de `Id`, y lo que declara la propia celda.
 - **Por fila.** El `Style` de una `Row` da a cada una de sus celdas las reglas `For style` de esos estilos (el pie de
   totales de una factura: `Style: total` en la `Row`, no en cada celda), y la regla `For id` de su `Id`, la suya.

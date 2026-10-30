@@ -28,8 +28,8 @@ class TableFragmentationTest {
 
     private static String[] table(String gap) {
         return gap == null
-                ? new String[]{"\tTable:", "\t\tId: T", "\t\tColumns: 1fr"}
-                : new String[]{"\tTable:", "\t\tId: T", "\t\tColumns: 1fr", "\t\tGap: " + gap};
+                ? new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: 1fr"}
+                : new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: 1fr", "\t\tGap: " + gap};
     }
 
     private static String[] group(String name) {
@@ -73,7 +73,7 @@ class TableFragmentationTest {
      */
     @Test
     void theBandOfARowSpansItsColumnsAndItsHeight() {
-        LayoutFixture l = LayoutFixture.layOut("\tTable:", "\t\tId: T", "\t\tColumns: 100 100", "\t\tGap: 10",
+        LayoutFixture l = LayoutFixture.layOut("\tTable:", "\t\tId: T", "\t\tColumn sizes: 100 100", "\t\tGap: 10",
                 "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tId: R1", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 20",
                 "\t\t\t\tCell:",

@@ -1,6 +1,6 @@
-# Case: Porcentaje vertical dentro de un Multicol
-# Code: INDEFINITE_PERCENTAGE
-# Line: 22
+# Case: Fixed dentro de un Columns
+# Code: POSITIONED_IN_COLUMNS
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,10 +13,8 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
-			Box:
-				Height: 200
+		Columns:
 			Count: 2
 			Block:
-				Box:
-					Height: 50%
+				Fixed:
+					Text: Nota

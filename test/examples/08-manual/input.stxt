@@ -119,7 +119,7 @@ Document (dev.stxt.pdf):
 			Text: En la caja
 		Grid:
 			Id: contents
-			Columns: repeat(3, 1fr)
+			Column sizes: repeat(3, 1fr)
 			Gap: 10
 			Box:
 				Margin: 0 0 4 0
@@ -216,7 +216,7 @@ Document (dev.stxt.pdf):
 				Text: Referencia de los bornes
 			Table:
 				Id: terminals
-				Columns: 56 1fr 100
+				Column sizes: 56 1fr 100
 				Head:
 					Row:
 						Cell: Borne
@@ -282,7 +282,7 @@ Document (dev.stxt.pdf):
 			Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica:
 			Table:
 				Id: schedule
-				Columns: 1fr 1fr 1fr
+				Column sizes: 1fr 1fr 1fr
 				Box:
 					Margin: 0 0 12 0
 				Head:
@@ -327,7 +327,7 @@ Document (dev.stxt.pdf):
 				Text: Especificaciones técnicas
 			Table:
 				Id: specs
-				Columns: 150 1fr
+				Column sizes: 150 1fr
 				Body:
 					Row:
 						Cell: Alimentación
@@ -358,11 +358,11 @@ Document (dev.stxt.pdf):
 			Id: support
 			Heading 2:
 				Text: Garantía y soporte
-			Multicol:
+			Columns:
 				Count: 2
-				Column gap: 26
-				Rule: 0.5
-				Rule color: #BFD9D7
+				Gap: 26
+				Separator: 0.5
+				Separator color: #BFD9D7
 				Box:
 					Margin: 0 0 12 0
 				Markdown:
@@ -376,7 +376,7 @@ Document (dev.stxt.pdf):
 						Cuando termine su vida útil, no tires el termostato a la basura doméstica. Llévalo a un punto limpio o entrégalo en cualquier tienda al comprar uno nuevo. Las pilas se reciclan por separado.
 			Grid:
 				Id: contact
-				Columns: repeat(3, 1fr)
+				Column sizes: repeat(3, 1fr)
 				Gap: 10
 				Area:
 					Block:

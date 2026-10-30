@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 				Background: #F1EFE8
 	Section:
 		Grid:
-			Columns: 150 1fr
+			Column sizes: 150 1fr
 			Gap: 20
 			Areas >>
 				head head
@@ -60,8 +60,8 @@ El `Area` admite además `Horizontal` y `Vertical` (la alineación del ítem en 
 
 | Propiedad | Por defecto | Qué hace |
 |---|---|---|
-| `Columns` | una columna | El ancho de cada columna |
-| `Rows` | lo que mida cada fila | El alto de cada fila |
+| `Column sizes` | una columna | El ancho de cada columna |
+| `Row sizes` | lo que mida cada fila | El alto de cada fila |
 | `Gap` | `0` | El hueco entre celdas (con dos valores: entre filas y entre columnas) |
 | `Areas` | — | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
 | `Flow` | `row` | Si los ítems sin sitio fijo se colocan por filas (`row`) o por columnas (`column`) |
@@ -82,7 +82,7 @@ Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de
 | `repeat(3, 1fr)` | tres columnas `1fr` |
 
 Primero se colocan las columnas fijas y las `auto`, y lo que sobra se reparte entre las fracciones. Las filas miden lo que su
-ítem más alto, salvo que declares `Rows`; las filas en porcentaje necesitan un `Height` en el `Grid`.
+ítem más alto, salvo que declares `Row sizes`; las filas en porcentaje necesitan un `Height` en el `Grid`.
 
 ## Cómo se comporta
 

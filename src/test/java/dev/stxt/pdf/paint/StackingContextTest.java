@@ -240,14 +240,14 @@ class StackingContextTest {
     }
 
     /**
-     * La línea entre columnas va con el fondo del {@code Multicol}, y solo entre columnas con
+     * La línea entre columnas va con el fondo del {@code Columns}, y solo entre columnas con
      * contenido: tres columnas de 165 con huecos de 10 y dos bloques, una sola línea, centrada en
      * el primer hueco y con el alto de la columna más alta.
      */
     @Test
     void multicolRuleBetweenColumnsWithContent() {
-        Recorder r = record("\tMulticol:", "\t\tCount: 3", "\t\tColumn gap: 10", "\t\tRule: 2",
-                "\t\tRule color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
+        Recorder r = record("\tColumns:", "\t\tCount: 3", "\t\tGap: 10", "\t\tSeparator: 2",
+                "\t\tSeparator color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #111", "\t\t\tBreak:",
                 "\t\t\t\tInside: avoid",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tBackground: #222", "\t\t\tBreak:",
@@ -258,7 +258,7 @@ class StackingContextTest {
 
     @Test
     void ruleColorIsTheTextColorByDefault() {
-        Recorder r = record("\tMulticol:", "\t\tCount: 2", "\t\tColumn gap: 10", "\t\tRule: 1",
+        Recorder r = record("\tColumns:", "\t\tCount: 2", "\t\tGap: 10", "\t\tSeparator: 1",
                 "\t\tTypography:", "\t\t\tColor: #00F",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid");
@@ -459,7 +459,7 @@ class StackingContextTest {
      */
     @Test
     void theBandOfARowIsPaintedUnderItsCells() {
-        Recorder r = record("\tTable:", "\t\tColumns: 100 100", "\t\tBody:",
+        Recorder r = record("\tTable:", "\t\tColumn sizes: 100 100", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEE", "\t\t\t\tCell:",
                 "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tBackground: #111", "\t\t\t\tCell:",
                 "\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10",

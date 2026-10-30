@@ -36,12 +36,12 @@ final class BuildContext {
     final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Si se está construyendo el contenido de un {@code Fixed}. */
     boolean insideFixed;
-    /** Si se está construyendo el contenido de un {@code Multicol}. */
+    /** Si se está construyendo el contenido de un {@code Columns}. */
     boolean insideMulticol;
     /**
      * La caja que no se parte entre páginas ({@code un Absolute}, {@code un Fixed} o {@code un Relative girado}) cuyo
      * contenido se está construyendo, o {@code null}: dentro, un {@code Break} no tiene efecto, salvo en las columnas
-     * de un {@code Multicol} (referencia/comun/cortes.md).
+     * de un {@code Columns} (referencia/comun/cortes.md).
      */
     String unbreakable;
     /**

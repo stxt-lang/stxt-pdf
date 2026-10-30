@@ -243,7 +243,7 @@ class StylesFileTest {
         // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Head cell del documento.
         String styles = BASE + "\tFor element: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
         Box table = root(styles, "\tStyles:", "\t\tFor element: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tTable:", "\t\tColumns: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
+                "\tTable:", "\t\tColumn sizes: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
         assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().box().padding());
         assertEquals(Sides.all(Value.pt(7)), table.children().get(1).style().box().padding());

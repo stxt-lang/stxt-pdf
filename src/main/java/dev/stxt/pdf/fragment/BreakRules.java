@@ -134,7 +134,7 @@ public final class BreakRules {
 
     /**
      * El corte forzado entre dos cajas hermanas en flujo: {@code PAGE}, {@code COLUMN} (solo
-     * dentro de un {@code Multicol}) o {@code AUTO} si no hay ninguno. Si hay de los dos, gana el
+     * dentro de un {@code Columns}) o {@code AUTO} si no hay ninguno. Si hay de los dos, gana el
      * de página.
      */
     public static Break forcedBetween(Box before, Box after) {
@@ -144,7 +144,7 @@ public final class BreakRules {
     /**
      * El corte forzado antes de la caja ({@code Before} de {@code Break}) o, si es un bloque, de
      * su primer hijo en flujo: como en CSS, el corte forzado del primer hijo se propaga al padre,
-     * porque los dos empiezan en el mismo punto. De un {@code Multicol} solo sale el de página:
+     * porque los dos empiezan en el mismo punto. De un {@code Columns} solo sale el de página:
      * el de columna se queda en su primera columna.
      *
      * @return {@code PAGE}, {@code COLUMN} o {@code AUTO}
@@ -176,12 +176,12 @@ public final class BreakRules {
         return forced == Break.PAGE ? BreakAppeal.FORCED_PAGE : BreakAppeal.PERFECT_BREAK;
     }
 
-    /** Los cortes forzados de un bloque y de un {@code Multicol} son también los de sus hijos de los extremos. */
+    /** Los cortes forzados de un bloque y de un {@code Columns} son también los de sus hijos de los extremos. */
     private static boolean propagates(Box box) {
         return box.style().layout() == Layout.BLOCK || box.style().layout() == Layout.MULTICOL;
     }
 
-    /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Multicol}, solo el de página. */
+    /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Columns}, solo el de página. */
     private static Break fromInside(Box box, Break forced) {
         return box.style().layout() == Layout.MULTICOL && forced == Break.COLUMN ? Break.AUTO : forced;
     }

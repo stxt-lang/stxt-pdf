@@ -125,7 +125,7 @@ public final class Style extends StyleGroup {
         return list;
     }
 
-    /** Las de {@code Multicol} (referencia/componentes/multicol.md). */
+    /** Las de {@code Columns} (referencia/componentes/columns.md). */
     public MulticolStyle multicol() {
         return multicol;
     }
@@ -242,7 +242,7 @@ public final class Style extends StyleGroup {
     // --- Líneas de las propiedades -------------------------------------------------------------------
     /**
      * Línea de cada propiedad declarada, por su clave ({@link PropertyKey}): el nombre canónico ({@code "height"}; las
-     * de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.rows"}). Es del documento o, si la
+     * de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.row-sizes"}). Es del documento o, si la
      * propiedad llega de una regla suya, del documento de estilos aparte. Las de {@link #LINED_PROPERTIES} se heredan
      * con su valor, para señalar dónde se declaró.
      */

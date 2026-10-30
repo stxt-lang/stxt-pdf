@@ -1,6 +1,6 @@
-# Case: Línea entre columnas sin hueco
-# Code: COLUMN_RULE_WIDTH
-# Line: 18
+# Case: Línea entre columnas más ancha que el hueco
+# Code: SEPARATOR_WIDTH
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,7 +13,8 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
+		Columns:
 			Count: 2
-			Rule: 0.5
+			Gap: 4
+			Separator: 6
 			Text: Hola

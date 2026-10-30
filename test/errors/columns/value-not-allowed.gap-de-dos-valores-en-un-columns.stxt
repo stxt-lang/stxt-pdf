@@ -1,6 +1,6 @@
-# Case: Multicol sin Count ni Column width
-# Code: MULTICOL_COLUMNS
-# Line: 16
+# Case: Gap de dos valores en un Columns, que solo tiene hueco entre columnas
+# Code: VALUE_NOT_ALLOWED
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,6 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
-			Column gap: 12
+		Columns:
+			Count: 2
+			Gap: 10 20
 			Text: Hola

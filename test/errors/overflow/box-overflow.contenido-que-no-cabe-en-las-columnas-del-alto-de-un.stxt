@@ -1,4 +1,4 @@
-# Case: Contenido que no cabe en las columnas del alto de un Multicol
+# Case: Contenido que no cabe en las columnas del alto de un Columns
 # Code: BOX_OVERFLOW
 # Line: 18
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
+		Columns:
 			Box:
 				Height: 50
 			Count: 2

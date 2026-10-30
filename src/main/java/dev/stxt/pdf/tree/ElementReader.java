@@ -174,7 +174,7 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Multicol} (referencia/componentes/multicol.md): su contenido va en su flujo de columnas, una caja de
+     * Un {@code Columns} (referencia/componentes/columns.md): su contenido va en su flujo de columnas, una caja de
      * bloque generada que es su único hijo y de la que cada columna es un fragmento. Crea un contexto de formato de
      * bloque, para que los márgenes no salgan de las columnas, y su alto no es definido: lo decide el reparto en
      * columnas.

@@ -59,8 +59,8 @@ import java.util.Set;
  * sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, referencia/componentes/list.md), {@code
  * Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y {@code TD} para las tablas
  * (referencia/componentes/table.md), {@code Figure} para las imágenes con {@code Alt} (con su texto alternativo y su
- * {@code BBox}, referencia/componentes/image.md) y {@code Div} para el resto, también un {@code Multicol}
- * (referencia/componentes/multicol.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
+ * {@code BBox}, referencia/componentes/image.md) y {@code Div} para el resto, también un {@code Columns}
+ * (referencia/componentes/columns.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
  * contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del elemento de su caja; una caja partida
  * entre páginas tiene contenido en varias. Los fondos, los bordes, las imágenes sin {@code Alt} (decorativas) y los
  * {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
@@ -157,7 +157,7 @@ final class PdfStructure {
 
     /**
      * Elementos de la caja y de sus descendientes, salvo los {@code Fixed}. El flujo de columnas
-     * de un {@code Multicol} no tiene elemento: su contenido cuelga del {@code Multicol}.
+     * de un {@code Columns} no tiene elemento: su contenido cuelga del {@code Columns}.
      */
     private void build(Box box, PDStructureNode parent) {
         if (box.role() == Role.FLOW) {

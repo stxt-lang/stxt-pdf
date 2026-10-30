@@ -199,7 +199,7 @@ class PositioningTest {
                 + "\t\t\t\t\t\tId: %s\n\t\t\t\t\t\tText: aaa";
         LayoutFixture flex = layOut("\tRelative:", "\t\tFlex:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
         assertRect(48, 48, 15, 12, flex.rect("F"));
-        LayoutFixture grid = layOut("\tRelative:", "\t\tGrid:", "\t\t\tColumns: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
+        LayoutFixture grid = layOut("\tRelative:", "\t\tGrid:", "\t\t\tColumn sizes: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
                 inner.formatted("G"));
         assertRect(48, 48, 15, 12, grid.rect("G"));
     }

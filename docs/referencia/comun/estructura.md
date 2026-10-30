@@ -17,7 +17,7 @@ propiedades que tienen sentido en ellos. El motor calcula la posición y el tama
 ## Elementos
 
 Cada elemento solo admite los hijos que tienen sentido en él: sus propiedades y, si es un contenedor, otros elementos. Lo
-define el [schema](#schema), así que una propiedad fuera de su sitio (`Columns` en un `Flex`, `Offset` en un `Block`) es
+define el [schema](#schema), así que una propiedad fuera de su sitio (`Column sizes` en un `Flex`, `Offset` en un `Block`) es
 un error al leer el documento, también en el editor.
 
 La raíz es `Document`, con exactamente un `Page`, un `Title` y un `Language`, un `Styles` opcional con las reglas
@@ -40,7 +40,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Head`, `Body`, `Foot` | Cabecera, cuerpo y pie de una `Table` | Una o varias `Row` |
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
-| `Multicol` | Bloque cuyo contenido fluye por varias columnas ([Multicol](../componentes/multicol.md)) | Elementos en flujo |
+| `Columns` | Bloque cuyo contenido fluye por varias columnas ([Columns](../componentes/columns.md)) | Elementos en flujo |
 | `Markdown` | Contenido escrito en Markdown ([Markdown](../componentes/markdown.md)) | Su texto en `Content` |
 | `Image` | Imagen PNG, JPEG o SVG, o una página de un PDF ([Image](../componentes/image.md)) | Nada: la ruta va en el valor |
 | `Table of contents` | Índice automático ([Table of contents](../componentes/table-of-contents.md)) | Nada: las entradas las genera el motor |
@@ -153,7 +153,7 @@ Cada elemento decide **cómo coloca a sus hijos**:
 | `Section` (el área útil), `Block`, `Relative`, `Absolute`, `Fixed`, encabezados, `List`, `List item`, `Markdown`, `Table of contents`, `Cell` con elementos | En flujo de bloque ([Block](../componentes/block.md#el-flujo-de-bloque)) |
 | `Flex` | En líneas ([Flex](../componentes/flex.md)) |
 | `Grid`, `Table` | En una rejilla ([Grid](../componentes/grid.md), [Table](../componentes/table.md)) |
-| `Multicol` | En columnas, cada una en flujo de bloque ([Multicol](../componentes/multicol.md)) |
+| `Columns` | En columnas, cada una en flujo de bloque ([Columns](../componentes/columns.md)) |
 | `Text`, `Paragraph`, `Cell` con valor | Sin hijos: reparte su texto en líneas ([Tipografía](tipografia.md#el-reparto-en-líneas)) |
 | `Image` | Sin hijos: su contenido es la imagen ([Image](../componentes/image.md)) |
 
@@ -180,16 +180,16 @@ vez; los elementos, las veces que se quiera.
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate`, `Rotate`; elementos |
 | `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Main axis`, `Cross axis`, `Lines`; `Item`, `Absolute`, `Fixed` |
-| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns`, `Rows`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
+| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Absolute`, `Fixed` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
 | `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Columns` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
-| `Multicol` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Column width`, `Column gap`, `Rule`, `Rule color`, `Fill`; elementos en flujo |
+| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
@@ -202,7 +202,7 @@ vez; los elementos, las veces que se quiera.
 | `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Inside`, `Decoration` |
 
-*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`,
+*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Relative`, `Absolute` y `Fixed`; *elementos en flujo*, todos menos `Absolute` y `Fixed`.
 
 Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`;

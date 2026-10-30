@@ -162,7 +162,7 @@ class BreakRulesTest {
         assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.forcedAppeal(Break.COLUMN));
     }
 
-    /** De un {@code Multicol} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él. */
+    /** De un {@code Columns} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él. */
     @Test
     void aMulticolOnlyPropagatesPageBreaks() {
         Box multicol = box(Element.MULTICOL, Break.AUTO, Break.AUTO);

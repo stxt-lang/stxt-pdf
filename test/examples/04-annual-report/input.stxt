@@ -178,7 +178,7 @@ Document (dev.stxt.pdf):
 				Text: Hitos del año
 			Grid:
 				Id: milestones
-				Columns: repeat(4, 1fr)
+				Column sizes: repeat(4, 1fr)
 				Gap: 14
 				Area:
 					Block:
@@ -211,7 +211,7 @@ Document (dev.stxt.pdf):
 				Text: Un año en cifras
 			Grid:
 				Id: tiles
-				Columns: repeat(3, 1fr)
+				Column sizes: repeat(3, 1fr)
 				Gap: 12
 				Box:
 					Margin: 0 0 18 0
@@ -286,12 +286,12 @@ Document (dev.stxt.pdf):
 				Text: Clientes y comunidad
 			Paragraph: Una cooperativa existe para quien la usa. Este año hemos atendido a 8.412 clientes, el 46 % de ellos hogares.
 				Style: lead
-			Multicol:
+			Columns:
 				Id: community
 				Count: 2
-				Column gap: 26
-				Rule: 0.5
-				Rule color: #C9D5E3
+				Gap: 26
+				Separator: 0.5
+				Separator color: #C9D5E3
 				Box:
 					Margin: 0 0 14 0
 				Markdown:
@@ -328,7 +328,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Table:
 				Id: accounts
-				Columns: 1fr 80 80 80
+				Column sizes: 1fr 80 80 80
 				Column align: left right right right
 				Box:
 					Margin: 0 0 18 0
@@ -424,7 +424,7 @@ Document (dev.stxt.pdf):
 				Text: Indicadores ambientales
 			Table:
 				Id: indicators
-				Columns: 1fr 70 70 70
+				Column sizes: 1fr 70 70 70
 				Column align: left right right right
 				Head:
 					Row:
@@ -466,7 +466,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Table:
 				Id: board
-				Columns: 1fr 1fr 104
+				Column sizes: 1fr 1fr 104
 				Column align: left left right
 				Box:
 					Margin: 0 0 18 0
@@ -518,7 +518,7 @@ Document (dev.stxt.pdf):
 				Text: Calendario 2026
 			Table:
 				Id: calendar
-				Columns: 170 1fr 1fr 1fr 1fr
+				Column sizes: 170 1fr 1fr 1fr 1fr
 				Column align: left right right right right
 				Box:
 					Margin: 0 0 6 0

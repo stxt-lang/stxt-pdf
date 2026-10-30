@@ -7,7 +7,7 @@
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus márgenes horizontales
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija su `Height`, su `Max height`,
-  su `Aspect ratio` o, en un `Grid`, sus filas de tamaño fijo (`BOX_OVERFLOW`), en la línea de esa propiedad (`Rows` para
+  su `Aspect ratio` o, en un `Grid`, sus filas de tamaño fijo (`BOX_OVERFLOW`), en la línea de esa propiedad (`Row sizes` para
   las filas; si declara varias, la primera de esta lista);
 - **algo del flujo que no cabe en el área útil de una página y no se puede partir** (`PAGE_OVERFLOW`), en la línea de lo
   que impide partirlo: su `Padding` o su `Border` si el relleno y el borde del fragmento ya no caben en la página; si no,
@@ -25,8 +25,8 @@
 - **el marcador de una lista que no cabe en su sangría** (`LIST_MARKER_OVERFLOW`, [List](../componentes/list.md#posición));
 - **una tabla cuya cabecera y pie no dejan sitio al cuerpo** al principio de una página (`TABLE_REPEAT_OVERFLOW`,
   [Table](../componentes/table.md#cortes)), en la línea de la `Table`;
-- **el contenido de un `Multicol` que no cabe en sus columnas** y no puede seguir en otra página (`BOX_OVERFLOW`,
-  [Multicol](../componentes/multicol.md#lo-que-no-cabe)): en la línea de su `Height` (o `Max height`, o `Aspect ratio`) si
+- **el contenido de un `Columns` que no cabe en sus columnas** y no puede seguir en otra página (`BOX_OVERFLOW`,
+  [Columns](../componentes/columns.md#lo-que-no-cabe)): en la línea de su `Height` (o `Max height`, o `Aspect ratio`) si
   es su alto el que se acaba, o en la de su `Count` si, sin página ni alto que llenar, tiene más cortes de columna que
   columnas.
 
@@ -38,7 +38,7 @@ desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
 
 Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no se baja a un hijo salvo que se salga
 también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido. Una caja cuyo alto impone el
-padre (un ítem estirado a una fila fija) se señala a sí misma, no las `Rows` del `Grid`.
+padre (un ítem estirado a una fila fija) se señala a sí misma, no las `Row sizes` del `Grid`.
 
 Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Relative` incluido.
 Una caja girada en flujo se comprueba en su contenedor con ese rectángulo, que es lo que ocupa. Las cajas en flujo de

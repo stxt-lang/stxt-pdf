@@ -23,7 +23,7 @@ Document (dev.stxt.pdf):
 				Width: 120
 				Margin: 0 0 20 0
 		Grid:
-			Columns: 1fr 1fr
+			Column sizes: 1fr 1fr
 			Gap: 16
 			Area:
 				Image: examples/catalog/silla.jpg

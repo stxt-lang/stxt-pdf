@@ -130,12 +130,12 @@ recortadas con `splitBands` si su grupo se parte, o la de la última unidad en l
 sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
 tipo); el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
-El contenido de un `Multicol` va en una caja generada, el flujo de columnas (`Element.COLUMNS`), su único hijo: cada
+El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMNS`), su único hijo: cada
 columna es un fragmento de esa caja, maquetado con los algoritmos de siempre. Las columnas solo están al principio del
-contenedor de fragmentos (`atFragmentainerStart`) si lo está el `Multicol`, y los cortes entre columnas no cuentan para el
+contenedor de fragmentos (`atFragmentainerStart`) si lo está el `Columns`, y los cortes entre columnas no cuentan para el
 padre: el corte de página tiene la calidad del de la última columna.
 
-> **Decisión:** el flujo de columnas es una caja generada. *Alternativa descartada:* que el `Multicol` apile los hijos él
+> **Decisión:** el flujo de columnas es una caja generada. *Alternativa descartada:* que el `Columns` apile los hijos él
 > mismo, repitiendo el flujo de bloque.
 
 `MulticolLayout` maqueta el flujo de columnas una vez por columna con `context.layout`, con el alto de la columna como
@@ -229,7 +229,7 @@ compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un
 
 > **Decisión:** los desbordamientos se buscan sobre el resultado paginado, no en cada algoritmo al colocar: así no cuentan
 > las pasadas de medida, en las que una caja se maqueta con un espacio provisional. Solo dos se detectan al maquetar,
-> porque sin sitio no se avanza: `TABLE_REPEAT_OVERFLOW` y los cortes de columna de más de un `Multicol`.
+> porque sin sitio no se avanza: `TABLE_REPEAT_OVERFLOW` y los cortes de columna de más de un `Columns`.
 
 > **Decisión:** dos tolerancias con nombre, no una: con `EPSILON` en `Overflow` el motor sería más estricto y una caja que se
 > sale 0,005 pt sería un error. *Alternativa descartada:* una sola tolerancia, con ese cambio de comportamiento.

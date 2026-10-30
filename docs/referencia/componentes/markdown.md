@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 | `Content` | bloque `>>` | — | El Markdown. Obligatorio. |
 | `Bullet markers` | lista de `bullet`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
 | `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
-| `Table columns` | `equal`, `auto` | — | Las `Columns` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+| `Table columns` | `equal`, `auto` | — | Las `Column sizes` de las tablas: `equal`, `repeat(n, 1fr)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -75,7 +75,7 @@ así:
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel; un `List item` por ítem |
 | `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `Start`, el primer número si no es 1 |
-| Tabla | `Table` con las `Columns` de `Table columns`; la fila de cabecera en `Head` y el resto en `Body` |
+| Tabla | `Table` con las `Column sizes` de `Table columns`; la fila de cabecera en `Head` y el resto en `Body` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../comun/formato-del-texto.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
@@ -184,7 +184,7 @@ encabezado. Es lo único de lo generado que lleva `Id`.
 
 ## Dónde va
 
-Donde va un elemento en flujo: en una sección, `Block`, `Relative`, `Absolute`, `Fixed`, `Multicol`, `List item`, `Cell` y
+Donde va un elemento en flujo: en una sección, `Block`, `Relative`, `Absolute`, `Fixed`, `Columns`, `List item`, `Cell` y
 como elemento de un `Item` o un `Area`.
 
 ## Errores

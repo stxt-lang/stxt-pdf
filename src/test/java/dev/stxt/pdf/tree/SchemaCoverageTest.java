@@ -115,8 +115,8 @@ class SchemaCoverageTest {
             Map.entry("Shrink", "Shrink: 0"),
             Map.entry("Basis", "Basis: 50"),
             // Grid y Area
-            Map.entry("Columns", "Columns: 100"),
-            Map.entry("Rows", "Rows: 20"),
+            Map.entry("Column sizes", "Column sizes: 100"),
+            Map.entry("Row sizes", "Row sizes: 20"),
             Map.entry("Areas", "Areas >>\n\ta"),
             Map.entry("Flow", "Flow: column"),
             Map.entry("Horizontal", "Horizontal: center"),
@@ -125,13 +125,12 @@ class SchemaCoverageTest {
             Map.entry("Marker", "Marker: decimal"),
             Map.entry("Start", "Start: 3"),
             Map.entry("Number", "Number: 5"),
-            // Multicol
+            // Columns
             Map.entry("Count", "Count: 3"),
-            Map.entry("Column width", "Column width: 100"),
-            Map.entry("Column gap", "Column gap: 12"),
-            Map.entry("Rule", "Rule: 1"),
-            Map.entry("Rule color", "Rule color: #999999"),
-            Map.entry("Fill", "Fill: auto"),
+            Map.entry("Min column width", "Min column width: 100"),
+            Map.entry("Separator", "Separator: 1"),
+            Map.entry("Separator color", "Separator color: #999999"),
+            Map.entry("Balance", "Balance: false"),
             // Markdown
             Map.entry("Bullet markers", "Bullet markers: bullet dash"),
             Map.entry("Number markers", "Number markers: decimal lower-alpha"),
@@ -194,9 +193,9 @@ class SchemaCoverageTest {
                 Set.of("Marker")));
         t.put("List item", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\tList item:\n\t\t\t{}\n"
                 + "\t\t\tParagraph: Uno"));
-        // Rule necesita un Column gap que la contenga, y Rule color, una Rule.
-        t.put("Multicol", new Template(HEADER + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 1\n"
-                + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Column gap", "Rule")));
+        // Separator necesita un Gap que lo contenga, y Separator color, un Separator.
+        t.put("Columns", new Template(HEADER + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 1\n"
+                + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Gap", "Separator")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
         // Un índice necesita algún encabezado que listar.
@@ -204,8 +203,8 @@ class SchemaCoverageTest {
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
-        String table = HEADER + "\tTable:\n\t\tColumns: 100\n";
-        t.put("Table", new Template(table + "\t\t{}\n\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Columns")));
+        String table = HEADER + "\tTable:\n\t\tColumn sizes: 100\n";
+        t.put("Table", new Template(table + "\t\t{}\n\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Column sizes")));
         t.put("Row", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
         t.put("Cell", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
         // Las reglas van dentro del Styles de la cabecera.

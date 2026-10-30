@@ -294,7 +294,7 @@ class PdfCanvasTest {
         // Área útil de 160: la cabecera y el pie (12 cada uno) dejan 136, once filas por página.
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tTable:\n\t\tColumns: 1fr 60\n"
+                + "\tTable:\n\t\tColumn sizes: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Valor\n"
                 + "\t\tBody:\n" + body
                 + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tSpan: 1 2\n"));
@@ -338,7 +338,7 @@ class PdfCanvasTest {
     @Test
     void headerCellsAreRowHeaders() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
-                + "\tTable:\n\t\tColumns: 100 100\n"
+                + "\tTable:\n\t\tColumn sizes: 100 100\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Importe\n"
                 + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"
                 + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"));
@@ -406,16 +406,16 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un {@code Multicol} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna
-     * (referencia/componentes/multicol.md).
+     * Un {@code Columns} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna
+     * (referencia/componentes/columns.md).
      */
     @Test
     void multicolIsADivWithoutColumns() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tMulticol:\n\t\tCount: 2\n\t\tColumn gap: 10\n\t\tRule: 0.5\n"
+                + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 0.5\n"
                 + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n"));
-        try (PDDocument pdf = Loader.loadPDF(render(doc, "multicol"))) {
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "columns"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
             PDStructureElement multicol = (PDStructureElement) document.getKids().get(0);
@@ -627,7 +627,7 @@ class PdfCanvasTest {
         }
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tTable:\n\t\tColumns: 1fr 60\n"
+                + "\tTable:\n\t\tColumn sizes: 1fr 60\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\t\tLink: https://c.example\n\t\t\t\tCell: Valor\n"
                 + "\t\tBody:\n" + body));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "table-links"))) {

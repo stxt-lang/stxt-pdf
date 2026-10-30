@@ -103,8 +103,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 
 > **Decisión:** los enums de los valores están en `model`, uno por fichero, porque los usan varios grupos y `model` no
 > puede depender de `tree`. Las constantes se llaman como el valor del documento (`TextAlign.JUSTIFY` ↔ `justify`), porque
-> se leen con `Enum.valueOf` sobre el texto en mayúsculas y con el guion como guion bajo. El de `Fill` de `Multicol` se
-> llama `ColumnFill`.
+> se leen con `Enum.valueOf` sobre el texto en mayúsculas y con el guion como guion bajo.
 
 > **Decisión:** `Box.describe()` es la única forma de nombrar una caja en los mensajes (`main (línea 12)`), y el volcado
 > escribe el `Id`.
@@ -137,7 +136,7 @@ cerrarlo con `TextRuns`.
 
 - **Marcador de lista:** `ListBuilder` crea en `Box.marker` la caja del marcador, generada y fuera de `children`
   (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`).
-- **Flujo de columnas:** el contenido de un `Multicol` va en una caja de bloque generada (`Element.COLUMNS`), su único hijo.
+- **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMNS`), su único hijo.
 - **Entradas de índice:** `ContentsBuilder` genera al final una caja `Flex` por encabezado (`Element.CONTENTS_ENTRY_1`…`6`)
   con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`); `Box.key()` da el
   `Id` o ese nombre.

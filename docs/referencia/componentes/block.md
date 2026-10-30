@@ -16,7 +16,7 @@ Block:
 ## El flujo de bloque
 
 Es como colocan a sus hijos en flujo un `Block`, cada sección (el área útil), `Relative`, `Absolute`, `Fixed`, los
-encabezados, `List`, `List item`, `Markdown`, `Table of contents`, una `Cell` con elementos y cada columna de un `Multicol`. Los hijos
+encabezados, `List`, `List item`, `Markdown`, `Table of contents`, una `Cell` con elementos y cada columna de un `Columns`. Los hijos
 en flujo se apilan en vertical:
 
 1. **Ancho.** Con `Width: auto`, la caja ocupa el ancho del contenedor de referencia menos sus márgenes horizontales. Con
@@ -46,7 +46,7 @@ dan 15; `−10` y `−4` dan −10. En un corte de página, los márgenes que to
 ## Contextos de formato de bloque
 
 Aíslan el colapso de márgenes: los márgenes de dentro no salen. Los crean: cada sección, `Absolute` y `Fixed`, los ítems
-de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Multicol` y los `Block` y `Relative` con
+de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Columns` y los `Block` y `Relative` con
 `Isolate: true`. Los márgenes de los ítems de `Flex` y `Grid` nunca colapsan.
 
 | Propiedad | Valores | Por defecto | Notas |

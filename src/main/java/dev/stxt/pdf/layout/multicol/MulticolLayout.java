@@ -11,7 +11,6 @@ import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.Slice;
-import dev.stxt.pdf.model.ColumnFill;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
@@ -31,12 +30,12 @@ import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 
 /**
- * Layout de un {@code Multicol} (referencia/componentes/multicol.md): su contenido llena la primera columna,
+ * Layout de un {@code Columns} (referencia/componentes/columns.md): su contenido llena la primera columna,
  * sigue en la siguiente y, al acabar las columnas de la página, continúa en la primera columna
  * de la página siguiente.
  *
  * <p>{@code BoxTreeBuilder} mete el contenido en el flujo de columnas, una caja de bloque que es
- * el único hijo del {@code Multicol}. Cada columna es un fragmento de esa caja: se maqueta con
+ * el único hijo del {@code Columns}. Cada columna es un fragmento de esa caja: se maqueta con
  * {@code context.layout}, con el alto de la columna como lo que queda de fragmentainer y el token
  * de la columna anterior como punto de partida. Los algoritmos que ya saben partir hacen el
  * resto.</p>
@@ -54,11 +53,11 @@ import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
  *
  * <p>Cortes. Un corte de columna es un corte más dentro del flujo; uno de página
  * ({@link BreakAppeal#FORCED_PAGE}) deja de llenar columnas y pasa al padre. Si la primera
- * columna no coloca nada, el {@code Multicol} corta antes de él; si no coloca nada otra columna,
+ * columna no coloca nada, el {@code Columns} corta antes de él; si no coloca nada otra columna,
  * el resto pasa a la página siguiente. La calidad del corte es la de la última columna.</p>
  *
  * <p>El contenido que no cabe en las columnas es un error ({@link ErrorCode#BOX_OVERFLOW}) si no
- * puede seguir en otra página: cuando el alto propio del {@code Multicol} termina en esta, o
+ * puede seguir en otra página: cuando el alto propio del {@code Columns} termina en esta, o
  * cuando, sin página ni alto que llenar, hay más cortes de columna que columnas.</p>
  */
 public final class MulticolLayout implements LayoutAlgorithm {
@@ -77,7 +76,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
     /**
      * Con {@code Count}, ese número de columnas del min-content o el max-content del contenido,
-     * más los huecos; con {@code Column width} el mínimo es una columna, porque el número de
+     * más los huecos; con {@code Min column width} el mínimo es una columna, porque el número de
      * columnas se adapta al ancho, y el máximo, columnas de al menos ese ancho.
      */
     @Override
@@ -97,7 +96,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
         return new Run(box, model, space, (BreakToken.Block) from).layOut();
     }
 
-    /** El flujo de columnas: el único hijo del {@code Multicol}. */
+    /** El flujo de columnas: el único hijo del {@code Columns}. */
     private static Box flow(Box multicol) {
         return multicol.children().get(0);
     }
@@ -128,7 +127,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
         }
     }
 
-    /** Layout de un fragmento del {@code Multicol}. */
+    /** Layout de un fragmento del {@code Columns}. */
     private final class Run {
         final Box box;
         final Box flow;
@@ -178,10 +177,10 @@ public final class MulticolLayout implements LayoutAlgorithm {
                 return LayoutResult.before(box);
             }
             if (!fill.finished() && own <= page) {
-                // El Multicol termina en esta página y su contenido no.
+                // El Columns termina en esta página y su contenido no.
                 throw tooTall(limit);
             }
-            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicol().fill() == ColumnFill.BALANCE) {
+            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicol().balance()) {
                 fill = balance(fill, limit, atStart);
             }
             return result(fill);

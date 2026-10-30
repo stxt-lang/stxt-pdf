@@ -33,9 +33,9 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
 | `Image` con `Alt` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
-| El resto (`Block`, `Flex`, `Grid`, `Multicol`, `Markdown`, los posicionados…) | `Div` |
+| El resto (`Block`, `Flex`, `Grid`, `Columns`, `Markdown`, los posicionados…) | `Div` |
 
-Lo que genera un `Markdown` cuelga de su `Div` con sus propios elementos. El contenido de un `Multicol` cuelga de su `Div`
+Lo que genera un `Markdown` cuelga de su `Div` con sus propios elementos. El contenido de un `Columns` cuelga de su `Div`
 de columna en columna. El texto de cada caja es contenido marcado de su elemento, también sus tramos con formato, que no
 tienen elemento propio; una caja partida entre páginas tiene contenido marcado en varias.
 

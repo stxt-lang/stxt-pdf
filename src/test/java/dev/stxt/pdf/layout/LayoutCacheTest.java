@@ -45,7 +45,7 @@ class LayoutCacheTest {
             String wrapper = flex ? "Item:" : "Area:";
             lines.add(indent + (flex ? "Flex:" : "Grid:"));
             if (!flex) {
-                lines.add(indent + "\tColumns: auto 1fr");
+                lines.add(indent + "\tColumn sizes: auto 1fr");
             }
             lines.add(indent + "\t" + wrapper);
             lines.add(indent + "\t\tText: hoja " + level);

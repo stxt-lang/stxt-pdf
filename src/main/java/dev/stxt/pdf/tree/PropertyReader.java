@@ -5,7 +5,6 @@ import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.ColumnFill;
 import dev.stxt.pdf.model.Decoration;
 import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Distribution;
@@ -64,7 +63,7 @@ import static dev.stxt.pdf.tree.ValueReader.value;
 /**
  * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
  * y {@code Break} (referencia/comun/estructura.md), que comparten los elementos y las reglas de
- * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Multicol} y las de los envoltorios
+ * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Columns} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
  * <p>Los {@code switch} no tienen una rama {@code default} que asigne, y las tablas
@@ -78,9 +77,9 @@ final class PropertyReader {
      */
     static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "main-axis", "cross-axis", "lines");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
-    static final Set<String> GRID = Set.of("columns", "rows", "gap", "areas", "flow", "horizontal", "vertical");
-    /** Propiedades del elemento {@code Multicol}. */
-    static final Set<String> MULTICOL = Set.of("count", "column-width", "column-gap", "rule", "rule-color", "fill");
+    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
+    /** Propiedades del elemento {@code Columns}. */
+    static final Set<String> MULTICOL = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
     /** Lee una propiedad en el estilo; su línea ya está apuntada. */
     @FunctionalInterface
@@ -246,8 +245,8 @@ final class PropertyReader {
     static void grid(Node p, Style s) {
         s.declared(PropertyKey.grid(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "columns" -> s.grid().setColumns(tracks(p));
-            case "rows" -> s.grid().setRows(tracks(p));
+            case "column-sizes" -> s.grid().setColumns(tracks(p));
+            case "row-sizes" -> s.grid().setRows(tracks(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
                 s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
@@ -261,18 +260,18 @@ final class PropertyReader {
     }
 
     /**
-     * Propiedades de {@code Multicol}, hijas del elemento (referencia/componentes/multicol.md); sus nombres no se
-     * repiten en otro elemento y su línea se guarda sin prefijo ({@code column-gap}).
+     * Propiedades de {@code Columns}, hijas del elemento (referencia/componentes/columns.md); su línea se guarda sin
+     * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Flex} y {@code Grid} lo lleva.
      */
     static void multicol(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
         switch (p.getCanonicalName()) {
             case "count" -> s.multicol().setCount(positiveInteger(p));
-            case "column-width" -> s.multicol().setColumnWidth(positive(p));
-            case "column-gap" -> s.multicol().setColumnGap(nonNegative(p));
-            case "rule" -> s.multicol().setRule(positive(p));
-            case "rule-color" -> s.multicol().setRuleColor(color(p));
-            case "fill" -> s.multicol().setFill(enumValue(ColumnFill.class, p));
+            case "min-column-width" -> s.multicol().setColumnWidth(positive(p));
+            case "gap" -> s.multicol().setColumnGap(columnGap(p));
+            case "separator" -> s.multicol().setRule(positive(p));
+            case "separator-color" -> s.multicol().setRuleColor(color(p));
+            case "balance" -> s.multicol().setBalance(bool(p));
             default -> throw unread(p);
         }
     }
@@ -320,6 +319,15 @@ final class PropertyReader {
                     + "Number label: Anexo {number}.");
         }
         return label;
+    }
+
+    /** {@code Gap} de {@code Columns}: un solo valor, el hueco entre columnas, en puntos. */
+    private static double columnGap(Node p) {
+        if (p.getText().trim().split("\\s+").length > 1) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap de un Columns admite un solo valor, el hueco entre "
+                    + "columnas: " + p.getText().trim());
+        }
+        return nonNegative(p);
     }
 
     /**

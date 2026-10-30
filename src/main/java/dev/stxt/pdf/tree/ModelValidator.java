@@ -23,8 +23,8 @@ import static dev.stxt.pdf.tree.PropertyKey.BREAK_BEFORE;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_INSIDE;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
-import static dev.stxt.pdf.tree.PropertyKey.RULE;
-import static dev.stxt.pdf.tree.PropertyKey.RULE_COLOR;
+import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
+import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_LINES;
 import static dev.stxt.pdf.tree.PropertyKey.FLEX_MAIN_AXIS;
@@ -77,33 +77,33 @@ final class ModelValidator {
     }
 
     /**
-     * Un {@code Multicol} fija sus columnas con {@code Count}, {@code Column width} o los dos; con una sola columna no
-     * hay hueco ni línea entre columnas, {@code Rule color} necesita {@code Rule} y la línea cabe en el hueco
-     * (referencia/componentes/multicol.md).
+     * Un {@code Columns} fija sus columnas con {@code Count}, {@code Min column width} o los dos; con una sola columna no
+     * hay hueco ni línea entre columnas, {@code Separator color} necesita {@code Separator} y la línea cabe en el hueco
+     * (referencia/componentes/columns.md).
      */
     static void validateMulticol(Style s, int line) {
         if (s.multicol().count() == null && s.multicol().columnWidth() == null) {
-            throw error(line, ErrorCode.MULTICOL_COLUMNS, "Un Multicol necesita Count, Column width o los dos: "
-                    + "Count fija el número de columnas y Column width su ancho mínimo");
+            throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "Un Columns necesita Count, Min column width o los dos: "
+                    + "Count fija el número de columnas y Min column width su ancho mínimo");
         }
         if (s.multicol().count() != null && s.multicol().count() == 1) {
-            for (String p : List.of(COLUMN_GAP, RULE)) {
+            for (String p : List.of(COLUMN_GAP, SEPARATOR)) {
                 if (s.isDeclared(p)) {
-                    throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(RULE) ? "Rule" : "Column gap")
+                    throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(SEPARATOR) ? "Separator" : "Gap")
                             + " no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo");
                 }
             }
         }
-        if (s.isDeclared(RULE_COLOR) && !s.isDeclared(RULE)) {
-            throw error(s.line(RULE_COLOR), ErrorCode.RULE_COLOR_WITHOUT_RULE,
-                    "Rule color no tiene efecto sin Rule, que es la que pinta la línea entre columnas: declara su "
+        if (s.isDeclared(SEPARATOR_COLOR) && !s.isDeclared(SEPARATOR)) {
+            throw error(s.line(SEPARATOR_COLOR), ErrorCode.SEPARATOR_COLOR_WITHOUT_SEPARATOR,
+                    "Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas: declara su "
                             + "grosor o quítalo");
         }
         if (s.multicol().rule() > s.multicol().columnGap() + Tolerance.EPSILON) {
-            String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (" + s.line(COLUMN_GAP) + ")"
-                    : "Column gap, que sin declarar es 0";
-            throw error(s.line(RULE), ErrorCode.COLUMN_RULE_WIDTH, "Rule es más ancha que " + gap
-                    + ": la línea se pintaría sobre las columnas; ensancha Column gap o adelgaza Rule");
+            String gap = s.isDeclared(COLUMN_GAP) ? "Gap (" + s.line(COLUMN_GAP) + ")"
+                    : "Gap, que sin declarar es 0";
+            throw error(s.line(SEPARATOR), ErrorCode.SEPARATOR_WIDTH, "Separator es más ancho que " + gap
+                    + ": la línea se pintaría sobre las columnas; ensancha Gap o adelgaza Separator");
         }
     }
 
@@ -176,7 +176,7 @@ final class ModelValidator {
         validateColumnBreaks(ctx, s);
     }
 
-    /** {@code Before} y {@code After: column} solo dentro de un {@code Multicol}, que es quien tiene columnas. */
+    /** {@code Before} y {@code After: column} solo dentro de un {@code Columns}, que es quien tiene columnas. */
     private static void validateColumnBreaks(BuildContext ctx, Style s) {
         if (ctx.insideMulticol) {
             return;
@@ -184,8 +184,8 @@ final class ModelValidator {
         String property = s.breaks().before() == Break.COLUMN ? BREAK_BEFORE
                 : s.breaks().after() == Break.COLUMN ? BREAK_AFTER : null;
         if (property != null) {
-            throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_MULTICOL, (property.equals(BREAK_BEFORE)
-                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Multicol: usa page para "
+            throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_COLUMNS, (property.equals(BREAK_BEFORE)
+                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Columns: usa page para "
                     + "cortar la página");
         }
     }
@@ -325,7 +325,7 @@ final class ModelValidator {
             return;
         }
         if (s.grid().rows().stream().anyMatch(ValueReader::hasPercentage)) {
-            throw indefinite(s.line(GRID_ROWS), "Rows");
+            throw indefinite(s.line(GRID_ROWS), "Row sizes");
         }
         // En flex, el hueco entre filas solo cuenta en column o con varias líneas.
         boolean rowGapUsed = s.layout() == Layout.GRID

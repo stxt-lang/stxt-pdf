@@ -234,7 +234,7 @@ public final class Overflow {
     /**
      * El contenido de una caja pasa de su alto: el culpable es lo que lo fija, por este orden, su
      * {@code Height}, su {@code Max height}, su {@code Aspect ratio} o las filas de un grid
-     * ({@code Rows}; si fueran {@code auto}, crecerían con su contenido).
+     * ({@code Row sizes}; si fueran {@code auto}, crecerían con su contenido).
      */
     private static InvalidModelException tooTall(Fragment container, double needed, double height, Fragment child) {
         Box box = container.box();

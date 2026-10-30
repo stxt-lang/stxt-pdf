@@ -18,7 +18,7 @@ puede sobrescribir.
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas |
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada; no admite las propiedades propias de un
-elemento (`Gap`, `Columns`, `Offset`, `Marker`, `Link`, `Rotate`…).
+elemento (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link`, `Rotate`…).
 
 ```
 Styles:

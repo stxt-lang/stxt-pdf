@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Table:
-			Columns: 1fr 1fr
+			Column sizes: 1fr 1fr
 			Head:
 				Row:
 					Break:

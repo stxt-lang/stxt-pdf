@@ -5,14 +5,14 @@
 | **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Fixed`. Cada sección tiene la suya ([Document](../componentes/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](caja.md#las-cuatro-cajas)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([Recursos](recursos.md)). |
-| **Columna** | Cada contenedor de fragmentos en que un `Multicol` reparte su contenido en una página ([Multicol](../componentes/multicol.md)). |
-| **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Multicol`, cada columna ([Cortes](cortes.md#modelo)). |
+| **Columna** | Cada contenedor de fragmentos en que un `Columns` reparte su contenido en una página ([Columns](../componentes/columns.md)). |
+| **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Columns`, cada columna ([Cortes](cortes.md#modelo)). |
 | **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](caja.md#el-contenedor-de-referencia)). |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](capas-y-giro.md)). |
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color…)` ([La caja](caja.md#degradado)). |
-| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Multicol`, `Markdown`, `Table of contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
+| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
 | **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `TOC 1` … `6`. |
 | **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |

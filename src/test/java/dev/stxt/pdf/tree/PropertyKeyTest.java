@@ -37,7 +37,7 @@ class PropertyKeyTest {
         assertEquals(PropertyKey.FONT_WEIGHT, PropertyKey.internal("bold"));
         assertEquals("break-inside", PropertyKey.internal("inside"));
         assertEquals(PropertyKey.LINE_HEIGHT, PropertyKey.internal("line-height"));
-        assertEquals(PropertyKey.GRID_ROWS, PropertyKey.grid("rows"));
+        assertEquals(PropertyKey.GRID_ROWS, PropertyKey.grid("row-sizes"));
         assertEquals(PropertyKey.ITEM_GROW, PropertyKey.item("grow"));
         assertEquals(PropertyKey.FLEX_GAP, PropertyKey.flex("gap"));
     }

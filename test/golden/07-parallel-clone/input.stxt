@@ -45,7 +45,7 @@ Document (dev.stxt.pdf):
 					Background: #F1EFE8
 		Grid:
 			Id: grid
-			Columns: 1fr 1fr
+			Column sizes: 1fr 1fr
 			Gap: 10
 			Area:
 				Block:

@@ -1,6 +1,6 @@
-# Case: Fixed dentro de un Multicol
-# Code: POSITIONED_IN_MULTICOL
-# Line: 19
+# Case: Min column width en porcentaje
+# Code: VALUE_NOT_ALLOWED
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,8 +13,6 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
-			Count: 2
-			Block:
-				Fixed:
-					Text: Nota
+		Columns:
+			Min column width: 30%
+			Text: Hola

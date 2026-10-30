@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 			Id: grid
 			Break:
 				Before: page
-			Columns: 1fr 1fr
+			Column sizes: 1fr 1fr
 			Gap: 10
 			Area:
 				Block:

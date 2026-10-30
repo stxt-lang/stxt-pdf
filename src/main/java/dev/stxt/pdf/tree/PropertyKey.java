@@ -45,11 +45,11 @@ public final class PropertyKey {
     public static final String NUMBER = "number";
     public static final String PDF_PAGE = "pdf-page";
 
-    // Multicol
+    // Columns
     public static final String COUNT = "count";
-    public static final String COLUMN_GAP = "column-gap";
-    public static final String RULE = "rule";
-    public static final String RULE_COLOR = "rule-color";
+    public static final String COLUMN_GAP = "gap";
+    public static final String SEPARATOR = "separator";
+    public static final String SEPARATOR_COLOR = "separator-color";
 
     // Break
     public static final String BREAK_BEFORE = "break-before";
@@ -61,7 +61,7 @@ public final class PropertyKey {
     public static final String FLEX_MAIN_AXIS = "flex.main-axis";
     public static final String FLEX_LINES = "flex.lines";
     public static final String FLEX_GAP = "flex.gap";
-    public static final String GRID_ROWS = "grid.rows";
+    public static final String GRID_ROWS = "grid.row-sizes";
     public static final String GRID_GAP = "grid.gap";
     public static final String ITEM_GROW = "item.grow";
     public static final String ITEM_BASIS = "item.basis";

@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 /**
  * Elementos de caja del documento (referencia/comun/estructura.md), el marcador que el motor genera para cada {@code
- * List item} (referencia/componentes/list.md) y el flujo de columnas de cada {@code Multicol}
- * (referencia/componentes/multicol.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
+ * List item} (referencia/componentes/list.md) y el flujo de columnas de cada {@code Columns}
+ * (referencia/componentes/columns.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
  * significado que usan las reglas {@code For element}, los marcadores y las etiquetas del PDF.
  *
  * <p>La estructura (qué hijos admite cada elemento) está solo en el schema; {@code ElementTest}
@@ -45,10 +45,10 @@ public enum Element {
     /** Sin valor, un bloque; con valor, una caja de texto ({@link BoxTreeBuilder} cambia el {@code Layout}). */
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Bloque en columnas (referencia/componentes/multicol.md): su contenido va en el flujo de columnas, {@link
+     * Bloque en columnas (referencia/componentes/columns.md): su contenido va en el flujo de columnas, {@link
      * #COLUMNS}.
      */
-    MULTICOL("Multicol", Layout.MULTICOL, Position.STATIC, true, false, 0),
+    MULTICOL("Columns", Layout.MULTICOL, Position.STATIC, true, false, 0),
     /**
      * Contenido en Markdown (referencia/componentes/markdown.md): un bloque cuyos hijos son los elementos que
      * {@link MarkdownBuilder} genera a partir de su {@code Content}.
@@ -75,8 +75,8 @@ public enum Element {
      */
     ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * El flujo de columnas de un {@code Multicol}, generado por el motor: un bloque con los hijos del {@code Multicol},
-     * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/multicol.md).
+     * El flujo de columnas de un {@code Columns}, generado por el motor: un bloque con los hijos del {@code Columns},
+     * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/columns.md).
      */
     COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
@@ -236,7 +236,7 @@ public enum Element {
          * contenido.
          */
         LEADER,
-        /** El flujo de columnas de un {@code Multicol}: no tiene significado propio, su contenido es el del {@code Multicol}. */
+        /** El flujo de columnas de un {@code Columns}: no tiene significado propio, su contenido es el del {@code Columns}. */
         FLOW,
         /** Una caja sin más significado. */
         BLOCK

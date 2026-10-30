@@ -21,7 +21,7 @@ class GridFragmentationTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumns: 1fr 1fr"};
+    private static final String[] GRID = {"\tGrid:", "\t\tId: G", "\t\tColumn sizes: 1fr 1fr"};
 
     private static String[] cell(String id, String cell) {
         return new String[]{"\t\tArea: " + cell, "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:",
@@ -108,7 +108,7 @@ class GridFragmentationTest {
     void relativePercentOffsetUsesTheWholeHeightOfAFragmentedGrid() {
         // Como en el flujo de bloque: el 10 % es del Height entero del grid (30).
         LayoutFixture l = layOutPaged(PAGE,
-                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 300", "\t\tRows: 80 15",
+                "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 300", "\t\tRow sizes: 80 15",
                 "\t\tArea: 2 1", "\t\t\tRelative:", "\t\t\t\tId: R", "\t\t\t\tOffset: 10% auto auto auto",
                 "\t\t\t\tBox:", "\t\t\t\t\tHeight: 15");
         assertEquals(3, l.pages());
@@ -123,7 +123,7 @@ class GridFragmentationTest {
     @Test
     void aTallRowAfterTheFirstPageIsSplitFromTheTop() {
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
-        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumns: 30 100",
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tVertical: start", "\t\t\tText: " + text, "\t\t\t\tId: T",
@@ -142,7 +142,7 @@ class GridFragmentationTest {
     @Test
     void aStretchedTextInATallRowFitsItsLines() {
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
-        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumns: 30 100",
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tText: " + text, "\t\t\t\tId: T",

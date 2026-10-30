@@ -72,7 +72,7 @@ línea (**max-content**):
 | `Flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
 | `Flex` en `column` | máximo de los ítems | máximo de los ítems |
 | `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su max-content también como mínimo, más los huecos |
-| `Multicol` | ver [Multicol](../componentes/multicol.md#tamaños-intrínsecos) | |
+| `Columns` | ver [Columns](../componentes/columns.md#tamaños-intrínsecos) | |
 
 Una caja con `Width` fijo tiene ese valor como min-content y max-content (el mínimo automático de un ítem de `Flex` mira
 en cambio su contenido, [Flex](../componentes/flex.md#algoritmo)). `Absolute` y `Fixed` no aportan nada a sus ancestros.

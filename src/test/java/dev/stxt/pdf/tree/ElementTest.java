@@ -55,8 +55,8 @@ class ElementTest {
         // El marcador es generado y Marker es una propiedad de List: no es un elemento.
         assertTrue(Element.of("marker").isEmpty());
         assertTrue(Element.of("item").isEmpty());
-        // Ni el flujo de columnas de un Multicol, que también es generado.
-        assertTrue(Element.of("columns").isEmpty());
+        // El flujo de columnas de un Columns es generado y no tiene nombre: "columns" es el propio Columns.
+        assertEquals(Optional.of(Element.MULTICOL), Element.of("columns"));
         // Generados: el marcador, la franja de una fila, el flujo de columnas, el bloque de código de un Markdown y,
         // del índice, seis entradas, el título, la guía y el número de página.
         assertEquals(Element.values().length - 13, Element.written().size());

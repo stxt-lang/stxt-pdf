@@ -8,7 +8,7 @@ la página, ni en los encabezados ni en las celdas ([Encabezados](../componentes
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` fuerza un salto de página antes de la caja; `column`, un salto a la columna siguiente (solo dentro de un `Multicol`, [Multicol](../componentes/multicol.md#cortes)). |
+| `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` fuerza un salto de página antes de la caja; `column`, un salto a la columna siguiente (solo dentro de un `Columns`, [Columns](../componentes/columns.md#cortes)). |
 | `After` | `auto`, `page`, `column`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
 | `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja. |
 | `Decoration` | `slice`, `clone` | `slice` | Qué pasa con el borde y el relleno en un corte. |
@@ -16,7 +16,7 @@ la página, ni en los encabezados ni en las celdas ([Encabezados](../componentes
 ## Modelo
 
 Un **contenedor de fragmentos** es donde caen los trozos de las cajas: uno por página, con la altura del área útil, y uno
-por columna dentro de un `Multicol` ([Multicol](../componentes/multicol.md)). Cada caja produce un **fragmento** por
+por columna dentro de un `Columns` ([Columns](../componentes/columns.md)). Cada caja produce un **fragmento** por
 contenedor de fragmentos en el que aparece.
 
 ## Oportunidades de corte
@@ -52,22 +52,22 @@ nada) es un error (`PAGE_OVERFLOW`, [Desbordamiento](desbordamiento.md)).
 
 ## Cortes forzados
 
-`Before: page` y `After: page` fuerzan un salto de página, y `Before: column` y `After: column`, dentro de un `Multicol`,
+`Before: page` y `After: page` fuerzan un salto de página, y `Before: column` y `After: column`, dentro de un `Columns`,
 un salto a la columna siguiente (que, en la última columna, es también de página). Solo se aplican a cajas en flujo:
 `Absolute` y `Fixed` no admiten `Break`.
 
-- El `Before` del primer hijo de un bloque y el `After` del último se propagan al bloque; de un `Multicol` solo sale el de
+- El `Before` del primer hijo de un bloque y el `After` del último se propagan al bloque; de un `Columns` solo sale el de
   página.
 - Si una caja tiene los dos, gana el de página.
 - Un corte forzado al principio de una página (o de una columna) se ignora: no deja páginas en blanco. Lo mismo el
   `After: page` de la última caja de una sección.
-- Un corte de página dentro de un `Multicol` deja sin llenar las columnas que quedan en esa página.
+- Un corte de página dentro de un `Columns` deja sin llenar las columnas que quedan en esa página.
 - Dentro de una caja que no se parte (un `Absolute`, un `Fixed`, un `Relative` girado o una caja girada en flujo), ningún
   `Break` tiene efecto. Si
   lo escribe el propio elemento (o la `Row` de una celda) es un error (`BREAK_IN_UNBREAKABLE`); si llega de una regla de
-  `Styles`, no tiene efecto y no es un error. Las columnas de un `Multicol` de dentro sí se cortan, y sus `Break` cuentan.
+  `Styles`, no tiene efecto y no es un error. Las columnas de un `Columns` de dentro sí se cortan, y sus `Break` cuentan.
 
-> **Decisión:** un corte de página atraviesa las columnas de un `Multicol`. *Límite:* dentro de un ítem de un `Flex` o
+> **Decisión:** un corte de página atraviesa las columnas de un `Columns`. *Límite:* dentro de un ítem de un `Flex` o
 > un `Grid` partido en paralelo, un corte de página actúa como uno de columna.
 
 ## Márgenes en los cortes

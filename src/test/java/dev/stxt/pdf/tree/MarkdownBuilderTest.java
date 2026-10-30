@@ -129,7 +129,7 @@ class MarkdownBuilderTest {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: equal"),
                 "| Mes | Total |", "|-----|------:|", "| Ene | **120** |", "| Feb |");
         assertEquals(List.of("Table @16",
-                "  Columns: repeat(2, 1fr) @14",
+                "  Column sizes: repeat(2, 1fr) @14",
                 "  Head @16",
                 "    Row @16",
                 "      Cell: Mes @16",
@@ -167,7 +167,7 @@ class MarkdownBuilderTest {
     @Test
     void autoColumns() {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "| A |", "|---|", "| 1 |");
-        assertEquals("repeat(1, auto)", ((InlineNode) t.elements().get(0)).getChild("columns").getText());
+        assertEquals("repeat(1, auto)", ((InlineNode) t.elements().get(0)).getChild("column-sizes").getText());
     }
 
     @Test

@@ -1,7 +1,7 @@
 # Boletín mensual de unos pueblos, de dos páginas con aire de periódico: cabecera de portada,
 # noticia principal con una foto recortada (Fit: cover), artículos a tres columnas con filete y
 # cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
-# una rejilla. El cuerpo es Markdown dentro de Multicol. La cabecera de portada es un bloque de la
+# una rejilla. El cuerpo es Markdown dentro de Columns. La cabecera de portada es un bloque de la
 # primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
 # minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
 Document (dev.stxt.pdf):
@@ -88,12 +88,12 @@ Document (dev.stxt.pdf):
 					Height: 214
 			Text: Los puestos del mercado de otoño, durante el montaje del jueves en la plaza Mayor. Foto: archivo del Ayuntamiento.
 				Style: caption
-			Multicol:
+			Columns:
 				Id: lead-text
 				Count: 3
-				Column gap: 16
-				Rule: 0.5
-				Rule color: #CFC8C0
+				Gap: 16
+				Separator: 0.5
+				Separator color: #CFC8C0
 				Box:
 					Margin: 0 0 6 0
 				Markdown:
@@ -145,12 +145,12 @@ Document (dev.stxt.pdf):
 							- **La cresta de Sant Roc** (5 h, 14 km): solo con buen tiempo y calzado de montaña; ++recomendable salir antes de las ocho++.
 
 							Recuerden llevar agua, no salirse de los senderos señalizados y llevarse de vuelta cualquier residuo que generen.
-			Multicol:
+			Columns:
 				Id: briefs
 				Count: 2
-				Column gap: 22
-				Rule: 0.5
-				Rule color: #CFC8C0
+				Gap: 22
+				Separator: 0.5
+				Separator color: #CFC8C0
 				Box:
 					Margin: 0 0 14 0
 				Markdown:
@@ -177,7 +177,7 @@ Document (dev.stxt.pdf):
 						Letter spacing: 0.6
 			Table:
 				Id: agenda
-				Columns: 70 52 1fr 120
+				Column sizes: 70 52 1fr 120
 				Box:
 					Margin: 0 0 14 0
 				Head:
@@ -224,7 +224,7 @@ Document (dev.stxt.pdf):
 						Letter spacing: 0.6
 			Grid:
 				Id: classifieds
-				Columns: repeat(4, 1fr)
+				Column sizes: repeat(4, 1fr)
 				Gap: 10
 				Area:
 					Block:

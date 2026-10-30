@@ -76,7 +76,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -116,7 +116,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -167,9 +167,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Columns
+			Child: Column sizes
 				Max: 1
-			Child: Rows
+			Child: Row sizes
 				Max: 1
 			Child: Gap
 				Max: 1
@@ -383,13 +383,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
-	Node: Multicol
+	Node: Columns
 		Type: GROUP
-		Description: Bloque en columnas: su contenido llena la primera columna, sigue en la siguiente y, al acabar la página, continúa en la primera columna de la siguiente. Count, Column width o los dos fijan las columnas.
+		Description: Bloque en columnas: su contenido llena la primera columna, sigue en la siguiente y, al acabar la página, continúa en la primera columna de la siguiente. Count, Min column width o los dos fijan las columnas.
 		Children:
 			Child: Id
 				Max: 1
@@ -405,15 +405,15 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Count
 				Max: 1
-			Child: Column width
+			Child: Min column width
 				Max: 1
-			Child: Column gap
+			Child: Gap
 				Max: 1
-			Child: Rule
+			Child: Separator
 				Max: 1
-			Child: Rule color
+			Child: Separator color
 				Max: 1
-			Child: Fill
+			Child: Balance
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -431,7 +431,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 	Node: Relative
 		Type: GROUP
@@ -475,7 +475,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -517,7 +517,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -561,7 +561,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -610,7 +610,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Table
 				Max: 1
-			Child: Multicol
+			Child: Columns
 				Max: 1
 			Child: Relative
 				Max: 1
@@ -655,13 +655,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Table
 				Max: 1
-			Child: Multicol
+			Child: Columns
 				Max: 1
 			Child: Relative
 				Max: 1
 	Node: Table
 		Type: GROUP
-		Description: Tabla: sus filas (Row) en Head, Body y Foot, en ese orden, sobre las columnas de Columns. Al partirse, Head y Foot se repiten en cada página.
+		Description: Tabla: sus filas (Row) en Head, Body y Foot, en ese orden, sobre las columnas de Column sizes. Al partirse, Head y Foot se repiten en cada página.
 		Children:
 			Child: Id
 				Max: 1
@@ -675,7 +675,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Columns
+			Child: Column sizes
 				Min: 1
 				Max: 1
 			Child: Column align
@@ -751,7 +751,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 			Child: Image
 			Child: Table
-			Child: Multicol
+			Child: Columns
 			Child: Relative
 			Child: Absolute
 			Child: Fixed
@@ -1168,7 +1168,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Before
 		Type: ENUM
-		Description: Corte antes de la caja: page lo fuerza (y column, dentro de un Multicol, pasa a la columna siguiente), avoid lo evita.
+		Description: Corte antes de la caja: page lo fuerza (y column, dentro de un Columns, pasa a la columna siguiente), avoid lo evita.
 		Values:
 			Value: auto
 			Value: page
@@ -1176,7 +1176,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: avoid
 	Node: After
 		Type: ENUM
-		Description: Corte después de la caja: page lo fuerza (y column, dentro de un Multicol, pasa a la columna siguiente), avoid la mantiene con la siguiente.
+		Description: Corte después de la caja: page lo fuerza (y column, dentro de un Columns, pasa a la columna siguiente), avoid la mantiene con la siguiente.
 		Values:
 			Value: auto
 			Value: page
@@ -1207,7 +1207,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: BOOLEAN
 		Description: Permite repartir los ítems en varias líneas.
 	Node: Gap
-		Description: Separación: un valor, o dos (filas columnas).
+		Description: Separación: en Flex y Grid, un valor, o dos (filas columnas); en Columns, un valor, el hueco entre columnas.
 	Node: Main axis
 		Type: ENUM
 		Description: Reparto del sobrante en el eje principal.
@@ -1245,10 +1245,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	# Grid
 
-	Node: Columns
-		Description: Pistas de las columnas.
-	Node: Rows
-		Description: Pistas de las filas.
+	Node: Column sizes
+		Description: Tamaño de cada columna: una pista por columna.
+	Node: Row sizes
+		Description: Tamaño de cada fila: una pista por fila.
 	Node: Areas
 		Type: TEXT
 		Description: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
@@ -1304,25 +1304,20 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: BOOLEAN
 		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Head, cuyas celdas ya son cabeceras de columna.
 
-	# Multicol
+	# Columns
 
 	Node: Count
 		Type: INTEGER
-		Description: Número de columnas del Multicol (al menos 1); con Column width, el máximo.
-	Node: Column width
+		Description: Número de columnas de un Columns (al menos 1); con Min column width, el máximo.
+	Node: Min column width
 		Description: Ancho mínimo de las columnas, en puntos: caben tantas como permita el ancho, hasta Count si se declara.
-	Node: Column gap
-		Description: Separación entre columnas, en puntos. Por defecto, 0.
-	Node: Rule
-		Description: Grosor de la línea entre columnas, centrada en Column gap, que debe ser al menos igual de ancho.
-	Node: Rule color
+	Node: Separator
+		Description: Grosor de la línea entre las columnas de un Columns, centrada en Gap, que debe ser al menos igual de ancho.
+	Node: Separator color
 		Description: Color de la línea entre columnas. Por defecto, el Color del texto.
-	Node: Fill
-		Type: ENUM
-		Description: Reparto entre columnas: balance (por defecto) iguala las columnas del último fragmento; auto las llena en orden.
-		Values:
-			Value: balance
-			Value: auto
+	Node: Balance
+		Type: BOOLEAN
+		Description: Reparto entre las columnas de un Columns: con true (por defecto) se igualan las columnas del último fragmento; con false se llenan en orden.
 
 	# Image
 

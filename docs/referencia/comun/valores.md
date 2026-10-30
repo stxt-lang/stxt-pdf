@@ -23,11 +23,11 @@ silencioso. Los argumentos de `min()`, `max()` y `clamp()` son números o porcen
 
 ## Listas y `repeat`
 
-Algunas propiedades admiten varios valores separados por espacios (`Columns`, `Rows`, `Margin`…). En las listas de
+Algunas propiedades admiten varios valores separados por espacios (`Column sizes`, `Row sizes`, `Margin`…). En las listas de
 pistas, `repeat(n, patrón)` repite un patrón:
 
 ```
-Columns: 150 repeat(3, 1fr) minmax(100, 2fr)
+Column sizes: 150 repeat(3, 1fr) minmax(100, 2fr)
 ```
 
 equivale a `150 1fr 1fr 1fr minmax(100, 2fr)`.
@@ -51,7 +51,7 @@ pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la
 
 `#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA` en hexadecimal: `#000`, `#A32D2D`, `#12315A80`. El último dígito o par es la
 **opacidad** (`FF` o `F`, opaco; `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
-color (`Color`, `Border color`, `Background`, `Rule color`).
+color (`Color`, `Border color`, `Background`, `Separator color`).
 
 > **Decisión:** la opacidad va en cada color; no hay `Opacity` de la caja, que afectaría a todo lo que contiene.
 
@@ -96,8 +96,8 @@ es un **alto definido**, que se decide al leer el documento con esta regla fija:
 
 La base de `Height`, `Min height` y `Max height` de un `Absolute` o un `Fixed` es su contenedor de referencia, y la de un
 ítem de grid, su área: las dos son siempre definidas. Un ítem de `Flex` estirado **no** da un alto definido a sus hijos:
-si lo necesitan, declara su `Height`. El alto de las columnas de un `Multicol` tampoco es definido
-([Multicol](../componentes/multicol.md#contenido)).
+si lo necesitan, declara su `Height`. El alto de las columnas de un `Columns` tampoco es definido
+([Columns](../componentes/columns.md#contenido)).
 
 > **Decisión:** el alto definido se decide al leer el documento, no al maquetar. Es más estricto (un ítem de `Flex`
 > estirado no da alto definido aunque su alto se acabe conociendo), pero el error sale siempre, en la línea de la

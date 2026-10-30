@@ -1,6 +1,6 @@
-# Case: Rule color sin Rule, que es la que pinta la línea
-# Code: RULE_COLOR_WITHOUT_RULE
-# Line: 19
+# Case: Corte de columna fuera de un Columns
+# Code: COLUMN_BREAK_OUTSIDE_COLUMNS
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,8 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
-			Count: 2
-			Column gap: 20
-			Rule color: #999999
-			Text: Hola
+		Paragraph: Uno
+			Break:
+				After: column
+		Paragraph: Dos

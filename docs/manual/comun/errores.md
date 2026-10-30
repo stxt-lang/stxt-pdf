@@ -16,7 +16,7 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 
 | Código | Qué pasa | Qué hacer |
 |---|---|---|
-| `CHILD_NOT_DECLARED` | Una propiedad o un elemento donde no se admite (`Columns` en un `Flex`, `Typography` en una `Image`) | Mira la tabla de propiedades del elemento |
+| `CHILD_NOT_DECLARED` | Una propiedad o un elemento donde no se admite (`Column sizes` en un `Flex`, `Typography` en una `Image`) | Mira la tabla de propiedades del elemento |
 | `TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE` | Un texto sin fuente o sin tamaño | Decláralos en `For element: Document` |
 | `FONT_UNKNOWN` | La fuente no está en `fonts/` | Revisa el nombre de la familia; el mensaje lista las que hay |
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usa otra fuente o quita el carácter |

@@ -9,4 +9,4 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Grid:
-			Rows: 50% 50%
+			Row sizes: 50% 50%

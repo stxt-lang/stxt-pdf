@@ -10,7 +10,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Grid:
 			Flow: column
-			Rows: 10 10
+			Row sizes: 10 10
 			Area: 1 1
 				Block:
 					Box:

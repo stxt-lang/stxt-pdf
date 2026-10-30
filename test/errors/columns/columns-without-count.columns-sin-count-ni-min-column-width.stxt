@@ -1,6 +1,6 @@
-# Case: Absolute como hijo de un Multicol
-# Code: CHILD_NOT_DECLARED
-# Line: 18
+# Case: Columns sin Count ni Min column width
+# Code: COLUMNS_WITHOUT_COUNT
+# Line: 16
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,7 +13,6 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Multicol:
-			Count: 2
-			Absolute:
-				Text: Nota
+		Columns:
+			Gap: 12
+			Text: Hola

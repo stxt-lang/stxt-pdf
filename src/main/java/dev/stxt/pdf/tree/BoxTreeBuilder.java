@@ -334,13 +334,13 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un {@code Multicol}
-     * (referencia/componentes/multicol.md) y un encabezado respeta la jerarquía (referencia/componentes/heading.md).
+     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un {@code Columns}
+     * (referencia/componentes/columns.md) y un encabezado respeta la jerarquía (referencia/componentes/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideMulticol && kind.position() != Position.STATIC && kind.position() != Position.RELATIVE) {
-            throw error(n, ErrorCode.POSITIONED_IN_MULTICOL, "Un " + n.getName() + " no puede estar dentro de un "
-                    + "Multicol: su posición no depende de las columnas; sácalo del Multicol");
+            throw error(n, ErrorCode.POSITIONED_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
+                    + "Columns: su posición no depende de las columnas; sácalo del Columns");
         }
         if (kind.headingLevel() > 0) {
             heading(ctx, n, kind.headingLevel());
@@ -366,7 +366,7 @@ public final class BoxTreeBuilder {
 
     /**
      * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Flex}, {@code Grid} y
-     * {@code Table}, {@code Multicol}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
+     * {@code Table}, {@code Columns}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
      */
     private String properties(BuildContext ctx, InlineNode n, ElementReader reader, Style s, Box parent) {
         String id = null;

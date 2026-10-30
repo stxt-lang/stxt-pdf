@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Table:
-			Columns: 100 100
+			Column sizes: 100 100
 			Head:
 				Row:
 					Cell: Concepto

@@ -49,7 +49,7 @@ class PageReferencesTest {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tText: La fila está en la página {page of: row}.", "\t\tId: ref", "\t\tLink: #row"},
                 fullPages(1),
-                new String[]{"\tTable:", "\t\tColumns: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tId: row",
+                new String[]{"\tTable:", "\t\tColumn sizes: 1fr", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tId: row",
                         "\t\t\t\tCell: Total"}));
         assertTrue(l.has(2, "row"));
         assertEquals("La fila está en la página 2.", text(l, 1, "ref"));

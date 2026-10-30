@@ -146,7 +146,7 @@ Document (dev.stxt.pdf):
 				Text: Calendario y honorarios
 			Table:
 				Id: fees
-				Columns: 36 1fr 84 74
+				Column sizes: 36 1fr 84 74
 				Column align: left left right right
 				Box:
 					Margin: 0 0 14 0
@@ -188,7 +188,7 @@ Document (dev.stxt.pdf):
 				Inside: avoid
 			Paragraph: Y en prueba de conformidad, las partes firman este contrato por duplicado y a un solo efecto, en el lugar y la fecha indicados al principio.
 			Grid:
-				Columns: 1fr 1fr
+				Column sizes: 1fr 1fr
 				Gap: 30
 				Box:
 					Margin: 10 0 0 0

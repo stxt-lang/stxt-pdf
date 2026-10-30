@@ -45,7 +45,7 @@ Document (dev.stxt.pdf):
 				Cinco ~~seis~~.
 		Table:
 			Id: tab
-			Columns: 80 80
+			Column sizes: 80 80
 			Body:
 				Row:
 					Cell: **aaaa** **bbbb**
