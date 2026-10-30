@@ -19,7 +19,6 @@ saliendo al trabajar y solo toca ese.
 
 - Verificar los PDF con lectores de pantalla reales (NVDA, JAWS, VoiceOver): hoy los comprueba veraPDF (PDF/UA-1) y un
   lector simulado.
-- El `Link` suelto de un `Fixed` (un pie con una web) se anuncia al final de la estructura, no en su sitio de lectura.
 - Idioma por tramo dentro de una línea (una palabra en inglés en un párrafo español): hoy el idioma es de la caja.
 - Contraste de color entre el texto y su fondo: el motor conoce `Color` y `Background`, pero no lo que hay detrás de una
   imagen.

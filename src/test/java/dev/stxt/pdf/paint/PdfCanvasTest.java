@@ -439,7 +439,7 @@ class PdfCanvasTest {
      * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
      * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
      * lleva la {@code OBJR} de la anotación; el de un {@code Fixed}, que no es contenido, es un
-     * {@code Link} suelto del {@code Document} con su {@code Alt} (referencia/implementacion/pdf.md).
+     * {@code Link} sin contenido en su sitio del árbol, con su {@code Alt} (referencia/implementacion/pdf.md).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -472,9 +472,9 @@ class PdfCanvasTest {
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
             PDStructureElement outer = (PDStructureElement) tree.getKids().get(0);
             PDStructureElement document = firstSection(outer);
-            // El Link del Fixed no es contenido: cuelga suelto del Document, no de la sección.
-            assertEquals(List.of("Sect", "Link"), types(outer));
-            assertEquals(List.of("P", "Link", "Div"), types(document));
+            // El Link del Fixed no envuelve contenido, pero está en su sitio de la sección: tras la imagen.
+            assertEquals(List.of("Sect"), types(outer));
+            assertEquals(List.of("P", "Link", "Link", "Div"), types(document));
             // La caja con Link: P → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
             PDStructureElement span = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(span));
@@ -491,13 +491,13 @@ class PdfCanvasTest {
             assertEquals("Logotipo", ((PDStructureElement) imageLink.getKids().get(0)).getAlternateDescription());
             assertNull(imageLink.getAlternateDescription());
             // El tramo del Markdown: P → [texto, Link → [texto del enlace, OBJR], texto].
-            PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(2))
+            PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(3))
                     .getKids().get(0);
             assertEquals("P", paragraph.getStructureType());
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
             assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
-            // El Fixed: un Link suelto del Document, con el texto como Alt y la OBJR.
-            PDStructureElement fixed = (PDStructureElement) outer.getKids().get(1);
+            // El Fixed: un Link sin contenido, con el texto como Alt y la OBJR.
+            PDStructureElement fixed = (PDStructureElement) document.getKids().get(2);
             assertEquals(List.of("OBJR"), shape(fixed));
             assertEquals("pie", fixed.getAlternateDescription());
             assertEquals(fixed.getCOSObject(), ((COSObjectable) tree.getParentTree()
@@ -613,8 +613,8 @@ class PdfCanvasTest {
 
     /**
      * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
-     * solo es contenido (y envuelve el texto de la celda) en la primera; en las demás es un {@code Link}
-     * suelto del {@code Document} (referencia/implementacion/pdf.md).
+     * solo es contenido (y envuelve el texto de la celda) en la primera; las anotaciones de las demás van al mismo
+     * {@code Link} (referencia/implementacion/pdf.md).
      */
     @Test
     void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {
@@ -638,17 +638,60 @@ class PdfCanvasTest {
             PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
             PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
             assertEquals(List.of("Link"), types(th));
-            // El Link de la celda solo tiene la anotación de la primera página.
+            // El Link de la celda envuelve el texto de la primera página y lleva las anotaciones de las dos.
             PDStructureElement cellLink = (PDStructureElement) th.getKids().get(0);
-            assertEquals(List.of("MCR", "OBJR"), shape(cellLink));
+            assertEquals(List.of("MCR", "OBJR", "OBJR"), shape(cellLink));
             assertEquals(pdf.getPage(0), ((PDObjectReference) cellLink.getKids().get(1)).getPage());
-            // La de la segunda es un Link suelto del Document.
+            assertEquals(pdf.getPage(1), ((PDObjectReference) cellLink.getKids().get(2)).getPage());
+            assertEquals(List.of("Sect"), types(outer));
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
-            PDStructureElement repeated = (PDStructureElement) outer.getKids().get(1);
-            assertEquals("Link", repeated.getStructureType());
-            assertEquals("Concepto", repeated.getAlternateDescription());
-            assertEquals(repeated.getCOSObject(), ((COSObjectable) tree.getParentTree()
+            assertEquals(cellLink.getCOSObject(), ((COSObjectable) tree.getParentTree()
                     .getValue(links(pdf, 1).get(0).getStructParent())).getCOSObject());
+        }
+    }
+
+    /**
+     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Fixed} o de una imagen decorativa es un
+     * {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en su
+     * orden de lectura (referencia/implementacion/pdf.md).
+     */
+    @Test
+    void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
+                + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: Más en [la web](https://pie.example)\n"
+                + "\t\t\tTypography:\n\t\t\t\tInline: markdown\n"
+                + "\tText: Uno\n"
+                + "\tImage: test/wide.png\n\t\tLink: https://logo.example\n"
+                + "\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n"));
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "links-not-content"))) {
+            assertEquals(2, pdf.getNumberOfPages());
+            PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("Sect"), types(outer));
+            PDStructureElement section = firstSection(outer);
+            // El Fixed está antes que el texto en el documento, y la imagen entre los dos textos.
+            assertEquals(List.of("Link", "P", "Link", "P"), types(section));
+            PDStructureElement footer = (PDStructureElement) section.getKids().get(0);
+            assertEquals(List.of("OBJR", "OBJR"), shape(footer));
+            assertEquals("la web", footer.getAlternateDescription());
+            assertEquals(pdf.getPage(0), ((PDObjectReference) footer.getKids().get(0)).getPage());
+            assertEquals(pdf.getPage(1), ((PDObjectReference) footer.getKids().get(1)).getPage());
+            PDStructureElement logo = (PDStructureElement) section.getKids().get(2);
+            assertEquals(List.of("OBJR"), shape(logo));
+            assertEquals("https://logo.example", logo.getAlternateDescription());
+        }
+    }
+
+    /** Un {@code Fixed} que no sale en ninguna página no deja un {@code Link} vacío. */
+    @Test
+    void aFixedThatIsNeverPaintedLeavesNoEmptyLink() throws Exception {
+        InlineNode doc = reader.read(Docs.sectioned(LINKS
+                + "\tFixed:\n\t\tPages: even\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
+                + "\tText: Uno\n"));
+        try (PDDocument pdf = Loader.loadPDF(render(doc, "links-never-painted"))) {
+            PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
+                    .getKids().get(0);
+            assertEquals(List.of("P"), types(firstSection(outer)));
         }
     }
 

@@ -134,10 +134,13 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
   varias líneas: un contenido marcado y una `OBJR` por línea. Dos enlaces seguidos con el mismo destino son uno.
 - *`Alt`:* un `Link` que contiene algo que leer (texto o una figura con su `Alt`) no lleva `Alt`, porque el lector lo leería
   en lugar del contenido; uno sin nada dentro lo lleva con el texto del enlace.
-- *Lo que no es contenido* (un `Fixed`, una imagen decorativa, las filas repetidas de una tabla) no tiene a qué envolver:
-  su anotación va a un `Link` suelto, hijo del `Document`, sin contenido y con el texto del enlace como `Alt`, porque
-  PDF/UA exige que toda anotación de enlace esté en un `Link`. Por eso un pie con una web se anuncia al final de la
-  estructura, una vez por página.
+- *Lo que no es contenido* (un `Fixed`, una imagen decorativa) no tiene a qué envolver, pero PDF/UA exige que toda
+  anotación de enlace esté en un `Link`. Cada enlace suyo (el de una caja y uno por destino de sus enlaces de texto) es un
+  `Link` sin contenido en el sitio de la caja en el árbol, con el texto del enlace como `Alt` y una `OBJR` por página en
+  que sale: un pie con una web se anuncia una vez, donde está el `Fixed` en el documento. Si el `Fixed` no sale en
+  ninguna página, no hay `Link`.
+- *Las filas repetidas de una tabla:* sus anotaciones van al `Link` de la primera página, el que envuelve el texto de la
+  celda.
 
 > **Decisión:** el `Link` envuelve lo que se pulsa. *Alternativa descartada:* un `Link` con solo la referencia a la
 > anotación, que no cumple PDF/UA.
@@ -145,8 +148,10 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
 > **Decisión:** un enlace de varias líneas es un solo `Link` (las anotaciones siguen siendo una por línea, que es lo que el
 > visor necesita): un lector de pantalla anuncia un enlace, no uno por línea.
 
-> **Decisión:** el `Link` suelto de lo que no es contenido. *Alternativa descartada:* marcar esas anotaciones como ocultas,
-> que las quita del ratón.
+> **Decisión:** el enlace de lo que no es contenido es un `Link` sin contenido en el sitio de la caja, con las anotaciones
+> de todas las páginas. *Alternativas descartadas:* un `Link` suelto del `Document` por página, que un lector de pantalla
+> anuncia al final de la estructura y tantas veces como páginas; marcar esas anotaciones como ocultas, que las quita del
+> ratón.
 
 ## Marcadores
 

@@ -99,11 +99,18 @@ final class PdfStructure {
     private final Set<PDStructureElement> emptyLinks = new HashSet<>();
     /** El {@code Link} del enlace de texto que se está pintando, para colgarle la anotación de su zona. */
     private PDStructureElement inline;
+    /**
+     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Fixed}, una imagen decorativa), por caja y
+     * destino: están en el sitio de la caja en el árbol, sin contenido, y reciben las anotaciones de todas las páginas.
+     */
+    private final Map<Box, Map<String, PDStructureElement>> standIns = new HashMap<>();
+    /**
+     * Los {@code Link} de los enlaces de texto de las cajas que se repiten (la cabecera y el pie de una tabla), por
+     * caja y destino: los de la primera página, que reciben las anotaciones de las repeticiones.
+     */
+    private final Map<Box, Map<String, PDStructureElement>> firstLinks = new HashMap<>();
 
     private static final String[] TABLE_GROUPS = {"THead", "TBody", "TFoot"};
-
-    /** El elemento {@code Document}, raíz del árbol de estructura. */
-    private final PDStructureElement document;
 
     /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (referencia/componentes/document.md). */
     private final Box root;
@@ -119,7 +126,6 @@ final class PdfStructure {
         markInfo.setMarked(true);
         catalog.setMarkInfo(markInfo);
         build(root, treeRoot);
-        document = elements.get(root);
     }
 
     /**
@@ -132,7 +138,8 @@ final class PdfStructure {
             return;
         }
         if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER) {
-            // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact.
+            // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact; su enlace, sí.
+            standIns(box, parent);
             return;
         }
         // Una imagen con enlace es el contenido de su Link: Link → Figure.
@@ -161,11 +168,44 @@ final class PdfStructure {
             content = body;
         }
         content = linked(box, content);
+        children(box, content);
+    }
+
+    /** Los elementos de los hijos de la caja; de un {@code Fixed}, que no es contenido, solo sus enlaces. */
+    private void children(Box box, PDStructureNode content) {
         for (Box child : box.children()) {
-            if (child.style().position() != Position.FIXED) {
+            if (child.style().position() == Position.FIXED) {
+                standIns(child, content);
+            } else {
                 build(child, content);
             }
         }
+    }
+
+    /**
+     * Los {@code Link} de los enlaces de una caja que no es contenido y de lo que contiene, en su sitio del árbol: el
+     * de la caja ({@code Link} del elemento) y uno por destino de sus enlaces de texto, en orden.
+     */
+    private void standIns(Box box, PDStructureNode parent) {
+        if (box.style().link() != null) {
+            standIn(box, box.style().link(), parent);
+        }
+        if (box.formattedRuns() != null) {
+            for (var run : box.formattedRuns()) {
+                if (run.format().link() != null) {
+                    standIn(box, run.format().link(), parent);
+                }
+            }
+        }
+        box.children().forEach(child -> standIns(child, parent));
+    }
+
+    private void standIn(Box box, String destination, PDStructureNode parent) {
+        standIns.computeIfAbsent(box, k -> new HashMap<>()).computeIfAbsent(destination, k -> {
+            PDStructureElement link = new PDStructureElement("Link", parent);
+            parent.appendKid(link);
+            return link;
+        });
     }
 
     /**
@@ -271,12 +311,7 @@ final class PdfStructure {
             if (group != 1) {
                 repeats(cell);
             }
-            PDStructureNode content = linked(cell, c);
-            for (Box child : cell.children()) {
-                if (child.style().position() != Position.FIXED) {
-                    build(child, content);
-                }
-            }
+            children(cell, linked(cell, c));
         }
     }
 
@@ -446,14 +481,14 @@ final class PdfStructure {
     /**
      * Etiqueta la zona de una caja con {@code Link} (referencia/implementacion/pdf.md): la
      * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
-     * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. En un
-     * {@code Fixed}, en una imagen decorativa o en las filas repetidas de una tabla, donde la caja no
-     * es contenido, el enlace va a un {@code Link} aparte ({@link #outside}).
+     * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. Donde la caja no es
+     * contenido, el enlace va al {@code Link} que la sustituye en su sitio ({@link #standIns}) o, en las filas
+     * repetidas de una tabla, al de la primera página.
      */
-    void link(Box box, PDAnnotationLink annotation, String description) {
+    void link(Box box, String destination, PDAnnotationLink annotation, String description) {
         PDStructureElement parent = elements.get(box);
-        if (parent == null || !isContent(box)) {
-            outside(annotation, description);
+        if (parent == null) {
+            outside(box, destination, annotation, description);
             return;
         }
         PDStructureElement link = boxLinks.get(box);
@@ -463,35 +498,53 @@ final class PdfStructure {
             link.setPage(page);
             parent.appendKid(link);
             emptyLinks.add(link);
+            boxLinks.put(box, link);
         }
-        if (emptyLinks.contains(link) && link.getAlternateDescription() == null) {
-            link.setAlternateDescription(description != null ? description : annotation.getContents());
+        if (emptyLinks.contains(link)) {
+            describe(link, annotation, description);
         }
         attach(link, annotation);
     }
 
-    /** Etiqueta la zona de una línea del enlace de texto que empezó {@link #markLink}. */
-    void inlineLink(PDAnnotationLink annotation, String description) {
+    /**
+     * Etiqueta la zona de una línea del enlace de texto que empezó {@link #markLink}; si el texto no es contenido, va
+     * al {@code Link} de su caja y su destino que lo sustituye en su sitio ({@link #standIns}) o, en las filas
+     * repetidas de una tabla, al de la primera página.
+     */
+    void inlineLink(Box box, String destination, PDAnnotationLink annotation, String description) {
         if (inline != null) {
+            firstLinks.computeIfAbsent(box, k -> new HashMap<>()).putIfAbsent(destination, inline);
             attach(inline, annotation);
+            return;
+        }
+        PDStructureElement first = firstLinks.getOrDefault(box, Map.of()).get(destination);
+        if (first != null) {
+            attach(first, annotation);
         } else {
-            outside(annotation, description);
+            outside(box, destination, annotation, description);
         }
     }
 
     /**
-     * Etiqueta el enlace de algo que no es contenido (un {@code Fixed}, una imagen decorativa, las filas
-     * repetidas de una tabla): PDF/UA exige que toda anotación de enlace esté en un {@code Link}. Es un
-     * {@code Link} hijo del {@code Document}, sin contenido marcado y con el texto del enlace como
-     * {@code Alt}: un lector de pantalla lo anuncia, y lo que se repite en cada página (un pie con una
-     * web) se anuncia en cada una.
+     * Etiqueta el enlace de una caja que no es contenido (en un {@code Fixed}, una imagen decorativa): PDF/UA exige
+     * que toda anotación de enlace esté en un {@code Link}. Es el {@code Link} de la caja y su destino que se puso en
+     * su sitio del árbol al construirlo, sin contenido marcado y con el texto del enlace como {@code Alt}: un lector
+     * de pantalla lo anuncia una vez, en su orden de lectura, aunque se repita en cada página (un pie con una web).
      */
-    private void outside(PDAnnotationLink annotation, String description) {
-        PDStructureElement link = new PDStructureElement("Link", document);
-        link.setPage(page);
-        link.setAlternateDescription(description != null ? description : annotation.getContents());
-        document.appendKid(link);
+    private void outside(Box box, String destination, PDAnnotationLink annotation, String description) {
+        PDStructureElement link = standIns.getOrDefault(box, Map.of()).get(destination);
+        if (link == null) {
+            throw new IllegalStateException("Enlace sin Link en la estructura: " + destination);
+        }
+        describe(link, annotation, description);
         attach(link, annotation);
+    }
+
+    /** El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. */
+    private static void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
+        if (link.getAlternateDescription() == null) {
+            link.setAlternateDescription(description != null ? description : annotation.getContents());
+        }
     }
 
     private void attach(PDStructureElement link, PDAnnotationLink annotation) {
@@ -524,6 +577,14 @@ final class PdfStructure {
      * {@code destinations}.
      */
     void finish(PDDocument doc, Map<Box, PDPageXYZDestination> destinations) {
+        // Un Link sin anotaciones (el de un Fixed que no sale en ninguna página) no puede quedar vacío.
+        for (Map<String, PDStructureElement> links : standIns.values()) {
+            for (PDStructureElement link : links.values()) {
+                if (link.getKids().isEmpty()) {
+                    ((PDStructureNode) link.getParent()).removeKid(link);
+                }
+            }
+        }
         PDNumberTreeNode parentTree = new PDNumberTreeNode(PDParentTreeValue.class);
         parentTree.setNumbers(parents);
         treeRoot.setParentTree(parentTree);

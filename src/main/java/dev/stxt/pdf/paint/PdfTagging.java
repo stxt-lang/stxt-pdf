@@ -110,9 +110,9 @@ final class PdfTagging implements Tagging {
         }
         annotations.add(annotation);
         if (linkText) {
-            structure.inlineLink(annotation, description);
+            structure.inlineLink(box, destination, annotation, description);
         } else {
-            structure.link(box, annotation, description);
+            structure.link(box, destination, annotation, description);
         }
     }
 

@@ -63,7 +63,9 @@ repetidas de una tabla, también.
 
 Un lector de pantalla anuncia cada enlace una vez, aunque ocupe varias líneas, con lo que enlaza: el texto de la caja (los
 de un `Block`, unidos por espacios; el número de página de una entrada de índice no cuenta) o el `Alt` de una imagen; sin
-texto, el destino. Los enlaces se recorren con el tabulador en el orden de lectura. Cómo queda en el PDF:
+texto, el destino. El de un `Fixed` o el de las filas repetidas de una tabla también se anuncia una vez, en su sitio del
+documento, aunque sea clicable en todas las páginas. Los enlaces se recorren con el tabulador en el orden de lectura. Cómo
+queda en el PDF:
 [El PDF por dentro](../implementacion/pdf.md#enlaces).
 
 ## Lo que no hay
@@ -71,4 +73,3 @@ texto, el destino. Los enlaces se recorren con el tabulador en el orden de lectu
 - Enlaces con título, definiciones de enlaces aparte (`[x][ref]`) e imágenes dentro de un enlace de Markdown: una imagen
   clicable es una `Image` con `Link`.
 - Un texto propio para el enlace distinto de lo que enlaza.
-- El enlace de un `Fixed` se anuncia al final del documento, no en su sitio de lectura.
