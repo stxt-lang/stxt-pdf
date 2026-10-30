@@ -48,9 +48,14 @@ public final class DocumentSchema {
      *         ({@code CHILD_NOT_DECLARED}, {@code TOO_FEW_CHILDREN}…) y su línea
      */
     public static void validate(Node root) {
+        validate(root, false);
+    }
+
+    /** Como {@link #validate(Node)}; {@code inStyles}, si es un documento de estilos aparte. */
+    static void validate(Node root, boolean inStyles) {
         List<ValidationException> errors = new SchemaValidator(PROVIDER, true).validate(root);
         if (!errors.isEmpty()) {
-            throw new DocumentSyntaxException(errors.get(0));
+            throw new DocumentSyntaxException(errors.get(0), inStyles);
         }
     }
 

@@ -83,7 +83,7 @@ class BoxTreeBuilderTest {
         Box b = root.children().get(1).children().get(0);
         assertEquals(new Cell(1, 2, 1, 1), b.style().item().area());
         assertEquals(Alignment.CENTER, b.style().item().vertical());
-        assertEquals(17, b.style().line("item.area"));
+        assertEquals(17, b.style().line("item.area").number());
         assertEquals(Cell.AUTO, root.children().get(1).children().get(1).style().item().area());
     }
 
@@ -198,7 +198,7 @@ class BoxTreeBuilderTest {
         assertEquals("#333", text.style().typography().color());
         assertEquals(20, text.style().typography().usedLineHeight(), 1e-9);
         // La línea de la declaración se hereda: los errores de fuentes la señalan.
-        assertEquals(10, text.style().line("font"));
+        assertEquals(10, text.style().line("font").number());
     }
 
     @Test

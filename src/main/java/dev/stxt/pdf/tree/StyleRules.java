@@ -40,9 +40,6 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
  */
 final class StyleRules {
 
-    /** Cómo se llama el documento de estilos aparte en los mensajes de error. */
-    static final String EXTERNAL = "los estilos";
-
     /** Reglas {@code Element}, por elemento y en el orden en que se aplican. */
     private final Map<Element, List<InlineNode>> elementRules = new EnumMap<>(Element.class);
     /** Reglas {@code Element: Document}, en el orden en que se aplican. */
@@ -164,7 +161,7 @@ final class StyleRules {
 
     /** Un error de una regla; si viene del documento de estilos aparte, lo dice. */
     private static InvalidModelException located(InvalidModelException e, boolean fromFile) {
-        return fromFile ? e.inSource(EXTERNAL) : e;
+        return fromFile ? e.inStylesDocument() : e;
     }
 
     /**
@@ -362,10 +359,12 @@ final class StyleRules {
     }
 
     /**
-     * Los grupos de una regla, con la misma lectura que en un elemento: cada valor con su línea. Un
-     * error de una regla del documento de estilos aparte lo dice.
+     * Los grupos de una regla, con la misma lectura que en un elemento: cada valor con su línea, que en una regla del
+     * documento de estilos aparte es de ese documento. Un error de una regla del documento de estilos aparte lo dice.
      */
     private void read(InlineNode rule, Style s) {
+        boolean fromFile = external.contains(rule);
+        s.readingStyles(fromFile);
         try {
             for (Node g : rule.getChildren()) {
                 switch (g.getCanonicalName()) {
@@ -376,7 +375,9 @@ final class StyleRules {
                 }
             }
         } catch (InvalidModelException e) {
-            throw located(e, external.contains(rule));
+            throw located(e, fromFile);
+        } finally {
+            s.readingStyles(false);
         }
     }
 }

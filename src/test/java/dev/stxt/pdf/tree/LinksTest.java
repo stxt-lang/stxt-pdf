@@ -42,7 +42,7 @@ class LinksTest {
                 "\t\t\tLink: mailto:a@b.c");
         Box block = root.children().get(0);
         assertEquals("https://stxt.dev", block.style().link());
-        assertEquals(14, block.style().line("link"));
+        assertEquals(14, block.style().line("link").number());
         // Lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva enlace propio.
         assertNull(block.children().get(0).style().link());
         assertEquals("mailto:a@b.c", block.children().get(1).style().link());

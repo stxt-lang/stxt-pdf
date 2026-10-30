@@ -42,9 +42,9 @@ class TextCaseTest {
         assertEquals(Transform.CAPITALIZE, text.style().typography().transform());
         assertEquals(-0.5, text.style().typography().letterSpacing(), 1e-9);
         assertTrue(text.style().typography().smallCaps());
-        assertEquals(15, block.style().line("transform"));
-        assertEquals(16, block.style().line("letter-spacing"));
-        assertEquals(17, block.style().line("small-caps"));
+        assertEquals(15, block.style().line("transform").number());
+        assertEquals(16, block.style().line("letter-spacing").number());
+        assertEquals(17, block.style().line("small-caps").number());
     }
 
     @Test
@@ -83,7 +83,7 @@ class TextCaseTest {
         assertEquals(Locale.forLanguageTag("tr"), turkish.style().typography().locale());
         assertEquals(Locale.forLanguageTag("tr"), turkish.children().get(0).style().typography().locale());
         assertEquals(Locale.forLanguageTag("es"), root.children().get(1).style().typography().locale());
-        assertEquals(15, turkish.style().line("language"));
+        assertEquals(15, turkish.style().line("language").number());
     }
 
     /** También en una regla de {@code Styles}: una clase para las palabras de otro idioma. */

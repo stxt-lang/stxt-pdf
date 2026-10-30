@@ -43,7 +43,10 @@ Traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen del e
 pasan al elemento que envuelven), interpreta valores, aplica la herencia y comprueba las reglas que el schema no puede
 expresar. Los errores son `InvalidModelException` con un `ErrorCode` y la **línea del nodo culpable**: la de la propiedad
 (`Style.line(HEIGHT)`, con las claves de `PropertyKey`), no la de su caja. `PropertyKey.internal` da el nombre interno de
-los nombres cortos (`Size` → `font-size`), que es la clave de `Style.line`.
+los nombres cortos (`Size` → `font-size`), que es la clave de `Style.line`. La línea es un `SourceLine`: su número y si es
+del documento de estilos aparte, porque una propiedad que llega de una regla suya tiene la línea de ese documento
+(`StyleRules` marca el `Style` mientras la lee). Se escribe en los mensajes tal cual (`línea 8 de los estilos`), y el error
+que se construye con ella lo dice también en `inStyles()`.
 
 `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`. `BoxTreeBuilder.element`
 es el orden común a todos los elementos (el sitio, la herencia, las reglas, las propiedades y sus comprobaciones, la caja y

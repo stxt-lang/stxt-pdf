@@ -27,11 +27,6 @@ saliendo al trabajar y solo toca ese.
 - `Alt` de las imágenes: hoy una `Image` sin `Alt` es decorativa sin aviso. Si los olvidos resultan un problema, hacer
   `Alt` obligatorio con `Alt:` vacío para las decorativas.
 
-### Estilos
-
-- Los errores que se detectan después de construir el árbol (una fuente que no existe, un desbordamiento) señalan la línea
-  de una regla del documento de estilos aparte sin decir que es de ese fichero.
-
 ### Aspecto de las cajas
 
 - Sombras (descartadas: PDFBox no desenfoca y habría que aproximar con capas), degradados con paradas con posición,

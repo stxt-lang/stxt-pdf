@@ -61,7 +61,7 @@ class TablesTest {
                 "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tHeader: true", "\t\t\t\tCell: 120").children().get(0);
         assertEquals(List.of(false, false, true, false, true, false),
                 table.children().stream().map(c -> c.style().header()).toList());
-        assertEquals(22, table.children().get(2).style().line("header"));
+        assertEquals(22, table.children().get(2).style().line("header").number());
     }
 
     @Test
@@ -196,7 +196,7 @@ class TablesTest {
         for (Box cell : table.children().subList(2, 4)) {
             assertEquals(Break.PAGE, cell.style().breaks().before());
             assertTrue(cell.style().breaks().avoidInside());
-            assertEquals(21, cell.style().line("break-before"));
+            assertEquals(21, cell.style().line("break-before").number());
         }
         assertFalse(table.children().get(0).style().breaks().avoidInside());
     }

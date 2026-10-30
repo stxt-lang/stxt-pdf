@@ -100,7 +100,7 @@ final class ModelValidator {
                             + "grosor o quítalo");
         }
         if (s.multicol().rule() > s.multicol().columnGap() + Tolerance.EPSILON) {
-            String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (línea " + s.line(COLUMN_GAP) + ")"
+            String gap = s.isDeclared(COLUMN_GAP) ? "Column gap (" + s.line(COLUMN_GAP) + ")"
                     : "Column gap, que sin declarar es 0";
             throw error(s.line(RULE), ErrorCode.COLUMN_RULE_WIDTH, "Rule es más ancha que " + gap
                     + ": la línea se pintaría sobre las columnas; ensancha Column gap o adelgaza Rule");
@@ -194,7 +194,7 @@ final class ModelValidator {
         if (!s.isDeclared(OFFSET)) {
             return;
         }
-        int line = s.line(OFFSET);
+        SourceLine line = s.line(OFFSET);
         Sides<Value> o = s.offset();
         if (s.position() == Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
@@ -228,7 +228,7 @@ final class ModelValidator {
         if (!horizontalAuto && !verticalAuto) {
             return;
         }
-        int line = s.line(MARGIN);
+        SourceLine line = s.line(MARGIN);
         if (flexItem || gridItem) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de flex o "
                     + "grid; alinea con Main axis, Cross axis, Horizontal o Vertical");
@@ -253,7 +253,8 @@ final class ModelValidator {
     }
 
     /** Un {@code Absolute} o un {@code Fixed} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
-    private static void validateOutOfFlowMargins(Style s, int line, boolean horizontalAuto, boolean verticalAuto) {
+    private static void validateOutOfFlowMargins(Style s, SourceLine line, boolean horizontalAuto,
+                                                 boolean verticalAuto) {
         Sides<Value> o = s.offset();
         if (horizontalAuto && (o.left().isAuto() || s.box().width().isAuto() || o.right().isAuto())) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
@@ -270,15 +271,15 @@ final class ModelValidator {
                                        String max, Value maxValue) {
         if (maxValue != null && comparable(minValue, maxValue) && amount(minValue) > amount(maxValue)) {
             throw error(s.line(min), ErrorCode.MIN_MAX_CONFLICT,
-                    label(min) + " es mayor que " + label(max) + " (línea " + s.line(max) + ")");
+                    label(min) + " es mayor que " + label(max) + " (" + s.line(max) + ")");
         }
         if (comparable(value, minValue) && amount(value) < amount(minValue)) {
             throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
-                    label(size) + " es menor que " + label(min) + " (línea " + s.line(min) + ")");
+                    label(size) + " es menor que " + label(min) + " (" + s.line(min) + ")");
         }
         if (maxValue != null && comparable(value, maxValue) && amount(value) > amount(maxValue)) {
             throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
-                    label(size) + " es mayor que " + label(max) + " (línea " + s.line(max) + ")");
+                    label(size) + " es mayor que " + label(max) + " (" + s.line(max) + ")");
         }
     }
 
@@ -359,7 +360,7 @@ final class ModelValidator {
         return h.isAuto() && gridItem && vertical == Alignment.STRETCH;
     }
 
-    private static InvalidModelException indefinite(int line, String what) {
+    private static InvalidModelException indefinite(SourceLine line, String what) {
         return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " usa un porcentaje de un alto que no es "
                 + "definido: declara el Height del containing block, o usa puntos");
     }

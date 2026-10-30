@@ -145,9 +145,11 @@ Styles (dev.stxt.pdf):
   (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Una clase de `Class` puede tener su `For class` en
   cualquiera de los dos.
 - **Errores.** Una regla del documento de estilos se valida como una del documento, y su error lleva la línea **de ese
-  fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Los errores que
-  dependen de la maquetación (una fuente que no existe, un desbordamiento) señalan la línea de la propiedad sin decir en
-  qué fichero está.
+  fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Una propiedad que
+  llega de una regla del documento de estilos conserva su línea en él, también la tipografía que se hereda, así que lo
+  mismo vale para los errores que se ven al aplicarla o al maquetar (una fuente que no existe, un desbordamiento). Si un
+  mensaje nombra otra línea, también dice de qué documento es: `línea 8 de los estilos: Min width es mayor que Max width
+  (línea 10)`.
 
 > **Decisión:** la prioridad entre los dos orígenes es por nivel, así que sacar el `Styles` a un fichero no cambia nada.
 > *Alternativa descartada:* que todas las reglas del fichero valgan menos que cualquiera del documento.

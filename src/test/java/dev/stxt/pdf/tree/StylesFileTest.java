@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,8 +65,8 @@ class StylesFileTest {
         // Lo que el documento no declara lo pone el documento de estilos.
         assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
         // Cada propiedad guarda la línea de su regla, también en el documento aparte.
-        assertEquals(10, text.style().line("font-size"));
-        assertEquals(9, text.style().line("font-weight"));
+        assertEquals(SourceLine.of(10), text.style().line("font-size"));
+        assertEquals(SourceLine.inStyles(9), text.style().line("font-weight"));
     }
 
     @Test
@@ -143,6 +144,40 @@ class StylesFileTest {
     }
 
     @Test
+    void aRuleCheckedAfterBuildingTheTreePointsToTheStylesDocument() {
+        InvalidModelException e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tWidth: 10\n\t\t\tHeight: 10\n"
+                + "\t\t\tAspect ratio: 2\n", "\tBlock:", "\t\tText: hola");
+        assertEquals(ErrorCode.ASPECT_RATIO_CONFLICT, e.errorCode());
+        assertEquals(10, e.line());
+        assertTrue(e.inStyles());
+        assertTrue(e.getMessage().startsWith("línea 10 de los estilos: "), e.getMessage());
+    }
+
+    @Test
+    void aMessageNamesTheDocumentOfEachLine() {
+        // Min width llega de los estilos y Max width es del documento: cada línea dice de dónde es.
+        InvalidModelException e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tMin width: 100\n",
+                "\tBlock:", "\t\tBox:", "\t\t\tMax width: 50", "\t\tText: hola");
+        assertEquals(ErrorCode.MIN_MAX_CONFLICT, e.errorCode());
+        assertEquals("línea 8 de los estilos: Min width es mayor que Max width (línea 10)", e.getMessage());
+        // Y al revés.
+        e = error(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tMax width: 50\n",
+                "\tBlock:", "\t\tBox:", "\t\t\tMin width: 100", "\t\tText: hola");
+        assertFalse(e.inStyles());
+        assertEquals("línea 10: Min width es mayor que Max width (línea 8 de los estilos)", e.getMessage());
+    }
+
+    @Test
+    void aDeclarationOfTheDocumentAfterARuleOfTheStylesDocumentIsOfTheDocument() {
+        Box block = root(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tPadding: 1\n",
+                "\tBlock:", "\t\tBox:", "\t\t\tMargin: 2", "\t\tText: hola").children().get(0);
+        assertEquals(SourceLine.inStyles(8), block.style().line("padding"));
+        assertEquals(SourceLine.of(10), block.style().line("margin"));
+        // La tipografía se hereda con su documento.
+        assertEquals(SourceLine.inStyles(4), block.children().get(0).style().line("font"));
+    }
+
+    @Test
     void anUnknownElementInTheStylesDocumentIsAnError() {
         InvalidModelException e = error(BASE + "\tElement: Nada\n\t\tBox:\n\t\t\tPadding: 1\n", "\tText: hola");
         assertEquals(ErrorCode.STYLE_UNKNOWN_ELEMENT, e.errorCode());
@@ -185,6 +220,7 @@ class StylesFileTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> READER.readStyles(HEADER + "\tSection:\n\t\tText: a"));
         assertEquals(ErrorCode.DOCUMENT_ROOT, e.errorCode());
+        assertTrue(e.inStyles());
         assertThrows(InvalidModelException.class, () -> READER.readStyles(BASE + "Styles (dev.stxt.pdf):\n"));
         // Y no se pasa un Document como estilos.
         InlineNode document = READER.read(Docs.sectioned(HEADER + "\tText: a"));
@@ -196,6 +232,8 @@ class StylesFileTest {
         DocumentSyntaxException e = assertThrows(DocumentSyntaxException.class,
                 () -> READER.readStyles("Styles (dev.stxt.pdf):\n\tElement: Text\n\t\tColour: red\n"));
         assertEquals("NODE_NOT_DEFINED_IN_SCHEMA", e.code());
+        assertTrue(e.inStyles());
+        assertTrue(e.getMessage().startsWith("línea 3 de los estilos: "), e.getMessage());
         // Un documento de estilos no tiene Media ni elementos.
         assertThrows(DocumentSyntaxException.class, () -> READER.readStyles("Styles (dev.stxt.pdf):\n\tText: a\n"));
     }
@@ -228,5 +266,33 @@ class StylesFileTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> Converter.create().toPdf(document, new ByteArrayOutputStream()));
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.errorCode());
+    }
+
+    /** El error de convertir el documento (cabecera y estas líneas) con el documento de estilos aparte. */
+    private static InvalidModelException conversionError(String styles, String... lines) {
+        InlineNode document = READER.read(Docs.sectioned(HEADER + String.join("\n", lines)));
+        Converter converter = Converter.builder().styles(styles).build();
+        return assertThrows(InvalidModelException.class, () -> converter.toPdf(document, new ByteArrayOutputStream()));
+    }
+
+    @Test
+    void anUnknownFontOfTheStylesDocumentPointsToItsLine() {
+        InvalidModelException e = conversionError("Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tTypography:\n"
+                + "\t\t\tFont: Nada\n\t\t\tSize: 10\n", "\tText: hola");
+        assertEquals(ErrorCode.FONT_UNKNOWN, e.errorCode());
+        assertEquals(4, e.line());
+        assertTrue(e.inStyles());
+        assertTrue(e.getMessage().startsWith("línea 4 de los estilos: "), e.getMessage());
+    }
+
+    @Test
+    void anOverflowCausedByTheStylesDocumentPointsToItsLine() {
+        // La línea del error es la del Width, en los estilos; la caja se nombra por su línea en el documento.
+        InvalidModelException e = conversionError(BASE + "\tElement: Block\n\t\tBox:\n\t\t\tWidth: 2000\n",
+                "\tBlock:", "\t\tText: hola");
+        assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
+        assertTrue(e.inStyles());
+        assertTrue(e.getMessage().startsWith("línea 8 de los estilos: La caja de la línea 8 no cabe a lo ancho"),
+                e.getMessage());
     }
 }

@@ -34,12 +34,19 @@ public abstract class StxtPdfException extends RuntimeException {
 
     private final Kind kind;
     private final int line;
+    private final boolean inStyles;
     private final String code;
 
     protected StxtPdfException(Kind kind, int line, String code, String message, Throwable cause) {
+        this(kind, line, false, code, message, cause);
+    }
+
+    /** {@code inStyles}: la línea es del documento de estilos aparte, no del documento. */
+    protected StxtPdfException(Kind kind, int line, boolean inStyles, String code, String message, Throwable cause) {
         super(message, cause);
         this.kind = kind;
         this.line = line;
+        this.inStyles = inStyles;
         this.code = code;
     }
 
@@ -47,9 +54,17 @@ public abstract class StxtPdfException extends RuntimeException {
         return kind;
     }
 
-    /** La línea del documento donde está el nodo culpable, o {@link #NO_LINE} si el error no es de una línea. */
+    /**
+     * La línea donde está el nodo culpable, o {@link #NO_LINE} si el error no es de una línea. Es del documento, o
+     * del documento de estilos aparte si {@link #inStyles()}.
+     */
     public int line() {
         return line;
+    }
+
+    /** Si {@link #line()} es del documento de estilos aparte (referencia/comun/estilos.md) y no del documento. */
+    public boolean inStyles() {
+        return inStyles;
     }
 
     /**

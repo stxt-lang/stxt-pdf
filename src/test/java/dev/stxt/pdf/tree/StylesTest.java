@@ -36,7 +36,7 @@ class StylesTest {
         assertEquals(5, padding(outer.children().get(0)), 1e-9);
         assertEquals(Sides.all(Value.pt(0)), root.children().get(1).style().box().padding());
         // La línea es la de la regla: los errores la señalan.
-        assertEquals(14, outer.style().line("padding"));
+        assertEquals(14, outer.style().line("padding").number());
     }
 
     @Test
@@ -46,8 +46,8 @@ class StylesTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 14").children().get(0);
         assertEquals(14, text.style().typography().fontSize(), 1e-9);
         assertEquals(FontWeight.BOLD, text.style().typography().fontWeight());
-        assertEquals(19, text.style().line("font-size"));
-        assertEquals(15, text.style().line("font-weight"));
+        assertEquals(19, text.style().line("font-size").number());
+        assertEquals(15, text.style().line("font-weight").number());
     }
 
     @Test

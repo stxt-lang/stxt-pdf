@@ -10,6 +10,7 @@ import dev.stxt.pdf.tree.DocumentSchema;
 import dev.stxt.pdf.tree.DocumentSyntaxException;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import dev.stxt.pdf.tree.SourceLine;
 import dev.stxt.exceptions.ParseException;
 import dev.stxt.exceptions.STXTException;
 import dev.stxt.exceptions.STXTIOException;
@@ -43,12 +44,12 @@ public final class DocumentReader {
 
     /** Lee y valida un documento; devuelve su nodo raíz. */
     public InlineNode read(String content) {
-        return root(parse(() -> parser().parse(content)));
+        return root(parse(() -> parser().parse(content), false));
     }
 
     /** Lee y valida un documento desde un fichero UTF-8; devuelve su nodo raíz. */
     public InlineNode read(Path file) {
-        return root(parse(() -> parser().parseFile(file.toFile())));
+        return root(parse(() -> parser().parseFile(file.toFile()), false));
     }
 
     /**
@@ -56,20 +57,23 @@ public final class DocumentReader {
      * pasa junto al documento al maquetarlo; devuelve su nodo raíz.
      */
     public InlineNode readStyles(String content) {
-        return styles(parse(() -> parser().parse(content)));
+        return styles(parse(() -> parser().parse(content), true));
     }
 
     /** Lee y valida un documento de estilos aparte desde un fichero UTF-8; devuelve su nodo raíz. */
     public InlineNode readStyles(Path file) {
-        return styles(parse(() -> parser().parseFile(file.toFile())));
+        return styles(parse(() -> parser().parseFile(file.toFile()), true));
     }
 
-    /** Lo que lee la librería, con los errores de la librería convertidos a los del motor. */
-    private static List<Node> parse(Supplier<List<Node>> parsing) {
+    /**
+     * Lo que lee la librería, con los errores de la librería convertidos a los del motor; {@code inStyles}, si lo que
+     * se lee es un documento de estilos aparte.
+     */
+    private static List<Node> parse(Supplier<List<Node>> parsing, boolean inStyles) {
         try {
             return parsing.get();
         } catch (ParseException e) {
-            throw new DocumentSyntaxException(e);
+            throw new DocumentSyntaxException(e, inStyles);
         } catch (STXTIOException e) {
             throw new ResourceException("No se puede leer el documento: " + e.getMessage(), e);
         } catch (STXTException e) {
@@ -86,14 +90,14 @@ public final class DocumentReader {
     private static InlineNode styles(List<Node> roots) {
         if (roots.size() != 1) {
             int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
-            throw new InvalidModelException(line, ErrorCode.DOCUMENT_ROOT, "El documento de estilos debe tener "
-                    + "exactamente un nodo raíz y tiene " + roots.size(), "los estilos");
+            throw new InvalidModelException(SourceLine.inStyles(line), ErrorCode.DOCUMENT_ROOT, "El documento de "
+                    + "estilos debe tener exactamente un nodo raíz y tiene " + roots.size());
         }
         Node root = roots.get(0);
         if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("styles")
                 || !(root instanceof InlineNode styles)) {
-            throw new InvalidModelException(root.getLine(), ErrorCode.DOCUMENT_ROOT,
-                    "El nodo raíz del documento de estilos debe ser Styles (" + NAMESPACE + "):", "los estilos");
+            throw new InvalidModelException(SourceLine.inStyles(root.getLine()), ErrorCode.DOCUMENT_ROOT,
+                    "El nodo raíz del documento de estilos debe ser Styles (" + NAMESPACE + "):");
         }
         return styles;
     }

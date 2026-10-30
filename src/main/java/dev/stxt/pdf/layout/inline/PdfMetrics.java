@@ -178,7 +178,7 @@ public final class PdfMetrics implements TextMeasurer {
         for (String p : List.of(FONT, FONT_WEIGHT, FONT_STYLE)) {
             if (s.isDeclared(p)) {
                 String name = p.equals(FONT) ? "Font" : p.equals(FONT_WEIGHT) ? "Weight" : "Style";
-                parts.add(name + " en la línea " + s.line(p));
+                parts.add(name + " en la " + s.line(p));
             }
         }
         return String.join(", ", parts);

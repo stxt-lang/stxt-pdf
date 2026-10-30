@@ -68,7 +68,7 @@ class TableStylesTest {
         assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style().box().padding().top()));
         assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style().box().padding().top()));
         // La línea de lo que aporta la regla es la de la regla.
-        assertEquals(14, cell(table, "h1").style().line("font-weight"));
+        assertEquals(14, cell(table, "h1").style().line("font-weight").number());
     }
 
     @Test
@@ -157,7 +157,7 @@ class TableStylesTest {
         assertEquals(TextAlign.CENTER, cell(table, "h2").style().typography().textAlign());
         assertEquals(TextAlign.CENTER, cell(table, "b3").style().typography().textAlign());
         // La línea de la alineación es la de Column align.
-        assertEquals(21, cell(table, "a2").style().line("text-align"));
+        assertEquals(21, cell(table, "a2").style().line("text-align").number());
     }
 
     @Test
@@ -211,7 +211,7 @@ class TableStylesTest {
             assertNull(cell(table, other).style().box().background(), other);
         }
         // La línea de lo que aporta la clase es la de su regla.
-        assertEquals(14, cell(table, "t2").style().line("font-weight"));
+        assertEquals(14, cell(table, "t2").style().line("font-weight").number());
     }
 
     /** Gana a las reglas de columna y de posición y pierde con las clases de la propia celda. */

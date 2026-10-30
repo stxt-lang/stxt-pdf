@@ -35,7 +35,7 @@ converter.toPdf(doc, out);
 ## Errores
 
 Todo error es un `StxtPdfException`, con tres datos: `kind()` (de quién es la culpa), `code()` (el código) y `line()` (la
-línea, 0 si no es de una línea).
+línea, 0 si no es de una línea). Si la línea es del fichero de estilos aparte, `inStyles()` es `true`.
 
 ```java
 try {

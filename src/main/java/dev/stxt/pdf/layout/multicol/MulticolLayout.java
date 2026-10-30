@@ -15,6 +15,7 @@ import dev.stxt.pdf.model.ColumnFill;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import dev.stxt.pdf.tree.SourceLine;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
@@ -285,7 +286,8 @@ public final class MulticolLayout implements LayoutAlgorithm {
         InvalidModelException tooTall(double limit) {
             Style s = box.style();
             String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO).filter(s::isDeclared).findFirst().orElse(null);
-            return new InvalidModelException(property != null ? s.line(property) : box.line(), ErrorCode.BOX_OVERFLOW,
+            return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(box.line()),
+                    ErrorCode.BOX_OVERFLOW,
                     "El contenido del Multicol " + box.describe() + " no cabe en su alto: " + columns.count()
                             + (columns.count() == 1 ? " columna" : " columnas") + " de " + pt(Math.max(0, limit))
                             + " no bastan; aumenta su alto o reduce el contenido");
@@ -294,7 +296,8 @@ public final class MulticolLayout implements LayoutAlgorithm {
         /** Sin página ni alto que llenar, los cortes de columna necesitan más columnas de las que hay. */
         InvalidModelException tooManyColumnBreaks() {
             Style s = box.style();
-            return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : box.line(), ErrorCode.BOX_OVERFLOW,
+            return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : SourceLine.of(box.line()),
+                    ErrorCode.BOX_OVERFLOW,
                     "El Multicol " + box.describe() + " tiene " + columns.count() + (columns.count() == 1 ? " columna" : " columnas")
                             + " y sus cortes de columna necesitan más: sin página ni alto que llenar, lo que no "
                             + "cabe no puede seguir en otra página; quita cortes de columna o añade columnas");

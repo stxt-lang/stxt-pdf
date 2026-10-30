@@ -22,6 +22,7 @@ import java.util.Map;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,6 +84,24 @@ class PdfMetricsTest {
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
         assertEquals(16, e.line());
         assertTrue(e.getMessage().endsWith("(Font en la línea 10, Weight en la línea 15)"), e.getMessage());
+    }
+
+    @Test
+    void missingVariantNamesTheStylesDocumentOfEachDeclaration(@TempDir Path dir) throws IOException {
+        Path fonts = Files.createDirectories(dir.resolve("fonts"));
+        Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("r.ttf"));
+        PdfMetrics regularOnly = new PdfMetrics(new Resources(dir));
+        String styles = "Styles (dev.stxt.pdf):\n\tElement: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
+                + "\t\t\tSize: 10\n";
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tMedia:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\tBlock:\n\t\tTypography:\n\t\t\tWeight: bold\n\t\tText: Hola";
+        DocumentReader reader = new DocumentReader();
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> regularOnly.validate(
+                new BoxTreeBuilder().build(reader.read(Docs.sectioned(doc)), reader.readStyles(styles)).root()));
+        assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
+        // El error es del texto, en el documento; la familia está declarada en los estilos.
+        assertFalse(e.inStyles());
+        assertTrue(e.getMessage().endsWith("(Font en la línea 4 de los estilos, Weight en la línea 10)"), e.getMessage());
     }
 
     @Test

@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -147,12 +148,14 @@ class ConverterErrorsTest {
     }
 
     @Test
-    void anErrorWithoutLineHasNoLinePrefixAndASourceKeepsHisLine() {
+    void anErrorWithoutLineHasNoLinePrefixAndTheStylesDocumentKeepsItsLine() {
         InvalidModelException withoutLine = new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT, "demasiado");
         assertEquals("demasiado", withoutLine.getMessage());
-        InvalidModelException inStyles = new InvalidModelException(8, ErrorCode.VALUE_SYNTAX, "mal").inSource("los estilos");
+        assertFalse(withoutLine.inStyles());
+        InvalidModelException inStyles = new InvalidModelException(8, ErrorCode.VALUE_SYNTAX, "mal").inStylesDocument();
         assertEquals("línea 8 de los estilos: mal", inStyles.getMessage());
         assertEquals(8, inStyles.line());
+        assertTrue(inStyles.inStyles());
         assertEquals("VALUE_SYNTAX", inStyles.code());
         assertEquals(Kind.INVALID_DOCUMENT, inStyles.kind());
         assertEquals(Kind.LIMIT, ErrorCode.PAGE_LIMIT.kind());

@@ -98,4 +98,9 @@ final class Nodes {
     static InvalidModelException error(int line, ErrorCode code, String message) {
         return new InvalidModelException(line, code, message);
     }
+
+    /** Un error de la línea de una propiedad, que puede ser del documento de estilos aparte. */
+    static InvalidModelException error(SourceLine line, ErrorCode code, String message) {
+        return new InvalidModelException(line, code, message);
+    }
 }

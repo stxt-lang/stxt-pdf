@@ -145,7 +145,8 @@ contestar:
 
 El código es el de la tabla de arriba, el de STXT para los errores de sintaxis y de schema (`CHILD_NOT_DECLARED`),
 `RESOURCE`, `IMAGE_FORMAT` o `INTERNAL`. La línea es `0` si el error no es de una línea (un recurso, un límite o un fallo
-interno). Cómo se ven desde Java está en [Uso desde Java](../implementacion/api.md#errores).
+interno). Si es del [documento de estilos aparte](estilos.md#documento-de-estilos-aparte), el mensaje lo dice (`línea 8
+de los estilos: …`). Cómo se ven desde Java está en [Uso desde Java](../implementacion/api.md#errores).
 
 > **Decisión:** un fallo que el motor debería haber evitado (una página que no avanza, un enlace sin destino) es
 > `INTERNAL`: es un defecto del motor, no del documento.

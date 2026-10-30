@@ -39,7 +39,8 @@ final class ListBuilder {
                 : previous.isEmpty() ? list.style().list().start()
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
-            throw error(s.list().number() != null ? s.line(NUMBER) : n.getLine(), ErrorCode.LIST_NUMBER_RANGE,
+            throw error(s.list().number() != null ? s.line(NUMBER) : SourceLine.of(n.getLine()),
+                    ErrorCode.LIST_NUMBER_RANGE,
                     "El número " + number + " no se puede escribir con Marker: " + markerName(marker)
                             + ", que numera " + ListMarkers.range(marker));
         }

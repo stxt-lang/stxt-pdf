@@ -62,14 +62,16 @@ estilo, el bit de cursiva de `fsSelection`.
 ## Errores
 
 Todo error del motor es un `StxtPdfException` (lo lanzan `DocumentReader` y `Converter`), así que una sola `catch` basta.
-`kind()` dice de quién es la culpa, `code()` qué falla y `line()` dónde (`NO_LINE`, 0, si no es de una línea):
+`kind()` dice de quién es la culpa, `code()` qué falla y `line()` dónde (`NO_LINE`, 0, si no es de una línea); `inStyles()`
+dice si esa línea es del [documento de estilos aparte](../comun/estilos.md#documento-de-estilos-aparte) y no del documento:
 
 ```java
 try {
     converter.toPdf(doc, out);
 } catch (StxtPdfException e) {
     switch (e.kind()) {
-        case INVALID_DOCUMENT -> reply(422, e.code() + " en la línea " + e.line() + ": " + e.getMessage());
+        case INVALID_DOCUMENT -> reply(422, e.code() + " en la línea " + e.line()
+                + (e.inStyles() ? " de los estilos" : "") + ": " + e.getMessage());
         case LIMIT -> reply(413, e.getMessage());
         case RESOURCE, INTERNAL -> reply(500, e.getMessage());   // de la configuración o del motor
     }

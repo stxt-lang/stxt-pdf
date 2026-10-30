@@ -25,7 +25,7 @@ import java.util.Map;
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/relative-absolute-fixed.md: el layout y la posición, que
  * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate}, el giro, {@code Link}, {@code
- * Header} e {@code In contents}) y la línea donde se declaró cada propiedad.</p>
+ * Header} e {@code In contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
  * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
@@ -241,12 +241,14 @@ public final class Style extends StyleGroup {
 
     // --- Líneas de las propiedades -------------------------------------------------------------------
     /**
-     * Línea del documento de cada propiedad declarada, por su clave ({@link PropertyKey}): el
-     * nombre canónico ({@code "height"}; las de {@code Flex}, {@code Grid} e {@code Item}, con
-     * prefijo: {@code "grid.rows"}). Las
-     * de {@link #LINED_PROPERTIES} se heredan con su valor, para señalar dónde se declaró.
+     * Línea de cada propiedad declarada, por su clave ({@link PropertyKey}): el nombre canónico ({@code "height"}; las
+     * de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.rows"}). Es del documento o, si la
+     * propiedad llega de una regla suya, del documento de estilos aparte. Las de {@link #LINED_PROPERTIES} se heredan
+     * con su valor, para señalar dónde se declaró.
      */
-    private final Map<String, Integer> lines = new HashMap<>();
+    private final Map<String, SourceLine> lines = new HashMap<>();
+    /** Si lo que se lee ahora es una regla del documento de estilos aparte ({@link #readingStyles}). */
+    private boolean readingStyles;
 
     /**
      * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
@@ -270,8 +272,22 @@ public final class Style extends StyleGroup {
         return s;
     }
 
-    /** Apunta la línea donde se declara una propiedad. */
+    /**
+     * Las propiedades que se declaren mientras {@code reading} sea {@code true} vienen de una regla del documento de
+     * estilos aparte, y su línea es de ese documento.
+     */
+    void readingStyles(boolean reading) {
+        writable();
+        readingStyles = reading;
+    }
+
+    /** Apunta la línea donde se declara una propiedad: del documento de estilos si se lee una regla suya. */
     void declared(String property, int line) {
+        declared(property, new SourceLine(line, readingStyles));
+    }
+
+    /** Apunta la línea donde se declara una propiedad, con su documento. */
+    void declared(String property, SourceLine line) {
         writable();
         lines.put(property, line);
     }
@@ -282,12 +298,12 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * Línea donde se declaró la propiedad.
+     * Línea donde se declaró la propiedad, con su documento.
      *
      * @throws IllegalStateException si no se declaró
      */
-    public int line(String property) {
-        Integer line = lines.get(property);
+    public SourceLine line(String property) {
+        SourceLine line = lines.get(property);
         if (line == null) {
             throw new IllegalStateException("Propiedad no declarada: " + property);
         }

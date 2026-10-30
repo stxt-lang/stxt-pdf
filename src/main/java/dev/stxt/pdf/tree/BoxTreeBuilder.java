@@ -124,9 +124,9 @@ public final class BoxTreeBuilder {
         if (styles != null) {
             if (!is(styles, "styles") || !DocumentSchema.NAMESPACE.equals(styles.getNamespace())) {
                 throw error(styles, ErrorCode.DOCUMENT_ROOT, "El nodo raíz del documento de estilos debe ser Styles ("
-                        + DocumentSchema.NAMESPACE + "):").inSource(StyleRules.EXTERNAL);
+                        + DocumentSchema.NAMESPACE + "):").inStylesDocument();
             }
-            DocumentSchema.validate(styles);
+            DocumentSchema.validate(styles, true);
         }
         MediaReader.Spec documentMedia = MediaReader.media(inline(child(document, "media").orElseThrow()), null);
         Media media = documentMedia.media();
