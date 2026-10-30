@@ -1,6 +1,6 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 
 import java.util.OptionalDouble;
 
@@ -35,9 +35,9 @@ public record ConstraintSpace(
         boolean contentHeight) {
 
     /** Espacio de la caja raíz al empezar una página: el área útil entera. */
-    public static ConstraintSpace forPage(Media media) {
-        double width = media.pageArea().width();
-        OptionalDouble height = OptionalDouble.of(media.pageArea().height());
+    public static ConstraintSpace forPage(PageSetup pageSetup) {
+        double width = pageSetup.pageArea().width();
+        OptionalDouble height = OptionalDouble.of(pageSetup.pageArea().height());
         return new ConstraintSpace(width, height, true, true, width, height, height, true, false);
     }
 

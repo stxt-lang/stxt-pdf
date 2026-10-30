@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Table of contents} (referencia/componentes/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área útil de
- * 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
+ * {@code Table of contents} (referencia/componentes/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área
+ * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
  */
-class ContentsTest {
+class TableOfContentsTest {
 
     private static final double PAGE = 180;
 
@@ -40,11 +40,11 @@ class ContentsTest {
     }
 
     /**
-     * Un encabezado con {@code In table of contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y las
-     * páginas no cambian) pero no tiene entrada (referencia/componentes/table-of-contents.md).
+     * Un encabezado con {@code In table of contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y
+     * las páginas no cambian) pero no tiene entrada (referencia/componentes/table-of-contents.md).
      */
     @Test
-    void aHeadingWithInContentsFalseHasNoEntry() {
+    void aHeadingWithInTableOfContentsFalseHasNoEntry() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
                 "\tHeading 1:", "\t\tIn table of contents: false", "\t\tText: Portada"));
         List<Fragment> entries = entries(l);
@@ -62,7 +62,7 @@ class ContentsTest {
         String[] pages = {"1", "2", "3"};
         for (int i = 0; i < 3; i++) {
             Fragment entry = entries.get(i);
-            assertEquals(Element.contentsEntry(i == 1 ? 2 : 1), entry.box().element());
+            assertEquals(Element.tocEntry(i == 1 ? 2 : 1), entry.box().element());
             assertEquals(12 * i, entry.y(), 1e-9);
             assertEquals(3, entry.children().size());
             Fragment title = entry.children().get(0);
@@ -70,7 +70,7 @@ class ContentsTest {
             Fragment page = entry.children().get(2);
             assertEquals(titles[i], text(title));
             assertEquals(pages[i], text(page));
-            assertEquals(Element.CONTENTS_LEADER, leader.box().element());
+            assertEquals(Element.TOC_LEADER, leader.box().element());
             // El título y el número miden lo que escriben; la guía llena el hueco, con 4 pt a cada lado.
             double titleWidth = 5 * titles[i].length();
             assertEquals(0, title.x(), 1e-9);

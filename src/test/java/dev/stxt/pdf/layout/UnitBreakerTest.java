@@ -4,9 +4,9 @@ import dev.stxt.pdf.fragment.BreakAppeal;
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Unit;
-import dev.stxt.pdf.layout.position.RelativeOffset;
+import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
@@ -36,7 +36,7 @@ class UnitBreakerTest {
     private final Engine engine = new Engine();
     private final Box container = new StyleEditor().box("C", Element.FLEX);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
-            Decoration.OPEN);
+            Edges.OPEN);
 
     private static Box item(String id, double height) {
         return new StyleEditor().height(Value.pt(height)).box(id, Element.BLOCK);
@@ -48,7 +48,7 @@ class UnitBreakerTest {
         LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
                 Insets.ZERO, List.of(), List.of(), true, true));
         return new UnitBreaker.Placed(item, r, ConstraintSpace.fixed(100, NONE, 100, NONE, false), 0, y, unit,
-                RelativeOffset.NONE);
+                FrameOffset.NONE);
     }
 
     /** Tres unidades de 40, con un ítem cada una. */

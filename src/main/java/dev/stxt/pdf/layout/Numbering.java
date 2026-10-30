@@ -1,7 +1,7 @@
 package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.layout.inline.PageNumbers;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.tree.Section;
 
 import java.util.Arrays;
@@ -11,9 +11,10 @@ import java.util.List;
  * El número impreso de cada página física, el último de su tanda y cómo se escriben
  * (referencia/componentes/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
  * empieza en su {@code Start}; {@code none} no numera ni avanza el contador. Cada página se escribe con el {@code Page
- * style} de su sección. La página en blanco con que acaba una sección ({@code Begin on: odd}) es una página más de ella.
+ * style} de su sección. La página en blanco con que acaba una sección ({@code Begin on: odd}) es una página más de
+ * ella.
  */
-record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
+record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
 
     /**
      * @param results    el flujo de cada sección, un resultado por página
@@ -26,7 +27,7 @@ record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
         }
         int[] printed = new int[pages];
         int[] totals = new int[pages];
-        NumberStyle[] styles = new NumberStyle[pages];
+        NumberFormat[] styles = new NumberFormat[pages];
         int counter = 0;
         int tandaFirst = 0;
         int i = 0;
@@ -40,7 +41,7 @@ record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
             }
             int own = results.get(k).size() + (blankAfter[k] ? 1 : 0);
             for (int j = 0; j < own; j++) {
-                styles[i] = section.pageStyle();
+                styles[i] = section.pageNumberFormat();
                 printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
             }
         }
@@ -63,7 +64,7 @@ record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
     }
 
     /** Cómo se escribe el número de la página física {@code number}. */
-    NumberStyle style(int number) {
+    NumberFormat style(int number) {
         return styles[number - 1];
     }
 

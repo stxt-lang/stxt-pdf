@@ -62,7 +62,7 @@ class HeadingNumberingTest {
     }
 
     @Test
-    void theContentsEntriesCarryTheNumber() {
+    void theTocEntriesCarryTheNumber() {
         LayoutFixture l = layOut(document(
                 "\tTable of contents:", "\t\tId: toc", "\t\tLevels: 1 2",
                 "\tHeading 1:", "\t\tText: Uno",

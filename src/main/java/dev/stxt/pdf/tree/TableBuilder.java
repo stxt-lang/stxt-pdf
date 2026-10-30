@@ -56,14 +56,14 @@ final class TableBuilder {
      * Las filas de una {@code Table} (referencia/componentes/table.md) como ítems de un grid con colocación explícita:
      * cada {@code Cell} va en la primera columna libre de su fila, contando las que ocupan los {@code Span} de las
      * filas de arriba. Los grupos van en el orden {@code Head}, {@code Body}, {@code Foot}; cada fila llena exactamente
-     * las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code Head}
-     * y {@code Foot} se repiten en cada página y no admiten {@code Break}. {@code cells} construye la caja de cada
-     * celda, con la tabla como padre. Cada celda lleva su posición ({@link CellPosition}) para las reglas de {@code
-     * Styles} y el {@code Column align} de su columna. Una fila con {@code Id} o {@code Box} tiene además su caja
-     * ({@link #row}).
+     * las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code
+     * Head} y {@code Foot} se repiten en cada página y no admiten {@code Break}. {@code cells} construye la caja de
+     * cada celda, con la tabla como padre. Cada celda lleva su posición ({@link CellPosition}) para las reglas de
+     * {@code Styles} y el {@code Column align} de su columna. Una fila con {@code Id} o {@code Box} tiene además su
+     * caja ({@link #row}).
      */
     static void table(BuildContext ctx, InlineNode n, Box table, Cells cells) {
-        int count = table.style().grid().columns().size();
+        int count = table.style().grid().columnSizes().size();
         Columns columns = new Columns(count, columnAlign(n, count),
                 child(n, "column-align").map(Node::getLine).orElse(0));
         int last = -1;
@@ -88,7 +88,9 @@ final class TableBuilder {
         }
     }
 
-    /** Las columnas de la tabla: cuántas hay ({@code Column sizes}) y su {@code Column align}, con su línea (0 sin él). */
+    /**
+     * Las columnas de la tabla: cuántas hay ({@code Column sizes}) y su {@code Column align}, con su línea (0 sin él).
+     */
     private record Columns(int count, List<TextAlign> aligns, int alignLine) {
     }
 

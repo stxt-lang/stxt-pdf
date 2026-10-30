@@ -54,7 +54,7 @@ class BlockLayoutTest {
     }
 
     @Test
-    void isolateStopsTheCollapse() {
+    void containMarginsStopsTheCollapse() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tMargin: 10 0 0 0", "\t\tContain margins: true",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0");

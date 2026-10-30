@@ -7,7 +7,7 @@ import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
-import dev.stxt.pdf.layout.PendingAbsolute;
+import dev.stxt.pdf.layout.PendingOverlay;
 import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Position;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * resuelven cuando su containing block ya conoce su tamaño, después del layout en flujo:
  *
  * <ul>
- *   <li>Las {@code absolute} suben como {@link PendingAbsolute} hasta su containing block, y
+ *   <li>Las {@code absolute} suben como {@link PendingOverlay} hasta su containing block, y
  *       {@link LayoutContext#layout} las resuelve con {@link #resolvePending} al terminar el layout de
  *       esa caja. Sus fragmentos se añaden al final de los hijos del fragmento del containing
  *       block, no de su padre en el árbol de cajas.</li>
@@ -33,17 +33,17 @@ import java.util.function.Supplier;
  *       {@link dev.stxt.pdf.layout.Paginator} en cada página, con {@link #layOut}.</li>
  * </ul>
  *
- * <p>En cada eje se resuelve la ecuación de {@link AbsoluteEquation}. El ancho automático es el
+ * <p>En cada eje se resuelve la ecuación de {@link OverlayEquation}. El ancho automático es el
  * ajuste al contenido de la caja de borde, limitado después por {@code Min width} y
  * {@code Max width}; si el límite lo cambia, se vuelve a resolver con ese ancho. El alto
  * automático es el del contenido, salvo que arriba y abajo estén declarados: entonces la caja se
  * estira entre ellos. Una caja fuera de flujo no se fragmenta.</p>
  */
-public final class AbsoluteLayout {
+public final class OverlayLayout {
 
     private final LayoutContext context;
 
-    public AbsoluteLayout(LayoutContext context) {
+    public OverlayLayout(LayoutContext context) {
         this.context = context;
     }
 
@@ -62,8 +62,8 @@ public final class AbsoluteLayout {
         double cbWidth = f.width() - f.border().horizontal();
         double cbHeight = f.height() - f.border().vertical();
         List<Fragment> placed = new ArrayList<>();
-        List<PendingAbsolute> rest = new ArrayList<>();
-        for (PendingAbsolute p : r.pending()) {
+        List<PendingOverlay> rest = new ArrayList<>();
+        for (PendingOverlay p : r.pending()) {
             if (resolvesHere(p, box)) {
                 LayoutResult a = layOut(p, cbWidth, cbHeight, f.padding());
                 placed.add(a.fragment());
@@ -75,8 +75,8 @@ public final class AbsoluteLayout {
         return new LayoutResult(f.withMoreChildren(placed), r.breakToken(), r.breakAppeal(), rest, r.adjoining());
     }
 
-    private static boolean resolvesHere(PendingAbsolute p, Box box) {
-        return p.box().style().position() == Position.ABSOLUTE && p.box().outOfFlowContainingBlock() == box;
+    private static boolean resolvesHere(PendingOverlay p, Box box) {
+        return p.box().style().position() == Position.OVERLAY && p.box().outOfFlowContainingBlock() == box;
     }
 
     /**
@@ -90,7 +90,7 @@ public final class AbsoluteLayout {
      * @return el fragmento colocado respecto a la caja de contenido del containing block y las
      *         cajas {@code fixed} de su interior, con la posición estática relativa a esa misma caja
      */
-    public LayoutResult layOut(PendingAbsolute p, double cbWidth, double cbHeight, Insets cbPadding) {
+    public LayoutResult layOut(PendingOverlay p, double cbWidth, double cbHeight, Insets cbPadding) {
         Box box = p.box();
         Style s = box.style();
         OptionalDouble cbHeightBase = OptionalDouble.of(cbHeight);
@@ -112,12 +112,12 @@ public final class AbsoluteLayout {
         // Tamaños intrínsecos de la caja de borde: los de la caja de margen sin sus márgenes.
         IntrinsicSizes content = width.isPresent()
                 ? IntrinsicSizes.ZERO : intrinsic.get().plus(-Insets.resolve(s.box().margin(), 0).horizontal());
-        AbsoluteEquation.Solution h = AbsoluteEquation.horizontal(left, width, right, marginLeft, marginRight,
+        OverlayEquation.Solution h = OverlayEquation.horizontal(left, width, right, marginLeft, marginRight,
                 cbWidth, staticX, content);
         if (width.isEmpty()) {
             double constrained = BoxModel.constrainWidth(s, h.size(), cbWidth);
             if (constrained != h.size()) {
-                h = AbsoluteEquation.horizontal(left, OptionalDouble.of(constrained), right, marginLeft, marginRight,
+                h = OverlayEquation.horizontal(left, OptionalDouble.of(constrained), right, marginLeft, marginRight,
                         cbWidth, staticX, content);
             }
         }
@@ -138,7 +138,7 @@ public final class AbsoluteLayout {
         }
         LayoutResult r = context.layout(box, space, null);
         Fragment f = r.fragment();
-        AbsoluteEquation.Solution v = AbsoluteEquation.vertical(top, height, bottom, marginTop, marginBottom,
+        OverlayEquation.Solution v = OverlayEquation.vertical(top, height, bottom, marginTop, marginBottom,
                 cbHeight, staticY, f.height());
 
         double x = h.start() + h.marginStart() - cbPadding.left();
@@ -146,7 +146,7 @@ public final class AbsoluteLayout {
         // Las cajas fixed del interior pasan de la caja de contenido de esta a la del containing block.
         double dx = x + f.border().left() + sized.padding().left();
         double dy = y + f.border().top() + sized.padding().top();
-        List<PendingAbsolute> fixed = r.pending().stream().map(q -> q.translated(dx, dy)).toList();
+        List<PendingOverlay> fixed = r.pending().stream().map(q -> q.translated(dx, dy)).toList();
         return LayoutResult.finished(f.moved(x, y), fixed, AdjoiningMargins.NONE);
     }
 

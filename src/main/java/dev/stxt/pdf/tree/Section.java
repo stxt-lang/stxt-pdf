@@ -1,6 +1,6 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 
 /**
  * Una sección del documento (referencia/componentes/document.md): su caja, que es la raíz de su layout (una
@@ -8,16 +8,16 @@ import dev.stxt.pdf.model.NumberStyle;
  * que dice de las páginas que ocupa.
  *
  * @param box          la caja: el área útil de cada una de sus páginas; es {@link Element#SECTION}
- * @param media        su medio: el del documento con lo que ella declara encima
+ * @param pageSetup        su medio: el del documento con lo que ella declara encima
  * @param numbering    cómo numera sus páginas
- * @param pageStyle    cómo se escriben sus números de página ({@code Page number format})
+ * @param pageNumberFormat    cómo se escriben sus números de página ({@code Page number format})
  * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
  *                     declara
- * @param inheritFixed si lleva los {@code Page overlay} del documento
+ * @param inheritPageOverlays si lleva los {@code Page overlay} del documento
  * @param beginOn      en qué página física empieza ({@code Begin on})
  */
-public record Section(Box box, Media media, PageNumbering numbering, NumberStyle pageStyle, int start,
-                      boolean inheritFixed, BeginOn beginOn) {
+public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, NumberFormat pageNumberFormat, int start,
+                      boolean inheritPageOverlays, BeginOn beginOn) {
 
     /**
      * {@code Begin on} (referencia/componentes/document.md): en qué página física empieza la sección. Si no le toca, la

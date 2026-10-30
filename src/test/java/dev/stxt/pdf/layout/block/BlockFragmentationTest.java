@@ -57,7 +57,7 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void sliceDecorationDropsBorderAtTheBreak() {
+    void openEdgesDropBorderAtTheBreak() {
         // Q: borde 2 y relleno 3. Primer fragmento: 5 + C1 (40) + 55 de C2 hasta el final de la página.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: Q", "\t\tBox:", "\t\t\tBorder: 2", "\t\t\tPadding: 3",
@@ -117,7 +117,7 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void cloneDecorationRepeatsBorderInEveryFragment() {
+    void closedEdgesRepeatBorderInEveryFragment() {
         // Como el anterior, con clone: el contenido de cada página cabe entre 5 arriba y 5 abajo
         // (90 pt). Página 1: C1 (40) + 50 de C2. Página 2: 5 + los 30 que faltan de C2 + 5.
         LayoutFixture l = layOutPaged(PAGE,
@@ -146,7 +146,7 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void cloneTextKeepsItsDecorationOnEveryPage() {
+    void closedTextKeepsItsEdgesOnEveryPage() {
         // Relleno 10 con clone: caben 80 / 12 = 6 líneas por página; 10 líneas = 6 + 4.
         LayoutFixture l = layOutPaged(PAGE, "\tText: " + String.join(" ", java.util.Collections.nCopies(10, "aaaaa")),
                 "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tPadding: 10", "\t\tBreak:",

@@ -49,15 +49,17 @@ public final class FlexStyle extends StyleGroup {
         return direction == Direction.HORIZONTAL;
     }
 
-    /** {@code Horizontal} o {@code Vertical}, la del eje principal: el reparto del sobrante. Por defecto, {@code start}. */
+    /**
+     * {@code Horizontal} o {@code Vertical}, la del eje principal: el reparto del sobrante. Por defecto, {@code start}.
+     */
     public Distribution mainAxis() {
         Distribution v = isHorizontal() ? horizontal : vertical;
         return v != null ? v : Distribution.START;
     }
 
     /**
-     * {@code Horizontal} o {@code Vertical}, la del eje cruzado: la alineación de los ítems. Por defecto, {@code stretch}.
-     * Que sea una alineación lo comprueba {@code ModelValidator.validateFlex}.
+     * {@code Horizontal} o {@code Vertical}, la del eje cruzado: la alineación de los ítems. Por defecto, {@code
+     * stretch}. Que sea una alineación lo comprueba {@code ModelValidator.validateFlex}.
      */
     public Alignment crossAxis() {
         Distribution v = isHorizontal() ? vertical : horizontal;

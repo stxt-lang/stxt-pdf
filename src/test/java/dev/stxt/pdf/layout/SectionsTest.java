@@ -2,7 +2,7 @@ package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
@@ -62,7 +62,9 @@ class SectionsTest {
         return null;
     }
 
-    /** El fragmento con ese {@code Id} en el flujo o en los {@code Page overlay} de la página; {@code null} si no sale. */
+    /**
+     * El fragmento con ese {@code Id} en el flujo o en los {@code Page overlay} de la página; {@code null} si no sale.
+     */
     private static Fragment on(Page page, String id) {
         Fragment found = find(page.content(), id);
         for (Fragment fixed : page.fixed()) {
@@ -71,7 +73,7 @@ class SectionsTest {
         return found;
     }
 
-    private static List<String> fixedIds(Page page) {
+    private static List<String> pageOverlayIds(Page page) {
         return page.fixed().stream().map(f -> f.box().id()).collect(Collectors.toList());
     }
 
@@ -86,7 +88,7 @@ class SectionsTest {
     }
 
     @Test
-    void eachSectionStartsANewPageWithItsOwnMedia() {
+    void eachSectionStartsANewPageWithItsOwnPageSetup() {
         LaidOutDocument d = layWith("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tPaper: A4\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n",
                 "\tSection:", "\t\tBlock:", "\t\t\tId: a",
@@ -95,18 +97,18 @@ class SectionsTest {
                 "\tSection:", "\t\tPage:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
         assertEquals(4, d.pages().size());
         // Sin Page propio, el del documento.
-        assertEquals(595, d.pages().get(0).media().width(), 1e-9);
-        assertEquals(842, d.pages().get(0).media().height(), 1e-9);
+        assertEquals(595, d.pages().get(0).pageSetup().width(), 1e-9);
+        assertEquals(842, d.pages().get(0).pageSetup().height(), 1e-9);
         // Solo Orientation: el papel del documento girado, con sus márgenes.
-        assertEquals(842, d.pages().get(1).media().width(), 1e-9);
-        assertEquals(595, d.pages().get(1).media().height(), 1e-9);
-        assertEquals(40, d.pages().get(1).media().margin().left(), 1e-9);
+        assertEquals(842, d.pages().get(1).pageSetup().width(), 1e-9);
+        assertEquals(595, d.pages().get(1).pageSetup().height(), 1e-9);
+        assertEquals(40, d.pages().get(1).pageSetup().margin().left(), 1e-9);
         // Solo Margin: el tamaño del documento.
-        assertEquals(595, d.pages().get(2).media().width(), 1e-9);
-        assertEquals(10, d.pages().get(2).media().margin().top(), 1e-9);
+        assertEquals(595, d.pages().get(2).pageSetup().width(), 1e-9);
+        assertEquals(10, d.pages().get(2).pageSetup().margin().top(), 1e-9);
         // Un tamaño propio y un margen propio.
-        assertEquals(612, d.pages().get(3).media().width(), 1e-9);
-        assertEquals(0, d.pages().get(3).media().margin().left(), 1e-9);
+        assertEquals(612, d.pages().get(3).pageSetup().width(), 1e-9);
+        assertEquals(0, d.pages().get(3).pageSetup().margin().left(), 1e-9);
         // El área útil de cada página es la de su medio: el ancho de la caja de la sección.
         assertEquals(515, d.pages().get(0).content().width(), 1e-9);
         assertEquals(762, d.pages().get(1).content().width(), 1e-9);
@@ -137,24 +139,24 @@ class SectionsTest {
                 new String[] {"\tSection:", "\t\tBlock:", "\t\t\tId: c"});
         assertEquals(4, d.pages().size());
         // Pages: first cuenta dentro de la sección: solo su primera página.
-        assertEquals(List.of("foot", "head-a"), fixedIds(d.pages().get(0)));
-        assertEquals(List.of("foot"), fixedIds(d.pages().get(1)));
+        assertEquals(List.of("foot", "head-a"), pageOverlayIds(d.pages().get(0)));
+        assertEquals(List.of("foot"), pageOverlayIds(d.pages().get(1)));
         // Inherit page overlays: false deja la sección sin los del documento.
-        assertEquals(List.of("head-b"), fixedIds(d.pages().get(2)));
-        assertEquals(List.of("foot"), fixedIds(d.pages().get(3)));
+        assertEquals(List.of("head-b"), pageOverlayIds(d.pages().get(2)));
+        assertEquals(List.of("foot"), pageOverlayIds(d.pages().get(3)));
     }
 
     @Test
-    void pagesOfAFixedOfTheDocumentCountTheWholeDocument() {
+    void pagesOfAPageOverlayOfTheDocumentCountTheWholeDocument() {
         LaidOutDocument d = lay(
                 "\tPage overlay:", "\t\tId: not-first", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 10",
                 "\tPage overlay:", "\t\tId: last", "\t\tPages: last", "\t\tBox:", "\t\t\tHeight: 10",
                 join(new String[] {"\tSection:"}, fullPage("a")),
                 join(new String[] {"\tSection:"}, fullPage("b1"), fullPage("b2")));
         assertEquals(3, d.pages().size());
-        assertEquals(List.of(), fixedIds(d.pages().get(0)));
-        assertEquals(List.of("not-first"), fixedIds(d.pages().get(1)));
-        assertEquals(List.of("not-first", "last"), fixedIds(d.pages().get(2)));
+        assertEquals(List.of(), pageOverlayIds(d.pages().get(0)));
+        assertEquals(List.of("not-first"), pageOverlayIds(d.pages().get(1)));
+        assertEquals(List.of("not-first", "last"), pageOverlayIds(d.pages().get(2)));
     }
 
     @Test
@@ -167,7 +169,7 @@ class SectionsTest {
         assertEquals(4, d.pages().size());
         assertEquals(List.of(0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
         assertFalse(d.pages().get(0).numbered());
-        assertEquals(List.of(), fixedIds(d.pages().get(0)));
+        assertEquals(List.of(), pageOverlayIds(d.pages().get(0)));
         // La primera página interior es la 1 de 2, aunque sea la segunda del documento; el anexo
         // reinicia el contador, así que es la 1 de 1 y no cuenta para el total del cuerpo.
         assertEquals("Página 1 de 2", text(d.pages().get(1), "num"));
@@ -190,8 +192,8 @@ class SectionsTest {
                 join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tStart: 5"}, fullPage("b1"),
                         fullPage("b2")));
         assertEquals(List.of(1, 2, 3, 5, 6), d.pages().stream().map(Page::printed).toList());
-        assertEquals(List.of(NumberStyle.LOWER_ROMAN, NumberStyle.LOWER_ROMAN, NumberStyle.LOWER_ROMAN,
-                NumberStyle.DECIMAL, NumberStyle.DECIMAL), d.pages().stream().map(Page::style).toList());
+        assertEquals(List.of(NumberFormat.LOWER_ROMAN, NumberFormat.LOWER_ROMAN, NumberFormat.LOWER_ROMAN,
+                NumberFormat.DECIMAL, NumberFormat.DECIMAL), d.pages().stream().map(Page::style).toList());
         assertEquals("Página i de iii", text(d.pages().get(0), "num"));
         assertEquals("Página iii de iii", text(d.pages().get(2), "num"));
         assertEquals("Página 5 de 6", text(d.pages().get(3), "num"));
@@ -234,8 +236,8 @@ class SectionsTest {
 
     /**
      * {@code Begin on: odd}: si la sección anterior acaba en impar, acaba con una página en blanco de ella, sin
-     * contenido ni {@code Page overlay}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages} de los
-     * {@code Page overlay} de su sección (referencia/componentes/document.md).
+     * contenido ni {@code Page overlay}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages}
+     * de los {@code Page overlay} de su sección (referencia/componentes/document.md).
      */
     @Test
     void aSectionThatBeginsOnAnOddPageLeavesABlankPageBefore() {
@@ -250,9 +252,9 @@ class SectionsTest {
         assertTrue(blank.blank());
         assertEquals(0, blank.section());
         assertEquals(List.of(), blank.content().children());
-        assertEquals(List.of(), fixedIds(blank));
+        assertEquals(List.of(), pageOverlayIds(blank));
         // Pages: last de la sección es su última página con contenido, no la página en blanco.
-        assertEquals(List.of("num", "last-a"), fixedIds(d.pages().get(0)));
+        assertEquals(List.of("num", "last-a"), pageOverlayIds(d.pages().get(0)));
         assertEquals(List.of(1, 2, 3), d.pages().stream().map(Page::printed).toList());
         assertEquals("Página 1 de 3", text(d.pages().get(0), "num"));
         assertEquals("Página 3 de 3", text(d.pages().get(2), "num"));
@@ -289,8 +291,8 @@ class SectionsTest {
         assertEquals(List.of(0, 0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
         assertEquals(List.of(false, true, false, true, false), d.pages().stream().map(Page::blank).toList());
         // La página en blanco tiene el medio de su sección: la portada, sin márgenes.
-        assertEquals(0, d.pages().get(1).media().margin().top(), 1e-9);
-        assertEquals(NumberStyle.LOWER_ROMAN, d.pages().get(3).style());
+        assertEquals(0, d.pages().get(1).pageSetup().margin().top(), 1e-9);
+        assertEquals(NumberFormat.LOWER_ROMAN, d.pages().get(3).style());
     }
 
     @Test

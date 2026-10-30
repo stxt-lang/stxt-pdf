@@ -10,10 +10,10 @@ import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
-import dev.stxt.pdf.layout.PendingAbsolute;
+import dev.stxt.pdf.layout.PendingOverlay;
 import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.layout.UnitBreaker;
-import dev.stxt.pdf.layout.position.RelativeOffset;
+import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Direction;
@@ -50,8 +50,8 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * al contenido.</p>
  *
  * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
- * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
- * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
+ * {@link PendingOverlay} con la esquina de la caja de contenido como posición estática. Los
+ * ítems {@code relative} se desplazan con {@link FrameOffset} después de alinearlos.</p>
  *
  * <p>Simplificación: en vertical, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
@@ -171,11 +171,11 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
 
         LayoutResult layOut(BreakToken from) {
-            List<PendingAbsolute> pending = new ArrayList<>();
+            List<PendingOverlay> pending = new ArrayList<>();
             List<Item> items = new ArrayList<>();
             for (Box child : box.children()) {
                 if (child.style().isOutOfFlow()) {
-                    pending.add(new PendingAbsolute(child, 0, 0));
+                    pending.add(new PendingOverlay(child, 0, 0));
                 } else {
                     items.add(row ? rowItem(child) : columnItem(child));
                 }
@@ -233,7 +233,7 @@ public final class FlexLayout implements LayoutAlgorithm {
          * Paso 8: alinear. Las unidades de la fragmentación son las líneas en horizontal y los ítems en
          * vertical (con Wrap, el contenedor entero).
          */
-        UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingAbsolute> pending) {
+        UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingOverlay> pending) {
             int n = lines.size();
             double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
@@ -459,7 +459,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         UnitBreaker.Placed place(Item it, double mainPos, double crossPos, int unit) {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
-            RelativeOffset offset = RelativeOffset.of(it.box.style(), contentWidth, contentHeight);
+            FrameOffset offset = FrameOffset.of(it.box.style(), contentWidth, contentHeight);
             return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit,
                     offset);
         }

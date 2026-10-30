@@ -39,7 +39,7 @@ la caja (vacío = sin fragmentación), si la caja empieza la página y si se mid
 (`measuringContentHeight()`).
 
 **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad del corte
-(`BreakAppeal.PERFECT_BREAK` … `FORCED`), las `PendingAbsolute` que suben hasta su contenedor de referencia (con la posición
+(`BreakAppeal.PERFECT_BREAK` … `FORCED`), las `PendingOverlay` que suben hasta su contenedor de referencia (con la posición
 estática relativa a la caja de contenido de quien devuelve el resultado) y los `AdjoiningMargins`.
 
 ## `BoxModel`
@@ -65,9 +65,9 @@ guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockF
 
 ## Cajas posicionadas
 
-Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`; los devuelven como `PendingAbsolute` con su posición estática, y
-los hijos `Frame` se desplazan con `RelativeOffset` después de colocarlos. `Engine.layout` resuelve con `AbsoluteLayout`
-(sobre `AbsoluteEquation`) los `Overlay` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
+Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`; los devuelven como `PendingOverlay` con su posición estática, y
+los hijos `Frame` se desplazan con `FrameOffset` después de colocarlos. `Engine.layout` resuelve con `OverlayLayout`
+(sobre `OverlayEquation`) los `Overlay` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
 del de esa caja); los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
 que incluye su `Pages`.
 
@@ -130,7 +130,7 @@ recortadas con `splitBands` si su grupo se parte, o la de la última unidad en l
 sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
 tipo); el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
-El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMNS`), su único hijo: cada
+El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMN_FLOW`), su único hijo: cada
 columna es un fragmento de esa caja, maquetado con los algoritmos de siempre. Las columnas solo están al principio del
 contenedor de fragmentos (`atFragmentainerStart`) si lo está el `Columns`, y los cortes entre columnas no cuentan para el
 padre: el corte de página tiene la calidad del de la última columna.
@@ -138,7 +138,7 @@ padre: el corte de página tiene la calidad del de la última columna.
 > **Decisión:** el flujo de columnas es una caja generada. *Alternativa descartada:* que el `Columns` apile los hijos él
 > mismo, repitiendo el flujo de bloque.
 
-`MulticolLayout` maqueta el flujo de columnas una vez por columna con `context.layout`, con el alto de la columna como
+`ColumnsLayout` maqueta el flujo de columnas una vez por columna con `context.layout`, con el alto de la columna como
 `fragmentainerRemaining` y el token de la columna anterior como `from`; cada columna es un fragmento suyo. El equilibrado es
 una búsqueda binaria del alto mínimo, con precisión de 0,001 pt, que rechaza los altos con cortes entre columnas peores
 que los del reparto en orden.
@@ -176,8 +176,8 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
 `Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
-(`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `Media`, su sección, su
-`printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingAbsolute(box, 0, 0)`
+(`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `PageSetup`, su sección, su
+`printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingOverlay(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
 **Páginas en blanco.** Tras el flujo, `blankAfter` mira qué secciones dejan la siguiente, con `Begin on: odd`, en una
@@ -223,7 +223,7 @@ que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasad
 ## Desbordamientos
 
 `Overflow` recorre el resultado paginado y señala al culpable más interior ([Desbordamiento](../comun/desbordamiento.md)),
-usando el `Media` de cada página. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
+usando el `PageSetup` de cada página. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
 layout, y `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar y la precisión de los volcados. Se
 compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un `1e-9` propio.
 

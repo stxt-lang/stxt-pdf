@@ -8,7 +8,7 @@ import java.util.Locale;
  * referencia/componentes/heading.md) y el de las páginas de una sección ({@code Page number format},
  * referencia/componentes/document.md), que solo admite cifras y romanos.
  */
-public enum NumberStyle {
+public enum NumberFormat {
     DECIMAL, LOWER_ALPHA, UPPER_ALPHA, LOWER_ROMAN, UPPER_ROMAN;
 
     private static final int[] ROMAN_VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};

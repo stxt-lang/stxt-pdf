@@ -126,8 +126,8 @@ public final class Box {
     }
 
     /**
-     * Nombre con que se refiere a la caja un índice (referencia/componentes/table-of-contents.md) cuando no tiene {@code Id}: el
-     * de un encabezado que lista un {@code Table of contents}. {@code null} en el resto.
+     * Nombre con que se refiere a la caja un índice (referencia/componentes/table-of-contents.md) cuando no tiene
+     * {@code Id}: el de un encabezado que lista un {@code Table of contents}. {@code null} en el resto.
      */
     public String anchor() {
         return anchor;
@@ -176,9 +176,9 @@ public final class Box {
     }
 
     /**
-     * Las cajas de las filas de una {@code Table} que tienen {@code Id} o {@code Box} (referencia/componentes/table.md),
-     * en orden; la fila de cada una es la de su {@code Area}. No son hijas de la tabla, que solo tiene celdas, pero la
-     * tienen de padre. Vacía en el resto de cajas.
+     * Las cajas de las filas de una {@code Table} que tienen {@code Id} o {@code Box}
+     * (referencia/componentes/table.md), en orden; la fila de cada una es la de su {@code Area}. No son hijas de la
+     * tabla, que solo tiene celdas, pero la tienen de padre. Vacía en el resto de cajas.
      */
     public List<Box> rows() {
         return rows;
@@ -326,7 +326,7 @@ public final class Box {
      * {@code fixed}, los ítems de flex y grid, las cajas con {@code Contain margins: true} y las giradas en flujo.
      */
     public boolean establishesBlockFormattingContext() {
-        if (parent == null || style.isolate() || style.isOutOfFlow() || style.rotatesInFlow()) {
+        if (parent == null || style.containMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
             return true;
         }
         Layout l = parent.style.layout();
@@ -340,7 +340,7 @@ public final class Box {
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
-        boolean fixed = style.position() == Position.FIXED;
+        boolean fixed = style.position() == Position.PAGE_OVERLAY;
         // Una caja girada en flujo también lo es, como las posicionadas (referencia/comun/capas-y-giro.md).
         while (b.parent != null && (fixed || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;

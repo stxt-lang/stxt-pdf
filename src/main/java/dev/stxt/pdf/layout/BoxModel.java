@@ -1,7 +1,7 @@
 package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.layout.image.NaturalSize;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  */
 public record BoxModel(Insets margin, Insets border, Insets padding, double width,
                        OptionalDouble height, double minHeight, OptionalDouble maxHeight,
-                       Decoration decoration) {
+                       Edges decoration) {
 
     /**
      * Resuelve el modelo de caja de una caja con los tamaños intrínsecos del motor y, si es una
@@ -97,7 +97,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 height = OptionalDouble.of(Sizing.constrain(height.getAsDouble(), minHeight, maxHeight));
             }
         }
-        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.breaks().decoration());
+        return new BoxModel(margin, border, padding, width, height, minHeight, maxHeight, s.breaks().edges());
     }
 
     /**
@@ -150,7 +150,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             }
         }
         return new BoxModel(margin, border, padding, width, OptionalDouble.of(height), minHeight, maxHeight,
-                s.breaks().decoration());
+                s.breaks().edges());
     }
 
     /**
@@ -227,7 +227,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
 
     /** Cada fragmento lleva borde y relleno completos ({@code Edges: closed}). */
     public boolean clones() {
-        return decoration == Decoration.CLOSED;
+        return decoration == Edges.CLOSED;
     }
 
     /** Nada separa el borde superior de la caja de su contenido: ni borde ni relleno. */

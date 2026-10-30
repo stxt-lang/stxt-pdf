@@ -3,10 +3,10 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Leader;
 
 /**
- * Las propiedades de un {@code Table of contents} (referencia/componentes/table-of-contents.md): los niveles que lista y la guía de sus
- * entradas, que también lleva la guía generada de cada una. No se heredan.
+ * Las propiedades de un {@code Table of contents} (referencia/componentes/table-of-contents.md): los niveles que lista
+ * y la guía de sus entradas, que también lleva la guía generada de cada una. No se heredan.
  */
-public final class ContentsStyle extends StyleGroup {
+public final class TableOfContentsStyle extends StyleGroup {
 
     /** Primer y último nivel de encabezado que lista un {@code Table of contents} ({@code Levels}). */
     private int from = 1;
@@ -14,7 +14,7 @@ public final class ContentsStyle extends StyleGroup {
     /** {@code Leader} de un {@code Table of contents}; también lo lleva la guía generada de cada entrada. */
     private Leader leader = Leader.DOTS;
 
-    ContentsStyle() {
+    TableOfContentsStyle() {
     }
 
     public int from() {

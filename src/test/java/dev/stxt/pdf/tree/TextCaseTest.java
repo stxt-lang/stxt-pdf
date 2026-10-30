@@ -1,7 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Transform;
+import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class TextCaseTest {
     @Test
     void defaultsDoNothing() {
         Style s = build("\tText: Hola").children().get(0).style();
-        assertEquals(Transform.NONE, s.typography().transform());
+        assertEquals(TextCase.NONE, s.typography().textCase());
         assertEquals(0, s.typography().letterSpacing());
         assertFalse(s.typography().smallCaps());
     }
@@ -39,7 +39,7 @@ class TextCaseTest {
         Box block = build("\tBlock:", "\t\tTypography:", "\t\t\tCase: capitalize", "\t\t\tLetter spacing: -0.5",
                 "\t\t\tSmall caps: true", "\t\tText: Hola").children().get(0);
         Box text = block.children().get(0);
-        assertEquals(Transform.CAPITALIZE, text.style().typography().transform());
+        assertEquals(TextCase.CAPITALIZE, text.style().typography().textCase());
         assertEquals(-0.5, text.style().typography().letterSpacing(), 1e-9);
         assertTrue(text.style().typography().smallCaps());
         assertEquals(15, block.style().line("case").number());
@@ -56,11 +56,11 @@ class TextCaseTest {
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
         Style heading = root.children().get(0).children().get(0).style();
-        assertEquals(Transform.UPPERCASE, heading.typography().transform());
+        assertEquals(TextCase.UPPERCASE, heading.typography().textCase());
         assertTrue(heading.typography().smallCaps());
         assertEquals(1, heading.typography().letterSpacing(), 1e-9);
         assertEquals(1, root.children().get(1).style().typography().letterSpacing(), 1e-9);
-        assertEquals(Transform.NONE, root.children().get(1).style().typography().transform());
+        assertEquals(TextCase.NONE, root.children().get(1).style().typography().textCase());
     }
 
     @Test
@@ -103,7 +103,10 @@ class TextCaseTest {
         assertEquals(15, e.line());
     }
 
-    /** El idioma del documento es el {@code Language} de {@code Document}; la regla {@code For element: Document} no lo cambia. */
+    /**
+     * El idioma del documento es el {@code Language} de {@code Document}; la regla {@code For element: Document} no lo
+     * cambia.
+     */
     @Test
     void elementDocumentCannotChangeTheLanguage() {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"

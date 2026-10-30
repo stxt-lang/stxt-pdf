@@ -488,7 +488,9 @@ final class MarkdownBuilder {
             return new TextFormat(f.bold(), f.italic(), true, f.strike(), destination);
         }
 
-        /** Marcadores de {@code Bullet markers} (sin numerar) o de {@code Number markers} (numerados), uno por nivel. */
+        /**
+         * Marcadores de {@code Bullet markers} (sin numerar) o de {@code Number markers} (numerados), uno por nivel.
+         */
         private static List<String> markers(Node n, boolean numbered) {
             List<String> markers = new ArrayList<>();
             for (String token : n.getText().trim().split("\\s+")) {

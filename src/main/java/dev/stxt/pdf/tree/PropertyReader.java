@@ -5,22 +5,22 @@ import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.GridAreas;
-import dev.stxt.pdf.model.Inline;
+import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Leader;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.TextAlign;
-import dev.stxt.pdf.model.TextWrap;
-import dev.stxt.pdf.model.Transform;
+import dev.stxt.pdf.model.LineBreaking;
+import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
 import dev.stxt.pdf.model.WhiteSpace;
@@ -79,7 +79,7 @@ final class PropertyReader {
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
     /** Propiedades del elemento {@code Columns}. */
-    static final Set<String> MULTICOL = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
+    static final Set<String> COLUMNS = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
     /** Lee una propiedad en el estilo; su línea ya está apuntada. */
     @FunctionalInterface
@@ -97,16 +97,16 @@ final class PropertyReader {
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
             entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
             entry("color", (p, s) -> s.typography().setColor(color(p))),
-            entry("line-breaking", (p, s) -> s.typography().setTextWrap(enumValue(TextWrap.class, p))),
-            entry("markup", (p, s) -> s.typography().setInline(enumValue(Inline.class, p))),
-            entry("case", (p, s) -> s.typography().setTransform(enumValue(Transform.class, p))),
+            entry("line-breaking", (p, s) -> s.typography().setLineBreaking(enumValue(LineBreaking.class, p))),
+            entry("markup", (p, s) -> s.typography().setMarkup(enumValue(Markup.class, p))),
+            entry("case", (p, s) -> s.typography().setTextCase(enumValue(TextCase.class, p))),
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
             entry("white-space", (p, s) -> s.typography().setWhiteSpace(enumValue(WhiteSpace.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
             entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
-            entry("number-format", (p, s) -> s.typography().setNumberStyle(enumValue(NumberStyle.class, p))),
+            entry("number-format", (p, s) -> s.typography().setNumberFormat(enumValue(NumberFormat.class, p))),
             entry("number-label", (p, s) -> s.typography().setNumberLabel(numberLabel(p))),
             entry("widows", (p, s) -> s.typography().setWidows(positiveInteger(p))),
             entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
@@ -120,15 +120,15 @@ final class PropertyReader {
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
-            entry("contain-margins", (p, s) -> s.setIsolate(bool(p))),
+            entry("contain-margins", (p, s) -> s.setContainMargins(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
-            entry("row-header", (p, s) -> s.setHeader(bool(p))),
-            entry("in-table-of-contents", (p, s) -> s.setInContents(bool(p))),
+            entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
+            entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
-            entry("pdf-page", (p, s) -> s.image().setPage(positiveInteger(p))),
-            entry("levels", ContentsBuilder::levels),
-            entry("leader", (p, s) -> s.contents().setLeader(enumValue(Leader.class, p))));
+            entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
+            entry("levels", TableOfContentsBuilder::levels),
+            entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 
     private PropertyReader() {
     }
@@ -149,7 +149,7 @@ final class PropertyReader {
                 case "padding" -> s.box().setPadding(nonNegativeSides(p, true));
                 case "border" -> s.box().setBorder(nonNegativeSides(p, false));
                 case "border-color" -> s.box().setBorderColor(colorSides(p));
-                case "corner-radius" -> s.box().setRadius(radius(p));
+                case "corner-radius" -> s.box().setCornerRadius(radius(p));
                 case "background" -> s.box().setBackground(paint(p));
                 default -> throw unread(p);
             }
@@ -218,7 +218,7 @@ final class PropertyReader {
                 case "before" -> s.breaks().setBefore(enumValue(Break.class, p));
                 case "after" -> s.breaks().setAfter(enumValue(Break.class, p));
                 case "inside" -> s.breaks().setAvoidInside(breakInside(p));
-                case "edges" -> s.breaks().setDecoration(enumValue(Decoration.class, p));
+                case "edges" -> s.breaks().setEdges(enumValue(Edges.class, p));
                 default -> throw unread(p);
             }
         }
@@ -245,8 +245,8 @@ final class PropertyReader {
     static void grid(Node p, Style s) {
         s.declared(PropertyKey.grid(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "column-sizes" -> s.grid().setColumns(tracks(p));
-            case "row-sizes" -> s.grid().setRows(tracks(p));
+            case "column-sizes" -> s.grid().setColumnSizes(tracks(p));
+            case "row-sizes" -> s.grid().setRowSizes(tracks(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
                 s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
@@ -263,15 +263,15 @@ final class PropertyReader {
      * Propiedades de {@code Columns}, hijas del elemento (referencia/componentes/columns.md); su línea se guarda sin
      * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Flex} y {@code Grid} lo lleva.
      */
-    static void multicol(Node p, Style s) {
+    static void columns(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
         switch (p.getCanonicalName()) {
-            case "count" -> s.multicol().setCount(positiveInteger(p));
-            case "min-column-width" -> s.multicol().setColumnWidth(positive(p));
-            case "gap" -> s.multicol().setColumnGap(columnGap(p));
-            case "separator" -> s.multicol().setRule(positive(p));
-            case "separator-color" -> s.multicol().setRuleColor(color(p));
-            case "balance" -> s.multicol().setBalance(bool(p));
+            case "count" -> s.columns().setCount(positiveInteger(p));
+            case "min-column-width" -> s.columns().setMinColumnWidth(positive(p));
+            case "gap" -> s.columns().setColumnGap(columnGap(p));
+            case "separator" -> s.columns().setSeparator(positive(p));
+            case "separator-color" -> s.columns().setSeparatorColor(color(p));
+            case "balance" -> s.columns().setBalance(bool(p));
             default -> throw unread(p);
         }
     }
@@ -310,8 +310,8 @@ final class PropertyReader {
     }
 
     /**
-     * {@code Horizontal} o {@code Vertical} de un {@code Grid}, un {@code Area} o un {@code Item}: una alineación. {@code
-     * between}, {@code around} y {@code evenly} reparten el eje principal de un {@code Flex} y solo valen en él.
+     * {@code Horizontal} o {@code Vertical} de un {@code Grid}, un {@code Area} o un {@code Item}: una alineación.
+     * {@code between}, {@code around} y {@code evenly} reparten el eje principal de un {@code Flex} y solo valen en él.
      */
     private static Alignment alignment(Node p) {
         Distribution d = enumValue(Distribution.class, p);

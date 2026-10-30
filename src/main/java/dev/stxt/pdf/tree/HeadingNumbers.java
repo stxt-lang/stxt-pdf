@@ -1,6 +1,6 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +28,13 @@ final class HeadingNumbers {
     /** Si el último encabezado de cada nivel está numerado: el de cada nivel anterior es un antecesor del siguiente. */
     private final boolean[] numbered = new boolean[LEVELS + 1];
     /** Cómo se escribe el número de cada nivel: el {@code Number format} de su último encabezado. */
-    private final NumberStyle[] styles = new NumberStyle[LEVELS + 1];
+    private final NumberFormat[] styles = new NumberFormat[LEVELS + 1];
 
     /**
      * Registra un encabezado en orden del documento y devuelve su número ({@code "4.2"}, {@code "II.a"}), o
      * {@code null} si no se numera.
      */
-    String next(int level, boolean number, NumberStyle style) {
+    String next(int level, boolean number, NumberFormat style) {
         for (int deeper = level + 1; deeper <= LEVELS; deeper++) {
             counters[deeper] = 0;
         }

@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.multicol;
+package dev.stxt.pdf.layout.columns;
 
 import dev.stxt.pdf.layout.LayoutFixture;
 import dev.stxt.pdf.model.Rect;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * referencia/componentes/columns.md. Con {@code Count: 2} y {@code Gap: 15}, las columnas miden 250 y la
  * segunda empieza en x = 305.
  */
-class MulticolLayoutTest {
+class ColumnsLayoutTest {
 
     static void assertRect(double x, double y, double w, double h, Rect r) {
         assertEquals(new Rect(x, y, w, h).toString(),
@@ -55,7 +55,7 @@ class MulticolLayoutTest {
 
     /** Un {@code Columns} con {@code M} de {@code Id}, sus propiedades y sus bloques. */
     @SafeVarargs
-    static String[] multicol(List<String> properties, List<String>... blocks) {
+    static String[] columnsElement(List<String> properties, List<String>... blocks) {
         List<String> lines = new ArrayList<>(List.of("\tColumns:", "\t\tId: M"));
         properties.forEach(p -> lines.add("\t\t" + p));
         for (List<String> b : blocks) {
@@ -68,7 +68,7 @@ class MulticolLayoutTest {
 
     @Test
     void balancedByDefault() {
-        LayoutFixture l = layOut(multicol(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false),
+        LayoutFixture l = layOut(columnsElement(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false),
                 block("D", 30, false)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 40, 250, 30, l.rect("A"));
@@ -79,7 +79,7 @@ class MulticolLayoutTest {
 
     @Test
     void fillAutoFillsInOrder() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
                 block("B", 30, false), block("C", 30, false), block("D", 30, false)));
         assertRect(40, 40, 515, 120, l.rect("M"));
         assertRect(40, 130, 250, 30, l.rect("D"));
@@ -87,7 +87,7 @@ class MulticolLayoutTest {
 
     @Test
     void balanceKeepsWholeTheBoxesThatAvoidBreaks() {
-        LayoutFixture l = layOut(multicol(TWO, block("A", 30, true), block("B", 30, true), block("C", 30, true)));
+        LayoutFixture l = layOut(columnsElement(TWO, block("A", 30, true), block("B", 30, true), block("C", 30, true)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 70, 250, 30, l.rect("B"));
         assertRect(305, 40, 250, 30, l.rect("C"));
@@ -96,7 +96,7 @@ class MulticolLayoutTest {
     /** Un alto definido se parte como cualquier caja: 90 en dos columnas de 45. */
     @Test
     void balanceSlicesTheBoxesThatCanBreak() {
-        LayoutFixture l = layOut(multicol(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false)));
+        LayoutFixture l = layOut(columnsElement(TWO, block("A", 30, false), block("B", 30, false), block("C", 30, false)));
         assertRect(40, 40, 515, 45, l.rect("M"));
         // El fragmento de B en la segunda columna: los 15 que no caben en la primera.
         assertRect(305, 40, 250, 15, l.rect("B"));
@@ -106,7 +106,7 @@ class MulticolLayoutTest {
     @Test
     void columnWidthFitsAsManyColumnsAsPossible() {
         // Tres columnas de 165 con huecos de 10.
-        LayoutFixture l = layOut(multicol(List.of("Min column width: 150", "Gap: 10"), block("A", 30, true),
+        LayoutFixture l = layOut(columnsElement(List.of("Min column width: 150", "Gap: 10"), block("A", 30, true),
                 block("B", 30, true), block("C", 30, true)));
         assertRect(40, 40, 515, 30, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -116,7 +116,7 @@ class MulticolLayoutTest {
 
     @Test
     void columnBreak() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
                 block("B", 30, false, "\t\t\tBreak:", "\t\t\t\tBefore: column"), block("C", 30, false)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -137,7 +137,7 @@ class MulticolLayoutTest {
 
     @Test
     void heightIsFilledInOrderWithFillAuto() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
                 block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
@@ -147,7 +147,7 @@ class MulticolLayoutTest {
 
     @Test
     void heightIsBalanced() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 100"),
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 100"),
                 block("A", 30, true), block("B", 30, true), block("C", 30, true), block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
         assertRect(305, 40, 250, 30, l.rect("C"));
@@ -155,7 +155,7 @@ class MulticolLayoutTest {
 
     @Test
     void borderAndPaddingSurroundTheColumns() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 10",
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 10",
                 "\tBorder: 1"), block("A", 30, true), block("B", 30, true)));
         // Contenido de 493 de ancho: columnas de 239.
         assertRect(40, 40, 515, 52, l.rect("M"));
@@ -165,7 +165,7 @@ class MulticolLayoutTest {
 
     @Test
     void marginsOfTheContentDoNotLeaveTheColumns() {
-        LayoutFixture l = layOut(multicol(TWO, sized("A", true, "Height: 30", "Margin: 10 0")));
+        LayoutFixture l = layOut(columnsElement(TWO, sized("A", true, "Height: 30", "Margin: 10 0")));
         assertRect(40, 40, 515, 50, l.rect("M"));
         assertRect(40, 50, 250, 30, l.rect("A"));
     }
@@ -174,7 +174,7 @@ class MulticolLayoutTest {
     @Test
     void flexItemIsBalancedAndSizedByItsColumns() {
         List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tVertical: start", "\t\tItem:"));
-        for (String line : multicol(List.of("Count: 2", "Gap: 10", "Balance: false"),
+        for (String line : columnsElement(List.of("Count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {
             lines.add("\t\t" + line);
@@ -242,7 +242,7 @@ class MulticolLayoutTest {
      */
     @Test
     void heightWithBorderAndPaddingLeavesTheColumnsTheRest() {
-        LayoutFixture l = layOut(multicol(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
+        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
                         "\tBorder: 5", "\tPadding: 5"), block("A", 12, true), block("B", 12, true), block("C", 12, true),
                 block("D", 12, true), block("E", 12, true)));
         assertRect(50, 74, 240, 12, l.rect("C"));
@@ -253,10 +253,10 @@ class MulticolLayoutTest {
     @Test
     void theMessageCountsTheColumns() {
         // Bloques enteros de 40 en columnas de 30: no caben.
-        String one = assertThrows(InvalidModelException.class, () -> layOut(multicol(List.of("Count: 1", "Box:",
+        String one = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 1", "Box:",
                 "\tHeight: 30"), block("A", 40, true)))).getMessage();
         assertTrue(one.contains("1 columna de 30 no bastan"), one);
-        String two = assertThrows(InvalidModelException.class, () -> layOut(multicol(List.of("Count: 2", "Box:",
+        String two = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 2", "Box:",
                 "\tHeight: 30"), block("A", 40, true), block("B", 40, true), block("C", 40, true)))).getMessage();
         assertTrue(two.contains("2 columnas de 30 no bastan"), two);
         // Sin página (un ítem flex no se parte) ni alto, los cortes de columna necesitan más columnas de las que hay.

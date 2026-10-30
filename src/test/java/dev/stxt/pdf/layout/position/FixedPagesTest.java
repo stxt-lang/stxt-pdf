@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** {@code Pages} de un {@code Page overlay} (referencia/componentes/frame-and-overlays.md): en qué páginas sale. */
 class FixedPagesTest {
 
-    /** Un documento de {@code pages} páginas (una por bloque) y un {@code Page overlay} por cada valor de {@code Pages}. */
+    /**
+     * Un documento de {@code pages} páginas (una por bloque) y un {@code Page overlay} por cada valor de {@code Pages}.
+     */
     private static LayoutFixture document(int pages, String... fixedValues) {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < pages; i++) {
@@ -44,7 +46,7 @@ class FixedPagesTest {
     }
 
     @Test
-    void withoutPagesAFixedGoesInEveryPage() {
+    void withoutPagesAPageOverlayGoesInEveryPage() {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",

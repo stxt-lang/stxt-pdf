@@ -15,7 +15,7 @@ import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -56,20 +56,20 @@ public final class SvgCanvas implements Canvas {
     }
 
     /** SVG completo de una página, del tamaño del medio, sin imágenes. */
-    public static String page(Page page, Media media, boolean debug) {
-        return page(page, media, debug, null);
+    public static String page(Page page, PageSetup pageSetup, boolean debug) {
+        return page(page, pageSetup, debug, null);
     }
 
     /** SVG completo de una página, del tamaño del medio, con las imágenes de {@code resources}. */
-    public static String page(Page page, Media media, boolean debug, Resources resources) {
-        double height = media.height();
+    public static String page(Page page, PageSetup pageSetup, boolean debug, Resources resources) {
+        double height = pageSetup.height();
         SvgCanvas c = new SvgCanvas(debug, resources);
-        Rect area = media.pageArea();
+        Rect area = pageSetup.pageArea();
         StackingContext.build(page.content(), page.fixed(), area.x(), area.y()).paint(c);
         return String.format(Locale.ROOT,
                 "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.2fpt\" height=\"%.2fpt\" viewBox=\"0 0 %.2f %.2f\">\n"
                         + "<rect width=\"100%%\" height=\"100%%\" fill=\"#ffffff\"/>\n%s</svg>\n",
-                media.width(), height, media.width(), height, c.svg);
+                pageSetup.width(), height, pageSetup.width(), height, c.svg);
     }
 
     /** Un grupo {@code <g>} con el giro, que se cierra en {@link #endRotation()}. */
@@ -295,7 +295,7 @@ public final class SvgCanvas implements Canvas {
             return;
         }
         ImageFile file = resources.images().find(box.image());
-        int number = box.style().image().page();
+        int number = box.style().image().pdfPage();
         Rect target = ImageFit.place(box.style().image().fit(), content, file.width(number), file.height(number));
         String data;
         try {

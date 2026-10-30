@@ -13,7 +13,7 @@ import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.SourceLine;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.Style;
 
 import java.awt.geom.AffineTransform;
@@ -63,11 +63,11 @@ public final class Overflow {
     public static void check(List<Page> pages) {
         for (Page p : pages) {
             // Cada página tiene el medio de su sección (referencia/componentes/document.md).
-            Media media = p.media();
-            Rect area = media.pageArea();
-            Insets m = media.margin();
+            PageSetup pageSetup = p.pageSetup();
+            Rect area = pageSetup.pageArea();
+            Insets m = pageSetup.margin();
             // La página física, en coordenadas del área útil.
-            Rect page = new Rect(-m.left(), -m.top(), media.width(), media.height());
+            Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
             content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
             for (Fragment f : p.fixed()) {
                 fragment(f, 0, 0, page, NONE);

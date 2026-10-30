@@ -103,8 +103,9 @@ final class PdfStructure {
     /** El {@code Link} del enlace de texto que se está pintando, para colgarle la anotación de su zona. */
     private PDStructureElement inline;
     /**
-     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Page overlay}, una imagen decorativa), por caja y
-     * destino: están en el sitio de la caja en el árbol, sin contenido, y reciben las anotaciones de todas las páginas.
+     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Page overlay}, una imagen decorativa), por
+     * caja y destino: están en el sitio de la caja en el árbol, sin contenido, y reciben las anotaciones de todas las
+     * páginas.
      */
     private final Map<Box, Map<String, PDStructureElement>> standIns = new HashMap<>();
     /**
@@ -194,7 +195,7 @@ final class PdfStructure {
             e.appendKid(body);
             content = body;
         }
-        if (pdf2 != null && box.role() == Role.CONTENTS_ENTRY) {
+        if (pdf2 != null && box.role() == Role.TOC_ENTRY) {
             // PDF/UA-2: un TOCI no contiene un Link, sino una Reference que lo contiene; y señala a su encabezado.
             entries.put(box, e);
             PDStructureElement reference = element("Reference", e);
@@ -220,7 +221,7 @@ final class PdfStructure {
     /** Los elementos de los hijos de la caja; de un {@code Page overlay}, que no es contenido, solo sus enlaces. */
     private void children(Box box, PDStructureNode content) {
         for (Box child : box.children()) {
-            if (child.style().position() == Position.FIXED) {
+            if (child.style().position() == Position.PAGE_OVERLAY) {
                 standIns(child, content);
             } else {
                 build(child, content);
@@ -310,7 +311,7 @@ final class PdfStructure {
         if (box.hasText() || box.marker() != null || box.isImage() && box.style().image().alt() != null) {
             return true;
         }
-        return box.children().stream().anyMatch(c -> c.style().position() != Position.FIXED && hasContent(c));
+        return box.children().stream().anyMatch(c -> c.style().position() != Position.PAGE_OVERLAY && hasContent(c));
     }
 
     /**
@@ -339,11 +340,11 @@ final class PdfStructure {
             PDStructureElement c = element(type(cell), row);
             row.appendKid(c);
             elements.put(cell, c);
-            if (group == 0 || cell.style().header() || p.rows() > 1 || p.columns() > 1) {
+            if (group == 0 || cell.style().rowHeader() || p.rows() > 1 || p.columns() > 1) {
                 PDTableAttributeObject attributes = new PDTableAttributeObject();
                 if (group == 0) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_COLUMN);
-                } else if (cell.style().header()) {
+                } else if (cell.style().rowHeader()) {
                     attributes.setScope(PDTableAttributeObject.SCOPE_ROW);
                 }
                 if (p.rows() > 1) {
@@ -457,10 +458,10 @@ final class PdfStructure {
             case LIST_ITEM -> "LI";
             case TABLE -> "Table";
             case ROW -> "TR";
-            case CELL -> group(box) == 0 || box.style().header() ? "TH" : "TD";
+            case CELL -> group(box) == 0 || box.style().rowHeader() ? "TH" : "TD";
             case FIGURE -> "Figure";
-            case CONTENTS -> "TOC";
-            case CONTENTS_ENTRY -> "TOCI";
+            case TABLE_OF_CONTENTS -> "TOC";
+            case TOC_ENTRY -> "TOCI";
             case SPAN, PAGE_NUMBER -> "Span";
             case LEADER, FLOW, BLOCK -> "Div";
         };
@@ -577,10 +578,11 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta el enlace de una caja que no es contenido (en un {@code Page overlay}, una imagen decorativa): PDF/UA exige
-     * que toda anotación de enlace esté en un {@code Link}. Es el {@code Link} de la caja y su destino que se puso en
-     * su sitio del árbol al construirlo, sin contenido marcado y con el texto del enlace como {@code Alt}: un lector
-     * de pantalla lo anuncia una vez, en su orden de lectura, aunque se repita en cada página (un pie con una web).
+     * Etiqueta el enlace de una caja que no es contenido (en un {@code Page overlay}, una imagen decorativa): PDF/UA
+     * exige que toda anotación de enlace esté en un {@code Link}. Es el {@code Link} de la caja y su destino que se
+     * puso en su sitio del árbol al construirlo, sin contenido marcado y con el texto del enlace como {@code Alt}: un
+     * lector de pantalla lo anuncia una vez, en su orden de lectura, aunque se repita en cada página (un pie con una
+     * web).
      */
     private void outside(Box box, String destination, PDAnnotationLink annotation, String description) {
         PDStructureElement link = standIns.getOrDefault(box, Map.of()).get(destination);
@@ -593,8 +595,8 @@ final class PdfStructure {
 
     /**
      * El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. Con PDF/UA-2, la
-     * anotación no lleva además su texto ({@code Table of contents}): lo que se lee es el {@code Alt}, y los dos tendrían que
-     * coincidir.
+     * anotación no lleva además su texto ({@code Table of contents}): lo que se lee es el {@code Alt}, y los dos
+     * tendrían que coincidir.
      */
     private void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
         if (link.getAlternateDescription() == null) {

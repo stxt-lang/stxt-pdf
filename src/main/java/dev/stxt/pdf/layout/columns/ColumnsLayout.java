@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.multicol;
+package dev.stxt.pdf.layout.columns;
 
 import dev.stxt.pdf.fragment.BreakAppeal;
 import dev.stxt.pdf.fragment.BreakToken;
@@ -60,7 +60,7 @@ import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
  * puede seguir en otra página: cuando el alto propio del {@code Columns} termina en esta, o
  * cuando, sin página ni alto que llenar, hay más cortes de columna que columnas.</p>
  */
-public final class MulticolLayout implements LayoutAlgorithm {
+public final class ColumnsLayout implements LayoutAlgorithm {
 
     /**
      * Precisión de la búsqueda del alto equilibrado: los cortes cambian a saltos (una línea, una
@@ -70,7 +70,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
 
     private final LayoutContext context;
 
-    public MulticolLayout(LayoutContext context) {
+    public ColumnsLayout(LayoutContext context) {
         this.context = context;
     }
 
@@ -83,11 +83,11 @@ public final class MulticolLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         IntrinsicSizes content = context.intrinsic(flow(box));
         Style s = box.style();
-        int count = s.multicol().count() != null ? s.multicol().count() : 1;
-        int narrowest = s.multicol().columnWidth() == null ? count : 1;
-        double width = s.multicol().columnWidth() != null ? s.multicol().columnWidth() : 0;
-        return new IntrinsicSizes(narrowest * content.minContent() + (narrowest - 1) * s.multicol().columnGap(),
-                count * Math.max(content.maxContent(), width) + (count - 1) * s.multicol().columnGap());
+        int count = s.columns().count() != null ? s.columns().count() : 1;
+        int narrowest = s.columns().minColumnWidth() == null ? count : 1;
+        double width = s.columns().minColumnWidth() != null ? s.columns().minColumnWidth() : 0;
+        return new IntrinsicSizes(narrowest * content.minContent() + (narrowest - 1) * s.columns().columnGap(),
+                count * Math.max(content.maxContent(), width) + (count - 1) * s.columns().columnGap());
     }
 
     @Override
@@ -97,8 +97,8 @@ public final class MulticolLayout implements LayoutAlgorithm {
     }
 
     /** El flujo de columnas: el único hijo del {@code Columns}. */
-    private static Box flow(Box multicol) {
-        return multicol.children().get(0);
+    private static Box flow(Box columnsBox) {
+        return columnsBox.children().get(0);
     }
 
     /**
@@ -150,7 +150,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
             this.resume = first ? null : from.childToken();
             this.contentDone = !first && from.nextChild() > 0;
             Style s = box.style();
-            this.columns = Columns.of(s.multicol().count(), s.multicol().columnWidth(), s.multicol().columnGap(), model.contentWidth());
+            this.columns = Columns.of(s.columns().count(), s.columns().minColumnWidth(), s.columns().columnGap(), model.contentWidth());
         }
 
         LayoutResult layOut() {
@@ -180,7 +180,7 @@ public final class MulticolLayout implements LayoutAlgorithm {
                 // El Columns termina en esta página y su contenido no.
                 throw tooTall(limit);
             }
-            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().multicol().balance()) {
+            if (fill.fitsIn(limit, BreakAppeal.FORCED) && box.style().columns().balance()) {
                 fill = balance(fill, limit, atStart);
             }
             return result(fill);

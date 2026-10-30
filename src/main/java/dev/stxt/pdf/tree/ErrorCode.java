@@ -16,7 +16,9 @@ public enum ErrorCode {
     DOCUMENT_ROOT,
     /** Un tamaño o un margen del medio no válido, o márgenes que no dejan área útil. */
     PAGE_SIZE,
-    /** Una {@code Section} sin contenido (solo {@code Page overlay}, que no ocupan sitio): no tendría ninguna página. */
+    /**
+     * Una {@code Section} sin contenido (solo {@code Page overlay}, que no ocupan sitio): no tendría ninguna página.
+     */
     SECTION_EMPTY,
     /** Un texto con {@code {page}} o {@code {pages}} en una página que no tiene número ({@code Page numbering: none}). */
     PAGE_NUMBER_UNAVAILABLE,
@@ -90,7 +92,10 @@ public enum ErrorCode {
     // --- Markdown ------------------------------------------------------------------------------
     /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes dentro de un texto, código, citas, HTML… */
     MARKDOWN_UNSUPPORTED,
-    /** Una lista o una tabla de un {@code Markdown} sin su {@code Bullet markers}, {@code Number markers} o {@code Table columns}. */
+    /**
+     * Una lista o una tabla de un {@code Markdown} sin su {@code Bullet markers}, {@code Number markers} o {@code Table
+     * columns}.
+     */
     MARKDOWN_PROPERTY_MISSING,
     /** Código, en línea o en un bloque, sin {@code Code font} en {@code Typography}, propia o heredada. */
     CODE_WITHOUT_FONT,
@@ -103,7 +108,10 @@ public enum ErrorCode {
      * puede dibujar.
      */
     IMAGE_FORMAT,
-    /** {@code Pdf page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Pdf page}). */
+    /**
+     * {@code Pdf page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Pdf
+     * page}).
+     */
     IMAGE_PAGE,
     /** {@code Inside} o {@code Edges} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,
@@ -111,7 +119,10 @@ public enum ErrorCode {
     // --- Referencias --------------------------------------------------------------------------
     /** Una referencia ({@code {page of: id}}) sin {@code Id}, o con un {@code Id} que no tiene ninguna caja. */
     REFERENCE_UNKNOWN,
-    /** Una referencia a la página de una caja que no tiene una única página: la de un {@code Page overlay} o una de sus cajas. */
+    /**
+     * Una referencia a la página de una caja que no tiene una única página: la de un {@code Page overlay} o una de sus
+     * cajas.
+     */
     REFERENCE_NOT_PLACEABLE,
     /** Una referencia a una caja que no tiene número: ni es un ítem de una lista numerada ni un encabezado. */
     REFERENCE_NOT_NUMBERED,
@@ -121,7 +132,10 @@ public enum ErrorCode {
     // --- Enlaces ------------------------------------------------------------------------------
     /** Un destino de enlace vacío, mal escrito o con un esquema que no es https, http, mailto ni {@code #id}. */
     LINK_SCHEME,
-    /** Un enlace {@code #id} a un {@code Id} que no existe o que está en un {@code Page overlay}, que se repite en todas las páginas. */
+    /**
+     * Un enlace {@code #id} a un {@code Id} que no existe o que está en un {@code Page overlay}, que se repite en todas
+     * las páginas.
+     */
     LINK_UNKNOWN,
 
     // --- Índice -------------------------------------------------------------------------------
@@ -150,7 +164,10 @@ public enum ErrorCode {
     MARGIN_AUTO_WITHOUT_EFFECT,
     /** {@code Start} en una {@code Section} sin {@code Page numbering: restart}. */
     START_WITHOUT_RESTART,
-    /** Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Corner radius}) en el {@code Box} de una {@code Row}. */
+    /**
+     * Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Corner radius}) en el
+     * {@code Box} de una {@code Row}.
+     */
     ROW_BOX,
     /** {@code Page number format} en una {@code Section} con {@code Page numbering: none}. */
     PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
@@ -180,7 +197,10 @@ public enum ErrorCode {
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,
     /** {@code Contain margins: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
     CONTAIN_MARGINS_IN_ITEM,
-    /** Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja girada en flujo. */
+    /**
+     * Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja
+     * girada en flujo.
+     */
     BREAK_IN_UNBREAKABLE,
     /** {@code Inside} o {@code Edges} en un {@code Frame} girado o en una caja girada en flujo, que no se parten. */
     BREAK_IN_ROTATED,
@@ -192,7 +212,10 @@ public enum ErrorCode {
     // --- Desbordamientos (al maquetar) -------------------------------------------------------
     /** Una palabra más ancha que su línea. */
     TEXT_OVERFLOW,
-    /** Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o un {@code Overlay} que sale de la página. */
+    /**
+     * Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o un {@code Overlay} que sale de la
+     * página.
+     */
     BOX_OVERFLOW,
     /** Algo del flujo más alto que la página que no se puede partir. */
     PAGE_OVERFLOW,

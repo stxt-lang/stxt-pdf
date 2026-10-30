@@ -79,7 +79,8 @@ class StylesFileTest {
 
     @Test
     void thePriorityLevelsStayTheSameAcrossBothSources() {
-        // Un For style del documento aparte gana a un For element del documento, y a su vez pierde ante For style del documento.
+        // Un For style del documento aparte gana a un For element del documento, y a su vez pierde ante For style del
+        // documento.
         String styles = BASE + "\tFor style: a\n\t\tBox:\n\t\t\tPadding: 2\n\t\t\tMargin: 2\n";
         Box root = root(styles,
                 "\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tPadding: 1", "\t\t\t\tMargin: 1",
@@ -240,7 +241,8 @@ class StylesFileTest {
 
     @Test
     void tablePositionRulesOfTheStylesDocumentGoBeforeThoseOfTheDocument() {
-        // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Head cell del documento.
+        // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Head cell
+        // del documento.
         String styles = BASE + "\tFor element: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
         Box table = root(styles, "\tStyles:", "\t\tFor element: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tTable:", "\t\tColumn sizes: 1fr", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
@@ -250,7 +252,7 @@ class StylesFileTest {
     }
 
     @Test
-    void theGeneratedEntriesOfAContentsTakeTheRulesOfTheStylesDocument() {
+    void theGeneratedEntriesOfATableOfContentsTakeTheRulesOfTheStylesDocument() {
         String styles = BASE + "\tFor element: TOC 1\n\t\tBox:\n\t\t\tPadding: 6\n";
         Box contents = root(styles, "\tHeading 1:", "\t\tText: Uno", "\tTable of contents:").children().get(1);
         assertEquals(Sides.all(Value.pt(6)), contents.children().get(0).style().box().padding());

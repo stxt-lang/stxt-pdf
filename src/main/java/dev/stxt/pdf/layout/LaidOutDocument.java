@@ -2,7 +2,7 @@ package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.tree.Box;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.Metadata;
 
 import java.util.List;
@@ -19,13 +19,13 @@ import java.util.List;
  * que entregarlo a los otros hilos de forma segura (un {@code Future}, un ejecutor, un campo {@code volatile}…)
  * y no por un campo corriente.</p>
  *
- * @param media    el medio del documento: el de las secciones que no declaran el suyo; el de cada
- *                 página es {@link Page#media()}
+ * @param pageSetup    el medio del documento: el de las secciones que no declaran el suyo; el de cada
+ *                 página es {@link Page#pageSetup()}
  * @param metadata título e idioma del documento
  * @param root     la raíz del documento, de la que cuelgan sus secciones (referencia/componentes/document.md)
  * @param pages    las páginas, en orden; nunca vacía
  */
-public record LaidOutDocument(Media media, Metadata metadata, Box root, List<Page> pages) {
+public record LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, List<Page> pages) {
 
     public LaidOutDocument {
         pages = List.copyOf(pages);

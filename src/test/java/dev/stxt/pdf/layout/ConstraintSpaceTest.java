@@ -1,7 +1,7 @@
 package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
@@ -62,7 +62,7 @@ class ConstraintSpaceTest {
 
     @Test
     void forPageIsTheWholePageArea() {
-        ConstraintSpace s = ConstraintSpace.forPage(new Media(595, 842, new Insets(40, 40, 40, 40)));
+        ConstraintSpace s = ConstraintSpace.forPage(new PageSetup(595, 842, new Insets(40, 40, 40, 40)));
         assertEquals(new ConstraintSpace(515, OptionalDouble.of(762), true, true,
                 515, OptionalDouble.of(762), OptionalDouble.of(762), true, false), s);
         assertTrue(s.fragmenting());

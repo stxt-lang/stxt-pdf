@@ -1,6 +1,6 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
 import org.junit.jupiter.api.Test;
 
@@ -17,10 +17,10 @@ class SliceTest {
     private static final Insets BORDER = Insets.all(1);
     private static final Insets PADDING = Insets.all(4);
     private static final OptionalDouble NONE = OptionalDouble.empty();
-    private static final BoxModel AUTO = model(NONE, 0, NONE, Decoration.OPEN);
-    private static final BoxModel AUTO_CLONE = model(NONE, 0, NONE, Decoration.CLOSED);
+    private static final BoxModel AUTO = model(NONE, 0, NONE, Edges.OPEN);
+    private static final BoxModel AUTO_CLONE = model(NONE, 0, NONE, Edges.CLOSED);
 
-    private static BoxModel model(OptionalDouble height, double min, OptionalDouble max, Decoration d) {
+    private static BoxModel model(OptionalDouble height, double min, OptionalDouble max, Edges d) {
         return new BoxModel(Insets.ZERO, BORDER, PADDING, 100, height, min, max, d);
     }
 
@@ -60,7 +60,7 @@ class SliceTest {
 
     @Test
     void definiteHeightIsTheTotalOfAllFragments() {
-        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Decoration.OPEN);
+        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Edges.OPEN);
         // El contenido termina, pero el alto propio no cabe: la página se llena y sigue.
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, false, false, 100);
@@ -71,7 +71,7 @@ class SliceTest {
 
     @Test
     void definiteHeightCutInsideTheContentFillsThePage() {
-        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Decoration.OPEN);
+        BoxModel m = model(OptionalDouble.of(300), 0, NONE, Edges.OPEN);
         // Llega al final de la página, pero solo consume su borde y relleno superiores (5) y lo que ocupa el contenido
         // (50): el resto del alto queda para el contenido que sigue.
         assertSlice(Slice.of(m, true, 0, 50, false, page(100)), 100, true, false, false, 55);
@@ -81,7 +81,7 @@ class SliceTest {
 
     @Test
     void minHeightAppliesToTheTotal() {
-        BoxModel m = model(NONE, 200, NONE, Decoration.OPEN);
+        BoxModel m = model(NONE, 200, NONE, Edges.OPEN);
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, false, false, 100);
         Slice last = Slice.of(m, false, first.consumed(), 0, true, page(762));
@@ -90,12 +90,12 @@ class SliceTest {
 
     @Test
     void maxHeightAppliesToTheTotal() {
-        BoxModel m = model(NONE, 0, OptionalDouble.of(50), Decoration.OPEN);
+        BoxModel m = model(NONE, 0, OptionalDouble.of(50), Edges.OPEN);
         assertSlice(Slice.of(m, true, 0, 80, true, page(200)), 50, true, true, true, 50);
     }
 
     @Test
-    void cloneRepeatsTheDecorationInEveryFragment() {
+    void closedRepeatsTheEdgesInEveryFragment() {
         // 100 de página: 90 para el contenido.
         Slice first = Slice.of(AUTO_CLONE, true, 0, 90, false, page(100));
         assertSlice(first, 100, true, true, false, 90);
@@ -107,7 +107,7 @@ class SliceTest {
     @Test
     void cloneWithDefiniteHeightSplitsTheContentBoxHeight() {
         // Height 250: 240 de caja de contenido, repartidos en 90 + 90 + 60.
-        BoxModel m = model(OptionalDouble.of(250), 0, NONE, Decoration.CLOSED);
+        BoxModel m = model(OptionalDouble.of(250), 0, NONE, Edges.CLOSED);
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, true, false, 90);
         Slice second = Slice.of(m, false, first.consumed(), 0, true, page(100));

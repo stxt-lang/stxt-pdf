@@ -56,7 +56,7 @@ class ElementTest {
         assertTrue(Element.of("marker").isEmpty());
         assertTrue(Element.of("item").isEmpty());
         // El flujo de columnas de un Columns es generado y no tiene nombre: "columns" es el propio Columns.
-        assertEquals(Optional.of(Element.MULTICOL), Element.of("columns"));
+        assertEquals(Optional.of(Element.COLUMNS), Element.of("columns"));
         // Generados: el marcador, la franja de una fila, el flujo de columnas, el bloque de código de un Markdown y,
         // del índice, seis entradas, el título, la guía y el número de página.
         assertEquals(Element.values().length - 13, Element.written().size());
@@ -66,8 +66,8 @@ class ElementTest {
         assertTrue(!Element.written().contains(Element.CODE_BLOCK));
         assertTrue(Element.CODE_BLOCK.hasText());
         // Las entradas del índice las nombran las reglas For element, pero no se escriben.
-        assertEquals(Optional.of(Element.CONTENTS_ENTRY_2), Element.of("toc-2"));
-        assertEquals(Element.CONTENTS_ENTRY_4, Element.contentsEntry(4));
+        assertEquals(Optional.of(Element.TOC_2), Element.of("toc-2"));
+        assertEquals(Element.TOC_4, Element.tocEntry(4));
         assertTrue(Element.of("contents-title").isEmpty());
     }
 

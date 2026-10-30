@@ -63,8 +63,8 @@ class ImageLayoutTest {
     }
 
     /**
-     * Un PDF mide lo que su página, ya en puntos: la de {@code Pdf page}, recortada y girada ({@code pages.pdf}: 200 × 100,
-     * 150 × 50 y 100 × 200), o la primera.
+     * Un PDF mide lo que su página, ya en puntos: la de {@code Pdf page}, recortada y girada ({@code pages.pdf}: 200 ×
+     * 100, 150 × 50 y 100 × 200), o la primera.
      */
     @Test
     void pdfHasTheSizeOfItsPage() {

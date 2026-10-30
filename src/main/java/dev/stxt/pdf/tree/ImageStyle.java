@@ -12,7 +12,7 @@ public final class ImageStyle extends StyleGroup {
     private String alt;
     private Fit fit = Fit.CONTAIN;
     /** Página de un PDF, desde 1. */
-    private int page = 1;
+    private int pdfPage = 1;
 
     ImageStyle() {
     }
@@ -36,12 +36,12 @@ public final class ImageStyle extends StyleGroup {
     }
 
     /** La página que se dibuja de un PDF, desde 1; 1 si no se declara. */
-    public int page() {
-        return page;
+    public int pdfPage() {
+        return pdfPage;
     }
 
-    void setPage(int v) {
+    void setPdfPage(int v) {
         writable();
-        page = v;
+        pdfPage = v;
     }
 }

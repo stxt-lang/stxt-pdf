@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.TextWrap;
+import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.tree.Style;
 
@@ -76,15 +76,21 @@ public final class LineBreaker {
         return lines;
     }
 
-    /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}). */
+    /**
+     * Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace,
+     * double, LineBreaking)}).
+     */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
                                                      FontFace font, double fontSize) {
-        return breakParagraphs(text, available, measurer, font, fontSize, TextWrap.SIMPLE);
+        return breakParagraphs(text, available, measurer, font, fontSize, LineBreaking.SIMPLE);
     }
 
-    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}, para un texto sin formato. */
+    /**
+     * Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, LineBreaking)}, para un texto sin
+     * formato.
+     */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
-                                                     FontFace font, double fontSize, TextWrap wrap) {
+                                                     FontFace font, double fontSize, LineBreaking wrap) {
         return breakParagraphs(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
                 .map(p -> p.stream().map(Line::text).toList()).toList();
     }
@@ -94,17 +100,17 @@ public final class LineBreaker {
      * párrafo). {@code font} es la fuente de la caja; cada tramo la cambia con su formato.
      */
     public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
-                                                   FontFace font, double fontSize, TextWrap wrap) {
+                                                   FontFace font, double fontSize, LineBreaking wrap) {
         return breakParagraphs(runs, available, measurer, font, fontSize, 0, wrap);
     }
 
-    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}, con interletraje. */
+    /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, LineBreaking)}, con interletraje. */
     public static List<List<Line>> breakParagraphs(List<TextRun> runs, double available, TextMeasurer measurer,
                                                    FontFace font, double fontSize, double letterSpacing,
-                                                   TextWrap wrap) {
+                                                   LineBreaking wrap) {
         List<List<Line>> result = new ArrayList<>();
         for (List<Word> paragraph : paragraphs(runs)) {
-            if (wrap == TextWrap.BALANCED) {
+            if (wrap == LineBreaking.BALANCED) {
                 result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
                 continue;
             }

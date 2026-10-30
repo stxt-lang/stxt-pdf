@@ -1,7 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 
 /**
  * El grupo {@code Break} (referencia/comun/cortes.md): los cortes de página o de columna antes, después y dentro de la
@@ -12,7 +12,7 @@ public final class BreakStyle extends StyleGroup {
     private Break before = Break.AUTO;
     private Break after = Break.AUTO;
     private boolean avoidInside;
-    private Decoration decoration = Decoration.OPEN;
+    private Edges edges = Edges.OPEN;
 
     BreakStyle() {
     }
@@ -44,12 +44,12 @@ public final class BreakStyle extends StyleGroup {
         avoidInside = v;
     }
 
-    public Decoration decoration() {
-        return decoration;
+    public Edges edges() {
+        return edges;
     }
 
-    void setDecoration(Decoration v) {
+    void setEdges(Edges v) {
         writable();
-        decoration = v;
+        edges = v;
     }
 }

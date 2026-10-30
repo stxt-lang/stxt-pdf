@@ -13,13 +13,13 @@ import java.util.function.DoubleUnaryOperator;
  *
  * <p>Un {@link OptionalDouble} vacío representa {@code auto}. El tamaño es el de la caja de borde.</p>
  */
-public final class AbsoluteEquation {
+public final class OverlayEquation {
 
     /** Solución de la ecuación en un eje. */
     public record Solution(double start, double marginStart, double size, double marginEnd, double end) {
     }
 
-    private AbsoluteEquation() {
+    private OverlayEquation() {
     }
 
     /**

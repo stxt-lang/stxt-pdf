@@ -152,7 +152,7 @@ class PdfCanvasTest {
     }
 
     @Test
-    void pageHasTheSizeOfTheMedia() throws Exception {
+    void pageHasTheSizeOfThePageSetup() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 842\n"
                 + "\t\tMargin: 20\n\tBlock:\n\t\tBox:\n\t\t\tHeight: 500\n\t\t\tBackground: #F1EFE8\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "page-size"))) {
@@ -332,8 +332,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una celda con {@code Row header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la cabecera
-     * siguen siendo {@code Scope: Column} y las demás, {@code TD} (referencia/componentes/table.md).
+     * Una celda con {@code Row header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la
+     * cabecera siguen siendo {@code Scope: Column} y las demás, {@code TD} (referencia/componentes/table.md).
      */
     @Test
     void headerCellsAreRowHeaders() throws Exception {
@@ -410,7 +410,7 @@ class PdfCanvasTest {
      * (referencia/componentes/columns.md).
      */
     @Test
-    void multicolIsADivWithoutColumns() throws Exception {
+    void columnsIsADivWithoutOneElementPerColumn() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 0.5\n"
@@ -418,9 +418,9 @@ class PdfCanvasTest {
         try (PDDocument pdf = Loader.loadPDF(render(doc, "columns"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
-            PDStructureElement multicol = (PDStructureElement) document.getKids().get(0);
-            assertEquals("Div", multicol.getStructureType());
-            assertEquals(List.of("P", "P"), types(multicol));
+            PDStructureElement columnsBox = (PDStructureElement) document.getKids().get(0);
+            assertEquals("Div", columnsBox.getStructureType());
+            assertEquals(List.of("P", "P"), types(columnsBox));
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Uno") && text.contains("Dos"), text);
         }
@@ -654,9 +654,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Page overlay} o de una imagen decorativa es un
-     * {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en su
-     * orden de lectura (referencia/implementacion/pdf.md).
+     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Page overlay} o de una imagen decorativa
+     * es un {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en
+     * su orden de lectura (referencia/implementacion/pdf.md).
      */
     @Test
     void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
@@ -838,9 +838,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un índice (referencia/componentes/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título y
-     * número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada encabezado,
-     * también la de un encabezado de un Markdown.
+     * Un índice (referencia/componentes/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título
+     * y número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada
+     * encabezado, también la de un encabezado de un Markdown.
      */
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
@@ -1054,9 +1054,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con {@code Page number format} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda (i, ii, 5, VI). Se
-     * miran las entradas del PDF y no el texto que genera PDFBox, que pasa a mayúsculas con el idioma de la JVM: en
-     * turco, «vi» sería «Vİ».
+     * Con {@code Page number format} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda (i, ii, 5,
+     * VI). Se miran las entradas del PDF y no el texto que genera PDFBox, que pasa a mayúsculas con el idioma de la
+     * JVM: en turco, «vi» sería «Vİ».
      */
     @Test
     void pageLabelsKeepThePageStyleAndTheStart() throws Exception {

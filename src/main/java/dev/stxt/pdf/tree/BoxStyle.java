@@ -29,7 +29,7 @@ public final class BoxStyle extends StyleGroup {
     /** Un color por lado; {@code null} = el {@code Color} del texto ({@link TypographyStyle#color()}). */
     private Sides<String> borderColor;
     /** Esquinas redondeadas, de la caja de borde; solo pintado. */
-    private Corners<Value> radius = Corners.all(Value.pt(0));
+    private Corners<Value> cornerRadius = Corners.all(Value.pt(0));
 
     BoxStyle() {
     }
@@ -142,12 +142,12 @@ public final class BoxStyle extends StyleGroup {
         borderColor = v;
     }
 
-    public Corners<Value> radius() {
-        return radius;
+    public Corners<Value> cornerRadius() {
+        return cornerRadius;
     }
 
-    void setRadius(Corners<Value> v) {
+    void setCornerRadius(Corners<Value> v) {
         writable();
-        radius = v;
+        cornerRadius = v;
     }
 }

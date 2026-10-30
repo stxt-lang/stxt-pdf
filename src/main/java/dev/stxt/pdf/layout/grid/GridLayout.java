@@ -10,10 +10,10 @@ import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
-import dev.stxt.pdf.layout.PendingAbsolute;
+import dev.stxt.pdf.layout.PendingOverlay;
 import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.layout.UnitBreaker;
-import dev.stxt.pdf.layout.position.RelativeOffset;
+import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Area;
 import dev.stxt.pdf.model.Break;
@@ -46,8 +46,8 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * ítems valen 0. Una pista en porcentaje sobre un tamaño indefinido vale 0.</p>
  *
  * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
- * {@link PendingAbsolute} con la esquina de la caja de contenido como posición estática. Los
- * ítems {@code relative} se desplazan con {@link RelativeOffset} después de alinearlos.</p>
+ * {@link PendingOverlay} con la esquina de la caja de contenido como posición estática. Los
+ * ítems {@code relative} se desplazan con {@link FrameOffset} después de alinearlos.</p>
  *
  * <p>Entre páginas (referencia/comun/cortes.md) se corta entre filas con {@link UnitBreaker}; los ítems de una
  * fila que no cabe en una página se parten en paralelo.</p>
@@ -66,8 +66,8 @@ public final class GridLayout implements LayoutAlgorithm {
 
     private static Grid grid(Box box) {
         Style s = box.style();
-        int explicitColumns = Math.max(s.grid().columns().size(), s.grid().areas().columns());
-        int explicitRows = Math.max(s.grid().rows().size(), s.grid().areas().rows());
+        int explicitColumns = Math.max(s.grid().columnSizes().size(), s.grid().areas().columns());
+        int explicitRows = Math.max(s.grid().rowSizes().size(), s.grid().areas().rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style().item().area()).toList();
         Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().flow());
@@ -81,7 +81,7 @@ public final class GridLayout implements LayoutAlgorithm {
             columns = Math.max(columns, a.columnEnd());
             rows = Math.max(rows, a.rowEnd());
         }
-        return new Grid(items, areas, tracks(s.grid().columns(), columns), tracks(s.grid().rows(), rows));
+        return new Grid(items, areas, tracks(s.grid().columnSizes(), columns), tracks(s.grid().rowSizes(), rows));
     }
 
     /**
@@ -188,10 +188,10 @@ public final class GridLayout implements LayoutAlgorithm {
 
         // Alinear cada ítem en su área.
         List<UnitBreaker.Placed> placed = new ArrayList<>();
-        List<PendingAbsolute> pending = new ArrayList<>();
+        List<PendingOverlay> pending = new ArrayList<>();
         for (Box child : box.children()) {
             if (child.style().isOutOfFlow()) {
-                pending.add(new PendingAbsolute(child, 0, 0));
+                pending.add(new PendingOverlay(child, 0, 0));
             }
         }
         for (int i = 0; i < n; i++) {
@@ -208,7 +208,7 @@ public final class GridLayout implements LayoutAlgorithm {
                     + Sizing.align(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
             double py = y[a.row() - 1] + margin.top()
                     + Sizing.align(vertical, areaHeight, f.height() + margin.vertical());
-            RelativeOffset relative = RelativeOffset.of(item.style(), contentWidth, contentHeight);
+            FrameOffset relative = FrameOffset.of(item.style(), contentWidth, contentHeight);
             placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1,
                     relative));
         }

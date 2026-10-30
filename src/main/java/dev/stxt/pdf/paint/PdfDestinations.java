@@ -34,9 +34,9 @@ final class PdfDestinations {
     static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
         for (int i = 0; i < pages.size(); i++) {
-            Rect area = pages.get(i).media().pageArea();
+            Rect area = pages.get(i).pageSetup().pageArea();
             find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i),
-                    pages.get(i).media().height(), targets);
+                    pages.get(i).pageSetup().height(), targets);
         }
         return targets;
     }

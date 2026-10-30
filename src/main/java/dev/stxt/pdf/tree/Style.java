@@ -20,12 +20,13 @@ import java.util.Map;
  *
  * <p>Las propiedades van por grupos, cada uno en su clase: los del documento ({@link TypographyStyle},
  * {@link BoxStyle} y {@link BreakStyle}, referencia/comun/estructura.md) y los de un tipo de elemento ({@link
- * FlexStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link MulticolStyle}, {@link ImageStyle} y
- * {@link ContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
+ * FlexStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle}, {@link ImageStyle} y
+ * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
- * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Contain margins}, el giro, {@code Link}, {@code
- * Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
+ * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Contain margins}, el giro, {@code Link},
+ * {@code Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento
+ * ({@link SourceLine}).</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
  * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
@@ -34,7 +35,7 @@ import java.util.Map;
  * {@link Marker}…): los nombres de sus constantes coinciden con los valores del documento en mayúsculas y con
  * el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}), que es como los interpreta
  * {@link PropertyReader}. {@link Layout} y {@link Position} no son valores del documento: salen del elemento
- * ({@code Text} es {@code INLINE}; {@code Overlay}, un {@code BLOCK} {@code ABSOLUTE}).</p>
+ * ({@code Text} es {@code INLINE}; {@code Overlay}, un {@code BLOCK} {@code OVERLAY}).</p>
  *
  * <p>Solo {@code tree} escribe un estilo, mientras {@link BoxTreeBuilder} construye el árbol; al terminar se
  * cierra con su caja ({@link Box#close}) y ya solo se lee, también desde varios hilos.</p>
@@ -48,9 +49,9 @@ public final class Style extends StyleGroup {
     private final GridStyle grid = new GridStyle();
     private final ItemStyle item = new ItemStyle();
     private final ListStyle list = new ListStyle();
-    private final MulticolStyle multicol = new MulticolStyle();
+    private final ColumnsStyle columns = new ColumnsStyle();
     private final ImageStyle image = new ImageStyle();
-    private final ContentsStyle contents = new ContentsStyle();
+    private final TableOfContentsStyle tableOfContents = new TableOfContentsStyle();
 
     // --- Propiedades del elemento ------------------------------------------------------------------
     private Layout layout = Layout.BLOCK;
@@ -60,7 +61,7 @@ public final class Style extends StyleGroup {
     private Integer layer;
     /** Solo en un {@code Page overlay}: las páginas en que sale. */
     private Pages pages = Pages.ALL;
-    private boolean isolate;
+    private boolean containMargins;
     /**
      * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Frame}, {@code
      * Overlay}, {@code Page overlay} e {@code Image}; {@code null} = sin giro. No se hereda.
@@ -73,14 +74,15 @@ public final class Style extends StyleGroup {
      */
     private String link;
     /**
-     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se hereda.
-     */
-    private boolean header;
-    /**
-     * {@code In table of contents} de un encabezado: si tiene entrada en los índices (referencia/componentes/table-of-contents.md). No se
+     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se
      * hereda.
      */
-    private boolean inContents = true;
+    private boolean rowHeader;
+    /**
+     * {@code In table of contents} de un encabezado: si tiene entrada en los índices
+     * (referencia/componentes/table-of-contents.md). No se hereda.
+     */
+    private boolean inTableOfContents = true;
 
     /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
     Style() {
@@ -126,8 +128,8 @@ public final class Style extends StyleGroup {
     }
 
     /** Las de {@code Columns} (referencia/componentes/columns.md). */
-    public MulticolStyle multicol() {
-        return multicol;
+    public ColumnsStyle columns() {
+        return columns;
     }
 
     /** Las de {@code Image} (referencia/componentes/image.md). */
@@ -136,8 +138,8 @@ public final class Style extends StyleGroup {
     }
 
     /** Las de {@code Table of contents} (referencia/componentes/table-of-contents.md). */
-    public ContentsStyle contents() {
-        return contents;
+    public TableOfContentsStyle tableOfContents() {
+        return tableOfContents;
     }
 
     // --- Propiedades del elemento ------------------------------------------------------------------
@@ -186,13 +188,13 @@ public final class Style extends StyleGroup {
         pages = v;
     }
 
-    public boolean isolate() {
-        return isolate;
+    public boolean containMargins() {
+        return containMargins;
     }
 
-    void setIsolate(boolean v) {
+    void setContainMargins(boolean v) {
         writable();
-        isolate = v;
+        containMargins = v;
     }
 
     public Rotation rotation() {
@@ -221,22 +223,22 @@ public final class Style extends StyleGroup {
         link = v;
     }
 
-    public boolean header() {
-        return header;
+    public boolean rowHeader() {
+        return rowHeader;
     }
 
-    void setHeader(boolean v) {
+    void setRowHeader(boolean v) {
         writable();
-        header = v;
+        rowHeader = v;
     }
 
-    public boolean inContents() {
-        return inContents;
+    public boolean inTableOfContents() {
+        return inTableOfContents;
     }
 
-    void setInContents(boolean v) {
+    void setInTableOfContents(boolean v) {
         writable();
-        inContents = v;
+        inTableOfContents = v;
     }
 
     // --- Líneas de las propiedades -------------------------------------------------------------------
@@ -316,7 +318,7 @@ public final class Style extends StyleGroup {
     }
 
     public boolean isOutOfFlow() {
-        return position == Position.ABSOLUTE || position == Position.FIXED;
+        return position == Position.OVERLAY || position == Position.PAGE_OVERLAY;
     }
 
     /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
@@ -329,8 +331,8 @@ public final class Style extends StyleGroup {
         grid.close();
         item.close();
         list.close();
-        multicol.close();
+        columns.close();
         image.close();
-        contents.close();
+        tableOfContents.close();
     }
 }

@@ -14,7 +14,7 @@ import dev.stxt.pdf.tree.BoxTreeBuilder;
 import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.References;
 import dev.stxt.pdf.tree.Section;
 
@@ -34,7 +34,8 @@ import java.util.Set;
  * (referencia/componentes/frame-and-overlays.md). Su containing block es el área útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
- * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
+ * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se
+ * vuelve a paginar con las suyas.</p>
  *
  * <p>Las referencias a la página de otra caja ({@code {page of: id}}, referencia/comun/referencias.md) se resuelven
  * paginando hasta que converjan: cada pasada supone una página para cada caja referida (la
@@ -58,14 +59,15 @@ public final class Paginator {
     }
 
     /**
-     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus {@code Page overlay} y los del
-     * documento (referencia/componentes/document.md). Las referencias convergen para todo el documento a la vez.
+     * Pagina el documento: cada sección desde su primera página, con su {@link PageSetup}, y sus {@code Page overlay} y
+     * los del documento (referencia/componentes/document.md). Las referencias convergen para todo el documento a la
+     * vez.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
         List<Section> sections = tree.sections();
         // Cada caja fixed de una sección una sola vez, con la posición estática de la página donde aparece.
-        List<Map<Box, PendingAbsolute>> fixed = new ArrayList<>();
+        List<Map<Box, PendingOverlay>> fixed = new ArrayList<>();
         sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
         // Los textos con {page} o {pages}, que cambian de ancho si el total necesita más cifras.
         List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
@@ -85,7 +87,7 @@ public final class Paginator {
      * referidas con {@code {page of: id}}, que cambian el ancho de los textos que las escriben. Solo se vuelve a
      * maquetar lo que depende de esos textos: el resto sale de la caché.
      */
-    private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingAbsolute>> fixed,
+    private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingOverlay>> fixed,
                           List<Box> numberedTexts) {
         List<References.Site> sites = References.sites(root);
         Set<String> targets = new LinkedHashSet<>();
@@ -133,10 +135,10 @@ public final class Paginator {
      * Segunda fase, ya con el total de páginas: cada página con su contenido numerado ({@code {page}} y
      * {@code {pages}}) y sus {@code Page overlay}, los de su sección y, si los hereda, los del documento.
      */
-    private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingAbsolute>> fixed,
+    private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingOverlay>> fixed,
                              boolean numbered) {
         // Los Page overlay del documento: los hijos de la raíz que no son una sección.
-        List<Box> documentFixed = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
+        List<Box> documentPageOverlays = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
         for (int k = 0; k < sections.size(); k++) {
@@ -148,14 +150,14 @@ public final class Paginator {
                 // Pages cuenta dentro del alcance donde se declara: el documento o la sección
                 // (referencia/componentes/document.md).
                 List<Queued> queue = new ArrayList<>();
-                if (section.inheritFixed()) {
-                    documentFixed.forEach(b -> queue.add(new Queued(new PendingAbsolute(b, 0, 0), number,
+                if (section.inheritPageOverlays()) {
+                    documentPageOverlays.forEach(b -> queue.add(new Queued(new PendingOverlay(b, 0, 0), number,
                             numbering.pages())));
                 }
-                for (PendingAbsolute p : fixed.get(k).values()) {
+                for (PendingOverlay p : fixed.get(k).values()) {
                     queue.add(new Queued(p, i + 1, own.size()));
                 }
-                List<Fragment> fixedFragments = placeFixed(queue, section, numbered, printed, numbering.label(number),
+                List<Fragment> pageOverlayFragments = placePageOverlays(queue, section, numbered, printed, numbering.label(number),
                         numbering.totalLabel(number));
                 if (numbered && printed == 0) {
                     unavailable(section.box());
@@ -163,17 +165,17 @@ public final class Paginator {
                 Fragment content = numbered && printed > 0
                         ? engine.number(own.get(i).fragment(), numbering.label(number), numbering.totalLabel(number))
                         : own.get(i).fragment();
-                pages.add(new Page(number, content, fixedFragments, section.media(), k, printed,
+                pages.add(new Page(number, content, pageOverlayFragments, section.pageSetup(), k, printed,
                         numbering.style(number), false));
             }
             if (flow.blankAfter()[k]) {
-                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Page overlay
-                // (referencia/componentes/document.md).
+                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Page
+                // overlay (referencia/componentes/document.md).
                 int number = pages.size() + 1;
-                Rect area = section.media().pageArea();
+                Rect area = section.pageSetup().pageArea();
                 Fragment empty = new Fragment(section.box(), 0, 0, area.width(), area.height(), Insets.ZERO,
                         Insets.ZERO, Insets.ZERO, List.of(), List.of(), true, true);
-                pages.add(new Page(number, empty, List.of(), section.media(), k, numbering.printed(number),
+                pages.add(new Page(number, empty, List.of(), section.pageSetup(), k, numbering.printed(number),
                         numbering.style(number), true));
             }
         }
@@ -212,9 +214,9 @@ public final class Paginator {
      * (referencia/componentes/frame-and-overlays.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
      * sale en su resultado y se coloca después.
      */
-    private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, String page,
+    private List<Fragment> placePageOverlays(List<Queued> queue, Section section, boolean numbered, int printed, String page,
                                       String tanda) {
-        Rect area = section.media().pageArea();
+        Rect area = section.pageSetup().pageArea();
         List<Fragment> fragments = new ArrayList<>();
         for (int q = 0; q < queue.size(); q++) {
             Queued item = queue.get(q);
@@ -232,7 +234,7 @@ public final class Paginator {
     }
 
     /** Una caja fixed por colocar y las páginas de su alcance: el documento o su sección. */
-    private record Queued(PendingAbsolute pending, int number, int total) {
+    private record Queued(PendingOverlay pending, int number, int total) {
     }
 
     /**
@@ -278,7 +280,8 @@ public final class Paginator {
     /**
      * La página en que empieza cada caja referida: la de su primer fragmento (referencia/comun/referencias.md), con su
      * número impreso (referencia/componentes/document.md). Una caja que no sale en ninguna página (no debería pasar:
-     * las cajas con {@code Page overlay} se rechazan al construir el árbol) o que está en una página sin número es un error.
+     * las cajas con {@code Page overlay} se rechazan al construir el árbol) o que está en una página sin número es un
+     * error.
      */
     private static Map<String, String> pagesOf(List<List<LayoutResult>> results, boolean[] blankAfter,
                                                Numbering numbering, Set<String> targets,
@@ -337,7 +340,7 @@ public final class Paginator {
      * Pagina el flujo de cada sección: un resultado por página y sección. Apunta en {@code fixed}, por
      * sección, las cajas {@code fixed}.
      */
-    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingAbsolute>> fixed) {
+    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> fixed) {
         List<List<LayoutResult>> all = new ArrayList<>();
         int pages = 0;
         for (int k = 0; k < sections.size(); k++) {
@@ -345,7 +348,7 @@ public final class Paginator {
             List<LayoutResult> results = new ArrayList<>();
             BreakToken token = null;
             do {
-                ConstraintSpace space = ConstraintSpace.forPage(section.media());
+                ConstraintSpace space = ConstraintSpace.forPage(section.pageSetup());
                 LayoutResult r = engine.layout(section.box(), space, token);
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {

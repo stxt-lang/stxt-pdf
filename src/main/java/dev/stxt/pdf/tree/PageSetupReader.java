@@ -20,16 +20,16 @@ import static dev.stxt.pdf.tree.ValueReader.points;
  * Lo que el documento dice de sí mismo y de sus páginas: el {@code Page} del documento y de cada {@code Section}
  * (referencia/componentes/document.md) y el {@code Title} y el {@code Language} (referencia/componentes/document.md).
  */
-final class MediaReader {
+final class PageSetupReader {
 
-    private MediaReader() {
+    private PageSetupReader() {
     }
 
     /**
      * Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo
      * (referencia/componentes/document.md).
      */
-    record Spec(Media media, Media.Paper paper) {
+    record Spec(PageSetup pageSetup, PageSetup.Paper paper) {
     }
 
     /** {@code Title} y {@code Language} de {@code Document}: un título no vacío y una etiqueta BCP 47. */
@@ -50,22 +50,22 @@ final class MediaReader {
      * {@code Width} y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez. El de una
      * sección hereda por grupos el del documento, {@code base} ({@code null} en el del documento).
      */
-    static Spec media(InlineNode n, Spec base) {
+    static Spec pageSetup(InlineNode n, Spec base) {
         Optional<Node> orientation = child(n, "orientation");
         Optional<Node> widthNode = child(n, "width");
         Optional<Node> heightNode = child(n, "height");
-        Media.Paper named = paper(n, base);
+        PageSetup.Paper named = paper(n, base);
         double width;
         double height;
         if (named != null) {
-            boolean landscape = orientation.map(o -> enumValue(Media.Orientation.class, o))
-                    .orElse(Media.Orientation.PORTRAIT) == Media.Orientation.LANDSCAPE;
+            boolean landscape = orientation.map(o -> enumValue(PageSetup.Orientation.class, o))
+                    .orElse(PageSetup.Orientation.PORTRAIT) == PageSetup.Orientation.LANDSCAPE;
             width = landscape ? named.height : named.width;
             height = landscape ? named.width : named.height;
         } else if (base != null && widthNode.isEmpty() && heightNode.isEmpty() && orientation.isEmpty()) {
             // El tamaño es el del documento.
-            width = base.media().width();
-            height = base.media().height();
+            width = base.pageSetup().width();
+            height = base.pageSetup().height();
             named = base.paper();
         } else {
             if (orientation.isPresent()) {
@@ -80,20 +80,20 @@ final class MediaReader {
             height = points(heightNode.get());
         }
         Optional<Node> marginNode = child(n, "margin");
-        Insets margin = marginNode.map(MediaReader::margin)
-                .orElse(base != null ? base.media().margin() : Insets.ZERO);
-        Media media = new Media(width, height, margin);
-        if (media.pageArea().width() <= 0 || media.pageArea().height() <= 0) {
+        Insets margin = marginNode.map(PageSetupReader::margin)
+                .orElse(base != null ? base.pageSetup().margin() : Insets.ZERO);
+        PageSetup pageSetup = new PageSetup(width, height, margin);
+        if (pageSetup.pageArea().width() <= 0 || pageSetup.pageArea().height() <= 0) {
             throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "Los márgenes de la página no dejan área útil");
         }
-        return new Spec(media, named);
+        return new Spec(pageSetup, named);
     }
 
     /**
      * El papel con nombre del medio: su {@code Paper} o, en una sección que solo declara {@code Orientation},
      * el del documento; {@code null} si el tamaño no sale de un papel.
      */
-    private static Media.Paper paper(InlineNode n, Spec base) {
+    private static PageSetup.Paper paper(InlineNode n, Spec base) {
         Optional<Node> paper = child(n, "paper");
         Optional<Node> orientation = child(n, "orientation");
         Optional<Node> widthNode = child(n, "width");
@@ -104,7 +104,7 @@ final class MediaReader {
                 throw error(both.get(), ErrorCode.PAGE_SIZE, "Page declara Paper y " + both.get().getName()
                         + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
             }
-            return enumValue(Media.Paper.class, paper.get());
+            return enumValue(PageSetup.Paper.class, paper.get());
         }
         if (base != null && orientation.isPresent() && widthNode.isEmpty() && heightNode.isEmpty()) {
             // Una sección que solo gira el papel del documento.

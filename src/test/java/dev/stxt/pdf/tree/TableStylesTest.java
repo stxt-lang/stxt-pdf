@@ -231,7 +231,10 @@ class TableStylesTest {
                 background(table).stream().map(String::toLowerCase).toList());
     }
 
-    /** Como el {@code Style} de una caja: una clase sin regla {@code For style} es un error, con la línea del {@code Style}. */
+    /**
+     * Como el {@code Style} de una caja: una clase sin regla {@code For style} es un error, con la línea del {@code
+     * Style}.
+     */
     @Test
     void aRowClassWithoutARuleIsAnError() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,

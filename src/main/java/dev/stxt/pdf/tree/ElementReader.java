@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
-import dev.stxt.pdf.model.Inline;
+import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.TextRun;
 
@@ -17,14 +17,14 @@ import static dev.stxt.pdf.tree.ListBuilder.validateList;
 import static dev.stxt.pdf.tree.ModelValidator.font;
 import static dev.stxt.pdf.tree.ModelValidator.validateFlex;
 import static dev.stxt.pdf.tree.ModelValidator.validateImage;
-import static dev.stxt.pdf.tree.ModelValidator.validateMulticol;
+import static dev.stxt.pdf.tree.ModelValidator.validateColumns;
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyReader.flex;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.grid;
 import static dev.stxt.pdf.tree.PropertyReader.item;
-import static dev.stxt.pdf.tree.PropertyReader.multicol;
+import static dev.stxt.pdf.tree.PropertyReader.columns;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 import static dev.stxt.pdf.tree.TableBuilder.cellText;
 import static dev.stxt.pdf.tree.TableBuilder.table;
@@ -103,7 +103,7 @@ enum ElementReader {
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
-            if (s.header() && position != null && position.group() == CellPosition.HEAD) {
+            if (s.rowHeader() && position != null && position.group() == CellPosition.HEAD) {
                 throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEAD, "Row header no tiene efecto en una celda de Head: "
                         + "las celdas de la cabecera ya son cabeceras de columna");
             }
@@ -179,34 +179,34 @@ enum ElementReader {
      * bloque, para que los márgenes no salgan de las columnas, y su alto no es definido: lo decide el reparto en
      * columnas.
      */
-    MULTICOL {
+    COLUMNS {
         @Override
         boolean property(Node p, Style s) {
-            if (!PropertyReader.MULTICOL.contains(p.getCanonicalName())) {
+            if (!PropertyReader.COLUMNS.contains(p.getCanonicalName())) {
                 return false;
             }
-            multicol(p, s);
+            columns(p, s);
             return true;
         }
 
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
-            validateMulticol(s, n.getLine());
+            validateColumns(s, n.getLine());
         }
 
         @Override
-        void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box multicol) {
-            Style s = Style.inheriting(multicol.style());
-            s.setIsolate(true);
-            Box flow = new Box(null, Element.COLUMNS, s, false, n.getLine());
-            multicol.addChild(flow);
+        void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box columns) {
+            Style s = Style.inheriting(columns.style());
+            s.setContainMargins(true);
+            Box flow = new Box(null, Element.COLUMN_FLOW, s, false, n.getLine());
+            columns.addChild(flow);
             ctx.definiteHeight.put(flow, false);
-            boolean outer = ctx.insideMulticol;
+            boolean outer = ctx.insideColumns;
             String outerUnbreakable = ctx.unbreakable;
-            ctx.insideMulticol = true;
+            ctx.insideColumns = true;
             ctx.unbreakable = null;
             builder.buildContent(ctx, n, flow);
-            ctx.insideMulticol = outer;
+            ctx.insideColumns = outer;
             ctx.unbreakable = outerUnbreakable;
         }
     },
@@ -230,10 +230,10 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Table of contents} (referencia/componentes/table-of-contents.md): sus entradas las genera {@link ContentsBuilder} al
-     * final, con todos los encabezados.
+     * Un {@code Table of contents} (referencia/componentes/table-of-contents.md): sus entradas las genera {@link
+     * TableOfContentsBuilder} al final, con todos los encabezados.
      */
-    CONTENTS {
+    TABLE_OF_CONTENTS {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             builder.buildContent(ctx, n, box);
@@ -262,9 +262,9 @@ enum ElementReader {
             case GRID -> GRID;
             case FLEX -> FLEX;
             case LIST -> LIST;
-            case MULTICOL -> MULTICOL;
+            case COLUMNS -> COLUMNS;
             case MARKDOWN -> MARKDOWN;
-            case CONTENTS -> CONTENTS;
+            case TABLE_OF_CONTENTS -> TABLE_OF_CONTENTS;
             default -> CONTAINER;
         };
     }
@@ -305,7 +305,7 @@ enum ElementReader {
      * sus errores señalan la línea donde empieza.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style().typography().inline() != Inline.MARKDOWN || ctx.insideMarkdown) {
+        if (box.style().typography().markup() != Markup.MARKDOWN || ctx.insideMarkdown) {
             return;
         }
         int first = box.textBlock() ? box.textLine() + 1 : box.textLine();

@@ -32,7 +32,7 @@ public final class StxtDump {
         for (Page p : pages) {
             // Las coordenadas son las de la página, con el área útil del medio de su sección
             // (referencia/componentes/document.md).
-            Rect pageArea = p.media().pageArea();
+            Rect pageArea = p.pageSetup().pageArea();
             sb.append("\tPage: ").append(p.number()).append('\n');
             dumpChildren(sb, p.content(), pageArea.x(), pageArea.y(), 2, includeWithoutId);
             for (Fragment fixed : p.fixed()) {

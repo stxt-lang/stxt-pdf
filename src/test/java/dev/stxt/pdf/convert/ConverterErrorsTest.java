@@ -5,7 +5,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.InternalException;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
 import dev.stxt.pdf.resources.ResourceException;
@@ -124,8 +124,8 @@ class ConverterErrorsTest {
     void anUnexpectedFailureIsInternalAndKeepsItsCause() {
         Converter converter = converter();
         LaidOutDocument good = converter.layOut(document("\tText: Hola"));
-        LaidOutDocument broken = new LaidOutDocument(good.media(), good.metadata(), good.root(),
-                List.of(new Page(1, null, List.of(), null, 0, 1, NumberStyle.DECIMAL, false)));
+        LaidOutDocument broken = new LaidOutDocument(good.pageSetup(), good.metadata(), good.root(),
+                List.of(new Page(1, null, List.of(), null, 0, 1, NumberFormat.DECIMAL, false)));
         StxtPdfException e = failure(() -> converter.toSvg(broken));
         assertInstanceOf(InternalException.class, e);
         assertEquals(Kind.INTERNAL, e.kind());

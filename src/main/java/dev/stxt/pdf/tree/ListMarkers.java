@@ -1,7 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Marker;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 
 /**
  * Texto del marcador de un ítem de lista (referencia/componentes/list.md): un símbolo ({@code •},
@@ -35,7 +35,7 @@ final class ListMarkers {
      * lo que da {@code {number of: id}} (referencia/comun/referencias.md); {@code null} si el marcador no numera.
      */
     static String number(Marker marker, int number) {
-        return marker.numbered() ? NumberStyle.valueOf(marker.name()).format(number) : null;
+        return marker.numbered() ? NumberFormat.valueOf(marker.name()).format(number) : null;
     }
 
     /** Si la numeración puede escribir el número: {@code decimal} desde 0, letras desde 1, romanos de 1 a 3999. */

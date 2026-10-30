@@ -13,8 +13,8 @@ import java.util.List;
  */
 public final class GridStyle extends StyleGroup {
 
-    private List<Value> columns = List.of();
-    private List<Value> rows = List.of();
+    private List<Value> columnSizes = List.of();
+    private List<Value> rowSizes = List.of();
     /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
     private GridAreas areas = GridAreas.NONE;
     private Direction flow = Direction.HORIZONTAL;
@@ -27,22 +27,22 @@ public final class GridStyle extends StyleGroup {
     GridStyle() {
     }
 
-    public List<Value> columns() {
-        return columns;
+    public List<Value> columnSizes() {
+        return columnSizes;
     }
 
-    void setColumns(List<Value> v) {
+    void setColumnSizes(List<Value> v) {
         writable();
-        columns = v;
+        columnSizes = v;
     }
 
-    public List<Value> rows() {
-        return rows;
+    public List<Value> rowSizes() {
+        return rowSizes;
     }
 
-    void setRows(List<Value> v) {
+    void setRowSizes(List<Value> v) {
         writable();
-        rows = v;
+        rowSizes = v;
     }
 
     public GridAreas areas() {

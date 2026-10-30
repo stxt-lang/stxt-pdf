@@ -19,7 +19,7 @@ import java.util.List;
  * @param adjoining   márgenes de los descendientes que colapsan fuera de la caja (referencia/componentes/block.md)
  */
 public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAppeal,
-                           List<PendingAbsolute> pending, AdjoiningMargins adjoining) {
+                           List<PendingOverlay> pending, AdjoiningMargins adjoining) {
 
     public LayoutResult {
         pending = List.copyOf(pending);
@@ -35,7 +35,7 @@ public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAp
         return finished(fragment, List.of(), AdjoiningMargins.NONE);
     }
 
-    public static LayoutResult finished(Fragment fragment, List<PendingAbsolute> pending, AdjoiningMargins adjoining) {
+    public static LayoutResult finished(Fragment fragment, List<PendingOverlay> pending, AdjoiningMargins adjoining) {
         return new LayoutResult(fragment, null, BreakAppeal.PERFECT_BREAK, pending, adjoining);
     }
 

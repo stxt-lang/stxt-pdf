@@ -5,8 +5,8 @@ import dev.stxt.pdf.fragment.BreakRules;
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Unit;
-import dev.stxt.pdf.layout.position.RelativeOffset;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.layout.position.FrameOffset;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.tree.Box;
 
@@ -55,7 +55,7 @@ public final class UnitBreaker {
      * @param relative desplazamiento de {@code relative} incluido en {@code x} e {@code y}
      */
     public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
-                         RelativeOffset relative) {
+                         FrameOffset relative) {
     }
 
     /**
@@ -98,7 +98,7 @@ public final class UnitBreaker {
      * @param outOfFlow cajas {@code absolute} y {@code fixed} del contenedor; van con el primer fragmento
      * @param units     las unidades en que se agrupan los ítems
      */
-    public record Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units,
+    public record Arranged(BoxModel model, List<Placed> placed, List<PendingOverlay> outOfFlow, Units units,
                            List<Band> bands) {
 
         public Arranged {
@@ -106,14 +106,15 @@ public final class UnitBreaker {
         }
 
         /** Un contenedor sin franjas: los de flex y grid. */
-        public Arranged(BoxModel model, List<Placed> placed, List<PendingAbsolute> outOfFlow, Units units) {
+        public Arranged(BoxModel model, List<Placed> placed, List<PendingOverlay> outOfFlow, Units units) {
             this(model, placed, outOfFlow, units, List.of());
         }
     }
 
     /**
-     * La franja de una unidad: la fila de una tabla con {@code Id} o {@code Box} (referencia/componentes/table.md#filas),
-     * que se pinta debajo de sus celdas con el alto de la unidad en cada fragmento.
+     * La franja de una unidad: la fila de una tabla con {@code Id} o {@code Box}
+     * (referencia/componentes/table.md#filas), que se pinta debajo de sus celdas con el alto de la unidad en cada
+     * fragmento.
      *
      * @param box    la caja de la fila
      * @param unit   su unidad
@@ -128,7 +129,7 @@ public final class UnitBreaker {
          * de su {@code Break}), el primer trozo no lleva borde inferior y los siguientes no llevan superior.
          */
         public Fragment fragment(double y, double height, boolean first, boolean last) {
-            boolean clone = box.style().breaks().decoration() == Decoration.CLOSED;
+            boolean clone = box.style().breaks().edges() == Edges.CLOSED;
             Insets sliced = clone ? border : new Insets(first ? border.top() : 0, border.right(),
                     last ? border.bottom() : 0, border.left());
             return new Fragment(box, x, y, width, height, Insets.ZERO, sliced, Insets.ZERO, List.of(), List.of(),
@@ -182,7 +183,7 @@ public final class UnitBreaker {
     }
 
     /** Un ítem en este fragmento: su fragmento ya colocado y sus cajas absolutas. */
-    private record Piece(Fragment fragment, List<PendingAbsolute> pending) {
+    private record Piece(Fragment fragment, List<PendingOverlay> pending) {
     }
 
     /**
@@ -205,7 +206,7 @@ public final class UnitBreaker {
         final BreakToken.Container from;
         final boolean first;
         final List<Placed> placed;
-        final List<PendingAbsolute> outOfFlow;
+        final List<PendingOverlay> outOfFlow;
         final Units units;
         final List<Band> bands;
         final Repeat repeat;
@@ -426,7 +427,7 @@ public final class UnitBreaker {
          * Un ítem que se repite: su fragmento va en todos, pero sus cajas absolutas solo en el
          * primero, como las del contenedor.
          */
-        void repeated(Piece piece, List<Fragment> fragments, List<PendingAbsolute> pending) {
+        void repeated(Piece piece, List<Fragment> fragments, List<PendingOverlay> pending) {
             fragments.add(piece.fragment());
             if (first) {
                 pending.addAll(piece.pending());
@@ -460,7 +461,7 @@ public final class UnitBreaker {
         LayoutResult result(double contentHeight, boolean contentFinished, int nextLine, List<BreakToken> itemTokens,
                             int appeal) {
             List<Fragment> fragments = new ArrayList<>();
-            List<PendingAbsolute> pending = new ArrayList<>(first ? outOfFlow : List.of());
+            List<PendingOverlay> pending = new ArrayList<>(first ? outOfFlow : List.of());
             double units = Math.max(0, contentHeight);
             // Las franjas de las filas, delante de las celdas de su grupo para pintarse debajo.
             fragments.addAll(repeat.headBands());

@@ -11,7 +11,7 @@ import dev.stxt.pdf.model.Rect;
  * @param height alto de la página, en pt
  * @param margin márgenes de página, en pt
  */
-public record Media(double width, double height, Insets margin) {
+public record PageSetup(double width, double height, Insets margin) {
 
     /** Área útil: el containing block inicial y el de las cajas {@code fixed}. */
     public Rect pageArea() {

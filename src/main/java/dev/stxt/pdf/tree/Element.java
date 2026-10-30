@@ -46,9 +46,9 @@ public enum Element {
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
      * Bloque en columnas (referencia/componentes/columns.md): su contenido va en el flujo de columnas, {@link
-     * #COLUMNS}.
+     * #COLUMN_FLOW}.
      */
-    MULTICOL("Columns", Layout.MULTICOL, Position.STATIC, true, false, 0),
+    COLUMNS("Columns", Layout.COLUMNS, Position.STATIC, true, false, 0),
     /**
      * Contenido en Markdown (referencia/componentes/markdown.md): un bloque cuyos hijos son los elementos que
      * {@link MarkdownBuilder} genera a partir de su {@code Content}.
@@ -61,24 +61,24 @@ public enum Element {
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
      * Índice automático (referencia/comun/referencias.md): un bloque cuyos hijos, generados al construir el árbol, son
-     * una entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
+     * una entrada por encabezado ({@link #TOC_1} … {@link #TOC_6}).
      */
-    CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
-    RELATIVE("Frame", Layout.BLOCK, Position.RELATIVE, true, false, 0),
-    ABSOLUTE("Overlay", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
-    FIXED("Page overlay", Layout.BLOCK, Position.FIXED, false, false, 0),
+    TABLE_OF_CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
+    FRAME("Frame", Layout.BLOCK, Position.FRAME, true, false, 0),
+    OVERLAY("Overlay", Layout.BLOCK, Position.OVERLAY, false, false, 0),
+    PAGE_OVERLAY("Page overlay", Layout.BLOCK, Position.PAGE_OVERLAY, false, false, 0),
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
-     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (referencia/componentes/table.md): una franja que
-     * se pinta debajo de sus celdas. No se nombra en las reglas {@code For element}.
+     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (referencia/componentes/table.md): una franja
+     * que se pinta debajo de sus celdas. No se nombra en las reglas {@code For element}.
      */
     ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
      * El flujo de columnas de un {@code Columns}, generado por el motor: un bloque con los hijos del {@code Columns},
      * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/columns.md).
      */
-    COLUMNS(null, Layout.BLOCK, Position.STATIC, false, false, 0),
+    COLUMN_FLOW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
      * Un bloque de código de un {@link #MARKDOWN} (referencia/componentes/markdown.md): un texto preformateado
      * generado. No se escribe en el documento, pero las reglas {@code For element} lo nombran ({@code Code block}) para
@@ -86,22 +86,22 @@ public enum Element {
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
-     * Las entradas de un {@link #CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el título, la
-     * guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las nombran ({@code
-     * TOC 2}) para darles estilo (referencia/componentes/table-of-contents.md).
+     * Las entradas de un {@link #TABLE_OF_CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el
+     * título, la guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las
+     * nombran ({@code TOC 2}) para darles estilo (referencia/componentes/table-of-contents.md).
      */
-    CONTENTS_ENTRY_1("TOC 1", Layout.FLEX),
-    CONTENTS_ENTRY_2("TOC 2", Layout.FLEX),
-    CONTENTS_ENTRY_3("TOC 3", Layout.FLEX),
-    CONTENTS_ENTRY_4("TOC 4", Layout.FLEX),
-    CONTENTS_ENTRY_5("TOC 5", Layout.FLEX),
-    CONTENTS_ENTRY_6("TOC 6", Layout.FLEX),
+    TOC_1("TOC 1", Layout.FLEX),
+    TOC_2("TOC 2", Layout.FLEX),
+    TOC_3("TOC 3", Layout.FLEX),
+    TOC_4("TOC 4", Layout.FLEX),
+    TOC_5("TOC 5", Layout.FLEX),
+    TOC_6("TOC 6", Layout.FLEX),
     /** El título de una entrada del índice: el texto del encabezado. */
-    CONTENTS_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
+    TOC_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /** La guía (puntos o línea) entre el título y el número de una entrada: una caja vacía que se pinta. */
-    CONTENTS_LEADER(null, Layout.BLOCK, Position.STATIC, false, false, 0),
+    TOC_LEADER(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /** El número de página de una entrada del índice: {@code {page of: …}} del encabezado. */
-    CONTENTS_PAGE(null, Layout.INLINE, Position.STATIC, false, false, 0);
+    TOC_PAGE(null, Layout.INLINE, Position.STATIC, false, false, 0);
 
     /** Los elementos que se nombran, por su nombre canónico ({@code list-item}): los escritos y las entradas del índice. */
     private static final Map<String, Element> BY_NAME = Arrays.stream(values())
@@ -152,7 +152,10 @@ public enum Element {
         return Arrays.stream(values()).filter(Element::isWritten).toList();
     }
 
-    /** Los elementos que una regla {@code For element} puede nombrar: los escritos, los bloques de código y las entradas del índice. */
+    /**
+     * Los elementos que una regla {@code For element} puede nombrar: los escritos, los bloques de código y las entradas
+     * del índice.
+     */
     public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
     }
@@ -162,9 +165,9 @@ public enum Element {
         return label != null && !selectorOnly;
     }
 
-    /** La entrada de un {@link #CONTENTS} para los encabezados de ese nivel (1 a 6). */
-    public static Element contentsEntry(int level) {
-        return values()[CONTENTS_ENTRY_1.ordinal() + level - 1];
+    /** La entrada de un {@link #TABLE_OF_CONTENTS} para los encabezados de ese nivel (1 a 6). */
+    public static Element tocEntry(int level) {
+        return values()[TOC_1.ordinal() + level - 1];
     }
 
     /** El nombre como se escribe ({@code List item}); {@code null} en las cajas generadas. */
@@ -203,8 +206,9 @@ public enum Element {
     /**
      * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
      * (referencia/comun/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
-     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Page overlay},
-     * un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link #role()}).
+     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Page
+     * overlay}, un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link
+     * #role()}).
      */
     public enum Role {
         /** La raíz anónima del documento, que no tiene elemento. */
@@ -225,18 +229,21 @@ public enum Element {
         /** Una imagen. */
         FIGURE,
         /** Un índice ({@code Table of contents}, referencia/componentes/table-of-contents.md). */
-        CONTENTS,
-        CONTENTS_ENTRY,
+        TABLE_OF_CONTENTS,
+        TOC_ENTRY,
         /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
         SPAN,
         /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
         PAGE_NUMBER,
         /**
-         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/table-of-contents.md) y no es
-         * contenido.
+         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/table-of-contents.md) y
+         * no es contenido.
          */
         LEADER,
-        /** El flujo de columnas de un {@code Columns}: no tiene significado propio, su contenido es el del {@code Columns}. */
+        /**
+         * El flujo de columnas de un {@code Columns}: no tiene significado propio, su contenido es el del {@code
+         * Columns}.
+         */
         FLOW,
         /** Una caja sin más significado. */
         BLOCK
@@ -257,13 +264,13 @@ public enum Element {
             case ROW -> Role.ROW;
             case CELL -> Role.CELL;
             case IMAGE -> Role.FIGURE;
-            case CONTENTS -> Role.CONTENTS;
-            case CONTENTS_ENTRY_1, CONTENTS_ENTRY_2, CONTENTS_ENTRY_3, CONTENTS_ENTRY_4, CONTENTS_ENTRY_5,
-                 CONTENTS_ENTRY_6 -> Role.CONTENTS_ENTRY;
-            case CONTENTS_TITLE -> Role.SPAN;
-            case CONTENTS_PAGE -> Role.PAGE_NUMBER;
-            case CONTENTS_LEADER -> Role.LEADER;
-            case COLUMNS -> Role.FLOW;
+            case TABLE_OF_CONTENTS -> Role.TABLE_OF_CONTENTS;
+            case TOC_1, TOC_2, TOC_3, TOC_4, TOC_5,
+                 TOC_6 -> Role.TOC_ENTRY;
+            case TOC_TITLE -> Role.SPAN;
+            case TOC_PAGE -> Role.PAGE_NUMBER;
+            case TOC_LEADER -> Role.LEADER;
+            case COLUMN_FLOW -> Role.FLOW;
             default -> Role.BLOCK;
         };
     }

@@ -245,7 +245,7 @@ class StackingContextTest {
      * el primer hueco y con el alto de la columna más alta.
      */
     @Test
-    void multicolRuleBetweenColumnsWithContent() {
+    void separatorBetweenColumnsWithContent() {
         Recorder r = record("\tColumns:", "\t\tCount: 3", "\t\tGap: 10", "\t\tSeparator: 2",
                 "\t\tSeparator color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #111", "\t\t\tBreak:",
@@ -405,7 +405,10 @@ class StackingContextTest {
                 "\tText: sin enlace").links);
     }
 
-    /** {@code Corner radius} es de la caja de borde; el fondo, dentro del borde, pierde su grosor; la imagen, el borde y el relleno. */
+    /**
+     * {@code Corner radius} es de la caja de borde; el fondo, dentro del borde, pierde su grosor; la imagen, el borde y
+     * el relleno.
+     */
     @Test
     void radiusRoundsTheBorderBoxAndTheInnerBoxesLoseTheBorder() {
         Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tCorner radius: 10",

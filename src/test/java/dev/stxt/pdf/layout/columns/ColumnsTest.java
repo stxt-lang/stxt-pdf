@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.multicol;
+package dev.stxt.pdf.layout.columns;
 
 import org.junit.jupiter.api.Test;
 

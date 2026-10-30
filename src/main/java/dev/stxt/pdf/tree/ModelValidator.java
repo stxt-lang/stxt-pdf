@@ -60,9 +60,9 @@ final class ModelValidator {
     }
 
     /**
-     * {@code Horizontal} y {@code Vertical}, {@code Lines} y {@code Gap} de un {@code Flex}: la del eje principal reparte
-     * y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code between}, {@code around} ni {@code
-     * evenly} (referencia/componentes/flex.md).
+     * {@code Horizontal} y {@code Vertical}, {@code Lines} y {@code Gap} de un {@code Flex}: la del eje principal
+     * reparte y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code between}, {@code around} ni
+     * {@code evenly} (referencia/componentes/flex.md).
      */
     static void validateFlex(Style s) {
         String main = s.flex().isHorizontal() ? "Horizontal" : "Vertical";
@@ -93,16 +93,16 @@ final class ModelValidator {
     }
 
     /**
-     * Un {@code Columns} fija sus columnas con {@code Count}, {@code Min column width} o los dos; con una sola columna no
-     * hay hueco ni línea entre columnas, {@code Separator color} necesita {@code Separator} y la línea cabe en el hueco
-     * (referencia/componentes/columns.md).
+     * Un {@code Columns} fija sus columnas con {@code Count}, {@code Min column width} o los dos; con una sola columna
+     * no hay hueco ni línea entre columnas, {@code Separator color} necesita {@code Separator} y la línea cabe en el
+     * hueco (referencia/componentes/columns.md).
      */
-    static void validateMulticol(Style s, int line) {
-        if (s.multicol().count() == null && s.multicol().columnWidth() == null) {
+    static void validateColumns(Style s, int line) {
+        if (s.columns().count() == null && s.columns().minColumnWidth() == null) {
             throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "Un Columns necesita Count, Min column width o los dos: "
                     + "Count fija el número de columnas y Min column width su ancho mínimo");
         }
-        if (s.multicol().count() != null && s.multicol().count() == 1) {
+        if (s.columns().count() != null && s.columns().count() == 1) {
             for (String p : List.of(COLUMN_GAP, SEPARATOR)) {
                 if (s.isDeclared(p)) {
                     throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(SEPARATOR) ? "Separator" : "Gap")
@@ -115,7 +115,7 @@ final class ModelValidator {
                     "Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas: declara su "
                             + "grosor o quítalo");
         }
-        if (s.multicol().rule() > s.multicol().columnGap() + Tolerance.EPSILON) {
+        if (s.columns().separator() > s.columns().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Gap (" + s.line(COLUMN_GAP) + ")"
                     : "Gap, que sin declarar es 0";
             throw error(s.line(SEPARATOR), ErrorCode.SEPARATOR_WIDTH, "Separator es más ancho que " + gap
@@ -150,7 +150,7 @@ final class ModelValidator {
             }
             return;
         }
-        if (s.position() != Position.RELATIVE && !s.rotatesInFlow()) {
+        if (s.position() != Position.FRAME && !s.rotatesInFlow()) {
             return;
         }
         String what = s.rotatesInFlow() ? "una caja girada" : "un Frame girado";
@@ -160,7 +160,7 @@ final class ModelValidator {
                         + " no tiene efecto en " + what + ", que no se parte entre páginas: quítalo");
             }
         }
-        if (s.rotatesInFlow() && s.isolate()) {
+        if (s.rotatesInFlow() && s.containMargins()) {
             throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ROTATED, "Contain margins no tiene efecto en una caja girada, "
                     + "que ya corta el colapso de márgenes con sus hijos: quítalo");
         }
@@ -195,7 +195,10 @@ final class ModelValidator {
         validateColumnBreaks(ctx, s);
     }
 
-    /** El valor del eje cruzado de un {@code Flex} si es un reparto ({@code between}…), que no vale ahí; si no, {@code null}. */
+    /**
+     * El valor del eje cruzado de un {@code Flex} si es un reparto ({@code between}…), que no vale ahí; si no, {@code
+     * null}.
+     */
     private static String crossSpread(Style s) {
         Distribution v = s.flex().crossDeclared();
         return v == Distribution.BETWEEN || v == Distribution.AROUND || v == Distribution.EVENLY
@@ -221,7 +224,7 @@ final class ModelValidator {
 
     /** {@code Before} y {@code After: column} solo dentro de un {@code Columns}, que es quien tiene columnas. */
     private static void validateColumnBreaks(BuildContext ctx, Style s) {
-        if (ctx.insideMulticol) {
+        if (ctx.insideColumns) {
             return;
         }
         String property = s.breaks().before() == Break.COLUMN ? BREAK_BEFORE
@@ -239,7 +242,7 @@ final class ModelValidator {
         }
         SourceLine line = s.line(OFFSET);
         Sides<Value> o = s.offset();
-        if (s.position() == Position.RELATIVE) {
+        if (s.position() == Position.FRAME) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
                 throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
                         + "desde arriba y desde abajo: deja uno de los dos en auto");
@@ -263,7 +266,10 @@ final class ModelValidator {
         }
     }
 
-    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Overlay y Page overlay, con inicio, tamaño y fin. */
+    /**
+     * Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Overlay y Page
+     * overlay, con inicio, tamaño y fin.
+     */
     private static void validateMargins(Style s, Layout parentLayout, boolean flexItem, boolean gridItem) {
         Sides<Value> m = s.box().margin();
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
@@ -295,7 +301,10 @@ final class ModelValidator {
         }
     }
 
-    /** Un {@code Overlay} o un {@code Page overlay} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
+    /**
+     * Un {@code Overlay} o un {@code Page overlay} solo se centra con {@code Margin auto} si declara inicio, tamaño y
+     * fin.
+     */
     private static void validateOutOfFlowMargins(Style s, SourceLine line, boolean horizontalAuto,
                                                  boolean verticalAuto) {
         Sides<Value> o = s.offset();
@@ -346,7 +355,7 @@ final class ModelValidator {
             }
         }
         boolean parentDefinite = ctx.isDefinite(parent);
-        if (s.position() == Position.RELATIVE && !parentDefinite
+        if (s.position() == Position.FRAME && !parentDefinite
                 && (hasPercentage(s.offset().top()) || hasPercentage(s.offset().bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
@@ -367,7 +376,7 @@ final class ModelValidator {
         if (ctx.isDefinite(box)) {
             return;
         }
-        if (s.grid().rows().stream().anyMatch(ValueReader::hasPercentage)) {
+        if (s.grid().rowSizes().stream().anyMatch(ValueReader::hasPercentage)) {
             throw indefinite(s.line(GRID_ROWS), "Row sizes");
         }
         // En flex, el hueco entre filas solo cuenta en vertical o con varias líneas.

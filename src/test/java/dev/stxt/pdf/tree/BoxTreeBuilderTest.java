@@ -58,7 +58,7 @@ class BoxTreeBuilderTest {
         assertEquals(List.of(Layout.INLINE, Layout.FLEX, Layout.GRID, Layout.BLOCK,
                 Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout()).toList());
         assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
-                Position.RELATIVE, Position.ABSOLUTE, Position.FIXED),
+                Position.FRAME, Position.OVERLAY, Position.PAGE_OVERLAY),
                 root.children().stream().map(b -> b.style().position()).toList());
         assertEquals("hola", root.children().get(0).text());
     }
@@ -137,10 +137,10 @@ class BoxTreeBuilderTest {
         assertEquals("CHILD_NOT_DECLARED", e.code());
         assertEquals(12, e.line());
 
-        InlineNode noMedia = (InlineNode) STXT.rawParser().parse(
+        InlineNode noPageSetup = (InlineNode) STXT.rawParser().parse(
                 "Document (dev.stxt.pdf):\n\tSection:\n\t\tBlock:\n\t\t\tId: a").get(0);
         assertEquals("TOO_FEW_CHILDREN",
-                assertThrows(DocumentSyntaxException.class, () -> new BoxTreeBuilder().build(noMedia)).code());
+                assertThrows(DocumentSyntaxException.class, () -> new BoxTreeBuilder().build(noPageSetup)).code());
 
         // Sin el namespace no se validaría nada: es un error de raíz.
         InlineNode noNamespace = (InlineNode) STXT.rawParser().parse(
@@ -205,8 +205,8 @@ class BoxTreeBuilderTest {
     void theSpecificationExampleIsValid() throws IOException {
         String doc = Files.readString(Path.of("test", "spec", "report.stxt"));
         BoxTreeBuilder.Result r = build(doc);
-        assertEquals(515, r.media().pageArea().width(), 1e-9);
-        assertEquals(762, r.media().pageArea().height(), 1e-9);
+        assertEquals(515, r.pageSetup().pageArea().width(), 1e-9);
+        assertEquals(762, r.pageSetup().pageArea().height(), 1e-9);
     }
 
     /**
@@ -217,18 +217,18 @@ class BoxTreeBuilderTest {
     void namedPaperSizes() {
         String head = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n";
         String body = "\tSection:\n\t\tBlock:\n";
-        Media a4 = build(head + "\t\tPaper: A4\n\t\tMargin: 40\n" + body).media();
-        assertEquals(new Media(595, 842, new dev.stxt.pdf.model.Insets(40, 40, 40, 40)), a4);
-        Media landscape = build(head + "\t\tPaper: A4\n\t\tOrientation: landscape\n" + body).media();
+        PageSetup a4 = build(head + "\t\tPaper: A4\n\t\tMargin: 40\n" + body).pageSetup();
+        assertEquals(new PageSetup(595, 842, new dev.stxt.pdf.model.Insets(40, 40, 40, 40)), a4);
+        PageSetup landscape = build(head + "\t\tPaper: A4\n\t\tOrientation: landscape\n" + body).pageSetup();
         assertEquals(842, landscape.width(), 1e-9);
         assertEquals(595, landscape.height(), 1e-9);
-        Media portrait = build(head + "\t\tPaper: Letter\n\t\tOrientation: portrait\n" + body).media();
+        PageSetup portrait = build(head + "\t\tPaper: Letter\n\t\tOrientation: portrait\n" + body).pageSetup();
         assertEquals(612, portrait.width(), 1e-9);
         assertEquals(792, portrait.height(), 1e-9);
-        for (Media.Paper paper : Media.Paper.values()) {
+        for (PageSetup.Paper paper : PageSetup.Paper.values()) {
             String name = paper.name().length() == 2 ? paper.name()
                     : paper.name().charAt(0) + paper.name().substring(1).toLowerCase(java.util.Locale.ROOT);
-            Media m = build(head + "\t\tPaper: " + name + "\n" + body).media();
+            PageSetup m = build(head + "\t\tPaper: " + name + "\n" + body).pageSetup();
             assertTrue(m.width() < m.height(), name);
         }
     }
@@ -265,12 +265,12 @@ class BoxTreeBuilderTest {
 
     /**
      * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
-     * (referencia/comun/errores.md): {@code Contain margins: false} en un ítem es el valor por defecto, un {@code Break} que
-     * llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque esté
-     * dentro de un {@code Overlay}.
+     * (referencia/comun/errores.md): {@code Contain margins: false} en un ítem es el valor por defecto, un {@code
+     * Break} que llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque
+     * esté dentro de un {@code Overlay}.
      */
     @Test
-    void breaksAndIsolateWithoutEffectOnlyFailWhenTheElementWritesThem() {
+    void breaksAndContainMarginsWithoutEffectOnlyFailWhenTheElementWritesThem() {
         build(document(
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",

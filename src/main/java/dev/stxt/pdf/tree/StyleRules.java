@@ -176,7 +176,8 @@ final class StyleRules {
 
     /**
      * Aplica la regla {@code For element} de un elemento generado (una entrada del índice,
-     * referencia/componentes/table-of-contents.md), si la hay: no tiene nodo, así que no hay clases ni {@code Id} que mirar.
+     * referencia/componentes/table-of-contents.md), si la hay: no tiene nodo, así que no hay clases ni {@code Id} que
+     * mirar.
      */
     void apply(Element kind, Style s) {
         for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {

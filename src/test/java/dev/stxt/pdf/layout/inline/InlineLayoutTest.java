@@ -41,7 +41,7 @@ class InlineLayoutTest {
     }
 
     @Test
-    void textWrapPrettyIsInheritedAndUsesKnuthPlass() {
+    void lineBreakingBalancedIsInheritedAndUsesKnuthPlass() {
         // El ejemplo de LineBreakerTest.prettyMinimizesTheDemerits a escala 5: ancho 50.
         String text = "a bbb c ddddd e fff";
         LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLine breaking: balanced",

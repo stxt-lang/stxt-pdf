@@ -4,7 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Value;
@@ -83,7 +83,7 @@ public final class BoxTreeBuilder {
      * (referencia/componentes/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
      * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
      */
-    public record Result(Media media, Box root, List<Section> sections, Metadata metadata) {
+    public record Result(PageSetup pageSetup, Box root, List<Section> sections, Metadata metadata) {
     }
 
     /**
@@ -128,9 +128,9 @@ public final class BoxTreeBuilder {
             }
             DocumentSchema.validate(styles, true);
         }
-        MediaReader.Spec documentMedia = MediaReader.media(inline(child(document, "page").orElseThrow()), null);
-        Media media = documentMedia.media();
-        Metadata metadata = MediaReader.metadata(document);
+        PageSetupReader.Spec documentPageSetup = PageSetupReader.pageSetup(inline(child(document, "page").orElseThrow()), null);
+        PageSetup pageSetup = documentPageSetup.pageSetup();
+        Metadata metadata = PageSetupReader.metadata(document);
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
         // La tipografía de For element: Document la heredan todas las cajas.
@@ -144,54 +144,55 @@ public final class BoxTreeBuilder {
             if (h.getCanonicalName().equals("page-overlay")) {
                 root.addChild(element(ctx, inline(h), root, null, null));
             } else if (h.getCanonicalName().equals("section")) {
-                Section section = section(ctx, inline(h), root, documentMedia, sections.isEmpty());
+                Section section = section(ctx, inline(h), root, documentPageSetup, sections.isEmpty());
                 sections.add(section);
                 // Cuelga de la raíz sin ser su hija (sin padre): cada sección es la raíz de su layout.
                 root.addSection(section.box());
             }
         }
-        ContentsBuilder.build(ctx, root);
+        TableOfContentsBuilder.build(ctx, root);
         References.validate(root);
         LinkTargets.validate(root);
         finish.accept(root);
         // Desde aquí el árbol no cambia: el layout, el pintado y otros hilos solo lo leen.
         root.close();
-        return new Result(media, root, List.copyOf(sections), metadata);
+        return new Result(pageSetup, root, List.copyOf(sections), metadata);
     }
 
     /**
      * Una {@code Section} (referencia/componentes/document.md): su caja, que es la raíz de su layout y tiene el alto de
-     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Page overlay} que lleva.
+     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Page overlay} que
+     * lleva.
      */
-    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia,
+    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, PageSetupReader.Spec documentPageSetup,
                             boolean first) {
         Style s = Style.inheriting(documentRoot.style());
         s.setLayout(Layout.BLOCK);
         s.setPosition(Position.STATIC);
         ctx.rules.applySection(n, s);
         String id = null;
-        MediaReader.Spec media = documentMedia;
+        PageSetupReader.Spec pageSetup = documentPageSetup;
         Section.PageNumbering numbering = Section.PageNumbering.CONTINUE;
-        NumberStyle pageStyle = NumberStyle.DECIMAL;
-        Node pageStyleNode = null;
+        NumberFormat pageNumberFormat = NumberFormat.DECIMAL;
+        Node pageNumberFormatNode = null;
         Node startNode = null;
         int start = 1;
-        boolean inheritFixed = true;
+        boolean inheritPageOverlays = true;
         Section.BeginOn beginOn = Section.BeginOn.ANY;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
-                case "page" -> media = MediaReader.media(inline(p), documentMedia);
+                case "page" -> pageSetup = PageSetupReader.pageSetup(inline(p), documentPageSetup);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
                 case "page-number-format" -> {
-                    pageStyle = enumValue(NumberStyle.class, p);
-                    pageStyleNode = p;
+                    pageNumberFormat = enumValue(NumberFormat.class, p);
+                    pageNumberFormatNode = p;
                 }
                 case "start" -> {
                     start = positiveInteger(p);
                     startNode = p;
                 }
-                case "inherit-page-overlays" -> inheritFixed = bool(p);
+                case "inherit-page-overlays" -> inheritPageOverlays = bool(p);
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {
@@ -209,18 +210,18 @@ public final class BoxTreeBuilder {
             throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start solo tiene efecto con Page numbering: "
                     + "restart, que es cuando la numeración vuelve a empezar: decláralo o quita Start");
         }
-        if (pageStyleNode != null && numbering == Section.PageNumbering.NONE) {
-            throw error(pageStyleNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format no tiene efecto con Page "
+        if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
+            throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format no tiene efecto con Page "
                     + "numbering: none, porque las páginas de la sección no tienen número: quítalo");
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
-        if (box.children().stream().allMatch(c -> c.style().position() == Position.FIXED)) {
+        if (box.children().stream().allMatch(c -> c.style().position() == Position.PAGE_OVERLAY)) {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Page overlay no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
-        return new Section(box, media.media(), numbering, pageStyle, start, inheritFixed, beginOn);
+        return new Section(box, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays, beginOn);
     }
 
     /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */
@@ -275,19 +276,19 @@ public final class BoxTreeBuilder {
         if (number != null) {
             listItem(ctx, n, box, parent, number);
         }
-        boolean outerFixed = ctx.insideFixed;
+        boolean outerPageOverlay = ctx.insidePageOverlay;
         String outerUnbreakable = ctx.unbreakable;
-        ctx.insideFixed |= s.position() == Position.FIXED;
+        ctx.insidePageOverlay |= s.position() == Position.PAGE_OVERLAY;
         if (ctx.unbreakable == null) {
             ctx.unbreakable = unbreakable(s);
         }
         reader.content(this, ctx, n, box);
-        ctx.insideFixed = outerFixed;
+        ctx.insidePageOverlay = outerPageOverlay;
         ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
             // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
             String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
-                    s.typography().numberStyle());
+                    s.typography().numberFormat());
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, headingNumber);
             }
@@ -299,14 +300,14 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Contain margins} en un ítem de {@code Flex} o {@code
-     * Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row} de una
-     * celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se mira
-     * aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
+     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Contain margins} en un ítem de {@code Flex} o
+     * {@code Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row}
+     * de una celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se
+     * mira aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
      */
     private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
         boolean item = wrapper != null && !is(wrapper, "row");
-        if (item && s.isolate()) {
+        if (item && s.containMargins()) {
             throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ITEM, "Contain margins no tiene efecto en un ítem de "
                     + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo");
         }
@@ -326,9 +327,9 @@ public final class BoxTreeBuilder {
     /** Cómo se nombra la caja en los mensajes si no se parte entre páginas, o {@code null} si se parte. */
     private static String unbreakable(Style s) {
         return switch (s.position()) {
-            case ABSOLUTE -> "un Overlay";
-            case FIXED -> "un Page overlay";
-            case RELATIVE -> s.rotation() != null ? "un Frame girado" : null;
+            case OVERLAY -> "un Overlay";
+            case PAGE_OVERLAY -> "un Page overlay";
+            case FRAME -> s.rotation() != null ? "un Frame girado" : null;
             default -> s.rotatesInFlow() ? "una caja girada" : null;
         };
     }
@@ -338,7 +339,7 @@ public final class BoxTreeBuilder {
      * (referencia/componentes/columns.md) y un encabezado respeta la jerarquía (referencia/componentes/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
-        if (ctx.insideMulticol && kind.position() != Position.STATIC && kind.position() != Position.RELATIVE) {
+        if (ctx.insideColumns && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
             throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
                     + "Columns: su posición no depende de las columnas; sácalo del Columns");
         }
@@ -409,12 +410,12 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Page overlay} y sin
-     * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
+     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Page
+     * overlay} y sin saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
      * como mucho un nivel respecto al anterior.
      */
     private static void heading(BuildContext ctx, InlineNode n, int level) {
-        if (ctx.insideFixed) {
+        if (ctx.insidePageOverlay) {
             throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "Un " + n.getName() + " no puede estar dentro de un Page overlay, "
                     + "que se repite en cada página y no forma parte del contenido: usa un Text");
         }

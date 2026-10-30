@@ -5,7 +5,7 @@ import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.TextWrap;
+import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.resources.Resources;
 import org.junit.jupiter.api.Test;
 
@@ -73,7 +73,7 @@ class LineBreakerPropertiesTest {
         for (int i = 0; i < 3000; i++) {
             String text = randomText(random);
             double available = 5 + random.nextInt(400);
-            for (TextWrap wrap : TextWrap.values()) {
+            for (LineBreaking wrap : LineBreaking.values()) {
                 String where = wrap + ", " + available + " pt: \"" + text.replace("\n", "\\n") + "\"";
                 List<List<String>> lines = LineBreaker.breakParagraphs(text, available, METRICS, FONT, 10, wrap);
                 List<List<String>> expected = paragraphs(text);
@@ -168,7 +168,7 @@ class LineBreakerPropertiesTest {
                         + nudges[random.nextInt(nudges.length)];
             }
             assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
-                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, TextWrap.SIMPLE),
+                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE),
                     available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
         }
     }

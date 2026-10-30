@@ -70,7 +70,7 @@ public final class ContrastCheck implements Canvas {
      */
     public static void check(LaidOutDocument document) {
         for (Page page : document.pages()) {
-            Rect area = page.media().pageArea();
+            Rect area = page.pageSetup().pageArea();
             StackingContext.build(page.content(), page.fixed(), area.x(), area.y()).paint(new ContrastCheck());
         }
     }

@@ -168,7 +168,7 @@ public final class InlineLayout implements LayoutAlgorithm {
                     available, measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing()));
         } else {
             paragraphs = LineBreaker.breakParagraphs(runs(box), available, measurer, s.typography().fontFace(), s.typography().fontSize(),
-                    s.typography().letterSpacing(), s.typography().textWrap());
+                    s.typography().letterSpacing(), s.typography().lineBreaking());
         }
         List<LineBreaker.Line> texts = new ArrayList<>();
         int[] paragraphEnds = new int[paragraphs.size()];

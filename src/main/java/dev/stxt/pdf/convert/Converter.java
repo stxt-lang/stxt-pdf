@@ -130,7 +130,7 @@ public final class Converter {
     public List<String> toSvg(LaidOutDocument document) {
         Objects.requireNonNull(document, "document");
         return guarded(() -> document.pages().stream()
-                .map((Page page) -> SvgCanvas.page(page, page.media(), debug, resources))
+                .map((Page page) -> SvgCanvas.page(page, page.pageSetup(), debug, resources))
                 .toList());
     }
 

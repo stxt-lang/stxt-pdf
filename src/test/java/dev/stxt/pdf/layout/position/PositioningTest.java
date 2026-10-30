@@ -18,7 +18,7 @@ class PositioningTest {
     }
 
     @Test
-    void relativeShiftsWithoutMovingSiblings() {
+    void frameShiftsWithoutMovingSiblings() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
                 "\tFrame:", "\t\tId: R", "\t\tOffset: 5 auto auto 10", "\t\tBox:", "\t\t\tHeight: 20",
@@ -79,7 +79,7 @@ class PositioningTest {
     }
 
     @Test
-    void absoluteBoxesDoNotContributeToTheParentHeight() {
+    void overlaysDoNotContributeToTheParentHeight() {
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: R",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 50");
@@ -147,7 +147,7 @@ class PositioningTest {
     }
 
     @Test
-    void nestedAbsoluteUsesTheNearestPositionedAncestor() {
+    void nestedOverlayUsesTheNearestPositionedAncestor() {
         // B es absolute y por tanto containing block de C, aunque esté dentro de R.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
@@ -160,7 +160,7 @@ class PositioningTest {
     }
 
     @Test
-    void fixedUsesThePageArea() {
+    void pageOverlayUsesThePageArea() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tPage overlay:", "\t\tId: F", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 20");

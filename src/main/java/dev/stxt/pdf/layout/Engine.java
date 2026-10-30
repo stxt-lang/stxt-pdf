@@ -14,8 +14,8 @@ import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.InlineLayout;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
-import dev.stxt.pdf.layout.multicol.MulticolLayout;
-import dev.stxt.pdf.layout.position.AbsoluteLayout;
+import dev.stxt.pdf.layout.columns.ColumnsLayout;
+import dev.stxt.pdf.layout.position.OverlayLayout;
 import dev.stxt.pdf.layout.table.TableLayout;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Insets;
@@ -64,7 +64,7 @@ public final class Engine implements LayoutContext {
     private final Limits limits;
     private final InlineLayout inline;
     private final TableLayout table;
-    private final AbsoluteLayout absolute;
+    private final OverlayLayout absolute;
     /** El algoritmo de cada {@code Layout}; una tabla, que es un grid, tiene el suyo ({@link #algorithm}). */
     private final Map<Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Layout.class);
 
@@ -107,12 +107,12 @@ public final class Engine implements LayoutContext {
         this.inline = new InlineLayout(this, measurer);
         GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
-        this.absolute = new AbsoluteLayout(this);
+        this.absolute = new OverlayLayout(this);
         algorithms.put(Layout.BLOCK, new BlockLayout(this));
         algorithms.put(Layout.INLINE, inline);
         algorithms.put(Layout.FLEX, new FlexLayout(this));
         algorithms.put(Layout.GRID, grid);
-        algorithms.put(Layout.MULTICOL, new MulticolLayout(this));
+        algorithms.put(Layout.COLUMNS, new ColumnsLayout(this));
         algorithms.put(Layout.IMAGE, new ImageLayout(this));
     }
 
@@ -148,7 +148,7 @@ public final class Engine implements LayoutContext {
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
             Overflow.check(pages);
-            return new LaidOutDocument(tree.media(), tree.metadata(), tree.root(), pages);
+            return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages);
         } finally {
             release();
         }
@@ -230,9 +230,9 @@ public final class Engine implements LayoutContext {
     /**
      * {@inheritDoc}
      *
-     * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría sin
-     * contenedor: su {@code Width} o, si no lo tiene, su max-content (referencia/comun/capas-y-giro.md). Los porcentajes
-     * cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
+     * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría
+     * sin contenedor: su {@code Width} o, si no lo tiene, su max-content (referencia/comun/capas-y-giro.md). Los
+     * porcentajes cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
      */
     @Override
     public IntrinsicSizes intrinsic(Box box) {
@@ -309,14 +309,15 @@ public final class Engine implements LayoutContext {
             return LayoutResult.before(box);
         }
         // Lo que sube de dentro (los Page overlay) tiene su posición estática en la caja sin girar.
-        List<PendingAbsolute> pending = r.pending().stream()
+        List<PendingOverlay> pending = r.pending().stream()
                 .map(p -> p.translated(f.turned().x(), f.turned().y())).toList();
         return LayoutResult.finished(f, pending, AdjoiningMargins.NONE);
     }
 
     /**
      * El ancho de la caja de borde de una caja girada en flujo: el que da su {@code Width} o, si es {@code auto}, su
-     * max-content, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de siempre.
+     * max-content, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de
+     * siempre.
      */
     private double turnedWidth(Box box, ConstraintSpace space) {
         if (box.isImage() || !box.style().box().width().isAuto()) {
@@ -353,7 +354,7 @@ public final class Engine implements LayoutContext {
     }
 
     /** Layout de las cajas fuera de flujo; el {@link Paginator} lo usa para las {@code fixed}. */
-    AbsoluteLayout absolute() {
+    OverlayLayout absolute() {
         return absolute;
     }
 

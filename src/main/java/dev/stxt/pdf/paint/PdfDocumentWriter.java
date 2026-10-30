@@ -3,11 +3,11 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
-import dev.stxt.pdf.tree.Media;
+import dev.stxt.pdf.tree.PageSetup;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -85,21 +85,21 @@ public final class PdfDocumentWriter {
             // Todas las páginas existen antes de pintar ninguna: un enlace puede ir hacia delante.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {
-                Media media = pages.get(i).media();
-                PDPage page = new PDPage(new PDRectangle((float) media.width(), (float) media.height()));
+                PageSetup pageSetup = pages.get(i).pageSetup();
+                PDPage page = new PDPage(new PDRectangle((float) pageSetup.width(), (float) pageSetup.height()));
                 doc.addPage(page);
                 pdfPages.add(page);
             }
             for (int i = 0; i < pages.size(); i++) {
                 Page p = pages.get(i);
                 // Cada página tiene el medio de su sección (referencia/componentes/document.md).
-                Media media = p.media();
-                Rect area = media.pageArea();
+                PageSetup pageSetup = p.pageSetup();
+                Rect area = pageSetup.pageArea();
                 PDPage page = pdfPages.get(i);
                 structure.startPage(page);
                 PdfCanvas canvas;
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
-                    canvas = new PdfCanvas(doc, cs, media.height(), resources, fonts, images, structure, links,
+                    canvas = new PdfCanvas(doc, cs, pageSetup.height(), resources, fonts, images, structure, links,
                             debug);
                     StackingContext.build(p.content(), p.fixed(), area.x(), area.y()).paint(canvas);
                 }
@@ -123,7 +123,7 @@ public final class PdfDocumentWriter {
      * añaden nada. Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
      */
     private static void labels(PDDocument doc, List<Page> pages) {
-        if (pages.stream().allMatch(p -> p.printed() == p.number() && p.style() == NumberStyle.DECIMAL)) {
+        if (pages.stream().allMatch(p -> p.printed() == p.number() && p.style() == NumberFormat.DECIMAL)) {
             return;
         }
         PDPageLabels labels = new PDPageLabels(doc);

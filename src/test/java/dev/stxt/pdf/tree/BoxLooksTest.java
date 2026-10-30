@@ -13,7 +13,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md). */
+/**
+ * {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md).
+ */
 class BoxLooksTest {
 
     private static Box block(String... boxLines) {
@@ -25,20 +27,20 @@ class BoxLooksTest {
     @Test
     void radiusFollowsTheCornerOrderOfCss() {
         Style s = block("Corner radius: 1 2 3 4").style();
-        assertEquals(new Corners<>(Value.pt(1), Value.pt(2), Value.pt(3), Value.pt(4)), s.box().radius());
-        assertEquals(Corners.all(Value.pt(8)), block("Corner radius: 8").style().box().radius());
+        assertEquals(new Corners<>(Value.pt(1), Value.pt(2), Value.pt(3), Value.pt(4)), s.box().cornerRadius());
+        assertEquals(Corners.all(Value.pt(8)), block("Corner radius: 8").style().box().cornerRadius());
         assertEquals(new Corners<>(Value.pt(0), Value.pt(20), Value.pt(0), Value.pt(20)),
-                block("Corner radius: 0 20").style().box().radius());
+                block("Corner radius: 0 20").style().box().cornerRadius());
     }
 
     @Test
     void radiusAcceptsPercentages() {
-        assertEquals(Corners.all(new Value.Percentage(50)), block("Corner radius: 50%").style().box().radius());
+        assertEquals(Corners.all(new Value.Percentage(50)), block("Corner radius: 50%").style().box().cornerRadius());
     }
 
     @Test
     void withoutRadiusTheCornersAreSquare() {
-        assertEquals(Corners.all(Value.pt(0)), block("Padding: 1").style().box().radius());
+        assertEquals(Corners.all(Value.pt(0)), block("Padding: 1").style().box().cornerRadius());
     }
 
     @Test
@@ -69,7 +71,7 @@ class BoxLooksTest {
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).sections().get(0).box();
         // Lo propio gana a la regla propiedad a propiedad: el color, no el degradado; el radio de la regla se mantiene.
         assertEquals(new Paint.Solid("#CCC"), root.children().get(0).style().box().background());
-        assertEquals(Corners.all(Value.pt(6)), root.children().get(0).style().box().radius());
+        assertEquals(Corners.all(Value.pt(6)), root.children().get(0).style().box().cornerRadius());
         assertEquals(new Paint.Linear(90, List.of("#000", "#FFF")), root.children().get(1).style().box().background());
     }
 }

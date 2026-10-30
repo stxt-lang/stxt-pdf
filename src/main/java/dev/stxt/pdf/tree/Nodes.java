@@ -60,7 +60,7 @@ final class Nodes {
 
     /** Nombre del elemento posicionado: {@code Overlay} o {@code Page overlay}. */
     static String position(Style s) {
-        return s.position() == Position.FIXED ? "Page overlay" : "Overlay";
+        return s.position() == Position.PAGE_OVERLAY ? "Page overlay" : "Overlay";
     }
 
     /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */

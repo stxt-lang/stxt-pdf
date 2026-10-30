@@ -2,7 +2,7 @@ package dev.stxt.pdf.layout.inline;
 
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.Transform;
+import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.List;
@@ -30,16 +30,16 @@ public final class TextTransform {
 
     /** Si hay algo que transformar. */
     public static boolean applies(Style s) {
-        return s.typography().transform() != Transform.NONE || s.typography().smallCaps();
+        return s.typography().textCase() != TextCase.NONE || s.typography().smallCaps();
     }
 
     /** Los tramos con la transformación y las versalitas de {@code s}; los mismos si no se piden. */
     public static List<TextRun> apply(List<TextRun> runs, Style s) {
-        return applies(s) ? apply(runs, s.typography().transform(), s.typography().smallCaps(), s.typography().locale()) : runs;
+        return applies(s) ? apply(runs, s.typography().textCase(), s.typography().smallCaps(), s.typography().locale()) : runs;
     }
 
     /** Los tramos transformados, con los seguidos del mismo formato unidos. */
-    public static List<TextRun> apply(List<TextRun> runs, Transform transform, boolean smallCaps,
+    public static List<TextRun> apply(List<TextRun> runs, TextCase transform, boolean smallCaps,
                                       Locale locale) {
         TextRun.Joiner out = new TextRun.Joiner();
         // Para capitalize: si el carácter anterior (aunque sea de otro tramo) separa palabras.
@@ -68,7 +68,7 @@ public final class TextTransform {
         return out.build();
     }
 
-    private static String transform(String text, Transform transform, boolean wordStart, Locale locale) {
+    private static String transform(String text, TextCase transform, boolean wordStart, Locale locale) {
         return switch (transform) {
             case NONE -> text;
             case UPPERCASE -> text.toUpperCase(locale);

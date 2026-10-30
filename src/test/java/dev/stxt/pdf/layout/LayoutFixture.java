@@ -73,12 +73,12 @@ public final class LayoutFixture {
         return "\t\tWidth: 595\n\t\tHeight: " + height + "\n\t\tMargin: 40\n";
     }
 
-    private static LayoutFixture layOut(String media, String... boxLines) {
-        return layOut(media, Map.of(), boxLines);
+    private static LayoutFixture layOut(String pageSetup, String... boxLines) {
+        return layOut(pageSetup, Map.of(), boxLines);
     }
 
-    private static LayoutFixture layOut(String media, Map<String, List<TextRun>> runs, String... boxLines) {
-        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n" + media + FONT + String.join("\n", boxLines);
+    private static LayoutFixture layOut(String pageSetup, Map<String, List<TextRun>> runs, String... boxLines) {
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n" + pageSetup + FONT + String.join("\n", boxLines);
         return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)).pages());
     }
 

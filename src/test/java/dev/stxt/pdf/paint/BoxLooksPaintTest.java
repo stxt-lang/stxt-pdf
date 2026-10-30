@@ -286,7 +286,7 @@ class BoxLooksPaintTest {
     void svgClipsARoundedImage() {
         String image = HEAD + "\tImage: test/wide.png\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tCorner radius: 50%\n";
         LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(image)));
-        String svg = SvgCanvas.page(document.pages().get(0), document.media(), false, new Resources());
+        String svg = SvgCanvas.page(document.pages().get(0), document.pageSetup(), false, new Resources());
         assertTrue(svg.contains("<clipPath id=\"c0\">"), svg);
         assertTrue(svg.contains("<g clip-path=\"url(#c0)\"><svg x=\"20.00\""), svg);
     }
@@ -294,6 +294,6 @@ class BoxLooksPaintTest {
     private static String svg(String document) {
         InlineNode input = new DocumentReader().read(Docs.sectioned(document));
         LaidOutDocument laidOut = new Engine().layOutDocument(input);
-        return SvgCanvas.page(laidOut.pages().get(0), laidOut.media(), false);
+        return SvgCanvas.page(laidOut.pages().get(0), laidOut.pageSetup(), false);
     }
 }

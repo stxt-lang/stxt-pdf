@@ -84,7 +84,7 @@ class MarkdownTest {
     }
 
     @Test
-    void headingsCannotGoInAFixed() {
+    void headingsCannotGoInAPageOverlay() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tBlock:", "\tPage overlay:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
         assertEquals(ErrorCode.HEADING_IN_PAGE_OVERLAY, e.errorCode());
@@ -110,8 +110,8 @@ class MarkdownTest {
     }
 
     /**
-     * {@code Code font} es de {@code Typography}: se hereda de un antecesor, y {@code For element: Code block} cambia la de
-     * los bloques sin tocar la del código en línea (referencia/componentes/markdown.md).
+     * {@code Code font} es de {@code Typography}: se hereda de un antecesor, y {@code For element: Code block} cambia
+     * la de los bloques sin tocar la del código en línea (referencia/componentes/markdown.md).
      */
     @Test
     void theCodeFontIsInheritedAndACodeBlockRuleChangesOnlyTheBlocks() {
@@ -132,8 +132,8 @@ class MarkdownTest {
     }
 
     /**
-     * referencia/comun/estilos.md: la regla {@code For element: Code block} da estilo al código y no a los demás textos, ni
-     * al revés.
+     * referencia/comun/estilos.md: la regla {@code For element: Code block} da estilo al código y no a los demás
+     * textos, ni al revés.
      */
     @Test
     void aCodeBlockHasItsOwnElementRule() {

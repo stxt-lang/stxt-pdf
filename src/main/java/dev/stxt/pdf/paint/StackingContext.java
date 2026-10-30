@@ -2,7 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.model.Decoration;
+import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.Insets;
@@ -139,8 +139,8 @@ public final class StackingContext {
         List<Frame> inner = parent.inner();
         for (Fragment h : parent.f().children()) {
             Style s = h.box().style();
-            List<Frame> frames = s.position() == Position.FIXED ? List.of()
-                    : s.position() == Position.ABSOLUTE ? turnsOnly(inner) : inner;
+            List<Frame> frames = s.position() == Position.PAGE_OVERLAY ? List.of()
+                    : s.position() == Position.OVERLAY ? turnsOnly(inner) : inner;
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), frames);
             if (createsContext(h)) {
                 addContext(p);
@@ -158,7 +158,7 @@ public final class StackingContext {
 
     private static boolean createsContext(Fragment f) {
         Style s = f.box().style();
-        if (s.position() == Position.FIXED) {
+        if (s.position() == Position.PAGE_OVERLAY) {
             return true;
         }
         if (s.layer() == null) {
@@ -239,7 +239,7 @@ public final class StackingContext {
         Style s = p.f().box().style();
         Insets border = p.f().border();
         return s.box().background() != null || border.top() > 0 || border.right() > 0 || border.bottom() > 0
-                || border.left() > 0 || s.multicol().rule() > 0;
+                || border.left() > 0 || s.columns().separator() > 0;
     }
 
     /**
@@ -287,20 +287,20 @@ public final class StackingContext {
             canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.box().background());
         }
         canvas.border(borderBox, p.f().border(), radii, borderColors(s));
-        if (s.multicol().rule() > 0) {
+        if (s.columns().separator() > 0) {
             paintRules(canvas, p);
         }
     }
 
     /**
-     * Las esquinas de la caja de borde del fragmento (referencia/comun/caja.md): {@code Corner radius} resuelto contra su
-     * tamaño y, en una caja partida entre páginas con {@code Edges: open}, solo las de
+     * Las esquinas de la caja de borde del fragmento (referencia/comun/caja.md): {@code Corner radius} resuelto contra
+     * su tamaño y, en una caja partida entre páginas con {@code Edges: open}, solo las de
      * arriba en el primer fragmento y las de abajo en el último.
      */
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
-        Radii radii = Radii.resolve(s.box().radius(), p.borderBox().width(), p.borderBox().height());
-        if (s.breaks().decoration() == Decoration.CLOSED) {
+        Radii radii = Radii.resolve(s.box().cornerRadius(), p.borderBox().width(), p.borderBox().height());
+        if (s.breaks().edges() == Edges.CLOSED) {
             return radii;
         }
         return radii.forFragment(p.f().first(), p.f().last());
@@ -329,11 +329,11 @@ public final class StackingContext {
         List<Fragment> columns = p.f().children();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double height = columns.stream().mapToDouble(Fragment::height).max().orElse(0);
-        String color = s.multicol().ruleColor() != null ? s.multicol().ruleColor() : s.typography().color();
+        String color = s.columns().separatorColor() != null ? s.columns().separatorColor() : s.typography().color();
         for (int i = 1; i < columns.size(); i++) {
             Fragment left = columns.get(i - 1);
             double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
-            canvas.background(new Rect(content.x() + middle - s.multicol().rule() / 2, content.y(), s.multicol().rule(), height),
+            canvas.background(new Rect(content.x() + middle - s.columns().separator() / 2, content.y(), s.columns().separator(), height),
                     color);
         }
     }
@@ -400,14 +400,14 @@ public final class StackingContext {
     }
 
     /**
-     * La guía de una entrada de índice (referencia/componentes/table-of-contents.md): puntos o una línea sobre la línea base del
-     * texto de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
+     * La guía de una entrada de índice (referencia/componentes/table-of-contents.md): puntos o una línea sobre la línea
+     * base del texto de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
      */
     private static void paintLeader(Canvas canvas, Piece p) {
         Style s = p.f().box().style();
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         double baseline = canvas.vertical(s.typography().fontFace()).baseline(content.y(), s.typography().usedLineHeight(), s.typography().fontSize());
-        for (Rect shape : Leaders.shapes(s.contents().leader(), content, baseline, s.typography().fontSize())) {
+        for (Rect shape : Leaders.shapes(s.tableOfContents().leader(), content, baseline, s.typography().fontSize())) {
             canvas.background(shape, s.typography().color());
         }
     }

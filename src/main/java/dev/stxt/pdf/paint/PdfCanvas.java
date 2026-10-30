@@ -228,7 +228,7 @@ public final class PdfCanvas implements Canvas {
         }
         io(() -> {
             ImageFile file = resources.images().find(box.image());
-            int number = box.style().image().page();
+            int number = box.style().image().pdfPage();
             double width = file.width(number);
             double height = file.height(number);
             Rect target = ImageFit.place(box.style().image().fit(), content, width, height);

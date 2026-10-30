@@ -35,13 +35,13 @@ final class BuildContext {
     /** Los contadores de la numeración de los encabezados ({@code Numbered}, referencia/componentes/heading.md). */
     final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Si se está construyendo el contenido de un {@code Page overlay}. */
-    boolean insideFixed;
+    boolean insidePageOverlay;
     /** Si se está construyendo el contenido de un {@code Columns}. */
-    boolean insideMulticol;
+    boolean insideColumns;
     /**
-     * La caja que no se parte entre páginas ({@code un Overlay}, {@code un Page overlay} o {@code un Frame girado}) cuyo
-     * contenido se está construyendo, o {@code null}: dentro, un {@code Break} no tiene efecto, salvo en las columnas
-     * de un {@code Columns} (referencia/comun/cortes.md).
+     * La caja que no se parte entre páginas ({@code un Overlay}, {@code un Page overlay} o {@code un Frame girado})
+     * cuyo contenido se está construyendo, o {@code null}: dentro, un {@code Break} no tiene efecto, salvo en las
+     * columnas de un {@code Columns} (referencia/comun/cortes.md).
      */
     String unbreakable;
     /**
@@ -49,7 +49,10 @@ final class BuildContext {
      * (referencia/componentes/markdown.md).
      */
     boolean insideMarkdown;
-    /** Los {@code Table of contents} del documento, en orden: sus entradas se generan al final, con todos los encabezados. */
+    /**
+     * Los {@code Table of contents} del documento, en orden: sus entradas se generan al final, con todos los
+     * encabezados.
+     */
     final List<Box> contents = new ArrayList<>();
     /**
      * Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo

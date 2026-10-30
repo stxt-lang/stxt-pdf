@@ -35,8 +35,8 @@ import java.util.List;
  *                 sumado a {@code x}: su sitio en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo,
  *                 con la base de porcentajes de su layout; 0 en las demás cajas
  * @param offsetY  ídem en vertical
- * @param turned   en una caja girada en flujo (referencia/comun/capas-y-giro.md), su caja de borde sin girar, relativa a
- *                 ({@code x}, {@code y}) y centrada en el rectángulo que la envuelve; sus hijos y sus líneas se
+ * @param turned   en una caja girada en flujo (referencia/comun/capas-y-giro.md), su caja de borde sin girar, relativa
+ *                 a ({@code x}, {@code y}) y centrada en el rectángulo que la envuelve; sus hijos y sus líneas se
  *                 refieren a ella. {@code null} en las demás cajas
  */
 public record Fragment(Box box, double x, double y, double width, double height, Insets margin,

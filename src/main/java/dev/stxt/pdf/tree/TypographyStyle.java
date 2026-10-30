@@ -3,11 +3,11 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.model.Inline;
-import dev.stxt.pdf.model.NumberStyle;
+import dev.stxt.pdf.model.Markup;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.TextAlign;
-import dev.stxt.pdf.model.TextWrap;
-import dev.stxt.pdf.model.Transform;
+import dev.stxt.pdf.model.LineBreaking;
+import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.WhiteSpace;
 
@@ -32,9 +32,9 @@ public final class TypographyStyle extends StyleGroup {
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     private Value lineHeight;
     private TextAlign textAlign = TextAlign.LEFT;
-    private TextWrap textWrap = TextWrap.SIMPLE;
-    private Inline inline = Inline.NONE;
-    private Transform transform = Transform.NONE;
+    private LineBreaking lineBreaking = LineBreaking.SIMPLE;
+    private Markup markup = Markup.NONE;
+    private TextCase textCase = TextCase.NONE;
     /** Separación entre letras, en puntos; puede ser negativa. */
     private double letterSpacing;
     private boolean smallCaps;
@@ -52,7 +52,7 @@ public final class TypographyStyle extends StyleGroup {
      */
     private boolean numbered;
     /** {@code Number format}: cómo se escribe el número del nivel del encabezado. */
-    private NumberStyle numberStyle = NumberStyle.DECIMAL;
+    private NumberFormat numberFormat = NumberFormat.DECIMAL;
     /** {@code Number label}: lo que se escribe delante del título, con {@code {number}}; {@code null} = el número. */
     private String numberLabel;
     /**
@@ -78,16 +78,16 @@ public final class TypographyStyle extends StyleGroup {
         fontSize = parent.fontSize;
         lineHeight = parent.lineHeight;
         textAlign = parent.textAlign;
-        textWrap = parent.textWrap;
-        inline = parent.inline;
-        transform = parent.transform;
+        lineBreaking = parent.lineBreaking;
+        markup = parent.markup;
+        textCase = parent.textCase;
         letterSpacing = parent.letterSpacing;
         smallCaps = parent.smallCaps;
         ligatures = parent.ligatures;
         whiteSpace = parent.whiteSpace;
         tabSize = parent.tabSize;
         numbered = parent.numbered;
-        numberStyle = parent.numberStyle;
+        numberFormat = parent.numberFormat;
         numberLabel = parent.numberLabel;
         locale = parent.locale;
         color = parent.color;
@@ -158,31 +158,31 @@ public final class TypographyStyle extends StyleGroup {
         textAlign = v;
     }
 
-    public TextWrap textWrap() {
-        return textWrap;
+    public LineBreaking lineBreaking() {
+        return lineBreaking;
     }
 
-    void setTextWrap(TextWrap v) {
+    void setLineBreaking(LineBreaking v) {
         writable();
-        textWrap = v;
+        lineBreaking = v;
     }
 
-    public Inline inline() {
-        return inline;
+    public Markup markup() {
+        return markup;
     }
 
-    void setInline(Inline v) {
+    void setMarkup(Markup v) {
         writable();
-        inline = v;
+        markup = v;
     }
 
-    public Transform transform() {
-        return transform;
+    public TextCase textCase() {
+        return textCase;
     }
 
-    void setTransform(Transform v) {
+    void setTextCase(TextCase v) {
         writable();
-        transform = v;
+        textCase = v;
     }
 
     public double letterSpacing() {
@@ -239,13 +239,13 @@ public final class TypographyStyle extends StyleGroup {
         numbered = v;
     }
 
-    public NumberStyle numberStyle() {
-        return numberStyle;
+    public NumberFormat numberFormat() {
+        return numberFormat;
     }
 
-    void setNumberStyle(NumberStyle v) {
+    void setNumberFormat(NumberFormat v) {
         writable();
-        numberStyle = v;
+        numberFormat = v;
     }
 
     /** La plantilla de {@code Number label}, o {@code null} si no se declara. */

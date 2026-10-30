@@ -12,10 +12,10 @@ import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.MarginStrut;
-import dev.stxt.pdf.layout.PendingAbsolute;
+import dev.stxt.pdf.layout.PendingOverlay;
 import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.layout.Slice;
-import dev.stxt.pdf.layout.position.RelativeOffset;
+import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.tree.Box;
@@ -33,7 +33,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * <pre>
  * cursor = 0; strut = vacío
  * para cada hijo:
- *     si es absolute/fixed: anotar PendingAbsolute con la posición estática; continuar
+ *     si es absolute/fixed: anotar PendingOverlay con la posición estática; continuar
  *     r = context.layout(hijo, caja de contenido como containing block)
  *     strut += margen superior del hijo + los que salen de él por arriba
  *     si aún no hay nada entre el borde superior de la caja y el hijo: el strut sale de la caja
@@ -116,7 +116,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         final double contentRemaining;
 
         final List<Fragment> fragments = new ArrayList<>();
-        final List<PendingAbsolute> pending = new ArrayList<>();
+        final List<PendingOverlay> pending = new ArrayList<>();
         final List<Mark> marks = new ArrayList<>();
         MarginStrut strut = MarginStrut.EMPTY;
         MarginStrut topOut = MarginStrut.EMPTY;
@@ -151,8 +151,8 @@ public final class BlockLayout implements LayoutAlgorithm {
                 if (child.style().isOutOfFlow()) {
                     // Posición estática: donde empezaría si estuviera en flujo
                     // (referencia/componentes/frame-and-overlays.md). La caja se resuelve en su containing block
-                    // (AbsoluteLayout).
-                    pending.add(new PendingAbsolute(child, 0, atTop ? 0 : cursor + strut.resolve()));
+                    // (OverlayLayout).
+                    pending.add(new PendingOverlay(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
                 }
                 if (fragmenting && progress) {
@@ -220,7 +220,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera
             // (referencia/componentes/frame-and-overlays.md).
-            RelativeOffset offset = RelativeOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
+            FrameOffset offset = FrameOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();
             fragments.add(f.moved(childX, childY, offset.dx(), offset.dy()));
@@ -282,7 +282,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         /** Corta la caja en {@code m}: lo posterior pasa al fragmento siguiente. */
         LayoutResult broken(Mark m) {
             List<Fragment> kept = fragments.subList(0, m.fragments());
-            List<PendingAbsolute> keptPending = pending.subList(0, m.pending());
+            List<PendingOverlay> keptPending = pending.subList(0, m.pending());
             // Los márgenes que tocan el corte se truncan: el contenido acaba en el cursor.
             Slice slice = Slice.of(model, first, consumed, m.cursor(), false, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),

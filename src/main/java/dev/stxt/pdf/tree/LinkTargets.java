@@ -51,7 +51,7 @@ final class LinkTargets {
             throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "El enlace " + destination
                     + " lleva a un Id que no existe: ninguna caja tiene el Id " + id);
         }
-        if (References.insideFixed(target)) {
+        if (References.insidePageOverlay(target)) {
             throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "El enlace " + destination + " lleva a "
                     + id + ", que está en un Page overlay y se repite en todas las páginas: no tiene un único destino");
         }

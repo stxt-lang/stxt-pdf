@@ -1,7 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Inline;
+import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -80,7 +80,7 @@ class InlineFormatTest {
         Box root = buildInline("\tBlock:", "\t\tText: Uno **dos**",
                 "\t\tText: Tres **cuatro**", "\t\t\tTypography:", "\t\t\t\tMarkup: none");
         Box block = root.children().get(0);
-        assertEquals(Inline.MARKDOWN, block.style().typography().inline());
+        assertEquals(Markup.MARKDOWN, block.style().typography().markup());
         assertEquals("Uno dos", block.children().get(0).text());
         assertEquals(List.of(run("Uno "), run("dos", "b")), block.children().get(0).formattedRuns());
         assertEquals("Tres **cuatro**", block.children().get(1).text());

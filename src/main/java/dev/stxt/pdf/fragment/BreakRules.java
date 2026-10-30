@@ -178,12 +178,12 @@ public final class BreakRules {
 
     /** Los cortes forzados de un bloque y de un {@code Columns} son también los de sus hijos de los extremos. */
     private static boolean propagates(Box box) {
-        return box.style().layout() == Layout.BLOCK || box.style().layout() == Layout.MULTICOL;
+        return box.style().layout() == Layout.BLOCK || box.style().layout() == Layout.COLUMNS;
     }
 
     /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Columns}, solo el de página. */
     private static Break fromInside(Box box, Break forced) {
-        return box.style().layout() == Layout.MULTICOL && forced == Break.COLUMN ? Break.AUTO : forced;
+        return box.style().layout() == Layout.COLUMNS && forced == Break.COLUMN ? Break.AUTO : forced;
     }
 
     private static Break forced(Break b) {

@@ -8,7 +8,7 @@ import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.TextWrap;
+import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
@@ -47,17 +47,17 @@ class LineBreakerTest {
         // Knuth-Plass prefiere una línea con la máxima y otra con 100 × (1/1)³ = 100.
         String text = "a bbb c ddddd e fff";
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, TextWrap.SIMPLE).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, LineBreaking.SIMPLE).get(0));
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
-                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, TextWrap.BALANCED).get(0));
+                LineBreaker.breakParagraphs(text, 10, measurer, F, 1, LineBreaking.BALANCED).get(0));
     }
 
     @Test
     void prettyKeepsParagraphsAndOverflowingWords() {
         assertEquals(List.of(List.of("a", "larguísima", "b"), List.of("uno", "dos")),
-                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, F, 1, TextWrap.BALANCED));
+                LineBreaker.breakParagraphs("a larguísima b\n\nuno dos", 4, measurer, F, 1, LineBreaking.BALANCED));
         assertEquals(List.of(List.of("uno dos tres")),
-                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, F, 1, TextWrap.BALANCED));
+                LineBreaker.breakParagraphs("uno dos tres", 100, measurer, F, 1, LineBreaking.BALANCED));
     }
 
     @Test
@@ -135,9 +135,9 @@ class LineBreakerTest {
         // Sin formato, "aa bb" (5) cabe en 6; con "bb cc" en negrita, "aa bb" mide 7.
         List<TextRun> runs = List.of(run("aa "), run("bb cc", "b"));
         assertEquals(List.of("aa bb", "cc"),
-                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, TextWrap.SIMPLE).get(0)));
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, LineBreaking.SIMPLE).get(0)));
         List<LineBreaker.Line> lines = LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1,
-                TextWrap.SIMPLE).get(0);
+                LineBreaking.SIMPLE).get(0);
         assertEquals(List.of("aa", "bb", "cc"), texts(lines));
         assertEquals(List.of(run("bb", "b")), lines.get(1).runs());
     }
@@ -147,8 +147,8 @@ class LineBreakerTest {
         // "a bb c": con bb en negrita, la palabra mide 4 y no cabe con las otras en 6.
         List<TextRun> runs = List.of(run("a "), run("bb", "b"), run(" c"));
         assertEquals(List.of("a bb c"),
-                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, TextWrap.BALANCED).get(0)));
-        assertEquals(2, LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1, TextWrap.BALANCED)
+                texts(LineBreaker.breakParagraphs(runs, 6, measurer, F, 1, LineBreaking.BALANCED).get(0)));
+        assertEquals(2, LineBreaker.breakParagraphs(runs, 6, boldIsWider, F, 1, LineBreaking.BALANCED)
                 .get(0).size());
     }
 
@@ -157,22 +157,22 @@ class LineBreakerTest {
         TextFormat underline = new TextFormat(false, false, true, false);
         // Dentro de un tramo subrayado, el espacio también lo está.
         assertEquals(List.of(new TextRun("a b", underline)),
-                LineBreaker.breakParagraphs(List.of(run("a b", "u")), 100, measurer, F, 1, TextWrap.SIMPLE)
+                LineBreaker.breakParagraphs(List.of(run("a b", "u")), 100, measurer, F, 1, LineBreaking.SIMPLE)
                         .get(0).get(0).runs());
         // Entre dos tramos subrayados separados por un espacio sin formato, no.
         assertEquals(List.of(run("a", "u"), run(" "), run("b c", "u")),
                 LineBreaker.breakParagraphs(List.of(run("a", "u"), run(" "), run("b c", "u")), 100, measurer, F, 1,
-                        TextWrap.SIMPLE).get(0).get(0).runs());
+                        LineBreaking.SIMPLE).get(0).get(0).runs());
         // Los espacios seguidos valen uno, con el formato del primero.
         assertEquals(List.of(run("a ", "u"), run("b")),
                 LineBreaker.breakParagraphs(List.of(run("a  ", "u"), run("\n b")), 100, measurer, F, 1,
-                        TextWrap.SIMPLE).get(0).get(0).runs());
+                        LineBreaking.SIMPLE).get(0).get(0).runs());
     }
 
     @Test
     void aBlankLineAcrossRunsSeparatesParagraphs() {
         List<List<LineBreaker.Line>> p = LineBreaker.breakParagraphs(List.of(run("uno\n", "b"), run("\ndos")), 100,
-                measurer, F, 1, TextWrap.SIMPLE);
+                measurer, F, 1, LineBreaking.SIMPLE);
         assertEquals(2, p.size());
         assertEquals(List.of(run("uno", "b")), p.get(0).get(0).runs());
         assertEquals(List.of(run("dos")), p.get(1).get(0).runs());
@@ -210,16 +210,16 @@ class LineBreakerTest {
     void letterSpacingChangesTheBreaks() {
         // Ancho 8: «uno dos» cabe (7), pero con interletraje 1 mide 13.
         assertEquals(List.of(List.of("uno dos")),
-                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 0, TextWrap.SIMPLE)));
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 0, LineBreaking.SIMPLE)));
         assertEquals(List.of(List.of("uno", "dos")),
-                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 1, TextWrap.SIMPLE)));
+                paragraphs(LineBreaker.breakParagraphs(List.of(run("uno dos")), 8, measurer, F, 1, 1, LineBreaking.SIMPLE)));
     }
 
     @Test
     void letterSpacingWorksWithKnuthPlass() {
         // Con interletraje 1 y ancho 9, entran dos palabras de dos letras (2+1 + 1+1 + 2... = 8) y no tres.
         List<List<LineBreaker.Line>> l = LineBreaker.breakParagraphs(List.of(run("ab cd ef gh")), 9, measurer, F, 1, 1,
-                TextWrap.BALANCED);
+                LineBreaking.BALANCED);
         assertEquals(List.of(List.of("ab cd", "ef gh")), paragraphs(l));
     }
 

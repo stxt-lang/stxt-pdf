@@ -86,7 +86,7 @@ public final class References {
             }
             switch (r.kind()) {
                 case PAGE -> {
-                    if (insideFixed(target)) {
+                    if (insidePageOverlay(target)) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_PLACEABLE, text
                                 + ": " + r.id() + " está en un Page overlay, que se repite en todas las páginas");
                     }
@@ -108,9 +108,9 @@ public final class References {
     }
 
     /** Si la caja es un {@code Page overlay} o está dentro de uno. */
-    static boolean insideFixed(Box box) {
+    static boolean insidePageOverlay(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
-            if (b.style().position() == Position.FIXED) {
+            if (b.style().position() == Position.PAGE_OVERLAY) {
                 return true;
             }
         }

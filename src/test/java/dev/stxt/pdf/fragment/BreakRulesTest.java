@@ -162,17 +162,19 @@ class BreakRulesTest {
         assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.forcedAppeal(Break.COLUMN));
     }
 
-    /** De un {@code Columns} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él. */
+    /**
+     * De un {@code Columns} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él.
+     */
     @Test
-    void aMulticolOnlyPropagatesPageBreaks() {
-        Box multicol = box(Element.MULTICOL, Break.AUTO, Break.AUTO);
-        Box flow = box(Element.COLUMNS, Break.AUTO, Break.AUTO);
-        StyleEditor.addChildren(multicol, flow);
+    void aColumnsOnlyPropagatesPageBreaks() {
+        Box columnsBox = box(Element.COLUMNS, Break.AUTO, Break.AUTO);
+        Box flow = box(Element.COLUMN_FLOW, Break.AUTO, Break.AUTO);
+        StyleEditor.addChildren(columnsBox, flow);
         Box first = box(Element.BLOCK, Break.COLUMN, Break.AUTO);
         Box last = box(Element.BLOCK, Break.AUTO, Break.PAGE);
         StyleEditor.addChildren(flow, first, last);
         assertEquals(Break.COLUMN, BreakRules.forcedBefore(flow));
-        assertEquals(Break.AUTO, BreakRules.forcedBefore(multicol));
-        assertEquals(Break.PAGE, BreakRules.forcedAfter(multicol));
+        assertEquals(Break.AUTO, BreakRules.forcedBefore(columnsBox));
+        assertEquals(Break.PAGE, BreakRules.forcedAfter(columnsBox));
     }
 }

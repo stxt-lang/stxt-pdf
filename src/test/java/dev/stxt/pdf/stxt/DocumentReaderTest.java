@@ -86,9 +86,9 @@ class DocumentReaderTest {
         assertEquals("INVALID_VALUE", e.code());
         assertEquals(10, e.line());
 
-        DocumentSyntaxException noMedia = assertThrows(DocumentSyntaxException.class,
+        DocumentSyntaxException noPageSetup = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read("Document (dev.stxt.pdf):\n\tSection:\n\t\tBlock:\n\t\t\tId: a"));
-        assertEquals("TOO_FEW_CHILDREN", noMedia.code());
+        assertEquals("TOO_FEW_CHILDREN", noPageSetup.code());
 
         DocumentSyntaxException unknown = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tColour: #fff")));

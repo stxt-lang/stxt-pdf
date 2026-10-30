@@ -38,9 +38,9 @@ public final class PdfMetrics implements TextMeasurer {
 
     private final Resources resources;
     /**
-     * La última fuente que se ha pedido y su fichero: el texto de una caja se mide casi siempre con la misma, y buscarla
-     * en {@link FontLibrary} en cada palabra se notaba. Se puede leer y escribir desde varios hilos sin cerrojo:
-     * la entrada es un {@code record}, con los campos finales, y en el peor caso se vuelve a buscar.
+     * La última fuente que se ha pedido y su fichero: el texto de una caja se mide casi siempre con la misma, y
+     * buscarla en {@link FontLibrary} en cada palabra se notaba. Se puede leer y escribir desde varios hilos sin
+     * cerrojo: la entrada es un {@code record}, con los campos finales, y en el peor caso se vuelve a buscar.
      */
     private Found last;
 
