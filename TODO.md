@@ -12,6 +12,7 @@ saliendo al trabajar y solo toca ese.
 - Mirar como api permite a partir de stxt crear otro, y con cualquier página de esto usarlo dircto en pdfbox, para poder
   poner listeners, e integrar en otros lados
 - Un docker para esto
+- Revisar que la lectura del pdf se cachea correctamente y no se hace cada vez que se genera un pdf
 
 ## Notas de Claude
 
