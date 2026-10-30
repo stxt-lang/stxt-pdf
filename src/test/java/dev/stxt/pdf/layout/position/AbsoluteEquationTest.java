@@ -62,7 +62,7 @@ class AbsoluteEquationTest {
     }
 
     /**
-     * Cada caso de la ecuación (referencia/componentes/relative-absolute-fixed.md) con márgenes distintos de 0 y todos
+     * Cada caso de la ecuación (referencia/componentes/frame-and-overlays.md) con márgenes distintos de 0 y todos
      * los valores comprobados (pruebas de mutación: los tests de arriba miran un valor y con márgenes nulos).
      */
     @Test

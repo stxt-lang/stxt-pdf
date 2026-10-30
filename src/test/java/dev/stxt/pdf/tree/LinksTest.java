@@ -84,10 +84,10 @@ class LinksTest {
         assertEquals(ErrorCode.LINK_UNKNOWN, unknown.errorCode());
         // La línea del Link, no la de su caja.
         assertEquals(14, unknown.line());
-        InvalidModelException fixed = error("\tFixed:", "\t\tText: cabecera", "\t\t\tId: cabecera",
+        InvalidModelException fixed = error("\tPage overlay:", "\t\tText: cabecera", "\t\t\tId: cabecera",
                 "\tText: a", "\t\tLink: #cabecera");
         assertEquals(ErrorCode.LINK_UNKNOWN, fixed.errorCode());
-        assertTrue(fixed.getMessage().contains("Fixed"), fixed.getMessage());
+        assertTrue(fixed.getMessage().contains("Page overlay"), fixed.getMessage());
     }
 
     @Test

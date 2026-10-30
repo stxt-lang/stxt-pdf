@@ -11,7 +11,7 @@ Document (dev.stxt.pdf):
 	Title: Factura 2025-0147
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -34 0
 			Box:

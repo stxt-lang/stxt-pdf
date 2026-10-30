@@ -65,7 +65,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 10
 			Line height: 14
-	For element: Fixed
+	For element: Page overlay
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5

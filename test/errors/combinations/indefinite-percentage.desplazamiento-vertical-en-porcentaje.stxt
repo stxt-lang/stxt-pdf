@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Block:
-			Relative:
+			Frame:
 				Offset: 10% auto auto auto
 				Box:
 					Height: 10

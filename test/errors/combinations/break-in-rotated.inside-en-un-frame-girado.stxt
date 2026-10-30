@@ -1,4 +1,4 @@
-# Case: Inside en un Relative girado, que no se parte
+# Case: Inside en un Frame girado, que no se parte
 # Code: BREAK_IN_ROTATED
 # Line: 14
 Document (dev.stxt.pdf):
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Relative:
+		Frame:
 			Rotate: 5
 			Break:
 				Inside: avoid

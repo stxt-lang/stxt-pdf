@@ -164,7 +164,7 @@ class PdfCanvasTest {
 
     private static final String HEADINGS = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 400\n"
             + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-            + "\tFixed:\n\t\tOffset: auto 0 -30 0\n\t\tText: Pie\n"
+            + "\tPage overlay:\n\t\tOffset: auto 0 -30 0\n\t\tText: Pie\n"
             + "\tHeading 1:\n\t\tText: Uno\n"
             + "\tParagraph: Hola.\n"
             + "\tHeading 2:\n\t\tText: Uno\n\t\tText: punto uno\n"
@@ -200,7 +200,7 @@ class PdfCanvasTest {
             PDStructureElement document = firstSection((PDStructureElement) treeRoot.getKids().get(0));
             assertEquals("Sect", document.getStructureType());
             assertEquals("Document", ((PDStructureElement) treeRoot.getKids().get(0)).getStructureType());
-            // El Fixed es un artifact: no está en el árbol. El orden es el del documento.
+            // El Page overlay es un artifact: no está en el árbol. El orden es el del documento.
             assertEquals(List.of("H1", "P", "H2", "P", "H1"), types(document));
             PDStructureElement h2 = (PDStructureElement) document.getKids().get(2);
             assertEquals(List.of("Span", "Span"), types(h2));
@@ -441,7 +441,7 @@ class PdfCanvasTest {
      * Un enlace a una URL es una anotación {@code Link} sin borde con su acción {@code URI}, del
      * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
      * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
-     * lleva la {@code OBJR} de la anotación; el de un {@code Fixed}, que no es contenido, es un
+     * lleva la {@code OBJR} de la anotación; el de un {@code Page overlay}, que no es contenido, es un
      * {@code Link} sin contenido en su sitio del árbol, con su {@code Alt} (referencia/implementacion/pdf.md).
      */
     @Test
@@ -449,11 +449,11 @@ class PdfCanvasTest {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tText: Escribe a soporte\n\t\tLink: mailto:soporte@airemas.example\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Logotipo\n\t\tLink: https://stxt.dev\n"
-                + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
+                + "\tPage overlay:\n\t\tOffset: auto 0 0 auto\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\tVisita [la web](https://web.example) hoy.\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "links"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
-            // Un Fixed se pinta el último, encima de todo.
+            // Un Page overlay se pinta el último, encima de todo.
             assertEquals(List.of("mailto:soporte@airemas.example", "https://stxt.dev", "https://web.example",
                     "https://pie.example"), links.stream().map(PdfCanvasTest::uri).toList());
             PDAnnotationLink text = links.get(0);
@@ -475,7 +475,7 @@ class PdfCanvasTest {
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
             PDStructureElement outer = (PDStructureElement) tree.getKids().get(0);
             PDStructureElement document = firstSection(outer);
-            // El Link del Fixed no envuelve contenido, pero está en su sitio de la sección: tras la imagen.
+            // El Link del Page overlay no envuelve contenido, pero está en su sitio de la sección: tras la imagen.
             assertEquals(List.of("Sect"), types(outer));
             assertEquals(List.of("P", "Link", "Link", "Div"), types(document));
             // La caja con Link: P → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
@@ -499,7 +499,7 @@ class PdfCanvasTest {
             assertEquals("P", paragraph.getStructureType());
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
             assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
-            // El Fixed: un Link sin contenido, con el texto como Alt y la OBJR.
+            // El Page overlay: un Link sin contenido, con el texto como Alt y la OBJR.
             PDStructureElement fixed = (PDStructureElement) document.getKids().get(2);
             assertEquals(List.of("OBJR"), shape(fixed));
             assertEquals("pie", fixed.getAlternateDescription());
@@ -654,14 +654,14 @@ class PdfCanvasTest {
     }
 
     /**
-     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Fixed} o de una imagen decorativa es un
+     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Page overlay} o de una imagen decorativa es un
      * {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en su
      * orden de lectura (referencia/implementacion/pdf.md).
      */
     @Test
     void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
-                + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: Más en [la web](https://pie.example)\n"
+                + "\tPage overlay:\n\t\tOffset: auto 0 0 auto\n\t\tText: Más en [la web](https://pie.example)\n"
                 + "\t\t\tTypography:\n\t\t\t\tInline: markdown\n"
                 + "\tText: Uno\n"
                 + "\tImage: test/wide.png\n\t\tLink: https://logo.example\n"
@@ -672,7 +672,7 @@ class PdfCanvasTest {
                     .getKids().get(0);
             assertEquals(List.of("Sect"), types(outer));
             PDStructureElement section = firstSection(outer);
-            // El Fixed está antes que el texto en el documento, y la imagen entre los dos textos.
+            // El Page overlay está antes que el texto en el documento, y la imagen entre los dos textos.
             assertEquals(List.of("Link", "P", "Link", "P"), types(section));
             PDStructureElement footer = (PDStructureElement) section.getKids().get(0);
             assertEquals(List.of("OBJR", "OBJR"), shape(footer));
@@ -685,11 +685,11 @@ class PdfCanvasTest {
         }
     }
 
-    /** Un {@code Fixed} que no sale en ninguna página no deja un {@code Link} vacío. */
+    /** Un {@code Page overlay} que no sale en ninguna página no deja un {@code Link} vacío. */
     @Test
     void aFixedThatIsNeverPaintedLeavesNoEmptyLink() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
-                + "\tFixed:\n\t\tPages: even\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
+                + "\tPage overlay:\n\t\tPages: even\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
                 + "\tText: Uno\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "links-never-painted"))) {
             PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
@@ -868,13 +868,13 @@ class PdfCanvasTest {
 
     /**
      * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox}; sin él, y en un
-     * {@code Fixed}, es un artifact (referencia/componentes/image.md). Cada fichero se incrusta una vez.
+     * {@code Page overlay}, es un artifact (referencia/componentes/image.md). Cada fichero se incrusta una vez.
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
                 + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tFixed:\n\t\tOffset: -30 -30 auto auto\n\t\tImage: test/square.png\n"
+                + "\tPage overlay:\n\t\tOffset: -30 -30 auto auto\n\t\tImage: test/square.png\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n"
                 + "\tImage: test/tall.jpg\n\t\tBox:\n\t\t\tHeight: 60\n"
                 + "\tParagraph: Fin.\n"
@@ -984,7 +984,7 @@ class PdfCanvasTest {
                 + "\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tImage: test/wide.png\n\t\tAlt: Paisaje\n\t\tRotate: 90\n"
                 + "\tText: Ir al sello\n\t\tLink: #sello\n"
-                + "\tAbsolute:\n\t\tId: sello\n\t\tOffset: 60 auto auto 60\n\t\tRotate: 90\n\t\tLink: https://stxt.dev\n"
+                + "\tOverlay:\n\t\tId: sello\n\t\tOffset: 60 auto auto 60\n\t\tRotate: 90\n\t\tLink: https://stxt.dev\n"
                 + "\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 20\n\t\tText: Sello\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "rotation"))) {
             List<PDAnnotationLink> links = links(pdf, 0);

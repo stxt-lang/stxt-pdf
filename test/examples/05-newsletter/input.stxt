@@ -11,7 +11,7 @@ Document (dev.stxt.pdf):
 	Title: Gaceta del Valle · Octubre de 2025
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: running
 			Pages: not-first
 			Offset: -24 0 auto 0
@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 							Letter spacing: 0.8
 				Item:
 					Text: Octubre de 2025 · Nº 87
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -36 0
 			Box:

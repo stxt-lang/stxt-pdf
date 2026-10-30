@@ -53,7 +53,7 @@ final class LinkTargets {
         }
         if (References.insideFixed(target)) {
             throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "El enlace " + destination + " lleva a "
-                    + id + ", que está en un Fixed y se repite en todas las páginas: no tiene un único destino");
+                    + id + ", que está en un Page overlay y se repite en todas las páginas: no tiene un único destino");
         }
     }
 }

@@ -13,7 +13,7 @@ import dev.stxt.pdf.model.NumberStyle;
  * @param pageStyle    cómo se escriben sus números de página ({@code Page number format})
  * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
  *                     declara
- * @param inheritFixed si lleva los {@code Fixed} del documento
+ * @param inheritFixed si lleva los {@code Page overlay} del documento
  * @param beginOn      en qué página física empieza ({@code Begin on})
  */
 public record Section(Box box, Media media, PageNumbering numbering, NumberStyle pageStyle, int start,

@@ -21,7 +21,7 @@ class PaginationCacheTest {
     private static String document(String footer, String first, int paragraphs) {
         StringBuilder sb = new StringBuilder("Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n"
                 + "\tTitle: Caché\n\tLanguage: es\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
-                + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tFixed:\n\t\tOffset: auto 0 0 0\n\t\tText: " + footer
+                + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tPage overlay:\n\t\tOffset: auto 0 0 0\n\t\tText: " + footer
                 + "\n\tSection:\n\t\tParagraph: " + first + "\n");
         for (int i = 0; i < paragraphs; i++) {
             sb.append("\t\tParagraph: ").append(PARAGRAPH).append(' ').append(i).append('\n');

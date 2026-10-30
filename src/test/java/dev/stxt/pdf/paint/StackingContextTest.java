@@ -204,20 +204,20 @@ class StackingContextTest {
     @Test
     void absoluteBeforeLaterRelative() {
         List<String> order = paint(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBackground: #000",
-                "\t\tBlock:", "\t\t\tAbsolute:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tOverlay:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\tBackground: #111",
-                "\t\tRelative:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222");
+                "\t\tFrame:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222");
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
     @Test
     void equalLayerInDocumentOrder() {
         List<String> order = paint(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBackground: #000",
-                "\t\tBlock:", "\t\t\tAbsolute:", "\t\t\t\tLayer: 1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tOverlay:", "\t\t\t\tLayer: 1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10",
                 "\t\t\t\t\tHeight: 10", "\t\t\t\t\tBackground: #111",
-                "\t\tRelative:", "\t\t\tLayer: 1", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222");
+                "\t\tFrame:", "\t\t\tLayer: 1", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222");
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
@@ -225,17 +225,17 @@ class StackingContextTest {
     @Test
     void fixedInDocumentOrder() {
         List<String> order = paint(
-                "\tFixed:", "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222");
+                "\tPage overlay:", "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222");
         assertEquals(List.of("#111", "#222"), order);
     }
 
     @Test
     void layerStillWins() {
         List<String> order = paint(
-                "\tRelative:", "\t\tLayer: 2", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
-                "\tRelative:", "\t\tLayer: 1", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222",
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #333");
+                "\tFrame:", "\t\tLayer: 2", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
+                "\tFrame:", "\t\tLayer: 1", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #333");
         assertEquals(List.of("#333", "#222", "#111"), order);
     }
 
@@ -492,22 +492,22 @@ class StackingContextTest {
     }
 
     /**
-     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Absolute} de dentro, alrededor
+     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Overlay} de dentro, alrededor
      * de su origen (referencia/comun/capas-y-giro.md); una {@code Image} en flujo, sobre su centro y en sus dos pasos.
      */
     @Test
     void rotatedBoxesWrapEverythingTheyPaint() {
         Recorder r = record(
-                "\tRelative:", "\t\tRotate: 8", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tHeight: 100",
+                "\tFrame:", "\t\tRotate: 8", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #111",
-                "\t\tAbsolute:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
+                "\t\tOverlay:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
                 "\t\t\t\tBackground: #222",
                 "\tImage: test/square.png", "\t\tRotate: 45", "\t\tBox:", "\t\t\tBackground: #333",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
         // Primero el flujo (la imagen de 30 × 30 ocupa el cuadrado que la envuelve, de 42,43 de lado, en (40, 140), con
         // su centro en (61,2, 161,2), girada en el paso de los fondos y en el del contenido) y después el posicionado:
-        // cada paso suyo y de lo que contiene (también el Absolute), girado.
+        // cada paso suyo y de lo que contiene (también el Overlay), girado.
         String turn = "rotate 8 40.0 40.0";
         assertEquals(List.of("rotate 45 61.2 161.2", "background #333", "end rotate", "background #444",
                 "rotate 45 61.2 161.2", "image", "end rotate",
@@ -517,7 +517,7 @@ class StackingContextTest {
 
     /**
      * Un {@code Block} girado en flujo: sus descendientes se pintan en los pasos del contexto que lo contiene, cada uno
-     * con el giro del bloque, y el {@code Absolute} de dentro, que lo tiene de contenedor de referencia, también
+     * con el giro del bloque, y el {@code Overlay} de dentro, que lo tiene de contenedor de referencia, también
      * (referencia/comun/capas-y-giro.md).
      */
     @Test
@@ -526,7 +526,7 @@ class StackingContextTest {
                 "\tBlock:", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 20",
                 "\t\t\tBackground: #555",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #666",
-                "\t\tAbsolute:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
+                "\t\tOverlay:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
                 "\t\t\t\tBackground: #777",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #888");
         // El bloque de 100 × 20 ocupa, girado, 20 × 100 en (40, 40): su centro es (50, 90).
@@ -538,7 +538,7 @@ class StackingContextTest {
 
     /**
      * Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los fondos, los bordes y las
-     * imágenes de su flujo, también de un {@code Relative}, pero no su texto ni un {@code Absolute}
+     * imágenes de su flujo, también de un {@code Frame}, pero no su texto ni un {@code Overlay}
      * (referencia/comun/caja.md).
      */
     @Test
@@ -547,13 +547,13 @@ class StackingContextTest {
                 "\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tRadius: 12", "\t\t\tBorder: 2",
                 "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tBackground: #111", "\t\t\tText: hola",
-                "\t\tRelative:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
-                "\t\tAbsolute:", "\t\t\tOffset: -5 -5 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\t\tFrame:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
+                "\t\tOverlay:", "\t\t\tOffset: -5 -5 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
                 "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #333");
         // La caja de relleno: la de borde (en 40, 40, de 100 de ancho y con 22 de contenido) menos el borde de 2, con
         // radios de 10.
         String clip = "clip 42 42 96 22 10/10 10/10 10/10 10/10";
-        // El texto se pinta sin recorte, y el Absolute, que asoma por la esquina, tampoco se recorta.
+        // El texto se pinta sin recorte, y el Overlay, que asoma por la esquina, tampoco se recorta.
         assertEquals(List.of("background #000", clip, "background #111", "end clip", "text 'hola' normal",
                 clip, "background #222", "end clip", "background #333"),
                 r.events.stream().filter(e -> !e.startsWith("background #FFF")).toList());

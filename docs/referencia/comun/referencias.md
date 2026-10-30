@@ -28,8 +28,8 @@ List:
   página donde empieza. Es el **número impreso** de esa página, no el físico: el mismo que dice `{page}` en su pie. Si la
   página no tiene número (`Page numbering: none`), es `REFERENCE_NOT_PLACEABLE`. Una `Section` con `Id` se puede referir:
   es su primera página. Si la caja es una fila repetida de una tabla (cabecera o pie), la primera de sus páginas.
-- **Dónde se puede referir.** Cualquier caja con `Id` que no sea un `Fixed` ni esté dentro de uno, que se repiten en todas
-  las páginas (`REFERENCE_NOT_PLACEABLE`). La referencia puede ir antes o después de la caja, y también en un `Fixed` (que
+- **Dónde se puede referir.** Cualquier caja con `Id` que no sea un `Page overlay` ni esté dentro de uno, que se repiten en todas
+  las páginas (`REFERENCE_NOT_PLACEABLE`). La referencia puede ir antes o después de la caja, y también en un `Page overlay` (que
   escribe lo mismo en todas las páginas).
 - **El `Id` es el de la caja**, igual que en `For id`: el de un `Item` o un `Area` va en su elemento. Un `Id` que no
   existe, o una referencia sin `Id` (`{page of: }`), es un error (`REFERENCE_UNKNOWN`) con la línea del texto, o la del

@@ -1,13 +1,13 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las páginas en que sale un {@code Fixed} (referencia/componentes/relative-absolute-fixed.md); la página 1 es la
+ * Las páginas en que sale un {@code Page overlay} (referencia/componentes/frame-and-overlays.md); la página 1 es la
  * primera del documento.
  */
 public enum Pages {
     ALL, FIRST, NOT_FIRST, ODD, EVEN, LAST;
 
-    /** Si un {@code Fixed} con este valor sale en la página {@code page} de un documento de {@code total}. */
+    /** Si un {@code Page overlay} con este valor sale en la página {@code page} de un documento de {@code total}. */
     public boolean includes(int page, int total) {
         return switch (this) {
             case ALL -> true;

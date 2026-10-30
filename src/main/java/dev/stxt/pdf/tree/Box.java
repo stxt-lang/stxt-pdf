@@ -323,7 +323,7 @@ public final class Box {
     /**
      * Crea un contexto de formato de bloque, que aísla el colapso de márgenes
      * (referencia/componentes/block.md): el área útil (la raíz), las cajas {@code absolute} y
-     * {@code fixed}, los ítems de flex y grid, las cajas con {@code Isolate: true} y las giradas en flujo.
+     * {@code fixed}, los ítems de flex y grid, las cajas con {@code Contain margins: true} y las giradas en flujo.
      */
     public boolean establishesBlockFormattingContext() {
         if (parent == null || style.isolate() || style.isOutOfFlow() || style.rotatesInFlow()) {

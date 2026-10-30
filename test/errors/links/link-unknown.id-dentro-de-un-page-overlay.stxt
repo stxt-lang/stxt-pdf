@@ -1,4 +1,4 @@
-# Case: Un Link a una caja de un Fixed, que se repite en todas las páginas
+# Case: Un Link a una caja de un Page overlay, que se repite en todas las páginas
 # Code: LINK_UNKNOWN
 # Line: 21
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: 0 0 auto auto
 			Text: Cabecera
 				Id: cabecera

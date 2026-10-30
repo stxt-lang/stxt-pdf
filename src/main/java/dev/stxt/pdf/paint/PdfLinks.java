@@ -65,7 +65,7 @@ final class PdfLinks {
         for (Internal link : internal) {
             Box box = byKey.get(link.id());
             if (box == null) {
-                // El builder ya comprobó que existe y que no está en un Fixed (LinkTargets).
+                // El builder ya comprobó que existe y que no está en un Page overlay (LinkTargets).
                 throw new InternalException("Enlace sin destino: #" + link.id());
             }
             PDActionGoTo goTo = structure.goTo(box, destinations.get(box));

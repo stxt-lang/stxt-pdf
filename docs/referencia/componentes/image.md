@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 		Paper: A4
 		Margin: 40
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: -30 0 auto auto
 			Image: test/square.png
 				Box:
@@ -117,7 +117,7 @@ partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla d
 
 ## Dónde va
 
-Donde va un elemento en flujo: en una sección, `Block`, `Relative`, `Absolute`, `Fixed` (un logotipo que se repite en cada
+Donde va un elemento en flujo: en una sección, `Block`, `Frame`, `Overlay`, `Page overlay` (un logotipo que se repite en cada
 página), `Columns`, `List item` (pero no al principio: el marcador necesita una línea con la que alinearse,
 `LIST_ITEM_WITHOUT_LINE`), `Cell` y como elemento de un `Item` o un `Area`. En un `Markdown`, una imagen sola en su párrafo
 (`![Alt](ruta)`) es una `Image` ([Markdown](markdown.md)).
@@ -157,7 +157,7 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 Una `Image` de un PDF dibuja **una de sus páginas**, la de `Pdf page` (la primera, si no se declara), como una imagen más: se
 dimensiona, se coloca, se recorta y se gira como cualquier otra. Sirve para poner en el documento un plano, un gráfico o
 una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF; y como
-**fondo de página**: un papel con membrete, un formulario preimpreso, en un `Fixed` detrás del contenido.
+**fondo de página**: un papel con membrete, un formulario preimpreso, en un `Page overlay` detrás del contenido.
 
 La página va como dibujo vectorial, con su contenido tal cual: sus trazados, sus imágenes y su texto, que se ve nítido a
 cualquier tamaño y **se puede seleccionar y copiar**, con sus fuentes. Cada página se copia una vez en el PDF, aunque se
@@ -184,7 +184,7 @@ sería accesible. Quien convierte puede quitar esta comprobación (`Check.PDF_IM
 PDF/UA. La de un PDF cifrado no se puede quitar. Un PDF de más bytes que el límite es `PDF_TOO_LARGE` ([Límites](#límites)).
 
 Un papel de carta con el membrete completo en la primera página y el logotipo pequeño en las demás (las páginas 1 y 2 de
-`letterhead.pdf`), detrás del contenido y a sangre: un `Fixed` con `Layer` negativa que sale del área útil con un
+`letterhead.pdf`), detrás del contenido y a sangre: un `Page overlay` con `Layer` negativa que sale del área útil con un
 `Offset` negativo igual al margen, y una imagen de `Width` y `Height` al 100 % de él. Los márgenes del documento dejan el
 sitio del membrete y del pie, que el contenido no puede pisar:
 
@@ -206,13 +206,13 @@ Document (dev.stxt.pdf):
 				Width: 100%
 				Height: 100%
 	Section:
-		Fixed:
+		Page overlay:
 			Pages: first
 			Offset: -140 -72 -80 -72
 			Layer: -1
 			Image: examples/letterhead/letterhead.pdf
 				Style: letterhead
-		Fixed:
+		Page overlay:
 			Pages: not-first
 			Offset: -140 -72 -80 -72
 			Layer: -1
@@ -227,7 +227,7 @@ Document (dev.stxt.pdf):
 		Paragraph: Condiciones generales de la propuesta.
 ```
 
-> **Decisión:** una página de un PDF es una imagen, con todo lo de una imagen, y un papel con membrete es un `Fixed` con
+> **Decisión:** una página de un PDF es una imagen, con todo lo de una imagen, y un papel con membrete es un `Page overlay` con
 > esa imagen. *Alternativa descartada:* un elemento propio para insertar páginas enteras de otro PDF en el documento, o un
 > fondo de página propio de la sección.
 
@@ -257,7 +257,7 @@ que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORM
 ## Accesibilidad
 
 Con `Alt`, un texto no vacío, la imagen es una figura que un lector de pantalla anuncia con ese texto. Sin `Alt` es
-decorativa y no se lee, igual que los fondos; dentro de un `Fixed`, siempre, y en las filas repetidas de una tabla, solo
+decorativa y no se lee, igual que los fondos; dentro de un `Page overlay`, siempre, y en las filas repetidas de una tabla, solo
 la primera vez. Una página de un PDF, igual: su texto se puede seleccionar, pero el lector de pantalla anuncia el `Alt`,
 no lo lee.
 

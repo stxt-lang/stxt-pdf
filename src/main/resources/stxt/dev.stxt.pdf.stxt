@@ -10,7 +10,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con For element: Document), los Fixed de todas las secciones y una o más Section con el contenido, en orden.
+		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con For element: Document), los Page overlay de todas las secciones y una o más Section con el contenido, en orden.
 		Children:
 			Child: Page
 				Min: 1
@@ -23,7 +23,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Styles
 				Max: 1
-			Child: Fixed
+			Child: Page overlay
 			Child: Section
 				Min: 1
 	Node: Page
@@ -42,7 +42,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Section
 		Type: GROUP
-		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Page (que hereda del documento por grupos), sus propios Fixed y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
+		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Page (que hereda del documento por grupos), sus propios Page overlay y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
 		Children:
 			Child: Id
 				Max: 1
@@ -56,7 +56,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Start
 				Max: 1
-			Child: Inherit fixed
+			Child: Inherit page overlays
 				Max: 1
 			Child: Begin on
 				Max: 1
@@ -77,9 +77,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
 	Node: Block
 		Type: GROUP
 		Description: Caja que apila sus hijos en vertical (flujo de bloque).
@@ -96,7 +96,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Isolate
+			Child: Contain margins
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -117,9 +117,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
 	Node: Flex
 		Type: GROUP
 		Description: Contenedor flex: coloca sus ítems (Item) a lo largo de un eje.
@@ -149,8 +149,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Lines
 				Max: 1
 			Child: Item
-			Child: Absolute
-			Child: Fixed
+			Child: Overlay
+			Child: Page overlay
 	Node: Grid
 		Type: GROUP
 		Description: Contenedor grid: coloca sus ítems (Area) en una rejilla de filas y columnas.
@@ -182,8 +182,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Vertical
 				Max: 1
 			Child: Area
-			Child: Absolute
-			Child: Fixed
+			Child: Overlay
+			Child: Page overlay
 	Node: Text
 		Type: INLINE
 		Description: Caja de texto. El texto va en el valor (una línea) o en Content (un bloque).
@@ -384,9 +384,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
 	Node: Columns
 		Type: GROUP
 		Description: Bloque en columnas: su contenido llena la primera columna, sigue en la siguiente y, al acabar la página, continúa en la primera columna de la siguiente. Count, Min column width o los dos fijan las columnas.
@@ -432,10 +432,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-	Node: Relative
+			Child: Frame
+	Node: Frame
 		Type: GROUP
-		Description: Caja de bloque que se desplaza con Offset sin mover a sus hermanos. Es el containing block de sus descendientes Absolute.
+		Description: Marco: un bloque en su sitio del flujo que se puede desplazar con Offset sin mover a sus hermanos. Es la referencia de los Overlay que contiene.
 		Children:
 			Child: Id
 				Max: 1
@@ -449,7 +449,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Isolate
+			Child: Contain margins
 				Max: 1
 			Child: Offset
 				Max: 1
@@ -476,12 +476,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
-	Node: Absolute
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
+	Node: Overlay
 		Type: GROUP
-		Description: Caja de bloque fuera de flujo, colocada con Offset en su containing block.
+		Description: Bloque superpuesto, fuera de flujo: no ocupa espacio y se coloca con Offset en el Frame, Overlay o Page overlay que lo contiene (o, si no hay, en el área útil).
 		Children:
 			Child: Id
 				Max: 1
@@ -518,12 +518,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
-	Node: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
+	Node: Page overlay
 		Type: GROUP
-		Description: Caja de bloque fuera de flujo, colocada con Offset en el área útil. En modo paginado se repite en las páginas que dice Pages (todas por defecto).
+		Description: Bloque superpuesto a las páginas, fuera de flujo: se coloca con Offset en el área útil y se repite en las páginas que dice Pages (todas por defecto). Cabeceras, pies y marcas de agua.
 		Children:
 			Child: Id
 				Max: 1
@@ -562,9 +562,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
 	Node: Item
 		Type: GROUP
 		Description: Ítem de un Flex: cómo crece, encoge y se alinea. Contiene exactamente un elemento.
@@ -612,7 +612,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Columns
 				Max: 1
-			Child: Relative
+			Child: Frame
 				Max: 1
 	Node: Area
 		Type: INLINE
@@ -657,7 +657,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Columns
 				Max: 1
-			Child: Relative
+			Child: Frame
 				Max: 1
 	Node: Table
 		Type: GROUP
@@ -752,9 +752,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Image
 			Child: Table
 			Child: Columns
-			Child: Relative
-			Child: Absolute
-			Child: Fixed
+			Child: Frame
+			Child: Overlay
+			Child: Page overlay
 
 	Node: Markdown
 		Type: GROUP
@@ -982,9 +982,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: In table of contents
 		Type: BOOLEAN
 		Description: Si el encabezado tiene entrada en los índices (Table of contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
-	Node: Isolate
+	Node: Contain margins
 		Type: BOOLEAN
-		Description: Crea un contexto de formato de bloque: corta el colapso de márgenes con los hijos.
+		Description: Si la caja contiene los márgenes de sus hijos: con true, los del primero y el último quedan dentro y no se juntan con los suyos (crea un contexto de formato de bloque). Por defecto, false.
 	Node: Offset
 		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
 	Node: Layer
@@ -992,7 +992,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
 	Node: Pages
 		Type: ENUM
-		Description: Páginas en que sale un Fixed, contando desde la 1 dentro de su alcance (las del documento si es un Fixed de Document, las de la sección si es de una Section): all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
+		Description: Páginas en que sale un Page overlay, contando desde la 1 dentro de su alcance (las del documento si es un Page overlay de Document, las de la sección si es de una Section): all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
 		Values:
 			Value: all
 			Value: first
@@ -1014,18 +1014,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: decimal
 			Value: lower-roman
 			Value: upper-roman
-	Node: Inherit fixed
+	Node: Inherit page overlays
 		Type: BOOLEAN
-		Description: Si la Section lleva los Fixed del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
+		Description: Si la Section lleva los Page overlay del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
 	Node: Begin on
 		Type: ENUM
-		Description: En qué página física empieza una Section: any (por defecto), en la siguiente; odd, en una impar, la de la derecha al imprimir a doble cara. Si no le toca, la sección anterior acaba con una página en blanco, que cuenta para el número pero no lo imprime ni lleva los Fixed. No vale en la primera sección.
+		Description: En qué página física empieza una Section: any (por defecto), en la siguiente; odd, en una impar, la de la derecha al imprimir a doble cara. Si no le toca, la sección anterior acaba con una página en blanco, que cuenta para el número pero no lo imprime ni lleva los Page overlay. No vale en la primera sección.
 		Values:
 			Value: any
 			Value: odd
 	Node: Rotate
 		Type: NUMBER
-		Description: Giro de la caja, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0). En Block, Text, Paragraph e Image, que están en flujo, gira sobre su centro y la caja ocupa el rectángulo que la envuelve girada; sin Width, mide su contenido sin partir líneas. En Relative, Absolute y Fixed gira al pintar, alrededor de Rotate origin, y no cambia el layout. Lo girado debe caber en la página y no se parte entre páginas.
+		Description: Giro de la caja, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0). En Block, Text, Paragraph e Image, que están en flujo, gira sobre su centro y la caja ocupa el rectángulo que la envuelve girada; sin Width, mide su contenido sin partir líneas. En Frame, Overlay y Page overlay gira al pintar, alrededor de Rotate origin, y no cambia el layout. Lo girado debe caber en la página y no se parte entre páginas.
 	Node: Rotate origin
 		Description: Punto alrededor del que gira la caja de borde con Rotate: una o dos palabras clave de top, bottom, left, right y center (top left, bottom…), o dos medidas desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto (20 50%). Por defecto, center.
 	Node: Paper

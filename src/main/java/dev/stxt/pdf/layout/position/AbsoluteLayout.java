@@ -21,7 +21,7 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Layout de las cajas {@code absolute} y {@code fixed} (referencia/componentes/relative-absolute-fixed.md). Se
+ * Layout de las cajas {@code absolute} y {@code fixed} (referencia/componentes/frame-and-overlays.md). Se
  * resuelven cuando su containing block ya conoce su tamaño, después del layout en flujo:
  *
  * <ul>

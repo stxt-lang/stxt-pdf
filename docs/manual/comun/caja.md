@@ -47,7 +47,7 @@ error, porque la proporción no tendría efecto.
 Los márgenes separan una caja de las de alrededor. Entre dos cajas una debajo de otra, los márgenes verticales **no se
 suman: se queda el mayor**. Con 20 debajo de una caja y 30 encima de la siguiente, las separa 30, no 50. Lo mismo pasa
 entre una caja y su primer o su último hijo si la caja no tiene borde ni relleno en ese lado: el margen del hijo sale fuera.
-Si no quieres que salga, dale un relleno o un borde, o `Isolate: true` ([Block](../componentes/block.md)). Un margen
+Si no quieres que salga, dale un relleno o un borde, o `Contain margins: true` ([Block](../componentes/block.md)). Un margen
 negativo junta las cajas.
 
 **Centrar.** `Margin: 0 auto` centra en horizontal una caja con `Width` (o `Max width`): los dos márgenes laterales se
@@ -78,7 +78,7 @@ comprueba, porque no se sabe qué hay debajo. Quien convierte puede desactivar l
 `Radius: 50%` en una caja cuadrada es un círculo (una foto de perfil, una insignia). El fondo y el borde siguen la curva.
 Una imagen se recorta con las esquinas de su caja. Lo que hay dentro de una caja redondeada también sigue su curva: el
 fondo, el borde o la imagen de un hijo que llega a la esquina se recorta, sin tener que redondearlo. El texto no se recorta,
-ni un `Absolute`, que puede asomar por la esquina a propósito.
+ni un `Overlay`, que puede asomar por la esquina a propósito.
 
 ## Lo que no cambia el tamaño
 

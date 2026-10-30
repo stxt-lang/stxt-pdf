@@ -4,7 +4,7 @@
 
 El contenido se pinta en el orden del documento: lo que va después, encima. Dentro de cada caja, primero los fondos y los
 bordes de todo lo que hay en el flujo y después los textos y las imágenes, así que un fondo nunca tapa un texto de otra
-caja. Las cajas posicionadas (`Relative`, `Absolute`, `Fixed`) se pintan después, encima del flujo.
+caja. Las cajas posicionadas (`Frame`, `Overlay`, `Page overlay`) se pintan después, encima del flujo.
 
 **`Layer`** cambia ese orden. Es un entero que admiten los elementos posicionados y los envoltorios `Item` y `Area`:
 
@@ -13,7 +13,7 @@ caja. Las cajas posicionadas (`Relative`, `Absolute`, `Fixed`) se pintan despué
 - a igual `Layer`, manda el orden del documento.
 
 ```
-Fixed:
+Page overlay:
 	Layer: -1
 	Offset: 0
 	Block:
@@ -94,13 +94,13 @@ Document (dev.stxt.pdf):
 - **Gira sobre su centro.** Con `Margin: 0 auto` se centra.
 - **No puede ser directamente un ítem de un `Flex` o un `Grid`**, que le dan su tamaño: gira una caja dentro del ítem.
 
-### Solo al pintar: `Relative`, `Absolute` y `Fixed`
+### Solo al pintar: `Frame`, `Overlay` y `Page overlay`
 
 Un posicionado girado **no mueve nada**: la caja ocupa su sitio como si no estuviera girada, y lo de alrededor no se
 entera. Es para lo que va encima de todo, como un sello o una etiqueta en diagonal:
 
 ```
-Absolute:
+Overlay:
 	Offset: 10 10 auto auto
 	Rotate: 12
 	Box:
@@ -116,6 +116,6 @@ Absolute:
 - **`Rotate origin`** es el punto alrededor del que gira: una o dos de `top`, `bottom`, `left`, `right` y `center` (por
   defecto, el centro), o dos medidas desde la esquina de arriba a la izquierda de la caja. `Rotate origin: top left` gira
   sobre esa esquina; `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
-- Para un texto en vertical en el margen de la página, gira un `Fixed` que lo contiene.
+- Para un texto en vertical en el margen de la página, gira un `Page overlay` que lo contiene.
 
 Más detalle en la [referencia](../../referencia/comun/capas-y-giro.md).

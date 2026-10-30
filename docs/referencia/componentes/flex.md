@@ -1,7 +1,7 @@
 # `Flex` e `Item`
 
 Un `Flex` coloca sus ítems en líneas: en el **eje principal** (`Direction`) uno tras otro y alineados en el **eje
-cruzado**. Cada hijo en flujo es un `Item`, que envuelve al elemento que hace de ítem; además admite `Absolute` y `Fixed`.
+cruzado**. Cada hijo en flujo es un `Item`, que envuelve al elemento que hace de ítem; además admite `Overlay` y `Page overlay`.
 El `Flex` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
 
 ```
@@ -124,8 +124,8 @@ parte.
 
 ## Posicionadas
 
-La posición estática de un `Absolute` o un `Fixed` hijo de un `Flex` es la esquina superior izquierda de su caja de
-contenido ([posicionados](relative-absolute-fixed.md#absolute)).
+La posición estática de un `Overlay` o un `Page overlay` hijo de un `Flex` es la esquina superior izquierda de su caja de
+contenido ([posicionados](frame-and-overlays.md#overlay)).
 
 ## Lo que no hay
 

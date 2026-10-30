@@ -97,11 +97,11 @@ class ContrastCheckTest {
     void textOverAnImageIsNotChecked() {
         // Lo que hay debajo es la imagen: no se sabe.
         assertDoesNotThrow(() -> layOut("\tBlock:", "\t\tImage: test/wide.png", "\t\t\tBox:", "\t\t\t\tWidth: 300",
-                "\t\tAbsolute:", "\t\t\tOffset: 0 auto auto 0", "\t\t\tText: hola", "\t\t\t\tTypography:",
+                "\t\tOverlay:", "\t\t\tOffset: 0 auto auto 0", "\t\t\tText: hola", "\t\t\t\tTypography:",
                 "\t\t\t\t\tColor: #FFFFFF"));
         // Con un fondo opaco encima de la imagen, se vuelve a saber.
         error("\tBlock:", "\t\tImage: test/wide.png", "\t\t\tBox:", "\t\t\t\tWidth: 300",
-                "\t\tAbsolute:", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tBackground: #EEEEEE",
+                "\t\tOverlay:", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tBackground: #EEEEEE",
                 "\t\t\tText: hola", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #FFFFFF");
     }
 

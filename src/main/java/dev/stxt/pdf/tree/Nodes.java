@@ -58,9 +58,9 @@ final class Nodes {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
-    /** Nombre del elemento posicionado: {@code Absolute} o {@code Fixed}. */
+    /** Nombre del elemento posicionado: {@code Overlay} o {@code Page overlay}. */
     static String position(Style s) {
-        return s.position() == Position.FIXED ? "Fixed" : "Absolute";
+        return s.position() == Position.FIXED ? "Page overlay" : "Overlay";
     }
 
     /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */

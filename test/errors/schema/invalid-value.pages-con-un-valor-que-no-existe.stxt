@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: 0 auto auto 0
 			Pages: second
 			Text: Hola

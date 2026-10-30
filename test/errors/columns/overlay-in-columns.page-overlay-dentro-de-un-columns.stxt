@@ -1,6 +1,6 @@
-# Case: Absolute como hijo de un Columns
-# Code: CHILD_NOT_DECLARED
-# Line: 18
+# Case: Page overlay dentro de un Columns
+# Code: OVERLAY_IN_COLUMNS
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -15,5 +15,6 @@ Document (dev.stxt.pdf):
 	Section:
 		Columns:
 			Count: 2
-			Absolute:
-				Text: Nota
+			Block:
+				Page overlay:
+					Text: Nota

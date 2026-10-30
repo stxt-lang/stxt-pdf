@@ -1,6 +1,6 @@
-# Páginas en que sale un Fixed (referencia/componentes/relative-absolute-fixed.md). Área útil de 260 × 160 desde (20, 20).
+# Páginas en que sale un Page overlay (referencia/componentes/frame-and-overlays.md). Área útil de 260 × 160 desde (20, 20).
 #
-# Cuatro páginas, una por bloque de 60 (Break After: page). Los Fixed no ocupan sitio: el flujo
+# Cuatro páginas, una por bloque de 60 (Break After: page). Los Page overlay no ocupan sitio: el flujo
 # no cambia con ellos ni sin ellos. Pages cuenta las páginas desde la 1, en el orden del documento.
 #   cover (first):     x = 20, y = 20, solo en la página 1.
 #   head (not-first):  Offset 0 0 auto 0: x = 20, y = 20, 260 × 12; páginas 2, 3 y 4.
@@ -45,46 +45,46 @@ Document (dev.stxt.pdf):
 			Id: c4
 			Box:
 				Height: 60
-		Fixed:
+		Page overlay:
 			Id: cover
 			Pages: first
 			Offset: 0 auto auto 0
 			Box:
 				Width: 100
 				Height: 40
-		Fixed:
+		Page overlay:
 			Id: head
 			Pages: not-first
 			Offset: 0 0 auto 0
 			Box:
 				Height: 12
-			Fixed:
+			Page overlay:
 				Id: inner
 				Pages: first
 				Offset: 0 auto auto 0
 				Box:
 					Width: 10
 					Height: 10
-		Fixed:
+		Page overlay:
 			Id: foot
 			Offset: auto 0 0 0
 			Box:
 				Height: 10
-		Fixed:
+		Page overlay:
 			Id: odd
 			Pages: odd
 			Offset: 30 auto auto 0
 			Box:
 				Width: 20
 				Height: 8
-		Fixed:
+		Page overlay:
 			Id: even
 			Pages: even
 			Offset: 60 0 auto auto
 			Box:
 				Width: 20
 				Height: 8
-		Fixed:
+		Page overlay:
 			Id: end
 			Pages: last
 			Offset: auto 0 0 auto

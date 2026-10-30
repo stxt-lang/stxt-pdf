@@ -1,4 +1,4 @@
-# Posicionamiento (referencia/componentes/relative-absolute-fixed.md): relative, absolute en su containing block y
+# Posicionamiento (referencia/componentes/frame-and-overlays.md): relative, absolute en su containing block y
 # fixed en el margen de la página.
 Document (dev.stxt.pdf):
 	Language: es
@@ -8,12 +8,12 @@ Document (dev.stxt.pdf):
 		Height: 842
 		Margin: 40
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Offset: -30 0 auto 0
 			Box:
 				Height: 20
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -30 0
 			Box:
@@ -23,14 +23,14 @@ Document (dev.stxt.pdf):
 			Box:
 				Height: 24
 				Margin: 0 0 16 0
-		Relative:
+		Frame:
 			Id: card
 			Offset: 5 auto auto 10
 			Box:
 				Height: 100
 				Padding: 10
 				Border: 2
-			Absolute:
+			Overlay:
 				Id: badge
 				Offset: 0 0 auto auto
 				Box:
@@ -40,7 +40,7 @@ Document (dev.stxt.pdf):
 			Id: next
 			Box:
 				Height: 30
-		Absolute:
+		Overlay:
 			Id: stamp
 			Offset: 0 0 auto auto
 			Box:

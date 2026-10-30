@@ -61,7 +61,7 @@ public final class References {
 
     /**
      * Comprueba que cada referencia señala una caja con ese {@code Id} y que se puede referir:
-     * la página, de una caja que no esté en un {@code Fixed} (que está en todas las páginas), y
+     * la página, de una caja que no esté en un {@code Page overlay} (que está en todas las páginas), y
      * el número, de una que lo tenga.
      *
      * @throws InvalidModelException con la línea de la referencia
@@ -88,7 +88,7 @@ public final class References {
                 case PAGE -> {
                     if (insideFixed(target)) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_PLACEABLE, text
-                                + ": " + r.id() + " está en un Fixed, que se repite en todas las páginas");
+                                + ": " + r.id() + " está en un Page overlay, que se repite en todas las páginas");
                     }
                 }
                 case NUMBER -> {
@@ -107,7 +107,7 @@ public final class References {
         return "{" + r.kind().keyword() + " of: " + r.id() + "}";
     }
 
-    /** Si la caja es un {@code Fixed} o está dentro de uno. */
+    /** Si la caja es un {@code Page overlay} o está dentro de uno. */
     static boolean insideFixed(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
             if (b.style().position() == Position.FIXED) {

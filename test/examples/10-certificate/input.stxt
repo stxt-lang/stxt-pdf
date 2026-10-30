@@ -1,8 +1,8 @@
 # Certificado de un curso, en una página A4 apaisada (Paper y Orientation: 842 × 595). Un fondo crema y tres marcos
-# concéntricos con cuatro adornos en las esquinas, todos Fixed con Layer negativa; el contenido
+# concéntricos con cuatro adornos en las esquinas, todos Page overlay con Layer negativa; el contenido
 # centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
 # lados de un sello con cintas, ligeramente girado (una Image con Rotate, que ocupa el cuadrado que la
-# envuelve). El número del certificado va en vertical en el margen izquierdo: un Fixed girado −90 grados
+# envuelve). El número del certificado va en vertical en el margen izquierdo: un Page overlay girado −90 grados
 # alrededor de su esquina de arriba a la izquierda.
 # El nombre de la escuela se escribe en minúscula y la regla de su estilo lo pone en mayúsculas,
 # separadas (Transform y Letter spacing).
@@ -14,59 +14,59 @@ Document (dev.stxt.pdf):
 	Title: Certificado de finalización · Cerámica a mano
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: paper
 			Offset: -64 -80 -56 -80
 			Layer: -3
 			Box:
 				Background: #FBF7EC
-		Fixed:
+		Page overlay:
 			Id: frame-outer
 			Offset: -48 -62 -40 -62
 			Layer: -2
 			Box:
 				Border: 5
 				Border color: #14305E
-		Fixed:
+		Page overlay:
 			Id: frame-middle
 			Offset: -38 -52 -30 -52
 			Layer: -2
 			Box:
 				Border: 1.5
 				Border color: #926829
-		Fixed:
+		Page overlay:
 			Id: frame-inner
 			Offset: -32 -46 -24 -46
 			Layer: -2
 			Box:
 				Border: 0.5
 				Border color: #14305E
-		Fixed:
+		Page overlay:
 			Offset: -45 auto auto -59
 			Layer: -1
 			Block:
 				Style: corner
-		Fixed:
+		Page overlay:
 			Offset: -45 -59 auto auto
 			Layer: -1
 			Block:
 				Style: corner
-		Fixed:
+		Page overlay:
 			Offset: auto auto -37 -59
 			Layer: -1
 			Block:
 				Style: corner
-		Fixed:
+		Page overlay:
 			Offset: auto -59 -37 auto
 			Layer: -1
 			Block:
 				Style: corner
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -22 0
 			Text: Verificable en escuelaceramica.example/verificar
 				Link: https://escuelaceramica.example/verificar
-		Fixed:
+		Page overlay:
 			Id: serial
 			Offset: 363.5 auto auto -31
 			Rotate: -90

@@ -1,6 +1,6 @@
-# Case: Margin auto en absolute sin inicio y fin
-# Code: MARGIN_AUTO_WITHOUT_EFFECT
-# Line: 15
+# Case: Overlay sobre-restringido
+# Code: OVERCONSTRAINED
+# Line: 12
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -8,8 +8,8 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Absolute:
+		Overlay:
+			Offset: 0 10 auto 10
 			Box:
 				Width: 100
 				Height: 10
-				Margin: 0 auto

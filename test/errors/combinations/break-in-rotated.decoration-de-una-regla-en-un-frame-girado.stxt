@@ -1,4 +1,4 @@
-# Case: Decoration de una regla en un Relative girado
+# Case: Decoration de una regla en un Frame girado
 # Code: BREAK_IN_ROTATED
 # Line: 13
 Document (dev.stxt.pdf):
@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Break:
 				Decoration: clone
 	Section:
-		Relative:
+		Frame:
 			Style: stamp
 			Rotate: -8
 			Block:

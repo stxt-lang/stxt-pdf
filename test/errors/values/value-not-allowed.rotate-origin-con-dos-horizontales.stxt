@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Absolute:
+		Overlay:
 			Rotate: 10
 			Rotate origin: left right
 			Box:

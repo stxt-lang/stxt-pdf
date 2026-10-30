@@ -1,4 +1,4 @@
-# Case: Before: page en un texto dentro de un Absolute, que no se parte
+# Case: Inside: avoid en un bloque dentro de un Frame girado, que no se parte
 # Code: BREAK_IN_UNBREAKABLE
 # Line: 20
 Document (dev.stxt.pdf):
@@ -13,8 +13,9 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Text: Cuerpo
-		Absolute:
-			Paragraph: Sello
+		Frame:
+			Rotate: 10
+			Block:
 				Break:
-					Before: page
+					Inside: avoid
+				Text: Sello

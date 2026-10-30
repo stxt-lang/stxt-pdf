@@ -25,21 +25,21 @@ class RotationLayoutTest {
     @Test
     void rotationDoesNotChangeTheLayout() {
         LayoutFixture l = LayoutFixture.layOut("\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\tRelative:", "\t\tId: R", "\t\tRotate: 30", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 50",
+                "\tFrame:", "\t\tId: R", "\t\tRotate: 30", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 50",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 10");
         assertEquals(new Rect(40, 140, 200, 50), l.rect("R"));
         assertEquals(new Rect(40, 190, 515, 10), l.rect("B"));
     }
 
     /**
-     * Área útil de 100: tras un bloque de 60 quedan 40, y el {@code Relative} girado mide 60. Sin
+     * Área útil de 100: tras un bloque de 60 quedan 40, y el {@code Frame} girado mide 60. Sin
      * girar se partiría entre sus dos bloques; girado pasa entero a la página siguiente.
      */
     @Test
     void aRotatedRelativeIsNotSplit() {
         String[] content = {
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
-                "\tRelative:", "\t\tId: R", "{}", "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30",
+                "\tFrame:", "\t\tId: R", "{}", "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30",
                 "\t\tBlock:", "\t\t\tId: Z", "\t\t\tBox:", "\t\t\t\tHeight: 30"};
         LayoutFixture plain = LayoutFixture.layOutPaged(180, with(content, "\t\tLayer: 1"));
         assertTrue(plain.has(1, "R"));
@@ -56,18 +56,18 @@ class RotationLayoutTest {
     @Test
     void aRotatedRelativeThatFitsStaysOnItsPage() {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
-                "\tRelative:", "\t\tId: R", "\t\tRotate: -5", "\t\tBox:", "\t\t\tHeight: 100");
+                "\tFrame:", "\t\tId: R", "\t\tRotate: -5", "\t\tBox:", "\t\t\tHeight: 100");
         assertEquals(1, l.pages());
         assertEquals(new Rect(40, 40, 515, 100), l.rect("R"));
     }
 
     /**
-     * Un {@code Absolute} de 60 × 100 en y = 760 de la página se sale por abajo sin girar (llega a
+     * Un {@code Overlay} de 60 × 100 en y = 760 de la página se sale por abajo sin girar (llega a
      * 860 de 842), pero girado 90 grados alrededor de su centro (30, 50) ocupa de 780 a 840: cabe.
      */
     @Test
     void aRotatedBoxIsCheckedAsItIsPainted() {
-        String[] lines = {"\tAbsolute:", "\t\tId: S", "\t\tOffset: 720 auto auto 0", "{}",
+        String[] lines = {"\tOverlay:", "\t\tId: S", "\t\tOffset: 720 auto auto 0", "{}",
                 "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 100"};
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> LayoutFixture.layOut(with(lines, "\t\tLayer: 1")));
@@ -80,7 +80,7 @@ class RotationLayoutTest {
     @Test
     void aRotatedBoxThatLeavesThePageIsAnOverflow() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
-                "\tRelative:", "\t\tRotate: -90", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tWidth: 100",
+                "\tFrame:", "\t\tRotate: -90", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 10"));
         assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
         assertTrue(e.getMessage().contains("girada"), e.getMessage());
@@ -131,7 +131,7 @@ class RotationLayoutTest {
 
     /**
      * Un {@code Block} de 100 × 20 girado 90 ocupa 20 × 100 en (40, 40), y su caja sin girar está en (0, 80). Es el
-     * contenedor de referencia del {@code Absolute} de dentro, que se coloca en su caja sin girar; el margen de su
+     * contenedor de referencia del {@code Overlay} de dentro, que se coloca en su caja sin girar; el margen de su
      * hijo no sale de él.
      */
     @Test
@@ -139,7 +139,7 @@ class RotationLayoutTest {
         LayoutFixture l = LayoutFixture.layOut("\tBlock:", "\t\tId: R", "\t\tRotate: 90", "\t\tBox:",
                 "\t\t\tWidth: 100",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tMargin: 10 0 0 0",
-                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
                 "\t\t\t\tHeight: 10");
         assertEquals(new Rect(40, 40, 20, 100), l.rect("R"));
         assertEquals(new Rect(0, 90, 100, 10), l.rect("C"));

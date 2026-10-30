@@ -62,7 +62,7 @@ class SectionsTest {
         return null;
     }
 
-    /** El fragmento con ese {@code Id} en el flujo o en los {@code Fixed} de la página; {@code null} si no sale. */
+    /** El fragmento con ese {@code Id} en el flujo o en los {@code Page overlay} de la página; {@code null} si no sale. */
     private static Fragment on(Page page, String id) {
         Fragment found = find(page.content(), id);
         for (Fragment fixed : page.fixed()) {
@@ -129,17 +129,17 @@ class SectionsTest {
     @Test
     void fixedBoxesOfTheDocumentGoEverywhereAndThoseOfASectionOnlyInIt() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: foot", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 10",
-                join(new String[] {"\tSection:", "\t\tFixed:", "\t\t\tId: head-a", "\t\t\tPages: first",
+                "\tPage overlay:", "\t\tId: foot", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 10",
+                join(new String[] {"\tSection:", "\t\tPage overlay:", "\t\t\tId: head-a", "\t\t\tPages: first",
                         "\t\t\tBox:", "\t\t\t\tHeight: 10"}, fullPage("a1"), fullPage("a2")),
-                new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tFixed:", "\t\t\tId: head-b", "\t\t\tBox:",
+                new String[] {"\tSection:", "\t\tInherit page overlays: false", "\t\tPage overlay:", "\t\t\tId: head-b", "\t\t\tBox:",
                         "\t\t\t\tHeight: 10", "\t\tBlock:", "\t\t\tId: b"},
                 new String[] {"\tSection:", "\t\tBlock:", "\t\t\tId: c"});
         assertEquals(4, d.pages().size());
         // Pages: first cuenta dentro de la sección: solo su primera página.
         assertEquals(List.of("foot", "head-a"), fixedIds(d.pages().get(0)));
         assertEquals(List.of("foot"), fixedIds(d.pages().get(1)));
-        // Inherit fixed: false deja la sección sin los del documento.
+        // Inherit page overlays: false deja la sección sin los del documento.
         assertEquals(List.of("head-b"), fixedIds(d.pages().get(2)));
         assertEquals(List.of("foot"), fixedIds(d.pages().get(3)));
     }
@@ -147,8 +147,8 @@ class SectionsTest {
     @Test
     void pagesOfAFixedOfTheDocumentCountTheWholeDocument() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: not-first", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 10",
-                "\tFixed:", "\t\tId: last", "\t\tPages: last", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tPage overlay:", "\t\tId: not-first", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tPage overlay:", "\t\tId: last", "\t\tPages: last", "\t\tBox:", "\t\t\tHeight: 10",
                 join(new String[] {"\tSection:"}, fullPage("a")),
                 join(new String[] {"\tSection:"}, fullPage("b1"), fullPage("b2")));
         assertEquals(3, d.pages().size());
@@ -160,9 +160,9 @@ class SectionsTest {
     @Test
     void anUnnumberedCoverDoesNotCountAndTheNumberingCanRestart() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tPages: not-first", "\t\tText: Página {page} de {pages}",
-                join(new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tPage numbering: none"}, fullPage("cover")),
-                join(new String[] {"\tSection:", "\t\tInherit fixed: true"}, fullPage("b1"), fullPage("b2")),
+                "\tPage overlay:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tPages: not-first", "\t\tText: Página {page} de {pages}",
+                join(new String[] {"\tSection:", "\t\tInherit page overlays: false", "\t\tPage numbering: none"}, fullPage("cover")),
+                join(new String[] {"\tSection:", "\t\tInherit page overlays: true"}, fullPage("b1"), fullPage("b2")),
                 join(new String[] {"\tSection:", "\t\tPage numbering: restart"}, fullPage("annex")));
         assertEquals(4, d.pages().size());
         assertEquals(List.of(0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
@@ -183,7 +183,7 @@ class SectionsTest {
     @Test
     void romanPagesAndARestartThatStartsAtFive() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
+                "\tPage overlay:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
                 join(new String[] {"\tSection:", "\t\tPage number format: lower-roman", "\t\tText: El cuerpo empieza en la "
                         + "{page of: b1} y el prefacio en la {page of: p1}.", "\t\t\tId: ref"}, fullPage("p1"),
                         fullPage("p2")),
@@ -201,10 +201,10 @@ class SectionsTest {
     @Test
     void aSectionThatContinuesFollowsTheCounterOfTheOnesBefore() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: num", "\t\tText: {page}/{pages}",
+                "\tPage overlay:", "\t\tId: num", "\t\tText: {page}/{pages}",
                 join(new String[] {"\tSection:"}, fullPage("a")),
-                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tInherit fixed: false"}, fullPage("hole")),
-                join(new String[] {"\tSection:", "\t\tInherit fixed: false"}, fullPage("b")));
+                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tInherit page overlays: false"}, fullPage("hole")),
+                join(new String[] {"\tSection:", "\t\tInherit page overlays: false"}, fullPage("b")));
         assertEquals(List.of(1, 0, 2), d.pages().stream().map(Page::printed).toList());
     }
 
@@ -225,8 +225,8 @@ class SectionsTest {
     void pagesCountsOnlyTheNumberedPagesOfTheRun() {
         // {pages} cuenta las páginas numeradas de la tanda, no las del documento.
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: n", "\t\tPages: last", "\t\tText: {pages}",
-                join(new String[] {"\tSection:", "\t\tInherit fixed: false", "\t\tPage numbering: none"}, fullPage("c1"), fullPage("c2")),
+                "\tPage overlay:", "\t\tId: n", "\t\tPages: last", "\t\tText: {pages}",
+                join(new String[] {"\tSection:", "\t\tInherit page overlays: false", "\t\tPage numbering: none"}, fullPage("c1"), fullPage("c2")),
                 join(new String[] {"\tSection:"}, fullPage("b")));
         assertEquals(3, d.pages().size());
         assertEquals("1", text(d.pages().get(2), "n"));
@@ -234,14 +234,14 @@ class SectionsTest {
 
     /**
      * {@code Begin on: odd}: si la sección anterior acaba en impar, acaba con una página en blanco de ella, sin
-     * contenido ni {@code Fixed}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages} de los
-     * {@code Fixed} de su sección (referencia/componentes/document.md).
+     * contenido ni {@code Page overlay}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages} de los
+     * {@code Page overlay} de su sección (referencia/componentes/document.md).
      */
     @Test
     void aSectionThatBeginsOnAnOddPageLeavesABlankPageBefore() {
         LaidOutDocument d = lay(
-                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
-                join(new String[] {"\tSection:", "\t\tFixed:", "\t\t\tId: last-a", "\t\t\tPages: last",
+                "\tPage overlay:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
+                join(new String[] {"\tSection:", "\t\tPage overlay:", "\t\t\tId: last-a", "\t\t\tPages: last",
                         "\t\t\tBox:", "\t\t\t\tHeight: 10"}, fullPage("a")),
                 new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tText: Empieza en la {page of: b}.",
                         "\t\t\tId: ref", "\t\tBlock:", "\t\t\tId: b"});

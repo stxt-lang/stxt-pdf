@@ -17,7 +17,7 @@ La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `Doc
 `BoxTreeBuilder` vuelve a validar el árbol al empezar, así que el resto del builder da la estructura por buena.
 
 En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `Text`, `Paragraph`, `Cell`, `Image`,
-`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Isolate`, `Wrap`, `Header` e
+`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Contain margins`, `Wrap`, `Header` e
 `In table of contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
 valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
 `ValueReader`.
@@ -111,10 +111,10 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `Media`, `Page numbering`,
-`Page number format`, `Start`, `Inherit fixed` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
+`Page number format`, `Start`, `Inherit page overlays` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
 **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
-(referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
-`parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con `parent`) y no se
+(referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Page overlay` y subir por
+`parent` se quedan dentro de la sección. Los `Page overlay` hijos de `Document` también son hijos de la raíz (con `parent`) y no se
 maquetan en el flujo: los coloca el `Paginator`.
 
 > **Decisión:** una sección es la raíz de su layout, sin padre, y cuelga de la raíz del documento sin ser hija, así que el

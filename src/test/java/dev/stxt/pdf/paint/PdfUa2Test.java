@@ -42,7 +42,7 @@ class PdfUa2Test {
             + "\tList:\n\t\tMarker: dash\n\t\tBox:\n\t\t\tPadding: 0 0 0 16\n\t\tList item:\n\t\t\tText: Un ítem\n"
             + "\tText: Vuelve al principio\n\t\tLink: #uno\n"
             + "\tHeading 1:\n\t\tId: uno\n\t\tText: Dos\n"
-            + "\tFixed:\n\t\tOffset: auto 0 0 auto\n\t\tText: ¿Más? Escríbenos\n\t\t\tLink: mailto:a@b.example\n";
+            + "\tPage overlay:\n\t\tOffset: auto 0 0 auto\n\t\tText: ¿Más? Escríbenos\n\t\t\tLink: mailto:a@b.example\n";
 
     private static byte[] pdf(int ua) throws Exception {
         InlineNode document = new DocumentReader().read(Docs.sectioned(DOCUMENT));

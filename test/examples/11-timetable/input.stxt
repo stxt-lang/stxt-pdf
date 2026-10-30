@@ -10,7 +10,7 @@ Document (dev.stxt.pdf):
 	Title: Horario de 2.º B · Curso 2025-26
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -30 0
 			Flex:

@@ -54,7 +54,7 @@ class BoxTreeBuilderTest {
     void elementsGiveLayoutAndPosition() {
         Box root = build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
-                "\tFlex:", "\tGrid:", "\tRelative:", "\tAbsolute:", "\tFixed:")).sections().get(0).box();
+                "\tFlex:", "\tGrid:", "\tFrame:", "\tOverlay:", "\tPage overlay:")).sections().get(0).box();
         assertEquals(List.of(Layout.INLINE, Layout.FLEX, Layout.GRID, Layout.BLOCK,
                 Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout()).toList());
         assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
@@ -248,12 +248,12 @@ class BoxTreeBuilderTest {
     @Test
     void rotateAndItsOrigin() {
         Box root = build(document(
-                "\tRelative:", "\t\tRotate: -8.5",
-                "\tAbsolute:", "\t\tRotate: 90", "\t\tRotate origin: bottom right",
-                "\tFixed:", "\t\tRotate: 359.5", "\t\tRotate origin: top",
+                "\tFrame:", "\t\tRotate: -8.5",
+                "\tOverlay:", "\t\tRotate: 90", "\t\tRotate origin: bottom right",
+                "\tPage overlay:", "\t\tRotate: 359.5", "\t\tRotate origin: top",
                 "\tImage: test/square.png", "\t\tRotate: -359",
-                "\tRelative:",
-                "\tRelative:", "\t\tRotate: 30", "\t\tRotate origin: 10 25%")).sections().get(0).box();
+                "\tFrame:",
+                "\tFrame:", "\t\tRotate: 30", "\t\tRotate origin: 10 25%")).sections().get(0).box();
         assertEquals(new dev.stxt.pdf.model.Rotation(-8.5, 0.5, 0.5), root.children().get(0).style().rotation());
         assertEquals(new dev.stxt.pdf.model.Rotation(90, 1, 1), root.children().get(1).style().rotation());
         assertEquals(new dev.stxt.pdf.model.Rotation(359.5, 0.5, 0), root.children().get(2).style().rotation());
@@ -265,21 +265,21 @@ class BoxTreeBuilderTest {
 
     /**
      * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
-     * (referencia/comun/errores.md): {@code Isolate: false} en un ítem es el valor por defecto, un {@code Break} que
+     * (referencia/comun/errores.md): {@code Contain margins: false} en un ítem es el valor por defecto, un {@code Break} que
      * llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque esté
-     * dentro de un {@code Absolute}.
+     * dentro de un {@code Overlay}.
      */
     @Test
     void breaksAndIsolateWithoutEffectOnlyFailWhenTheElementWritesThem() {
         build(document(
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
-                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate: false",
-                "\tAbsolute:", "\t\tParagraph: Sello",
+                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tContain margins: false",
+                "\tOverlay:", "\t\tParagraph: Sello",
                 "\t\tColumns:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
                 "\t\t\tBlock:"));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tFixed:", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: page", "\tBlock:")));
+                "\tPage overlay:", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: page", "\tBlock:")));
         assertEquals(ErrorCode.BREAK_IN_UNBREAKABLE, e.errorCode());
     }
 }

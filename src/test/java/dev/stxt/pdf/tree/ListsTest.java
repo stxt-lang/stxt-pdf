@@ -80,8 +80,8 @@ class ListsTest {
     @Test
     void theFirstLineMayBeDeepInsideBlocks() {
         Box list = root("\tList:", "\t\tMarker: dash",
-                "\t\tList item:", "\t\t\tBlock:", "\t\t\t\tAbsolute:", "\t\t\t\t\tText: fuera",
-                "\t\t\t\tRelative:", "\t\t\t\t\tText: dentro",
+                "\t\tList item:", "\t\t\tBlock:", "\t\t\t\tOverlay:", "\t\t\t\t\tText: fuera",
+                "\t\t\t\tFrame:", "\t\t\t\t\tText: dentro",
                 "\t\tList item:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: anidado").children().get(0);
         assertEquals(List.of("– ", "– "), markers(list));

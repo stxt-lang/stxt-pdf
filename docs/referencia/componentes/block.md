@@ -1,6 +1,6 @@
 # `Block`
 
-Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate` y
+Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins` y
 `Rotate`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
 y ocupa el rectángulo que la envuelve ([Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)).
 
@@ -15,7 +15,7 @@ Block:
 
 ## El flujo de bloque
 
-Es como colocan a sus hijos en flujo un `Block`, cada sección (el área útil), `Relative`, `Absolute`, `Fixed`, los
+Es como colocan a sus hijos en flujo un `Block`, cada sección (el área útil), `Frame`, `Overlay`, `Page overlay`, los
 encabezados, `List`, `List item`, `Markdown`, `Table of contents`, una `Cell` con elementos y cada columna de un `Columns`. Los hijos
 en flujo se apilan en vertical:
 
@@ -27,8 +27,8 @@ en flujo se apilan en vertical:
 3. **Altura.** Se calcula su layout y el cursor avanza.
 
 Con `Height: auto`, la altura del contenedor es la posición final del cursor más su relleno y su borde. **El ancho se
-propaga de padres a hijos; la altura, de hijos a padres.** Un `Absolute` o un `Fixed` entre los hijos no ocupa sitio
-([posicionados](relative-absolute-fixed.md)).
+propaga de padres a hijos; la altura, de hijos a padres.** Un `Overlay` o un `Page overlay` entre los hijos no ocupa sitio
+([posicionados](frame-and-overlays.md)).
 
 ## Colapso de márgenes
 
@@ -45,16 +45,16 @@ dan 15; `−10` y `−4` dan −10. En un corte de página, los márgenes que to
 
 ## Contextos de formato de bloque
 
-Aíslan el colapso de márgenes: los márgenes de dentro no salen. Los crean: cada sección, `Absolute` y `Fixed`, los ítems
-de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Columns` y los `Block` y `Relative` con
-`Isolate: true`. Los márgenes de los ítems de `Flex` y `Grid` nunca colapsan.
+Aíslan el colapso de márgenes: los márgenes de dentro no salen. Los crean: cada sección, `Overlay` y `Page overlay`, los ítems
+de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Columns` y los `Block` y `Frame` con
+`Contain margins: true`. Los márgenes de los ítems de `Flex` y `Grid` nunca colapsan.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Isolate` | booleano | `false` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Solo en `Block` y `Relative`, y no en un ítem de `Flex` o `Grid` (`ISOLATE_IN_ITEM`). |
+| `Contain margins` | booleano | `false` | Crea un contexto de formato de bloque nuevo: corta el colapso de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Flex` o `Grid` (`CONTAIN_MARGINS_IN_ITEM`). |
 
-> **Decisión:** `Isolate` solo está donde puede tener efecto: `Absolute`, `Fixed` y los ítems ya aíslan, y `Flex`, `Grid`
-> y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Relative` que es ítem, `Isolate: true` es un error.
+> **Decisión:** `Contain margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Flex`, `Grid`
+> y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Contain margins: true` es un error.
 
 ## Tamaños intrínsecos
 

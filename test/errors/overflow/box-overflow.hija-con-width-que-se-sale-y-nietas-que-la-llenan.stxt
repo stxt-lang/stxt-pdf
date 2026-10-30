@@ -11,13 +11,13 @@ Document (dev.stxt.pdf):
 		Block:
 			Box:
 				Width: 100
-			Relative:
+			Frame:
 				Box:
 					Width: 150
 				Block:
 					Box:
 						Height: 10
-				Absolute:
+				Overlay:
 					Box:
 						Width: 10
 						Height: 10

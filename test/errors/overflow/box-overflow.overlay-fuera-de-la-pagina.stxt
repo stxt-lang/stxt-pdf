@@ -1,4 +1,4 @@
-# Case: Absolute que se sale por la izquierda
+# Case: Overlay fuera de la página
 # Code: BOX_OVERFLOW
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,8 +8,8 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Absolute:
-			Offset: 0 auto auto -100
+		Overlay:
+			Offset: -100 auto auto 0
 			Box:
 				Width: 50
 				Height: 10

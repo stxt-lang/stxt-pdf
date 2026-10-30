@@ -87,7 +87,7 @@ class PdfPagesTest {
             "\t\t\t\tFont: IBM Plex Sans",
             "\t\t\t\tSize: 10",
             "\tSection:",
-            "\t\tFixed:",
+            "\t\tPage overlay:",
             "\t\t\tOffset: -40 -40 -40 -40",
             "\t\t\tLayer: -1",
             "\t\t\tImage: examples/letterhead/letterhead.pdf",
@@ -169,7 +169,7 @@ class PdfPagesTest {
      */
     @Test
     void theLayersOfThePageKeepTheirMarksAndGetAName() throws Exception {
-        String doc = DOCUMENT.substring(0, DOCUMENT.indexOf("\t\tFixed:")) + "\t\tImage: test/layers.pdf\n"
+        String doc = DOCUMENT.substring(0, DOCUMENT.indexOf("\t\tPage overlay:")) + "\t\tImage: test/layers.pdf\n"
                 + "\t\t\tAlt: Una página con una capa de notas\n";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Converter.create().toPdf(new DocumentReader().read(doc), out);

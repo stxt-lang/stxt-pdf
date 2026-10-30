@@ -150,7 +150,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 Box child = box.children().get(i);
                 if (child.style().isOutOfFlow()) {
                     // Posición estática: donde empezaría si estuviera en flujo
-                    // (referencia/componentes/relative-absolute-fixed.md). La caja se resuelve en su containing block
+                    // (referencia/componentes/frame-and-overlays.md). La caja se resuelve en su containing block
                     // (AbsoluteLayout).
                     pending.add(new PendingAbsolute(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
@@ -219,7 +219,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera
-            // (referencia/componentes/relative-absolute-fixed.md).
+            // (referencia/componentes/frame-and-overlays.md).
             RelativeOffset offset = RelativeOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();

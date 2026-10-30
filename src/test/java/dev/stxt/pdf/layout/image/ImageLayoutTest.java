@@ -250,7 +250,7 @@ class ImageLayoutTest {
     @Test
     void absoluteShrinksToTheImage() {
         LayoutFixture f = layOut(
-                "\tAbsolute:",
+                "\tOverlay:",
                 "\t\tId: A",
                 "\t\tOffset: 10 auto auto 20",
                 "\t\tImage: test/square.png",

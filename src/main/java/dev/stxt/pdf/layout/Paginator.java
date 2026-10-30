@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
  * y se repiten en las páginas que dice su {@code Pages}, todas por defecto
- * (referencia/componentes/relative-absolute-fixed.md). Su containing block es el área útil.</p>
+ * (referencia/componentes/frame-and-overlays.md). Su containing block es el área útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
  * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se vuelve a paginar con las suyas.</p>
@@ -58,7 +58,7 @@ public final class Paginator {
     }
 
     /**
-     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus {@code Fixed} y los del
+     * Pagina el documento: cada sección desde su primera página, con su {@link Media}, y sus {@code Page overlay} y los del
      * documento (referencia/componentes/document.md). Las referencias convergen para todo el documento a la vez.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
@@ -131,11 +131,11 @@ public final class Paginator {
 
     /**
      * Segunda fase, ya con el total de páginas: cada página con su contenido numerado ({@code {page}} y
-     * {@code {pages}}) y sus {@code Fixed}, los de su sección y, si los hereda, los del documento.
+     * {@code {pages}}) y sus {@code Page overlay}, los de su sección y, si los hereda, los del documento.
      */
     private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingAbsolute>> fixed,
                              boolean numbered) {
-        // Los Fixed del documento: los hijos de la raíz que no son una sección.
+        // Los Page overlay del documento: los hijos de la raíz que no son una sección.
         List<Box> documentFixed = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
@@ -167,7 +167,7 @@ public final class Paginator {
                         numbering.style(number), false));
             }
             if (flow.blankAfter()[k]) {
-                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Fixed
+                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Page overlay
                 // (referencia/componentes/document.md).
                 int number = pages.size() + 1;
                 Rect area = section.media().pageArea();
@@ -208,8 +208,8 @@ public final class Paginator {
     }
 
     /**
-     * Los {@code Fixed} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
-     * (referencia/componentes/relative-absolute-fixed.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
+     * Los {@code Page overlay} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
+     * (referencia/componentes/frame-and-overlays.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
      * sale en su resultado y se coloca después.
      */
     private List<Fragment> placeFixed(List<Queued> queue, Section section, boolean numbered, int printed, String page,
@@ -244,8 +244,8 @@ public final class Paginator {
         if (found != null) {
             throw new InvalidModelException(found.line(), ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
                     + (found.id() != null ? found.id() : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
-                    + "sin número (Page numbering: none): quita el marcador, o pon la sección con Inherit fixed: false "
-                    + "o el Fixed en las secciones que numeran");
+                    + "sin número (Page numbering: none): quita el marcador, o pon la sección con Inherit page overlays: false "
+                    + "o el Page overlay en las secciones que numeran");
         }
     }
 
@@ -278,7 +278,7 @@ public final class Paginator {
     /**
      * La página en que empieza cada caja referida: la de su primer fragmento (referencia/comun/referencias.md), con su
      * número impreso (referencia/componentes/document.md). Una caja que no sale en ninguna página (no debería pasar:
-     * las cajas con {@code Fixed} se rechazan al construir el árbol) o que está en una página sin número es un error.
+     * las cajas con {@code Page overlay} se rechazan al construir el árbol) o que está en una página sin número es un error.
      */
     private static Map<String, String> pagesOf(List<List<LayoutResult>> results, boolean[] blankAfter,
                                                Numbering numbering, Set<String> targets,

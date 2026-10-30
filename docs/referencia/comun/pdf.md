@@ -23,7 +23,7 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
   nivel, las listas como listas con su número de ítems, las tablas como tablas con sus cabeceras, las imágenes con `Alt`
   como figuras y un `Table of contents` como un índice.
 - **Decoración:** los fondos, los bordes, las rayas del texto, las guías de un índice, las líneas entre columnas, las
-  imágenes sin `Alt`, las filas repetidas de una tabla y todo lo que hay en un `Fixed` no se leen.
+  imágenes sin `Alt`, las filas repetidas de una tabla y todo lo que hay en un `Page overlay` no se leen.
 - **Idioma:** el `Language` de `Document` es el de todo el contenido; una caja que declara otro se lee con ese
   ([Tipografía](tipografia.md#idioma-language)).
 - **Texto que se lee:** el escrito, también con `Transform` y `Small caps`
@@ -54,13 +54,13 @@ de siempre, la línea de la caja).
 - **Un texto con opacidad** (`Color: #00000080`) se mezcla con lo que tiene debajo antes de comparar.
 - **Encima de una imagen** no se sabe qué hay debajo, así que ese texto no se comprueba, salvo que un fondo opaco tape la
   imagen.
-- Se comprueba todo el texto que se pinta, también el de un `Fixed` y el de las entradas de un índice.
+- Se comprueba todo el texto que se pinta, también el de un `Page overlay` y el de las entradas de un índice.
 
 Quien convierte puede desactivarla ([Uso desde Java](../implementacion/api.md#convertir)); por defecto está activa.
 
 > **Decisión:** el contraste se mira en lo que se pinta, no en el árbol de cajas: un texto sobre una caja que no es la suya
-> (un `Absolute` encima de un fondo) tiene debajo ese fondo. *Alternativa descartada:* mirar solo los fondos de la caja y
-> de las de fuera, que daba por blanco lo que hay debajo de un `Absolute` sobre una foto.
+> (un `Overlay` encima de un fondo) tiene debajo ese fondo. *Alternativa descartada:* mirar solo los fondos de la caja y
+> de las de fuera, que daba por blanco lo que hay debajo de un `Overlay` sobre una foto.
 
 > **Decisión:** el texto sobre una imagen no se comprueba. *Alternativa descartada:* tratarlo como un error, que impide la
 > portada con el título sobre una foto aunque se lea bien.

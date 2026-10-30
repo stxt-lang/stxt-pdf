@@ -1,4 +1,4 @@
-# Case: Relative girado más alto que el área útil: no se parte
+# Case: Frame girado más alto que el área útil: no se parte
 # Code: PAGE_OVERFLOW
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Paper: A6
 		Margin: 20
 	Section:
-		Relative:
+		Frame:
 			Rotate: 180
 			Block:
 				Box:

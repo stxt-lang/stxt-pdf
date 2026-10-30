@@ -1,6 +1,6 @@
-# Case: Página de una caja que está en un Fixed
-# Code: REFERENCE_NOT_PLACEABLE
-# Line: 16
+# Case: Sección con solo un Page overlay, que no ocupa sitio
+# Code: SECTION_EMPTY
+# Line: 15
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,7 +13,5 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Text: Ver la página {page of: pie}
-		Fixed:
+		Page overlay:
 			Text: Pie
-				Id: pie

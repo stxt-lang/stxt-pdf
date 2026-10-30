@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 0 0 0 20
 	Section:
-		Fixed:
+		Page overlay:
 			Id: foot
 			Offset: auto 0 -30 0
 			Markdown:

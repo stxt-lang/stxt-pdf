@@ -1,5 +1,5 @@
-# Case: Encabezado dentro de un Fixed
-# Code: HEADING_IN_FIXED
+# Case: Encabezado dentro de un Page overlay
+# Code: HEADING_IN_PAGE_OVERLAY
 # Line: 17
 Document (dev.stxt.pdf):
 	Language: es
@@ -13,6 +13,6 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Heading 1:
 				Text: Cabecera

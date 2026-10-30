@@ -109,7 +109,7 @@ class GridFragmentationTest {
         // Como en el flujo de bloque: el 10 % es del Height entero del grid (30).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 300", "\t\tRow sizes: 80 15",
-                "\t\tArea: 2 1", "\t\t\tRelative:", "\t\t\t\tId: R", "\t\t\t\tOffset: 10% auto auto auto",
+                "\t\tArea: 2 1", "\t\t\tFrame:", "\t\t\t\tId: R", "\t\t\t\tOffset: 10% auto auto auto",
                 "\t\t\t\tBox:", "\t\t\t\t\tHeight: 15");
         assertEquals(3, l.pages());
         assertRect(40, 150, 515, 15, l.rect(1, "R"));

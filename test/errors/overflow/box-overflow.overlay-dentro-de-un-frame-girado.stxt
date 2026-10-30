@@ -1,4 +1,4 @@
-# Case: Absolute sin girar dentro de un Relative girado que lo saca de la página
+# Case: Overlay sin girar dentro de un Frame girado que lo saca de la página
 # Code: BOX_OVERFLOW
 # Line: 16
 Document (dev.stxt.pdf):
@@ -9,11 +9,11 @@ Document (dev.stxt.pdf):
 		Height: 842
 		Margin: 40
 	Section:
-		Relative:
+		Frame:
 			Rotate: 180
 			Box:
 				Height: 100
-			Absolute:
+			Overlay:
 				Offset: 0 auto auto 0
 				Box:
 					Width: 20

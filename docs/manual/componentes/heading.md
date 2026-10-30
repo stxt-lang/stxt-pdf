@@ -106,7 +106,7 @@ el índice ([Table of contents](table-of-contents.md)). Es lo normal para el tí
 
 ## Dónde va
 
-Donde va cualquier elemento, pero no dentro de un `Fixed` (que se repite en cada página), de un ítem de una lista ni de una
+Donde va cualquier elemento, pero no dentro de un `Page overlay` (que se repite en cada página), de un ítem de una lista ni de una
 celda de una tabla.
 
 Más detalle en la [referencia](../../referencia/componentes/heading.md).

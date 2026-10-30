@@ -1,4 +1,4 @@
-# Case: Fixed que se sale por abajo
+# Case: Page overlay que se sale por abajo
 # Code: BOX_OVERFLOW
 # Line: 13
 Document (dev.stxt.pdf):
@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Block:
-		Fixed:
+		Page overlay:
 			Offset: 830 auto auto 0
 			Box:
 				Width: 50

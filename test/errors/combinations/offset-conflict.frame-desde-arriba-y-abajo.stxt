@@ -1,6 +1,6 @@
-# Case: Cortes en un Absolute
-# Code: CHILD_NOT_DECLARED
-# Line: 14
+# Case: Frame desde arriba y abajo
+# Code: OFFSET_CONFLICT
+# Line: 12
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -8,8 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Absolute:
+		Frame:
+			Offset: 5 auto 9 auto
 			Box:
 				Height: 10
-			Break:
-				Before: page

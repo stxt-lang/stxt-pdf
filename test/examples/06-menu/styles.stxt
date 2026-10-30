@@ -27,7 +27,7 @@ Styles (dev.stxt.pdf):
 			Letter spacing: 2
 		Box:
 			Margin: 16 0 9 0
-	For element: Fixed
+	For element: Page overlay
 		Typography:
 			Color: #776F64
 	For style: name

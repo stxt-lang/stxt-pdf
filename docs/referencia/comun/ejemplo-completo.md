@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For element: Fixed
+		For element: Page overlay
 			Box:
 				Height: 20
 			Typography:
@@ -43,13 +43,13 @@ Document (dev.stxt.pdf):
 			Break:
 				After: avoid
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Offset: -30 0 auto 0
 			Typography:
 				Color: #5F5E5A
 			Text: Informe trimestral
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -30 0
 			Text: Página {page} de {pages}
@@ -76,7 +76,7 @@ Document (dev.stxt.pdf):
 						dentro del bloque equivalen a espacios.
 
 						Una línea en blanco empieza un párrafo nuevo.
-		Absolute:
+		Overlay:
 			Id: stamp
 			Offset: 0 0 auto auto
 			Box:
@@ -97,17 +97,17 @@ Document (dev.stxt.pdf):
 - **Fuentes:** la regla `For element: Document` declara `Font` y `Size`, que heredan todas las cajas. El título
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
-- **Reglas** ([Styles](estilos.md)): `For element: Fixed` da a la cabecera y
+- **Reglas** ([Styles](estilos.md)): `For element: Page overlay` da a la cabecera y
   al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `For element: Text` justifica todos los
   textos; en los de una sola línea (título, cabecera) no se nota, porque la última línea de un
   párrafo no se justifica. El pie y el sello lo sobrescriben con su propio `Align`, y el estilo
   `panel` de `side` lo devuelve a `left`: una regla `For style` gana a la de `For element`. La
   regla `For id: title` lleva todo el estilo del título, que en el documento solo declara su
   texto y su `Id`. El resultado es el mismo que si cada elemento declarase esas propiedades.
-- **`header`** (`Fixed`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
+- **`header`** (`Page overlay`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.
-- **`footer`** (`Fixed`): abajo −30 con alto 20 da arriba = 762 + 30 − 20 = 772, es decir,
+- **`footer`** (`Page overlay`): abajo −30 con alto 20 da arriba = 762 + 30 − 20 = 772, es decir,
   y = 40 + 772 = **812**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
   en cada página.
 - **`title`**: primer elemento en flujo, en y = **40**, con una línea de 24 pt. Su margen
@@ -118,6 +118,6 @@ Document (dev.stxt.pdf):
   cada columna: `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**. `side` no se
   parte (`Inside: avoid`); `main` puede partirse entre páginas respetando viudas y
   huérfanas (2 por defecto).
-- **`stamp`** (`Absolute`): no hay ancestro posicionado, así que su contenedor de referencia es el
+- **`stamp`** (`Overlay`): no hay ancestro posicionado, así que su contenedor de referencia es el
   área útil. Arriba 0 y derecha 0 con ancho 80 la anclan a la esquina superior derecha:
   x = 40 + 515 − 80 = **475**, y = **40**. Con `Layer: 1` se pinta por encima del título.

@@ -22,7 +22,7 @@ class PageNumbersTest {
     private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
 
     /** Pie fijo; el {@code Id} está en su {@code Text}, que ocupa todo el ancho del pie. */
-    private static final String[] FOOTER = {"\tFixed:", "\t\tOffset: auto 0 -30 0", "\t\tBox:", "\t\t\tHeight: 20",
+    private static final String[] FOOTER = {"\tPage overlay:", "\t\tOffset: auto 0 -30 0", "\t\tBox:", "\t\t\tHeight: 20",
             "\t\tTypography:", "\t\t\tAlign: right",
             "\t\tText: Página {page} de {pages}", "\t\t\tId: footer"};
 
@@ -60,7 +60,7 @@ class PageNumbersTest {
         // A ocupa 100 páginas. El pie mide 35 pt (7 caracteres): "Hoja 00" cabe, pero "Hoja 100"
         // no. Al repaginar reservando tres cifras, el número pasa a su propia línea.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tFixed:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
+                "\tPage overlay:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
                 "\t\tText: Hoja {page}", "\t\t\tId: footer",
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10000");
         assertEquals(100, l.pages());
@@ -76,7 +76,7 @@ class PageNumbersTest {
         // A ocupa 8 páginas, numeradas en romanos. El pie mide 35 pt (7 caracteres): "Hoja 00" cabe, pero "Hoja viii"
         // no. Al repaginar reservando cuatro letras (las de viii), el número pasa a su propia línea.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tFixed:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
+                "\tPage overlay:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
                 "\t\tText: Hoja {page}", "\t\t\tId: footer",
                 "\tSection:", "\t\tPage number format: lower-roman",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 800");

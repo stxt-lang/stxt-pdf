@@ -1,6 +1,6 @@
-# Case: Isolate en un ítem de Flex, que ya corta el colapso de márgenes
-# Code: ISOLATE_IN_ITEM
-# Line: 19
+# Case: Página de una caja que está en un Page overlay
+# Code: REFERENCE_NOT_PLACEABLE
+# Line: 16
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,8 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
-			Item:
-				Block:
-					Isolate: true
-					Text: Hola
+		Text: Ver la página {page of: pie}
+		Page overlay:
+			Text: Pie
+				Id: pie

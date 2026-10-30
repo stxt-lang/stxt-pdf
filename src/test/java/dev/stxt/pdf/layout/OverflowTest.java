@@ -112,7 +112,7 @@ class OverflowTest {
     @Test
     void aRotatedBoxDoesNotBreak() {
         InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOutPaged(PAGE, "\tRelative:", "\t\tId: R", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 120")));
+                () -> layOutPaged(PAGE, "\tFrame:", "\t\tId: R", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 120")));
         assertContains("La caja R (línea", e);
         assertContains("está girada, así que no se parte entre páginas, y no cabe en una: mide 120 de alto y llega 20 "
                 + "más allá del área útil", e);
@@ -121,13 +121,13 @@ class OverflowTest {
     @Test
     void rotatedBoxesOutsideThePage() {
         InvalidModelException own = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOut("\tRelative:", "\t\tId: R", "\t\tRotate: -30", "\t\tRotate origin: bottom left",
+                () -> layOut("\tFrame:", "\t\tId: R", "\t\tRotate: -30", "\t\tRotate origin: bottom left",
                         "\t\tBox:", "\t\t\tHeight: 40")));
         assertContains("La caja R (línea", own);
         assertContains("girada se sale de la página: revisa su Rotate, su Rotate origin, su posición", own);
         InvalidModelException inside = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOut("\tRelative:", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 100",
-                        "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 20",
+                () -> layOut("\tFrame:", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 100",
+                        "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                         "\t\t\t\tHeight: 150")));
         assertContains("La caja A (línea", inside);
         // Sin «su su»: lo que hay que revisar empieza por «su» en los dos casos.
@@ -151,7 +151,7 @@ class OverflowTest {
 
     /**
      * El Flex tiene 10 de relleno (su contenido mide 495) y un primer ítem de 20: R empieza en 30 y su contenido en 40;
-     * S, un Relative desplazado 60 (que no cuenta), ocupa de 44 a 504, dentro de la página: la culpable es R.
+     * S, un Frame desplazado 60 (que no cuenta), ocupa de 44 a 504, dentro de la página: la culpable es R.
      */
     @Test
     void tooWideMeasuresFromTheContainerAndIgnoresRelativeOffsets() {
@@ -160,7 +160,7 @@ class OverflowTest {
                 "\t\tItem:", "\t\t\tShrink: 0", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 20", "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBasis: 600", "\t\t\tShrink: 0",
                 "\t\t\tBlock:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 4", "\t\t\t\t\tPadding: 6",
-                "\t\t\t\tRelative:", "\t\t\t\t\tId: S", "\t\t\t\t\tOffset: auto auto auto 60", "\t\t\t\t\tBox:",
+                "\t\t\t\tFrame:", "\t\t\t\t\tId: S", "\t\t\t\t\tOffset: auto auto auto 60", "\t\t\t\t\tBox:",
                 "\t\t\t\t\t\tWidth: 460", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tMargin: 0 0 0 4")));
         assertContains("La caja R (línea", e);
         assertContains("mide 600 y el contenido de su contenedor mide 495", e);
@@ -178,7 +178,7 @@ class OverflowTest {
     }
 
     /**
-     * T va en un Relative desplazado 8 hacia abajo dentro de P: el desbordamiento se mide en su sitio, sin el
+     * T va en un Frame desplazado 8 hacia abajo dentro de P: el desbordamiento se mide en su sitio, sin el
      * desplazamiento (referencia/comun/desbordamiento.md), así que la línea de 120 acaba en 10 + 120 = 130, 30 más
      * allá.
      */
@@ -186,7 +186,7 @@ class OverflowTest {
     void pageOverflowIgnoresRelativeOffsets() {
         InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
-                        "\t\tRelative:", "\t\t\tOffset: 8 auto auto auto",
+                        "\t\tFrame:", "\t\t\tOffset: 8 auto auto auto",
                         "\t\t\tText: a", "\t\t\t\tId: T", "\t\t\t\tTypography:", "\t\t\t\t\tLine height: 120")));
         assertContains("La caja T (línea", e);
         assertContains("llega 30 más allá del área útil", e);

@@ -1,4 +1,4 @@
-# Case: Regla que aplica Break a un Absolute
+# Case: Regla que aplica Break a un Overlay
 # Code: STYLE_NOT_ALLOWED
 # Line: 14
 Document (dev.stxt.pdf):
@@ -14,5 +14,5 @@ Document (dev.stxt.pdf):
 			Break:
 				Before: page
 	Section:
-		Absolute:
+		Overlay:
 			Style: page

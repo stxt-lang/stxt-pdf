@@ -28,7 +28,7 @@ Un porcentaje es una parte de otra medida, casi siempre de su contenedor de refe
 - `Line height` es del tamaño de la fuente de la propia caja.
 
 **Un alto que se conoce** es el del área útil de la página, el de una caja con `Height` en puntos (o en porcentaje de otro
-alto que se conoce) y el de algunas cajas que se estiran (un `Absolute` anclado arriba y abajo, una celda de `Grid`). El alto
+alto que se conoce) y el de algunas cajas que se estiran (un `Overlay` anclado arriba y abajo, una celda de `Grid`). El alto
 de una caja que mide lo que su contenido no se conoce antes de maquetarla, así que un `Height: 50%` dentro de ella es un
 error. Si necesitas el porcentaje, da un `Height` al contenedor.
 

@@ -20,7 +20,7 @@ class BoxTest {
 
     /** Un bloque con una lista numerada y una caja fuera de flujo. */
     private static final String[] BLOCK = {"\tBlock:", "\t\tList:", "\t\t\tMarker: decimal", "\t\t\tList item:",
-            "\t\t\t\tParagraph: Uno", "\t\tAbsolute:", "\t\t\tText: fuera"};
+            "\t\t\t\tParagraph: Uno", "\t\tOverlay:", "\t\t\tText: fuera"};
 
     private static BoxTreeBuilder.Result build(String... lines) {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"

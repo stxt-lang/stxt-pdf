@@ -23,7 +23,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
    reglas de `Styles`, comprueba las reglas que el schema no puede expresar y cierra el árbol, que desde ahí es de solo
    lectura.
 3. **Maquetar.** `Engine` despacha cada caja a su algoritmo de layout; el `Paginator` reparte cada sección en páginas,
-   repite la paginación hasta que las referencias convergen y coloca los `Fixed`. `Overflow` comprueba que nada desborda.
+   repite la paginación hasta que las referencias convergen y coloca los `Page overlay`. `Overflow` comprueba que nada desborda.
    El resultado es un `LaidOutDocument`: una lista de `Page` con su árbol de `Fragment`.
 4. **Pintar.** `StackingContext` recorre los fragmentos de cada página en orden de pintado y llama a un `Canvas`:
    `PdfCanvas` escribe el PDF (con su etiquetado, marcadores y enlaces) y `SvgCanvas`, el SVG de depuración.
@@ -85,7 +85,7 @@ nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`ConstraintSpace`** y **`LayoutResult`**: la entrada y la salida inmutables del layout de una caja. El resultado lleva
   el `Fragment`, el `BreakToken` para continuar en la página siguiente y la calidad del corte.
 - **`Paginator`**: reparte cada sección en páginas, hace converger las referencias, numera las páginas y coloca los
-  `Fixed`.
+  `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas), `FlexResolver`, `TrackSizing` y `Placement` (grid),
   `Columns` (multicolumna), `AbsoluteEquation`, `UnitBreaker` (cortes de flex, grid y tablas), `Slice` (alto, borde y

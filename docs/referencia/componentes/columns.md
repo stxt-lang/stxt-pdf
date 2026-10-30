@@ -46,7 +46,7 @@ Las columnas se reparten el ancho que dejan los huecos: miden `(W − (n − 1) 
 
 Dentro de las columnas los hijos se apilan en flujo de bloque ([Block](block.md#el-flujo-de-bloque)): cada columna es un
 contexto de formato de bloque, así que los márgenes de dentro no salen del `Columns`. Admite todos los elementos en flujo;
-un `Absolute` o un `Fixed` dentro de un `Columns`, a cualquier profundidad, es un error (`POSITIONED_IN_COLUMNS`). El
+un `Overlay` o un `Page overlay` dentro de un `Columns`, a cualquier profundidad, es un error (`OVERLAY_IN_COLUMNS`). El
 alto de las columnas no es definido: un porcentaje vertical de dentro es un error (`INDEFINITE_PERCENTAGE`), aunque el
 `Columns` tenga `Height`.
 
@@ -68,7 +68,7 @@ que le queda de él:
 3. El `Columns` mide en esa página lo que su columna más alta (con `Height`, lo de cualquier caja con alto definido,
    [Cortes](../comun/cortes.md#alto-definido-y-cortes)).
 
-Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Flex` o de `Grid`, o que está en un `Absolute`) no
+Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Flex` o de `Grid`, o que está en un `Overlay`) no
 hay alto que llenar: las columnas se equilibran siempre, también con `Balance: false`.
 
 > **Decisión:** el equilibrado no incumple reglas que el reparto en orden respeta: un bloque con `Inside: avoid` no se
@@ -118,4 +118,4 @@ El contenido se lee en orden, de columna en columna; la línea entre columnas no
 
 - Contenido que ocupe todas las columnas a la vez (un título a lo ancho en medio): se parte el `Columns` en dos.
 - Equilibrar todas las páginas, no solo la última, y líneas entre columnas con estilo.
-- `Absolute` y `Fixed` dentro de las columnas.
+- `Overlay` y `Page overlay` dentro de las columnas.

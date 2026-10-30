@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Relative:
+		Frame:
 			Rotate: 0
 			Box:
 				Height: 10

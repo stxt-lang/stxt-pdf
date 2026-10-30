@@ -118,7 +118,7 @@ class PageReferencesTest {
     @Test
     void referencesInAFixedBoxUseTheSamePageOnEveryPage() {
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFixed:", "\t\tText: Índice en la {page of: toc}", "\t\t\tId: head"},
+                new String[]{"\tPage overlay:", "\t\tText: Índice en la {page of: toc}", "\t\t\tId: head"},
                 fullPages(1),
                 new String[]{"\tBlock:", "\t\tId: toc", "\t\tBox:", "\t\t\tHeight: 10"}));
         assertEquals(2, l.pages());

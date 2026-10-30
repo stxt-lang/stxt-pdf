@@ -21,7 +21,7 @@ class PositioningTest {
     void relativeShiftsWithoutMovingSiblings() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
-                "\tRelative:", "\t\tId: R", "\t\tOffset: 5 auto auto 10", "\t\tBox:", "\t\t\tHeight: 20",
+                "\tFrame:", "\t\tId: R", "\t\tOffset: 5 auto auto 10", "\t\tBox:", "\t\t\tHeight: 20",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 10");
         assertRect(40, 40, 515, 10, l.rect("A"));
         assertRect(50, 55, 515, 20, l.rect("R"));
@@ -32,8 +32,8 @@ class PositioningTest {
     void relativeOffsets() {
         // Arriba y abajo, o izquierda y derecha, a la vez son un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tId: start", "\t\tOffset: 5 auto auto 11", "\t\tBox:", "\t\t\tHeight: 20",
-                "\tRelative:", "\t\tId: endOnly", "\t\tOffset: auto 7 9 auto", "\t\tBox:", "\t\t\tHeight: 20");
+                "\tFrame:", "\t\tId: start", "\t\tOffset: 5 auto auto 11", "\t\tBox:", "\t\t\tHeight: 20",
+                "\tFrame:", "\t\tId: endOnly", "\t\tOffset: auto 7 9 auto", "\t\tBox:", "\t\t\tHeight: 20");
         assertRect(51, 45, 515, 20, l.rect("start"));
         assertRect(33, 51, 515, 20, l.rect("endOnly"));
     }
@@ -43,9 +43,9 @@ class PositioningTest {
         // Izquierda: 10 % de 515. Arriba: 10 % del alto del padre (200). Un porcentaje vertical
         // con el alto del padre indefinido es un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tId: top", "\t\tOffset: auto auto auto 10%", "\t\tBox:", "\t\t\tHeight: 20",
+                "\tFrame:", "\t\tId: top", "\t\tOffset: auto auto auto 10%", "\t\tBox:", "\t\t\tHeight: 20",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
-                "\t\tRelative:", "\t\t\tId: inner", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
+                "\t\tFrame:", "\t\t\tId: inner", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
                 "\t\t\t\tHeight: 10");
         assertRect(91.5, 40, 515, 20, l.rect("top"));
         assertRect(40, 80, 515, 10, l.rect("inner"));
@@ -56,9 +56,9 @@ class PositioningTest {
         // El área útil mide 515 × 762 desde (40, 40), sea cual sea el alto del flujo.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\tAbsolute:", "\t\tId: S", "\t\tOffset: 0 0 auto auto", "\t\tBox:", "\t\t\tWidth: 80",
+                "\tOverlay:", "\t\tId: S", "\t\tOffset: 0 0 auto auto", "\t\tBox:", "\t\t\tWidth: 80",
                 "\t\t\tHeight: 30",
-                "\tAbsolute:", "\t\tId: F", "\t\tOffset: auto 0 0 auto", "\t\tBox:", "\t\t\tWidth: 80",
+                "\tOverlay:", "\t\tId: F", "\t\tOffset: auto 0 0 auto", "\t\tBox:", "\t\t\tWidth: 80",
                 "\t\t\tHeight: 30");
         assertRect(475, 40, 80, 30, l.rect("S"));
         assertRect(475, 772, 80, 30, l.rect("F"));
@@ -68,10 +68,10 @@ class PositioningTest {
     void containingBlockIsThePaddingBoxOfThePositionedAncestor() {
         // Caja de relleno de R: (42, 42), 511 × 96.
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tId: R", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 10",
-                "\t\tAbsolute:", "\t\t\tId: TL", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\tFrame:", "\t\tId: R", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 10",
+                "\t\tOverlay:", "\t\t\tId: TL", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\t\t\tHeight: 20",
-                "\t\tAbsolute:", "\t\t\tId: BR", "\t\t\tOffset: auto 0 0 auto", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\t\tOverlay:", "\t\t\tId: BR", "\t\t\tOffset: auto 0 0 auto", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\t\t\tHeight: 20");
         assertRect(40, 40, 515, 100, l.rect("R"));
         assertRect(42, 42, 50, 20, l.rect("TL"));
@@ -81,8 +81,8 @@ class PositioningTest {
     @Test
     void absoluteBoxesDoNotContributeToTheParentHeight() {
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tId: R",
-                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 50");
+                "\tFrame:", "\t\tId: R",
+                "\t\tOverlay:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 50");
         assertRect(40, 40, 515, 0, l.rect("R"));
         assertRect(40, 40, 10, 50, l.rect("A"));
     }
@@ -91,10 +91,10 @@ class PositioningTest {
     void staticPositionAndShrinkToFit() {
         // A estaría en la caja de contenido de M: (40 + 5, 40 + 10 + 5). Su texto mide 30.
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tId: R",
+                "\tFrame:", "\t\tId: R",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tPadding: 5",
-                "\t\t\tAbsolute:", "\t\t\t\tId: A",
+                "\t\t\tOverlay:", "\t\t\t\tId: A",
                 "\t\t\t\tText: aaa bb");
         assertRect(40, 40, 515, 20, l.rect("R"));
         assertRect(45, 55, 30, 12, l.rect("A"));
@@ -103,16 +103,16 @@ class PositioningTest {
     @Test
     void autoSizeStretchesBetweenOffsets() {
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\t\tAbsolute:", "\t\t\tId: S", "\t\t\tOffset: 10 20 30 15");
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\tOverlay:", "\t\t\tId: S", "\t\t\tOffset: 10 20 30 15");
         assertRect(55, 50, 480, 60, l.rect("S"));
     }
 
     @Test
     void autoMarginsCenter() {
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 200",
-                "\t\tAbsolute:", "\t\t\tId: C", "\t\t\tOffset: 0", "\t\t\tBox:", "\t\t\t\tWidth: 100",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 200",
+                "\t\tOverlay:", "\t\t\tId: C", "\t\t\tOffset: 0", "\t\t\tBox:", "\t\t\t\tWidth: 100",
                 "\t\t\t\tHeight: 50", "\t\t\t\tMargin: auto");
         assertRect(247.5, 115, 100, 50, l.rect("C"));
     }
@@ -121,8 +121,8 @@ class PositioningTest {
     void minAndMaxWidthLimitTheAutomaticWidth() {
         // El máximo convierte el estiramiento en un ancho fijo: sobre-restringida, se ignora la derecha.
         LayoutFixture l = layOut(
-                "\tAbsolute:", "\t\tId: min", "\t\tBox:", "\t\t\tMin width: 100",
-                "\t\tText: aaa", "\tAbsolute:", "\t\tId: max", "\t\tOffset: 0 0 auto 0", "\t\tBox:",
+                "\tOverlay:", "\t\tId: min", "\t\tBox:", "\t\t\tMin width: 100",
+                "\t\tText: aaa", "\tOverlay:", "\t\tId: max", "\t\tOffset: 0 0 auto 0", "\t\tBox:",
                 "\t\t\tMax width: 200", "\t\t\tHeight: 10");
         assertRect(40, 40, 100, 12, l.rect("min"));
         assertRect(40, 40, 200, 10, l.rect("max"));
@@ -131,8 +131,8 @@ class PositioningTest {
     @Test
     void percentagesUseTheContainingBlock() {
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 100",
-                "\t\tAbsolute:", "\t\t\tId: P", "\t\t\tOffset: 50% auto auto 25%", "\t\t\tBox:", "\t\t\t\tWidth: 50%",
+                "\tFrame:", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 100",
+                "\t\tOverlay:", "\t\t\tId: P", "\t\t\tOffset: 50% auto auto 25%", "\t\t\tBox:", "\t\t\t\tWidth: 50%",
                 "\t\t\t\tHeight: 10%");
         assertRect(90, 90, 100, 10, l.rect("P"));
     }
@@ -140,8 +140,8 @@ class PositioningTest {
     @Test
     void absoluteMovesWithItsRelativeContainingBlock() {
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tOffset: 10 auto auto 20", "\t\tBox:", "\t\t\tHeight: 50",
-                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\tFrame:", "\t\tOffset: 10 auto auto 20", "\t\tBox:", "\t\t\tHeight: 50",
+                "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 10",
                 "\t\t\t\tHeight: 10");
         assertRect(60, 50, 10, 10, l.rect("A"));
     }
@@ -150,10 +150,10 @@ class PositioningTest {
     void nestedAbsoluteUsesTheNearestPositionedAncestor() {
         // B es absolute y por tanto containing block de C, aunque esté dentro de R.
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\t\tAbsolute:", "\t\t\tId: B", "\t\t\tOffset: 10 auto auto 10", "\t\t\tBox:", "\t\t\t\tWidth: 100",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\tOverlay:", "\t\t\tId: B", "\t\t\tOffset: 10 auto auto 10", "\t\t\tBox:", "\t\t\t\tWidth: 100",
                 "\t\t\t\tHeight: 50", "\t\t\t\tBorder: 1",
-                "\t\t\tAbsolute:", "\t\t\t\tId: C", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
+                "\t\t\tOverlay:", "\t\t\t\tId: C", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10");
         assertRect(50, 50, 100, 50, l.rect("B"));
         assertRect(139, 89, 10, 10, l.rect("C"));
@@ -163,7 +163,7 @@ class PositioningTest {
     void fixedUsesThePageArea() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\tFixed:", "\t\tId: F", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 20");
+                "\tPage overlay:", "\t\tId: F", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 20");
         assertRect(40, 782, 515, 20, l.rect("F"));
     }
 
@@ -172,34 +172,34 @@ class PositioningTest {
         // G no tiene desplazamientos: queda en su posición estática, en la caja de contenido de R.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 30",
-                "\tRelative:", "\t\tBox:", "\t\t\tPadding: 10", "\t\t\tHeight: 100",
-                "\t\tFixed:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\tFrame:", "\t\tBox:", "\t\t\tPadding: 10", "\t\t\tHeight: 100",
+                "\t\tPage overlay:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 10",
                 "\t\t\t\tHeight: 10",
-                "\t\tFixed:", "\t\t\tId: G", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
+                "\t\tPage overlay:", "\t\t\tId: G", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
         assertRect(40, 40, 10, 10, l.rect("F"));
         assertRect(50, 80, 10, 10, l.rect("G"));
     }
 
     // Casos que faltaban según las pruebas de mutación: el borde y el relleno de las cajas
-    // entre un Absolute y su containing block, en un bloque, un ítem flex y un área de grid.
+    // entre un Overlay y su containing block, en un bloque, un ítem flex y un área de grid.
 
     @Test
     void staticPositionInsideABorderedBox() {
         // La caja de contenido de M empieza en (40 + 3 + 5, 40 + 3 + 5).
-        String inner = "\t\t\tBox:\n\t\t\t\tBorder: 3\n\t\t\t\tPadding: 5\n\t\t\tAbsolute:\n\t\t\t\tId: %s\n"
+        String inner = "\t\t\tBox:\n\t\t\t\tBorder: 3\n\t\t\t\tPadding: 5\n\t\t\tOverlay:\n\t\t\t\tId: %s\n"
                 + "\t\t\t\tText: aaa";
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBlock:", inner.formatted("A"));
+                "\tFrame:", "\t\tBlock:", inner.formatted("A"));
         assertRect(48, 48, 15, 12, l.rect("A"));
     }
 
     @Test
     void staticPositionInsideABorderedFlexItemAndGridArea() {
-        String inner = "\t\t\t\t\tBox:\n\t\t\t\t\t\tBorder: 3\n\t\t\t\t\t\tPadding: 5\n\t\t\t\t\tAbsolute:\n"
+        String inner = "\t\t\t\t\tBox:\n\t\t\t\t\t\tBorder: 3\n\t\t\t\t\t\tPadding: 5\n\t\t\t\t\tOverlay:\n"
                 + "\t\t\t\t\t\tId: %s\n\t\t\t\t\t\tText: aaa";
-        LayoutFixture flex = layOut("\tRelative:", "\t\tFlex:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
+        LayoutFixture flex = layOut("\tFrame:", "\t\tFlex:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
         assertRect(48, 48, 15, 12, flex.rect("F"));
-        LayoutFixture grid = layOut("\tRelative:", "\t\tGrid:", "\t\t\tColumn sizes: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
+        LayoutFixture grid = layOut("\tFrame:", "\t\tGrid:", "\t\t\tColumn sizes: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
                 inner.formatted("G"));
         assertRect(48, 48, 15, 12, grid.rect("G"));
     }
@@ -209,8 +209,8 @@ class PositioningTest {
         // La caja de relleno de R empieza en (42, 42); A sale 42 por la izquierda y por arriba, hasta la esquina de la
         // página (0, 0), y no más: no es un desbordamiento (referencia/comun/desbordamiento.md).
         LayoutFixture l = layOut(
-                "\tRelative:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
-                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tOffset: -42 auto auto -42", "\t\t\tBox:", "\t\t\t\tWidth: 20",
+                "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
+                "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: -42 auto auto -42", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                 "\t\t\t\tHeight: 20");
         assertRect(0, 0, 20, 20, l.rect("A"));
     }
@@ -218,26 +218,26 @@ class PositioningTest {
     @Test
     void staticPositionInsideAContainingBlockWithPadding() {
         // Sin Offset, A va en la caja de contenido de R: (40 + 3 + 7, 40 + 3 + 7).
-        LayoutFixture l = layOut("\tRelative:", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
-                "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tText: aaa");
+        LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
+                "\t\tOverlay:", "\t\t\tId: A", "\t\t\tText: aaa");
         assertRect(50, 50, 15, 12, l.rect("A"));
     }
 
     @Test
     void staticPositionAfterABottomMargin() {
         // Detrás de un bloque de 10 con 6 de margen inferior: (40, 40 + 10 + 6).
-        LayoutFixture l = layOut("\tRelative:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
-                "\t\t\t\tMargin: 0 0 6 0", "\t\tAbsolute:", "\t\t\tId: A", "\t\t\tText: aaa");
+        LayoutFixture l = layOut("\tFrame:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
+                "\t\t\t\tMargin: 0 0 6 0", "\t\tOverlay:", "\t\t\tId: A", "\t\t\tText: aaa");
         assertRect(40, 56, 15, 12, l.rect("A"));
     }
 
     @Test
     void shrinkToFitAndStretchLeaveTheMargins() {
         // F: el texto mide 30 (max-content), entre 10 de margen a cada lado. S: 100 − 10 − 20 − 5 − 7 de alto.
-        LayoutFixture l = layOut("\tRelative:", "\t\tBox:", "\t\t\tHeight: 100",
-                "\t\tAbsolute:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tMargin: 0 10",
+        LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
+                "\t\tOverlay:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tMargin: 0 10",
                 "\t\t\tText: aaa bb",
-                "\t\tAbsolute:", "\t\t\tId: S", "\t\t\tOffset: 10 auto 20 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\t\tOverlay:", "\t\t\tId: S", "\t\t\tOffset: 10 auto 20 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\t\t\tMargin: 5 0 7 0");
         assertRect(50, 40, 30, 12, l.rect("F"));
         assertRect(40, 55, 50, 58, l.rect("S"));
@@ -246,9 +246,9 @@ class PositioningTest {
     @Test
     void aFixedInsideABorderedAbsoluteStartsInItsContentBox() {
         // A, en (50, 50), tiene 3 de borde y 7 de relleno: F, sin Offset, empieza en (60, 60).
-        LayoutFixture l = layOut("\tAbsolute:", "\t\tOffset: 10 auto auto 10", "\t\tBox:", "\t\t\tWidth: 100",
+        LayoutFixture l = layOut("\tOverlay:", "\t\tOffset: 10 auto auto 10", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 50", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
-                "\t\tFixed:", "\t\t\tId: F", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
+                "\t\tPage overlay:", "\t\t\tId: F", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
         assertRect(60, 60, 10, 10, l.rect("F"));
     }
 

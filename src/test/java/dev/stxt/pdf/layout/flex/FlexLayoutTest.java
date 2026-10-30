@@ -272,12 +272,12 @@ class FlexLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                // Un flex posicionado: Relative con el relleno y, dentro, el Flex con el alto.
-                "\tRelative:", "\t\tBox:", "\t\t\tPadding: 5",
+                // Un flex posicionado: Frame con el relleno y, dentro, el Flex con el alto.
+                "\tFrame:", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tFlex:", "\t\t\tBox:", "\t\t\t\tHeight: 40",
-                "\t\t\tItem:", "\t\t\t\tRelative:", "\t\t\t\t\tId: R", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100",
+                "\t\t\tItem:", "\t\t\t\tFrame:", "\t\t\t\t\tId: R", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tOffset: 3 auto auto 4",
-                "\t\t\tAbsolute:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
+                "\t\t\tOverlay:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
                 "\t\t\tItem:", "\t\t\t\tBlock:", "\t\t\t\t\tId: B", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100");
         assertRect(49, 48, 100, 40, l.rect("R"));

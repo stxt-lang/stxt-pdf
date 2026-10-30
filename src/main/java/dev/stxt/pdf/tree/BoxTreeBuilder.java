@@ -79,7 +79,7 @@ public final class BoxTreeBuilder {
             "foot", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
 
     /**
-     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Fixed} y sus secciones
+     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Page overlay} y sus secciones
      * (referencia/componentes/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
      * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
      */
@@ -141,7 +141,7 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(root, true);
         List<Section> sections = new ArrayList<>();
         for (Node h : document.getChildren()) {
-            if (h.getCanonicalName().equals("fixed")) {
+            if (h.getCanonicalName().equals("page-overlay")) {
                 root.addChild(element(ctx, inline(h), root, null, null));
             } else if (h.getCanonicalName().equals("section")) {
                 Section section = section(ctx, inline(h), root, documentMedia, sections.isEmpty());
@@ -161,7 +161,7 @@ public final class BoxTreeBuilder {
 
     /**
      * Una {@code Section} (referencia/componentes/document.md): su caja, que es la raíz de su layout y tiene el alto de
-     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
+     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Page overlay} que lleva.
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia,
                             boolean first) {
@@ -191,7 +191,7 @@ public final class BoxTreeBuilder {
                     start = positiveInteger(p);
                     startNode = p;
                 }
-                case "inherit-fixed" -> inheritFixed = bool(p);
+                case "inherit-page-overlays" -> inheritFixed = bool(p);
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {
@@ -217,7 +217,7 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
         if (box.children().stream().allMatch(c -> c.style().position() == Position.FIXED)) {
-            throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
+            throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Page overlay no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
         return new Section(box, media.media(), numbering, pageStyle, start, inheritFixed, beginOn);
@@ -299,7 +299,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate} en un ítem de {@code Flex} o {@code
+     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Contain margins} en un ítem de {@code Flex} o {@code
      * Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row} de una
      * celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se mira
      * aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
@@ -307,7 +307,7 @@ public final class BoxTreeBuilder {
     private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
         boolean item = wrapper != null && !is(wrapper, "row");
         if (item && s.isolate()) {
-            throw error(s.line("isolate"), ErrorCode.ISOLATE_IN_ITEM, "Isolate no tiene efecto en un ítem de "
+            throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ITEM, "Contain margins no tiene efecto en un ítem de "
                     + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo");
         }
         if (ctx.unbreakable == null) {
@@ -326,9 +326,9 @@ public final class BoxTreeBuilder {
     /** Cómo se nombra la caja en los mensajes si no se parte entre páginas, o {@code null} si se parte. */
     private static String unbreakable(Style s) {
         return switch (s.position()) {
-            case ABSOLUTE -> "un Absolute";
-            case FIXED -> "un Fixed";
-            case RELATIVE -> s.rotation() != null ? "un Relative girado" : null;
+            case ABSOLUTE -> "un Overlay";
+            case FIXED -> "un Page overlay";
+            case RELATIVE -> s.rotation() != null ? "un Frame girado" : null;
             default -> s.rotatesInFlow() ? "una caja girada" : null;
         };
     }
@@ -339,7 +339,7 @@ public final class BoxTreeBuilder {
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideMulticol && kind.position() != Position.STATIC && kind.position() != Position.RELATIVE) {
-            throw error(n, ErrorCode.POSITIONED_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
+            throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
                     + "Columns: su posición no depende de las columnas; sácalo del Columns");
         }
         if (kind.headingLevel() > 0) {
@@ -409,13 +409,13 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Fixed} y sin
+     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Page overlay} y sin
      * saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
      * como mucho un nivel respecto al anterior.
      */
     private static void heading(BuildContext ctx, InlineNode n, int level) {
         if (ctx.insideFixed) {
-            throw error(n, ErrorCode.HEADING_IN_FIXED, "Un " + n.getName() + " no puede estar dentro de un Fixed, "
+            throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "Un " + n.getName() + " no puede estar dentro de un Page overlay, "
                     + "que se repite en cada página y no forma parte del contenido: usa un Text");
         }
         if (level > ctx.headingLevel + 1) {

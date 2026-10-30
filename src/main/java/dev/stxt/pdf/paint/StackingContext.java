@@ -80,7 +80,7 @@ public final class StackingContext {
     private record Frame(Piece piece, boolean clip) {
     }
 
-    /** Los marcos sin los recortes: lo que hereda un {@code Absolute}, que no recortan las cajas de fuera. */
+    /** Los marcos sin los recortes: lo que hereda un {@code Overlay}, que no recortan las cajas de fuera. */
     private static List<Frame> turnsOnly(List<Frame> frames) {
         return frames.stream().filter(f -> !f.clip()).toList();
     }
@@ -131,8 +131,8 @@ public final class StackingContext {
     }
 
     /**
-     * Reparte los descendientes de {@code parent}. Los de su flujo, también un {@code Relative} o un ítem con {@code
-     * Layer}, heredan sus giros y sus recortes; un {@code Absolute}, solo sus giros; un {@code Fixed}, nada.
+     * Reparte los descendientes de {@code parent}. Los de su flujo, también un {@code Frame} o un ítem con {@code
+     * Layer}, heredan sus giros y sus recortes; un {@code Overlay}, solo sus giros; un {@code Page overlay}, nada.
      */
     private void walkChildren(Piece parent) {
         Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
@@ -190,7 +190,7 @@ public final class StackingContext {
             i++;
         }
         if (i == 0) {
-            // Raíces distintas: un Fixed del documento y uno de una sección, que es la raíz de su layout
+            // Raíces distintas: un Page overlay del documento y uno de una sección, que es la raíz de su layout
             // (referencia/componentes/document.md). Los del documento van antes.
             return Boolean.compare(pathA.get(0).element() != null, pathB.get(0).element() != null);
         }

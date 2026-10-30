@@ -17,7 +17,7 @@ import java.util.List;
  *                0 si la página no se numera ({@code Page numbering: none})
  * @param style   cómo se escribe su número ({@code Page number format} de su sección)
  * @param blank   es la página en blanco con que acaba su sección para que la siguiente empiece en impar
- *                ({@code Begin on: odd}): sin contenido ni {@code Fixed}
+ *                ({@code Begin on: odd}): sin contenido ni {@code Page overlay}
  */
 public record Page(int number, Fragment content, List<Fragment> fixed, Media media, int section, int printed,
                    NumberStyle style, boolean blank) {

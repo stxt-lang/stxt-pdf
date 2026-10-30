@@ -38,14 +38,14 @@ class SchemaCoverageTest {
             // Section
             Map.entry("Page numbering", "Page numbering: restart"),
             Map.entry("Page number format", "Page number format: lower-roman"),
-            Map.entry("Inherit fixed", "Inherit fixed: false"),
+            Map.entry("Inherit page overlays", "Inherit page overlays: false"),
             Map.entry("Begin on", "Begin on: any"),
             // Elementos
             Map.entry("Id", "Id: x"),
             Map.entry("Style", "Style: c"),
             Map.entry("Link", "Link: https://example.com/a"),
             Map.entry("In table of contents", "In table of contents: false"),
-            Map.entry("Isolate", "Isolate: true"),
+            Map.entry("Contain margins", "Contain margins: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
             Map.entry("Pages", "Pages: not-first"),
@@ -172,11 +172,11 @@ class SchemaCoverageTest {
         // Paper excluye Width y Height, que leen todos los documentos (la cabecera).
         t.put("Page", new Template("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tPaper: A4\n\t\t{}\n\tSection:\n\t\tBlock:",
                 Set.of("Paper", "Width", "Height")));
-        for (String element : List.of("Block", "Relative", "Absolute")) {
+        for (String element : List.of("Block", "Frame", "Overlay")) {
             t.put(element, new Template(HEADER + "\t" + element + ":\n\t\t{}"));
         }
-        // Una sección con solo Fixed no tiene contenido.
-        t.put("Fixed", new Template(HEADER + "\tBlock:\n\tFixed:\n\t\t{}"));
+        // Una sección con solo Page overlay no tiene contenido.
+        t.put("Page overlay", new Template(HEADER + "\tBlock:\n\tPage overlay:\n\t\t{}"));
         // Lines necesita Wrap.
         t.put("Flex", new Template(HEADER + "\tFlex:\n\t\tWrap: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap")));
         t.put("Grid", new Template(HEADER + "\tGrid:\n\t\t{}\n\t\tArea:\n\t\t\tBlock:"));

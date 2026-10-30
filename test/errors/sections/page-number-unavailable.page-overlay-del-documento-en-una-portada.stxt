@@ -1,4 +1,4 @@
-# Case: Fixed del documento con {page} en una portada sin números
+# Case: Page overlay del documento con {page} en una portada sin números
 # Code: PAGE_NUMBER_UNAVAILABLE
 # Line: 17
 Document (dev.stxt.pdf):
@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
+	Page overlay:
 		Offset: auto 0 0 0
 		Text: Página {page}
 	Section:

@@ -186,8 +186,8 @@ class StylesFileTest {
 
     @Test
     void breakFromTheStylesDocumentCannotGoToAnAbsolute() {
-        InvalidModelException e = error(BASE + "\tFor element: Absolute\n\t\tBreak:\n\t\t\tAfter: avoid\n",
-                "\tAbsolute:", "\t\tText: a");
+        InvalidModelException e = error(BASE + "\tFor element: Overlay\n\t\tBreak:\n\t\t\tAfter: avoid\n",
+                "\tOverlay:", "\t\tText: a");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
         assertEquals(7, e.line());
         assertTrue(e.getMessage().startsWith("línea 7 de los estilos: "), e.getMessage());

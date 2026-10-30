@@ -29,7 +29,7 @@ sin servidor, con otro esquema (`javascript:`, `file:`, `tel:`…) o una ruta re
 
 `#id` lleva a la página y a la esquina superior izquierda de la caja con ese `Id` (de su primer trozo, si está partida),
 que puede estar antes o después del enlace. Es `LINK_UNKNOWN`, con la línea del `Link`, si no existe o si está en un
-`Fixed`, que se repite en todas las páginas y no tiene un único sitio. Una `Section` con `Id` lleva a su primera página. Un
+`Page overlay`, que se repite en todas las páginas y no tiene un único sitio. Una `Section` con `Id` lleva a su primera página. Un
 encabezado de un `Markdown` es un destino si lleva `{#id}` ([Markdown](../componentes/markdown.md#encabezados)).
 
 ## Dónde se admite `Link`
@@ -56,14 +56,14 @@ línea; se puede combinar con negrita y cursiva (`[la **web**](…)`). El enlace
 
 La zona clicable de una caja con `Link` es su **caja de borde**, en cada página por la que pasa. La de un enlace de
 Markdown es el rectángulo de cada trozo de cada línea, del alto de la línea; dos tramos seguidos con el mismo destino (una
-parte en negrita dentro de un enlace) son una zona. Un `Fixed` con `Link` es clicable en todas las páginas; las filas
+parte en negrita dentro de un enlace) son una zona. Un `Page overlay` con `Link` es clicable en todas las páginas; las filas
 repetidas de una tabla, también.
 
 ## Accesibilidad
 
 Un lector de pantalla anuncia cada enlace una vez, aunque ocupe varias líneas, con lo que enlaza: el texto de la caja (los
 de un `Block`, unidos por espacios; el número de página de una entrada de índice no cuenta) o el `Alt` de una imagen; sin
-texto, el destino. El de un `Fixed` o el de las filas repetidas de una tabla también se anuncia una vez, en su sitio del
+texto, el destino. El de un `Page overlay` o el de las filas repetidas de una tabla también se anuncia una vez, en su sitio del
 documento, aunque sea clicable en todas las páginas. Los enlaces se recorren con el tabulador en el orden de lectura. Cómo
 queda en el PDF:
 [El PDF por dentro](../implementacion/pdf.md#enlaces).

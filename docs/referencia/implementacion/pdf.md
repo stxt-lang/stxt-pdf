@@ -111,7 +111,7 @@ envuelve los dos `Span`.
 
 No forman parte del contenido: los fondos, los bordes, los degradados, las rayas del texto (subrayado y tachado), las guías
 de un índice, las líneas entre columnas, las imágenes sin `Alt`, las filas repetidas de una tabla desde su segunda página
-y todo lo que hay dentro de un `Fixed`.
+y todo lo que hay dentro de un `Page overlay`.
 
 ## Enlaces
 
@@ -135,10 +135,10 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
   varias líneas: un contenido marcado y una `OBJR` por línea. Dos enlaces seguidos con el mismo destino son uno.
 - *`Alt`:* un `Link` que contiene algo que leer (texto o una figura con su `Alt`) no lleva `Alt`, porque el lector lo leería
   en lugar del contenido; uno sin nada dentro lo lleva con el texto del enlace.
-- *Lo que no es contenido* (un `Fixed`, una imagen decorativa) no tiene a qué envolver, pero PDF/UA exige que toda
+- *Lo que no es contenido* (un `Page overlay`, una imagen decorativa) no tiene a qué envolver, pero PDF/UA exige que toda
   anotación de enlace esté en un `Link`. Cada enlace suyo (el de una caja y uno por destino de sus enlaces de texto) es un
   `Link` sin contenido en el sitio de la caja en el árbol, con el texto del enlace como `Alt` y una `OBJR` por página en
-  que sale: un pie con una web se anuncia una vez, donde está el `Fixed` en el documento. Si el `Fixed` no sale en
+  que sale: un pie con una web se anuncia una vez, donde está el `Page overlay` en el documento. Si el `Page overlay` no sale en
   ninguna página, no hay `Link`.
 - *Las filas repetidas de una tabla:* sus anotaciones van al `Link` de la primera página, el que envuelve el texto de la
   celda.

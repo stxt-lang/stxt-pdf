@@ -91,10 +91,10 @@ es un **alto definido**, que se decide al leer el documento con esta regla fija:
 - el área útil;
 - el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
 - el de una caja con `Height: auto` y `Aspect ratio`;
-- el de un `Absolute` o un `Fixed` con `Height: auto` estirado entre arriba y abajo;
+- el de un `Overlay` o un `Page overlay` con `Height: auto` estirado entre arriba y abajo;
 - el de un ítem de grid con `Height: auto` estirado en su área (`Vertical: stretch`).
 
-La base de `Height`, `Min height` y `Max height` de un `Absolute` o un `Fixed` es su contenedor de referencia, y la de un
+La base de `Height`, `Min height` y `Max height` de un `Overlay` o un `Page overlay` es su contenedor de referencia, y la de un
 ítem de grid, su área: las dos son siempre definidas. Un ítem de `Flex` estirado **no** da un alto definido a sus hijos:
 si lo necesitan, declara su `Height`. El alto de las columnas de un `Columns` tampoco es definido
 ([Columns](../componentes/columns.md#contenido)).

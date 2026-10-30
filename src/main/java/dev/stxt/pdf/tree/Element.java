@@ -64,9 +64,9 @@ public enum Element {
      * una entrada por encabezado ({@link #CONTENTS_ENTRY_1} … {@link #CONTENTS_ENTRY_6}).
      */
     CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
-    RELATIVE("Relative", Layout.BLOCK, Position.RELATIVE, true, false, 0),
-    ABSOLUTE("Absolute", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
-    FIXED("Fixed", Layout.BLOCK, Position.FIXED, false, false, 0),
+    RELATIVE("Frame", Layout.BLOCK, Position.RELATIVE, true, false, 0),
+    ABSOLUTE("Overlay", Layout.BLOCK, Position.ABSOLUTE, false, false, 0),
+    FIXED("Page overlay", Layout.BLOCK, Position.FIXED, false, false, 0),
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
@@ -203,7 +203,7 @@ public enum Element {
     /**
      * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
      * (referencia/comun/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
-     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Fixed},
+     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Page overlay},
      * un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link #role()}).
      */
     public enum Role {

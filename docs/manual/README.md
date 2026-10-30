@@ -48,7 +48,7 @@ Cada página de componente tiene un documento completo que puedes copiar, conver
 | [`Flex`](componentes/flex.md) | Elementos en fila o en columna que se reparten el espacio |
 | [`Grid`](componentes/grid.md) | Una rejilla de filas y columnas |
 | [`Columns`](componentes/columns.md) | Texto en varias columnas, como en una revista |
-| [`Relative`, `Absolute` y `Fixed`](componentes/relative-absolute-fixed.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
+| [`Frame`, `Overlay` y `Page overlay`](componentes/frame-and-overlays.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
 | [`Image`](componentes/image.md) | Imágenes PNG, JPEG y SVG |
 | [`Markdown`](componentes/markdown.md) | Escribir contenido largo en Markdown |
 | [`Table of contents`](componentes/table-of-contents.md) | El índice automático |

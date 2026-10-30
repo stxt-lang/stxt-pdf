@@ -16,7 +16,7 @@ Document (dev.stxt.pdf):
 	Title: Contrato de prestación de servicios de diseño · LUM-2025-044
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Pages: not-first
 			Offset: -60 0 auto 0
@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
 							Width: 78
 				Item:
 					Text: Contrato de prestación de servicios de diseño · Ref. LUM-2025-044
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -48 0
 			Box:

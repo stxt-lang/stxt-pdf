@@ -22,7 +22,7 @@ Styles (dev.stxt.pdf):
 			Radius: 5
 		Typography:
 			Align: center
-	For element: Fixed
+	For element: Page overlay
 		Typography:
 			Size: 7.5
 			Color: #6B7A72

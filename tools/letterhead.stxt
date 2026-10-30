@@ -25,7 +25,7 @@ Document (dev.stxt.pdf):
 				Align: center
 	Section:
 		Id: first
-		Absolute:
+		Overlay:
 			Offset: 40 72 auto 72
 			Flex:
 				Main axis: between
@@ -47,19 +47,19 @@ Document (dev.stxt.pdf):
 						Text: 972 00 11 22 · tallernogal.example
 							Typography:
 								Align: right
-		Absolute:
+		Overlay:
 			Offset: auto 72 28 72
 			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
 				Style: legal
 	Section:
 		Id: next
-		Absolute:
+		Overlay:
 			Offset: 30 72 auto auto
 			Image: examples/brand/nogal.svg
 				Alt: Nogal, taller de mobiliario
 				Box:
 					Width: 80
-		Absolute:
+		Overlay:
 			Offset: auto 72 28 72
 			Text: Taller Nogal S.L. · CIF B-17482930 · Inscrita en el Registro Mercantil de Girona, tomo 3120, folio 44
 				Style: legal

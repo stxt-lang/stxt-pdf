@@ -7,7 +7,7 @@ import java.util.function.DoubleUnaryOperator;
 
 /**
  * Resuelve la posición y el tamaño de una caja {@code absolute} o {@code fixed} en un eje
- * (referencia/componentes/relative-absolute-fixed.md). Siempre se cumple:
+ * (referencia/componentes/frame-and-overlays.md). Siempre se cumple:
  *
  * <pre>inicio + margen inicio + tamaño + margen fin + fin = tamaño del containing block</pre>
  *

@@ -21,7 +21,7 @@ combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (aba
 - Un tramo puede llevar el destino de un enlace ([Enlaces](enlaces.md)), que no cambia cómo se mide ni cómo se ve.
 
 > **Decisión:** un tramo es un conjunto de marcas, no un peso y un estilo propios: así `Styles` puede cambiar la fuente
-> de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` y `Italic` explícitos, que podrían deshacer
+> de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` e `Italic` explícitos, que podrían deshacer
 > el estilo de la caja.
 
 ## Formato en línea (`Inline`)

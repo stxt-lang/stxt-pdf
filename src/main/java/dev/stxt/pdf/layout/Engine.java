@@ -256,7 +256,7 @@ public final class Engine implements LayoutContext {
 
     /**
      * Layout de una caja con su algoritmo. Si la caja es el containing block de cajas
-     * {@code absolute} de su interior, las resuelve al terminar (referencia/componentes/relative-absolute-fixed.md).
+     * {@code absolute} de su interior, las resuelve al terminar (referencia/componentes/frame-and-overlays.md).
      *
      * <p>Si la caja termina en esta página y solo se salen de ella su borde y su relleno
      * inferiores, se repite el layout con ese espacio reservado (referencia/comun/cortes.md): la caja termina dentro
@@ -308,7 +308,7 @@ public final class Engine implements LayoutContext {
                 && !fits(f.height(), space.fragmentainerRemaining().getAsDouble())) {
             return LayoutResult.before(box);
         }
-        // Lo que sube de dentro (los Fixed) tiene su posición estática en la caja sin girar.
+        // Lo que sube de dentro (los Page overlay) tiene su posición estática en la caja sin girar.
         List<PendingAbsolute> pending = r.pending().stream()
                 .map(p -> p.translated(f.turned().x(), f.turned().y())).toList();
         return LayoutResult.finished(f, pending, AdjoiningMargins.NONE);

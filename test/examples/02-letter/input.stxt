@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 	Title: Propuesta de mobiliario para el Mirador del Valle
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -42 0
 			Text: Taller Nogal S.L. · CIF B-17482930 · Carrer de la Farga, 14 · 17800 Olot · tallernogal.example

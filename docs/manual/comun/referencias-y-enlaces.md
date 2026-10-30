@@ -25,7 +25,7 @@ List:
 - La referencia puede ir antes o después de la caja que nombra.
 - El número de página es el que se imprime en esa página (el de su pie), no la posición de la hoja en el PDF.
 - Una referencia a un `Id` que no existe es un error, igual que la página de algo que no tiene una sola página (lo que hay
-  dentro de un `Fixed`, que se repite en todas) o de algo que está en una página sin número.
+  dentro de un `Page overlay`, que se repite en todas) o de algo que está en una página sin número.
 - `{number of: id}` de un ítem da solo el suyo (`3`, `c`, `IV`); de un encabezado numerado, el completo (`4.2`). Lo demás no
   tiene número.
 

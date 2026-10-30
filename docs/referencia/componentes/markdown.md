@@ -170,7 +170,7 @@ todo el documento, y con el `Typography` del `Markdown`, que hereda.
 
 `#` es siempre `Heading 1`, y la jerarquía se comprueba en orden del documento junto con los encabezados escritos fuera del
 `Markdown` ([Encabezados](heading.md#jerarquía)): después de un `Heading 1`, un Markdown puede empezar por `##`. Se numeran
-como los demás y entran en los índices. Dentro de un `Fixed`, un Markdown no puede tener encabezados.
+como los demás y entran en los índices. Dentro de un `Page overlay`, un Markdown no puede tener encabezados.
 
 Un encabezado lleva `Id` si lo escribe al final de su texto, `{#id}`: `## Ventas {#ventas}` es un `Heading 2` con
 `Id: ventas` y el texto «Ventas». Es su `Id` como si lo hubiera escrito el autor: único en el documento
@@ -184,7 +184,7 @@ encabezado. Es lo único de lo generado que lleva `Id`.
 
 ## Dónde va
 
-Donde va un elemento en flujo: en una sección, `Block`, `Relative`, `Absolute`, `Fixed`, `Columns`, `List item`, `Cell` y
+Donde va un elemento en flujo: en una sección, `Block`, `Frame`, `Overlay`, `Page overlay`, `Columns`, `List item`, `Cell` y
 como elemento de un `Item` o un `Area`.
 
 ## Errores

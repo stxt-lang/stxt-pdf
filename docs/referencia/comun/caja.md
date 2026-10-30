@@ -15,9 +15,9 @@ su `Offset`:
 
 | Caja | Contenedor de referencia |
 |---|---|
-| En flujo (también `Relative`) | la caja de **contenido** del padre |
-| `Absolute` | la caja de **relleno** del elemento posicionado (`Relative`, `Absolute` o `Fixed`) más cercano entre sus ancestros; si no hay ninguno, el área útil |
-| `Fixed` | el área útil de cada página |
+| En flujo (también `Frame`) | la caja de **contenido** del padre |
+| `Overlay` | la caja de **relleno** del elemento posicionado (`Frame`, `Overlay` o `Page overlay`) más cercano entre sus ancestros; si no hay ninguno, el área útil |
+| `Page overlay` | el área útil de cada página |
 | Ítem de `Grid` (y celda de `Table`) | su área: las pistas que ocupa y los huecos de dentro |
 
 ## El grupo `Box`
@@ -48,7 +48,7 @@ El modelo de caja. No se hereda.
 - **en flujo de bloque**, en horizontal y en una caja con `Width` o `Max width` (o una `Image`, que mide su ancho
   natural): con los dos márgenes `auto`, el sobrante se reparte entre ambos y la caja queda **centrada**; si solo uno es
   `auto`, absorbe el sobrante;
-- **en un `Absolute` o un `Fixed`**, con inicio, tamaño y fin declarados ([posicionados](../componentes/relative-absolute-fixed.md#absolute)).
+- **en un `Overlay` o un `Page overlay`**, con inicio, tamaño y fin declarados ([posicionados](../componentes/frame-and-overlays.md#overlay)).
 
 Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Flex` y `Grid` (que se alinean
 con `Main axis`, `Cross axis`, `Horizontal` y `Vertical`) son errores.
@@ -67,7 +67,7 @@ línea (**max-content**):
 |---|---|---|
 | `Text` | palabra más ancha | párrafo más largo en una línea |
 | `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
-| `Block`, `Relative`, `Absolute`, `Fixed` | máximo del min-content de los hijos | máximo del max-content de los hijos |
+| `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del min-content de los hijos | máximo del max-content de los hijos |
 | `Flex` en `row`, sin `Wrap` | suma del min-content de los ítems + huecos | suma del max-content + huecos |
 | `Flex` en `row`, con `Wrap` | máximo del min-content de los ítems | suma del max-content + huecos |
 | `Flex` en `column` | máximo de los ítems | máximo de los ítems |
@@ -75,7 +75,7 @@ línea (**max-content**):
 | `Columns` | ver [Columns](../componentes/columns.md#tamaños-intrínsecos) | |
 
 Una caja con `Width` fijo tiene ese valor como min-content y max-content (el mínimo automático de un ítem de `Flex` mira
-en cambio su contenido, [Flex](../componentes/flex.md#algoritmo)). `Absolute` y `Fixed` no aportan nada a sus ancestros.
+en cambio su contenido, [Flex](../componentes/flex.md#algoritmo)). `Overlay` y `Page overlay` no aportan nada a sus ancestros.
 En `Flex` se usan los tamaños intrínsecos de cada ítem tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En
 `Grid`, el max-content hace que las fracciones lleguen al max-content de su contenido.
 
@@ -119,9 +119,9 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
   borde de cada lado, y una esquina que se queda sin radio es cuadrada. Una `Image` se recorta con los radios de su caja
   de contenido (la de borde menos el borde y el relleno).
 - **Lo que contiene.** Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los **fondos, los
-  bordes y las imágenes** de lo que tiene en su flujo, a cualquier profundidad (también un `Relative` y un ítem con
+  bordes y las imágenes** de lo que tiene en su flujo, a cualquier profundidad (también un `Frame` y un ítem con
   `Layer`): un hijo con fondo que llega a la esquina sigue la curva sin redondearlo. El **texto no se recorta**, ni un
-  `Absolute` o un `Fixed`, que se colocan a propósito y pueden sobresalir (una insignia que asoma por la esquina). Varias
+  `Overlay` o un `Page overlay`, que se colocan a propósito y pueden sobresalir (una insignia que asoma por la esquina). Varias
   cajas redondeadas una dentro de otra suman sus recortes. Como nada del flujo se sale de su caja (sería un
   [desbordamiento](desbordamiento.md)), el recorte solo cambia lo que toca las esquinas.
 - **Cajas partidas.** Con `Decoration: slice`, solo el primer fragmento de una caja tiene las esquinas de arriba y solo
@@ -133,7 +133,7 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
 > toca una esquina; o una propiedad `Clip`.
 
 > **Decisión:** el recorte no alcanza al texto: un texto cortado a medias se leería mal y no avisaría. Tampoco a un
-> `Absolute`, que sale del flujo para colocarse donde quiera. *Alternativa descartada:* recortarlo todo, como una ventana.
+> `Overlay`, que sale del flujo para colocarse donde quiera. *Alternativa descartada:* recortarlo todo, como una ventana.
 
 > **Decisión:** un radio por esquina; la elipse se pide con %. Los % de una caja partida son de cada fragmento: uno muy
 > bajo reduce sus radios. *Alternativa descartada:* dos radios por esquina (`10 / 20`).

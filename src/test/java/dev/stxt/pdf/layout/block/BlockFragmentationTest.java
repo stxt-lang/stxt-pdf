@@ -266,9 +266,9 @@ class BlockFragmentationTest {
     void absoluteChildFallsOnThePageOfItsPosition() {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 90",
-                "\tRelative:", "\t\tId: P", "\t\tBreak:", "\t\t\tInside: avoid",
+                "\tFrame:", "\t\tId: P", "\t\tBreak:", "\t\t\tInside: avoid",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30",
-                "\t\tAbsolute:", "\t\t\tId: S", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 20",
+                "\t\tOverlay:", "\t\t\tId: S", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                 "\t\t\t\tHeight: 20");
         assertFalse(l.has(1, "S"));
         assertRect(535, 40, 20, 20, l.rect(2, "S"));
@@ -281,7 +281,7 @@ class BlockFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 300",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 80",
-                "\t\tRelative:", "\t\t\tId: R", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
+                "\t\tFrame:", "\t\t\tId: R", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
                 "\t\t\t\tHeight: 15");
         assertEquals(3, l.pages());
         assertRect(40, 150, 515, 15, l.rect(1, "R"));

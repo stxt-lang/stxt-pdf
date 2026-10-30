@@ -122,9 +122,9 @@ final class ModelValidator {
 
     /**
      * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
-     * y un {@code Relative} girado o una caja girada en flujo no se parten entre páginas, así que {@code Inside} y {@code
+     * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Inside} y {@code
      * Decoration} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla el colapso
-     * de márgenes: {@code Isolate} no tiene efecto en ella.
+     * de márgenes: {@code Contain margins} no tiene efecto en ella.
      */
     static void validateRotation(Style s) {
         if (s.rotation() == null) {
@@ -137,7 +137,7 @@ final class ModelValidator {
         if (s.position() != Position.RELATIVE && !s.rotatesInFlow()) {
             return;
         }
-        String what = s.rotatesInFlow() ? "una caja girada" : "un Relative girado";
+        String what = s.rotatesInFlow() ? "una caja girada" : "un Frame girado";
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
@@ -145,7 +145,7 @@ final class ModelValidator {
             }
         }
         if (s.rotatesInFlow() && s.isolate()) {
-            throw error(s.line("isolate"), ErrorCode.ISOLATE_IN_ROTATED, "Isolate no tiene efecto en una caja girada, "
+            throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ROTATED, "Contain margins no tiene efecto en una caja girada, "
                     + "que ya corta el colapso de márgenes con sus hijos: quítalo");
         }
     }
@@ -198,16 +198,16 @@ final class ModelValidator {
         Sides<Value> o = s.offset();
         if (s.position() == Position.RELATIVE) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
                         + "desde arriba y desde abajo: deja uno de los dos en auto");
             }
             if (!o.left().isAuto() && !o.right().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Relative no puede desplazarse a la vez "
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
                         + "desde la izquierda y desde la derecha: deja uno de los dos en auto");
             }
             return;
         }
-        // Absolute y Fixed: inicio + tamaño + fin no puede fijar la posición dos veces.
+        // Overlay y Page overlay: inicio + tamaño + fin no puede fijar la posición dos veces.
         if (!o.left().isAuto() && !s.box().width().isAuto() && !o.right().isAuto()
                 && !s.box().margin().left().isAuto() && !s.box().margin().right().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
@@ -220,7 +220,7 @@ final class ModelValidator {
         }
     }
 
-    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Absolute y Fixed, con inicio, tamaño y fin. */
+    /** Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Overlay y Page overlay, con inicio, tamaño y fin. */
     private static void validateMargins(Style s, Layout parentLayout, boolean flexItem, boolean gridItem) {
         Sides<Value> m = s.box().margin();
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
@@ -252,7 +252,7 @@ final class ModelValidator {
         }
     }
 
-    /** Un {@code Absolute} o un {@code Fixed} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
+    /** Un {@code Overlay} o un {@code Page overlay} solo se centra con {@code Margin auto} si declara inicio, tamaño y fin. */
     private static void validateOutOfFlowMargins(Style s, SourceLine line, boolean horizontalAuto,
                                                  boolean verticalAuto) {
         Sides<Value> o = s.offset();
@@ -286,8 +286,8 @@ final class ModelValidator {
     /**
      * Porcentajes verticales de la caja: su base debe ser un alto definido (referencia/comun/valores.md). La base de
      * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
-     * definido para Absolute y Fixed) o el área (los ítems de grid); la de los desplazamientos
-     * de un Relative y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
+     * definido para Overlay y Page overlay) o el área (los ítems de grid); la de los desplazamientos
+     * de un Frame y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
      */
     private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean flexItem,
                                             boolean gridItem) {
@@ -340,7 +340,7 @@ final class ModelValidator {
     /**
      * Si el alto de la caja de contenido es definido, sin maquetar: un {@code Height} que se
      * resuelve (puntos, o porcentaje de una base definida), {@code Aspect ratio} con alto
-     * {@code auto}, un Absolute o un Fixed estirado entre arriba y abajo, o un ítem de grid
+     * {@code auto}, un Overlay o un Page overlay estirado entre arriba y abajo, o un ítem de grid
      * estirado ({@code Vertical: stretch}) en su área.
      */
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {

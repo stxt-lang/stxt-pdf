@@ -1,7 +1,7 @@
 # `Document`
 
 La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Page`, un `Title` y un
-`Language`, un `Styles` opcional ([Styles](../comun/estilos.md)), los `Fixed` de todo el documento y una o más `Section`,
+`Language`, un `Styles` opcional ([Styles](../comun/estilos.md)), los `Page overlay` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
 `For element: Document`.
 
@@ -17,14 +17,14 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-	Fixed:
+	Page overlay:
 		Id: footer
 		Offset: auto 0 -30 0
 		Text: Página {page} de {pages}
 	Section:
 		Id: front-cover
 		Page numbering: none
-		Inherit fixed: false
+		Inherit page overlays: false
 		Page:
 			Margin: 0
 		Block:
@@ -80,7 +80,7 @@ Page:
 es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer
-nivel de cada sección y de los `Fixed`, y su alto es siempre definido.
+nivel de cada sección y de los `Page overlay`, y su alto es siempre definido.
 
 > **Decisión:** los tamaños ISO 216 van redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842); Letter y
 > Legal son exactos. *Alternativa descartada:* los valores con decimales (A4 = 595,28 × 841,89).
@@ -106,10 +106,10 @@ contenido está en alguna.
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
-| `Inherit fixed` | booleano | `true` | Si lleva los `Fixed` del documento. Con `false`, solo salen los suyos. |
+| `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
 
-Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
+Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
 
 - **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página; y la siguiente empieza otra. El
   contenido de una sección no se mezcla con el de otra.
@@ -117,8 +117,8 @@ Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
   de sus elementos de primer nivel): sus márgenes y su alto salen de su `Page`, y cada página lleva el suyo. Una
   `Section` no es una caja con `Box` propio: no tiene `Margin`, `Padding` ni fondo, y es un contexto de formato de bloque
   que no colapsa con nada.
-- **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Fixed`, que no ocupan sitio, no tendría
-  ninguna página. Un `Absolute` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
+- **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Page overlay`, que no ocupan sitio, no tendría
+  ninguna página. Un `Overlay` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
 - **Tipografía por sección.** Las reglas que llegan a una sección solo pueden dar `Typography` (`Language` incluido: un
   anexo en inglés), que hereda todo su contenido.
 - **Un solo documento.** La jerarquía de encabezados, los índices (`Table of contents`, que listan los encabezados de todas las
@@ -139,15 +139,15 @@ del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado)
 > **Decisión:** herencia por grupos, para que `Orientation: landscape` sola dé el papel del documento apaisado.
 > *Alternativa descartada:* un `Page` completo en cada sección.
 
-### `Fixed` del documento y de la sección
+### `Page overlay` del documento y de la sección
 
-Un `Fixed` de `Document` sale en las páginas de todas las secciones salvo las que declaran `Inherit fixed: false`; uno de
+Un `Page overlay` de `Document` sale en las páginas de todas las secciones salvo las que declaran `Inherit page overlays: false`; uno de
 una `Section`, solo en las suyas. `Pages` cuenta dentro del alcance donde se declara
-([posicionados](relative-absolute-fixed.md#pages)). Se colocan en el área útil de cada página, que es la de su sección.
-Los del documento se pintan antes que los de la sección. `Inherit fixed: false` en un documento sin `Fixed`, que no tiene
+([posicionados](frame-and-overlays.md#pages)). Se colocan en el área útil de cada página, que es la de su sección.
+Los del documento se pintan antes que los de la sección. `Inherit page overlays: false` en un documento sin `Page overlay`, que no tiene
 efecto, no es un error: una plantilla puede ponerlos después.
 
-Un `Fixed` del documento no está en ningún flujo: su posición estática es la esquina del área útil.
+Un `Page overlay` del documento no está en ningún flujo: su posición estática es la esquina del área útil.
 
 > **Decisión:** `Pages` cuenta dentro del alcance donde se declara. *Alternativa descartada:* contar siempre las páginas
 > físicas del documento.
@@ -161,7 +161,7 @@ con una portada `none` y 6 páginas de cuerpo, la primera página interior es «
 
 **Lo que se imprime manda.** `{page of: id}`, las entradas de un índice y el pie dicen el mismo número: el del contador. Una
 referencia a algo que está en una página sin número es `REFERENCE_NOT_PLACEABLE`, y un texto con `{page}` o `{pages}` que
-cae en una página sin número (el `Fixed` del documento en una portada que lo hereda) es `PAGE_NUMBER_UNAVAILABLE`: nunca se
+cae en una página sin número (el `Page overlay` del documento en una portada que lo hereda) es `PAGE_NUMBER_UNAVAILABLE`: nunca se
 deja en blanco. Los marcadores, los enlaces y `Pages` siguen la página física. Un encabezado de una sección `none` no puede
 estar en un índice (`In table of contents: false`).
 
@@ -204,8 +204,8 @@ La página en blanco es **una página más de la sección anterior**:
 
 - Tiene su `Page`, su `Page number format` y su numeración: si la sección numera, avanza el contador y cuenta para `{pages}`
   como cualquier otra, aunque no se imprima; si es `none`, no tiene número.
-- No tiene contenido ni `Fixed`, ni los de la sección ni los del documento.
-- No cuenta para el `Pages` de los `Fixed` de su sección (`Pages: last` es su última página con contenido). Para los del
+- No tiene contenido ni `Page overlay`, ni los de la sección ni los del documento.
+- No cuenta para el `Pages` de los `Page overlay` de su sección (`Pages: last` es su última página con contenido). Para los del
   documento, que cuentan las páginas físicas, sí cuenta, aunque no salgan en ella.
 
 ```

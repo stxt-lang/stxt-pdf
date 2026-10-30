@@ -1,5 +1,5 @@
 // Sonda de QA: documentos de texto largo de 200 a 12 800 párrafos, con {page} y {pages}
-// en un Fixed; da el tiempo de lectura, layout y pintado y los aciertos y fallos de la caché, también por página.
+// en un Page overlay; da el tiempo de lectura, layout y pintado y los aciertos y fallos de la caché, también por página.
 // Los de 2000 y 2100 párrafos quedan a los dos lados de la página 100, donde {pages} necesita una cifra más;
 // los "indice" llevan además un Table of contents y un {page of: …} por capítulo, que se repiten hasta converger. Para el perfil: añade
 // -XX:StartFlightRecording=filename=rec.jfr,settings=profile y mira "jfr print --events jdk.ExecutionSample".
@@ -17,7 +17,7 @@ public class ScaleProbe {
     static String head() {
         return "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: Perf\n\tLanguage: es\n"
              + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-             + "\tFixed:\n\t\tOffset: auto 0 0 0\n\t\tText: Pagina {page} de {pages}\n\tSection:\n";
+             + "\tPage overlay:\n\t\tOffset: auto 0 0 0\n\t\tText: Pagina {page} de {pages}\n\tSection:\n";
     }
     static String LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
 

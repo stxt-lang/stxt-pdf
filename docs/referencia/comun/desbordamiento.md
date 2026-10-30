@@ -13,11 +13,11 @@
   que impide partirlo: su `Padding` o su `Border` si el relleno y el borde del fragmento ya no caben en la página; si no,
   su `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no, su `Height` (en una
   `Image` sin él, su `Width`, del que sale el alto); en una caja girada, que no se parte, su `Rotate`;
-- **un `Absolute` o un `Fixed` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
+- **un `Overlay` o un `Page overlay` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
   ocupar los márgenes de la página, pero no salir de la página;
 - **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Rotate`: lo que se comprueba es
   el rectángulo que envuelve lo que se pinta, con los giros de sus ancestros ([Capas y giro](capas-y-giro.md#giro-rotate)).
-  Un `Absolute` o un `Fixed` girado se comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro
+  Un `Overlay` o un `Page overlay` girado se comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro
   de una caja girada, también, en la línea del elemento;
 - **una caja girada en flujo más ancha que su contenedor** (`BOX_OVERFLOW`): el rectángulo que la envuelve, con sus
   márgenes, no cabe en su caja de contenido. Se señala su `Width` o, sin él, su `Rotate`: sin `Width` no parte su texto en
@@ -31,7 +31,7 @@
   columnas.
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro, se nombra lo de dentro.
-Los `Relative` se comprueban en su sitio, sin el desplazamiento de `Offset` ni el giro de `Rotate` (lo girado se comprueba
+Los `Frame` se comprueban en su sitio, sin el desplazamiento de `Offset` ni el giro de `Rotate` (lo girado se comprueba
 además contra la página), y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino decisiones del
 autor. Tampoco cuentan los márgenes verticales, que colapsan. Una caja puede salirse hasta 0,01 pt sin que sea un
 desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
@@ -40,7 +40,7 @@ Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no
 también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido. Una caja cuyo alto impone el
 padre (un ítem estirado a una fila fija) se señala a sí misma, no las `Row sizes` del `Grid`.
 
-Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Relative` incluido.
+Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Frame` incluido.
 Una caja girada en flujo se comprueba en su contenedor con ese rectángulo, que es lo que ocupa. Las cajas en flujo de
 dentro de una girada se comprueban contra su padre sin girar, y no se baja a ellas para buscar al culpable de lo que se
 sale a lo ancho de la girada.

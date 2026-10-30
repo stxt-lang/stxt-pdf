@@ -60,7 +60,7 @@ Document (dev.stxt.pdf):
 - Con `Balance: true`, la última página no deja una columna llena y otra vacía: el motor busca el alto con el que quedan
   igualadas sin romper ninguna regla de corte.
 - Un `Height` en el `Columns` limita el alto de las columnas; si el contenido no cabe, es un error.
-- Dentro de un `Columns` no puede haber `Absolute` ni `Fixed`, ni porcentajes de alto.
+- Dentro de un `Columns` no puede haber `Overlay` ni `Page overlay`, ni porcentajes de alto.
 
 Para un título a lo ancho entre dos tramos en columnas, pon el título fuera y dos `Columns`, uno antes y otro después.
 

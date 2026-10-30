@@ -76,9 +76,9 @@ Colocar las cajas una detrás de otra según estas reglas es el **flujo**. El an
 ancho que le deja su padre (o el que declare). El alto va de dentro afuera: una caja mide lo que mide su contenido (o lo que
 declare).
 
-**Fuera del flujo** están las cajas **posicionadas**: `Absolute` se coloca en un sitio exacto sin ocupar espacio, `Fixed`
-se repite en cada página (cabeceras y pies) y `Relative` se desplaza sin mover a las demás
-([posicionados](../componentes/relative-absolute-fixed.md)).
+**Fuera del flujo** están las cajas **posicionadas**: `Overlay` se coloca en un sitio exacto sin ocupar espacio, `Page overlay`
+se repite en cada página (cabeceras y pies) y `Frame` se desplaza sin mover a las demás
+([posicionados](../componentes/frame-and-overlays.md)).
 
 **El contenedor de referencia** de una caja es el rectángulo contra el que se miden sus porcentajes y sus
 desplazamientos: para una caja en flujo, el espacio de contenido de su padre; para las posicionadas, el que diga su página.

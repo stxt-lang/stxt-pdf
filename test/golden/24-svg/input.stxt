@@ -11,7 +11,7 @@
 # así que su ancho es 30 × 2 = 60; banner, con Grow, ocupa lo que queda (260 − 60 − 10 = 190) y
 # con los dos ejes declarados la imagen cubre la caja (Fit: cover). md traduce la imagen sola en
 # su párrafo a una Image de su tamaño natural (150 × 75) y el párrafo va debajo: md mide 75 + 12.
-# logo: un Fixed en la esquina de arriba a la derecha, de 12 × 6, en las dos.
+# logo: un Page overlay en la esquina de arriba a la derecha, de 12 × 6, en las dos.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300
@@ -25,7 +25,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: -16 0 auto auto
 			Image: test/shapes.svg
 				Id: logo

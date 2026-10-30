@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For element: Fixed
+		For element: Page overlay
 			Box:
 				Height: 20
 			Typography:
@@ -38,13 +38,13 @@ Document (dev.stxt.pdf):
 			Break:
 				After: avoid
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Offset: -30 0 auto 0
 			Typography:
 				Color: #5F5E5A
 			Text: Informe trimestral
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -30 0
 			Text: Página {page} de {pages}
@@ -71,7 +71,7 @@ Document (dev.stxt.pdf):
 						dentro del bloque equivalen a espacios.
 
 						Una línea en blanco empieza un párrafo nuevo.
-		Absolute:
+		Overlay:
 			Id: stamp
 			Offset: 0 0 auto auto
 			Box:

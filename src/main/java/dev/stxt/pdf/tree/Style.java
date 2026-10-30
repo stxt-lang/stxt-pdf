@@ -23,8 +23,8 @@ import java.util.Map;
  * FlexStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link MulticolStyle}, {@link ImageStyle} y
  * {@link ContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
- * (referencia/comun/estructura.md y referencia/componentes/relative-absolute-fixed.md: el layout y la posición, que
- * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate}, el giro, {@code Link}, {@code
+ * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
+ * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Contain margins}, el giro, {@code Link}, {@code
  * Header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
@@ -34,7 +34,7 @@ import java.util.Map;
  * {@link Marker}…): los nombres de sus constantes coinciden con los valores del documento en mayúsculas y con
  * el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}), que es como los interpreta
  * {@link PropertyReader}. {@link Layout} y {@link Position} no son valores del documento: salen del elemento
- * ({@code Text} es {@code INLINE}; {@code Absolute}, un {@code BLOCK} {@code ABSOLUTE}).</p>
+ * ({@code Text} es {@code INLINE}; {@code Overlay}, un {@code BLOCK} {@code ABSOLUTE}).</p>
  *
  * <p>Solo {@code tree} escribe un estilo, mientras {@link BoxTreeBuilder} construye el árbol; al terminar se
  * cierra con su caja ({@link Box#close}) y ya solo se lee, también desde varios hilos.</p>
@@ -58,12 +58,12 @@ public final class Style extends StyleGroup {
     private Sides<Value> offset = Sides.all(Value.AUTO);
     /** {@code null} = auto. */
     private Integer layer;
-    /** Solo en un {@code Fixed}: las páginas en que sale. */
+    /** Solo en un {@code Page overlay}: las páginas en que sale. */
     private Pages pages = Pages.ALL;
     private boolean isolate;
     /**
-     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Relative}, {@code
-     * Absolute}, {@code Fixed} e {@code Image}; {@code null} = sin giro. No se hereda.
+     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Frame}, {@code
+     * Overlay}, {@code Page overlay} e {@code Image}; {@code null} = sin giro. No se hereda.
      */
     private Rotation rotation;
     /**

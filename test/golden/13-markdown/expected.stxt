@@ -4,7 +4,7 @@
 # numerada (24): 90. table desde 174: la fila de Head y las tres de Body, de 12: 48.
 # long es un párrafo de 61 palabras de 7 letras: 13 por línea (103 caracteres), así que 5
 # líneas. Empieza en 222 y le quedan 38: caben 3 y quedan 2, que respeta viudas y huérfanas.
-# foot (Fixed, Offset auto 0 -30 0) acaba 30 por debajo del área útil, en 290: y = 278.
+# foot (Page overlay, Offset auto 0 -30 0) acaba 30 por debajo del área útil, en 290: y = 278.
 # Página 2: las 2 líneas que faltan de long y after.
 Result:
 	Page: 1

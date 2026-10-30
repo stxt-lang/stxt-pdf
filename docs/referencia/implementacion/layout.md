@@ -65,10 +65,10 @@ guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockF
 
 ## Cajas posicionadas
 
-Los algoritmos no maquetan los hijos `Absolute` y `Fixed`; los devuelven como `PendingAbsolute` con su posición estática, y
-los hijos `Relative` se desplazan con `RelativeOffset` después de colocarlos. `Engine.layout` resuelve con `AbsoluteLayout`
-(sobre `AbsoluteEquation`) los `Absolute` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
-del de esa caja); los `Fixed` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
+Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`; los devuelven como `PendingAbsolute` con su posición estática, y
+los hijos `Frame` se desplazan con `RelativeOffset` después de colocarlos. `Engine.layout` resuelve con `AbsoluteLayout`
+(sobre `AbsoluteEquation`) los `Overlay` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
+del de esa caja); los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
 que incluye su `Pages`.
 
 ## Cajas giradas en flujo
@@ -80,7 +80,7 @@ rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` gua
 algoritmos de los padres no saben nada del giro: ven una caja del tamaño del rectángulo, que no se parte (`BEFORE` si no
 cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`; además es un
 contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su min-content y su
-max-content son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Absolute`
+max-content son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
 (`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
 
 ## Fragmentos
@@ -88,7 +88,7 @@ max-content son el ancho del rectángulo más los márgenes. Es contenedor de re
 Un **`Fragment`** tiene su posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa a coordenadas absolutas
 de página. Lleva su propio `border` y `padding`, que en un fragmento partido no son los de la caja: se usan siempre los del
 fragmento para llegar a su caja de contenido. Lleva también el `margin` usado (con la base de porcentajes de su layout) y el
-desplazamiento de `Relative` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo
+desplazamiento de `Frame` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo
 existe en los fragmentos: `Box` no guarda posición ni tamaño.
 
 En una caja girada en flujo, `x`, `y`, `width` y `height` son los del rectángulo que ocupa, y `turned`, su caja de borde
@@ -101,7 +101,7 @@ sin girar relativa a él. Sus hijos y sus líneas se refieren a la caja sin gira
 > produjo. *Alternativa descartada:* que `Overflow` resuelva los márgenes con el ancho de contenido del padre, que no es la
 > base de los ítems de grid.
 
-> **Decisión:** `Overflow` comprueba un `Relative` en su sitio con el desplazamiento que usó el layout, guardado en el
+> **Decisión:** `Overflow` comprueba un `Frame` en su sitio con el desplazamiento que usó el layout, guardado en el
 > fragmento, en lugar de recalcularlo: en un padre partido entre páginas la base de un porcentaje vertical no es el alto del
 > fragmento, y recalcularlo rechazaba documentos válidos.
 
@@ -177,13 +177,13 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
 `Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
 (`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `Media`, su sección, su
-`printed` (0 = sin número) y su estilo. Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)`
+`printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingAbsolute(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
 **Páginas en blanco.** Tras el flujo, `blankAfter` mira qué secciones dejan la siguiente, con `Begin on: odd`, en una
 página física par. Esas acaban con una página en blanco: `Numbering` la cuenta como una página más de la sección, `pagesOf`
 le reserva su número físico y `pages` la añade como una `Page` con `blank`, un fragmento vacío de la caja de la sección y
-sin `Fixed`. No forma parte del flujo de la sección, así que el `Pages` de sus `Fixed` no la ve.
+sin `Page overlay`. No forma parte del flujo de la sección, así que el `Pages` de sus `Page overlay` no la ve.
 
 **`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio) y las líneas
 los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
@@ -201,7 +201,7 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 > paso. Como la primera pasada supone `00`, con referencias a páginas siempre hay al menos dos. *Alternativa descartada:*
 > quedarse con la última pasada sin avisar.
 
-> **Decisión:** un `Id` que no existe (`REFERENCE_UNKNOWN`) y la página de una caja de un `Fixed`
+> **Decisión:** un `Id` que no existe (`REFERENCE_UNKNOWN`) y la página de una caja de un `Page overlay`
 > (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura; la
 > de una caja que cae en una página sin número, al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
 

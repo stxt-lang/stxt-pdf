@@ -10,17 +10,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Pages} de un {@code Fixed} (referencia/componentes/relative-absolute-fixed.md): en qué páginas sale. */
+/** {@code Pages} de un {@code Page overlay} (referencia/componentes/frame-and-overlays.md): en qué páginas sale. */
 class FixedPagesTest {
 
-    /** Un documento de {@code pages} páginas (una por bloque) y un {@code Fixed} por cada valor de {@code Pages}. */
+    /** Un documento de {@code pages} páginas (una por bloque) y un {@code Page overlay} por cada valor de {@code Pages}. */
     private static LayoutFixture document(int pages, String... fixedValues) {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < pages; i++) {
             lines.addAll(List.of("\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60"));
         }
         for (String value : fixedValues) {
-            lines.addAll(List.of("\tFixed:", "\t\tId: " + value, "\t\tPages: " + value, "\t\tOffset: 0 auto auto 0",
+            lines.addAll(List.of("\tPage overlay:", "\t\tId: " + value, "\t\tPages: " + value, "\t\tOffset: 0 auto auto 0",
                     "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10"));
         }
         // Con 180 pt de alto el área útil mide 100, así que cada bloque de 60 ocupa su página.
@@ -48,7 +48,7 @@ class FixedPagesTest {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
-                "\tFixed:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 10");
+                "\tPage overlay:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 10");
         assertEquals(List.of(1, 2), pagesOf(l, "F"));
     }
 
@@ -66,7 +66,7 @@ class FixedPagesTest {
     void aFixedNeverMovesTheFlowWhereItIsShownOrNot() {
         String[] flow = {"\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60"};
-        String[] fixed = {"\tFixed:", "\t\tId: F", "\t\tPages: first", "\t\tBox:", "\t\t\tHeight: 50"};
+        String[] fixed = {"\tPage overlay:", "\t\tId: F", "\t\tPages: first", "\t\tBox:", "\t\t\tHeight: 50"};
         LayoutFixture without = LayoutFixture.layOutPaged(180, flow);
         String[] both = java.util.stream.Stream.concat(java.util.Arrays.stream(flow), java.util.Arrays.stream(fixed))
                 .toArray(String[]::new);
@@ -83,8 +83,8 @@ class FixedPagesTest {
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
-                "\tFixed:", "\t\tId: outer", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 30",
-                "\t\tFixed:", "\t\t\tId: inner", "\t\t\tPages: last", "\t\t\tBox:", "\t\t\t\tHeight: 10");
+                "\tPage overlay:", "\t\tId: outer", "\t\tPages: not-first", "\t\tBox:", "\t\t\tHeight: 30",
+                "\t\tPage overlay:", "\t\t\tId: inner", "\t\t\tPages: last", "\t\t\tBox:", "\t\t\t\tHeight: 10");
         assertEquals(List.of(2, 3), pagesOf(l, "outer"));
         assertEquals(List.of(3), pagesOf(l, "inner"));
         assertFalse(l.has(1, "inner"));

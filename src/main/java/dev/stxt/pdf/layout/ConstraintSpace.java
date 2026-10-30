@@ -91,7 +91,7 @@ public record ConstraintSpace(
     }
 
     /**
-     * El mismo espacio, sin fragmentación: una caja que no se parte (un {@code Relative} girado,
+     * El mismo espacio, sin fragmentación: una caja que no se parte (un {@code Frame} girado,
      * referencia/comun/cortes.md).
      */
     public ConstraintSpace unfragmented() {

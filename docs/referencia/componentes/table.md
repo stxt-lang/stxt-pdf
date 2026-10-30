@@ -167,7 +167,7 @@ Las filas de `Head` y `Foot` se **repiten** en cada página de la tabla: la cabe
 tabla entera pasa a la página siguiente, y la cabecera no se queda sola. Si al principio de una página la cabecera y el pie
 no dejan sitio al cuerpo, la tabla no puede avanzar y es un error (`TABLE_REPEAT_OVERFLOW`); una fila del cuerpo que no
 cabe en el sitio que dejan se parte en paralelo, como cualquier fila, y si no se puede partir desborda la página
-(`PAGE_OVERFLOW`). Las cajas `Absolute` y `Fixed` de las celdas de la cabecera y el pie solo van en el primer fragmento de
+(`PAGE_OVERFLOW`). Las cajas `Overlay` y `Page overlay` de las celdas de la cabecera y el pie solo van en el primer fragmento de
 la tabla.
 
 > **Decisión:** una celda con un párrafo largo en una tabla con cabecera no es un error: se parte. *Alternativa

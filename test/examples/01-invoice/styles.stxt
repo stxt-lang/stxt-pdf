@@ -53,7 +53,7 @@ Styles (dev.stxt.pdf):
 			Padding: 7 8
 			Border: 0 0 0.5 0
 			Border color: #DCCFB8
-	For element: Fixed
+	For element: Page overlay
 		Typography:
 			Size: 7.5
 			Color: #7A6A5C

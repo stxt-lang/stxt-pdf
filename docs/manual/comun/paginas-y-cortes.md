@@ -46,7 +46,7 @@ Block:
 - Los encabezados ya evitan quedarse solos al final de una página: no hace falta `After: avoid`
   ([Encabezados](../componentes/heading.md)).
 - `Inside: avoid` no impide partir una caja que no cabe ni en una página entera.
-- Los elementos posicionados `Absolute` y `Fixed` no admiten `Break`, porque no se parten ni están en el flujo. Tampoco
+- Los elementos posicionados `Overlay` y `Page overlay` no admiten `Break`, porque no se parten ni están en el flujo. Tampoco
   lo que hay dentro de ellos o de una caja girada: un `Break` escrito ahí es un error (salvo en las columnas de un
   `Columns`). El que llega de una regla de `Styles` simplemente no tiene efecto.
 
@@ -66,15 +66,15 @@ contenido de la página siguiente empieza arriba del todo.
 En cualquier texto, `{page}` escribe el número de la página y `{pages}` el total:
 
 ```
-Fixed:
+Page overlay:
 	Offset: auto 0 -30 0
 	Text: Página {page} de {pages}
 		Typography:
 			Align: right
 ```
 
-Un pie de página como este es un `Fixed`, que se repite en cada página
-([posicionados](../componentes/relative-absolute-fixed.md#fixed)). Qué número lleva cada página lo decide su sección: puede
+Un pie de página como este es un `Page overlay`, que se repite en cada página
+([posicionados](../componentes/frame-and-overlays.md#page-overlay)). Qué número lleva cada página lo decide su sección: puede
 seguir la cuenta, volver a empezar en 1 o no tener número, como una portada
 ([Document](../componentes/document.md#numeración-de-las-páginas)). `{pages}` es el último número de la cuenta en curso: con
 una portada sin número y seis páginas de cuerpo, la primera dice «Página 1 de 6».

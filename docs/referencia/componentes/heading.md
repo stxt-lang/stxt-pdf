@@ -50,10 +50,10 @@ le puede seguir un `Heading 2`, pero no un `Heading 3`. Se puede bajar los nivel
 
 ## Dónde va
 
-Donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de un `Fixed` (`HEADING_IN_FIXED`), que
+Donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de un `Page overlay` (`HEADING_IN_PAGE_OVERLAY`), que
 se repite en cada página y no forma parte del contenido, ni dentro de un `List item` o una `Cell`.
 
-> **Decisión:** dentro de un `Fixed` sería un encabezado sin marcador que un lector de pantalla no anuncia: es un error.
+> **Decisión:** dentro de un `Page overlay` sería un encabezado sin marcador que un lector de pantalla no anuncia: es un error.
 > *Alternativa descartada:* permitirlo como un bloque sin significado.
 
 ## Fuera del índice

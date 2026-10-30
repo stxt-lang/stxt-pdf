@@ -91,9 +91,9 @@ Image: planos/sala.pdf
 		Width: 100%
 ```
 
-También sirve de **papel preimpreso**: un membrete, un formulario, un fondo. Se pone en un `Fixed` detrás del contenido
+También sirve de **papel preimpreso**: un membrete, un formulario, un fondo. Se pone en un `Page overlay` detrás del contenido
 (`Layer` negativa) que llega al borde de la página con un `Offset` negativo igual al margen, y la imagen ocupa todo el
-`Fixed` con `Width` y `Height` al 100 %. El margen del documento deja libre el sitio del membrete y del pie:
+`Page overlay` con `Width` y `Height` al 100 %. El margen del documento deja libre el sitio del membrete y del pie:
 
 ```
 Document (dev.stxt.pdf):
@@ -109,7 +109,7 @@ Document (dev.stxt.pdf):
 				Size: 10.5
 				Line height: 16
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: -140 -72 -80 -72
 			Layer: -1
 			Image: examples/letterhead/letterhead.pdf
@@ -120,7 +120,7 @@ Document (dev.stxt.pdf):
 		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor, con el detalle de cada pieza y su plazo de entrega.
 ```
 
-Con dos `Fixed`, uno con `Pages: first` y otro con `Pages: not-first` y `Pdf page: 2`, la primera hoja lleva un membrete y las
+Con dos `Page overlay`, uno con `Pages: first` y otro con `Pages: not-first` y `Pdf page: 2`, la primera hoja lleva un membrete y las
 siguientes, otro.
 
 Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Sus capas, sí. Un PDF con un

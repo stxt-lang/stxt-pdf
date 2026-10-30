@@ -2,7 +2,7 @@
 
 | Término | Definición |
 |---|---|
-| **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Fixed`. Cada sección tiene la suya ([Document](../componentes/document.md#page)). |
+| **Área útil** | Rectángulo de la página menos sus márgenes; el contenedor de referencia de los elementos de primer nivel de una sección y de los `Page overlay`. Cada sección tiene la suya ([Document](../componentes/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](caja.md#las-cuatro-cajas)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes; los recursos se buscan solo hacia abajo ([Recursos](recursos.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Columns` reparte su contenido en una página ([Columns](../componentes/columns.md)). |
@@ -12,10 +12,10 @@
 | **Contexto de formato de bloque** | Región que aísla el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color…)` ([La caja](caja.md#degradado)). |
-| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Relative`, `Absolute` o `Fixed` ([Estructura](estructura.md#elementos)). |
-| **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Absolute` y `Fixed`. |
+| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](estructura.md#elementos)). |
+| **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Overlay` y `Page overlay`. |
 | **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `TOC 1` … `6`. |
-| **Elemento posicionado** | `Relative`, `Absolute` o `Fixed`. |
+| **Elemento posicionado** | `Frame`, `Overlay` o `Page overlay`. |
 | **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([Enlaces](enlaces.md)). |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)). |
@@ -28,9 +28,9 @@
 | **Min-content / max-content** | Tamaño mínimo sin desbordar / tamaño sin saltos de línea ([La caja](caja.md#tamaños-intrínsecos)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4`, `Letter`…), en vertical o, con `Orientation: landscape`, apaisado. |
 | **Pista** | Columna o fila de un `Grid` o una `Table`. |
-| **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo ([posicionados](../componentes/relative-absolute-fixed.md#absolute)). |
+| **Posición estática** | Donde habría quedado una caja posicionada si estuviera en flujo ([posicionados](../componentes/frame-and-overlays.md#overlay)). |
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([Referencias](referencias.md)). |
-| **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Fixed` y su numeración ([Document](../componentes/document.md#section)). |
+| **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Page overlay` y su numeración ([Document](../componentes/document.md#section)). |
 | **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya. |
 | **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([Formato del texto](formato-del-texto.md#tramos)). |

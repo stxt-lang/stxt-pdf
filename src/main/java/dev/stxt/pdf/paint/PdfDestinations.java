@@ -19,7 +19,7 @@ import java.util.Map;
  * enlaces a una caja del documento ({@link PdfLinks}, referencia/comun/enlaces.md).
  *
  * <p>Tienen destino los encabezados y las cajas que se pueden señalar ({@link Box#key()}: con
- * {@code Id}, o los encabezados que lista un índice). Los {@code Fixed} no: se repiten en todas
+ * {@code Id}, o los encabezados que lista un índice). Los {@code Page overlay} no: se repiten en todas
  * las páginas y no tienen un único destino.</p>
  */
 final class PdfDestinations {

@@ -85,7 +85,7 @@ Son errores:
   (`STYLE_UNKNOWN_ELEMENT`);
 - un `For column` que no es un número (`VALUE_SYNTAX`) o un rango que no va de menor a mayor (`VALUE_NOT_ALLOWED`);
 - dos reglas con el mismo selector en el mismo origen, también dos `For column` con el mismo rango (`STYLE_DUPLICATE`);
-- una regla que da `Break` a un elemento que no lo admite: `Absolute`, `Fixed`, un encabezado, un `Text` de un encabezado o
+- una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
   una celda, también con una regla de posición, de columna o de el estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
 - un nombre de `Style` sin su regla `For style` (`STYLE_WITHOUT_RULE`).

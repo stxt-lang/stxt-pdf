@@ -120,7 +120,7 @@ final class PropertyReader {
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
-            entry("isolate", (p, s) -> s.setIsolate(bool(p))),
+            entry("contain-margins", (p, s) -> s.setIsolate(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("header", (p, s) -> s.setHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInContents(bool(p))),

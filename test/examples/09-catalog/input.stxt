@@ -1,8 +1,8 @@
 # Catálogo de producto de un taller de muebles, de cinco páginas. Son dos secciones: la portada, a
-# sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit fixed: false), y el
+# sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit page overlays: false), y el
 # cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Table of contents, que el
 # motor rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
-# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Absolute con Rotate), y una página
+# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Overlay con Rotate), y una página
 # final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
 # solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
 # In table of contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 		Margin: 54 50 64 50
 	Title: Catálogo 2026 · Taller Nogal
 	Language: es
-	Fixed:
+	Page overlay:
 		Id: footer
 		Offset: auto 0 -40 0
 		Box:
@@ -30,10 +30,10 @@ Document (dev.stxt.pdf):
 	Section:
 		Id: front-cover
 		Page numbering: none
-		Inherit fixed: false
+		Inherit page overlays: false
 		Page:
 			Margin: 0
-		Relative:
+		Frame:
 			Id: cover
 			Box:
 				Width: 595
@@ -141,7 +141,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/silla.jpg
@@ -178,7 +178,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/mesa.jpg
@@ -215,7 +215,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/lampara.jpg
@@ -225,7 +225,7 @@ Document (dev.stxt.pdf):
 									Width: 100%
 									Height: 205
 									Radius: 5.5 5.5 0 0
-							Absolute:
+							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40
 								Style: new
@@ -259,7 +259,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/taburete.jpg
@@ -308,7 +308,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/estanteria.jpg
@@ -345,7 +345,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/banco.jpg
@@ -382,7 +382,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/espejo.jpg
@@ -419,7 +419,7 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: card
-						Relative:
+						Frame:
 							Box:
 								Height: 205
 							Image: examples/catalog/escritorio.jpg
@@ -429,7 +429,7 @@ Document (dev.stxt.pdf):
 									Width: 100%
 									Height: 205
 									Radius: 5.5 5.5 0 0
-							Absolute:
+							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40
 								Style: new

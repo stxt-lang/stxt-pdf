@@ -1,4 +1,4 @@
-# Case: Absolute que cabe en la página sin girar y girado se sale
+# Case: Overlay que cabe en la página sin girar y girado se sale
 # Code: BOX_OVERFLOW
 # Line: 14
 Document (dev.stxt.pdf):
@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 		Margin: 40
 	Section:
-		Absolute:
+		Overlay:
 			Offset: 0 auto auto 0
 			Rotate: 45
 			Box:

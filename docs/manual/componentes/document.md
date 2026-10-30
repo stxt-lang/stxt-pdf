@@ -5,7 +5,7 @@
 - `Language` y `Title`, obligatorios;
 - `Page`, el papel y los márgenes;
 - `Styles`, opcional, con las reglas de estilo ([Estilos](../comun/estilos.md));
-- los `Fixed` de todo el documento (cabeceras y pies), opcionales;
+- los `Page overlay` de todo el documento (cabeceras y pies), opcionales;
 - una o más `Section`, con el contenido.
 
 ```
@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Size: 22
 				Bold: true
-	Fixed:
+	Page overlay:
 		Offset: auto 0 -30 0
 		Text: Página {page} de {pages}
 			Typography:
@@ -32,7 +32,7 @@ Document (dev.stxt.pdf):
 				Align: right
 	Section:
 		Page numbering: none
-		Inherit fixed: false
+		Inherit page overlays: false
 		Page:
 			Margin: 0
 		Block:
@@ -83,8 +83,8 @@ El tamaño de la página y sus márgenes. El tamaño se da de una de dos formas,
 | `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
 
 `Margin` son los márgenes de la página, de 1 a 4 números (arriba, derecha, abajo, izquierda). Lo que queda dentro es el
-**área útil**: donde va el contenido. Las cabeceras y los pies van en los márgenes, con un `Fixed`
-([posicionados](relative-absolute-fixed.md#fixed)).
+**área útil**: donde va el contenido. Las cabeceras y los pies van en los márgenes, con un `Page overlay`
+([posicionados](frame-and-overlays.md#page-overlay)).
 
 ## `Section`
 
@@ -96,18 +96,18 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 | `Page numbering` | `continue` (por defecto): sigue la cuenta de páginas; `restart`: vuelve a empezar en 1; `none`: sus páginas no tienen número ni cuentan |
 | `Page number format` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`…) o `upper-roman` (`I`, `II`…) |
 | `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
-| `Inherit fixed` | `true` (por defecto): lleva las cabeceras y los pies del documento; `false`: solo los suyos |
+| `Inherit page overlays` | `true` (por defecto): lleva las cabeceras y los pies del documento; `false`: solo los suyos |
 | `Begin on` | `any` (por defecto): empieza en la página siguiente; `odd`: en una impar, la de la derecha al imprimir a doble cara |
 | `Id`, `Style` | Para enlazarla (`#id`, su primera página) y darle tipografía con una regla (`Typography` y nada más: un anexo en otro idioma) |
 
-Una sección puede tener sus propios `Fixed`, que solo salen en sus páginas. Una sección vacía es un error: no tendría
+Una sección puede tener sus propios `Page overlay`, que solo salen en sus páginas. Una sección vacía es un error: no tendría
 ninguna página.
 
 ## Numeración de las páginas
 
 `{page}` escribe el número de la página y `{pages}` el último número de la cuenta en curso, que empieza de nuevo en cada
 sección con `Page numbering: restart`. Una página de una sección `none` no tiene número: si un texto con `{page}` cae en ella
-(un pie del documento en la portada), es un error, así que esa sección declara `Inherit fixed: false`.
+(un pie del documento en la portada), es un error, así que esa sección declara `Inherit page overlays: false`.
 
 Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie de la página: el impreso, también en
 romanos si su sección tiene `Page number format: lower-roman`. Para un prefacio en romanos, su sección declara `Page number format` y la
@@ -132,7 +132,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Serif
 				Size: 11
-	Fixed:
+	Page overlay:
 		Offset: auto 0 -30 0
 		Text: {page}
 		Typography:
@@ -150,14 +150,14 @@ Document (dev.stxt.pdf):
 
 ## Recetas
 
-- **Portada a sangre:** una sección con `Page` de `Margin: 0`, `Page numbering: none` e `Inherit fixed: false`, y un bloque
+- **Portada a sangre:** una sección con `Page` de `Margin: 0`, `Page numbering: none` e `Inherit page overlays: false`, y un bloque
   de `Height: 100%` con su fondo.
 - **Una página apaisada en medio:** una sección con `Orientation: landscape`.
 - **Un título que no va al índice:** `In table of contents: false` en el encabezado ([Encabezados](heading.md)).
 
 ## Lo que no hay
 
-- Un fondo de página propio: se pinta con un bloque del tamaño de la página o con un `Fixed` detrás de todo
+- Un fondo de página propio: se pinta con un bloque del tamaño de la página o con un `Page overlay` detrás de todo
   ([Capas y giro](../comun/capas-y-giro.md)).
 
 Más detalle en la [referencia](../../referencia/componentes/document.md).

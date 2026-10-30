@@ -116,7 +116,7 @@ class TextTypographyTest {
 
     @Test
     void aPageMarkerIsNumberedAfterTheTransform() {
-        LayoutFixture l = layOutPaged(180, "\tFixed:", "\t\tOffset: auto 0 -30 0", "\t\tTypography:",
+        LayoutFixture l = layOutPaged(180, "\tPage overlay:", "\t\tOffset: auto 0 -30 0", "\t\tTypography:",
                 "\t\t\tTransform: uppercase",
                 "\t\tText: Página {page} de {pages}", "\t\t\tId: footer",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 150");

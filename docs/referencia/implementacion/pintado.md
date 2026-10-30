@@ -16,8 +16,8 @@ una caja redondeada (cuartos de elipse como Bézier) y el trapecio de cada lado 
 Cada `Piece` lleva en `frames` la cadena de giros y recortes de sus ancestros, de la página hacia dentro, y cada paso del
 pintado se la aplica con `Canvas.beginRotation`/`endRotation` y `beginClip`/`endClip`, y después el giro de la propia caja:
 una caja girada se pinta girada con todo lo que contiene, sea un contexto o gire en flujo. Una caja con esquinas
-redondeadas añade a lo que tiene en flujo (también a un `Relative`) el recorte por la curva de su caja de relleno; un
-`Absolute` hereda solo los giros, y un `Fixed`, nada. El fondo, el borde y la imagen se pintan con los recortes; el texto,
+redondeadas añade a lo que tiene en flujo (también a un `Frame`) el recorte por la curva de su caja de relleno; un
+`Overlay` hereda solo los giros, y un `Page overlay`, nada. El fondo, el borde y la imagen se pintan con los recortes; el texto,
 solo con los giros; y el contorno de depuración (`Canvas.outlines()`), sin recortes, para que se vea la caja entera. El paso
 de los fondos de una caja que no pinta nada no recorta. Las zonas de los enlaces las calcula
 `StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`; el rectángulo de cada tramo con enlace
@@ -174,7 +174,7 @@ La caché de fuentes de JSVG es de toda la JVM y no está sincronizada: un SVG c
 ### PDF etiquetado
 
 `PdfStructure` construye el árbol de estructura con el contenido marcado (`Tagging.beginText`/`endText`; fondos, bordes y
-`Fixed` son *artifacts*) y los marcadores. `PdfStructure.type` es un `switch` exhaustivo sobre `Element.Role`, así que un
+`Page overlay` son *artifacts*) y los marcadores. `PdfStructure.type` es un `switch` exhaustivo sobre `Element.Role`, así que un
 elemento nuevo con un papel que ya existe no toca `paint`. `PdfStructure.build` crea el `Link` de una caja con `Link` como
 hijo de su elemento y padre de su contenido, y `PdfStructure.markLink` el de un enlace de texto; `PdfStructure.outside` el
 `Link` suelto de lo que no es contenido.

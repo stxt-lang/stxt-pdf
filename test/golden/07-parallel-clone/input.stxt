@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -15 0
 			Box:

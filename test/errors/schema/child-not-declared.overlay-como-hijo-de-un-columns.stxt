@@ -1,6 +1,6 @@
-# Case: Sección con solo un Fixed, que no ocupa sitio
-# Code: SECTION_EMPTY
-# Line: 15
+# Case: Overlay como hijo de un Columns
+# Code: CHILD_NOT_DECLARED
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,5 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
-			Text: Pie
+		Columns:
+			Count: 2
+			Overlay:
+				Text: Nota

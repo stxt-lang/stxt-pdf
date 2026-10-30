@@ -1,7 +1,7 @@
 # `Grid` y `Area`
 
 En un `Grid`, cuyos ítems son el elemento de cada `Area`, el motor resuelve primero **dónde** va cada ítem y después
-**cuánto** mide cada pista (cada columna y cada fila). Cada hijo en flujo es un `Area`; además admite `Absolute` y `Fixed`.
+**cuánto** mide cada pista (cada columna y cada fila). Cada hijo en flujo es un `Area`; además admite `Overlay` y `Page overlay`.
 El `Grid` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento en flujo.
 
 ```
@@ -121,8 +121,8 @@ que ocupa un mismo ítem se parten juntas ([Cortes](../comun/cortes.md#cortes-en
 
 ## Posicionadas
 
-La posición estática de un `Absolute` o un `Fixed` hijo de un `Grid` es la esquina superior izquierda de su caja de
-contenido ([posicionados](relative-absolute-fixed.md#absolute)).
+La posición estática de un `Overlay` o un `Page overlay` hijo de un `Grid` es la esquina superior izquierda de su caja de
+contenido ([posicionados](frame-and-overlays.md#overlay)).
 
 ## Lo que no hay
 

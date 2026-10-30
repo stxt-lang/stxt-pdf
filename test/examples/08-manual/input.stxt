@@ -1,5 +1,5 @@
 # Guía rápida de un termostato, de tres páginas. Reúne lo que suele tener un manual técnico:
-# una figura con números superpuestos (un Relative con sus Absolute encima) y su leyenda al
+# una figura con números superpuestos (un Frame con sus Overlay encima) y su leyenda al
 # lado (una List de Paragraph con la negrita escrita con Inline: markdown, que la regla de
 # Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
 # un bloque de terminal con las columnas alineadas (un Text con White space: pre, en monoespaciada), un
@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 	Title: Guía rápida del termostato Aire+ T2
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Offset: -34 0 auto 0
 			Flex:
@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 					Text: Aire+ T2 · Guía rápida
 				Item:
 					Text: Versión 2.1 · Octubre de 2025
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -40 0
 			Box:
@@ -73,7 +73,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 6 0
 			Item:
-				Relative:
+				Frame:
 					Id: device
 					Box:
 						Width: 250
@@ -82,19 +82,19 @@ Document (dev.stxt.pdf):
 						Alt: El termostato visto de frente, con el anillo de temperatura y el indicador luminoso
 						Box:
 							Width: 100%
-					Absolute:
+					Overlay:
 						Offset: 30 auto auto 184
 						Style: badge
 						Text: 1
-					Absolute:
+					Overlay:
 						Offset: 76 auto auto 124
 						Style: badge
 						Text: 2
-					Absolute:
+					Overlay:
 						Offset: 170 auto auto 70
 						Style: badge
 						Text: 3
-					Absolute:
+					Overlay:
 						Offset: 120 auto auto 190
 						Style: badge
 						Text: 4

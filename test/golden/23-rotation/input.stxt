@@ -3,18 +3,18 @@
 # Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
 # El giro de un posicionado solo cambia el pintado: sus Rect son los de las cajas sin girar. Una caja girada en
 # flujo ocupa el rectángulo que la envuelve: su Rect es ese.
-#   tag (Absolute):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
+#   tag (Overlay):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
 #                     Girado 45 grados alrededor de su centro (360, 50), lo envuelve un cuadrado de
 #                     (80 + 20) × cos 45 = 70,7: de y = 14,6 a 85,4 y de x = 324,6 a 395,4; cabe.
 #   intro:            el primer bloque del flujo, 380 × 150 en (20, 20).
-#   stamp (Relative): 120 × 60 en (20, 170), girado −8 alrededor de su centro (80, 200): lo
+#   stamp (Frame): 120 × 60 en (20, 170), girado −8 alrededor de su centro (80, 200): lo
 #                     envuelve de x = 16,4 a 143,6 y de y = 161,9 a 238,1; cabe.
-#   big (Relative):   girado 180, mide 40 + 50 = 90 y en la página 1 quedan 278 − 230 = 48. Sin girar
+#   big (Frame):   girado 180, mide 40 + 50 = 90 y en la página 1 quedan 278 − 230 = 48. Sin girar
 #                     se partiría entre b1 (40, que cabe) y b2; girado no se parte y pasa entero a la
 #                     página 2: (20, 20), con b1 en y = 20 y b2 en y = 60.
 #   badge (Image):    test/square.png, 30 × 30, girada 45 sobre su centro: en flujo detrás de big, ocupa el
 #                     cuadrado que la envuelve, de 30 × √2 = 42,43 de lado, en (20, 110).
-#   side (Fixed):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
+#   side (Page overlay):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
 #                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Girado −90 alrededor de su esquina
 #                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.
 Document (dev.stxt.pdf):
@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Absolute:
+		Overlay:
 			Id: tag
 			Offset: 20 0 auto auto
 			Rotate: 45
@@ -51,7 +51,7 @@ Document (dev.stxt.pdf):
 				Padding: 12 110 12 12
 				Background: #F2EFE8
 			Text: Una caja girada ocupa su sitio sin girar: el sello de abajo no mueve el bloque que lo sigue.
-		Relative:
+		Frame:
 			Id: stamp
 			Rotate: -8
 			Box:
@@ -67,7 +67,7 @@ Document (dev.stxt.pdf):
 					Align: center
 					Color: #C0392B
 					Transform: uppercase
-		Relative:
+		Frame:
 			Id: big
 			Rotate: 180
 			Block:
@@ -85,7 +85,7 @@ Document (dev.stxt.pdf):
 		Image: test/square.png
 			Id: badge
 			Rotate: 45
-		Fixed:
+		Page overlay:
 			Id: side
 			Offset: 229 auto auto -17
 			Rotate: -90

@@ -20,7 +20,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Id: header
 			Offset: -15 0 auto 0
 			Box:
@@ -28,7 +28,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Size: 8
 			Text: Cabecera
-		Fixed:
+		Page overlay:
 			Id: footer
 			Offset: auto 0 -15 0
 			Box:

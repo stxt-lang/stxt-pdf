@@ -31,7 +31,7 @@ import java.util.List;
  * @param lines    líneas de texto, si la caja contiene texto
  * @param first    es el primer fragmento de la caja
  * @param last     es el último fragmento de la caja
- * @param offsetX  desplazamiento de un {@code Relative} (referencia/componentes/relative-absolute-fixed.md), ya
+ * @param offsetX  desplazamiento de un {@code Frame} (referencia/componentes/frame-and-overlays.md), ya
  *                 sumado a {@code x}: su sitio en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo,
  *                 con la base de porcentajes de su layout; 0 en las demás cajas
  * @param offsetY  ídem en vertical
@@ -56,7 +56,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
                 null);
     }
 
-    /** Un fragmento sin desplazamiento de {@code Relative}: el que devuelve el layout de una caja. */
+    /** Un fragmento sin desplazamiento de {@code Frame}: el que devuelve el layout de una caja. */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last) {
         this(box, x, y, width, height, margin, border, padding, children, lines, first, last, 0, 0);
@@ -101,7 +101,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
 
     /**
      * El fragmento en ({@code newX}, {@code newY}), que ya incluye el desplazamiento de
-     * {@code Relative} ({@code dx}, {@code dy}).
+     * {@code Frame} ({@code dx}, {@code dy}).
      */
     public Fragment moved(double newX, double newY, double dx, double dy) {
         return new Fragment(box, newX, newY, width, height, margin, border, padding, children, lines, first, last,

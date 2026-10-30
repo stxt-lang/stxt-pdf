@@ -36,7 +36,7 @@ Styles (dev.stxt.pdf):
 			Padding: 5 6
 			Border: 0 0 0.5 0
 			Border color: #CFC8C0
-	For element: Fixed
+	For element: Page overlay
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5

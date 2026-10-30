@@ -1,5 +1,5 @@
-# Case: Isolate en un Block girado, que ya corta el colapso de márgenes
-# Code: ISOLATE_IN_ROTATED
+# Case: Contain margins en un Block girado, que ya corta el colapso de márgenes
+# Code: CONTAIN_MARGINS_IN_ROTATED
 # Line: 18
 Document (dev.stxt.pdf):
 	Language: es
@@ -15,5 +15,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Block:
 			Rotate: 90
-			Isolate: true
+			Contain margins: true
 			Text: Lateral

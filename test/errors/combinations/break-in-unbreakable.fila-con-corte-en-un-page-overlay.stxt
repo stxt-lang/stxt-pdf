@@ -1,4 +1,4 @@
-# Case: Una fila de tabla con Break dentro de un Fixed, que se repite y no se parte
+# Case: Una fila de tabla con Break dentro de un Page overlay, que se repite y no se parte
 # Code: BREAK_IN_UNBREAKABLE
 # Line: 23
 Document (dev.stxt.pdf):
@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Text: Cuerpo
-		Fixed:
+		Page overlay:
 			Table:
 				Column sizes: 1fr
 				Body:

@@ -1,4 +1,4 @@
-# Los bloques del flujo, siempre en (20, 20). Los Fixed salen, por página, en el orden del documento:
+# Los bloques del flujo, siempre en (20, 20). Los Page overlay salen, por página, en el orden del documento:
 # cover (1), head (2, 3, 4), foot (todas), odd (1, 3), even (2, 4) y end (4).
 Result:
 	Page: 1

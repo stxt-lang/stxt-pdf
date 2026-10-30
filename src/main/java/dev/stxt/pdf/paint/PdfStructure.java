@@ -63,7 +63,7 @@ import java.util.Set;
  * (referencia/componentes/columns.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
  * contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del elemento de su caja; una caja partida
  * entre páginas tiene contenido en varias. Los fondos, los bordes, las imágenes sin {@code Alt} (decorativas) y los
- * {@code Fixed} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
+ * {@code Page overlay} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
  *
  * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, referencia/comun/tipografia.md) es
  * el {@code Lang} de su elemento, que heredan los de dentro.</p>
@@ -83,7 +83,7 @@ import java.util.Set;
 final class PdfStructure {
 
     private final PDStructureTreeRoot treeRoot = new PDStructureTreeRoot();
-    /** Elemento de estructura de cada caja; las de un {@code Fixed} no tienen. */
+    /** Elemento de estructura de cada caja; las de un {@code Page overlay} no tienen. */
     private final Map<Box, PDStructureElement> elements = new HashMap<>();
     /** Por página, los elementos a los que pertenece cada {@code MCID}: el árbol de padres. */
     private final Map<Integer, PDParentTreeValue> parents = new HashMap<>();
@@ -103,7 +103,7 @@ final class PdfStructure {
     /** El {@code Link} del enlace de texto que se está pintando, para colgarle la anotación de su zona. */
     private PDStructureElement inline;
     /**
-     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Fixed}, una imagen decorativa), por caja y
+     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Page overlay}, una imagen decorativa), por caja y
      * destino: están en el sitio de la caja en el árbol, sin contenido, y reciben las anotaciones de todas las páginas.
      */
     private final Map<Box, Map<String, PDStructureElement>> standIns = new HashMap<>();
@@ -156,7 +156,7 @@ final class PdfStructure {
     }
 
     /**
-     * Elementos de la caja y de sus descendientes, salvo los {@code Fixed}. El flujo de columnas
+     * Elementos de la caja y de sus descendientes, salvo los {@code Page overlay}. El flujo de columnas
      * de un {@code Columns} no tiene elemento: su contenido cuelga del {@code Columns}.
      */
     private void build(Box box, PDStructureNode parent) {
@@ -217,7 +217,7 @@ final class PdfStructure {
         return e;
     }
 
-    /** Los elementos de los hijos de la caja; de un {@code Fixed}, que no es contenido, solo sus enlaces. */
+    /** Los elementos de los hijos de la caja; de un {@code Page overlay}, que no es contenido, solo sus enlaces. */
     private void children(Box box, PDStructureNode content) {
         for (Box child : box.children()) {
             if (child.style().position() == Position.FIXED) {
@@ -477,7 +477,7 @@ final class PdfStructure {
 
     /**
      * Apunta el texto de un fragmento de la caja en la página actual y da su {@code MCID}; -1 si
-     * es un <em>artifact</em> (dentro de un {@code Fixed}). Cuelga del elemento de la caja o, si la caja
+     * es un <em>artifact</em> (dentro de un {@code Page overlay}). Cuelga del elemento de la caja o, si la caja
      * tiene {@code Link}, de este.
      */
     int mark(Box box) {
@@ -577,7 +577,7 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta el enlace de una caja que no es contenido (en un {@code Fixed}, una imagen decorativa): PDF/UA exige
+     * Etiqueta el enlace de una caja que no es contenido (en un {@code Page overlay}, una imagen decorativa): PDF/UA exige
      * que toda anotación de enlace esté en un {@code Link}. Es el {@code Link} de la caja y su destino que se puso en
      * su sitio del árbol al construirlo, sin contenido marcado y con el texto del enlace como {@code Alt}: un lector
      * de pantalla lo anuncia una vez, en su orden de lectura, aunque se repita en cada página (un pie con una web).
@@ -676,7 +676,7 @@ final class PdfStructure {
      * {@code destinations}.
      */
     void finish(PDDocument doc, Map<Box, PDPageXYZDestination> destinations) {
-        // Un Link sin anotaciones (el de un Fixed que no sale en ninguna página) no puede quedar vacío.
+        // Un Link sin anotaciones (el de un Page overlay que no sale en ninguna página) no puede quedar vacío.
         for (Map<String, PDStructureElement> links : standIns.values()) {
             for (PDStructureElement link : links.values()) {
                 if (link.getKids().isEmpty()) {

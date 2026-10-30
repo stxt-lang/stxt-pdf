@@ -2,7 +2,7 @@
 
 ## El grupo `Break`
 
-Los cortes de página. No se heredan. No se admite en `Absolute` ni en `Fixed`, que no se parten ni están en el flujo de
+Los cortes de página. No se heredan. No se admite en `Overlay` ni en `Page overlay`, que no se parten ni están en el flujo de
 la página, ni en los encabezados ni en las celdas ([Encabezados](../componentes/heading.md#cortes),
 [Table](../componentes/table.md#filas)).
 
@@ -54,7 +54,7 @@ nada) es un error (`PAGE_OVERFLOW`, [Desbordamiento](desbordamiento.md)).
 
 `Before: page` y `After: page` fuerzan un salto de página, y `Before: column` y `After: column`, dentro de un `Columns`,
 un salto a la columna siguiente (que, en la última columna, es también de página). Solo se aplican a cajas en flujo:
-`Absolute` y `Fixed` no admiten `Break`.
+`Overlay` y `Page overlay` no admiten `Break`.
 
 - El `Before` del primer hijo de un bloque y el `After` del último se propagan al bloque; de un `Columns` solo sale el de
   página.
@@ -62,7 +62,7 @@ un salto a la columna siguiente (que, en la última columna, es también de pág
 - Un corte forzado al principio de una página (o de una columna) se ignora: no deja páginas en blanco. Lo mismo el
   `After: page` de la última caja de una sección.
 - Un corte de página dentro de un `Columns` deja sin llenar las columnas que quedan en esa página.
-- Dentro de una caja que no se parte (un `Absolute`, un `Fixed`, un `Relative` girado o una caja girada en flujo), ningún
+- Dentro de una caja que no se parte (un `Overlay`, un `Page overlay`, un `Frame` girado o una caja girada en flujo), ningún
   `Break` tiene efecto. Si
   lo escribe el propio elemento (o la `Row` de una celda) es un error (`BREAK_IN_UNBREAKABLE`); si llega de una regla de
   `Styles`, no tiene efecto y no es un error. Las columnas de un `Columns` de dentro sí se cortan, y sus `Break` cuentan.
@@ -122,9 +122,9 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../componente
 
 - **Imágenes.** Una `Image` no se parte: si no cabe en lo que queda de la página (o de la columna), pasa entera a la
   siguiente ([Image](../componentes/image.md#cortes-de-página)).
-- **Posicionadas.** Un `Absolute` se coloca en la página donde cae su posición y no se parte. Si su contenedor de
+- **Posicionadas.** Un `Overlay` se coloca en la página donde cae su posición y no se parte. Si su contenedor de
   referencia está partido, se resuelve contra el fragmento de esa página: su alto es el de ese fragmento, no el total. Un
-  `Fixed` se repite en las páginas que dice su `Pages`. Un `Relative` se parte como cualquier bloque, salvo si está
+  `Page overlay` se repite en las páginas que dice su `Pages`. Un `Frame` se parte como cualquier bloque, salvo si está
   girado: entonces, como una imagen, pasa entero a la página siguiente si no cabe en lo que queda de la actual
   ([Capas y giro](capas-y-giro.md#giro-rotate)).
 - **Giradas en flujo.** Un `Block`, un `Text` o un `Paragraph` girado tampoco se parte: como una imagen, entero o en la

@@ -56,7 +56,7 @@ class BlockLayoutTest {
     @Test
     void isolateStopsTheCollapse() {
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tMargin: 10 0 0 0", "\t\tIsolate: true",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tMargin: 10 0 0 0", "\t\tContain margins: true",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0");
         assertRect(40, 50, 515, 70, l.rect("P"));
         assertRect(40, 70, 515, 30, l.rect("C"));
@@ -170,7 +170,7 @@ class BlockLayoutTest {
     void outOfFlowBoxesTakeNoSpace() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10",
-                "\tAbsolute:", "\t\tBox:", "\t\t\tHeight: 50",
+                "\tOverlay:", "\t\tBox:", "\t\t\tHeight: 50",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 10");
         assertRect(40, 50, 515, 10, l.rect("B"));
     }

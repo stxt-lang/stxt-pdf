@@ -1,6 +1,6 @@
-# Case: Absolute sin Offset más ancho que la página
-# Code: BOX_OVERFLOW
-# Line: 11
+# Case: Frame desde izquierda y derecha
+# Code: OFFSET_CONFLICT
+# Line: 12
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Absolute:
+		Frame:
+			Offset: auto 7 auto 11
 			Box:
-				Width: 700
 				Height: 10

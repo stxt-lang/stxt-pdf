@@ -1,5 +1,5 @@
 # Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
-# doble dibujados con Fixed de Layer negativa, que quedan detrás del contenido en todas las
+# doble dibujados con Page overlay de Layer negativa, que quedan detrás del contenido en todas las
 # páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
 # con el precio y la nota final en negrita dentro de la línea (Inline: markdown). Los rótulos de las
 # secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
@@ -11,13 +11,13 @@ Document (dev.stxt.pdf):
 	Title: Carta · Restaurante La Cala
 	Language: es
 	Section:
-		Fixed:
+		Page overlay:
 			Id: paper
 			Offset: -50 -54 -52 -54
 			Layer: -2
 			Box:
 				Background: #FBF6EA
-		Fixed:
+		Page overlay:
 			Id: frame-outer
 			Offset: -30 -34 -32 -34
 			Layer: -1
@@ -25,7 +25,7 @@ Document (dev.stxt.pdf):
 				Radius: 10
 				Border: 1.2
 				Border color: #14365C
-		Fixed:
+		Page overlay:
 			Id: frame-inner
 			Offset: -24 -28 -26 -28
 			Layer: -1
@@ -33,7 +33,7 @@ Document (dev.stxt.pdf):
 				Radius: 4
 				Border: 0.5
 				Border color: #926829
-		Fixed:
+		Page overlay:
 			Id: footer
 			Pages: not-first
 			Offset: auto 0 -19 0

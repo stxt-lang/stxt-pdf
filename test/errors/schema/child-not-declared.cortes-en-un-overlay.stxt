@@ -1,6 +1,6 @@
-# Case: Relative desde arriba y abajo
-# Code: OFFSET_CONFLICT
-# Line: 12
+# Case: Cortes en un Overlay
+# Code: CHILD_NOT_DECLARED
+# Line: 14
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -8,7 +8,8 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Relative:
-			Offset: 5 auto 9 auto
+		Overlay:
 			Box:
 				Height: 10
+			Break:
+				Before: page

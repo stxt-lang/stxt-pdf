@@ -180,10 +180,10 @@ class GridLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                // Un grid posicionado: Relative y, dentro, el Grid con el alto.
-                "\tRelative:", "\t\tGrid:", "\t\t\tBox:", "\t\t\t\tHeight: 50", "\t\t\tColumn sizes: 100 100",
-                "\t\t\tArea:", "\t\t\t\tRelative:", "\t\t\t\t\tId: R", "\t\t\t\t\tOffset: 3 auto auto 4",
-                "\t\t\tAbsolute:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
+                // Un grid posicionado: Frame y, dentro, el Grid con el alto.
+                "\tFrame:", "\t\tGrid:", "\t\t\tBox:", "\t\t\t\tHeight: 50", "\t\t\tColumn sizes: 100 100",
+                "\t\t\tArea:", "\t\t\t\tFrame:", "\t\t\t\t\tId: R", "\t\t\t\t\tOffset: 3 auto auto 4",
+                "\t\t\tOverlay:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
                 "\t\t\tArea:", "\t\t\t\tBlock:", "\t\t\t\t\tId: B");
         assertRect(44, 43, 100, 50, l.rect("R"));

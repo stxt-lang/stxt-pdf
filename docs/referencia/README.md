@@ -49,7 +49,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [`Flex`](componentes/flex.md) | `Flex` e `Item` |
 | [`Grid`](componentes/grid.md) | `Grid` y `Area` |
 | [`Columns`](componentes/columns.md) | `Columns` |
-| [`Relative`, `Absolute` y `Fixed`](componentes/relative-absolute-fixed.md) | Los elementos posicionados |
+| [`Frame`, `Overlay` y `Page overlay`](componentes/frame-and-overlays.md) | Los elementos posicionados |
 | [`Image`](componentes/image.md) | `Image`: PNG, JPEG y SVG |
 | [`Markdown`](componentes/markdown.md) | `Markdown` y el elemento generado `Code block` |
 | [`Table of contents`](componentes/table-of-contents.md) | `Table of contents` y las entradas que genera |

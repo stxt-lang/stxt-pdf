@@ -1,4 +1,4 @@
-# Case: Relative girado alrededor de su esquina que se sale por arriba
+# Case: Frame girado alrededor de su esquina que se sale por arriba
 # Code: BOX_OVERFLOW
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Paper: A5
 		Margin: 20
 	Section:
-		Relative:
+		Frame:
 			Rotate: -30
 			Rotate origin: bottom left
 			Box:

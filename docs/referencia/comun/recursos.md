@@ -55,7 +55,7 @@ tramo (`Bold: false` con un tramo en negrita necesita la negrita), y cada tramo,
 desconocida (`FONT_UNKNOWN`), una variante que falta (`FONT_VARIANT_MISSING`) o un carácter que la fuente no tiene
 (`GLYPH_MISSING`) son errores con la línea del nodo culpable: la de la `Font` declarada (aunque esté en una antecesora o en
 una regla) si la familia no existe; la del texto, o la del tramo, si falta una variante, y el mensaje nombra dónde se
-declaran `Font`, `Bold` y `Italic`; la del carácter dentro de un bloque `Content >>` si falta un carácter.
+declaran `Font`, `Bold` e `Italic`; la del carácter dentro de un bloque `Content >>` si falta un carácter.
 
 También son errores, sin línea porque no son del documento (`RESOURCE`), que no exista `fonts/`, un fichero que no se puede
 leer, una fuente variable o dos ficheros con la misma familia, peso y estilo.

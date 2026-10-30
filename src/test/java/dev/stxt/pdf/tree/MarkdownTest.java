@@ -85,11 +85,11 @@ class MarkdownTest {
 
     @Test
     void headingsCannotGoInAFixed() {
-        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tBlock:", "\tFixed:",
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> build("\tBlock:", "\tPage overlay:",
                 "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\t# Pie"));
-        assertEquals(ErrorCode.HEADING_IN_FIXED, e.errorCode());
+        assertEquals(ErrorCode.HEADING_IN_PAGE_OVERLAY, e.errorCode());
         assertEquals(17, e.line());
-        assertDoesNotThrow(() -> build("\tBlock:", "\tFixed:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
+        assertDoesNotThrow(() -> build("\tBlock:", "\tPage overlay:", "\t\tMarkdown:", "\t\t\tContent >>", "\t\t\t\tPie **{page}**"));
     }
 
     @Test

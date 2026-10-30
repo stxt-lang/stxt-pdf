@@ -12,7 +12,7 @@
 # su ancho mínimo sería 160 y las columnas no cabrían). contain dibuja la imagen de 100 × 50
 # centrada en su caja, sobre su fondo; cover la dibuja de 125 × 62,5 y la recorta. El Markdown traduce la imagen sola en su párrafo a una Image de su tamaño
 # natural (30 × 30) y el párrafo va debajo: md mide 30 + 12.
-# logo: un Fixed en la esquina de arriba a la derecha, en el margen de la página, en las dos.
+# logo: un Page overlay en la esquina de arriba a la derecha, en el margen de la página, en las dos.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300
@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Fixed:
+		Page overlay:
 			Offset: -16 0 auto auto
 			Image: test/square.png
 				Id: logo
