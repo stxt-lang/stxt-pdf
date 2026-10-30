@@ -202,6 +202,10 @@ public enum ErrorCode {
     /** La fuente no tiene un carácter del texto. */
     GLYPH_MISSING,
 
+    // --- Accesibilidad (al convertir) -------------------------------------------------------
+    /** El texto tiene poco contraste con lo que hay debajo; se puede desactivar al convertir. */
+    CONTRAST_LOW,
+
     // --- Límites ------------------------------------------------------------------------------
     /** El documento ocupa más páginas que {@code Limits.maxPages}; no es de ninguna línea. */
     PAGE_LIMIT(Kind.LIMIT),

@@ -70,7 +70,7 @@ Styles (dev.stxt.pdf):
 			Size: 10
 	For class: place
 		Typography:
-			Color: #6B7B85
+			Color: #697882
 		Box:
 			Margin: 0 0 4 0
 	For class: figure
@@ -82,4 +82,4 @@ Styles (dev.stxt.pdf):
 	For class: caption
 		Typography:
 			Size: 7.5
-			Color: #6B7B85
+			Color: #697882

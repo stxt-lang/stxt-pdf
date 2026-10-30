@@ -6,6 +6,7 @@ import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.golden.ReferenceFiles;
 import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.output.StxtDump;
@@ -81,6 +82,7 @@ class ExamplesTest {
         InlineNode styles = Files.exists(stylesFile) ? reader.readStyles(stylesFile) : null;
         Resources resources = new Resources();
         LaidOutDocument document = new Engine(new PdfMetrics(resources), resources).layOutDocument(input, styles);
+        ContrastCheck.check(document);
         String dump = StxtDump.dump(document.pages(), false);
         Path actual = ACTUAL_DIR.resolve(dir.getFileName());
         byte[] pdf = pdf(document, resources);

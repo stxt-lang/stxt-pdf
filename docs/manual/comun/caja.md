@@ -60,6 +60,18 @@ El borde se pinta entre el relleno y el margen. Con un color por lado, los lados
 lado con grosor 0 no se ve, así que `Border: 0 0 0 3` es una franja a la izquierda. El fondo se pinta detrás del contenido
 y del relleno, hasta el borde. Un fondo o un color con opacidad deja ver lo que hay debajo.
 
+### Contraste
+
+El texto tiene que distinguirse de su fondo, para que lo pueda leer quien ve peor: al convertir, un texto con poco
+contraste es un error (`CONTRAST_LOW`) que dice cuánto tiene y cuánto necesita. Hace falta al menos **4,5:1**, o **3:1** en
+el texto grande (`Size` de 18 o más, o de 14 en negrita). Como referencia, el gris `#767676` sobre blanco llega justo a
+4,5:1, y el negro sobre blanco tiene 21:1.
+
+Lo que cuenta es lo que hay de verdad debajo del texto: el fondo de su caja, el de las de fuera o el de una caja que tenga
+detrás, mezclados si tienen opacidad; de un degradado, el peor de sus colores. El texto encima de una imagen no se
+comprueba, porque no se sabe qué hay debajo. Quien convierte puede desactivar la comprobación
+([Uso desde Java](uso-desde-java.md)).
+
 ## Esquinas
 
 `Radius: 6` redondea las cuatro esquinas con un radio de 6 puntos; con cuatro valores, cada esquina tiene el suyo.

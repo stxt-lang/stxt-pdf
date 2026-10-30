@@ -33,7 +33,7 @@ Document (dev.stxt.pdf):
 			Layer: -2
 			Box:
 				Border: 1.5
-				Border color: #A8782F
+				Border color: #926829
 		Fixed:
 			Id: frame-inner
 			Offset: -32 -46 -24 -46

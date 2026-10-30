@@ -84,12 +84,13 @@ class GoldenTest {
      * Escribe en {@code dir} ({@code target/reference/golden/<caso>/}) {@code output.pdf} y un {@code page-N.png} por
      * página ({@link ReferenceFiles#writeActual}), y devuelve las imágenes para compararlas con las versionadas. El PDF
      * lleva los contornos de depuración de las cajas y se maqueta con las métricas reales de las fuentes de
-     * {@code resources/fonts}, que se incrustan ({@link Converter}), no con las de la comparación.
+     * {@code resources/fonts}, que se incrustan ({@link Converter}), no con las de la comparación. Sin comprobar el
+     * contraste: un caso golden prueba dónde va cada cosa, y sus colores solo distinguen las cajas.
      */
     private static List<BufferedImage> writePdfAndImages(Path dir, InlineNode input, InlineNode styles)
             throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.Builder converter = Converter.builder().debug(true);
+        Converter.Builder converter = Converter.builder().debug(true).checkContrast(false);
         if (styles != null) {
             converter.styles(styles);
         }

@@ -43,7 +43,7 @@ Styles (dev.stxt.pdf):
 	Element: Fixed
 		Typography:
 			Size: 7.5
-			Color: #8A7A6C
+			Color: #7D6F62
 	Element: Contents entry 1
 		Typography:
 			Font: IBM Plex Serif
@@ -89,7 +89,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Font: IBM Plex Mono
 			Size: 7.5
-			Color: #8A7A6C
+			Color: #7D6F62
 	For class: dims
 		Typography:
 			Size: 7.5
@@ -99,7 +99,7 @@ Styles (dev.stxt.pdf):
 			Font: IBM Plex Serif
 			Size: 14
 			Weight: bold
-			Color: #B5651D
+			Color: #A65C1B
 	For class: new
 		Typography:
 			Size: 7
@@ -110,7 +110,7 @@ Styles (dev.stxt.pdf):
 			Letter spacing: 0.8
 		Box:
 			Radius: 3
-			Background: #B5651D
+			Background: #A65C1B
 			Padding: 3 7
 	Element: Head cell
 		Typography:
@@ -125,4 +125,4 @@ Styles (dev.stxt.pdf):
 			Size: 30
 			Line height: 32
 			Weight: bold
-			Color: #B5651D
+			Color: #A65C1B

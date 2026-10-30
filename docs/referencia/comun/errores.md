@@ -41,6 +41,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 2. **Modelo:** las reglas que el schema no puede expresar, con los códigos de abajo.
 3. **Recursos** ([Recursos](recursos.md)): las fuentes y las imágenes ([Image](../componentes/image.md)).
 4. **Desbordamientos** ([Desbordamiento](desbordamiento.md)): sobre el resultado maquetado.
+5. **Contraste** ([El PDF](pdf.md#contraste)): sobre lo que se pinta, al convertir; quien convierte lo puede desactivar.
 
 ## Códigos
 
@@ -119,6 +120,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` (línea de la `Code font`) | `Fuente desconocida: Arial. Familias en …/resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Weight` y `Style`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic… (Font en la línea 6, …)` |
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `La fuente IBM Plex Sans normal no tiene el carácter '漢' (U+6F22)` |
+| `CONTRAST_LOW` | El texto tiene un contraste de 4,5:1 con lo que tiene debajo, o de 3:1 si es grande ([El PDF](pdf.md#contraste)); línea del `Color` del texto, o de su caja si no lo tiene | `El texto de la caja de la línea 12 tiene un contraste de 2,84:1 con su fondo (#999999 sobre #FFFFFF) y necesita 4,5:1…` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `White space: pre` (línea de la palabra) | `La palabra 'supercalifragilística' no cabe en la línea: la línea mide 138.69 y la caja deja 100…` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Multicol`), y los `Absolute`, los `Fixed` y lo girado en la página | `El contenido de la caja de la línea 7 no cabe en su alto: su texto llega a 24 y la caja deja 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `El marcador '1.' del List item de la línea 12 mide 11.45 con su espacio, y la sangría deja 5…` |

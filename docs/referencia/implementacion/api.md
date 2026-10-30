@@ -28,6 +28,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `styles(InlineNode)`, `styles(Path)`, `styles(String)` | El documento de estilos aparte |
 | `limits(Limits)` | Los límites de la conversión |
 | `debug(boolean)` | Pinta los contornos de las cajas |
+| `checkContrast(boolean)` | Comprueba el contraste del texto con su fondo ([El PDF](../comun/pdf.md#contraste)); por defecto sí. `layOut` lo comprueba con `ContrastCheck`, un lienzo que apunta lo que se pinta |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si

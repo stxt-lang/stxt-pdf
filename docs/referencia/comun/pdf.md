@@ -30,12 +30,44 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
   ([Formato del texto](formato-del-texto.md#mayúsculas-transform)), y las palabras de dos líneas seguidas no se pegan al
   copiar el texto.
 - **Enlaces:** se anuncian con lo que enlazan ([Enlaces](enlaces.md#accesibilidad)).
+- **Contraste:** el texto se distingue de lo que tiene debajo ([abajo](#contraste)).
 
 `Title` y `Language` son obligatorios en `Document` ([Document](../componentes/document.md#title-y-language)), así que todo
 PDF declara cumplir **PDF/UA-1**, la norma de PDF accesible. Los tests lo comprueban con veraPDF.
 
 > **Decisión:** `Title` y `Language` son obligatorios: el idioma es lo que un lector de pantalla necesita para leer el
 > contenido, y PDF/UA exige los dos. *Alternativa descartada:* dejarlos opcionales y no declarar PDF/UA sin ellos.
+
+## Contraste
+
+Al convertir, el motor comprueba que cada texto se distingue de lo que tiene debajo, con el contraste de las pautas de
+accesibilidad WCAG (nivel AA): al menos **4,5:1**, o **3:1** en el texto grande (`Size` de 18 o más, o de 14 en negrita).
+Si no llega, es un error (`CONTRAST_LOW`) con la línea del `Color` del texto, también si lo hereda (sin `Color`, el negro
+de siempre, la línea de la caja).
+
+- **Lo que hay debajo** es lo que se ha pintado antes que el texto en el punto donde empieza: los fondos (`Background`) de
+  su caja, de las de fuera y de las que tiene detrás, mezclados con su opacidad sobre el blanco de la página. Las cajas que
+  no están debajo de ese punto no cuentan, ni los bordes.
+- **Un degradado:** cuenta cada uno de sus colores, y vale el peor.
+- **Un texto con opacidad** (`Color: #00000080`) se mezcla con lo que tiene debajo antes de comparar.
+- **Encima de una imagen** no se sabe qué hay debajo, así que ese texto no se comprueba, salvo que un fondo opaco tape la
+  imagen.
+- Se comprueba todo el texto que se pinta, también el de un `Fixed` y el de las entradas de un índice.
+
+Quien convierte puede desactivarla ([Uso desde Java](../implementacion/api.md#convertir)); por defecto está activa.
+
+> **Decisión:** el contraste se mira en lo que se pinta, no en el árbol de cajas: un texto sobre una caja que no es la suya
+> (un `Absolute` encima de un fondo) tiene debajo ese fondo. *Alternativa descartada:* mirar solo los fondos de la caja y
+> de las de fuera, que daba por blanco lo que hay debajo de un `Absolute` sobre una foto.
+
+> **Decisión:** el texto sobre una imagen no se comprueba. *Alternativa descartada:* tratarlo como un error, que impide la
+> portada con el título sobre una foto aunque se lea bien.
+
+> **Decisión:** se mira el punto donde empieza cada tramo de texto, no toda su superficie. *Alternativa descartada:* el
+> peor color de todo lo que el tramo toca, que obliga a medir el texto y cuenta como fondo el subrayado del propio texto.
+
+> **Decisión:** la comprobación está activa por defecto y se desactiva al convertir, no en el documento. *Alternativa
+> descartada:* una propiedad del documento, que lo dejaría a quien escribe y no a quien publica el PDF.
 
 ## Marcadores
 

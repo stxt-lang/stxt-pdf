@@ -20,6 +20,7 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 | `TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE` | Un texto sin fuente o sin tamaño | Decláralos en `Element: Document` |
 | `FONT_UNKNOWN` | La fuente no está en `fonts/` | Revisa el nombre de la familia; el mensaje lista las que hay |
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usa otra fuente o quita el carácter |
+| `CONTRAST_LOW` | Un texto que apenas se distingue de su fondo: un gris claro sobre blanco | Oscurece su `Color` o cambia el fondo ([Caja](caja.md#contraste)) |
 | `TEXT_OVERFLOW` | Una palabra más ancha que su línea | Ensancha la caja, baja el tamaño o parte la palabra |
 | `BOX_OVERFLOW` | Una caja no cabe en su sitio: más ancha que su padre, contenido más alto que su `Height`, o algo que se sale de la página | Revisa el `Width`, el `Height` o el `Offset` que dice el mensaje |
 | `PAGE_OVERFLOW` | Algo que no se puede partir no cabe ni en una página vacía | Hazlo más pequeño o permite partirlo |

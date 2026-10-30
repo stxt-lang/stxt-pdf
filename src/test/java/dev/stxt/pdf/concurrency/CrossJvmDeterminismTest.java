@@ -52,7 +52,9 @@ class CrossJvmDeterminismTest {
             for (Path dir : dirs) {
                 InlineNode document = reader.read(dir.resolve("input.stxt"));
                 Path styles = dir.resolve("styles.stxt");
-                Converter.Builder builder = Converter.builder();
+                // Los colores de un caso golden solo distinguen las cajas: no se les pide contraste.
+                Converter.Builder builder = Converter.builder()
+                        .checkContrast(!dir.startsWith(Path.of("test", "golden")));
                 if (Files.exists(styles)) {
                     builder.styles(reader.readStyles(styles));
                 }

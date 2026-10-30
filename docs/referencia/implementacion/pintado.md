@@ -158,6 +158,16 @@ hijo de su elemento y padre de su contenido, y `PdfStructure.markLink` el de un 
 > los nombres de las etiquetas del PDF están en `PdfStructure`. *Alternativa descartada:* métodos del PDF en `Element`, que
 > ponen el PDF en `tree`.
 
+## El contraste
+
+`ContrastCheck` es un `Canvas` que no dibuja: apunta, en el orden de pintado, la zona y los colores de cada fondo
+(`fill` y `background`) y la zona de cada imagen, en coordenadas de la página (con el giro aplicado). En cada `text` mira
+el punto de la primera letra (un cuarto del cuerpo a la derecha y un tercio por encima de la línea base, donde no llega el
+subrayado) y recorre lo apuntado que lo contiene: un color opaco sustituye lo de debajo, uno translúcido se mezcla con cada
+color posible de debajo, una imagen lo deja sin conocer hasta que un color opaco la tapa. La caja del texto la sabe por su
+`Tagging` (`beginText`). Los bordes no se apuntan y las esquinas redondeadas cuentan como rectas. Lo usa
+`Converter.layOut`, sobre las páginas ya maquetadas ([El PDF](../comun/pdf.md#contraste)).
+
 ## El SVG de depuración
 
 `SvgCanvas` escribe el SVG de los tests: `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para

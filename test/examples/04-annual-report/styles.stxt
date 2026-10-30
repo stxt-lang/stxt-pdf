@@ -47,7 +47,7 @@ Styles (dev.stxt.pdf):
 	Element: Fixed
 		Typography:
 			Size: 7.5
-			Color: #6B7B8C
+			Color: #687788
 	For class: section
 		Break:
 			Before: page
@@ -65,7 +65,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 8
 			Weight: bold
-			Color: #E07B1F
+			Color: #B16118
 			Transform: uppercase
 			Letter spacing: 1
 		Box:

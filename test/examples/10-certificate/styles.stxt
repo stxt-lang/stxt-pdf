@@ -29,7 +29,7 @@ Styles (dev.stxt.pdf):
 			Font: IBM Plex Sans
 			Size: 10
 			Weight: bold
-			Color: #A8782F
+			Color: #926829
 			Transform: uppercase
 			Letter spacing: 3
 		Box:
@@ -50,13 +50,13 @@ Styles (dev.stxt.pdf):
 			Margin: 2 auto 8 auto
 			Padding: 0 0 4 0
 			Border: 0 0 1 0
-			Border color: #A8782F
+			Border color: #926829
 	For class: corner
 		Box:
 			Width: 14
 			Height: 14
 			Radius: 50%
-			Background: #A8782F
+			Background: #926829
 	For class: line
 		Box:
 			Padding: 5 0 0 0
@@ -69,9 +69,9 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Font: IBM Plex Sans
 			Size: 7.5
-			Color: #7B7D8C
+			Color: #6F707F
 	For class: serial
 		Typography:
-			Color: #A8782F
+			Color: #926829
 			Transform: uppercase
 			Letter spacing: 1.5

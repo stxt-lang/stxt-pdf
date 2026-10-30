@@ -27,6 +27,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
    El resultado es un `LaidOutDocument`: una lista de `Page` con su árbol de `Fragment`.
 4. **Pintar.** `StackingContext` recorre los fragmentos de cada página en orden de pintado y llama a un `Canvas`:
    `PdfCanvas` escribe el PDF (con su etiquetado, marcadores y enlaces) y `SvgCanvas`, el SVG de depuración.
+   `ContrastCheck` es un lienzo que no dibuja: `Converter.layOut` pinta con él cada página para comprobar el contraste del
+   texto ([El PDF](comun/pdf.md#contraste)).
 
 `Converter` envuelve los cuatro pasos para quien convierte ([Uso desde Java](implementacion/api.md)).
 
@@ -101,6 +103,7 @@ nombra `Engine`: dependen de la interfaz `LayoutContext`.
   (`PdfDestinations`), enlaces (`PdfLinks`) y guardado. `PdfCanvas` dibuja una página, con `PdfContent`, `PdfFonts`,
   `PdfGradients` y `PdfImages`.
 - **`SvgCanvas`**: el SVG de depuración de los tests ([El pintado](implementacion/pintado.md)).
+- **`ContrastCheck`**: el contraste del texto con lo que tiene debajo ([El pintado](implementacion/pintado.md#el-contraste)).
 
 ## Reglas de la arquitectura
 

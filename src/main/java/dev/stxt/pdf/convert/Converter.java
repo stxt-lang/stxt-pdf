@@ -8,6 +8,7 @@ import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.StxtPdfException;
+import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.paint.PdfDocumentWriter;
 import dev.stxt.pdf.paint.SvgCanvas;
 import dev.stxt.pdf.resources.Resources;
@@ -51,12 +52,14 @@ public final class Converter {
     private final InlineNode styles;
     private final boolean debug;
     private final Limits limits;
+    private final boolean checkContrast;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
         this.styles = builder.styles;
         this.debug = builder.debug;
         this.limits = builder.limits;
+        this.checkContrast = builder.checkContrast;
     }
 
     /** Un conversor con la configuración por defecto: recursos en {@code resources/}, sin estilos aparte ni depuración. */
@@ -80,11 +83,20 @@ public final class Converter {
 
     /**
      * Maqueta un documento ya validado ({@link DocumentReader}) con las métricas reales de las fuentes de la carpeta de
-     * recursos. Falla con los errores del documento (referencia/comun/errores.md) antes de que se escriba nada.
+     * recursos. Falla con los errores del documento (referencia/comun/errores.md) antes de que se escriba nada,
+     * también con el poco contraste de un texto si no se ha desactivado su comprobación ({@link
+     * Builder#checkContrast}).
      */
     public LaidOutDocument layOut(InlineNode document) {
         Objects.requireNonNull(document, "document");
-        return guarded(() -> new Engine(new PdfMetrics(resources), resources, limits).layOutDocument(document, styles));
+        return guarded(() -> {
+            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits)
+                    .layOutDocument(document, styles);
+            if (checkContrast) {
+                ContrastCheck.check(laidOut);
+            }
+            return laidOut;
+        });
     }
 
     /** Maqueta {@code document} y escribe el PDF en {@code target}, que no se cierra. */
@@ -152,6 +164,7 @@ public final class Converter {
         private InlineNode styles;
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
+        private boolean checkContrast = true;
 
         private Builder() {
         }
@@ -187,6 +200,15 @@ public final class Converter {
          */
         public Builder limits(Limits limits) {
             this.limits = Objects.requireNonNull(limits, "limits");
+            return this;
+        }
+
+        /**
+         * Si comprueba el contraste del texto con su fondo (referencia/comun/pdf.md): con poco, la conversión falla
+         * con {@code CONTRAST_LOW}. Por defecto sí.
+         */
+        public Builder checkContrast(boolean check) {
+            this.checkContrast = check;
             return this;
         }
 

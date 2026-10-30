@@ -32,7 +32,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Radius: 4
 				Border: 0.5
-				Border color: #A8782F
+				Border color: #926829
 		Fixed:
 			Id: footer
 			Pages: not-first
@@ -332,7 +332,7 @@ Document (dev.stxt.pdf):
 						Font: IBM Plex Sans
 						Size: 8
 						Weight: bold
-						Color: #A8782F
+						Color: #926829
 						Transform: uppercase
 						Letter spacing: 2
 						Align: center
@@ -365,4 +365,4 @@ Document (dev.stxt.pdf):
 					Inline: markdown
 					Size: 7
 					Align: center
-					Color: #8A8174
+					Color: #776F64

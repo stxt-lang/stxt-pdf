@@ -3,6 +3,7 @@ package dev.stxt.pdf.examples;
 import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.golden.ReferenceFiles;
 import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.model.Limits;
@@ -117,6 +118,7 @@ class DocumentationExamplesTest {
         Resources resources = new Resources();
         LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources)
                 .layOutDocument(reader.read(document.text()));
+        ContrastCheck.check(laidOut);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfDocumentWriter.write(laidOut, resources, Limits.DEFAULT, out, false);
         byte[] pdf = out.toByteArray();

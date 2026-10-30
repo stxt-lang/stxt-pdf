@@ -252,11 +252,12 @@ public final class Style extends StyleGroup {
 
     /**
      * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
-     * (las de {@code Typography} que la eligen, también la del código) y {@code Line height}, que fijan el alto de las
-     * líneas (referencia/comun/desbordamiento.md).
+     * (las de {@code Typography} que la eligen, también la del código), {@code Line height}, que fijan el alto de las
+     * líneas (referencia/comun/desbordamiento.md), y {@code Color}, del contraste del texto (referencia/comun/pdf.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
-            PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT);
+            PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT,
+            PropertyKey.COLOR);
 
     /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
     static Style inheriting(Style parent) {
