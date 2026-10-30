@@ -5,6 +5,7 @@ import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.StxtPdfException;
@@ -17,8 +18,11 @@ import dev.stxt.pdf.stxt.DocumentReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -52,7 +56,7 @@ public final class Converter {
     private final InlineNode styles;
     private final boolean debug;
     private final Limits limits;
-    private final boolean checkContrast;
+    private final Set<Check> excluded;
     private final int pdfUa;
 
     private Converter(Builder builder) {
@@ -60,7 +64,7 @@ public final class Converter {
         this.styles = builder.styles;
         this.debug = builder.debug;
         this.limits = builder.limits;
-        this.checkContrast = builder.checkContrast;
+        this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
         this.pdfUa = builder.pdfUa;
     }
 
@@ -83,18 +87,23 @@ public final class Converter {
         return limits;
     }
 
+    /** Las comprobaciones que no hace ({@link Builder#exclude}); vacío si las hace todas. */
+    public Set<Check> excluded() {
+        return excluded;
+    }
+
     /**
      * Maqueta un documento ya validado ({@link DocumentReader}) con las métricas reales de las fuentes de la carpeta de
      * recursos. Falla con los errores del documento (referencia/comun/errores.md) antes de que se escriba nada,
-     * también con el poco contraste de un texto si no se ha desactivado su comprobación ({@link
-     * Builder#checkContrast}).
+     * también con los de las comprobaciones que no se han quitado ({@link Builder#exclude}): el poco contraste de un
+     * texto y lo que impide dibujar igual la página de un PDF.
      */
     public LaidOutDocument layOut(InlineNode document) {
         Objects.requireNonNull(document, "document");
         return guarded(() -> {
-            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits)
+            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded)
                     .layOutDocument(document, styles);
-            if (checkContrast) {
+            if (!excluded.contains(Check.CONTRAST)) {
                 ContrastCheck.check(laidOut);
             }
             return laidOut;
@@ -166,7 +175,7 @@ public final class Converter {
         private InlineNode styles;
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
-        private boolean checkContrast = true;
+        private final Set<Check> excluded = EnumSet.noneOf(Check.class);
         private int pdfUa = 1;
 
         private Builder() {
@@ -198,8 +207,8 @@ public final class Converter {
         }
 
         /**
-         * Lo máximo que acepta la conversión (páginas, píxeles de una imagen, elementos y niveles de un SVG);
-         * por defecto {@link Limits#DEFAULT}. Un documento que lo supera falla con un error {@code LIMIT}.
+         * Lo máximo que acepta la conversión (páginas, píxeles de una imagen, elementos y niveles de un SVG, bytes de
+         * un PDF); por defecto {@link Limits#DEFAULT}. Un documento que lo supera falla con un error {@code LIMIT}.
          */
         public Builder limits(Limits limits) {
             this.limits = Objects.requireNonNull(limits, "limits");
@@ -207,11 +216,14 @@ public final class Converter {
         }
 
         /**
-         * Si comprueba el contraste del texto con su fondo (referencia/comun/pdf.md): con poco, la conversión falla
-         * con {@code CONTRAST_LOW}. Por defecto sí.
+         * Quita esas comprobaciones ({@link Check}): el contraste del texto con su fondo (referencia/comun/pdf.md) y lo
+         * que impide dibujar igual la página de un PDF (referencia/componentes/image.md). Por defecto se hacen todas;
+         * cada llamada añade las suyas a las que ya se quitaron.
          */
-        public Builder checkContrast(boolean check) {
-            this.checkContrast = check;
+        public Builder exclude(Check... checks) {
+            for (Check check : checks) {
+                excluded.add(Objects.requireNonNull(check, "check"));
+            }
             return this;
         }
 

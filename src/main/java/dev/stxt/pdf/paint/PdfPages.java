@@ -3,7 +3,9 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.resources.PdfInspector;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorName;
+import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdfparser.PDFStreamParser;
@@ -35,6 +37,9 @@ import java.util.Set;
  * y las imágenes en el árbol de estructura ({@code StructParent}, {@code StructParents}). El formulario lo etiqueta
  * después la {@code Image} que lo dibuja, como figura o como decoración.</p>
  *
+ * <p>{@link LayerUtility} copia también al catálogo las capas del PDF de origen (su contenido opcional), que deciden
+ * lo que se ve; una configuración de las capas sin nombre lo recibe, el del fichero, porque PDF/UA-1 lo pide (7.10).</p>
+ *
  * <p>El formulario tiene el recorte de la página ({@code BBox}) y una matriz que lo lleva, ya girado
  * ({@code Rotate}), a un rectángulo con la esquina de abajo a la izquierda en el origen, del tamaño que da
  * {@link dev.stxt.pdf.resources.ImageFile#width(int)}.</p>
@@ -48,23 +53,55 @@ final class PdfPages {
             OperatorName.BEGIN_MARKED_CONTENT_SEQ, OperatorName.END_MARKED_CONTENT, OperatorName.MARKED_CONTENT_POINT,
             OperatorName.MARKED_CONTENT_POINT_WITH_PROPS);
 
+    private final PDDocument doc;
     private final LayerUtility layers;
     /** Los formularios ya limpios: los recursos copiados se comparten entre las páginas de un mismo PDF. */
     private final Set<COSBase> cleaned = new HashSet<>();
 
     PdfPages(PDDocument doc) {
+        this.doc = doc;
         this.layers = new LayerUtility(doc);
     }
 
-    /** La página {@code number} (desde 1) de {@code source}, copiada en un formulario. */
-    PDFormXObject page(PDDocument source, int number) throws IOException {
+    /**
+     * La página {@code number} (desde 1) de {@code source}, copiada en un formulario; {@code name} es el nombre del
+     * fichero, el de las configuraciones de sus capas que no lo tengan.
+     */
+    PDFormXObject page(PDDocument source, int number, String name) throws IOException {
         PDPage page = source.getPage(number - 1);
         PDFormXObject form = layers.importPageAsForm(source, page);
         PDRectangle crop = page.getCropBox();
         form.setBBox(crop);
         form.setMatrix(placement(crop, PdfInspector.rotation(page)));
         clean(form);
+        nameLayers(name);
         return form;
+    }
+
+    /** Pone {@code name} a las configuraciones de las capas del documento que no tienen nombre. */
+    private void nameLayers(String name) {
+        COSDictionary properties = doc.getDocumentCatalog().getCOSObject().getCOSDictionary(COSName.OCPROPERTIES);
+        if (properties == null) {
+            return;
+        }
+        List<COSDictionary> configurations = new ArrayList<>();
+        COSDictionary initial = properties.getCOSDictionary(COSName.D);
+        if (initial != null) {
+            configurations.add(initial);
+        }
+        COSArray others = properties.getCOSArray(COSName.getPDFName("Configs"));
+        if (others != null) {
+            for (int i = 0; i < others.size(); i++) {
+                if (others.getObject(i) instanceof COSDictionary configuration) {
+                    configurations.add(configuration);
+                }
+            }
+        }
+        for (COSDictionary configuration : configurations) {
+            if (configuration.getString(COSName.NAME) == null) {
+                configuration.setString(COSName.NAME, name);
+            }
+        }
     }
 
     /**

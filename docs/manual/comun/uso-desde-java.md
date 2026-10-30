@@ -29,10 +29,22 @@ converter.toPdf(doc, out);
 |---|---|
 | `resources` | La carpeta `resources/` del directorio de trabajo ([Recursos](recursos.md)) |
 | `styles` | Ninguno. El fichero de estilos aparte del documento ([Estilos](estilos.md#estilos-en-un-fichero-aparte)) |
-| `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG |
+| `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF |
 | `debug` | `false`. Con `true`, pinta el contorno de cada caja |
 | `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
-| `checkContrast` | `true`: un texto que apenas se distingue de su fondo es un error ([Caja](caja.md#contraste)). Con `false`, no se comprueba |
+| `exclude` | Ninguna: se comprueba todo. Quita las comprobaciones que se le dicen (abajo) |
+
+Por defecto se comprueba todo. Con `exclude` se quitan comprobaciones, que dejan de ser un error:
+
+```java
+Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
+```
+
+| Comprobación | Qué es un error si no se quita |
+|---|---|
+| `Check.CONTRAST` | Un texto que apenas se distingue de su fondo ([Caja](caja.md#contraste)) |
+| `Check.PDF_IMAGE_FONTS` | Una página de un PDF con una fuente sin incrustar o que no dice qué carácter es cada glifo ([Image](../componentes/image.md#una-página-de-un-pdf)) |
+| `Check.PDF_IMAGE_ANNOTATIONS` | Una página de un PDF con un campo de formulario o un comentario que se ven, que no se dibujarían |
 
 ## Errores
 

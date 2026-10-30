@@ -11,12 +11,14 @@ al convertir ([Uso desde Java](../implementacion/api.md#límites)):
 | `maxImagePixels` | 25 000 000 | Ancho × alto de un PNG o un JPEG | `IMAGE_TOO_LARGE` |
 | `maxSvgElements` | 20 000 | Los elementos que dibuja un SVG: los del fichero más los de lo que repite cada `<use>` | `SVG_TOO_COMPLEX` |
 | `maxSvgDepth` | 64 | Los niveles de anidado de un SVG, con el `<svg>` de la raíz | `SVG_TOO_COMPLEX` |
+| `maxPdfBytes` | 20 000 000 | Los bytes del fichero de un PDF que dibuja una `Image`, sin abrirlo | `PDF_TOO_LARGE` |
 
 Los valores por defecto son los de un servicio con poca memoria. Un PNG con transparencia necesita unos 4 bytes por píxel
 al decodificarse (25 Mpx son 100 MB), una página más tarda lo que su contenido, y un SVG de 300 000 rectángulos tarda
 unos 5 s; subir los límites sube también la memoria que hay que reservar a cada conversión. Un SVG de 1 KB con 5 niveles de
 `<use>` de 10 copias cada uno son 111 111 elementos. Un SVG con más de 15 niveles de `<use>` anidados no se puede dibujar
-aunque cumpla estos límites (`IMAGE_FORMAT`), y un `<use>` circular tampoco.
+aunque cumpla estos límites (`IMAGE_FORMAT`), y un `<use>` circular tampoco. Un PDF se lee entero al abrirlo, aunque
+solo se dibuje una de sus páginas: para una página de un PDF grande, lo mejor es un PDF con solo esa página.
 
 El texto del documento tiene además sus propios límites: 10 MB, 100 niveles de anidado y 10 000 caracteres por línea,
 también con error `LIMIT`.

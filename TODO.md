@@ -18,14 +18,12 @@ saliendo al trabajar y solo toca ese.
 
 ### PDF como imagen
 
-- Solo se comprueba que las fuentes de la página estén incrustadas. Las demás reglas de PDF/UA sobre las fuentes (un
-  `ToUnicode` en cada una, anchos coherentes…) no se miran: un PDF de otro programa puede dar un documento que veraPDF
-  rechace. Habría que decidir si se comprueban al leerlo o se deja a quien convierte.
-- `LayerUtility` copia también el contenido opcional (`OCProperties`) del PDF de origen al catálogo; PDF/UA-1 pide un
-  `Name` en cada configuración (7.10) y no se comprueba.
+- De las reglas de PDF/UA sobre las fuentes de la página solo se comprueban dos: incrustadas y con `ToUnicode`
+  (`Check.PDF_IMAGE_FONTS`). Las demás (anchos coherentes con el programa de la fuente, `CIDToGIDMap`, codificaciones de
+  las TrueType simbólicas, `.notdef`…) no: un PDF de otro programa aún puede dar un documento que veraPDF rechace.
+- Las capas del PDF de origen reciben un `Name` si no lo tienen, pero una configuración con `AS` (PDF/UA-1, 7.10) se
+  copia tal cual: no está comprobado si veraPDF la rechaza.
 - Las marcas de contenido se quitan del contenido de la página y de sus formularios, no de los patrones de mosaico ni de
   los glifos de las fuentes Type 3.
-- No hay límite para un PDF (páginas, tamaño, complejidad del contenido): se abre entero con PDFBox. Quizá un
-  `maxPdfBytes` en `Limits`.
 - `tools/ExamplePdfs.java` no da los mismos bytes en cada ejecución (el identificador y las fechas del PDF): regenerar
-  `letterhead.pdf` cambia el binario aunque no cambie nada.
+  cambia los binarios aunque no cambie nada, así que solo se suben los ficheros nuevos o los que cambian de verdad.

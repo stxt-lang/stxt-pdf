@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -56,6 +57,7 @@ class LimitsTest {
         assertEquals(25_000_000L, d.maxImagePixels());
         assertEquals(20_000, d.maxSvgElements());
         assertEquals(64, d.maxSvgDepth());
+        assertEquals(20_000_000L, d.maxPdfBytes());
         assertSame(d, Converter.create().limits());
     }
 
@@ -65,6 +67,7 @@ class LimitsTest {
         assertThrows(IllegalArgumentException.class, () -> Limits.DEFAULT.withMaxImagePixels(0));
         assertThrows(IllegalArgumentException.class, () -> Limits.DEFAULT.withMaxSvgElements(-1));
         assertThrows(IllegalArgumentException.class, () -> Limits.DEFAULT.withMaxSvgDepth(0));
+        assertThrows(IllegalArgumentException.class, () -> Limits.DEFAULT.withMaxPdfBytes(0));
         assertThrows(NullPointerException.class, () -> Converter.builder().limits(null));
         Limits changed = Limits.DEFAULT.withMaxPages(5).withMaxSvgDepth(9);
         assertEquals(5, changed.maxPages());
@@ -115,6 +118,22 @@ class LimitsTest {
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals(8, e.line());
         assertTrue(e.getMessage().contains("200 × 100 píxeles"), e.getMessage());
+    }
+
+    /** Los bytes del fichero de un PDF, antes de abrirlo: el límite es justo su tamaño. */
+    @Test
+    void thePdfLimitIsExactlyTheBytesOfTheFile() throws IOException {
+        long bytes = Files.size(RESOURCES.root().resolve("images/test/pages.pdf"));
+        InlineNode document = image("test/pages.pdf");
+        convert(converter(Limits.DEFAULT.withMaxPdfBytes(bytes)), document);
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> convert(converter(Limits.DEFAULT.withMaxPdfBytes(bytes - 1)), document));
+        assertEquals(ErrorCode.PDF_TOO_LARGE, e.errorCode());
+        assertEquals(Kind.LIMIT, e.kind());
+        assertEquals(8, e.line());
+        assertTrue(e.getMessage().contains("Limits.maxPdfBytes"), e.getMessage());
+        // Solo cuenta para los PDF: un PNG más grande que el límite no lo mira.
+        convert(converter(Limits.DEFAULT.withMaxPdfBytes(1)), image("test/wide.png"));
     }
 
     /** Se mira en la cabecera: una imagen enorme se rechaza sin decodificarla ni dibujarla. */

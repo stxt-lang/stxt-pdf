@@ -5,6 +5,7 @@ import dev.stxt.Node;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.output.StxtDump;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.paint.SvgCanvas;
@@ -90,7 +91,7 @@ class GoldenTest {
     private static List<BufferedImage> writePdfAndImages(Path dir, InlineNode input, InlineNode styles)
             throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.Builder converter = Converter.builder().debug(true).checkContrast(false);
+        Converter.Builder converter = Converter.builder().debug(true).exclude(Check.CONTRAST);
         if (styles != null) {
             converter.styles(styles);
         }

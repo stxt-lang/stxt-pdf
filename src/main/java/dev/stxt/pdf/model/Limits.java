@@ -17,17 +17,20 @@ package dev.stxt.pdf.model;
  *                       ({@code SVG_TOO_COMPLEX}); un SVG puede ser pequeño y repetirse miles de millones de veces
  * @param maxSvgDepth    niveles de anidado de un SVG, contando el {@code <svg>} de la raíz
  *                       ({@code SVG_TOO_COMPLEX}); más profundos agotan la pila del dibujo
+ * @param maxPdfBytes    bytes del fichero de un PDF que dibuja una {@code Image}, que se miran antes de abrirlo
+ *                       ({@code PDF_TOO_LARGE})
  */
-public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int maxSvgDepth) {
+public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int maxSvgDepth, long maxPdfBytes) {
 
-    /** 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG. */
-    public static final Limits DEFAULT = new Limits(2_000, 25_000_000L, 20_000, 64);
+    /** 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF. */
+    public static final Limits DEFAULT = new Limits(2_000, 25_000_000L, 20_000, 64, 20_000_000L);
 
     public Limits {
         require("maxPages", maxPages);
         require("maxImagePixels", maxImagePixels);
         require("maxSvgElements", maxSvgElements);
         require("maxSvgDepth", maxSvgDepth);
+        require("maxPdfBytes", maxPdfBytes);
     }
 
     private static void require(String name, long value) {
@@ -37,18 +40,22 @@ public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int 
     }
 
     public Limits withMaxPages(int maxPages) {
-        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth);
+        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
     public Limits withMaxImagePixels(long maxImagePixels) {
-        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth);
+        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
     public Limits withMaxSvgElements(int maxSvgElements) {
-        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth);
+        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
     public Limits withMaxSvgDepth(int maxSvgDepth) {
-        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth);
+        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
+    }
+
+    public Limits withMaxPdfBytes(long maxPdfBytes) {
+        return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 }

@@ -2,6 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
@@ -107,7 +108,7 @@ class ContrastCheckTest {
     @Test
     void theCheckCanBeTurnedOff() {
         String document = HEADER + "\tSection:\n\t\tText: hola\n\t\t\tTypography:\n\t\t\t\tColor: #EEEEEE\n";
-        assertDoesNotThrow(() -> Converter.builder().checkContrast(false).build()
+        assertDoesNotThrow(() -> Converter.builder().exclude(Check.CONTRAST).build()
                 .layOut(new DocumentReader().read(document)));
     }
 }

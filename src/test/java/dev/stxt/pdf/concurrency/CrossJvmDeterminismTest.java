@@ -3,6 +3,7 @@ package dev.stxt.pdf.concurrency;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.PdfBytes;
 import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -53,8 +54,10 @@ class CrossJvmDeterminismTest {
                 InlineNode document = reader.read(dir.resolve("input.stxt"));
                 Path styles = dir.resolve("styles.stxt");
                 // Los colores de un caso golden solo distinguen las cajas: no se les pide contraste.
-                Converter.Builder builder = Converter.builder()
-                        .checkContrast(!dir.startsWith(Path.of("test", "golden")));
+                Converter.Builder builder = Converter.builder();
+                if (dir.startsWith(Path.of("test", "golden"))) {
+                    builder.exclude(Check.CONTRAST);
+                }
                 if (Files.exists(styles)) {
                     builder.styles(reader.readStyles(styles));
                 }

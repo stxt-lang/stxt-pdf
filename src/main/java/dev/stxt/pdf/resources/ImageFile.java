@@ -1,5 +1,6 @@
 package dev.stxt.pdf.resources;
 
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
@@ -108,6 +109,20 @@ public final class ImageFile {
         } finally {
             reader.dispose();
         }
+    }
+
+    /**
+     * Si el fichero es un PDF, mirando solo su cabecera.
+     *
+     * @throws IOException si no se puede leer
+     */
+    static boolean isPdf(Path path) throws IOException {
+        byte[] head = new byte[PDF.length];
+        int n;
+        try (InputStream in = Files.newInputStream(path)) {
+            n = in.readNBytes(head, 0, head.length);
+        }
+        return startsWith(head, n, PDF);
     }
 
     /** Si empieza como un XML (con o sin la marca de orden de bytes de UTF-8). */
@@ -246,13 +261,23 @@ public final class ImageFile {
     }
 
     /**
-     * Por qué no se puede dibujar esa página de un PDF (una fuente sin incrustar, una anotación que se ve), para el
-     * mensaje; {@code null} si se puede, y en el resto de formatos.
+     * Por qué esa página de un PDF no se dibujaría igual que en su PDF según la comprobación {@code check}, para el
+     * mensaje: con {@link Check#PDF_IMAGE_FONTS}, una fuente sin incrustar o sin {@code ToUnicode}; con
+     * {@link Check#PDF_IMAGE_ANNOTATIONS}, una anotación que se ve. {@code null} si no hay problema, con otra
+     * comprobación y en el resto de formatos.
      *
      * @param page desde 1, hasta {@link #pages()}
      */
-    public String problem(int page) {
-        return format == Format.PDF ? pages.get(page - 1).problem() : null;
+    public String problem(int page, Check check) {
+        if (format != Format.PDF) {
+            return null;
+        }
+        PdfInspector.PdfPage p = pages.get(page - 1);
+        return switch (check) {
+            case PDF_IMAGE_FONTS -> p.fonts();
+            case PDF_IMAGE_ANNOTATIONS -> p.annotations();
+            default -> null;
+        };
     }
 
     /** Ancho natural en puntos; el de un PDF, el de su primera página. */

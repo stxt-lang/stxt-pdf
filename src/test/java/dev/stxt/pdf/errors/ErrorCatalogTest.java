@@ -47,7 +47,9 @@ class ErrorCatalogTest {
             ErrorCode.FONT_VARIANT_MISSING,
             // Con las mismas métricas para cualquier cifra la paginación siempre converge: es una red
             // de seguridad que prueba PageReferencesTest con un medidor que la fuerza.
-            ErrorCode.REFERENCE_UNSTABLE);
+            ErrorCode.REFERENCE_UNSTABLE,
+            // Un PDF de más de 20 MB no cabe en el repositorio: lo prueba LimitsTest con un límite más bajo.
+            ErrorCode.PDF_TOO_LARGE);
 
     private final DocumentReader reader = new DocumentReader();
 

@@ -141,8 +141,11 @@ recursos (los compartidos entre páginas, una vez) y no sus anotaciones. El form
 contenido (`BMC`, `BDC`, `EMC`, `MP`, `DP`) de su contenido y del de los formularios que usa, salvo las de contenido
 opcional (`/OC`), y las entradas `StructParent` y `StructParents`. Los PDF de origen se abren una vez por fichero y se
 cierran después de guardar. `PdfInspector` (`resources`) lee al cargar el documento el tamaño de cada página, con el
-mismo giro (`PdfInspector.rotation`), y lo que impide dibujarla: una anotación que se ve que no es un enlace y una fuente
-sin incrustar en sus recursos, los de sus formularios o los de sus patrones.
+mismo giro (`PdfInspector.rotation`), y lo que impide dibujarla igual, por separado para cada `Check`: una anotación que
+se ve que no es un enlace (`PDF_IMAGE_ANNOTATIONS`) y una fuente sin incrustar o sin `ToUnicode` (salvo una simple que no
+es simbólica) en sus recursos, los de sus formularios o los de sus patrones (`PDF_IMAGE_FONTS`). `Images` lanza el error
+de las que no se han quitado. `LayerUtility` copia también las capas (`OCProperties`) al catálogo, y `PdfPages` pone el
+nombre del fichero a cada configuración sin `Name` (la `D` y las de `Configs`), que PDF/UA-1 pide (7.10).
 
 > **Decisión:** el etiquetado del PDF de origen se quita del contenido copiado: sus `MCID` no son de este documento, y un
 > *artifact* o un contenido marcado dentro de la figura de la `Image` incumple PDF/UA. Las marcas de contenido opcional se

@@ -165,14 +165,23 @@ use en varias páginas del documento. Lo que no es contenido de la página no se
 
 - **Las anotaciones.** Un enlace de la página no se copia (lo que se ve de él, el texto, sí). Una anotación que se ve, como
   un campo de formulario relleno, un comentario o un sello, no se dibujaría, así que es un error (`IMAGE_FORMAT`): el PDF
-  se aplana antes de usarlo, por ejemplo imprimiéndolo a PDF.
+  se aplana antes de usarlo, por ejemplo imprimiéndolo a PDF. Quien convierte puede quitar esta comprobación
+  (`Check.PDF_IMAGE_ANNOTATIONS`, [Uso desde Java](../implementacion/api.md#comprobaciones)), y entonces la página se
+  dibuja sin ellas.
 - **El etiquetado.** La página es una imagen: con `Alt` es una figura y un lector de pantalla anuncia ese texto, no el de
   la página; sin `Alt` es decoración, como un fondo ([Accesibilidad](#accesibilidad)). Tampoco se copian sus marcadores.
+
+Las **capas** de la página (su contenido opcional) sí se copian, porque deciden lo que se ve: una capa apagada sigue
+apagada, y el visor las enseña en su lista de capas. Una configuración de las capas sin nombre recibe el del fichero
+(`planos.pdf`), que PDF/UA pide.
 
 `Page` es la página física, desde 1, no el número que lleva impreso. Una página que el PDF no tiene es un error
 (`IMAGE_PAGE`, con la línea de `Page`), y `Page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
 (`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página que usa una
-fuente sin incrustar: el visor la sustituiría por otra y el documento no sería accesible.
+fuente sin incrustar, o sin `ToUnicode` (lo que dice qué carácter es cada glifo; una fuente simple que no es simbólica no
+lo necesita): el visor la sustituiría por otra, o su texto no se podría copiar ni leer en voz alta, y el documento no
+sería accesible. Quien convierte puede quitar esta comprobación (`Check.PDF_IMAGE_FONTS`), y el PDF puede no cumplir
+PDF/UA. La de un PDF cifrado no se puede quitar. Un PDF de más bytes que el límite es `PDF_TOO_LARGE` ([Límites](#límites)).
 
 Un papel de carta con el membrete completo en la primera página y el logotipo pequeño en las demás (las páginas 1 y 2 de
 `letterhead.pdf`), detrás del contenido y a sangre: un `Fixed` con `Layer` negativa que sale del área útil con un
@@ -229,11 +238,20 @@ Document (dev.stxt.pdf):
 > **Decisión:** una anotación que se ve es un error, no se dibuja su apariencia. *Alternativa descartada:* aplanarla al
 > copiarla, que obliga a interpretar cada tipo de anotación; ignorarla en silencio.
 
+> **Decisión:** lo que impide que la página se vea igual o sea accesible (fuentes, anotaciones) se comprueba por
+> defecto, y quien convierte puede quitarlo; lo que impide leerla (cifrado, dañado), no. *Alternativa descartada:* una
+> propiedad del documento, que pone en el documento una decisión de quien convierte.
+
+> **Decisión:** de las reglas de PDF/UA sobre las fuentes se comprueban las que más fallan en los PDF de otros programas:
+> que estén incrustadas y que tengan `ToUnicode`. *Alternativa descartada:* comprobar todas, que es repetir un validador
+> de PDF/UA.
+
 ## Límites
 
 Una imagen no puede pedir más de lo que admiten los [límites](../comun/limites.md): un PNG o un JPEG, más píxeles que
 `maxImagePixels` (`IMAGE_TOO_LARGE`), y un SVG, más elementos o niveles que `maxSvgElements` y `maxSvgDepth`
-(`SVG_TOO_COMPLEX`), siempre con la línea de la `Image` y antes de maquetar. Un `<use>` cuenta todo lo que repite cada vez
+(`SVG_TOO_COMPLEX`), y un PDF, más bytes que `maxPdfBytes` (`PDF_TOO_LARGE`, 20 MB por defecto), siempre con la línea de
+la `Image` y antes de maquetar. Un `<use>` cuenta todo lo que repite cada vez
 que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORMAT`.
 
 ## Accesibilidad

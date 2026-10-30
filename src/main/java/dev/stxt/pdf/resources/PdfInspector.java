@@ -9,6 +9,8 @@ import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDSimpleFont;
+import org.apache.pdfbox.pdmodel.font.PDType3Font;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.pattern.PDAbstractPattern;
@@ -26,21 +28,24 @@ import java.util.Set;
 
 /**
  * Lee un PDF de {@code images/} (referencia/componentes/image.md): el tamaño de cada página, en puntos y ya girado,
- * y lo que impide dibujarla igual dentro del documento. Una página se dibuja con su contenido, no con sus anotaciones,
- * así que una anotación que se ve (un campo de formulario, un comentario, un sello) es un problema; un enlace, no,
- * porque no se ve. Una fuente sin incrustar tampoco se admite: el visor la sustituiría por otra y el PDF no sería accesible.
- * Un PDF cifrado, sin páginas o que no se puede leer es un error del fichero.
+ * y lo que impide dibujarla igual dentro del documento, en dos grupos que quien convierte puede no comprobar
+ * ({@link dev.stxt.pdf.model.Check}). Una página se dibuja con su contenido, no con sus anotaciones, así que una
+ * anotación que se ve (un campo de formulario, un comentario, un sello) es un problema; un enlace, no, porque no se ve.
+ * Una fuente sin incrustar, o que no dice qué carácter es cada glifo, también: el visor la sustituiría por otra, o su
+ * texto no se podría copiar ni leer en voz alta, y el documento no sería accesible. Un PDF cifrado, sin páginas o que
+ * no se puede leer es un error del fichero.
  */
 public final class PdfInspector {
 
     /**
      * Una página del PDF.
      *
-     * @param width   ancho en puntos, el del recorte de la página ({@code CropBox}) ya girado
-     * @param height  alto en puntos, igual
-     * @param problem por qué no se puede dibujar, para el mensaje; {@code null} si se puede
+     * @param width       ancho en puntos, el del recorte de la página ({@code CropBox}) ya girado
+     * @param height      alto en puntos, igual
+     * @param annotations por qué sus anotaciones impiden dibujarla igual, para el mensaje; {@code null} si no
+     * @param fonts       por qué sus fuentes impiden dibujarla igual, para el mensaje; {@code null} si no
      */
-    record PdfPage(double width, double height, String problem) {
+    record PdfPage(double width, double height, String annotations, String fonts) {
     }
 
     private PdfInspector() {
@@ -65,7 +70,7 @@ public final class PdfInspector {
                 boolean turned = rotation(page) % 180 != 0;
                 double width = turned ? crop.getHeight() : crop.getWidth();
                 double height = turned ? crop.getWidth() : crop.getHeight();
-                pages.add(new PdfPage(width, height, problem(page)));
+                pages.add(new PdfPage(width, height, annotations(page), fonts(page.getResources(), new HashSet<>())));
             }
             return Collections.unmodifiableList(pages);
         } catch (InvalidPasswordException e) {
@@ -88,8 +93,8 @@ public final class PdfInspector {
         return degrees % 90 == 0 ? degrees : 0;
     }
 
-    /** Lo primero que impide dibujar la página igual que en su PDF, o {@code null}. */
-    private static String problem(PDPage page) throws IOException {
+    /** La primera anotación que se ve y no se dibujaría, o {@code null}. */
+    private static String annotations(PDPage page) throws IOException {
         for (PDAnnotation annotation : page.getAnnotations()) {
             if (!(annotation instanceof PDAnnotationLink) && !annotation.isHidden() && !annotation.isNoView()
                     && annotation.getNormalAppearanceStream() != null) {
@@ -97,47 +102,59 @@ public final class PdfInspector {
                         + "un comentario), que no se dibujaría: aplánala en el PDF antes de usarlo";
             }
         }
-        String font = unembeddedFont(page.getResources(), new HashSet<>());
-        if (font != null) {
-            return "usa la fuente " + font + " sin incrustar, que el visor sustituiría por otra: crea el PDF con las "
-                    + "fuentes incrustadas";
-        }
         return null;
     }
 
     /**
-     * El nombre de la primera fuente sin incrustar de unos recursos, de los formularios y de los patrones que usan, o
-     * {@code null}. {@code seen} evita recorrer dos veces unos recursos compartidos (o un formulario que se usa a sí
-     * mismo).
+     * La primera fuente de unos recursos, de los formularios y de los patrones que usan, que no está incrustada o no
+     * dice qué carácter es cada glifo, o {@code null}. {@code seen} evita recorrer dos veces unos recursos compartidos
+     * (o un formulario que se usa a sí mismo).
      */
-    private static String unembeddedFont(PDResources resources, Set<COSBase> seen) throws IOException {
+    private static String fonts(PDResources resources, Set<COSBase> seen) throws IOException {
         if (resources == null || !seen.add(resources.getCOSObject())) {
             return null;
         }
         for (COSName name : resources.getFontNames()) {
             PDFont font = resources.getFont(name);
-            if (font != null && !font.isEmbedded()) {
-                return font.getName();
+            if (font == null) {
+                continue;
+            }
+            if (!font.isEmbedded()) {
+                return "usa la fuente " + font.getName() + " sin incrustar, que el visor sustituiría por otra: crea el "
+                        + "PDF con las fuentes incrustadas";
+            }
+            if (!hasUnicode(font)) {
+                return "usa la fuente " + font.getName() + " sin ToUnicode, que dice qué carácter es cada glifo: su "
+                        + "texto no se podría copiar ni leer en voz alta; crea el PDF de nuevo, por ejemplo como PDF/A";
             }
         }
         for (COSName name : resources.getXObjectNames()) {
             PDXObject object = resources.getXObject(name);
             if (object instanceof PDFormXObject form) {
-                String font = unembeddedFont(form.getResources(), seen);
-                if (font != null) {
-                    return font;
+                String problem = fonts(form.getResources(), seen);
+                if (problem != null) {
+                    return problem;
                 }
             }
         }
         for (COSName name : resources.getPatternNames()) {
             PDAbstractPattern pattern = resources.getPattern(name);
             if (pattern instanceof PDTilingPattern tiling) {
-                String font = unembeddedFont(tiling.getResources(), seen);
-                if (font != null) {
-                    return font;
+                String problem = fonts(tiling.getResources(), seen);
+                if (problem != null) {
+                    return problem;
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Si la fuente dice qué carácter es cada glifo: con un {@code ToUnicode} o, una fuente simple que no es simbólica,
+     * con los nombres de los glifos de su codificación (ISO 32000-1, 9.10.2).
+     */
+    private static boolean hasUnicode(PDFont font) {
+        return font.getCOSObject().containsKey(COSName.TO_UNICODE)
+                || font instanceof PDSimpleFont simple && !(font instanceof PDType3Font) && !simple.isSymbolic();
     }
 }

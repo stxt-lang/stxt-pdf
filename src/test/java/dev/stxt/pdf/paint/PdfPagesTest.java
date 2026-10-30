@@ -162,4 +162,29 @@ class PdfPagesTest {
         assertEquals(Map.of(), PdfUa.failedRules(bytes));
         assertEquals(Map.of(), PdfUa.failedRules(pdf(2), 2));
     }
+
+    /**
+     * Las capas del PDF de origen (su contenido opcional) llegan al documento y siguen decidiendo lo que se ve; su
+     * configuración, que no tenía nombre, se llama como el fichero, porque PDF/UA-1 lo pide.
+     */
+    @Test
+    void theLayersOfThePageKeepTheirMarksAndGetAName() throws Exception {
+        String doc = DOCUMENT.substring(0, DOCUMENT.indexOf("\t\tFixed:")) + "\t\tImage: test/layers.pdf\n"
+                + "\t\t\tAlt: Una página con una capa de notas\n";
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Converter.create().toPdf(new DocumentReader().read(doc), out);
+        byte[] bytes = out.toByteArray();
+        try (PDDocument pdf = Loader.loadPDF(bytes)) {
+            assertEquals("layers.pdf", pdf.getDocumentCatalog().getOCProperties().getCOSObject()
+                    .getCOSDictionary(COSName.D).getString(COSName.NAME));
+            assertTrue(new PDFTextStripper().getText(pdf).contains("Capa de notas"));
+            PDFormXObject form = forms(pdf.getPage(0).getResources()).get(0);
+            String content = new String(form.getContentStream().toByteArray(), StandardCharsets.ISO_8859_1);
+            assertTrue(content.contains("/OC /"), content);
+        }
+        assertEquals(Map.of(), PdfUa.failedRules(bytes));
+        out.reset();
+        Converter.builder().pdfUa(2).build().toPdf(new DocumentReader().read(doc), out);
+        assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), 2));
+    }
 }

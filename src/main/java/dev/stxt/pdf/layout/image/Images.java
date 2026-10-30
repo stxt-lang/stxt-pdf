@@ -1,5 +1,6 @@
 package dev.stxt.pdf.layout.image;
 
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
@@ -10,24 +11,32 @@ import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.PropertyKey;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * Las imágenes del documento en la carpeta de recursos (referencia/componentes/image.md): el fichero y
  * el tamaño natural de cada {@code Image}. Los errores del fichero son del documento y llevan la
  * línea de la {@code Image}: {@code IMAGE_UNKNOWN} si la ruta no existe o sale de la carpeta, e
  * {@code IMAGE_FORMAT} si no es PNG, JPEG, PDF ni un SVG admitido. Una imagen que supera los {@link Limits} es
  * {@code IMAGE_TOO_LARGE} (los píxeles de un PNG o JPEG) o {@code SVG_TOO_COMPLEX} (los elementos y los
- * niveles de un SVG), también con la línea de la {@code Image}. La página de un PDF tiene que existir, y {@code Page}
- * en otro formato es un error ({@code IMAGE_PAGE}, con la línea de {@code Page}); una página que no se puede dibujar
- * igual que en su PDF es {@code IMAGE_FORMAT}.
+ * niveles de un SVG), también con la línea de la {@code Image}; un PDF de más bytes que los {@link Limits},
+ * {@code PDF_TOO_LARGE}, antes de abrirlo. La página de un PDF tiene que existir, y {@code Page} en otro formato es un
+ * error ({@code IMAGE_PAGE}, con la línea de {@code Page}); una página que no se dibujaría igual que en su PDF es
+ * {@code IMAGE_FORMAT}, salvo que se quite su comprobación ({@link Check#PDF_IMAGE_FONTS},
+ * {@link Check#PDF_IMAGE_ANNOTATIONS}).
  */
 public final class Images {
 
     private final Resources resources;
     private final Limits limits;
+    private final Set<Check> excluded;
 
-    public Images(Resources resources, Limits limits) {
+    /** Sin las comprobaciones de {@code excluded}. */
+    public Images(Resources resources, Limits limits, Set<Check> excluded) {
         this.resources = resources;
         this.limits = limits;
+        this.excluded = excluded.isEmpty() ? Set.of() : EnumSet.copyOf(excluded);
     }
 
     /**
@@ -37,6 +46,7 @@ public final class Images {
      */
     public void validate(Box box) {
         if (box.isImage()) {
+            checkPdfBytes(box);
             ImageFile file = file(box);
             checkLimits(file, box);
             checkPage(file, box);
@@ -65,8 +75,28 @@ public final class Images {
         }
     }
 
-    /** Que {@code Page} sea de un PDF y la página exista, y que se pueda dibujar. */
-    private static void checkPage(ImageFile file, Box box) {
+    /** Que un PDF no tenga más bytes que el límite: se mira antes de abrirlo. */
+    private void checkPdfBytes(Box box) {
+        long bytes;
+        try {
+            bytes = resources.images().pdfBytes(box.image());
+        } catch (ResourceException e) {
+            // La ruta no existe o sale de la carpeta: lo dice file(box), con su código.
+            return;
+        }
+        if (bytes > limits.maxPdfBytes()) {
+            throw new InvalidModelException(box.line(), ErrorCode.PDF_TOO_LARGE, "El PDF " + box.image() + " ocupa "
+                    + megabytes(bytes) + " y el máximo es " + megabytes(limits.maxPdfBytes())
+                    + ": usa un PDF más pequeño, con solo las páginas que necesitas (Limits.maxPdfBytes lo cambia)");
+        }
+    }
+
+    private static String megabytes(long bytes) {
+        return String.format(java.util.Locale.ROOT, "%.1f MB", bytes / 1_000_000.0);
+    }
+
+    /** Que {@code Page} sea de un PDF y la página exista, y que se pueda dibujar con las comprobaciones que se hacen. */
+    private void checkPage(ImageFile file, Box box) {
         int page = box.style().image().page();
         if (box.style().isDeclared(PropertyKey.PAGE)) {
             if (file.format() != ImageFile.Format.PDF) {
@@ -79,10 +109,12 @@ public final class Images {
                         + " y no tiene la " + page);
             }
         }
-        String problem = file.problem(page);
-        if (problem != null) {
-            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "La página " + page + " del PDF "
-                    + box.image() + " " + problem);
+        for (Check check : new Check[] {Check.PDF_IMAGE_ANNOTATIONS, Check.PDF_IMAGE_FONTS}) {
+            String problem = excluded.contains(check) ? null : file.problem(page, check);
+            if (problem != null) {
+                throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "La página " + page + " del PDF "
+                        + box.image() + " " + problem + " (o quita la comprobación " + check + " al convertir)");
+            }
         }
     }
 

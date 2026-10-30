@@ -1,5 +1,8 @@
 package dev.stxt.pdf.resources;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,6 +17,21 @@ public final class ImageLibrary {
 
     ImageLibrary(Resources resources) {
         this.resources = resources;
+    }
+
+    /**
+     * Los bytes del fichero de esa ruta si es un PDF, sin abrirlo ni leerlo entero, para comprobar su límite antes
+     * de leerlo con {@link #find}; 0 si es de otro formato.
+     *
+     * @throws ResourceException si la ruta sale de la carpeta, no existe o no se puede leer
+     */
+    public long pdfBytes(String path) {
+        Path file = resources.resolve("images", path);
+        try {
+            return ImageFile.isPdf(file) ? Files.size(file) : 0;
+        } catch (IOException e) {
+            throw new ResourceException("No se puede leer la imagen " + path + ": " + e.getMessage(), e);
+        }
     }
 
     /**

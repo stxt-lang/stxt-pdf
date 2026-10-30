@@ -101,7 +101,7 @@ final class PdfImages implements Closeable {
                 source = Loader.loadPDF(file.path().toFile());
                 sources.put(file.path(), source);
             }
-            form = imports.page(source, number);
+            form = imports.page(source, number, file.path().getFileName().toString());
             forms.put(number, form);
         }
         return form;

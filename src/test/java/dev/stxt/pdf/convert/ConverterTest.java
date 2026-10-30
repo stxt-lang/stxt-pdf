@@ -4,11 +4,14 @@ import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.PdfBytes;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.resources.ResourceException;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -17,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -126,6 +130,7 @@ class ConverterTest {
         Converter.Builder builder = Converter.builder();
         assertThrows(NullPointerException.class, () -> builder.resources(null));
         assertThrows(NullPointerException.class, () -> builder.styles((InlineNode) null));
+        assertThrows(NullPointerException.class, () -> builder.exclude((Check) null));
         Converter converter = builder.build();
         assertThrows(NullPointerException.class, () -> converter.layOut(null));
         assertThrows(NullPointerException.class, () -> converter.toPdf((LaidOutDocument) null, new ByteArrayOutputStream()));
@@ -140,5 +145,46 @@ class ConverterTest {
         builder.debug(true);
         assertArrayEquals(pdf(Converter.builder().styles(BASE).build(), document()), pdf(converter, document()));
         assertFalse(converter.toSvg(converter.layOut(document())).isEmpty());
+    }
+
+    /** Por defecto se hacen todas las comprobaciones; {@code exclude} quita las que se le dicen, y se acumulan. */
+    @Test
+    void everyCheckIsDoneUnlessExcluded() {
+        assertEquals(Set.of(), Converter.create().excluded());
+        Converter converter = Converter.builder().exclude(Check.CONTRAST).exclude(Check.PDF_IMAGE_FONTS).build();
+        assertEquals(Set.of(Check.CONTRAST, Check.PDF_IMAGE_FONTS), converter.excluded());
+        assertThrows(UnsupportedOperationException.class, () -> converter.excluded().add(Check.PDF_IMAGE_ANNOTATIONS));
+    }
+
+    /** Una fuente sin incrustar en la página de un PDF es un error, salvo que se quite {@link Check#PDF_IMAGE_FONTS}. */
+    @Test
+    void theFontsOfAPdfImageAreCheckedUnlessExcluded() throws IOException {
+        InlineNode document = READER.read(Docs.sectioned(HEADER + "\tImage: test/standard-font.pdf"));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> Converter.create().layOut(document));
+        assertEquals(ErrorCode.IMAGE_FORMAT, e.errorCode());
+        assertTrue(e.getMessage().contains("Helvetica sin incrustar"), e.getMessage());
+        assertTrue(e.getMessage().contains("PDF_IMAGE_FONTS"), e.getMessage());
+        // Quitar la otra no basta.
+        assertThrows(InvalidModelException.class,
+                () -> Converter.builder().exclude(Check.PDF_IMAGE_ANNOTATIONS).build().layOut(document));
+        assertFalse(pdf(Converter.builder().exclude(Check.PDF_IMAGE_FONTS).build(), document).length == 0);
+    }
+
+    /**
+     * Un campo de formulario que se ve en la página de un PDF es un error, salvo que se quite
+     * {@link Check#PDF_IMAGE_ANNOTATIONS}: entonces la página se dibuja sin él.
+     */
+    @Test
+    void theAnnotationsOfAPdfImageAreCheckedUnlessExcluded() throws IOException {
+        InlineNode document = READER.read(Docs.sectioned(HEADER + "\tImage: test/form-field.pdf"));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> Converter.create().layOut(document));
+        assertEquals(ErrorCode.IMAGE_FORMAT, e.errorCode());
+        assertTrue(e.getMessage().contains("PDF_IMAGE_ANNOTATIONS"), e.getMessage());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Converter.builder().exclude(Check.PDF_IMAGE_ANNOTATIONS).build().toPdf(document, out);
+        try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
+            assertTrue(pdf.getPage(0).getAnnotations().isEmpty());
+            assertEquals(null, pdf.getDocumentCatalog().getAcroForm());
+        }
     }
 }

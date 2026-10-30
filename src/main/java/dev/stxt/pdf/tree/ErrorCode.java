@@ -217,7 +217,9 @@ public enum ErrorCode {
     /** Una imagen PNG o JPEG con más píxeles que {@code Limits.maxImagePixels} (línea de la {@code Image}). */
     IMAGE_TOO_LARGE(Kind.LIMIT),
     /** Un SVG que dibuja más elementos o anida más niveles que {@code Limits.maxSvgElements} y {@code maxSvgDepth} (línea de la {@code Image}). */
-    SVG_TOO_COMPLEX(Kind.LIMIT);
+    SVG_TOO_COMPLEX(Kind.LIMIT),
+    /** Un PDF de más bytes que {@code Limits.maxPdfBytes} (línea de la {@code Image}). */
+    PDF_TOO_LARGE(Kind.LIMIT);
 
     private final Kind kind;
 

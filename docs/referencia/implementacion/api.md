@@ -29,13 +29,39 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `limits(Limits)` | Los límites de la conversión |
 | `debug(boolean)` | Pinta los contornos de las cajas |
 | `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)); otra es un `IllegalArgumentException` |
-| `checkContrast(boolean)` | Comprueba el contraste del texto con su fondo ([El PDF](../comun/pdf.md#contraste)); por defecto sí. `layOut` lo comprueba con `ContrastCheck`, un lienzo que apunta lo que se pinta |
+| `exclude(Check...)` | Quita comprobaciones; por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si
 > no hay, no se llama a `styles`. Vive en un package propio, encima de todos los demás. `PdfDocumentWriter.write` y `Engine`
 > siguen siendo públicos como capa de bajo nivel. *Alternativa descartada:* un método con una sobrecarga por cada
 > combinación de opciones.
+
+## Comprobaciones
+
+Algunas comprobaciones no son reglas del documento sino de lo que se ve o de lo que traen los ficheros, y quien convierte
+puede quitarlas con `exclude`, que se acumula entre llamadas. Por defecto se hacen todas; `Converter.excluded()` dice las
+que se han quitado. Son los valores del enum `Check` (`model`):
+
+| `Check` | Qué comprueba | Sin ella |
+|---|---|---|
+| `CONTRAST` | El contraste del texto con su fondo, `CONTRAST_LOW` ([El PDF](../comun/pdf.md#contraste)). `layOut` lo comprueba con `ContrastCheck`, un lienzo que apunta lo que se pinta | Un texto puede no leerse |
+| `PDF_IMAGE_FONTS` | Que las fuentes de la página de un PDF que dibuja una `Image` estén incrustadas y digan qué carácter es cada glifo, `IMAGE_FORMAT` ([Image](../componentes/image.md#pdf)) | El visor puede sustituir una fuente, su texto puede no copiarse y el PDF puede no cumplir PDF/UA |
+| `PDF_IMAGE_ANNOTATIONS` | Que la página de un PDF no tenga anotaciones que se vean, `IMAGE_FORMAT` | La página se dibuja sin ellas |
+
+```java
+Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAGE_ANNOTATIONS).build();
+```
+
+`Engine` recibe las que se quitan y se las pasa a `Images`; el contraste lo comprueba `Converter.layOut` después de
+maquetar.
+
+> **Decisión:** una sola forma de quitar comprobaciones, un enum y `exclude`, en vez de un booleano por cada una: por
+> defecto se hace todo y lo que se quita se nombra. *Alternativa descartada:* `checkContrast(boolean)` y un método más por
+> cada comprobación nueva.
+
+> **Decisión:** lo que impide leer un PDF (cifrado, dañado, sin la página) no se puede quitar: no es lo que se ve, sino que
+> no hay nada que dibujar. *Alternativa descartada:* una comprobación más para el PDF cifrado.
 
 ## Estilos aparte
 
@@ -82,7 +108,7 @@ try {
 
 | Clase | Qué es |
 |---|---|
-| `InvalidModelException` (`tree`) | Las reglas del modelo, los desbordamientos y los recursos que nombra el documento; `errorCode()` da el `ErrorCode` y `ErrorCode.kind()` su tipo (`INVALID_DOCUMENT` salvo `PAGE_LIMIT`, `IMAGE_TOO_LARGE` y `SVG_TOO_COMPLEX`, que son `LIMIT`) |
+| `InvalidModelException` (`tree`) | Las reglas del modelo, los desbordamientos y los recursos que nombra el documento; `errorCode()` da el `ErrorCode` y `ErrorCode.kind()` su tipo (`INVALID_DOCUMENT` salvo `PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX` y `PDF_TOO_LARGE`, que son `LIMIT`) |
 | `DocumentSyntaxException` (`tree`) | La sintaxis y el schema de `stxt-core`, con su código y su línea y la excepción original como causa; un `LimitException` de la librería es `LIMIT` |
 | `ResourceException` (`resources`) | La carpeta de recursos (`RESOURCE`), con `ImageFormatException` |
 | `InternalException` (`model`) | Un fallo del motor; la causa original va en `getCause()` |
@@ -115,7 +141,8 @@ Converter converter = Converter.builder()
 
 Llega al `Engine` (que lo pasa a `Images` y al `Paginator`) y a `PdfDocumentWriter.write` (los límites del dibujo de JSVG).
 `Images.validate` los comprueba antes de maquetar con lo que `ImageFile` leyó sin decodificar nada: los píxeles de la
-cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin recursión.
+cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin recursión. Los bytes de un PDF los mira
+`ImageLibrary.pdfBytes` antes de leerlo con `find`, que lo abre con PDFBox: un PDF de más se rechaza sin abrirlo.
 
 > **Decisión:** los valores por defecto se eligieron midiendo: un PNG con transparencia de 144 Mpx (547 KB en disco) agota
 > un heap de 512 MB, uno de 900 Mpx de 106 KB tarda 23 s, 20 000 niveles de SVG desbordan la pila de la JVM y una cadena de
@@ -130,6 +157,10 @@ cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin
 > JSVG trae sus propios límites (2000 elementos y 30 niveles, y 15 niveles de `<use>` anidados), que rechazaban SVG
 > legítimos: el motor le da los suyos, y si aun así no carga un SVG es `IMAGE_FORMAT`. *Alternativa descartada:* dejar que
 > JSVG cuente al dibujar, que falla tarde, sin línea y sin tipo.
+
+> **Decisión:** el límite de un PDF son los bytes del fichero, que se miran sin abrirlo, y 20 MB por defecto: PDFBox lee
+> su estructura entera al abrirlo, y un plano o un membrete caben de sobra. *Alternativa descartada:* contar sus páginas o
+> sus objetos, que obliga a abrirlo antes de saber si se puede.
 
 > **Decisión:** los límites del texto STXT (10 MB, 100 niveles, 10 000 caracteres por línea) son los de `stxt-core`, que ya
 > da un error `LIMIT`; `Limits` solo tiene lo que el motor comprueba por su cuenta.

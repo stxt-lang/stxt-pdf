@@ -17,6 +17,7 @@ import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.layout.multicol.MulticolLayout;
 import dev.stxt.pdf.layout.position.AbsoluteLayout;
 import dev.stxt.pdf.layout.table.TableLayout;
+import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Limits;
@@ -92,9 +93,17 @@ public final class Engine implements LayoutContext {
 
     /** Motor con esas métricas, esas imágenes y esos {@link Limits} (referencia/comun/limites.md). */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits) {
+        this(measurer, resources, limits, Set.of());
+    }
+
+    /**
+     * Motor con esas métricas, esas imágenes y esos {@link Limits}, sin las comprobaciones de {@code excluded} que
+     * se hacen al maquetar (las de las imágenes de PDF, {@link Check}).
+     */
+    public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded) {
         this.measurer = measurer;
         this.limits = limits;
-        this.images = new Images(resources, limits);
+        this.images = new Images(resources, limits, excluded);
         this.inline = new InlineLayout(this, measurer);
         GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);

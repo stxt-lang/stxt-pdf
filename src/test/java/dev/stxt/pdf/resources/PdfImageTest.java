@@ -1,5 +1,6 @@
 package dev.stxt.pdf.resources;
 
+import dev.stxt.pdf.model.Check;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -42,7 +43,8 @@ class PdfImageTest {
         assertEquals(200, f.width(), 1e-9);
         assertEquals(100, f.height(), 1e-9);
         for (int page = 1; page <= 3; page++) {
-            assertNull(f.problem(page));
+            assertNull(f.problem(page, Check.PDF_IMAGE_FONTS));
+            assertNull(f.problem(page, Check.PDF_IMAGE_ANNOTATIONS));
         }
     }
 
@@ -50,20 +52,31 @@ class PdfImageTest {
     void theOtherFormatsHaveOnePage() {
         ImageFile png = images.find("test/wide.png");
         assertEquals(1, png.pages());
-        assertNull(png.problem(1));
+        assertNull(png.problem(1, Check.PDF_IMAGE_FONTS));
         assertEquals(png.width(), png.width(1), 1e-9);
     }
 
     @Test
     void aFontThatIsNotEmbeddedCannotBeDrawn() {
-        String problem = images.find("test/standard-font.pdf").problem(1);
+        ImageFile f = images.find("test/standard-font.pdf");
+        String problem = f.problem(1, Check.PDF_IMAGE_FONTS);
         assertTrue(problem.contains("Helvetica sin incrustar"), problem);
+        assertNull(f.problem(1, Check.PDF_IMAGE_ANNOTATIONS));
+    }
+
+    /** Sin {@code ToUnicode}, una fuente Type 0 no dice qué carácter es cada glifo. */
+    @Test
+    void aFontWithoutUnicodeCannotBeDrawn() {
+        String problem = images.find("test/no-unicode.pdf").problem(1, Check.PDF_IMAGE_FONTS);
+        assertTrue(problem.contains("sin ToUnicode"), problem);
     }
 
     @Test
     void aVisibleAnnotationCannotBeDrawn() {
-        String problem = images.find("test/form-field.pdf").problem(1);
+        ImageFile f = images.find("test/form-field.pdf");
+        String problem = f.problem(1, Check.PDF_IMAGE_ANNOTATIONS);
         assertTrue(problem.contains("Widget"), problem);
+        assertNull(f.problem(1, Check.CONTRAST));
     }
 
     @Test

@@ -89,7 +89,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `LINK_SCHEME` | El destino de un enlace es una URL `https://`, `http://` (con servidor) o `mailto:` (con destinatario) o `#id`; no está vacío ni mal escrito ([Enlaces](enlaces.md)) | `Link: 'javascript:alert(1)' no tiene un esquema admitido: solo https://, http://, mailto: y #id` |
 | `LINK_UNKNOWN` | Un enlace `#id` lleva a una caja que existe y que no está en un `Fixed` ni dentro de uno | `El enlace #nada lleva a un Id que no existe: ninguna caja tiene el Id nada` |
 | `IMAGE_UNKNOWN` | Una `Image` tiene ruta, y es la de un fichero de `images/` (línea de la `Image`) | `No existe el recurso logos/acme.png en …/resources/images` |
-| `IMAGE_FORMAT` | Una `Image` es un PNG, un JPEG, un SVG del subconjunto admitido o un PDF sin cifrar, que se puede leer, y la página que dibuja de un PDF no tiene anotaciones que se vean ni fuentes sin incrustar (línea de la `Image`) ([Image](../componentes/image.md#svg)) | `La imagen dibujo.gif no es PNG, JPEG, SVG ni PDF (es GIF): conviértela a uno de los cuatro` |
+| `IMAGE_FORMAT` | Una `Image` es un PNG, un JPEG, un SVG del subconjunto admitido o un PDF sin cifrar, que se puede leer, y la página que dibuja de un PDF no tiene anotaciones que se vean ni fuentes sin incrustar o sin `ToUnicode`, salvo que quien convierte quite esas comprobaciones (línea de la `Image`) ([Image](../componentes/image.md#svg)) | `La imagen dibujo.gif no es PNG, JPEG, SVG ni PDF (es GIF): conviértela a uno de los cuatro` |
 | `IMAGE_PAGE` | `Page` va en la `Image` de un PDF y es una página que el PDF tiene (línea de `Page`) ([Image](../componentes/image.md#pdf)) | `El PDF planos.pdf tiene 3 páginas y no tiene la 4` |
 | `BREAK_IN_IMAGE` | Una `Image` no declara `Inside` ni `Decoration`, tampoco en una regla | `Inside no tiene efecto en una Image, que no se parte entre páginas: quítalo` |
 | `CONTENTS_EMPTY` | Un `Contents` tiene algún encabezado en los niveles de `Levels` (línea del `Contents`) | `El índice no tiene ningún encabezado de los niveles 2 a 3 (Levels): no tendría entradas` |
@@ -130,6 +130,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `PAGE_LIMIT` | El documento no ocupa más páginas que el límite, 2000 por defecto ([Límites](limites.md); no es de ninguna línea) | `El documento tiene más de 2000 páginas, el máximo que admite el motor (Limits.maxPages lo cambia)` |
 | `IMAGE_TOO_LARGE` | Un PNG o un JPEG no tiene más píxeles que el límite, 25 millones por defecto (línea de la `Image`) | `La imagen test/limit-huge.png tiene 6000 × 6000 píxeles (36,0 Mpx) y el máximo es 25,0 Mpx: reduce su resolución…` |
 | `SVG_TOO_COMPLEX` | Un SVG no dibuja más elementos (contando lo que repite cada `<use>`) ni anida más niveles que el límite, 20 000 y 64 por defecto (línea de la `Image`) | `El SVG test/limit-depth.svg anida 72 niveles y el máximo es 64: aplánalo…` |
+| `PDF_TOO_LARGE` | Un PDF no ocupa más bytes que el límite, 20 MB por defecto (línea de la `Image`) | `El PDF planos.pdf ocupa 31,4 MB y el máximo es 20,0 MB: usa un PDF más pequeño…` |
 
 [`test/errors/`](../../../test/errors) tiene un documento de ejemplo por cada código, con la línea que debe dar
 ([Pruebas](../implementacion/pruebas.md#catálogo-de-errores-errorcatalogtest)).
@@ -143,7 +144,7 @@ contestar:
 |---|---|---|
 | `INVALID_DOCUMENT` | El documento o sus estilos no son válidos: sintaxis, schema, una regla del modelo, un desbordamiento, un recurso que el documento nombra y no existe | un error del cliente (4xx), con la línea |
 | `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas) o no se puede leer el fichero del documento | un fallo de su configuración (5xx) |
-| `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limites.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, o un texto STXT demasiado grande o anidado | un error del cliente por exceso (413 o 422) |
+| `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limites.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, un PDF demasiado grande, o un texto STXT demasiado grande o anidado | un error del cliente por exceso (413 o 422) |
 | `INTERNAL` | Un fallo del motor, no del documento ni del entorno | un fallo del servidor (500), que conviene informar |
 
 El código es el de la tabla de arriba, el de STXT para los errores de sintaxis y de schema (`CHILD_NOT_DECLARED`),

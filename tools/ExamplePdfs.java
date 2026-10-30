@@ -1,5 +1,7 @@
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.stxt.DocumentReader;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -11,11 +13,14 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.graphics.optionalcontent.PDOptionalContentGroup;
+import org.apache.pdfbox.pdmodel.graphics.optionalcontent.PDOptionalContentProperties;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -29,7 +34,8 @@ import java.nio.file.Path;
  * <li>{@code resources/images/examples/letterhead/letterhead.pdf}: el papel de carta de Taller Nogal, maquetado con el
  * propio motor desde {@code tools/letterhead.stxt} (un PDF etiquetado, con fuentes incrustadas).</li>
  * <li>{@code resources/images/test/*.pdf}: los casos de los tests, escritos con PDFBox: páginas de tamaños distintos,
- * con recorte y giradas ({@code pages.pdf}), una fuente sin incrustar, un campo de formulario y un PDF cifrado.</li>
+ * con recorte y giradas ({@code pages.pdf}), una fuente sin incrustar, una fuente sin {@code ToUnicode}, un campo de
+ * formulario, un PDF cifrado y una página con contenido opcional.</li>
  * </ul>
  *
  * <p>Necesita las clases del motor y sus dependencias:</p>
@@ -51,6 +57,8 @@ public class ExamplePdfs {
         standardFont();
         formField();
         encrypted();
+        noUnicode();
+        layers();
     }
 
     /** El papel de carta, con el motor. */
@@ -157,6 +165,53 @@ public class ExamplePdfs {
             page.getAnnotations().add(widget);
             field.setValue("Ramon Puig");
             doc.save(IMAGES.resolve("test/form-field.pdf").toFile());
+        }
+    }
+
+    /** Un texto en una fuente incrustada a la que se le quita el {@code ToUnicode}: no dice qué carácter es cada glifo. */
+    static void noUnicode() throws IOException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = page(doc, 200, 100);
+            draw(doc, page, PDType0Font.load(doc, PLEX.toFile()), new Color(0x1B6E8C), 0, 0, 200, 100, "Sin Unicode");
+            doc.save(bytes);
+        }
+        try (PDDocument doc = Loader.loadPDF(bytes.toByteArray())) {
+            PDResources resources = doc.getPage(0).getResources();
+            for (COSName name : resources.getFontNames()) {
+                resources.getFont(name).getCOSObject().removeItem(COSName.TO_UNICODE);
+            }
+            doc.save(IMAGES.resolve("test/no-unicode.pdf").toFile());
+        }
+    }
+
+    /**
+     * Una página con una capa (contenido opcional) encendida, un texto que solo sale en ella, y una configuración de las
+     * capas sin {@code Name}, que PDF/UA pide.
+     */
+    static void layers() throws IOException {
+        try (PDDocument doc = new PDDocument()) {
+            PDOptionalContentProperties properties = new PDOptionalContentProperties();
+            PDOptionalContentGroup notes = new PDOptionalContentGroup("Notas");
+            properties.addGroup(notes);
+            properties.getCOSObject().getCOSDictionary(COSName.D).removeItem(COSName.NAME);
+            doc.getDocumentCatalog().setOCProperties(properties);
+            PDPage page = page(doc, 200, 100);
+            PDFont font = PDType0Font.load(doc, PLEX.toFile());
+            try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
+                cs.setNonStrokingColor(new Color(0xF4F1EA));
+                cs.addRect(0, 0, 200, 100);
+                cs.fill();
+                cs.beginMarkedContent(COSName.OC, notes);
+                cs.beginText();
+                cs.setFont(font, 14);
+                cs.setNonStrokingColor(Color.BLACK);
+                cs.newLineAtOffset(10, 40);
+                cs.showText("Capa de notas");
+                cs.endText();
+                cs.endMarkedContent();
+            }
+            doc.save(IMAGES.resolve("test/layers.pdf").toFile());
         }
     }
 

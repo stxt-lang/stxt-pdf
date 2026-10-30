@@ -123,9 +123,11 @@ Document (dev.stxt.pdf):
 Con dos `Fixed`, uno con `Pages: first` y otro con `Pages: not-first` y `Page: 2`, la primera hoja lleva un membrete y las
 siguientes, otro.
 
-Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Un PDF con un campo de
-formulario relleno o un comentario que se ven es un error: aplánalo antes, por ejemplo imprimiéndolo a PDF. También lo es
-un PDF cifrado y uno que no lleva sus fuentes incrustadas.
+Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Sus capas, sí. Un PDF con un
+campo de formulario relleno o un comentario que se ven es un error: aplánalo antes, por ejemplo imprimiéndolo a PDF.
+También lo es un PDF cifrado y uno con fuentes que no van incrustadas o que no dicen qué carácter es cada letra
+(`ToUnicode`). Las comprobaciones de las anotaciones y de las fuentes se pueden quitar al convertir
+([Uso desde Java](../comun/uso-desde-java.md)); la del cifrado, no.
 
 ## Accesibilidad
 
@@ -135,7 +137,7 @@ lector de pantalla lee el `Alt`. Un papel preimpreso es decoración: va sin `Alt
 
 ## Límites
 
-Por seguridad, una imagen no puede tener más de 25 millones de píxeles, y un SVG, más de 20 000 elementos ni 64 niveles de
-anidado ([Uso desde Java](../comun/uso-desde-java.md) para cambiarlo).
+Por seguridad, una imagen no puede tener más de 25 millones de píxeles; un SVG, más de 20 000 elementos ni 64 niveles de
+anidado, y un PDF, más de 20 MB ([Uso desde Java](../comun/uso-desde-java.md) para cambiarlo).
 
 Más detalle en la [referencia](../../referencia/componentes/image.md).
