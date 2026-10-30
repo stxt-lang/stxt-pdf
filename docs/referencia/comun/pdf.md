@@ -33,7 +33,9 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
 - **Contraste:** el texto se distingue de lo que tiene debajo ([abajo](#contraste)).
 
 `Title` y `Language` son obligatorios en `Document` ([Document](../componentes/document.md#title-y-language)), así que todo
-PDF declara cumplir **PDF/UA-1**, la norma de PDF accesible. Los tests lo comprueban con veraPDF.
+PDF declara cumplir **PDF/UA-1**, la norma de PDF accesible. Quien convierte puede pedir **PDF/UA-2**, su versión nueva, que
+escribe un PDF 2.0 ([Uso desde Java](../implementacion/api.md#convertir); qué cambia por dentro, en
+[El PDF por dentro](../implementacion/pdf.md#pdfua-2)). Los tests comprueban los dos con veraPDF.
 
 > **Decisión:** `Title` y `Language` son obligatorios: el idioma es lo que un lector de pantalla necesita para leer el
 > contenido, y PDF/UA exige los dos. *Alternativa descartada:* dejarlos opcionales y no declarar PDF/UA sin ellos.

@@ -50,22 +50,39 @@ public final class PdfDocumentWriter {
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug) throws IOException {
+        write(document, resources, limits, target, debug, 1);
+    }
+
+    /**
+     * Como {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean)}, cumpliendo la parte {@code ua} de
+     * PDF/UA: 1 (PDF 1.7) o 2 (PDF 2.0), referencia/implementacion/pdf.md.
+     */
+    public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
+            boolean debug, int ua) throws IOException {
+        if (ua != 1 && ua != 2) {
+            throw new IllegalArgumentException("PDF/UA tiene las partes 1 y 2: " + ua);
+        }
         try {
-            paintAndSave(document, resources, limits, target, debug);
+            paintAndSave(document, resources, limits, target, debug, ua);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
     }
 
     private static void paintAndSave(LaidOutDocument document, Resources resources, Limits limits,
-            OutputStream target, boolean debug) throws IOException {
+            OutputStream target, boolean debug, int ua) throws IOException {
         List<Page> pages = document.pages();
         try (PDDocument doc = new PDDocument()) {
+            if (ua == 2) {
+                // La cabecera del fichero y la versión del catálogo.
+                doc.getDocument().setVersion(2.0f);
+                doc.getDocumentCatalog().setVersion("2.0");
+            }
             PdfFonts fonts = new PdfFonts(doc, resources);
             PdfImages images = new PdfImages(doc, limits);
-            PdfStructure structure = new PdfStructure(doc, document.root());
+            PdfStructure structure = new PdfStructure(doc, document.root(), ua);
             PdfLinks links = new PdfLinks();
-            PdfStructure.metadata(doc, document.metadata());
+            PdfStructure.metadata(doc, document.metadata(), ua);
             // Todas las páginas existen antes de pintar ninguna: un enlace puede ir hacia delante.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {
@@ -95,7 +112,7 @@ public final class PdfDocumentWriter {
             }
             labels(doc, pages);
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
-            links.resolve(destinations);
+            links.resolve(destinations, structure);
             structure.finish(doc, destinations);
             doc.save(target);
         }

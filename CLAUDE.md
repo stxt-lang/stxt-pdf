@@ -7,7 +7,8 @@ está cómo se trabaja.
 
 stxt-pdf es un motor de layout y generación de PDF a partir de documentos escritos en [STXT](https://stxt.dev): los
 documentos se maquetan en páginas de tamaño fijo y se escriben en un PDF con las fuentes incrustadas, etiquetado
-(PDF/UA-1) y con marcadores. Todas las medidas están en puntos tipográficos (1 pt = 1/72 in; A4 = 595 × 842).
+(PDF/UA-1, o PDF/UA-2 como opción) y con marcadores. Todas las medidas están en puntos tipográficos (1 pt = 1/72 in;
+A4 = 595 × 842).
 
 ## Documentación
 

@@ -3,6 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextTransform;
 import dev.stxt.pdf.model.Cell;
+import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Reference;
@@ -11,6 +12,7 @@ import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.Metadata;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -28,6 +30,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -110,7 +113,19 @@ final class PdfStructure {
      */
     private final Map<Box, Map<String, PDStructureElement>> firstLinks = new HashMap<>();
 
+    /** El espacio de nombres estándar de PDF 2.0 (ISO 32000-2, 14.8.6). */
+    static final String PDF_2_NAMESPACE = "http://iso.org/pdf2/ssn";
+
     private static final String[] TABLE_GROUPS = {"THead", "TBody", "TFoot"};
+    /** Los tipos que no están en el espacio de nombres de PDF 2.0: se quedan en el de PDF 1.7, el de omisión. */
+    private static final Set<String> PDF_1_7_ONLY = Set.of("TOC", "TOCI", "Reference");
+
+    /** La parte de PDF/UA que cumple el PDF: 1 o 2 (referencia/implementacion/pdf.md). */
+    private final int ua;
+    /** Con PDF/UA-2, el espacio de nombres de PDF 2.0 de los elementos; con PDF/UA-1, {@code null}. */
+    private final COSDictionary pdf2;
+    /** Con PDF/UA-2, el {@code TOCI} de cada entrada de índice, que señala con {@code Ref} a su encabezado. */
+    private final Map<Box, PDStructureElement> entries = new HashMap<>();
 
     /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (referencia/componentes/document.md). */
     private final Box root;
@@ -118,8 +133,20 @@ final class PdfStructure {
     private PDPage page;
     private COSArray pageParents;
 
-    PdfStructure(PDDocument doc, Box root) {
+    /** {@code ua}: la parte de PDF/UA, 1 o 2. */
+    PdfStructure(PDDocument doc, Box root, int ua) {
         this.root = root;
+        this.ua = ua;
+        if (ua == 2) {
+            pdf2 = new COSDictionary();
+            pdf2.setItem(COSName.TYPE, COSName.getPDFName("Namespace"));
+            pdf2.setString(COSName.getPDFName("NS"), PDF_2_NAMESPACE);
+            COSArray namespaces = new COSArray();
+            namespaces.add(pdf2);
+            treeRoot.getCOSObject().setItem(COSName.getPDFName("Namespaces"), namespaces);
+        } else {
+            pdf2 = null;
+        }
         PDDocumentCatalog catalog = doc.getDocumentCatalog();
         catalog.setStructureTreeRoot(treeRoot);
         PDMarkInfo markInfo = new PDMarkInfo();
@@ -144,7 +171,7 @@ final class PdfStructure {
         }
         // Una imagen con enlace es el contenido de su Link: Link → Figure.
         PDStructureNode owner = box.isImage() && box.style().link() != null ? newLink(box, parent) : parent;
-        PDStructureElement e = new PDStructureElement(type(box), owner);
+        PDStructureElement e = element(type(box), owner);
         owner.appendKid(e);
         elements.put(box, e);
         if (box.headingLevel() > 0) {
@@ -159,16 +186,35 @@ final class PdfStructure {
         if (box.role() == Role.LIST_ITEM) {
             // LI: el marcador (Lbl) y el contenido (LBody).
             if (box.marker() != null) {
-                PDStructureElement label = new PDStructureElement("Lbl", e);
+                PDStructureElement label = element("Lbl", e);
                 e.appendKid(label);
                 elements.put(box.marker(), label);
             }
-            PDStructureElement body = new PDStructureElement("LBody", e);
+            PDStructureElement body = element("LBody", e);
             e.appendKid(body);
             content = body;
         }
+        if (pdf2 != null && box.role() == Role.CONTENTS_ENTRY) {
+            // PDF/UA-2: un TOCI no contiene un Link, sino una Reference que lo contiene; y señala a su encabezado.
+            entries.put(box, e);
+            PDStructureElement reference = element("Reference", e);
+            e.appendKid(reference);
+            content = reference;
+        }
         content = linked(box, content);
         children(box, content);
+    }
+
+    /**
+     * Un elemento de estructura nuevo de ese tipo; con PDF/UA-2, en el espacio de nombres de PDF 2.0 si el tipo está
+     * en él. Lo añade a su padre quien lo crea.
+     */
+    private PDStructureElement element(String type, PDStructureNode parent) {
+        PDStructureElement e = new PDStructureElement(type, parent);
+        if (pdf2 != null && !PDF_1_7_ONLY.contains(type)) {
+            e.getCOSObject().setItem(COSName.getPDFName("NS"), pdf2);
+        }
+        return e;
     }
 
     /** Los elementos de los hijos de la caja; de un {@code Fixed}, que no es contenido, solo sus enlaces. */
@@ -202,7 +248,7 @@ final class PdfStructure {
 
     private void standIn(Box box, String destination, PDStructureNode parent) {
         standIns.computeIfAbsent(box, k -> new HashMap<>()).computeIfAbsent(destination, k -> {
-            PDStructureElement link = new PDStructureElement("Link", parent);
+            PDStructureElement link = element("Link", parent);
             parent.appendKid(link);
             return link;
         });
@@ -229,7 +275,7 @@ final class PdfStructure {
         }
         if (box.role() == Role.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();
-            numbering.setListNumbering(listNumbering(box.style().list().marker()));
+            numbering.setListNumbering(listNumbering(box.style().list().marker(), ua));
             e.addAttribute(numbering);
         }
     }
@@ -250,7 +296,7 @@ final class PdfStructure {
 
     /** Un {@code Link} hijo de {@code parent} para la caja. */
     private PDStructureElement newLink(Box box, PDStructureNode parent) {
-        PDStructureElement link = new PDStructureElement("Link", parent);
+        PDStructureElement link = element("Link", parent);
         parent.appendKid(link);
         boxLinks.put(box, link);
         if (!hasContent(box)) {
@@ -282,15 +328,15 @@ final class PdfStructure {
             Cell p = cell.style().item().area();
             int group = group(cell);
             if (groups[group] == null) {
-                groups[group] = new PDStructureElement(TABLE_GROUPS[group], e);
+                groups[group] = element(TABLE_GROUPS[group], e);
                 e.appendKid(groups[group]);
             }
             if (p.row() != rowIndex) {
-                row = new PDStructureElement("TR", groups[group]);
+                row = element("TR", groups[group]);
                 groups[group].appendKid(row);
                 rowIndex = p.row();
             }
-            PDStructureElement c = new PDStructureElement(type(cell), row);
+            PDStructureElement c = element(type(cell), row);
             row.appendKid(c);
             elements.put(cell, c);
             if (group == 0 || cell.style().header() || p.rows() > 1 || p.columns() > 1) {
@@ -337,11 +383,15 @@ final class PdfStructure {
         return row >= rows - table.footRows() ? 2 : 1;
     }
 
-    /** {@code ListNumbering} de una lista; {@code dash} no tiene equivalente y es {@code None}. */
-    private static String listNumbering(Marker marker) {
+    /**
+     * {@code ListNumbering} de una lista; {@code dash} no tiene equivalente en PDF/UA-1 y es {@code None}, y en
+     * PDF/UA-2 es {@code Unordered}, de PDF 2.0.
+     */
+    private static String listNumbering(Marker marker, int ua) {
         return switch (marker) {
             case DISC -> PDListAttributeObject.LIST_NUMBERING_DISC;
-            case DASH, NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
+            case DASH -> ua == 2 ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
+            case NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
             case DECIMAL -> PDListAttributeObject.LIST_NUMBERING_DECIMAL;
             case LOWER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_LOWER_ALPHA;
             case UPPER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_UPPER_ALPHA;
@@ -355,7 +405,7 @@ final class PdfStructure {
      * metadatos XMP ({@code dc:title}), y el visor lo muestra en lugar del nombre del fichero; el
      * idioma ({@code Lang} del catálogo) es el de todo el contenido.
      */
-    static void metadata(PDDocument doc, Metadata metadata) throws IOException {
+    static void metadata(PDDocument doc, Metadata metadata, int ua) throws IOException {
         PDDocumentCatalog catalog = doc.getDocumentCatalog();
         if (metadata.language() != null) {
             catalog.setLanguage(metadata.language());
@@ -368,16 +418,16 @@ final class PdfStructure {
         preferences.setDisplayDocTitle(true);
         catalog.setViewerPreferences(preferences);
         PDMetadata xmp = new PDMetadata(doc);
-        xmp.importXMPMetadata(xmp(metadata.title()).getBytes(StandardCharsets.UTF_8));
+        xmp.importXMPMetadata(xmp(metadata.title(), ua).getBytes(StandardCharsets.UTF_8));
         catalog.setMetadata(xmp);
     }
 
     /**
-     * Paquete XMP mínimo con el título y la declaración de PDF/UA-1 ({@code pdfuaid:part}). Un
-     * documento siempre tiene {@code Title} (obligatorio): sin título el PDF no cumpliría PDF/UA (7.1) y
-     * no podría afirmarlo.
+     * Paquete XMP mínimo con el título y la declaración de PDF/UA ({@code pdfuaid:part}, 1 o 2; la 2 con la revisión
+     * de la norma, {@code pdfuaid:rev}). Un documento siempre tiene {@code Title} (obligatorio): sin título el PDF no
+     * cumpliría PDF/UA (7.1) y no podría afirmarlo.
      */
-    static String xmp(String title) {
+    static String xmp(String title, int ua) {
         String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
         return "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
                 + "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n"
@@ -386,7 +436,8 @@ final class PdfStructure {
                 + "<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">" + escaped + "</rdf:li></rdf:Alt></dc:title>\n"
                 + "</rdf:Description>\n"
                 + "<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n"
-                + "<pdfuaid:part>1</pdfuaid:part>\n"
+                + "<pdfuaid:part>" + ua + "</pdfuaid:part>\n"
+                + (ua == 2 ? "<pdfuaid:rev>2024</pdfuaid:rev>\n" : "")
                 + "</rdf:Description>\n"
                 + "</rdf:RDF>\n"
                 + "</x:xmpmeta>\n"
@@ -448,7 +499,7 @@ final class PdfStructure {
         if (holder == null || !isContent(box)) {
             return -1;
         }
-        PDStructureElement link = new PDStructureElement("Link", holder);
+        PDStructureElement link = element("Link", holder);
         link.setPage(page);
         holder.appendKid(link);
         inline = link;
@@ -494,7 +545,7 @@ final class PdfStructure {
         PDStructureElement link = boxLinks.get(box);
         if (link == null) {
             // Una caja que no puede envolver su contenido en un Link (una tabla): un Link aparte, hijo suyo.
-            link = new PDStructureElement("Link", parent);
+            link = element("Link", parent);
             link.setPage(page);
             parent.appendKid(link);
             emptyLinks.add(link);
@@ -540,11 +591,59 @@ final class PdfStructure {
         attach(link, annotation);
     }
 
-    /** El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. */
-    private static void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
+    /**
+     * El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. Con PDF/UA-2, la
+     * anotación no lleva además su texto ({@code Contents}): lo que se lee es el {@code Alt}, y los dos tendrían que
+     * coincidir.
+     */
+    private void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
         if (link.getAlternateDescription() == null) {
             link.setAlternateDescription(description != null ? description : annotation.getContents());
         }
+        if (ua == 2) {
+            annotation.getCOSObject().removeItem(COSName.CONTENTS);
+        }
+    }
+
+    /** El elemento de la caja con esa clave ({@link Box#key()}), o del antecesor más cercano que lo tiene. */
+    private PDStructureElement target(String key) {
+        for (Box box : elements.keySet()) {
+            if (key.equals(box.key())) {
+                return element(box);
+            }
+        }
+        return null;
+    }
+
+    /** El elemento de la caja o, si no tiene, el del antecesor más cercano que lo tiene. */
+    private PDStructureElement element(Box box) {
+        for (Box b = box; b != null; b = b.parent()) {
+            if (elements.containsKey(b)) {
+                return elements.get(b);
+            }
+        }
+        return elements.get(root);
+    }
+
+    /**
+     * Con PDF/UA-2, la acción que lleva a la caja: un destino de estructura ({@code SD}, el elemento de la caja con la
+     * posición de {@code destination}) y, para los visores que no lo entienden, el destino de su página ({@code D});
+     * con PDF/UA-1, {@code null}, y se usa el destino de la página.
+     */
+    PDActionGoTo goTo(Box box, PDPageXYZDestination destination) {
+        if (ua != 2) {
+            return null;
+        }
+        COSArray sd = new COSArray();
+        sd.add(element(box));
+        COSArray d = destination.getCOSObject();
+        for (int i = 1; i < d.size(); i++) {
+            sd.add(d.get(i));
+        }
+        PDActionGoTo goTo = new PDActionGoTo();
+        goTo.setDestination(destination);
+        goTo.getCOSObject().setItem(COSName.getPDFName("SD"), sd);
+        return goTo;
     }
 
     private void attach(PDStructureElement link, PDAnnotationLink annotation) {
@@ -585,6 +684,15 @@ final class PdfStructure {
                 }
             }
         }
+        // PDF/UA-2: cada entrada de índice señala con Ref el elemento de su encabezado.
+        entries.forEach((entry, toci) -> {
+            PDStructureElement heading = target(Links.target(entry.style().link()));
+            if (heading != null) {
+                COSArray ref = new COSArray();
+                ref.add(heading);
+                toci.getCOSObject().setItem(COSName.getPDFName("Ref"), ref);
+            }
+        });
         PDNumberTreeNode parentTree = new PDNumberTreeNode(PDParentTreeValue.class);
         parentTree.setNumbers(parents);
         treeRoot.setParentTree(parentTree);
@@ -604,7 +712,12 @@ final class PdfStructure {
             PDOutlineNode parent = open.isEmpty() ? outline : open.peek();
             PDOutlineItem item = new PDOutlineItem();
             item.setTitle(h.headingText());
-            item.setDestination(destinations.get(h));
+            PDActionGoTo goTo = goTo(h, destinations.get(h));
+            if (goTo != null) {
+                item.setAction(goTo);
+            } else {
+                item.setDestination(destinations.get(h));
+            }
             parent.addLast(item);
             open.push(item);
             levels.push(h.headingLevel());

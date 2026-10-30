@@ -2,7 +2,7 @@
 
 Motor de layout y generación de PDF a partir de documentos escritos en [STXT](https://stxt.dev). Describes qué hay en
 cada página y cómo se ve; el motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe un PDF con las
-fuentes incrustadas, accesible (PDF/UA-1) y con marcadores.
+fuentes incrustadas, accesible (PDF/UA-1, o PDF/UA-2 si se pide) y con marcadores.
 
 ```
 Document (dev.stxt.pdf):

@@ -12,8 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Validación de accesibilidad de un PDF contra PDF/UA-1 con veraPDF (solo para los tests). Da las
- * reglas que incumple, cada una con el número de veces y su mensaje.
+ * Validación de accesibilidad de un PDF contra PDF/UA-1 o PDF/UA-2 con veraPDF (solo para los tests). Da las
+ * reglas que incumple, cada una con el número de veces y su mensaje. PDF/UA-2 se valida con el perfil de veraPDF que
+ * añade las reglas de ISO/TS 32005 (qué elemento puede contener a cuál).
  */
 public final class PdfUa {
 
@@ -26,7 +27,12 @@ public final class PdfUa {
 
     /** Las reglas de PDF/UA-1 que incumple el PDF, por cláusula y número ({@code 7.18.5-1}), con su mensaje. */
     public static Map<String, String> failedRules(byte[] pdf) {
-        PDFAFlavour flavour = PDFAFlavour.PDFUA_1;
+        return failedRules(pdf, 1);
+    }
+
+    /** Las reglas de la parte {@code part} de PDF/UA (1 o 2) que incumple el PDF. */
+    public static Map<String, String> failedRules(byte[] pdf, int part) {
+        PDFAFlavour flavour = part == 2 ? PDFAFlavour.PDFUA_2 : PDFAFlavour.PDFUA_1;
         try (PDFAParser parser = Foundries.defaultInstance().createParser(new ByteArrayInputStream(pdf), flavour)) {
             PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false);
             Map<String, String> failed = new LinkedHashMap<>();

@@ -100,19 +100,24 @@ class ExamplesTest {
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), dir.getFileName() + "/");
         }
         ReferenceFiles.checkImages(dir, actual, images, "examples.update");
-        accessibility(dir, pdf);
+        accessibility(dir, pdf, 1);
+        accessibility(dir, pdf(document, resources, 2), 2);
     }
 
     private static byte[] pdf(LaidOutDocument document, Resources resources) throws IOException {
+        return pdf(document, resources, 1);
+    }
+
+    private static byte[] pdf(LaidOutDocument document, Resources resources, int ua) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false);
+        PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false, ua);
         return out.toByteArray();
     }
 
-    /** El PDF etiquetado cumple PDF/UA-1 salvo en {@link #KNOWN_UA_FAILURES}. */
-    private static void accessibility(Path dir, byte[] pdf) {
-        Map<String, String> unexpected = new LinkedHashMap<>(PdfUa.failedRules(pdf));
+    /** El PDF etiquetado cumple la parte {@code ua} de PDF/UA salvo en {@link #KNOWN_UA_FAILURES}. */
+    private static void accessibility(Path dir, byte[] pdf, int ua) {
+        Map<String, String> unexpected = new LinkedHashMap<>(PdfUa.failedRules(pdf, ua));
         unexpected.keySet().removeAll(KNOWN_UA_FAILURES);
-        assertEquals(Map.of(), unexpected, dir.getFileName() + ": reglas de PDF/UA-1 incumplidas");
+        assertEquals(Map.of(), unexpected, dir.getFileName() + ": reglas de PDF/UA-" + ua + " incumplidas");
     }
 }

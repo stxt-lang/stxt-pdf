@@ -31,6 +31,7 @@ converter.toPdf(doc, out);
 | `styles` | Ninguno. El fichero de estilos aparte del documento ([Estilos](estilos.md#estilos-en-un-fichero-aparte)) |
 | `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG |
 | `debug` | `false`. Con `true`, pinta el contorno de cada caja |
+| `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
 | `checkContrast` | `true`: un texto que apenas se distingue de su fondo es un error ([Caja](caja.md#contraste)). Con `false`, no se comprueba |
 
 ## Errores

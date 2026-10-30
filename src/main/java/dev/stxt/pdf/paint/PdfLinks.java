@@ -4,6 +4,7 @@ import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
@@ -50,21 +51,29 @@ final class PdfLinks {
         return annotation;
     }
 
-    /** Pone a los enlaces internos el destino de su caja. */
-    void resolve(Map<Box, PDPageXYZDestination> destinations) {
-        Map<String, PDPageXYZDestination> byKey = new java.util.HashMap<>();
+    /**
+     * Pone a los enlaces internos el destino de su caja; con PDF/UA-2, como una acción con el destino de estructura
+     * ({@link PdfStructure#goTo}).
+     */
+    void resolve(Map<Box, PDPageXYZDestination> destinations, PdfStructure structure) {
+        Map<String, Box> byKey = new java.util.HashMap<>();
         destinations.forEach((box, d) -> {
             if (box.key() != null) {
-                byKey.put(box.key(), d);
+                byKey.put(box.key(), box);
             }
         });
         for (Internal link : internal) {
-            PDPageXYZDestination d = byKey.get(link.id());
-            if (d == null) {
+            Box box = byKey.get(link.id());
+            if (box == null) {
                 // El builder ya comprobó que existe y que no está en un Fixed (LinkTargets).
                 throw new InternalException("Enlace sin destino: #" + link.id());
             }
-            link.annotation().setDestination(d);
+            PDActionGoTo goTo = structure.goTo(box, destinations.get(box));
+            if (goTo != null) {
+                link.annotation().setAction(goTo);
+            } else {
+                link.annotation().setDestination(destinations.get(box));
+            }
         }
     }
 }

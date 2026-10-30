@@ -29,7 +29,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [Referencias](comun/referencias.md) | `{page of: id}` y `{number of: id}`, y cómo converge la paginación |
 | [Enlaces](comun/enlaces.md) | `Link` y los enlaces de Markdown: destinos, zonas y PDF etiquetado |
 | [Recursos y fuentes](comun/recursos.md) | La carpeta de recursos, las rutas seguras y cómo se identifican y se comprueban las fuentes |
-| [El PDF](comun/pdf.md) | Lo que lleva todo PDF: fuentes incrustadas, accesibilidad, marcadores, título y PDF/UA-1 |
+| [El PDF](comun/pdf.md) | Lo que lleva todo PDF: fuentes incrustadas, accesibilidad, contraste, marcadores, título y PDF/UA-1 o PDF/UA-2 |
 | [Desbordamiento](comun/desbordamiento.md) | Nada puede desbordar: qué se comprueba y a quién se señala |
 | [Errores](comun/errores.md) | La política de errores, los niveles de validación, los códigos y sus tipos |
 | [Límites](comun/limites.md) | Páginas, píxeles y complejidad de los SVG que admite una conversión |

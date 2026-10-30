@@ -12,7 +12,8 @@ escribe el código, en [El pintado](pintado.md#el-pdf).
 - Las fuentes son las TTF de la carpeta de recursos, incrustadas como subconjunto (Type 0, Identity-H) con los glifos que
   se usan.
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre;
-  `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP.
+  `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
+  quien convierte lo pide ([abajo](#pdfua-2)).
 
 > **Decisión:** todo PDF declara PDF/UA-1. veraPDF lo comprueba solo en parte (no el orden de lectura ni el sentido de los
 > textos), así que se apoya además en el repaso a mano del etiquetado. *Alternativa descartada:* no declararlo.
@@ -84,7 +85,7 @@ espacios tras él. No está en la estructura: la de un elemento con `Transform` 
 `UpperRoman`, y `None` para `dash` y `none`.
 
 > **Decisión:** `dash` es `ListNumbering: None`, porque PDF/UA-1 no tiene un valor para el guion. *Alternativa
-> descartada:* `Unordered`, de PDF 2.0.
+> descartada:* `Unordered`, de PDF 2.0, que sí se usa con PDF/UA-2 ([abajo](#pdfua-2)).
 
 ### Tablas
 
@@ -158,6 +159,33 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
 Uno por encabezado (también los de un `Markdown`), con el texto de sus `Text` unido por espacios (con su número, si lo
 lleva), anidados por nivel y con destino en la esquina superior izquierda de su primer fragmento. El catálogo pide al visor
 que los muestre al abrir el documento (`PageMode: UseOutlines`).
+
+## PDF/UA-2
+
+Con `Converter.builder().pdfUa(2)`, el PDF es PDF 2.0 (en la cabecera del fichero y en el `Version` del catálogo) y cumple
+PDF/UA-2 (ISO 14289-2), con `pdfuaid:part` 2 y `pdfuaid:rev` 2024 en los metadatos XMP. Todo lo de arriba vale igual, con
+estas diferencias:
+
+- **Espacio de nombres:** el árbol de estructura declara el de PDF 2.0 (`Namespaces`, `http://iso.org/pdf2/ssn`) y cada
+  elemento lo lleva en `NS`, salvo `TOC`, `TOCI` y `Reference`, que no existen en PDF 2.0 y se quedan en el de PDF 1.7, el
+  de omisión.
+- **Índices:** un `TOCI` no puede contener un `Link`: es `TOCI → Reference → Link → título, número`, y el `TOCI` señala con
+  `Ref` el elemento del encabezado al que lleva.
+- **Destinos de estructura:** un enlace a una caja del documento y un marcador son una acción `GoTo` con el elemento de la
+  caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición; `D`, con la página, queda para los
+  visores que no entienden `SD`.
+- **Listas:** `dash` es `ListNumbering: Unordered`.
+- **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
+
+veraPDF lo valida con su perfil de PDF/UA-2, que añade las reglas de ISO/TS 32005 sobre qué elemento puede contener a
+cuál.
+
+> **Decisión:** PDF/UA-2 es una opción y PDF/UA-1 lo de siempre: PDF 2.0 aún no lo abre bien cualquier visor.
+> *Alternativa descartada:* pasar todo a PDF/UA-2.
+
+> **Decisión:** los enlaces con `Alt` no llevan `Contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
+> mismo, y lo dicen; pero veraPDF compara el `Alt` sin descodificar cuando el texto tiene acentos y lo da por distinto.
+> *Alternativa descartada:* quitar el `Alt`, que es lo que lee un lector de pantalla en un `Link` vacío.
 
 ## Imágenes
 

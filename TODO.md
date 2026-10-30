@@ -20,7 +20,6 @@ saliendo al trabajar y solo toca ese.
 - Verificar los PDF con lectores de pantalla reales (NVDA, JAWS, VoiceOver): hoy los comprueba veraPDF (PDF/UA-1) y un
   lector simulado.
 - Idioma por tramo dentro de una línea (una palabra en inglés en un párrafo español): hoy el idioma es de la caja.
-- PDF/UA-2 y PDF 2.0: `TOCI` con `Reference` y `Ref`, destinos de estructura, `ListNumbering` para las listas con guion.
 - `Alt` de las imágenes: hoy una `Image` sin `Alt` es decorativa sin aviso. Si los olvidos resultan un problema, hacer
   `Alt` obligatorio con `Alt:` vacío para las decorativas.
 

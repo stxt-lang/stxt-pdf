@@ -125,5 +125,9 @@ class DocumentationExamplesTest {
         Files.createDirectories(ACTUAL_DIR);
         Files.write(ACTUAL_DIR.resolve(document.name() + ".pdf"), pdf);
         assertEquals(Map.of(), PdfUa.failedRules(pdf), document.name() + ": reglas de PDF/UA-1 incumplidas");
+        ByteArrayOutputStream ua2 = new ByteArrayOutputStream();
+        PdfDocumentWriter.write(laidOut, resources, Limits.DEFAULT, ua2, false, 2);
+        assertEquals(Map.of(), PdfUa.failedRules(ua2.toByteArray(), 2),
+                document.name() + ": reglas de PDF/UA-2 incumplidas");
     }
 }

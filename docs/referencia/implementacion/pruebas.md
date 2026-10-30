@@ -46,7 +46,8 @@ las que cambian. La CI sube `target/reference` cuando falla.
 
 Cada carpeta de `test/examples/NN-nombre/` es un documento completo (`input.stxt`, con su `styles.stxt`) con un `page-N.png`
 por página (versionados, sin contornos, a 110 ppp), el `output.pdf` y un `expected.stxt` con el volcado de las cajas con
-`Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, y el PDF se valida con veraPDF (PDF/UA-1). El volcado
+`Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
+valida con veraPDF, como PDF/UA-1 y escrito también como PDF/UA-2. El volcado
 no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta las imágenes que
 cambian y reescribe el `output.pdf`, y se revisa mirando las imágenes. Con `-Dexamples.only=NN-nombre` se prueba un solo
 ejemplo. Las imágenes de los ejemplos están en `resources/images/examples/` y las genera `java tools/ExampleImages.java`
@@ -68,7 +69,8 @@ ejemplo. Las imágenes de los ejemplos están en `resources/images/examples/` y 
 ## Documentos de la documentación (`DocumentationExamplesTest`)
 
 Cada documento completo (`Document (dev.stxt.pdf):` en un bloque de código) del [manual](../../manual/README.md) y de la
-referencia se maqueta con las métricas reales y se escribe en PDF, que debe cumplir PDF/UA-1 según veraPDF; el PDF queda en
+referencia se maqueta con las métricas reales, se comprueba su contraste y se escribe en PDF, que debe cumplir PDF/UA-1 y,
+escrito como PDF/UA-2, PDF/UA-2 según veraPDF; el PDF queda en
 `target/reference/docs/`. El [ejemplo completo](../comun/ejemplo-completo.md) debe ser `test/spec/report.stxt` sin su cabecera
 de comentarios. Así ningún ejemplo de la documentación deja de funcionar sin que se note.
 

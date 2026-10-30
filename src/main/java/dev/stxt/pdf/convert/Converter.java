@@ -53,6 +53,7 @@ public final class Converter {
     private final boolean debug;
     private final Limits limits;
     private final boolean checkContrast;
+    private final int pdfUa;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
@@ -60,6 +61,7 @@ public final class Converter {
         this.debug = builder.debug;
         this.limits = builder.limits;
         this.checkContrast = builder.checkContrast;
+        this.pdfUa = builder.pdfUa;
     }
 
     /** Un conversor con la configuración por defecto: recursos en {@code resources/}, sin estilos aparte ni depuración. */
@@ -112,7 +114,7 @@ public final class Converter {
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
-        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug));
+        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa));
     }
 
     /** El SVG de cada página de un documento ya maquetado, en orden. */
@@ -165,6 +167,7 @@ public final class Converter {
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
         private boolean checkContrast = true;
+        private int pdfUa = 1;
 
         private Builder() {
         }
@@ -209,6 +212,20 @@ public final class Converter {
          */
         public Builder checkContrast(boolean check) {
             this.checkContrast = check;
+            return this;
+        }
+
+        /**
+         * La parte de PDF/UA que cumple el PDF (referencia/comun/pdf.md): 1, en PDF 1.7, o 2, en PDF 2.0. Por
+         * defecto 1.
+         *
+         * @throws IllegalArgumentException si no es 1 ni 2
+         */
+        public Builder pdfUa(int part) {
+            if (part != 1 && part != 2) {
+                throw new IllegalArgumentException("PDF/UA tiene las partes 1 y 2: " + part);
+            }
+            this.pdfUa = part;
             return this;
         }
 
