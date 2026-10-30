@@ -3,7 +3,7 @@
 # cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
 # una rejilla. El cuerpo es Markdown dentro de Columns. La cabecera de portada es un bloque de la
 # primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
-# minúscula y se ponen en mayúsculas con Transform, a veces con interletraje (Letter spacing).
+# minúscula y se ponen en mayúsculas con Case, a veces con interletraje (Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 						Typography:
 							Bold: true
 							Color: #A4301F
-							Transform: uppercase
+							Case: uppercase
 							Letter spacing: 0.8
 				Item:
 					Text: Octubre de 2025 · Nº 87
@@ -67,7 +67,7 @@ Document (dev.stxt.pdf):
 					Font: IBM Plex Sans
 					Size: 7.5
 					Bold: true
-					Transform: uppercase
+					Case: uppercase
 					Letter spacing: 0.8
 				Item:
 					Text: Boletín mensual de los pueblos de la Garrotxa
@@ -173,7 +173,7 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Agenda de octubre y noviembre
 					Typography:
-						Transform: uppercase
+						Case: uppercase
 						Letter spacing: 0.6
 			Table:
 				Id: agenda
@@ -191,36 +191,36 @@ Document (dev.stxt.pdf):
 						Cell: Sáb. 25 oct.
 						Cell: 19:00
 						Cell: Concierto del coro del valle
-							Header: true
+							Row header: true
 						Cell: Iglesia de Sant Roc
 					Row:
 						Cell: Dom. 26 oct.
 						Cell: 10:00
 						Cell: Salida micológica con guía
-							Header: true
+							Row header: true
 						Cell: Plaza Mayor
 					Row:
 						Cell: Sáb. 1 nov.
 						Cell: 11:00
 						Cell: Mercado y castañada popular
-							Header: true
+							Row header: true
 						Cell: Plaza Mayor
 					Row:
 						Cell: Vie. 7 nov.
 						Cell: 20:30
 						Cell: Cine al aire libre: «El hayedo»
-							Header: true
+							Row header: true
 						Cell: Polideportivo
 					Row:
 						Cell: Sáb. 22 nov.
 						Cell: 21:00
 						Cell: Cena del club de lectura
-							Header: true
+							Row header: true
 						Cell: Centro cívico
 			Heading 2:
 				Text: Anuncios por palabras
 					Typography:
-						Transform: uppercase
+						Case: uppercase
 						Letter spacing: 0.6
 			Grid:
 				Id: classifieds

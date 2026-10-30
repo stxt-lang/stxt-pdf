@@ -12,7 +12,7 @@ public final class BreakStyle extends StyleGroup {
     private Break before = Break.AUTO;
     private Break after = Break.AUTO;
     private boolean avoidInside;
-    private Decoration decoration = Decoration.SLICE;
+    private Decoration decoration = Decoration.OPEN;
 
     BreakStyle() {
     }

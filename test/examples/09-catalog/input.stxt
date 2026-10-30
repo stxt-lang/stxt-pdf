@@ -6,7 +6,7 @@
 # final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
 # solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
 # In table of contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
-# ponen en mayúsculas (Transform).
+# ponen en mayúsculas (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -54,7 +54,7 @@ Document (dev.stxt.pdf):
 						Size: 10
 						Bold: true
 						Color: #F3C27C
-						Transform: uppercase
+						Case: uppercase
 						Letter spacing: 4
 					Box:
 						Margin: 0 0 8 0
@@ -150,7 +150,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -187,7 +187,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -224,7 +224,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40
@@ -268,7 +268,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -317,7 +317,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -354,7 +354,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -391,7 +391,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Flex:
@@ -428,7 +428,7 @@ Document (dev.stxt.pdf):
 								Box:
 									Width: 100%
 									Height: 205
-									Radius: 5.5 5.5 0 0
+									Corner radius: 5.5 5.5 0 0
 							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40
@@ -482,7 +482,7 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Nogal
-							Header: true
+							Row header: true
 							Typography:
 								Bold: true
 						Cell: Oscura, de veta marcada y cálida
@@ -490,7 +490,7 @@ Document (dev.stxt.pdf):
 						Cell: Aceite natural, cera de abeja, teñido nogal oscuro
 					Row:
 						Cell: Roble
-							Header: true
+							Row header: true
 							Typography:
 								Bold: true
 						Cell: Clara, de veta fina y muy resistente
@@ -498,7 +498,7 @@ Document (dev.stxt.pdf):
 						Cell: Aceite blanco o natural, jabón
 					Row:
 						Cell: Cerezo
-							Header: true
+							Row header: true
 							Typography:
 								Bold: true
 						Cell: Rojiza, que se oscurece con la luz
@@ -506,7 +506,7 @@ Document (dev.stxt.pdf):
 						Cell: Aceite natural
 					Row:
 						Cell: Fresno
-							Header: true
+							Row header: true
 							Typography:
 								Bold: true
 						Cell: Clara y elástica, ideal para piezas curvas

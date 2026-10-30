@@ -62,7 +62,7 @@ Document (dev.stxt.pdf):
 			Bullet markers: dash
 			Typography:
 				Align: justify
-				Text wrap: pretty
+				Line breaking: balanced
 			Content >>
 				Estimado Sr. Puig:
 

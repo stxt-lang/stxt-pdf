@@ -114,7 +114,7 @@ class MulticolFragmentationTest {
     @Test
     void cloneDecorationRepeatsBorderAndPadding() {
         LayoutFixture l = layOutPaged(PAGE, multicol(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 5",
-                "Break:", "\tDecoration: clone"), blocks(8, true)));
+                "Break:", "\tEdges: closed"), blocks(8, true)));
         // Columnas de 90 entre los 5 de arriba y de abajo, y de 245 de ancho: tres bloques enteros
         // por columna en la página 1.
         assertEquals(2, l.pages());
@@ -136,7 +136,7 @@ class MulticolFragmentationTest {
     @Test
     void cloneWithHeightLeavesTheRestToTheLastPage() {
         LayoutFixture l = layOutPaged(PAGE, multicol(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
-                "\tHeight: 160", "\tPadding: 5", "Break:", "\tDecoration: clone"), blocks(10, true)));
+                "\tHeight: 160", "\tPadding: 5", "Break:", "\tEdges: closed"), blocks(10, true)));
         assertEquals(2, l.pages());
         assertRect(305, 95, 245, 25, l.rect(1, "F"));
         assertRect(45, 70, 245, 25, l.rect(2, "H"));

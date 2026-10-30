@@ -55,7 +55,7 @@ idioma cambia respecto al de fuera; los elementos de dentro lo heredan.
 
 ### Texto que se lee
 
-Un elemento con `Transform` o `Small caps` lleva `ActualText` con el texto escrito, para que un lector de pantalla lea
+Un elemento con `Case` o `Small caps` lleva `ActualText` con el texto escrito, para que un lector de pantalla lea
 «Emisor» y no «EMISOR», salvo si su texto contiene `{page}`, `{pages}` o una referencia, que cambian con la página.
 
 > **Decisión:** sin `ActualText` en un texto con `{page}` o referencias. *Alternativa descartada:* dar el texto sustituido
@@ -63,8 +63,8 @@ Un elemento con `Transform` o `Small caps` lleva `ActualText` con el texto escri
 
 Una línea de texto normal que no es la última de su caja (o de su fragmento) acaba con un espacio invisible tras la última
 palabra: el corte de línea se come el espacio, y sin él quien une el texto de las líneas (un lector de pantalla, la
-extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `White space: pre`
-y `pre-wrap` no lo lleva: sus líneas son líneas.
+extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `White space: preserve`
+y `preserve-wrap` no lo lleva: sus líneas son líneas.
 
 > **Decisión:** el espacio invisible al final de cada línea partida. *Alternativa descartada:* dejarlo a la geometría,
 > como hacen algunos extractores.
@@ -73,7 +73,7 @@ Con `Letter spacing`, los caracteres de un texto se pintan separados, y quien ex
 uno adivina espacios entre ellos (con PDFBox, `I n f o r m e` desde 1,5 pt en un cuerpo de 10). Por eso cada secuencia
 de tramos seguidos de una línea con el mismo enlace va en un contenido marcado `Span` con `ActualText`: su texto, con el
 espacio invisible del final si llega al final de la línea. Lo respetan Acrobat, poppler (`pdftotext`) y PDFBox, que deja
-espacios tras él. No está en la estructura: la de un elemento con `Transform` sigue siendo la del texto escrito.
+espacios tras él. No está en la estructura: la de un elemento con `Case` sigue siendo la del texto escrito.
 
 > **Decisión:** un `ActualText` por secuencia de tramos y línea. *Alternativa descartada:* uno por tramo, que deja entre
 > dos tramos el hueco del interletraje y hace adivinar un espacio de más; o `Tc` en vez de `TJ`, que separa los
@@ -89,7 +89,7 @@ espacios tras él. No está en la estructura: la de un elemento con `Transform` 
 
 ### Tablas
 
-Una celda de `Head` es `TH` con `Scope: Column`; una de `Body` o `Foot` con `Header: true`, `TH` con `Scope: Row`; el resto,
+Una celda de `Head` es `TH` con `Scope: Column`; una de `Body` o `Foot` con `Row header: true`, `TH` con `Scope: Row`; el resto,
 `TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y el pie son contenido en la
 primera página en que sale cada celda; donde se repiten, son *artifacts*, así que el árbol tiene una sola `THead` y una
 sola `TFoot`.

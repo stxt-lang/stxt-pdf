@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Transform}, {@code Letter spacing} y {@code Small caps} (referencia/comun/formato-del-texto.md). Con {@link
+ * {@code Case}, {@code Letter spacing} y {@code Small caps} (referencia/comun/formato-del-texto.md). Con {@link
  * FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}.
  */
 class TextTypographyTest {
@@ -32,23 +32,23 @@ class TextTypographyTest {
 
     @Test
     void uppercaseChangesWhatIsDrawnAndTheCharacterCount() {
-        List<TextLine> lines = lines("Straße", "Transform: uppercase");
+        List<TextLine> lines = lines("Straße", "Case: uppercase");
         assertEquals("STRASSE", lines.get(0).text());
         assertEquals(35, lines.get(0).width(), 1e-9);
     }
 
     @Test
     void transformIsInherited() {
-        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tTransform: uppercase",
+        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tCase: uppercase",
                 "\t\tText: hola", "\t\t\tId: A",
-                "\t\tText: hola", "\t\t\tId: B", "\t\t\tTypography:", "\t\t\t\tTransform: capitalize");
+                "\t\tText: hola", "\t\t\tId: B", "\t\t\tTypography:", "\t\t\t\tCase: capitalize");
         assertEquals("HOLA", l.fragment("A").lines().get(0).text());
         assertEquals("Hola", l.fragment("B").lines().get(0).text());
     }
 
     @Test
     void theTextOfTheBoxIsNotChanged() {
-        LayoutFixture l = layOut("\tText: hola", "\t\tId: T", "\t\tTypography:", "\t\t\tTransform: uppercase");
+        LayoutFixture l = layOut("\tText: hola", "\t\tId: T", "\t\tTypography:", "\t\t\tCase: uppercase");
         assertEquals("hola", l.fragment("T").box().text());
     }
 
@@ -117,7 +117,7 @@ class TextTypographyTest {
     @Test
     void aPageMarkerIsNumberedAfterTheTransform() {
         LayoutFixture l = layOutPaged(180, "\tPage overlay:", "\t\tOffset: auto 0 -30 0", "\t\tTypography:",
-                "\t\t\tTransform: uppercase",
+                "\t\t\tCase: uppercase",
                 "\t\tText: Página {page} de {pages}", "\t\t\tId: footer",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 150");
         assertEquals(2, l.pages());

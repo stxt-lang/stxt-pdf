@@ -44,10 +44,10 @@ class InlineLayoutTest {
     void textWrapPrettyIsInheritedAndUsesKnuthPlass() {
         // El ejemplo de LineBreakerTest.prettyMinimizesTheDemerits a escala 5: ancho 50.
         String text = "a bbb c ddddd e fff";
-        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tText wrap: pretty",
+        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLine breaking: balanced",
                 "\t\tText: " + text, "\t\t\tId: P", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\tText: " + text, "\t\t\tId: G", "\t\t\tBox:", "\t\t\t\tWidth: 50", "\t\t\tTypography:",
-                "\t\t\t\tText wrap: auto");
+                "\t\t\t\tLine breaking: simple");
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
                 l.fragment("P").lines().stream().map(TextLine::text).toList());
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),

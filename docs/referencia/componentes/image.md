@@ -3,7 +3,7 @@
 Una `Image` pone en el documento una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos
 ([Recursos](../comun/recursos.md)). Es una caja sin hijos, como un `Text`, cuyo contenido es la imagen: se coloca, se
 dimensiona, se corta entre páginas y se pinta como cualquier caja, con su `Box` (márgenes, relleno, borde, fondo y
-esquinas) y su `Break` (sin `Inside` ni `Decoration`, porque no se parte). Admite además `Id`, `Style` y `Link`; no admite
+esquinas) y su `Break` (sin `Inside` ni `Edges`, porque no se parte). Admite además `Id`, `Style` y `Link`; no admite
 `Typography`, porque no tiene texto.
 
 ```
@@ -46,7 +46,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 |---|---|---|---|
 | *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
-| `Fit` | `contain`, `cover`, `fill` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Fit` | `contain`, `cover`, `stretch` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | — | Gira la imagen sobre su centro (un sello); ocupa el rectángulo que la envuelve girada. |
 
@@ -105,14 +105,14 @@ Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción,
 
 Si la caja de contenido y la imagen tienen proporciones distintas, `contain` (por defecto) dibuja la imagen entera, lo más
 grande que cabe y centrada, y deja ver el fondo a los lados; `cover` la dibuja lo más pequeña que cubre la caja, centrada,
-y recorta lo que sobra; `fill` la estira a la caja y la deforma. Con la misma proporción, las tres dan lo mismo. Una imagen
+y recorta lo que sobra; `stretch` la estira a la caja y la deforma. Con la misma proporción, las tres dan lo mismo. Una imagen
 se recorta además con las esquinas redondeadas de su caja de contenido ([La caja](../comun/caja.md#esquinas)).
 
 ## Cortes de página
 
 Una imagen no se parte: si no cabe en lo que queda de la página (o de la columna de un `Columns`), pasa entera a la
 siguiente, como una línea de texto. Si no cabe ni en una página entera, es `PAGE_OVERFLOW`, con la línea de su `Height` (o,
-sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja; `Inside` y `Decoration`, que solo cuentan al
+sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja; `Inside` y `Edges`, que solo cuentan al
 partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla de `Styles`.
 
 ## Dónde va
@@ -268,7 +268,7 @@ no lo lee.
 
 El PDF lleva cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal cual y
 el PNG sin pérdida y con su transparencia. Un SVG o una página de un PDF se escalan a su caja como un PNG, pero siguen
-siendo un dibujo vectorial nítido a cualquier tamaño (`fill` deforma el dibujo); una página de un PDF se copia una vez,
+siendo un dibujo vectorial nítido a cualquier tamaño (`stretch` deforma el dibujo); una página de un PDF se copia una vez,
 aunque salga en varias páginas.
 
 ## Lo que no hay

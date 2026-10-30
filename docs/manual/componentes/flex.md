@@ -19,7 +19,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 10
 				Background: #F1EFE8
-				Radius: 4
+				Corner radius: 4
 			Typography:
 				Align: center
 	Section:

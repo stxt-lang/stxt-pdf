@@ -225,9 +225,9 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return Sizing.constrain(contentHeight + border.vertical() + padding.vertical(), minHeight, maxHeight);
     }
 
-    /** Cada fragmento lleva borde y relleno completos ({@code Decoration: clone}). */
+    /** Cada fragmento lleva borde y relleno completos ({@code Edges: closed}). */
     public boolean clones() {
-        return decoration == Decoration.CLONE;
+        return decoration == Decoration.CLOSED;
     }
 
     /** Nada separa el borde superior de la caja de su contenido: ni borde ni relleno. */
@@ -243,9 +243,9 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     /**
      * Espacio para los hijos en flujo: la caja de contenido es su containing block. Lo que
      * queda de página se mide desde el principio de la caja de contenido (y,
-     * con {@code Decoration: clone}, sin el borde y el relleno inferiores).
+     * con {@code Edges: closed}, sin el borde y el relleno inferiores).
      *
-     * @param first es el primer fragmento de la caja (con {@code slice}, los siguientes no llevan
+     * @param first es el primer fragmento de la caja (con {@code open}, los siguientes no llevan
      *              borde ni relleno superiores, ver {@link Slice})
      */
     public ConstraintSpace childSpace(ConstraintSpace space, boolean first) {

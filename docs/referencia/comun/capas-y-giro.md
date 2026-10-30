@@ -62,7 +62,7 @@ Text: Lunes
   de sus hijos no salen de ella, y `Contain margins`, que no tendría efecto, es `CONTAIN_MARGINS_IN_ROTATED`. Es también el contenedor de
   referencia de los `Overlay` de dentro, que se colocan en su caja sin girar y giran con ella.
 - **No se parte** entre páginas, como una `Image`: entera o, si no cabe en lo que queda, en la página siguiente; `Inside`
-  y `Decoration` son `BREAK_IN_ROTATED`, y un `Break` de dentro, `BREAK_IN_UNBREAKABLE` ([Cortes](cortes.md)).
+  y `Edges` son `BREAK_IN_ROTATED`, y un `Break` de dentro, `BREAK_IN_UNBREAKABLE` ([Cortes](cortes.md)).
 - **No puede ser un ítem de `Flex` o `Grid`** (`ROTATED_ITEM`), que ocupa el sitio que le da su contenedor: se gira una
   caja dentro del ítem.
 
@@ -84,7 +84,7 @@ Un posicionado girado gira alrededor de su `Rotate origin` (el centro de su caja
 layout**: como el `Offset` de un `Frame`, es solo pintado. La caja ocupa su sitio sin girar y sus hermanos no se
 mueven. Para un texto vertical en el margen de la página se gira un `Overlay` o un `Page overlay` que lo contiene.
 
-Un `Frame` girado no se parte entre páginas; `Inside` y `Decoration` no tienen efecto en él y son un error
+Un `Frame` girado no se parte entre páginas; `Inside` y `Edges` no tienen efecto en él y son un error
 (`BREAK_IN_ROTATED`), también desde una regla.
 
 `Rotate origin` se escribe de una de dos formas:

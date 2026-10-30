@@ -299,7 +299,7 @@ class MarkdownBuilderTest {
         assertEquals(List.of(
                 "Text @17",
                 "  Typography @17",
-                "    White space: pre @17",
+                "    White space: preserve @17",
                 "  Content: a  b\n  c @17"), outline(t.elements().get(1)));
         assertEquals(Set.of(t.elements().get(1)), t.codeBlocks());
     }

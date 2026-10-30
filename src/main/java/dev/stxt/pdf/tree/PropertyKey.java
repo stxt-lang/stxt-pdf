@@ -55,7 +55,7 @@ public final class PropertyKey {
     public static final String BREAK_BEFORE = "break-before";
     public static final String BREAK_AFTER = "break-after";
     public static final String BREAK_INSIDE = "break-inside";
-    public static final String DECORATION = "decoration";
+    public static final String DECORATION = "edges";
 
     // Flex, Grid e Item
     public static final String FLEX_HORIZONTAL = "flex.horizontal";

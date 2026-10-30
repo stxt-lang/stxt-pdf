@@ -122,7 +122,7 @@ class BlockFragmentationTest {
         // (90 pt). Página 1: C1 (40) + 50 de C2. Página 2: 5 + los 30 que faltan de C2 + 5.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: Q", "\t\tBox:", "\t\t\tBorder: 2", "\t\t\tPadding: 3", "\t\tBreak:",
-                "\t\t\tDecoration: clone",
+                "\t\t\tEdges: closed",
                 "\t\tBlock:", "\t\t\tId: C1", "\t\t\tBox:", "\t\t\t\tHeight: 40",
                 "\t\tBlock:", "\t\t\tId: C2", "\t\t\tBox:", "\t\t\t\tHeight: 80");
         assertEquals(2, l.pages());
@@ -138,7 +138,7 @@ class BlockFragmentationTest {
     void cloneFixedHeightIsTheTotalOfTheContent() {
         // Height 250 con borde 5: 240 de contenido en trozos de 90, cada uno con 10 de borde.
         LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 250", "\t\t\tBorder: 5",
-                "\t\tBreak:", "\t\t\tDecoration: clone");
+                "\t\tBreak:", "\t\t\tEdges: closed");
         assertEquals(3, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
         assertRect(40, 40, 515, 100, l.rect(2, "A"));
@@ -150,7 +150,7 @@ class BlockFragmentationTest {
         // Relleno 10 con clone: caben 80 / 12 = 6 líneas por página; 10 líneas = 6 + 4.
         LayoutFixture l = layOutPaged(PAGE, "\tText: " + String.join(" ", java.util.Collections.nCopies(10, "aaaaa")),
                 "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tPadding: 10", "\t\tBreak:",
-                "\t\t\tDecoration: clone");
+                "\t\t\tEdges: closed");
         assertEquals(2, l.pages());
         assertRect(40, 40, 50, 92, l.rect(1, "P"));
         assertRect(40, 40, 50, 68, l.rect(2, "P"));

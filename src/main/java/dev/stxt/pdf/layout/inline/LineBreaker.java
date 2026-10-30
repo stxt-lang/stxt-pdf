@@ -20,8 +20,8 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reparte un texto en líneas (referencia/comun/tipografia.md). Con {@code Text wrap: auto},
- * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code pretty}, con
+ * Reparte un texto en líneas (referencia/comun/tipografia.md). Con {@code Line breaking: simple},
+ * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code balanced}, con
  * Knuth-Plass ({@link #optimal}).
  *
  * <p>Tratamiento del espacio en blanco: los saltos de línea simples del bloque {@code Text} y
@@ -79,7 +79,7 @@ public final class LineBreaker {
     /** Líneas de cada párrafo con el algoritmo voraz (ver {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}). */
     public static List<List<String>> breakParagraphs(String text, double available, TextMeasurer measurer,
                                                      FontFace font, double fontSize) {
-        return breakParagraphs(text, available, measurer, font, fontSize, TextWrap.AUTO);
+        return breakParagraphs(text, available, measurer, font, fontSize, TextWrap.SIMPLE);
     }
 
     /** Como {@link #breakParagraphs(List, double, TextMeasurer, FontFace, double, TextWrap)}, para un texto sin formato. */
@@ -104,7 +104,7 @@ public final class LineBreaker {
                                                    TextWrap wrap) {
         List<List<Line>> result = new ArrayList<>();
         for (List<Word> paragraph : paragraphs(runs)) {
-            if (wrap == TextWrap.PRETTY) {
+            if (wrap == TextWrap.BALANCED) {
                 result.add(optimal(paragraph, available, measurer, font, fontSize, letterSpacing));
                 continue;
             }

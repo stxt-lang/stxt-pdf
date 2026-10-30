@@ -168,7 +168,7 @@ class LineBreakerPropertiesTest {
                         + nudges[random.nextInt(nudges.length)];
             }
             assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
-                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, TextWrap.AUTO),
+                    LineBreaker.breakParagraphs(runs, available, metrics, font, size, spacing, TextWrap.SIMPLE),
                     available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
         }
     }

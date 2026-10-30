@@ -5,7 +5,7 @@
 # envuelve). El número del certificado va en vertical en el margen izquierdo: un Page overlay girado −90 grados
 # alrededor de su esquina de arriba a la izquierda.
 # El nombre de la escuela se escribe en minúscula y la regla de su estilo lo pone en mayúsculas,
-# separadas (Transform y Letter spacing).
+# separadas (Case y Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

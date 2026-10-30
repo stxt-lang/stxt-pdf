@@ -30,7 +30,7 @@ Styles (dev.stxt.pdf):
 			Size: 10
 			Bold: true
 			Color: #926829
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 3
 		Box:
 			Margin: 0 0 8 0
@@ -55,7 +55,7 @@ Styles (dev.stxt.pdf):
 		Box:
 			Width: 14
 			Height: 14
-			Radius: 50%
+			Corner radius: 50%
 			Background: #926829
 	For style: line
 		Box:
@@ -73,5 +73,5 @@ Styles (dev.stxt.pdf):
 	For style: serial
 		Typography:
 			Color: #926829
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 1.5

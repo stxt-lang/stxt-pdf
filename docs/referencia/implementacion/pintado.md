@@ -7,7 +7,7 @@ Cómo se dibuja un documento maquetado (package `paint`). Qué se dibuja está e
 
 `StackingContext` recorre los fragmentos de una página en el orden de pintado (contextos de apilamiento, `Layer`, fondos
 antes que texto) y llama a un `Canvas`. Resuelve los radios de cada fragmento (`Radii.resolve` sobre su caja de borde; con
-`Decoration: slice`, `forFragment(first, last)` deja solo las esquinas de su lado) y llama a `Canvas.fill` (el fondo, con
+`Edges: open`, `forFragment(first, last)` deja solo las esquinas de su lado) y llama a `Canvas.fill` (el fondo, con
 `radii.inset(borde)`), `Canvas.border` (un color por lado, ya resuelto) e `image` (con los radios de la caja de contenido);
 `Canvas.background(Rect, String)` queda para los rectángulos lisos (guías, líneas entre columnas, rayas del texto). La
 línea base la calcula con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en SVG). `Shapes` da el camino de

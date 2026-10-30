@@ -1,4 +1,4 @@
-# Case: Radius no admite auto
+# Case: Corner radius no admite auto
 # Code: VALUE_NOT_ALLOWED
 # Line: 13
 Document (dev.stxt.pdf):
@@ -10,4 +10,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Block:
 			Box:
-				Radius: auto
+				Corner radius: auto

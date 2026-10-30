@@ -149,7 +149,7 @@ class HeadingNumbersTest {
 
     @Test
     void theNumberIsAPlainRunBeforeTheFormattedOnes() {
-        BoxTreeBuilder.Result tree = build(NUMBERED + "\t\t\t\tInline: markdown\n", "",
+        BoxTreeBuilder.Result tree = build(NUMBERED + "\t\t\t\tMarkup: markdown\n", "",
                 "\tHeading 1:", "\t\tText: Un **gran** título");
         Box text = headings(tree).get(0).children().get(0);
         assertEquals("1 Un gran título", text.text());

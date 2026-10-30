@@ -26,8 +26,8 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
   imágenes sin `Alt`, las filas repetidas de una tabla y todo lo que hay en un `Page overlay` no se leen.
 - **Idioma:** el `Language` de `Document` es el de todo el contenido; una caja que declara otro se lee con ese
   ([Tipografía](tipografia.md#idioma-language)).
-- **Texto que se lee:** el escrito, también con `Transform` y `Small caps`
-  ([Formato del texto](formato-del-texto.md#mayúsculas-transform)), y las palabras de dos líneas seguidas no se pegan al
+- **Texto que se lee:** el escrito, también con `Case` y `Small caps`
+  ([Formato del texto](formato-del-texto.md#mayúsculas-case)), y las palabras de dos líneas seguidas no se pegan al
   copiar el texto.
 - **Enlaces:** se anuncian con lo que enlazan ([Enlaces](enlaces.md#accesibilidad)).
 - **Contraste:** el texto se distingue de lo que tiene debajo ([abajo](#contraste)).

@@ -2,9 +2,9 @@
 
 Todas estas propiedades son de `Typography`: se heredan y se pueden poner en una regla de `Styles`.
 
-## Negrita, cursiva y más dentro de una frase (`Inline`)
+## Negrita, cursiva y más dentro de una frase (`Markup`)
 
-Por defecto el texto es literal: un asterisco es un asterisco. Con `Inline: markdown`, el texto de un `Text`, un
+Por defecto el texto es literal: un asterisco es un asterisco. Con `Markup: markdown`, el texto de un `Text`, un
 `Paragraph` o una `Cell` entiende las marcas de Markdown dentro de la línea:
 
 | Se escribe | Sale |
@@ -20,21 +20,21 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Inline: mark
 Styles:
 	For element: Paragraph
 		Typography:
-			Inline: markdown
+			Markup: markdown
 Paragraph: El pago se hace en **30 días**, salvo *acuerdo* en contra.
 ```
 
 Las marcas se pueden combinar (`***negrita y cursiva***`) y no se ven en el PDF. Para escribir un asterisco literal, ponle
 una barra delante (`\*`). Solo vale lo que cabe dentro de una línea: un título, una lista o una tabla van en un
 [`Markdown`](../componentes/markdown.md). Lo demás es texto tal cual: `2024. Un buen año` o `- 5 % de descuento` se ven
-como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `Inline: none`.
+como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `Markup: none`.
 
 La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita. El tamaño, el
 color y la fuente son los de la caja.
 
 ## Código
 
-Con `Inline: markdown`, lo que va entre comillas invertidas es código y se escribe en la fuente de `Code font`, que
+Con `Markup: markdown`, lo que va entre comillas invertidas es código y se escribe en la fuente de `Code font`, que
 suele ser una monoespaciada. `Code font` va en `Typography` y se hereda: se declara una vez para todo el documento, y
 vale también para el código de un [`Markdown`](../componentes/markdown.md).
 
@@ -44,7 +44,7 @@ Styles:
 		Typography:
 			Font: IBM Plex Sans
 			Size: 10
-			Inline: markdown
+			Markup: markdown
 			Code font: IBM Plex Mono
 Paragraph: Ejecuta `mvn test` antes de publicar.
 ```
@@ -52,9 +52,9 @@ Paragraph: Ejecuta `mvn test` antes de publicar.
 El código conserva la negrita y la cursiva de lo que lo rodea y no cambia el alto de la línea. Sin `Code font`, un texto
 con código es un error.
 
-## Mayúsculas (`Transform`)
+## Mayúsculas (`Case`)
 
-`Transform: uppercase` pinta el texto en mayúsculas, `lowercase` en minúsculas y `capitalize` pone en mayúscula la primera
+`Case: uppercase` pinta el texto en mayúsculas, `lowercase` en minúsculas y `capitalize` pone en mayúscula la primera
 letra de cada palabra. El texto se escribe normal y la regla lo transforma, así que un lector de pantalla lee «Emisor» y no
 «EMISOR». Las reglas de cada letra son las del idioma de la caja.
 
@@ -62,7 +62,7 @@ letra de cada palabra. El texto se escribe normal y la regla lo transforma, así
 Styles:
 	For style: label
 		Typography:
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 1
 			Size: 8
 Text: Datos del cliente
@@ -87,8 +87,8 @@ No cambian lo que se lee ni lo que se copia, y no se aplican con interletraje.
 
 ## Texto preformateado (`White space`)
 
-Para código, salidas de terminal o columnas alineadas con espacios. Con `White space: pre`, el texto **conserva sus espacios
-y sus saltos de línea**: cada línea escrita es una línea en el PDF, también las vacías. Con `pre-wrap`, además, una línea
+Para código, salidas de terminal o columnas alineadas con espacios. Con `White space: preserve`, el texto **conserva sus espacios
+y sus saltos de línea**: cada línea escrita es una línea en el PDF, también las vacías. Con `preserve-wrap`, además, una línea
 demasiado larga se parte entre palabras. Lo normal es usar una fuente monoespaciada y escribir el texto en un `Content >>`:
 
 ```
@@ -96,14 +96,14 @@ Text:
 	Typography:
 		Font: IBM Plex Mono
 		Size: 9
-		White space: pre
+		White space: preserve
 	Content >>
 		$ termostato --estado
 		temperatura   21,5 °C
 		consigna      22,0 °C
 ```
 
-- Con `pre`, una línea más ancha que la caja es un error: hazla más corta o usa `pre-wrap`.
+- Con `preserve`, una línea más ancha que la caja es un error: hazla más corta o usa `preserve-wrap`.
 - `Tab size` (4 por defecto) es el número de columnas de un tabulador: cada tabulador lleva a la siguiente columna múltiplo
   de `Tab size`, como en un editor.
 - Las líneas preformateadas no se justifican.
@@ -112,7 +112,7 @@ Text:
 
 ## Subrayado y tachado
 
-Son rayas del color del texto, con la posición y el grosor que dice la fuente. Se escriben con `Inline: markdown` o en un
+Son rayas del color del texto, con la posición y el grosor que dice la fuente. Se escriben con `Markup: markdown` o en un
 `Markdown`; no hay estilos de raya.
 
 Más detalle en la [referencia](../../referencia/comun/formato-del-texto.md).

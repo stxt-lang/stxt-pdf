@@ -25,7 +25,7 @@ import java.util.Map;
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
  * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Contain margins}, el giro, {@code Link}, {@code
- * Header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
+ * Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento ({@link SourceLine}).</p>
  *
  * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
  * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
@@ -73,7 +73,7 @@ public final class Style extends StyleGroup {
      */
     private String link;
     /**
-     * {@code Header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se hereda.
+     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se hereda.
      */
     private boolean header;
     /**

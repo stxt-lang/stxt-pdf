@@ -1,4 +1,4 @@
-# Case: Decoration de una regla en un Frame girado
+# Case: Edges de una regla en un Frame girado
 # Code: BREAK_IN_ROTATED
 # Line: 13
 Document (dev.stxt.pdf):
@@ -10,7 +10,7 @@ Document (dev.stxt.pdf):
 	Styles:
 		For style: stamp
 			Break:
-				Decoration: clone
+				Edges: closed
 	Section:
 		Frame:
 			Style: stamp

@@ -89,8 +89,8 @@ nivel de cada sección y de los `Page overlay`, y su alto es siempre definido.
 
 `Document` exige exactamente un `Title` (un texto no vacío; si no, `VALUE_NOT_ALLOWED`) y exactamente un `Language` (una
 etiqueta BCP 47: `es`, `en-US`, `ca`…; si no, `VALUE_NOT_ALLOWED`); si falta cualquiera de los dos, `TOO_FEW_CHILDREN`. No
-afectan al layout, salvo que `Language` da las reglas de las mayúsculas de `Transform`
-([Formato del texto](../comun/formato-del-texto.md#mayúsculas-transform)). El título es el que muestra el visor, y el idioma,
+afectan al layout, salvo que `Language` da las reglas de las mayúsculas de `Case`
+([Formato del texto](../comun/formato-del-texto.md#mayúsculas-case)). El título es el que muestra el visor, y el idioma,
 el que usa un lector de pantalla; los dos son obligatorios para que el PDF sea accesible ([El PDF](../comun/pdf.md)).
 
 ## `Section`

@@ -67,7 +67,7 @@ Document (dev.stxt.pdf):
 			Body:
 				Row:
 					Cell: 9:00 – 10:00
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Matemáticas
 						Style: slot math
@@ -81,7 +81,7 @@ Document (dev.stxt.pdf):
 						Style: slot sci
 				Row:
 					Cell: 10:00 – 11:00
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Lengua
 						Style: slot lang
@@ -95,14 +95,14 @@ Document (dev.stxt.pdf):
 						Style: slot eng
 				Row:
 					Cell:
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Recreo · 11:00 – 11:30
 						Span: 1 5
 						Style: break
 				Row:
 					Cell: 11:30 – 12:30
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Ciencias
 						Style: slot sci
@@ -116,7 +116,7 @@ Document (dev.stxt.pdf):
 						Style: slot lang
 				Row:
 					Cell: 12:30 – 13:30
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Educación física
 						Style: slot pe
@@ -130,14 +130,14 @@ Document (dev.stxt.pdf):
 						Style: slot math
 				Row:
 					Cell:
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Comedor y patio · 13:30 – 15:00
 						Span: 1 5
 						Style: break
 				Row:
 					Cell: 15:00 – 16:00
-						Header: true
+						Row header: true
 						Style: hour
 					Cell: Taller
 						Style: slot lab

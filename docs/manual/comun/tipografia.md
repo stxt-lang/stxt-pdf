@@ -30,13 +30,13 @@ Styles:
 | `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos; `140%`, 1,4 veces el tamaño |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
 | `Color` | color | `#000000` | El color del texto |
-| `Text wrap` | `auto`, `pretty` | `auto` | Cómo se reparte el texto en líneas |
+| `Line breaking` | `simple`, `balanced` | `simple` | Cómo se reparte el texto en líneas |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | `es`, `en-GB`, `ca`… | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md)) |
 | `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
 
-El resto (`Inline`, `Transform`, `Small caps`, `Letter spacing`, `Ligatures`, `White space` y `Tab size`) está en
+El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `White space` y `Tab size`) está en
 [Formato del texto](formato-del-texto.md).
 
 ## Fuente y tamaño
@@ -60,8 +60,8 @@ salvo la última de cada párrafo, las de una sola palabra y las líneas preform
 
 ## Reparto en líneas
 
-El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `Text wrap: auto`, cada línea se llena todo lo
-que puede. Con `Text wrap: pretty`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
+El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `Line breaking: simple`, cada línea se llena todo lo
+que puede. Con `Line breaking: balanced`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
 se nota sobre todo en texto justificado. No se parten palabras con guion: una palabra más ancha que la línea es un error.
 
 Los espacios seguidos y los saltos de línea simples son un solo espacio; una línea en blanco separa dos párrafos.

@@ -164,7 +164,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             paragraphs = List.of();
         } else if (s.typography().whiteSpace().preformatted()) {
             // Todo el texto es un solo párrafo: las líneas en blanco no lo separan.
-            paragraphs = List.of(PreformattedText.lines(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRE_WRAP,
+            paragraphs = List.of(PreformattedText.lines(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRESERVE_WRAP,
                     available, measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing()));
         } else {
             paragraphs = LineBreaker.breakParagraphs(runs(box), available, measurer, s.typography().fontFace(), s.typography().fontSize(),
@@ -186,7 +186,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             return IntrinsicSizes.ZERO;
         }
         if (s.typography().whiteSpace().preformatted()) {
-            return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRE_WRAP,
+            return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRESERVE_WRAP,
                     measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
         }
         return LineBreaker.intrinsics(runs(box), measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());

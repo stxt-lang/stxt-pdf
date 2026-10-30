@@ -124,13 +124,13 @@ final class ModelValidator {
     }
 
     /**
-     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Inside} y {@code Decoration}, que solo
+     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Inside} y {@code Edges}, que solo
      * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
      */
     static void validateImage(Style s) {
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
+                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
                         + " no tiene efecto en una Image, que no se parte entre páginas: quítalo");
             }
         }
@@ -139,7 +139,7 @@ final class ModelValidator {
     /**
      * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
      * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Inside} y {@code
-     * Decoration} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla el colapso
+     * Edges} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla el colapso
      * de márgenes: {@code Contain margins} no tiene efecto en ella.
      */
     static void validateRotation(Style s) {
@@ -156,7 +156,7 @@ final class ModelValidator {
         String what = s.rotatesInFlow() ? "una caja girada" : "un Frame girado";
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Decoration")
+                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
                         + " no tiene efecto en " + what + ", que no se parte entre páginas: quítalo");
             }
         }

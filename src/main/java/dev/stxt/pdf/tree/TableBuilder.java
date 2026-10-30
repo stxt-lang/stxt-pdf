@@ -34,7 +34,7 @@ final class TableBuilder {
     private static final List<String> TABLE_GROUPS = List.of("head", "body", "foot");
 
     /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (referencia/componentes/table.md#filas). */
-    private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "radius");
+    private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
 
     private TableBuilder() {
     }
@@ -140,7 +140,7 @@ final class TableBuilder {
      * La caja de una {@code Row} con {@code Id} o {@code Box} (referencia/componentes/table.md#filas): la franja de la
      * fila {@code tableRow} de la tabla (desde 1), de la primera columna a la última, que se pinta debajo de sus
      * celdas. Su {@code Box} solo admite el aspecto ({@code ROW_BOX}); lee también su {@code Typography} (el color de
-     * su borde por defecto) y su {@code Break} (su {@code Decoration}). Sin {@code Id} ni {@code Box}, la fila no tiene
+     * su borde por defecto) y su {@code Break} (su {@code Edges}). Sin {@code Id} ni {@code Box}, la fila no tiene
      * caja.
      */
     private static void row(BuildContext ctx, InlineNode row, Box table, int tableRow, int columns) {
@@ -158,7 +158,7 @@ final class TableBuilder {
             for (Node p : b.getChildren()) {
                 if (!ROW_LOOK.contains(p.getCanonicalName())) {
                     throw error(p, ErrorCode.ROW_BOX, p.getName() + " no tiene efecto en una Row, que no es una caja "
-                            + "del layout: su Box solo admite Background, Border, Border color y Radius; dáselo a sus "
+                            + "del layout: su Box solo admite Background, Border, Border color y Corner radius; dáselo a sus "
                             + "celdas");
                 }
             }

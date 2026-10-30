@@ -24,7 +24,7 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     public static final Radii NONE = new Radii(Corner.SQUARE, Corner.SQUARE, Corner.SQUARE, Corner.SQUARE);
 
     /**
-     * Resuelve {@code Radius} contra la caja de borde: un porcentaje horizontal es del ancho y uno
+     * Resuelve {@code Corner radius} contra la caja de borde: un porcentaje horizontal es del ancho y uno
      * vertical, del alto, así que {@code 50%} en una caja que no es cuadrada es una elipse. Como en
      * CSS, si dos radios seguidos de un lado suman más que el lado, todos se reducen por el mismo
      * factor hasta que caben.
@@ -69,7 +69,7 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     }
 
     /**
-     * Las esquinas de un fragmento de una caja partida (referencia/comun/cortes.md): con {@code Decoration: slice},
+     * Las esquinas de un fragmento de una caja partida (referencia/comun/cortes.md): con {@code Edges: open},
      * solo el primer fragmento tiene las de arriba y solo el último las de abajo.
      */
     public Radii forFragment(boolean topEdge, boolean bottomEdge) {

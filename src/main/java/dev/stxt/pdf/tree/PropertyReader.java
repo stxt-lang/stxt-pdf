@@ -97,9 +97,9 @@ final class PropertyReader {
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
             entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
             entry("color", (p, s) -> s.typography().setColor(color(p))),
-            entry("text-wrap", (p, s) -> s.typography().setTextWrap(enumValue(TextWrap.class, p))),
-            entry("inline", (p, s) -> s.typography().setInline(enumValue(Inline.class, p))),
-            entry("transform", (p, s) -> s.typography().setTransform(enumValue(Transform.class, p))),
+            entry("line-breaking", (p, s) -> s.typography().setTextWrap(enumValue(TextWrap.class, p))),
+            entry("markup", (p, s) -> s.typography().setInline(enumValue(Inline.class, p))),
+            entry("case", (p, s) -> s.typography().setTransform(enumValue(Transform.class, p))),
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
@@ -122,7 +122,7 @@ final class PropertyReader {
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("contain-margins", (p, s) -> s.setIsolate(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
-            entry("header", (p, s) -> s.setHeader(bool(p))),
+            entry("row-header", (p, s) -> s.setHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInContents(bool(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
@@ -149,7 +149,7 @@ final class PropertyReader {
                 case "padding" -> s.box().setPadding(nonNegativeSides(p, true));
                 case "border" -> s.box().setBorder(nonNegativeSides(p, false));
                 case "border-color" -> s.box().setBorderColor(colorSides(p));
-                case "radius" -> s.box().setRadius(radius(p));
+                case "corner-radius" -> s.box().setRadius(radius(p));
                 case "background" -> s.box().setBackground(paint(p));
                 default -> throw unread(p);
             }
@@ -218,7 +218,7 @@ final class PropertyReader {
                 case "before" -> s.breaks().setBefore(enumValue(Break.class, p));
                 case "after" -> s.breaks().setAfter(enumValue(Break.class, p));
                 case "inside" -> s.breaks().setAvoidInside(breakInside(p));
-                case "decoration" -> s.breaks().setDecoration(enumValue(Decoration.class, p));
+                case "edges" -> s.breaks().setDecoration(enumValue(Decoration.class, p));
                 default -> throw unread(p);
             }
         }

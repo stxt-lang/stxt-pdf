@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * {@code Inline: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell}
+ * {@code Markup: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell}
  * (referencia/comun/formato-del-texto.md).
  */
 class InlineFormatTest {
@@ -28,10 +28,10 @@ class InlineFormatTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(HEADER + String.join("\n", lines))))).sections().get(0).box();
     }
 
-    /** Como {@link #build}, con {@code Inline: markdown} en el {@code Typography} del documento. */
+    /** Como {@link #build}, con {@code Markup: markdown} en el {@code Typography} del documento. */
     private static Box buildInline(String... lines) {
         return new BoxTreeBuilder().build(new DocumentReader()
-                .read(Docs.sectioned(Docs.mergeStyles(HEADER + "\t\t\t\tInline: markdown\n" + String.join("\n", lines))))).sections().get(0).box();
+                .read(Docs.sectioned(Docs.mergeStyles(HEADER + "\t\t\t\tMarkup: markdown\n" + String.join("\n", lines))))).sections().get(0).box();
     }
 
     @Test
@@ -44,7 +44,7 @@ class InlineFormatTest {
     @Test
     void theFourFormatsAndLinksBecomeRuns() {
         Box text = build("\tText: Una **negrita**, *cursiva*, ++subrayado*, ~~tachado~~ y [web](https://a.example).",
-                "\t\tTypography:", "\t\t\tInline: markdown").children().get(0);
+                "\t\tTypography:", "\t\t\tMarkup: markdown").children().get(0);
         assertEquals("Una negrita, cursiva, ++subrayado*, tachado y web.", text.text());
         assertEquals(List.of(run("Una "), run("negrita", "b"), run(", "), run("cursiva", "i"),
                 run(", ++subrayado*, "), run("tachado", "s"), run(" y "),
@@ -53,14 +53,14 @@ class InlineFormatTest {
 
     @Test
     void underlineIsTwoPlusSigns() {
-        Box text = build("\tText: Un ++subrayado++ y **++ambos++**", "\t\tTypography:", "\t\t\tInline: markdown")
+        Box text = build("\tText: Un ++subrayado++ y **++ambos++**", "\t\tTypography:", "\t\t\tMarkup: markdown")
                 .children().get(0);
         assertEquals(List.of(run("Un "), run("subrayado", "u"), run(" y "), run("ambos", "bu")), text.formattedRuns());
     }
 
     @Test
     void escapesGiveTheLiteralCharacter() {
-        Box text = build("\tText: Dos \\*\\*estrellas\\*\\* y 3 \\* 4", "\t\tTypography:", "\t\t\tInline: markdown")
+        Box text = build("\tText: Dos \\*\\*estrellas\\*\\* y 3 \\* 4", "\t\tTypography:", "\t\t\tMarkup: markdown")
                 .children().get(0);
         assertEquals("Dos **estrellas** y 3 * 4", text.text());
         assertNull(text.formattedRuns());
@@ -68,7 +68,7 @@ class InlineFormatTest {
 
     @Test
     void theContentBlockJoinsLinesWithASpaceAndKeepsParagraphs() {
-        Box text = build("\tText:", "\t\tTypography:", "\t\t\tInline: markdown", "\t\tContent >>",
+        Box text = build("\tText:", "\t\tTypography:", "\t\t\tMarkup: markdown", "\t\tContent >>",
                 "\t\t\tPrimera línea con **negrita**", "\t\t\tsigue aquí.", "", "", "\t\t\tOtro *párrafo*.").children().get(0);
         assertEquals("Primera línea con negrita sigue aquí.\n\nOtro párrafo.", text.text());
         assertEquals(List.of(run("Primera línea con "), run("negrita", "b"), run(" sigue aquí.\n\nOtro "),
@@ -78,7 +78,7 @@ class InlineFormatTest {
     @Test
     void itIsInheritedAndNoneTurnsItOff() {
         Box root = buildInline("\tBlock:", "\t\tText: Uno **dos**",
-                "\t\tText: Tres **cuatro**", "\t\t\tTypography:", "\t\t\t\tInline: none");
+                "\t\tText: Tres **cuatro**", "\t\t\tTypography:", "\t\t\t\tMarkup: none");
         Box block = root.children().get(0);
         assertEquals(Inline.MARKDOWN, block.style().typography().inline());
         assertEquals("Uno dos", block.children().get(0).text());
@@ -89,7 +89,7 @@ class InlineFormatTest {
 
     @Test
     void aStylesRuleTurnsItOnForAnElement() {
-        Box root = build("\tStyles:", "\t\tFor element: Paragraph", "\t\t\tTypography:", "\t\t\t\tInline: markdown",
+        Box root = build("\tStyles:", "\t\tFor element: Paragraph", "\t\t\tTypography:", "\t\t\t\tMarkup: markdown",
                 "\tParagraph: Un **párrafo**", "\tText: Un **texto**");
         assertEquals("Un párrafo", root.children().get(0).text());
         assertEquals(List.of(run("Un "), run("párrafo", "b")), root.children().get(0).formattedRuns());

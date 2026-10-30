@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Transform}, {@code Letter spacing} y {@code Small caps} en el árbol (referencia/comun/formato-del-texto.md).
+ * {@code Case}, {@code Letter spacing} y {@code Small caps} en el árbol (referencia/comun/formato-del-texto.md).
  */
 class TextCaseTest {
 
@@ -36,13 +36,13 @@ class TextCaseTest {
 
     @Test
     void propertiesAreReadAndInherited() {
-        Box block = build("\tBlock:", "\t\tTypography:", "\t\t\tTransform: capitalize", "\t\t\tLetter spacing: -0.5",
+        Box block = build("\tBlock:", "\t\tTypography:", "\t\t\tCase: capitalize", "\t\t\tLetter spacing: -0.5",
                 "\t\t\tSmall caps: true", "\t\tText: Hola").children().get(0);
         Box text = block.children().get(0);
         assertEquals(Transform.CAPITALIZE, text.style().typography().transform());
         assertEquals(-0.5, text.style().typography().letterSpacing(), 1e-9);
         assertTrue(text.style().typography().smallCaps());
-        assertEquals(15, block.style().line("transform").number());
+        assertEquals(15, block.style().line("case").number());
         assertEquals(16, block.style().line("letter-spacing").number());
         assertEquals(17, block.style().line("small-caps").number());
     }
@@ -51,7 +51,7 @@ class TextCaseTest {
     void theyCanBeSetInTheDocumentAndInStylesRules() {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
                 + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\t\t\t\tLetter spacing: 1\n"
-                + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tTransform: uppercase\n"
+                + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tCase: uppercase\n"
                 + "\t\t\t\tSmall caps: true\n"
                 + "\tHeading 1:\n\t\tText: Informe\n\tText: Hola\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();

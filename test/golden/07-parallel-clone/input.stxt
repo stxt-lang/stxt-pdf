@@ -1,6 +1,6 @@
 # Hito 7 (referencia/comun/cortes.md). Área útil de 260 × 160 desde (20, 20).
 #
-# Página 1: card (Decoration: clone, borde 2 y relleno 3) deja 160 − 10 = 150 al contenido:
+# Página 1: card (Edges: closed, borde 2 y relleno 3) deja 160 − 10 = 150 al contenido:
 #   caben 150 de los 200 de c1.
 # Página 2: card vuelve a tener borde y relleno arriba; los 50 que faltan de c1 (card mide 60).
 #   La fila de grid (200) no cabe en los 100 que quedan: grid pasa a la página siguiente.
@@ -37,7 +37,7 @@ Document (dev.stxt.pdf):
 				Padding: 3
 				Border color: #A32D2D
 			Break:
-				Decoration: clone
+				Edges: closed
 			Block:
 				Id: c1
 				Box:

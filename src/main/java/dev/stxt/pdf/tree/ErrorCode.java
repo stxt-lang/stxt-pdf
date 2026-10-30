@@ -74,8 +74,8 @@ public enum ErrorCode {
     TABLE_ROW_BREAK,
     /** Un {@code Column align} con distinto número de alineaciones que columnas tiene la tabla. */
     TABLE_COLUMN_ALIGN,
-    /** {@code Header} en una celda de {@code Head}, cuyas celdas ya son cabeceras de columna. */
-    TABLE_HEADER,
+    /** {@code Row header} en una celda de {@code Head}, cuyas celdas ya son cabeceras de columna. */
+    ROW_HEADER_IN_HEAD,
 
     // --- Columnas ------------------------------------------------------------------------------
     /** Un {@code Columns} sin {@code Count} ni {@code Min column width}. */
@@ -105,7 +105,7 @@ public enum ErrorCode {
     IMAGE_FORMAT,
     /** {@code Pdf page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Pdf page}). */
     IMAGE_PAGE,
-    /** {@code Inside} o {@code Decoration} en una {@code Image}, que no se parte. */
+    /** {@code Inside} o {@code Edges} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,
 
     // --- Referencias --------------------------------------------------------------------------
@@ -150,7 +150,7 @@ public enum ErrorCode {
     MARGIN_AUTO_WITHOUT_EFFECT,
     /** {@code Start} en una {@code Section} sin {@code Page numbering: restart}. */
     START_WITHOUT_RESTART,
-    /** Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Radius}) en el {@code Box} de una {@code Row}. */
+    /** Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Corner radius}) en el {@code Box} de una {@code Row}. */
     ROW_BOX,
     /** {@code Page number format} en una {@code Section} con {@code Page numbering: none}. */
     PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
@@ -182,7 +182,7 @@ public enum ErrorCode {
     CONTAIN_MARGINS_IN_ITEM,
     /** Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja girada en flujo. */
     BREAK_IN_UNBREAKABLE,
-    /** {@code Inside} o {@code Decoration} en un {@code Frame} girado o en una caja girada en flujo, que no se parten. */
+    /** {@code Inside} o {@code Edges} en un {@code Frame} girado o en una caja girada en flujo, que no se parten. */
     BREAK_IN_ROTATED,
     /** {@code Contain margins: true} en una caja girada en flujo, que ya aísla. */
     CONTAIN_MARGINS_IN_ROTATED,

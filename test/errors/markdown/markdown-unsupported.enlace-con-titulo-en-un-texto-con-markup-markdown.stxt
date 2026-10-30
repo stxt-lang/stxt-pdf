@@ -1,4 +1,4 @@
-# Case: Una imagen en un texto con Inline: markdown
+# Case: El título de un enlace en un texto con Markup: markdown
 # Code: MARKDOWN_UNSUPPORTED
 # Line: 17
 Document (dev.stxt.pdf):
@@ -12,6 +12,6 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Inline: markdown
+				Markup: markdown
 	Section:
-		Text: Mira ![logo](a.png) aquí
+		Text: Visita [la web](https://a.example "título")

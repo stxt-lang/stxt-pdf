@@ -23,7 +23,7 @@ class ImageFitTest {
 
     @Test
     void fillIsTheBox() {
-        assertEquals(BOX, ImageFit.place(Fit.FILL, BOX, 150, 75));
+        assertEquals(BOX, ImageFit.place(Fit.STRETCH, BOX, 150, 75));
     }
 
     @Test

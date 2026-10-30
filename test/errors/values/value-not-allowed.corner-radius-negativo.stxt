@@ -1,5 +1,5 @@
-# Case: Transform con un valor que no existe
-# Code: INVALID_VALUE
+# Case: Corner radius con un valor negativo
+# Code: VALUE_NOT_ALLOWED
 # Line: 13
 Document (dev.stxt.pdf):
 	Language: es
@@ -9,5 +9,5 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Block:
-			Typography:
-				Transform: shout
+			Box:
+				Corner radius: -4

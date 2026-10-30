@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: term
 			Typography:
-				White space: pre
+				White space: preserve
 			Content >>
 				> Ajustes > Bornes
 				L   230 V   [ OK ]
@@ -40,7 +40,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: tabs
 			Typography:
-				White space: pre
+				White space: preserve
 				Tab size: 8
 			Content >>
 				a	b
@@ -48,7 +48,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: wrapped
 			Typography:
-				White space: pre-wrap
+				White space: preserve-wrap
 			Content >>
 				  aaaa bbbb cccc dddd eeee ffff gggg hhhh
 				corta

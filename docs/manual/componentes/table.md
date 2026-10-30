@@ -44,13 +44,13 @@ Document (dev.stxt.pdf):
 			Body:
 				Row:
 					Cell: Silla de nogal
-						Header: true
+						Row header: true
 					Cell: 12
 					Cell: 145,00
 					Cell: 1740,00
 				Row:
 					Cell: Mesa de comedor
-						Header: true
+						Row header: true
 					Cell: 1
 					Cell: 890,00
 					Cell: 890,00
@@ -58,7 +58,7 @@ Document (dev.stxt.pdf):
 				Row:
 					Style: total
 					Cell: Total
-						Header: true
+						Row header: true
 						Span: 1 3
 					Cell: 2630,00
 ```
@@ -81,7 +81,7 @@ Una celda con valor (`Cell: 145,00`) es un texto. Sin valor, tiene elementos den
 `Table`…), pero no las dos cosas. Cada celda tiene su propio borde: una línea entre filas es el borde de abajo de las celdas.
 `Gap` en la `Table` separa las celdas.
 
-**`Header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
+**`Row header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
 de pantalla la lee con cada celda de la fila. Las celdas de `Head` ya son cabeceras de columna.
 
 ## Estilo de las celdas
@@ -104,7 +104,7 @@ celdas) y `Break` (el de la fila). Una celda no admite `Break`: los cortes son d
 
 Con `Box`, una fila tiene un fondo y un borde propios: una **franja** de la primera columna a la última, debajo de sus
 celdas. Un borde de fila es una línea entera, también por encima del hueco entre columnas, y el fondo de una celda tapa el
-de su fila. El `Box` de una `Row` solo admite `Background`, `Border`, `Border color` y `Radius`: la fila mide lo que sus
+de su fila. El `Box` de una `Row` solo admite `Background`, `Border`, `Border color` y `Corner radius`: la fila mide lo que sus
 celdas, así que un `Padding` o un `Height` en ella es un error. El `Id` de una fila sirve también para enlazarla
 (`Link: #total`) o para citar su página (`{page of: total}`).
 
@@ -153,7 +153,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Background: #F4F2EC
 						Border: 1 0 0 0
-						Radius: 0 0 4 4
+						Corner radius: 0 0 4 4
 					Cell: Total
 					Cell: 2000,00
 ```

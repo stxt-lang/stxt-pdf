@@ -1,4 +1,4 @@
-# Case: Código en un texto con Inline: markdown, sin Code font
+# Case: Código en un texto con Markup: markdown, sin Code font
 # Code: CODE_WITHOUT_FONT
 # Line: 17
 Document (dev.stxt.pdf):
@@ -12,6 +12,6 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Inline: markdown
+				Markup: markdown
 	Section:
 		Text: Usa `mvn test` para probar

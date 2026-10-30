@@ -22,7 +22,7 @@ Document (dev.stxt.pdf):
 				Border: 0 0 0 4
 				Border color: #C0392B
 				Background: #FBEAE8
-				Radius: 0 6 6 0
+				Corner radius: 0 6 6 0
 			Break:
 				Inside: avoid
 	Section:

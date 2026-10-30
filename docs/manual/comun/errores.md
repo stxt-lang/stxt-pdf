@@ -44,7 +44,7 @@ sale en el PDF. Un `Margin: auto` que no centra, un `Lines` o un `Gap` de dos me
 `Rotate origin` sin `Rotate` no harían nada, y es mejor saberlo.
 
 Hay excepciones pensadas para no estorbar: escribir el valor por defecto (`Span: 1 1`), lo que se hereda (una
-`Typography` vale para lo que hay dentro), un `Border color` sin `Border` o un `Radius` sin nada que redondear (suelen
+`Typography` vale para lo que hay dentro), un `Border color` sin `Border` o un `Corner radius` sin nada que redondear (suelen
 venir de un estilo compartido), lo que llega de una regla a donde no puede actuar, una regla que todavía no se aplica a
 nada y las propiedades de un `Markdown` que su contenido no usa. La lista completa está en la
 [referencia](../../referencia/comun/errores.md#lo-que-no-tiene-efecto).

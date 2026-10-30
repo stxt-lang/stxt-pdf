@@ -43,7 +43,7 @@ error. Si necesitas el porcentaje, da un `Height` al contenedor.
 | `10 20 5` | 10 | 20 | 5 | 20 |
 | `10 20 5 0` | 10 | 20 | 5 | 0 |
 
-`Border color` admite también de 1 a 4 colores, en el mismo orden. `Radius` admite de 1 a 4 valores, uno por **esquina**:
+`Border color` admite también de 1 a 4 colores, en el mismo orden. `Corner radius` admite de 1 a 4 valores, uno por **esquina**:
 arriba a la izquierda, arriba a la derecha, abajo a la derecha y abajo a la izquierda.
 
 ## Colores

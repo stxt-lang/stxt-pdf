@@ -188,7 +188,7 @@ public final class PdfCanvas implements Canvas {
      * Un borde liso y opaco de esquinas cuadradas: un rectángulo por lado con ancho, los de los
      * lados verticales encima de los otros. Los rectángulos solapados no dejan costuras en los
      * píxeles de borde, que el anillo par-impar sí deja, y es como se pintaba antes de
-     * {@code Radius}.
+     * {@code Corner radius}.
      */
     private void squareBorder(Rect r, Insets w, String color) {
         if (w.top() > 0) {

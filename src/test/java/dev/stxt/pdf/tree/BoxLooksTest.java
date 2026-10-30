@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** {@code Radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md). */
+/** {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md). */
 class BoxLooksTest {
 
     private static Box block(String... boxLines) {
@@ -24,16 +24,16 @@ class BoxLooksTest {
 
     @Test
     void radiusFollowsTheCornerOrderOfCss() {
-        Style s = block("Radius: 1 2 3 4").style();
+        Style s = block("Corner radius: 1 2 3 4").style();
         assertEquals(new Corners<>(Value.pt(1), Value.pt(2), Value.pt(3), Value.pt(4)), s.box().radius());
-        assertEquals(Corners.all(Value.pt(8)), block("Radius: 8").style().box().radius());
+        assertEquals(Corners.all(Value.pt(8)), block("Corner radius: 8").style().box().radius());
         assertEquals(new Corners<>(Value.pt(0), Value.pt(20), Value.pt(0), Value.pt(20)),
-                block("Radius: 0 20").style().box().radius());
+                block("Corner radius: 0 20").style().box().radius());
     }
 
     @Test
     void radiusAcceptsPercentages() {
-        assertEquals(Corners.all(new Value.Percentage(50)), block("Radius: 50%").style().box().radius());
+        assertEquals(Corners.all(new Value.Percentage(50)), block("Corner radius: 50%").style().box().radius());
     }
 
     @Test
@@ -64,7 +64,7 @@ class BoxLooksTest {
     @Test
     void theRulesOfStylesCanSetThem() {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
-                + "\tStyles:\n\t\tFor element: Block\n\t\t\tBox:\n\t\t\t\tRadius: 6\n\t\t\t\tBackground: linear(90, #000, #FFF)\n"
+                + "\tStyles:\n\t\tFor element: Block\n\t\t\tBox:\n\t\t\t\tCorner radius: 6\n\t\t\t\tBackground: linear(90, #000, #FFF)\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tBackground: #CCC\n\tBlock:\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).sections().get(0).box();
         // Lo propio gana a la regla propiedad a propiedad: el color, no el degradado; el radio de la regla se mantiene.

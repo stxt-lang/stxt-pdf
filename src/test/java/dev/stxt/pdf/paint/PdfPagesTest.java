@@ -92,7 +92,7 @@ class PdfPagesTest {
             "\t\t\tLayer: -1",
             "\t\t\tImage: examples/letterhead/letterhead.pdf",
             "\t\t\t\tPdf page: 2",
-            "\t\t\t\tFit: fill",
+            "\t\t\t\tFit: stretch",
             "\t\t\t\tBox:",
             "\t\t\t\t\tWidth: 100%",
             "\t\t\t\t\tHeight: 100%",

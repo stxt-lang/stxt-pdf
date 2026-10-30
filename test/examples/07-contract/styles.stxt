@@ -15,7 +15,7 @@ Styles (dev.stxt.pdf):
 			Bold: true
 			Align: center
 			Color: #3F3D8F
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.4
 		Box:
 			Margin: 0 0 4 0
@@ -26,7 +26,7 @@ Styles (dev.stxt.pdf):
 			Line height: 13
 			Bold: true
 			Color: #3F3D8F
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.8
 		Box:
 			Margin: 16 0 6 0
@@ -50,7 +50,7 @@ Styles (dev.stxt.pdf):
 	For element: Paragraph
 		Typography:
 			Align: justify
-			Inline: markdown
+			Markup: markdown
 		Box:
 			Margin: 0 0 7 0
 	For element: List

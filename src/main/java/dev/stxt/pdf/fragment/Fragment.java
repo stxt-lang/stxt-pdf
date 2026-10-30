@@ -22,7 +22,7 @@ import java.util.List;
  * @param margin   márgenes usados de la caja en el layout que produjo el fragmento
  *                 ({@code auto} = 0, como en {@link dev.stxt.pdf.layout.BoxModel}): los
  *                 porcentajes dependen de la base de ese layout, que solo conoce el algoritmo
- * @param border   bordes pintados en este fragmento (con {@code Decoration: slice}, el
+ * @param border   bordes pintados en este fragmento (con {@code Edges: open}, el
  *                 primero no tiene borde inferior y los siguientes no tienen superior)
  * @param padding  relleno de este fragmento, con el mismo criterio que {@code border}; la caja
  *                 de contenido del fragmento, a la que se refieren hijos y líneas, es la caja de

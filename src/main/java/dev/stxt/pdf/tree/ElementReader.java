@@ -104,7 +104,7 @@ enum ElementReader {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
             if (s.header() && position != null && position.group() == CellPosition.HEAD) {
-                throw error(s.line("header"), ErrorCode.TABLE_HEADER, "Header no tiene efecto en una celda de Head: "
+                throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEAD, "Row header no tiene efecto en una celda de Head: "
                         + "las celdas de la cabecera ya son cabeceras de columna");
             }
         }
@@ -299,7 +299,7 @@ enum ElementReader {
     }
 
     /**
-     * Con {@code Inline: markdown} (referencia/comun/formato-del-texto.md), el texto de la caja es Markdown en línea:
+     * Con {@code Markup: markdown} (referencia/comun/formato-del-texto.md), el texto de la caja es Markdown en línea:
      * pasa a ser el texto seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro
      * de un {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un bloque:
      * sus errores señalan la línea donde empieza.

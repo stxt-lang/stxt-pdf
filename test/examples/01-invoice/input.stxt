@@ -1,9 +1,9 @@
 # Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
 # una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
 # fijo. El estilo está todo en styles.stxt: los elementos solo llevan su contenido. Los textos llevan
-# Inline: markdown para poner una negrita dentro de la frase, y los datos para el pago, además, Code
+# Markup: markdown para poner una negrita dentro de la frase, y los datos para el pago, además, Code
 # font: el IBAN y el BIC, como código en línea, en la fuente monoespaciada. Los rótulos se escriben como
-# una frase normal y las reglas los ponen en mayúsculas (Transform) y los separan (Letter spacing).
+# una frase normal y las reglas los ponen en mayúsculas (Case) y los separan (Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -44,7 +44,7 @@ Document (dev.stxt.pdf):
 							Color: #3B2A1E
 							Align: right
 							Line height: 30
-							Transform: uppercase
+							Case: uppercase
 							Letter spacing: 2
 					Text: Nº 2025-0147
 						Typography:
@@ -126,67 +126,67 @@ Document (dev.stxt.pdf):
 				Row:
 					Cell: MN-014
 					Cell: Mesa de comedor en nogal macizo, 180 × 90 cm
-						Header: true
+						Row header: true
 					Cell: 6
 					Cell: 640,00 €
 					Cell: 3.840,00 €
 				Row:
 					Cell: MN-022
 					Cell: Silla de roble con asiento de anea
-						Header: true
+						Row header: true
 					Cell: 24
 					Cell: 118,00 €
 					Cell: 2.832,00 €
 				Row:
 					Cell: MN-031
 					Cell: Estantería modular de pared, cinco baldas
-						Header: true
+						Row header: true
 					Cell: 8
 					Cell: 215,00 €
 					Cell: 1.720,00 €
 				Row:
 					Cell: MN-040
 					Cell: Banco tapizado para recibidor
-						Header: true
+						Row header: true
 					Cell: 4
 					Cell: 189,50 €
 					Cell: 758,00 €
 				Row:
 					Cell: MN-057
 					Cell: Espejo ovalado con marco de nogal, 70 × 100 cm
-						Header: true
+						Row header: true
 					Cell: 12
 					Cell: 96,00 €
 					Cell: 1.152,00 €
 				Row:
 					Cell: SV-001
 					Cell: Transporte y montaje en obra (dos operarios, una jornada)
-						Header: true
+						Row header: true
 					Cell: 1
 					Cell: 480,00 €
 					Cell: 480,00 €
 				Row:
 					Cell: SV-004
 					Cell: Acabado con aceite natural y cera de abeja
-						Header: true
+						Row header: true
 					Cell: 1
 					Cell: 260,00 €
 					Cell: 260,00 €
 			Foot:
 				Row:
 					Cell: Base imponible
-						Header: true
+						Row header: true
 						Span: 1 4
 					Cell: 11.042,00 €
 				Row:
 					Cell: IVA (21 %)
-						Header: true
+						Row header: true
 						Span: 1 4
 					Cell: 2.318,82 €
 				Row:
 					Style: total
 					Cell: Total a pagar
-						Header: true
+						Row header: true
 						Span: 1 4
 					Cell: 13.360,82 €
 		Grid:
@@ -196,7 +196,7 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Typography:
-						Inline: markdown
+						Markup: markdown
 						Code font: IBM Plex Mono
 					Text: Datos para el pago
 						Style: label
@@ -211,4 +211,4 @@ Document (dev.stxt.pdf):
 						Typography:
 							Size: 8
 							Color: #5C4E43
-							Inline: markdown
+							Markup: markdown

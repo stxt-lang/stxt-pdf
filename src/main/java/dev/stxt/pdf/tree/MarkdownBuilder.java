@@ -84,7 +84,7 @@ final class MarkdownBuilder {
             .build();
 
     /**
-     * El de un texto con {@code Inline: markdown}: sin bloques ni tablas, así que lo que en un {@code Markdown}
+     * El de un texto con {@code Markup: markdown}: sin bloques ni tablas, así que lo que en un {@code Markdown}
      * empezaría un bloque ({@code -}, {@code 2024.}, {@code #}, {@code >}, {@code ---}) es texto
      * (referencia/comun/formato-del-texto.md).
      */
@@ -101,7 +101,7 @@ final class MarkdownBuilder {
             + "imágenes solas en su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, "
             + "`código` y [enlaces](destino)";
 
-    private static final String INLINE_SUBSET = "un texto con Inline: markdown solo admite párrafos con **negrita**, "
+    private static final String INLINE_SUBSET = "un texto con Markup: markdown solo admite párrafos con **negrita**, "
             + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); lo demás va en un Markdown, y un carácter "
             + "especial se escribe con \\ delante (\\*)";
 
@@ -129,7 +129,7 @@ final class MarkdownBuilder {
     }
 
     /**
-     * Un texto con {@code Inline: markdown} (referencia/comun/formato-del-texto.md): sus tramos. Solo párrafos, que se
+     * Un texto con {@code Markup: markdown} (referencia/comun/formato-del-texto.md): sus tramos. Solo párrafos, que se
      * separan con una línea en blanco, como en un {@code Text}; la sintaxis de los bloques es texto, y lo que no se
      * admite dentro de la línea, {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
      *
@@ -167,7 +167,7 @@ final class MarkdownBuilder {
         /** Listas con viñetas y numeradas que contienen el bloque que se traduce. */
         private int bulletDepth;
         private int numberingDepth;
-        /** Es el texto en línea de un {@code Inline: markdown}, no un elemento {@code Markdown}. */
+        /** Es el texto en línea de un {@code Markup: markdown}, no un elemento {@code Markdown}. */
         private final boolean inlineOnly;
         /** Las líneas del Markdown, para contar las celdas de una fila de tabla, que el parser no conserva. */
         private final String[] source;
@@ -248,7 +248,7 @@ final class MarkdownBuilder {
             }
             InlineNode text = node("Text", "", line);
             InlineNode typography = node("Typography", "", line);
-            typography.addChild(node("White space", "pre", line));
+            typography.addChild(node("White space", "preserve", line));
             text.addChild(typography);
             // El Content >> va en la línea de las vallas; con sangría, en la anterior a la primera línea.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
@@ -535,7 +535,7 @@ final class MarkdownBuilder {
                 what = n.getClass().getSimpleName();
             }
             return inlineOnly
-                    ? error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Inline: markdown no admite " + what + ": " + INLINE_SUBSET)
+                    ? error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markup: markdown no admite " + what + ": " + INLINE_SUBSET)
                     : error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite " + what + ": " + SUBSET);
         }
 

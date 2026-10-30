@@ -1,5 +1,5 @@
-# Case: Radius con un valor negativo
-# Code: VALUE_NOT_ALLOWED
+# Case: Case con un valor que no existe
+# Code: INVALID_VALUE
 # Line: 13
 Document (dev.stxt.pdf):
 	Language: es
@@ -9,5 +9,5 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Block:
-			Box:
-				Radius: -4
+			Typography:
+				Case: shout

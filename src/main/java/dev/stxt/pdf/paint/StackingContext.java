@@ -43,7 +43,7 @@ import java.util.Objects;
  * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
  *
  * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene, y una
- * caja con {@code Radius} recorta por su curva los fondos, los bordes y las imágenes de lo que tiene en flujo
+ * caja con {@code Corner radius} recorta por su curva los fondos, los bordes y las imágenes de lo que tiene en flujo
  * (referencia/comun/caja.md). Cada pieza lleva la cadena de giros y recortes de sus ancestros, de la página hacia
  * dentro ({@code Piece.frames}), y cada paso del pintado se la aplica: el fondo, el borde y la imagen, entera; el
  * texto, solo los giros.</p>
@@ -293,14 +293,14 @@ public final class StackingContext {
     }
 
     /**
-     * Las esquinas de la caja de borde del fragmento (referencia/comun/caja.md): {@code Radius} resuelto contra su
-     * tamaño y, en una caja partida entre páginas con {@code Decoration: slice}, solo las de
+     * Las esquinas de la caja de borde del fragmento (referencia/comun/caja.md): {@code Corner radius} resuelto contra su
+     * tamaño y, en una caja partida entre páginas con {@code Edges: open}, solo las de
      * arriba en el primer fragmento y las de abajo en el último.
      */
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
         Radii radii = Radii.resolve(s.box().radius(), p.borderBox().width(), p.borderBox().height());
-        if (s.breaks().decoration() == Decoration.CLONE) {
+        if (s.breaks().decoration() == Decoration.CLOSED) {
             return radii;
         }
         return radii.forFragment(p.f().first(), p.f().last());

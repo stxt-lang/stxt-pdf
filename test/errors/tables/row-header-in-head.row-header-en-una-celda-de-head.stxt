@@ -1,5 +1,5 @@
-# Case: Header en una celda de Head, que ya es cabecera de columna
-# Code: TABLE_HEADER
+# Case: Row header en una celda de Head, que ya es cabecera de columna
+# Code: ROW_HEADER_IN_HEAD
 # Line: 21
 Document (dev.stxt.pdf):
 	Language: es
@@ -18,7 +18,7 @@ Document (dev.stxt.pdf):
 			Head:
 				Row:
 					Cell: Concepto
-						Header: true
+						Row header: true
 					Cell: Importe
 			Body:
 				Row:

@@ -117,7 +117,7 @@ huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`
 `BEFORE`: «no cabe nada, corta antes de mí», que nunca se pasa como `from`. El `Paginator` detecta la falta de progreso
 comparando tokens. El token de la raíz no acumula alto: cada página tiene el área útil entera.
 
-`Slice` calcula el alto, el borde y el relleno de cada fragmento (`Decoration: slice` y `clone`; `Slice.contentRemaining` da
+`Slice` calcula el alto, el borde y el relleno de cada fragmento (`Edges: open` y `closed`; `Slice.contentRemaining` da
 lo que queda al contenido). Flex y grid cortan entre unidades (líneas, ítems o filas; `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
 que cabe en la página. Una unidad que no cabe ni al principio de página parte sus ítems en paralelo, repitiendo su layout con
@@ -145,7 +145,7 @@ que los del reparto en orden.
 
 ## Texto
 
-`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `pre` y `pre-wrap`, con `PreformattedText`.
+`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `preserve` y `preserve-wrap`, con `PreformattedText`.
 `InlineLayout.runs` sustituye las referencias por su valor y aplica `TextTransform` a los tramos **antes** de repartirlos.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`).

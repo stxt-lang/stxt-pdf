@@ -365,7 +365,7 @@ final class ValueReader {
         return new Paint.Linear(angle, stops);
     }
 
-    /** {@code Radius}: de 1 a 4 radios (puntos o porcentajes no negativos), arriba izquierda, arriba derecha, abajo derecha, abajo izquierda. */
+    /** {@code Corner radius}: de 1 a 4 radios (puntos o porcentajes no negativos), arriba izquierda, arriba derecha, abajo derecha, abajo izquierda. */
     static Corners<Value> radius(Node n) {
         List<Value> list = parse(n, () -> ValueParser.list(n.getText()));
         if (list.isEmpty() || list.size() > 4) {

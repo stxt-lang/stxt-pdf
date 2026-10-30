@@ -1,6 +1,6 @@
 # Guía rápida de un termostato, de tres páginas. Reúne lo que suele tener un manual técnico:
 # una figura con números superpuestos (un Frame con sus Overlay encima) y su leyenda al
-# lado (una List de Paragraph con la negrita escrita con Inline: markdown, que la regla de
+# lado (una List de Paragraph con la negrita escrita con Markup: markdown, que la regla de
 # Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
 # un bloque de terminal con las columnas alineadas (un Text con White space: pre, en monoespaciada), un
 # código en línea y tablas de especificaciones y de averías. La estructura
@@ -9,7 +9,7 @@
 # numerados (Numbered: true en styles.stxt: 1 a 8) y sus subapartados, Heading 3 (3.1, 8.1…, también
 # los de un Markdown); el título del producto declara Numbered: false. Un enlace de Markdown remite al
 # apartado de las especificaciones con {number of: specs-heading}. Los rótulos se escriben en
-# minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
+# minúscula y se ponen en mayúsculas, separadas, con Case y Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -50,7 +50,7 @@ Document (dev.stxt.pdf):
 					Size: 8
 					Bold: true
 					Color: #8FD1CC
-					Transform: uppercase
+					Case: uppercase
 					Letter spacing: 1.2
 			Heading 1:
 				Text: Termostato Aire+ T2
@@ -197,7 +197,7 @@ Document (dev.stxt.pdf):
 				Style: code
 				Text:
 					Typography:
-						White space: pre
+						White space: preserve
 					Content >>
 						> Ajustes > Servicio > Bornes
 
@@ -225,25 +225,25 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: L
-							Header: true
+							Row header: true
 							Style: mono
 						Cell: Alimentación, fase
 						Cell: Marrón
 					Row:
 						Cell: N
-							Header: true
+							Row header: true
 							Style: mono
 						Cell: Alimentación, neutro
 						Cell: Azul
 					Row:
 						Cell: C
-							Header: true
+							Row header: true
 							Style: mono
 						Cell: Común del contacto de la caldera
 						Cell: Gris
 					Row:
 						Cell: NO
-							Header: true
+							Row header: true
 							Style: mono
 						Cell: Contacto normalmente abierto
 						Cell: Amarillo
@@ -293,22 +293,22 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Mañana · 06:30–08:30
-							Header: true
+							Row header: true
 						Cell: 21 °C
 						Cell: 18 °C
 					Row:
 						Cell: Día · 08:30–17:00
-							Header: true
+							Row header: true
 						Cell: 17 °C
 						Cell: 20 °C
 					Row:
 						Cell: Tarde · 17:00–23:00
-							Header: true
+							Row header: true
 						Cell: 21,5 °C
 						Cell: 21,5 °C
 					Row:
 						Cell: Noche · 23:00–06:30
-							Header: true
+							Row header: true
 						Cell: 16 °C
 						Cell: 16 °C
 			Heading 2:
@@ -331,27 +331,27 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Alimentación
-							Header: true
+							Row header: true
 						Cell: 230 V c. a., 50 Hz, o 2 pilas AA
 							Style: mono
 					Row:
 						Cell: Contacto de salida
-							Header: true
+							Row header: true
 						Cell: 6 A / 250 V, libre de potencial
 							Style: mono
 					Row:
 						Cell: Rango de temperatura
-							Header: true
+							Row header: true
 						Cell: de 5 a 30 °C, pasos de 0,5 °C
 							Style: mono
 					Row:
 						Cell: Conectividad
-							Header: true
+							Row header: true
 						Cell: Wifi 2,4 GHz (IEEE 802.11 b/g/n)
 							Style: mono
 					Row:
 						Cell: Dimensiones
-							Header: true
+							Row header: true
 						Cell: 86 × 86 × 24 mm
 							Style: mono
 		Block:

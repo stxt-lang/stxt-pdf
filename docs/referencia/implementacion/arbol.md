@@ -17,7 +17,7 @@ La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `Doc
 `BoxTreeBuilder` vuelve a validar el árbol al empezar, así que el resto del builder da la estructura por buena.
 
 En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `Text`, `Paragraph`, `Cell`, `Image`,
-`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Contain margins`, `Wrap`, `Header` e
+`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Contain margins`, `Wrap`, `Row header` e
 `In table of contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
 valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
 `ValueReader`.
@@ -65,7 +65,7 @@ Las piezas:
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
-| `MarkdownBuilder` | Traduce un `Markdown` (y el texto con `Inline: markdown`) a nodos STXT |
+| `MarkdownBuilder` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT |
 | `ContentsBuilder` | Las entradas de los índices, al final de la construcción |
 | `HeadingNumbers` | Los números de los encabezados |
 | `References`, `LinkTargets` | Comprueban las referencias y los enlaces `#id` del árbol entero |
@@ -157,5 +157,5 @@ de la fila; tampoco da la línea de cada celda: los errores de una celda señala
 `MarkdownBuilder` parsea el `Content` con commonmark-java 0.30.1 (con las extensiones de tablas, tachado y subrayado) y lo
 traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema; los tramos de cada texto van aparte,
 por nodo (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos con `element(...)` como
-hijos de la caja del `Markdown`. El texto con `Inline: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
+hijos de la caja del `Markdown`. El texto con `Markup: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
 misma traducción en modo `inlineOnly`; dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).

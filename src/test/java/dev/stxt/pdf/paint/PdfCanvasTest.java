@@ -332,7 +332,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una celda con {@code Header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la cabecera
+     * Una celda con {@code Row header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la cabecera
      * siguen siendo {@code Scope: Column} y las demás, {@code TD} (referencia/componentes/table.md).
      */
     @Test
@@ -340,8 +340,8 @@ class PdfCanvasTest {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tTable:\n\t\tColumn sizes: 100 100\n"
                 + "\t\tHead:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Importe\n"
-                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"
-                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tHeader: true\n\t\t\t\tCell: 120\n"));
+                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tRow header: true\n\t\t\t\tCell: 120\n"
+                + "\t\tFoot:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tRow header: true\n\t\t\t\tCell: 120\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "row-headers"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
@@ -662,7 +662,7 @@ class PdfCanvasTest {
     void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tPage overlay:\n\t\tOffset: auto 0 0 auto\n\t\tText: Más en [la web](https://pie.example)\n"
-                + "\t\t\tTypography:\n\t\t\t\tInline: markdown\n"
+                + "\t\t\tTypography:\n\t\t\t\tMarkup: markdown\n"
                 + "\tText: Uno\n"
                 + "\tImage: test/wide.png\n\t\tLink: https://logo.example\n"
                 + "\tText: Dos\n\t\tBreak:\n\t\t\tBefore: page\n"));
@@ -791,7 +791,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con {@code Transform} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura conserva el texto
+     * Con {@code Case} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura conserva el texto
      * escrito (referencia/comun/formato-del-texto.md): {@code ActualText}. Un texto con el número de página no lo
      * lleva, porque cambia con la página.
      */
@@ -799,10 +799,10 @@ class PdfCanvasTest {
     void capsAreOnlyPaintedAndTheStructureKeepsTheWrittenText() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
-                + "\tParagraph: Emisor y destinatario\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
+                + "\tParagraph: Emisor y destinatario\n\t\tTypography:\n\t\t\tCase: uppercase\n"
                 + "\t\t\tLetter spacing: 1\n"
                 + "\tParagraph: Año nuevo\n\t\tTypography:\n\t\t\tSmall caps: true\n"
-                + "\tParagraph: Hoja {page}\n\t\tTypography:\n\t\t\tTransform: uppercase\n"
+                + "\tParagraph: Hoja {page}\n\t\tTypography:\n\t\t\tCase: uppercase\n"
                 + "\tParagraph: Sin cambios\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "caps"))) {
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
@@ -829,7 +829,7 @@ class PdfCanvasTest {
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tParagraph: Informe del trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n"
-                + "\tParagraph: Informe **del** trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n\t\t\tInline: markdown\n"));
+                + "\tParagraph: Informe **del** trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n\t\t\tMarkup: markdown\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "letter-spacing"))) {
             // pdfbox deja espacios tras el ActualText de cada secuencia: el texto es el de cada línea sin ellos.
             assertEquals(List.of("Informe del trimestre", "Informe del trimestre"),

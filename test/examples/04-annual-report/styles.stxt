@@ -34,7 +34,7 @@ Styles (dev.stxt.pdf):
 			Margin: 0 0 8 0
 		Typography:
 			Align: justify
-			Inline: markdown
+			Markup: markdown
 	For element: List
 		Box:
 			Padding: 0 0 0 16
@@ -66,7 +66,7 @@ Styles (dev.stxt.pdf):
 			Size: 8
 			Bold: true
 			Color: #B16118
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 1
 		Box:
 			Margin: 0 0 6 0

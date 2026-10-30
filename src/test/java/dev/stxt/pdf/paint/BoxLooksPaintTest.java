@@ -77,7 +77,7 @@ class BoxLooksPaintTest {
 
     @Test
     void roundedCornersLeaveTheCornerOfTheBoxEmpty() throws Exception {
-        BufferedImage page = render(doc("Radius: 20\nBackground: #FF0000"));
+        BufferedImage page = render(doc("Corner radius: 20\nBackground: #FF0000"));
         // La esquina (20, 20) está fuera de la curva; el centro y el medio de un lado, dentro.
         assertColor(page, 21, 21, 255, 255, 255, 0);
         assertColor(page, 119, 59, 255, 255, 255, 0);
@@ -92,7 +92,7 @@ class BoxLooksPaintTest {
 
     @Test
     void aFiftyPercentRadiusOnASquareIsACircle() throws Exception {
-        String square = HEAD + "\tBlock:\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tRadius: 50%\n"
+        String square = HEAD + "\tBlock:\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tCorner radius: 50%\n"
                 + "\t\t\tBackground: #0000FF\n";
         BufferedImage page = render(square);
         assertColor(page, 50, 50, 0, 0, 255, 0);
@@ -102,7 +102,7 @@ class BoxLooksPaintTest {
 
     @Test
     void aBorderWithRadiusIsARingAroundTheBackground() throws Exception {
-        BufferedImage page = render(doc("Radius: 20\nBorder: 6\nBorder color: #00FF00\nBackground: #FF0000"));
+        BufferedImage page = render(doc("Corner radius: 20\nBorder: 6\nBorder color: #00FF00\nBackground: #FF0000"));
         assertColor(page, 70, 22, 0, 255, 0, 0);
         assertColor(page, 70, 40, 255, 0, 0, 0);
         assertColor(page, 21, 21, 255, 255, 255, 0);
@@ -133,7 +133,7 @@ class BoxLooksPaintTest {
      */
     @Test
     void roundedInnerCornersLeaveNoGapBetweenTheSidesAndTheBackground() throws Exception {
-        BufferedImage page = render(doc("Radius: 20\nBorder: 6\nBorder color: #00FF00 #0000FF #00FF00 #0000FF\n"
+        BufferedImage page = render(doc("Corner radius: 20\nBorder: 6\nBorder color: #00FF00 #0000FF #00FF00 #0000FF\n"
                 + "Background: #FF0000"));
         // (27, 27) está dentro de la caja de relleno (desde 26) y fuera de su curva (a 18 pt del centro, 14 de radio).
         int[] c = rgb(page, 27, 27);
@@ -178,7 +178,7 @@ class BoxLooksPaintTest {
 
     @Test
     void aGradientIsClippedToTheRoundedBox() throws Exception {
-        BufferedImage page = render(doc("Radius: 20\nBackground: linear(90, #000000, #FFFFFF)"));
+        BufferedImage page = render(doc("Corner radius: 20\nBackground: linear(90, #000000, #FFFFFF)"));
         assertColor(page, 21, 21, 255, 255, 255, 0);
         assertColor(page, 70, 40, 127, 127, 127, 6);
     }
@@ -219,7 +219,7 @@ class BoxLooksPaintTest {
     @Test
     void imagesAreClippedToTheRoundedBox() throws Exception {
         String image = HEAD + "\tImage: test/wide.png\n\t\tFit: cover\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n"
-                + "\t\t\tRadius: 50%\n";
+                + "\t\t\tCorner radius: 50%\n";
         BufferedImage page = render(image);
         assertColor(page, 22, 22, 255, 255, 255, 0);
         int[] center = rgb(page, 50, 50);
@@ -228,7 +228,7 @@ class BoxLooksPaintTest {
 
     @Test
     void thePdfStaysTaggedAndTheDecorationsAreArtifacts() throws Exception {
-        try (PDDocument pdf = Loader.loadPDF(pdf(doc("Radius: 8\nBorder: 2\nBorder color: #111111 #222222\n"
+        try (PDDocument pdf = Loader.loadPDF(pdf(doc("Corner radius: 8\nBorder: 2\nBorder color: #111111 #222222\n"
                 + "Background: linear(90, #FF000000, #FF0000)")))) {
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.contains("/Artifact BMC"), content);
@@ -241,7 +241,7 @@ class BoxLooksPaintTest {
 
     @Test
     void svgPaintsRoundedBoxesAsPaths() {
-        String svg = svg(doc("Radius: 8\nBackground: #FF0000"));
+        String svg = svg(doc("Corner radius: 8\nBackground: #FF0000"));
         assertTrue(svg.contains("<path d=\"M28.00 20.00 L112.00 20.00 C"), svg);
         assertTrue(svg.contains(" fill=\"#FF0000\"/>"), svg);
     }
@@ -284,7 +284,7 @@ class BoxLooksPaintTest {
 
     @Test
     void svgClipsARoundedImage() {
-        String image = HEAD + "\tImage: test/wide.png\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tRadius: 50%\n";
+        String image = HEAD + "\tImage: test/wide.png\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n\t\t\tCorner radius: 50%\n";
         LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(image)));
         String svg = SvgCanvas.page(document.pages().get(0), document.media(), false, new Resources());
         assertTrue(svg.contains("<clipPath id=\"c0\">"), svg);

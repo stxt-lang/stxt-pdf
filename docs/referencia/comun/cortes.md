@@ -11,7 +11,7 @@ la página, ni en los encabezados ni en las celdas ([Encabezados](../componentes
 | `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` fuerza un salto de página antes de la caja; `column`, un salto a la columna siguiente (solo dentro de un `Columns`, [Columns](../componentes/columns.md#cortes)). |
 | `After` | `auto`, `page`, `column`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
 | `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja. |
-| `Decoration` | `slice`, `clone` | `slice` | Qué pasa con el borde y el relleno en un corte. |
+| `Edges` | `open`, `closed` | `open` | Qué pasa con el borde y el relleno en un corte. |
 
 ## Modelo
 
@@ -78,19 +78,19 @@ corte forzado, se trunca el margen anterior al corte y se conserva el posterior.
 
 ## Bordes y relleno en los cortes
 
-Con `Decoration: slice`, el primer fragmento no tiene borde ni relleno inferiores y los siguientes no tienen los
-superiores. Con `Decoration: clone`, cada fragmento se pinta como una caja completa: el contenido de cada página cabe entre
+Con `Edges: open`, el primer fragmento no tiene borde ni relleno inferiores y los siguientes no tienen los
+superiores. Con `Edges: closed`, cada fragmento se pinta como una caja completa: el contenido de cada página cabe entre
 su borde y relleno superiores e inferiores.
 
-Con `slice`, el borde y el relleno inferiores solo se reservan si la caja terminaría en la página: si entonces no caben,
+Con `open`, el borde y el relleno inferiores solo se reservan si la caja terminaría en la página: si entonces no caben,
 la caja se corta antes (o pasa entera a la página siguiente) y termina allí con ellos. Si la caja se corta de todos modos,
 su fragmento llega hasta el final de la página, sin dejar hueco.
 
 ## Alto definido y cortes
 
-Un `Height` fijo es el total de todos los fragmentos, no el de cada uno; con `clone`, el total del contenido es ese alto
+Un `Height` fijo es el total de todos los fragmentos, no el de cada uno; con `closed`, el total del contenido es ese alto
 menos un borde y un relleno, y cada fragmento les suma los suyos. `Min height` y `Max height` también se aplican al total
-(con `clone`, al contenido total más un borde y un relleno).
+(con `closed`, al contenido total más un borde y un relleno).
 
 Una caja con `Height` definido se parte como cualquier otra, aunque no tenga contenido: lo que no cabe de su alto pasa a la
 página siguiente. Para evitarlo se declara `Inside: avoid`, que no impide partirla si no cabe en una página entera.

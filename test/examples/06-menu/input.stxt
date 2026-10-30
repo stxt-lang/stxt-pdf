@@ -1,8 +1,8 @@
 # Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
 # doble dibujados con Page overlay de Layer negativa, que quedan detrás del contenido en todas las
 # páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
-# con el precio y la nota final en negrita dentro de la línea (Inline: markdown). Los rótulos de las
-# secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Transform y Letter spacing.
+# con el precio y la nota final en negrita dentro de la línea (Markup: markdown). Los rótulos de las
+# secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Case y Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 420
@@ -22,7 +22,7 @@ Document (dev.stxt.pdf):
 			Offset: -30 -34 -32 -34
 			Layer: -1
 			Box:
-				Radius: 10
+				Corner radius: 10
 				Border: 1.2
 				Border color: #14365C
 		Page overlay:
@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 			Offset: -24 -28 -26 -28
 			Layer: -1
 			Box:
-				Radius: 4
+				Corner radius: 4
 				Border: 0.5
 				Border color: #926829
 		Page overlay:
@@ -323,7 +323,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 18 0 12 0
 					Padding: 14 16
-					Radius: 6
+					Corner radius: 6
 					Border: 1.2
 					Border color: #14365C
 					Background: #FFFFFF
@@ -333,7 +333,7 @@ Document (dev.stxt.pdf):
 						Size: 8
 						Bold: true
 						Color: #926829
-						Transform: uppercase
+						Case: uppercase
 						Letter spacing: 2
 						Align: center
 				Text: Siete pasos, del mercado a la mesa
@@ -353,7 +353,7 @@ Document (dev.stxt.pdf):
 				Text: **54 €**  ·  maridaje, 24 € más
 					Typography:
 						Font: IBM Plex Sans
-						Inline: markdown
+						Markup: markdown
 						Size: 10
 						Align: center
 						Color: #14365C
@@ -362,7 +362,7 @@ Document (dev.stxt.pdf):
 			Text: **IVA incluido.** Si tiene alguna alergia o intolerancia, avise a su camarero: casi todos los platos se pueden adaptar.
 				Typography:
 					Font: IBM Plex Sans
-					Inline: markdown
+					Markup: markdown
 					Size: 7
 					Align: center
 					Color: #776F64

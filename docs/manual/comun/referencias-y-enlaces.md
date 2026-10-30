@@ -51,7 +51,7 @@ Paragraph: Ver las especificaciones
 ```
 
 **Una parte de una línea**, con la sintaxis de Markdown, en un [`Markdown`](../componentes/markdown.md) o en un texto con
-`Inline: markdown`: `Consulta [las especificaciones](#specs) o [la web](https://airemas.example).`
+`Markup: markdown`: `Consulta [las especificaciones](#specs) o [la web](https://airemas.example).`
 
 - El destino es una dirección `https://…`, `http://…` o `mailto:…`, o `#id`: la caja con ese `Id`, que puede estar en
   cualquier parte del documento. Cualquier otra cosa es un error.

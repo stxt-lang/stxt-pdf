@@ -7,7 +7,7 @@ versalitas, interletraje, ligaduras, texto preformateado y rayas. Todas son prop
 ## Tramos
 
 El texto puede tener partes con formato dentro de una misma línea: **negrita**, *cursiva*, subrayado y tachado,
-combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (abajo) o los genera un `Markdown`.
+combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (abajo) o los genera un `Markdown`.
 
 - Cada tramo usa su variante de la fuente, que debe existir (`FONT_VARIANT_MISSING`, con la línea del tramo) y tener sus
   caracteres (`GLYPH_MISSING`). La negrita y la cursiva se **suman** a las de la caja: no se pueden quitar.
@@ -24,17 +24,17 @@ combinables. Cada parte es un **tramo**. Se escriben con `Inline: markdown` (aba
 > de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` e `Italic` explícitos, que podrían deshacer
 > el estilo de la caja.
 
-## Formato en línea (`Inline`)
+## Formato en línea (`Markup`)
 
 Por defecto el texto de un `Text`, un `Paragraph` o una `Cell` es **literal**: los asteriscos son asteriscos. Con
-`Inline: markdown` se interpreta como el Markdown en línea de un [`Markdown`](../componentes/markdown.md), con la misma
+`Markup: markdown` se interpreta como el Markdown en línea de un [`Markdown`](../componentes/markdown.md), con la misma
 sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `código` `` ([abajo](#código-en-línea)) y
 `[texto](destino)` ([Enlaces](enlaces.md)).
 
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
 - Cada párrafo de `Content`, separado por una línea en blanco, es un párrafo; el salto de línea simple vale un espacio.
-- **Se hereda**: se declara una vez en `For element: Document` o en una regla, y un texto vuelve al literal con `Inline: none`.
+- **Se hereda**: se declara una vez en `For element: Document` o en una regla, y un texto vuelve al literal con `Markup: none`.
 - Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
   `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
   escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen, HTML o un salto
@@ -49,16 +49,16 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `códig
 > **Decisión:** el formato en línea se pide con una propiedad heredable: el texto es literal salvo que se pida, y se pide
 > una vez. *Alternativa descartada:* hijos `Run` con su propio `Typography`, mucho más largos de escribir.
 
-> **Decisión:** la sintaxis de los bloques es texto, no un error. Como `Inline` se hereda y se declara una vez para todo
+> **Decisión:** la sintaxis de los bloques es texto, no un error. Como `Markup` se hereda y se declara una vez para todo
 > el documento, un error alcanzaría a cualquier texto, celda o encabezado que empiece por un número con punto, un guion
 > o un `#`, y la lista de lo que hay que escapar es larga (`-`, `+`, `*`, `1.`, `1)`, `>`, `#`, una línea `---` o `===`,
-> una lista que empieza a media frase). Quien escriba una lista en un texto con `Inline: markdown` la obtiene literal,
-> como sin `Inline`. *Alternativa descartada:* `MARKDOWN_UNSUPPORTED` con la línea del bloque, que obligaba a escapar el
+> una lista que empieza a media frase). Quien escriba una lista en un texto con `Markup: markdown` la obtiene literal,
+> como sin `Markup`. *Alternativa descartada:* `MARKDOWN_UNSUPPORTED` con la línea del bloque, que obligaba a escapar el
 > primer carácter.
 
 ## Código en línea
 
-Con `Inline: markdown`, o en un `Markdown`, lo que va entre comillas invertidas (`` `mvn test` ``) es **código**: un
+Con `Markup: markdown`, o en un `Markdown`, lo que va entre comillas invertidas (`` `mvn test` ``) es **código**: un
 tramo con la familia de `Code font`, que conserva el peso y el estilo de la caja y los de las marcas del tramo
 (``**`x`**`` es código en negrita). El tamaño, el color y `Line height` son los de la caja, así que las líneas no
 cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
@@ -67,9 +67,9 @@ cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
 para todo el documento. Sin ella, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en
 un `Markdown`, la del párrafo); si la familia no existe, `FONT_UNKNOWN`, con la línea de `Code font`.
 
-## Mayúsculas (`Transform`)
+## Mayúsculas (`Case`)
 
-`Transform` cambia **lo que se pinta, no lo que se escribe**: un rótulo se escribe como una frase normal y una regla lo pone
+`Case` cambia **lo que se pinta, no lo que se escribe**: un rótulo se escribe como una frase normal y una regla lo pone
 en mayúsculas.
 
 - Cambia lo que mide el texto (`ß` pasa a `SS`), así que se aplica antes de repartirlo en líneas.
@@ -83,12 +83,12 @@ en mayúsculas.
 ## Versalitas (`Small caps`)
 
 `Small caps` pinta cada minúscula, pasada a mayúscula, al 80 % del `Size`; los espacios, las cifras, los signos y las
-mayúsculas, no. Se aplica después de `Transform`: con `lowercase` todo son versalitas, con `uppercase` ninguna y con
+mayúsculas, no. Se aplica después de `Case`: con `lowercase` todo son versalitas, con `uppercase` ninguna y con
 `capitalize` solo la inicial es grande. El `Size` de la caja no cambia, ni la altura de las líneas ni las rayas. Un lector
-de pantalla lee el texto escrito, como con `Transform`.
+de pantalla lee el texto escrito, como con `Case`.
 
 > **Decisión:** las versalitas son sintetizadas, no la característica `smcp` de la fuente, que no tiene ninguna de las
-> incluidas. Con `Transform: uppercase` no tienen efecto y no es un error: las dos se heredan, y es normal declararlas
+> incluidas. Con `Case: uppercase` no tienen efecto y no es un error: las dos se heredan, y es normal declararlas
 > en sitios distintos.
 
 ## Interletraje (`Letter spacing`)
@@ -113,27 +113,27 @@ ninguna). Lo que se mide es lo que se pinta; una ligadura no cruza un espacio ni
 
 ## Texto preformateado (`White space`)
 
-Por defecto el espacio en blanco se colapsa. Con `White space: pre` o `pre-wrap` el texto **conserva sus espacios y sus
+Por defecto el espacio en blanco se colapsa. Con `White space: preserve` o `preserve-wrap` el texto **conserva sus espacios y sus
 saltos de línea**: cada línea del texto es una línea de la caja, también las vacías. Una línea en blanco **no** separa
 párrafos: el texto entero es un párrafo para las viudas y huérfanas ([Cortes](cortes.md)), así que un bloque largo se
 parte entre líneas. Actúa en un `Text`, un `Paragraph` y una `Cell` con texto; lo normal es una fuente monoespaciada y un
 `Content >>`, que conserva la sangría relativa (no los espacios al final de una línea ni las líneas en blanco del final).
 Un salto de línea al final del texto no añade una línea vacía.
 
-- **`pre`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
-- **`pre-wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
+- **`preserve`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
+- **`preserve-wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
   espacios del corte se pierden. Una palabra más ancha que la caja sigue siendo un error.
 - **Tabulaciones (`Tab size`).** Cada tabulación lleva a la siguiente columna múltiplo de `Tab size`, contando desde el
   principio de la línea (con `Tab size: 4`, `a⇥b` es `a   b`, y `abcd⇥e`, `abcd    e`). Un valor menor que 1 es
   `VALUE_NOT_ALLOWED`.
 - **Alineación.** `justify` se trata como `left`, porque `Align` se hereda y un bloque de código heredaría el error;
   `right` y `center` alinean cada línea por separado.
-- `Transform`, `Letter spacing`, los tramos, `{page}` y las referencias funcionan como siempre. Con `Inline: markdown` el
+- `Case`, `Letter spacing`, los tramos, `{page}` y las referencias funcionan como siempre. Con `Markup: markdown` el
   texto se interpreta primero, así que las líneas que se conservan son las de los párrafos.
 
 ### Tamaños intrínsecos
 
-Con `pre`, min-content y max-content son la línea más ancha; con `pre-wrap`, min-content es la palabra más ancha y
+Con `preserve`, min-content y max-content son la línea más ancha; con `preserve-wrap`, min-content es la palabra más ancha y
 max-content, la línea más ancha.
 
 > **Decisión:** el texto preformateado es una propiedad heredable, no un elemento `Preformatted`, que no cabría en una
@@ -149,4 +149,4 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 - Tramos con otro tamaño, otro color u otra familia (salvo el código), ni que quiten la negrita o la cursiva de la caja.
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
-- `Transform` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `White space`.
+- `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `White space`.

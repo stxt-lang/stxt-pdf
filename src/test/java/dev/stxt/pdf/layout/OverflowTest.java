@@ -137,7 +137,7 @@ class OverflowTest {
     @Test
     void aPreformattedLineThatDoesNotFit() {
         InvalidModelException e = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tWhite space: pre")));
+                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tWhite space: preserve")));
         assertContains("Una línea de un texto con White space: pre", e);
         assertContains("la línea mide 595 y la caja deja 515", e);
     }

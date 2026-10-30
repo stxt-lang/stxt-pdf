@@ -100,8 +100,8 @@ Paragraph: Los datos de la sección {number of: ventas} lo confirman.
   `Heading 1` sin número (otra parte, un anexo) hace que los contadores de debajo vuelvan a empezar.
 - **Se escribe delante del título.** El número (o su `Number label`, abajo) y un espacio van delante del primer `Text`
   del encabezado, como si el autor los hubiera escrito: miden lo que escriben, el texto puede pasar a una línea más
-  (continúa bajo el número, sin sangría) y salen en el índice, en los marcadores y en lo que se lee. `Transform`,
-  `Letter spacing` y `Small caps` los cambian como al resto del texto (`Transform: uppercase` escribe `ANEXO A.`).
+  (continúa bajo el número, sin sangría) y salen en el índice, en los marcadores y en lo que se lee. `Case`,
+  `Letter spacing` y `Small caps` los cambian como al resto del texto (`Case: uppercase` escribe `ANEXO A.`).
 - **Se puede referir.** `{number of: id}` de un encabezado con `Id` y numerado da su número completo (`1.1`): «la sección
   {number of: ventas}» escribe «la sección 1.1» ([Referencias](../comun/referencias.md#number-of-id)).
 

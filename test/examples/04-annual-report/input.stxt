@@ -8,7 +8,7 @@
 # Numbered: false, para que no cuenten. Los capítulos son Heading 1 numerados (Numbered: true en
 # styles.stxt: 1 a 6) y sus apartados, Heading 2 (1.1, 2.1…); el índice y los marcadores del PDF llevan el
 # número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
-# interletraje (Transform).
+# interletraje (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -60,7 +60,7 @@ Document (dev.stxt.pdf):
 						Size: 9
 						Bold: true
 						Color: #F2A65A
-						Transform: uppercase
+						Case: uppercase
 						Letter spacing: 2
 					Box:
 						Margin: 0 0 10 0
@@ -341,31 +341,31 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Venta de energía
-							Header: true
+							Row header: true
 						Cell: 4.128
 						Cell: 3.774
 						Cell: +9,4 %
 					Row:
 						Cell: Servicios y mantenimiento
-							Header: true
+							Row header: true
 						Cell: 792
 						Cell: 640
 						Cell: +23,8 %
 					Row:
 						Cell: Gastos de explotación
-							Header: true
+							Row header: true
 						Cell: −3.980
 						Cell: −3.612
 						Cell: +10,2 %
 					Row:
 						Cell: Amortizaciones
-							Header: true
+							Row header: true
 						Cell: −540
 						Cell: −498
 						Cell: +8,4 %
 					Row:
 						Cell: Resultado financiero
-							Header: true
+							Row header: true
 						Cell: −88
 						Cell: −71
 						Cell: +23,9 %
@@ -373,7 +373,7 @@ Document (dev.stxt.pdf):
 					Row:
 						Style: total
 						Cell: Resultado del ejercicio
-							Header: true
+							Row header: true
 						Cell: 312
 						Cell: 233
 						Cell: +33,9 %
@@ -435,25 +435,25 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Producción renovable (MWh)
-							Header: true
+							Row header: true
 						Cell: 1.930
 						Cell: 2.148
 						Cell: 2.384
 					Row:
 						Cell: CO₂ evitado en el año (t)
-							Header: true
+							Row header: true
 						Cell: 2.800
 						Cell: 3.600
 						Cell: 4.300
 					Row:
 						Cell: Residuos valorizados (%)
-							Header: true
+							Row header: true
 						Cell: 82
 						Cell: 87
 						Cell: 91
 					Row:
 						Cell: Agua usada en las plantas (m³)
-							Header: true
+							Row header: true
 						Cell: 640
 						Cell: 590
 						Cell: 540
@@ -478,27 +478,27 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Carme Vidal i Roca
-							Header: true
+							Row header: true
 						Cell: Presidenta
 						Cell: 2019
 					Row:
 						Cell: Oriol Pagès Vila
-							Header: true
+							Row header: true
 						Cell: Vicepresidente
 						Cell: 2019
 					Row:
 						Cell: Núria Serra Comas
-							Header: true
+							Row header: true
 						Cell: Secretaria
 						Cell: 2023
 					Row:
 						Cell: Jordi Casas Font
-							Header: true
+							Row header: true
 						Cell: Tesorero
 						Cell: 2023
 					Row:
 						Cell: Anna Bosch Puig
-							Header: true
+							Row header: true
 						Cell: Vocal de consumo
 						Cell: 2023
 			Heading 2:
@@ -532,7 +532,7 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Cell: Oficina de atención en Olot
-							Header: true
+							Row header: true
 						Cell: Obras y apertura
 							Span: 1 2
 							Style: bar
@@ -540,7 +540,7 @@ Document (dev.stxt.pdf):
 						Cell:
 					Row:
 						Cell: Tarifa horaria
-							Header: true
+							Row header: true
 						Cell:
 						Cell: Diseño y pruebas
 							Span: 1 2
@@ -548,7 +548,7 @@ Document (dev.stxt.pdf):
 						Cell:
 					Row:
 						Cell: Almacenamiento de la nave
-							Header: true
+							Row header: true
 						Cell:
 						Cell:
 						Cell: Ampliación
@@ -556,7 +556,7 @@ Document (dev.stxt.pdf):
 							Style: bar
 					Row:
 						Cell: Cuarto aerogenerador
-							Header: true
+							Row header: true
 						Cell: Tramitación, obra y puesta en marcha
 							Span: 1 3
 							Style: bar

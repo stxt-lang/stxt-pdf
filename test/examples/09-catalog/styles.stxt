@@ -74,7 +74,7 @@ Styles (dev.stxt.pdf):
 			Margin: 0 0 16 0
 	For style: card
 		Box:
-			Radius: 6
+			Corner radius: 6
 			Background: #FBF8F3
 			Border: 0.5
 			Border color: #E6DAC6
@@ -106,10 +106,10 @@ Styles (dev.stxt.pdf):
 			Bold: true
 			Align: center
 			Color: #FFFFFF
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.8
 		Box:
-			Radius: 3
+			Corner radius: 3
 			Background: #A65C1B
 			Padding: 3 7
 	For element: Head cell

@@ -7,7 +7,7 @@ propiedades que tienen sentido en ellos. El motor calcula la posición y el tama
 ## Convenciones
 
 - **Todas las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada). Un A4 mide 595 × 842 pt.
-- **Los nombres de nodos y valores están en inglés**: `Margin`, `Overlay`, `Decoration: slice`. El texto de un `Text`
+- **Los nombres de nodos y valores están en inglés**: `Margin`, `Overlay`, `Edges: open`. El texto de un `Text`
   puede estar en cualquier idioma.
 - **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*; *vertical*, el de `Height` y *arriba/abajo*. La
   escritura es siempre horizontal, de izquierda a derecha.
@@ -84,7 +84,7 @@ Text: Resultados del trimestre
 ```
 
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
-> `Text wrap` no puede ser `Wrap`, que es de `Flex`, porque un nombre es el mismo nodo en todo el schema.
+> `Line breaking` y no `Wrap`, que es de `Flex` y es otra cosa, porque un nombre es el mismo nodo en todo el schema.
 
 ### Propiedades del elemento
 
@@ -188,7 +188,7 @@ vez; los elementos, las veces que se quiera.
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
 | `Head`, `Body`, `Foot` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
-| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Header`; elementos salvo los encabezados |
+| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elementos salvo los encabezados |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
@@ -198,9 +198,9 @@ vez; los elementos, las veces que se quiera.
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `Grow`, `Shrink`, `Basis`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
-| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Radius`, `Background` |
-| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Text wrap`, `Inline`, `Transform`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
-| `Break` | `Before`, `After`, `Inside`, `Decoration` |
+| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Break` | `Before`, `After`, `Inside`, `Edges` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`; *elementos en flujo*, todos menos `Overlay` y `Page overlay`.

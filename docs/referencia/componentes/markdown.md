@@ -82,7 +82,7 @@ así:
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../comun/enlaces.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
-| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `White space: pre` cuya fuente es su `Code font`, con el código en su `Content` |
+| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `White space: preserve` cuya fuente es su `Code font`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`; con `![](ruta)`, decorativa ([Image](image.md)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes dentro de un texto
@@ -101,8 +101,8 @@ Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALU
 ## Texto
 
 Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Text`. El formato dentro de la línea se suma:
-`***x***` es negrita y cursiva. Esa misma sintaxis en línea, sin el resto de elementos, la admite `Inline: markdown` en un
-`Text`, un `Paragraph` o una `Cell` ([Formato del texto](../comun/formato-del-texto.md#formato-en-línea-inline)), que dentro
+`***x***` es negrita y cursiva. Esa misma sintaxis en línea, sin el resto de elementos, la admite `Markup: markdown` en un
+`Text`, un `Paragraph` o una `Cell` ([Formato del texto](../comun/formato-del-texto.md#formato-en-línea-markup)), que dentro
 de un `Markdown` no actúa: sus textos ya vienen interpretados.
 
 ## Código
@@ -112,25 +112,25 @@ familia de `Code font`: conserva el peso y el estilo del texto que lo rodea y se
 párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace. El espacio en blanco de una línea con
 código en línea se colapsa como en cualquier párrafo; lo que conserva los espacios es el bloque.
 
-Un bloque de código es un `Text` con `White space: pre` ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space))
+Un bloque de código es un `Text` con `White space: preserve` ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space))
 cuya fuente es su `Code font`, así que se parte entre líneas entre páginas y una línea más ancha que la caja es un error
 (`TEXT_OVERFLOW`); no tiene `Id` ni `Style`, pero es el elemento generado `Code block` y lo nombra la regla
 `For element: Code block` ([Styles](../comun/estilos.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
 tamaño menor, `Inside: avoid`…). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
-un Markdown y para los que se escriben); un `Text` escrito a mano con `White space: pre` tampoco es un `Code block`. Su
+un Markdown y para los que se escriben); un `Text` escrito a mano con `White space: preserve` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown`, así que `Size`, `Color`, `Tab size` o `Code font` se declaran en el `Typography` del
 `Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea; un
 `Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja,
 no el de la fuente del código, así que las líneas con código en línea no cambian de alto.
 
 `Code font` es de `Typography` ([Tipografía](../comun/tipografia.md)) y se hereda: se declara una vez, en
-`For element: Document`, y vale para el código de los `Markdown` y de los textos con `Inline: markdown`. Sin ella, el código
+`For element: Document`, y vale para el código de los `Markdown` y de los textos con `Markup: markdown`. Sin ella, el código
 es un error (`CODE_WITHOUT_FONT`), con la línea del párrafo o la del bloque; si la familia no existe, `FONT_UNKNOWN`,
 con la línea de `Code font`.
 
-> **Decisión:** `Code font` es de `Typography`, heredable: así el código en línea de un texto con `Inline: markdown`
+> **Decisión:** `Code font` es de `Typography`, heredable: así el código en línea de un texto con `Markup: markdown`
 > también tiene fuente, y se declara una vez para todo el documento. *Alternativa descartada:* una propiedad del
-> `Markdown`, que dejaba sin código a los textos con `Inline: markdown` (la factura de los ejemplos usaba un `Markdown`
+> `Markdown`, que dejaba sin código a los textos con `Markup: markdown` (la factura de los ejemplos usaba un `Markdown`
 > solo para escribir el IBAN y el BIC).
 
 > **Decisión:** el bloque de código es un elemento generado que solo nombran las reglas. *Alternativa descartada:* un
@@ -154,7 +154,7 @@ Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`
 la de la caja. Una celda con texto es una `Cell` con valor; una vacía, una `Cell` vacía. A una fila con menos celdas que la
 cabecera se le añaden celdas vacías, como en GFM; una con más es `MARKDOWN_UNSUPPORTED`, con la línea de la fila (una `\|`
 escapada no separa celdas). Las celdas reciben las reglas de las celdas de cualquier tabla
-([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Header`).
+([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Row header`).
 
 > **Decisión:** las celdas que faltan se completan, como en GFM, porque una celda vacía al final de la fila se escribe a
 > menudo sin su barra; las que sobran son un error, porque GFM las descarta sin avisar. *Alternativa descartada:* seguir

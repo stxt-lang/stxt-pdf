@@ -30,7 +30,7 @@ no caben en lo que queda de página, pasan enteras a la siguiente, y si no caben
 | `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` empieza la caja en una página nueva; `avoid` evita cortar justo antes |
 | `After` | `auto`, `page`, `column`, `avoid` | `auto` | `page` hace que lo siguiente empiece en una página nueva; `avoid` mantiene la caja con la siguiente |
 | `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja |
-| `Decoration` | `slice`, `clone` | `slice` | Qué pasa con el borde y el relleno de una caja partida |
+| `Edges` | `open`, `closed` | `open` | Qué pasa con el borde y el relleno de una caja partida |
 
 `column` es lo mismo que `page` pero dentro de un [`Columns`](../componentes/columns.md): salta a la columna siguiente.
 
@@ -54,9 +54,9 @@ Block:
 
 Cuando una caja con borde o relleno se parte entre dos páginas:
 
-- con `Decoration: slice` (por defecto), la caja se corta como una hoja de papel: el primer trozo no tiene borde ni relleno
+- con `Edges: open` (por defecto), la caja se corta como una hoja de papel: el primer trozo no tiene borde ni relleno
   abajo y el siguiente no los tiene arriba;
-- con `Decoration: clone`, cada trozo se pinta como una caja completa, con su borde y su relleno por los cuatro lados.
+- con `Edges: closed`, cada trozo se pinta como una caja completa, con su borde y su relleno por los cuatro lados.
 
 Un `Height` fijo es el alto total de la caja, sumando todos sus trozos. Los márgenes que tocan un corte desaparecen: el
 contenido de la página siguiente empieza arriba del todo.

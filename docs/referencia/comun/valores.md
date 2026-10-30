@@ -43,9 +43,9 @@ equivale a `150 1fr 1fr 1fr minmax(100, 2fr)`.
 | `10 20 5` | 10 | 20 | 5 | 20 |
 | `10 20 5 0` | 10 | 20 | 5 | 0 |
 
-`Border color` admite también de 1 a 4 colores con este orden. `Radius` admite de 1 a 4 valores con el mismo convenio,
+`Border color` admite también de 1 a 4 colores con este orden. `Corner radius` admite de 1 a 4 valores con el mismo convenio,
 pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la derecha y abajo a la izquierda
-(`Radius: 0 20` redondea solo la esquina de arriba a la derecha y la de abajo a la izquierda).
+(`Corner radius: 0 20` redondea solo la esquina de arriba a la derecha y la de abajo a la izquierda).
 
 ## Colores
 
@@ -79,7 +79,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
 | Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
 | `Line height` | el `Size` de la propia caja |
-| `Radius` | el ancho de la caja de borde en horizontal y su alto en vertical ([La caja](caja.md#esquinas)) |
+| `Corner radius` | el ancho de la caja de borde en horizontal y su alto en vertical ([La caja](caja.md#esquinas)) |
 
 `Border` no admite porcentajes. El contenedor de referencia de cada caja está en [La caja](caja.md#el-contenedor-de-referencia).
 

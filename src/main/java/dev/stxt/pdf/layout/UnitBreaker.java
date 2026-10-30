@@ -124,11 +124,11 @@ public final class UnitBreaker {
     public record Band(Box box, int unit, double x, double width, Insets border) {
 
         /**
-         * El fragmento de la franja en {@code y}, con {@code height} de alto. Partida, con {@code Decoration: slice} (la
+         * El fragmento de la franja en {@code y}, con {@code height} de alto. Partida, con {@code Edges: open} (la
          * de su {@code Break}), el primer trozo no lleva borde inferior y los siguientes no llevan superior.
          */
         public Fragment fragment(double y, double height, boolean first, boolean last) {
-            boolean clone = box.style().breaks().decoration() == Decoration.CLONE;
+            boolean clone = box.style().breaks().decoration() == Decoration.CLOSED;
             Insets sliced = clone ? border : new Insets(first ? border.top() : 0, border.right(),
                     last ? border.bottom() : 0, border.left());
             return new Fragment(box, x, y, width, height, Insets.ZERO, sliced, Insets.ZERO, List.of(), List.of(),

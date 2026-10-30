@@ -37,9 +37,9 @@ Table:
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | — | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
-| `Header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`TABLE_HEADER`). |
+| `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`ROW_HEADER_IN_HEAD`). |
 | `Id` | texto | — | `Row` | Destino de enlaces y de `{page of: id}`; su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
-| `Box` | `Background`, `Border`, `Border color`, `Radius` | — | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
+| `Box` | `Background`, `Border`, `Border color`, `Corner radius` | — | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -60,12 +60,12 @@ vacía se escribe `Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo
 Una `Cell` es una caja con dos formas, como un `Text`: con valor (`Cell: 100`), una caja de texto de una línea; sin valor,
 un bloque con elementos (cualquiera salvo los encabezados), o vacía si no tiene ninguno. Las dos cosas a la vez son un error
 (`CELL_CONTENT`); un texto largo va en un `Paragraph`. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Span` y
-`Header`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
+`Row header`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
 Los márgenes de una celda la separan de su área, como en un `Grid`.
 
-> **Decisión:** `Header: true` va en cada celda que es cabecera de su fila (el concepto de una factura, la hora de un
+> **Decisión:** `Row header: true` va en cada celda que es cabecera de su fila (el concepto de una factura, la hora de un
 > horario): sirve también para la etiqueta de un pie de totales o la tercera columna de una agenda. *Alternativa
-> descartada:* `Header columns: N` en la `Table`, que solo sirve para columnas enteras.
+> descartada:* `Row header columns: N` en la `Table`, que solo sirve para columnas enteras.
 
 ## Estilo de las celdas
 
@@ -109,7 +109,7 @@ o para su **franja**:
 - **`Break`.** Es el de sus celdas: con él se fuerza o se evita el corte antes o después de la fila, o dentro de ella. Una
   celda no declara `Break`, ni siquiera desde una regla (`STYLE_NOT_ALLOWED`, también la de el estilo o el `Id` de su
   `Row`: el `Break` de la fila lo declara la `Row`).
-- **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color` y `Radius`. Cualquier otra propiedad
+- **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color` y `Corner radius`. Cualquier otra propiedad
   (`Padding`, `Margin`, `Height`…) no tendría efecto en una fila y es `ROW_BOX`.
 
 Una fila con `Box` o `Id` tiene una **franja**: un rectángulo que va de la primera columna a la última, con el `Gap` entre
@@ -153,7 +153,7 @@ cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con
 página vacía.
 
 Una fila que se parte entre páginas parte también su franja: en cada página va del principio al final de lo que hay de
-la fila, y su borde se corta como el de cualquier caja, según el `Decoration` de su `Break` ([Cortes](../comun/cortes.md)).
+la fila, y su borde se corta como el de cualquier caja, según el `Edges` de su `Break` ([Cortes](../comun/cortes.md)).
 Si se parte un grupo de filas que una celda ocupa a la vez, cada franja se recorta en la primera página, y en la siguiente
 la continuación lleva la franja de la última fila del grupo.
 
@@ -179,7 +179,7 @@ la tabla.
 ## Accesibilidad
 
 Un lector de pantalla lee la tabla como tabla: las celdas de `Head` son las cabeceras de su columna y las que declaran
-`Header: true`, las de su fila, y las anuncia con cada celda. La cabecera y el pie repetidos se leen una sola vez, en la
+`Row header: true`, las de su fila, y las anuncia con cada celda. La cabecera y el pie repetidos se leen una sola vez, en la
 primera página en que salen.
 
 ## Lo que no hay

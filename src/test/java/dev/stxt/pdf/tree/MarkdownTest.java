@@ -105,7 +105,7 @@ class MarkdownTest {
         Box code = md.children().get(1);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals("a  b\n  c", code.text());
-        assertEquals(WhiteSpace.PRE, code.style().typography().whiteSpace());
+        assertEquals(WhiteSpace.PRESERVE, code.style().typography().whiteSpace());
         assertEquals("IBM Plex Mono", code.style().typography().font());
     }
 
@@ -153,7 +153,7 @@ class MarkdownTest {
         assertEquals(8, code.style().typography().fontSize(), 1e-9);
         assertEquals(new Paint.Solid("#EEEEEE"), code.style().box().background());
         assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
-        assertEquals(WhiteSpace.PRE, code.style().typography().whiteSpace());
+        assertEquals(WhiteSpace.PRESERVE, code.style().typography().whiteSpace());
         assertEquals("IBM Plex Mono", code.style().typography().font());
         // Y el Text del encabezado no recibe lo del bloque de código.
         assertNull(title.style().box().background());
@@ -162,7 +162,7 @@ class MarkdownTest {
     /** Un {@code Text} escrito a mano con {@code White space: pre} sigue siendo un {@code Text}. */
     @Test
     void aWrittenPreformattedTextIsNotACodeBlock() {
-        Box root = build("\tText:", "\t\tTypography:", "\t\t\tWhite space: pre", "\t\tContent >>", "\t\t\ta  b");
+        Box root = build("\tText:", "\t\tTypography:", "\t\t\tWhite space: preserve", "\t\tContent >>", "\t\t\ta  b");
         assertEquals(Element.TEXT, root.children().get(0).element());
     }
 }

@@ -113,7 +113,7 @@ class TableFragmentationTest {
 
     /**
      * Una fila que no cabe en una página se parte, y su franja con ella: hasta el final de su celda en la primera, que
-     * llega al final del área útil, y desde arriba en la siguiente, sin el borde del corte (con {@code Decoration:
+     * llega al final del área útil, y desde arriba en la siguiente, sin el borde del corte (con {@code Edges:
      * slice}).
      */
     @Test

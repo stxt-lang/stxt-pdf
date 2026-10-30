@@ -18,7 +18,7 @@
 | **Elemento posicionado** | `Frame`, `Overlay` o `Page overlay`. |
 | **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([Enlaces](enlaces.md)). |
 | **Envoltorio** | `Item` o `Area`: no es una caja; añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
-| **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Inline: markdown` ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)). |
+| **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Markup: markdown` ([Formato del texto](formato-del-texto.md#formato-en-línea-markup)). |
 | **Fragmento** | Parte de una caja que cae en un contenedor de fragmentos. |
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve; posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](capas-y-giro.md#giro-rotate)). |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
@@ -32,7 +32,7 @@
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([Referencias](referencias.md)). |
 | **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Page overlay` y su numeración ([Document](../componentes/document.md#section)). |
 | **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya. |
-| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: pre` o `pre-wrap`). |
+| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: preserve` o `preserve-wrap`). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([Formato del texto](formato-del-texto.md#tramos)). |
 | **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

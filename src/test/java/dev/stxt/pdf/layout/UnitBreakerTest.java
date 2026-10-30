@@ -36,7 +36,7 @@ class UnitBreakerTest {
     private final Engine engine = new Engine();
     private final Box container = new StyleEditor().box("C", Element.FLEX);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
-            Decoration.SLICE);
+            Decoration.OPEN);
 
     private static Box item(String id, double height) {
         return new StyleEditor().height(Value.pt(height)).box(id, Element.BLOCK);

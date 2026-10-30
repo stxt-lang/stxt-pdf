@@ -32,7 +32,7 @@ public final class TypographyStyle extends StyleGroup {
     /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
     private Value lineHeight;
     private TextAlign textAlign = TextAlign.LEFT;
-    private TextWrap textWrap = TextWrap.AUTO;
+    private TextWrap textWrap = TextWrap.SIMPLE;
     private Inline inline = Inline.NONE;
     private Transform transform = Transform.NONE;
     /** Separación entre letras, en puntos; puede ser negativa. */

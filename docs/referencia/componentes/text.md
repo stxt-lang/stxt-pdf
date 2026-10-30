@@ -9,8 +9,8 @@ líneas ([Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragr
 
 El texto va en su valor (`Text: Un título`) o en un hijo `Content >>` con un bloque indentado, que admite párrafos
 separados por una línea en blanco. Uno de los dos es obligatorio, y no se admiten ambos (`TEXT_CONTENT`). Por defecto el
-texto es literal; con `Inline: markdown` admite formato dentro de la línea
-([Formato del texto](../comun/formato-del-texto.md#formato-en-línea-inline)).
+texto es literal; con `Markup: markdown` admite formato dentro de la línea
+([Formato del texto](../comun/formato-del-texto.md#formato-en-línea-markup)).
 
 ```
 Text: Una línea, en el valor.

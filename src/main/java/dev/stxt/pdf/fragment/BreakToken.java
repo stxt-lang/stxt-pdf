@@ -29,7 +29,7 @@ public sealed interface BreakToken {
      * Bloque: siguiente hijo a colocar y, si el corte fue dentro de él, su propio token.
      *
      * @param consumedHeight alto de caja de borde de los fragmentos anteriores de la caja (con
-     *                       {@code Decoration: clone}, de su caja de contenido); un
+     *                       {@code Edges: closed}, de su caja de contenido); un
      *                       {@code Height} definido es el total de todos los fragmentos
      */
     record Block(int nextChild, BreakToken childToken, double consumedHeight) implements BreakToken {

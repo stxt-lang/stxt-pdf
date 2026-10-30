@@ -19,7 +19,7 @@ Styles (dev.stxt.pdf):
 			Line height: 14
 			Bold: true
 			Color: #1F7A7A
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.8
 		Box:
 			Margin: 20 0 9 0
@@ -30,7 +30,7 @@ Styles (dev.stxt.pdf):
 		Box:
 			Margin: 0 0 6 0
 		Typography:
-			Inline: markdown
+			Markup: markdown
 	For element: List
 		Box:
 			Padding: 0 0 0 11
@@ -45,20 +45,20 @@ Styles (dev.stxt.pdf):
 			Size: 8
 			Bold: true
 			Color: #8FD1CC
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.8
 		Box:
 			Margin: 20 0 8 0
 	For style: track
 		Box:
 			Height: 3
-			Radius: 1.5
+			Corner radius: 1.5
 			Background: #2F7370
 			Margin: 3 0 9 0
 	For style: fill
 		Box:
 			Height: 3
-			Radius: 1.5
+			Corner radius: 1.5
 			Background: #FFFFFF
 	For style: dates
 		Typography:

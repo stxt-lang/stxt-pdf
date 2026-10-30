@@ -11,12 +11,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Las mayúsculas del texto al pintarlo: {@code Transform} y {@code Small caps}
+ * Las mayúsculas del texto al pintarlo: {@code Case} y {@code Small caps}
  * (referencia/comun/formato-del-texto.md). Se aplica a los tramos antes de repartirlos en líneas, porque cambia lo
  * que miden (la «ß» pasa a «SS», las versalitas se pintan más pequeñas); el texto de la caja no
  * cambia.
  *
- * <p>Primero va {@code Transform} y después las versalitas: las minúsculas que quedan pasan a
+ * <p>Primero va {@code Case} y después las versalitas: las minúsculas que quedan pasan a
  * mayúsculas con {@link TextFormat#smallCaps()}. Las reglas de cada letra son las del idioma
  * ({@link Locale}) de {@code Language}. Los marcadores {@code {page}} y {@code {pages}} se dejan
  * como están: se sustituyen al terminar de paginar ({@link PageNumbers}).</p>

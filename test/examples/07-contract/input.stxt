@@ -1,10 +1,10 @@
 # Contrato de servicios de diseño entre un estudio y una cooperativa, de varias páginas: cabecera
 # fija con el logotipo desde la segunda hoja (la primera lleva el título) y pie fijo con rúbricas,
-# reunidos (con las partes en negrita, gracias a Inline: markdown en la regla de Paragraph) y
+# reunidos (con las partes en negrita, gracias a Markup: markdown en la regla de Paragraph) y
 # exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de tres niveles de
 # numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
 # bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
-# de styles.stxt los ponen en mayúsculas (Transform). Los apartados (Reunidos, Exponen, Cláusulas) son
+# de styles.stxt los ponen en mayúsculas (Case). Los apartados (Reunidos, Exponen, Cláusulas) son
 # Heading 2 numerados (Numbered: true en styles.stxt) y el título del contrato declara Numbered: false.
 # El anexo es un Heading 1 de el estilo annex, numerado en romanos con su etiqueta (Number format y Number
 # label: «Anexo I · …»), al que remiten las cláusulas con {number of: annex-title}; el considerando III
@@ -104,7 +104,7 @@ Document (dev.stxt.pdf):
 			Id: clauses
 			Number markers: decimal lower-alpha lower-roman
 			Typography:
-				Text wrap: pretty
+				Line breaking: balanced
 			Content >>
 				1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo {number of: annex-title}.
 
@@ -160,26 +160,26 @@ Document (dev.stxt.pdf):
 					Row:
 						Cell: 1
 						Cell: Firma del contrato y arranque (40 %)
-							Header: true
+							Row header: true
 						Cell: 3 nov. 2025
 						Cell: 7.360 €
 					Row:
 						Cell: 2
 						Cell: Entrega de la identidad visual y el manual de marca (30 %)
-							Header: true
+							Row header: true
 						Cell: 15 dic. 2025
 						Cell: 5.520 €
 					Row:
 						Cell: 3
 						Cell: Puesta en marcha del sitio web y entrega de los ficheros (30 %)
-							Header: true
+							Row header: true
 						Cell: 9 feb. 2026
 						Cell: 5.520 €
 				Foot:
 					Row:
 						Style: total
 						Cell: Total sin IVA
-							Header: true
+							Row header: true
 							Span: 1 3
 						Cell: 18.400 €
 		Block:
@@ -199,7 +199,7 @@ Document (dev.stxt.pdf):
 							Typography:
 								Bold: true
 								Color: #3F3D8F
-								Transform: uppercase
+								Case: uppercase
 								Letter spacing: 0.6
 						Image: examples/certificate/signature-director.svg
 							Alt: Firma de Irene Calvo Mas
@@ -220,7 +220,7 @@ Document (dev.stxt.pdf):
 							Typography:
 								Bold: true
 								Color: #3F3D8F
-								Transform: uppercase
+								Case: uppercase
 								Letter spacing: 0.6
 						Image: examples/letter/signature.svg
 							Alt: Firma de Carme Vidal i Roca

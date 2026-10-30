@@ -10,14 +10,14 @@ import java.util.List;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reparte en líneas un texto con {@code White space: pre} o {@code pre-wrap}
+ * Reparte en líneas un texto con {@code White space: pre} o {@code preserve-wrap}
  * (referencia/comun/formato-del-texto.md): los espacios y los saltos de línea del texto se conservan.
  *
  * <p>Cada línea del texto es una línea de la caja, también las vacías (una línea en blanco no
  * separa párrafos: todo el texto es uno solo para las viudas y huérfanas). Una tabulación lleva
  * hasta la siguiente columna múltiplo de {@code Tab size}, contando los caracteres desde el
- * principio de la línea; un salto de línea final no añade una línea vacía. Con {@code pre} las
- * líneas no se parten, así que una más ancha que la caja desborda; con {@code pre-wrap} se parten
+ * principio de la línea; un salto de línea final no añade una línea vacía. Con {@code preserve} las
+ * líneas no se parten, así que una más ancha que la caja desborda; con {@code preserve-wrap} se parten
  * entre palabras (los espacios del corte se pierden: no se ven) y una palabra más ancha que la
  * caja desborda.</p>
  */
@@ -42,7 +42,7 @@ final class PreformattedText {
     }
 
     /**
-     * min-content y max-content: con {@code pre}, la línea más ancha; con {@code pre-wrap}, la
+     * min-content y max-content: con {@code preserve}, la línea más ancha; con {@code preserve-wrap}, la
      * palabra más ancha y la línea más ancha.
      */
     static IntrinsicSizes intrinsics(List<TextRun> runs, int tabSize, boolean wrap, TextMeasurer measurer,
@@ -111,7 +111,7 @@ final class PreformattedText {
     }
 
     /**
-     * Parte una línea de {@code pre-wrap} con el algoritmo voraz: una palabra pasa a la línea
+     * Parte una línea de {@code preserve-wrap} con el algoritmo voraz: una palabra pasa a la línea
      * siguiente si, con ella, la línea no cabe y ya tenía otra palabra. Los espacios de antes de la
      * primera palabra (la sangría) se conservan; los del corte, no.
      */

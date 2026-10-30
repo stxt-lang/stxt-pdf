@@ -19,7 +19,7 @@ Styles (dev.stxt.pdf):
 	For element: Cell
 		Box:
 			Padding: 14 6
-			Radius: 5
+			Corner radius: 5
 		Typography:
 			Align: center
 	For element: Page overlay

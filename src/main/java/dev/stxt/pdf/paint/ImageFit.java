@@ -21,7 +21,7 @@ final class ImageFit {
      * @param height alto natural de la imagen
      */
     static Rect place(Fit fit, Rect content, double width, double height) {
-        if (fit == Fit.FILL) {
+        if (fit == Fit.STRETCH) {
             return content;
         }
         double sx = content.width() / width;

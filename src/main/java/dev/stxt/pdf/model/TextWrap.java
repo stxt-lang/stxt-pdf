@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** Reparto en líneas: voraz ({@code auto}) o Knuth-Plass ({@code pretty}). */
-public enum TextWrap { AUTO, PRETTY }
+/** {@code Line breaking}: reparto en líneas voraz ({@code simple}) o Knuth-Plass ({@code balanced}). */
+public enum TextWrap { SIMPLE, BALANCED }

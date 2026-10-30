@@ -352,10 +352,10 @@ class StackingContextTest {
                 "\t\t\t\tSize: 10", "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30"};
         Recorder normal = record(concat(head, "\t\tText: aaaa bbbb cccc"));
         assertEquals(List.of("[texto", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
-        Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tWhite space: pre-wrap"));
+        Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tWhite space: preserve-wrap"));
         assertEquals(List.of("[texto", "'aaaa'", "]"), pre.sequences);
         Recorder preWrapped = record(concat(head, "\t\tText: aaaa bbbb", "\t\t\tTypography:",
-                "\t\t\t\tWhite space: pre-wrap"));
+                "\t\t\t\tWhite space: preserve-wrap"));
         assertEquals(List.of("[texto", "'aaaa'", "'bbbb'", "]"), preWrapped.sequences);
     }
 
@@ -405,10 +405,10 @@ class StackingContextTest {
                 "\tText: sin enlace").links);
     }
 
-    /** {@code Radius} es de la caja de borde; el fondo, dentro del borde, pierde su grosor; la imagen, el borde y el relleno. */
+    /** {@code Corner radius} es de la caja de borde; el fondo, dentro del borde, pierde su grosor; la imagen, el borde y el relleno. */
     @Test
     void radiusRoundsTheBorderBoxAndTheInnerBoxesLoseTheBorder() {
-        Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tRadius: 10",
+        Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tCorner radius: 10",
                 "\t\t\tBorder: 2", "\t\t\tBackground: #CCC");
         assertEquals(List.of("8/8 8/8 8/8 8/8"), r.fillRadii);
         // El primer borde es el de la raíz del documento.
@@ -424,7 +424,7 @@ class StackingContextTest {
     @Test
     void imagesAreClippedWithTheRadiiOfTheirContentBox() {
         Recorder r = record("\tImage: test/wide.png", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 50",
-                "\t\t\tRadius: 50%", "\t\t\tBorder: 5", "\t\t\tPadding: 5");
+                "\t\t\tCorner radius: 50%", "\t\t\tBorder: 5", "\t\t\tPadding: 5");
         // Radio de 25 menos 5 de borde y 5 de relleno.
         assertEquals(List.of("15/15 15/15 15/15 15/15"), r.imageRadii);
         assertEquals("25/25 25/25 25/25 25/25", r.borderRadii.get(r.borderRadii.size() - 1));
@@ -470,15 +470,15 @@ class StackingContextTest {
     /** Una caja partida con {@code slice} solo redondea las esquinas de arriba en el primer fragmento y las de abajo en el último. */
     @Test
     void aSlicedBoxRoundsOnlyItsOuterCorners() {
-        String[] box = {"\tBlock:", "\t\tBox:", "\t\t\tHeight: 120", "\t\t\tRadius: 6", "\t\t\tBackground: #CCC"};
+        String[] box = {"\tBlock:", "\t\tBox:", "\t\t\tHeight: 120", "\t\t\tCorner radius: 6", "\t\t\tBackground: #CCC"};
         assertEquals(List.of("6/6 6/6 0/0 0/0"), recordSmallPage(0, box).fillRadii);
         assertEquals(List.of("0/0 0/0 6/6 6/6"), recordSmallPage(1, box).fillRadii);
     }
 
     @Test
     void aClonedBoxRoundsEveryFragment() {
-        String[] box = {"\tBlock:", "\t\tBox:", "\t\t\tHeight: 120", "\t\t\tRadius: 6", "\t\t\tBackground: #CCC",
-                "\t\tBreak:", "\t\t\tDecoration: clone"};
+        String[] box = {"\tBlock:", "\t\tBox:", "\t\t\tHeight: 120", "\t\t\tCorner radius: 6", "\t\t\tBackground: #CCC",
+                "\t\tBreak:", "\t\t\tEdges: closed"};
         assertEquals(List.of("6/6 6/6 6/6 6/6"), recordSmallPage(0, box).fillRadii);
         assertEquals(List.of("6/6 6/6 6/6 6/6"), recordSmallPage(1, box).fillRadii);
     }
@@ -544,7 +544,7 @@ class StackingContextTest {
     @Test
     void roundedCornersClipTheBackgroundsOfTheFlowButNotTheText() {
         Recorder r = record(FONT,
-                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tRadius: 12", "\t\t\tBorder: 2",
+                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tCorner radius: 12", "\t\t\tBorder: 2",
                 "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tBackground: #111", "\t\t\tText: hola",
                 "\t\tFrame:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
@@ -569,7 +569,7 @@ class StackingContextTest {
     /** Una imagen dentro de una caja redondeada se recorta por la curva; su texto alternativo no cambia nada. */
     @Test
     void anImageInsideARoundedBoxIsClipped() {
-        Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tRadius: 8", "\t\tImage: test/wide.png", "\t\t\tBox:",
+        Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tCorner radius: 8", "\t\tImage: test/wide.png", "\t\t\tBox:",
                 "\t\t\t\tWidth: 50");
         int image = r.events.indexOf("image");
         assertTrue(image > 0 && r.events.get(image - 1).startsWith("clip "), r.events.toString());

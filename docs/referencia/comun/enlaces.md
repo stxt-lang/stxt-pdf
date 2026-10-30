@@ -2,7 +2,7 @@
 
 Un enlace lleva a quien lo pulsa a una URL de fuera del documento o a otra caja de él. Se escribe de dos maneras, que
 producen lo mismo en el PDF: la propiedad `Link` de una caja, que hace clicable la caja entera, y el enlace de Markdown
-(`[texto](destino)`), que hace clicable una parte de una línea, en un `Markdown` o en un texto con `Inline: markdown`.
+(`[texto](destino)`), que hace clicable una parte de una línea, en un `Markdown` o en un texto con `Markup: markdown`.
 
 ```
 Text: Escribe a soporte@airemas.example

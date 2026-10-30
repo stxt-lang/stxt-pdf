@@ -104,7 +104,7 @@ para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo 
 - Lo generado no tiene `Id`, salvo un encabezado que lo escribe al final, `## Ventas {#ventas}`: así se enlaza
   (`[ver ventas](#ventas)`) o se cita (`{page of: ventas}`, `{number of: ventas}`).
 - Los errores dicen la línea del documento donde empieza el bloque de Markdown que falla.
-- Para negrita o cursiva en un párrafo suelto, no hace falta un `Markdown`: basta `Inline: markdown`
+- Para negrita o cursiva en un párrafo suelto, no hace falta un `Markdown`: basta `Markup: markdown`
   ([Formato del texto](../comun/formato-del-texto.md)).
 
 Más detalle en la [referencia](../../referencia/componentes/markdown.md).

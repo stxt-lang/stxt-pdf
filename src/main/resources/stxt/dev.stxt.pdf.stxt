@@ -711,7 +711,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Row
 		Type: GROUP
-		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For style de su Style y For id de su Id se aplican a cada una de ellas.
+		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Corner radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For style de su Style y For id de su Id se aplican a cada una de ellas.
 		Children:
 			Child: Id
 				Max: 1
@@ -741,7 +741,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Span
 				Max: 1
-			Child: Header
+			Child: Row header
 				Max: 1
 			Child: Block
 			Child: Flex
@@ -901,7 +901,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Border color
 				Max: 1
-			Child: Radius
+			Child: Corner radius
 				Max: 1
 			Child: Background
 				Max: 1
@@ -925,11 +925,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Color
 				Max: 1
-			Child: Text wrap
+			Child: Line breaking
 				Max: 1
-			Child: Inline
+			Child: Markup
 				Max: 1
-			Child: Transform
+			Child: Case
 				Max: 1
 			Child: Letter spacing
 				Max: 1
@@ -963,7 +963,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Inside
 				Max: 1
-			Child: Decoration
+			Child: Edges
 				Max: 1
 
 	# Document
@@ -971,7 +971,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Title
 		Description: Título del documento: el que muestra el visor del PDF. Obligatorio.
 	Node: Language
-		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Transform. No vale en For element: Document, que usa el de Document.
+		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Case. No vale en For element: Document, que usa el de Document.
 
 	# Elemento
 
@@ -1076,7 +1076,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Grosor del borde: arriba, derecha, abajo, izquierda (1 a 4 valores).
 	Node: Border color
 		Description: Color del borde: arriba, derecha, abajo, izquierda (1 a 4 colores). Por defecto, el Color del texto.
-	Node: Radius
+	Node: Corner radius
 		Description: Esquinas redondeadas: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda (1 a 4 valores, número o %). Solo pintado: redondea el fondo, el borde y el recorte de una Image.
 	Node: Background
 		Description: Fondo, pintado en la caja de relleno: un color o un degradado linear(ángulo, color, color…).
@@ -1086,7 +1086,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Font
 		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document).
 	Node: Code font
-		Description: Familia de la fuente del código (`código` en un texto con Inline: markdown o en un Markdown, y los bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si hay código, propia o heredada.
+		Description: Familia de la fuente del código (`código` en un texto con Markup: markdown o en un Markdown, y los bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si hay código, propia o heredada.
 	Node: Bold
 		Type: BOOLEAN
 		Description: Negrita: la variante de peso 700 de la fuente. Por defecto, false.
@@ -1107,19 +1107,19 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: justify
 	Node: Color
 		Description: Color del texto.
-	Node: Text wrap
+	Node: Line breaking
 		Type: ENUM
-		Description: Reparto del texto en líneas: auto (voraz, por defecto) o pretty (Knuth-Plass, que equilibra las líneas del párrafo).
+		Description: Reparto del texto en líneas: simple (voraz, por defecto: cada línea se llena todo lo que puede) o balanced (Knuth-Plass, que equilibra las líneas del párrafo).
 		Values:
-			Value: auto
-			Value: pretty
-	Node: Inline
+			Value: simple
+			Value: balanced
+	Node: Markup
 		Type: ENUM
 		Description: Formato dentro de la línea del texto: none (por defecto; el texto es literal) o markdown (interpreta **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino), con los escapes de CommonMark; no hace nada dentro de un Markdown).
 		Values:
 			Value: none
 			Value: markdown
-	Node: Transform
+	Node: Case
 		Type: ENUM
 		Description: Mayúsculas del texto al pintarlo: none (por defecto), uppercase, lowercase o capitalize (la primera letra de cada palabra). El texto del documento y el de la estructura del PDF siguen siendo los escritos; las reglas de cada letra son las del idioma de Language.
 		Values:
@@ -1137,14 +1137,14 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Si el texto se mide y se pinta con las ligaduras de la fuente (fi, fl, ffi…). Por defecto, false: un glifo por carácter. Se hereda. Con Letter spacing distinto de 0 no hay ligaduras. Solo importa en las fuentes que las tienen (IBM Plex Sans y Serif; Plex Mono no).
 	Node: White space
 		Type: ENUM
-		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio, y una línea en blanco separa párrafos), pre (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o pre-wrap (como pre, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
+		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio, y una línea en blanco separa párrafos), preserve (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o preserve-wrap (como preserve, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
 		Values:
 			Value: normal
-			Value: pre
-			Value: pre-wrap
+			Value: preserve
+			Value: preserve-wrap
 	Node: Tab size
 		Type: INTEGER
-		Description: Con White space pre o pre-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
+		Description: Con White space preserve o preserve-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
 	Node: Numbered
 		Type: BOOLEAN
 		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: For element: Document lo activa en todos, una regla For element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
@@ -1190,12 +1190,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Values:
 			Value: auto
 			Value: avoid
-	Node: Decoration
+	Node: Edges
 		Type: ENUM
-		Description: Borde y relleno en un corte: slice (por defecto) los corta, clone los repite en cada fragmento.
+		Description: Borde y relleno de una caja partida entre páginas: open (por defecto) los deja abiertos en el corte; closed los cierra en cada fragmento, que lleva su borde y su relleno completos.
 		Values:
-			Value: slice
-			Value: clone
+			Value: open
+			Value: closed
 
 	# Flex
 
@@ -1290,7 +1290,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Span
 		Description: Filas y columnas que ocupa la celda, en ese orden (1 1 por defecto): 1 3 ocupa tres columnas de su fila.
-	Node: Header
+	Node: Row header
 		Type: BOOLEAN
 		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Head, cuyas celdas ya son cabeceras de columna.
 
@@ -1315,11 +1315,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Texto alternativo de una Image: con él, la imagen es una figura (Figure) del PDF etiquetado; sin él, es decorativa.
 	Node: Fit
 		Type: ENUM
-		Description: Cómo llena una Image su caja si tienen proporciones distintas: contain (por defecto) cabe entera y centrada; cover llena la caja, centrada y recortada; fill se deforma.
+		Description: Cómo llena una Image su caja si tienen proporciones distintas: contain (por defecto) cabe entera y centrada; cover llena la caja, centrada y recortada; stretch la estira a la caja y la deforma.
 		Values:
 			Value: contain
 			Value: cover
-			Value: fill
+			Value: stretch
 	Node: Pdf page
 		Type: INTEGER
 		Description: Página que dibuja una Image de un PDF, desde 1 (por defecto, la primera). En una imagen que no es un PDF, o una página que el PDF no tiene, es un error.

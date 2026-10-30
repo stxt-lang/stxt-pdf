@@ -52,7 +52,7 @@ class LongTextTest {
     private static String document(int paragraphs, String wrap) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
-                "\t\t\t\tText wrap: " + wrap, "\tText:", "\t\tContent >>"));
+                "\t\t\t\tLine breaking: " + wrap, "\tText:", "\t\tContent >>"));
         for (int p = 0; p < paragraphs; p++) {
             if (p > 0) {
                 lines.add("");
@@ -77,8 +77,8 @@ class LongTextTest {
     /** Con el doble de páginas, el doble de mediciones (antes, el cuádruple). */
     @Test
     void measurementsGrowLinearlyWithThePages() {
-        Run small = run(new FixedMetrics(), 100, "auto");
-        Run large = run(new FixedMetrics(), 200, "auto");
+        Run small = run(new FixedMetrics(), 100, "simple");
+        Run large = run(new FixedMetrics(), 200, "simple");
         assertTrue(large.pages() >= 2 * small.pages() - 1, large.pages() + " páginas, " + small.pages());
         double ratio = (double) large.measurements() / small.measurements();
         assertTrue(ratio < 2.5, "Con el doble de texto, " + ratio + " veces más mediciones");
@@ -94,7 +94,7 @@ class LongTextTest {
         TextMeasurer[] metrics = {new FixedMetrics(), new PdfMetrics()};
         String[] names = {"FixedMetrics", "PdfMetrics"};
         for (int m = 0; m < metrics.length; m++) {
-            for (String wrap : List.of("auto", "pretty")) {
+            for (String wrap : List.of("simple", "balanced")) {
                 run(metrics[m], 50, wrap); // calentamiento de la JVM
                 for (int paragraphs : new int[]{260, 520, 1040}) {
                     Run r = run(metrics[m], paragraphs, wrap);

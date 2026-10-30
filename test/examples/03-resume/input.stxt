@@ -1,8 +1,8 @@
 # Currículum de una diseñadora de producto. Una página A4 sin márgenes: un grid de dos columnas
 # a página completa, con una barra lateral de color (foto, contacto, herramientas con barras
 # de nivel e idiomas) y el cuerpo con perfil, cifras, experiencia en línea de tiempo y formación.
-# Los párrafos y un logro llevan Inline: markdown para la negrita y la cursiva dentro de la frase. Los
-# rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Transform).
+# Los párrafos y un logro llevan Markup: markdown para la negrita y la cursiva dentro de la frase. Los
+# rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -23,7 +23,7 @@ Document (dev.stxt.pdf):
 						Alt: Retrato de Marta Ferrer
 						Box:
 							Width: 100%
-							Radius: 50%
+							Corner radius: 50%
 							Margin: 0 0 4 0
 					Text: Contacto
 						Style: side-title
@@ -173,7 +173,7 @@ Document (dev.stxt.pdf):
 									List item:
 										Text: **Premio Sol Digital 2021** al mejor diseño de interacción.
 											Typography:
-												Inline: markdown
+												Markup: markdown
 						Area:
 							Text: 2016 – 2018
 								Style: dates

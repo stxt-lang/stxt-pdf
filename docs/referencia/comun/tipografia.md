@@ -19,14 +19,14 @@ celdas).
 | `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](valores.md#colores)). |
-| `Text wrap` | `auto`, `pretty` | `auto` | Reparto en líneas: voraz (`auto`) o Knuth-Plass (`pretty`). |
-| `Inline` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](formato-del-texto.md#formato-en-línea-inline)). |
-| `Transform` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](formato-del-texto.md#mayúsculas-transform)). |
+| `Line breaking` | `simple`, `balanced` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`balanced`). |
+| `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](formato-del-texto.md#formato-en-línea-markup)). |
+| `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](formato-del-texto.md#mayúsculas-case)). |
 | `Letter spacing` | número (puntos) | `0` | Interletraje; puede ser negativo ([Formato del texto](formato-del-texto.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](formato-del-texto.md#versalitas-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). |
-| `White space` | `normal`, `pre`, `pre-wrap` | `normal` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)). |
-| `Tab size` | entero ≥ 1 | `4` | Con `pre` o `pre-wrap`, las columnas de una tabulación. |
+| `White space` | `normal`, `preserve`, `preserve-wrap` | `normal` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)). |
+| `Tab size` | entero ≥ 1 | `4` | Con `preserve` o `preserve-wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md#numeración-numbered)). |
 | `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
@@ -46,15 +46,15 @@ Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../componentes/t
 ## Espacios y párrafos
 
 Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** separa párrafos
-y fuerza un salto. Con `White space: pre` o `pre-wrap` se conservan
+y fuerza un salto. Con `White space: preserve` o `preserve-wrap` se conservan
 ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)).
 
 ## El reparto en líneas
 
 El texto se reparte en **líneas** del ancho de la caja de contenido:
 
-- **`Text wrap: auto`**, algoritmo voraz: las palabras se añaden a la línea mientras quepan.
-- **`Text wrap: pretty`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
+- **`Line breaking: simple`**, algoritmo voraz: las palabras se añaden a la línea mientras quepan.
+- **`Line breaking: balanced`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
   líneas, de modo que las líneas quedan más parejas (sin guiones; los espacios se estiran hasta la mitad de su ancho y no
   se encogen; la última línea no cuenta).
 
@@ -86,14 +86,14 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 ## Tamaños intrínsecos
 
-min-content = la palabra más ancha; max-content = el párrafo más largo en una sola línea (con `pre` y `pre-wrap`, ver
+min-content = la palabra más ancha; max-content = el párrafo más largo en una sola línea (con `preserve` y `preserve-wrap`, ver
 [Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
 
 ## Idioma (`Language`)
 
 Una caja cuyo texto no está en el idioma del documento declara el suyo en `Typography` (`Language: en-GB`), también desde
 una regla de `Styles` (`For style: english`). Se hereda; un lector de pantalla cambia de voz al leer esa caja, y
-`Transform` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `For element: Document`
+`Case` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `For element: Document`
 no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de `Document`
 ([Document](../componentes/document.md#title-y-language)).
 

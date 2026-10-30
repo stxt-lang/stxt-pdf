@@ -35,7 +35,7 @@ El modelo de caja. No se hereda.
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](valores.md#abreviados-de-cuatro-lados)). No afecta al layout. |
-| `Radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
+| `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(…)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
 
 > **Decisión:** lo que se hereda va en `Typography` y lo que no, en `Box` o `Break`: por eso `Background` y
@@ -105,13 +105,13 @@ proporción: la de su fichero, o la de `Aspect ratio`, y en ella se aplica a la 
 
 ## Fondo, borde y esquinas
 
-`Background`, `Border color` y `Radius` solo cambian el aspecto: ninguno mueve ni cambia el tamaño de una caja. El fondo
+`Background`, `Border color` y `Corner radius` solo cambian el aspecto: ninguno mueve ni cambia el tamaño de una caja. El fondo
 y el borde van debajo del contenido ([Capas y giro](capas-y-giro.md#orden-de-pintado)). Para quien lee el PDF con un
 lector de pantalla son decoración ([El PDF](pdf.md#accesibilidad)).
 
 ### Esquinas
 
-`Radius` redondea la caja de borde con un cuarto de elipse por esquina. Un porcentaje horizontal es del ancho de la caja
+`Corner radius` redondea la caja de borde con un cuarto de elipse por esquina. Un porcentaje horizontal es del ancho de la caja
 de borde y uno vertical, de su alto: `50%` hace un círculo en una caja cuadrada y una elipse en las demás. Si dos radios
 seguidos de un lado suman más que el lado, todos se reducen por el mismo factor hasta que caben.
 
@@ -124,8 +124,8 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
   `Overlay` o un `Page overlay`, que se colocan a propósito y pueden sobresalir (una insignia que asoma por la esquina). Varias
   cajas redondeadas una dentro de otra suman sus recortes. Como nada del flujo se sale de su caja (sería un
   [desbordamiento](desbordamiento.md)), el recorte solo cambia lo que toca las esquinas.
-- **Cajas partidas.** Con `Decoration: slice`, solo el primer fragmento de una caja tiene las esquinas de arriba y solo
-  el último, las de abajo; con `clone`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
+- **Cajas partidas.** Con `Edges: open`, solo el primer fragmento de una caja tiene las esquinas de arriba y solo
+  el último, las de abajo; con `closed`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
   fragmento, no sobre el de la caja entera.
 
 > **Decisión:** la caja redondeada recorta siempre lo que contiene, sin propiedad que lo pida, porque lo que se sale de

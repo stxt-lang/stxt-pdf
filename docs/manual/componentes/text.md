@@ -22,8 +22,8 @@ Document (dev.stxt.pdf):
 				Margin: 0 0 10 0
 			Typography:
 				Align: justify
-				Text wrap: pretty
-				Inline: markdown
+				Line breaking: balanced
+				Markup: markdown
 	Section:
 		Text: Madrid, 3 de marzo
 			Typography:
@@ -47,7 +47,7 @@ los dos. Dentro del bloque:
 - en un `Text`, una línea en blanco empieza otro párrafo; en un `Paragraph`, es un error: para varios párrafos, varios
   `Paragraph`.
 
-El texto es literal salvo que pidas formato con `Inline: markdown` ([Formato del texto](../comun/formato-del-texto.md)).
+El texto es literal salvo que pidas formato con `Markup: markdown` ([Formato del texto](../comun/formato-del-texto.md)).
 Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: id}`, `{number of: id}`
 ([Referencias y enlaces](../comun/referencias-y-enlaces.md)).
 

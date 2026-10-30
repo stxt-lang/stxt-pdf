@@ -47,7 +47,7 @@ Styles (dev.stxt.pdf):
 			Size: 7.5
 			Bold: true
 			Color: #A4301F
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.8
 	For style: caption
 		Typography:
@@ -94,7 +94,7 @@ Styles (dev.stxt.pdf):
 			Bold: true
 			Size: 7
 			Color: #A4301F
-			Transform: uppercase
+			Case: uppercase
 			Letter spacing: 0.6
 		Box:
 			Margin: 0 0 3 0

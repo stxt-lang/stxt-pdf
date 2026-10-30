@@ -12,7 +12,7 @@ Block:
 		Border: 0 0 0 3
 		Border color: #B5651D
 		Background: #F1EFE8
-		Radius: 0 6 6 0
+		Corner radius: 0 6 6 0
 	Paragraph: Una nota con una franja de color a la izquierda.
 ```
 
@@ -25,7 +25,7 @@ Block:
 | `Padding` | El espacio de dentro, de 1 a 4 valores |
 | `Border` | El grosor del borde, de 1 a 4 valores |
 | `Border color` | El color del borde, de 1 a 4 colores; por defecto, el del texto |
-| `Radius` | Las esquinas redondeadas, de 1 a 4 valores |
+| `Corner radius` | Las esquinas redondeadas, de 1 a 4 valores |
 | `Background` | El fondo: un color o un degradado |
 
 ## Tamaño
@@ -74,8 +74,8 @@ comprueba, porque no se sabe qué hay debajo. Quien convierte puede desactivar l
 
 ## Esquinas
 
-`Radius: 6` redondea las cuatro esquinas con un radio de 6 puntos; con cuatro valores, cada esquina tiene el suyo.
-`Radius: 50%` en una caja cuadrada es un círculo (una foto de perfil, una insignia). El fondo y el borde siguen la curva.
+`Corner radius: 6` redondea las cuatro esquinas con un radio de 6 puntos; con cuatro valores, cada esquina tiene el suyo.
+`Corner radius: 50%` en una caja cuadrada es un círculo (una foto de perfil, una insignia). El fondo y el borde siguen la curva.
 Una imagen se recorta con las esquinas de su caja. Lo que hay dentro de una caja redondeada también sigue su curva: el
 fondo, el borde o la imagen de un hijo que llega a la esquina se recorta, sin tener que redondearlo. El texto no se recorta,
 ni un `Overlay`, que puede asomar por la esquina a propósito.

@@ -31,14 +31,14 @@ Document (dev.stxt.pdf):
 					Fit: cover
 					Box:
 						Height: 160
-						Radius: 6
+						Corner radius: 6
 			Area:
 				Image: examples/catalog/mesa.jpg
 					Alt: Mesa de comedor de nogal
 					Fit: cover
 					Box:
 						Height: 160
-						Radius: 6
+						Corner radius: 6
 ```
 
 ## Propiedades
@@ -47,11 +47,11 @@ Document (dev.stxt.pdf):
 |---|---|
 | *(valor)* | La ruta del fichero dentro de `images/`: `Image: logos/acme.png`. Obligatoria |
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
-| `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `contain` (entera, con espacio a los lados), `cover` (llena la caja y recorta lo que sobra) o `fill` (se deforma) |
+| `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `contain` (entera, con espacio a los lados), `cover` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro; ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 
-Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Inside` ni `Decoration`: no se parte). No admite `Typography`.
+Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Inside` ni `Edges`: no se parte). No admite `Typography`.
 
 ## El tamaño
 

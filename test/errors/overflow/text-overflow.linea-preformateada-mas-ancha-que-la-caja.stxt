@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Mono
 				Size: 10
-				White space: pre
+				White space: preserve
 	Section:
 		Text:
 			Box:

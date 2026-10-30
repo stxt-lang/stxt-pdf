@@ -10,15 +10,15 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * relleno. Es la parte común de la fragmentación de todos los algoritmos.
  *
  * <ul>
- *   <li>Con {@code Decoration: slice}, el primer fragmento no tiene borde ni relleno inferiores
+ *   <li>Con {@code Edges: open}, el primer fragmento no tiene borde ni relleno inferiores
  *       y los siguientes no tienen los superiores.</li>
- *   <li>Con {@code Decoration: clone}, cada fragmento tiene borde y relleno completos: el
+ *   <li>Con {@code Edges: closed}, cada fragmento tiene borde y relleno completos: el
  *       contenido de cada página cabe entre ellos.</li>
  *   <li>Un {@code Height} definido es el total de todos los fragmentos: si el contenido termina
  *       y el alto propio de la caja no cabe en la página, lo que falta pasa al fragmento
  *       siguiente. Un fragmento cortado dentro del contenido llega hasta el final de la página,
  *       sin pasar del alto que le queda a la caja, pero solo consume lo que ocupa su contenido: el
- *       hueco del final de la página no se le quita al contenido que sigue. Con {@code clone}, el
+ *       hueco del final de la página no se le quita al contenido que sigue. Con {@code closed}, el
  *       total es el del contenido: el alto menos un borde y un relleno.</li>
  *   <li>Con alto {@code auto}, el fragmento mide lo que su contenido; {@code Min height} y
  *       {@code Max height} se aplican al total.</li>
@@ -29,18 +29,18 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * @param padding  relleno de este fragmento
  * @param finished la caja termina en este fragmento
  * @param consumed alto de caja de borde de este fragmento y de los anteriores; con
- *                 {@code clone}, alto de su caja de contenido
+ *                 {@code closed}, alto de su caja de contenido
  */
 public record Slice(double height, Insets border, Insets padding, boolean finished, double consumed) {
 
-    /** Borde y relleno superiores del fragmento: con {@code slice}, solo los tiene el primero. */
+    /** Borde y relleno superiores del fragmento: con {@code open}, solo los tiene el primero. */
     public static double top(BoxModel model, boolean first) {
         return first || model.clones() ? model.border().top() + model.padding().top() : 0;
     }
 
     /**
      * Lo que queda de página para el contenido del fragmento: sin el borde y el relleno
-     * superiores y, con {@code clone}, tampoco los inferiores. Con {@code slice}, los inferiores
+     * superiores y, con {@code closed}, tampoco los inferiores. Con {@code open}, los inferiores
      * no se reservan aquí: solo hacen falta si la caja termina en esta página, y de eso se
      * encarga {@link Engine#layout}.
      */
@@ -96,7 +96,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
     }
 
     /**
-     * {@code Decoration: clone}: el reparto se hace con el alto de la caja de contenido, y cada
+     * {@code Edges: closed}: el reparto se hace con el alto de la caja de contenido, y cada
      * fragmento le suma el borde y el relleno completos.
      */
     private static Slice cloned(BoxModel model, double consumed, double content, boolean contentFinished,
@@ -118,7 +118,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             }
         } else if (model.height().isPresent()) {
             double total = Math.max(0, model.height().getAsDouble() - decoration);
-            // Como con slice: hasta el final de la página, consumiendo solo el contenido.
+            // Como con open: hasta el final de la página, consumiendo solo el contenido.
             h = Math.max(h, Math.min(available, total - consumed));
             return new Slice(decoration + h, model.border(), model.padding(), false, consumed + content);
         }
