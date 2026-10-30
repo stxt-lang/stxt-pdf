@@ -67,12 +67,12 @@ class InlineFormatTest {
     }
 
     @Test
-    void theContentBlockJoinsLinesWithASpaceAndKeepsParagraphs() {
+    void theContentBlockJoinsLinesWithASpace() {
         Box text = build("\tText:", "\t\tTypography:", "\t\t\tMarkup: markdown", "\t\tContent >>",
-                "\t\t\tPrimera línea con **negrita**", "\t\t\tsigue aquí.", "", "", "\t\t\tOtro *párrafo*.").children().get(0);
-        assertEquals("Primera línea con negrita sigue aquí.\n\nOtro párrafo.", text.text());
-        assertEquals(List.of(run("Primera línea con "), run("negrita", "b"), run(" sigue aquí.\n\nOtro "),
-                run("párrafo", "i"), run(".")), text.formattedRuns());
+                "\t\t\tPrimera línea con **negrita**", "\t\t\tsigue *aquí*.").children().get(0);
+        assertEquals("Primera línea con negrita sigue aquí.", text.text());
+        assertEquals(List.of(run("Primera línea con "), run("negrita", "b"), run(" sigue "), run("aquí", "i"), run(".")),
+                text.formattedRuns());
     }
 
     @Test
@@ -125,10 +125,11 @@ class InlineFormatTest {
                 () -> buildInline("\tText: Uno", "\tText: Ver ![logo](logo.png)"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, image.errorCode());
         assertEquals(15, image.line());
-        InvalidModelException second = assertThrows(InvalidModelException.class,
-                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\tVer ![logo](logo.png)"));
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, second.errorCode());
-        assertEquals(18, second.line());
+        // En un bloque, la línea del texto, la primera del bloque.
+        InvalidModelException block = assertThrows(InvalidModelException.class,
+                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "\t\t\tver ![logo](logo.png)"));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, block.errorCode());
+        assertEquals(16, block.line());
     }
 
     /** Lo que en un Markdown empezaría un bloque es texto, sin escaparlo (referencia/comun/formato-del-texto.md). */
@@ -159,7 +160,7 @@ class InlineFormatTest {
     @Test
     void codeWithoutCodeFontIsAnErrorOnTheLineOfTheText() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "", "\t\t\tUsa `mvn`."));
+                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "\t\t\tusa `mvn`."));
         assertEquals(ErrorCode.CODE_WITHOUT_FONT, e.errorCode());
         assertEquals(16, e.line());
     }

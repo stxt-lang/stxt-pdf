@@ -125,14 +125,12 @@ class ColumnsLayoutTest {
     }
 
     @Test
-    void textIsBalancedBetweenParagraphs() {
-        LayoutFixture l = layOut("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15", "\t\tText:",
-                "\t\t\tId: T", "\t\t\tContent >>", "\t\t\t\tUno", "", "\t\t\t\tDos", "", "\t\t\t\tTres", "",
-                "\t\t\t\tCuatro");
+    void paragraphsAreBalancedBetweenColumns() {
+        LayoutFixture l = layOut("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15", "\t\tParagraph: Uno",
+                "\t\tParagraph: Dos", "\t\tParagraph: Tres", "\t\t\tId: T", "\t\tParagraph: Cuatro");
         assertRect(40, 40, 515, 24, l.rect("M"));
-        // El segundo fragmento del texto, en la segunda columna.
-        assertRect(305, 40, 250, 24, l.rect("T"));
-        assertEquals("Tres", l.fragment("T").lines().get(0).text());
+        // El tercer párrafo abre la segunda columna.
+        assertRect(305, 40, 250, 12, l.rect("T"));
     }
 
     @Test

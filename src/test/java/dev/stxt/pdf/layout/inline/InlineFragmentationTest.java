@@ -83,8 +83,8 @@ class InlineFragmentationTest {
     void breakBetweenParagraphs() {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30",
-                "\tText:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30", "\t\tContent >>", "\t\t\t" + words(5), "",
-                "\t\t\t" + words(5));
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30", "\t\tParagraph: " + words(5),
+                "\t\tParagraph: " + words(5));
         assertEquals(2, l.pages());
         assertRect(40, 70, 30, 60, l.rect(1, "P"));
         assertRect(40, 40, 30, 60, l.rect(2, "P"));

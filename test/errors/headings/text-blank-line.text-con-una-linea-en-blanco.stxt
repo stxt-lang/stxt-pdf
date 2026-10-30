@@ -1,6 +1,6 @@
-# Case: Un texto con Markup: markdown con la línea de su segundo párrafo
-# Code: MARKDOWN_UNSUPPORTED
-# Line: 21
+# Case: Text con una línea en blanco: un Text no tiene párrafos
+# Code: TEXT_BLANK_LINE
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -12,10 +12,9 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Markup: markdown
 	Section:
 		Text:
 			Content >>
-				Primer párrafo con **negrita**.
+				Primero.
 
-				Ver ![logo](logo.png)
+				Segundo.

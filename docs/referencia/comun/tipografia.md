@@ -41,12 +41,13 @@ Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` p
 
 Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../componentes/text.md)), y lo generan los encabezados
 (sus `Text`), las entradas de un `Table of contents` y lo que traduce un `Markdown`. El texto de un `Text` va en su valor
-(`Text: Un título`) o en un hijo `Content >>` con un bloque indentado, que admite párrafos.
+(`Text: Un título`) o en un hijo `Content >>` con un bloque indentado, sin líneas en blanco: cada caja es un párrafo.
 
 ## Espacios y párrafos
 
-Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** separa párrafos
-y fuerza un salto. Con `White space: preserve` o `preserve-wrap` se conservan
+Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** es un error
+(`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Con `White space: preserve` o `preserve-wrap` se
+conservan los espacios y los saltos de línea, también las líneas en blanco de un `Text`
 ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)).
 
 ## El reparto en líneas

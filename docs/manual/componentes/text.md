@@ -1,8 +1,8 @@
 # `Text` y `Paragraph`
 
-`Text` y `Paragraph` son cajas de texto: reparten su texto en líneas del ancho que tienen. La diferencia es de
-significado: un `Paragraph` es **un párrafo** (y así lo etiqueta el PDF para la accesibilidad), y un `Text` es texto sin
-más, que puede tener varios párrafos.
+`Text` y `Paragraph` son cajas de texto: reparten su texto en líneas del ancho que tienen. La diferencia es su
+papel: un `Paragraph` es **un párrafo** del contenido, y un `Text` es **texto suelto**: un rótulo, una cifra, una línea
+de una cabecera.
 
 ```
 Document (dev.stxt.pdf):
@@ -44,8 +44,8 @@ Va en el valor si es corto (`Paragraph: Un saludo cordial.`) o en un bloque `Con
 los dos. Dentro del bloque:
 
 - los saltos de línea simples son espacios, así que puedes partir las líneas como quieras;
-- en un `Text`, una línea en blanco empieza otro párrafo; en un `Paragraph`, es un error: para varios párrafos, varios
-  `Paragraph`.
+- una línea en blanco es un error: para varios párrafos, varios `Paragraph`. Solo en un texto preformateado
+  (`White space: preserve`, [Formato del texto](../comun/formato-del-texto.md)) es una línea más del texto.
 
 El texto es literal salvo que pidas formato con `Markup: markdown` ([Formato del texto](../comun/formato-del-texto.md)).
 Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: id}`, `{number of: id}`

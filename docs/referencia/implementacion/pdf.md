@@ -27,7 +27,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | El documento | `Document` (la raíz) |
 | `Section` | `Sect`, con `Lang` si cambia su idioma |
 | `Heading 1` … `Heading 6` | `H1` … `H6`; sus `Text` son `Span` |
-| `Text`, `Paragraph` | `P`; un `Text` con varios párrafos es un solo `P` |
+| `Text`, `Paragraph` | `P` |
 | `List`, `List item` | `L` y `LI`, con el marcador en `Lbl` y el contenido en `LBody` |
 | `Table` y sus partes | `Table`, `THead`, `TBody`, `TFoot`, `TR`, y `TH` o `TD` |
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |

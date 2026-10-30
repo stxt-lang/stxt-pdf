@@ -20,8 +20,9 @@ saliendo al trabajar y solo toca ese.
 
 - Segunda vuelta: los valores que vienen de la maquetación web (`fr`, `minmax`, `min-content`, `max-content`,
   `fit-content`, `min`, `max`, `clamp`, `repeat`).
-- Pendiente de decidir si `Paragraph` y `Text` se quedan los dos: hoy solo se diferencian en que `Paragraph` no admite
-  líneas en blanco y en que las reglas `For element` los distinguen.
+- Un `Text` ya no tiene varios párrafos (solo uno preformateado tiene líneas en blanco, y esas son contenido), pero
+  `InlineLayout` y `LineBreaker.breakParagraphs` siguen partiendo el texto en párrafos por las líneas en blanco y
+  respetando `Widows` y `Orphans` en cada uno: se puede simplificar a un solo párrafo por caja.
 
 ### PDF como imagen
 

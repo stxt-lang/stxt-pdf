@@ -111,7 +111,7 @@ UTF-8). Si cambian las dependencias: *Maven → Update Project*.
    sin comentarlo.
 2. **Una propiedad nueva o cambiada:** el schema `.stxt` (en su grupo o en cada elemento que la admite), su tabla y su
    explicación en la página de la referencia y del manual, el resumen del schema en
-   [estructura](docs/referencia/comun/estructura.md#schema), el grupo de `Italic` que le toca, su lectura (`PropertyReader`,
+   [estructura](docs/referencia/comun/estructura.md#schema), el grupo de `Style` que le toca, su lectura (`PropertyReader`,
    o `ElementReader` si es propia de un elemento) y, si aplica, su validación (`ModelValidator`).
 3. **Una regla de validación nueva:** su `ErrorCode`, su fila en la tabla de [errores](docs/referencia/comun/errores.md) y un
    caso en el catálogo.

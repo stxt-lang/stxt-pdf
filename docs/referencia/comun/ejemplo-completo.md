@@ -22,7 +22,7 @@ Document (dev.stxt.pdf):
 				Height: 20
 			Typography:
 				Size: 8
-		For element: Text
+		For element: Paragraph
 			Typography:
 				Align: justify
 		For style: panel
@@ -69,13 +69,13 @@ Document (dev.stxt.pdf):
 						Resumen de las cifras clave
 						del trimestre.
 			Area:
-				Text:
+				Block:
 					Id: main
-					Content >>
-						Primer párrafo del informe. Los saltos de línea simples
-						dentro del bloque equivalen a espacios.
-
-						Una línea en blanco empieza un párrafo nuevo.
+					Paragraph:
+						Content >>
+							Primer párrafo del informe. Los saltos de línea simples
+							dentro del bloque equivalen a espacios.
+					Paragraph: Cada párrafo es un Paragraph.
 		Overlay:
 			Id: stamp
 			Offset: 0 0 auto auto
@@ -98,10 +98,10 @@ Document (dev.stxt.pdf):
   cambia el tamaño y va en negrita; la cabecera y el pie declaran un cuerpo menor, que heredan
   sus `Text`.
 - **Reglas** ([Styles](estilos.md)): `For element: Page overlay` da a la cabecera y
-  al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `For element: Text` justifica todos los
-  textos; en los de una sola línea (título, cabecera) no se nota, porque la última línea de un
-  párrafo no se justifica. El pie y el sello lo sobrescriben con su propio `Align`, y el estilo
-  `panel` de `side` lo devuelve a `left`: una regla `For style` gana a la de `For element`. La
+  al pie 20 de alto y el cuerpo 8, que heredan sus `Text`. `For element: Paragraph` justifica los
+  párrafos del cuerpo, los de `main`; los textos sueltos (título, cabecera, pie, sello) son `Text` y
+  no les llega. El pie y el sello se alinean con su propio `Align`, y el estilo `panel` de `side`,
+  a la izquierda. La
   regla `For id: title` lleva todo el estilo del título, que en el documento solo declara su
   texto y su `Id`. El resultado es el mismo que si cada elemento declarase esas propiedades.
 - **`header`** (`Page overlay`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.

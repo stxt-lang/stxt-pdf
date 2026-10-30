@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 				Height: 20
 			Typography:
 				Size: 8
-		For element: Text
+		For element: Paragraph
 			Typography:
 				Align: justify
 		For style: panel
@@ -64,13 +64,13 @@ Document (dev.stxt.pdf):
 						Resumen de las cifras clave
 						del trimestre.
 			Area:
-				Text:
+				Block:
 					Id: main
-					Content >>
-						Primer párrafo del informe. Los saltos de línea simples
-						dentro del bloque equivalen a espacios.
-
-						Una línea en blanco empieza un párrafo nuevo.
+					Paragraph:
+						Content >>
+							Primer párrafo del informe. Los saltos de línea simples
+							dentro del bloque equivalen a espacios.
+					Paragraph: Cada párrafo es un Paragraph.
 		Overlay:
 			Id: stamp
 			Offset: 0 0 auto auto

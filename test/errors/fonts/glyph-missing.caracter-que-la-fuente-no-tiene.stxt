@@ -1,6 +1,6 @@
 # Case: Carácter que la fuente no tiene
 # Code: GLYPH_MISSING
-# Line: 20
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -16,5 +16,4 @@ Document (dev.stxt.pdf):
 		Text:
 			Content >>
 				Primera línea
-
 				Kanji 漢

@@ -48,16 +48,13 @@ class LongTextTest {
         }
     }
 
-    /** Un {@code Text} con {@code paragraphs} párrafos de cuatro frases. */
+    /** {@code paragraphs} párrafos ({@code Paragraph}) de cuatro frases. */
     private static String document(int paragraphs, String wrap) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
-                "\t\t\t\tLine breaking: " + wrap, "\tText:", "\t\tContent >>"));
+                "\t\t\t\tLine breaking: " + wrap));
         for (int p = 0; p < paragraphs; p++) {
-            if (p > 0) {
-                lines.add("");
-            }
-            lines.add("\t\t\t" + (p + 1) + ". " + SENTENCE.repeat(4).strip());
+            lines.add("\tParagraph: " + (p + 1) + ". " + SENTENCE.repeat(4).strip());
         }
         return String.join("\n", lines);
     }

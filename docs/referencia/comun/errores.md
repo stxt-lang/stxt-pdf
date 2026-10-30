@@ -65,7 +65,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un 
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([Encabezados](../componentes/heading.md#jerarquía)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
 | `HEADING_IN_PAGE_OVERLAY` | Un encabezado no va dentro de un `Page overlay` | `Un Heading 1 no puede estar dentro de un Page overlay…: usa un Text` |
 | `BREAK_IN_HEADING` | Un `Text` de un encabezado no declara `Break` | `Un Text de un encabezado no admite Break: el motor ya evita cortar…` |
-| `PARAGRAPH_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content` (línea de la línea en blanco) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |
+| `TEXT_BLANK_LINE` | Un `Paragraph` no tiene líneas en blanco en su `Content`, ni un `Text` que no es preformateado (línea de la línea en blanco) ([Text](../componentes/text.md)) | `Un Paragraph es un solo párrafo: quita la línea en blanco…` |
 | `LIST_ITEM_EMPTY` | Un `List item` contiene al menos un elemento ([List](../componentes/list.md)) | `Un List item necesita al menos un elemento: un Paragraph, un Text, un Block…` |
 | `LIST_NUMBER_NOT_ALLOWED` | `Start` y `Number` solo en las listas numeradas | `Start no tiene efecto con Marker: bullet, que no numera los ítems` |
 | `LIST_NUMBER_RANGE` | El número cabe en la numeración: `decimal` desde 0, letras desde 1, romanos de 1 a 3999 (línea del `Start`, del `Number` o del ítem) | `El número 4000 no se puede escribir con Marker: upper-roman, que numera de 1 a 3999` |

@@ -109,10 +109,10 @@ class PdfMetricsTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
                         "\t\tText:", "\t\t\tTypography:", "\t\t\t\tBold: true", "\t\t\tContent >>",
-                        "\t\t\t\tPrimera línea", "", "\t\t\t\tKanji 漢"));
+                        "\t\t\t\tPrimera línea", "\t\t\t\tKanji 漢"));
         assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
-        assertEquals(21, e.line());
-        assertEquals("línea 21: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
+        assertEquals(20, e.line());
+        assertEquals("línea 20: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
     }
 
     @Test

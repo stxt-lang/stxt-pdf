@@ -64,7 +64,8 @@ El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `
 que puede. Con `Line breaking: balanced`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
 se nota sobre todo en texto justificado. No se parten palabras con guion: una palabra más ancha que la línea es un error.
 
-Los espacios seguidos y los saltos de línea simples son un solo espacio; una línea en blanco separa dos párrafos.
+Los espacios seguidos y los saltos de línea simples son un solo espacio. Una línea en blanco es un error: cada texto es
+un solo párrafo, y para varios se escriben varios `Paragraph`.
 
 ## Viudas y huérfanas
 

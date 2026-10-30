@@ -50,8 +50,11 @@ public enum ErrorCode {
     HEADING_IN_PAGE_OVERLAY,
     /** Un {@code Text} de un encabezado con {@code Break}: el motor ya evita el corte. */
     BREAK_IN_HEADING,
-    /** Un {@code Paragraph} con líneas en blanco, que lo partirían en varios párrafos. */
-    PARAGRAPH_BLANK_LINE,
+    /**
+     * Una línea en blanco en un {@code Paragraph}, que lo partiría en varios párrafos, o en un {@code Text} que no es
+     * preformateado.
+     */
+    TEXT_BLANK_LINE,
 
     // --- Listas ----------------------------------------------------------------------------------
     /** Un {@code List item} sin ningún elemento. */

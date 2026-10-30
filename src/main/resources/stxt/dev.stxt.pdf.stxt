@@ -186,7 +186,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Text
 		Type: INLINE
-		Description: Caja de texto. El texto va en el valor (una línea) o en Content (un bloque).
+		Description: Texto suelto, que no es un párrafo del contenido: un rótulo, una cifra, una línea de una cabecera, los trozos de un encabezado. El texto va en el valor (una línea) o en Content (un bloque), sin líneas en blanco salvo si es preformateado.
 		Children:
 			Child: Id
 				Max: 1
@@ -206,7 +206,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Paragraph
 		Type: INLINE
-		Description: Párrafo: un Text con significado (etiqueta P en el PDF). Un solo párrafo, sin líneas en blanco en Content.
+		Description: Un párrafo del contenido, que las reglas For element: Paragraph estilan aparte de los textos sueltos. Un solo párrafo: sin líneas en blanco en Content.
 		Children:
 			Child: Id
 				Max: 1
@@ -1050,7 +1050,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: landscape
 	Node: Content
 		Type: BLOCK
-		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco separa párrafos.
+		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco es un error, salvo en un Text preformateado (White space: preserve o preserve-wrap).
 
 	# Box
 
@@ -1137,7 +1137,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Si el texto se mide y se pinta con las ligaduras de la fuente (fi, fl, ffi…). Por defecto, false: un glifo por carácter. Se hereda. Con Letter spacing distinto de 0 no hay ligaduras. Solo importa en las fuentes que las tienen (IBM Plex Sans y Serif; Plex Mono no).
 	Node: White space
 		Type: ENUM
-		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio, y una línea en blanco separa párrafos), preserve (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o preserve-wrap (como preserve, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
+		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio), preserve (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o preserve-wrap (como preserve, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
 		Values:
 			Value: normal
 			Value: preserve

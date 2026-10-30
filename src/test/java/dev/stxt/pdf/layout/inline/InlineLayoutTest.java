@@ -55,16 +55,14 @@ class InlineLayoutTest {
     }
 
     @Test
-    void justifyFillsAllLinesButTheLastOfEachParagraph() {
+    void justifyFillsAllLinesButTheLast() {
         // Primera línea: 95 pt y 3 espacios, el sobrante (5) se reparte entre ellos.
         LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\tTypography:",
-                "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\t" + TEXT, "", "\t\t\t" + TEXT);
+                "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\t" + TEXT);
         List<TextLine> lines = l.fragment("T").lines();
-        assertEquals(4, lines.size());
+        assertEquals(2, lines.size());
         assertEquals(new TextLine(0, 0, 100, 12, "aaaa bbbb cccc dddd", 5.0 / 3), lines.get(0));
         assertEquals(new TextLine(0, 12, 20, 12, "eeee", 0), lines.get(1));
-        assertEquals(5.0 / 3, lines.get(2).wordSpacing(), 1e-9);
-        assertEquals(0, lines.get(3).wordSpacing(), 1e-9);
     }
 
     @Test
@@ -93,9 +91,9 @@ class InlineLayoutTest {
     }
 
     @Test
-    void blankLineSeparatesParagraphs() {
-        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tContent >>", "\t\t\tuna dos", "\t\t\ttres", "", "\t\t\tcuatro");
-        assertEquals(List.of("una dos tres", "cuatro"),
+    void aLineBreakInContentIsASpace() {
+        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tContent >>", "\t\t\tuna dos", "\t\t\ttres");
+        assertEquals(List.of("una dos tres"),
                 l.fragment("T").lines().stream().map(TextLine::text).toList());
     }
 
@@ -132,13 +130,12 @@ class InlineLayoutTest {
 
     @Test
     void theLastLineOfAParagraphIsNotJustifiedEvenWithSeveralWords() {
-        // «aa bb» (25) se justifica a 30; «cc dd», la última del primer párrafo, no.
+        // «aa bb» (25) se justifica a 30; «cc dd», la última, no.
         LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:",
-                "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\taa bb cc dd", "", "\t\t\tee ff");
+                "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\taa bb cc dd");
         List<TextLine> lines = l.fragment("T").lines();
-        assertEquals(List.of("aa bb", "cc dd", "ee ff"), lines.stream().map(TextLine::text).toList());
+        assertEquals(List.of("aa bb", "cc dd"), lines.stream().map(TextLine::text).toList());
         assertEquals(5, lines.get(0).wordSpacing(), 1e-9);
         assertEquals(0, lines.get(1).wordSpacing(), 1e-9);
-        assertEquals(0, lines.get(2).wordSpacing(), 1e-9);
     }
 }

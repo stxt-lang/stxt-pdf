@@ -101,7 +101,7 @@ final class MarkdownBuilder {
             + "imágenes solas en su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, "
             + "`código` y [enlaces](destino)";
 
-    private static final String INLINE_SUBSET = "un texto con Markup: markdown solo admite párrafos con **negrita**, "
+    private static final String INLINE_SUBSET = "un texto con Markup: markdown solo admite texto con **negrita**, "
             + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); lo demás va en un Markdown, y un carácter "
             + "especial se escribe con \\ delante (\\*)";
 

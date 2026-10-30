@@ -354,7 +354,11 @@ enum ElementReader {
         box.setImage(path);
     }
 
-    /** El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos. */
+    /**
+     * El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos, y sin líneas en
+     * blanco, que lo partirían en párrafos (referencia/componentes/text.md). En un texto preformateado, una línea en blanco
+     * es contenido y sí vale, salvo en un {@code Paragraph}, que es siempre un solo párrafo.
+     */
     private static void text(InlineNode n, Box box) {
         Optional<Node> content = child(n, "content");
         boolean value = !n.getText().isBlank();
@@ -368,7 +372,8 @@ enum ElementReader {
         }
         Node source = content.orElse(n);
         font(n, source, box);
-        if (box.element() == Element.PARAGRAPH) {
+        boolean paragraph = box.element() == Element.PARAGRAPH;
+        if (paragraph || !box.style().typography().whiteSpace().preformatted()) {
             // Las líneas en blanco al principio o al final no separan nada.
             String text = source.getText();
             Matcher blank = BLANK_LINE.matcher(text)
@@ -376,8 +381,10 @@ enum ElementReader {
             if (blank.find()) {
                 // El bloque empieza en la línea siguiente a Content; la línea en blanco, tras el salto encontrado.
                 int line = source.getLine() + 2 + (int) text.substring(0, blank.start()).chars().filter(c -> c == '\n').count();
-                throw error(line, ErrorCode.PARAGRAPH_BLANK_LINE, "Un Paragraph es un solo párrafo: quita la línea "
-                        + "en blanco o usa un Paragraph para cada uno");
+                throw error(line, ErrorCode.TEXT_BLANK_LINE, paragraph
+                        ? "Un Paragraph es un solo párrafo: quita la línea en blanco o usa un Paragraph para cada uno"
+                        : "Un Text no tiene párrafos: quita la línea en blanco, o escribe un Paragraph para cada párrafo "
+                        + "(en un Block si van juntos); en un texto preformateado (White space: preserve) sí vale");
             }
         }
         box.setText(source.getText(), source.getLine(), source instanceof TextNode);

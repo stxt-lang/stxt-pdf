@@ -8,8 +8,8 @@
 #            2 líneas (tres palabras de 8 caben en 26; la cuarta lo pasa a 35): 24. Desde y = 20.
 #   fmt:     lo mismo con Markup heredado: "aaaa bbbb cccc dddd" son 19 caracteres: 1 línea, 12. y = 44.
 #   escaped: con \* delante, los asteriscos son literales: 35 caracteres otra vez, 2 líneas: 24. y = 56.
-#   blocks:  Content con dos párrafos (una línea en blanco los separa); el salto de línea simple del
-#            primero vale un espacio: cada uno es una línea: 24. y = 80.
+#   blocks:  un Block con dos Paragraph con Content; el salto de línea simple del primero vale un
+#            espacio: cada uno es una línea: 24. y = 80.
 #   tab:     una Cell de 80 de ancho (16 caracteres): "**aaaa** **bbbb**" literal serían 17 y dos
 #            líneas; interpretada, "aaaa bbbb" es una línea: la fila y la tabla miden 12. y = 104.
 #   md:      un Markdown no se interpreta dos veces: "\*\*aaaa\*\* …" da 35 caracteres literales
@@ -36,13 +36,15 @@ Document (dev.stxt.pdf):
 			Id: fmt
 		Text: \*\*aaaa\*\* \*\*bbbb\*\* \*\*cccc\*\* \*\*dddd\*\*
 			Id: escaped
-		Text:
+		Block:
 			Id: blocks
-			Content >>
-				Uno *dos* ++tres++
-				cuatro.
-
-				Cinco ~~seis~~.
+			Paragraph:
+				Content >>
+					Uno *dos* ++tres++
+					cuatro.
+			Paragraph:
+				Content >>
+					Cinco ~~seis~~.
 		Table:
 			Id: tab
 			Column sizes: 80 80

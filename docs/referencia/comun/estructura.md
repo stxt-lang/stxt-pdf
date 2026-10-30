@@ -31,8 +31,8 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Block` | Caja que apila sus hijos en vertical ([Block](../componentes/block.md)) | Elementos |
 | `Flex` | Coloca sus ítems en líneas ([Flex](../componentes/flex.md)) | `Item`, `Overlay` y `Page overlay` |
 | `Grid` | Coloca sus ítems en una rejilla ([Grid](../componentes/grid.md)) | `Area`, `Overlay` y `Page overlay` |
-| `Text` | Caja de texto ([Text](../componentes/text.md)) | Su texto: en el valor o en `Content` |
-| `Paragraph` | Un párrafo: un `Text` con significado ([Text](../componentes/text.md#paragraph)) | Su texto, sin líneas en blanco |
+| `Text` | Texto suelto: un rótulo, una cifra, una línea de una cabecera ([Text](../componentes/text.md)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
+| `Paragraph` | Un párrafo del contenido ([Text](../componentes/text.md#paragraph)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
 | `Heading 1` … `Heading 6` | Encabezado de nivel 1 a 6 ([Encabezados](../componentes/heading.md)) | Uno o varios `Text` |
 | `List` | Lista con marcadores o numerada ([List](../componentes/list.md)) | Uno o varios `List item` |
 | `List item` | Ítem de una `List`: un bloque con su marcador | Elementos, salvo los encabezados |
@@ -135,11 +135,9 @@ Document (dev.stxt.pdf):
 			Gap: 10
 			Item:
 				Grow: 1
-				Text:
-					Content >>
-						Primer párrafo.
-
-						Segundo párrafo.
+				Block:
+					Paragraph: Primer párrafo.
+					Paragraph: Segundo párrafo.
 			Item:
 				Block:
 					Box:

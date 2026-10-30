@@ -1,5 +1,5 @@
 # Case: Paragraph con una línea en blanco
-# Code: PARAGRAPH_BLANK_LINE
+# Code: TEXT_BLANK_LINE
 # Line: 19
 Document (dev.stxt.pdf):
 	Language: es
