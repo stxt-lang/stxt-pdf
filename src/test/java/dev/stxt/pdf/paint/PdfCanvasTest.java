@@ -16,6 +16,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.COSObjectable;
+import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
+import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
@@ -47,6 +49,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -1050,7 +1053,11 @@ class PdfCanvasTest {
         }
     }
 
-    /** Con {@code Page style} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda. */
+    /**
+     * Con {@code Page style} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda (i, ii, 5, VI). Se
+     * miran las entradas del PDF y no el texto que genera PDFBox, que pasa a mayúsculas con el idioma de la JVM: en
+     * turco, «vi» sería «Vİ».
+     */
     @Test
     void pageLabelsKeepThePageStyleAndTheStart() throws Exception {
         InlineNode doc = reader.read(SECTIONS_HEAD
@@ -1058,8 +1065,13 @@ class PdfCanvasTest {
                 + "\tSection:\n\t\tPage numbering: restart\n\t\tStart: 5\n\t\tText: Cuerpo\n"
                 + "\tSection:\n\t\tPage style: upper-roman\n\t\tText: Anexo\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "page-labels-styles"))) {
-            assertArrayEquals(new String[] {"i", "ii", "5", "VI"},
-                    pdf.getDocumentCatalog().getPageLabels().getLabelsByPageIndices());
+            PDPageLabels labels = pdf.getDocumentCatalog().getPageLabels();
+            List<String> ranges = new ArrayList<>();
+            for (int index : new TreeSet<>(labels.getPageIndices())) {
+                PDPageLabelRange range = labels.getPageLabelRange(index);
+                ranges.add(index + ":" + range.getStyle() + ":" + range.getStart());
+            }
+            assertEquals(List.of("0:r:1", "2:D:5", "3:R:6"), ranges);
         }
     }
 
