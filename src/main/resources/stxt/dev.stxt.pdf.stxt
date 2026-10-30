@@ -58,6 +58,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Inherit fixed
 				Max: 1
+			Child: Begin on
+				Max: 1
 			Child: Block
 			Child: Flex
 			Child: Grid
@@ -1005,6 +1007,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Inherit fixed
 		Type: BOOLEAN
 		Description: Si la Section lleva los Fixed del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
+	Node: Begin on
+		Type: ENUM
+		Description: En qué página física empieza una Section: any (por defecto), en la siguiente; odd, en una impar, la de la derecha al imprimir a doble cara. Si no le toca, la sección anterior acaba con una página en blanco, que cuenta para el número pero no lo imprime ni lleva los Fixed. No vale en la primera sección.
+		Values:
+			Value: any
+			Value: odd
 	Node: Rotate
 		Type: NUMBER
 		Description: Giro de la caja al pintarla, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0), alrededor de Rotate origin. No cambia el layout: la caja ocupa su sitio sin girar; lo girado debe caber en la página.

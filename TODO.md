@@ -32,11 +32,6 @@ saliendo al trabajar y solo toca ese.
 - Los errores que se detectan después de construir el árbol (una fuente que no existe, un desbordamiento) señalan la línea
   de una regla del documento de estilos aparte sin decir que es de ese fichero.
 
-### Encabezados y secciones
-
-- Secciones: empezar en página impar con una página en blanco (doble cara): decidir si la página en blanco cuenta para
-  el número, si lleva los `Fixed` y si cuenta en `Pages`.
-
 ### Tablas
 
 - Una fila no tiene `Box` (un borde o un fondo de fila se da a cada celda, y un `Border` se repite entre celdas) ni `Id`

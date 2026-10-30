@@ -124,7 +124,7 @@ class ConverterErrorsTest {
         Converter converter = converter();
         LaidOutDocument good = converter.layOut(document("\tText: Hola"));
         LaidOutDocument broken = new LaidOutDocument(good.media(), good.metadata(), good.root(),
-                List.of(new Page(1, null, List.of(), null, 0, 1, NumberStyle.DECIMAL)));
+                List.of(new Page(1, null, List.of(), null, 0, 1, NumberStyle.DECIMAL, false)));
         StxtPdfException e = failure(() -> converter.toSvg(broken));
         assertInstanceOf(InternalException.class, e);
         assertEquals(Kind.INTERNAL, e.kind());

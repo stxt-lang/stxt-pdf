@@ -1,0 +1,20 @@
+# Case: Begin on: odd en la primera sección, que ya empieza en la página 1
+# Code: BEGIN_ON_FIRST_SECTION
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Media:
+		Width: 595
+		Height: 842
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Begin on: odd
+		Paragraph: Uno
+	Section:
+		Begin on: odd
+		Paragraph: Dos

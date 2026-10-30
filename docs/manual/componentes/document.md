@@ -97,6 +97,7 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 | `Page style` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`…) o `upper-roman` (`I`, `II`…) |
 | `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
 | `Inherit fixed` | `true` (por defecto): lleva las cabeceras y los pies del documento; `false`: solo los suyos |
+| `Begin on` | `any` (por defecto): empieza en la página siguiente; `odd`: en una impar, la de la derecha al imprimir a doble cara |
 | `Id`, `Class` | Para enlazarla (`#id`, su primera página) y darle tipografía con una regla (`Typography` y nada más: un anexo en otro idioma) |
 
 Una sección puede tener sus propios `Fixed`, que solo salen en sus páginas. Una sección vacía es un error: no tendría
@@ -112,6 +113,41 @@ Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie
 romanos si su sección tiene `Page style: lower-roman`. Para un prefacio en romanos, su sección declara `Page style` y la
 del cuerpo, `Page numbering: restart`; con `Start`, la numeración empieza en otro número.
 
+## Doble cara
+
+En un libro, cada capítulo empieza en una página de la derecha, que es impar. Con `Begin on: odd`, si la sección anterior
+acaba en una página impar, el motor añade detrás una **página en blanco**: sin contenido, sin cabecera ni pie. Cuenta
+para el número de página, como en un libro, aunque no se imprima: así las páginas impares siguen a la derecha. La primera
+sección ya empieza en la página 1, así que en ella es un error.
+
+```
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Dos capítulos
+	Media:
+		Paper: A5
+		Margin: 50
+	Styles:
+		Element: Document
+			Typography:
+				Font: IBM Plex Serif
+				Size: 11
+	Fixed:
+		Offset: auto 0 -30 0
+		Text: {page}
+		Typography:
+			Align: center
+	Section:
+		Heading 1:
+			Text: Capítulo 1
+		Paragraph: El primer capítulo ocupa una sola página.
+	Section:
+		Begin on: odd
+		Heading 1:
+			Text: Capítulo 2
+		Paragraph: El segundo empieza en la página 3: la 2 queda en blanco.
+```
+
 ## Recetas
 
 - **Portada a sangre:** una sección con `Media` de `Margin: 0`, `Page numbering: none` e `Inherit fixed: false`, y un bloque
@@ -121,7 +157,6 @@ del cuerpo, `Page numbering: restart`; con `Start`, la numeración empieza en ot
 
 ## Lo que no hay
 
-- Empezar una sección en página impar (imprimir a doble cara).
 - Un fondo de página propio: se pinta con un bloque del tamaño de la página o con un `Fixed` detrás de todo
   ([Capas y giro](../comun/capas-y-giro.md)).
 

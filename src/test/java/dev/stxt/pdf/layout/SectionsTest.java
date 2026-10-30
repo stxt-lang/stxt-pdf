@@ -232,6 +232,77 @@ class SectionsTest {
         assertEquals("1", text(d.pages().get(2), "n"));
     }
 
+    /**
+     * {@code Begin on: odd}: si la sección anterior acaba en impar, acaba con una página en blanco de ella, sin
+     * contenido ni {@code Fixed}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages} de los
+     * {@code Fixed} de su sección (referencia/componentes/document.md).
+     */
+    @Test
+    void aSectionThatBeginsOnAnOddPageLeavesABlankPageBefore() {
+        LaidOutDocument d = lay(
+                "\tFixed:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: Página {page} de {pages}",
+                join(new String[] {"\tSection:", "\t\tFixed:", "\t\t\tId: last-a", "\t\t\tPages: last",
+                        "\t\t\tBox:", "\t\t\t\tHeight: 10"}, fullPage("a")),
+                new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tText: Empieza en la {page of: b}.",
+                        "\t\t\tId: ref", "\t\tBlock:", "\t\t\tId: b"});
+        assertEquals(3, d.pages().size());
+        Page blank = d.pages().get(1);
+        assertTrue(blank.blank());
+        assertEquals(0, blank.section());
+        assertEquals(List.of(), blank.content().children());
+        assertEquals(List.of(), fixedIds(blank));
+        // Pages: last de la sección es su última página con contenido, no la página en blanco.
+        assertEquals(List.of("num", "last-a"), fixedIds(d.pages().get(0)));
+        assertEquals(List.of(1, 2, 3), d.pages().stream().map(Page::printed).toList());
+        assertEquals("Página 1 de 3", text(d.pages().get(0), "num"));
+        assertEquals("Página 3 de 3", text(d.pages().get(2), "num"));
+        assertEquals("Empieza en la 3.", text(d.pages().get(2), "ref"));
+        assertFalse(d.pages().get(2).blank());
+    }
+
+    @Test
+    void aSectionThatAlreadyBeginsOnAnOddPageNeedsNoBlankPage() {
+        LaidOutDocument d = lay(
+                join(new String[] {"\tSection:"}, fullPage("a1"), fullPage("a2")),
+                join(new String[] {"\tSection:", "\t\tBegin on: odd"}, fullPage("b")),
+                join(new String[] {"\tSection:", "\t\tBegin on: odd"}, fullPage("c")));
+        // a: 1 y 2; b: 3; la página en blanco, 4; c: 5.
+        assertEquals(5, d.pages().size());
+        assertEquals(List.of(false, false, false, true, false), d.pages().stream().map(Page::blank).toList());
+        assertEquals(List.of(0, 0, 1, 1, 2), d.pages().stream().map(Page::section).toList());
+        assertNotNull(on(d.pages().get(4), "c"));
+    }
+
+    /**
+     * La página en blanco es de la sección anterior: tras una portada sin números no tiene número, y la paridad es la
+     * de la página física, no la del número impreso.
+     */
+    @Test
+    void theBlankPageFollowsTheNumberingOfItsSection() {
+        LaidOutDocument d = lay(
+                join(new String[] {"\tSection:", "\t\tPage numbering: none", "\t\tMedia:", "\t\t\tMargin: 0"},
+                        new String[] {"\t\tBlock:", "\t\t\tId: cover"}),
+                join(new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tPage style: lower-roman"},
+                        fullPage("p")),
+                join(new String[] {"\tSection:", "\t\tBegin on: odd", "\t\tPage numbering: restart"},
+                        fullPage("b")));
+        assertEquals(List.of(0, 0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
+        assertEquals(List.of(false, true, false, true, false), d.pages().stream().map(Page::blank).toList());
+        // La página en blanco tiene el medio de su sección: la portada, sin márgenes.
+        assertEquals(0, d.pages().get(1).media().margin().top(), 1e-9);
+        assertEquals(NumberStyle.LOWER_ROMAN, d.pages().get(3).style());
+    }
+
+    @Test
+    void beginOnOddInTheFirstSectionHasNoEffect() {
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> lay("\tSection:", "\t\tBegin on: odd", "\t\tBlock:"));
+        assertEquals(ErrorCode.BEGIN_ON_FIRST_SECTION, e.errorCode());
+        assertEquals(14, e.line());
+        // any, el valor por defecto, se puede escribir.
+        assertEquals(1, lay("\tSection:", "\t\tBegin on: any", "\t\tBlock:").pages().size());
+    }
+
     @Test
     void theClassOfASectionGivesItsContentATypography() {
         LaidOutDocument d = layWith(HEADER + "\t\tFor class: annex\n\t\t\tTypography:\n\t\t\t\tSize: 20\n",

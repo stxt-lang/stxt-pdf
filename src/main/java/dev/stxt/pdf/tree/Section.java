@@ -14,9 +14,21 @@ import dev.stxt.pdf.model.NumberStyle;
  * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
  *                     declara
  * @param inheritFixed si lleva los {@code Fixed} del documento
+ * @param beginOn      en qué página física empieza ({@code Begin on})
  */
 public record Section(Box box, Media media, PageNumbering numbering, NumberStyle pageStyle, int start,
-                      boolean inheritFixed) {
+                      boolean inheritFixed, BeginOn beginOn) {
+
+    /**
+     * {@code Begin on} (referencia/componentes/document.md): en qué página física empieza la sección. Si no le toca, la
+     * anterior acaba con una página en blanco.
+     */
+    public enum BeginOn {
+        /** En la página siguiente, sea cual sea. */
+        ANY,
+        /** En una página impar: a la derecha, al imprimir a doble cara. */
+        ODD
+    }
 
     /** {@code Page numbering} (referencia/componentes/document.md): qué hace la sección con el contador de páginas. */
     public enum PageNumbering {

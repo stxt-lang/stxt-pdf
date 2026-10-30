@@ -39,6 +39,7 @@ class SchemaCoverageTest {
             Map.entry("Page numbering", "Page numbering: restart"),
             Map.entry("Page style", "Page style: lower-roman"),
             Map.entry("Inherit fixed", "Inherit fixed: false"),
+            Map.entry("Begin on", "Begin on: any"),
             // Elementos
             Map.entry("Id", "Id: x"),
             Map.entry("Class", "Class: c"),

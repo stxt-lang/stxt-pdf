@@ -143,7 +143,7 @@ public final class BoxTreeBuilder {
             if (h.getCanonicalName().equals("fixed")) {
                 root.addChild(element(ctx, inline(h), root, null, null));
             } else if (h.getCanonicalName().equals("section")) {
-                Section section = section(ctx, inline(h), root, documentMedia);
+                Section section = section(ctx, inline(h), root, documentMedia, sections.isEmpty());
                 sections.add(section);
                 // Cuelga de la raíz sin ser su hija (sin padre): cada sección es la raíz de su layout.
                 root.addSection(section.box());
@@ -162,7 +162,8 @@ public final class BoxTreeBuilder {
      * Una {@code Section} (referencia/componentes/document.md): su caja, que es la raíz de su layout y tiene el alto de
      * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Fixed} que lleva.
      */
-    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia) {
+    private Section section(BuildContext ctx, InlineNode n, Box documentRoot, MediaReader.Spec documentMedia,
+                            boolean first) {
         Style s = Style.inheriting(documentRoot.style());
         s.setLayout(Layout.BLOCK);
         s.setPosition(Position.STATIC);
@@ -175,6 +176,7 @@ public final class BoxTreeBuilder {
         Node startNode = null;
         int start = 1;
         boolean inheritFixed = true;
+        Section.BeginOn beginOn = Section.BeginOn.ANY;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
@@ -189,6 +191,14 @@ public final class BoxTreeBuilder {
                     startNode = p;
                 }
                 case "inherit-fixed" -> inheritFixed = bool(p);
+                case "begin-on" -> {
+                    beginOn = enumValue(Section.BeginOn.class, p);
+                    if (first && beginOn == Section.BeginOn.ODD) {
+                        // La primera página del documento ya es impar (referencia/componentes/document.md).
+                        throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd no tiene efecto en la primera "
+                                + "sección, que ya empieza en la página 1: quítalo");
+                    }
+                }
                 default -> {
                 }
             }
@@ -209,7 +219,7 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Fixed no "
                     + "cuentan, no ocupan sitio) no tiene ninguna página");
         }
-        return new Section(box, media.media(), numbering, pageStyle, start, inheritFixed);
+        return new Section(box, media.media(), numbering, pageStyle, start, inheritFixed, beginOn);
     }
 
     /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */

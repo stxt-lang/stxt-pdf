@@ -73,8 +73,11 @@ public final class Paginator {
         return pages(root, sections, flow, fixed, !numberedTexts.isEmpty());
     }
 
-    /** El flujo de cada sección, un resultado por página, y la numeración de sus páginas. */
-    private record Flow(List<List<LayoutResult>> results, Numbering numbering) {
+    /**
+     * El flujo de cada sección, un resultado por página, si acaba con una página en blanco ({@code Begin on: odd} en
+     * la siguiente) y la numeración de sus páginas.
+     */
+    private record Flow(List<List<LayoutResult>> results, boolean[] blankAfter, Numbering numbering) {
     }
 
     /**
@@ -102,7 +105,8 @@ public final class Paginator {
         while (true) {
             fixed.forEach(Map::clear);
             List<List<LayoutResult>> results = flow(sections, fixed);
-            Numbering numbering = Numbering.of(sections, results);
+            boolean[] blankAfter = blankAfter(sections, results);
+            Numbering numbering = Numbering.of(sections, results, blankAfter);
             boolean again = false;
             String covering = PageNumbers.cover(probe, numbering.probe());
             if (!numberedTexts.isEmpty() && !covering.equals(probe)) {
@@ -110,7 +114,7 @@ public final class Paginator {
                 engine.reservePageNumbers(probe, numberedTexts);
                 again = true;
             }
-            Map<String, String> actual = pagesOf(results, numbering, targets, sites);
+            Map<String, String> actual = pagesOf(results, blankAfter, numbering, targets, sites);
             if (!actual.equals(assumed)) {
                 if (++changes > MAX_REFERENCE_PASSES) {
                     throw unstable(sites, assumed, actual);
@@ -120,7 +124,7 @@ public final class Paginator {
                 again = true;
             }
             if (!again) {
-                return new Flow(results, numbering);
+                return new Flow(results, blankAfter, numbering);
             }
         }
     }
@@ -160,10 +164,47 @@ public final class Paginator {
                         ? engine.number(own.get(i).fragment(), numbering.label(number), numbering.totalLabel(number))
                         : own.get(i).fragment();
                 pages.add(new Page(number, content, fixedFragments, section.media(), k, printed,
-                        numbering.style(number)));
+                        numbering.style(number), false));
+            }
+            if (flow.blankAfter()[k]) {
+                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Fixed
+                // (referencia/componentes/document.md).
+                int number = pages.size() + 1;
+                Rect area = section.media().pageArea();
+                Fragment empty = new Fragment(section.box(), 0, 0, area.width(), area.height(), Insets.ZERO,
+                        Insets.ZERO, Insets.ZERO, List.of(), List.of(), true, true);
+                pages.add(new Page(number, empty, List.of(), section.media(), k, numbering.printed(number),
+                        numbering.style(number), true));
             }
         }
         return pages;
+    }
+
+    /**
+     * Las secciones que acaban con una página en blanco: las que dejan la siguiente, con {@code Begin on: odd}, en una
+     * página física par (referencia/componentes/document.md).
+     */
+    private boolean[] blankAfter(List<Section> sections, List<List<LayoutResult>> results) {
+        boolean[] blank = new boolean[sections.size()];
+        int pages = 0;
+        for (int k = 0; k < sections.size(); k++) {
+            pages += results.get(k).size();
+            if (k + 1 < sections.size() && sections.get(k + 1).beginOn() == Section.BeginOn.ODD && pages % 2 == 1) {
+                blank[k] = true;
+                pages++;
+            }
+        }
+        if (pages > engine.limits().maxPages()) {
+            throw pageLimit();
+        }
+        return blank;
+    }
+
+    private InvalidModelException pageLimit() {
+        int maxPages = engine.limits().maxPages();
+        return new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT,
+                "El documento tiene más de " + maxPages + " páginas, el máximo que admite el motor "
+                        + "(Limits.maxPages lo cambia)");
     }
 
     /**
@@ -239,20 +280,23 @@ public final class Paginator {
      * número impreso (referencia/componentes/document.md). Una caja que no sale en ninguna página (no debería pasar:
      * las cajas con {@code Fixed} se rechazan al construir el árbol) o que está en una página sin número es un error.
      */
-    private static Map<String, String> pagesOf(List<List<LayoutResult>> results, Numbering numbering,
-                                               Set<String> targets, List<References.Site> sites) {
+    private static Map<String, String> pagesOf(List<List<LayoutResult>> results, boolean[] blankAfter,
+                                               Numbering numbering, Set<String> targets,
+                                               List<References.Site> sites) {
         Map<String, String> pages = new LinkedHashMap<>();
         if (targets.isEmpty()) {
             return pages;
         }
         int number = 0;
-        for (List<LayoutResult> section : results) {
-            for (LayoutResult r : section) {
+        for (int k = 0; k < results.size(); k++) {
+            for (LayoutResult r : results.get(k)) {
                 number++;
                 if (pages.size() < targets.size()) {
                     firstPages(r.fragment(), number, targets, pages, numbering, sites);
                 }
             }
+            // La página en blanco no tiene nada a lo que referirse, pero ocupa su número.
+            number += blankAfter[k] ? 1 : 0;
         }
         for (String id : targets) {
             if (!pages.containsKey(id)) {
@@ -312,11 +356,8 @@ public final class Paginator {
                 int section0 = k;
                 r.pending().forEach(p -> fixed.get(section0).putIfAbsent(p.box(), p));
                 token = next;
-                int maxPages = engine.limits().maxPages();
-                if (pages + results.size() > maxPages) {
-                    throw new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT,
-                            "El documento tiene más de " + maxPages + " páginas, el máximo que admite el motor "
-                                    + "(Limits.maxPages lo cambia)");
+                if (pages + results.size() > engine.limits().maxPages()) {
+                    throw pageLimit();
                 }
             } while (token != null);
             pages += results.size();

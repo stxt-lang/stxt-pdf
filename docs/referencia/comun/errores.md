@@ -102,6 +102,7 @@ sin `Wrap`, `Rotate origin` sin `Rotate`, `Rule color` sin `Rule`, un margen `au
 | `ISOLATE_IN_ITEM` | `Isolate: true` no va en un ítem de `Flex` o `Grid`, que ya corta el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)) | `Isolate no tiene efecto en un ítem de Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo` |
 | `START_WITHOUT_RESTART` | `Start` en una `Section` solo con `Page numbering: restart` ([Document](../componentes/document.md#numeración-de-las-páginas)) | `Start solo tiene efecto con Page numbering: restart…` |
 | `PAGE_STYLE_WITHOUT_NUMBERS` | `Page style` no va en una `Section` con `Page numbering: none` | `Page style no tiene efecto con Page numbering: none…` |
+| `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` no va en la primera `Section`, que ya empieza en la página 1 ([Document](../componentes/document.md#empezar-en-página-impar)) | `Begin on: odd no tiene efecto en la primera sección…` |
 | `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true…` |
 | `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Flex`, solo con `Wrap: true` ([Flex](../componentes/flex.md#propiedades-del-flex)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: escribe un solo valor…` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en `column` necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex column del padre no tiene un alto definido…` |

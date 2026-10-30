@@ -107,6 +107,7 @@ contenido está en alguna.
 | `Page style` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_STYLE_WITHOUT_NUMBERS`. |
 | `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit fixed` | booleano | `true` | Si lleva los `Fixed` del documento. Con `false`, solo salen los suyos. |
+| `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
 
 Su contenido son elementos en flujo, `Relative`, `Absolute` y `Fixed`.
 
@@ -193,9 +194,40 @@ que no tendría efecto porque la sección sigue la cuenta de la anterior, `START
 > **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan; lo que no tiene número es un error, nunca
 > un hueco vacío. *Alternativa descartada:* dejar el hueco vacío.
 
+### Empezar en página impar
+
+Para imprimir a doble cara, `Begin on: odd` hace que la sección empiece en una página física impar, la de la derecha: si
+la anterior acaba en una impar, acaba con una **página en blanco**. La página física es la posición en el documento (la
+primera es la 1), no el número impreso. Con `any` (por defecto), la sección empieza en la página siguiente.
+
+La página en blanco es **una página más de la sección anterior**:
+
+- Tiene su `Media`, su `Page style` y su numeración: si la sección numera, avanza el contador y cuenta para `{pages}`
+  como cualquier otra, aunque no se imprima; si es `none`, no tiene número.
+- No tiene contenido ni `Fixed`, ni los de la sección ni los del documento.
+- No cuenta para el `Pages` de los `Fixed` de su sección (`Pages: last` es su última página con contenido). Para los del
+  documento, que cuentan las páginas físicas, sí cuenta, aunque no salgan en ella.
+
+```
+Section:
+	Id: chapter-2
+	Begin on: odd
+	Heading 1:
+		Text: Capítulo 2
+```
+
+La primera sección ya empieza en la página 1: `Begin on: odd` en ella no tendría efecto y es `BEGIN_ON_FIRST_SECTION`.
+
+> **Decisión:** la página en blanco es de la sección anterior y cuenta para el número, como en un libro: así los números
+> impares impresos caen a la derecha. *Alternativa descartada:* una página sin número que no cuenta, que desplaza la
+> paridad de los números.
+
+> **Decisión:** la paridad es la de la página física, que es la que decide el lado al imprimir. Solo `odd`: empezar en
+> par casi no se usa y obligaría a una página en blanco antes de la primera sección. *Alternativa descartada:* la
+> paridad del número impreso, que no existe en una sección `none` y no siempre coincide con el lado.
+
 ## Lo que no hay
 
-- Empezar una sección en página impar con una página en blanco (impresión a doble cara).
 - Un fondo de página propio de la sección (una portada a sangre pinta un bloque del tamaño de la página) y una página
   apaisada que no sea una sección entera.
 - Páginas con nombre o reglas de página: lo que cambia de una parte a otra es una sección.

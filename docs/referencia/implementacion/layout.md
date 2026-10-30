@@ -160,6 +160,11 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 `printed` (0 = sin número) y su estilo. Un `Fixed` del documento se pone con `PendingAbsolute(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
+**Páginas en blanco.** Tras el flujo, `blankAfter` mira qué secciones dejan la siguiente, con `Begin on: odd`, en una
+página física par. Esas acaban con una página en blanco: `Numbering` la cuenta como una página más de la sección, `pagesOf`
+le reserva su número físico y `pages` la añade como una `Page` con `blank`, un fragmento vacío de la caja de la sección y
+sin `Fixed`. No forma parte del flujo de la sección, así que el `Pages` de sus `Fixed` no la ve.
+
 **`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio) y las líneas
 los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
 valores de cada página ya escritos (`PageNumbers`). Si algún número impreso no cabe en el de prueba (`Numbering.probe`:

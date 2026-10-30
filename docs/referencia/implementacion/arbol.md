@@ -108,8 +108,8 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 
 ## Las secciones y la raíz
 
-`BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `Media`, `Page numbering` e
-`Inherit fixed`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
+`BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `Media`, `Page numbering`,
+`Page style`, `Start`, `Inherit fixed` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
 **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
 (referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Fixed` y subir por
 `parent` se quedan dentro de la sección. Los `Fixed` hijos de `Document` también son hijos de la raíz (con `parent`) y no se

@@ -147,6 +147,8 @@ public enum ErrorCode {
     START_WITHOUT_RESTART,
     /** {@code Page style} en una {@code Section} con {@code Page numbering: none}. */
     PAGE_STYLE_WITHOUT_NUMBERS,
+    /** {@code Begin on: odd} en la primera {@code Section}, que ya empieza en la página 1. */
+    BEGIN_ON_FIRST_SECTION,
     /** {@code Lines} sin {@code Wrap: true}. */
     LINES_WITHOUT_WRAP,
     /** {@code Gap} de dos valores en un {@code Flex} sin {@code Wrap: true}. */

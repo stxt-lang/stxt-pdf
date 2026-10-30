@@ -11,12 +11,19 @@ import java.util.List;
  * El número impreso de cada página física, el último de su tanda y cómo se escriben
  * (referencia/componentes/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
  * empieza en su {@code Start}; {@code none} no numera ni avanza el contador. Cada página se escribe con el {@code Page
- * style} de su sección.
+ * style} de su sección. La página en blanco con que acaba una sección ({@code Begin on: odd}) es una página más de ella.
  */
 record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
 
-    static Numbering of(List<Section> sections, List<List<LayoutResult>> results) {
+    /**
+     * @param results    el flujo de cada sección, un resultado por página
+     * @param blankAfter si cada sección acaba con una página en blanco
+     */
+    static Numbering of(List<Section> sections, List<List<LayoutResult>> results, boolean[] blankAfter) {
         int pages = results.stream().mapToInt(List::size).sum();
+        for (boolean blank : blankAfter) {
+            pages += blank ? 1 : 0;
+        }
         int[] printed = new int[pages];
         int[] totals = new int[pages];
         NumberStyle[] styles = new NumberStyle[pages];
@@ -31,7 +38,8 @@ record Numbering(int[] printed, int[] totals, NumberStyle[] styles) {
                 counter = section.start() - 1;
                 tandaFirst = i;
             }
-            for (int j = 0; j < results.get(k).size(); j++) {
+            int own = results.get(k).size() + (blankAfter[k] ? 1 : 0);
+            for (int j = 0; j < own; j++) {
                 styles[i] = section.pageStyle();
                 printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
             }
