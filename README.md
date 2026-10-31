@@ -72,7 +72,6 @@ mvn test
 ```
 
 Cómo está hecho el motor: [arquitectura](docs/referencia/arquitectura.md); cómo se prueba: [pruebas](docs/referencia/implementacion/pruebas.md).
-Las ideas pendientes están en [`TODO.md`](TODO.md).
 
 ## Licencia
 

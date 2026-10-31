@@ -53,7 +53,7 @@ Open Font License). Los nombres, las empresas y los datos de los documentos son 
 
 ## Lo que se aprende al escribirlos
 
-Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TODO.md`](../../TODO.md)):
+Qué se resolvió bien con lo que hay y qué se echa en falta:
 
 - **Una portada sin cabecera ni pie** es una `Section` (hito 32, ejemplos 04 y 09): con su `Page`
   (`Margin: 0`, así que es a sangre sin ningún `Offset` negativo), `Page numbering: none` (no cuenta, y la
@@ -94,7 +94,7 @@ Qué se resolvió bien con lo que hay y qué se echa en falta (apuntado en [`TOD
   `Corner radius` en las esquinas de arriba. Un color por lado (`Border color`) y la franja de un aviso (`Border: 0 0 0 3`)
   se combinan con un radio solo en el lado contrario (`Corner radius: 0 4 4 0`). Un degradado con un extremo
   transparente (04) funde una imagen con el color de lo que hay debajo sin tocar la imagen. Sin sombras
-  (ver `TODO.md`): las fichas del catálogo siguen con su filete.
+  ([La caja](../../docs/referencia/comun/caja.md#lo-que-no-hay)): las fichas del catálogo siguen con su filete.
 - **Lo girado** (hito 30) es un posicionado o una imagen con `Rotate`: la etiqueta en diagonal del
   catálogo (09) es un `Overlay`, y el número vertical del certificado (10), un `Page overlay` girado −90 grados
   alrededor de su esquina de arriba a la izquierda (`Rotate origin: top left`), así que su `Offset` es

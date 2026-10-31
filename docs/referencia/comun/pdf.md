@@ -82,6 +82,8 @@ muestra al abrir el documento.
 
 ## Lo que no hay
 
-- PDF/UA-2 y PDF 2.0.
-- Idioma por tramo dentro de una línea, y comprobación del contraste entre el texto y su fondo.
-- Formularios, adjuntos, firmas digitales, capas opcionales y cifrado.
+- PDF/A.
+- Idioma por tramo dentro de una línea ([Tipografía](tipografia.md#idioma-language)).
+- Formularios, adjuntos, firmas digitales y cifrado.
+- Capas opcionales propias: solo se conservan las de la página de un PDF usada como imagen
+  ([Image](../componentes/image.md#pdf)).

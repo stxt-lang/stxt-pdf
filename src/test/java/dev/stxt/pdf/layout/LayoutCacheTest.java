@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Regresión de la regla de {@code CLAUDE.md}: toda recursión de layout y de tamaños intrínsecos
+ * Regresión de la regla de la arquitectura (referencia/arquitectura.md): toda recursión de layout y de tamaños intrínsecos
  * pasa por {@code engine.layout}/{@code engine.intrinsic}, que usan la {@link LayoutCache}. Sin
  * ella, cada nivel de flex o grid maqueta a sus hijos varias veces (medida, intrínsecos, layout
  * final) y el trabajo crece de forma exponencial con la profundidad. El trabajo se mide por las

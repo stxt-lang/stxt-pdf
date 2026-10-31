@@ -59,7 +59,7 @@ class ExamplesTest {
     /**
      * Reglas de PDF/UA-1 que los ejemplos todavía incumplen y no son de lo que se comprueba aquí; el resto
      * debe cumplirse. Ahora ninguna: cada ejemplo, que declara PDF/UA-1 (tiene {@code Title}), lo cumple
-     * según veraPDF. Se añade aquí una regla solo con un motivo apuntado en {@code TODO.md}.
+     * según veraPDF. Se añade aquí una regla solo con su motivo escrito al lado.
      */
     private static final Set<String> KNOWN_UA_FAILURES = Set.of();
 
