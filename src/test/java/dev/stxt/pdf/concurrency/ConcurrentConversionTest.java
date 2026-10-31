@@ -1,7 +1,6 @@
 package dev.stxt.pdf.concurrency;
 
 import dev.stxt.InlineNode;
-import dev.stxt.pdf.PdfBytes;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.resources.Resources;
@@ -37,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * several threads convert the examples at the same time, with the real fonts and images, and each PDF is the same as
  * the one the sequential conversion gives.
  *
- * <p>The PDF bytes are compared once the dates and identifiers are removed, which are the only things
- * that change from one conversion to another. It covers the four uses that matter: one {@link Resources} per thread,
+ * <p>The PDF bytes are compared as they are: the file identifier comes from the content, and the engine writes no
+ * dates. It covers the four uses that matter: one {@link Resources} per thread,
  * one shared by all, one {@link Converter} used from several threads and one {@link LaidOutDocument} painted from
  * several threads.</p>
  */
@@ -83,11 +82,11 @@ class ConcurrentConversionTest {
         return builder.build();
     }
 
-    /** Document and styles → PDF, without dates or identifiers. */
+    /** Document and styles → PDF. */
     private static byte[] convert(Converter converter, InlineNode document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         converter.toPdf(document, out);
-        return PdfBytes.withoutVolatileFields(out.toByteArray());
+        return out.toByteArray();
     }
 
     @Test
@@ -163,7 +162,7 @@ class ConcurrentConversionTest {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             converter.toPdf(document, out);
-            return PdfBytes.withoutVolatileFields(out.toByteArray());
+            return out.toByteArray();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

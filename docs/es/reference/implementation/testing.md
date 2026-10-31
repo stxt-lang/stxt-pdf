@@ -50,7 +50,7 @@ ejemplo. Cada idioma tiene su `input.stxt`, un `page-N.png` por página (version
 `output.pdf` y un `expected.stxt` con el volcado de las cajas con `Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
 valida con veraPDF, como PDF/UA-1 y escrito también como PDF/UA-2. El
 volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta las imágenes que
-cambian y reescribe el `output.pdf`, y se revisa mirando las imágenes. `-Dexamples.only` limita la prueba a un ejemplo
+cambian y el `output.pdf`, y se revisa mirando las imágenes. `-Dexamples.only` limita la prueba a un ejemplo
 (`01-invoice`), a un idioma (`en`) o a los dos (`01-invoice/en`). Un test comprueba además que la versión inglesa es espejo
 de la castellana: los mismos nodos en el mismo orden, los mismos `Id` y `Style`, la misma imagen en su carpeta de idioma y
 `Language: en`. Solo cambian los textos. Las imágenes de los ejemplos están en `resources/images/examples/` y las genera
@@ -65,9 +65,10 @@ figuras del manual y el sello del certificado) se generan una vez por idioma, en
 > imágenes: con texto y fuentes reales, calcularlo a mano no tiene sentido. *Alternativa descartada:* comparar solo las
 > imágenes, que no detecta cambios de un punto.
 
-> **Decisión:** el `output.pdf` de cada ejemplo se versiona para poder abrirlo desde el repositorio, pero solo se escribe con
-> `-Dexamples.update=true` y no se compara: lleva un identificador (`/ID`) que cambia en cada ejecución. Lo que se vigila
-> son las imágenes y el volcado.
+> **Decisión:** el `output.pdf` de cada ejemplo se versiona para poder abrirlo desde el repositorio y se compara byte a
+> byte, como las imágenes: el mismo documento da los mismos bytes ([El PDF](pdf.md#páginas-fuentes-y-metadatos)), así que
+> un `output.pdf` distinto es un cambio de verdad, y el nuevo queda en `target/reference/`. *Alternativa descartada:* no
+> compararlo, que dejó en el repositorio PDF que ya no eran los que daba el motor.
 
 > **Decisión:** las imágenes de los ejemplos las genera un programa (`tools/ExampleImages.java`): no hay ficheros de
 > terceros ni derechos que respetar, y se pueden cambiar retocando el programa. Las fuentes son IBM Plex Sans, Serif y Mono,
@@ -100,7 +101,8 @@ los casos válidos, y los inválidos van al catálogo.
 
 - **Propiedades:** `ValueParserPropertiesTest`, `LineBreakerPropertiesTest` y `FragmentationPropertiesTest` prueban
   propiedades con miles de entradas al azar de un `Random` con semilla fija (un fallo se repite) y sin librerías nuevas.
-- **Determinismo:** `CrossJvmDeterminismTest` comprueba que una JVM hija da el mismo PDF de cada ejemplo y golden.
+- **Determinismo:** `CrossJvmDeterminismTest` comprueba que una JVM hija da el mismo PDF, byte a byte, de cada ejemplo y
+  golden, y `PdfIdTest`, que el identificador sale del contenido.
 - **Hilos:** `ConcurrentConversionTest` y `EngineContractTest` ([Uso desde Java](api.md#hilos)).
 - **Arquitectura:** `ArchitectureTest` comprueba las dependencias entre packages ([Arquitectura](../architecture.md)).
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`

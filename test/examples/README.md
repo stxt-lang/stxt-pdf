@@ -16,12 +16,12 @@ document and its result:
 | `es/input.stxt`, `en/input.stxt` | The document. It validates against the schema and is laid out without errors. |
 | `page-N.png` | One image per page of the PDF, at 110 dpi. They are versioned. |
 | `expected.stxt` | The [dump](../../docs/en/reference/implementation/testing.md#the-dump) of the boxes with an `Id`, with the real metrics. |
-| `output.pdf` | The PDF, to open it from the repository. It is rewritten with `-Dexamples.update=true` and not compared: it carries the date and an identifier. |
+| `output.pdf` | The PDF, to open it from the repository. It is compared byte for byte, like the images, and rewritten with `-Dexamples.update=true`. |
 
 `ExamplesTest` runs the examples with `mvn test`: it checks that the document is read and laid out, that the dump does
-not change (tolerance of 0.01 pt) and that the page images are the versioned ones (except for antialiasing). The PDF
-(tagged, with bookmarks and embedded fonts) and the new images are written to `target/reference/examples/NN-name/en/`
-(or `es/`). If an image changes, the test fails, and if the change is the intended one, it is accepted with
+not change (tolerance of 0.01 pt), that the page images are the versioned ones (except for antialiasing) and that the
+PDF is, byte for byte. The PDF (tagged, with bookmarks and embedded fonts) and the new images are written to
+`target/reference/examples/NN-name/en/` (or `es/`). If the PDF or an image changes, the test fails, and if the change is the intended one, it is accepted with
 `-Dexamples.update=true` after looking at the images. The expected dump is not worked out by hand: it is a snapshot of
 what the engine produces, reviewed by looking at the images.
 

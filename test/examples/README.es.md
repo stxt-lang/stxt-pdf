@@ -17,13 +17,13 @@ idiomas, y una subcarpeta por idioma con el documento y su resultado:
 | `es/input.stxt`, `en/input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
 | `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
 | `expected.stxt` | El [volcado](../../docs/es/reference/implementation/testing.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
-| `output.pdf` | El PDF, para abrirlo desde el repositorio. Se reescribe con `-Dexamples.update=true` y no se compara: lleva la fecha y un identificador. |
+| `output.pdf` | El PDF, para abrirlo desde el repositorio. Se compara byte a byte, como las imágenes, y se reescribe con `-Dexamples.update=true`. |
 
 Los ejemplos los ejecuta `ExamplesTest` con `mvn test`: comprueba que el documento se lee y se
-maqueta, que el volcado no cambia (tolerancia de 0,01 pt) y que las imágenes de las páginas son las
-versionadas (salvo el antialiasing). El PDF (etiquetado, con marcadores y las fuentes incrustadas) y
-las imágenes nuevas se escriben en `target/reference/examples/NN-nombre/es/` (o `en/`). Si una imagen cambia, el
-test falla, y si el cambio es el que se busca, se acepta con `-Dexamples.update=true` después de mirar
+maqueta, que el volcado no cambia (tolerancia de 0,01 pt), que las imágenes de las páginas son las
+versionadas (salvo el antialiasing) y que el PDF también lo es, byte a byte. El PDF (etiquetado, con marcadores y las
+fuentes incrustadas) y las imágenes nuevas se escriben en `target/reference/examples/NN-nombre/es/` (o `en/`). Si el PDF
+o una imagen cambian, el test falla, y si el cambio es el que se busca, se acepta con `-Dexamples.update=true` después de mirar
 las imágenes. El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que se
 revisa mirando las imágenes.
 

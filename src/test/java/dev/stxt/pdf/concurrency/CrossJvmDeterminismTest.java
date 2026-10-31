@@ -1,7 +1,6 @@
 package dev.stxt.pdf.concurrency;
 
 import dev.stxt.InlineNode;
-import dev.stxt.pdf.PdfBytes;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -19,8 +18,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * The PDF of each example and of each golden case is the same in another JVM, without dates or
- * identifiers. In another JVM the {@code identityHashCode} of the boxes changes, and with it the order in which an
+ * The PDF of each example and of each golden case is the same in another JVM, byte for byte. In another JVM the {@code identityHashCode} of the boxes changes, and with it the order in which an
  * {@code IdentityHashMap} or a {@code HashSet} of boxes is traversed: if the result depended on that order, it would
  * show here. Within the same JVM, {@link ConcurrentConversionTest} checks it.
  */
@@ -66,7 +64,7 @@ class CrossJvmDeterminismTest {
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 builder.build().toPdf(document, out);
-                byte[] pdf = PdfBytes.withoutVolatileFields(out.toByteArray());
+                byte[] pdf = out.toByteArray();
                 hashes.add(dir.toString().replace('\\', '/') + " "
                         + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(pdf)));
             }

@@ -14,6 +14,13 @@ escribe el código está en [El pintado](painting.md#el-pdf).
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre,
   y `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
   quien convierte lo pide ([abajo](#pdfua-2)).
+- El PDF no lleva fechas, y su identificador (`/ID` del tráiler) sale del contenido: el mismo documento, con los mismos
+  recursos y opciones, da los mismos bytes. `PdfId` guarda el documento con un identificador provisional de ceros, calcula
+  el SHA-256 de lo guardado y pone sus 16 primeros bytes en lugar de los ceros, en las dos mitades, sin mover nada más.
+
+> **Decisión:** el identificador sale del contenido y no de la hora. Así una conversión se puede repetir y comparar byte a
+> byte, y dos documentos distintos tienen identificadores distintos, que es lo que pide la norma. *Alternativa
+> descartada:* el identificador que PDFBox calcula con la hora, que cambia en cada conversión.
 
 > **Decisión:** todo PDF declara PDF/UA-1. veraPDF lo comprueba solo en parte (no el orden de lectura ni el sentido de los
 > textos), así que se apoya además en el repaso a mano del etiquetado. *Alternativa descartada:* no declararlo.

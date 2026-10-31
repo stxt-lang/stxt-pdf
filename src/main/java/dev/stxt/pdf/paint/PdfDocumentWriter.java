@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
@@ -27,7 +28,8 @@ import java.util.Map;
 /**
  * The PDF document: creates the pages, paints each one with its {@link PdfCanvas}, and sets the page labels, the
  * link destinations and the structure tree ({@link PdfStructure}) before saving it.
- * One PDF page per page of the result, in pt, with the size of the paper of its section.
+ * One PDF page per page of the result, in pt, with the size of the paper of its section. The file identifier comes from
+ * the content ({@link PdfId}): the same document gives the same bytes.
  *
  * <p><strong>Threads:</strong> {@link #write} is static and all its state (the PDF document, the embedded
  * fonts, the structure, the links) belongs to that call, so it can be called concurrently from several
@@ -113,7 +115,12 @@ public final class PdfDocumentWriter {
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations, structure);
             structure.finish(doc, destinations);
-            doc.save(target);
+            PdfId.prepare(doc);
+            ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+            doc.save(pdf);
+            byte[] bytes = pdf.toByteArray();
+            PdfId.fill(bytes);
+            target.write(bytes);
         }
     }
 

@@ -17,6 +17,8 @@ First version published on Maven Central.
   `Table of contents`.
 - Reusable styles (`Styles`, `For element`, `For style`), in the document or in a separate file.
 - Internal references and links, heading and page numbering, rotation, rounded corners and balanced columns.
+- The same document, with the same resources and options, gives the same bytes: the PDF carries no dates and its file
+  identifier (`/ID`) is made from its content.
 - Errors with a code and a line (`InvalidModelException` with its `ErrorCode`), a WCAG AA contrast check
   (`CONTRAST_LOW`) and limits for hostile input (`PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX`, `PDF_TOO_LARGE`).
 - Messages, comments and javadoc in English. The documentation is in English (`docs/en`) and Spanish (`docs/es`), and

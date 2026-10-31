@@ -25,12 +25,12 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 /**
  * Generates the PDFs used by the {@code Image} elements of the documentation and the tests
@@ -44,10 +44,10 @@ import java.util.Arrays;
  * field, an encrypted PDF and a page with optional content.</li>
  * </ul>
  *
- * <p>Running it again gives the same bytes, so only the files that really change show up in git: the PDFs written with
- * PDFBox get a trailer identifier ({@code /ID}) made from their name instead of the one PDFBox makes from the time, and
- * the encrypted one uses RC4, whose result depends only on that identifier, and not AES, which adds random bytes. The
- * letterhead, whose identifier the engine leaves to PDFBox, is only written when something other than it changes.</p>
+ * <p>Running it again gives the same bytes, so only the files that really change show up in git. The engine already
+ * gives them; the PDFs written with PDFBox get a trailer identifier ({@code /ID}) made from their name instead of the
+ * one PDFBox makes from the time, and the encrypted one uses RC4, whose result depends only on that identifier, and not
+ * AES, which adds random bytes.</p>
  *
  * <p>It needs the classes of the engine and its dependencies:</p>
  *
@@ -76,17 +76,9 @@ public class ExamplePdfs {
     static void letterhead() throws IOException {
         Path out = IMAGES.resolve("examples/letterhead/letterhead.pdf");
         Files.createDirectories(out.getParent());
-        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
-        Converter.create().toPdf(new DocumentReader().read(Path.of("tools", "letterhead.stxt")), pdf);
-        if (!Files.exists(out) || !Arrays.equals(withoutId(Files.readAllBytes(out)), withoutId(pdf.toByteArray()))) {
-            Files.write(out, pdf.toByteArray());
+        try (OutputStream target = Files.newOutputStream(out)) {
+            Converter.create().toPdf(new DocumentReader().read(Path.of("tools", "letterhead.stxt")), target);
         }
-    }
-
-    /** The PDF without its trailer identifier, the only thing that changes between two identical conversions. */
-    private static byte[] withoutId(byte[] pdf) {
-        return new String(pdf, StandardCharsets.ISO_8859_1).replaceAll("/ID\\s*\\[[^\\]]*\\]", "")
-                .getBytes(StandardCharsets.ISO_8859_1);
     }
 
     /** Saves a PDF written with PDFBox in {@code images/}, with a trailer identifier made from its name. */

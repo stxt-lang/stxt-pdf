@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -46,9 +47,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  * (reference/common/styles.md). Each language folder has {@code input.stxt}, which must validate and lay out without
  * errors; the dump of the boxes with {@code Id} ({@code expected.stxt},
  * reference/implementation/testing.md), which is compared with a tolerance of 0.01 pt; one image per page ({@code
- * page-N.png}, versioned) and the PDF ({@code output.pdf}, versioned so it can be opened from the repository, but not
- * compared: it carries the date and an identifier that change on every run). The PDF and the new images are
- * written to {@code target/reference/examples/NN-name/<language>/}, and if any image is not the versioned one the
+ * page-N.png}, versioned) and the PDF ({@code output.pdf}, versioned and compared byte for byte: the same document
+ * gives the same bytes). The PDF and the new images are written to
+ * {@code target/reference/examples/NN-name/<language>/}, and if the PDF or any image is not the versioned one the
  * example fails.</p>
  *
  * <p>The expected dump is not calculated by hand: it is a snapshot of what the engine gives, which the
@@ -164,6 +165,8 @@ class ExamplesTest {
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), id + "/");
         }
         ReferenceFiles.checkImages(dir, actual, images, "examples.update");
+        assertArrayEquals(Files.readAllBytes(pdfFile), pdf, id + ": output.pdf is not the versioned one (the new one "
+                + "is in " + actual + "); if the change is intended, -Dexamples.update=true accepts it");
         accessibility(id, pdf, 1);
         accessibility(id, pdf(document, resources, 2), 2);
     }

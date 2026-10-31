@@ -14,6 +14,14 @@ code writes it is in [Painting](painting.md#the-pdf).
 - `Title` goes to the document information and to the XMP metadata, with `DisplayDocTitle` so that the viewer shows it,
   and `Language` is the `Lang` of the catalog. Every PDF declares PDF/UA-1 (`pdfuaid:part`) in its XMP metadata, or PDF/UA-2 if
   the caller asks for it ([below](#pdfua-2)).
+- The PDF carries no dates, and its identifier (`/ID` of the trailer) comes from the content: the same document, with the
+  same resources and options, gives the same bytes. `PdfId` saves the document with a placeholder identifier of zeros,
+  computes the SHA-256 of what was saved and puts its first 16 bytes in place of the zeros, in both halves, without moving
+  anything else.
+
+> **Decision:** the identifier comes from the content and not from the time. This way a conversion can be repeated and
+> compared byte for byte, and two different documents have different identifiers, which is what the standard asks for.
+> *Rejected alternative:* the identifier that PDFBox computes from the time, which changes on every conversion.
 
 > **Decision:** every PDF declares PDF/UA-1. veraPDF checks it only in part (not the reading order or the meaning of the
 > texts), so it also relies on the manual review of the tagging. *Rejected alternative:* not declaring it.

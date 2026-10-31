@@ -2,7 +2,6 @@ package dev.stxt.pdf.convert;
 
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.PdfBytes;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.resources.ResourceException;
@@ -45,7 +44,7 @@ class ConverterTest {
     private static byte[] pdf(Converter converter, InlineNode document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         converter.toPdf(document, out);
-        return PdfBytes.withoutVolatileFields(out.toByteArray());
+        return out.toByteArray();
     }
 
     @Test
@@ -91,7 +90,7 @@ class ConverterTest {
         LaidOutDocument laidOut = converter.layOut(document);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         converter.toPdf(laidOut, out);
-        assertArrayEquals(pdf(converter, document), PdfBytes.withoutVolatileFields(out.toByteArray()));
+        assertArrayEquals(pdf(converter, document), out.toByteArray());
     }
 
     @Test
