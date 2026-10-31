@@ -5,7 +5,7 @@ las páginas de [implementación](README.md#implementación) y en el javadoc.
 
 Java 17 y Maven: artefacto `dev.stxt:stxt-pdf`, package raíz `dev.stxt.pdf`. Las dependencias de terceros son
 `stxt-core` (leer y validar STXT), PDFBox (escribir el PDF), commonmark-java (Markdown), JSVG y `pdfbox-graphics2d`
-(dibujar SVG en el PDF); en los tests, JUnit 5, veraPDF y PIT.
+(dibujar SVG en el PDF). En los tests, JUnit 5, veraPDF y PIT.
 
 ## Flujo de datos
 
@@ -22,7 +22,7 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
 2. **Construir el árbol.** `BoxTreeBuilder` traduce cada elemento a una `Box` con su `Style`, aplica la herencia y las
    reglas de `Styles`, comprueba las reglas que el schema no puede expresar y cierra el árbol, que desde ahí es de solo
    lectura.
-3. **Maquetar.** `Engine` despacha cada caja a su algoritmo de layout; el `Paginator` reparte cada sección en páginas,
+3. **Maquetar.** `Engine` despacha cada caja a su algoritmo de layout. El `Paginator` reparte cada sección en páginas,
    repite la paginación hasta que las referencias convergen y coloca los `Page overlay`. `Overflow` comprueba que nada desborda.
    El resultado es un `LaidOutDocument`: una lista de `Page` con su árbol de `Fragment`.
 4. **Pintar.** `StackingContext` recorre los fragmentos de cada página en orden de pintado y llama a un `Canvas`:
@@ -34,11 +34,11 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
 
 ## Packages
 
-Las dependencias van en un solo sentido y sin ciclos; `ArchitectureTest` tiene escrito qué puede usar cada package:
+Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene escrito qué puede usar cada package:
 
 | Package | Puede usar | Qué hay |
 |---|---|---|
-| `model` | nada | Tipos puros y compartidos: los valores (`Value`, `ValueParser`), los enums de los valores (uno por fichero: `TextAlign`, `Marker`, `Break`…), la geometría (`Rect`, `Sides`, `Insets`), el texto con formato (`TextRun`, `TextFormat`, `FontFace`), las referencias (`Reference`), los enlaces (`Links`), la colocación de grid (`GridAreas`, `Area`, `Cell`), los colores y los fondos (`Colors`, `Paint`, `Radii`), el giro (`Rotation`), la tolerancia (`Tolerance`), los límites (`Limits`) y la raíz de los errores (`StxtPdfException`) |
+| `model` | nada | Tipos puros y compartidos: los valores (`Value`, `ValueParser`), los enums de los valores (uno por fichero, como `TextAlign`, `Marker` o `Break`), la geometría (`Rect`, `Sides`, `Insets`), el texto con formato (`TextRun`, `TextFormat`, `FontFace`), las referencias (`Reference`), los enlaces (`Links`), la colocación de grid (`GridAreas`, `Area`, `Cell`), los colores y los fondos (`Colors`, `Paint`, `Radii`), el giro (`Rotation`), la tolerancia (`Tolerance`), los límites (`Limits`) y la raíz de los errores (`StxtPdfException`) |
 | `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`) |
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
@@ -46,17 +46,17 @@ Las dependencias van en un solo sentido y sin ciclos; `ArchitectureTest` tiene e
 | `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`) y un subpackage por algoritmo: `block`, `inline`, `flex`, `grid`, `table`, `columns`, `position` e `image` |
 | `output` | `fragment`, `model` | `StxtDump`, el volcado de los tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | El pintado (`StackingContext`, `Canvas`) y los dos lienzos: el PDF (`PdfDocumentWriter`, `PdfCanvas` y sus piezas) y el SVG (`SvgCanvas`) |
-| `convert` | todos menos `tree` y `output` | `Converter`, la entrada del motor; nada depende de él |
+| `convert` | todos menos `tree` y `output` | `Converter`, la entrada del motor. Nada depende de él |
 
 Un tipo que necesitan `tree` y `layout` va en `model`. Entre los algoritmos de `layout`, el bloque usa `inline` (los
-marcadores de las listas son texto) y `position`; `flex` y `grid` usan `position`; la tabla usa `grid`. Ningún algoritmo
+marcadores de las listas son texto) y `position`, `flex` y `grid` usan `position`, y la tabla usa `grid`. Ningún algoritmo
 nombra `Engine`: dependen de la interfaz `LayoutContext`.
 
 ## Las clases principales
 
 ### Entrada
 
-- **`Converter`** (`convert`): la fachada. Inmutable y segura entre hilos; reúne la carpeta de recursos, los estilos
+- **`Converter`** (`convert`): la fachada. Inmutable y segura entre hilos. Reúne la carpeta de recursos, los estilos
   aparte, los límites y el modo de depuración (`Converter.builder()`), y da `layOut`, `toPdf` y `toSvg`. Cada conversión crea
   su propio `Engine`.
 - **`DocumentReader`** (`stxt`): lee un documento o un documento de estilos y lo valida contra el schema.
@@ -66,15 +66,19 @@ nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`Box`**: una caja del árbol. Guarda su `Element`, su `Style`, sus hijos, su texto y sus tramos, su imagen, su marcador
   de lista, su número y su `Id`. No guarda geometría: la posición y el tamaño solo existen en los fragmentos. Se cierra al
   terminar la construcción.
-- **`Element`**: el enum de los elementos (`BLOCK`, `HEADING_2`, `CELL`…), con su `Layout`, su `Position` y su papel
+- **`Element`**: el enum de los elementos (como `BLOCK`, `HEADING_2` o `CELL`), con su `Layout`, su `Position` y su papel
   (`Element.Role`), que es lo único que el layout y el pintado miran.
 - **`Style`** y sus grupos: las propiedades de una caja, separadas como en el documento (`TypographyStyle`, el único que
   se hereda, `BoxStyle`, `BreakStyle`) y por tipo de elemento (`FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`,
   `ColumnsStyle`, `ImageStyle`, `TableOfContentsStyle`), con la línea del documento de cada propiedad.
-- **`BoxTreeBuilder`**: el orquestador de la construcción. Lo propio de cada familia de elementos lo hace `ElementReader`;
-  los valores, `ValueReader`; las propiedades, `PropertyReader`; las reglas de `Styles`, `StyleRules`; tablas, listas,
-  Markdown e índices, `TableBuilder`, `ListBuilder`, `MarkdownBuilder` y `TableOfContentsBuilder`; las reglas que miran la caja ya
-  leída, `ModelValidator` ([El árbol de cajas](implementacion/arbol.md)).
+- **`BoxTreeBuilder`**: el orquestador de la construcción ([El árbol de cajas](implementacion/arbol.md)). Reparte el
+  trabajo entre sus piezas:
+  - `ElementReader`, lo propio de cada familia de elementos;
+  - `ValueReader`, los valores, y `PropertyReader`, las propiedades;
+  - `StyleRules`, las reglas de `Styles`;
+  - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` y `TableOfContentsBuilder`, las tablas, las listas, el Markdown y
+    los índices;
+  - `ModelValidator`, las reglas que miran la caja ya leída.
 
 ### Layout (`layout`)
 
@@ -90,15 +94,15 @@ nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas), `FlexResolver`, `TrackSizing` y `Placement` (grid),
   `Columns` (cuántas columnas y de qué ancho), `OverlayEquation`, `UnitBreaker` (cortes de flex, grid y tablas), `Slice` (alto, borde y
   relleno de cada fragmento) ([El layout](implementacion/layout.md)).
-- **`TextMeasurer`**: mide el texto. `FixedMetrics` (cada carácter mide medio cuerpo) es el de los tests de layout;
+- **`TextMeasurer`**: mide el texto. `FixedMetrics` (cada carácter mide medio cuerpo) es el de los tests de layout.
   `PdfMetrics` da las métricas reales de las fuentes y es el del PDF.
 
 ### Pintado (`paint`)
 
-- **`StackingContext`**: ordena el pintado de una página en contextos de apilamiento y llama al lienzo; calcula también las
+- **`StackingContext`**: ordena el pintado de una página en contextos de apilamiento y llama al lienzo. Calcula también las
   zonas de los enlaces.
-- **`Canvas`**: la interfaz de los lienzos, que solo dibujan; cada lienzo da su `Tagging` (el etiquetado del PDF; en el SVG,
-  nada).
+- **`Canvas`**: la interfaz de los lienzos, que solo dibujan. Cada lienzo da su `Tagging`: el etiquetado del PDF, y en el
+  SVG, nada.
 - **`PdfDocumentWriter`**: escribe el documento PDF: páginas, etiquetado (`PdfStructure`), marcadores, destinos
   (`PdfDestinations`), enlaces (`PdfLinks`) y guardado. `PdfCanvas` dibuja una página, con `PdfContent`, `PdfFonts`,
   `PdfGradients` y `PdfImages`.

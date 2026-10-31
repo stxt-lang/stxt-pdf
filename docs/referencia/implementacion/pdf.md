@@ -1,8 +1,8 @@
 # El PDF por dentro
 
 Qué escribe el motor en el PDF y por qué: el árbol de estructura del PDF etiquetado, los *artifacts*, las anotaciones de
-enlace, los marcadores y los metadatos. Lo que nota quien lee el documento está en [El PDF](../comun/pdf.md); cómo lo
-escribe el código, en [El pintado](pintado.md#el-pdf).
+enlace, los marcadores y los metadatos. Lo que nota quien lee el documento está en [El PDF](../comun/pdf.md). Cómo lo
+escribe el código está en [El pintado](pintado.md#el-pdf).
 
 ## Páginas, fuentes y metadatos
 
@@ -11,8 +11,8 @@ escribe el código, en [El pintado](pintado.md#el-pdf).
   número físico en cifras: un documento que numera como siempre no las lleva.
 - Las fuentes son las TTF de la carpeta de recursos, incrustadas como subconjunto (Type 0, Identity-H) con los glifos que
   se usan.
-- `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre;
-  `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
+- `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre,
+  y `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
   quien convierte lo pide ([abajo](#pdfua-2)).
 
 > **Decisión:** todo PDF declara PDF/UA-1. veraPDF lo comprueba solo en parte (no el orden de lectura ni el sentido de los
@@ -26,20 +26,20 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 |---|---|
 | El documento | `Document` (la raíz) |
 | `Section` | `Sect`, con `Lang` si cambia su idioma |
-| `Heading 1` … `Heading 6` | `H1` … `H6`; sus `Text` son `Span` |
+| `Heading 1` a `Heading 6` | `H1` a `H6`, y sus `Text`, `Span` |
 | `Text`, `Paragraph` | `P` |
 | `List`, `List item` | `L` y `LI`, con el marcador en `Lbl` y el contenido en `LBody` |
 | `Table` y sus partes | `Table`, `THead`, `TBody`, `TFoot`, `TR`, y `TH` o `TD` |
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
 | `Image` con `Alt` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
-| El resto (`Block`, `Flex`, `Grid`, `Columns`, `Markdown`, los posicionados…) | `Div` |
+| El resto (como `Block`, `Flex`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
 
 Lo que genera un `Markdown` cuelga de su `Div` con sus propios elementos. El contenido de un `Columns` cuelga de su `Div`
 de columna en columna. El texto de cada caja es contenido marcado de su elemento, también sus tramos con formato, que no
-tienen elemento propio; una caja partida entre páginas tiene contenido marcado en varias.
+tienen elemento propio. Una caja partida entre páginas tiene contenido marcado en varias.
 
-> **Decisión:** un `Text` es un `P`, no un `Span`: un `Span` es texto en línea y un lector de pantalla no distingue dónde
+> **Decisión:** un `Text` es un `P` y no un `Span`: un `Span` es texto en línea y un lector de pantalla no distingue dónde
 > acaba. Solo son `Span` el `Text` de un encabezado y las dos piezas de una entrada de índice. *Alternativa descartada:*
 > que lo decida una propiedad del `Text`.
 
@@ -49,9 +49,9 @@ tienen elemento propio; una caja partida entre páginas tiene contenido marcado 
 ### Idioma
 
 El `Language` de `Document` es el `Lang` del catálogo. Una caja que declara otro lleva `Lang` en su elemento, solo donde el
-idioma cambia respecto al de fuera; los elementos de dentro lo heredan.
+idioma cambia respecto al de fuera, y los elementos de dentro lo heredan.
 
-> **Decisión:** el idioma es de la caja, no de un tramo: un idioma por tramo partiría el contenido marcado.
+> **Decisión:** el idioma es de la caja y no de un tramo: un idioma por tramo partiría el contenido marcado.
 
 ### Texto que se lee
 
@@ -76,7 +76,7 @@ espacio invisible del final si llega al final de la línea. Lo respetan Acrobat,
 espacios tras él. No está en la estructura: la de un elemento con `Case` sigue siendo la del texto escrito.
 
 > **Decisión:** un `ActualText` por secuencia de tramos y línea. *Alternativa descartada:* uno por tramo, que deja entre
-> dos tramos el hueco del interletraje y hace adivinar un espacio de más; o `Tc` en vez de `TJ`, que separa los
+> dos tramos el hueco del interletraje y hace adivinar un espacio de más, o `Tc` en vez de `TJ`, que separa los
 > caracteres igual y los extractores tratan del mismo modo.
 
 ### Listas
@@ -89,9 +89,9 @@ espacios tras él. No está en la estructura: la de un elemento con `Case` sigue
 
 ### Tablas
 
-Una celda de `Head` es `TH` con `Scope: Column`; una de `Body` o `Foot` con `Row header: true`, `TH` con `Scope: Row`; el resto,
-`TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y el pie son contenido en la
-primera página en que sale cada celda; donde se repiten, son *artifacts*, así que el árbol tiene una sola `THead` y una
+Una celda de `Head` es `TH` con `Scope: Column`, una de `Body` o `Foot` con `Row header: true` es `TH` con `Scope: Row`,
+y el resto, `TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y el pie son contenido en la
+primera página en que sale cada celda. Donde se repiten, son *artifacts*, así que el árbol tiene una sola `THead` y una
 sola `TFoot`.
 
 > **Decisión:** las repeticiones son *artifacts*, y un lector de pantalla no lee la cabecera en cada página.
@@ -99,12 +99,12 @@ sola `TFoot`.
 
 ### Figuras
 
-El `BBox` de la `Figure` de una imagen es su caja de contenido en la página, no la parte visible con `contain`; el de una
-imagen girada, el rectángulo que la envuelve.
+El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `contain`. El de
+una imagen girada es el rectángulo que la envuelve.
 
 ### Índices
 
-Cada entrada es un `TOCI` con el título y el número en dos `Span`; la guía es un *artifact*. El `Link` de la entrada
+Cada entrada es un `TOCI` con el título y el número en dos `Span`, y la guía es un *artifact*. El `Link` de la entrada
 envuelve los dos `Span`.
 
 ## *Artifacts*
@@ -115,26 +115,26 @@ y todo lo que hay dentro de un `Page overlay`.
 
 ## Enlaces
 
-Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la página, y como texto (`Table of contents`) lo
-que dice la caja o el tramo: el texto de la caja y de lo que contiene unido por espacios, o el `Alt` de una imagen; sin
-texto, el propio destino. Las referencias y los marcadores de página del texto salen sin sustituir. Los destinos internos
+Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la página, y como texto (`Contents`) lo que
+dice la caja o el tramo: el texto de la caja y de lo que contiene unido por espacios, o el `Alt` de una imagen. Sin
+texto, lleva el propio destino. Las referencias y los marcadores de página del texto salen sin sustituir. Los destinos internos
 se resuelven después de pintar todas las páginas, así que un enlace puede ir hacia delante. Las páginas con anotaciones
 llevan `Tabs: S`, para que el visor recorra los enlaces en el orden de la estructura.
 
 En una caja girada, la anotación tiene como `Rect` el rectángulo que envuelve la zona girada y como `QuadPoints` la zona
-girada; el destino de una caja girada es el rectángulo que la envuelve.
+girada. El destino de una caja girada es el rectángulo que la envuelve.
 
 El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referencia a objeto (`OBJR`), como pide PDF/UA:
 
-- *Caja con `Link`:* el `Link` es hijo del elemento de la caja y contiene su contenido (`P → Link → texto`;
-  `Div → Link → P, P`; `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
+- *Caja con `Link`:* el `Link` es hijo del elemento de la caja y contiene su contenido (`P → Link → texto`,
+  `Div → Link → P, P` o `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
   (`Link → Figure`), porque una `Figure` no puede contener a su `Link`. Una caja partida tiene un solo `Link` con una `OBJR`
   por fragmento.
 - *Enlace dentro del texto:* el `Link` es hijo del elemento del texto (`P → texto, Link, texto`) y contiene el contenido
   marcado de las palabras del enlace, que se pintan en secuencias aparte. Es uno por enlace y fragmento, aunque ocupe
   varias líneas: un contenido marcado y una `OBJR` por línea. Dos enlaces seguidos con el mismo destino son uno.
 - *`Alt`:* un `Link` que contiene algo que leer (texto o una figura con su `Alt`) no lleva `Alt`, porque el lector lo leería
-  en lugar del contenido; uno sin nada dentro lo lleva con el texto del enlace.
+  en lugar del contenido. Uno sin nada dentro lo lleva con el texto del enlace.
 - *Lo que no es contenido* (un `Page overlay`, una imagen decorativa) no tiene a qué envolver, pero PDF/UA exige que toda
   anotación de enlace esté en un `Link`. Cada enlace suyo (el de una caja y uno por destino de sus enlaces de texto) es un
   `Link` sin contenido en el sitio de la caja en el árbol, con el texto del enlace como `Alt` y una `OBJR` por página en
@@ -147,11 +147,11 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
 > anotación, que no cumple PDF/UA.
 
 > **Decisión:** un enlace de varias líneas es un solo `Link` (las anotaciones siguen siendo una por línea, que es lo que el
-> visor necesita): un lector de pantalla anuncia un enlace, no uno por línea.
+> visor necesita): un lector de pantalla anuncia un enlace y no uno por línea.
 
 > **Decisión:** el enlace de lo que no es contenido es un `Link` sin contenido en el sitio de la caja, con las anotaciones
 > de todas las páginas. *Alternativas descartadas:* un `Link` suelto del `Document` por página, que un lector de pantalla
-> anuncia al final de la estructura y tantas veces como páginas; marcar esas anotaciones como ocultas, que las quita del
+> anuncia al final de la estructura y tantas veces como páginas, o marcar esas anotaciones como ocultas, que las quita del
 > ratón.
 
 ## Marcadores
@@ -172,10 +172,10 @@ estas diferencias:
 - **Índices:** un `TOCI` no puede contener un `Link`: es `TOCI → Reference → Link → título, número`, y el `TOCI` señala con
   `Ref` el elemento del encabezado al que lleva.
 - **Destinos de estructura:** un enlace a una caja del documento y un marcador son una acción `GoTo` con el elemento de la
-  caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición; `D`, con la página, queda para los
+  caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición. `D`, con la página, queda para los
   visores que no entienden `SD`.
 - **Listas:** `dash` es `ListNumbering: Unordered`.
-- **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Table of contents`, porque lo que se lee es el `Alt`.
+- **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
 
 veraPDF lo valida con su perfil de PDF/UA-2, que añade las reglas de ISO/TS 32005 sobre qué elemento puede contener a
 cuál.
@@ -183,8 +183,8 @@ cuál.
 > **Decisión:** PDF/UA-2 es una opción y PDF/UA-1 lo de siempre: PDF 2.0 aún no lo abre bien cualquier visor.
 > *Alternativa descartada:* pasar todo a PDF/UA-2.
 
-> **Decisión:** los enlaces con `Alt` no llevan `Table of contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
-> mismo, y lo dicen; pero veraPDF compara el `Alt` sin descodificar cuando el texto tiene acentos y lo da por distinto.
+> **Decisión:** los enlaces con `Alt` no llevan `Contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
+> mismo, y lo dicen, pero veraPDF compara el `Alt` sin descodificar cuando el texto tiene acentos y lo da por distinto.
 > *Alternativa descartada:* quitar el `Alt`, que es lo que lee un lector de pantalla en un `Link` vacío.
 
 ## Imágenes

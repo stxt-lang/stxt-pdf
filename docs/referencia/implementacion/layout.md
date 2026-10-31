@@ -1,11 +1,11 @@
 # El layout
 
 Cómo calcula el motor la posición y el tamaño de cada caja (package `layout` y `fragment`). El comportamiento está en las
-páginas de comportamiento común y de cada componente; aquí, cómo está hecho.
+páginas de comportamiento común y de cada componente, y aquí, cómo está hecho.
 
 ## `Engine` y `LayoutContext`
 
-`Engine` despacha por `Style.layout` al algoritmo correspondiente (un `EnumMap`; la tabla, que es un grid, tiene el suyo).
+`Engine` despacha por `Style.layout` al algoritmo correspondiente (un `EnumMap`, y la tabla, que es un grid, tiene el suyo).
 Los algoritmos no conocen el motor: dependen de **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
 `measurer`, `natural`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
 layout o de tamaños intrínsecos pasa por `context.layout(...)` / `context.intrinsic(...)`**, nunca directamente al
@@ -15,7 +15,7 @@ algoritmo, para usar la `LayoutCache` (sin ella, flex y grid anidados crecen de 
 desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
 El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `absolute()`) es de package.
 
-> **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`; el protocolo de la
+> **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`. El protocolo de la
 > paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia.
 
 > **Decisión:** el protocolo de la paginación no es público: quien manejara un `Engine` desde fuera podría romper la
@@ -27,9 +27,9 @@ El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `abso
 
 ## `LayoutAlgorithm`
 
-`contentIntrinsic(box)` (anchos más estrecho y natural del contenido, sin borde, relleno, margen ni `Width`; independiente del espacio) y
-`layout(box, space, from)`. Los de la caja de margen los da `context.intrinsic(box)` con `BoxModel.intrinsic`; los del
-contenido, `context.contentIntrinsic(box)` (el mínimo automático de un ítem de `Flex`).
+Tiene dos métodos: `contentIntrinsic(box)`, los anchos más estrecho y natural del contenido (sin borde, relleno, margen
+ni `Width`, e independientes del espacio), y `layout(box, space, from)`. Los de la caja de margen los da
+`context.intrinsic(box)` con `BoxModel.intrinsic`, y los del contenido, `context.contentIntrinsic(box)` (el mínimo automático de un ítem de `Flex`).
 
 ## `ConstraintSpace` y `LayoutResult`
 
@@ -39,22 +39,22 @@ la caja (vacío = sin fragmentación), si la caja empieza la página y si se mid
 (`measuringContentHeight()`).
 
 **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad del corte
-(`BreakAppeal.PERFECT_BREAK` … `FORCED`), las `PendingOverlay` que suben hasta su contenedor de referencia (con la posición
+(de `BreakAppeal.PERFECT_BREAK` a `FORCED`), las `PendingOverlay` que suben hasta su contenedor de referencia (con la posición
 estática relativa a la caja de contenido de quien devuelve el resultado) y los `AdjoiningMargins`.
 
 ## `BoxModel`
 
 Margen, borde, relleno, ancho de la caja de borde y alto si es definido, a partir del `ConstraintSpace`. Es la parte común de
-todos los algoritmos; `childSpace()` da el espacio de los hijos en flujo y `BoxModel.intrinsic(...)` pasa de tamaños
+todos los algoritmos. `childSpace()` da el espacio de los hijos en flujo y `BoxModel.intrinsic(...)` pasa de tamaños
 intrínsecos del contenido a los de la caja de margen. Los márgenes `auto` valen 0: el centrado lo hace el padre, que es quien
 coloca al hijo. El dimensionado de una imagen está en `BoxModel.replaced`, para que las sondas de flex, grid y absolute midan
 bien la imagen: se usa siempre `BoxModel.resolve(box, space, context)`, que le pasa el tamaño natural. Primero se aplica el
-máximo y luego el mínimo; si chocan, gana el mínimo (`Sizing.constrain`).
+máximo y luego el mínimo. Si chocan, gana el mínimo (`Sizing.constrain`).
 
 ## Colapso de márgenes
 
 Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que salen por arriba o por abajo (y si está vacía y
-deja pasar los suyos); el padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
+deja pasar los suyos). El padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
 guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockFormattingContext()` dice qué cajas lo cortan.
 
 ## Grid
@@ -65,10 +65,10 @@ guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockF
 
 ## Cajas posicionadas
 
-Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`; los devuelven como `PendingOverlay` con su posición estática, y
+Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`. Los devuelven como `PendingOverlay` con su posición estática, y
 los hijos `Frame` se desplazan con `FrameOffset` después de colocarlos. `Engine.layout` resuelve con `OverlayLayout`
 (sobre `OverlayEquation`) los `Overlay` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
-del de esa caja); los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
+del de esa caja). Los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
 que incluye su `Pages`.
 
 ## Cajas giradas en flujo
@@ -78,14 +78,14 @@ que incluye su `Pages`.
 borde y relleno), sin fragmentación y sin `from`. El resultado se envuelve con `Fragment.turned`: el fragmento mide el
 rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` guarda esa caja sin girar, centrada en él. Los
 algoritmos de los padres no saben nada del giro: ven una caja del tamaño del rectángulo, que no se parte (`BEFORE` si no
-cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`; además es un
+cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`: es un
 contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su ancho más estrecho y su
 ancho natural son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
 (`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
 
 ## Fragmentos
 
-Un **`Fragment`** tiene su posición relativa a la caja de **contenido** del padre; `StxtDump` la pasa a coordenadas absolutas
+Un **`Fragment`** tiene su posición relativa a la caja de **contenido** del padre. `StxtDump` la pasa a coordenadas absolutas
 de página. Lleva su propio `border` y `padding`, que en un fragmento partido no son los de la caja: se usan siempre los del
 fragmento para llegar a su caja de contenido. Lleva también el `margin` usado (con la base de porcentajes de su layout) y el
 desplazamiento de `Frame` ya sumado a su posición (`offsetX`/`offsetY`), que `Overflow` necesita. La geometría solo
@@ -93,7 +93,7 @@ existe en los fragmentos: `Box` no guarda posición ni tamaño.
 
 En una caja girada en flujo, `x`, `y`, `width` y `height` son los del rectángulo que ocupa, y `turned`, su caja de borde
 sin girar relativa a él. Sus hijos y sus líneas se refieren a la caja sin girar: quien baja a ellos usa
-`Fragment.borderBox(x, y)`, `contentWidth()` y `contentHeight()`, que la tienen en cuenta, nunca `width` y `height`.
+`Fragment.borderBox(x, y)`, `contentWidth()` y `contentHeight()`, que la tienen en cuenta, y nunca `width` y `height`.
 
 > **Decisión:** la geometría usada solo existe en los fragmentos: una caja se maqueta muchas veces (sondas, medidas,
 > estirado, cada página) y la caché devuelve resultados sin volver a escribirla, así que «el último layout» de una caja no
@@ -107,18 +107,18 @@ sin girar relativa a él. Sus hijos y sus líneas se refieren a la caja sin gira
 
 ## Fragmentación
 
-Cada algoritmo coloca lo que cabe en `fragmentainerRemaining` y devuelve el corte con su calidad; el padre lo compara con los
+Cada algoritmo coloca lo que cabe en `fragmentainerRemaining` y devuelve el corte con su calidad. El padre lo compara con los
 cortes entre sus hijos y se queda con el **último de mayor calidad** (`BreakRules.best`). Relajar las reglas en el orden de
 [Cortes](../comun/cortes.md#elección-del-corte) sale solo de esa comparación: por eso un hijo que no puede respetar viudas y
 huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`.
 
 **`BreakToken`** (sealed, records con `equals`): `Block`, `Line`, `Container`, con el alto ya consumido por la caja (un
-`Height` definido es el total de todos los fragmentos; un fragmento cortado solo consume lo que ocupa su contenido), y
+`Height` definido es el total de todos los fragmentos, y un fragmento cortado solo consume lo que ocupa su contenido), y
 `BEFORE`: «no cabe nada, corta antes de mí», que nunca se pasa como `from`. El `Paginator` detecta la falta de progreso
 comparando tokens. El token de la raíz no acumula alto: cada página tiene el área útil entera.
 
-`Slice` calcula el alto, el borde y el relleno de cada fragmento (`Edges: open` y `closed`; `Slice.contentRemaining` da
-lo que queda al contenido). Flex y grid cortan entre unidades (líneas, ítems o filas; `fragment.Unit`) con `UnitBreaker`: se
+`Slice` calcula el alto, el borde y el relleno de cada fragmento (`Edges: open` y `closed`), y `Slice.contentRemaining`
+da lo que queda al contenido. Flex y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
 que cabe en la página. Una unidad que no cabe ni al principio de página parte sus ítems en paralelo, repitiendo su layout con
 `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de
@@ -127,8 +127,8 @@ cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`,
 `GridLayout.arrange` las crea con el ancho de las columnas, `TableLayout` coloca las de la cabecera y el pie en el
 `Repeat` y deja las del cuerpo en su unidad, y `UnitBreaker` las pone en cada fragmento delante de los ítems (enteras,
 recortadas con `splitBands` si su grupo se parte, o la de la última unidad en la continuación del grupo). Son fragmentos
-sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN` (`BreakRules.forcedBetween` devuelve el
-tipo); el de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
+sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN`
+(`BreakRules.forcedBetween` devuelve el tipo). El de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
 El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMN_FLOW`), su único hijo: cada
 columna es un fragmento de esa caja, maquetado con los algoritmos de siempre. Las columnas solo están al principio del
@@ -139,7 +139,7 @@ padre: el corte de página tiene la calidad del de la última columna.
 > mismo, repitiendo el flujo de bloque.
 
 `ColumnsLayout` maqueta el flujo de columnas una vez por columna con `context.layout`, con el alto de la columna como
-`fragmentainerRemaining` y el token de la columna anterior como `from`; cada columna es un fragmento suyo. El equilibrado es
+`fragmentainerRemaining` y el token de la columna anterior como `from`, y cada columna es un fragmento suyo. El equilibrado es
 una búsqueda binaria del alto mínimo, con precisión de 0,001 pt, que rechaza los altos con cortes entre columnas peores
 que los del reparto en orden.
 
@@ -157,9 +157,9 @@ y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.
 `GSUB` palabra a palabra si hay ligaduras. `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics`
 comprueba que existen las fuentes y tienen todos los caracteres.
 
-**Texto largo.** Cada página maqueta el texto desde otra línea, así que la `LayoutCache` no ayuda; `InlineLayout` memoriza
-el reparto en líneas por caja y ancho disponible (si no, el coste crece con el cuadrado de las páginas; lo vigila
-`LongTextTest`). El reparto voraz suma los avances de las palabras y los espacios de la línea en curso y solo mide la línea
+**Texto largo.** Cada página maqueta el texto desde otra línea, así que la `LayoutCache` no ayuda. `InlineLayout` memoriza
+el reparto en líneas por caja y ancho disponible (sin esa memoria, el coste crece con el cuadrado de las páginas, y lo
+vigila `LongTextTest`). El reparto voraz suma los avances de las palabras y los espacios de la línea en curso y solo mide la línea
 entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 
 > **Decisión:** el ancho de un texto es aditivo entre palabras y el reparto voraz suma, midiendo la línea entera solo cerca
@@ -169,7 +169,7 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 > `FontFile`.
 
 > **Decisión:** la línea base de un marcador de lista se calcula al maquetar con las métricas del medidor (con
-> `FixedMetrics`, la aproximación 0,8/0,2; con `PdfMetrics`, la `hhea` de la fuente), no al pintar: el marcador es un
+> `FixedMetrics`, la aproximación 0,8/0,2, y con `PdfMetrics`, la `hhea` de la fuente) y no al pintar: el marcador es un
 > fragmento normal, con su rectángulo en el volcado. El SVG pinta siempre con la aproximación, así que un marcador de otro
 > tamaño que su primera línea puede quedar ligeramente desplazado en el SVG de un documento maquetado con las métricas
 > reales.
@@ -178,8 +178,8 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
 `Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
-(`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`); `Page` lleva su `PageSetup`, su sección, su
-`printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingOverlay(box, 0, 0)`
+(`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`). `Page` lleva su `PageSetup`, su
+sección, su `printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingOverlay(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
 **Páginas en blanco.** Tras el flujo, `blankAfter` mira qué secciones dejan la siguiente, con `Begin on: odd`, en una
@@ -188,24 +188,24 @@ le reserva su número físico y `pages` la añade como una `Page` con `blank`, u
 sin `Page overlay`. No forma parte del flujo de la sección, así que el `Pages` de sus `Page overlay` no la ve.
 
 **`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio) y las líneas
-los conservan; al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
+los conservan. Al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
 valores de cada página ya escritos (`PageNumbers`). Si algún número impreso no cabe en el de prueba (`Numbering.probe`:
 tantos caracteres como el más largo, con `M` o `m` si hay romanos), se vuelve a paginar con uno que lo cubre
 (`PageNumbers.cover`), que solo crece.
 
 **Referencias.** `Engine.assume` fija las páginas supuestas (la primera vez, `00`), se pagina, se mira en qué página ha
 quedado el primer fragmento de cada caja referida (`Box.key()`) y se vuelve a paginar si alguna difiere, hasta 10 pasadas que
-cambien algo; si no convergen, `REFERENCE_UNSTABLE`. Las pasadas por crecer las cifras de `{pages}` no cuentan, porque
+cambien algo. Si no convergen, es `REFERENCE_UNSTABLE`. Las pasadas por crecer las cifras de `{pages}` no cuentan, porque
 solo crecen. Con un medidor aditivo la paginación converge siempre: el error es una red de seguridad.
 
-> **Decisión:** `{page of: id}` se sustituye antes de repartir el texto en líneas, no en un hueco reservado como `{page}`:
+> **Decisión:** `{page of: id}` se sustituye antes de repartir el texto en líneas y no en un hueco reservado como `{page}`:
 > el marcador tiene espacios y el reparto lo partiría en tres palabras, y con la convergencia no hace falta un segundo
 > paso. Como la primera pasada supone `00`, con referencias a páginas siempre hay al menos dos. *Alternativa descartada:*
 > quedarse con la última pasada sin avisar.
 
 > **Decisión:** un `Id` que no existe (`REFERENCE_UNKNOWN`) y la página de una caja de un `Page overlay`
-> (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura; la
-> de una caja que cae en una página sin número, al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
+> (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura. La
+> de una caja que cae en una página sin número se detecta al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
 
 > **Decisión:** con `{pages}` y 100 páginas o más, o con números romanos, se vuelve a paginar reservando el ancho del
 > número más largo, en lugar de dejar que el número real se salga del hueco reservado. En romanos se reserva una `M` por
@@ -229,11 +229,11 @@ usando el `PageSetup` de cada página. Las tolerancias son dos, con nombre: `Tol
 layout, y `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar y la precisión de los volcados. Se
 compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un `1e-9` propio.
 
-> **Decisión:** los desbordamientos se buscan sobre el resultado paginado, no en cada algoritmo al colocar: así no cuentan
+> **Decisión:** los desbordamientos se buscan sobre el resultado paginado y no en cada algoritmo al colocar: así no cuentan
 > las pasadas de medida, en las que una caja se maqueta con un espacio provisional. Solo dos se detectan al maquetar,
 > porque sin sitio no se avanza: `TABLE_REPEAT_OVERFLOW` y los cortes de columna de más de un `Columns`.
 
-> **Decisión:** dos tolerancias con nombre, no una: con `EPSILON` en `Overflow` el motor sería más estricto y una caja que se
+> **Decisión:** dos tolerancias con nombre y no una: con `EPSILON` en `Overflow` el motor sería más estricto y una caja que se
 > sale 0,005 pt sería un error. *Alternativa descartada:* una sola tolerancia, con ese cambio de comportamiento.
 
 ## Hilos

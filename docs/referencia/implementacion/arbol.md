@@ -1,14 +1,14 @@
 # El árbol de cajas
 
 Cómo pasa el documento leído a un árbol de `Box` (package `tree`). Lo que dice cada regla está en las páginas de
-comportamiento; aquí, dónde vive en el código.
+comportamiento, y aquí, dónde vive en el código.
 
 ## Los nodos de `stxt-core`
 
 El motor trabaja directamente con `dev.stxt.Node`, `InlineNode` (valor en línea e hijos) y `TextNode` (bloque `>>`);
 `getText()` da el contenido en los dos casos. Los nombres se comparan por `getCanonicalName()`: minúsculas y los espacios
 convertidos en guiones (`Min width` → `min-width`). Los errores de sintaxis y del schema son `ParseException` de la
-librería, con código (`INVALID_VALUE`, `CHILD_NOT_DECLARED`…) y línea, que `DocumentReader` y `DocumentSchema` convierten
+librería, con código (como `INVALID_VALUE` o `CHILD_NOT_DECLARED`) y línea, que `DocumentReader` y `DocumentSchema` convierten
 en `DocumentSyntaxException` ([Uso desde Java](api.md#errores)).
 
 ## Validar contra el schema
@@ -16,11 +16,15 @@ en `DocumentSyntaxException` ([Uso desde Java](api.md#errores)).
 La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `DocumentReader` valida con él al leer y
 `BoxTreeBuilder` vuelve a validar el árbol al empezar, así que el resto del builder da la estructura por buena.
 
-En el schema, los elementos contenedores y los grupos son `GROUP` (sin valor); `Text`, `Paragraph`, `Cell`, `Image`,
-`Area` y las reglas de `Styles`, `INLINE`; `Content`, `BLOCK`; `Areas`, `TEXT`; `Contain margins`, `Wrap`, `Row header` e
-`In table of contents`, `BOOLEAN`; `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`; `Rotate`, `NUMBER`; las de
-valores cerrados (`Fit`, `Leader`, `Pages`, `Paper`…), `ENUM`, y el resto, `INLINE` sin hijos cuya forma comprueba
-`ValueReader`.
+En el schema:
+
+- los elementos contenedores y los grupos son `GROUP` (sin valor);
+- `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`, `INLINE`;
+- `Content`, `BLOCK`, y `Areas`, `TEXT`;
+- `Contain margins`, `Wrap`, `Row header` e `In table of contents`, `BOOLEAN`;
+- `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`, y `Rotate`, `NUMBER`;
+- las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
+- el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
 
 Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que
 `Item` y `Area` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
@@ -39,10 +43,10 @@ escribe el autor.
 
 ## `BoxTreeBuilder`
 
-Traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen del elemento; las propiedades de `Item` y `Area`
-pasan al elemento que envuelven), interpreta valores, aplica la herencia y comprueba las reglas que el schema no puede
+Traduce cada elemento a una `Box` (`Style.layout` y `Style.position` salen del elemento, y las propiedades de `Item` y
+`Area` pasan al elemento que envuelven), interpreta valores, aplica la herencia y comprueba las reglas que el schema no puede
 expresar. Los errores son `InvalidModelException` con un `ErrorCode` y la **línea del nodo culpable**: la de la propiedad
-(`Style.line(HEIGHT)`, con las claves de `PropertyKey`), no la de su caja. `PropertyKey.internal` da el nombre interno de
+(`Style.line(HEIGHT)`, con las claves de `PropertyKey`) y no la de su caja. `PropertyKey.internal` da el nombre interno de
 los nombres cortos (`Size` → `font-size`), que es la clave de `Style.line`. La línea es un `SourceLine`: su número y si es
 del documento de estilos aparte, porque una propiedad que llega de una regla suya tiene la línea de ese documento
 (`StyleRules` marca el `Style` mientras la lee). Se escribe en los mensajes tal cual (`línea 8 de los estilos`), y el error
@@ -53,7 +57,7 @@ es el orden común a todos los elementos (el sitio, la herencia, las reglas, las
 el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
 `GRID`, `FLEX`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la
 caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
-elemento nuevo sin nada propio es un `CONTAINER`; con algo propio, una familia nueva, sin tocar `element`.
+elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`.
 
 Las piezas:
 
@@ -69,24 +73,24 @@ Las piezas:
 | `TableOfContentsBuilder` | Las entradas de los índices, al final de la construcción |
 | `HeadingNumbers` | Los números de los encabezados |
 | `References`, `LinkTargets` | Comprueban las referencias y los enlaces `#id` del árbol entero |
-| `ModelValidator` | Las reglas que miran la caja ya leída (márgenes, mínimos y máximos, alto definido, giro…) |
+| `ModelValidator` | Las reglas que miran la caja ya leída (como los márgenes, los mínimos y máximos, el alto definido o el giro) |
 | `Nodes` | El acceso a los nodos y los errores |
 
 Ningún método de `tree` pasa de 60 líneas ni de complejidad 20.
 
-> **Decisión:** las familias de elementos son un enum con métodos por defecto, no una interfaz con una clase por familia:
+> **Decisión:** las familias de elementos son un enum con métodos por defecto y no una interfaz con una clase por familia:
 > son pocas, están cerradas (las da el schema) y comparten casi todo. *Alternativa descartada:* una interfaz con una clase
 > por familia, o las familias como métodos privados del builder.
 
 ## `Box` y `Style`
 
-`Box` tiene los campos privados, se lee con métodos (`text()`, `children()`, `formattedRuns()`…) y se escribe con métodos
-`set…` del package. `Style` se parte en un grupo por cada grupo del documento (`TypographyStyle`, `BoxStyle`, `BreakStyle`)
+`Box` tiene los campos privados, se lee con métodos (como `text()`, `children()` o `formattedRuns()`) y se escribe con
+métodos `set...` del package. `Style` se parte en un grupo por cada grupo del documento (`TypographyStyle`, `BoxStyle`, `BreakStyle`)
 y por cada tipo de elemento con propiedades propias (`FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ColumnsStyle`,
-`ImageStyle`, `TableOfContentsStyle`); en `Style` quedan las propiedades que definen el elemento y las líneas. Fuera de `tree` se
+`ImageStyle`, `TableOfContentsStyle`). En `Style` quedan las propiedades que definen el elemento y las líneas. Fuera de `tree` se
 lee a través del grupo: `style.typography().fontSize()`, `style.flex().direction()`, `style.box().margin()`. Solo se hereda
 `TypographyStyle`: `Style.inheriting` copia el grupo del padre. Una propiedad nueva va en el grupo de su sitio en el
-documento, con su lectura y su `set…`.
+documento, con su lectura y su `set...`.
 
 `BoxTreeBuilder.build` cierra el árbol al terminar (`Box.close`, que cierra también el estilo): los hijos pasan a una lista
 inmutable, los que están en flujo se calculan una vez y escribir en una caja o un estilo cerrados es un
@@ -97,7 +101,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 > deja de ser una convención y un documento maquetado se puede leer desde varios hilos. *Alternativa descartada:* accesores
 > sin cierre, o un `StyleBuilder` aparte.
 
-> **Decisión:** los grupos de `Style` son clases que se cierran con la caja, no `record`: el builder escribe las propiedades
+> **Decisión:** los grupos de `Style` son clases que se cierran con la caja y no `record`: el builder escribe las propiedades
 > de una en una (los grupos, después las reglas por prioridad y después lo del elemento), y con `record` cada escritura
 > rehace un registro de hasta 19 componentes. *Alternativa descartada:* `record` inmutables por grupo.
 
@@ -111,8 +115,8 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
-`Page number format`, `Start`, `Inherit page overlays` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box` **sin `parent`**) y
-**cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
+`Page number format`, `Start`, `Inherit page overlays` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box`
+**sin `parent`**) y **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
 (referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Page overlay` y subir por
 `parent` se quedan dentro de la sección. Los `Page overlay` hijos de `Document` también son hijos de la raíz (con `parent`) y no se
 maquetan en el flujo: los coloca el `Paginator`.
@@ -125,7 +129,7 @@ maquetan en el flujo: los coloca el `Paginator`.
 ## Texto y tramos
 
 `Box.text()` es siempre el texto entero y `Box.formattedRuns()` (`null` sin formato) lo parte en `TextRun` con un
-`TextFormat`; `Box.runs()` da un único tramo si no hay formato. Los tests de layout ponen tramos en el árbol antes de
+`TextFormat`. `Box.runs()` da un único tramo si no hay formato. Los tests de layout ponen tramos en el árbol antes de
 cerrarlo con `TextRuns`.
 
 > **Decisión:** el texto de la caja sigue siendo una cadena y los tramos son una partición suya: las líneas del documento,
@@ -137,8 +141,8 @@ cerrarlo con `TextRuns`.
 - **Marcador de lista:** `ListBuilder` crea en `Box.marker` la caja del marcador, generada y fuera de `children`
   (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
-- **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Flex` por encabezado (`Element.TOC_1`…`6`)
-  con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`); `Box.key()` da el
+- **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Flex` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
+  con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el
   `Id` o ese nombre.
 - **Bloque de código:** `MarkdownBuilder` marca el nodo `Text` que genera (`Translation.codeBlocks`) y
   `BoxTreeBuilder.element` le da el elemento `Element.CODE_BLOCK`.
@@ -147,15 +151,15 @@ Los elementos generados que se nombran en `Styles` sin escribirse en el document
 
 ## Markdown
 
-> **Decisión:** el Markdown se traduce a nodos STXT, no a cajas: lo generado se construye como cualquier otro elemento, así
+> **Decisión:** el Markdown se traduce a nodos STXT y no a cajas: lo generado se construye como cualquier otro elemento, así
 > que las reglas de `Styles`, la validación, el PDF etiquetado y los marcadores no tienen ningún caso especial, y lo generado
 > se valida además contra el schema. *Alternativa descartada:* construir las cajas desde el árbol del parser.
 
 commonmark-java descarta las celdas que sobran de una fila de tabla, así que `MarkdownBuilder` las cuenta en el texto
-de la fila; tampoco da la línea de cada celda: los errores de una celda señalan la de su fila.
+de la fila. Tampoco da la línea de cada celda, así que los errores de una celda señalan la de su fila.
 
 `MarkdownBuilder` parsea el `Content` con commonmark-java 0.30.1 (con las extensiones de tablas, tachado y subrayado) y lo
-traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema; los tramos de cada texto van aparte,
+traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema. Los tramos de cada texto van aparte,
 por nodo (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos con `element(...)` como
 hijos de la caja del `Markdown`. El texto con `Markup: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
-misma traducción en modo `inlineOnly`; dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).
+misma traducción en modo `inlineOnly`. Dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).

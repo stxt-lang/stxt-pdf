@@ -28,8 +28,8 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `styles(InlineNode)`, `styles(Path)`, `styles(String)` | El documento de estilos aparte |
 | `limits(Limits)` | Los límites de la conversión |
 | `debug(boolean)` | Pinta los contornos de las cajas |
-| `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)); otra es un `IllegalArgumentException` |
-| `exclude(Check...)` | Quita comprobaciones; por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
+| `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)). Otro valor es un `IllegalArgumentException` |
+| `exclude(Check...)` | Quita comprobaciones. Por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si
@@ -40,8 +40,8 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 ## Comprobaciones
 
 Algunas comprobaciones no son reglas del documento sino de lo que se ve o de lo que traen los ficheros, y quien convierte
-puede quitarlas con `exclude`, que se acumula entre llamadas. Por defecto se hacen todas; `Converter.excluded()` dice las
-que se han quitado. Son los valores del enum `Check` (`model`):
+puede quitarlas con `exclude`, que se acumula entre llamadas. Por defecto se hacen todas, y `Converter.excluded()` dice
+las que se han quitado. Son los valores del enum `Check` (`model`):
 
 | `Check` | Qué comprueba | Sin ella |
 |---|---|---|
@@ -53,7 +53,7 @@ que se han quitado. Son los valores del enum `Check` (`model`):
 Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAGE_ANNOTATIONS).build();
 ```
 
-`Engine` recibe las que se quitan y se las pasa a `Images`; el contraste lo comprueba `Converter.layOut` después de
+`Engine` recibe las que se quitan y se las pasa a `Images`, y el contraste lo comprueba `Converter.layOut` después de
 maquetar.
 
 > **Decisión:** una sola forma de quitar comprobaciones, un enum y `exclude`, en vez de un booleano por cada una: por
@@ -71,17 +71,19 @@ Converter converter = Converter.builder().styles(styles).build();
 converter.toPdf(doc, out);
 ```
 
-Por debajo, `BoxTreeBuilder.build(documento, estilos)` y `Engine.layOutDocument(documento, estilos)` lo reciben igual; puede
-ser `null` en esos dos. Ver [Styles](../comun/estilos.md#documento-de-estilos-aparte).
+Por debajo, `BoxTreeBuilder.build(documento, estilos)` y `Engine.layOutDocument(documento, estilos)` lo reciben igual. En
+esos dos puede ser `null`. Ver [Styles](../comun/estilos.md#documento-de-estilos-aparte).
 
 ## Recursos
 
-`new Resources(Path.of("otra"))` usa otra carpeta de recursos; toda ruta pasa por `Resources.resolve`, que nunca va hacia
-atrás. `Resources` se comparte entre hilos y entre conversiones; indexa `fonts/` una vez y guarda las imágenes leídas.
+`new Resources(Path.of("otra"))` usa otra carpeta de recursos. Toda ruta pasa por `Resources.resolve`, que nunca va hacia
+atrás. `Resources` se comparte entre hilos y entre conversiones. Indexa `fonts/` una vez y guarda las imágenes leídas.
 
-`FontLibrary` identifica cada TTF por su interior: la familia es la tipográfica de la tabla `name` (`nameID` 16) o, si no
-la tiene, la familia (`nameID` 1); el peso, `usWeightClass` de `OS/2` (400 o 700; los demás se ignoran sin error), y el
-estilo, el bit de cursiva de `fsSelection`.
+`FontLibrary` identifica cada TTF por su interior:
+
+- **familia:** la tipográfica de la tabla `name` (`nameID` 16) o, si no la tiene, la familia (`nameID` 1);
+- **peso:** `usWeightClass` de `OS/2` (400 o 700, y los demás se ignoran sin error);
+- **estilo:** el bit de cursiva de `fsSelection`.
 
 > **Decisión:** las fuentes solo se comprueban con `PdfMetrics` (`Engine.layOutDocument` llama a `validate`). Con
 > `FixedMetrics` no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar
@@ -90,8 +92,8 @@ estilo, el bit de cursiva de `fsSelection`.
 ## Errores
 
 Todo error del motor es un `StxtPdfException` (lo lanzan `DocumentReader` y `Converter`), así que una sola `catch` basta.
-`kind()` dice de quién es la culpa, `code()` qué falla y `line()` dónde (`NO_LINE`, 0, si no es de una línea); `inStyles()`
-dice si esa línea es del [documento de estilos aparte](../comun/estilos.md#documento-de-estilos-aparte) y no del documento:
+`kind()` dice de quién es la culpa, `code()` qué falla y `line()` dónde (`NO_LINE`, 0, si no es de una línea).
+`inStyles()` dice si esa línea es del [documento de estilos aparte](../comun/estilos.md#documento-de-estilos-aparte) y no del documento:
 
 ```java
 try {
@@ -108,15 +110,15 @@ try {
 
 | Clase | Qué es |
 |---|---|
-| `InvalidModelException` (`tree`) | Las reglas del modelo, los desbordamientos y los recursos que nombra el documento; `errorCode()` da el `ErrorCode` y `ErrorCode.kind()` su tipo (`INVALID_DOCUMENT` salvo `PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX` y `PDF_TOO_LARGE`, que son `LIMIT`) |
-| `DocumentSyntaxException` (`tree`) | La sintaxis y el schema de `stxt-core`, con su código y su línea y la excepción original como causa; un `LimitException` de la librería es `LIMIT` |
+| `InvalidModelException` (`tree`) | Las reglas del modelo, los desbordamientos y los recursos que nombra el documento. `errorCode()` da el `ErrorCode` y `ErrorCode.kind()` su tipo (`INVALID_DOCUMENT` salvo `PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX` y `PDF_TOO_LARGE`, que son `LIMIT`) |
+| `DocumentSyntaxException` (`tree`) | La sintaxis y el schema de `stxt-core`, con su código y su línea y la excepción original como causa. Un `LimitException` de la librería es `LIMIT` |
 | `ResourceException` (`resources`) | La carpeta de recursos (`RESOURCE`), con `ImageFormatException` |
-| `InternalException` (`model`) | Un fallo del motor; la causa original va en `getCause()` |
+| `InternalException` (`model`) | Un fallo del motor. La causa original va en `getCause()` |
 
 Los fallos de entrada y salida al escribir en el destino siguen siendo la `IOException` de `toPdf`. `Converter` deja pasar
 los errores del motor, convierte cualquier otra excepción de ejecución en `InternalException` y no toca la `IOException`
 del destino. Un `IllegalStateException` o `IllegalArgumentException` solo es válido dentro del motor para un mal uso
-interno; lo que puede ocurrirle a quien convierte va con uno de estos tipos. Los códigos y los tipos están en
+interno. Lo que puede ocurrirle a quien convierte va con uno de estos tipos. Los códigos y los tipos están en
 [Errores](../comun/errores.md).
 
 > **Decisión:** `code()` es el código en texto, común a todos, y el enum pasa a `errorCode()` en `InvalidModelException`:
@@ -130,8 +132,8 @@ interno; lo que puede ocurrirle a quien convierte va con uno de estos tipos. Los
 
 ## Límites
 
-`Limits` es inmutable; `Limits.DEFAULT` tiene los valores por defecto ([Límites](../comun/limites.md)) y se cambia con
-`withMax…`:
+`Limits` es inmutable. `Limits.DEFAULT` tiene los valores por defecto ([Límites](../comun/limites.md)) y se cambia con
+los métodos `withMax...`:
 
 ```java
 Converter converter = Converter.builder()
@@ -150,7 +152,7 @@ cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin
 > 256 niveles) dejaba a un servicio expuesto a cada una de ellas. *Alternativa descartada:* propiedades del sistema, o
 > constantes sin configurar.
 
-> **Decisión:** los límites son de cada conversión, no de `Resources`: dos conversiones con límites distintos comparten los
+> **Decisión:** los límites son de cada conversión y no de `Resources`: dos conversiones con límites distintos comparten los
 > mismos recursos. *Alternativa descartada:* atar la caché de imágenes a un único juego de límites.
 
 > **Decisión:** `SvgInspector` cuenta por exceso lo que contará JSVG, así que lo que cumple el límite no falla al dibujar.
@@ -163,7 +165,7 @@ cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin
 > sus objetos, que obliga a abrirlo antes de saber si se puede.
 
 > **Decisión:** los límites del texto STXT (10 MB, 100 niveles, 10 000 caracteres por línea) son los de `stxt-core`, que ya
-> da un error `LIMIT`; `Limits` solo tiene lo que el motor comprueba por su cuenta.
+> da un error `LIMIT`. `Limits` solo tiene lo que el motor comprueba por su cuenta.
 
 ## Hilos
 
@@ -174,16 +176,16 @@ dos hilos que convierten a la vez no comparten ningún estado que cambie.
 |---|---|
 | `Converter`, `Resources`, `DocumentReader` | Sí. Se crean una vez y se usan desde todos los hilos |
 | `LaidOutDocument` (lo que devuelve `layOut`) | Sí, para pintarlo: un mismo documento maquetado se puede escribir a PDF y a SVG desde varios hilos. Se entrega a los demás hilos con un `Future`, un ejecutor o un campo `volatile` |
-| `Engine` | **No.** Guarda la caché del layout y el estado de la numeración. Uno por conversión; reutilizarlo en secuencia es seguro (lo suelta todo al terminar cada documento) |
+| `Engine` | **No.** Guarda la caché del layout y el estado de la numeración. Uno por conversión, y reutilizarlo en secuencia es seguro (lo suelta todo al terminar cada documento) |
 | `Box` y `Style` (el árbol de cajas) | Solo lectura una vez construido |
 
 `ConcurrentConversionTest` comprueba con ocho hilos convirtiendo los once ejemplos que el PDF es el mismo, byte a byte, que
 en la conversión secuencial, y `EngineContractTest`, que un `Engine` reutilizado da lo mismo que uno nuevo. El texto de un
 SVG se dibuja con las fuentes de la carpeta de recursos sin darlas de alta en la JVM, así que no depende de su idioma ni de
-otras carpetas; JSVG lo dibuja con AWT, así que en un servidor sin pantalla se arranca la JVM con
+otras carpetas. JSVG lo dibuja con AWT, así que en un servidor sin pantalla se arranca la JVM con
 `-Djava.awt.headless=true`.
 
-> **Decisión:** el contrato de hilos está escrito, no solo observado. El schema compartido de `stxt-core` se apoya en dos
+> **Decisión:** el contrato de hilos está escrito y no solo observado. El schema compartido de `stxt-core` se apoya en dos
 > hechos de la versión 1.0.3, comprobados en su bytecode: el proveedor del schema solo lee de un mapa y el validador solo
 > escribe campos en su constructor. Un cambio de versión obliga a repasarlo (está anotado en el `pom.xml` y en
 > `DocumentSchema`). *Alternativa descartada:* una copia del schema por hilo.

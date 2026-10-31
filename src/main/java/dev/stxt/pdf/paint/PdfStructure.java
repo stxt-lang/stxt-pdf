@@ -595,7 +595,7 @@ final class PdfStructure {
 
     /**
      * El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. Con PDF/UA-2, la
-     * anotación no lleva además su texto ({@code Table of contents}): lo que se lee es el {@code Alt}, y los dos
+     * anotación no lleva además su texto ({@code Contents}): lo que se lee es el {@code Alt}, y los dos
      * tendrían que coincidir.
      */
     private void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
