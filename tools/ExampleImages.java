@@ -33,6 +33,10 @@ import java.util.Random;
  * of {@code resources/fonts/}, and it is deterministic: the same Java version gives the same
  * result.
  *
+ * <p>The images with text (the charts of the report, the figures of the manual and the seal of the certificate) are
+ * drawn once per language of the examples, in a {@code es/} or {@code en/} subfolder. The logos keep their text in
+ * every language: they are the brand of the companies.</p>
+ *
  * <pre>
  * java tools/ExampleImages.java            # from the root of the repository
  * </pre>
@@ -51,6 +55,9 @@ public class ExampleImages {
     static final Color GREEN = new Color(0x4C8C4A);
     static final Color GREY = new Color(0x6B6B6B);
 
+    /** The languages of the examples: Spanish is the original, English the mirror. */
+    static final String[] LANGUAGES = {"es", "en"};
+
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.ROOT);
         System.setProperty("java.awt.headless", "true");
@@ -61,10 +68,14 @@ public class ExampleImages {
         newsletter();
         menu();
         contract();
-        manual();
         catalog();
         certificate();
         planner();
+        for (String lang : LANGUAGES) {
+            reportCharts(lang);
+            manual(lang);
+            seal(lang);
+        }
         System.out.println("Images written to " + OUT);
     }
 
@@ -266,6 +277,11 @@ public class ExampleImages {
 
     static void rightAligned(Graphics2D g, String s, Font f, Color c, float right, float y) {
         text(g, s, f, c, right - width(g, s, f), y);
+    }
+
+    /** The text in Spanish or in English, according to {@code lang}. */
+    static String tr(String lang, String es, String en) {
+        return lang.equals("es") ? es : en;
     }
 
     static Color alpha(Color c, int a) {
@@ -489,10 +505,15 @@ public class ExampleImages {
         }
         g.dispose();
         save(cover, "report/cover.jpg");
+    }
 
+    /** The three charts of the report, with their texts in {@code lang}. */
+    static void reportCharts(String lang) throws IOException {
         // Monthly production: bars.
         double[] mwh = {112, 128, 171, 208, 251, 287, 306, 291, 232, 176, 124, 98};
-        String[] months = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
+        String[] months = lang.equals("es")
+                ? new String[] {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"}
+                : new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         Svg bars = svg(1400, 640);
         float left = 90;
         float right = 1370;
@@ -511,11 +532,13 @@ public class ExampleImages {
             fill(bars, c, new RoundRectangle2D.Float(left + slot * i + slot * 0.18f, bottom - bh, slot * 0.64f, bh, 8, 8));
             centered(bars, months[i], small, GREY, left + slot * (i + 0.5f), bottom + 40);
         }
-        bars.save("report/chart-production.svg");
+        bars.save("report/" + lang + "/chart-production.svg");
 
         // Customer mix: ring with legend.
         Svg ring = svg(1400, 640);
-        String[] names = {"Hogares", "Comercios", "Industria", "Administración"};
+        String[] names = lang.equals("es")
+                ? new String[] {"Hogares", "Comercios", "Industria", "Administración"}
+                : new String[] {"Households", "Businesses", "Industry", "Public sector"};
         double[] parts = {46, 27, 19, 8};
         Color[] colors = {new Color(0x1B6E8C), new Color(0xE07B1F), new Color(0x4C8C4A), new Color(0x8A6FB3)};
         double angle = 90;
@@ -527,15 +550,15 @@ public class ExampleImages {
             fill(ring, colors[i], slice);
             angle += sweep;
         }
-        centered(ring, "8.412", font("Sans", "Bold", 64), INK, 340, 335);
-        centered(ring, "clientes", font("Sans", "Regular", 32), GREY, 340, 382);
+        centered(ring, tr(lang, "8.412", "8,412"), font("Sans", "Bold", 64), INK, 340, 335);
+        centered(ring, tr(lang, "clientes", "customers"), font("Sans", "Regular", 32), GREY, 340, 382);
         for (int i = 0; i < parts.length; i++) {
             float y = 150 + i * 110;
             fill(ring, colors[i], new RoundRectangle2D.Float(720, y - 34, 44, 44, 10, 10));
             text(ring, names[i], font("Sans", "Regular", 42), INK, 790, y);
-            text(ring, (int) parts[i] + " %", font("Sans", "Bold", 42), colors[i], 1170, y);
+            text(ring, (int) parts[i] + tr(lang, " %", "%"), font("Sans", "Bold", 42), colors[i], 1170, y);
         }
-        ring.save("report/chart-mix.svg");
+        ring.save("report/" + lang + "/chart-mix.svg");
 
         // Cumulative emission savings: line with area.
         Svg line = svg(1400, 640);
@@ -575,7 +598,7 @@ public class ExampleImages {
             fill(line, Color.WHITE, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
             stroke(line, new Color(0x2F6B2E), 5, new Ellipse2D.Float(x - 11, y - 11, 22, 22));
         }
-        line.save("report/chart-savings.svg");
+        line.save("report/" + lang + "/chart-savings.svg");
     }
 
     // =========================================================================================
@@ -743,7 +766,8 @@ public class ExampleImages {
     // Manual: device, phone screen and wiring diagram
     // =========================================================================================
 
-    static void manual() throws IOException {
+    /** The three figures of the manual, with their texts in {@code lang}. */
+    static void manual(String lang) throws IOException {
         // Thermostat seen from the front.
         Svg d = svg(900, 900);
         fill(d, alpha(Color.BLACK, 30), new RoundRectangle2D.Float(110, 130, 700, 700, 120, 120));
@@ -752,12 +776,12 @@ public class ExampleImages {
         fill(d, new Color(0x222831), new Ellipse2D.Float(190, 200, 500, 500));
         stroke(d, new Color(0x5CC8C0), 18, new Arc2D.Float(215, 225, 450, 450, 225, -240, Arc2D.OPEN));
         stroke(d, new Color(0x2E3A46), 18, new Arc2D.Float(215, 225, 450, 450, -15, -30, Arc2D.OPEN));
-        centered(d, "21,5°", font("Sans", "Bold", 130), Color.WHITE, 440, 470);
-        centered(d, "Modo Confort", font("Sans", "Regular", 36), new Color(0x9FB3C2), 440, 535);
+        centered(d, tr(lang, "21,5°", "21.5°"), font("Sans", "Bold", 130), Color.WHITE, 440, 470);
+        centered(d, tr(lang, "Modo Confort", "Comfort mode"), font("Sans", "Regular", 36), new Color(0x9FB3C2), 440, 535);
         fill(d, new Color(0xE9A23B), new Ellipse2D.Float(418, 580, 44, 44));
-        centered(d, "Objetivo 22°", font("Sans", "Regular", 32), new Color(0x9FB3C2), 440, 660);
+        centered(d, tr(lang, "Objetivo 22°", "Target 22°"), font("Sans", "Regular", 32), new Color(0x9FB3C2), 440, 660);
         fill(d, new Color(0x4C8C4A), new Ellipse2D.Float(660, 135, 26, 26));
-        d.save("manual/thermostat.svg");
+        d.save("manual/" + lang + "/thermostat.svg");
 
         // Screen of the app.
         BufferedImage s = image(560, 1000, true);
@@ -768,12 +792,12 @@ public class ExampleImages {
         g.setClip(new RoundRectangle2D.Float(28, 28, 504, 944, 56, 56));
         fill(g, new Color(0x1F7A7A), new Rectangle2D.Float(28, 28, 504, 140));
         g.setClip(null);
-        text(g, "Salón", font("Sans", "Bold", 48), Color.WHITE, 62, 110);
+        text(g, tr(lang, "Salón", "Living room"), font("Sans", "Bold", 48), Color.WHITE, 62, 110);
         rightAligned(g, "09:41", font("Sans", "Regular", 30), alpha(Color.WHITE, 220), 500, 62);
         stroke(g, new Color(0xD7DEE6), 22, new Arc2D.Float(110, 220, 340, 340, 225, -270, Arc2D.OPEN));
         stroke(g, new Color(0xE9A23B), 22, new Arc2D.Float(110, 220, 340, 340, 225, -170, Arc2D.OPEN));
-        centered(g, "21,5°", font("Sans", "Bold", 84), INK, 280, 410);
-        centered(g, "Calentando", font("Sans", "Regular", 30), GREY, 280, 460);
+        centered(g, tr(lang, "21,5°", "21.5°"), font("Sans", "Bold", 84), INK, 280, 410);
+        centered(g, tr(lang, "Calentando", "Heating"), font("Sans", "Regular", 30), GREY, 280, 460);
         fill(g, Color.WHITE, new Ellipse2D.Float(130, 620, 120, 120));
         fill(g, Color.WHITE, new Ellipse2D.Float(310, 620, 120, 120));
         stroke(g, new Color(0xD7DEE6), 4, new Ellipse2D.Float(130, 620, 120, 120));
@@ -782,20 +806,22 @@ public class ExampleImages {
         centered(g, "+", font("Sans", "Bold", 80), INK, 370, 705);
         fill(g, new Color(0xFFFFFF), new RoundRectangle2D.Float(62, 800, 436, 110, 30, 30));
         stroke(g, new Color(0xD7DEE6), 3, new RoundRectangle2D.Float(62, 800, 436, 110, 30, 30));
-        text(g, "Programa semanal", font("Sans", "Regular", 34), INK, 90, 866);
+        text(g, tr(lang, "Programa semanal", "Weekly schedule"), font("Sans", "Regular", 34), INK, 90, 866);
         fill(g, new Color(0x4C8C4A), new RoundRectangle2D.Float(400, 832, 70, 40, 40, 40));
         fill(g, Color.WHITE, new Ellipse2D.Float(436, 836, 32, 32));
         g.dispose();
-        save(s, "manual/app.png");
+        save(s, "manual/" + lang + "/app.png");
 
         // Wiring diagram: terminal block.
         Svg w = svg(1400, 560);
         fill(w, new Color(0xF4F4F1), new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
         stroke(w, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
-        text(w, "Termostato", font("Sans", "Bold", 40), INK, 80, 110);
+        text(w, tr(lang, "Termostato", "Thermostat"), font("Sans", "Bold", 40), INK, 80, 110);
         String[] term = {"L", "N", "C", "NO"};
         Color[] wire = {new Color(0x8B4A2B), new Color(0x2F6DB5), new Color(0x777777), new Color(0xD9A400)};
-        String[] label = {"Fase (marrón)", "Neutro (azul)", "Común de la caldera", "Caldera: contacto NO"};
+        String[] label = lang.equals("es")
+                ? new String[] {"Fase (marrón)", "Neutro (azul)", "Común de la caldera", "Caldera: contacto NO"}
+                : new String[] {"Live (brown)", "Neutral (blue)", "Boiler common", "Boiler: NO contact"};
         for (int i = 0; i < 4; i++) {
             float y = 160 + i * 88;
             fill(w, new Color(0x2E3A46), new RoundRectangle2D.Float(440, y, 120, 60, 12, 12));
@@ -804,7 +830,7 @@ public class ExampleImages {
             fill(w, wire[i], new Ellipse2D.Float(890, y + 18, 24, 24));
             text(w, label[i], font("Sans", "Regular", 38), INK, 940, y + 43);
         }
-        w.save("manual/wiring.svg");
+        w.save("manual/" + lang + "/wiring.svg");
     }
 
     // =========================================================================================
@@ -934,7 +960,8 @@ public class ExampleImages {
     // Certificate: seal and two signatures
     // =========================================================================================
 
-    static void certificate() throws IOException {
+    /** The seal of the certificate, with its text in {@code lang}. */
+    static void seal(String lang) throws IOException {
         Svg g = svg(600, 760);
         Color gold = new Color(0xC9A24A);
         Color goldDark = new Color(0x8C6D23);
@@ -973,10 +1000,13 @@ public class ExampleImages {
         stroke(g, goldDark, 6, new Ellipse2D.Float(90, 90, 420, 420));
         stroke(g, new Color(0xF3E2A8), 3, new Ellipse2D.Float(110, 110, 380, 380));
         fill(g, goldDark, star(300, 240, 105, 44));
-        centered(g, "CERTIFICADO", font("Serif", "Bold", 40), new Color(0x4F3B0F), 300, 400);
-        centered(g, "DE EXCELENCIA", font("Serif", "Bold", 32), new Color(0x4F3B0F), 300, 446);
-        g.save("certificate/seal.svg");
+        centered(g, tr(lang, "CERTIFICADO", "CERTIFICATE"), font("Serif", "Bold", 40), new Color(0x4F3B0F), 300, 400);
+        centered(g, tr(lang, "DE EXCELENCIA", "OF EXCELLENCE"), font("Serif", "Bold", 32), new Color(0x4F3B0F), 300, 446);
+        g.save("certificate/" + lang + "/seal.svg");
+    }
 
+    /** The two signatures of the certificate. */
+    static void certificate() throws IOException {
         Svg s1 = svg(700, 240);
         signature(s1, new Color(0x14305E), 21);
         s1.save("certificate/signature-director.svg");

@@ -271,7 +271,7 @@ Document (dev.stxt.pdf):
 								Margin: 2 0 0 0
 			Heading 2:
 				Text: Producción mensual
-			Image: examples/report/chart-production.svg
+			Image: examples/report/es/chart-production.svg
 				Id: chart-production
 				Alt: Gráfico de barras con la producción mensual de 2025, en MWh: de 98 en diciembre a 306 en julio
 				Box:
@@ -312,7 +312,7 @@ Document (dev.stxt.pdf):
 						## Fondo solidario
 
 						El uno por ciento de la facturación va a un fondo que paga las facturas de las familias en situación de vulnerabilidad: este año, 61 hogares.
-			Image: examples/report/chart-mix.svg
+			Image: examples/report/es/chart-mix.svg
 				Id: chart-mix
 				Alt: Gráfico en anillo con los clientes por tipo: hogares 46 %, comercios 27 %, industria 19 % y administración 8 %
 				Box:
@@ -398,7 +398,7 @@ Document (dev.stxt.pdf):
 			Style: section
 			Heading 1:
 				Text: Medio ambiente
-			Image: examples/report/chart-savings.svg
+			Image: examples/report/es/chart-savings.svg
 				Id: chart-savings
 				Alt: Gráfico de líneas con las toneladas de CO₂ evitadas de forma acumulada: de 0 en 2019 a 15.900 en 2025
 				Box:

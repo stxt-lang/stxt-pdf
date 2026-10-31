@@ -1,0 +1,57 @@
+Result:
+	Page: 1
+		Fragment: banner
+			Rect: 54 64 487 109
+		Fragment: overview
+			Rect: 54 191 487 250
+			Fragment: device
+				Rect: 54 191 250 250
+		Fragment: contents
+			Rect: 54 494 487 49
+		Fragment: warning-power
+			Rect: 54 551 487 65.5
+		Fragment: installation
+			Rect: 54 628.5 487 133.5
+		Fragment: header
+			Rect: 54 30 487 14.5
+		Fragment: footer
+			Rect: 54 796 487 20
+	Page: 2
+		Fragment: installation
+			Rect: 54 64 487 654.3
+			Fragment: wiring
+				Rect: 54 64 487 194.8
+			Fragment: terminal
+				Rect: 54 403.3 487 98
+			Fragment: terminals
+				Rect: 54 593.3 487 125
+		Fragment: header
+			Rect: 54 30 487 14.5
+		Fragment: footer
+			Rect: 54 796 487 20
+	Page: 3
+		Fragment: app
+			Rect: 54 64 487 668.5
+			Fragment: app-screen
+				Rect: 54 97 112 200
+			Fragment: schedule
+				Rect: 54 386 487 125
+		Fragment: header
+			Rect: 54 30 487 14.5
+		Fragment: footer
+			Rect: 54 796 487 20
+	Page: 4
+		Fragment: app
+			Rect: 54 64 487 158
+			Fragment: specs-heading
+				Rect: 54 64 487 25
+			Fragment: specs
+				Rect: 54 97 487 125
+		Fragment: support
+			Rect: 54 242 487 214
+			Fragment: contact
+				Rect: 54 390.5 487 65.5
+		Fragment: header
+			Rect: 54 30 487 14.5
+		Fragment: footer
+			Rect: 54 796 487 20

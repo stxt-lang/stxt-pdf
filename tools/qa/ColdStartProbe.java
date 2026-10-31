@@ -27,7 +27,9 @@ public class ColdStartProbe {
     public static void main(String[] a) throws Exception {
         List<In> ins = new ArrayList<>();
         try (var ds = Files.newDirectoryStream(Path.of("test/examples"), Files::isDirectory)) {
-            for (Path d : ds) ins.add(new In(d.getFileName().toString(), d.resolve("input.stxt"), d.resolve("styles.stxt")));
+            for (Path d : ds)
+                for (String lang : List.of("es", "en"))
+                    ins.add(new In(d.getFileName() + "/" + lang, d.resolve(lang).resolve("input.stxt"), d.resolve("styles.stxt")));
         }
         ins.sort(Comparator.comparing(In::name));
 

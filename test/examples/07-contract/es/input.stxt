@@ -6,8 +6,9 @@
 # signature block, which is not split across pages. The titles are written in lowercase and the rules
 # of styles.stxt put them in uppercase (Case). The sections (Reunidos, Exponen, Cláusulas) are
 # numbered Heading 2 (Numbered: true in styles.stxt) and the contract title declares Numbered: false.
-# The annex is a Heading 1 with the annex style, numbered in Roman numerals with its label (Number format and Number
-# label: "Anexo I · ..."), which the clauses refer to with {number of: annex-title}; recital III
+# The annex is a Heading 1 with the annex style, numbered in Roman numerals (Number format, in styles.stxt) with its
+# label (Number label: "Anexo I · ...", in the document because it is text and styles.stxt serves both languages), which
+# the clauses refer to with {number of: annex-title}; recital III
 # refers to the clauses section with {number of: terms}.
 Document (dev.stxt.pdf):
 	Page:
@@ -143,6 +144,8 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Id: annex-title
 				Style: annex
+				Typography:
+					Number label: Anexo {number} ·
 				Text: Calendario y honorarios
 			Table:
 				Id: fees

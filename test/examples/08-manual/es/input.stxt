@@ -78,7 +78,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Width: 250
 						Height: 250
-					Image: examples/manual/thermostat.svg
+					Image: examples/manual/es/thermostat.svg
 						Alt: El termostato visto de frente, con el anillo de temperatura y el indicador luminoso
 						Box:
 							Width: 100%
@@ -170,7 +170,7 @@ Document (dev.stxt.pdf):
 					3. Atornilla la base a la pared, a **1,5 m** del suelo y lejos de corrientes de aire y de fuentes de calor.
 					4. Conecta los cables a los bornes según el esquema de abajo y aprieta bien los tornillos.
 					5. Encaja el termostato en la base y restablece la corriente: se encenderá solo.
-			Image: examples/manual/wiring.svg
+			Image: examples/manual/es/wiring.svg
 				Id: wiring
 				Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
 				Box:
@@ -260,7 +260,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 8 0
 				Item:
-					Image: examples/manual/app.png
+					Image: examples/manual/es/app.png
 						Id: app-screen
 						Alt: La pantalla principal de la aplicación, con la temperatura del salón y los botones más y menos
 						Box:

@@ -19,6 +19,7 @@ First version published on Maven Central.
 - Internal references and links, heading and page numbering, rotation, rounded corners and balanced columns.
 - Errors with a code and a line (`InvalidModelException` with its `ErrorCode`), a WCAG AA contrast check
   (`CONTRAST_LOW`) and limits for hostile input (`PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX`, `PDF_TOO_LARGE`).
-- Messages, comments and javadoc in English. The documentation is in English (`docs/en`) and Spanish (`docs/es`).
+- Messages, comments and javadoc in English. The documentation is in English (`docs/en`) and Spanish (`docs/es`), and
+  so are the eleven examples of `test/examples` (one `en/` and one `es/` folder per example).
 - The jar includes no fonts: they are read from the resources folder (`resources/` in the working directory, or the one
   passed with `Converter.builder().resources(...)`).

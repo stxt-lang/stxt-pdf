@@ -1,0 +1,40 @@
+Result:
+	Page: 1
+		Fragment: cover
+			Rect: 0 0 595 842
+			Fragment: cover-mark
+				Rect: 56 64 74 74
+			Fragment: cover-products
+				Rect: 56 393.5 483 108
+	Page: 2
+		Fragment: index
+			Rect: 50 54 495 331.5
+			Fragment: toc
+				Rect: 50 125 495 260.5
+		Fragment: footer
+			Rect: 50 798 495 20
+	Page: 3
+		Fragment: dining
+			Rect: 50 54 495 697
+			Fragment: grid-dining
+				Rect: 50 142 495 609
+		Fragment: footer
+			Rect: 50 798 495 20
+	Page: 4
+		Fragment: rest
+			Rect: 50 54 495 697
+			Fragment: grid-rest
+				Rect: 50 142 495 609
+		Fragment: footer
+			Rect: 50 798 495 20
+	Page: 5
+		Fragment: woods
+			Rect: 50 54 495 517
+			Fragment: wood-table
+				Rect: 50 125 495 157
+			Fragment: steps
+				Rect: 50 336 495 109
+			Fragment: contact
+				Rect: 50 471 495 100
+		Fragment: footer
+			Rect: 50 798 495 20

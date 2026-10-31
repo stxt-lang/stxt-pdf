@@ -58,15 +58,16 @@ class ConcurrentConversionTest {
     static void readExamplesAndConvertThemInSequence() throws IOException {
         DocumentReader reader = new DocumentReader();
         Resources resources = new Resources();
+        // One document per example and language (01-invoice/en), with the styles of the example, shared by both.
         List<Path> dirs;
-        try (Stream<Path> list = Files.list(EXAMPLES)) {
-            dirs = list.filter(Files::isDirectory).sorted().toList();
+        try (Stream<Path> found = Files.find(EXAMPLES, 3, (p, a) -> p.getFileName().toString().equals("input.stxt"))) {
+            dirs = found.map(Path::getParent).sorted().toList();
         }
         for (Path dir : dirs) {
             InlineNode document = reader.read(dir.resolve("input.stxt"));
-            Path styles = dir.resolve("styles.stxt");
+            Path styles = dir.getParent().resolve("styles.stxt");
             InlineNode rules = Files.exists(styles) ? reader.readStyles(styles) : null;
-            Example pending = new Example(dir.getFileName().toString(), document, rules, null);
+            Example pending = new Example(EXAMPLES.relativize(dir).toString().replace('\\', '/'), document, rules, null);
             EXAMPLE_LIST.add(new Example(pending.name(), document, rules,
                     convert(converter(pending, resources), document)));
         }

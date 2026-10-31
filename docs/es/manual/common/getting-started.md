@@ -81,4 +81,4 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 
 - [Conceptos](concepts.md): las ideas que usa el resto del manual.
 - [Estilos](styles.md): reglas para no repetir el estilo en cada elemento.
-- Los [ejemplos](../../../../test/examples/README.md): once documentos reales con su PDF.
+- Los [ejemplos](../../../../test/examples/README.es.md): once documentos reales con su PDF.

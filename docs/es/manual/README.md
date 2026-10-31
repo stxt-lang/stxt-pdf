@@ -51,4 +51,4 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [`Markdown`](components/markdown.md) | Escribir contenido largo en Markdown |
 | [`Table of contents`](components/table-of-contents.md) | El índice automático |
 
-Los [ejemplos](../../../test/examples/README.md) son once documentos reales con su PDF, de una factura a un informe anual.
+Los [ejemplos](../../../test/examples/README.es.md) son once documentos reales con su PDF, de una factura a un informe anual.

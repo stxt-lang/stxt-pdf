@@ -34,8 +34,9 @@ public class ConcurrencyProbe {
         try (var ds = Files.newDirectoryStream(Path.of("test/examples"), p -> Files.isDirectory(p))) {
             for (Path d : ds) {
                 Path st = d.resolve("styles.stxt");
-                ins.add(new In(d.getFileName().toString(), rd.read(d.resolve("input.stxt")),
-                        Files.exists(st) ? rd.readStyles(st) : null));
+                for (String lang : List.of("es", "en"))
+                    ins.add(new In(d.getFileName() + "/" + lang, rd.read(d.resolve(lang).resolve("input.stxt")),
+                            Files.exists(st) ? rd.readStyles(st) : null));
             }
         }
         ins.sort(Comparator.comparing(In::name));

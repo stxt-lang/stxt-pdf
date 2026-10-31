@@ -44,7 +44,7 @@ class EngineContractTest {
 
     @Test
     void layingOutAnEngineReleasesItsCache() throws IOException {
-        Path dir = firstExample();
+        Path dir = exampleDocuments().get(0);
         InlineNode document = new DocumentReader().read(dir.resolve("input.stxt"));
         Resources resources = new Resources();
         Engine engine = new Engine(new PdfMetrics(resources), resources);
@@ -64,10 +64,7 @@ class EngineContractTest {
         DocumentReader reader = new DocumentReader();
         Resources resources = new Resources();
         Engine reused = new Engine(new PdfMetrics(resources), resources);
-        List<Path> dirs;
-        try (Stream<Path> list = Files.list(EXAMPLES)) {
-            dirs = list.filter(Files::isDirectory).sorted().toList();
-        }
+        List<Path> dirs = exampleDocuments();
         assertFalse(dirs.isEmpty());
         // Two rounds, so that each document also follows a different one from the one that preceded it.
         for (int round = 0; round < 2; round++) {
@@ -77,19 +74,21 @@ class EngineContractTest {
                 String fresh = StxtDump.dump(new Engine(new PdfMetrics(resources), resources)
                         .layOutDocument(document, styles).pages(), true);
                 String again = StxtDump.dump(reused.layOutDocument(document, styles).pages(), true);
-                assertEquals(fresh, again, dir.getFileName() + " (round " + (round + 1) + ")");
+                assertEquals(fresh, again, EXAMPLES.relativize(dir) + " (round " + (round + 1) + ")");
             }
         }
     }
 
-    private static Path firstExample() throws IOException {
-        try (Stream<Path> list = Files.list(EXAMPLES)) {
-            return list.filter(Files::isDirectory).sorted().findFirst().orElseThrow();
+    /** The folders of the documents of the examples, one per example and language ({@code 01-invoice/en}), in order. */
+    private static List<Path> exampleDocuments() throws IOException {
+        try (Stream<Path> found = Files.find(EXAMPLES, 3, (p, a) -> p.getFileName().toString().equals("input.stxt"))) {
+            return found.map(Path::getParent).sorted().toList();
         }
     }
 
+    /** The separate styles of an example, shared by its languages: in the folder of the example. */
     private static InlineNode styles(Path dir) {
-        Path file = dir.resolve("styles.stxt");
+        Path file = dir.getParent().resolve("styles.stxt");
         return Files.exists(file) ? new DocumentReader().readStyles(file) : null;
     }
 

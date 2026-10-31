@@ -11,8 +11,8 @@ Document (dev.stxt.pdf):
 		Paper: A4
 		Orientation: landscape
 		Margin: 64 80 56 80
-	Title: Certificado de finalización · Cerámica a mano
-	Language: es
+	Title: Certificate of Completion · Handmade Ceramics
+	Language: en
 	Section:
 		Page overlay:
 			Id: paper
@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 		Page overlay:
 			Id: footer
 			Offset: auto 0 -22 0
-			Text: Verificable en escuelaceramica.example/verificar
+			Text: Verifiable at escuelaceramica.example/verificar
 				Link: https://escuelaceramica.example/verificar
 		Page overlay:
 			Id: serial
@@ -73,22 +73,22 @@ Document (dev.stxt.pdf):
 			Rotate origin: top left
 			Box:
 				Width: 260
-			Text: Certificado nº cer-2025-0412
+			Text: Certificate no. cer-2025-0412
 				Style: serial
 		Text: Escuela de cerámica del Valle
 			Style: school
 		Heading 1:
-			Text: Certificado de finalización
-		Text: Se otorga a
+			Text: Certificate of Completion
+		Text: Presented to
 			Style: aside
 		Text: Elena Ruiz Navarro
 			Id: recipient
 			Style: name
-		Text: por haber completado con aprovechamiento el curso
+		Text: for having successfully completed the course
 			Style: aside
 		Heading 2:
-			Text: Cerámica a mano: del barro a la pieza
-		Text: Curso de 40 horas lectivas, impartido en Olot del 8 de septiembre al 24 de octubre de 2025, con una calificación final de sobresaliente.
+			Text: Handmade Ceramics: From Clay to Finished Piece
+		Text: A course of 40 class hours, held in Olot from September 8 to October 24, 2025, with a final grade of Outstanding.
 			Box:
 				Width: 500
 				Margin: 0 auto 18 auto
@@ -101,7 +101,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Width: 220
 					Image: examples/certificate/signature-director.svg
-						Alt: Firma de la directora de la escuela
+						Alt: Signature of the school director
 						Box:
 							Width: 140
 							Margin: 0 auto
@@ -110,12 +110,12 @@ Document (dev.stxt.pdf):
 						Text: Montserrat Puig Vila
 							Typography:
 								Bold: true
-						Text: Directora de la Escuela
+						Text: Director of the School
 			Item:
 				Block:
-					Image: examples/certificate/seal.svg
+					Image: examples/certificate/en/seal.svg
 						Id: seal
-						Alt: Sello de excelencia de la escuela
+						Alt: Seal of excellence of the school
 						Rotate: -8
 						Box:
 							Width: 100
@@ -124,7 +124,7 @@ Document (dev.stxt.pdf):
 					Box:
 						Width: 220
 					Image: examples/certificate/signature-teacher.svg
-						Alt: Firma del profesor del curso
+						Alt: Signature of the course instructor
 						Box:
 							Width: 140
 							Margin: 0 auto
@@ -133,4 +133,4 @@ Document (dev.stxt.pdf):
 						Text: Martí Roca Font
 							Typography:
 								Bold: true
-						Text: Profesor del curso
+						Text: Course Instructor

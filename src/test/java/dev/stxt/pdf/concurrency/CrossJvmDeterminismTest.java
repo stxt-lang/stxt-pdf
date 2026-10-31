@@ -44,15 +44,18 @@ class CrossJvmDeterminismTest {
 
         static List<String> all() throws Exception {
             DocumentReader reader = new DocumentReader();
+            // One document per example and language (test/examples/01-invoice/en) and per golden case.
             List<Path> dirs;
-            try (Stream<Path> examples = Files.list(Path.of("test", "examples"));
+            try (Stream<Path> examples = Files.find(Path.of("test", "examples"), 3,
+                    (p, a) -> p.getFileName().toString().equals("input.stxt"));
                  Stream<Path> golden = Files.list(Path.of("test", "golden"))) {
-                dirs = Stream.concat(examples, golden).filter(Files::isDirectory).sorted().toList();
+                dirs = Stream.concat(examples.map(Path::getParent), golden.filter(Files::isDirectory)).sorted().toList();
             }
             List<String> hashes = new java.util.ArrayList<>();
             for (Path dir : dirs) {
                 InlineNode document = reader.read(dir.resolve("input.stxt"));
-                Path styles = dir.resolve("styles.stxt");
+                // The styles of an example are in its folder, shared by its languages.
+                Path styles = (dir.startsWith(Path.of("test", "examples")) ? dir.getParent() : dir).resolve("styles.stxt");
                 // The colors of a golden case only tell the boxes apart: no contrast is required of them.
                 Converter.Builder builder = Converter.builder();
                 if (dir.startsWith(Path.of("test", "golden"))) {

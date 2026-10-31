@@ -41,7 +41,6 @@ Styles (dev.stxt.pdf):
 			Align: left
 			Letter spacing: 0.8
 			Number format: upper-roman
-			Number label: Anexo {number} ·
 		Box:
 			Margin: 16 0 6 0
 			Padding: 0 0 3 0
