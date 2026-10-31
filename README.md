@@ -1,12 +1,14 @@
 # stxt-pdf
 
-Motor de layout y generación de PDF a partir de documentos [STXT](https://stxt.dev). El documento describe qué hay en cada
-página y cómo se ve. El motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF.
+**English** | [Español](README.es.md)
+
+Layout engine and PDF generator for [STXT](https://stxt.dev) documents. The document describes what goes on each page and
+how it looks. The engine works out where everything goes, splits the content into pages and writes the PDF.
 
 ```
 Document (dev.stxt.pdf):
-    Language: es
-    Title: Informe del trimestre
+    Language: en
+    Title: Quarterly report
     Page:
         Paper: A4
         Margin: 50
@@ -17,49 +19,52 @@ Document (dev.stxt.pdf):
                 Size: 10
     Section:
         Heading 1:
-            Text: Informe del trimestre
-        Paragraph: Las ventas han crecido un 12 % respecto al trimestre anterior.
+            Text: Quarterly report
+        Paragraph: Sales grew by 12% compared with the previous quarter.
 ```
 
-El PDF lleva:
+The PDF has:
 
-- **Las fuentes incrustadas**, con los caracteres que se usan.
-- **Etiquetado** para la accesibilidad: PDF/UA-1, o PDF/UA-2 si se pide.
-- **Marcadores**, uno por encabezado.
+- **Embedded fonts**, with the characters that are used.
+- **Tagging** for accessibility: PDF/UA-1, or PDF/UA-2 on request.
+- **Bookmarks**, one per heading.
 
-**El motor es estricto.** Cada elemento solo admite las propiedades que tienen sentido en él. Ningún elemento tiene un
-aspecto propio: un `Heading 1` no es más grande que un `Paragraph` si un estilo no lo dice. Lo que no tendría efecto, se
-contradice o no cabe es un error con su línea.
+**The engine is strict.** Each element accepts only the properties that make sense in it. No element has a look of its
+own: a `Heading 1` is not larger than a `Paragraph` unless a style says so. Anything that would have no effect,
+contradicts something else or does not fit is an error with its line.
 
-## Documentación
+## Documentation
 
-| | Qué hay |
+| | Contents |
 |---|---|
-| [Ejemplos](#ejemplos) | Once documentos reales, con su PDF y su fuente |
-| [Manual](docs/es/manual/README.md) | Cómo se escribe un documento, del primero a cada elemento. Basta con saber STXT ([stxt.dev](https://stxt.dev)) |
-| [Referencia](docs/es/reference/README.md) | La regla exacta de cada comportamiento, las decisiones de diseño y la arquitectura del código |
+| [Examples](#examples) | Eleven real documents, with their PDF and their source |
+| [Manual](docs/en/manual/README.md) | How to write a document, from the first one to each element. Knowing STXT is enough ([stxt.dev](https://stxt.dev)) |
+| [Reference](docs/en/reference/README.md) | The exact rule for each behavior, the design decisions and the architecture of the code |
 
-## Ejemplos
+The documentation is written in Spanish first ([docs/es](docs/es)) and mirrored in English.
 
-| | Documento | PDF | Fuente |
+## Examples
+
+| | Document | PDF | Source |
 |---|---|---|---|
-| [![](test/examples/01-invoice/page-1.png)](test/examples/01-invoice/output.pdf) | **Factura**: tabla con pie de totales, tarjetas con esquinas redondeadas, código en línea | [PDF](test/examples/01-invoice/output.pdf) (1 página) | [STXT](test/examples/01-invoice/input.stxt) |
-| [![](test/examples/02-letter/page-1.png)](test/examples/02-letter/output.pdf) | **Carta comercial**: membrete, texto justificado con reparto equilibrado, firma | [PDF](test/examples/02-letter/output.pdf) (1 página) | [STXT](test/examples/02-letter/input.stxt) |
-| [![](test/examples/03-resume/page-1.png)](test/examples/03-resume/output.pdf) | **Currículum**: rejilla a página completa, foto circular, barras de nivel | [PDF](test/examples/03-resume/output.pdf) (1 página) | [STXT](test/examples/03-resume/input.stxt) |
-| [![](test/examples/04-annual-report/page-1.png)](test/examples/04-annual-report/output.pdf) | **Informe anual**: portada a sangre, capítulos numerados, índice automático, gráficos, dos columnas | [PDF](test/examples/04-annual-report/output.pdf) (7 páginas) | [STXT](test/examples/04-annual-report/input.stxt) |
-| [![](test/examples/05-newsletter/page-1.png)](test/examples/05-newsletter/output.pdf) | **Boletín**: tres columnas equilibradas, fotos recortadas, agenda en tabla | [PDF](test/examples/05-newsletter/output.pdf) (2 páginas) | [STXT](test/examples/05-newsletter/input.stxt) |
-| [![](test/examples/06-menu/page-1.png)](test/examples/06-menu/output.pdf) | **Carta de restaurante**: tamaño de página propio, marco doble detrás del contenido | [PDF](test/examples/06-menu/output.pdf) (2 páginas) | [STXT](test/examples/06-menu/input.stxt) |
-| [![](test/examples/07-contract/page-1.png)](test/examples/07-contract/output.pdf) | **Contrato**: cláusulas con tres niveles de numeración, referencias, firmas que no se parten | [PDF](test/examples/07-contract/output.pdf) (3 páginas) | [STXT](test/examples/07-contract/input.stxt) |
-| [![](test/examples/08-manual/page-1.png)](test/examples/08-manual/output.pdf) | **Manual**: figura con números superpuestos, avisos, terminal preformateado, «véase la página» | [PDF](test/examples/08-manual/output.pdf) (4 páginas) | [STXT](test/examples/08-manual/input.stxt) |
-| [![](test/examples/09-catalog/page-1.png)](test/examples/09-catalog/output.pdf) | **Catálogo**: fichas en rejilla, etiqueta en diagonal, índice de productos | [PDF](test/examples/09-catalog/output.pdf) (5 páginas) | [STXT](test/examples/09-catalog/input.stxt) |
-| [![](test/examples/10-certificate/page-1.png)](test/examples/10-certificate/output.pdf) | **Certificado**: A4 apaisado, marcos concéntricos, sello girado, texto en vertical | [PDF](test/examples/10-certificate/output.pdf) (1 página) | [STXT](test/examples/10-certificate/input.stxt) |
-| [![](test/examples/11-timetable/page-1.png)](test/examples/11-timetable/output.pdf) | **Horario**: tabla con celdas separadas y redondeadas, colores por estilo | [PDF](test/examples/11-timetable/output.pdf) (1 página) | [STXT](test/examples/11-timetable/input.stxt) |
+| [![](test/examples/01-invoice/page-1.png)](test/examples/01-invoice/output.pdf) | **Invoice**: table with a totals footer, cards with rounded corners, inline code | [PDF](test/examples/01-invoice/output.pdf) (1 page) | [STXT](test/examples/01-invoice/input.stxt) |
+| [![](test/examples/02-letter/page-1.png)](test/examples/02-letter/output.pdf) | **Business letter**: letterhead, justified text with balanced line breaking, signature | [PDF](test/examples/02-letter/output.pdf) (1 page) | [STXT](test/examples/02-letter/input.stxt) |
+| [![](test/examples/03-resume/page-1.png)](test/examples/03-resume/output.pdf) | **Résumé**: full-page grid, circular photo, skill bars | [PDF](test/examples/03-resume/output.pdf) (1 page) | [STXT](test/examples/03-resume/input.stxt) |
+| [![](test/examples/04-annual-report/page-1.png)](test/examples/04-annual-report/output.pdf) | **Annual report**: full-bleed cover, numbered chapters, automatic table of contents, charts, two columns | [PDF](test/examples/04-annual-report/output.pdf) (7 pages) | [STXT](test/examples/04-annual-report/input.stxt) |
+| [![](test/examples/05-newsletter/page-1.png)](test/examples/05-newsletter/output.pdf) | **Newsletter**: three balanced columns, cropped photos, events table | [PDF](test/examples/05-newsletter/output.pdf) (2 pages) | [STXT](test/examples/05-newsletter/input.stxt) |
+| [![](test/examples/06-menu/page-1.png)](test/examples/06-menu/output.pdf) | **Restaurant menu**: custom page size, double frame behind the content | [PDF](test/examples/06-menu/output.pdf) (2 pages) | [STXT](test/examples/06-menu/input.stxt) |
+| [![](test/examples/07-contract/page-1.png)](test/examples/07-contract/output.pdf) | **Contract**: clauses with three numbering levels, cross-references, signatures kept together | [PDF](test/examples/07-contract/output.pdf) (3 pages) | [STXT](test/examples/07-contract/input.stxt) |
+| [![](test/examples/08-manual/page-1.png)](test/examples/08-manual/output.pdf) | **Manual**: figure with overlaid numbers, notices, preformatted terminal, "see page" references | [PDF](test/examples/08-manual/output.pdf) (4 pages) | [STXT](test/examples/08-manual/input.stxt) |
+| [![](test/examples/09-catalog/page-1.png)](test/examples/09-catalog/output.pdf) | **Catalog**: product cards in a grid, diagonal label, product index | [PDF](test/examples/09-catalog/output.pdf) (5 pages) | [STXT](test/examples/09-catalog/input.stxt) |
+| [![](test/examples/10-certificate/page-1.png)](test/examples/10-certificate/output.pdf) | **Certificate**: landscape A4, concentric frames, rotated seal, vertical text | [PDF](test/examples/10-certificate/output.pdf) (1 page) | [STXT](test/examples/10-certificate/input.stxt) |
+| [![](test/examples/11-timetable/page-1.png)](test/examples/11-timetable/output.pdf) | **Timetable**: table with separated, rounded cells, colors by style | [PDF](test/examples/11-timetable/output.pdf) (1 page) | [STXT](test/examples/11-timetable/input.stxt) |
 
-El estilo de cada ejemplo está en su `styles.stxt`. Lo que enseña cada uno está en el [índice de los ejemplos](test/examples/README.md).
+The documents are in Spanish. The style of each example is in its `styles.stxt`. What each one shows is in the
+[index of the examples](test/examples/README.md).
 
-## Uso
+## Usage
 
-Java 17 o superior.
+Java 17 or later.
 
 ```xml
 <dependency>
@@ -74,24 +79,25 @@ implementation 'dev.stxt:stxt-pdf:0.8.0'
 ```
 
 ```java
-InlineNode doc = new DocumentReader().read(Path.of("informe.stxt"));
-try (OutputStream out = Files.newOutputStream(Path.of("informe.pdf"))) {
+InlineNode doc = new DocumentReader().read(Path.of("report.stxt"));
+try (OutputStream out = Files.newOutputStream(Path.of("report.pdf"))) {
     Converter.create().toPdf(doc, out);
 }
 ```
 
-Las fuentes y las imágenes se buscan en `resources/`. El repositorio incluye IBM Plex Sans, Serif y Mono, con licencia SIL
-Open Font License. Las opciones, los errores, los límites y el uso con varios hilos están en
-[Uso desde Java](docs/es/manual/common/java-usage.md).
+Fonts and images are looked up in `resources/`. The repository includes IBM Plex Sans, Serif and Mono, under the SIL Open
+Font License. Options, errors, limits and use from several threads are described in
+[Using from Java](docs/en/manual/common/java-usage.md).
 
-## Desarrollo
+## Development
 
 ```bash
 mvn test
 ```
 
-Cómo está hecho el motor: [arquitectura](docs/es/reference/architecture.md). Cómo se prueba: [pruebas](docs/es/reference/implementation/testing.md).
+How the engine is built: [architecture](docs/en/reference/architecture.md). How it is tested:
+[testing](docs/en/reference/implementation/testing.md).
 
-## Licencia
+## License
 
 [MIT](LICENSE).
