@@ -1,4 +1,4 @@
-# Case: Inside: avoid en un bloque dentro de un Frame girado, que no se parte
+# Case: Keep together: true en un bloque dentro de un Frame girado, que no se parte
 # Code: BREAK_IN_UNBREAKABLE
 # Line: 20
 Document (dev.stxt.pdf):
@@ -17,5 +17,5 @@ Document (dev.stxt.pdf):
 			Rotate: 10
 			Block:
 				Break:
-					Inside: avoid
+					Keep together: true
 				Text: Sello

@@ -154,7 +154,7 @@ class BreakRulesTest {
         Box a = box(Element.BLOCK, Break.AUTO, Break.COLUMN);
         Box b = box(Element.BLOCK, Break.PAGE, Break.AUTO);
         assertEquals(Break.PAGE, BreakRules.forcedBetween(a, b));
-        assertEquals(Break.COLUMN, BreakRules.forcedBetween(a, box(Element.BLOCK, Break.AVOID,
+        assertEquals(Break.COLUMN, BreakRules.forcedBetween(a, box(Element.BLOCK, Break.AUTO,
                 Break.AUTO)));
         assertEquals(Break.AUTO, BreakRules.forcedBetween(b, a));
         assertEquals(BreakAppeal.FORCED_PAGE, BreakRules.forcedAppeal(Break.PAGE));

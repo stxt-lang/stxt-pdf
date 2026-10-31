@@ -112,7 +112,7 @@ Styles (dev.stxt.pdf):
 			Corner radius: 3
 			Background: #A65C1B
 			Padding: 3 7
-	For element: Head cell
+	For element: Header cell
 		Typography:
 			Bold: true
 			Size: 8

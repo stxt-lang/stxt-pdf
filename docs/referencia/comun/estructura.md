@@ -36,8 +36,8 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Heading 1` a `Heading 6` | Encabezado de nivel 1 a 6 ([Encabezados](../componentes/heading.md)) | Uno o varios `Text` |
 | `List` | Lista con marcadores o numerada ([List](../componentes/list.md)) | Uno o varios `List item` |
 | `List item` | Ítem de una `List`: un bloque con su marcador | Elementos, salvo los encabezados |
-| `Table` | Tabla con cabecera y pie que se repiten en cada página ([Table](../componentes/table.md)) | `Head`, `Body` y `Foot`, en ese orden |
-| `Head`, `Body`, `Foot` | Cabecera, cuerpo y pie de una `Table` | Una o varias `Row` |
+| `Table` | Tabla con cabecera y pie que se repiten en cada página ([Table](../componentes/table.md)) | `Header rows`, `Body` y `Footer rows`, en ese orden |
+| `Header rows`, `Body`, `Footer rows` | Cabecera, cuerpo y pie de una `Table` | Una o varias `Row` |
 | `Row` | Fila de una tabla | Una o varias `Cell` |
 | `Cell` | Celda: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Columns` | Bloque cuyo contenido fluye por varias columnas ([Columns](../componentes/columns.md)) | Elementos en flujo |
@@ -50,13 +50,14 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Area` | Ítem de un `Grid`: el área que ocupa y cómo se alinea | Exactamente un elemento en flujo |
 
-**Elementos** son todos menos `Section`, `Item`, `Area`, `Head`, `Body`, `Foot` y `Row`, y cada uno es una caja del
-[árbol](#el-árbol-de-cajas). **Elementos en flujo** son los que pueden ser un ítem: todos menos `Overlay` y `Page overlay`, que
-salen del flujo, y `List item` y `Cell`, que solo van en una `List` y en una `Row`.
+**Elementos** son todos menos `Section`, `Item`, `Area`, `Header rows`, `Body`, `Footer rows` y `Row`, y cada uno es una
+caja del [árbol](#el-árbol-de-cajas). **Elementos en flujo** son los que pueden ser un ítem: todos menos `Overlay` y
+`Page overlay`, que salen del flujo, y `List item` y `Cell`, que solo van en una `List` y en una `Row`.
 
 `Item` y `Area` no son cajas: son **envoltorios** que añaden al elemento lo que solo tiene sentido dentro de su
-contenedor. `Head`, `Body`, `Foot` y `Row` tampoco: agrupan las celdas, que sí lo son. Una `Row` con `Id` o `Box` tiene
-además una franja que se pinta debajo de sus celdas ([Table](../componentes/table.md#filas)), pero no ocupa sitio.
+contenedor. `Header rows`, `Body`, `Footer rows` y `Row` tampoco: agrupan las celdas, que sí lo son. Una `Row` con `Id`
+o `Box` tiene además una franja que se pinta debajo de sus celdas ([Table](../componentes/table.md#filas)), pero no
+ocupa sitio.
 
 > **Decisión:** `Item` y `Area` son envoltorios con exactamente un elemento en flujo (`SINGLE_ELEMENT`): el tamaño, los
 > márgenes y el `Id` van en el elemento, y cada ítem es una sola caja. Todo hijo en flujo de un `Flex` es un `Item`, y de
@@ -80,7 +81,7 @@ Text: Resultados del trimestre
         Bold: true
         Size: 20
     Break:
-        After: avoid
+        Keep with next: true
 ```
 
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
@@ -101,7 +102,7 @@ Text: Resultados del trimestre
 | `Style` | nombres separados por espacios | sin valor | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
 | `In table of contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` o `#id` | sin valor | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
-| `Contain margins` | booleano | `false` | `Block`, `Frame` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
+| `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
 
 ## Orden y texto
 
@@ -183,29 +184,29 @@ vez, y los elementos, las veces que se quiera.
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
 | `Styles` | `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins`, `Rotate`; elementos |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`; elementos |
 | `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Lines`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
 | `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
-| `Head`, `Body`, `Foot` | `Row` (al menos una) |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Header rows`, `Body` (obligatorio), `Footer rows` |
+| `Header rows`, `Body`, `Footer rows` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elementos salvo los encabezados |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
-| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `Grow`, `Shrink`, `Basis`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background` |
-| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `White space`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
-| `Break` | `Before`, `After`, `Inside`, `Edges` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.

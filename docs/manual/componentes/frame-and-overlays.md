@@ -84,7 +84,7 @@ sin `Offset` no se mueve: sirve para que los `Overlay` de dentro se coloquen res
 | `Rotate`, `Rotate origin` | Los tres | Girar la caja ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 | `Pages` | `Page overlay` | En qué páginas sale |
 
-Admiten además `Id`, `Style`, `Link`, `Box` y `Typography`. `Frame` admite también `Break` y `Contain margins`. `Overlay` y
+Admiten además `Id`, `Style`, `Link`, `Box` y `Typography`. `Frame` admite también `Break` y `Isolate margins`. `Overlay` y
 `Page overlay` no admiten `Break`, porque no se parten.
 
 ## `Page overlay`

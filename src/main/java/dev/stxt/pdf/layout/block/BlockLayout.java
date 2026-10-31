@@ -142,7 +142,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             this.contentRemaining = fragmenting
                     ? childSpace.fragmentainerRemaining().getAsDouble() : Double.POSITIVE_INFINITY;
             // En un fragmento que continúa la caja no sale ningún margen por arriba.
-            this.atTop = first && !box.establishesBlockFormattingContext() && model.openAtTop();
+            this.atTop = first && !box.isolatesMargins() && model.openAtTop();
         }
 
         LayoutResult layOut() {
@@ -311,7 +311,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /** Todos los hijos colocados. */
         LayoutResult finished() {
-            boolean openAtBottom = !box.establishesBlockFormattingContext() && model.openAtBottom();
+            boolean openAtBottom = !box.isolatesMargins() && model.openAtBottom();
             double contentHeight;
             AdjoiningMargins out;
             if (atTop) {

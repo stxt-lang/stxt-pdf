@@ -30,12 +30,12 @@ class ColumnsLayoutTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    /** Un {@code Block} hijo del {@code Columns} con su alto y, si {@code whole}, {@code Inside: avoid}. */
+    /** Un {@code Block} hijo del {@code Columns} con su alto y, si {@code whole}, {@code Keep together: true}. */
     static List<String> block(String id, double height, boolean whole, String... more) {
         List<String> lines = new ArrayList<>(List.of("\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:",
                 "\t\t\t\tHeight: " + height));
         if (whole) {
-            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tInside: avoid"));
+            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tKeep together: true"));
         }
         Collections.addAll(lines, more);
         return lines;
@@ -48,7 +48,7 @@ class ColumnsLayoutTest {
             lines.add("\t\t\t\t" + p);
         }
         if (whole) {
-            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tInside: avoid"));
+            lines.addAll(List.of("\t\t\tBreak:", "\t\t\t\tKeep together: true"));
         }
         return lines;
     }
@@ -86,7 +86,7 @@ class ColumnsLayoutTest {
     }
 
     @Test
-    void balanceKeepsWholeTheBoxesThatAvoidBreaks() {
+    void balanceKeepsWholeTheBoxesThatKeepTogether() {
         LayoutFixture l = layOut(columnsElement(TWO, block("A", 30, true), block("B", 30, true), block("C", 30, true)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 70, 250, 30, l.rect("B"));

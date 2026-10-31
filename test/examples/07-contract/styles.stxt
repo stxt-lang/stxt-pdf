@@ -66,7 +66,7 @@ Styles (dev.stxt.pdf):
 			Font: IBM Plex Sans
 			Size: 7.5
 			Color: #6C6B8A
-	For element: Head cell
+	For element: Header cell
 		Typography:
 			Font: IBM Plex Sans
 			Bold: true

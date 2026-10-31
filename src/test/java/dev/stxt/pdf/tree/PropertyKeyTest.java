@@ -35,7 +35,7 @@ class PropertyKeyTest {
     void shortNamesUseTheInternalName() {
         assertEquals(PropertyKey.FONT_SIZE, PropertyKey.internal("size"));
         assertEquals(PropertyKey.FONT_WEIGHT, PropertyKey.internal("bold"));
-        assertEquals("break-inside", PropertyKey.internal("inside"));
+        assertEquals(PropertyKey.BREAK_AFTER, PropertyKey.internal("after"));
         assertEquals(PropertyKey.LINE_HEIGHT, PropertyKey.internal("line-height"));
         assertEquals(PropertyKey.GRID_ROWS, PropertyKey.grid("row-sizes"));
         assertEquals(PropertyKey.ITEM_GROW, PropertyKey.item("grow"));

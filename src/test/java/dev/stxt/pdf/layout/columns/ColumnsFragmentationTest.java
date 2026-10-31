@@ -27,7 +27,7 @@ class ColumnsFragmentationTest {
         return blocks(n, false);
     }
 
-    /** Ídem; {@code whole}: con {@code Inside: avoid}. */
+    /** Ídem; {@code whole}: con {@code Keep together: true}. */
     @SuppressWarnings("unchecked")
     private static List<String>[] blocks(int n, boolean whole) {
         List<List<String>> blocks = new ArrayList<>();
@@ -74,7 +74,7 @@ class ColumnsFragmentationTest {
         List<String> column = List.of("\t\t\tBreak:", "\t\t\t\tBefore: column");
         LayoutFixture l = layOutPaged(PAGE, columnsElement(TWO, block("A", 25, false),
                 block("B", 25, false, column.toArray(String[]::new)),
-                block("C", 25, false, "\t\t\tBreak:", "\t\t\t\tBefore: column", "\t\t\t\tInside: avoid")));
+                block("C", 25, false, "\t\t\tBreak:", "\t\t\t\tBefore: column", "\t\t\t\tKeep together: true")));
         assertEquals(2, l.pages());
         assertRect(305, 40, 250, 25, l.rect(1, "B"));
         assertRect(40, 40, 250, 25, l.rect(2, "C"));
@@ -91,9 +91,9 @@ class ColumnsFragmentationTest {
         assertRect(40, 40, 515, 12, l.rect(2, "M"));
     }
 
-    /** Partir un bloque con {@code Inside: avoid} es el peor corte: antes se corta delante del Columns. */
+    /** Partir un bloque con {@code Keep together: true} es el peor corte: antes se corta delante del Columns. */
     @Test
-    void avoidInsideInTheFirstColumnMovesTheColumns() {
+    void keepTogetherInTheFirstColumnMovesTheColumns() {
         List<String> lines = new ArrayList<>(List.of("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90"));
         lines.addAll(List.of(columnsElement(TWO, block("A", 25, true))));
         LayoutFixture l = layOutPaged(PAGE, lines.toArray(String[]::new));

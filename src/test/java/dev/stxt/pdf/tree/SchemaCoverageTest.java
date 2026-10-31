@@ -45,7 +45,7 @@ class SchemaCoverageTest {
             Map.entry("Style", "Style: c"),
             Map.entry("Link", "Link: https://example.com/a"),
             Map.entry("In table of contents", "In table of contents: false"),
-            Map.entry("Contain margins", "Contain margins: true"),
+            Map.entry("Isolate margins", "Isolate margins: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
             Map.entry("Pages", "Pages: not-first"),
@@ -61,8 +61,8 @@ class SchemaCoverageTest {
             // El Box de una Row solo admite el aspecto.
             Map.entry("Box", "Box:\n\tBackground: #EEEEEE"),
             Map.entry("Typography", "Typography:\n\tColor: #333333"),
-            // Inside no se admite en una Image, que no se parte.
-            Map.entry("Break", "Break:\n\tAfter: avoid"),
+            // Keep together no se admite en una Image, que no se parte.
+            Map.entry("Break", "Break:\n\tKeep with next: true"),
             // Box
             Map.entry("Width", "Width: 100"),
             Map.entry("Height", "Height: 100"),
@@ -92,7 +92,7 @@ class SchemaCoverageTest {
             Map.entry("Small caps", "Small caps: true"),
             Map.entry("Ligatures", "Ligatures: true"),
             Map.entry("Code font", "Code font: IBM Plex Mono"),
-            Map.entry("White space", "White space: preserve-wrap"),
+            Map.entry("Preformatted", "Preformatted: wrap"),
             Map.entry("Tab size", "Tab size: 8"),
             Map.entry("Numbered", "Numbered: true"),
             Map.entry("Number format", "Number format: upper-roman"),
@@ -101,8 +101,10 @@ class SchemaCoverageTest {
             Map.entry("Orphans", "Orphans: 3"),
             // Break
             Map.entry("Before", "Before: page"),
-            Map.entry("After", "After: avoid"),
-            Map.entry("Inside", "Inside: avoid"),
+            Map.entry("After", "After: page"),
+            Map.entry("Keep with next", "Keep with next: true"),
+            Map.entry("Keep with previous", "Keep with previous: true"),
+            Map.entry("Keep together", "Keep together: true"),
             Map.entry("Edges", "Edges: closed"),
             // Flex e Item
             Map.entry("Direction", "Direction: vertical"),

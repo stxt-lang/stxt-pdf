@@ -21,7 +21,9 @@ import static dev.stxt.pdf.tree.Nodes.position;
 import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_AFTER;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_BEFORE;
-import static dev.stxt.pdf.tree.PropertyKey.BREAK_INSIDE;
+import static dev.stxt.pdf.tree.PropertyKey.KEEP_TOGETHER;
+import static dev.stxt.pdf.tree.PropertyKey.KEEP_WITH_NEXT;
+import static dev.stxt.pdf.tree.PropertyKey.KEEP_WITH_PREVIOUS;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
@@ -124,13 +126,13 @@ final class ModelValidator {
     }
 
     /**
-     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Inside} y {@code Edges}, que solo
+     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Keep together} y {@code Edges}, que solo
      * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
      */
     static void validateImage(Style s) {
-        for (String p : List.of(BREAK_INSIDE, DECORATION)) {
+        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
+                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
                         + " no tiene efecto en una Image, que no se parte entre páginas: sobra");
             }
         }
@@ -138,9 +140,9 @@ final class ModelValidator {
 
     /**
      * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
-     * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Inside} y {@code
-     * Edges} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla el colapso
-     * de márgenes: {@code Contain margins} no tiene efecto en ella.
+     * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Keep together} y
+     * {@code Edges} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla los
+     * márgenes: {@code Isolate margins} no tiene efecto en ella.
      */
     static void validateRotation(Style s) {
         if (s.rotation() == null) {
@@ -154,14 +156,14 @@ final class ModelValidator {
             return;
         }
         String what = s.rotatesInFlow() ? "una caja girada" : "un Frame girado";
-        for (String p : List.of(BREAK_INSIDE, DECORATION)) {
+        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
+                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
                         + " no tiene efecto en " + what + ", que no se parte entre páginas: sobra");
             }
         }
-        if (s.rotatesInFlow() && s.containMargins()) {
-            throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ROTATED, "Contain margins no tiene efecto en una caja girada, "
+        if (s.rotatesInFlow() && s.isolateMargins()) {
+            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins no tiene efecto en una caja girada, "
                     + "que ya corta el colapso de márgenes con sus hijos: sobra");
         }
     }
@@ -193,6 +195,7 @@ final class ModelValidator {
         validateMinMax(s, HEIGHT, s.box().height(), MIN_HEIGHT, s.box().minHeight(), MAX_HEIGHT, s.box().maxHeight());
         validatePercentages(ctx, s, parent, flexItem, gridItem);
         validateColumnBreaks(ctx, s);
+        validateKeeps(s);
     }
 
     /**
@@ -234,6 +237,26 @@ final class ModelValidator {
                     ? "Before" : "After") + ": column solo tiene efecto dentro de un Columns: para "
                     + "cortar la página se usa page");
         }
+    }
+
+    /**
+     * {@code Keep with next} con un salto después de la caja, o {@code Keep with previous} con uno antes: la caja no
+     * puede ir con la otra y separarse de ella a la vez (referencia/comun/cortes.md).
+     */
+    private static void validateKeeps(Style s) {
+        BreakStyle b = s.breaks();
+        if (b.keepWithNext() && b.after() != Break.AUTO) {
+            throw error(s.line(KEEP_WITH_NEXT), ErrorCode.KEEP_CONFLICT, "Keep with next mantiene la caja con la "
+                    + "siguiente y After: " + value(b.after()) + " la separa de ella: sobra uno de los dos");
+        }
+        if (b.keepWithPrevious() && b.before() != Break.AUTO) {
+            throw error(s.line(KEEP_WITH_PREVIOUS), ErrorCode.KEEP_CONFLICT, "Keep with previous mantiene la caja con "
+                    + "la anterior y Before: " + value(b.before()) + " la separa de ella: sobra uno de los dos");
+        }
+    }
+
+    private static String value(Break b) {
+        return b.name().toLowerCase(Locale.ROOT);
     }
 
     private static void validateOffset(Style s) {

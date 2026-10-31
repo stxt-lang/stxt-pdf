@@ -31,7 +31,7 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
 final class TableBuilder {
 
     /** Grupos de filas de una {@code Table}, en el orden en que van. */
-    private static final List<String> TABLE_GROUPS = List.of("head", "body", "foot");
+    private static final List<String> TABLE_GROUPS = List.of("header-rows", "body", "footer-rows");
 
     /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (referencia/componentes/table.md#filas). */
     private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
@@ -55,12 +55,12 @@ final class TableBuilder {
     /**
      * Las filas de una {@code Table} (referencia/componentes/table.md) como ítems de un grid con colocación explícita:
      * cada {@code Cell} va en la primera columna libre de su fila, contando las que ocupan los {@code Span} de las
-     * filas de arriba. Los grupos van en el orden {@code Head}, {@code Body}, {@code Foot}; cada fila llena exactamente
-     * las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las filas de {@code
-     * Head} y {@code Foot} se repiten en cada página y no admiten {@code Break}. {@code cells} construye la caja de
-     * cada celda, con la tabla como padre. Cada celda lleva su posición ({@link CellPosition}) para las reglas de
-     * {@code Styles} y el {@code Column align} de su columna. Una fila con {@code Id} o {@code Box} tiene además su
-     * caja ({@link #row}).
+     * filas de arriba. Los grupos van en el orden {@code Header rows}, {@code Body}, {@code Footer rows}; cada fila
+     * llena exactamente las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las
+     * filas de {@code Header rows} y {@code Footer rows} se repiten en cada página y no admiten {@code Break}.
+     * {@code cells} construye la caja de cada celda, con la tabla como padre. Cada celda lleva su posición
+     * ({@link CellPosition}) para las reglas de {@code Styles} y el {@code Column align} de su columna. Una fila con
+     * {@code Id} o {@code Box} tiene además su caja ({@link #row}).
      */
     static void table(BuildContext ctx, InlineNode n, Box table, Cells cells) {
         int count = table.style().grid().columnSizes().size();
@@ -75,14 +75,15 @@ final class TableBuilder {
             }
             if (group < last) {
                 throw error(g, ErrorCode.TABLE_ORDER, g.getName() + " va después de "
-                        + label(TABLE_GROUPS.get(last)) + ": los grupos de una Table van en el orden Head, Body, Foot");
+                        + label(TABLE_GROUPS.get(last))
+                        + ": los grupos de una Table van en el orden Header rows, Body, Footer rows");
             }
             last = group;
             int rows = rows(ctx, g, group, firstRow, columns, table, cells);
             if (group == 0) {
-                table.setHeadRows(rows);
+                table.setHeaderRows(rows);
             } else if (group == 2) {
-                table.setFootRows(rows);
+                table.setFooterRows(rows);
             }
             firstRow += rows;
         }

@@ -34,9 +34,9 @@ class TablesTest {
     @Test
     void tableIsAGridWithExplicitPlacement() {
         Box table = root("\tTable:", "\t\tColumn sizes: 120 * *", "\t\tGap: 2 4",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Ventas", "\t\t\t\tCell: 100", "\t\t\t\tCell: 120",
-                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
+                "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3").children().get(0);
         assertEquals(Element.TABLE, table.element());
         assertEquals(Layout.GRID, table.style().layout());
         assertEquals(List.of(Value.pt(120), new Value.Fraction(1), new Value.Fraction(1)), table.style().grid().columnSizes());
@@ -44,8 +44,8 @@ class TablesTest {
         assertEquals(Value.pt(4), table.style().grid().columnGap());
         assertEquals(List.of("1 1 1 1", "1 2 1 1", "1 3 1 1", "2 1 1 1", "2 2 1 1", "2 3 1 1", "3 1 1 3"),
                 areas(table));
-        assertEquals(1, table.headRows());
-        assertEquals(1, table.footRows());
+        assertEquals(1, table.headerRows());
+        assertEquals(1, table.footerRows());
         Box cell = table.children().get(3);
         assertEquals(Element.CELL, cell.element());
         assertEquals(Layout.INLINE, cell.style().layout());
@@ -56,9 +56,9 @@ class TablesTest {
     @Test
     void headerMarksTheRowHeaderCells() {
         Box table = root("\tTable:", "\t\tColumn sizes: 100 100",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: Importe",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: Concepto", "\t\t\t\tCell: Importe",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa", "\t\t\t\t\tRow header: true", "\t\t\t\tCell: 120",
-                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tRow header: true", "\t\t\t\tCell: 120").children().get(0);
+                "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tRow header: true", "\t\t\t\tCell: 120").children().get(0);
         assertEquals(List.of(false, false, true, false, true, false),
                 table.children().stream().map(c -> c.style().rowHeader()).toList());
         assertEquals(22, table.children().get(2).style().line("row-header").number());
@@ -67,9 +67,9 @@ class TablesTest {
     @Test
     void headerInAHeadCellIsAnError() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tTable:", "\t\tColumn sizes: 100", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
+                () -> root("\tTable:", "\t\tColumn sizes: 100", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: Concepto",
                         "\t\t\t\t\tRow header: true", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: Mesa"));
-        assertEquals(ErrorCode.ROW_HEADER_IN_HEAD, e.errorCode());
+        assertEquals(ErrorCode.ROW_HEADER_IN_HEADER_ROWS, e.errorCode());
         assertEquals(18, e.line());
     }
 
@@ -81,8 +81,8 @@ class TablesTest {
                 "\t\t\tRow:", "\t\t\t\tCell: d",
                 "\t\t\tRow:", "\t\t\t\tCell: e", "\t\t\t\t\tSpan: 1 2").children().get(0);
         assertEquals(List.of("1 1 2 1", "1 2 1 1", "1 3 3 1", "2 2 1 1", "3 1 1 2"), areas(table));
-        assertEquals(0, table.headRows());
-        assertEquals(0, table.footRows());
+        assertEquals(0, table.headerRows());
+        assertEquals(0, table.footerRows());
     }
 
     @Test
@@ -190,15 +190,15 @@ class TablesTest {
     void rowBreakGoesToItsCells() {
         Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b",
-                "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tInside: avoid",
+                "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page", "\t\t\t\t\tKeep together: true",
                 "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
         assertEquals(Break.AUTO, table.children().get(1).style().breaks().before());
         for (Box cell : table.children().subList(2, 4)) {
             assertEquals(Break.PAGE, cell.style().breaks().before());
-            assertTrue(cell.style().breaks().avoidInside());
+            assertTrue(cell.style().breaks().keepTogether());
             assertEquals(21, cell.style().line("break-before").number());
         }
-        assertFalse(table.children().get(0).style().breaks().avoidInside());
+        assertFalse(table.children().get(0).style().breaks().keepTogether());
     }
 
     @Test

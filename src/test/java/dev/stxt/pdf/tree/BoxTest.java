@@ -83,7 +83,7 @@ class BoxTest {
         Box list = section.children().get(0).children().get(0);
         Box text = list.children().get(0).children().get(0);
         Style s = list.style();
-        assertThrows(IllegalStateException.class, () -> s.setContainMargins(true));
+        assertThrows(IllegalStateException.class, () -> s.setIsolateMargins(true));
         assertThrows(IllegalStateException.class, () -> s.declared(PropertyKey.FONT_SIZE, 3));
         assertThrows(IllegalStateException.class, () -> s.list().setStart(4));
         assertThrows(IllegalStateException.class, () -> s.box().setHeight(Value.pt(10)));

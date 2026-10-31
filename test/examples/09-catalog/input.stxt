@@ -473,7 +473,7 @@ Document (dev.stxt.pdf):
 				Column sizes: 70 * 90 *
 				Box:
 					Margin: 0 0 22 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Madera
 						Cell: Carácter

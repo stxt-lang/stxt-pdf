@@ -31,9 +31,9 @@ Su texto, en el índice y en los marcadores, es el de sus `Text` unido por espac
 
 ## Cortes
 
-El motor **evita siempre** cortar dentro de un encabezado y después de él, como si declarara `Inside: avoid` y
-`After: avoid` ([Cortes](../comun/cortes.md)): un título no queda solo al final de una página ni se parte. Son `avoid`, así
-que se relajan como cualquier otro cuando no hay un corte mejor. Por eso un encabezado no admite `Break`, ni sus `Text`
+El motor **evita siempre** cortar dentro de un encabezado y después de él, como si declarara `Keep together: true` y
+`Keep with next: true` ([Cortes](../comun/cortes.md)): un título no queda solo al final de una página ni se parte. Se relajan
+como los declarados cuando no hay un corte mejor. Por eso un encabezado no admite `Break`, ni sus `Text`
 tampoco (`BREAK_IN_HEADING`), ni de una regla (`STYLE_NOT_ALLOWED`). El corte antes del encabezado no cambia.
 
 > **Decisión:** el motor lo evita siempre, en lugar de dejarlo al autor. *Alternativa descartada:* un valor por defecto

@@ -2,7 +2,7 @@
 
 **Nada puede desbordar.** El motor comprueba el resultado ya paginado y da un error con la primera de estas situaciones:
 
-- **una palabra más ancha que su línea, o una línea de un texto con `White space: preserve` más ancha que su caja**
+- **una palabra más ancha que su línea, o una línea de un texto con `Preformatted: true` más ancha que su caja**
   (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra;
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus márgenes horizontales
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;

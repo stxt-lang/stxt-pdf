@@ -63,8 +63,8 @@ Un elemento con `Case` o `Small caps` lleva `ActualText` con el texto escrito, p
 
 Una línea de texto normal que no es la última de su caja (o de su fragmento) acaba con un espacio invisible tras la última
 palabra: el corte de línea se come el espacio, y sin él quien une el texto de las líneas (un lector de pantalla, la
-extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `White space: preserve`
-y `preserve-wrap` no lo lleva: sus líneas son líneas.
+extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `Preformatted: true`
+y `wrap` no lo lleva: sus líneas son líneas.
 
 > **Decisión:** el espacio invisible al final de cada línea partida. *Alternativa descartada:* dejarlo a la geometría,
 > como hacen algunos extractores.
@@ -89,10 +89,10 @@ espacios tras él. No está en la estructura: la de un elemento con `Case` sigue
 
 ### Tablas
 
-Una celda de `Head` es `TH` con `Scope: Column`, una de `Body` o `Foot` con `Row header: true` es `TH` con `Scope: Row`,
-y el resto, `TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y el pie son contenido en la
-primera página en que sale cada celda. Donde se repiten, son *artifacts*, así que el árbol tiene una sola `THead` y una
-sola `TFoot`.
+Una celda de `Header rows` es `TH` con `Scope: Column`, una de `Body` o `Footer rows` con `Row header: true` es `TH` con
+`Scope: Row`, y el resto, `TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y
+el pie son contenido en la primera página en que sale cada celda. Donde se repiten, son *artifacts*, así que el árbol
+tiene una sola `THead` y una sola `TFoot`.
 
 > **Decisión:** las repeticiones son *artifacts*, y un lector de pantalla no lee la cabecera en cada página.
 > *Alternativa descartada:* marcar cada repetición como contenido de la misma celda.

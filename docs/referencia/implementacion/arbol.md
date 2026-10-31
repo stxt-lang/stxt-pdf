@@ -21,7 +21,7 @@ En el schema:
 - los elementos contenedores y los grupos son `GROUP` (sin valor);
 - `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`, `INLINE`;
 - `Content`, `BLOCK`, y `Areas`, `TEXT`;
-- `Contain margins`, `Wrap`, `Row header` e `In table of contents`, `BOOLEAN`;
+- `Isolate margins`, `Wrap`, `Row header` e `In table of contents`, `BOOLEAN`;
 - `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`, y `Rotate`, `NUMBER`;
 - las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
@@ -29,11 +29,11 @@ En el schema:
 Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que
 `Item` y `Area` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
 tenga su texto en un sitio y solo uno, que la raíz sea `Document`, que el `Text` de un encabezado no tenga `Break`, la
-jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Head`, `Body`, `Foot`, que una `Cell` no tenga a la
-vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema como lo que
-escribe el autor.
+jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Header rows`, `Body`, `Footer rows`, que una `Cell`
+no tenga a la vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema
+como lo que escribe el autor.
 
-> **Decisión:** lo que ya rechaza el schema no tiene código propio del motor: `Direction: row`, `Inside: page` o un
+> **Decisión:** lo que ya rechaza el schema no tiene código propio del motor: `Direction: row`, `Before: avoid` o un
 > bloque `>>` donde van hijos son errores del schema, con su código de `stxt-core`.
 
 > **Decisión:** `BoxTreeBuilder` valida contra el schema al empezar, aunque el documento venga de `DocumentReader`: un árbol

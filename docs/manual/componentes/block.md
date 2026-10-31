@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
                 Background: #FBEAE8
                 Corner radius: 0 6 6 0
             Break:
-                Inside: avoid
+                Keep together: true
     Section:
         Paragraph: Antes de instalar el termostato, corta la corriente.
         Block:
@@ -36,7 +36,7 @@ Document (dev.stxt.pdf):
         Paragraph: Después, retira la tapa con cuidado.
 ```
 
-Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins` y `Rotate` (girarlo con todo lo que contiene,
+Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins` y `Rotate` (girarlo con todo lo que contiene,
 [Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)), y dentro cualquier elemento.
 
 ## Cómo coloca a sus hijos
@@ -50,16 +50,16 @@ Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins` y 
 Así colocan también sus hijos las secciones, los encabezados, las listas, las celdas con elementos y los elementos
 posicionados.
 
-## `Contain margins`
+## `Isolate margins`
 
 El margen de arriba del primer hijo (y el de abajo del último) sale fuera del `Block` si este no tiene ni borde ni relleno
-en ese lado: queda como margen del propio `Block`. Con `Contain margins: true`, los márgenes de los hijos se quedan dentro. Un
-`Block` que es ítem de un `Flex` o un `Grid` ya los deja dentro, así que ahí `Contain margins: true` es un error.
+en ese lado: queda como margen del propio `Block`. Con `Isolate margins: true`, los márgenes de los hijos se quedan dentro. Un
+`Block` que es ítem de un `Flex` o un `Grid` ya los deja dentro, así que ahí `Isolate margins: true` es un error.
 
 ## Recetas
 
 - **Un recuadro:** un `Block` con `Padding`, `Border` y `Background`.
-- **Que no se parta:** `Break` con `Inside: avoid` (el bloque de firmas de un contrato).
+- **Que no se parta:** `Break` con `Keep together: true` (el bloque de firmas de un contrato).
 - **Empezar en página nueva:** `Break` con `Before: page`.
 
 Más detalle en la [referencia](../../referencia/componentes/block.md).

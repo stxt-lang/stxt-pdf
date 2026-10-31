@@ -153,14 +153,6 @@ final class ValueReader {
         }
     }
 
-    static boolean breakInside(Node n) {
-        Break b = enumValue(Break.class, n);
-        if (b == Break.PAGE || b == Break.COLUMN) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Inside solo admite auto o avoid");
-        }
-        return b == Break.AVOID;
-    }
-
     static boolean bool(Node n) {
         return switch (n.getText().trim().toLowerCase(Locale.ROOT)) {
             case "true", "yes" -> true;

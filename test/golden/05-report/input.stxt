@@ -29,7 +29,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Align: left
 			Break:
-				Inside: avoid
+				Keep together: true
 		For id: title
 			Box:
 				Margin: 0 0 16 0
@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
 				Size: 20
 				Line height: 24
 			Break:
-				After: avoid
+				Keep with next: true
 	Section:
 		Page overlay:
 			Id: header

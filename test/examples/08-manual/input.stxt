@@ -2,7 +2,7 @@
 # una figura con números superpuestos (un Frame con sus Overlay encima) y su leyenda al
 # lado (una List de Paragraph con la negrita escrita con Markup: markdown, que la regla de
 # Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
-# un bloque de terminal con las columnas alineadas (un Text con White space: pre, en monoespaciada), un
+# un bloque de terminal con las columnas alineadas (un Text con Preformatted: pre, en monoespaciada), un
 # código en línea y tablas de especificaciones y de averías. La estructura
 # de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
 # {page of: wiring}, la página donde está (también dentro de Markdown). Los apartados son Heading 2
@@ -197,7 +197,7 @@ Document (dev.stxt.pdf):
 				Style: code
 				Text:
 					Typography:
-						White space: preserve
+						Preformatted: true
 					Content >>
 						> Ajustes > Servicio > Bornes
 
@@ -217,7 +217,7 @@ Document (dev.stxt.pdf):
 			Table:
 				Id: terminals
 				Column sizes: 56 * 100
-				Head:
+				Header rows:
 					Row:
 						Cell: Borne
 						Cell: Función
@@ -285,7 +285,7 @@ Document (dev.stxt.pdf):
 				Column sizes: * * *
 				Box:
 					Margin: 0 0 12 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Franja
 						Cell: De lunes a viernes

@@ -53,7 +53,7 @@ final class StyleRules {
      * {@code Id} no es un error: el elemento puede llegar después, de una plantilla.
      */
     private final Map<String, List<InlineNode>> idRules = new HashMap<>();
-    /** Reglas {@code For element} de una posición en una tabla ({@code Head cell}, {@code Even row cell}…). */
+    /** Reglas {@code For element} de una posición en una tabla ({@code Header cell}, {@code Even row cell}…). */
     private final List<CellRule> cellRules = new ArrayList<>();
     /** Reglas {@code For column}, en el orden en que se aplican. */
     private final List<ColumnRule> columnRules = new ArrayList<>();
@@ -254,7 +254,7 @@ final class StyleRules {
     /**
      * Aplica las reglas que corresponden a un elemento, de menos a más prioridad: la de su tipo,
      * las de la posición de una celda en su tabla (primero el {@code Column align} de su columna,
-     * luego {@code Head cell}, {@code Body cell} o {@code Foot cell}, y {@code Odd row cell} o
+     * luego {@code Header cell}, {@code Body cell} o {@code Footer cell}, y {@code Odd row cell} o
      * {@code Even row cell}), las de su columna ({@code For column}, en el orden de
      * {@code Styles}), las de sus clases (en el orden de {@code Styles}) y la de su {@code Id}.
      * Van después de la herencia y antes de lo que declara el propio elemento, y se mezclan

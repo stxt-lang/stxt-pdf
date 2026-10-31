@@ -1,5 +1,5 @@
-# Case: Contain margins en un ítem de Flex, que ya corta el colapso de márgenes
-# Code: CONTAIN_MARGINS_IN_ITEM
+# Case: Isolate margins en un ítem de Flex, que ya corta el colapso de márgenes
+# Code: ISOLATE_MARGINS_IN_ITEM
 # Line: 19
 Document (dev.stxt.pdf):
 	Language: es
@@ -16,5 +16,5 @@ Document (dev.stxt.pdf):
 		Flex:
 			Item:
 				Block:
-					Contain margins: true
+					Isolate margins: true
 					Text: Hola

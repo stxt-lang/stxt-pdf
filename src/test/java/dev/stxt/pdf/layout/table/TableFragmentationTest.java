@@ -47,13 +47,13 @@ class TableFragmentationTest {
     }
 
     @Test
-    void headAndFootRepeatOnEveryPage() {
+    void headerAndFooterRowsRepeatOnEveryPage() {
         // La cabecera (20) y el pie (10) dejan 70 al cuerpo: dos filas de 30 por página. El pie va
         // detrás de la última fila colocada.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Head"), row("H", 20),
+                group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30), row("B3", 30), row("B4", 30),
-                group("Foot"), row("F", 10)));
+                group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 90, l.rect(1, "T"));
         assertRect(40, 40, 515, 20, l.rect(1, "H"));
@@ -95,12 +95,12 @@ class TableFragmentationTest {
 
     /** Las franjas de la cabecera y del pie se repiten en cada página, como sus celdas. */
     @Test
-    void bandsOfHeadAndFootRepeat() {
+    void bandsOfHeaderAndFooterRowsRepeat() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Head"), row("H", 20, "\t\t\t\tId: HR"),
+                group("Header rows"), row("H", 20, "\t\t\t\tId: HR"),
                 group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tId: R2"), row("B3", 30, "\t\t\t\tId: R3"),
                 row("B4", 30),
-                group("Foot"), row("F", 10, "\t\t\t\tId: FR")));
+                group("Footer rows"), row("F", 10, "\t\t\t\tId: FR")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 20, l.rect(1, "HR"));
         assertRect(40, 90, 515, 30, l.rect(1, "R2"));
@@ -133,13 +133,13 @@ class TableFragmentationTest {
     }
 
     @Test
-    void gapsSeparateHeadAndFootFromTheBody() {
+    void gapsSeparateHeaderAndFooterRowsFromTheBody() {
         // Con 5 de hueco, la cabecera ocupa 25 y el pie 15: quedan 60, y B1 (30) y B2 (que acaba
         // en 65) no caben juntas.
         LayoutFixture l = layOutPaged(PAGE, concat(table("5"),
-                group("Head"), row("H", 20),
+                group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30),
-                group("Foot"), row("F", 10)));
+                group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 65, 515, 30, l.rect(1, "B1"));
         assertRect(40, 100, 515, 10, l.rect(1, "F"));
@@ -149,12 +149,12 @@ class TableFragmentationTest {
     }
 
     @Test
-    void tableThatDoesNotFitMovesWithItsHead() {
+    void tableThatDoesNotFitMovesWithItsHeaderRows() {
         // Tras X (50), la cabecera, la primera fila y el pie (60) no caben: la tabla entera pasa
         // a la página 2, sin dejar la cabecera sola.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50"}, table(null),
-                group("Head"), row("H", 20), group("Body"), row("B1", 30), group("Foot"), row("F", 10)));
+                group("Header rows"), row("H", 20), group("Body"), row("B1", 30), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "T"));
         assertRect(40, 40, 515, 20, l.rect(2, "H"));
@@ -162,11 +162,11 @@ class TableFragmentationTest {
     }
 
     @Test
-    void tallBodyRowBreaksBetweenHeadAndFoot() {
+    void tallBodyRowBreaksBetweenHeaderAndFooterRows() {
         // B1 (100) no cabe en los 70 que dejan la cabecera y el pie: se parte, 70 + 30, y la
         // cabecera y el pie se repiten alrededor de cada parte.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Head"), row("H", 20), group("Body"), row("B1", 100), group("Foot"), row("F", 10)));
+                group("Header rows"), row("H", 20), group("Body"), row("B1", 100), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 60, 515, 70, l.rect(1, "B1"));
         assertRect(40, 130, 515, 10, l.rect(1, "F"));
@@ -178,7 +178,7 @@ class TableFragmentationTest {
     @Test
     void rowBreakForcesAPageWithTheHeadRepeated() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Head"), row("H", 20),
+                group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page")));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B2"));
@@ -188,7 +188,7 @@ class TableFragmentationTest {
     }
 
     @Test
-    void withoutHeadAndFootItBreaksLikeAGrid() {
+    void withoutHeaderAndFooterRowsItBreaksLikeAGrid() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Body"), row("B1", 40), row("B2", 40), row("B3", 40)));
         assertEquals(2, l.pages());

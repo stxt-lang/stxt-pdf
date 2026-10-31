@@ -44,8 +44,8 @@ Las columnas se reparten el ancho que dejan los huecos: miden `(W − (n − 1) 
 
 ## Contenido
 
-Dentro de las columnas los hijos se apilan en flujo de bloque ([Block](block.md#el-flujo-de-bloque)): cada columna es un
-contexto de formato de bloque, así que los márgenes de dentro no salen del `Columns`. Admite todos los elementos en flujo.
+Dentro de las columnas los hijos se apilan en flujo de bloque ([Block](block.md#el-flujo-de-bloque)): cada columna aísla
+los márgenes, así que los de dentro no salen del `Columns`. Admite todos los elementos en flujo.
 Un `Overlay` o un `Page overlay` dentro de un `Columns`, a cualquier profundidad, es un error (`OVERLAY_IN_COLUMNS`). El
 alto de las columnas no es definido: un porcentaje vertical de dentro es un error (`INDEFINITE_PERCENTAGE`), aunque el
 `Columns` tenga `Height`.
@@ -56,7 +56,7 @@ alto de las columnas no es definido: un porcentaje vertical de dentro es un erro
 ## Alto de las columnas
 
 Cada columna es un contenedor de fragmentos ([Cortes](../comun/cortes.md#modelo)), y el contenido se parte entre columnas
-igual que entre páginas, con las mismas reglas (viudas y huérfanas, `avoid`, garantía de progreso). En cada página, las
+igual que entre páginas, con las mismas reglas (viudas y huérfanas, `Keep with next`, `Keep with previous` y `Keep together`, garantía de progreso). En cada página, las
 columnas miden lo que queda de página para el contenido del `Columns` y, si tiene `Height` (o `Max height`), no pasan de lo
 que le queda de él:
 
@@ -71,7 +71,7 @@ que le queda de él:
 Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Flex` o de `Grid`, o que está en un `Overlay`) no
 hay alto que llenar: las columnas se equilibran siempre, también con `Balance: false`.
 
-> **Decisión:** el equilibrado no incumple reglas que el reparto en orden respeta: un bloque con `Inside: avoid` no se
+> **Decisión:** el equilibrado no incumple reglas que el reparto en orden respeta: un bloque con `Keep together: true` no se
 > parte y un párrafo de tres líneas con viudas y huérfanas de 2 no se reparte. *Alternativa descartada:* un equilibrado que
 > incumple reglas para igualar mejor, o equilibrar también las páginas intermedias.
 

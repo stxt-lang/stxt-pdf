@@ -36,7 +36,7 @@ Styles:
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md)) |
 | `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
 
-El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `White space` y `Tab size`) está en
+El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
 [Formato del texto](formato-del-texto.md).
 
 ## Fuente y tamaño

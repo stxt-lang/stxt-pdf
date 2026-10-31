@@ -7,7 +7,7 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Tolerance;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.ErrorCode;
@@ -302,10 +302,11 @@ public final class Overflow {
         // No está en el texto si la ha cambiado el layout, como un número de página.
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
-        if (box.style().typography().whiteSpace() == WhiteSpace.PRESERVE) {
-            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: preserve "
-                    + "('" + excerpt(word) + "'...) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
-                    + pt(width) + ". Hay que ensanchar la caja, reducir el Size o usar White space: preserve-wrap, que parte las líneas");
+        if (box.style().typography().preformatted() == Preformatted.TRUE) {
+            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con Preformatted: "
+                    + "true ('" + excerpt(word) + "'...) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja "
+                    + "deja " + pt(width) + ". Hay que ensanchar la caja, reducir el Size o usar Preformatted: wrap, que "
+                    + "parte las líneas");
         }
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + excerpt(word) + "' no cabe en "
                 + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)

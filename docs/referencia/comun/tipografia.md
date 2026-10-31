@@ -25,8 +25,8 @@ celdas).
 | `Letter spacing` | número (puntos) | `0` | Interletraje; puede ser negativo ([Formato del texto](formato-del-texto.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](formato-del-texto.md#versalitas-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). |
-| `White space` | `normal`, `preserve`, `preserve-wrap` | `normal` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)). |
-| `Tab size` | entero ≥ 1 | `4` | Con `preserve` o `preserve-wrap`, las columnas de una tabulación. |
+| `Preformatted` | `false`, `true`, `wrap` | `false` | Texto preformateado ([Formato del texto](formato-del-texto.md#texto-preformateado)). |
+| `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: true` o `wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md#numeración-numbered)). |
 | `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
@@ -46,9 +46,9 @@ Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../componentes/t
 ## Espacios y párrafos
 
 Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** es un error
-(`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Con `White space: preserve` o `preserve-wrap` se
+(`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Con `Preformatted: true` o `wrap` se
 conservan los espacios y los saltos de línea, también las líneas en blanco de un `Text`
-([Formato del texto](formato-del-texto.md#texto-preformateado-white-space)).
+([Formato del texto](formato-del-texto.md#texto-preformateado)).
 
 ## El reparto en líneas
 
@@ -87,8 +87,8 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 ## Tamaños intrínsecos
 
-El ancho más estrecho es la palabra más ancha, y el natural, el párrafo más largo en una sola línea (con `preserve` y
-`preserve-wrap`, ver [Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
+El ancho más estrecho es la palabra más ancha, y el natural, el párrafo más largo en una sola línea (con
+`Preformatted: true` o `wrap`, ver [Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
 
 ## Idioma (`Language`)
 

@@ -96,7 +96,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Contain margins
+			Child: Isolate margins
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -449,7 +449,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Contain margins
+			Child: Isolate margins
 				Max: 1
 			Child: Offset
 				Max: 1
@@ -663,7 +663,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table
 		Type: GROUP
-		Description: Tabla: sus filas (Row) en Head, Body y Foot, en ese orden, sobre las columnas de Column sizes. Al partirse, Head y Foot se repiten en cada página.
+		Description: Tabla: sus filas (Row) en Header rows, Body y Footer rows, en ese orden, sobre las columnas de Column sizes. Al partirse, Header rows y Footer rows se repiten en cada página.
 		Children:
 			Child: Id
 				Max: 1
@@ -684,14 +684,14 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Gap
 				Max: 1
-			Child: Head
+			Child: Header rows
 				Max: 1
 			Child: Body
 				Min: 1
 				Max: 1
-			Child: Foot
+			Child: Footer rows
 				Max: 1
-	Node: Head
+	Node: Header rows
 		Type: GROUP
 		Description: Filas de cabecera de una Table: van al principio de cada página de la tabla.
 		Children:
@@ -703,7 +703,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Row
 				Min: 1
-	Node: Foot
+	Node: Footer rows
 		Type: GROUP
 		Description: Filas de pie de una Table: van al final de cada página de la tabla.
 		Children:
@@ -834,7 +834,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: For element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; TOC 1 a 6, las entradas de un Table of contents), una posición dentro de una tabla (Head cell, Body cell, Foot cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
+		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; TOC 1 a 6, las entradas de un Table of contents), una posición dentro de una tabla (Header cell, Body cell, Footer cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
 		Children:
 			Child: Box
 				Max: 1
@@ -937,7 +937,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Ligatures
 				Max: 1
-			Child: White space
+			Child: Preformatted
 				Max: 1
 			Child: Tab size
 				Max: 1
@@ -955,13 +955,17 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Break
 		Type: GROUP
-		Description: Cortes de página: antes, después y dentro de la caja, y su decoración. No se hereda.
+		Description: Cortes de página: los saltos antes y después de la caja, lo que se mantiene junto y la decoración de la caja partida. No se hereda.
 		Children:
 			Child: Before
 				Max: 1
 			Child: After
 				Max: 1
-			Child: Inside
+			Child: Keep with next
+				Max: 1
+			Child: Keep with previous
+				Max: 1
+			Child: Keep together
 				Max: 1
 			Child: Edges
 				Max: 1
@@ -984,9 +988,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: In table of contents
 		Type: BOOLEAN
 		Description: Si el encabezado tiene entrada en los índices (Table of contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
-	Node: Contain margins
+	Node: Isolate margins
 		Type: BOOLEAN
-		Description: Si la caja contiene los márgenes de sus hijos: con true, los del primero y el último quedan dentro y no se juntan con los suyos (crea un contexto de formato de bloque). Por defecto, false.
+		Description: Si la caja aísla los márgenes de sus hijos: con true, los del primero y el último quedan dentro y no se juntan con los suyos. Por defecto, false.
 	Node: Offset
 		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
 	Node: Layer
@@ -1050,7 +1054,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: landscape
 	Node: Content
 		Type: BLOCK
-		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco es un error, salvo en un Text preformateado (White space: preserve o preserve-wrap).
+		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco es un error, salvo en un Text preformateado (Preformatted: true o wrap).
 
 	# Box
 
@@ -1135,16 +1139,16 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Ligatures
 		Type: BOOLEAN
 		Description: Si el texto se mide y se pinta con las ligaduras de la fuente (fi, fl, ffi…). Por defecto, false: un glifo por carácter. Se hereda. Con Letter spacing distinto de 0 no hay ligaduras. Solo importa en las fuentes que las tienen (IBM Plex Sans y Serif; Plex Mono no).
-	Node: White space
+	Node: Preformatted
 		Type: ENUM
-		Description: Tratamiento del espacio en blanco del texto: normal (por defecto; los espacios y los saltos de línea valen un espacio), preserve (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o preserve-wrap (como preserve, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
+		Description: Texto preformateado: false (por defecto; los espacios y los saltos de línea valen un espacio), true (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o wrap (como true, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
 		Values:
-			Value: normal
-			Value: preserve
-			Value: preserve-wrap
+			Value: false
+			Value: true
+			Value: wrap
 	Node: Tab size
 		Type: INTEGER
-		Description: Con White space preserve o preserve-wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
+		Description: Con Preformatted: true o wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
 	Node: Numbered
 		Type: BOOLEAN
 		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: For element: Document lo activa en todos, una regla For element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
@@ -1170,26 +1174,27 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Before
 		Type: ENUM
-		Description: Corte antes de la caja: page lo fuerza (y column, dentro de un Columns, pasa a la columna siguiente), avoid lo evita.
+		Description: Salto antes de la caja: auto (por defecto) no lo fuerza; page la lleva a una página nueva y column, dentro de un Columns, a la columna siguiente.
 		Values:
 			Value: auto
 			Value: page
 			Value: column
-			Value: avoid
 	Node: After
 		Type: ENUM
-		Description: Corte después de la caja: page lo fuerza (y column, dentro de un Columns, pasa a la columna siguiente), avoid la mantiene con la siguiente.
+		Description: Salto después de la caja: auto (por defecto) no lo fuerza; page lleva lo siguiente a una página nueva y column, dentro de un Columns, a la columna siguiente.
 		Values:
 			Value: auto
 			Value: page
 			Value: column
-			Value: avoid
-	Node: Inside
-		Type: ENUM
-		Description: avoid intenta no partir la caja.
-		Values:
-			Value: auto
-			Value: avoid
+	Node: Keep with next
+		Type: BOOLEAN
+		Description: Si la caja se mantiene en la misma página que la siguiente: evita el corte entre las dos (títulos, rótulos). Por defecto, false. Con After: page o column, es una contradicción.
+	Node: Keep with previous
+		Type: BOOLEAN
+		Description: Si la caja se mantiene en la misma página que la anterior: evita el corte entre las dos. Por defecto, false. Con Before: page o column, es una contradicción.
+	Node: Keep together
+		Type: BOOLEAN
+		Description: Si la caja se mantiene entera: evita partirla entre páginas. Por defecto, false.
 	Node: Edges
 		Type: ENUM
 		Description: Borde y relleno de una caja partida entre páginas: open (por defecto) los deja abiertos en el corte; closed los cierra en cada fragmento, que lleva su borde y su relleno completos.
@@ -1292,7 +1297,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Filas y columnas que ocupa la celda, en ese orden (1 1 por defecto): 1 3 ocupa tres columnas de su fila.
 	Node: Row header
 		Type: BOOLEAN
-		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Head, cuyas celdas ya son cabeceras de columna.
+		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Header rows, cuyas celdas ya son cabeceras de columna.
 
 	# Columns
 

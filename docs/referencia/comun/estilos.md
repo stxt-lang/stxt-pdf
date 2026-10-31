@@ -12,7 +12,7 @@ puede sobrescribir.
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
 | `For element` | un elemento generado por el motor: `Code block` o `TOC 1` a `TOC 6` | los bloques de código de un `Markdown` ([Markdown](../componentes/markdown.md#código)) o las entradas de un `Table of contents` ([Table of contents](../componentes/table-of-contents.md#estilo)). No se escriben en el documento |
-| `For element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../componentes/table.md#estilo-de-las-celdas)) |
+| `For element` | una posición en una tabla: `Header cell`, `Body cell`, `Footer cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../componentes/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style` y las celdas de una `Row` con él en su `Style` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas |
@@ -55,7 +55,7 @@ Cada propiedad toma, de más a menos fuerte:
 4. las reglas `For style` de los estilos de la `Row` de una celda, con el mismo criterio de orden (la regla `For id` del
    `Id` de su `Row` va entre los puntos 2 y 3);
 5. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
-6. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después `Odd row cell` o
+6. las reglas de posición de una celda (`Header cell`, `Body cell`, `Footer cell`, y después `Odd row cell` o
    `Even row cell`);
 7. el `Column align` de su tabla, solo para `Align`;
 8. la regla `For element` de su tipo;
@@ -64,12 +64,13 @@ Cada propiedad toma, de más a menos fuerte:
 
 Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table` ([Table](../componentes/table.md#estilo-de-las-celdas)).
 
-Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare `Size: 20`. Las
-reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento `Bold`, se aplican
-las dos. Lo que una regla da a un elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
-`Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Style` y el `Id` de una `Row` aplican
-sus reglas a cada una de sus celdas y no a la franja de la fila. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en
-`For element` (para dar estilo a las celdas de cada grupo están las reglas de posición). `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
+Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare
+`Size: 20`. Las reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento
+`Bold`, se aplican las dos. Lo que una regla da a un elemento en `Typography` lo heredan sus descendientes, como si lo
+hubiera declarado él. `Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Style` y el
+`Id` de una `Row` aplican sus reglas a cada una de sus celdas y no a la franja de la fila. `Header rows`, `Body`,
+`Footer rows` y `Row` no se pueden nombrar en `For element` (para dar estilo a las celdas de cada grupo están las reglas
+de posición). `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../componentes/document.md#section)).
 
 > **Decisión:** prioridad fija en lugar de especificidad calculada. *Alternativa descartada:* especificidad calculada y

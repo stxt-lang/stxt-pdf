@@ -116,8 +116,8 @@ Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
   contenido de una sección no se mezcla con el de otra.
 - **Cada sección es la raíz de su layout.** Su caja es el área útil de cada una de sus páginas (el contenedor de referencia
   de sus elementos de primer nivel): sus márgenes y su alto salen de su `Page`, y cada página lleva el suyo. Una
-  `Section` no es una caja con `Box` propio: no tiene `Margin`, `Padding` ni fondo, y es un contexto de formato de bloque
-  que no colapsa con nada.
+  `Section` no es una caja con `Box` propio: no tiene `Margin`, `Padding` ni fondo, y aísla los márgenes: no
+  colapsa con nada.
 - **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Page overlay`, que no ocupan sitio, no tendría
   ninguna página. Un `Overlay` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
 - **Tipografía por sección.** Las reglas que llegan a una sección solo pueden dar `Typography` (`Language` incluido: un

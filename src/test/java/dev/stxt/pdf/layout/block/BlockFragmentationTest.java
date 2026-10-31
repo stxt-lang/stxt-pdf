@@ -47,10 +47,10 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void avoidInsideMovesTheBox() {
+    void keepTogetherMovesTheBox() {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 60",
-                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tInside: avoid");
+                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
         assertRect(40, 40, 515, 60, l.rect(2, "B"));
@@ -81,12 +81,12 @@ class BlockFragmentationTest {
     @Test
     void sliceReservesBottomDecorationWhenTheBoxEnds() {
         // El contenido (40 + 55) cabe en 100, pero el relleno inferior (10) no: con 90 para el
-        // contenido, C2 (avoid) pasa a la página 2 y Q termina allí con su relleno.
+        // contenido, C2 (Keep together) pasa a la página 2 y Q termina allí con su relleno.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: Q", "\t\tBox:", "\t\t\tPadding: 0 0 10 0",
                 "\t\tBlock:", "\t\t\tId: C1", "\t\t\tBox:", "\t\t\t\tHeight: 40",
                 "\t\tBlock:", "\t\t\tId: C2", "\t\t\tBox:", "\t\t\t\tHeight: 55", "\t\t\tBreak:",
-                "\t\t\t\tInside: avoid");
+                "\t\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 40, l.rect(1, "Q"));
         assertRect(40, 40, 515, 65, l.rect(2, "Q"));
@@ -162,7 +162,7 @@ class BlockFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 95",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 10 0 0 0", "\t\tBreak:",
-                "\t\t\tInside: avoid");
+                "\t\t\tKeep together: true");
         assertRect(40, 40, 515, 10, l.rect(2, "B"));
     }
 
@@ -200,12 +200,12 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void avoidAfterKeepsTheTitleWithTheNextBox() {
+    void keepWithNextKeepsTheTitleWithTheNextBox() {
         // T no puede quedar sola al final: se corta antes de T, que es un corte sin reglas incumplidas.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50",
-                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 20", "\t\tBreak:", "\t\t\tAfter: avoid",
-                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tInside: avoid");
+                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 20", "\t\tBreak:", "\t\t\tKeep with next: true",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 50, l.rect(1, "X"));
         assertFalse(l.has(1, "T"));
@@ -215,11 +215,11 @@ class BlockFragmentationTest {
 
     @Test
     void aHeadingStaysWithTheNextBoxWithoutDeclaringIt() {
-        // El motor fija After: avoid en H (24 pt, dos líneas de 12): se corta antes de H.
+        // El motor fija Keep with next: true en H (24 pt, dos líneas de 12): se corta antes de H.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70",
                 "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos",
-                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 30", "\t\tBreak:", "\t\t\tInside: avoid");
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 30", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "H"));
         assertRect(40, 40, 515, 24, l.rect(2, "H"));
@@ -228,7 +228,7 @@ class BlockFragmentationTest {
 
     @Test
     void aHeadingIsNotSplit() {
-        // Tras X quedan 20 pt: cabe la primera línea de H, pero el motor fija Inside: avoid.
+        // Tras X quedan 20 pt: cabe la primera línea de H, pero el motor fija Keep together: true.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos");
@@ -238,22 +238,22 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void avoidIsRelaxedWhenThereIsNoOtherBreak() {
-        // T es lo primero de la página: no hay corte mejor que el que incumple avoid.
+    void keepsAreRelaxedWhenThereIsNoOtherBreak() {
+        // T es lo primero de la página: no hay corte mejor que el que incumple su Keep with next.
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 20", "\t\tBreak:", "\t\t\tAfter: avoid",
-                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 90", "\t\tBreak:", "\t\t\tInside: avoid");
+                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 20", "\t\tBreak:", "\t\t\tKeep with next: true",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 90", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 20, l.rect(1, "T"));
         assertRect(40, 40, 515, 90, l.rect(2, "P"));
     }
 
     @Test
-    void avoidInsideIsRelaxedWhenTheBoxIsTallerThanThePage() {
+    void keepTogetherIsRelaxedWhenTheBoxIsTallerThanThePage() {
         // B pasa a la página 2 y, como tampoco cabe ahí entera, se parte igualmente.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
-                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 150", "\t\tBreak:", "\t\t\tInside: avoid",
+                "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 150", "\t\tBreak:", "\t\t\tKeep together: true",
                 "\tBlock:", "\t\tId: C", "\t\tBox:", "\t\t\tHeight: 10");
         assertEquals(3, l.pages());
         assertRect(40, 40, 515, 10, l.rect(1, "A"));
@@ -266,7 +266,7 @@ class BlockFragmentationTest {
     void absoluteChildFallsOnThePageOfItsPosition() {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 90",
-                "\tFrame:", "\t\tId: P", "\t\tBreak:", "\t\t\tInside: avoid",
+                "\tFrame:", "\t\tId: P", "\t\tBreak:", "\t\t\tKeep together: true",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30",
                 "\t\tOverlay:", "\t\t\tId: S", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                 "\t\t\t\tHeight: 20");

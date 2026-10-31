@@ -376,12 +376,12 @@ final class PdfStructure {
         Box table = cell.parent();
         // Fila desde 0 de la celda en el grid de la tabla; la colocación la da TableBuilder.
         int row = cell.style().item().area().row() - 1;
-        if (row < table.headRows()) {
+        if (row < table.headerRows()) {
             return 0;
         }
         int rows = table.children().stream().mapToInt(c -> c.style().item().area().row() - 1 + c.style().item().area().rows())
                 .max().orElse(0);
-        return row >= rows - table.footRows() ? 2 : 1;
+        return row >= rows - table.footerRows() ? 2 : 1;
     }
 
     /**

@@ -1,0 +1,23 @@
+# Case: Keep with previous de una regla con un salto de página antes
+# Code: KEEP_CONFLICT
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: pegado
+			Break:
+				Keep with previous: true
+	Section:
+		Paragraph: Uno
+		Paragraph: Dos
+			Style: pegado
+			Break:
+				Before: page

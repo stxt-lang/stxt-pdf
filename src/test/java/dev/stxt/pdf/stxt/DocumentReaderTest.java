@@ -108,14 +108,14 @@ class DocumentReaderTest {
     void tablesValidateAgainstTheSchema() {
         InlineNode root = reader.read(doc(
                 "\tTable:", "\t\tId: t", "\t\tColumn sizes: 120 * *", "\t\tGap: 2",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true",
                 "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
                 "\t\t\t\tCell: Ventas", "\t\t\t\tCell:", "\t\t\t\t\tParagraph: 100", "\t\t\t\tCell:",
-                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3",
+                "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3",
                 "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 4"));
         Node cell = root;
-        for (String name : new String[] {"Section", "Table", "Foot", "Row", "Cell"}) {
+        for (String name : new String[] {"Section", "Table", "Footer rows", "Row", "Cell"}) {
             cell = assertInstanceOf(InlineNode.class, cell).getChild(name);
         }
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
@@ -124,7 +124,7 @@ class DocumentReaderTest {
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tColumn sizes: *", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
+                "\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         DocumentSyntaxException row = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tColumn sizes: *", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
         assertEquals("CHILD_NOT_DECLARED", row.code());

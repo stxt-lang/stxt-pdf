@@ -19,8 +19,8 @@ líneas ([Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragr
 
 El texto va en su valor (`Text: Un título`) o en un hijo `Content >>` con un bloque indentado. Uno de los dos es
 obligatorio, y no se admiten ambos (`TEXT_CONTENT`). Una línea en blanco es un error (`TEXT_BLANK_LINE`, en la línea de la
-línea en blanco), salvo en un texto preformateado (`White space: preserve` o `preserve-wrap`), donde es una línea más del
-texto ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space)). Por defecto el
+línea en blanco), salvo en un texto preformateado (`Preformatted: true` o `wrap`), donde es una línea más del
+texto ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado)). Por defecto el
 texto es literal, y con `Markup: markdown` admite formato dentro de la línea
 ([Formato del texto](../comun/formato-del-texto.md#formato-en-línea-markup)).
 

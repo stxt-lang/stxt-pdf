@@ -50,7 +50,7 @@ Paragraph: Resultados del trimestre
         Size: 20
         Bold: true
     Break:
-        After: avoid
+        Keep with next: true
 ```
 
 Fuera de los grupos van las propiedades del propio elemento: su `Id`, su `Style`, las columnas de una tabla o el

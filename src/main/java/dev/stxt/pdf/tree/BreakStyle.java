@@ -4,14 +4,17 @@ import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Edges;
 
 /**
- * El grupo {@code Break} (referencia/comun/cortes.md): los cortes de página o de columna antes, después y dentro de la
- * caja y su decoración en un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
+ * El grupo {@code Break} (referencia/comun/cortes.md): los saltos de página o de columna antes y después de la caja, lo
+ * que se mantiene junto ({@code Keep with next}, {@code Keep with previous}, {@code Keep together}) y su decoración en
+ * un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
  */
 public final class BreakStyle extends StyleGroup {
 
     private Break before = Break.AUTO;
     private Break after = Break.AUTO;
-    private boolean avoidInside;
+    private boolean keepWithNext;
+    private boolean keepWithPrevious;
+    private boolean keepTogether;
     private Edges edges = Edges.OPEN;
 
     BreakStyle() {
@@ -35,13 +38,31 @@ public final class BreakStyle extends StyleGroup {
         after = v;
     }
 
-    public boolean avoidInside() {
-        return avoidInside;
+    public boolean keepWithNext() {
+        return keepWithNext;
     }
 
-    void setAvoidInside(boolean v) {
+    void setKeepWithNext(boolean v) {
         writable();
-        avoidInside = v;
+        keepWithNext = v;
+    }
+
+    public boolean keepWithPrevious() {
+        return keepWithPrevious;
+    }
+
+    void setKeepWithPrevious(boolean v) {
+        writable();
+        keepWithPrevious = v;
+    }
+
+    public boolean keepTogether() {
+        return keepTogether;
+    }
+
+    void setKeepTogether(boolean v) {
+        writable();
+        keepTogether = v;
     }
 
     public Edges edges() {

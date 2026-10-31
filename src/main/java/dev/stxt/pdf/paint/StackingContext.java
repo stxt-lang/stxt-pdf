@@ -13,7 +13,7 @@ import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.VerticalMetrics;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.Style;
@@ -444,7 +444,7 @@ public final class StackingContext {
             TextLine l = lines.get(n);
             // El corte de línea se come el espacio: se escribe invisible tras la última palabra, para que quien
             // une el texto de las líneas (lector de pantalla, extracción, búsqueda) no pegue las palabras.
-            boolean spaceAfter = n < lines.size() - 1 && s.typography().whiteSpace() == WhiteSpace.NORMAL;
+            boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE;
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {

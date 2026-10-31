@@ -1,4 +1,4 @@
-# Case: Inside en una Image
+# Case: Keep together en una Image
 # Code: BREAK_IN_IMAGE
 # Line: 13
 Document (dev.stxt.pdf):
@@ -10,4 +10,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Image: test/wide.png
 			Break:
-				Inside: avoid
+				Keep together: true

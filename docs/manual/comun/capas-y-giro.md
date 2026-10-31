@@ -57,14 +57,14 @@ Document (dev.stxt.pdf):
                 Padding: 4 6
                 Border: 0 0 0.5 0
                 Border color: #C8C4BA
-        For element: Head cell
+        For element: Header cell
             Typography:
                 Bold: true
     Section:
         Table:
             Column sizes: * auto auto auto
             Column align: left center center center
-            Head:
+            Header rows:
                 Row:
                     Cell: Persona
                     Cell:

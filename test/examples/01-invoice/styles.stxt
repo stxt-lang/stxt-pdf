@@ -27,7 +27,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Bold: true
 			Size: 10.5
-	For element: Head cell
+	For element: Header cell
 		Typography:
 			Bold: true
 			Size: 8
@@ -45,7 +45,7 @@ Styles (dev.stxt.pdf):
 			Background: #EFE4D2
 			Border: 1.5 0 0 0
 			Border color: #3B2A1E
-	For element: Foot cell
+	For element: Footer cell
 		Typography:
 			Align: right
 	For element: Cell

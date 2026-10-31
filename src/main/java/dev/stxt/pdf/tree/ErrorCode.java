@@ -67,7 +67,7 @@ public enum ErrorCode {
     LIST_ITEM_WITHOUT_LINE,
 
     // --- Tablas -----------------------------------------------------------------------------------
-    /** {@code Head}, {@code Body} y {@code Foot} fuera de ese orden. */
+    /** {@code Header rows}, {@code Body} y {@code Footer rows} fuera de ese orden. */
     TABLE_ORDER,
     /** Una fila que no llena exactamente las columnas de la tabla. */
     TABLE_ROW_CELLS,
@@ -75,12 +75,12 @@ public enum ErrorCode {
     TABLE_SPAN,
     /** Una {@code Cell} con texto en el valor y elementos. */
     CELL_CONTENT,
-    /** {@code Break} en una fila de {@code Head} o de {@code Foot}, que se repiten en cada página. */
+    /** {@code Break} en una fila de {@code Header rows} o de {@code Footer rows}, que se repiten en cada página. */
     TABLE_ROW_BREAK,
     /** Un {@code Column align} con distinto número de alineaciones que columnas tiene la tabla. */
     TABLE_COLUMN_ALIGN,
-    /** {@code Row header} en una celda de {@code Head}, cuyas celdas ya son cabeceras de columna. */
-    ROW_HEADER_IN_HEAD,
+    /** {@code Row header} en una celda de {@code Header rows}, cuyas celdas ya son cabeceras de columna. */
+    ROW_HEADER_IN_HEADER_ROWS,
 
     // --- Columnas ------------------------------------------------------------------------------
     /** Un {@code Columns} sin {@code Count} ni {@code Min column width}. */
@@ -89,6 +89,8 @@ public enum ErrorCode {
     SEPARATOR_WIDTH,
     /** {@code Before} o {@code After: column} fuera de un {@code Columns}. */
     COLUMN_BREAK_OUTSIDE_COLUMNS,
+    /** {@code Keep with next} con {@code After}, o {@code Keep with previous} con {@code Before}, en la misma caja. */
+    KEEP_CONFLICT,
     /** Un {@code Overlay} o un {@code Page overlay} dentro de un {@code Columns}. */
     OVERLAY_IN_COLUMNS,
 
@@ -116,7 +118,7 @@ public enum ErrorCode {
      * page}).
      */
     IMAGE_PAGE,
-    /** {@code Inside} o {@code Edges} en una {@code Image}, que no se parte. */
+    /** {@code Keep together} o {@code Edges} en una {@code Image}, que no se parte. */
     BREAK_IN_IMAGE,
 
     // --- Referencias --------------------------------------------------------------------------
@@ -198,17 +200,19 @@ public enum ErrorCode {
     SINGLE_COLUMN,
     /** {@code Separator color} sin {@code Separator}. */
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,
-    /** {@code Contain margins: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
-    CONTAIN_MARGINS_IN_ITEM,
+    /** {@code Isolate margins: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
+    ISOLATE_MARGINS_IN_ITEM,
     /**
      * Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja
      * girada en flujo.
      */
     BREAK_IN_UNBREAKABLE,
-    /** {@code Inside} o {@code Edges} en un {@code Frame} girado o en una caja girada en flujo, que no se parten. */
+    /**
+     * {@code Keep together} o {@code Edges} en un {@code Frame} girado o en una caja girada en flujo, que no se parten.
+     */
     BREAK_IN_ROTATED,
-    /** {@code Contain margins: true} en una caja girada en flujo, que ya aísla. */
-    CONTAIN_MARGINS_IN_ROTATED,
+    /** {@code Isolate margins: true} en una caja girada en flujo, que ya aísla. */
+    ISOLATE_MARGINS_IN_ROTATED,
     /** {@code Rotate} en un {@code Block}, un {@code Text}, un {@code Paragraph} o una {@code Image} que es un ítem de {@code Flex} o {@code Grid}. */
     ROTATED_ITEM,
 

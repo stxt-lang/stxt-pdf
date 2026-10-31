@@ -58,8 +58,8 @@ import static dev.stxt.pdf.tree.Nodes.error;
 /**
  * Traduce un {@code Markdown} (referencia/componentes/markdown.md) a los nodos STXT de los elementos que ya existen:
  * encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a {@code Paragraph}, listas a {@code
- * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code White space:
- * pre} e imágenes solas en su párrafo a {@code Image} (referencia/componentes/image.md). Un enlace es un tramo
+ * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code Preformatted:
+ * true} e imágenes solas en su párrafo a {@code Image} (referencia/componentes/image.md). Un enlace es un tramo
  * subrayado con su destino (referencia/comun/enlaces.md); el código en línea, un tramo de código, que recibe la
  * familia de {@code Code font} al construir su caja. {@link BoxTreeBuilder} construye después esos nodos como
  * cualquier otro elemento, así que el schema, las reglas de {@code Styles}, la validación de
@@ -227,7 +227,7 @@ final class MarkdownBuilder {
         }
 
         /**
-         * Un bloque de código (con vallas o sangrado): un {@code Text} con {@code White space: pre}, con el código en
+         * Un bloque de código (con vallas o sangrado): un {@code Text} con {@code Preformatted: true}, con el código en
          * un {@code Content}; es un {@code Code block} y su fuente es su {@code Code font} ({@link ElementReader}). La
          * etiqueta de lenguaje de las vallas (<code>```java</code>) no tendría efecto, porque no hay resaltado, y es un
          * error.
@@ -248,7 +248,7 @@ final class MarkdownBuilder {
             }
             InlineNode text = node("Text", "", line);
             InlineNode typography = node("Typography", "", line);
-            typography.addChild(node("White space", "preserve", line));
+            typography.addChild(node("Preformatted", "true", line));
             text.addChild(typography);
             // El Content >> va en la línea de las vallas; con sangría, en la anterior a la primera línea.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
@@ -331,7 +331,7 @@ final class MarkdownBuilder {
             String track = mode.getText().trim().equals("equal") ? "*" : "auto";
             InlineNode table = node("Table", "", line);
             table.addChild(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()));
-            table.addChild(rows("Head", head));
+            table.addChild(rows("Header rows", head));
             table.addChild(rows("Body", body));
             for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {
                 extraCells(r, columns);
@@ -363,7 +363,7 @@ final class MarkdownBuilder {
             }
         }
 
-        /** {@code Head} o {@code Body} con sus filas; las celdas no tienen línea propia: la de su fila. */
+        /** {@code Header rows} o {@code Body} con sus filas; las celdas no tienen línea propia: la de su fila. */
         private InlineNode rows(String name, org.commonmark.node.Node group) {
             InlineNode out = node(name, "", line(group));
             for (org.commonmark.node.Node r = group.getFirstChild(); r != null; r = r.getNext()) {

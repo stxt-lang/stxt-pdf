@@ -65,11 +65,11 @@ class FlexFragmentationTest {
     }
 
     @Test
-    void columnRespectsAvoidBetweenItems() {
-        // Cortar antes de C incumple su avoid: se corta antes de B.
+    void columnRespectsKeepsBetweenItems() {
+        // Cortar antes de C incumple su Keep with previous: se corta antes de B.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
-                item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tBefore: avoid"}));
+                item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true"}));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
         assertRect(40, 40, 515, 40, l.rect(2, "B"));

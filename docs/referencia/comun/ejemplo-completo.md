@@ -32,7 +32,7 @@ Document (dev.stxt.pdf):
             Typography:
                 Align: left
             Break:
-                Inside: avoid
+                Keep together: true
         For id: title
             Box:
                 Margin: 0 0 16 0
@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
                 Size: 20
                 Line height: 24
             Break:
-                After: avoid
+                Keep with next: true
     Section:
         Page overlay:
             Id: header
@@ -107,12 +107,12 @@ Document (dev.stxt.pdf):
   y = 40 + 772 = **812**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
   en cada página.
 - **`title`**: primer elemento en flujo, en y = **40**, con una línea de 24 pt. Su margen
-  inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `After: avoid` en su `Break`, nunca queda
+  inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `Keep with next: true` en su `Break`, nunca queda
   solo al final de una página.
 - **`body`** (`Grid`): 515 − 20 de hueco = 495 para pistas. La columna fija mide **150** y la
   fracción recibe **345**. Los dos `Area` no tienen valor y se colocan automáticamente, uno en
   cada columna: `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**. `side` no se
-  parte (`Inside: avoid`). `main` puede partirse entre páginas respetando viudas y
+  parte (`Keep together: true`). `main` puede partirse entre páginas respetando viudas y
   huérfanas (2 por defecto).
 - **`stamp`** (`Overlay`): no hay ancestro posicionado, así que su contenedor de referencia es el
   área útil. Arriba 0 y derecha 0 con ancho 80 la anclan a la esquina superior derecha:

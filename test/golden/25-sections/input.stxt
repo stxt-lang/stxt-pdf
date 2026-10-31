@@ -4,7 +4,7 @@
 #   cover (1 página):  Margin 0, área útil de 300 × 200 desde (0, 0), sin números ni los Page overlay del documento.
 #                      cover-box llena la página (0, 0, 300 × 200); stamp (Page overlay de la sección) sale en (10, 10), 40 × 20.
 #   body (2 páginas):  el Page del documento. b1 (20, 20) y b2 (20, 80) caben en la página 2 (física); b3, no (60 + 60 + 60 > 160)
-#                      (con Inside: avoid, que no se parte) y pasa a la 3, en (20, 20). head (Pages: first, de la sección) sale solo en la primera página
+#                      (con Keep together: true, que no se parte) y pasa a la 3, en (20, 20). head (Pages: first, de la sección) sale solo en la primera página
 #                      de la sección: la 2 física, en (20, 20), 260 × 12. foot (Page overlay del documento) sale en las dos,
 #                      abajo: y = 20 + 160 - 12 = 168.
 #   wide (2 páginas):  Width 400, Height 150, Margin 10: área útil de 380 × 130 desde (10, 10). w1 (10, 10, 380 × 50);
@@ -80,7 +80,7 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: b3
 			Break:
-				Inside: avoid
+				Keep together: true
 			Box:
 				Height: 60
 				Background: #DCEBDD
@@ -101,7 +101,7 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: w2
 			Break:
-				Inside: avoid
+				Keep together: true
 			Box:
 				Height: 100
 				Background: #DCEBDD

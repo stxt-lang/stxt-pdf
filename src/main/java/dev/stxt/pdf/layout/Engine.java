@@ -296,8 +296,8 @@ public final class Engine implements LayoutContext {
     /**
      * Una caja girada en flujo (referencia/comun/capas-y-giro.md): se maqueta sin girar con su ancho, que no depende
      * del contenedor ({@link #turnedWidth}), y ocupa el rectángulo que envuelve su caja de borde girada sobre su
-     * centro. No se parte: entera o, si no cabe en lo que queda de página, en la siguiente. Es un contexto de formato
-     * de bloque: no salen de ella los márgenes de sus hijos.
+     * centro. No se parte: entera o, si no cabe en lo que queda de página, en la siguiente. Aísla los márgenes: no
+     * salen de ella los de sus hijos.
      */
     private LayoutResult rotatedInFlow(Box box, ConstraintSpace space) {
         ConstraintSpace own = ConstraintSpace.fixed(turnedWidth(box, space), OptionalDouble.empty(),

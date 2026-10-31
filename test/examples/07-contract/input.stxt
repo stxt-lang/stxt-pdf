@@ -150,7 +150,7 @@ Document (dev.stxt.pdf):
 				Column align: left left right right
 				Box:
 					Margin: 0 0 14 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Nº
 						Cell: Hito y entregable
@@ -175,7 +175,7 @@ Document (dev.stxt.pdf):
 							Row header: true
 						Cell: 9 feb. 2026
 						Cell: 5.520 €
-				Foot:
+				Footer rows:
 					Row:
 						Style: total
 						Cell: Total sin IVA
@@ -185,7 +185,7 @@ Document (dev.stxt.pdf):
 		Block:
 			Id: signatures
 			Break:
-				Inside: avoid
+				Keep together: true
 			Paragraph: Y en prueba de conformidad, las partes firman este contrato por duplicado y a un solo efecto, en el lugar y la fecha indicados al principio.
 			Grid:
 				Column sizes: * *

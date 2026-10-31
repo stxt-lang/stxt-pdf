@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 		For style: keep
 			Break:
-				Inside: avoid
+				Keep together: true
 	Section:
 		Table:
 			Column sizes: *

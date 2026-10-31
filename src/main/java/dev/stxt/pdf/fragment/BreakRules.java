@@ -18,7 +18,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * <p>La calidad de un corte es una de las constantes de {@link BreakAppeal}: mayor es mejor.
  * Se elige el <strong>último</strong> corte de mayor calidad, que es lo mismo que relajar las
  * reglas en el orden de la referencia (referencia/comun/cortes.md): primero viudas y huérfanas, después
- * {@code Before}/{@code After: avoid} y por último {@code Inside: avoid} (de {@code Break}).</p>
+ * {@code Keep with next} y {@code Keep with previous}, y por último {@code Keep together} (de {@code Break}).</p>
  */
 public final class BreakRules {
 
@@ -57,7 +57,7 @@ public final class BreakRules {
 
     /**
      * Líneas a colocar cuando ningún corte respeta viudas y huérfanas, pero el padre puede
-     * preferir partir el párrafo a separar dos cajas con {@code avoid}: se respetan las viudas
+     * preferir partir el párrafo a separar dos cajas que se mantienen juntas: se respetan las viudas
      * si se puede (y se incumplen las huérfanas) y, si no, se llena el espacio.
      *
      * @return entre 1 y {@code capacity}; requiere {@code 0 < capacity < pending}
@@ -108,10 +108,13 @@ public final class BreakRules {
 
     // --- Cortes entre cajas -----------------------------------------------------------------------
 
-    /** Calidad del corte entre dos cajas hermanas en flujo: {@code avoid} en cualquiera lo empeora. */
+    /**
+     * Calidad del corte entre dos cajas hermanas en flujo: {@code Keep with next} en la primera o {@code Keep with
+     * previous} en la segunda lo empeoran.
+     */
     public static int between(Box before, Box after) {
-        return before.style().breaks().after() == Break.AVOID || after.style().breaks().before() == Break.AVOID
-                ? BreakAppeal.VIOLATES_AVOID_BETWEEN : BreakAppeal.PERFECT_BREAK;
+        return before.style().breaks().keepWithNext() || after.style().breaks().keepWithPrevious()
+                ? BreakAppeal.VIOLATES_KEEP_BETWEEN : BreakAppeal.PERFECT_BREAK;
     }
 
     /**
@@ -208,9 +211,9 @@ public final class BreakRules {
         return forced;
     }
 
-    /** Calidad de un corte dentro de una caja: {@code Inside: avoid} lo deja en {@link BreakAppeal#FORCED}. */
+    /** Calidad de un corte dentro de una caja: {@code Keep together} lo deja en {@link BreakAppeal#FORCED}. */
     public static int inside(Box box, int appeal) {
-        return box.style().breaks().avoidInside() ? BreakAppeal.FORCED : appeal;
+        return box.style().breaks().keepTogether() ? BreakAppeal.FORCED : appeal;
     }
 
     // --- Elección del corte -----------------------------------------------------------------------

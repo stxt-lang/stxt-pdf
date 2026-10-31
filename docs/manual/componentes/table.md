@@ -19,7 +19,7 @@ Document (dev.stxt.pdf):
                 Padding: 4 6
                 Border: 0 0 0.5 0
                 Border color: #C8C4BA
-        For element: Head cell
+        For element: Header cell
             Typography:
                 Bold: true
                 Color: #FFFFFF
@@ -35,7 +35,7 @@ Document (dev.stxt.pdf):
         Table:
             Column sizes: * 60 80 80
             Column align: left right right right
-            Head:
+            Header rows:
                 Row:
                     Cell: Concepto
                     Cell: Uds.
@@ -54,7 +54,7 @@ Document (dev.stxt.pdf):
                     Cell: 1
                     Cell: 890,00
                     Cell: 890,00
-            Foot:
+            Footer rows:
                 Row:
                     Style: total
                     Cell: Total
@@ -65,8 +65,8 @@ Document (dev.stxt.pdf):
 
 ## La estructura
 
-- `Head` (opcional), `Body` (obligatorio) y `Foot` (opcional), en ese orden. Cada uno tiene una o varias `Row`, y cada fila,
-  sus `Cell` de izquierda a derecha.
+- `Header rows` (opcional), `Body` (obligatorio) y `Footer rows` (opcional), en ese orden. Cada uno tiene una o varias
+  `Row`, y cada fila, sus `Cell` de izquierda a derecha.
 - **`Column sizes`** (obligatorio) son las columnas, con las mismas medidas que un `Grid`: puntos, porcentajes, `auto` (lo que
   pida su contenido) y fracciones (`*`: una parte de lo que sobra) ([Grid](grid.md)).
 - Cada fila llena **exactamente** todas las columnas: una celda vacía se escribe `Cell:`. Una fila con celdas de más o de
@@ -82,7 +82,7 @@ Una celda con valor (`Cell: 145,00`) es un texto. Sin valor, tiene elementos den
 `Gap` en la `Table` separa las celdas.
 
 **`Row header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
-de pantalla la lee con cada celda de la fila. Las celdas de `Head` ya son cabeceras de columna.
+de pantalla la lee con cada celda de la fila. Las celdas de `Header rows` ya son cabeceras de columna.
 
 ## Estilo de las celdas
 
@@ -91,7 +91,7 @@ Sin repetir un estilo en cada celda:
 | Regla | Celdas |
 |---|---|
 | `For element: Cell` | Todas |
-| `For element: Head cell`, `Body cell`, `Foot cell` | Las de la cabecera, el cuerpo o el pie |
+| `For element: Header cell`, `Body cell`, `Footer cell` | Las de la cabecera, el cuerpo o el pie |
 | `For element: Odd row cell`, `Even row cell` | Las de las filas impares o pares del cuerpo (la cebra) |
 | `For column: 3` o `For column: 2 4` | Las que empiezan en esas columnas |
 | `For style: total` con `Style: total` en la `Row` | Las de esa fila |
@@ -131,7 +131,7 @@ Document (dev.stxt.pdf):
             Column sizes: * 80
             Column align: left right
             Gap: 0 8
-            Head:
+            Header rows:
                 Row:
                     Box:
                         Border: 0 0 1 0
@@ -146,7 +146,7 @@ Document (dev.stxt.pdf):
                 Row:
                     Cell: Maquetación
                     Cell: 800,00
-            Foot:
+            Footer rows:
                 Row:
                     Id: total
                     Style: total

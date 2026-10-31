@@ -40,7 +40,7 @@ class GridLayoutTest {
         // la celda con relleno (12 + 8) y estira a la otra.
         LayoutFixture l = layOut(
                 "\tTable:", "\t\tColumn sizes: 100 *", "\t\tGap: 0 5",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: aaa", "\t\t\t\t\tId: H1", "\t\t\t\tCell: bbb", "\t\t\t\t\tId: H2",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: aaa", "\t\t\t\t\tId: H1", "\t\t\t\tCell: bbb", "\t\t\t\t\tId: H2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: ccc", "\t\t\t\t\tId: B1", "\t\t\t\t\tBox:",
                 "\t\t\t\t\t\tPadding: 4", "\t\t\t\tCell:", "\t\t\t\t\tId: B2");
         assertRect(40, 40, 100, 12, l.rect("H1"));

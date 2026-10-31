@@ -42,7 +42,7 @@ class ColumnsElementTest {
         Box flow = columnsBox.children().get(0);
         assertEquals(Element.COLUMN_FLOW, flow.element());
         assertEquals(Layout.BLOCK, flow.style().layout());
-        assertTrue(flow.establishesBlockFormattingContext());
+        assertTrue(flow.isolatesMargins());
         assertEquals(List.of(Element.PARAGRAPH, Element.BLOCK), flow.children().stream().map(b -> b.element()).toList());
         assertSame(flow, flow.children().get(1).parent());
         // La tipografía del Columns llega a su contenido a través del flujo.

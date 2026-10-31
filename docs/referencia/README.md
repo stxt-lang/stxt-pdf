@@ -45,7 +45,7 @@ Si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [`Text`](componentes/text.md) | `Text` y `Paragraph` |
 | [Encabezados](componentes/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](componentes/list.md) | `List` y `List item` |
-| [`Table`](componentes/table.md) | `Table`, `Head`, `Body`, `Foot`, `Row` y `Cell` |
+| [`Table`](componentes/table.md) | `Table`, `Header rows`, `Body`, `Footer rows`, `Row` y `Cell` |
 | [`Flex`](componentes/flex.md) | `Flex` e `Item` |
 | [`Grid`](componentes/grid.md) | `Grid` y `Area` |
 | [`Columns`](componentes/columns.md) | `Columns` |

@@ -137,8 +137,8 @@ class OverflowTest {
     @Test
     void aPreformattedLineThatDoesNotFit() {
         InvalidModelException e = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tWhite space: preserve")));
-        assertContains("Una línea de un texto con White space: pre", e);
+                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tPreformatted: true")));
+        assertContains("Una línea de un texto con Preformatted: true", e);
         assertContains("la línea mide 595 y la caja deja 515", e);
     }
 
@@ -206,13 +206,13 @@ class OverflowTest {
     }
 
     @Test
-    void headAndFootThatLeaveNoRoomForTheBody() {
+    void headerAndFooterRowsThatLeaveNoRoomForTheBody() {
         // Cabecera de 60 y pie de 50 en un área útil de 100.
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOutPaged(PAGE,
                 "\tTable:", "\t\tId: X", "\t\tColumn sizes: *",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 60",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 60",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b",
-                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));
+                "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));
         assertContains("miden 110 y no dejan sitio al cuerpo", e);
     }
 }

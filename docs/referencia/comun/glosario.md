@@ -10,7 +10,7 @@
 | **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Columns`, cada columna ([Cortes](cortes.md#modelo)). |
 | **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](caja.md#el-contenedor-de-referencia)). |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](capas-y-giro.md)). |
-| **Contexto de formato de bloque** | Región que aísla el colapso de márgenes ([Block](../componentes/block.md#contextos-de-formato-de-bloque)). |
+| **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta el colapso de márgenes ([Block](../componentes/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color, ...)` ([La caja](caja.md#degradado)). |
 | **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](estructura.md#elementos)). |
@@ -32,7 +32,7 @@
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número ([Referencias](referencias.md)). |
 | **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Page overlay` y su numeración ([Document](../componentes/document.md#section)). |
 | **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya. |
-| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`White space: preserve` o `preserve-wrap`). |
+| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`Preformatted: true` o `wrap`). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace y, en el código, otra familia) ([Formato del texto](formato-del-texto.md#tramos)). |
 | **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

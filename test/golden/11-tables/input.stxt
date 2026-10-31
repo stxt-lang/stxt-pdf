@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
 			Id: t
 			Column sizes: 100 *
 			Gap: 0 10
-			Head:
+			Header rows:
 				Row:
 					Typography:
 						Bold: true
@@ -101,7 +101,7 @@ Document (dev.stxt.pdf):
 					Cell: Fila 14
 						Id: b14
 					Cell: 14
-			Foot:
+			Footer rows:
 				Row:
 					Typography:
 						Bold: true

@@ -187,7 +187,7 @@ class StylesFileTest {
 
     @Test
     void breakFromTheStylesDocumentCannotGoToAnAbsolute() {
-        InvalidModelException e = error(BASE + "\tFor element: Overlay\n\t\tBreak:\n\t\t\tAfter: avoid\n",
+        InvalidModelException e = error(BASE + "\tFor element: Overlay\n\t\tBreak:\n\t\t\tKeep with next: true\n",
                 "\tOverlay:", "\t\tText: a");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
         assertEquals(7, e.line());
@@ -203,7 +203,7 @@ class StylesFileTest {
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, box.errorCode());
         assertEquals(3, box.line());
-        InvalidModelException inDocument = error(null, "\tStyles:", "\t\tFor element: Document", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
+        InvalidModelException inDocument = error(null, "\tStyles:", "\t\tFor element: Document", "\t\t\tBreak:", "\t\t\t\tKeep with next: true",
                 "\tText: hola");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, inDocument.errorCode());
         assertEquals(9, inDocument.line());
@@ -241,11 +241,11 @@ class StylesFileTest {
 
     @Test
     void tablePositionRulesOfTheStylesDocumentGoBeforeThoseOfTheDocument() {
-        // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Head cell
-        // del documento.
+        // Dentro del nivel de la posición, el documento aparte va antes: una Odd row cell suya pierde ante la Header
+        // cell del documento.
         String styles = BASE + "\tFor element: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
-        Box table = root(styles, "\tStyles:", "\t\tFor element: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
-                "\tTable:", "\t\tColumn sizes: *", "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: a",
+        Box table = root(styles, "\tStyles:", "\t\tFor element: Header cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
+                "\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
         assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().box().padding());
         assertEquals(Sides.all(Value.pt(7)), table.children().get(1).style().box().padding());

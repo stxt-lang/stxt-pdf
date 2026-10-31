@@ -3,7 +3,7 @@
 #   El estilo total da Padding 6 (arriba y abajo) a cada celda de las filas que la declaran en su Row: una celda
 #   de una línea mide 12 + 12 = 24. Las filas sin estilo miden 12.
 #   Body: fila 1, sin estilo: 12 (y = 20); fila 2, con el estilo: 24 (y = 32); fila 3, sin estilo: 12 (y = 56).
-#   Foot: una fila con el estilo, 24 (y = 68). La tabla mide 12 + 24 + 12 + 24 = 72.
+#   Footer rows: una fila con el estilo, 24 (y = 68). La tabla mide 12 + 24 + 12 + 24 = 72.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -36,7 +36,7 @@ Document (dev.stxt.pdf):
 				Row:
 					Cell: e
 					Cell: f
-			Foot:
+			Footer rows:
 				Row:
 					Style: total
 					Cell: g

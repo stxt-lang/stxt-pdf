@@ -69,10 +69,11 @@ class InlineFragmentationTest {
     }
 
     @Test
-    void orphansAreRelaxedBeforeAvoid() {
-        // Cortar antes de P incumpliría el avoid de T; dejar una huérfana es menos grave (referencia/comun/cortes.md).
+    void orphansAreRelaxedBeforeKeeps() {
+        // Cortar antes de P incumpliría el Keep with next de T; dejar una huérfana es menos grave
+        // (referencia/comun/cortes.md).
         LayoutFixture l = layOutPaged(PAGE,
-                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tAfter: avoid",
+                "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tKeep with next: true",
                 "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(2, l.pages());
         assertRect(40, 120, 30, 12, l.rect(1, "P"));

@@ -23,7 +23,7 @@ import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +41,6 @@ import static dev.stxt.pdf.tree.ValueReader.LENGTH_OR_AUTO;
 import static dev.stxt.pdf.tree.ValueReader.SIZE;
 import static dev.stxt.pdf.tree.ValueReader.aspectRatio;
 import static dev.stxt.pdf.tree.ValueReader.bool;
-import static dev.stxt.pdf.tree.ValueReader.breakInside;
 import static dev.stxt.pdf.tree.ValueReader.check;
 import static dev.stxt.pdf.tree.ValueReader.color;
 import static dev.stxt.pdf.tree.ValueReader.colorSides;
@@ -103,7 +102,7 @@ final class PropertyReader {
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
-            entry("white-space", (p, s) -> s.typography().setWhiteSpace(enumValue(WhiteSpace.class, p))),
+            entry("preformatted", (p, s) -> s.typography().setPreformatted(enumValue(Preformatted.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
             entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
             entry("number-format", (p, s) -> s.typography().setNumberFormat(enumValue(NumberFormat.class, p))),
@@ -120,7 +119,7 @@ final class PropertyReader {
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
-            entry("contain-margins", (p, s) -> s.setContainMargins(bool(p))),
+            entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),
@@ -218,7 +217,9 @@ final class PropertyReader {
             switch (name) {
                 case "before" -> s.breaks().setBefore(enumValue(Break.class, p));
                 case "after" -> s.breaks().setAfter(enumValue(Break.class, p));
-                case "inside" -> s.breaks().setAvoidInside(breakInside(p));
+                case "keep-with-next" -> s.breaks().setKeepWithNext(bool(p));
+                case "keep-with-previous" -> s.breaks().setKeepWithPrevious(bool(p));
+                case "keep-together" -> s.breaks().setKeepTogether(bool(p));
                 case "edges" -> s.breaks().setEdges(enumValue(Edges.class, p));
                 default -> throw unread(p);
             }

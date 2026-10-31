@@ -3,7 +3,7 @@
 Una `Image` pone en el documento una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos
 ([Recursos](../comun/recursos.md)). Es una caja sin hijos, como un `Text`, cuyo contenido es la imagen: se coloca, se
 dimensiona, se corta entre páginas y se pinta como cualquier caja, con su `Box` (márgenes, relleno, borde, fondo y
-esquinas) y su `Break` (sin `Inside` ni `Edges`, porque no se parte). Admite además `Id`, `Style` y `Link`. No admite
+esquinas) y su `Break` (sin `Keep together` ni `Edges`, porque no se parte). Admite además `Id`, `Style` y `Link`. No admite
 `Typography`, porque no tiene texto.
 
 ```
@@ -115,7 +115,7 @@ Con la misma proporción, las tres dan lo mismo. Una imagen se recorta además c
 
 Una imagen no se parte: si no cabe en lo que queda de la página (o de la columna de un `Columns`), pasa entera a la
 siguiente, como una línea de texto. Si no cabe ni en una página entera, es `PAGE_OVERFLOW`, con la línea de su `Height` (o,
-sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja. `Inside` y `Edges`, que solo cuentan al
+sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja. `Keep together` y `Edges`, que solo cuentan al
 partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla de `Styles`.
 
 ## Dónde va

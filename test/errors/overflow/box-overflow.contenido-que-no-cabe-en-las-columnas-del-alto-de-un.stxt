@@ -21,14 +21,14 @@ Document (dev.stxt.pdf):
 				Box:
 					Height: 40
 				Break:
-					Inside: avoid
+					Keep together: true
 			Block:
 				Box:
 					Height: 40
 				Break:
-					Inside: avoid
+					Keep together: true
 			Block:
 				Box:
 					Height: 40
 				Break:
-					Inside: avoid
+					Keep together: true

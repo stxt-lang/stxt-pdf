@@ -115,7 +115,7 @@ Document (dev.stxt.pdf):
 			Column align: left left right right right
 			Box:
 				Margin: 0 0 24 0
-			Head:
+			Header rows:
 				Row:
 					Cell: Ref.
 					Cell: Descripción
@@ -172,7 +172,7 @@ Document (dev.stxt.pdf):
 					Cell: 1
 					Cell: 260,00 €
 					Cell: 260,00 €
-			Foot:
+			Footer rows:
 				Row:
 					Cell: Base imponible
 						Row header: true

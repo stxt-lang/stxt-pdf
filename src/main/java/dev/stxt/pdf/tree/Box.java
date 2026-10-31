@@ -49,8 +49,8 @@ public final class Box {
     private int textLine;
     private boolean textBlock;
     private Box marker;
-    private int headRows;
-    private int footRows;
+    private int headerRows;
+    private int footerRows;
     private List<Box> rows = new ArrayList<>();
     private boolean closed;
 
@@ -163,16 +163,18 @@ public final class Box {
     }
 
     /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Head} (referencia/componentes/table.md): las
+     * Filas de la rejilla de una {@code Table} que son de su {@code Header rows} (referencia/componentes/table.md): las
      * primeras. 0 en el resto de cajas.
      */
-    public int headRows() {
-        return headRows;
+    public int headerRows() {
+        return headerRows;
     }
 
-    /** Filas de la rejilla de una {@code Table} que son de su {@code Foot}: las últimas. 0 en el resto de cajas. */
-    public int footRows() {
-        return footRows;
+    /**
+     * Filas de la rejilla de una {@code Table} que son de su {@code Footer rows}: las últimas. 0 en el resto de cajas.
+     */
+    public int footerRows() {
+        return footerRows;
     }
 
     /**
@@ -248,14 +250,14 @@ public final class Box {
         this.marker = marker;
     }
 
-    void setHeadRows(int rows) {
+    void setHeaderRows(int rows) {
         writable();
-        this.headRows = rows;
+        this.headerRows = rows;
     }
 
-    void setFootRows(int rows) {
+    void setFooterRows(int rows) {
         writable();
-        this.footRows = rows;
+        this.footerRows = rows;
     }
 
     void addRow(Box row) {
@@ -321,12 +323,12 @@ public final class Box {
     }
 
     /**
-     * Crea un contexto de formato de bloque, que aísla el colapso de márgenes
-     * (referencia/componentes/block.md): el área útil (la raíz), las cajas {@code absolute} y
-     * {@code fixed}, los ítems de flex y grid, las cajas con {@code Contain margins: true} y las giradas en flujo.
+     * Si la caja aísla los márgenes, es decir, si corta su colapso (referencia/componentes/block.md): el área útil
+     * (la raíz), los {@code Overlay} y {@code Page overlay}, los ítems de flex y grid, las cajas con
+     * {@code Isolate margins: true} y las giradas en flujo.
      */
-    public boolean establishesBlockFormattingContext() {
-        if (parent == null || style.containMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
+    public boolean isolatesMargins() {
+        if (parent == null || style.isolateMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
             return true;
         }
         Layout l = parent.style.layout();

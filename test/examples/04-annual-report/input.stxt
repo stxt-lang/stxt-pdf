@@ -332,7 +332,7 @@ Document (dev.stxt.pdf):
 				Column align: left right right right
 				Box:
 					Margin: 0 0 18 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Concepto
 						Cell: 2025
@@ -369,7 +369,7 @@ Document (dev.stxt.pdf):
 						Cell: −88
 						Cell: −71
 						Cell: +23,9 %
-				Foot:
+				Footer rows:
 					Row:
 						Style: total
 						Cell: Resultado del ejercicio
@@ -426,7 +426,7 @@ Document (dev.stxt.pdf):
 				Id: indicators
 				Column sizes: * 70 70 70
 				Column align: left right right right
-				Head:
+				Header rows:
 					Row:
 						Cell: Indicador
 						Cell: 2023
@@ -470,7 +470,7 @@ Document (dev.stxt.pdf):
 				Column align: left left right
 				Box:
 					Margin: 0 0 18 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Nombre
 						Cell: Cargo
@@ -522,7 +522,7 @@ Document (dev.stxt.pdf):
 				Column align: left right right right right
 				Box:
 					Margin: 0 0 6 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Actividad
 						Cell: 1.er trim.

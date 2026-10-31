@@ -265,16 +265,16 @@ class BoxTreeBuilderTest {
 
     /**
      * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
-     * (referencia/comun/errores.md): {@code Contain margins: false} en un ítem es el valor por defecto, un {@code
+     * (referencia/comun/errores.md): {@code Isolate margins: false} en un ítem es el valor por defecto, un {@code
      * Break} que llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque
      * esté dentro de un {@code Overlay}.
      */
     @Test
-    void breaksAndContainMarginsWithoutEffectOnlyFailWhenTheElementWritesThem() {
+    void breaksAndIsolateMarginsWithoutEffectOnlyFailWhenTheElementWritesThem() {
         build(document(
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
-                "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tAfter: avoid",
-                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tContain margins: false",
+                "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tKeep with next: true",
+                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate margins: false",
                 "\tOverlay:", "\t\tParagraph: Sello",
                 "\t\tColumns:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
                 "\t\t\tBlock:"));

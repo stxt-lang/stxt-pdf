@@ -116,7 +116,7 @@ Styles (dev.stxt.pdf):
 			Background: #1A1D23
 			Padding: 10 14
 			Margin: 4 0 10 0
-	For element: Head cell
+	For element: Header cell
 		Typography:
 			Bold: true
 			Size: 8

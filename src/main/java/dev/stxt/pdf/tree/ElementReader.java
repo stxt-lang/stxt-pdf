@@ -103,9 +103,9 @@ enum ElementReader {
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
-            if (s.rowHeader() && position != null && position.group() == CellPosition.HEAD) {
-                throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEAD, "Row header no tiene efecto en una celda de Head: "
-                        + "las celdas de la cabecera ya son cabeceras de columna");
+            if (s.rowHeader() && position != null && position.group() == CellPosition.HEADER) {
+                throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEADER_ROWS, "Row header no tiene efecto en "
+                        + "una celda de Header rows: las celdas de la cabecera ya son cabeceras de columna");
             }
         }
 
@@ -175,8 +175,8 @@ enum ElementReader {
 
     /**
      * Un {@code Columns} (referencia/componentes/columns.md): su contenido va en su flujo de columnas, una caja de
-     * bloque generada que es su único hijo y de la que cada columna es un fragmento. Crea un contexto de formato de
-     * bloque, para que los márgenes no salgan de las columnas, y su alto no es definido: lo decide el reparto en
+     * bloque generada que es su único hijo y de la que cada columna es un fragmento. Aísla los márgenes, para que
+     * no salgan de las columnas, y su alto no es definido: lo decide el reparto en
      * columnas.
      */
     COLUMNS {
@@ -197,7 +197,7 @@ enum ElementReader {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box columns) {
             Style s = Style.inheriting(columns.style());
-            s.setContainMargins(true);
+            s.setIsolateMargins(true);
             Box flow = new Box(null, Element.COLUMN_FLOW, s, false, n.getLine());
             columns.addChild(flow);
             ctx.definiteHeight.put(flow, false);
@@ -373,7 +373,7 @@ enum ElementReader {
         Node source = content.orElse(n);
         font(n, source, box);
         boolean paragraph = box.element() == Element.PARAGRAPH;
-        if (paragraph || !box.style().typography().whiteSpace().preformatted()) {
+        if (paragraph || !box.style().typography().preformatted().enabled()) {
             // Las líneas en blanco al principio o al final no separan nada.
             String text = source.getText();
             Matcher blank = BLANK_LINE.matcher(text)
@@ -384,7 +384,7 @@ enum ElementReader {
                 throw error(line, ErrorCode.TEXT_BLANK_LINE, paragraph
                         ? "Un Paragraph es un solo párrafo: sobra la línea en blanco, o va un Paragraph para cada uno"
                         : "Un Text no tiene párrafos: sobra la línea en blanco, o va un Paragraph para cada párrafo "
-                        + "(en un Block si van juntos). En un texto preformateado (White space: preserve) sí vale");
+                        + "(en un Block si van juntos). En un texto preformateado (Preformatted: true) sí vale");
             }
         }
         box.setText(source.getText(), source.getLine(), source instanceof TextNode);

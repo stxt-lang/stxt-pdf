@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: * *
-			Foot:
+			Footer rows:
 				Row:
 					Cell: a
 					Cell: b

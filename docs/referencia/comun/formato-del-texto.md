@@ -111,17 +111,17 @@ Mono). Lo que se mide es lo que se pinta. Una ligadura no cruza un espacio ni el
 > **Decisión:** `false` por defecto: sin ligaduras el texto se pinta mucho más rápido (de 17 a 30 veces). *Alternativa
 > descartada:* ligaduras siempre, o nunca.
 
-## Texto preformateado (`White space`)
+## Texto preformateado
 
-Por defecto el espacio en blanco se colapsa. Con `White space: preserve` o `preserve-wrap` el texto **conserva sus espacios y sus
+Por defecto el espacio en blanco se colapsa. Con `Preformatted: true` o `wrap` el texto **conserva sus espacios y sus
 saltos de línea**: cada línea del texto es una línea de la caja, también las vacías. Una línea en blanco **no** separa
 párrafos: el texto entero es un párrafo para las viudas y huérfanas ([Cortes](cortes.md)), así que un bloque largo se
 parte entre líneas. Actúa en un `Text`, un `Paragraph` y una `Cell` con texto. Lo normal es una fuente monoespaciada y un
 `Content >>`, que conserva la sangría relativa (no los espacios al final de una línea ni las líneas en blanco del final).
 Un salto de línea al final del texto no añade una línea vacía.
 
-- **`preserve`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
-- **`preserve-wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
+- **`true`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
+- **`wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
   espacios del corte se pierden. Una palabra más ancha que la caja sigue siendo un error.
 - **Tabulaciones (`Tab size`).** Cada tabulación lleva a la siguiente columna múltiplo de `Tab size`, contando desde el
   principio de la línea (con `Tab size: 4`, `a⇥b` es `a   b`, y `abcd⇥e`, `abcd    e`). Un valor menor que 1 es
@@ -133,10 +133,10 @@ Un salto de línea al final del texto no añade una línea vacía.
 
 ### Tamaños intrínsecos
 
-Con `preserve`, el ancho más estrecho y el natural son la línea más ancha. Con `preserve-wrap`, el ancho más estrecho es la
+Con `Preformatted: true`, el ancho más estrecho y el natural son la línea más ancha. Con `wrap`, el ancho más estrecho es la
 palabra más ancha y el natural, la línea más ancha.
 
-> **Decisión:** el texto preformateado es una propiedad heredable y no un elemento `Preformatted`, que no cabría en una
+> **Decisión:** el texto preformateado es una propiedad heredable y no un elemento propio, que no cabría en una
 > `Cell` con valor.
 
 ## Subrayado y tachado
@@ -149,4 +149,4 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 - Tramos con otro tamaño, otro color u otra familia (salvo el código), ni que quiten la negrita o la cursiva de la caja.
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
-- `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `White space`.
+- `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.

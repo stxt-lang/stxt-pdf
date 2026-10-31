@@ -1,4 +1,4 @@
-# Case: Una línea de un texto con White space: pre más ancha que su caja
+# Case: Una línea de un texto con Preformatted: pre más ancha que su caja
 # Code: TEXT_OVERFLOW
 # Line: 22
 Document (dev.stxt.pdf):
@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Mono
 				Size: 10
-				White space: preserve
+				Preformatted: true
 	Section:
 		Text:
 			Box:

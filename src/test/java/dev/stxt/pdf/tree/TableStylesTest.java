@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Estilo de las celdas de una tabla por su posición y su columna (referencia/comun/estilos.md y
- * referencia/componentes/table.md): {@code Head cell}, {@code Body cell}, {@code Foot cell}, {@code Odd row cell},
+ * referencia/componentes/table.md): {@code Header cell}, {@code Body cell}, {@code Footer cell}, {@code Odd row cell},
  * {@code Even row cell}, {@code For column} y {@code Column align}.
  */
 class TableStylesTest {
@@ -28,12 +28,12 @@ class TableStylesTest {
     /** Una tabla de dos columnas con una fila de cabecera, tres de cuerpo y una de pie. */
     private static final String[] TABLE = {
             "\tTable:", "\t\tColumn sizes: * *",
-            "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
+            "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
             "\t\tBody:",
             "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
             "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2",
             "\t\t\tRow:", "\t\t\t\tCell: c1", "\t\t\t\tCell: c2",
-            "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tCell: f1", "\t\t\t\tCell: f2"};
+            "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: f1", "\t\t\t\tCell: f2"};
 
     private static String[] doc(String[] styles, String... table) {
         return java.util.stream.Stream.concat(java.util.Arrays.stream(styles), java.util.Arrays.stream(table))
@@ -55,10 +55,10 @@ class TableStylesTest {
     }
 
     @Test
-    void headBodyAndFootRulesApplyToTheCellsOfEachGroup() {
+    void headerBodyAndFooterRulesApplyToTheCellsOfEachGroup() {
         Box table = root(doc(new String[]{"\tStyles:",
-                "\t\tFor element: Head cell", "\t\t\tTypography:", "\t\t\t\tBold: true",
-                "\t\tFor element: Foot cell", "\t\t\tTypography:", "\t\t\t\tBold: true", "\t\t\t\tAlign: right",
+                "\t\tFor element: Header cell", "\t\t\tTypography:", "\t\t\t\tBold: true",
+                "\t\tFor element: Footer cell", "\t\t\tTypography:", "\t\t\t\tBold: true", "\t\t\t\tAlign: right",
                 "\t\tFor element: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3"}, TABLE)).children().get(0);
         assertEquals(FontWeight.BOLD, cell(table, "h2").style().typography().fontWeight());
         assertEquals(FontWeight.BOLD, cell(table, "f1").style().typography().fontWeight());
@@ -99,7 +99,7 @@ class TableStylesTest {
     void positionRulesAreMoreSpecificThanTheCellRule() {
         Box table = root(doc(new String[]{"\tStyles:",
                 "\t\tFor element: Cell", "\t\t\tBox:", "\t\t\t\tPadding: 1", "\t\t\t\tMargin: 1",
-                "\t\tFor element: Head cell", "\t\t\tBox:", "\t\t\t\tPadding: 2",
+                "\t\tFor element: Header cell", "\t\t\tBox:", "\t\t\t\tPadding: 2",
                 "\t\tFor element: Body cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\t\tFor element: Odd row cell", "\t\t\tBox:", "\t\t\t\tPadding: 4"}, TABLE)).children().get(0);
         assertEquals(Value.pt(2), cell(table, "h1").style().box().padding().top());
@@ -112,11 +112,11 @@ class TableStylesTest {
     @Test
     void forColumnWinsOverPositionButNotOverClassesIdOrTheCell() {
         Box table = root("\tStyles:",
-                "\t\tFor element: Head cell", "\t\t\tTypography:", "\t\t\t\tAlign: center",
+                "\t\tFor element: Header cell", "\t\t\tTypography:", "\t\t\t\tAlign: center",
                 "\t\tFor column: 2", "\t\t\tTypography:", "\t\t\t\tAlign: right",
                 "\t\tFor style: left", "\t\t\tTypography:", "\t\t\t\tAlign: left",
                 "\tTable:", "\t\tColumn sizes: * *",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\t\tStyle: left",
                 "\t\t\tRow:", "\t\t\t\tCell: c1", "\t\t\t\tCell: c2", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center")
@@ -143,10 +143,10 @@ class TableStylesTest {
     @Test
     void columnAlignIsTheDefaultOfEachColumnAndEverythingElseOverridesIt() {
         Box table = root("\tStyles:",
-                "\t\tFor element: Head cell", "\t\t\tTypography:", "\t\t\t\tAlign: center",
+                "\t\tFor element: Header cell", "\t\t\tTypography:", "\t\t\t\tAlign: center",
                 "\t\tFor column: 3", "\t\t\tTypography:", "\t\t\t\tAlign: left",
                 "\tTable:", "\t\tColumn sizes: * * *", "\t\tColumn align: left right right",
-                "\t\tHead:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2", "\t\t\t\tCell: h3",
+                "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2", "\t\t\t\tCell: h3",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2", "\t\t\t\tCell: a3",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\tCell: b3",
                 "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center").children().get(0);
@@ -172,7 +172,7 @@ class TableStylesTest {
     @Test
     void markdownTablesTakeTheRulesAndTheSeparatorRowAlignmentWins() {
         Box markdown = root("\tStyles:",
-                "\t\tFor element: Head cell", "\t\t\tTypography:", "\t\t\t\tBold: true",
+                "\t\tFor element: Header cell", "\t\t\tTypography:", "\t\t\t\tBold: true",
                 "\t\tFor column: 1", "\t\t\tTypography:", "\t\t\t\tAlign: right",
                 "\t\tFor element: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #444444",
                 "\tMarkdown:", "\t\tTable columns: equal",
@@ -200,7 +200,7 @@ class TableStylesTest {
                 "\t\t\tBox:", "\t\t\t\tBackground: #EFE4D2",
                 "\tTable:", "\t\tColumn sizes: * * *",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
-                "\t\tFoot:", "\t\t\tRow:", "\t\t\t\tStyle: total", "\t\t\t\tCell: t1", "\t\t\t\t\tSpan: 1 2",
+                "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tStyle: total", "\t\t\t\tCell: t1", "\t\t\t\t\tSpan: 1 2",
                 "\t\t\t\tCell: t2").children().get(0);
         for (String total : List.of("t1", "t2")) {
             assertEquals(FontWeight.BOLD, cell(table, total).style().typography().fontWeight(), total);
@@ -248,7 +248,7 @@ class TableStylesTest {
     @Test
     void aRowClassCannotGiveBreaksToTheCells() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tStyles:", "\t\tFor style: keep", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
+                () -> root("\tStyles:", "\t\tFor style: keep", "\t\t\tBreak:", "\t\t\t\tKeep together: true",
                         "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tStyle: keep",
                         "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());

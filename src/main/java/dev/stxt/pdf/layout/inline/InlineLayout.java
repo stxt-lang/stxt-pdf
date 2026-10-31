@@ -15,7 +15,7 @@ import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.Slice;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Style;
 
@@ -159,8 +159,8 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (!box.hasText()) {
             return List.of();
         }
-        if (s.typography().whiteSpace().preformatted()) {
-            return List.copyOf(PreformattedText.lines(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRESERVE_WRAP,
+        if (s.typography().preformatted().enabled()) {
+            return List.copyOf(PreformattedText.lines(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
                     available, measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing()));
         }
         return List.copyOf(LineBreaker.breakLines(runs(box), available, measurer, s.typography().fontFace(),
@@ -173,8 +173,8 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (!box.hasText()) {
             return IntrinsicSizes.ZERO;
         }
-        if (s.typography().whiteSpace().preformatted()) {
-            return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().whiteSpace() == WhiteSpace.PRESERVE_WRAP,
+        if (s.typography().preformatted().enabled()) {
+            return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
                     measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
         }
         return LineBreaker.intrinsics(runs(box), measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
@@ -207,7 +207,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         List<TextLine> lines = new ArrayList<>();
         for (int j = start; j < end; j++) {
             // Las líneas preformateadas no se justifican.
-            boolean justify = !s.typography().whiteSpace().preformatted() && j != texts.size() - 1;
+            boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1;
             lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, available, justify, lines.size() * lineHeight,
                     lineHeight));
         }
@@ -223,7 +223,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         // Una caja sin líneas, borde, relleno ni alto deja colapsar sus márgenes (referencia/componentes/block.md).
         boolean empty = first && lines.isEmpty() && slice.height() == 0 && model.openAtTop() && model.openAtBottom()
-                && !box.establishesBlockFormattingContext();
+                && !box.isolatesMargins();
         return LayoutResult.finished(fragment, List.of(), empty ? AdjoiningMargins.EMPTY_BOX : AdjoiningMargins.NONE);
     }
 }

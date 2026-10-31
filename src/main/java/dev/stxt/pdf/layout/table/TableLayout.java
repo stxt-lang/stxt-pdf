@@ -23,10 +23,10 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
  * Layout de una {@code Table} (referencia/componentes/table.md): el de su grid, con las filas de
- * {@code Head} y {@code Foot} repetidas en cada fragmento.
+ * {@code Header rows} y {@code Footer rows} repetidas en cada fragmento.
  *
  * <p>{@code BoxTreeBuilder} traduce la tabla a un grid con colocación explícita; las primeras
- * {@link Box#headRows()} filas de la rejilla son la cabecera y las últimas {@link Box#footRows()},
+ * {@link Box#headerRows()} filas de la rejilla son la cabecera y las últimas {@link Box#footerRows()},
  * el pie. Aquí se maqueta el grid entero sin fragmentar ({@link GridLayout#arrange}) y solo se
  * cortan las filas del cuerpo, con {@link UnitBreaker}: lo que queda de página para ellas es el
  * resto tras la cabecera y el pie, que van enteros en cada fragmento, la cabecera arriba y el pie
@@ -55,17 +55,18 @@ public final class TableLayout implements LayoutAlgorithm {
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         UnitBreaker.Arranged a = grid.arrange(box, space);
         UnitBreaker.Units all = a.units();
-        int head = box.headRows();
-        int bodyEnd = all.size() - box.footRows();
+        int head = box.headerRows();
+        int bodyEnd = all.size() - box.footerRows();
         // La cabecera mide hasta el principio del cuerpo y el pie desde su final: los dos, con su hueco.
         double bodyStart = all.get(head).start();
         double bodyBottom = all.get(bodyEnd - 1).end();
-        double footHeight = box.footRows() == 0 ? 0 : all.extent() - bodyBottom;
-        if (head + box.footRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
+        double footHeight = box.footerRows() == 0 ? 0 : all.extent() - bodyBottom;
+        if (head + box.footerRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
                 && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
             throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "La cabecera y el pie de la "
                     + "tabla " + box.describe() + " miden " + pt(bodyStart + footHeight) + " y no dejan sitio al cuerpo "
-                    + "en una página vacía, y se repiten en cada página: hay que reducir su alto o quitar filas de Head y Foot");
+                    + "en una página vacía, y se repiten en cada página: hay que reducir su alto o quitar filas "
+                    + "de Header rows y Footer rows");
         }
 
         List<UnitBreaker.Placed> headItems = new ArrayList<>();

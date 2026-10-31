@@ -1,9 +1,9 @@
 # `Table`
 
-Una `Table` coloca sus celdas en filas y columnas: sus filas (`Row`) van en una cabecera (`Head`, opcional), un cuerpo
-(`Body`, obligatorio) y un pie (`Foot`, opcional), **en ese orden** (`TABLE_ORDER`), y cada fila tiene sus celdas (`Cell`)
-de izquierda a derecha. La `Table` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va donde va un elemento
-en flujo, también dentro de una celda.
+Una `Table` coloca sus celdas en filas y columnas: sus filas (`Row`) van en una cabecera (`Header rows`, opcional), un
+cuerpo (`Body`, obligatorio) y un pie (`Footer rows`, opcional), **en ese orden** (`TABLE_ORDER`), y cada fila tiene sus
+celdas (`Cell`) de izquierda a derecha. La `Table` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va
+donde va un elemento en flujo, también dentro de una celda.
 
 ```
 Styles:
@@ -13,7 +13,7 @@ Styles:
             Border: 0 0 0.5 0
 Table:
     Column sizes: 120 * *
-    Head:
+    Header rows:
         Row:
             Typography:
                 Bold: true
@@ -25,7 +25,7 @@ Table:
             Cell: Ventas
             Cell: 100
             Cell: 120
-    Foot:
+    Footer rows:
         Row:
             Cell: Total
                 Span: 1 3
@@ -37,21 +37,25 @@ Table:
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | sin valor | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
-| `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Head` (`ROW_HEADER_IN_HEAD`). |
+| `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
+> **Decisión:** los grupos de filas que se repiten se llaman `Header rows` y `Footer rows`, los nombres de las
+> herramientas de maquetación. *Alternativa descartada:* `Header` y `Footer`, que en un procesador de textos son la
+> cabecera y el pie de la página (aquí, un `Page overlay`) y dejarían ocupado ese nombre en todo el schema.
+
 ## Una tabla es un grid
 
-`Column sizes` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones o `between`, y
-`Gap` separa las celdas. Las filas son pistas `auto`: cada una mide lo que su celda más alta, y las celdas se estiran a su
-fila. Cada celda es un ítem del grid colocado explícitamente: va en la primera columna libre de su fila, y ocupa las filas
-y columnas de su `Span` (`Span: 1 3` ocupa tres columnas). Una columna está ocupada si la ocupa una celda de una fila de
-arriba con un `Span` de varias filas. Cada fila llena **exactamente** todas las columnas (`TABLE_ROW_CELLS`): una celda
-vacía se escribe `Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo a otro (de `Head` a `Body`, de `Body` a
-`Foot`) ni se solapa con otra celda (`TABLE_SPAN`).
+`Column sizes` (obligatorio) y `Gap` son los de `Grid`: las columnas se dimensionan igual, con `auto`, fracciones o
+`between`, y `Gap` separa las celdas. Las filas son pistas `auto`: cada una mide lo que su celda más alta, y las celdas
+se estiran a su fila. Cada celda es un ítem del grid colocado explícitamente: va en la primera columna libre de su fila,
+y ocupa las filas y columnas de su `Span` (`Span: 1 3` ocupa tres columnas). Una columna está ocupada si la ocupa una
+celda de una fila de arriba con un `Span` de varias filas. Cada fila llena **exactamente** todas las columnas
+(`TABLE_ROW_CELLS`): una celda vacía se escribe `Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo a otro
+(de `Header rows` a `Body`, de `Body` a `Footer rows`) ni se solapa con otra celda (`TABLE_SPAN`).
 
 `Span: 1 1` explícito se admite: es el valor por defecto escrito y no una contradicción.
 
@@ -72,10 +76,11 @@ Los márgenes de una celda la separan de su área, como en un `Grid`.
 Una regla de `Styles` ([Styles](../comun/estilos.md)) da estilo a las celdas de una tabla sin repetir un estilo en cada
 una:
 
-- **Por posición.** `For element: Head cell`, `Body cell` y `Foot cell` son las celdas de cada grupo, y `Odd row cell`
-  y `Even row cell`, las de las filas impares y pares del **cuerpo**, contando desde la primera fila de `Body` como la 1
-  (la cebra, en la que no entran la cabecera ni el pie). La fila de una celda que ocupa varias es la **primera** de las que ocupa. Una
-  celda cumple a la vez la de su grupo y la de su fila, y la regla `For element: Cell` de siempre.
+- **Por posición.** `For element: Header cell`, `Body cell` y `Footer cell` son las celdas de cada grupo, y
+  `Odd row cell` y `Even row cell`, las de las filas impares y pares del **cuerpo**, contando desde la primera fila de
+  `Body` como la 1 (la cebra, en la que no entran la cabecera ni el pie). La fila de una celda que ocupa varias es la
+  **primera** de las que ocupa. Una celda cumple a la vez la de su grupo y la de su fila, y la regla
+  `For element: Cell` de siempre.
 - **Por columna.** `For column: 3` (o `For column: 2 4`, de la 2 a la 4) se aplica a las celdas que **empiezan** en esas
   columnas, en cualquier grupo: una celda con `Span` de varias columnas es de la columna donde empieza.
 - **`Column align`.** Un `Column align: left right right` de la `Table` da una alineación a cada columna (tantas como
@@ -98,9 +103,9 @@ Si dos `For column` se solapan, se aplican en el orden de `Styles`, como los est
 
 ## Filas
 
-Una `Row` no es una caja del layout: no ocupa sitio propio ni se nombra en `For element`, como `Head`, `Body` y `Foot`. Las
-filas de la tabla no tienen propiedad de tamaño y miden lo que su celda más alta. Lo que declara la fila es para sus celdas
-o para su **franja**:
+Una `Row` no es una caja del layout: no ocupa sitio propio ni se nombra en `For element`, como `Header rows`, `Body` y
+`Footer rows`. Las filas de la tabla no tienen propiedad de tamaño y miden lo que su celda más alta. Lo que declara la
+fila es para sus celdas o para su **franja**:
 
 - **`Style` e `Id`.** Las reglas `For style` de sus estilos y la regla `For id` de su `Id` se aplican a cada una de sus
   celdas ([Estilo de las celdas](#estilo-de-las-celdas)).
@@ -111,14 +116,14 @@ o para su **franja**:
 - **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color` y `Corner radius`. Cualquier otra propiedad
   (`Padding`, `Margin` o `Height`) no tendría efecto en una fila y es `ROW_BOX`.
 
-Una fila con `Box` o `Id` tiene una **franja**: un rectángulo que va de la primera columna a la última, con el `Gap` entre
-ellas, y del principio de la fila a su final. El `Gap` entre filas no es de ninguna. Se pinta **debajo de sus celdas**: el
-fondo de una celda tapa el de la fila, y una celda que ocupa varias filas, las franjas de todas. El color de su borde, si
-no declara `Border color`, es el del texto de la fila (su `Typography`, o el de la tabla). La franja de una fila de `Head`
-o `Foot` se repite con ella.
+Una fila con `Box` o `Id` tiene una **franja**: un rectángulo que va de la primera columna a la última, con el `Gap`
+entre ellas, y del principio de la fila a su final. El `Gap` entre filas no es de ninguna. Se pinta **debajo de sus
+celdas**: el fondo de una celda tapa el de la fila, y una celda que ocupa varias filas, las franjas de todas. El color
+de su borde, si no declara `Border color`, es el del texto de la fila (su `Typography`, o el de la tabla). La franja de
+una fila de `Header rows` o `Footer rows` se repite con ella.
 
 ```
-Foot:
+Footer rows:
     Row:
         Id: total
         Style: total
@@ -160,14 +165,14 @@ la continuación lleva la franja de la última fila del grupo.
 > página siguiente no se reparte entre las filas del grupo. *Alternativa descartada:* repartirlo por las alturas sin
 > partir, que no corresponden a lo que se coloca.
 
-Las filas de `Head` y `Foot` se **repiten** en cada página de la tabla: la cabecera arriba y el pie justo detrás de la
-última fila del cuerpo de esa página, cada uno con el `Gap` que lo separa del cuerpo. No se parten nunca y no admiten
-`Break` (`TABLE_ROW_BREAK`). Las filas del cuerpo se cortan en lo que dejan la cabecera y el pie: si no cabe ninguna, la
-tabla entera pasa a la página siguiente, y la cabecera no se queda sola. Si al principio de una página la cabecera y el pie
-no dejan sitio al cuerpo, la tabla no puede avanzar y es un error (`TABLE_REPEAT_OVERFLOW`). Una fila del cuerpo que no
-cabe en el sitio que dejan se parte en paralelo, como cualquier fila, y si no se puede partir desborda la página
-(`PAGE_OVERFLOW`). Las cajas `Overlay` y `Page overlay` de las celdas de la cabecera y el pie solo van en el primer fragmento de
-la tabla.
+Las filas de `Header rows` y `Footer rows` se **repiten** en cada página de la tabla: la cabecera arriba y el pie justo
+detrás de la última fila del cuerpo de esa página, cada uno con el `Gap` que lo separa del cuerpo. No se parten nunca y
+no admiten `Break` (`TABLE_ROW_BREAK`). Las filas del cuerpo se cortan en lo que dejan la cabecera y el pie: si no cabe
+ninguna, la tabla entera pasa a la página siguiente, y la cabecera no se queda sola. Si al principio de una página la
+cabecera y el pie no dejan sitio al cuerpo, la tabla no puede avanzar y es un error (`TABLE_REPEAT_OVERFLOW`). Una fila
+del cuerpo que no cabe en el sitio que dejan se parte en paralelo, como cualquier fila, y si no se puede partir desborda
+la página (`PAGE_OVERFLOW`). Las cajas `Overlay` y `Page overlay` de las celdas de la cabecera y el pie solo van en el
+primer fragmento de la tabla.
 
 > **Decisión:** una celda con un párrafo largo en una tabla con cabecera no es un error: se parte. *Alternativa
 > descartada:* exigir una fila entera del cuerpo en cada página.
@@ -177,9 +182,9 @@ la tabla.
 
 ## Accesibilidad
 
-Un lector de pantalla lee la tabla como tabla: las celdas de `Head` son las cabeceras de su columna y las que declaran
-`Row header: true`, las de su fila, y las anuncia con cada celda. La cabecera y el pie repetidos se leen una sola vez, en la
-primera página en que salen.
+Un lector de pantalla lee la tabla como tabla: las celdas de `Header rows` son las cabeceras de su columna y las que
+declaran `Row header: true`, las de su fila, y las anuncia con cada celda. La cabecera y el pie repetidos se leen una
+sola vez, en la primera página en que salen.
 
 ## Lo que no hay
 

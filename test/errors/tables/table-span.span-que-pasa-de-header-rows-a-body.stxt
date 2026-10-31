@@ -1,4 +1,4 @@
-# Case: Span que pasa de Head a Body
+# Case: Span que pasa de Header rows a Body
 # Code: TABLE_SPAN
 # Line: 21
 Document (dev.stxt.pdf):
@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: * *
-			Head:
+			Header rows:
 				Row:
 					Cell: a
 						Span: 2 2

@@ -9,7 +9,7 @@ import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
 import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 
 import java.util.Locale;
 
@@ -43,7 +43,7 @@ public final class TypographyStyle extends StyleGroup {
      * (referencia/comun/formato-del-texto.md). Se hereda.
      */
     private boolean ligatures;
-    private WhiteSpace whiteSpace = WhiteSpace.NORMAL;
+    private Preformatted preformatted = Preformatted.FALSE;
     /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
     private int tabSize = 4;
     /**
@@ -84,7 +84,7 @@ public final class TypographyStyle extends StyleGroup {
         letterSpacing = parent.letterSpacing;
         smallCaps = parent.smallCaps;
         ligatures = parent.ligatures;
-        whiteSpace = parent.whiteSpace;
+        preformatted = parent.preformatted;
         tabSize = parent.tabSize;
         numbered = parent.numbered;
         numberFormat = parent.numberFormat;
@@ -212,13 +212,13 @@ public final class TypographyStyle extends StyleGroup {
         ligatures = v;
     }
 
-    public WhiteSpace whiteSpace() {
-        return whiteSpace;
+    public Preformatted preformatted() {
+        return preformatted;
     }
 
-    void setWhiteSpace(WhiteSpace v) {
+    void setPreformatted(Preformatted v) {
         writable();
-        whiteSpace = v;
+        preformatted = v;
     }
 
     public int tabSize() {

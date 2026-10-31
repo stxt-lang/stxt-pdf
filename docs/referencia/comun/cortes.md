@@ -8,9 +8,15 @@ la página, ni en los encabezados ni en las celdas ([Encabezados](../componentes
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Before` | `auto`, `page`, `column`, `avoid` | `auto` | `page` fuerza un salto de página antes de la caja, y `column`, un salto a la columna siguiente (solo dentro de un `Columns`, [Columns](../componentes/columns.md#cortes)). |
-| `After` | `auto`, `page`, `column`, `avoid` | `auto` | `avoid` mantiene la caja con la siguiente (títulos). |
-| `Inside` | `auto`, `avoid` | `auto` | `avoid` intenta no partir la caja. |
+| `Before` | `auto`, `page`, `column` | `auto` | `page` fuerza un salto de página antes de la caja, y `column`, un salto a la columna siguiente (solo dentro de un `Columns`, [Columns](../componentes/columns.md#cortes)). |
+| `After` | `auto`, `page`, `column` | `auto` | Como `Before`, después de la caja. |
+| `Keep with next` | booleano | `false` | Evita el corte entre la caja y la siguiente (títulos). Con `After: page` o `column` es `KEEP_CONFLICT`. |
+| `Keep with previous` | booleano | `false` | Evita el corte entre la caja y la anterior. Con `Before: page` o `column` es `KEEP_CONFLICT`. |
+| `Keep together` | booleano | `false` | Intenta no partir la caja. |
+
+> **Decisión:** los saltos se dicen con `Before` y `After`, y lo que se mantiene junto, con `Keep with next`,
+> `Keep with previous` y `Keep together`, los nombres de los procesadores de textos. *Alternativa descartada:* un valor
+> `avoid` en `Before`, `After` e `Inside`, que no dice qué se mantiene con qué.
 | `Edges` | `open`, `closed` | `open` | Qué pasa con el borde y el relleno en un corte. |
 
 ## Modelo
@@ -33,12 +39,12 @@ El motor elige el **último** corte de la página que no incumple ninguna regla.
 este orden:
 
 1. `Widows` y `Orphans` (de `Typography`);
-2. `Before` y `After: avoid`;
-3. `Inside: avoid`.
+2. `Keep with next` y `Keep with previous`;
+3. `Keep together`.
 
 Si sigue sin haber corte posible, corta donde se acaba el espacio.
 
-Un párrafo que no puede respetar `Widows` y `Orphans` se parte igualmente si la alternativa es incumplir un `avoid`. En
+Un párrafo que no puede respetar `Widows` y `Orphans` se parte igualmente si la alternativa es incumplir un `Keep with next` o un `Keep with previous`. En
 ese corte se respetan las viudas si se puede y, si no, se llena el espacio.
 
 Si el mejor corte es anterior al hijo que no cabe, lo que va después pasa a la página siguiente, pero un hijo anterior
@@ -92,7 +98,7 @@ menos un borde y un relleno, y cada fragmento les suma los suyos. `Min height` y
 (con `closed`, al contenido total más un borde y un relleno).
 
 Una caja con `Height` definido se parte como cualquier otra, aunque no tenga contenido: lo que no cabe de su alto pasa a la
-página siguiente. Para evitarlo se declara `Inside: avoid`, que no impide partirla si no cabe en una página entera.
+página siguiente. Para evitarlo se declara `Keep together: true`, que no impide partirla si no cabe en una página entera.
 
 Un fragmento cortado de una caja con alto `auto` mide hasta el corte. Con alto definido, llega hasta el final de la página
 sin pasar del alto que le queda, pero solo **consume** de ese alto lo que ocupa su contenido (con su borde y relleno

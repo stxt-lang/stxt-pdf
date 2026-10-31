@@ -51,7 +51,7 @@ Document (dev.stxt.pdf):
 | `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 
-Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Inside` ni `Edges`: no se parte). No admite `Typography`.
+Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `Edges`: no se parte). No admite `Typography`.
 
 ## El tamaño
 

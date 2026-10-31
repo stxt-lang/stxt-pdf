@@ -249,9 +249,9 @@ class StackingContextTest {
         Recorder r = record("\tColumns:", "\t\tCount: 3", "\t\tGap: 10", "\t\tSeparator: 2",
                 "\t\tSeparator color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #111", "\t\t\tBreak:",
-                "\t\t\t\tInside: avoid",
+                "\t\t\t\tKeep together: true",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tBackground: #222", "\t\t\tBreak:",
-                "\t\t\t\tInside: avoid");
+                "\t\t\t\tKeep together: true");
         assertEquals(List.of("#000", "#F00", "#111", "#222"), r.backgrounds);
         assertEquals(new Rect(209, 40, 2, 30), r.rects.get(1));
     }
@@ -260,8 +260,8 @@ class StackingContextTest {
     void ruleColorIsTheTextColorByDefault() {
         Recorder r = record("\tColumns:", "\t\tCount: 2", "\t\tGap: 10", "\t\tSeparator: 1",
                 "\t\tTypography:", "\t\t\tColor: #00F",
-                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid",
-                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tInside: avoid");
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tKeep together: true",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tKeep together: true");
         assertEquals(List.of("#00F"), r.backgrounds);
     }
 
@@ -352,10 +352,10 @@ class StackingContextTest {
                 "\t\t\t\tSize: 10", "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30"};
         Recorder normal = record(concat(head, "\t\tText: aaaa bbbb cccc"));
         assertEquals(List.of("[texto", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
-        Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tWhite space: preserve-wrap"));
+        Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tPreformatted: wrap"));
         assertEquals(List.of("[texto", "'aaaa'", "]"), pre.sequences);
         Recorder preWrapped = record(concat(head, "\t\tText: aaaa bbbb", "\t\t\tTypography:",
-                "\t\t\t\tWhite space: preserve-wrap"));
+                "\t\t\t\tPreformatted: wrap"));
         assertEquals(List.of("[texto", "'aaaa'", "'bbbb'", "]"), preWrapped.sequences);
     }
 

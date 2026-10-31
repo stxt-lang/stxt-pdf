@@ -30,7 +30,7 @@ Styles:
 | `For element: Paragraph` (o cualquier otro elemento) | A todos los elementos de ese tipo |
 | `For style: note` | A los elementos con `Style: note` (un elemento puede tener varios estilos: `Style: note wide`) |
 | `For id: title` | Al elemento con `Id: title` |
-| `For element: Head cell`, `Body cell`, `Foot cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../componentes/table.md)) |
+| `For element: Header cell`, `Body cell`, `Footer cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../componentes/table.md)) |
 | `For column: 3` (o `For column: 2 4`) | A las celdas que empiezan en esa columna (o columnas) de una tabla |
 | `For element: Code block` | A los bloques de código de un `Markdown` |
 | `For element: TOC 1` a `TOC 6` | A las entradas de un índice, por nivel ([Table of contents](../componentes/table-of-contents.md)) |

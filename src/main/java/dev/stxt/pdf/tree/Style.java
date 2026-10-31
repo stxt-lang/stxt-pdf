@@ -24,7 +24,7 @@ import java.util.Map;
  * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
- * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Contain margins}, el giro, {@code Link},
+ * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, el giro, {@code Link},
  * {@code Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento
  * ({@link SourceLine}).</p>
  *
@@ -61,7 +61,7 @@ public final class Style extends StyleGroup {
     private Integer layer;
     /** Solo en un {@code Page overlay}: las páginas en que sale. */
     private Pages pages = Pages.ALL;
-    private boolean containMargins;
+    private boolean isolateMargins;
     /**
      * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Frame}, {@code
      * Overlay}, {@code Page overlay} e {@code Image}; {@code null} = sin giro. No se hereda.
@@ -188,13 +188,13 @@ public final class Style extends StyleGroup {
         pages = v;
     }
 
-    public boolean containMargins() {
-        return containMargins;
+    public boolean isolateMargins() {
+        return isolateMargins;
     }
 
-    void setContainMargins(boolean v) {
+    void setIsolateMargins(boolean v) {
         writable();
-        containMargins = v;
+        isolateMargins = v;
     }
 
     public Rotation rotation() {

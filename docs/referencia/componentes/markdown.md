@@ -75,14 +75,14 @@ así:
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
 | `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `Start`, el primer número si no es 1 |
-| Tabla | `Table` con las `Column sizes` de `Table columns`, con la fila de cabecera en `Head` y el resto en `Body` |
+| Tabla | `Table` con las `Column sizes` de `Table columns`, con la fila de cabecera en `Header rows` y el resto en `Body` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../comun/formato-del-texto.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../comun/enlaces.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
-| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `White space: preserve` cuya fuente es su `Code font`, con el código en su `Content` |
+| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes dentro de un texto
@@ -112,13 +112,13 @@ familia de `Code font`: conserva el peso y el estilo del texto que lo rodea y se
 párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace. El espacio en blanco de una línea con
 código en línea se colapsa como en cualquier párrafo. Lo que conserva los espacios es el bloque.
 
-Un bloque de código es un `Text` con `White space: preserve`
-([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space)) cuya fuente es su `Code font`, así
+Un bloque de código es un `Text` con `Preformatted: true`
+([Formato del texto](../comun/formato-del-texto.md#texto-preformateado)) cuya fuente es su `Code font`, así
 que se parte entre líneas entre páginas y una línea más ancha que la caja es un error (`TEXT_OVERFLOW`). No tiene `Id` ni
 `Style`, pero es el elemento generado `Code block` y lo nombra la regla
 `For element: Code block` ([Styles](../comun/estilos.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
-tamaño menor o `Inside: avoid`). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
-un Markdown y para los que se escriben). Un `Text` escrito a mano con `White space: preserve` tampoco es un `Code block`. Su
+tamaño menor o `Keep together: true`). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
+un Markdown y para los que se escriben). Un `Text` escrito a mano con `Preformatted: true` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown`, así que `Size`, `Color`, `Tab size` o `Code font` se declaran en el `Typography` del
 `Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea. Un
 `Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja

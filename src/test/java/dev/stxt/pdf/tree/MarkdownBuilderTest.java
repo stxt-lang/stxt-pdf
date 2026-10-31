@@ -130,7 +130,7 @@ class MarkdownBuilderTest {
                 "| Mes | Total |", "|-----|------:|", "| Ene | **120** |", "| Feb |");
         assertEquals(List.of("Table @16",
                 "  Column sizes: repeat(2, *) @14",
-                "  Head @16",
+                "  Header rows @16",
                 "    Row @16",
                 "      Cell: Mes @16",
                 "      Cell: Total @16",
@@ -203,7 +203,7 @@ class MarkdownBuilderTest {
                 "| A | B |", "|---|---|", "| [uno](https://a.example) | dos |");
         assertEquals(List.of(run("Ver "), link("anexo", "u", "#anexo")),
                 t.runs().get(t.elements().get(0).getChildren().get(0)));
-        // Table: Columns, Head, Body; la primera celda de la primera fila del cuerpo.
+        // Table: Columns, Header rows, Body; la primera celda de la primera fila del cuerpo.
         Node body = ((InlineNode) t.elements().get(1)).getChildren().get(2);
         Node cell = ((InlineNode) ((InlineNode) body).getChildren().get(0)).getChildren().get(0);
         assertEquals(List.of(link("uno", "u", "https://a.example")), t.runs().get(cell));
@@ -299,7 +299,7 @@ class MarkdownBuilderTest {
         assertEquals(List.of(
                 "Text @17",
                 "  Typography @17",
-                "    White space: preserve @17",
+                "    Preformatted: true @17",
                 "  Content: a  b\n  c @17"), outline(t.elements().get(1)));
         assertEquals(Set.of(t.elements().get(1)), t.codeBlocks());
     }

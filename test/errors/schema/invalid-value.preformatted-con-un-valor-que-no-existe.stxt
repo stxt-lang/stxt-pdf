@@ -1,4 +1,4 @@
-# Case: White space con un valor que no existe
+# Case: Preformatted con un valor que no existe
 # Code: INVALID_VALUE
 # Line: 13
 Document (dev.stxt.pdf):
@@ -10,4 +10,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Block:
 			Typography:
-				White space: nowrap
+				Preformatted: nowrap

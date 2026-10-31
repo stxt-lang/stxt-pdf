@@ -85,10 +85,10 @@ Algunas fuentes tienen glifos especiales para pares de letras (`fi`, `fl`): las 
 letra es la suya. Con `Ligatures: true` se usan las de la fuente (IBM Plex Sans y Serif tienen `fi`, `fl`, `ffi` y `ffl`).
 No cambian lo que se lee ni lo que se copia, y no se aplican con interletraje.
 
-## Texto preformateado (`White space`)
+## Texto preformateado
 
-Para código, salidas de terminal o columnas alineadas con espacios. Con `White space: preserve`, el texto **conserva sus espacios
-y sus saltos de línea**: cada línea escrita es una línea en el PDF, también las vacías. Con `preserve-wrap`, además, una línea
+Para código, salidas de terminal o columnas alineadas con espacios. Con `Preformatted: true`, el texto **conserva sus espacios
+y sus saltos de línea**: cada línea escrita es una línea en el PDF, también las vacías. Con `Preformatted: wrap`, además, una línea
 demasiado larga se parte entre palabras. Lo normal es usar una fuente monoespaciada y escribir el texto en un `Content >>`:
 
 ```
@@ -96,14 +96,14 @@ Text:
     Typography:
         Font: IBM Plex Mono
         Size: 9
-        White space: preserve
+        Preformatted: true
     Content >>
         $ termostato --estado
         temperatura   21,5 °C
         consigna      22,0 °C
 ```
 
-- Con `preserve`, una línea más ancha que la caja es un error. Hay que acortarla o usar `preserve-wrap`.
+- Con `Preformatted: true`, una línea más ancha que la caja es un error. Hay que acortarla o usar `Preformatted: wrap`.
 - `Tab size` (4 por defecto) es el número de columnas de un tabulador: cada tabulador lleva a la siguiente columna múltiplo
   de `Tab size`, como en un editor.
 - Las líneas preformateadas no se justifican.

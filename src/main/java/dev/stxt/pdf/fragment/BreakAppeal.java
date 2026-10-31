@@ -17,9 +17,9 @@ public final class BreakAppeal {
     public static final int PERFECT_BREAK = 3;
     /** Incumple viudas o huérfanas. */
     public static final int VIOLATES_WIDOWS = 2;
-    /** Incumple {@code Before}/{@code After: avoid} de {@code Break}. */
-    public static final int VIOLATES_AVOID_BETWEEN = 1;
-    /** Incumple {@code Inside: avoid} de {@code Break} o corta a la fuerza. */
+    /** Incumple {@code Keep with next} o {@code Keep with previous} de {@code Break}. */
+    public static final int VIOLATES_KEEP_BETWEEN = 1;
+    /** Incumple {@code Keep together} de {@code Break} o corta a la fuerza. */
     public static final int FORCED = 0;
 
     private BreakAppeal() {

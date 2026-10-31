@@ -1,5 +1,5 @@
-# Case: Row header en una celda de Head, que ya es cabecera de columna
-# Code: ROW_HEADER_IN_HEAD
+# Case: Row header en una celda de Header rows, que ya es cabecera de columna
+# Code: ROW_HEADER_IN_HEADER_ROWS
 # Line: 21
 Document (dev.stxt.pdf):
 	Language: es
@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: 100 100
-			Head:
+			Header rows:
 				Row:
 					Cell: Concepto
 						Row header: true

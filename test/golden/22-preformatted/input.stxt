@@ -1,7 +1,7 @@
 # Hito 29: texto preformateado y código (referencia/comun/formato-del-texto.md y referencia/componentes/markdown.md). Página de 200 × 300 con
 # márgenes de 20: área útil de 160 × 260 desde (20, 20). Líneas de 12 (Size 10); con las métricas de prueba cada
 # carácter mide 5 pt.
-#   term:    White space pre, cinco líneas del bloque, la cuarta vacía (una línea en blanco es una línea,
+#   term:    Preformatted pre, cinco líneas del bloque, la cuarta vacía (una línea en blanco es una línea,
 #            no separa párrafos), y una tabulación tras «PE» que lleva a la columna 4. La más larga mide
 #            18 caracteres, 90 pt: cabe y no se parte. 5 × 12 = 60. y = 20.
 #   tabs:    Tab size 8: «a» + tabulación son 8 columnas y «abcdefgh» + tabulación, 16; dos líneas: 24. y = 80.
@@ -9,10 +9,10 @@
 #            caracteres), se parte tras «ffff»: la sangría se conserva y las palabras hasta «ffff» son 31
 #            caracteres, 155 pt (con « gggg» serían 36 caracteres, 180). Quedan «gggg hhhh» y la segunda
 #            línea del texto, «corta»: 3 líneas, 36. y = 104.
-#   plain:   sin White space, los espacios se colapsan: una línea de 12. y = 140.
+#   plain:   sin Preformatted, los espacios se colapsan: una línea de 12. y = 140.
 #   md:      un Markdown con Code font: un Paragraph de una línea («Usa ls -l aquí.» con «ls -l» en la fuente
 #            del código; en un párrafo los espacios se colapsan, también en el código en línea: 12) y un
-#            bloque de código de dos líneas («a  b» y «  c»), que es un Text con White space pre: 24.
+#            bloque de código de dos líneas («a  b» y «  c»), que es un Text con Preformatted pre: 24.
 #            Los dos van seguidos y sin márgenes: 36. y = 152.
 Document (dev.stxt.pdf):
 	Language: es
@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: term
 			Typography:
-				White space: preserve
+				Preformatted: true
 			Content >>
 				> Ajustes > Bornes
 				L   230 V   [ OK ]
@@ -40,7 +40,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: tabs
 			Typography:
-				White space: preserve
+				Preformatted: true
 				Tab size: 8
 			Content >>
 				a	b
@@ -48,7 +48,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: wrapped
 			Typography:
-				White space: preserve-wrap
+				Preformatted: wrap
 			Content >>
 				  aaaa bbbb cccc dddd eeee ffff gggg hhhh
 				corta

@@ -20,5 +20,5 @@ Document (dev.stxt.pdf):
 				Body:
 					Row:
 						Break:
-							Inside: avoid
+							Keep together: true
 						Cell: Pie

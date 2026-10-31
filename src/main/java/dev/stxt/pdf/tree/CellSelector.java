@@ -12,9 +12,9 @@ import java.util.function.Predicate;
  */
 enum CellSelector {
 
-    HEAD_CELL("Head cell", p -> p.group() == CellPosition.HEAD),
+    HEADER_CELL("Header cell", p -> p.group() == CellPosition.HEADER),
     BODY_CELL("Body cell", p -> p.group() == CellPosition.BODY),
-    FOOT_CELL("Foot cell", p -> p.group() == CellPosition.FOOT),
+    FOOTER_CELL("Footer cell", p -> p.group() == CellPosition.FOOTER),
     /** Filas impares del cuerpo: la primera fila de {@code Body} es la 1. */
     ODD_ROW_CELL("Odd row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 1),
     EVEN_ROW_CELL("Even row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 0);
@@ -27,12 +27,12 @@ enum CellSelector {
         this.matches = matches;
     }
 
-    /** El selector con ese nombre canónico ({@code head-cell}); vacío si no es uno. */
+    /** El selector con ese nombre canónico ({@code header-cell}); vacío si no es uno. */
     static Optional<CellSelector> of(String canonicalName) {
         return Arrays.stream(values()).filter(s -> s.canonicalName().equals(canonicalName)).findFirst();
     }
 
-    /** El nombre como se escribe ({@code Head cell}). */
+    /** El nombre como se escribe ({@code Header cell}). */
     String label() {
         return label;
     }

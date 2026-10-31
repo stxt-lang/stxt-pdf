@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 				Height: 20
 				Margin: 10 0 10 0
 			Break:
-				After: avoid
+				Keep with next: true
 		Text: aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa
 			Id: text
 			Box:

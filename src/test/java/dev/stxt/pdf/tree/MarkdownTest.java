@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.model.WhiteSpace;
+import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -105,7 +105,7 @@ class MarkdownTest {
         Box code = md.children().get(1);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals("a  b\n  c", code.text());
-        assertEquals(WhiteSpace.PRESERVE, code.style().typography().whiteSpace());
+        assertEquals(Preformatted.TRUE, code.style().typography().preformatted());
         assertEquals("IBM Plex Mono", code.style().typography().font());
     }
 
@@ -153,16 +153,16 @@ class MarkdownTest {
         assertEquals(8, code.style().typography().fontSize(), 1e-9);
         assertEquals(new Paint.Solid("#EEEEEE"), code.style().box().background());
         assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
-        assertEquals(WhiteSpace.PRESERVE, code.style().typography().whiteSpace());
+        assertEquals(Preformatted.TRUE, code.style().typography().preformatted());
         assertEquals("IBM Plex Mono", code.style().typography().font());
         // Y el Text del encabezado no recibe lo del bloque de código.
         assertNull(title.style().box().background());
     }
 
-    /** Un {@code Text} escrito a mano con {@code White space: pre} sigue siendo un {@code Text}. */
+    /** Un {@code Text} escrito a mano con {@code Preformatted: true} sigue siendo un {@code Text}. */
     @Test
     void aWrittenPreformattedTextIsNotACodeBlock() {
-        Box root = build("\tText:", "\t\tTypography:", "\t\t\tWhite space: preserve", "\t\tContent >>", "\t\t\ta  b");
+        Box root = build("\tText:", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\tContent >>", "\t\t\ta  b");
         assertEquals(Element.TEXT, root.children().get(0).element());
     }
 }

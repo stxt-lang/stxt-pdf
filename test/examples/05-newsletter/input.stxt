@@ -180,7 +180,7 @@ Document (dev.stxt.pdf):
 				Column sizes: 70 52 * 120
 				Box:
 					Margin: 0 0 14 0
-				Head:
+				Header rows:
 					Row:
 						Cell: Fecha
 						Cell: Hora

@@ -75,8 +75,8 @@ public final class BoxTreeBuilder {
      * (aplicadas ya con sus reglas), los grupos de filas y el {@code Span}, que lee {@link TableBuilder},
      * y lo que lee {@link MarkdownBuilder}.
      */
-    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "head", "body",
-            "foot", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
+    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "header-rows", "body",
+            "footer-rows", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
 
     /**
      * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Page overlay} y sus secciones
@@ -266,8 +266,8 @@ public final class BoxTreeBuilder {
         if (kind.headingLevel() > 0) {
             // El motor evita cortar dentro del encabezado y después de él (referencia/componentes/heading.md); no se
             // declara.
-            s.breaks().setAfter(Break.AVOID);
-            s.breaks().setAvoidInside(true);
+            s.breaks().setKeepWithNext(true);
+            s.breaks().setKeepTogether(true);
         }
 
         Box box = new Box(id, kind, s, false, n.getLine());
@@ -300,15 +300,15 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Contain margins} en un ítem de {@code Flex} o
+     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate margins} en un ítem de {@code Flex} o
      * {@code Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row}
      * de una celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se
      * mira aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
      */
     private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
         boolean item = wrapper != null && !is(wrapper, "row");
-        if (item && s.containMargins()) {
-            throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ITEM, "Contain margins no tiene efecto en un ítem de "
+        if (item && s.isolateMargins()) {
+            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ITEM, "Isolate margins no tiene efecto en un ítem de "
                     + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: sobra");
         }
         if (ctx.unbreakable == null) {

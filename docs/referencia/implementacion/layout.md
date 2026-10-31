@@ -55,7 +55,7 @@ máximo y luego el mínimo. Si chocan, gana el mínimo (`Sizing.constrain`).
 
 Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que salen por arriba o por abajo (y si está vacía y
 deja pasar los suyos). El padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
-guarda el mayor positivo y el más negativo por separado. `Box.establishesBlockFormattingContext()` dice qué cajas lo cortan.
+guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
 
 ## Grid
 
@@ -78,8 +78,8 @@ que incluye su `Pages`.
 borde y relleno), sin fragmentación y sin `from`. El resultado se envuelve con `Fragment.turned`: el fragmento mide el
 rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` guarda esa caja sin girar, centrada en él. Los
 algoritmos de los padres no saben nada del giro: ven una caja del tamaño del rectángulo, que no se parte (`BEFORE` si no
-cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`: es un
-contexto de formato de bloque). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su ancho más estrecho y su
+cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`: aísla los
+márgenes). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su ancho más estrecho y su
 ancho natural son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
 (`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
 
@@ -145,7 +145,7 @@ que los del reparto en orden.
 
 ## Texto
 
-`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `preserve` y `preserve-wrap`, con `PreformattedText`.
+`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `Preformatted: true` o `wrap`, con `PreformattedText`.
 El texto de una caja es siempre un solo párrafo (las líneas en blanco son un error al leerlo, salvo en uno preformateado,
 donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
 `InlineLayout.runs` sustituye las referencias por su valor y aplica `TextTransform` a los tramos **antes** de repartirlos.

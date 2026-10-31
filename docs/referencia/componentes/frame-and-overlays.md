@@ -2,7 +2,7 @@
 
 Los tres **elementos posicionados** son bloques: apilan a sus hijos en flujo de bloque ([Block](block.md)). Para posicionar
 un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`, y
-`Frame`, también `Break` y `Contain margins`.
+`Frame`, también `Break` y `Isolate margins`.
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
@@ -24,7 +24,7 @@ un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `L
 
 > **Decisión:** `Overlay` y `Page overlay` no admiten `Break`, porque no se parten ni están en el flujo de la página. Un
 > `Break` escrito en un elemento de dentro es un error (`BREAK_IN_UNBREAKABLE`, [Cortes](../comun/cortes.md#cortes-forzados)).
-> El que llega de una regla no lo es, para que `For element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
+> El que llega de una regla no lo es, para que `For element: Paragraph` con `Keep with next: true` no dé un error en cada párrafo de un pie.
 > *Alternativa descartada:* comprobar también lo que llega de las reglas.
 
 ## `Frame`

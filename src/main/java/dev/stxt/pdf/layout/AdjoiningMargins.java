@@ -13,7 +13,7 @@ package dev.stxt.pdf.layout;
  */
 public record AdjoiningMargins(MarginStrut top, MarginStrut bottom, boolean collapsesThrough) {
 
-    /** Nada sale de la caja: contextos de formato propios, cajas con borde o relleno… */
+    /** Nada sale de la caja: cajas que aíslan los márgenes, cajas con borde o relleno… */
     public static final AdjoiningMargins NONE = new AdjoiningMargins(MarginStrut.EMPTY, MarginStrut.EMPTY, false);
 
     /** Caja vacía que no aporta márgenes de descendientes, pero deja colapsar los suyos. */
