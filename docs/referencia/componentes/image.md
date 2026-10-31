@@ -3,7 +3,7 @@
 Una `Image` pone en el documento una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos
 ([Recursos](../comun/recursos.md)). Es una caja sin hijos, como un `Text`, cuyo contenido es la imagen: se coloca, se
 dimensiona, se corta entre páginas y se pinta como cualquier caja, con su `Box` (márgenes, relleno, borde, fondo y
-esquinas) y su `Break` (sin `Inside` ni `Edges`, porque no se parte). Admite además `Id`, `Style` y `Link`; no admite
+esquinas) y su `Break` (sin `Inside` ni `Edges`, porque no se parte). Admite además `Id`, `Style` y `Link`. No admite
 `Typography`, porque no tiene texto.
 
 ```
@@ -44,11 +44,11 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| *(valor)* | ruta relativa a `images/` | — (obligatorio) | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
-| `Alt` | texto no vacío | — | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)); sin él, es decorativa. |
+| *(valor)* | ruta relativa a `images/` | obligatorio | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
+| `Alt` | texto no vacío | sin valor | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)). Sin él, es decorativa. |
 | `Fit` | `contain`, `cover`, `stretch` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
-| `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | — | Gira la imagen sobre su centro (un sello); ocupa el rectángulo que la envuelve girada. |
+| `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -56,10 +56,10 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo ([Recursos](../comun/recursos.md)):
 `Image: logos/acme.png` es `resources/images/logos/acme.png`. Se admiten PNG (con transparencia), JPEG, SVG y PDF, y el
-formato se reconoce por el contenido, no por la extensión (un SVG es un fichero que empieza por `<`, y un PDF, uno que
+formato se reconoce por el contenido y no por la extensión (un SVG es un fichero que empieza por `<`, y un PDF, uno que
 empieza por `%PDF-`). Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son un error
-(`IMAGE_UNKNOWN`); un fichero que no es PNG, JPEG, PDF ni un SVG admitido (GIF, WebP…) o que no se puede leer, también
-(`IMAGE_FORMAT`). Los errores señalan la línea de la `Image`.
+(`IMAGE_UNKNOWN`). Un fichero que no es PNG, JPEG, PDF ni un SVG admitido (como un GIF o un WebP), o que no se puede leer,
+es `IMAGE_FORMAT`. Los errores señalan la línea de la `Image`.
 
 Un XML que no es un SVG es también `IMAGE_FORMAT`. Un `Alt` vacío es `VALUE_NOT_ALLOWED`.
 
@@ -69,8 +69,8 @@ Un XML que no es un SVG es también `IMAGE_FORMAT`. Un `Alt` vacío es `VALUE_NO
 
 Cada píxel mide 0,75 pt (96 píxeles por pulgada), sin mirar la resolución que declare el fichero: una imagen de
 200 × 100 píxeles mide 150 × 75 pt. Para otro tamaño se declara `Width` o `Height`. El de un SVG sale de su `width` y
-`height` (en `px`, `pt`, `pc`, `in`, `cm` o `mm`; sin unidad, píxeles) o, si faltan, de su `viewBox`, también a 96 píxeles
-por pulgada; con solo uno de los dos lados y un `viewBox`, el otro sale de su proporción. Sin tamaño, o con medidas
+`height` (en `px`, `pt`, `pc`, `in`, `cm` o `mm`, y sin unidad, en píxeles) o, si faltan, de su `viewBox`, también a 96 píxeles
+por pulgada. Con solo uno de los dos lados y un `viewBox`, el otro sale de su proporción. Sin tamaño, o con medidas
 relativas (`%`, `em`), un SVG no tiene tamaño natural y es un error (`IMAGE_FORMAT`). Un PDF ya está en puntos: su tamaño
 natural es el de la página que se dibuja, el de su recorte (lo que enseña un visor) y girado si la página lo está ([PDF](#pdf)).
 
@@ -80,18 +80,18 @@ La caja de contenido de una imagen tiene la **proporción** del fichero, o la de
 sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
 
 - Con `Width` y `Height` en `auto`, mide su tamaño natural, **también en flujo de bloque**: no se estira al ancho del padre.
-  Si no cabe, es un desbordamiento (`BOX_OVERFLOW`); para que ocupe el ancho disponible, se declara `Width: 100%`.
+  Si no cabe, es un desbordamiento (`BOX_OVERFLOW`). Para que ocupe el ancho disponible, se declara `Width: 100%`.
   `Margin: 0 auto` la centra, porque no ocupa todo el ancho.
 - Con un eje declarado, o impuesto por el padre (un ítem de `Flex` con `Grow`, una columna de `Grid` con
   `Horizontal: stretch`), el otro sale de la proporción. Con los dos, la caja mide lo declarado y `Fit` decide cómo la llena
   la imagen.
 - `Min width`, `Max width`, `Min height` y `Max height` se aplican como en cualquier caja. Si los dos ejes son `auto` y el
   alto choca con su mínimo o su máximo, el ancho se vuelve a deducir del alto limitado: la proporción se conserva.
-- Su alto es siempre definido, así que un `Flex` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical; en
+- Su alto es siempre definido, así que un `Flex` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical. En
   horizontal sí se estira, y el alto sigue a la proporción.
 - **Tamaños intrínsecos:** el ancho más estrecho y el natural son los dos el ancho de su tamaño natural o, si declara
-  `Height` en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un ítem de `Flex` sin `Min width`, la imagen
-  no encoge por debajo de él.
+  `Height` en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un
+  ítem de `Flex` sin `Min width`, la imagen no encoge por debajo de él.
 
 Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.
 
@@ -103,16 +103,19 @@ Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción,
 
 ## `Fit`
 
-Si la caja de contenido y la imagen tienen proporciones distintas, `contain` (por defecto) dibuja la imagen entera, lo más
-grande que cabe y centrada, y deja ver el fondo a los lados; `cover` la dibuja lo más pequeña que cubre la caja, centrada,
-y recorta lo que sobra; `stretch` la estira a la caja y la deforma. Con la misma proporción, las tres dan lo mismo. Una imagen
-se recorta además con las esquinas redondeadas de su caja de contenido ([La caja](../comun/caja.md#esquinas)).
+Si la caja de contenido y la imagen tienen proporciones distintas:
+
+- `contain` (por defecto) dibuja la imagen entera, lo más grande que cabe y centrada, y deja ver el fondo a los lados.
+- `cover` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra.
+- `stretch` la estira a la caja y la deforma.
+
+Con la misma proporción, las tres dan lo mismo. Una imagen se recorta además con las esquinas redondeadas de su caja de contenido ([La caja](../comun/caja.md#esquinas)).
 
 ## Cortes de página
 
 Una imagen no se parte: si no cabe en lo que queda de la página (o de la columna de un `Columns`), pasa entera a la
 siguiente, como una línea de texto. Si no cabe ni en una página entera, es `PAGE_OVERFLOW`, con la línea de su `Height` (o,
-sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja; `Inside` y `Edges`, que solo cuentan al
+sin él, de su `Width`). `Before` y `After` funcionan como en cualquier caja. `Inside` y `Edges`, que solo cuentan al
 partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla de `Styles`.
 
 ## Dónde va
@@ -124,16 +127,16 @@ página), `Columns`, `List item` (pero no al principio: el marcador necesita una
 
 ## SVG
 
-Un SVG es un dibujo vectorial: el PDF lo lleva como rutas, rellenos, degradados y recortes, no como píxeles, así que se ve
-nítido a cualquier tamaño y pesa poco; se dimensiona, se coloca (`Fit` incluido) y se corta como cualquier imagen. Es un
+Un SVG es un dibujo vectorial: el PDF lo lleva como rutas, rellenos, degradados y recortes y no como píxeles, así que se ve
+nítido a cualquier tamaño y pesa poco. Se dimensiona, se coloca (`Fit` incluido) y se corta como cualquier imagen. Es un
 fichero XML en el espacio de nombres de SVG, y se admite un subconjunto cerrado: `svg` (sin otro `svg` dentro), `g`, `defs`,
 `title`, `desc`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `path`, `linearGradient`, `radialGradient`,
 `stop`, `clipPath`, `use`, `text` y `tspan`, con sus atributos de presentación (rellenos y trazos lisos o con degradado,
 opacidad, `transform`, recortes). Es un error (`IMAGE_FORMAT`, con la línea del SVG en el mensaje) cualquier otro elemento
-(scripts, animación, filtros, máscaras, patrones, marcadores, `image`, `style`, `symbol`, `metadata`…), una propiedad con
+(como scripts, animación, filtros, máscaras, patrones, marcadores, `image`, `style`, `symbol` o `metadata`), una propiedad con
 efecto fuera del subconjunto (`filter`, `mask`, `marker`), un atributo de otro espacio de nombres (salvo `xlink` y `xml`) o
-un manejador de eventos (`onclick`…): nada se ignora en silencio. Tampoco se admite nada de fuera del fichero: un `href` o un
-`url(…)` solo pueden llevar a un `#id` del propio SVG, y un DTD o una entidad son un error.
+un manejador de eventos (como `onclick`): nada se ignora en silencio. Tampoco se admite nada de fuera del fichero: un `href` o un
+`url(...)` solo pueden llevar a un `#id` del propio SVG, y un DTD o una entidad son un error.
 
 El texto de un SVG (`text`, `tspan`) usa solo las fuentes de `fonts/`, sin sustitución: su `font-family` (solo cuenta la
 primera de la lista, y no puede ser una genérica como `sans-serif`), su `font-weight` (`normal` o `bold`) y su `font-style`
@@ -146,7 +149,7 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 > de un editor suela necesitar limpiarse. *Alternativa descartada:* ignorar lo que no se dibuja, o los metadatos de los
 > editores.
 
-> **Decisión:** el texto de un SVG usa la primera familia de `font-family`, sin sustitución; sin `font-family` es un error.
+> **Decisión:** el texto de un SVG usa la primera familia de `font-family`, sin sustitución, y sin `font-family` es un error.
 > *Alternativa descartada:* probar las familias de la lista en orden.
 
 > **Decisión:** el texto de un SVG no es texto del PDF: se ve igual, pero no se puede seleccionar. En un documento
@@ -156,8 +159,8 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 
 Una `Image` de un PDF dibuja **una de sus páginas**, la de `Pdf page` (la primera, si no se declara), como una imagen más: se
 dimensiona, se coloca, se recorta y se gira como cualquier otra. Sirve para poner en el documento un plano, un gráfico o
-una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF; y como
-**fondo de página**: un papel con membrete, un formulario preimpreso, en un `Page overlay` detrás del contenido.
+una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF. También sirve
+como **fondo de página**: un papel con membrete o un formulario preimpreso, en un `Page overlay` detrás del contenido.
 
 La página va como dibujo vectorial, con su contenido tal cual: sus trazados, sus imágenes y su texto, que se ve nítido a
 cualquier tamaño y **se puede seleccionar y copiar**, con sus fuentes. Cada página se copia una vez en el PDF, aunque se
@@ -168,18 +171,18 @@ use en varias páginas del documento. Lo que no es contenido de la página no se
   se aplana antes de usarlo, por ejemplo imprimiéndolo a PDF. Quien convierte puede quitar esta comprobación
   (`Check.PDF_IMAGE_ANNOTATIONS`, [Uso desde Java](../implementacion/api.md#comprobaciones)), y entonces la página se
   dibuja sin ellas.
-- **El etiquetado.** La página es una imagen: con `Alt` es una figura y un lector de pantalla anuncia ese texto, no el de
-  la página; sin `Alt` es decoración, como un fondo ([Accesibilidad](#accesibilidad)). Tampoco se copian sus marcadores.
+- **El etiquetado.** La página es una imagen: con `Alt` es una figura y un lector de pantalla anuncia ese texto y no el
+  de la página. Sin `Alt` es decoración, como un fondo ([Accesibilidad](#accesibilidad)). Tampoco se copian sus marcadores.
 
 Las **capas** de la página (su contenido opcional) sí se copian, porque deciden lo que se ve: una capa apagada sigue
 apagada, y el visor las enseña en su lista de capas. Una configuración de las capas sin nombre recibe el del fichero
 (`planos.pdf`), que PDF/UA pide.
 
-`Pdf page` es la página física, desde 1, no el número que lleva impreso. Una página que el PDF no tiene es un error
+`Pdf page` es la página física, desde 1, y no el número que lleva impreso. Una página que el PDF no tiene es un error
 (`IMAGE_PAGE`, con la línea de `Pdf page`), y `Pdf page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
 (`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página que usa una
-fuente sin incrustar, o sin `ToUnicode` (lo que dice qué carácter es cada glifo; una fuente simple que no es simbólica no
-lo necesita): el visor la sustituiría por otra, o su texto no se podría copiar ni leer en voz alta, y el documento no
+fuente sin incrustar, o sin `ToUnicode` (lo que dice qué carácter es cada glifo, y que una fuente simple que no es
+simbólica no necesita): el visor la sustituiría por otra, o su texto no se podría copiar ni leer en voz alta, y el documento no
 sería accesible. Quien convierte puede quitar esta comprobación (`Check.PDF_IMAGE_FONTS`), y el PDF puede no cumplir
 PDF/UA. La de un PDF cifrado no se puede quitar. Un PDF de más bytes que el límite es `PDF_TOO_LARGE` ([Límites](#límites)).
 
@@ -235,11 +238,11 @@ Document (dev.stxt.pdf):
 > decoración. *Alternativa descartada:* injertar el árbol de estructura del PDF de origen, que no siempre existe ni encaja
 > en el del documento.
 
-> **Decisión:** una anotación que se ve es un error, no se dibuja su apariencia. *Alternativa descartada:* aplanarla al
-> copiarla, que obliga a interpretar cada tipo de anotación; ignorarla en silencio.
+> **Decisión:** una anotación que se ve es un error y no se dibuja su apariencia. *Alternativa descartada:* aplanarla al
+> copiarla, que obliga a interpretar cada tipo de anotación, o ignorarla en silencio.
 
 > **Decisión:** lo que impide que la página se vea igual o sea accesible (fuentes, anotaciones) se comprueba por
-> defecto, y quien convierte puede quitarlo; lo que impide leerla (cifrado, dañado), no. *Alternativa descartada:* una
+> defecto, y quien convierte puede quitarlo. Lo que impide leerla (un PDF cifrado o dañado) no se puede quitar. *Alternativa descartada:* una
 > propiedad del documento, que pone en el documento una decisión de quien convierte.
 
 > **Decisión:** de las reglas de PDF/UA sobre las fuentes se comprueban las que más fallan en los PDF de otros programas:
@@ -251,15 +254,14 @@ Document (dev.stxt.pdf):
 Una imagen no puede pedir más de lo que admiten los [límites](../comun/limites.md): un PNG o un JPEG, más píxeles que
 `maxImagePixels` (`IMAGE_TOO_LARGE`), y un SVG, más elementos o niveles que `maxSvgElements` y `maxSvgDepth`
 (`SVG_TOO_COMPLEX`), y un PDF, más bytes que `maxPdfBytes` (`PDF_TOO_LARGE`, 20 MB por defecto), siempre con la línea de
-la `Image` y antes de maquetar. Un `<use>` cuenta todo lo que repite cada vez
-que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORMAT`.
+la `Image` y antes de maquetar. Un `<use>` cuenta todo lo que repite cada vez que se usa, y un `<use>` que apunta a un elemento que lo contiene es `IMAGE_FORMAT`.
 
 ## Accesibilidad
 
 Con `Alt`, un texto no vacío, la imagen es una figura que un lector de pantalla anuncia con ese texto. Sin `Alt` es
-decorativa y no se lee, igual que los fondos; dentro de un `Page overlay`, siempre, y en las filas repetidas de una tabla, solo
-la primera vez. Una página de un PDF, igual: su texto se puede seleccionar, pero el lector de pantalla anuncia el `Alt`,
-no lo lee.
+decorativa y no se lee, igual que los fondos. Dentro de un `Page overlay` es decorativa siempre, y en las filas repetidas de una
+tabla solo se lee la primera vez. Una página de un PDF, igual: su texto se puede seleccionar, pero el lector de pantalla
+anuncia el `Alt` y no lee la página.
 
 > **Decisión:** una `Image` sin `Alt` es decorativa, sin aviso. *Alternativa descartada:* hacer `Alt` obligatorio, con un
 > `Alt` vacío para las decorativas, si un olvido del autor resulta ser un problema.
@@ -268,13 +270,14 @@ no lo lee.
 
 El PDF lleva cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal cual y
 el PNG sin pérdida y con su transparencia. Un SVG o una página de un PDF se escalan a su caja como un PNG, pero siguen
-siendo un dibujo vectorial nítido a cualquier tamaño (`stretch` deforma el dibujo); una página de un PDF se copia una vez,
-aunque salga en varias páginas.
+siendo un dibujo vectorial nítido a cualquier tamaño (`stretch` deforma el dibujo).
 
 ## Lo que no hay
 
-- GIF, WebP, TIFF y otros formatos; imágenes dentro de una línea de texto; varias resoluciones de una imagen.
+- GIF, WebP, TIFF y otros formatos.
+- Imágenes dentro de una línea de texto.
+- Varias resoluciones de una imagen.
 - Colocar la imagen dentro de su caja en otro sitio que el centro, o a su tamaño natural sin escalar.
 - En los SVG: patrones, máscaras, filtros, marcadores, imágenes, hojas de estilo y enlaces a otros ficheros.
-- En los PDF: insertar sus páginas como páginas del documento, con su tamaño; sus enlaces, campos de formulario,
-  comentarios, marcadores y etiquetado.
+- En los PDF: insertar sus páginas como páginas del documento, con su tamaño, y copiar sus enlaces, campos de
+  formulario, comentarios, marcadores y etiquetado.

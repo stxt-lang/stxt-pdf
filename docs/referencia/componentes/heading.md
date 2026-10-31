@@ -1,8 +1,8 @@
-# Encabezados: `Heading 1` … `Heading 6`
+# Encabezados: `Heading 1` a `Heading 6`
 
-Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados como en un `Block`; además admite `Id`,
+Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados como en un `Block`. Además admite `Id`,
 `Style`, `Link`, `In table of contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
-flujo de bloque de siempre; su significado se ve en las reglas `For element`, en los cortes, en la numeración, en los índices,
+flujo de bloque de siempre. Su significado se ve en las reglas `For element`, en los cortes, en la numeración, en los índices,
 en los marcadores del PDF y en lo que anuncia un lector de pantalla.
 
 ```
@@ -50,7 +50,7 @@ le puede seguir un `Heading 2`, pero no un `Heading 3`. Se puede bajar los nivel
 
 ## Dónde va
 
-Donde va un elemento en flujo, también como ítem de `Flex` o `Grid`; nunca dentro de un `Page overlay` (`HEADING_IN_PAGE_OVERLAY`), que
+Donde va un elemento en flujo, también como ítem de `Flex` o `Grid`, pero nunca dentro de un `Page overlay` (`HEADING_IN_PAGE_OVERLAY`), que
 se repite en cada página y no forma parte del contenido, ni dentro de un `List item` o una `Cell`.
 
 > **Decisión:** dentro de un `Page overlay` sería un encabezado sin marcador que un lector de pantalla no anuncia: es un error.
@@ -67,7 +67,7 @@ marcador, contando en la jerarquía y siendo destino de `#id`. Es lo normal para
 
 ## Numeración (`Numbered`)
 
-Con `Numbered: true` el encabezado lleva número: `1`, `1.1`, `1.1.1`… Como ningún estilo es implícito, se declara; es una
+Con `Numbered: true` el encabezado lleva número: `1`, `1.1`, `1.1.1`. Como ningún estilo es implícito, se declara. Es una
 propiedad de `Typography`, así que **se hereda** y se escribe donde convenga: en `For element: Document` numera todos los
 niveles, en una regla `For element: Heading 1` solo los de ese nivel, en una regla `For style` los de un estilo, y en la
 `Typography` de un encabezado, solo en él (`Numbered: false` lo deja sin número).
@@ -90,13 +90,13 @@ Heading 2:
 Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 ```
 
-- **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus encabezados `#`, `##`… se
+- **Cómo se cuenta.** En orden del documento, a través de las `Section` y de los `Markdown` (sus encabezados `#`, `##`, etc., se
   numeran como los demás), con un contador por nivel: sube con cada encabezado numerado de ese nivel y vuelve a 0 con
   cualquier encabezado de un nivel superior, esté numerado o no. El número es el de los niveles 1 a N unidos por puntos,
   **sin los niveles que no tienen número**, cada uno escrito con el `Number format` de su encabezado (abajo). Un
   encabezado sin numerar no cuenta ni lleva número.
 - **Un título sin número.** Lo normal: el título del documento es un `Heading 1` con `Numbered: false` y las secciones,
-  `Heading 2` numerados, que son `1`, `2`, `3` (y sus `Heading 3`, `2.1`…) porque el título no aporta nivel. Un nuevo
+  `Heading 2` numerados, que son `1`, `2`, `3` (y sus `Heading 3`, `2.1`, `2.2`) porque el título no aporta nivel. Un nuevo
   `Heading 1` sin número (otra parte, un anexo) hace que los contadores de debajo vuelvan a empezar.
 - **Se escribe delante del título.** El número (o su `Number label`, abajo) y un espacio van delante del primer `Text`
   del encabezado, como si el autor los hubiera escrito: miden lo que escriben, el texto puede pasar a una línea más
@@ -112,14 +112,14 @@ Dos propiedades de `Typography`, que se heredan y se dan como `Numbered`: en `Fo
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el contador del nivel del encabezado: `1`, `a`, `A`, `i`, `I`. Las letras siguen tras la `z` con `aa`; los romanos, tras 3999, con más `M`. |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el contador del nivel del encabezado: `1`, `a`, `A`, `i`, `I`. Las letras siguen tras la `z` con `aa`, y los romanos, tras 3999, con más `M`. |
 | `Number label` | texto con `{number}` una vez | el número | Lo que va delante del título: `{number}` es el número completo (`Number label: Anexo {number}.` da `Anexo A.`). Sin `{number}`, o con él dos veces, es `VALUE_NOT_ALLOWED`. |
 
 Cada nivel del número completo se escribe con el `Number format` del último encabezado de ese nivel: capítulos
 `upper-roman` y apartados `decimal` dan `II.1`. `{number of: id}` da el número, sin la etiqueta: «el anexo
 {number of: fees}» escribe «el anexo A». Los anexos se numeran aparte con un encabezado sin número por encima, que
 reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` con `Number format: upper-alpha` son `A`,
-`B`…
+`B`, `C`.
 
 ```
 Styles:
@@ -138,7 +138,7 @@ Paragraph: Los importes del anexo {number of: fees}.
 ```
 
 > **Decisión:** `Numbered`, `Number format` y `Number label` van en `Typography` para poder darlos en una regla y
-> heredarlos; el formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativa descartada:* una
+> heredarlos. El formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativa descartada:* una
 > plantilla con el número de cada nivel por separado (`{1}.{2}`), más difícil de escribir y de leer.
 
 > **Decisión:** los romanos pasados de 3999 se escriben con más `M` (4000 es `MMMM`), en lugar de un error que no se
@@ -148,10 +148,10 @@ Paragraph: Los importes del anexo {number of: fees}.
 > **Decisión:** los encabezados sin numerar no aportan nivel al número de los de debajo. *Alternativa descartada:* un error
 > si un encabezado numerado está bajo uno sin número, que obliga a numerar el título.
 
-> **Decisión:** el número es texto del primer `Text`, no una caja aparte como el marcador de una lista. *Alternativa
+> **Decisión:** el número es texto del primer `Text` y no una caja aparte como el marcador de una lista. *Alternativa
 > descartada:* el número colgado a la izquierda, que alinea los títulos pero obliga a un hueco fijo.
 
-`{number of: id}` da el número completo (`4.2`), no el de su último nivel como el de un `List item`. Los encabezados de un
+`{number of: id}` da el número completo (`4.2`) y no el de su último nivel como el de un `List item`. Los encabezados de un
 `Markdown` se numeran como los demás, y se pueden referir si llevan `Id`, que se escribe al final de su texto
 (`## Ventas {#ventas}`, [Markdown](markdown.md#encabezados)).
 

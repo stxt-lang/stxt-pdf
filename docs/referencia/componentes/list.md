@@ -2,8 +2,8 @@
 
 Una `List` apila sus ítems (`List item`) en vertical, como un `Block`, y cada ítem lleva un **marcador** generado por el
 motor, que no está en el documento. Las dos son cajas de bloque y admiten `Id`, `Style`, `Link`, `Box`, `Typography` y
-`Break`; un ítem contiene uno o varios elementos, cualquiera salvo los encabezados (`Paragraph`, `Text`, `Block`, otra
-`List`…). Un ítem vacío es `LIST_ITEM_EMPTY`. Una `List` va donde va un elemento en flujo, también dentro de otro ítem.
+`Break`. Un ítem contiene uno o varios elementos, cualquiera salvo los encabezados (un `Paragraph`, un `Text`, un `Block`
+u otra `List`). Un ítem vacío es `LIST_ITEM_EMPTY`. Una `List` va donde va un elemento en flujo, también dentro de otro ítem.
 
 ```
 Styles:
@@ -26,9 +26,9 @@ List:
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Marker` | `bullet`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — (obligatorio) | `List` | Marcador de los ítems: `•`, `–`, ninguno, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker` | `bullet`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | obligatorio | `List` | Marcador de los ítems: `•`, `–`, ninguno, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
 | `Start` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
-| `Number` | entero | — | `List item` | Número de este ítem; los siguientes continúan desde él. Solo en las numeraciones. |
+| `Number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de los ítems es el `Padding` izquierdo de la
 `List`.
@@ -47,10 +47,10 @@ No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de lo
 
 ## Numeración
 
-El primer ítem lleva el número `Start` (1 si no se declara); cada uno, el siguiente al anterior, salvo el que fija el suyo
-con `Number`, desde el que continúan los demás. Las letras siguen tras la `z` con dos letras (`aa`, `ab`…). `decimal`
-escribe desde 0; las letras y los romanos, desde 1, y los romanos, hasta 3999 (`LIST_NUMBER_RANGE`). `Start` y `Number`
-solo tienen efecto en las numeraciones (`LIST_NUMBER_NOT_ALLOWED`). Cada lista numera sus ítems; una lista anidada empieza
+El primer ítem lleva el número `Start` (1 si no se declara). Cada uno lleva el siguiente al anterior, salvo el que fija el suyo
+con `Number`, desde el que continúan los demás. Las letras siguen tras la `z` con dos letras (`aa`, `ab`). `decimal`
+escribe desde 0, y las letras y los romanos, desde 1. Los romanos llegan hasta 3999 (`LIST_NUMBER_RANGE`). `Start` y `Number`
+solo tienen efecto en las numeraciones (`LIST_NUMBER_NOT_ALLOWED`). Cada lista numera sus ítems, y una lista anidada empieza
 de nuevo. El número de un ítem se puede referir con `{number of: id}` ([Referencias](../comun/referencias.md#number-of-id)).
 
 ## Posición
@@ -79,6 +79,6 @@ Un lector de pantalla anuncia la lista con su número de ítems, y cada ítem co
 
 ## Lo que no hay
 
-- Marcadores dentro del ítem, con un estilo propio distinto del ítem, con imágenes o con otro texto; círculo hueco y
-  cuadrado.
+- Marcadores dentro del ítem, con un estilo propio distinto del ítem, con imágenes o con otro texto.
+- Círculo hueco y cuadrado.
 - Listas en orden inverso y otros sufijos que el punto.

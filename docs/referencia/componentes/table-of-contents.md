@@ -21,10 +21,15 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 ## Entradas
 
-Cada entrada es una fila con tres partes: el **título**, que es el texto del encabezado, con su número si lo lleva
-([Encabezados](heading.md#numeración-numbered)), sus `Text` unidos por un espacio y sin formato en línea; la **guía**, que
-crece hasta llenar el hueco, con 4 pt a cada lado; y el **número de página**, que funciona como un `{page of: …}` del
-encabezado ([Referencias](../comun/referencias.md)), también si el encabezado no tiene `Id`. Sin guía (`Leader: none`), el
+Cada entrada es una fila con tres partes:
+
+- el **título**, que es el texto del encabezado, con su número si lo lleva
+  ([Encabezados](heading.md#numeración-numbered)), sus `Text` unidos por un espacio y sin formato en línea;
+- la **guía**, que crece hasta llenar el hueco, con 4 pt a cada lado;
+- el **número de página**, que funciona como un `{page of: ...}` del encabezado ([Referencias](../comun/referencias.md)),
+  también si el encabezado no tiene `Id`.
+
+Sin guía (`Leader: none`), el
 título llena el hueco. Si el título no cabe en una línea, se parte, y el número queda en la primera línea.
 
 Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id` ([Enlaces](../comun/enlaces.md)).
@@ -34,27 +39,33 @@ Cada entrada es clicable entera y lleva a su encabezado, como un `Link: #id` ([E
 
 ## Guía
 
-Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al número; con `line`, una línea de 0,05
+Con `dots`, puntos cuadrados de 0,09 veces el cuerpo, cada medio cuerpo y pegados al número. Con `line`, es una línea de 0,05
 veces el cuerpo, de un lado al otro del hueco. Se pintan sobre la línea base de la entrada y con el color del texto. Son
-dibujo, no texto: no se seleccionan ni se leen.
+dibujo y no texto: no se seleccionan ni se leen.
 
 > **Decisión:** la guía es un dibujo que llena exactamente el hueco. *Alternativa descartada:* el carácter «.» repetido,
 > que se copiaría con el texto.
 
 ## Estilo
 
-La entrada hereda la tipografía del `Table of contents`; sus cajas, la de la entrada. Las reglas `For element: TOC 1` …
+La entrada hereda la tipografía del `Table of contents`, y sus cajas, la de la entrada. Las reglas `For element: TOC 1` a
 `TOC 6` dan `Box`, `Typography` y `Break` a las entradas de un nivel: la sangría de cada nivel es su `Padding`
 izquierdo, y el espacio entre entradas, su `Margin` o su `Padding` vertical. Las propias entradas no llevan `Id` ni
 `Style`.
 
-> **Decisión:** una regla por nivel, no por parte (`TOC title`…), que sería más fina y más larga de escribir.
+> **Decisión:** una regla por nivel y no por parte (`TOC title`), que sería más fina y más larga de escribir.
 
 ## Errores
 
-Un `Table of contents` sin ningún encabezado en sus niveles (`TABLE_OF_CONTENTS_EMPTY`, con la línea del `Table of contents`); un `Levels` que no son
-dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`); un `Table of contents` sin `Font` o sin `Size` propios o heredados
-(`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con la línea del `Table of contents`). Un encabezado de una sección sin números de
+Son errores:
+
+- un `Table of contents` sin ningún encabezado en sus niveles (`TABLE_OF_CONTENTS_EMPTY`, con la línea del
+  `Table of contents`);
+- un `Levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`);
+- un `Table of contents` sin `Font` o sin `Size` propios o heredados (`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con
+  la línea del `Table of contents`).
+
+Un encabezado de una sección sin números de
 página no puede estar en un índice: se declara con `In table of contents: false`.
 
 > **Decisión:** `Levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2».

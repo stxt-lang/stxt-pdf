@@ -52,15 +52,15 @@ puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-pag
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Paper` | `A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter`, `Legal` | — | Tamaño de papel con nombre, en vertical (tabla de abajo). |
+| `Paper` | `A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter`, `Legal` | sin valor | Tamaño de papel con nombre, en vertical (tabla de abajo). |
 | `Orientation` | `portrait`, `landscape` | `portrait` | Solo con `Paper`: `landscape` cambia el ancho por el alto. |
-| `Width` | número > 0 | — | Ancho de la página, sin `Paper`. |
-| `Height` | número > 0 | — | Alto de la página, sin `Paper`. |
+| `Width` | número > 0 | sin valor | Ancho de la página, sin `Paper`. |
+| `Height` | número > 0 | sin valor | Alto de la página, sin `Paper`. |
 | `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo puntos. |
 
 El tamaño de la página se declara **de una sola forma**: un `Paper` (con su `Orientation`, si es apaisada) o un `Width` y
 un `Height`. Declarar `Paper` con `Width` o `Height`, `Orientation` sin `Paper`, solo uno de `Width` y `Height`, o ninguna
-de las dos formas, es `PAGE_SIZE`; también unos márgenes que no dejan área útil. Los tamaños con nombre, en puntos
+de las dos formas, es `PAGE_SIZE`. También lo son unos márgenes que no dejan área útil. Los tamaños con nombre, en puntos
 enteros:
 
 | `Paper` | Ancho × alto (pt) | | `Paper` | Ancho × alto (pt) |
@@ -82,16 +82,17 @@ es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer
 nivel de cada sección y de los `Page overlay`, y su alto es siempre definido.
 
-> **Decisión:** los tamaños ISO 216 van redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842); Letter y
-> Legal son exactos. *Alternativa descartada:* los valores con decimales (A4 = 595,28 × 841,89).
+> **Decisión:** los tamaños ISO 216 van redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842), y Letter
+> y Legal son exactos. *Alternativa descartada:* los valores con decimales (A4 = 595,28 × 841,89).
 
 ## `Title` y `Language`
 
-`Document` exige exactamente un `Title` (un texto no vacío; si no, `VALUE_NOT_ALLOWED`) y exactamente un `Language` (una
-etiqueta BCP 47: `es`, `en-US`, `ca`…; si no, `VALUE_NOT_ALLOWED`); si falta cualquiera de los dos, `TOO_FEW_CHILDREN`. No
+`Document` exige exactamente un `Title`, que es un texto no vacío, y exactamente un `Language`, que es una etiqueta
+BCP 47 (`es`, `en-US` o `ca`). Un valor que no lo cumple es `VALUE_NOT_ALLOWED`, y si falta cualquiera de los dos,
+`TOO_FEW_CHILDREN`. No
 afectan al layout, salvo que `Language` da las reglas de las mayúsculas de `Case`
 ([Formato del texto](../comun/formato-del-texto.md#mayúsculas-case)). El título es el que muestra el visor, y el idioma,
-el que usa un lector de pantalla; los dos son obligatorios para que el PDF sea accesible ([El PDF](../comun/pdf.md)).
+el que usa un lector de pantalla. Los dos son obligatorios para que el PDF sea accesible ([El PDF](../comun/pdf.md)).
 
 ## `Section`
 
@@ -100,8 +101,8 @@ contenido está en alguna.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Id` | texto | — | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). |
-| `Style` | nombres separados por espacios | — | Le aplican las reglas `For style` con esos nombres; como `For id` y `For element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
+| `Id` | texto | sin valor | Único en el documento. Es el destino de `Link: #id` y de `{page of: id}` (su primera página). |
+| `Style` | nombres separados por espacios | sin valor | Le aplican las reglas `For style` con esos nombres. Como `For id` y `For element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
 | `Page` | como el del documento | el del documento | Ver [abajo](#el-page-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
@@ -111,7 +112,7 @@ contenido está en alguna.
 
 Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
 
-- **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página; y la siguiente empieza otra. El
+- **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página, y la siguiente empieza otra. El
   contenido de una sección no se mezcla con el de otra.
 - **Cada sección es la raíz de su layout.** Su caja es el área útil de cada una de sus páginas (el contenedor de referencia
   de sus elementos de primer nivel): sus márgenes y su alto salen de su `Page`, y cada página lleva el suyo. Una
@@ -123,26 +124,26 @@ Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
   anexo en inglés), que hereda todo su contenido.
 - **Un solo documento.** La jerarquía de encabezados, los índices (`Table of contents`, que listan los encabezados de todas las
   secciones, en orden), `Styles`, los `Id` (únicos en todo el documento) y la convergencia de las referencias son del
-  documento, no de la sección.
+  documento y no de la sección.
 
 > **Decisión:** no hay sección implícita para el contenido suelto: la separación está siempre a la vista.
 
-> **Decisión:** una sección sin contenido es un error, no una página en blanco que nadie escribió.
+> **Decisión:** una sección sin contenido es un error y no una página en blanco que nadie escribió.
 
 ### El `Page` de una sección
 
 Hereda del `Page` del documento **por grupos**: el tamaño (`Paper` con su `Orientation`, o `Width` y `Height`) se hereda
 entero o se declara entero, y `Margin` se hereda o se declara. Una sección que solo declara `Orientation` gira el `Paper`
-del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado); si el documento declara `Width` y
-`Height` no hay papel que girar y es `PAGE_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `PAGE_SIZE`.
+del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado). Si el documento declara `Width` y
+`Height`, no hay papel que girar y es `PAGE_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `PAGE_SIZE`.
 
 > **Decisión:** herencia por grupos, para que `Orientation: landscape` sola dé el papel del documento apaisado.
 > *Alternativa descartada:* un `Page` completo en cada sección.
 
 ### `Page overlay` del documento y de la sección
 
-Un `Page overlay` de `Document` sale en las páginas de todas las secciones salvo las que declaran `Inherit page overlays: false`; uno de
-una `Section`, solo en las suyas. `Pages` cuenta dentro del alcance donde se declara
+Un `Page overlay` de `Document` sale en las páginas de todas las secciones salvo las que declaran `Inherit page overlays: false`, y uno
+de una `Section`, solo en las suyas. `Pages` cuenta dentro del alcance donde se declara
 ([posicionados](frame-and-overlays.md#pages)). Se colocan en el área útil de cada página, que es la de su sección.
 Los del documento se pintan antes que los de la sección. `Inherit page overlays: false` en un documento sin `Page overlay`, que no tiene
 efecto, no es un error: una plantilla puede ponerlos después.
@@ -154,9 +155,13 @@ Un `Page overlay` del documento no está en ningún flujo: su posición estátic
 
 ### Numeración de las páginas
 
-Hay un contador de páginas por documento. Cada sección dice qué hace con él: `continue` (por defecto), sus páginas siguen
-numerándose; `restart`, su primera página vuelve a ser la 1; `none`, sus páginas no tienen número y no avanzan el
-contador. `{page}` es el valor del contador, y `{pages}`, el último valor de su **tanda**, la que empieza en cada `restart`:
+Hay un contador de páginas por documento. Cada sección dice qué hace con él:
+
+- `continue` (por defecto): sus páginas siguen numerándose.
+- `restart`: su primera página vuelve a ser la 1.
+- `none`: sus páginas no tienen número y no avanzan el contador.
+
+`{page}` es el valor del contador, y `{pages}`, el último valor de su **tanda**, la que empieza en cada `restart`:
 con una portada `none` y 6 páginas de cuerpo, la primera página interior es «1 de 6» aunque sea la segunda del documento.
 
 **Lo que se imprime manda.** `{page of: id}`, las entradas de un índice y el pie dicen el mismo número: el del contador. Una
@@ -178,32 +183,32 @@ la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a
 Section:
     Id: preface
     Page number format: lower-roman
-    Paragraph: El prefacio: sus páginas son i, ii, iii…
+    Paragraph: El prefacio: sus páginas son i, ii, iii...
 Section:
     Page numbering: restart
     Paragraph: El cuerpo empieza en la página 1.
 ```
 
-Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`; un `Start` sin `restart`,
-que no tendría efecto porque la sección sigue la cuenta de la anterior, `START_WITHOUT_RESTART`.
+Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. Un `Start` sin `restart`,
+que no tendría efecto porque la sección sigue la cuenta de la anterior, es `START_WITHOUT_RESTART`.
 
-> **Decisión:** el estilo es de la sección, no del contador: una sección `continue` en romanos sigue la cuenta de la
+> **Decisión:** el estilo es de la sección y no del contador: una sección `continue` en romanos sigue la cuenta de la
 > anterior y la escribe en romanos. Solo cifras y romanos, que son los de las páginas de los libros. *Alternativa
 > descartada:* letras (`a`, `b`), que no se usan para numerar páginas.
 
-> **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan; lo que no tiene número es un error, nunca
+> **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan. Lo que no tiene número es un error y nunca
 > un hueco vacío. *Alternativa descartada:* dejar el hueco vacío.
 
 ### Empezar en página impar
 
 Para imprimir a doble cara, `Begin on: odd` hace que la sección empiece en una página física impar, la de la derecha: si
 la anterior acaba en una impar, acaba con una **página en blanco**. La página física es la posición en el documento (la
-primera es la 1), no el número impreso. Con `any` (por defecto), la sección empieza en la página siguiente.
+primera es la 1) y no el número impreso. Con `any` (por defecto), la sección empieza en la página siguiente.
 
 La página en blanco es **una página más de la sección anterior**:
 
 - Tiene su `Page`, su `Page number format` y su numeración: si la sección numera, avanza el contador y cuenta para `{pages}`
-  como cualquier otra, aunque no se imprima; si es `none`, no tiene número.
+  como cualquier otra, aunque no se imprima. Si es `none`, no tiene número.
 - No tiene contenido ni `Page overlay`, ni los de la sección ni los del documento.
 - No cuenta para el `Pages` de los `Page overlay` de su sección (`Pages: last` es su última página con contenido). Para los del
   documento, que cuentan las páginas físicas, sí cuenta, aunque no salgan en ella.

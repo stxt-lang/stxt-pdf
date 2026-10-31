@@ -53,10 +53,10 @@ Document (dev.stxt.pdf):
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Content` | bloque `>>` | — | El Markdown. Obligatorio. |
-| `Bullet markers` | lista de `bullet`, `dash`, `none` | — | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento; el último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
-| `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | — | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
-| `Table columns` | `equal`, `auto` | — | Las `Column sizes` de las tablas: `equal`, `repeat(n, *)`; `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+| `Content` | bloque `>>` | sin valor | El Markdown. Obligatorio. |
+| `Bullet markers` | lista de `bullet`, `dash`, `none` | sin valor | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento. El último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
+| `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | sin valor | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
+| `Table columns` | `equal`, `auto` | sin valor | Las `Column sizes` de las tablas: `equal` es `repeat(n, *)`, y `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 
@@ -66,16 +66,16 @@ No van en las reglas de `Styles`, que solo admiten los grupos.
 
 ## El subconjunto
 
-El Markdown es [CommonMark](https://commonmark.org) con las tablas y el tachado de GFM y el subrayado `++…++`. Se traduce
+El Markdown es [CommonMark](https://commonmark.org) con las tablas y el tachado de GFM y el subrayado `++...++`. Se traduce
 así:
 
 | Markdown | Elemento |
 |---|---|
-| `#` … `######` (y los subrayados con `===` y `---`) | `Heading 1` … `Heading 6`, con un `Text`; con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
+| `#` a `######` (y los subrayados con `===` y `---`) | `Heading 1` a `Heading 6`, con un `Text`, y con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
-| `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel; un `List item` por ítem |
+| `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
 | `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `Start`, el primer número si no es 1 |
-| Tabla | `Table` con las `Column sizes` de `Table columns`; la fila de cabecera en `Head` y el resto en `Body` |
+| Tabla | `Table` con las `Column sizes` de `Table columns`, con la fila de cabecera en `Head` y el resto en `Body` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../comun/formato-del-texto.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
@@ -83,7 +83,7 @@ así:
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../comun/enlaces.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `White space: preserve` cuya fuente es su `Code font`, con el código en su `Content` |
-| `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`; con `![](ruta)`, decorativa ([Image](image.md)) |
+| `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes dentro de un texto
 (también dentro de un enlace) o con título (`![Alt](ruta "título")`), la etiqueta de lenguaje de un bloque de código
@@ -96,7 +96,7 @@ Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALU
 `Link`.
 
 > **Decisión:** lo que no tendría efecto (la etiqueta de lenguaje de un bloque de código, el título de un enlace) es un
-> error, no se ignora.
+> error y no se ignora.
 
 ## Texto
 
@@ -110,22 +110,23 @@ de un `Markdown` no actúa: sus textos ya vienen interpretados.
 El código en línea es un tramo de código ([Formato del texto](../comun/formato-del-texto.md#código-en-línea)), con la
 familia de `Code font`: conserva el peso y el estilo del texto que lo rodea y se suma a la negrita o la cursiva del
 párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace. El espacio en blanco de una línea con
-código en línea se colapsa como en cualquier párrafo; lo que conserva los espacios es el bloque.
+código en línea se colapsa como en cualquier párrafo. Lo que conserva los espacios es el bloque.
 
-Un bloque de código es un `Text` con `White space: preserve` ([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space))
-cuya fuente es su `Code font`, así que se parte entre líneas entre páginas y una línea más ancha que la caja es un error
-(`TEXT_OVERFLOW`); no tiene `Id` ni `Style`, pero es el elemento generado `Code block` y lo nombra la regla
+Un bloque de código es un `Text` con `White space: preserve`
+([Formato del texto](../comun/formato-del-texto.md#texto-preformateado-white-space)) cuya fuente es su `Code font`, así
+que se parte entre líneas entre páginas y una línea más ancha que la caja es un error (`TEXT_OVERFLOW`). No tiene `Id` ni
+`Style`, pero es el elemento generado `Code block` y lo nombra la regla
 `For element: Code block` ([Styles](../comun/estilos.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
-tamaño menor, `Inside: avoid`…). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
-un Markdown y para los que se escriben); un `Text` escrito a mano con `White space: preserve` tampoco es un `Code block`. Su
+tamaño menor o `Inside: avoid`). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
+un Markdown y para los que se escriben). Un `Text` escrito a mano con `White space: preserve` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown`, así que `Size`, `Color`, `Tab size` o `Code font` se declaran en el `Typography` del
-`Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea; un
-`Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja,
-no el de la fuente del código, así que las líneas con código en línea no cambian de alto.
+`Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea. Un
+`Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja
+y no el de la fuente del código, así que las líneas con código en línea no cambian de alto.
 
 `Code font` es de `Typography` ([Tipografía](../comun/tipografia.md)) y se hereda: se declara una vez, en
 `For element: Document`, y vale para el código de los `Markdown` y de los textos con `Markup: markdown`. Sin ella, el código
-es un error (`CODE_WITHOUT_FONT`), con la línea del párrafo o la del bloque; si la familia no existe, `FONT_UNKNOWN`,
+es un error (`CODE_WITHOUT_FONT`), con la línea del párrafo o la del bloque. Si la familia no existe, es `FONT_UNKNOWN`,
 con la línea de `Code font`.
 
 > **Decisión:** `Code font` es de `Typography`, heredable: así el código en línea de un texto con `Markup: markdown`
@@ -139,7 +140,7 @@ con la línea de `Code font`.
 ## Listas
 
 El nivel de una lista es el número de listas de su mismo tipo que la contienen: la primera lista con viñetas usa el primer
-marcador de `Bullet markers`; una con viñetas dentro de esa, el segundo, y así hasta el último, que sirve para los niveles más
+marcador de `Bullet markers`, una con viñetas dentro de esa, el segundo, y así hasta el último, que sirve para los niveles más
 profundos. Las numeradas cuentan aparte, con `Number markers`. Cada párrafo de un ítem es un `Paragraph`, y una lista anidada,
 una `List` dentro del `List item`. Las listas compactas y las separadas por líneas en blanco se traducen igual: el espacio
 entre ítems lo dan las reglas de `Styles`. Como cualquier lista, la sangría que deja sitio al marcador es su `Padding`
@@ -150,20 +151,20 @@ izquierdo, que se suele declarar en la regla `For element: List` ([List](list.md
 
 ## Tablas
 
-Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`) como `Align` de sus celdas; sin alineación,
-la de la caja. Una celda con texto es una `Cell` con valor; una vacía, una `Cell` vacía. A una fila con menos celdas que la
-cabecera se le añaden celdas vacías, como en GFM; una con más es `MARKDOWN_UNSUPPORTED`, con la línea de la fila (una `\|`
+Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`) como `Align` de sus celdas. Sin alineación,
+tienen la de la caja. Una celda con texto es una `Cell` con valor, y una vacía, una `Cell` vacía. A una fila con menos celdas que la
+cabecera se le añaden celdas vacías, como en GFM. Una con más es `MARKDOWN_UNSUPPORTED`, con la línea de la fila (una `\|`
 escapada no separa celdas). Las celdas reciben las reglas de las celdas de cualquier tabla
-([Table](table.md#estilo-de-las-celdas)); las tablas de Markdown no tienen cabeceras de fila (`Row header`).
+([Table](table.md#estilo-de-las-celdas)). Las tablas de Markdown no tienen cabeceras de fila (`Row header`).
 
 > **Decisión:** las celdas que faltan se completan, como en GFM, porque una celda vacía al final de la fila se escribe a
-> menudo sin su barra; las que sobran son un error, porque GFM las descarta sin avisar. *Alternativa descartada:* seguir
+> menudo sin su barra. Las que sobran son un error, porque GFM las descarta sin avisar. *Alternativa descartada:* seguir
 > a GFM también con las que sobran.
 
 ## Estilo
 
 Lo generado no tiene `Style`, ni `Id` salvo los encabezados que lo escriben ([abajo](#encabezados)): se le da estilo con
-las reglas `For element` de `Styles` (`For element: Heading 1`, `For element: Paragraph`, `For element: Code block`…), que se aplican a
+las reglas `For element` de `Styles` (como `For element: Heading 1`, `For element: Paragraph` o `For element: Code block`), que se aplican a
 todo el documento, y con el `Typography` del `Markdown`, que hereda.
 
 ## Encabezados
@@ -175,7 +176,7 @@ como los demás y entran en los índices. Dentro de un `Page overlay`, un Markdo
 Un encabezado lleva `Id` si lo escribe al final de su texto, `{#id}`: `## Ventas {#ventas}` es un `Heading 2` con
 `Id: ventas` y el texto «Ventas». Es su `Id` como si lo hubiera escrito el autor: único en el documento
 (`DUPLICATE_ID`), destino de `Link: #id` y de `[texto](#id)`, y lo refieren `{page of: id}` y, si está numerado,
-`{number of: id}`. No se pinta; vacío o con espacios (`{#mis ventas}`) es `VALUE_NOT_ALLOWED`, con la línea del
+`{number of: id}`. No se pinta. Vacío o con espacios (`{#mis ventas}`) es `VALUE_NOT_ALLOWED`, con la línea del
 encabezado. Es lo único de lo generado que lleva `Id`.
 
 > **Decisión:** el `Id` de un encabezado se escribe con la sintaxis de Pandoc y kramdown, `{#id}`, que conocen quienes
@@ -190,12 +191,12 @@ como elemento de un `Item` o un `Area`.
 ## Errores
 
 Los errores de lo generado señalan la línea del documento donde empieza su bloque de Markdown (la del ítem, la de la fila de
-la tabla); los del marcador de una lista, la de `Bullet markers` o `Number markers`, y los de las columnas de una tabla, la de
+la tabla). Los del marcador de una lista señalan la de `Bullet markers` o `Number markers`, y los de las columnas de una tabla, la de
 `Table columns`. Una lista o una tabla sin su propiedad es un error con la línea de la lista o la tabla
-(`MARKDOWN_PROPERTY_MISSING`); una propiedad que no se usa no lo es. El código sin `Code font` es `CODE_WITHOUT_FONT`
+(`MARKDOWN_PROPERTY_MISSING`). Una propiedad que no se usa no lo es. El código sin `Code font` es `CODE_WITHOUT_FONT`
 ([Código](#código)).
 
-Los errores de un párrafo de varias líneas señalan la primera; los de una celda, la de su fila.
+Los errores de un párrafo de varias líneas señalan la primera, y los de una celda, la de su fila.
 
 ## Accesibilidad
 

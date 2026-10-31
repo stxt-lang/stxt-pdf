@@ -1,20 +1,20 @@
 # `Frame`, `Overlay` y `Page overlay`
 
 Los tres **elementos posicionados** son bloques: apilan a sus hijos en flujo de bloque ([Block](block.md)). Para posicionar
-un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`; `Frame`
-también `Break` y `Contain margins`.
+un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`, y
+`Frame`, también `Break` y `Contain margins`.
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Los tres | Arriba, derecha, abajo, izquierda ([Valores](../comun/valores.md#abreviados-de-cuatro-lados)). |
 | `Layer` | entero | `auto` | Los tres | Orden de apilamiento ([Capas y giro](../comun/capas-y-giro.md)). También en `Item` y `Area`. |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Page overlay` | Las páginas en que sale ([Pages](#pages)). |
-| `Rotate`, `Rotate origin` | ver [Capas y giro](../comun/capas-y-giro.md#giro-rotate) | — | Los tres | Gira la caja al pintarla. También en `Image`. |
+| `Rotate`, `Rotate origin` | ver [Capas y giro](../comun/capas-y-giro.md#giro-rotate) | sin valor | Los tres | Gira la caja al pintarla. También en `Image`. |
 
 `Offset`, `Layer`, `Pages` y `Rotate` son propiedades del elemento: no van en `Styles` ni se heredan.
 
-> **Decisión:** `Frame` es un elemento, no una propiedad de cualquier caja: así `Offset` y `Layer` solo existen en los
-> elementos posicionados y en `Item`/`Area`, y el schema detecta su mal uso sin reglas propias; un `Frame` sin `Offset`
+> **Decisión:** `Frame` es un elemento y no una propiedad de cualquier caja: así `Offset` y `Layer` solo existen en los
+> elementos posicionados y en `Item`/`Area`, y el schema detecta su mal uso sin reglas propias. Un `Frame` sin `Offset`
 > marca el contenedor de referencia de los `Overlay`. *Alternativa descartada:* un `Offset` en cualquier elemento en flujo,
 > que necesitaría otra forma de marcar el contenedor de referencia sin desplazar.
 
@@ -23,17 +23,17 @@ también `Break` y `Contain margins`.
 > se leería peor en el caso habitual (un sello, una cabecera).
 
 > **Decisión:** `Overlay` y `Page overlay` no admiten `Break`, porque no se parten ni están en el flujo de la página. Un
-> `Break` escrito en un elemento de dentro es un error (`BREAK_IN_UNBREAKABLE`, [Cortes](../comun/cortes.md#cortes-forzados));
-> el que llega de una regla no, para que `For element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
+> `Break` escrito en un elemento de dentro es un error (`BREAK_IN_UNBREAKABLE`, [Cortes](../comun/cortes.md#cortes-forzados)).
+> El que llega de una regla no lo es, para que `For element: Paragraph` con `After: avoid` no dé un error en cada párrafo de un pie.
 > *Alternativa descartada:* comprobar también lo que llega de las reglas.
 
 ## `Frame`
 
 La caja se coloca como cualquier caja en flujo y después se desplaza visualmente según `Offset`. Su hueco original se
 conserva y sus hermanos no se mueven. Declarar a la vez arriba y abajo, o izquierda y derecha, es un error
-(`OFFSET_CONFLICT`): deja uno de los dos en `auto`. Un `Frame` sin `Offset` no se desplaza y sirve como contenedor de
+(`OFFSET_CONFLICT`): uno de los dos tiene que quedar en `auto`. Un `Frame` sin `Offset` no se desplaza y sirve como contenedor de
 referencia de sus descendientes `Overlay`. Los porcentajes del `Offset` se resuelven contra el ancho o el alto del
-contenedor de referencia; uno vertical necesita que su alto sea definido ([Valores](../comun/valores.md#alto-definido)).
+contenedor de referencia. Uno vertical necesita que su alto sea definido ([Valores](../comun/valores.md#alto-definido)).
 Un `Frame` se comprueba en su sitio, sin su desplazamiento ([Desbordamiento](../comun/desbordamiento.md)).
 
 ## `Overlay`
@@ -50,18 +50,18 @@ donde *inicio/fin* son izquierda/derecha o arriba/abajo del `Offset`. Según qu�
 
 | `auto` | Resultado |
 |---|---|
-| inicio, tamaño y fin | inicio = **posición estática**; tamaño automático; se despeja fin |
+| inicio, tamaño y fin | inicio = **posición estática**, tamaño automático y se despeja fin |
 | ninguno, con ambos márgenes `auto` | los márgenes se reparten el sobrante: **centrada** |
 | ninguno, sin márgenes `auto` | **error** (`OVERCONSTRAINED`): la posición se fija dos veces |
-| inicio y tamaño | tamaño automático; se despeja inicio (anclada al fin) |
-| inicio y fin | inicio = posición estática; se despeja fin |
-| tamaño y fin | tamaño automático; se despeja fin |
+| inicio y tamaño | tamaño automático y se despeja inicio (anclada al fin) |
+| inicio y fin | inicio = posición estática y se despeja fin |
+| tamaño y fin | tamaño automático y se despeja fin |
 | solo inicio | se despeja inicio |
 | solo tamaño | se despeja: la caja **se estira** entre inicio y fin |
 | solo fin | se despeja fin |
 
 Un margen `auto` solo tiene sentido cuando inicio, tamaño y fin están declarados (centra la caja o, si solo es `auto` uno
-de los dos, absorbe el sobrante); en los demás casos es un error. El **tamaño automático** es el ajuste al contenido
+de los dos, absorbe el sobrante). En los demás casos es un error. El **tamaño automático** es el ajuste al contenido
 (`fit`) en horizontal y la altura del contenido en vertical. La **posición estática** es donde habría quedado la
 caja si estuviera en flujo:
 
@@ -69,8 +69,8 @@ caja si estuviera en flujo:
   superior de la propia caja, que se suma después según la ecuación;
 - dentro de un `Flex` o un `Grid`, la esquina superior izquierda de su caja de contenido.
 
-Un `Overlay` se coloca cuando su contenedor de referencia ya tiene su tamaño, con el contenido en flujo colocado. Se pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia
-esté más arriba ([Capas y giro](../comun/capas-y-giro.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
+Un `Overlay` se coloca cuando su contenedor de referencia ya tiene su tamaño, con el contenido en flujo colocado. Se
+pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia esté más arriba ([Capas y giro](../comun/capas-y-giro.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
 su posición, y si su contenedor de referencia está partido, se resuelve contra el fragmento de esa página
 ([Cortes](../comun/cortes.md#lo-que-no-se-parte)). Puede ocupar los márgenes de la página, pero no salirse de ella
 (`BOX_OVERFLOW`).
@@ -83,7 +83,7 @@ lo heredan, y uno hijo de una `Section`, solo en las suyas ([Document](document.
 Los `Page overlay` no reservan espacio: el autor debe dejar sitio con el `Margin` de `Page`. Para colocarlos en el margen de la
 página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Page overlay` depende de su posición estática
 (desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
-todas en las que sale. Lo que hay dentro de un `Page overlay` es decoración de la página, no contenido: un lector de pantalla no
+todas en las que sale. Lo que hay dentro de un `Page overlay` es decoración de la página y no contenido: un lector de pantalla no
 lo lee, y no puede tener encabezados (`HEADING_IN_PAGE_OVERLAY`) ni ser el destino de un enlace o una referencia.
 
 > **Decisión:** un `Page overlay` se admite en cualquier contenedor, no solo como hijo de `Document` o de una sección: su posición
@@ -105,12 +105,12 @@ impreso de `{page}`, que puede reiniciarse o no existir ([Document](document.md#
 | `odd` / `even` | las impares / las pares |
 | `last` | solo la última |
 
-Es una condición de pintado, no de espacio: un `Page overlay` no reserva sitio ni donde sale ni donde no, así que el flujo es el
+Es una condición de pintado y no de espacio: un `Page overlay` no reserva sitio ni donde sale ni donde no, así que el flujo es el
 mismo con él o sin él. Una portada a sangre, con otro margen y sin numeración, es una sección. Un `Page overlay` que no sale en
 ninguna página (`not-first` en un documento de una sola) es válido y no se comprueba (`BOX_OVERFLOW` solo mira los que
 salen). Si un `Page overlay` contiene otro, el de dentro sale solo donde salen los dos, cada uno con su `Pages`.
 
-> **Decisión:** `Pages` es una propiedad del `Page overlay`, no un sistema de páginas con nombre. En un documento de una sola
+> **Decisión:** `Pages` es una propiedad del `Page overlay` y no un sistema de páginas con nombre. En un documento de una sola
 > página, `first` y `last` coinciden. *Alternativa descartada:* páginas con nombre y reglas por tipo de página.
 
 > **Decisión:** un `Page overlay` no empuja el flujo en las páginas donde sale. *Alternativa descartada:* que reservara su sitio,
