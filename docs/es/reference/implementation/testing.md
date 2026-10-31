@@ -66,7 +66,7 @@ figuras del manual y el sello del certificado) se generan una vez por idioma, en
 > imágenes, que no detecta cambios de un punto.
 
 > **Decisión:** el `output.pdf` de cada ejemplo se versiona para poder abrirlo desde el repositorio, pero solo se escribe con
-> `-Dexamples.update=true` y no se compara: lleva la fecha y un identificador que cambian en cada ejecución. Lo que se vigila
+> `-Dexamples.update=true` y no se compara: lleva un identificador (`/ID`) que cambia en cada ejecución. Lo que se vigila
 > son las imágenes y el volcado.
 
 > **Decisión:** las imágenes de los ejemplos las genera un programa (`tools/ExampleImages.java`): no hay ficheros de

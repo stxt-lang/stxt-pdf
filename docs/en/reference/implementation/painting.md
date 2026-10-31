@@ -138,14 +138,19 @@ The page of a PDF is copied by `PdfPages` with PDFBox's `LayerUtility.importPage
 resources (those shared between pages, once) and not its annotations. The form carries the crop box of the page as
 `BBox` and a matrix of its own that rotates it according to `Rotate` and brings it to the origin (`PdfPages.placement`), so it measures what
 `ImageFile.width(page)` says and is placed like an SVG. Then the tagging of the source PDF is removed from it: the content
-marks (`BMC`, `BDC`, `EMC`, `MP`, `DP`) of its content and of that of the forms it uses, except those of optional
-content (`/OC`), and the `StructParent` and `StructParents` entries. The source PDFs are opened once per file and
+marks (`BMC`, `BDC`, `EMC`, `MP`, `DP`) of its content and of that of the forms, the tiling patterns and the glyphs of
+the Type 3 fonts it uses, except those of optional content (`/OC`), and the `StructParent` and `StructParents` entries. The source PDFs are opened once per file and
 closed after saving. `PdfInspector` (`resources`) reads, when the document is loaded, the size of each page, with the
 same rotation (`PdfInspector.rotation`), and what prevents drawing it the same, separately for each `Check`: a visible annotation
-that is not a link (`PDF_IMAGE_ANNOTATIONS`) and a font that is not embedded or has no `ToUnicode` (except a simple one that is not
-symbolic) in its resources, those of its forms or those of its patterns (`PDF_IMAGE_FONTS`). `Images` throws the error
-of those that have not been removed. `LayerUtility` also copies the layers (`OCProperties`) to the catalog, and `PdfPages` sets the
-name of the file on each configuration without `Name` (the `D` and those of `Configs`), which PDF/UA-1 requires (7.10).
+that is not a link (`PDF_IMAGE_ANNOTATIONS`) and a font that does not comply with PDF/UA (`PDF_IMAGE_FONTS`). In the
+resources of the page and in those of its forms, its patterns and its Type 3 fonts it looks for a font that is not
+embedded, without `ToUnicode` (except a simple one that is not symbolic), a TrueType font with an encoding that PDF/UA does
+not allow or a Type 2 CIDFont without `CIDToGIDMap`. Then `PdfGlyphs` (a PDFBox `PDFStreamEngine`) walks the content of
+the page, its forms, the Type 3 glyphs it draws and its tiling patterns, and looks once at each code of each font: that it
+is not `.notdef`, that it says which character it is and that its width is that of the font program. `Images` throws the
+error of those that have not been removed. `LayerUtility` also copies the layers (`OCProperties`) to the catalog, and
+`PdfPages` sets the name of the file on each configuration without `Name` (the `D` and those of `Configs`) and removes its
+`AS`: PDF/UA requires the first and does not allow the second (ISO 14289-1, 7.10).
 
 > **Decision:** the tagging of the source PDF is removed from the copied content: its `MCID` do not belong to this document, and an
 > *artifact* or a marked content inside the figure of the `Image` violates PDF/UA. The optional content marks are

@@ -138,14 +138,19 @@ La página de un PDF la copia `PdfPages` con `LayerUtility.importPageAsForm` de 
 recursos (los compartidos entre páginas, una vez) y no sus anotaciones. El formulario lleva el recorte de la página como
 `BBox` y una matriz propia que lo gira según `Rotate` y lo lleva al origen (`PdfPages.placement`), así que mide lo que
 `ImageFile.width(page)` y se coloca igual que un SVG. Después se le quita el etiquetado del PDF de origen: las marcas de
-contenido (`BMC`, `BDC`, `EMC`, `MP`, `DP`) de su contenido y del de los formularios que usa, salvo las de contenido
-opcional (`/OC`), y las entradas `StructParent` y `StructParents`. Los PDF de origen se abren una vez por fichero y se
+contenido (`BMC`, `BDC`, `EMC`, `MP`, `DP`) de su contenido y del de los formularios, los patrones de mosaico y los glifos
+de las fuentes Type 3 que usa, salvo las de contenido opcional (`/OC`), y las entradas `StructParent` y `StructParents`. Los PDF de origen se abren una vez por fichero y se
 cierran después de guardar. `PdfInspector` (`resources`) lee al cargar el documento el tamaño de cada página, con el
 mismo giro (`PdfInspector.rotation`), y lo que impide dibujarla igual, por separado para cada `Check`: una anotación que
-se ve que no es un enlace (`PDF_IMAGE_ANNOTATIONS`) y una fuente sin incrustar o sin `ToUnicode` (salvo una simple que no
-es simbólica) en sus recursos, los de sus formularios o los de sus patrones (`PDF_IMAGE_FONTS`). `Images` lanza el error
-de las que no se han quitado. `LayerUtility` copia también las capas (`OCProperties`) al catálogo, y `PdfPages` pone el
-nombre del fichero a cada configuración sin `Name` (la `D` y las de `Configs`), que PDF/UA-1 pide (7.10).
+se ve que no es un enlace (`PDF_IMAGE_ANNOTATIONS`) y una fuente que no cumple PDF/UA (`PDF_IMAGE_FONTS`). En los recursos
+de la página y en los de sus formularios, sus patrones y sus fuentes Type 3 busca una fuente sin incrustar, sin `ToUnicode`
+(salvo una simple que no es simbólica), una TrueType con una codificación que PDF/UA no admite o una CIDFont de tipo 2 sin
+`CIDToGIDMap`. Después, `PdfGlyphs` (un `PDFStreamEngine` de PDFBox) recorre el contenido de la página, sus formularios,
+los glifos Type 3 que dibuja y sus patrones de mosaico, y mira una vez cada código de cada fuente: que no sea `.notdef`, que
+diga qué carácter es y que su ancho sea el del programa de fuente. `Images` lanza el error de las que no se han quitado.
+`LayerUtility` copia también las capas (`OCProperties`) al catálogo, y `PdfPages` pone el nombre del fichero a cada
+configuración sin `Name` (la `D` y las de `Configs`) y le quita sus `AS`: PDF/UA pide lo primero y no admite lo segundo
+(ISO 14289-1, 7.10).
 
 > **Decisión:** el etiquetado del PDF de origen se quita del contenido copiado: sus `MCID` no son de este documento, y un
 > *artifact* o un contenido marcado dentro de la figura de la `Image` incumple PDF/UA. Las marcas de contenido opcional se

@@ -49,10 +49,10 @@ public final class UnitBreaker {
      * @param result   its layout
      * @param space    space of that layout, to repeat it with fragmentation if the item is broken
      * @param x        position of its border box, relative to the content box of the container
-     *                 (includes the {@code relative} offset)
+     *                 (includes the offset of a {@code Frame})
      * @param y        likewise
      * @param unit     unit it belongs to
-     * @param relative {@code relative} offset included in {@code x} and {@code y}
+     * @param relative offset of a {@code Frame} included in {@code x} and {@code y}
      */
     public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
                          FrameOffset relative) {
@@ -95,7 +95,7 @@ public final class UnitBreaker {
      *
      * @param model     box model of the container
      * @param placed    placed items, in tree order
-     * @param outOfFlow {@code absolute} and {@code fixed} boxes of the container; they go with the first fragment
+     * @param outOfFlow {@code Overlay} and {@code Page overlay} boxes of the container; they go with the first fragment
      * @param units     the units in which the items are grouped
      */
     public record Arranged(BoxModel model, List<Placed> placed, List<PendingOverlay> outOfFlow, Units units,
@@ -185,7 +185,7 @@ public final class UnitBreaker {
         return new Run(context, box, space, (BreakToken.Container) from, arranged, repeat).layOut();
     }
 
-    /** An item in this fragment: its fragment already placed and its absolute boxes. */
+    /** An item in this fragment: its fragment already placed and its Overlay boxes. */
     private record Piece(Fragment fragment, List<PendingOverlay> pending) {
     }
 
@@ -427,7 +427,7 @@ public final class UnitBreaker {
         }
 
         /**
-         * An item that is repeated: its fragment goes in all of them, but its absolute boxes only in the
+         * An item that is repeated: its fragment goes in all of them, but its Overlay boxes only in the
          * first one, like those of the container.
          */
         void repeated(Piece piece, List<Fragment> fragments, List<PendingOverlay> pending) {

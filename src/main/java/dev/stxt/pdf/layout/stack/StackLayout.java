@@ -49,9 +49,9 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * container are measured already at the width of the container; in all other cases, with their fit
  * to the content.</p>
  *
- * <p>The {@code absolute} and {@code fixed} children are not items: they are returned as
+ * <p>The {@code Overlay} and {@code Page overlay} children are not items: they are returned as
  * {@link PendingOverlay} with the corner of the content box as static position. The
- * {@code relative} items are shifted with {@link FrameOffset} after being aligned.</p>
+ * {@code Frame} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
  * <p>Simplification: in vertical, the automatic minimum of an item with a declared {@code Height}
  * is that height, not the height of its content.</p>

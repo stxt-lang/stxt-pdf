@@ -65,7 +65,7 @@ public final class SvgCanvas implements Canvas {
         double height = pageSetup.height();
         SvgCanvas c = new SvgCanvas(debug, resources);
         Rect area = pageSetup.pageArea();
-        StackingContext.build(page.content(), page.fixed(), area.x(), area.y()).paint(c);
+        StackingContext.build(page.content(), page.pageOverlays(), area.x(), area.y()).paint(c);
         return String.format(Locale.ROOT,
                 "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.2fpt\" height=\"%.2fpt\" viewBox=\"0 0 %.2f %.2f\">\n"
                         + "<rect width=\"100%%\" height=\"100%%\" fill=\"#ffffff\"/>\n%s</svg>\n",

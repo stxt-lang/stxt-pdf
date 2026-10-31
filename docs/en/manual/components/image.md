@@ -129,8 +129,9 @@ sheet has one letterhead and the following ones, another.
 
 Whatever is not the drawing of the page is not copied: its links, its bookmarks and its tagging. Its layers are. A PDF with
 a filled-in form field or a visible comment is an error: it has to be flattened first, for example by printing it to PDF.
-So is an encrypted PDF and one with fonts that are not embedded or that do not say which character each glyph is
-(`ToUnicode`). The checks on annotations and fonts can be turned off when converting
+So is an encrypted PDF and one with fonts that do not comply with PDF/UA: that are not embedded, that do not say which
+character each glyph is (`ToUnicode`), that draw glyphs the font does not have, or with the other defects listed in the
+[reference](../../reference/components/image.md#pdf). The checks on annotations and fonts can be turned off when converting
 ([Usage from Java](../common/java-usage.md)). The one on encryption cannot.
 
 ## Accessibility

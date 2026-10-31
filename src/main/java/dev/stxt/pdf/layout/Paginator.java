@@ -29,7 +29,7 @@ import java.util.Set;
  * Pagination loop (reference/common/breaks.md): lays out the root once per page, from the
  * {@link BreakToken} of the previous one, until it comes back as {@code null}.
  *
- * <p>The {@code fixed} boxes take up no space, so they are resolved after paginating the flow
+ * <p>The {@code Page overlay} boxes take up no space, so they are resolved after paginating the flow
  * and repeated on the pages that their {@code Pages} says, all by default
  * (reference/components/frame-and-overlays.md). Their reference container is the page area.</p>
  *
@@ -66,13 +66,13 @@ public final class Paginator {
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
         List<Section> sections = tree.sections();
-        // Each fixed box of a section only once, with the static position of the page where it appears.
-        List<Map<Box, PendingOverlay>> fixed = new ArrayList<>();
-        sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
+        // Each Page overlay of a section only once, with the static position of the page where it appears.
+        List<Map<Box, PendingOverlay>> pageOverlays = new ArrayList<>();
+        sections.forEach(x -> pageOverlays.add(new LinkedHashMap<>()));
         // The texts with {page} or {pages}, which change width if the total needs more digits.
         List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
-        Flow flow = converge(root, sections, fixed, numberedTexts);
-        return pages(root, sections, flow, fixed, !numberedTexts.isEmpty());
+        Flow flow = converge(root, sections, pageOverlays, numberedTexts);
+        return pages(root, sections, flow, pageOverlays, !numberedTexts.isEmpty());
     }
 
     /**
@@ -87,7 +87,7 @@ public final class Paginator {
      * referred to with {@code {page of: id}}, which change the width of the texts that write them. Only what depends
      * on those texts is laid out again: the rest comes from the cache.
      */
-    private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingOverlay>> fixed,
+    private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingOverlay>> pageOverlays,
                           List<Box> numberedTexts) {
         List<References.Site> sites = References.sites(root);
         Set<String> targets = new LinkedHashSet<>();
@@ -105,8 +105,8 @@ public final class Paginator {
         String probe = PageNumbers.firstProbe();
         int changes = 0;
         while (true) {
-            fixed.forEach(Map::clear);
-            List<List<LayoutResult>> results = flow(sections, fixed);
+            pageOverlays.forEach(Map::clear);
+            List<List<LayoutResult>> results = flow(sections, pageOverlays);
             boolean[] blankAfter = blankAfter(sections, results);
             Numbering numbering = Numbering.of(sections, results, blankAfter);
             boolean again = false;
@@ -136,7 +136,7 @@ public final class Paginator {
      * {@code {pages}}) and its {@code Page overlay}s, those of its section and, if it inherits them, those of the
      * document.
      */
-    private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingOverlay>> fixed,
+    private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingOverlay>> pageOverlays,
                              boolean numbered) {
         // The Page overlays of the document: the children of the root that are not a section.
         List<Box> documentPageOverlays = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
@@ -155,7 +155,7 @@ public final class Paginator {
                     documentPageOverlays.forEach(b -> queue.add(new Queued(new PendingOverlay(b, 0, 0), number,
                             numbering.pages())));
                 }
-                for (PendingOverlay p : fixed.get(k).values()) {
+                for (PendingOverlay p : pageOverlays.get(k).values()) {
                     queue.add(new Queued(p, i + 1, own.size()));
                 }
                 List<Fragment> pageOverlayFragments = placePageOverlays(queue, section, numbered, printed, numbering.label(number),
@@ -212,7 +212,7 @@ public final class Paginator {
 
     /**
      * The {@code Page overlay}s of a page, in the page area of its section: only those that {@code Pages} includes in
-     * it (reference/components/frame-and-overlays.md), which take up no room where they do not appear. A fixed one
+     * it (reference/components/frame-and-overlays.md), which take up no room where they do not appear. A Page overlay
      * inside another comes out in its result and is placed afterwards.
      */
     private List<Fragment> placePageOverlays(List<Queued> queue, Section section, boolean numbered, int printed, String page,
@@ -234,7 +234,7 @@ public final class Paginator {
         return fragments;
     }
 
-    /** A fixed box to be placed and the pages of its scope: the document or its section. */
+    /** A Page overlay to be placed and the pages of its scope: the document or its section. */
     private record Queued(PendingOverlay pending, int number, int total) {
     }
 
@@ -338,10 +338,10 @@ public final class Paginator {
     }
 
     /**
-     * Paginates the flow of each section: one result per page and section. Records in {@code fixed}, per
-     * section, the {@code fixed} boxes.
+     * Paginates the flow of each section: one result per page and section. Records in {@code pageOverlays}, per
+     * section, the {@code Page overlay} boxes.
      */
-    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> fixed) {
+    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> pageOverlays) {
         List<List<LayoutResult>> all = new ArrayList<>();
         int pages = 0;
         for (int k = 0; k < sections.size(); k++) {
@@ -358,7 +358,7 @@ public final class Paginator {
                 }
                 results.add(r);
                 int section0 = k;
-                r.pending().forEach(p -> fixed.get(section0).putIfAbsent(p.box(), p));
+                r.pending().forEach(p -> pageOverlays.get(section0).putIfAbsent(p.box(), p));
                 token = next;
                 if (pages + results.size() > engine.limits().maxPages()) {
                     throw pageLimit();

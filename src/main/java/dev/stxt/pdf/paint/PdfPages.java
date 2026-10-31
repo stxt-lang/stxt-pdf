@@ -1,12 +1,14 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.resources.PdfInspector;
+import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorName;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
@@ -14,8 +16,14 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType3CharProc;
+import org.apache.pdfbox.pdmodel.font.PDType3Font;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.pattern.PDAbstractPattern;
+import org.apache.pdfbox.pdmodel.graphics.pattern.PDTilingPattern;
 
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
@@ -33,13 +41,14 @@ import java.util.Set;
  * <p>{@link LayerUtility} copies the content of the page and its resources (a resource shared by several pages,
  * once); annotations are not copied. Then the tagging of the source PDF is removed, since in the document it would
  * mean nothing and would clash with the document's own: the marked content ({@code BMC}, {@code BDC}, {@code EMC},
- * {@code MP}, {@code DP}), except that of optional content ({@code /OC}), which decides what is seen, and the entry of
- * the forms and images in the structure tree ({@code StructParent}, {@code StructParents}). The form is tagged later
- * by the {@code Image} that draws it, as a figure or as decoration.</p>
+ * {@code MP}, {@code DP}), except that of optional content ({@code /OC}), which decides what is seen, from the content
+ * of the page and of the forms, tiling patterns and glyphs of Type 3 fonts it uses, and the entry of the forms and
+ * images in the structure tree ({@code StructParent}, {@code StructParents}). The form is tagged later by the
+ * {@code Image} that draws it, as a figure or as decoration.</p>
  *
  * <p>{@link LayerUtility} also copies to the catalog the layers of the source PDF (its optional content), which decide
- * what is seen; a layer configuration without a name receives one, that of the file, because PDF/UA-1 requires it
- * (7.10).</p>
+ * what is seen; a layer configuration without a name receives one, that of the file, and loses its automatic states
+ * ({@code AS}), because PDF/UA requires both (ISO 14289-1, 7.10).</p>
  *
  * <p>The form has the crop of the page ({@code BBox}) and a matrix that takes it, already rotated
  * ({@code Rotate}), to a rectangle with its bottom left corner at the origin, of the size given by
@@ -50,13 +59,17 @@ final class PdfPages {
     private static final COSName STRUCT_PARENT = COSName.getPDFName("StructParent");
     private static final COSName STRUCT_PARENTS = COSName.getPDFName("StructParents");
     private static final COSName OC = COSName.getPDFName("OC");
+    private static final COSName AS = COSName.getPDFName("AS");
     private static final Set<String> MARKS = Set.of(OperatorName.BEGIN_MARKED_CONTENT,
             OperatorName.BEGIN_MARKED_CONTENT_SEQ, OperatorName.END_MARKED_CONTENT, OperatorName.MARKED_CONTENT_POINT,
             OperatorName.MARKED_CONTENT_POINT_WITH_PROPS);
 
     private final PDDocument doc;
     private final LayerUtility layers;
-    /** The forms already cleaned: the copied resources are shared among the pages of the same PDF. */
+    /**
+     * The forms, patterns and glyph procedures already cleaned: the copied resources are shared among the pages of the
+     * same PDF.
+     */
     private final Set<COSBase> cleaned = new HashSet<>();
 
     PdfPages(PDDocument doc) {
@@ -79,7 +92,11 @@ final class PdfPages {
         return form;
     }
 
-    /** Gives {@code name} to the layer configurations of the document that have no name. */
+    /**
+     * Gives {@code name} to the layer configurations of the document that have no name, and removes their automatic
+     * states ({@code AS}): the layers keep the state the configuration gives them, and a viewer no longer turns them on
+     * or off by itself when zooming, printing or exporting.
+     */
     private void nameLayers(String name) {
         COSDictionary properties = doc.getDocumentCatalog().getCOSObject().getCOSDictionary(COSName.OCPROPERTIES);
         if (properties == null) {
@@ -102,6 +119,7 @@ final class PdfPages {
             if (configuration.getString(COSName.NAME) == null) {
                 configuration.setString(COSName.NAME, name);
             }
+            configuration.removeItem(AS);
         }
     }
 
@@ -123,15 +141,22 @@ final class PdfPages {
         };
     }
 
-    /** Removes the tagging of the form and, once each, of the forms and images it uses. */
+    /** Removes the tagging of the form and, once each, of what it uses. */
     private void clean(PDFormXObject form) throws IOException {
         if (!cleaned.add(form.getCOSObject())) {
             return;
         }
         form.getCOSObject().removeItem(STRUCT_PARENT);
         form.getCOSObject().removeItem(STRUCT_PARENTS);
-        unmark(form);
-        PDResources resources = form.getResources();
+        unmark(form, form.getContentStream());
+        clean(form.getResources());
+    }
+
+    /**
+     * Removes, once each, the tagging of the forms and images of some resources, and the marks of their tiling patterns
+     * and of the glyphs of their Type 3 fonts.
+     */
+    private void clean(PDResources resources) throws IOException {
         if (resources == null) {
             return;
         }
@@ -143,11 +168,36 @@ final class PdfPages {
                 object.getCOSObject().removeItem(STRUCT_PARENT);
             }
         }
+        for (COSName name : resources.getPatternNames()) {
+            PDAbstractPattern pattern = resources.getPattern(name);
+            if (pattern instanceof PDTilingPattern tiling && cleaned.add(tiling.getCOSObject())) {
+                unmark(tiling, tiling.getContentStream());
+                clean(tiling.getResources());
+            }
+        }
+        for (COSName name : resources.getFontNames()) {
+            PDFont font = resources.getFont(name);
+            if (font instanceof PDType3Font type3 && cleaned.add(type3.getCOSObject())) {
+                COSDictionary procedures = type3.getCharProcs();
+                if (procedures != null) {
+                    for (COSName glyph : procedures.keySet()) {
+                        if (procedures.getDictionaryObject(glyph) instanceof COSStream stream) {
+                            PDType3CharProc procedure = new PDType3CharProc(type3, stream);
+                            unmark(procedure, procedure.getContentStream());
+                        }
+                    }
+                }
+                clean(type3.getResources());
+            }
+        }
     }
 
-    /** Rewrites the content of the form without the content marks, except those of optional content. */
-    private static void unmark(PDFormXObject form) throws IOException {
-        List<Object> tokens = new PDFStreamParser(form).parse();
+    /**
+     * Rewrites a content stream (that of a form, a tiling pattern or a glyph) without the content marks, except those
+     * of optional content.
+     */
+    private static void unmark(PDContentStream content, PDStream data) throws IOException {
+        List<Object> tokens = new PDFStreamParser(content).parse();
         List<Object> kept = new ArrayList<>(tokens.size());
         List<Object> operands = new ArrayList<>();
         // For each open mark, whether it was kept (to keep its EMC as well).
@@ -189,7 +239,7 @@ final class PdfPages {
         if (!changed) {
             return;
         }
-        try (OutputStream out = form.getContentStream().createOutputStream(COSName.FLATE_DECODE)) {
+        try (OutputStream out = data.createOutputStream(COSName.FLATE_DECODE)) {
             new ContentStreamWriter(out).writeTokens(kept);
         }
     }

@@ -6,7 +6,7 @@ import java.util.OptionalDouble;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * Resolves the position and the size of an {@code absolute} or {@code fixed} box on one axis
+ * Resolves the position and the size of an {@code Overlay} or {@code Page overlay} box on one axis
  * (reference/components/frame-and-overlays.md). It always holds that:
  *
  * <pre>start + start margin + size + end margin + end = size of the reference container</pre>

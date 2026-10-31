@@ -108,7 +108,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
                 dx, dy, turned);
     }
 
-    /** The same fragment with more children at the end (the absolute boxes this box resolves). */
+    /** The same fragment with more children at the end (the Overlay boxes this box resolves). */
     public Fragment withMoreChildren(List<Fragment> more) {
         List<Fragment> all = new ArrayList<>(children);
         all.addAll(more);

@@ -43,7 +43,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 | Comprobación | Qué es un error si no se quita |
 |---|---|
 | `Check.CONTRAST` | Un texto que apenas se distingue de su fondo ([Caja](box.md#contraste)) |
-| `Check.PDF_IMAGE_FONTS` | Una página de un PDF con una fuente sin incrustar o que no dice qué carácter es cada glifo ([Image](../components/image.md#una-página-de-un-pdf)) |
+| `Check.PDF_IMAGE_FONTS` | Una página de un PDF con una fuente que no cumple PDF/UA, como una sin incrustar o que no dice qué carácter es cada glifo ([Image](../components/image.md#una-página-de-un-pdf)) |
 | `Check.PDF_IMAGE_ANNOTATIONS` | Una página de un PDF con un campo de formulario o un comentario visibles, que no se dibujarían |
 
 ## Errores

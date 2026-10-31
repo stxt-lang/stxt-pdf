@@ -61,7 +61,7 @@ public record ConstraintSpace(
 
     /**
      * The parent imposes the width and, if there is one, the height, without fragmentation: stack and grid items
-     * and {@code absolute} boxes.
+     * and {@code Overlay} boxes.
      */
     public static ConstraintSpace fixed(double width, OptionalDouble height, double baseWidth,
                                         OptionalDouble baseHeight, boolean atStart) {

@@ -13,7 +13,7 @@ import dev.stxt.pdf.model.Rect;
  */
 public record PageSetup(double width, double height, Insets margin) {
 
-    /** Page area: the initial reference container and the one of {@code fixed} boxes. */
+    /** Page area: the initial reference container and the one of {@code Page overlay} boxes. */
     public Rect pageArea() {
         return new Rect(margin.left(), margin.top(), width - margin.horizontal(), height - margin.vertical());
     }

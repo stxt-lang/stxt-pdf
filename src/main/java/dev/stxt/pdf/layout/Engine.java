@@ -254,7 +254,7 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Layout of a box with its algorithm. If the box is the reference container of {@code absolute} boxes
+     * Layout of a box with its algorithm. If the box is the reference container of {@code Overlay} boxes
      * inside it, it resolves them when it finishes (reference/components/frame-and-overlays.md).
      *
      * <p>If the box ends on this page and only its bottom border and padding stick out of it, the layout is
@@ -353,7 +353,7 @@ public final class Engine implements LayoutContext {
         return inline.number(fragment, page, pages);
     }
 
-    /** Layout of the out-of-flow boxes; the {@link Paginator} uses it for the {@code fixed} ones. */
+    /** Layout of the out-of-flow boxes; the {@link Paginator} uses it for the {@code Page overlay} ones. */
     OverlayLayout absolute() {
         return absolute;
     }

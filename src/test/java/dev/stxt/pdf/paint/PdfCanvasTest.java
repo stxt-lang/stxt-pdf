@@ -500,10 +500,10 @@ class PdfCanvasTest {
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
             assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
             // The Page overlay: a Link without content, with the text as Alt and the OBJR.
-            PDStructureElement fixed = (PDStructureElement) document.getKids().get(2);
-            assertEquals(List.of("OBJR"), shape(fixed));
-            assertEquals("pie", fixed.getAlternateDescription());
-            assertEquals(fixed.getCOSObject(), ((COSObjectable) tree.getParentTree()
+            PDStructureElement overlay = (PDStructureElement) document.getKids().get(2);
+            assertEquals(List.of("OBJR"), shape(overlay));
+            assertEquals("pie", overlay.getAlternateDescription());
+            assertEquals(overlay.getCOSObject(), ((COSObjectable) tree.getParentTree()
                     .getValue(links.get(3).getStructParent())).getCOSObject());
             String extracted = new PDFTextStripper().getText(pdf);
             assertTrue(extracted.contains("Visita la web hoy."), extracted);

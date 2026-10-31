@@ -6,10 +6,9 @@ import dev.stxt.pdf.tree.Style;
 import java.util.OptionalDouble;
 
 /**
- * Visual offset of a {@code relative} box (reference/components/frame-and-overlays.md). It is applied
- * after placing it as if it were {@code static}: its space is kept and its siblings do not
- * move. If top and bottom are declared, top wins; if left and right are declared, left
- * wins.
+ * Visual offset of a {@code Frame} (reference/components/frame-and-overlays.md). It is applied after placing
+ * it in flow: its space is kept and its siblings do not move. Top and bottom, or left and right, are never both
+ * declared ({@code OFFSET_CONFLICT}); if they were, top and left would win.
  *
  * @param dx horizontal offset
  * @param dy vertical offset

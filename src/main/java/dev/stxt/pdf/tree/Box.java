@@ -314,7 +314,7 @@ public final class Box {
                 .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");
     }
 
-    /** Children that take part in the flow of the parent ({@code static} and {@code relative}). */
+    /** Children that take part in the flow of the parent (in flow and {@code Frame}). */
     public List<Box> inFlowChildren() {
         if (inFlowChildren != null) {
             return inFlowChildren;
@@ -336,15 +336,15 @@ public final class Box {
     }
 
     /**
-     * Reference container of an out-of-flow box (reference/common/box.md): for {@code absolute},
-     * the closest ancestor with a {@code Position} other than {@code static}; if there is none,
-     * or if the box is {@code fixed}, the root, which represents the page area.
+     * Reference container of an out-of-flow box (reference/common/box.md): for an {@code Overlay},
+     * the closest {@code Frame}, {@code Overlay} or {@code Page overlay} ancestor; if there is none,
+     * or if the box is a {@code Page overlay}, the root, which represents the page area.
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
-        boolean fixed = style.position() == Position.PAGE_OVERLAY;
+        boolean pageOverlay = style.position() == Position.PAGE_OVERLAY;
         // A box rotated in flow is one too, like the positioned ones (reference/common/layers-and-rotation.md).
-        while (b.parent != null && (fixed || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
+        while (b.parent != null && (pageOverlay || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;
         }
         return b;

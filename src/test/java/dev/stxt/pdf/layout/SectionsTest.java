@@ -67,14 +67,14 @@ class SectionsTest {
      */
     private static Fragment on(Page page, String id) {
         Fragment found = find(page.content(), id);
-        for (Fragment fixed : page.fixed()) {
-            found = found != null ? found : find(fixed, id);
+        for (Fragment overlay : page.pageOverlays()) {
+            found = found != null ? found : find(overlay, id);
         }
         return found;
     }
 
     private static List<String> pageOverlayIds(Page page) {
-        return page.fixed().stream().map(f -> f.box().id()).collect(Collectors.toList());
+        return page.pageOverlays().stream().map(f -> f.box().id()).collect(Collectors.toList());
     }
 
     /** The text of the box with that {@code Id}, or that of its descendants if it has no lines. */

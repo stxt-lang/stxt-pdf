@@ -68,7 +68,7 @@ keeps the largest positive and the most negative separately. `Box.isolatesMargin
 The algorithms do not lay out the `Overlay` and `Page overlay` children. They return them as `PendingOverlay` with their static position, and
 the `Frame` children are shifted with `FrameOffset` after placing them. `Engine.layout` resolves with `OverlayLayout`
 (on top of `OverlayEquation`) the `Overlay` whose reference container is the newly laid-out box (their fragments hang
-from that box's fragment). The `Page overlay` go up to the root and the `Paginator` places them in `Page.fixed` of each page, only on the
+from that box's fragment). The `Page overlay` go up to the root and the `Paginator` places them in `Page.pageOverlays` of each page, only on the
 pages included by their `Pages`.
 
 ## Rotated boxes in flow

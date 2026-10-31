@@ -179,15 +179,27 @@ use en varias páginas del documento. Lo que no es contenido de la página no se
 
 Las **capas** de la página (su contenido opcional) sí se copian, porque deciden lo que se ve: una capa apagada sigue
 apagada, y el visor las enseña en su lista de capas. Una configuración de las capas sin nombre recibe el del fichero
-(`planos.pdf`), que PDF/UA pide.
+(`planos.pdf`), que PDF/UA pide, y ninguna conserva sus estados automáticos (`AS`, que encienden o apagan una capa al
+ampliar, imprimir o exportar), que PDF/UA no admite: cada capa queda en el estado que le da la configuración.
 
 `Pdf page` es la página física, desde 1, y no el número que lleva impreso. Una página que el PDF no tiene es un error
 (`IMAGE_PAGE`, con la línea de `Pdf page`), y `Pdf page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
-(`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página que usa una
-fuente sin incrustar, o sin `ToUnicode` (lo que dice qué carácter es cada glifo, y que una fuente simple que no es
-simbólica no necesita): el visor la sustituiría por otra, o su texto no se podría copiar ni leer en voz alta, y el documento no
-sería accesible. Quien convierte puede quitar esta comprobación (`Check.PDF_IMAGE_FONTS`), y el PDF puede no cumplir
-PDF/UA. La de un PDF cifrado no se puede quitar. Un PDF de más bytes que el límite es `PDF_TOO_LARGE` ([Límites](#límites)).
+(`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página con una fuente
+que no cumple PDF/UA:
+
+- sin incrustar: el visor la sustituiría por otra;
+- que no dice qué carácter es un glifo que dibuja, ni con su `ToUnicode` ni, en una fuente simple que no es simbólica,
+  con su codificación: su texto no se podría copiar ni leer en voz alta;
+- que dibuja un glifo que no tiene (`.notdef`), o con un ancho distinto del de su programa de fuente en más de una unidad
+  de cada 1000 (el texto invisible no cuenta);
+- una TrueType que no es simbólica sin la codificación `WinAnsiEncoding` o `MacRomanEncoding`, o con nombres de glifo
+  fuera de la Adobe Glyph List;
+- una TrueType simbólica con `Encoding`, o con una tabla `cmap` de varias codificaciones y sin la Microsoft Symbol (3, 0);
+- una CIDFont de tipo 2 sin `CIDToGIDMap`.
+
+Se miran las fuentes de la página y las de sus formularios, sus patrones y sus fuentes Type 3, y los glifos que dibujan.
+Quien convierte puede quitar esta comprobación (`Check.PDF_IMAGE_FONTS`), y el PDF puede no cumplir PDF/UA. La de un PDF
+cifrado no se puede quitar. Un PDF de más bytes que el límite es `PDF_TOO_LARGE` ([Límites](#límites)).
 
 Un papel de carta con el membrete completo en la primera página y el logotipo pequeño en las demás (las páginas 1 y 2 de
 `letterhead.pdf`), detrás del contenido y a sangre: un `Page overlay` con `Layer` negativa que sale del área útil con un
@@ -248,9 +260,14 @@ Document (dev.stxt.pdf):
 > defecto, y quien convierte puede quitarlo. Lo que impide leerla (un PDF cifrado o dañado) no se puede quitar. *Alternativa descartada:* una
 > propiedad del documento, que pone en el documento una decisión de quien convierte.
 
-> **Decisión:** de las reglas de PDF/UA sobre las fuentes se comprueban las que más fallan en los PDF de otros programas:
-> que estén incrustadas y que tengan `ToUnicode`. *Alternativa descartada:* comprobar todas, que es repetir un validador
-> de PDF/UA.
+> **Decisión:** de las reglas de PDF/UA sobre las fuentes (ISO 14289-1, 7.21) se comprueban las de la lista de arriba,
+> que son las que veraPDF rechaza en los PDF de otros programas. Quedan fuera las de una fuente Type 0 que solo comprueba un
+> validador completo: el `CIDSystemInfo` de su CMap, su `CIDSet` y que una CMap que no es predefinida vaya incrustada.
+> *Alternativa descartada:* comprobar todas, que es repetir un validador de PDF/UA.
+
+> **Decisión:** los estados automáticos de las capas (`AS`) se quitan al copiarlas, porque PDF/UA no los admite: una capa
+> ya no se enciende ni se apaga sola al ampliar o al imprimir. *Alternativa descartada:* rechazar el PDF (`IMAGE_FORMAT`),
+> que obliga a rehacerlo por algo que no cambia lo que se ve al abrirlo.
 
 ## Límites
 

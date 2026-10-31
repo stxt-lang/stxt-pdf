@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Lays out a document 595 pt wide with margins of 40 (page area of 515 pt from
  * (40, 40)) and gives the fragments with an {@code Id} and their border box in page coordinates,
- * including those of {@code fixed} boxes. Without a page number, it refers to the first one.
+ * including those of {@code Page overlay} boxes. Without a page number, it refers to the first one.
  *
  * <p>It declares {@code Font: IBM Plex Sans} and {@code Size: 10} in the {@code Typography} of {@code Document},
  * because the text needs them (reference/common/errors.md); with {@link
@@ -40,7 +40,7 @@ public final class LayoutFixture {
             Map<String, Fragment> f = new HashMap<>();
             Map<String, Rect> r = new HashMap<>();
             walk(page.content().children(), 40, 40, f, r);
-            walk(page.fixed(), 40, 40, f, r);
+            walk(page.pageOverlays(), 40, 40, f, r);
             fragments.add(f);
             rects.add(r);
         }

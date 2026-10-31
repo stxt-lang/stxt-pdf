@@ -21,7 +21,7 @@ class PageNumbersTest {
     private static final double PAGE = 180;
     private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
 
-    /** Fixed footer; the {@code Id} is on its {@code Text}, which takes up the whole width of the footer. */
+    /** Footer in a {@code Page overlay}; the {@code Id} is on its {@code Text}, which takes up its whole width. */
     private static final String[] FOOTER = {"\tPage overlay:", "\t\tOffset: auto 0 -30 0", "\t\tBox:", "\t\t\tHeight: 20",
             "\t\tTypography:", "\t\t\tAlign: right",
             "\t\tText: Página {page} de {pages}", "\t\t\tId: footer"};

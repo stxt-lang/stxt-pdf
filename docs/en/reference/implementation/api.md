@@ -45,7 +45,7 @@ the ones that have been removed. They are the values of the enum `Check` (`model
 | `Check` | What it checks | Without it |
 |---|---|---|
 | `CONTRAST` | The contrast of the text with its background, `CONTRAST_LOW` ([The PDF](../common/pdf.md#contrast)). `layOut` checks it with `ContrastCheck`, a canvas that records what is painted | A text may be unreadable |
-| `PDF_IMAGE_FONTS` | That the fonts of the page of a PDF drawn by an `Image` are embedded and state which character each glyph is, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | The viewer may substitute a font, its text may not be copyable and the PDF may not conform to PDF/UA |
+| `PDF_IMAGE_FONTS` | That the fonts of the page of a PDF drawn by an `Image` comply with PDF/UA: embedded, stating which character each glyph is and the other rules of the list, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | The viewer may substitute a font, its text may not be copyable and the PDF may not conform to PDF/UA |
 | `PDF_IMAGE_ANNOTATIONS` | That the page of a PDF has no visible annotations, `IMAGE_FORMAT` | The page is drawn without them |
 
 ```java

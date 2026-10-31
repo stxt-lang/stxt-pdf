@@ -68,9 +68,9 @@ class FixedPagesTest {
     void aFixedNeverMovesTheFlowWhereItIsShownOrNot() {
         String[] flow = {"\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60"};
-        String[] fixed = {"\tPage overlay:", "\t\tId: F", "\t\tPages: first", "\t\tBox:", "\t\t\tHeight: 50"};
+        String[] overlay = {"\tPage overlay:", "\t\tId: F", "\t\tPages: first", "\t\tBox:", "\t\t\tHeight: 50"};
         LayoutFixture without = LayoutFixture.layOutPaged(180, flow);
-        String[] both = java.util.stream.Stream.concat(java.util.Arrays.stream(flow), java.util.Arrays.stream(fixed))
+        String[] both = java.util.stream.Stream.concat(java.util.Arrays.stream(flow), java.util.Arrays.stream(overlay))
                 .toArray(String[]::new);
         LayoutFixture with = LayoutFixture.layOutPaged(180, both);
         assertEquals(2, with.pages());

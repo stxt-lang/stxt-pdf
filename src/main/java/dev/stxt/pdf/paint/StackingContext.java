@@ -48,9 +48,9 @@ import java.util.Objects;
  * page inwards ({@code Piece.frames}), and each painting step applies it: background, border and image, the whole
  * chain; text, only the rotations.</p>
  *
- * <p>The "tree order" is that of the document, not that of the fragments: {@code absolute}
+ * <p>The "tree order" is that of the document, not that of the fragments: {@code Overlay}
  * boxes hang from the fragment of their reference container, after its in-flow children, and
- * {@code fixed} boxes are added at the end, so contexts are sorted by their box.</p>
+ * {@code Page overlay} boxes are added at the end, so contexts are sorted by their box.</p>
  */
 public final class StackingContext {
 
@@ -103,13 +103,13 @@ public final class StackingContext {
     }
 
     /**
-     * Root context of a page with its {@code fixed} boxes, which create child contexts of the
+     * Root context of a page with its {@code Page overlay} boxes, which create child contexts of the
      * root; their positions are relative to the page area.
      */
-    public static StackingContext build(Fragment root, List<Fragment> fixed, double originX, double originY) {
+    public static StackingContext build(Fragment root, List<Fragment> pageOverlays, double originX, double originY) {
         StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
         sc.walkChildren(sc.root);
-        for (Fragment f : fixed) {
+        for (Fragment f : pageOverlays) {
             sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()));
         }
         sc.sort();

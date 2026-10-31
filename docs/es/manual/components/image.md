@@ -125,8 +125,9 @@ siguientes, otro.
 
 Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Sus capas, sí. Un PDF con un
 campo de formulario relleno o un comentario visibles es un error: hay que aplanarlo antes, por ejemplo imprimiéndolo a PDF.
-También lo es un PDF cifrado y uno con fuentes que no van incrustadas o que no dicen qué carácter es cada letra
-(`ToUnicode`). Las comprobaciones de las anotaciones y de las fuentes se pueden quitar al convertir
+También lo es un PDF cifrado y uno con fuentes que no cumplen PDF/UA: que no van incrustadas, que no dicen qué carácter
+es cada letra (`ToUnicode`), que dibujan letras que la fuente no tiene, o con los otros defectos que enumera la
+[referencia](../../reference/components/image.md#pdf). Las comprobaciones de las anotaciones y de las fuentes se pueden quitar al convertir
 ([Uso desde Java](../common/java-usage.md)). La del cifrado, no.
 
 ## Accesibilidad

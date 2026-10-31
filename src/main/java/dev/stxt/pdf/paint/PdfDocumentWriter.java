@@ -101,7 +101,7 @@ public final class PdfDocumentWriter {
                 try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
                     canvas = new PdfCanvas(doc, cs, pageSetup.height(), resources, fonts, images, structure, links,
                             debug);
-                    StackingContext.build(p.content(), p.fixed(), area.x(), area.y()).paint(canvas);
+                    StackingContext.build(p.content(), p.pageOverlays(), area.x(), area.y()).paint(canvas);
                 }
                 if (!canvas.tagging().annotations().isEmpty()) {
                     page.setAnnotations(canvas.tagging().annotations());

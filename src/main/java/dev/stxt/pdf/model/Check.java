@@ -11,9 +11,10 @@ public enum Check {
     CONTRAST,
 
     /**
-     * The fonts of the page of a PDF that an {@code Image} draws (reference/components/image.md): embedded and with
-     * the mapping from each glyph to its character; otherwise, {@code IMAGE_FORMAT}. Without this check, the viewer may
-     * substitute a font and the document may not be PDF/UA.
+     * The fonts of the page of a PDF that an {@code Image} draws (reference/components/image.md): that they comply
+     * with PDF/UA, embedded, with the mapping from each glyph to its character and the other rules of that page;
+     * otherwise, {@code IMAGE_FORMAT}. Without this check, the viewer may substitute a font and the document may not be
+     * PDF/UA.
      */
     PDF_IMAGE_FONTS,
 

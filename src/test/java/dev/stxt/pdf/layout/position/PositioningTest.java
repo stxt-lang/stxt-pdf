@@ -148,7 +148,7 @@ class PositioningTest {
 
     @Test
     void nestedOverlayUsesTheNearestPositionedAncestor() {
-        // B is absolute and therefore the reference container of C, even though it is inside R.
+        // B is an Overlay and therefore the reference container of C, even though it is inside R.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tOverlay:", "\t\t\tId: B", "\t\t\tOffset: 10 auto auto 10", "\t\t\tBox:", "\t\t\t\tWidth: 100",

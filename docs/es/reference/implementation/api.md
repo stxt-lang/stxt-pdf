@@ -46,7 +46,7 @@ las que se han quitado. Son los valores del enum `Check` (`model`):
 | `Check` | Qué comprueba | Sin ella |
 |---|---|---|
 | `CONTRAST` | El contraste del texto con su fondo, `CONTRAST_LOW` ([El PDF](../common/pdf.md#contraste)). `layOut` lo comprueba con `ContrastCheck`, un lienzo que apunta lo que se pinta | Un texto puede no leerse |
-| `PDF_IMAGE_FONTS` | Que las fuentes de la página de un PDF que dibuja una `Image` estén incrustadas y digan qué carácter es cada glifo, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | El visor puede sustituir una fuente, su texto puede no copiarse y el PDF puede no cumplir PDF/UA |
+| `PDF_IMAGE_FONTS` | Que las fuentes de la página de un PDF que dibuja una `Image` cumplan PDF/UA: incrustadas, que digan qué carácter es cada glifo y las demás reglas de la lista, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | El visor puede sustituir una fuente, su texto puede no copiarse y el PDF puede no cumplir PDF/UA |
 | `PDF_IMAGE_ANNOTATIONS` | Que la página de un PDF no tenga anotaciones que se vean, `IMAGE_FORMAT` | La página se dibuja sin ellas |
 
 ```java

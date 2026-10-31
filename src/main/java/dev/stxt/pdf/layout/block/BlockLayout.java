@@ -33,13 +33,13 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * <pre>
  * cursor = 0; strut = empty
  * for each child:
- *     if absolute/fixed: record PendingOverlay with the static position; continue
+ *     if Overlay/Page overlay: record PendingOverlay with the static position; continue
  *     r = context.layout(child, content box as reference container)
  *     strut += top margin of the child + those that come out of it at the top
  *     if nothing yet between the top border of the box and the child: the strut comes out of the box
  *     else: cursor += strut                                            // merging
  *     place the fragment at (left margin, cursor)                      // auto margins = center
- *     if relative: shift the fragment by Offset
+ *     if Frame: shift the fragment by Offset
  *     cursor += height; strut = bottom margin of the child + those that come out of it at the bottom
  * Height auto = cursor (+ strut if it does not come out at the bottom) + padding + border
  * </pre>
@@ -95,7 +95,7 @@ public final class BlockLayout implements LayoutAlgorithm {
      *                   if the break is before it
      * @param cursor     height of the content up to the break, without the margins that touch it
      * @param fragments  child fragments that are kept
-     * @param pending    absolute boxes that are kept
+     * @param pending    Overlay boxes that are kept
      */
     private record Mark(int index, BreakToken childToken, int appeal, double cursor, int fragments, int pending) {
     }
@@ -219,7 +219,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
-            // A relative box is shifted after it is placed; the cursor is not affected
+            // A Frame is shifted after it is placed; the cursor is not affected
             // (reference/components/frame-and-overlays.md).
             FrameOffset offset = FrameOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();

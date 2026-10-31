@@ -43,7 +43,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 | Check | What is an error if it is not removed |
 |---|---|
 | `Check.CONTRAST` | A text that barely stands out from its background ([Box](box.md#contrast)) |
-| `Check.PDF_IMAGE_FONTS` | A page of a PDF with a font that is not embedded or that does not say which character each glyph is ([Image](../components/image.md#a-page-of-a-pdf)) |
+| `Check.PDF_IMAGE_FONTS` | A page of a PDF with a font that does not comply with PDF/UA, such as one that is not embedded or that does not say which character each glyph is ([Image](../components/image.md#a-page-of-a-pdf)) |
 | `Check.PDF_IMAGE_ANNOTATIONS` | A page of a PDF with a visible form field or comment, which would not be drawn |
 
 ## Errors

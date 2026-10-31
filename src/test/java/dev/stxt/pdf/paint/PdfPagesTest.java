@@ -4,11 +4,21 @@ import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSFloat;
+import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType3Font;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.optionalcontent.PDOptionalContentGroup;
+import org.apache.pdfbox.pdmodel.graphics.optionalcontent.PDOptionalContentProperties;
+import org.apache.pdfbox.pdmodel.graphics.pattern.PDTilingPattern;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
@@ -17,6 +27,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -165,7 +177,8 @@ class PdfPagesTest {
 
     /**
      * The layers of the source PDF (its optional content) reach the document and still decide what is visible; their
-     * configuration, which had no name, is named after the file, because PDF/UA-1 requires it.
+     * configuration, which had no name, is named after the file, and loses its automatic state ({@code AS}), because
+     * PDF/UA requires both.
      */
     @Test
     void theLayersOfThePageKeepTheirMarksAndGetAName() throws Exception {
@@ -175,8 +188,10 @@ class PdfPagesTest {
         Converter.create().toPdf(new DocumentReader().read(doc), out);
         byte[] bytes = out.toByteArray();
         try (PDDocument pdf = Loader.loadPDF(bytes)) {
-            assertEquals("layers.pdf", pdf.getDocumentCatalog().getOCProperties().getCOSObject()
-                    .getCOSDictionary(COSName.D).getString(COSName.NAME));
+            COSDictionary configuration = pdf.getDocumentCatalog().getOCProperties().getCOSObject()
+                    .getCOSDictionary(COSName.D);
+            assertEquals("layers.pdf", configuration.getString(COSName.NAME));
+            assertFalse(configuration.containsKey(COSName.getPDFName("AS")));
             assertTrue(new PDFTextStripper().getText(pdf).contains("Capa de notas"));
             PDFormXObject form = forms(pdf.getPage(0).getResources()).get(0);
             String content = new String(form.getContentStream().toByteArray(), StandardCharsets.ISO_8859_1);
@@ -186,5 +201,126 @@ class PdfPagesTest {
         out.reset();
         Converter.builder().pdfUa(2).build().toPdf(new DocumentReader().read(doc), out);
         assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), 2));
+    }
+
+    /**
+     * The marks of a tiling pattern and of the glyphs of a Type 3 font that the page uses are removed as well, except
+     * those of optional content.
+     */
+    @Test
+    void theMarksOfPatternsAndType3GlyphsAreRemoved() throws Exception {
+        try (PDDocument source = new PDDocument(); PDDocument target = new PDDocument()) {
+            PDPage page = new PDPage(new PDRectangle(200, 100));
+            source.addPage(page);
+            COSDictionary resources = new COSDictionary();
+            page.getCOSObject().setItem(COSName.RESOURCES, resources);
+
+            COSStream pattern = stream(source, "/P <</MCID 0>> BDC 0 0 10 10 re f EMC /OC /L1 BDC 0 0 5 5 re f EMC");
+            pattern.setItem(COSName.TYPE, COSName.PATTERN);
+            pattern.setInt(COSName.PATTERN_TYPE, 1);
+            pattern.setInt(COSName.PAINT_TYPE, 1);
+            pattern.setInt(COSName.TILING_TYPE, 1);
+            pattern.setItem(COSName.BBOX, new PDRectangle(0, 0, 10, 10).getCOSArray());
+            pattern.setInt(COSName.X_STEP, 10);
+            pattern.setInt(COSName.Y_STEP, 10);
+            COSDictionary layers = new COSDictionary();
+            layers.setItem(COSName.getPDFName("L1"), new PDOptionalContentGroup("Notas"));
+            COSDictionary patternResources = new COSDictionary();
+            patternResources.setItem(COSName.PROPERTIES, layers);
+            pattern.setItem(COSName.RESOURCES, patternResources);
+            COSDictionary patterns = new COSDictionary();
+            patterns.setItem(COSName.getPDFName("P1"), pattern);
+            resources.setItem(COSName.PATTERN, patterns);
+
+            COSDictionary font = new COSDictionary();
+            font.setItem(COSName.TYPE, COSName.FONT);
+            font.setItem(COSName.SUBTYPE, COSName.TYPE3);
+            font.setItem(COSName.FONT_BBOX, new PDRectangle(0, 0, 750, 750).getCOSArray());
+            COSArray matrix = new COSArray();
+            for (float v : new float[] {0.001f, 0, 0, 0.001f, 0, 0}) {
+                matrix.add(new COSFloat(v));
+            }
+            font.setItem(COSName.FONT_MATRIX, matrix);
+            COSDictionary procedures = new COSDictionary();
+            procedures.setItem(COSName.getPDFName("a"),
+                    stream(source, "1000 0 0 0 750 750 d1 /Span <</MCID 1>> BDC 0 0 750 750 re f EMC"));
+            font.setItem(COSName.CHAR_PROCS, procedures);
+            COSDictionary encoding = new COSDictionary();
+            COSArray differences = new COSArray();
+            differences.add(COSInteger.get(97));
+            differences.add(COSName.getPDFName("a"));
+            encoding.setItem(COSName.DIFFERENCES, differences);
+            font.setItem(COSName.ENCODING, encoding);
+            font.setInt(COSName.FIRST_CHAR, 97);
+            font.setInt(COSName.LAST_CHAR, 97);
+            COSArray widths = new COSArray();
+            widths.add(COSInteger.get(1000));
+            font.setItem(COSName.WIDTHS, widths);
+            COSDictionary fonts = new COSDictionary();
+            fonts.setItem(COSName.getPDFName("T1"), font);
+            resources.setItem(COSName.FONT, fonts);
+
+            page.getCOSObject().setItem(COSName.CONTENTS,
+                    stream(source, "/Pattern cs /P1 scn 0 0 100 100 re f BT /T1 20 Tf 10 10 Td (a) Tj ET"));
+
+            PDFormXObject form = new PdfPages(target).page(source, 1, "marks.pdf");
+            PDResources copied = form.getResources();
+            String tiling = text(((PDTilingPattern) copied.getPattern(COSName.getPDFName("P1"))).getContentStream()
+                    .toByteArray());
+            assertFalse(tiling.contains("MCID") || tiling.contains("/P "), tiling);
+            assertTrue(tiling.contains("/OC /L1 BDC"), tiling);
+            PDType3Font type3 = (PDType3Font) copied.getFont(COSName.getPDFName("T1"));
+            String glyph = text(type3.getCharProc(97).getContentStream().toByteArray());
+            assertFalse(glyph.contains("MCID") || glyph.contains("BDC"), glyph);
+            assertTrue(glyph.contains("d1"), glyph);
+        }
+    }
+
+    /**
+     * The automatic states of a layer configuration ({@code AS}), which PDF/UA does not allow, are removed; the
+     * configuration keeps its name.
+     */
+    @Test
+    void theAutomaticStatesOfTheLayersAreRemoved() throws Exception {
+        try (PDDocument source = new PDDocument(); PDDocument target = new PDDocument()) {
+            PDOptionalContentProperties properties = new PDOptionalContentProperties();
+            PDOptionalContentGroup notes = new PDOptionalContentGroup("Notas");
+            properties.addGroup(notes);
+            COSDictionary configuration = properties.getCOSObject().getCOSDictionary(COSName.D);
+            configuration.setString(COSName.NAME, "Capas");
+            COSDictionary event = new COSDictionary();
+            event.setName(COSName.getPDFName("Event"), "View");
+            COSArray category = new COSArray();
+            category.add(COSName.getPDFName("Zoom"));
+            event.setItem(COSName.getPDFName("Category"), category);
+            COSArray groups = new COSArray();
+            groups.add(notes);
+            event.setItem(COSName.getPDFName("OCGs"), groups);
+            COSArray states = new COSArray();
+            states.add(event);
+            configuration.setItem(COSName.getPDFName("AS"), states);
+            source.getDocumentCatalog().setOCProperties(properties);
+            PDPage page = new PDPage(new PDRectangle(200, 100));
+            source.addPage(page);
+            page.getCOSObject().setItem(COSName.CONTENTS, stream(source, "0 0 10 10 re f"));
+
+            new PdfPages(target).page(source, 1, "layers.pdf");
+            COSDictionary copied = target.getDocumentCatalog().getOCProperties().getCOSObject()
+                    .getCOSDictionary(COSName.D);
+            assertFalse(copied.containsKey(COSName.getPDFName("AS")));
+            assertEquals("Capas", copied.getString(COSName.NAME));
+        }
+    }
+
+    private static COSStream stream(PDDocument doc, String content) throws IOException {
+        COSStream stream = doc.getDocument().createCOSStream();
+        try (OutputStream out = stream.createOutputStream()) {
+            out.write(content.getBytes(StandardCharsets.ISO_8859_1));
+        }
+        return stream;
+    }
+
+    private static String text(byte[] bytes) {
+        return new String(bytes, StandardCharsets.ISO_8859_1);
     }
 }

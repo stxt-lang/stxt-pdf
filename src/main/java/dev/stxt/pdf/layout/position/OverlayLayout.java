@@ -21,15 +21,15 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Layout of the {@code absolute} and {@code fixed} boxes (reference/components/frame-and-overlays.md). They are
+ * Layout of the {@code Overlay} and {@code Page overlay} boxes (reference/components/frame-and-overlays.md). They are
  * resolved when their reference container already knows its size, after the in-flow layout:
  *
  * <ul>
- *   <li>The {@code absolute} ones go up as {@link PendingOverlay} to their reference container, and
+ *   <li>The {@code Overlay} ones go up as {@link PendingOverlay} to their reference container, and
  *       {@link LayoutContext#layout} resolves them with {@link #resolvePending} when the layout of
  *       that box finishes. Their fragments are added at the end of the children of the fragment of the containing
  *       block, not of their parent in the box tree.</li>
- *   <li>The {@code fixed} ones go up to the root and the
+ *   <li>The {@code Page overlay} ones go up to the root and the
  *       {@link dev.stxt.pdf.layout.Paginator} resolves them on each page, with {@link #layOut}.</li>
  * </ul>
  *
@@ -48,7 +48,7 @@ public final class OverlayLayout {
     }
 
     /**
-     * Resolves the pending {@code absolute} boxes whose reference container is {@code box} and adds
+     * Resolves the pending {@code Overlay} boxes whose reference container is {@code box} and adds
      * their fragments to that of {@code box}. The others keep going up.
      *
      * @param r result of the in-flow layout of {@code box}
@@ -88,7 +88,7 @@ public final class OverlayLayout {
      * @param cbHeight  height of the padding box of the reference container
      * @param cbPadding padding of the reference container
      * @return the fragment placed relative to the content box of the reference container and the
-     *         {@code fixed} boxes inside it, with the static position relative to that same box
+     *         {@code Page overlay} boxes inside it, with the static position relative to that same box
      */
     public LayoutResult layOut(PendingOverlay p, double cbWidth, double cbHeight, Insets cbPadding) {
         Box box = p.box();
@@ -143,11 +143,11 @@ public final class OverlayLayout {
 
         double x = h.start() + h.marginStart() - cbPadding.left();
         double y = v.start() + v.marginStart() - cbPadding.top();
-        // The fixed boxes inside go from the content box of this one to that of the reference container.
+        // The Page overlay boxes inside go from the content box of this one to that of the reference container.
         double dx = x + f.border().left() + sized.padding().left();
         double dy = y + f.border().top() + sized.padding().top();
-        List<PendingOverlay> fixed = r.pending().stream().map(q -> q.translated(dx, dy)).toList();
-        return LayoutResult.finished(f.moved(x, y), fixed, AdjoiningMargins.NONE);
+        List<PendingOverlay> pageOverlays = r.pending().stream().map(q -> q.translated(dx, dy)).toList();
+        return LayoutResult.finished(f.moved(x, y), pageOverlays, AdjoiningMargins.NONE);
     }
 
     /** An {@code auto} margin is a free term of the equation (empty). */

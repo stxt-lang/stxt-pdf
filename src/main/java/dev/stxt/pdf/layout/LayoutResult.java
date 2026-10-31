@@ -14,7 +14,7 @@ import java.util.List;
  * @param breakToken  where it was broken; {@code null} if the box has finished and
  *                    {@link BreakToken#BEFORE} if nothing of it fits (the parent breaks before)
  * @param breakAppeal quality of the chosen break (one of the constants of {@link BreakAppeal})
- * @param pending     absolute boxes whose reference container is an ancestor of this box, with the
+ * @param pending     Overlay boxes whose reference container is an ancestor of this box, with the
  *                    static position relative to the content box of this box
  * @param adjoining   margins of the descendants that merge outside the box (reference/components/block.md)
  */

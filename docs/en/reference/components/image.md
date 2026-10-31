@@ -179,15 +179,28 @@ used on several pages of the document. What is not content of the page is not co
 
 The **layers** of the page (its optional content) are copied, because they decide what is seen: a layer that is off stays
 off, and the viewer shows them in its list of layers. A layer configuration without a name receives that of the file
-(`planos.pdf`), which PDF/UA requires.
+(`planos.pdf`), which PDF/UA requires, and none keeps its automatic states (`AS`, which turn a layer on or off when
+zooming, printing or exporting), which PDF/UA does not allow: each layer stays in the state the configuration gives it.
 
 `Pdf page` is the physical page, from 1, and not the number printed on it. A page that the PDF does not have is an error
 (`IMAGE_PAGE`, with the line of `Pdf page`), and so is `Pdf page` in a PNG, a JPEG or an SVG, which has no pages. An
 encrypted PDF, even if it opens without a password, is an error (`IMAGE_FORMAT`, with the line of the `Image`), and so is a
-page that uses a font that is not embedded, or without `ToUnicode` (what says which character each glyph is, and which a
-simple font that is not symbolic does not need): the viewer would replace it with another one, or its text could not be copied or read aloud, and the document would not
-be accessible. The caller can remove this check (`Check.PDF_IMAGE_FONTS`), and the PDF may not comply with
-PDF/UA. That of an encrypted PDF cannot be removed. A PDF of more bytes than the limit is `PDF_TOO_LARGE` ([Limits](#limits)).
+page with a font that does not comply with PDF/UA:
+
+- not embedded: the viewer would replace it with another one;
+- that does not say which character a glyph it draws is, neither with its `ToUnicode` nor, in a simple font that is not
+  symbolic, with its encoding: its text could not be copied or read aloud;
+- that draws a glyph it does not have (`.notdef`), or with a width different from that of its font program by more than
+  one unit in 1000 (invisible text does not count);
+- a TrueType font that is not symbolic without the encoding `WinAnsiEncoding` or `MacRomanEncoding`, or with glyph names
+  outside the Adobe Glyph List;
+- a symbolic TrueType font with `Encoding`, or with a `cmap` table of several encodings and without the Microsoft Symbol
+  one (3, 0);
+- a Type 2 CIDFont without `CIDToGIDMap`.
+
+The fonts of the page and those of its forms, its patterns and its Type 3 fonts are looked at, and the glyphs they draw.
+The caller can remove this check (`Check.PDF_IMAGE_FONTS`), and the PDF may not comply with PDF/UA. That of an encrypted
+PDF cannot be removed. A PDF of more bytes than the limit is `PDF_TOO_LARGE` ([Limits](#limits)).
 
 A letter paper with the full letterhead on the first page and the small logo on the others (pages 1 and 2 of
 `letterhead.pdf`), behind the content and full-bleed: a `Page overlay` with a negative `Layer` that goes out of the page area with a
@@ -248,9 +261,14 @@ Document (dev.stxt.pdf):
 > default, and the caller can remove it. What prevents reading it (an encrypted or damaged PDF) cannot be removed. *Rejected alternative:* a
 > property of the document, which puts a decision of the caller in the document.
 
-> **Decision:** of the PDF/UA rules about fonts, the ones checked are those that fail most often in PDF files from other programs:
-> that they are embedded and that they have `ToUnicode`. *Rejected alternative:* checking all of them, which is repeating a PDF/UA
-> validator.
+> **Decision:** of the PDF/UA rules about fonts (ISO 14289-1, 7.21), the ones checked are those of the list above, which are
+> the ones veraPDF rejects in PDF files from other programs. Left out are those of a Type 0 font that only a full validator
+> checks: the `CIDSystemInfo` of its CMap, its `CIDSet` and that a CMap that is not predefined is embedded.
+> *Rejected alternative:* checking all of them, which is repeating a PDF/UA validator.
+
+> **Decision:** the automatic states of the layers (`AS`) are removed when copying them, because PDF/UA does not allow them:
+> a layer no longer turns on or off by itself when zooming or printing. *Rejected alternative:* rejecting the PDF
+> (`IMAGE_FORMAT`), which forces it to be made again for something that does not change what is seen when it is opened.
 
 ## Limits
 

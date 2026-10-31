@@ -28,7 +28,7 @@ Document (dev.stxt.pdf):
 		Overlay:
 			Offset: 40 72 auto 72
 			Stack:
-				Horizontal: between
+				Horizontal: justify
 				Vertical: end
 				Box:
 					Padding: 0 0 12 0

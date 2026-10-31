@@ -1,7 +1,10 @@
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -22,9 +25,12 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Generates the PDFs used by the {@code Image} elements of the documentation and the tests
@@ -37,6 +43,11 @@ import java.nio.file.Path;
  * cropped and rotated ({@code pages.pdf}), a font not embedded, a font without {@code ToUnicode}, a form
  * field, an encrypted PDF and a page with optional content.</li>
  * </ul>
+ *
+ * <p>Running it again gives the same bytes, so only the files that really change show up in git: the PDFs written with
+ * PDFBox get a trailer identifier ({@code /ID}) made from their name instead of the one PDFBox makes from the time, and
+ * the encrypted one uses RC4, whose result depends only on that identifier, and not AES, which adds random bytes. The
+ * letterhead, whose identifier the engine leaves to PDFBox, is only written when something other than it changes.</p>
  *
  * <p>It needs the classes of the engine and its dependencies:</p>
  *
@@ -65,9 +76,32 @@ public class ExamplePdfs {
     static void letterhead() throws IOException {
         Path out = IMAGES.resolve("examples/letterhead/letterhead.pdf");
         Files.createDirectories(out.getParent());
-        try (OutputStream target = Files.newOutputStream(out)) {
-            Converter.create().toPdf(new DocumentReader().read(Path.of("tools", "letterhead.stxt")), target);
+        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+        Converter.create().toPdf(new DocumentReader().read(Path.of("tools", "letterhead.stxt")), pdf);
+        if (!Files.exists(out) || !Arrays.equals(withoutId(Files.readAllBytes(out)), withoutId(pdf.toByteArray()))) {
+            Files.write(out, pdf.toByteArray());
         }
+    }
+
+    /** The PDF without its trailer identifier, the only thing that changes between two identical conversions. */
+    private static byte[] withoutId(byte[] pdf) {
+        return new String(pdf, StandardCharsets.ISO_8859_1).replaceAll("/ID\\s*\\[[^\\]]*\\]", "")
+                .getBytes(StandardCharsets.ISO_8859_1);
+    }
+
+    /** Saves a PDF written with PDFBox in {@code images/}, with a trailer identifier made from its name. */
+    private static void save(PDDocument doc, String name) throws IOException {
+        byte[] id;
+        try {
+            id = MessageDigest.getInstance("MD5").digest(name.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+        COSArray ids = new COSArray();
+        ids.add(new COSString(id));
+        ids.add(new COSString(id));
+        doc.getDocument().setDocumentID(ids);
+        doc.save(IMAGES.resolve(name).toFile());
     }
 
     /**
@@ -101,7 +135,7 @@ public class ExamplePdfs {
                 cs.showText("Página 3");
                 cs.endText();
             }
-            doc.save(IMAGES.resolve("test/pages.pdf").toFile());
+            save(doc, "test/pages.pdf");
         }
     }
 
@@ -141,7 +175,7 @@ public class ExamplePdfs {
                 cs.showText("Helvetica");
                 cs.endText();
             }
-            doc.save(IMAGES.resolve("test/standard-font.pdf").toFile());
+            save(doc, "test/standard-font.pdf");
         }
     }
 
@@ -164,7 +198,7 @@ public class ExamplePdfs {
             widget.setPage(page);
             page.getAnnotations().add(widget);
             field.setValue("Ramon Puig");
-            doc.save(IMAGES.resolve("test/form-field.pdf").toFile());
+            save(doc, "test/form-field.pdf");
         }
     }
 
@@ -183,20 +217,33 @@ public class ExamplePdfs {
             for (COSName name : resources.getFontNames()) {
                 resources.getFont(name).getCOSObject().removeItem(COSName.TO_UNICODE);
             }
-            doc.save(IMAGES.resolve("test/no-unicode.pdf").toFile());
+            save(doc, "test/no-unicode.pdf");
         }
     }
 
     /**
      * A page with a layer (optional content) turned on, a text that only appears in it, and a configuration of the
-     * layers without {@code Name}, which PDF/UA requires.
+     * layers without {@code Name}, which PDF/UA requires, and with an automatic state ({@code AS}: the layer turns on
+     * when zooming), which PDF/UA does not allow.
      */
     static void layers() throws IOException {
         try (PDDocument doc = new PDDocument()) {
             PDOptionalContentProperties properties = new PDOptionalContentProperties();
             PDOptionalContentGroup notes = new PDOptionalContentGroup("Notas");
             properties.addGroup(notes);
-            properties.getCOSObject().getCOSDictionary(COSName.D).removeItem(COSName.NAME);
+            COSDictionary configuration = properties.getCOSObject().getCOSDictionary(COSName.D);
+            configuration.removeItem(COSName.NAME);
+            COSDictionary zoom = new COSDictionary();
+            zoom.setName(COSName.getPDFName("Event"), "View");
+            COSArray category = new COSArray();
+            category.add(COSName.getPDFName("Zoom"));
+            zoom.setItem(COSName.getPDFName("Category"), category);
+            COSArray groups = new COSArray();
+            groups.add(notes);
+            zoom.setItem(COSName.getPDFName("OCGs"), groups);
+            COSArray states = new COSArray();
+            states.add(zoom);
+            configuration.setItem(COSName.getPDFName("AS"), states);
             doc.getDocumentCatalog().setOCProperties(properties);
             PDPage page = page(doc, 200, 100);
             PDFont font = PDType0Font.load(doc, PLEX.toFile());
@@ -213,7 +260,7 @@ public class ExamplePdfs {
                 cs.endText();
                 cs.endMarkedContent();
             }
-            doc.save(IMAGES.resolve("test/layers.pdf").toFile());
+            save(doc, "test/layers.pdf");
         }
     }
 
@@ -227,8 +274,9 @@ public class ExamplePdfs {
             }
             StandardProtectionPolicy policy = new StandardProtectionPolicy("owner", "", new AccessPermission());
             policy.setEncryptionKeyLength(128);
+            policy.setPreferAES(false);
             doc.protect(policy);
-            doc.save(IMAGES.resolve("test/encrypted.pdf").toFile());
+            save(doc, "test/encrypted.pdf");
         }
     }
 }

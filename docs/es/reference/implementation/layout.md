@@ -68,7 +68,7 @@ guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()
 Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`. Los devuelven como `PendingOverlay` con su posición estática, y
 los hijos `Frame` se desplazan con `FrameOffset` después de colocarlos. `Engine.layout` resuelve con `OverlayLayout`
 (sobre `OverlayEquation`) los `Overlay` cuyo contenedor de referencia es la caja recién maquetada (sus fragmentos cuelgan
-del de esa caja). Los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.fixed` de cada página, solo en las
+del de esa caja). Los `Page overlay` suben hasta la raíz y el `Paginator` los coloca en `Page.pageOverlays` de cada página, solo en las
 que incluye su `Pages`.
 
 ## Cajas giradas en flujo

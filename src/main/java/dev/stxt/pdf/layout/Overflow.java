@@ -40,8 +40,8 @@ import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
 /**
  * Checks, once paginated, that nothing overflows (reference/common/overflow.md): each line of text and
  * each in-flow child (with its horizontal margins) fit in the content box of its parent;
- * the flow fits in the page area of each page, and the {@code absolute} and
- * {@code fixed} boxes and the rotated ones fit on the page (the rotated ones, and those inside a
+ * the flow fits in the page area of each page, and the {@code Overlay} and
+ * {@code Page overlay} boxes and the rotated ones fit on the page (the rotated ones, and those inside a
  * rotated one, with the rectangle that encloses what is painted). It looks at the final result, not at the
  * measuring passes.
  *
@@ -69,7 +69,7 @@ public final class Overflow {
             // The physical page, in page area coordinates.
             Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
             content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
-            for (Fragment f : p.fixed()) {
+            for (Fragment f : p.pageOverlays()) {
                 fragment(f, 0, 0, page, NONE);
             }
         }
@@ -138,7 +138,7 @@ public final class Overflow {
                 marker(f, c);
             }
             if (!c.box().style().isOutOfFlow()) {
-                // The relative ones are checked in their place, without the offset.
+                // The Frame boxes are checked in their place, without the offset.
                 double x = c.x() - c.offsetX();
                 double y = c.y() - c.offsetY();
                 Insets margin = c.margin();

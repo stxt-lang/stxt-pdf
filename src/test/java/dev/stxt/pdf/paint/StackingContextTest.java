@@ -175,7 +175,7 @@ class StackingContextTest {
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(READER.read(Docs.sectioned(doc))).pages().get(index);
         Recorder canvas = new Recorder();
-        StackingContext.build(page.content(), page.fixed(), 10, 10).paint(canvas);
+        StackingContext.build(page.content(), page.pageOverlays(), 10, 10).paint(canvas);
         return canvas;
     }
 
@@ -196,11 +196,11 @@ class StackingContextTest {
                 + String.join("\n", boxLines);
         Page page = new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(doc)), runs)).pages().get(0);
         Recorder canvas = new Recorder();
-        StackingContext.build(page.content(), page.fixed(), 40, 40).paint(canvas);
+        StackingContext.build(page.content(), page.pageOverlays(), 40, 40).paint(canvas);
         return canvas;
     }
 
-    /** The {@code absolute} hangs from the fragment of its reference container, behind the {@code relative}. */
+    /** The {@code Overlay} hangs from the fragment of its reference container, behind the {@code Frame}. */
     @Test
     void absoluteBeforeLaterRelative() {
         List<String> order = paint(
@@ -221,7 +221,7 @@ class StackingContextTest {
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
-    /** The {@code fixed} ones are added to the root context at the end, but are painted in their place. */
+    /** The {@code Page overlay} ones are added to the root context at the end, but are painted in their place. */
     @Test
     void fixedInDocumentOrder() {
         List<String> order = paint(

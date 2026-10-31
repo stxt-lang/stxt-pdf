@@ -45,9 +45,9 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * height, in the final layout, once the rows have a size. The {@code auto} margins of the
  * items are 0. A percentage track over an indefinite size is 0.</p>
  *
- * <p>The {@code absolute} and {@code fixed} children are not items: they are returned as
+ * <p>The {@code Overlay} and {@code Page overlay} children are not items: they are returned as
  * {@link PendingOverlay} with the corner of the content box as static position. The
- * {@code relative} items are shifted with {@link FrameOffset} after being aligned.</p>
+ * {@code Frame} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
  * <p>Across pages (reference/common/breaks.md) the break goes between rows with {@link UnitBreaker}; the items of a
  * row that does not fit on a page are split in parallel.</p>
