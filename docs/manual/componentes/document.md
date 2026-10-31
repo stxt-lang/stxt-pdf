@@ -2,11 +2,11 @@
 
 `Document` es la raíz de todo documento. Tiene:
 
-- `Language` y `Title`, obligatorios;
-- `Page`, el papel y los márgenes;
-- `Styles`, opcional, con las reglas de estilo ([Estilos](../comun/estilos.md));
-- los `Page overlay` de todo el documento (cabeceras y pies), opcionales;
-- una o más `Section`, con el contenido.
+- **`Language`** y **`Title`**: obligatorios.
+- **`Page`**: el papel y los márgenes.
+- **`Styles`**: opcional, con las reglas de estilo ([Estilos](../comun/estilos.md)).
+- **`Page overlay`**: opcionales, las cabeceras y los pies de todo el documento.
+- **`Section`**: una o más, con el contenido.
 
 ```
 Document (dev.stxt.pdf):
@@ -58,22 +58,25 @@ Document (dev.stxt.pdf):
         Paragraph: El anexo, apaisado, vuelve a la página 1.
 ```
 
-Este documento tiene tres secciones: una portada a sangre, sin número de página y sin el pie; el cuerpo, que empieza en la
-página 1, y un anexo apaisado que vuelve a contar desde 1.
+Este documento tiene tres secciones:
+
+- Una portada a sangre, sin número de página y sin el pie.
+- El cuerpo, que empieza en la página 1.
+- Un anexo apaisado que vuelve a contar desde 1.
 
 ## `Title` y `Language`
 
-`Title` es el título que muestra el visor de PDF en lugar del nombre del fichero. `Language` es el idioma del documento
-(`es`, `en-US`, `ca`…): el lector de pantalla lo necesita para leer el texto, y las mayúsculas automáticas siguen sus
+`Title` es el título que muestra el visor de PDF en lugar del nombre del fichero. `Language` es el idioma del documento,
+una etiqueta BCP 47 (`es`, `en-US`, `ca`). El lector de pantalla lo necesita para leer el texto, y las mayúsculas automáticas siguen sus
 reglas. Los dos son obligatorios, porque sin ellos el PDF no es accesible.
 
 ## `Page`
 
 El tamaño de la página y sus márgenes. El tamaño se da de una de dos formas, nunca las dos:
 
-- con un **papel**: `Paper` (`A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter` o `Legal`) y, si es apaisado,
-  `Orientation: landscape`;
-- con **medidas**: `Width` y `Height`, en puntos.
+- **Con un papel**: `Paper` (`A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter` o `Legal`) y, si es apaisado,
+  `Orientation: landscape`.
+- **Con medidas**: `Width` y `Height`, en puntos.
 
 | `Paper` | Puntos | | `Paper` | Puntos |
 |---|---|---|---|---|
@@ -92,12 +95,12 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 
 | Propiedad | Qué hace |
 |---|---|
-| `Page` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Page` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado; con solo `Margin`, el mismo papel con otros márgenes |
-| `Page numbering` | `continue` (por defecto): sigue la cuenta de páginas; `restart`: vuelve a empezar en 1; `none`: sus páginas no tienen número ni cuentan |
-| `Page number format` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`…) o `upper-roman` (`I`, `II`…) |
+| `Page` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Page` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado, y con solo `Margin`, el mismo papel con otros márgenes |
+| `Page numbering` | `continue` (por defecto) sigue la cuenta de páginas, `restart` vuelve a empezar en 1 y con `none` sus páginas no tienen número ni cuentan |
+| `Page number format` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`, `iii`) o `upper-roman` (`I`, `II`, `III`) |
 | `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
-| `Inherit page overlays` | `true` (por defecto): lleva las cabeceras y los pies del documento; `false`: solo los suyos |
-| `Begin on` | `any` (por defecto): empieza en la página siguiente; `odd`: en una impar, la de la derecha al imprimir a doble cara |
+| `Inherit page overlays` | `true` (por defecto) lleva las cabeceras y los pies del documento, y `false`, solo los suyos |
+| `Begin on` | `any` (por defecto) empieza en la página siguiente, y `odd`, en una impar, la de la derecha al imprimir a doble cara |
 | `Id`, `Style` | Para enlazarla (`#id`, su primera página) y darle tipografía con una regla (`Typography` y nada más: un anexo en otro idioma) |
 
 Una sección puede tener sus propios `Page overlay`, que solo salen en sus páginas. Una sección vacía es un error: no tendría
@@ -111,7 +114,7 @@ sección con `Page numbering: restart`. Una página de una sección `none` no ti
 
 Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie de la página: el impreso, también en
 romanos si su sección tiene `Page number format: lower-roman`. Para un prefacio en romanos, su sección declara `Page number format` y la
-del cuerpo, `Page numbering: restart`; con `Start`, la numeración empieza en otro número.
+del cuerpo, `Page numbering: restart`. Con `Start`, la numeración empieza en otro número.
 
 ## Doble cara
 

@@ -43,10 +43,10 @@ Document (dev.stxt.pdf):
 |---|---|---|
 | `Marker` | `List` | **Obligatorio.** `bullet` (•), `dash` (–), `none`, `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Start` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
-| `Number` | `List item` | El número de este ítem; los siguientes siguen desde él |
+| `Number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
-elementos (un `Paragraph`, un `Text`, otra `List`…), pero no encabezados.
+elementos (un `Paragraph`, un `Text`, otra `List`), pero no encabezados.
 
 ## La sangría
 
@@ -58,7 +58,7 @@ marcadores quedan alineados a la derecha, pegados al texto con un espacio.
 
 - El marcador usa la tipografía del ítem y se alinea con su primera línea. Por eso un ítem tiene que empezar con un texto:
   si empieza con un `Flex`, un `Grid` o una imagen, es un error.
-- Cada lista numera sus ítems; una lista dentro de otra empieza de nuevo.
+- Cada lista numera sus ítems. Una lista dentro de otra empieza de nuevo.
 - Si el ítem se parte entre páginas, el marcador va en la primera.
 - `{number of: id}` escribe el número de un ítem con `Id` (`3`, `c`, `IV`): «véase la cláusula {number of: pago}».
 

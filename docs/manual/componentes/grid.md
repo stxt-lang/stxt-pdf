@@ -1,7 +1,7 @@
 # `Grid`
 
-Un `Grid` es una **rejilla**: declaras sus columnas (y, si quieres, sus filas) y cada ítem va en una celda o en un área de
-varias. Sirve para composiciones de página: una barra lateral y el cuerpo, fichas en dos columnas, un currículum.
+Un `Grid` es una **rejilla**: se declaran sus columnas (y, si hace falta, sus filas) y cada ítem va en una celda o en un
+área de varias. Sirve para composiciones de página: una barra lateral y el cuerpo, fichas en dos columnas, un currículum.
 
 ```
 Document (dev.stxt.pdf):
@@ -63,7 +63,7 @@ El `Area` admite además `Horizontal` y `Vertical` (la alineación del ítem en 
 | `Column sizes` | una columna | El ancho de cada columna |
 | `Row sizes` | lo que mida cada fila | El alto de cada fila |
 | `Gap` | `0` | El hueco entre celdas (con dos valores: entre filas y entre columnas) |
-| `Areas` | — | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
+| `Areas` | sin valor | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
 | `Flow` | `horizontal` | Si los ítems sin sitio fijo se colocan por filas (`horizontal`) o por columnas (`vertical`) |
 | `Horizontal`, `Vertical` | `stretch` | La alineación de los ítems en su celda: `start`, `end`, `center` o `stretch` (ocupar toda la celda) |
 
@@ -77,18 +77,18 @@ Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de
 | `25%` | una parte del ancho del `Grid` (sin descontar los huecos) |
 | `auto` | lo que pida su contenido |
 | `narrowest`, `natural` | lo más estrecho que puede ser su contenido, o lo que mide sin partir ninguna línea |
-| `*`, `2*` | una parte de lo que sobra; nunca menos que la palabra más larga de su contenido |
+| `*`, `2*` | una parte de lo que sobra, nunca menos que la palabra más larga de su contenido |
 | `between(100, *)` | entre 100 y una parte de lo que sobra |
 | `repeat(3, *)` | tres columnas `*` |
 
 Primero se colocan las columnas fijas y las `auto`, y lo que sobra se reparte entre las fracciones. Las filas miden lo que su
-ítem más alto, salvo que declares `Row sizes`; las filas en porcentaje necesitan un `Height` en el `Grid`.
+ítem más alto, salvo con `Row sizes`. Las filas en porcentaje necesitan un `Height` en el `Grid`.
 
 ## Cómo se comporta
 
-- Por defecto, cada ítem se estira a toda su celda o su área; con `start`, `end` o `center`, mide lo suyo y se alinea.
+- Por defecto, cada ítem se estira a toda su celda o su área. Con `start`, `end` o `center`, mide lo suyo y se alinea.
 - Los ítems no admiten `Margin: auto`: se alinean con `Horizontal` y `Vertical`.
-- Entre páginas, un `Grid` se corta entre filas; una fila que no cabe en una página entera se parte con sus ítems a la vez.
+- Entre páginas, un `Grid` se corta entre filas. Una fila que no cabe en una página entera se parte con sus ítems a la vez.
 - Una fila de tamaño fijo cuyo contenido no cabe es un error.
 
 Más detalle en la [referencia](../../referencia/componentes/grid.md).

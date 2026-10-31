@@ -43,11 +43,11 @@ Document (dev.stxt.pdf):
 Va en el valor si es corto (`Paragraph: Un saludo cordial.`) o en un bloque `Content >>` si es largo. Uno de los dos, nunca
 los dos. Dentro del bloque:
 
-- los saltos de línea simples son espacios, así que puedes partir las líneas como quieras;
-- una línea en blanco es un error: para varios párrafos, varios `Paragraph`. Solo en un texto preformateado
+- Los saltos de línea simples son espacios, así que las líneas se pueden partir donde convenga.
+- Una línea en blanco es un error: para varios párrafos, varios `Paragraph`. Solo en un texto preformateado
   (`White space: preserve`, [Formato del texto](../comun/formato-del-texto.md)) es una línea más del texto.
 
-El texto es literal salvo que pidas formato con `Markup: markdown` ([Formato del texto](../comun/formato-del-texto.md)).
+El texto es literal salvo con `Markup: markdown` ([Formato del texto](../comun/formato-del-texto.md)).
 Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: id}`, `{number of: id}`
 ([Referencias y enlaces](../comun/referencias-y-enlaces.md)).
 
@@ -67,7 +67,7 @@ Admiten `Id`, `Style`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesita
 
 ## ¿`Text` o `Paragraph`?
 
-Usa `Paragraph` para los párrafos del contenido y `Text` para lo demás: un rótulo, una cifra, una línea de una cabecera, el
+`Paragraph` es para los párrafos del contenido y `Text`, para lo demás: un rótulo, una cifra, una línea de una cabecera, el
 texto de un encabezado. Así el PDF etiquetado tiene la estructura correcta, y una regla `For element: Paragraph` estila todos los
 párrafos sin tocar el resto.
 

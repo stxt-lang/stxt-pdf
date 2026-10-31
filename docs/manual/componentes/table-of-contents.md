@@ -73,7 +73,7 @@ Admite además `Id`, `Style`, `Box`, `Typography` y `Break`. No tiene hijos: las
   Un encabezado con `In table of contents: false` no sale (el título de la portada, el del propio índice).
 - Cada entrada tiene el texto del encabezado, con su número si lo lleva, la guía y el número de la página, el mismo que lleva
   impreso esa página.
-- Se estilan con `For element: TOC 1` … `TOC 6`, una regla por nivel: la sangría de cada nivel es su
+- Se estilan con `For element: TOC 1` a `TOC 6`, una regla por nivel: la sangría de cada nivel es su
   `Padding` izquierdo, y la separación entre entradas, su `Margin`.
 - Si un título no cabe en una línea, se parte, y el número queda en la primera línea.
 - Un índice sin ningún encabezado en sus niveles es un error.

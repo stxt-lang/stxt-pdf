@@ -49,7 +49,7 @@ Document (dev.stxt.pdf):
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
 | `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `contain` (entera, con espacio a los lados), `cover` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
-| `Rotate` | Girar la imagen sobre su centro; ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
+| `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 
 Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Inside` ni `Edges`: no se parte). No admite `Typography`.
 
@@ -124,20 +124,23 @@ Con dos `Page overlay`, uno con `Pages: first` y otro con `Pages: not-first` y `
 siguientes, otro.
 
 Lo que no es el dibujo de la página no se copia: sus enlaces, sus marcadores y su etiquetado. Sus capas, sí. Un PDF con un
-campo de formulario relleno o un comentario que se ven es un error: aplánalo antes, por ejemplo imprimiéndolo a PDF.
+campo de formulario relleno o un comentario visibles es un error: hay que aplanarlo antes, por ejemplo imprimiéndolo a PDF.
 También lo es un PDF cifrado y uno con fuentes que no van incrustadas o que no dicen qué carácter es cada letra
 (`ToUnicode`). Las comprobaciones de las anotaciones y de las fuentes se pueden quitar al convertir
-([Uso desde Java](../comun/uso-desde-java.md)); la del cifrado, no.
+([Uso desde Java](../comun/uso-desde-java.md)). La del cifrado, no.
 
 ## Accesibilidad
 
 Una imagen con `Alt` es una figura del PDF etiquetado, con ese texto alternativo. Sin `Alt` es decoración: un fondo, un
-adorno. Escribe `Alt` en toda imagen que diga algo. La página de un PDF también: aunque su texto se pueda seleccionar, el
+adorno. Toda imagen que diga algo necesita su `Alt`. La página de un PDF también: aunque su texto se pueda seleccionar, el
 lector de pantalla lee el `Alt`. Un papel preimpreso es decoración: va sin `Alt`.
 
 ## Límites
 
-Por seguridad, una imagen no puede tener más de 25 millones de píxeles; un SVG, más de 20 000 elementos ni 64 niveles de
-anidado, y un PDF, más de 20 MB ([Uso desde Java](../comun/uso-desde-java.md) para cambiarlo).
+Por seguridad hay unos límites, que se pueden cambiar al convertir ([Uso desde Java](../comun/uso-desde-java.md)):
+
+- **Una imagen**: como mucho 25 millones de píxeles.
+- **Un SVG**: como mucho 20 000 elementos y 64 niveles de anidado.
+- **Un PDF**: como mucho 20 MB.
 
 Más detalle en la [referencia](../../referencia/componentes/image.md).

@@ -50,18 +50,18 @@ Document (dev.stxt.pdf):
                 Text: 14,50 €
 ```
 
-Arriba, tres ítems del mismo ancho; abajo, un plato a la izquierda y su precio a la derecha.
+Arriba, tres ítems del mismo ancho. Abajo, un plato a la izquierda y su precio a la derecha.
 
 ## `Item`
 
 Cada hijo de un `Flex` va dentro de un `Item`, que envuelve **exactamente un elemento**. El `Item` dice cómo participa en el
-`Flex`; el resto (tamaño, márgenes, `Id`, estilo) va en el elemento de dentro.
+`Flex`, y el resto (tamaño, márgenes, `Id`, estilo) va en el elemento de dentro.
 
 | Propiedad del `Item` | Por defecto | Qué hace |
 |---|---|---|
 | `Grow` | `0` | Qué parte del espacio que sobra recibe. Con `Grow: 1` en todos, se reparte a partes iguales |
 | `Shrink` | `1` | Qué parte del espacio que falta cede |
-| `Basis` | `auto` | El tamaño de partida: `auto` es su tamaño (el declarado o el de su contenido); `0` hace que todo el espacio se reparta según `Grow` |
+| `Basis` | `auto` | El tamaño de partida: `auto` es su tamaño (el declarado o el de su contenido) y `0` hace que todo el espacio se reparta según `Grow` |
 | `Horizontal`, `Vertical` | el del `Flex` | Su alineación en el otro eje: `Vertical` en un `Flex` en fila, `Horizontal` en uno en columna. En la dirección del `Flex` es un error: ahí el ítem crece o encoge con `Grow` y `Shrink` |
 | `Layer` | `auto` | Qué se pinta encima ([Capas y giro](../comun/capas-y-giro.md)) |
 
@@ -72,14 +72,14 @@ Cada hijo de un `Flex` va dentro de un `Item`, que envuelve **exactamente un ele
 | `Direction` | `horizontal`, `vertical` | `horizontal` | En fila (`horizontal`) o en columna (`vertical`) |
 | `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap`, puede tener dos: entre filas y entre columnas |
 | `Wrap` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
-| `Horizontal` | `start`, `end`, `center`, `between`, `around`, `evenly`; en columna, `start`, `end`, `center`, `stretch` | `start`; en columna, `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados, entre los ítems (`between`)… En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Flex` |
-| `Vertical` | `start`, `end`, `center`, `stretch`; en columna, `start`, `end`, `center`, `between`, `around`, `evenly` | `stretch`; en columna, `start` | Al revés que `Horizontal`: en fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila); en columna, dónde va lo que sobra |
+| `Horizontal` | `start`, `end`, `center`, `between`, `around`, `evenly`. En columna: `start`, `end`, `center`, `stretch` | `start`. En columna: `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados o entre los ítems (`between`). En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Flex` |
+| `Vertical` | `start`, `end`, `center`, `stretch`. En columna: `start`, `end`, `center`, `between`, `around`, `evenly` | `stretch`. En columna: `start` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila). En columna, dónde va lo que sobra |
 | `Lines` | `start`, `end`, `center`, `between`, `around`, `stretch` | `stretch` | Con `Wrap`, cómo se reparten las líneas |
 
 ## Cómo se reparte el espacio
 
 1. Cada ítem parte de su `Basis`: su tamaño declarado o, si no tiene, lo que mide su contenido sin partir líneas.
-2. Si sobra espacio, se reparte según `Grow`; si falta, los ítems ceden según `Shrink` (y según su tamaño: uno grande cede
+2. Si sobra espacio, se reparte según `Grow`. Si falta, los ítems ceden según `Shrink` (y según su tamaño: uno grande cede
    más).
 3. Un ítem nunca se estrecha más que su palabra más larga, salvo que declare `Min width: 0`.
 4. Si aun así no caben, es un error.
@@ -89,9 +89,9 @@ El reparto de lo que sobra solo actúa si ningún ítem crece. En fila, los íte
 
 ## Cosas a tener en cuenta
 
-- `Grow` en un `Flex` en columna necesita que el `Flex` tenga un alto en puntos; si no, no hay nada que repartir y es un error.
+- `Grow` en un `Flex` en columna necesita que el `Flex` tenga un alto en puntos. Si no, no hay nada que repartir y es un error.
 - Los ítems no admiten `Margin: auto`: se alinean con `Horizontal` y `Vertical`.
-- Entre páginas, un `Flex` en columna se corta entre ítems, y uno en fila, entre líneas; una fila que no cabe en una página
+- Entre páginas, un `Flex` en columna se corta entre ítems, y uno en fila, entre líneas. Una fila que no cabe en una página
   entera se parte con sus ítems a la vez.
 
 Más detalle en la [referencia](../../referencia/componentes/flex.md).

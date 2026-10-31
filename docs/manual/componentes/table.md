@@ -78,7 +78,7 @@ Document (dev.stxt.pdf):
 ## Las celdas
 
 Una celda con valor (`Cell: 145,00`) es un texto. Sin valor, tiene elementos dentro (un `Paragraph`, una `List`, otra
-`Table`…), pero no las dos cosas. Cada celda tiene su propio borde: una línea entre filas es el borde de abajo de las celdas.
+`Table`), pero no las dos cosas. Cada celda tiene su propio borde: una línea entre filas es el borde de abajo de las celdas.
 `Gap` en la `Table` separa las celdas.
 
 **`Row header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
@@ -163,6 +163,6 @@ Document (dev.stxt.pdf):
 - La tabla se corta entre filas: una fila que no cabe en lo que queda pasa entera a la siguiente página.
 - La cabecera se repite arriba en cada página, y el pie, detrás de la última fila de cada página. Nunca se quedan solas.
 - Una fila que no cabe ni en una página vacía se parte: sus celdas continúan en la página siguiente.
-- Con `Break` en una `Row` del cuerpo puedes forzar o evitar un corte antes o después de ella.
+- Un `Break` en una `Row` del cuerpo fuerza o evita un corte antes o después de ella.
 
 Más detalle en la [referencia](../../referencia/componentes/table.md).

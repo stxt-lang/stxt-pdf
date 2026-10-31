@@ -1,8 +1,8 @@
 # `Markdown`
 
 Un `Markdown` es un bloque cuyo contenido se escribe en Markdown. El motor lo traduce a los elementos de siempre
-(encabezados, párrafos, listas, tablas, imágenes), que se estilan con las mismas reglas de `Styles` que si los escribieras
-en STXT. Es la forma cómoda de escribir texto largo con formato.
+(encabezados, párrafos, listas, tablas, imágenes), que se estilan con las mismas reglas de `Styles` que los escritos
+en STXT. Sirve para texto largo con formato.
 
 ```
 Document (dev.stxt.pdf):
@@ -77,18 +77,19 @@ del `Markdown` o, una vez para todo el documento, en `For element: Document`, y 
 
 | Markdown | Sale |
 |---|---|
-| `#` … `######` | `Heading 1` … `Heading 6`; con `{#id}` al final (`## Ventas {#ventas}`), lleva ese `Id`, para enlazarlo o citarlo |
+| `#` a `######` | `Heading 1` a `Heading 6`. Con `{#id}` al final (`## Ventas {#ventas}`), lleva ese `Id`, para enlazarlo o citarlo |
 | Un párrafo | `Paragraph` |
 | `-`, `*`, `+` y `1.` | `List`, con viñetas o numerada |
-| Una tabla | `Table`, con la primera fila de cabecera; la alineación de cada columna sale de la fila de separación (`:--`, `--:`). A una fila con menos celdas que la cabecera se le añaden vacías; una con más es un error |
+| Una tabla | `Table`, con la primera fila de cabecera. La alineación de cada columna sale de la fila de separación (`:--`, `--:`). A una fila con menos celdas que la cabecera se le añaden vacías, y una con más es un error |
 | `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` | Formato dentro de la línea |
 | `[texto](destino)` | Un enlace, subrayado ([Referencias y enlaces](../comun/referencias-y-enlaces.md)) |
 | `` `código` `` | Código en línea, con `Code font` |
 | Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `For element: Code block` |
 | `![texto alternativo](ruta)`, sola en su párrafo | Una `Image` |
 
-Lo demás es un error, para que nada se pierda en silencio: citas, HTML, líneas horizontales, saltos de línea forzados,
-imágenes dentro de un párrafo, enlaces con título, la etiqueta de lenguaje de un bloque de código (no hay resaltado)…
+Lo demás es un error, para que nada se pierda en silencio. Por ejemplo: citas, HTML, líneas horizontales, saltos de línea
+forzados, imágenes dentro de un párrafo, enlaces con título o la etiqueta de lenguaje de un bloque de código (no hay
+resaltado).
 
 ## Estilo
 

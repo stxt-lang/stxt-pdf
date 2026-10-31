@@ -1,4 +1,4 @@
-# Encabezados: `Heading 1` … `Heading 6`
+# Encabezados: `Heading 1` a `Heading 6`
 
 Los títulos de capítulo y de apartado. Un encabezado es un bloque con uno o varios `Text` dentro, y su nivel va de 1 (el más
 importante) a 6.
@@ -60,7 +60,7 @@ evita cortar dentro de un encabezado y justo después de él, para que un títul
 
 ## Sin estilos por defecto
 
-Un `Heading 1` no es más grande que un `Heading 2` hasta que lo dices. Lo normal es dar el estilo de cada nivel en `Styles`,
+Un `Heading 1` no es más grande que un `Heading 2` si un estilo no lo dice. Lo normal es dar el estilo de cada nivel en `Styles`,
 una vez para todo el documento.
 
 ## Los niveles
@@ -71,7 +71,7 @@ pantalla tienen siempre un árbol correcto.
 
 ## Numeración (`Numbered`)
 
-Con `Numbered: true` (de `Typography`, se hereda) un encabezado lleva número: `1`, `1.1`, `1.1.1`… Se declara por nivel en
+Con `Numbered: true` (de `Typography`, se hereda) un encabezado lleva número: `1`, `1.1`, `1.1.1`. Se declara por nivel en
 una regla, en todo el documento o en un encabezado concreto.
 
 - Cada nivel cuenta en orden del documento, también a través de las secciones, y vuelve a empezar con cada encabezado de un
