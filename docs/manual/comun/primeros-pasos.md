@@ -38,16 +38,16 @@ Línea a línea:
 - **`Document (dev.stxt.pdf):`** es la raíz. El namespace `dev.stxt.pdf` dice que es un documento de stxt-pdf.
 - **`Language`** es el idioma del documento y **`Title`**, su título. Los dos son obligatorios: el visor de PDF muestra el
   título, y un lector de pantalla necesita el idioma para leer el texto en voz alta.
-- **`Page`** es el papel: un A4 con 50 puntos de margen por los cuatro lados. Todas las medidas están en
-  **puntos** (un punto es 1/72 de pulgada, unos 0,35 mm); un A4 mide 595 × 842.
-- **`Styles`** tiene las reglas de estilo. `For element: Document` da la fuente y el tamaño a todo el documento: no hay fuente
-  por defecto, así que se declara siempre. Las otras dos reglas dan tamaño a los títulos y separación a los párrafos.
+- **`Page`** es el papel: un A4 con 50 puntos de margen por los cuatro lados. Todas las medidas están en **puntos**: un
+  punto es 1/72 de pulgada (unos 0,35 mm), y un A4 mide 595 × 842.
+- **`Styles`** tiene las reglas de estilo. `For element: Document` da la fuente y el tamaño a todo el documento. No hay
+  fuente por defecto, así que se declara siempre. Las otras dos reglas dan tamaño a los títulos y separación a los párrafos.
 - **`Section`** tiene el contenido. Todo lo que se ve va dentro de una sección.
-- **`Heading 1`** es un título y **`Paragraph`**, un párrafo. Un texto corto va en el valor (`Paragraph: Los costes…`) y
+- **`Heading 1`** es un título y **`Paragraph`**, un párrafo. Un texto corto va en el valor (`Paragraph: Los costes...`) y
   uno largo, en un bloque `Content >>`, donde los saltos de línea simples son espacios.
 
-El motor coloca el título arriba del área de la página que dejan los márgenes, cada párrafo debajo del anterior, reparte
-el texto en líneas del ancho disponible y, si el contenido no cabe en una página, sigue en la siguiente.
+El motor coloca el título arriba del área que dejan los márgenes y cada párrafo debajo del anterior. Reparte el texto en
+líneas del ancho disponible y, si el contenido no cabe en una página, sigue en la siguiente.
 
 ## Convertirlo en PDF
 
@@ -60,11 +60,15 @@ try (OutputStream out = Files.newOutputStream(Path.of("informe.pdf"))) {
 }
 ```
 
-Las fuentes y las imágenes se buscan en la carpeta `resources/` del directorio de trabajo ([Recursos](recursos.md)), que
-en el repositorio ya trae IBM Plex Sans, Serif y Mono. Más opciones en [Uso desde Java](uso-desde-java.md).
+Las fuentes y las imágenes se buscan en la carpeta `resources/` del directorio de trabajo ([Recursos](recursos.md)). La
+del repositorio ya trae IBM Plex Sans, Serif y Mono. Más opciones en [Uso desde Java](uso-desde-java.md).
 
-Si el documento tiene un error, la conversión se para y dice qué y en qué línea: `línea 18: …`
-([Errores](errores.md)).
+Si el documento tiene un error, la conversión se para con un mensaje que dice qué falla y en qué línea
+([Errores](errores.md)):
+
+```
+línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width o Max width
+```
 
 ## Qué tiene el PDF
 
@@ -75,6 +79,6 @@ Si el documento tiene un error, la conversión se para y dice qué y en qué lí
 
 ## Siguientes pasos
 
-- [Conceptos](conceptos.md): cómo piensa el motor.
-- [Estilos](estilos.md): dar estilo sin repetirlo en cada elemento.
+- [Conceptos](conceptos.md): las ideas que usa el resto del manual.
+- [Estilos](estilos.md): reglas para no repetir el estilo en cada elemento.
 - Los [ejemplos](../../../test/examples/README.md): once documentos reales con su PDF.

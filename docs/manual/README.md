@@ -1,21 +1,19 @@
 # Manual de stxt-pdf
 
-stxt-pdf convierte un documento escrito en [STXT](https://stxt.dev) en un PDF: tú describes qué hay en cada página y cómo
-se ve, y el motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF con las fuentes
-incrustadas, accesible y con marcadores.
+stxt-pdf convierte un documento [STXT](https://stxt.dev) en un PDF. El documento describe qué hay en cada página y cómo se
+ve. El motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF con las fuentes incrustadas,
+etiquetado para la accesibilidad y con marcadores.
 
-Para seguir este manual basta con saber escribir STXT y qué es un PDF. Todo lo demás se explica aquí. Si algo no
-queda claro o necesitas el detalle exacto de una regla, la [referencia](../referencia/README.md) lo tiene todo; en
-principio no debería hacerte falta.
+Para seguir este manual basta con saber escribir STXT y qué es un PDF. El detalle exacto de cada regla está en la
+[referencia](../referencia/README.md).
 
 ## Cómo se lee
 
-Empieza por [primeros pasos](comun/primeros-pasos.md), que escribe un documento de principio a fin, y por
-[conceptos](comun/conceptos.md), que explica las ideas que usa el resto del manual. Después, cada página se puede leer
-sola: las de **comportamiento común** explican lo que comparten todos los elementos (medidas, márgenes, texto, cortes de
-página, estilos), y las de **componentes**, cada elemento.
+Primero, [primeros pasos](comun/primeros-pasos.md), que escribe un documento de principio a fin, y
+[conceptos](comun/conceptos.md), con las ideas que usa el resto del manual. Después, cada página se lee sola:
 
-Cada página de componente tiene un documento completo que puedes copiar, convertir y modificar.
+- **Comportamiento común**: lo que comparten todos los elementos (medidas, márgenes, texto, cortes de página, estilos).
+- **Componentes**: cada elemento, con un documento completo que se puede copiar y convertir.
 
 ## Comportamiento común
 
@@ -49,9 +47,8 @@ Cada página de componente tiene un documento completo que puedes copiar, conver
 | [`Grid`](componentes/grid.md) | Una rejilla de filas y columnas |
 | [`Columns`](componentes/columns.md) | Texto en varias columnas, como en una revista |
 | [`Frame`, `Overlay` y `Page overlay`](componentes/frame-and-overlays.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
-| [`Image`](componentes/image.md) | Imágenes PNG, JPEG y SVG |
+| [`Image`](componentes/image.md) | Imágenes PNG, JPEG y SVG, y páginas de un PDF |
 | [`Markdown`](componentes/markdown.md) | Escribir contenido largo en Markdown |
 | [`Table of contents`](componentes/table-of-contents.md) | El índice automático |
 
-Los [ejemplos](../../test/examples/README.md) son once documentos reales (una factura, un currículum, un informe anual…)
-con su PDF.
+Los [ejemplos](../../test/examples/README.md) son once documentos reales con su PDF, de una factura a un informe anual.
