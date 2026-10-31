@@ -4,37 +4,37 @@ Una lista con viñetas o numerada. Cada `List item` es un ítem, con un marcador
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Pasos
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: List
-			Box:
-				Padding: 0 0 0 18
-		For element: List item
-			Box:
-				Margin: 0 0 4 0
-	Section:
-		List:
-			Marker: decimal
-			List item:
-				Paragraph: Corta la corriente.
-			List item:
-				Paragraph: Retira la tapa del termostato.
-				List:
-					Marker: dash
-					List item:
-						Paragraph: Guarda los tornillos.
-					List item:
-						Paragraph: No toques los cables.
-			List item:
-				Paragraph: Conecta el cable rojo al borne L.
+    Language: es
+    Title: Pasos
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+        For element: List item
+            Box:
+                Margin: 0 0 4 0
+    Section:
+        List:
+            Marker: decimal
+            List item:
+                Paragraph: Corta la corriente.
+            List item:
+                Paragraph: Retira la tapa del termostato.
+                List:
+                    Marker: dash
+                    List item:
+                        Paragraph: Guarda los tornillos.
+                    List item:
+                        Paragraph: No toques los cables.
+            List item:
+                Paragraph: Conecta el cable rojo al borne L.
 ```
 
 ## Propiedades

@@ -7,21 +7,21 @@ motor, que no está en el documento. Las dos son cajas de bloque y admiten `Id`,
 
 ```
 Styles:
-	For element: List
-		Box:
-			Padding: 0 0 0 18
+    For element: List
+        Box:
+            Padding: 0 0 0 18
 List:
-	Marker: decimal
-	Start: 3
-	List item:
-		Paragraph: Primer punto
-	List item:
-		Number: 10
-		Paragraph: Segundo punto
-		List:
-			Marker: bullet
-			List item:
-				Text: Subpunto
+    Marker: decimal
+    Start: 3
+    List item:
+        Paragraph: Primer punto
+    List item:
+        Number: 10
+        Paragraph: Segundo punto
+        List:
+            Marker: bullet
+            List item:
+                Text: Subpunto
 ```
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |

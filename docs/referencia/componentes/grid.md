@@ -6,11 +6,11 @@ El `Grid` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va dond
 
 ```
 Grid:
-	Column sizes: * *
-	Area: 1 2
-		Text: Fila 1, columna 2
-	Area:
-		Text: Se coloca automáticamente
+    Column sizes: * *
+    Area: 1 2
+        Text: Fila 1, columna 2
+    Area:
+        Text: Se coloca automáticamente
 ```
 
 ## Propiedades del `Grid`

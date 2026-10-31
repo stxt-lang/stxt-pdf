@@ -14,12 +14,12 @@ Se escriben en el texto de un `Text`, un `Paragraph` o una `Cell` con valor, y s
 ```
 Text: El esquema de conexión está en la página {page of: wiring}; véase la cláusula {number of: pago}.
 Block:
-	Id: wiring
+    Id: wiring
 List:
-	Marker: decimal
-	List item:
-		Id: pago
-		Paragraph: …
+    Marker: decimal
+    List item:
+        Id: pago
+        Paragraph: …
 ```
 
 ## `{page of: id}`

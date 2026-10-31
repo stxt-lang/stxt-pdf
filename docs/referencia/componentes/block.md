@@ -6,11 +6,11 @@ y ocupa el rectángulo que la envuelve ([Capas y giro](../comun/capas-y-giro.md#
 
 ```
 Block:
-	Box:
-		Padding: 10
-		Background: #F1EFE8
-	Paragraph: Primer párrafo.
-	Paragraph: Segundo párrafo.
+    Box:
+        Padding: 10
+        Background: #F1EFE8
+    Paragraph: Primer párrafo.
+    Paragraph: Segundo párrafo.
 ```
 
 ## El flujo de bloque

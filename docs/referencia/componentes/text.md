@@ -27,9 +27,9 @@ texto es literal; con `Markup: markdown` admite formato dentro de la línea
 ```
 Text: Una línea, en el valor.
 Text:
-	Content >>
-		Un texto largo, en un bloque. Los saltos de línea simples
-		dentro del bloque equivalen a espacios.
+    Content >>
+        Un texto largo, en un bloque. Los saltos de línea simples
+        dentro del bloque equivalen a espacios.
 ```
 
 `Font` y `Size` son obligatorios, propios o heredados ([Tipografía](../comun/tipografia.md)).

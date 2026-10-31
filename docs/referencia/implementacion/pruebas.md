@@ -114,13 +114,13 @@ borde en **coordenadas absolutas de página**: `x y ancho alto`, en pt, con hast
 
 ```
 Result:
-	Page: 1
-		Fragment: header
-			Rect: 40 10 515 20
-		Fragment: body
-			Rect: 40 80 515 300
-			Fragment: side
-				Rect: 40 80 150 120
+    Page: 1
+        Fragment: header
+            Rect: 40 10 515 20
+        Fragment: body
+            Rect: 40 80 515 300
+            Fragment: side
+                Rect: 40 80 150 120
 ```
 
 Los volcados no tienen namespace y se leen con `STXT.rawParser()`.

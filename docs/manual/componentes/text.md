@@ -6,36 +6,36 @@ de una cabecera.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Carta
-	Page:
-		Paper: A4
-		Margin: 60
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Serif
-				Size: 11
-				Line height: 16
-		For element: Paragraph
-			Box:
-				Margin: 0 0 10 0
-			Typography:
-				Align: justify
-				Line breaking: balanced
-				Markup: markdown
-	Section:
-		Text: Madrid, 3 de marzo
-			Typography:
-				Align: right
-			Box:
-				Margin: 0 0 24 0
-		Paragraph: Estimada Sra. García:
-		Paragraph:
-			Content >>
-				Le escribimos para confirmar el pedido de **doce sillas** de nogal,
-				que le entregaremos en *dos semanas* en la dirección que nos indicó.
-		Paragraph: Un saludo cordial.
+    Language: es
+    Title: Carta
+    Page:
+        Paper: A4
+        Margin: 60
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 11
+                Line height: 16
+        For element: Paragraph
+            Box:
+                Margin: 0 0 10 0
+            Typography:
+                Align: justify
+                Line breaking: balanced
+                Markup: markdown
+    Section:
+        Text: Madrid, 3 de marzo
+            Typography:
+                Align: right
+            Box:
+                Margin: 0 0 24 0
+        Paragraph: Estimada Sra. García:
+        Paragraph:
+            Content >>
+                Le escribimos para confirmar el pedido de **doce sillas** de nogal,
+                que le entregaremos en *dos semanas* en la dirección que nos indicó.
+        Paragraph: Un saludo cordial.
 ```
 
 ## El texto

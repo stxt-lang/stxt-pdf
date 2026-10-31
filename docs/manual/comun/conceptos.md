@@ -44,13 +44,13 @@ es un error, porque las columnas son de un `Grid`. Las propiedades de cualquier 
 
 ```
 Paragraph: Resultados del trimestre
-	Box:
-		Margin: 0 0 16 0
-	Typography:
-		Size: 20
-		Bold: true
-	Break:
-		After: avoid
+    Box:
+        Margin: 0 0 16 0
+    Typography:
+        Size: 20
+        Bold: true
+    Break:
+        After: avoid
 ```
 
 Fuera de los grupos van las propiedades del propio elemento: su `Id`, su `Style`, las columnas de una tabla o el

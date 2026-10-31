@@ -48,7 +48,7 @@ columna estrecha:
 
 ```
 Text: Lunes
-	Rotate: -90
+    Rotate: -90
 ```
 
 - **Su tamaño sin girar no depende del contenedor.** Su ancho es el de su `Width` o, si es `auto`, lo que mide su

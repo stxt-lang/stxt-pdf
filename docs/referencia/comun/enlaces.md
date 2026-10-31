@@ -6,14 +6,14 @@ producen lo mismo en el PDF: la propiedad `Link` de una caja, que hace clicable 
 
 ```
 Text: Escribe a soporte@airemas.example
-	Link: mailto:soporte@airemas.example
+    Link: mailto:soporte@airemas.example
 
 Image: examples/brand/nogal.png
-	Link: https://tallernogal.example
+    Link: https://tallernogal.example
 
 Markdown:
-	Content >>
-		Consulta [las especificaciones](#specs) o [la web](https://airemas.example).
+    Content >>
+        Consulta [las especificaciones](#specs) o [la web](https://airemas.example).
 ```
 
 ## Destino

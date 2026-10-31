@@ -14,12 +14,12 @@ Un texto puede escribir datos que calcula el motor:
 ```
 Paragraph: El esquema de conexión está en la página {page of: wiring}. Véase la cláusula {number of: pago}.
 Block:
-	Id: wiring
+    Id: wiring
 List:
-	Marker: decimal
-	List item:
-		Id: pago
-		Paragraph: El pago se hará a 30 días.
+    Marker: decimal
+    List item:
+        Id: pago
+        Paragraph: El pago se hará a 30 días.
 ```
 
 - La referencia puede ir antes o después de la caja que nombra.
@@ -40,14 +40,14 @@ Un enlace hace clicable una zona del PDF. Lleva a una web, a un correo o a otra 
 
 ```
 Text: Escríbenos a soporte@airemas.example
-	Link: mailto:soporte@airemas.example
+    Link: mailto:soporte@airemas.example
 Image: examples/brand/nogal.svg
-	Alt: Taller Nogal
-	Link: https://tallernogal.example
-	Box:
-		Width: 80
+    Alt: Taller Nogal
+    Link: https://tallernogal.example
+    Box:
+        Width: 80
 Paragraph: Ver las especificaciones
-	Link: #specs
+    Link: #specs
 ```
 
 **Una parte de una línea**, con la sintaxis de Markdown, en un [`Markdown`](../componentes/markdown.md) o en un texto con

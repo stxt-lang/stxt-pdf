@@ -6,58 +6,58 @@ en STXT. Es la forma cómoda de escribir texto largo con formato.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Condiciones
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Heading 1
-			Typography:
-				Size: 16
-				Bold: true
-			Box:
-				Margin: 0 0 10 0
-		For element: Paragraph
-			Box:
-				Margin: 0 0 8 0
-		For element: List
-			Box:
-				Padding: 0 0 0 18
-		For element: Code block
-			Box:
-				Padding: 8
-				Background: #F1EFE8
-	Section:
-		Markdown:
-			Typography:
-				Code font: IBM Plex Mono
-			Bullet markers: bullet dash
-			Number markers: decimal
-			Table columns: auto
-			Content >>
-				# Condiciones de pago
+    Language: es
+    Title: Condiciones
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Heading 1
+            Typography:
+                Size: 16
+                Bold: true
+            Box:
+                Margin: 0 0 10 0
+        For element: Paragraph
+            Box:
+                Margin: 0 0 8 0
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+        For element: Code block
+            Box:
+                Padding: 8
+                Background: #F1EFE8
+    Section:
+        Markdown:
+            Typography:
+                Code font: IBM Plex Mono
+            Bullet markers: bullet dash
+            Number markers: decimal
+            Table columns: auto
+            Content >>
+                # Condiciones de pago
 
-				El pago se hará en **30 días** desde la fecha de la factura, por
-				transferencia a la cuenta `ES12 3456 7890`.
+                El pago se hará en **30 días** desde la fecha de la factura, por
+                transferencia a la cuenta `ES12 3456 7890`.
 
-				1. Envío de la factura.
-				2. Pago:
-				   - por transferencia;
-				   - o en efectivo, en el taller.
+                1. Envío de la factura.
+                2. Pago:
+                   - por transferencia;
+                   - o en efectivo, en el taller.
 
-				| Concepto | Importe |
-				|----------|--------:|
-				| Sillas   | 1740,00 |
-				| Mesa     |  890,00 |
+                | Concepto | Importe |
+                |----------|--------:|
+                | Sillas   | 1740,00 |
+                | Mesa     |  890,00 |
 
-				~~~
-				Referencia: 2026-014
-				~~~
+                ~~~
+                Referencia: 2026-014
+                ~~~
 ```
 
 ## Propiedades

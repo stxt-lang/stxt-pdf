@@ -18,9 +18,9 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Markup: mark
 
 ```
 Styles:
-	For element: Paragraph
-		Typography:
-			Markup: markdown
+    For element: Paragraph
+        Typography:
+            Markup: markdown
 Paragraph: El pago se hace en **30 días**, salvo *acuerdo* en contra.
 ```
 
@@ -40,12 +40,12 @@ vale también para el código de un [`Markdown`](../componentes/markdown.md).
 
 ```
 Styles:
-	For element: Document
-		Typography:
-			Font: IBM Plex Sans
-			Size: 10
-			Markup: markdown
-			Code font: IBM Plex Mono
+    For element: Document
+        Typography:
+            Font: IBM Plex Sans
+            Size: 10
+            Markup: markdown
+            Code font: IBM Plex Mono
 Paragraph: Ejecuta `mvn test` antes de publicar.
 ```
 
@@ -60,13 +60,13 @@ letra de cada palabra. El texto se escribe normal y la regla lo transforma, así
 
 ```
 Styles:
-	For style: label
-		Typography:
-			Case: uppercase
-			Letter spacing: 1
-			Size: 8
+    For style: label
+        Typography:
+            Case: uppercase
+            Letter spacing: 1
+            Size: 8
 Text: Datos del cliente
-	Style: label
+    Style: label
 ```
 
 ## Versalitas (`Small caps`)
@@ -93,14 +93,14 @@ demasiado larga se parte entre palabras. Lo normal es usar una fuente monoespaci
 
 ```
 Text:
-	Typography:
-		Font: IBM Plex Mono
-		Size: 9
-		White space: preserve
-	Content >>
-		$ termostato --estado
-		temperatura   21,5 °C
-		consigna      22,0 °C
+    Typography:
+        Font: IBM Plex Mono
+        Size: 9
+        White space: preserve
+    Content >>
+        $ termostato --estado
+        temperatura   21,5 °C
+        consigna      22,0 °C
 ```
 
 - Con `preserve`, una línea más ancha que la caja es un error. Hay que acortarla o usar `preserve-wrap`.

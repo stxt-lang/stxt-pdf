@@ -5,15 +5,15 @@ fondo y las esquinas.
 
 ```
 Block:
-	Box:
-		Width: 300
-		Margin: 0 0 12 0
-		Padding: 10 14
-		Border: 0 0 0 3
-		Border color: #B5651D
-		Background: #F1EFE8
-		Corner radius: 0 6 6 0
-	Paragraph: Una nota con una franja de color a la izquierda.
+    Box:
+        Width: 300
+        Margin: 0 0 12 0
+        Padding: 10 14
+        Border: 0 0 0 3
+        Border color: #B5651D
+        Background: #F1EFE8
+        Corner radius: 0 6 6 0
+    Paragraph: Una nota con una franja de color a la izquierda.
 ```
 
 | Propiedad | Qué hace |

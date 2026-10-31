@@ -60,7 +60,7 @@ pinta un azul que aparece de arriba abajo, desde transparente:
 
 ```
 Box:
-	Background: linear(180, #12315A00, #12315A)
+    Background: linear(180, #12315A00, #12315A)
 ```
 
 ## Otros

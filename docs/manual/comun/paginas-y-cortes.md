@@ -36,10 +36,10 @@ no caben en lo que queda de página, pasan enteras a la siguiente, y si no caben
 
 ```
 Block:
-	Break:
-		Inside: avoid
-	Paragraph: Firma del cliente
-	Paragraph: Firma del proveedor
+    Break:
+        Inside: avoid
+    Paragraph: Firma del cliente
+    Paragraph: Firma del proveedor
 ```
 
 - Un salto forzado al principio de una página no hace nada: nunca deja páginas en blanco.
@@ -67,10 +67,10 @@ En cualquier texto, `{page}` escribe el número de la página y `{pages}` el tot
 
 ```
 Page overlay:
-	Offset: auto 0 -30 0
-	Text: Página {page} de {pages}
-		Typography:
-			Align: right
+    Offset: auto 0 -30 0
+    Text: Página {page} de {pages}
+        Typography:
+            Align: right
 ```
 
 Un pie de página como este es un `Page overlay`, que se repite en cada página

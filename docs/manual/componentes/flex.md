@@ -5,49 +5,49 @@ poner cosas una al lado de otra: un logotipo y unos datos, tres cifras, un preci
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Cifras
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For style: figure
-			Box:
-				Padding: 10
-				Background: #F1EFE8
-				Corner radius: 4
-			Typography:
-				Align: center
-	Section:
-		Flex:
-			Gap: 12
-			Item:
-				Grow: 1
-				Basis: 0
-				Text: 12 % más de ventas
-					Style: figure
-			Item:
-				Grow: 1
-				Basis: 0
-				Text: 3 tiendas nuevas
-					Style: figure
-			Item:
-				Grow: 1
-				Basis: 0
-				Text: 98 % de clientes satisfechos
-					Style: figure
-		Flex:
-			Horizontal: between
-			Box:
-				Margin: 20 0 0 0
-			Item:
-				Text: Risotto de setas
-			Item:
-				Text: 14,50 €
+    Language: es
+    Title: Cifras
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For style: figure
+            Box:
+                Padding: 10
+                Background: #F1EFE8
+                Corner radius: 4
+            Typography:
+                Align: center
+    Section:
+        Flex:
+            Gap: 12
+            Item:
+                Grow: 1
+                Basis: 0
+                Text: 12 % más de ventas
+                    Style: figure
+            Item:
+                Grow: 1
+                Basis: 0
+                Text: 3 tiendas nuevas
+                    Style: figure
+            Item:
+                Grow: 1
+                Basis: 0
+                Text: 98 % de clientes satisfechos
+                    Style: figure
+        Flex:
+            Horizontal: between
+            Box:
+                Margin: 20 0 0 0
+            Item:
+                Text: Risotto de setas
+            Item:
+                Text: 14,50 €
 ```
 
 Arriba, tres ítems del mismo ancho; abajo, un plato a la izquierda y su precio a la derecha.

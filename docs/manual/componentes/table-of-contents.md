@@ -5,57 +5,57 @@ la página donde está. Cada entrada es clicable y lleva a su encabezado.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-				Numbered: true
-		For element: Heading 1
-			Typography:
-				Size: 18
-				Bold: true
-			Box:
-				Margin: 0 0 12 0
-		For element: Heading 2
-			Typography:
-				Size: 12
-				Bold: true
-			Box:
-				Margin: 10 0 6 0
-		For element: TOC 1
-			Typography:
-				Bold: true
-			Box:
-				Margin: 6 0 2 0
-		For element: TOC 2
-			Box:
-				Padding: 0 0 0 16
-	Section:
-		Heading 1:
-			In table of contents: false
-			Typography:
-				Numbered: false
-			Text: Índice
-		Table of contents:
-			Levels: 1 2
-	Section:
-		Heading 1:
-			Text: Resultados
-		Heading 2:
-			Text: Ventas
-		Paragraph: Las ventas crecieron un 12 %.
-		Heading 2:
-			Text: Costes
-		Paragraph: Los costes se mantienen.
-		Heading 1:
-			Text: Previsiones
-		Paragraph: Se espera un año estable.
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+                Numbered: true
+        For element: Heading 1
+            Typography:
+                Size: 18
+                Bold: true
+            Box:
+                Margin: 0 0 12 0
+        For element: Heading 2
+            Typography:
+                Size: 12
+                Bold: true
+            Box:
+                Margin: 10 0 6 0
+        For element: TOC 1
+            Typography:
+                Bold: true
+            Box:
+                Margin: 6 0 2 0
+        For element: TOC 2
+            Box:
+                Padding: 0 0 0 16
+    Section:
+        Heading 1:
+            In table of contents: false
+            Typography:
+                Numbered: false
+            Text: Índice
+        Table of contents:
+            Levels: 1 2
+    Section:
+        Heading 1:
+            Text: Resultados
+        Heading 2:
+            Text: Ventas
+        Paragraph: Las ventas crecieron un 12 %.
+        Heading 2:
+            Text: Costes
+        Paragraph: Los costes se mantienen.
+        Heading 1:
+            Text: Previsiones
+        Paragraph: Se espera un año estable.
 ```
 
 ## Propiedades

@@ -6,14 +6,14 @@ El `Flex` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va dond
 
 ```
 Flex:
-	Gap: 10
-	Item:
-		Grow: 1
-		Text: Crece
-	Item:
-		Block:
-			Box:
-				Width: 100
+    Gap: 10
+    Item:
+        Grow: 1
+        Text: Crece
+    Item:
+        Block:
+            Box:
+                Width: 100
 ```
 
 ## Propiedades del `Flex`

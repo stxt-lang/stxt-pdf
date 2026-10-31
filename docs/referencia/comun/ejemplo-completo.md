@@ -7,87 +7,87 @@ comprueba cada medida de abajo.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Page overlay
-			Box:
-				Height: 20
-			Typography:
-				Size: 8
-		For element: Paragraph
-			Typography:
-				Align: justify
-		For style: panel
-			Box:
-				Background: #F1EFE8
-				Padding: 10
-			Typography:
-				Align: left
-			Break:
-				Inside: avoid
-		For id: title
-			Box:
-				Margin: 0 0 16 0
-			Typography:
-				Bold: true
-				Size: 20
-				Line height: 24
-			Break:
-				After: avoid
-	Section:
-		Page overlay:
-			Id: header
-			Offset: -30 0 auto 0
-			Typography:
-				Color: #5F5E5A
-			Text: Informe trimestral
-		Page overlay:
-			Id: footer
-			Offset: auto 0 -30 0
-			Text: Página {page} de {pages}
-				Typography:
-					Align: right
-		Text: Resultados del trimestre
-			Id: title
-		Grid:
-			Id: body
-			Column sizes: 150 *
-			Gap: 20
-			Area:
-				Text:
-					Id: side
-					Style: panel
-					Content >>
-						Resumen de las cifras clave
-						del trimestre.
-			Area:
-				Block:
-					Id: main
-					Paragraph:
-						Content >>
-							Primer párrafo del informe. Los saltos de línea simples
-							dentro del bloque equivalen a espacios.
-					Paragraph: Cada párrafo es un Paragraph.
-		Overlay:
-			Id: stamp
-			Offset: 0 0 auto auto
-			Box:
-				Width: 80
-				Height: 30
-				Border: 1
-				Border color: #A32D2D
-			Layer: 1
-			Text: BORRADOR
-				Typography:
-					Align: center
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Page overlay
+            Box:
+                Height: 20
+            Typography:
+                Size: 8
+        For element: Paragraph
+            Typography:
+                Align: justify
+        For style: panel
+            Box:
+                Background: #F1EFE8
+                Padding: 10
+            Typography:
+                Align: left
+            Break:
+                Inside: avoid
+        For id: title
+            Box:
+                Margin: 0 0 16 0
+            Typography:
+                Bold: true
+                Size: 20
+                Line height: 24
+            Break:
+                After: avoid
+    Section:
+        Page overlay:
+            Id: header
+            Offset: -30 0 auto 0
+            Typography:
+                Color: #5F5E5A
+            Text: Informe trimestral
+        Page overlay:
+            Id: footer
+            Offset: auto 0 -30 0
+            Text: Página {page} de {pages}
+                Typography:
+                    Align: right
+        Text: Resultados del trimestre
+            Id: title
+        Grid:
+            Id: body
+            Column sizes: 150 *
+            Gap: 20
+            Area:
+                Text:
+                    Id: side
+                    Style: panel
+                    Content >>
+                        Resumen de las cifras clave
+                        del trimestre.
+            Area:
+                Block:
+                    Id: main
+                    Paragraph:
+                        Content >>
+                            Primer párrafo del informe. Los saltos de línea simples
+                            dentro del bloque equivalen a espacios.
+                    Paragraph: Cada párrafo es un Paragraph.
+        Overlay:
+            Id: stamp
+            Offset: 0 0 auto auto
+            Box:
+                Width: 80
+                Height: 30
+                Border: 1
+                Border color: #A32D2D
+            Layer: 1
+            Text: BORRADOR
+                Typography:
+                    Align: center
 ```
 
 **Cómo se maqueta:**

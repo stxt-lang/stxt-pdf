@@ -11,46 +11,46 @@ desplazamiento de 1 a 4 valores: arriba, derecha, abajo, izquierda.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Presupuesto
-	Page:
-		Paper: A4
-		Margin: 60 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Page overlay
-			Typography:
-				Size: 8
-				Color: #5F5E5A
-	Page overlay:
-		Offset: -36 0 auto 0
-		Text: Taller Nogal · Presupuesto 2026-014
-	Page overlay:
-		Pages: not-first
-		Offset: auto 0 -36 0
-		Text: Página {page} de {pages}
-			Typography:
-				Align: right
-	Section:
-		Frame:
-			Box:
-				Height: 120
-				Background: #F1EFE8
-			Paragraph: Presupuesto para la cocina de la calle Mayor.
-			Overlay:
-				Offset: 10 10 auto auto
-				Rotate: 8
-				Box:
-					Padding: 4 8
-					Border: 1
-					Border color: #A32D2D
-				Text: BORRADOR
-					Typography:
-						Color: #A32D2D
-						Bold: true
+    Language: es
+    Title: Presupuesto
+    Page:
+        Paper: A4
+        Margin: 60 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Page overlay
+            Typography:
+                Size: 8
+                Color: #5F5E5A
+    Page overlay:
+        Offset: -36 0 auto 0
+        Text: Taller Nogal · Presupuesto 2026-014
+    Page overlay:
+        Pages: not-first
+        Offset: auto 0 -36 0
+        Text: Página {page} de {pages}
+            Typography:
+                Align: right
+    Section:
+        Frame:
+            Box:
+                Height: 120
+                Background: #F1EFE8
+            Paragraph: Presupuesto para la cocina de la calle Mayor.
+            Overlay:
+                Offset: 10 10 auto auto
+                Rotate: 8
+                Box:
+                    Padding: 4 8
+                    Border: 1
+                    Border color: #A32D2D
+                Text: BORRADOR
+                    Typography:
+                        Color: #A32D2D
+                        Bold: true
 ```
 
 La cabecera sale en todas las páginas y el pie, en todas menos la primera; los dos van en el margen de la página (por eso el

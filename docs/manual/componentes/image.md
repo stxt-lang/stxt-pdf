@@ -6,39 +6,39 @@ posicionado.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Catálogo
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-	Section:
-		Image: examples/brand/nogal.svg
-			Alt: Taller Nogal
-			Box:
-				Width: 120
-				Margin: 0 0 20 0
-		Grid:
-			Column sizes: * *
-			Gap: 16
-			Area:
-				Image: examples/catalog/silla.jpg
-					Alt: Silla de nogal con asiento de lana
-					Fit: cover
-					Box:
-						Height: 160
-						Corner radius: 6
-			Area:
-				Image: examples/catalog/mesa.jpg
-					Alt: Mesa de comedor de nogal
-					Fit: cover
-					Box:
-						Height: 160
-						Corner radius: 6
+    Language: es
+    Title: Catálogo
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Section:
+        Image: examples/brand/nogal.svg
+            Alt: Taller Nogal
+            Box:
+                Width: 120
+                Margin: 0 0 20 0
+        Grid:
+            Column sizes: * *
+            Gap: 16
+            Area:
+                Image: examples/catalog/silla.jpg
+                    Alt: Silla de nogal con asiento de lana
+                    Fit: cover
+                    Box:
+                        Height: 160
+                        Corner radius: 6
+            Area:
+                Image: examples/catalog/mesa.jpg
+                    Alt: Mesa de comedor de nogal
+                    Fit: cover
+                    Box:
+                        Height: 160
+                        Corner radius: 6
 ```
 
 ## Propiedades
@@ -85,10 +85,10 @@ cualquier tamaño, y su texto se puede seleccionar.
 
 ```
 Image: planos/sala.pdf
-	Pdf page: 2
-	Alt: Plano de la sala de reuniones
-	Box:
-		Width: 100%
+    Pdf page: 2
+    Alt: Plano de la sala de reuniones
+    Box:
+        Width: 100%
 ```
 
 También sirve de **papel preimpreso**: un membrete, un formulario, un fondo. Se pone en un `Page overlay` detrás del contenido
@@ -97,27 +97,27 @@ También sirve de **papel preimpreso**: un membrete, un formulario, un fondo. Se
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Carta
-	Page:
-		Paper: A4
-		Margin: 140 72 80 72
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Serif
-				Size: 10.5
-				Line height: 16
-	Section:
-		Page overlay:
-			Offset: -140 -72 -80 -72
-			Layer: -1
-			Image: examples/letterhead/letterhead.pdf
-				Box:
-					Width: 100%
-					Height: 100%
-		Paragraph: Olot, 20 de octubre de 2025
-		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor, con el detalle de cada pieza y su plazo de entrega.
+    Language: es
+    Title: Carta
+    Page:
+        Paper: A4
+        Margin: 140 72 80 72
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 10.5
+                Line height: 16
+    Section:
+        Page overlay:
+            Offset: -140 -72 -80 -72
+            Layer: -1
+            Image: examples/letterhead/letterhead.pdf
+                Box:
+                    Width: 100%
+                    Height: 100%
+        Paragraph: Olot, 20 de octubre de 2025
+        Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor, con el detalle de cada pieza y su plazo de entrega.
 ```
 
 Con dos `Page overlay`, uno con `Pages: first` y otro con `Pages: not-first` y `Pdf page: 2`, la primera hoja lleva un membrete y las

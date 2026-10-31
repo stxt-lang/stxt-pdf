@@ -6,18 +6,18 @@ cambia solo lo suyo:
 
 ```
 Styles:
-	For element: Document
-		Typography:
-			Font: IBM Plex Serif
-			Size: 10.5
-			Line height: 15
-			Align: justify
-	For element: Heading 1
-		Typography:
-			Font: IBM Plex Sans
-			Size: 20
-			Bold: true
-			Align: left
+    For element: Document
+        Typography:
+            Font: IBM Plex Serif
+            Size: 10.5
+            Line height: 15
+            Align: justify
+    For element: Heading 1
+        Typography:
+            Font: IBM Plex Sans
+            Size: 20
+            Bold: true
+            Align: left
 ```
 
 | Propiedad | Valores | Por defecto | Qué hace |
@@ -81,8 +81,8 @@ idioma.
 
 ```
 Paragraph: «To be or not to be», dice el personaje.
-	Typography:
-		Language: en-GB
+    Typography:
+        Language: en-GB
 ```
 
 El idioma es de la caja entera, no de una palabra dentro de una línea.

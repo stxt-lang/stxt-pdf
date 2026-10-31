@@ -8,35 +8,35 @@ esquinas) y su `Break` (sin `Inside` ni `Edges`, porque no se parte). Admite ade
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 40
-	Section:
-		Page overlay:
-			Offset: -30 0 auto auto
-			Image: test/square.png
-				Box:
-					Width: 20
-		Image: test/wide.png
-			Alt: Un paisaje con montañas y un sol
-			Box:
-				Width: 100%
-				Margin: 0 0 10 0
-		Flex:
-			Gap: 10
-			Item:
-				Image: test/tall.jpg
-					Alt: Un retrato
-					Box:
-						Height: 60
-			Item:
-				Grow: 1
-				Image: test/wide.png
-					Fit: cover
-					Box:
-						Height: 60
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 40
+    Section:
+        Page overlay:
+            Offset: -30 0 auto auto
+            Image: test/square.png
+                Box:
+                    Width: 20
+        Image: test/wide.png
+            Alt: Un paisaje con montañas y un sol
+            Box:
+                Width: 100%
+                Margin: 0 0 10 0
+        Flex:
+            Gap: 10
+            Item:
+                Image: test/tall.jpg
+                    Alt: Un retrato
+                    Box:
+                        Height: 60
+            Item:
+                Grow: 1
+                Image: test/wide.png
+                    Fit: cover
+                    Box:
+                        Height: 60
 ```
 
 (El ejemplo usa las imágenes de prueba del repositorio, en `resources/images/test/`: un logotipo en la esquina de cada
@@ -190,41 +190,41 @@ sitio del membrete y del pie, que el contenido no puede pisar:
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Carta
-	Page:
-		Paper: A4
-		Margin: 140 72 80 72
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Serif
-				Size: 10.5
-				Line height: 16
-		For style: letterhead
-			Box:
-				Width: 100%
-				Height: 100%
-	Section:
-		Page overlay:
-			Pages: first
-			Offset: -140 -72 -80 -72
-			Layer: -1
-			Image: examples/letterhead/letterhead.pdf
-				Style: letterhead
-		Page overlay:
-			Pages: not-first
-			Offset: -140 -72 -80 -72
-			Layer: -1
-			Image: examples/letterhead/letterhead.pdf
-				Pdf page: 2
-				Style: letterhead
-		Paragraph: Olot, 20 de octubre de 2025
-		Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor.
-		Paragraph: Las condiciones generales van en la página siguiente.
-			Break:
-				After: page
-		Paragraph: Condiciones generales de la propuesta.
+    Language: es
+    Title: Carta
+    Page:
+        Paper: A4
+        Margin: 140 72 80 72
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 10.5
+                Line height: 16
+        For style: letterhead
+            Box:
+                Width: 100%
+                Height: 100%
+    Section:
+        Page overlay:
+            Pages: first
+            Offset: -140 -72 -80 -72
+            Layer: -1
+            Image: examples/letterhead/letterhead.pdf
+                Style: letterhead
+        Page overlay:
+            Pages: not-first
+            Offset: -140 -72 -80 -72
+            Layer: -1
+            Image: examples/letterhead/letterhead.pdf
+                Pdf page: 2
+                Style: letterhead
+        Paragraph: Olot, 20 de octubre de 2025
+        Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor.
+        Paragraph: Las condiciones generales van en la página siguiente.
+            Break:
+                After: page
+        Paragraph: Condiciones generales de la propuesta.
 ```
 
 > **Decisión:** una página de un PDF es una imagen, con todo lo de una imagen, y un papel con membrete es un `Page overlay` con

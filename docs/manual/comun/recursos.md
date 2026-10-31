@@ -5,8 +5,8 @@ desde el que se convierte:
 
 ```
 resources/
-	fonts/      fuentes .ttf
-	images/     imágenes .png, .jpg y .svg
+    fonts/      fuentes .ttf
+    images/     imágenes .png, .jpg y .svg
 ```
 
 Dentro de cada una, las subcarpetas son libres. La carpeta se puede cambiar al convertir

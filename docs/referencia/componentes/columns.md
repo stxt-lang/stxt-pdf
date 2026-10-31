@@ -7,16 +7,16 @@ elemento en flujo, también dentro de otro `Columns`.
 
 ```
 Columns:
-	Count: 2
-	Gap: 20
-	Separator: 0.5
-	Separator color: #999999
-	Paragraph:
-		Content >>
-			Texto largo que fluye por las dos columnas…
-	Paragraph:
-		Content >>
-			…y sigue en la página siguiente.
+    Count: 2
+    Gap: 20
+    Separator: 0.5
+    Separator color: #999999
+    Paragraph:
+        Content >>
+            Texto largo que fluye por las dos columnas…
+    Paragraph:
+        Content >>
+            …y sigue en la página siguiente.
 ```
 
 | Propiedad | Valores | Por defecto | Notas |

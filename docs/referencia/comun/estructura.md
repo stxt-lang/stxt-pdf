@@ -73,14 +73,14 @@ propiedad, como mucho una vez por grupo. Fuera de los grupos queda lo que define
 
 ```
 Text: Resultados del trimestre
-	Id: title
-	Box:
-		Margin: 0 0 16 0
-	Typography:
-		Bold: true
-		Size: 20
-	Break:
-		After: avoid
+    Id: title
+    Box:
+        Margin: 0 0 16 0
+    Typography:
+        Bold: true
+        Size: 20
+    Break:
+        After: avoid
 ```
 
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
@@ -115,34 +115,34 @@ respecto a los elementos, no importa.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-	Section:
-		Text: Un título
-			Id: title
-			Typography:
-				Size: 20
-		Flex:
-			Id: body
-			Gap: 10
-			Item:
-				Grow: 1
-				Block:
-					Paragraph: Primer párrafo.
-					Paragraph: Segundo párrafo.
-			Item:
-				Block:
-					Box:
-						Width: 100
-						Background: #F1EFE8
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Section:
+        Text: Un título
+            Id: title
+            Typography:
+                Size: 20
+        Flex:
+            Id: body
+            Gap: 10
+            Item:
+                Grow: 1
+                Block:
+                    Paragraph: Primer párrafo.
+                    Paragraph: Segundo párrafo.
+            Item:
+                Block:
+                    Box:
+                        Width: 100
+                        Background: #F1EFE8
 ```
 
 ## El árbol de cajas

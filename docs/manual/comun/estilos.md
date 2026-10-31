@@ -5,21 +5,21 @@ Las reglas de `Styles` dan propiedades a muchos elementos a la vez, para no repe
 
 ```
 Styles:
-	For element: Document
-		Typography:
-			Font: IBM Plex Sans
-			Size: 10
-	For element: Paragraph
-		Box:
-			Margin: 0 0 8 0
-	For style: note
-		Box:
-			Background: #F1EFE8
-			Padding: 8
-	For id: title
-		Typography:
-			Size: 20
-			Bold: true
+    For element: Document
+        Typography:
+            Font: IBM Plex Sans
+            Size: 10
+    For element: Paragraph
+        Box:
+            Margin: 0 0 8 0
+    For style: note
+        Box:
+            Background: #F1EFE8
+            Padding: 8
+    For id: title
+        Typography:
+            Size: 20
+            Bold: true
 ```
 
 ## Reglas
@@ -68,13 +68,13 @@ documento solo con el contenido:
 
 ```
 Styles (dev.stxt.pdf):
-	For element: Document
-		Typography:
-			Font: IBM Plex Sans
-			Size: 10
-	For style: panel
-		Box:
-			Padding: 10
+    For element: Document
+        Typography:
+            Font: IBM Plex Sans
+            Size: 10
+    For style: panel
+        Box:
+            Padding: 10
 ```
 
 El documento no dice dónde está su fichero de estilos: se pasa al convertirlo ([Uso desde Java](uso-desde-java.md)). Si el

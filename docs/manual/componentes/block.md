@@ -5,35 +5,35 @@ grupo no se parta entre páginas o para que sus hijos hereden una tipografía.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Aviso
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For style: warning
-			Box:
-				Margin: 12 0
-				Padding: 10 14
-				Border: 0 0 0 4
-				Border color: #C0392B
-				Background: #FBEAE8
-				Corner radius: 0 6 6 0
-			Break:
-				Inside: avoid
-	Section:
-		Paragraph: Antes de instalar el termostato, corta la corriente.
-		Block:
-			Style: warning
-			Paragraph: Atención
-				Typography:
-					Bold: true
-			Paragraph: Trabajar con la corriente conectada puede causar una descarga eléctrica.
-		Paragraph: Después, retira la tapa con cuidado.
+    Language: es
+    Title: Aviso
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For style: warning
+            Box:
+                Margin: 12 0
+                Padding: 10 14
+                Border: 0 0 0 4
+                Border color: #C0392B
+                Background: #FBEAE8
+                Corner radius: 0 6 6 0
+            Break:
+                Inside: avoid
+    Section:
+        Paragraph: Antes de instalar el termostato, corta la corriente.
+        Block:
+            Style: warning
+            Paragraph: Atención
+                Typography:
+                    Bold: true
+            Paragraph: Trabajar con la corriente conectada puede causar una descarga eléctrica.
+        Paragraph: Después, retira la tapa con cuidado.
 ```
 
 Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Contain margins` y `Rotate` (girarlo con todo lo que contiene,

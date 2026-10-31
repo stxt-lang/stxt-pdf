@@ -5,37 +5,37 @@ y, al acabar las columnas de una página, continúa en la página siguiente.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Boletín
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Serif
-				Size: 10
-				Align: justify
-		For element: Paragraph
-			Box:
-				Margin: 0 0 8 0
-	Section:
-		Columns:
-			Count: 2
-			Gap: 20
-			Separator: 0.5
-			Separator color: #999999
-			Paragraph:
-				Content >>
-					El mercado de los sábados vuelve a la plaza mayor con más puestos que nunca:
-					verdura de la huerta, quesos de la sierra y pan de leña.
-			Paragraph:
-				Content >>
-					La asociación de vecinos prepara además una ruta a pie por el río, con salida
-					desde el puente viejo a las diez de la mañana.
-			Paragraph:
-				Content >>
-					Las inscripciones están abiertas hasta el viernes en la biblioteca municipal.
+    Language: es
+    Title: Boletín
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 10
+                Align: justify
+        For element: Paragraph
+            Box:
+                Margin: 0 0 8 0
+    Section:
+        Columns:
+            Count: 2
+            Gap: 20
+            Separator: 0.5
+            Separator color: #999999
+            Paragraph:
+                Content >>
+                    El mercado de los sábados vuelve a la plaza mayor con más puestos que nunca:
+                    verdura de la huerta, quesos de la sierra y pan de leña.
+            Paragraph:
+                Content >>
+                    La asociación de vecinos prepara además una ruta a pie por el río, con salida
+                    desde el puente viejo a las diez de la mañana.
+            Paragraph:
+                Content >>
+                    Las inscripciones están abiertas hasta el viernes en la biblioteca municipal.
 ```
 
 ## Propiedades

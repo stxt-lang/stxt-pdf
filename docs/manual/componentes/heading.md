@@ -5,50 +5,50 @@ importante) a 6.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Manual de instalación
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Heading 1
-			Typography:
-				Size: 20
-				Bold: true
-				Numbered: false
-			Box:
-				Margin: 0 0 16 0
-		For element: Heading 2
-			Typography:
-				Size: 14
-				Bold: true
-				Numbered: true
-			Box:
-				Margin: 16 0 8 0
-		For element: Heading 3
-			Typography:
-				Size: 11
-				Bold: true
-				Numbered: true
-			Box:
-				Margin: 10 0 6 0
-	Section:
-		Heading 1:
-			Text: Manual de instalación
-		Heading 2:
-			Text: Antes de empezar
-		Paragraph: Comprueba que tienes todas las piezas.
-		Heading 2:
-			Id: wiring
-			Text: Conexión
-		Heading 3:
-			Text: Cables
-		Paragraph: Conecta el cable rojo al borne L.
-		Paragraph: Los pasos de la sección {number of: wiring} se hacen con la corriente cortada.
+    Language: es
+    Title: Manual de instalación
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Heading 1
+            Typography:
+                Size: 20
+                Bold: true
+                Numbered: false
+            Box:
+                Margin: 0 0 16 0
+        For element: Heading 2
+            Typography:
+                Size: 14
+                Bold: true
+                Numbered: true
+            Box:
+                Margin: 16 0 8 0
+        For element: Heading 3
+            Typography:
+                Size: 11
+                Bold: true
+                Numbered: true
+            Box:
+                Margin: 10 0 6 0
+    Section:
+        Heading 1:
+            Text: Manual de instalación
+        Heading 2:
+            Text: Antes de empezar
+        Paragraph: Comprueba que tienes todas las piezas.
+        Heading 2:
+            Id: wiring
+            Text: Conexión
+        Heading 3:
+            Text: Cables
+        Paragraph: Conecta el cable rojo al borne L.
+        Paragraph: Los pasos de la sección {number of: wiring} se hacen con la corriente cortada.
 ```
 
 El título del documento no lleva número y los apartados sí: «1 Antes de empezar», «2 Conexión», «2.1 Cables».
@@ -87,16 +87,16 @@ una regla, en todo el documento o en un encabezado concreto.
 
 ```
 Styles:
-	For style: annex
-		Typography:
-			Numbered: true
-			Number format: upper-alpha
-			Number label: Anexo {number}.
+    For style: annex
+        Typography:
+            Numbered: true
+            Number format: upper-alpha
+            Number label: Anexo {number}.
 Heading 1:
-	Text: Anexos
+    Text: Anexos
 Heading 2:
-	Style: annex
-	Text: Honorarios        # «Anexo A. Honorarios»
+    Style: annex
+    Text: Honorarios        # «Anexo A. Honorarios»
 ```
 
 ## Fuera del índice (`In table of contents`)

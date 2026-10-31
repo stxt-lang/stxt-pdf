@@ -4,33 +4,33 @@
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe del trimestre
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Heading 1
-			Typography:
-				Size: 18
-				Bold: true
-			Box:
-				Margin: 0 0 12 0
-		For element: Paragraph
-			Box:
-				Margin: 0 0 8 0
-	Section:
-		Heading 1:
-			Text: Informe del trimestre
-		Paragraph:
-			Content >>
-				Las ventas han crecido un 12 % respecto al trimestre anterior,
-				sobre todo en la zona norte.
-		Paragraph: Los costes se mantienen estables.
+    Language: es
+    Title: Informe del trimestre
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Heading 1
+            Typography:
+                Size: 18
+                Bold: true
+            Box:
+                Margin: 0 0 12 0
+        For element: Paragraph
+            Box:
+                Margin: 0 0 8 0
+    Section:
+        Heading 1:
+            Text: Informe del trimestre
+        Paragraph:
+            Content >>
+                Las ventas han crecido un 12 % respecto al trimestre anterior,
+                sobre todo en la zona norte.
+        Paragraph: Los costes se mantienen estables.
 ```
 
 Línea a línea:

@@ -5,40 +5,40 @@ varias. Sirve para composiciones de página: una barra lateral y el cuerpo, fich
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Ficha
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For style: panel
-			Box:
-				Padding: 10
-				Background: #F1EFE8
-	Section:
-		Grid:
-			Column sizes: 150 *
-			Gap: 20
-			Areas >>
-				head head
-				side main
-			Area: head
-				Text: Silla de nogal
-					Typography:
-						Size: 18
-						Bold: true
-			Area: side
-				Text: Ref. 0412
-					Style: panel
-			Area: main
-				Paragraph:
-					Content >>
-						Madera maciza de nogal, acabado al aceite. Asiento tapizado
-						en lana natural.
+    Language: es
+    Title: Ficha
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For style: panel
+            Box:
+                Padding: 10
+                Background: #F1EFE8
+    Section:
+        Grid:
+            Column sizes: 150 *
+            Gap: 20
+            Areas >>
+                head head
+                side main
+            Area: head
+                Text: Silla de nogal
+                    Typography:
+                        Size: 18
+                        Bold: true
+            Area: side
+                Text: Ref. 0412
+                    Style: panel
+            Area: main
+                Paragraph:
+                    Content >>
+                        Madera maciza de nogal, acabado al aceite. Asiento tapizado
+                        en lana natural.
 ```
 
 ## `Area`

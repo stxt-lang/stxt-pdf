@@ -4,63 +4,63 @@ Una tabla de filas y columnas. Su cabecera y su pie se repiten en cada página p
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Factura
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Cell
-			Box:
-				Padding: 4 6
-				Border: 0 0 0.5 0
-				Border color: #C8C4BA
-		For element: Head cell
-			Typography:
-				Bold: true
-				Color: #FFFFFF
-			Box:
-				Background: #12315A
-		For element: Even row cell
-			Box:
-				Background: #F4F2EC
-		For style: total
-			Typography:
-				Bold: true
-	Section:
-		Table:
-			Column sizes: * 60 80 80
-			Column align: left right right right
-			Head:
-				Row:
-					Cell: Concepto
-					Cell: Uds.
-					Cell: Precio
-					Cell: Importe
-			Body:
-				Row:
-					Cell: Silla de nogal
-						Row header: true
-					Cell: 12
-					Cell: 145,00
-					Cell: 1740,00
-				Row:
-					Cell: Mesa de comedor
-						Row header: true
-					Cell: 1
-					Cell: 890,00
-					Cell: 890,00
-			Foot:
-				Row:
-					Style: total
-					Cell: Total
-						Row header: true
-						Span: 1 3
-					Cell: 2630,00
+    Language: es
+    Title: Factura
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Cell
+            Box:
+                Padding: 4 6
+                Border: 0 0 0.5 0
+                Border color: #C8C4BA
+        For element: Head cell
+            Typography:
+                Bold: true
+                Color: #FFFFFF
+            Box:
+                Background: #12315A
+        For element: Even row cell
+            Box:
+                Background: #F4F2EC
+        For style: total
+            Typography:
+                Bold: true
+    Section:
+        Table:
+            Column sizes: * 60 80 80
+            Column align: left right right right
+            Head:
+                Row:
+                    Cell: Concepto
+                    Cell: Uds.
+                    Cell: Precio
+                    Cell: Importe
+            Body:
+                Row:
+                    Cell: Silla de nogal
+                        Row header: true
+                    Cell: 12
+                    Cell: 145,00
+                    Cell: 1740,00
+                Row:
+                    Cell: Mesa de comedor
+                        Row header: true
+                    Cell: 1
+                    Cell: 890,00
+                    Cell: 890,00
+            Foot:
+                Row:
+                    Style: total
+                    Cell: Total
+                        Row header: true
+                        Span: 1 3
+                    Cell: 2630,00
 ```
 
 ## La estructura
@@ -110,52 +110,52 @@ celdas, así que un `Padding` o un `Height` en ella es un error. El `Id` de una 
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Presupuesto
-	Page:
-		Paper: A5
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Cell
-			Box:
-				Padding: 4 6
-		For style: total
-			Typography:
-				Bold: true
-	Section:
-		Table:
-			Column sizes: * 80
-			Column align: left right
-			Gap: 0 8
-			Head:
-				Row:
-					Box:
-						Border: 0 0 1 0
-					Typography:
-						Bold: true
-					Cell: Concepto
-					Cell: Importe
-			Body:
-				Row:
-					Cell: Diseño
-					Cell: 1200,00
-				Row:
-					Cell: Maquetación
-					Cell: 800,00
-			Foot:
-				Row:
-					Id: total
-					Style: total
-					Box:
-						Background: #F4F2EC
-						Border: 1 0 0 0
-						Corner radius: 0 0 4 4
-					Cell: Total
-					Cell: 2000,00
+    Language: es
+    Title: Presupuesto
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Cell
+            Box:
+                Padding: 4 6
+        For style: total
+            Typography:
+                Bold: true
+    Section:
+        Table:
+            Column sizes: * 80
+            Column align: left right
+            Gap: 0 8
+            Head:
+                Row:
+                    Box:
+                        Border: 0 0 1 0
+                    Typography:
+                        Bold: true
+                    Cell: Concepto
+                    Cell: Importe
+            Body:
+                Row:
+                    Cell: Diseño
+                    Cell: 1200,00
+                Row:
+                    Cell: Maquetación
+                    Cell: 800,00
+            Foot:
+                Row:
+                    Id: total
+                    Style: total
+                    Box:
+                        Background: #F4F2EC
+                        Border: 1 0 0 0
+                        Corner radius: 0 0 4 4
+                    Cell: Total
+                    Cell: 2000,00
 ```
 
 ## Entre páginas

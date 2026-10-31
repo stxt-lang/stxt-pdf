@@ -8,47 +8,47 @@ generado hereda su `Typography`. No admite `Link`: su contenido lleva sus propio
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 40
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Heading 1
-			Typography:
-				Size: 18
-		For element: List
-			Box:
-				Padding: 0 0 0 20
-	Section:
-		Markdown:
-			Typography:
-				Code font: IBM Plex Mono
-			Bullet markers: bullet dash
-			Number markers: decimal
-			Table columns: equal
-			Content >>
-				# Resultados
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Heading 1
+            Typography:
+                Size: 18
+        For element: List
+            Box:
+                Padding: 0 0 0 20
+    Section:
+        Markdown:
+            Typography:
+                Code font: IBM Plex Mono
+            Bullet markers: bullet dash
+            Number markers: decimal
+            Table columns: equal
+            Content >>
+                # Resultados
 
-				Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
-				con ~~pérdidas~~ beneficios. El informe sale de `mvn test`.
+                Las ventas **suben** y los costes *bajan*: un trimestre ++muy bueno++,
+                con ~~pérdidas~~ beneficios. El informe sale de `mvn test`.
 
-				- Ventas en alza
-				- Costes:
-				  - personal
-				  - material
+                - Ventas en alza
+                - Costes:
+                  - personal
+                  - material
 
-				1. Revisar
-				2. Aprobar
+                1. Revisar
+                2. Aprobar
 
-				| Región | Ventas |
-				|--------|-------:|
-				| Norte  | 120    |
-				| Sur    | **95** |
+                | Región | Ventas |
+                |--------|-------:|
+                | Norte  | 120    |
+                | Sur    | **95** |
 ```
 
 | Propiedad | Valores | Por defecto | Notas |

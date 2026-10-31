@@ -7,39 +7,39 @@ que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`:
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe
-	Page:
-		Paper: A4
-		Margin: 56
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-	Page overlay:
-		Id: footer
-		Offset: auto 0 -30 0
-		Text: Página {page} de {pages}
-	Section:
-		Id: front-cover
-		Page numbering: none
-		Inherit page overlays: false
-		Page:
-			Margin: 0
-		Block:
-			Box:
-				Height: 100%
-				Background: #12315A
-	Section:
-		Id: body
-		Paragraph: El cuerpo del informe empieza en la página 1.
-	Section:
-		Id: annex
-		Page numbering: restart
-		Page:
-			Orientation: landscape
-		Paragraph: El anexo, apaisado, vuelve a la página 1.
+    Language: es
+    Title: Informe
+    Page:
+        Paper: A4
+        Margin: 56
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Page overlay:
+        Id: footer
+        Offset: auto 0 -30 0
+        Text: Página {page} de {pages}
+    Section:
+        Id: front-cover
+        Page numbering: none
+        Inherit page overlays: false
+        Page:
+            Margin: 0
+        Block:
+            Box:
+                Height: 100%
+                Background: #12315A
+    Section:
+        Id: body
+        Paragraph: El cuerpo del informe empieza en la página 1.
+    Section:
+        Id: annex
+        Page numbering: restart
+        Page:
+            Orientation: landscape
+        Paragraph: El anexo, apaisado, vuelve a la página 1.
 ```
 
 > **Decisión:** el documento es siempre una secuencia de páginas, así que el área útil tiene siempre alto definido.
@@ -72,9 +72,9 @@ enteros:
 
 ```
 Page:
-	Paper: A4
-	Orientation: landscape
-	Margin: 40
+    Paper: A4
+    Orientation: landscape
+    Margin: 40
 ```
 
 es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
@@ -176,12 +176,12 @@ la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a
 
 ```
 Section:
-	Id: preface
-	Page number format: lower-roman
-	Paragraph: El prefacio: sus páginas son i, ii, iii…
+    Id: preface
+    Page number format: lower-roman
+    Paragraph: El prefacio: sus páginas son i, ii, iii…
 Section:
-	Page numbering: restart
-	Paragraph: El cuerpo empieza en la página 1.
+    Page numbering: restart
+    Paragraph: El cuerpo empieza en la página 1.
 ```
 
 Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`; un `Start` sin `restart`,
@@ -210,10 +210,10 @@ La página en blanco es **una página más de la sección anterior**:
 
 ```
 Section:
-	Id: chapter-2
-	Begin on: odd
-	Heading 1:
-		Text: Capítulo 2
+    Id: chapter-2
+    Begin on: odd
+    Heading 1:
+        Text: Capítulo 2
 ```
 
 La primera sección ya empieza en la página 1: `Begin on: odd` en ella no tendría efecto y es `BEGIN_ON_FIRST_SECTION`.

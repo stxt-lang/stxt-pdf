@@ -8,8 +8,8 @@ llevan el suyo.
 
 ```
 Table of contents:
-	Levels: 1 2
-	Leader: dots
+    Levels: 1 2
+    Leader: dots
 ```
 
 | Propiedad | Valores | Por defecto | Notas |

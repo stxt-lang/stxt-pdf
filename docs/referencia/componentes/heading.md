@@ -7,21 +7,21 @@ en los marcadores del PDF y en lo que anuncia un lector de pantalla.
 
 ```
 Styles:
-	For element: Heading 1
-		Typography:
-			Size: 20
-			Bold: true
-		Box:
-			Margin: 0 0 10 0
-	For element: Paragraph
-		Box:
-			Margin: 0 0 6 0
+    For element: Heading 1
+        Typography:
+            Size: 20
+            Bold: true
+        Box:
+            Margin: 0 0 10 0
+    For element: Paragraph
+        Box:
+            Margin: 0 0 6 0
 Heading 1:
-	Id: results
-	Text: Resultados del trimestre
+    Id: results
+    Text: Resultados del trimestre
 Paragraph:
-	Content >>
-		Las ventas crecieron un 12 %.
+    Content >>
+        Las ventas crecieron un 12 %.
 ```
 
 **Sin estilos implícitos.** Un `Heading 1` no es más grande que un `Heading 2` por sí mismo: el estilo de cada nivel se
@@ -74,19 +74,19 @@ niveles, en una regla `For element: Heading 1` solo los de ese nivel, en una reg
 
 ```
 Styles:
-	For element: Document
-		Typography:
-			Numbered: true
+    For element: Document
+        Typography:
+            Numbered: true
 Heading 1:
-	Id: portada
-	Text: Informe del trimestre
-	Typography:
-		Numbered: false
+    Id: portada
+    Text: Informe del trimestre
+    Typography:
+        Numbered: false
 Heading 1:
-	Text: Resultados            # «1 Resultados»
+    Text: Resultados            # «1 Resultados»
 Heading 2:
-	Id: ventas
-	Text: Ventas                # «1.1 Ventas»
+    Id: ventas
+    Text: Ventas                # «1.1 Ventas»
 Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 ```
 
@@ -123,17 +123,17 @@ reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` c
 
 ```
 Styles:
-	For style: annex
-		Typography:
-			Numbered: true
-			Number format: upper-alpha
-			Number label: Anexo {number}.
+    For style: annex
+        Typography:
+            Numbered: true
+            Number format: upper-alpha
+            Number label: Anexo {number}.
 Heading 1:
-	Text: Anexos
+    Text: Anexos
 Heading 2:
-	Id: fees
-	Style: annex
-	Text: Honorarios            # «Anexo A. Honorarios»
+    Id: fees
+    Style: annex
+    Text: Honorarios            # «Anexo A. Honorarios»
 Paragraph: Los importes del anexo {number of: fees}.
 ```
 

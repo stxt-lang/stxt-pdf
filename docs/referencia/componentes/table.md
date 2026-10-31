@@ -7,28 +7,28 @@ en flujo, también dentro de una celda.
 
 ```
 Styles:
-	For element: Cell
-		Box:
-			Padding: 2 4
-			Border: 0 0 0.5 0
+    For element: Cell
+        Box:
+            Padding: 2 4
+            Border: 0 0 0.5 0
 Table:
-	Column sizes: 120 * *
-	Head:
-		Row:
-			Typography:
-				Bold: true
-			Cell: Concepto
-			Cell: T1
-			Cell: T2
-	Body:
-		Row:
-			Cell: Ventas
-			Cell: 100
-			Cell: 120
-	Foot:
-		Row:
-			Cell: Total
-				Span: 1 3
+    Column sizes: 120 * *
+    Head:
+        Row:
+            Typography:
+                Bold: true
+            Cell: Concepto
+            Cell: T1
+            Cell: T2
+    Body:
+        Row:
+            Cell: Ventas
+            Cell: 100
+            Cell: 120
+    Foot:
+        Row:
+            Cell: Total
+                Span: 1 3
 ```
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
@@ -120,15 +120,15 @@ o `Foot` se repite con ella.
 
 ```
 Foot:
-	Row:
-		Id: total
-		Style: total
-		Box:
-			Background: #F4F2EC
-			Border: 1 0 0 0
-		Cell: Total
-			Span: 1 3
-		Cell: 2630,00
+    Row:
+        Id: total
+        Style: total
+        Box:
+            Background: #F4F2EC
+            Border: 1 0 0 0
+        Cell: Total
+            Span: 1 3
+        Cell: 2630,00
 ```
 
 El `Id` de una fila es un `Id` del documento, único como cualquier otro: es destino de `Link: #id` y de `{page of: id}`

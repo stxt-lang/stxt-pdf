@@ -10,52 +10,52 @@
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe anual
-	Page:
-		Paper: A4
-		Margin: 56
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-		For element: Heading 1
-			Typography:
-				Size: 22
-				Bold: true
-	Page overlay:
-		Offset: auto 0 -30 0
-		Text: Página {page} de {pages}
-			Typography:
-				Size: 8
-				Align: right
-	Section:
-		Page numbering: none
-		Inherit page overlays: false
-		Page:
-			Margin: 0
-		Block:
-			Box:
-				Height: 100%
-				Padding: 300 56 0 56
-				Background: #12315A
-			Heading 1:
-				In table of contents: false
-				Text: Informe anual
-				Typography:
-					Color: #FFFFFF
-	Section:
-		Heading 1:
-			Text: Resultados
-		Paragraph: El cuerpo del informe empieza en la página 1.
-	Section:
-		Page numbering: restart
-		Page:
-			Orientation: landscape
-		Heading 1:
-			Text: Anexo
-		Paragraph: El anexo, apaisado, vuelve a la página 1.
+    Language: es
+    Title: Informe anual
+    Page:
+        Paper: A4
+        Margin: 56
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Heading 1
+            Typography:
+                Size: 22
+                Bold: true
+    Page overlay:
+        Offset: auto 0 -30 0
+        Text: Página {page} de {pages}
+            Typography:
+                Size: 8
+                Align: right
+    Section:
+        Page numbering: none
+        Inherit page overlays: false
+        Page:
+            Margin: 0
+        Block:
+            Box:
+                Height: 100%
+                Padding: 300 56 0 56
+                Background: #12315A
+            Heading 1:
+                In table of contents: false
+                Text: Informe anual
+                Typography:
+                    Color: #FFFFFF
+    Section:
+        Heading 1:
+            Text: Resultados
+        Paragraph: El cuerpo del informe empieza en la página 1.
+    Section:
+        Page numbering: restart
+        Page:
+            Orientation: landscape
+        Heading 1:
+            Text: Anexo
+        Paragraph: El anexo, apaisado, vuelve a la página 1.
 ```
 
 Este documento tiene tres secciones: una portada a sangre, sin número de página y sin el pie; el cuerpo, que empieza en la
@@ -122,30 +122,30 @@ sección ya empieza en la página 1, así que en ella es un error.
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Dos capítulos
-	Page:
-		Paper: A5
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Serif
-				Size: 11
-	Page overlay:
-		Offset: auto 0 -30 0
-		Text: {page}
-		Typography:
-			Align: center
-	Section:
-		Heading 1:
-			Text: Capítulo 1
-		Paragraph: El primer capítulo ocupa una sola página.
-	Section:
-		Begin on: odd
-		Heading 1:
-			Text: Capítulo 2
-		Paragraph: El segundo empieza en la página 3: la 2 queda en blanco.
+    Language: es
+    Title: Dos capítulos
+    Page:
+        Paper: A5
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 11
+    Page overlay:
+        Offset: auto 0 -30 0
+        Text: {page}
+        Typography:
+            Align: center
+    Section:
+        Heading 1:
+            Text: Capítulo 1
+        Paragraph: El primer capítulo ocupa una sola página.
+    Section:
+        Begin on: odd
+        Heading 1:
+            Text: Capítulo 2
+        Paragraph: El segundo empieza en la página 3: la 2 queda en blanco.
 ```
 
 ## Recetas

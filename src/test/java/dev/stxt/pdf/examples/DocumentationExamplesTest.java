@@ -49,6 +49,7 @@ class DocumentationExamplesTest {
     private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("docs");
     private static final Pattern EXAMPLE =
             Pattern.compile("```(?:stxt)?\n(Document \\(dev\\.stxt\\.pdf\\):\n.*?)```", Pattern.DOTALL);
+    private static final Pattern LEADING_TABS = Pattern.compile("(?m)^\t+");
 
     private final DocumentReader reader = new DocumentReader();
 
@@ -79,10 +80,14 @@ class DocumentationExamplesTest {
         }
     }
 
-    /** El ejemplo completo de la referencia es {@code test/spec/report.stxt}, sin los comentarios de su cabecera. */
+    /**
+     * El ejemplo completo de la referencia es {@code test/spec/report.stxt}, sin los comentarios de su cabecera. El
+     * {@code .stxt} indenta con tabuladores y los bloques STXT de los {@code .md} con cuatro espacios por nivel.
+     */
     @Test
     void theReportIsTheCompleteExample() throws IOException {
         String report = Files.readString(REPORT).replace("\r\n", "\n").replaceFirst("\\A(#[^\n]*\n)+", "");
+        report = LEADING_TABS.matcher(report).replaceAll(m -> "    ".repeat(m.group().length()));
         List<DocDocument> examples = examples(COMPLETE_EXAMPLE);
         assertEquals(1, examples.size());
         assertEquals(examples.get(0).text(), report);

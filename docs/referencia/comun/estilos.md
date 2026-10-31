@@ -22,23 +22,23 @@ elemento (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link`, `Rotate`…).
 
 ```
 Styles:
-	For element: Text
-		Typography:
-			Align: justify
-	For style: note
-		Box:
-			Background: #F1EFE8
-			Padding: 8
-	For id: title
-		Typography:
-			Size: 20
-			Bold: true
+    For element: Text
+        Typography:
+            Align: justify
+    For style: note
+        Box:
+            Background: #F1EFE8
+            Padding: 8
+    For id: title
+        Typography:
+            Size: 20
+            Bold: true
 Text: Resultados del trimestre
-	Id: title
-	Typography:
-		Align: left
+    Id: title
+    Typography:
+        Align: left
 Text: Una nota al margen.
-	Style: note
+    Style: note
 ```
 
 > **Decisión:** las reglas solo admiten los grupos: las propiedades propias de un elemento no se podrían validar al
@@ -105,10 +105,10 @@ por defecto) se declara en la regla `For element: Document`, que solo admite `Ty
 
 ```
 Styles:
-	For element: Document
-		Typography:
-			Font: IBM Plex Sans
-			Size: 10
+    For element: Document
+        Typography:
+            Font: IBM Plex Sans
+            Size: 10
 ```
 
 Es la base de la herencia: la regla `For element` de un tipo o lo que declara una caja la cambian para esa caja y sus
@@ -124,13 +124,13 @@ del documento principal o compartirlas entre varios:
 
 ```
 Styles (dev.stxt.pdf):
-	For element: Document
-		Typography:
-			Font: IBM Plex Sans
-			Size: 10
-	For style: panel
-		Box:
-			Padding: 10
+    For element: Document
+        Typography:
+            Font: IBM Plex Sans
+            Size: 10
+    For style: panel
+        Box:
+            Padding: 10
 ```
 
 - **Se pasa al maquetar, nunca se busca.** El documento no dice dónde está su documento de estilos y el motor no busca
