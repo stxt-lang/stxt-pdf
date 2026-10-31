@@ -110,11 +110,33 @@ public final class BreakRules {
 
     /**
      * Quality of the break between two in-flow sibling boxes: {@code Keep with next} on the first or {@code Keep with
-     * previous} on the second make it worse.
+     * previous} on the second make it worse, also when they come from inside ({@link #keepsWithNext}).
      */
     public static int between(Box before, Box after) {
-        return before.style().breaks().keepWithNext() || after.style().breaks().keepWithPrevious()
+        return keepsWithNext(before) || keepsWithPrevious(after)
                 ? BreakAppeal.VIOLATES_KEEP_BETWEEN : BreakAppeal.PERFECT_BREAK;
+    }
+
+    /**
+     * {@code Keep with next} of the box or, if it is a block, of its last in-flow child: like the forced breaks
+     * ({@link #forcedAfter}), it propagates to the parent, because both end at the same point. A heading that ends a
+     * block is not left alone at the end of the page.
+     */
+    private static boolean keepsWithNext(Box box) {
+        if (box.style().breaks().keepWithNext()) {
+            return true;
+        }
+        List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
+        return !children.isEmpty() && keepsWithNext(children.get(children.size() - 1));
+    }
+
+    /** {@code Keep with previous} of the box or, if it is a block, of its first in-flow child ({@link #keepsWithNext}). */
+    private static boolean keepsWithPrevious(Box box) {
+        if (box.style().breaks().keepWithPrevious()) {
+            return true;
+        }
+        List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
+        return !children.isEmpty() && keepsWithPrevious(children.get(0));
     }
 
     /**

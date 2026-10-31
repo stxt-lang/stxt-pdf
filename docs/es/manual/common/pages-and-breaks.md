@@ -49,6 +49,8 @@ Block:
 - Un salto forzado al principio de una página no hace nada: nunca deja páginas en blanco.
 - Los encabezados ya evitan quedarse solos al final de una página: no hace falta `Keep with next: true`
   ([Encabezados](../components/heading.md)).
+- El `Keep with next` del último hijo de un bloque vale también para el bloque, y el `Keep with previous` del primero,
+  igual: un encabezado al final de un `Block` sigue yendo con lo que viene después del bloque.
 - `Keep together: true` no impide partir una caja que no cabe ni en una página entera.
 - Los elementos posicionados `Overlay` y `Page overlay` no admiten `Break`, porque no se parten ni están en el flujo. Tampoco
   lo que hay dentro de ellos o de una caja girada: un `Break` escrito ahí es un error (salvo en las columnas de un

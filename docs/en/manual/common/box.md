@@ -49,7 +49,9 @@ Margins separate a box from the ones around it. Between two boxes one below the 
 the larger one is kept**. With 20 below one box and 30 above the next, they are 30 apart, not 50. The same happens
 between a box and its first or its last child if the box has no border or padding on that side: the margin of the child
 comes out. To keep it from coming out, the box needs a padding, a border or `Isolate margins: true`
-([Block](../components/block.md)). A negative margin brings the boxes closer together.
+([Block](../components/block.md)). A negative margin brings the boxes closer together,
+but it cannot take a box off the page or take more height from its parent than its content measures: both are an
+error (`BOX_OVERFLOW`).
 
 **Centering.** `Margin: 0 auto` centers horizontally a box with `Width` (or `Max width`): the two side margins share the
 leftover space. An `auto` where there is nothing to center is an error: in a box without a width, which already takes up

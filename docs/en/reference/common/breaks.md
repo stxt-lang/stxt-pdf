@@ -48,6 +48,10 @@ If there is still no possible break, it breaks where the space runs out.
 A paragraph that cannot respect `Widows` and `Orphans` is split anyway if the alternative is to violate a `Keep with next` or a `Keep with previous`. At
 that break, widows are respected if possible and, if not, the space is filled.
 
+`Keep with next` and `Keep with previous` propagate like the forced breaks: the `Keep with next` of the last in-flow
+child of a block (or of a `Columns`) also applies to the block, and so does the `Keep with previous` of the first one.
+This way, a heading that ends a `Block` is not left alone at the end of the page.
+
 If the best break comes before the child that does not fit, what follows moves to the next page, but an earlier child is
 never split inside to make room.
 

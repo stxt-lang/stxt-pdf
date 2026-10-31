@@ -30,6 +30,7 @@ import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_ROWS;
 import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.LINE_HEIGHT;
+import static dev.stxt.pdf.tree.PropertyKey.MARGIN;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MIN_WIDTH;
 import static dev.stxt.pdf.tree.PropertyKey.OFFSET;
@@ -40,10 +41,10 @@ import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
 /**
  * Checks, once paginated, that nothing overflows (reference/common/overflow.md): each line of text and
  * each in-flow child (with its horizontal margins) fit in the content box of its parent;
- * the flow fits in the page area of each page, and the {@code Overlay} and
- * {@code Page overlay} boxes and the rotated ones fit on the page (the rotated ones, and those inside a
- * rotated one, with the rectangle that encloses what is painted). It looks at the final result, not at the
- * measuring passes.
+ * the flow fits in the page area of each page, and every box fits on the physical page: the {@code Overlay} and
+ * {@code Page overlay} boxes, the rotated ones (they, and those inside a rotated one, with the rectangle that
+ * encloses what is painted) and the in-flow ones that the {@code Offset} of a {@code Frame} or a negative
+ * {@code Margin} takes out of it. It looks at the final result, not at the measuring passes.
  *
  * <p>The error points to the deepest culprit: the word that does not fit on its line, the innermost
  * box that sticks out, or the {@code Height} that falls short.</p>
@@ -102,6 +103,14 @@ public final class Overflow {
             throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : SourceLine.of(f.box().line()),
                     ErrorCode.BOX_OVERFLOW, "Box " + f.box().describe() + " goes off the page: its Offset and its "
                     + "size have to be checked");
+        } else if (!s.isOutOfFlow() && !inside(turn.isIdentity() ? borderBox : Rotation.envelope(turn, borderBox),
+                page)) {
+            // In flow it fits in its parent, but the Offset of a Frame or a negative Margin can take it off the page.
+            String property = s.isDeclared(OFFSET) ? OFFSET : s.isDeclared(MARGIN) ? MARGIN : null;
+            throw new InvalidModelException(property != null ? s.line(property) : SourceLine.of(f.box().line()),
+                    ErrorCode.BOX_OVERFLOW, "Box " + f.box().describe() + " goes off the page: its "
+                    + (OFFSET.equals(property) ? "Offset" : MARGIN.equals(property) ? "Margin" : "position")
+                    + " and its size have to be checked");
         }
         double cx = borderBox.x() + f.border().left() + f.padding().left();
         double cy = borderBox.y() + f.border().top() + f.padding().top();
@@ -245,10 +254,37 @@ public final class Overflow {
         String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO, GRID_ROWS)
                 .filter(s::isDeclared).findFirst().orElse(null);
         String what = child == null ? "its text" : "box " + child.box().describe();
+        Fragment negative = property == null && child != null ? negativeMargin(container) : null;
+        if (negative != null) {
+            // Nothing fixes the height: the content is taller than the box because a negative margin takes away more
+            // than the content measures, and the height of the content does not go below 0.
+            Style n = negative.box().style();
+            return new InvalidModelException(n.isDeclared(MARGIN) ? n.line(MARGIN) : SourceLine.of(negative.box().line()),
+                    ErrorCode.BOX_OVERFLOW, "The content of box " + box.describe() + " does not fit in its height: "
+                    + what + " reaches " + pt(needed) + " and the box leaves " + pt(height) + ", because the negative "
+                    + "Margin of box " + negative.box().describe() + " takes away more height than the content has");
+        }
         return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(box.line()),
                 ErrorCode.BOX_OVERFLOW,
                 "The content of box " + box.describe() + " does not fit in its height: " + what + " reaches "
                         + pt(needed) + " and the box leaves " + pt(height));
+    }
+
+    /** The first in-flow fragment inside {@code f}, in tree order, with a negative top or bottom margin; or null. */
+    private static Fragment negativeMargin(Fragment f) {
+        for (Fragment c : f.children()) {
+            if (c.box().style().isOutOfFlow() || c.box().isMarker()) {
+                continue;
+            }
+            if (c.margin().top() < 0 || c.margin().bottom() < 0) {
+                return c;
+            }
+            Fragment inner = negativeMargin(c);
+            if (inner != null) {
+                return inner;
+            }
+        }
+        return null;
     }
 
     /**

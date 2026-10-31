@@ -40,14 +40,15 @@ class PositioningTest {
 
     @Test
     void framePercentages() {
-        // Left: 10 % of 515. Top: 10 % of the height of the parent (200). A vertical percentage
-        // with an indefinite height of the parent is an error (error catalog).
+        // Left: 10 % of 515 (with Width: 100, so that it stays on the page). Top: 10 % of the height of the parent
+        // (200). A vertical percentage with an indefinite height of the parent is an error (error catalog).
         LayoutFixture l = layOut(
-                "\tFrame:", "\t\tId: top", "\t\tOffset: auto auto auto 10%", "\t\tBox:", "\t\t\tHeight: 20",
+                "\tFrame:", "\t\tId: top", "\t\tOffset: auto auto auto 10%", "\t\tBox:", "\t\t\tWidth: 100",
+                "\t\t\tHeight: 20",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
                 "\t\tFrame:", "\t\t\tId: inner", "\t\t\tOffset: 10% auto auto auto", "\t\t\tBox:",
                 "\t\t\t\tHeight: 10");
-        assertRect(91.5, 40, 515, 20, l.rect("top"));
+        assertRect(91.5, 40, 100, 20, l.rect("top"));
         assertRect(40, 80, 515, 10, l.rect("inner"));
     }
 

@@ -31,7 +31,7 @@ El modelo de caja. No se hereda.
 | `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Stack` y `Grid`, y 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
 | `Aspect ratio` | `ancho/alto` o número | sin valor | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
-| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra (ver [márgenes `auto`](#márgenes-auto)). |
+| `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo, sin sacar la caja de la página. `auto` solo centra (ver [márgenes `auto`](#márgenes-auto)). |
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](values.md#abreviados-de-cuatro-lados)). No afecta al layout. |

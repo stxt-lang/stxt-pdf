@@ -5,6 +5,16 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+- The `Keep with next` of the last in-flow child of a block, and the `Keep with previous` of the first one, also apply to
+  the block, like the forced breaks: a heading that ends a `Block` is no longer left alone at the end of the page.
+- The height of the content of a box is never negative. A box whose negative margins take away more than its children
+  measure measures its border and its padding, and the child that sticks out is `BOX_OVERFLOW` at the line of the
+  negative `Margin`. Before, the box was lower than its own border and the message gave a negative height.
+- An in-flow box that the `Offset` of a `Frame` or a negative `Margin` takes off the physical page is `BOX_OVERFLOW`, at
+  the line of that `Offset` or `Margin`. Before, it was laid out without an error and did not show.
+
 ## [0.8.0] - 2026-10-31
 
 First version published on Maven Central.

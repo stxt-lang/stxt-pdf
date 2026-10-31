@@ -31,7 +31,7 @@ The box model. It is not inherited.
 | `Min width`, `Min height` | number, %, `auto` | `auto` | `auto` = narrowest width in `Stack` and `Grid` items, and 0 elsewhere. |
 | `Max width`, `Max height` | number, % | no maximum | |
 | `Aspect ratio` | `width/height` or number | none | If one axis is `auto` and the other is known, it is derived. Example: `16/9`. With `Width` and `Height` declared it is an error (`ASPECT_RATIO_CONFLICT`). |
-| `Margin` | 1 to 4 values (number, %, `auto`) | `0` | It can be negative. `auto` only centers (see [`auto` margins](#auto-margins)). |
+| `Margin` | 1 to 4 values (number, %, `auto`) | `0` | It can be negative, without taking the box off the page. `auto` only centers (see [`auto` margins](#auto-margins)). |
 | `Padding` | 1 to 4 values (number ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 to 4 numbers ≥ 0 | `0` | Thickness. |
 | `Border color` | 1 to 4 colors | the text `Color` | Top, right, bottom, left ([Values](values.md#four-side-shorthands)). It does not affect the layout. |

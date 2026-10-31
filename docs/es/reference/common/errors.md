@@ -56,7 +56,7 @@ un `Overlay`. No lo es, a propósito:
 | `FIT_TRACK` | `fit` no es una pista de grid | `fit is not a grid track: the one that fits the content is auto` |
 | `DUPLICATE_ID` | Los `Id` son únicos | `Duplicate Id: a (already used on line 6)` |
 | `SINGLE_ELEMENT` | `Item` y `Area` contienen exactamente un elemento | `An Area contains exactly one element, and this one has 2` |
-| `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text has the text in the value and in Content (line 9): it goes in only one` |
+| `TEXT_CONTENT` | Un `Text` o un `Paragraph` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text has the text in the value and in Content (line 9): it goes in only one` |
 | `TEXT_WITHOUT_FONT` | El texto, y un `Table of contents`, necesitan `Font` en `Typography`, propia o heredada | `The text needs Font: it is declared in the Typography of the Text, of an ancestor or of Styles (For element: Document)` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado | `The text needs Size: it is declared in the Typography of the Text, of an ancestor or of Styles (For element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `For element` nombra un elemento de caja, un elemento generado o una posición en una tabla ([Styles](styles.md)) | `For element: 'Item' is not a box element or a position in a table (Document, Section, Block, Stack...)` |
@@ -125,7 +125,7 @@ un `Overlay`. No lo es, a propósito:
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter) | `The font IBM Plex Sans normal has no character '漢' (U+6F22)` |
 | `CONTRAST_LOW` | El texto tiene un contraste de 4,5:1 con lo que tiene debajo, o de 3:1 si es grande ([El PDF](pdf.md#contraste)); línea del `Color` del texto, o de su caja si no lo tiene | `The text of box at line 12 has a contrast of 2.84:1 with its background (#999999 on #FFFFFF) and needs 4.5:1...` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `Preformatted: true` (línea de la palabra) | `The word 'supercalifragilística' does not fit on the line: the line measures 138.69 and the box leaves 100...` |
-| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Columns`), y los `Overlay`, los `Page overlay` y lo girado en la página | `The content of box at line 7 does not fit in its height: its text reaches 24 and the box leaves 20` |
+| `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Columns`), y ninguna caja se sale de la página física | `The content of box at line 7 does not fit in its height: its text reaches 24 and the box leaves 20` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `The marker '1.' of List item at line 12 measures 11.45 with its space, and the indent leaves 5...` |
 | `TABLE_REPEAT_OVERFLOW` | La cabecera y el pie de una tabla dejan sitio al cuerpo en una página vacía (línea de la `Table`) | `The header and footer of the table at line 8 measure 900 and leave no room for the body on an empty page...` |
 | `PAGE_OVERFLOW` | Lo que no se puede partir cabe en una página | `Box at line 9 does not fit on the page and cannot be broken: it is 900 high...` |

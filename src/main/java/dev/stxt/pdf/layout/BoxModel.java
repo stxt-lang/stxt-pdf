@@ -216,12 +216,16 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 : OptionalDouble.empty();
     }
 
-    /** Final height of the border box: the definite one or, with {@code auto}, that of the content. */
+    /**
+     * Final height of the border box: the definite one or, with {@code auto}, that of the content, which is never
+     * negative (negative margins can take more than the content measures, reference/components/block.md).
+     */
     public double usedHeight(double contentHeight) {
         if (height.isPresent()) {
             return height.getAsDouble();
         }
-        return Sizing.constrain(contentHeight + border.vertical() + padding.vertical(), minHeight, maxHeight);
+        return Sizing.constrain(Math.max(0, contentHeight) + border.vertical() + padding.vertical(), minHeight,
+                maxHeight);
     }
 
     /** Each fragment carries full border and padding ({@code Edges: closed}). */

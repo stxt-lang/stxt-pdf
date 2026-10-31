@@ -73,7 +73,8 @@ dos veces y es un error, salvo con `Margin: auto` en ese eje, que la centra. Los
 contenedor.
 
 Un `Frame` no puede fijar a la vez arriba y abajo, ni izquierda y derecha: se desplaza desde uno de los dos. Un `Frame`
-sin `Offset` no se mueve: sirve para que los `Overlay` de dentro se coloquen respecto a él.
+sin `Offset` no se mueve: sirve para que los `Overlay` de dentro se coloquen respecto a él. Desplazado, un `Frame` puede
+ocupar los márgenes de la página, pero no salirse de ella.
 
 ## Propiedades
 

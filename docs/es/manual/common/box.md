@@ -48,7 +48,8 @@ Los márgenes separan una caja de las de alrededor. Entre dos cajas una debajo d
 suman: se queda el mayor**. Con 20 debajo de una caja y 30 encima de la siguiente, las separa 30, no 50. Lo mismo pasa
 entre una caja y su primer o su último hijo si la caja no tiene borde ni relleno en ese lado: el margen del hijo sale fuera.
 Para que no salga, la caja necesita un relleno, un borde o `Isolate margins: true` ([Block](../components/block.md)). Un margen
-negativo junta las cajas.
+negativo junta las cajas, pero no puede sacar una caja de la página ni quitar a su padre más alto del que mide su
+contenido: las dos cosas son un error (`BOX_OVERFLOW`).
 
 **Centrar.** `Margin: 0 auto` centra en horizontal una caja con `Width` (o `Max width`): los dos márgenes laterales se
 reparten lo que sobra. Un `auto` donde no hay nada que centrar es un error: en una caja sin ancho, que ya ocupa todo, o en

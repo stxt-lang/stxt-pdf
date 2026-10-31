@@ -22,7 +22,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usar otra fuente o quitar el carácter |
 | `CONTRAST_LOW` | Un texto que apenas se distingue de su fondo: un gris claro sobre blanco | Oscurecer su `Color` o cambiar el fondo ([Caja](box.md#contraste)) |
 | `TEXT_OVERFLOW` | Una palabra más ancha que su línea | Ensanchar la caja, bajar el tamaño o partir la palabra |
-| `BOX_OVERFLOW` | Una caja no cabe en su sitio: más ancha que su padre, contenido más alto que su `Height`, o algo que se sale de la página | Revisar el `Width`, el `Height` o el `Offset` que dice el mensaje |
+| `BOX_OVERFLOW` | Una caja no cabe en su sitio: más ancha que su padre, contenido más alto que su `Height`, o algo que se sale de la página | Revisar el `Width`, el `Height`, el `Offset` o el `Margin` que dice el mensaje |
 | `PAGE_OVERFLOW` | Algo que no se puede partir no cabe ni en una página vacía | Hacerlo más pequeño o permitir partirlo |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje de un alto que no se conoce | Dar un `Height` en puntos al contenedor ([Valores](values.md#porcentajes)) |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | Un `Margin: auto` que no puede centrar | Dar un `Width` a la caja, o quitar el `auto` |

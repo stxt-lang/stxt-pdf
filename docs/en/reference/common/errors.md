@@ -57,7 +57,7 @@ an `Overlay`. These are not errors, on purpose:
 | `FIT_TRACK` | `fit` is not a grid track | `fit is not a grid track: the one that fits the content is auto` |
 | `DUPLICATE_ID` | `Id` values are unique | `Duplicate Id: a (already used on line 6)` |
 | `SINGLE_ELEMENT` | `Item` and `Area` contain exactly one element | `An Area contains exactly one element, and this one has 2` |
-| `TEXT_CONTENT` | A `Text` has its text in the value or in `Content`, one of the two; a `Markdown` has content, and its headings and paragraphs, text | `Text has the text in the value and in Content (line 9): it goes in only one` |
+| `TEXT_CONTENT` | A `Text` or a `Paragraph` has its text in the value or in `Content`, one of the two; a `Markdown` has content, and its headings and paragraphs, text | `Text has the text in the value and in Content (line 9): it goes in only one` |
 | `TEXT_WITHOUT_FONT` | Text, and a `Table of contents`, need `Font` in `Typography`, their own or inherited | `The text needs Font: it is declared in the Typography of the Text, of an ancestor or of Styles (For element: Document)` |
 | `TEXT_WITHOUT_FONT_SIZE` | Text needs `Size` in `Typography`, its own or inherited | `The text needs Size: it is declared in the Typography of the Text, of an ancestor or of Styles (For element: Document)` |
 | `STYLE_UNKNOWN_ELEMENT` | `For element` names a box element, a generated element or a position in a table ([Styles](styles.md)) | `For element: 'Item' is not a box element or a position in a table (Document, Section, Block, Stack...)` |
@@ -126,7 +126,7 @@ an `Overlay`. These are not errors, on purpose:
 | `GLYPH_MISSING` | The font has all the characters of the text (line of the character) | `The font IBM Plex Sans normal has no character '漢' (U+6F22)` |
 | `CONTRAST_LOW` | The text has a contrast of 4.5:1 with what is under it, or of 3:1 if it is large ([The PDF](pdf.md#contrast)); line of the `Color` of the text, or of its box if it has none | `The text of box at line 12 has a contrast of 2.84:1 with its background (#999999 on #FFFFFF) and needs 4.5:1...` |
 | `TEXT_OVERFLOW` | No word is wider than its line, nor is a line of a text with `Preformatted: true` (line of the word) | `The word 'supercalifragilística' does not fit on the line: the line measures 138.69 and the box leaves 100...` |
-| `BOX_OVERFLOW` | Boxes fit in their container, content in its height (also in the columns of a `Columns`), and `Overlay` elements, `Page overlay` elements and what is rotated, on the page | `The content of box at line 7 does not fit in its height: its text reaches 24 and the box leaves 20` |
+| `BOX_OVERFLOW` | Boxes fit in their container, content in its height (also in the columns of a `Columns`), and no box goes outside the physical page | `The content of box at line 7 does not fit in its height: its text reaches 24 and the box leaves 20` |
 | `LIST_MARKER_OVERFLOW` | The marker of an item, with its space, fits in the left `Padding` of the list plus the left margin of the item (line of the item) | `The marker '1.' of List item at line 12 measures 11.45 with its space, and the indent leaves 5...` |
 | `TABLE_REPEAT_OVERFLOW` | The header and the footer of a table leave room for the body on an empty page (line of the `Table`) | `The header and footer of the table at line 8 measure 900 and leave no room for the body on an empty page...` |
 | `PAGE_OVERFLOW` | What cannot be split fits on a page | `Box at line 9 does not fit on the page and cannot be broken: it is 900 high...` |

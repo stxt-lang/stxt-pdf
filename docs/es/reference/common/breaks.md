@@ -47,6 +47,10 @@ Si sigue sin haber corte posible, corta donde se acaba el espacio.
 Un párrafo que no puede respetar `Widows` y `Orphans` se parte igualmente si la alternativa es incumplir un `Keep with next` o un `Keep with previous`. En
 ese corte se respetan las viudas si se puede y, si no, se llena el espacio.
 
+`Keep with next` y `Keep with previous` se propagan como los cortes forzados: el `Keep with next` del último hijo en
+flujo de un bloque (o de un `Columns`) vale también para el bloque, y el `Keep with previous` del primero, igual. Así,
+un encabezado que acaba un `Block` no se queda solo al final de la página.
+
 Si el mejor corte es anterior al hijo que no cabe, lo que va después pasa a la página siguiente, pero un hijo anterior
 nunca se parte por dentro para dejar sitio.
 

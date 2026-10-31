@@ -1,0 +1,15 @@
+# Case: Frame shifted off the page
+# Code: BOX_OVERFLOW
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Section:
+		Frame:
+			Offset: 900 auto auto 0
+			Box:
+				Height: 10

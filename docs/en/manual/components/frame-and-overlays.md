@@ -73,7 +73,8 @@ is set twice and it is an error, except with `Margin: auto` on that axis, which 
 or the height of the container.
 
 A `Frame` cannot set top and bottom at the same time, nor left and right: it is shifted from one of the two. A `Frame`
-without `Offset` does not move: it serves as the box the `Overlay` elements inside it are placed against.
+without `Offset` does not move: it serves as the box the `Overlay` elements inside it are placed against. Once shifted,
+a `Frame` can take up the margins of the page, but not go outside it.
 
 ## Properties
 

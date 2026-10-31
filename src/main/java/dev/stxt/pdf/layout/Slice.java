@@ -54,12 +54,14 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
      *
      * @param first           it is the first fragment of the box
      * @param consumed        height consumed by the previous fragments (see {@link #consumed()})
-     * @param content         height of the content placed in this fragment
+     * @param content         height of the content placed in this fragment; a negative one (negative margins) counts
+     *                        as 0
      * @param contentFinished the content ends in this fragment
      * @param space           space of the box; without fragmentation there is no limit
      */
     public static Slice of(BoxModel model, boolean first, double consumed, double content,
                            boolean contentFinished, ConstraintSpace space) {
+        content = Math.max(0, content);
         if (!space.fragmenting()) {
             return new Slice(model.usedHeight(content), model.border(), model.padding(), true, 0);
         }

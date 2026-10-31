@@ -8,7 +8,8 @@
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija su `Height`, su `Max height`,
   su `Aspect ratio` o, en un `Grid`, sus filas de tamaño fijo (`BOX_OVERFLOW`), en la línea de esa propiedad (`Row sizes` para
-  las filas, y si declara varias, la primera de esta lista);
+  las filas, y si declara varias, la primera de esta lista). Si nada fija el alto, lo que falta lo quita un `Margin`
+  negativo de dentro, y se señala ese `Margin`;
 - **algo del flujo que no cabe en el área útil de una página y no se puede partir** (`PAGE_OVERFLOW`), en la línea de lo
   que impide partirlo:
   - su `Padding` o su `Border`, si el relleno y el borde del fragmento ya no caben en la página;
@@ -17,6 +18,9 @@
   - en una caja girada, que no se parte, su `Rotate`;
 - **un `Overlay` o un `Page overlay` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
   ocupar los márgenes de la página, pero no salir de la página;
+- **una caja en flujo que se sale de la página física** (`BOX_OVERFLOW`): cabe en su padre, pero el `Offset` de un
+  `Frame` o un `Margin` negativo la sacan de la página; en la línea de su `Offset` o, si no lo tiene, de su `Margin`.
+  Como un `Overlay`, puede ocupar los márgenes de la página;
 - **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Rotate`: lo que se comprueba es
   el rectángulo que envuelve lo que se pinta, con los giros de sus ancestros ([Capas y giro](layers-and-rotation.md#giro-rotate)).
   Un `Overlay` o un `Page overlay` girado se comprueba solo así (puede salirse sin girar y caber girado), y uno sin girar dentro
@@ -35,8 +39,8 @@
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro, se nombra lo de dentro.
 Los `Frame` se comprueban en su sitio, sin el desplazamiento de `Offset` ni el giro de `Rotate` (lo girado se comprueba
 además contra la página), y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino decisiones del
-autor. Tampoco cuentan los márgenes verticales, que se fusionan. Una caja puede salirse hasta 0,01 pt sin que sea un
-desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
+autor, mientras la caja no salga de la página física. Tampoco cuentan los márgenes verticales, que se fusionan. Una caja
+puede salirse hasta 0,01 pt sin que sea un desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
 
 Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no se baja a un hijo salvo que se salga
 también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido. Una caja cuyo alto impone el

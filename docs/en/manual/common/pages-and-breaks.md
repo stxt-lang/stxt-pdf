@@ -50,6 +50,8 @@ Block:
 - A forced break at the start of a page does nothing: it never leaves blank pages.
 - Headings already avoid being left alone at the end of a page: `Keep with next: true` is not needed
   ([Headings](../components/heading.md)).
+- The `Keep with next` of the last child of a block also applies to the block, and so does the `Keep with previous` of
+  the first one: a heading at the end of a `Block` still goes with what comes after the block.
 - `Keep together: true` does not prevent splitting a box that does not fit even on a whole page.
 - The positioned elements `Overlay` and `Page overlay` do not accept `Break`, because they are not split and are not in
   the flow. Neither does what is inside them or inside a rotated box: a `Break` written there is an error (except in the

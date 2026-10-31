@@ -43,6 +43,13 @@ The result of merging several margins is **the largest positive one plus the mos
 give 15, and `−10` and `−4` give −10. At a page break, the margins that touch the break are truncated
 ([Breaks](../common/breaks.md#margins-at-breaks)).
 
+The height of the content of a box does not go below 0: if negative margins take away more than the children measure,
+the box measures its border and its padding, and the child that sticks out at the bottom is `BOX_OVERFLOW` at the line
+of the negative `Margin` ([Overflow](../common/overflow.md)).
+
+> **Decision:** the height of the content is never negative. *Rejected alternative:* letting the box measure less than
+> its border and its padding, which paints a box lower than its own border.
+
 ## Boxes that isolate margins
 
 A box that isolates margins stops their merging: the margins inside do not come out. These isolate them: each section, `Overlay` and `Page overlay`, the items

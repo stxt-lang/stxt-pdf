@@ -34,7 +34,8 @@ conserva y sus hermanos no se mueven. Declarar a la vez arriba y abajo, o izquie
 (`OFFSET_CONFLICT`): uno de los dos tiene que quedar en `auto`. Un `Frame` sin `Offset` no se desplaza y sirve como contenedor de
 referencia de sus descendientes `Overlay`. Los porcentajes del `Offset` se resuelven contra el ancho o el alto del
 contenedor de referencia. Uno vertical necesita que su alto sea definido ([Valores](../common/values.md#alto-definido)).
-Un `Frame` se comprueba en su sitio, sin su desplazamiento ([Desbordamiento](../common/overflow.md)).
+Un `Frame` se comprueba en su padre en su sitio, sin su desplazamiento, y ya desplazado, contra la página física: puede
+ocupar los márgenes de la página, pero no salirse de ella (`BOX_OVERFLOW`, [Desbordamiento](../common/overflow.md)).
 
 ## `Overlay`
 

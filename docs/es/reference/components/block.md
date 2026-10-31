@@ -43,6 +43,13 @@ El resultado de fusionar varios márgenes es **el mayor positivo más el más ne
 dan 15, y `−10` y `−4` dan −10. En un corte de página, los márgenes que tocan el corte se truncan
 ([Cortes](../common/breaks.md#márgenes-en-los-cortes)).
 
+El alto del contenido de una caja no baja de 0: si los márgenes negativos quitan más de lo que miden los hijos, la caja
+mide su borde y su relleno, y el hijo que se sale por abajo es `BOX_OVERFLOW` en la línea del `Margin` negativo
+([Desbordamiento](../common/overflow.md)).
+
+> **Decisión:** el alto del contenido nunca es negativo. *Alternativa descartada:* dejar que la caja mida menos que su
+> borde y su relleno, que pinta una caja más baja que su propio borde.
+
 ## Cajas que aíslan los márgenes
 
 Una caja que aísla los márgenes corta su fusión: los márgenes de dentro no salen. Los aíslan: cada sección, `Overlay` y `Page overlay`, los ítems

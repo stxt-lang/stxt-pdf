@@ -34,7 +34,8 @@ kept and its siblings do not move. Declaring top and bottom, or left and right, 
 (`OFFSET_CONFLICT`): one of the two has to stay `auto`. A `Frame` without `Offset` is not shifted and serves as the reference
 container of its `Overlay` descendants. The percentages of `Offset` are resolved against the width or the height of the
 reference container. A vertical one needs its height to be definite ([Values](../common/values.md#definite-height)).
-A `Frame` is checked in its place, without its offset ([Overflow](../common/overflow.md)).
+A `Frame` is checked in its parent in its place, without its offset, and once shifted, against the physical page: it
+can take up the margins of the page, but not go outside it (`BOX_OVERFLOW`, [Overflow](../common/overflow.md)).
 
 ## `Overlay`
 

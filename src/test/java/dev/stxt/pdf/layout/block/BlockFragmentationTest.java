@@ -249,6 +249,39 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void keepWithNextOfTheLastChildPropagatesToItsBlock() {
+        // T ends W and keeps with what follows W: the break between W and P violates it, so W moves to page 2 whole
+        // (a previous child is never split to make room).
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50",
+                "\tBlock:", "\t\tId: W",
+                "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 10",
+                "\t\tBlock:", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\tBreak:",
+                "\t\t\t\tKeep with next: true",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "T"));
+        assertRect(40, 40, 515, 30, l.rect(2, "W"));
+        assertRect(40, 50, 515, 20, l.rect(2, "T"));
+        assertRect(40, 70, 515, 60, l.rect(2, "P"));
+    }
+
+    @Test
+    void keepWithPreviousOfTheFirstChildPropagatesToItsBlock() {
+        // T starts W and keeps with Q: the break between Q and W violates it, so Q moves to page 2 with W.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70",
+                "\tBlock:", "\t\tId: Q", "\t\tBox:", "\t\t\tHeight: 20",
+                "\tBlock:", "\t\tId: W",
+                "\t\tBlock:", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\tBreak:",
+                "\t\t\t\tKeep with previous: true", "\t\t\t\tKeep together: true");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "Q"));
+        assertRect(40, 40, 515, 20, l.rect(2, "Q"));
+        assertRect(40, 60, 515, 20, l.rect(2, "T"));
+    }
+
+    @Test
     void keepTogetherIsRelaxedWhenTheBoxIsTallerThanThePage() {
         // B moves to page 2 and, since it does not fit whole there either, it is split anyway.
         LayoutFixture l = layOutPaged(PAGE,

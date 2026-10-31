@@ -1,0 +1,18 @@
+# Case: Negative margin that takes more height than the content of its parent has
+# Code: BOX_OVERFLOW
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Section:
+		Block:
+			Box:
+				Padding: 5
+			Block:
+				Box:
+					Height: 10
+					Margin: 0 0 -30 0
