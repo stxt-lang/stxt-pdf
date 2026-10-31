@@ -75,7 +75,7 @@ Document (dev.stxt.pdf):
 				Width: 260
 			Text: Certificate no. cer-2025-0412
 				Style: serial
-		Text: Escuela de cerámica del Valle
+		Text: Valle Ceramics School
 			Style: school
 		Heading 1:
 			Text: Certificate of Completion
