@@ -7,6 +7,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- A child whose merged top margins push it past the end of the page is no longer laid out there: the block breaks
+  before it. Before, an empty box with a fixed `Height` in that position was `PAGE_OVERFLOW` «it is 0 high».
+- An empty box (no height, border, padding or content) never overflows vertically: its merged margins can leave it past
+  the end of its parent's content, at the end of a block or just before a page break, and that was `BOX_OVERFLOW`.
+- The `After: page` (or `column`) of an empty box, and the forced break before the child that follows it, apply also
+  when the empty box opens its block. Before, they were lost unless something with content had been placed before.
 - The `Keep with next` of the last in-flow child of a block, and the `Keep with previous` of the first one, also apply to
   the block, like the forced breaks: a heading that ends a `Block` is no longer left alone at the end of the page.
 - The height of the content of a box is never negative. A box whose negative margins take away more than its children

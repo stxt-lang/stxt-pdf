@@ -52,7 +52,8 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * possible break with its quality ({@link BreakRules#between}); the state is saved to be able to go back to it.
  * When a child does not fit (it places nothing, it is broken inside or it overflows without being broken), the
  * last break of highest quality among the previous ones and the one inside the child is chosen. Forced breaks
- * apply as soon as they appear. In a non-forced break, the margins that touch it are truncated; in a forced one,
+ * apply as soon as they appear, also after an empty child, except at the start of a page. A child whose top border
+ * would fall past the end of the page (its merged margins push it there) is not laid out: the break goes before it. In a non-forced break, the margins that touch it are truncated; in a forced one,
  * the top margin of the child that starts the page is kept.</p>
  *
  * <p>A {@code List item} also carries its marker in the first fragment, hanging to its
@@ -155,12 +156,16 @@ public final class BlockLayout implements LayoutAlgorithm {
                     pending.add(new PendingOverlay(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
                 }
-                if (fragmenting && progress) {
+                if (fragmenting && previous != null) {
+                    // A forced break applies as soon as it appears, also after an empty child; only at the start of
+                    // a page, with nothing placed before it, is it ignored (reference/common/breaks.md).
                     Break forced = BreakRules.forcedBetween(previous, child);
-                    if (BreakRules.isForced(forced)) {
+                    if (BreakRules.isForced(forced) && (progress || !space.atFragmentainerStart())) {
                         return broken(mark(i, BreakRules.forcedAppeal(forced)));
                     }
-                    marks.add(mark(i, BreakRules.between(previous, child)));
+                    if (progress) {
+                        marks.add(mark(i, BreakRules.between(previous, child)));
+                    }
                 }
                 LayoutResult early = place(i, child);
                 if (early != null) {
@@ -179,12 +184,12 @@ public final class BlockLayout implements LayoutAlgorithm {
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
 
             double y = top(MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top()));
-            if (fragmenting && progress && contentRemaining - y <= EPSILON) {
-                return broken(BreakRules.best(marks, Mark::appeal));
+            if (noRoom(y)) {
+                return breakBefore();
             }
             LayoutResult r = layOutChild(child, y, childToken);
             if (r.breakToken() instanceof BreakToken.Before) {
-                return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
+                return breakBefore();
             }
             AdjoiningMargins adjoining = r.adjoining();
             MarginStrut childTop = noTopMargin ? MarginStrut.EMPTY : adjoining.top().add(margin.top());
@@ -194,10 +199,13 @@ public final class BlockLayout implements LayoutAlgorithm {
                     : top(childTop);
             if (fragmenting && !same(flowY, y)) {
                 // The margins that come out of the child at the top have moved it down: what is left of the page
-                // for it changes.
+                // for it changes, and it may have run out.
+                if (noRoom(flowY)) {
+                    return breakBefore();
+                }
                 r = layOutChild(child, flowY, childToken);
                 if (r.breakToken() instanceof BreakToken.Before) {
-                    return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
+                    return breakBefore();
                 }
             }
             Fragment f = r.fragment();
@@ -246,6 +254,22 @@ public final class BlockLayout implements LayoutAlgorithm {
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
             return null;
+        }
+
+        /**
+         * Nothing of a child whose top border would be at {@code y} fits on this page. At the start of a page, with
+         * nothing placed before it, something is placed anyway (progress guarantee): then there is always room.
+         */
+        boolean noRoom(double y) {
+            return fragmenting && contentRemaining - y <= EPSILON && !(space.atFragmentainerStart() && !progress);
+        }
+
+        /**
+         * The next child does not fit at all: the box breaks at the best break between the children already placed
+         * or, if none has been placed in this fragment, before itself.
+         */
+        LayoutResult breakBefore() {
+            return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
         }
 
         /**
@@ -331,6 +355,13 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
 
             Slice slice = Slice.of(model, first, consumed, contentHeight, true, space);
+            if (!slice.finished() && !space.atFragmentainerStart()
+                    && slice.height() <= Slice.top(model, first) + EPSILON) {
+                // Nothing of the box's own height fits (what is left of the page is 0 or negative): a fragment with
+                // only its top border and padding would be placed beyond the page. Away from the start of a page,
+                // the parent breaks before the box instead.
+                return LayoutResult.before(box);
+            }
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), withMarker(fragments, slice), List.of(), first, slice.finished());
             if (slice.finished()) {

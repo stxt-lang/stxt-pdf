@@ -42,8 +42,9 @@ The error points to the **innermost** culprit: if a box goes outside because som
 inside is named. `Frame` elements are checked in their place, without the shift of `Offset` or the rotation of `Rotate`
 (what is rotated is also checked against the page), and a negative margin counts as space gained: they are not
 overflows, but decisions of the author, as long as the box does not go outside the physical page. Vertical margins,
-which merge, do not count either. A box can go up to 0.01 pt outside without it being an overflow, which is what the
-font measurements in thousandths accumulate.
+which merge, do not count either, nor does an empty box (no height, border, padding or content), which paints nothing
+even if its merged margins leave it past the end of its parent's content. A box can go up to 0.01 pt outside without it
+being an overflow, which is what the font measurements in thousandths accumulate.
 
 A box that declares its width is the culprit for its children that only fill it: the engine does not go down to a child
 unless it also goes outside the box. In a box with `auto` width it does go down, because its width comes from its content.

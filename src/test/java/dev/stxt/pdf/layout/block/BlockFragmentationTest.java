@@ -192,6 +192,63 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void childPushedPastThePageByItsMarginBreaksBefore() {
+        // P starts at 80 with 20 left; the margin of C (60) puts it past the page: the break goes before P, whose
+        // padding keeps the margin inside it on page 2.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 80",
+                "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tPadding: 10 0 0 0",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tMargin: 60 0 0 0");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "P"));
+        assertRect(40, 40, 515, 90, l.rect(2, "P"));
+        assertRect(40, 110, 515, 20, l.rect(2, "C"));
+    }
+
+    @Test
+    void childPushedPastThePageByAnInnerMarginBreaksBefore() {
+        // The margin of C comes out of P and moves P past the page: the break goes before P and the margin, which
+        // touches the break, is truncated on page 2.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 80",
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 50", "\t\t\t\tMargin: 60 0 0 0");
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "P"));
+        assertRect(40, 40, 515, 50, l.rect(2, "P"));
+        assertRect(40, 40, 515, 50, l.rect(2, "C"));
+    }
+
+    @Test
+    void emptyBoxBeforeTheBreakDoesNotOverflow() {
+        // E (no height) sits at 90, where B would start, past the 70 of the fragment of P: it is not an overflow.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 70",
+                "\t\tBlock:", "\t\t\tId: E", "\t\t\tBox:", "\t\t\t\tMargin: 20 0 20 0",
+                "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:",
+                "\t\t\t\tKeep together: true");
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 70, l.rect(1, "P"));
+        assertRect(40, 130, 515, 0, l.rect(1, "E"));
+        assertRect(40, 40, 515, 30, l.rect(2, "B"));
+    }
+
+    @Test
+    void forcedBreakAfterAnEmptyFirstChildApplies() {
+        // E has no content, but the page break after it is not at the start of the page: B goes to page 2.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tId: E", "\t\t\tBreak:", "\t\t\t\tAfter: page",
+                "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 10");
+        assertEquals(2, l.pages());
+        assertRect(40, 50, 515, 0, l.rect(1, "E"));
+        assertFalse(l.has(1, "B"));
+        assertRect(40, 40, 515, 10, l.rect(2, "B"));
+    }
+
+    @Test
     void forcedBreakAtTheStartOfThePageIsIgnored() {
         LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10", "\t\tBreak:",
                 "\t\t\tBefore: page");

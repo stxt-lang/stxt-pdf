@@ -94,6 +94,19 @@ class BlockLayoutTest {
     }
 
     @Test
+    void emptyBoxAtTheEndDoesNotOverflow() {
+        // E (no height) sits at 90, past the 20 of P, whose bottom margin is the merged 30: it is not an overflow.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 20",
+                "\t\tBlock:", "\t\t\tId: E", "\t\t\tBox:", "\t\t\t\tMargin: 30 0 30 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
+        assertRect(40, 40, 515, 20, l.rect("P"));
+        assertRect(40, 90, 515, 0, l.rect("E"));
+        assertRect(40, 90, 515, 10, l.rect("S"));
+    }
+
+    @Test
     void negativeMargins() {
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 0 0 20 0",

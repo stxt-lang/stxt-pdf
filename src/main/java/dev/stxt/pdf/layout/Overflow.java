@@ -154,7 +154,9 @@ public final class Overflow {
                 if (x - margin.left() < -TOLERANCE || x + c.width() + margin.right() > width + TOLERANCE) {
                     throw tooWide(c, cx + x, cx, cx + width);
                 }
-                if (y + c.height() > height + TOLERANCE) {
+                // An empty box (no height, border, padding or content) paints nothing and its merged margins can
+                // leave it past the end of its parent's content: it never overflows vertically.
+                if (c.height() > 0 && y + c.height() > height + TOLERANCE) {
                     if (isPage) {
                         throw pageOverflow(c, cy + y, cy + height, height);
                     }
