@@ -1,7 +1,9 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Cell;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Pages;
@@ -10,10 +12,6 @@ import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Specified properties of a box, with the default values of reference/common/structure.md.

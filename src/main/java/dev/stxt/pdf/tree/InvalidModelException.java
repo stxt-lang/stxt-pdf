@@ -12,6 +12,8 @@ import dev.stxt.pdf.model.StxtPdfException;
  */
 public class InvalidModelException extends StxtPdfException {
 
+    private static final long serialVersionUID = 1L;
+
     private final ErrorCode errorCode;
     private final String detail;
 

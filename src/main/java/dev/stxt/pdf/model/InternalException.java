@@ -6,6 +6,8 @@ package dev.stxt.pdf.model;
  */
 public class InternalException extends StxtPdfException {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String CODE = "INTERNAL";
 
     public InternalException(String message) {

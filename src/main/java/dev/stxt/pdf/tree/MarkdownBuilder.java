@@ -1,24 +1,29 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.TextNode;
-import dev.stxt.pdf.model.Links;
-import dev.stxt.pdf.model.Marker;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
+import static dev.stxt.pdf.tree.Nodes.child;
+import static dev.stxt.pdf.tree.Nodes.error;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.commonmark.ext.gfm.strikethrough.Strikethrough;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
 import org.commonmark.ext.gfm.tables.TableBlock;
 import org.commonmark.ext.gfm.tables.TableBody;
 import org.commonmark.ext.gfm.tables.TableCell;
 import org.commonmark.ext.gfm.tables.TableHead;
-import org.commonmark.ext.gfm.tables.TableRow;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.ins.Ins;
 import org.commonmark.ext.ins.InsExtension;
 import org.commonmark.node.BlockQuote;
-import org.commonmark.node.BulletList;
 import org.commonmark.node.Code;
 import org.commonmark.node.Emphasis;
 import org.commonmark.node.FencedCodeBlock;
@@ -41,19 +46,13 @@ import org.commonmark.node.ThematicBreak;
 import org.commonmark.parser.IncludeSourceSpans;
 import org.commonmark.parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static dev.stxt.pdf.tree.Nodes.child;
-import static dev.stxt.pdf.tree.Nodes.error;
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.TextNode;
+import dev.stxt.pdf.model.Links;
+import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
 
 /**
  * Translates a {@code Markdown} (reference/components/markdown.md) into the STXT nodes of the elements that already

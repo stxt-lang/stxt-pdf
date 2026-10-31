@@ -14,6 +14,8 @@ import dev.stxt.exceptions.ParseException;
  */
 public class DocumentSyntaxException extends StxtPdfException {
 
+    private static final long serialVersionUID = 1L;
+
     public DocumentSyntaxException(ParseException cause) {
         this(cause, false);
     }

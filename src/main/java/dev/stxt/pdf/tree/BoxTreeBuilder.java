@@ -1,26 +1,9 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.model.NumberFormat;
-import dev.stxt.pdf.model.Position;
-import dev.stxt.pdf.model.Rotation;
-import dev.stxt.pdf.model.Value;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import static dev.stxt.pdf.tree.ListBuilder.itemNumber;
 import static dev.stxt.pdf.tree.ListBuilder.marker;
 import static dev.stxt.pdf.tree.ListBuilder.markerLine;
 import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
-import static dev.stxt.pdf.tree.ModelValidator.font;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
 import static dev.stxt.pdf.tree.ModelValidator.validateContainer;
 import static dev.stxt.pdf.tree.ModelValidator.validateRotation;
@@ -31,13 +14,26 @@ import static dev.stxt.pdf.tree.Nodes.is;
 import static dev.stxt.pdf.tree.Nodes.isElement;
 import static dev.stxt.pdf.tree.PropertyReader.box;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
-import static dev.stxt.pdf.tree.PropertyReader.item;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
-import static dev.stxt.pdf.tree.TableBuilder.table;
 import static dev.stxt.pdf.tree.ValueReader.angle;
 import static dev.stxt.pdf.tree.ValueReader.bool;
 import static dev.stxt.pdf.tree.ValueReader.enumValue;
 import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.NumberFormat;
+import dev.stxt.pdf.model.Position;
+import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Value;
 
 /**
  * Builds the box tree from the document (reference/common/structure.md): translates each

@@ -1,14 +1,7 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.Node;
-import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Colors;
-import dev.stxt.pdf.model.Corners;
-import dev.stxt.pdf.model.Paint;
-import dev.stxt.pdf.model.Rotation;
-import dev.stxt.pdf.model.Sides;
-import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.model.ValueParser;
+import static dev.stxt.pdf.tree.Nodes.error;
+import static dev.stxt.pdf.tree.Nodes.parse;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -16,8 +9,14 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static dev.stxt.pdf.tree.Nodes.error;
-import static dev.stxt.pdf.tree.Nodes.parse;
+import dev.stxt.Node;
+import dev.stxt.pdf.model.Colors;
+import dev.stxt.pdf.model.Corners;
+import dev.stxt.pdf.model.Paint;
+import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Value;
+import dev.stxt.pdf.model.ValueParser;
 
 /**
  * Parses the value of a property (reference/common/values.md and reference/common/structure.md) and checks what it

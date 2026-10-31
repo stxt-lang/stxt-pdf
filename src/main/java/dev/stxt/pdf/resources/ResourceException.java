@@ -10,6 +10,8 @@ import dev.stxt.pdf.model.StxtPdfException;
  */
 public class ResourceException extends StxtPdfException {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String CODE = "RESOURCE";
 
     public ResourceException(String message) {

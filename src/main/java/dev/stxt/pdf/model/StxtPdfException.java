@@ -21,6 +21,8 @@ package dev.stxt.pdf.model;
  */
 public abstract class StxtPdfException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     /** Whose fault an error is. */
     public enum Kind {
         INVALID_DOCUMENT,

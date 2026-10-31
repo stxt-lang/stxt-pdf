@@ -1,7 +1,6 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Alignment;
-import dev.stxt.pdf.model.Area;
 import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Value;
 

@@ -6,6 +6,8 @@ package dev.stxt.pdf.resources;
  */
 public class ImageFormatException extends ResourceException {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String CODE = "IMAGE_FORMAT";
 
     public ImageFormatException(String message) {
