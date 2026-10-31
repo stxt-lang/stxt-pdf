@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Catálogo de errores ({@code test/errors/<grupo>/*.stxt}): cada fichero es un documento que debe
- * fallar con un código en una línea (referencia/comun/errores.md). Empieza con tres líneas de comentario
+ * fallar con un código en una línea (reference/common/errors.md). Empieza con tres líneas de comentario
  * ({@code # Case:}, {@code # Code:} y {@code # Line:}) y la línea esperada es la del propio
  * fichero, cabecera incluida. Se lee y se maqueta con el {@link Converter} por defecto, con las métricas reales, de
  * modo que entran todos los errores: los de sintaxis y schema ({@code stxt-core}), los del modelo, los de las fuentes y

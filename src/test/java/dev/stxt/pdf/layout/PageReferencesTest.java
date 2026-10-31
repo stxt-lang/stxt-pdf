@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code {page of: id}} (referencia/comun/referencias.md). Páginas de 180 pt con márgenes de 40: área
+ * {@code {page of: id}} (reference/common/references.md). Páginas de 180 pt con márgenes de 40: área
  * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada
  * línea, 12.
  */
@@ -43,7 +43,7 @@ class PageReferencesTest {
         return l.fragment(page, id).lines().stream().map(x -> x.text()).reduce((a, b) -> a + "|" + b).orElse("");
     }
 
-    /** Una fila con {@code Id} se puede referir: su página es la de su franja (referencia/componentes/table.md#filas). */
+    /** Una fila con {@code Id} se puede referir: su página es la de su franja (reference/components/table.md#filas). */
     @Test
     void aReferenceToARowGivesThePageOfItsBand() {
         LayoutFixture l = layOutPaged(PAGE, concat(

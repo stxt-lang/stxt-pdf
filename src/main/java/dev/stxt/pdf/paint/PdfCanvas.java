@@ -29,11 +29,11 @@ import static dev.stxt.pdf.paint.PdfContent.io;
  * degradados de {@link PdfGradients} y la estructura de {@link PdfStructure}, todos del documento y compartidos
  * por sus páginas. PDF tiene el origen abajo a la izquierda: las coordenadas verticales se invierten al pintar.
  *
- * <p>El texto se pinta con las fuentes TTF de la carpeta de recursos (referencia/comun/recursos.md). Para que las
+ * <p>El texto se pinta con las fuentes TTF de la carpeta de recursos (reference/common/resources.md). Para que las
  * líneas midan lo mismo que al maquetar, el layout debe usar las mismas métricas:
  * {@code new Engine(new PdfMetrics(resources))}.</p>
  *
- * <p>Cada imagen (referencia/componentes/image.md) se incrusta una sola vez aunque se use en varias
+ * <p>Cada imagen (reference/components/image.md) se incrusta una sola vez aunque se use en varias
  * páginas, sin remuestrear: el JPEG tal cual y el PNG sin pérdida, con su transparencia; el SVG,
  * como dibujo vectorial ({@link PdfImages}).</p>
  *

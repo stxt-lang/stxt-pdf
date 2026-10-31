@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (referencia/comun/caja.md).
+ * {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (reference/common/box.md).
  */
 class BoxLooksTest {
 

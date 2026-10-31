@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * El número impreso de cada página física, el último de su tanda y cómo se escriben
- * (referencia/componentes/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
+ * (reference/components/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
  * empieza en su {@code Start}; {@code none} no numera ni avanza el contador. Cada página se escribe con el {@code Page
  * style} de su sección. La página en blanco con que acaba una sección ({@code Begin on: odd}) es una página más de
  * ella.

@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.TextFormat;
 import java.util.Map;
 
 /**
- * Los enlaces del árbol a otras cajas ({@code #id}, referencia/comun/enlaces.md): comprueba que cada
+ * Los enlaces del árbol a otras cajas ({@code #id}, reference/common/links.md): comprueba que cada
  * uno señala una caja con ese {@code Id} y que tiene un único sitio al que llevar. La sintaxis del
  * destino y su esquema se comprueban al leerlo; esto necesita el árbol entero, porque un enlace
  * puede ir hacia delante. Los enlaces a una URL de fuera no se comprueban más.

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Bloques en columnas al construir el árbol (referencia/componentes/columns.md): propiedades y flujo de columnas. */
+/** Bloques en columnas al construir el árbol (reference/components/columns.md): propiedades y flujo de columnas. */
 class ColumnsElementTest {
 
     private static Box root(String... lines) {

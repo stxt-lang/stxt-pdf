@@ -3,7 +3,7 @@ package dev.stxt.pdf.layout.grid;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Pista de grid con su función mínima y máxima (referencia/componentes/grid.md). {@code auto} equivale a
+ * Pista de grid con su función mínima y máxima (reference/components/grid.md). {@code auto} equivale a
  * {@code between(auto, auto)} y {@code *} a {@code between(auto, *)}: una fracción nunca baja
  * del ancho más estrecho de su contenido.
  */
@@ -29,7 +29,7 @@ public record Track(Value min, Value max) {
 
     /**
      * La misma pista sin base para los porcentajes: los porcentajes se comportan como {@code auto}
-     * (referencia/componentes/grid.md).
+     * (reference/components/grid.md).
      */
     Track withoutPercentBase() {
         return new Track(definiteOrAuto(min), definiteOrAuto(max));

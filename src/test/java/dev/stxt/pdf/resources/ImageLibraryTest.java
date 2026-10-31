@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/** Las imágenes de prueba de {@code resources/images/test/} (referencia/componentes/image.md). */
+/** Las imágenes de prueba de {@code resources/images/test/} (reference/components/image.md). */
 class ImageLibraryTest {
 
     private final ImageLibrary images = new Resources().images();

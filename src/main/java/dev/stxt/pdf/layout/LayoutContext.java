@@ -18,20 +18,20 @@ public interface LayoutContext {
      */
     LayoutResult layout(Box box, ConstraintSpace space, BreakToken from);
 
-    /** Ancho más estrecho y ancho natural de la caja de margen (referencia/comun/caja.md). */
+    /** Ancho más estrecho y ancho natural de la caja de margen (reference/common/box.md). */
     IntrinsicSizes intrinsic(Box box);
 
     /**
      * Ancho más estrecho y ancho natural del contenido de la caja, sin su {@code Width}: el mínimo automático de un ítem
-     * stack depende de ellos (referencia/componentes/stack.md).
+     * stack depende de ellos (reference/components/stack.md).
      */
     IntrinsicSizes contentIntrinsic(Box box);
 
     /**
-     * Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (referencia/componentes/list.md).
+     * Las métricas del texto: el marcador de una lista se mide y se alinea con ellas (reference/components/list.md).
      */
     TextMeasurer measurer();
 
-    /** Tamaño natural de una {@code Image}, de su fichero (referencia/componentes/image.md). */
+    /** Tamaño natural de una {@code Image}, de su fichero (reference/components/image.md). */
     NaturalSize natural(Box box);
 }

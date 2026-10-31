@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Dónde se cortó una caja y desde dónde hay que reanudar su layout en el siguiente
- * fragmentainer (referencia/comun/cortes.md). Un {@code null} en su lugar significa "la caja ha
+ * fragmentainer (reference/common/breaks.md). Un {@code null} en su lugar significa "la caja ha
  * terminado".
  *
  * <p>Son {@code record}: tienen {@code equals}, y por eso pueden formar parte de la clave de la

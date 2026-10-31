@@ -1,7 +1,7 @@
 package dev.stxt.pdf.layout;
 
 /**
- * Tamaños intrínsecos del ancho de una caja de margen (referencia/comun/caja.md).
+ * Tamaños intrínsecos del ancho de una caja de margen (reference/common/box.md).
  */
 public record IntrinsicSizes(double narrowest, double natural) {
 

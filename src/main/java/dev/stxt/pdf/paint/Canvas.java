@@ -21,7 +21,7 @@ public interface Canvas {
     void background(Rect r, String color);
 
     /**
-     * El fondo de una caja (referencia/comun/caja.md): un color o un degradado que llena
+     * El fondo de una caja (reference/common/box.md): un color o un degradado que llena
      * {@code paddingBox} con las esquinas {@code radii}, que son las de la caja de relleno.
      */
     void fill(Rect paddingBox, Radii radii, Paint paint);
@@ -62,14 +62,14 @@ public interface Canvas {
               double wordSpacing, double letterSpacing);
 
     /**
-     * La imagen de una {@code Image} (referencia/componentes/image.md) en su caja de contenido
+     * La imagen de una {@code Image} (reference/components/image.md) en su caja de contenido
      * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja con
      * las esquinas {@code radii} (las de la caja de contenido).
      */
     void image(Box box, Rect content, Radii radii);
 
     /**
-     * Empieza a pintar girado (referencia/comun/capas-y-giro.md): todo lo que se pinte hasta
+     * Empieza a pintar girado (reference/common/layers-and-rotation.md): todo lo que se pinte hasta
      * {@link #endRotation()}, también las zonas de los enlaces, gira {@code degrees} grados en el
      * sentido de las agujas del reloj alrededor del punto ({@code x}, {@code y}) de la página. Los
      * giros se anidan: uno dentro de otro se suma al de fuera.
@@ -80,7 +80,7 @@ public interface Canvas {
     void endRotation();
 
     /**
-     * Empieza a recortar (referencia/comun/caja.md): lo que se pinte hasta {@link #endClip()} solo se ve dentro de
+     * Empieza a recortar (reference/common/box.md): lo que se pinte hasta {@link #endClip()} solo se ve dentro de
      * {@code r} con las esquinas {@code radii}, con los giros en curso. Los recortes se anidan con los giros: cada uno
      * termina antes que lo que empezó antes que él.
      */
@@ -91,12 +91,12 @@ public interface Canvas {
 
     /**
      * Ascendente y descendente con que se pinta la fuente, para colocar la línea base
-     * (referencia/comun/tipografia.md); sin la fuente, {@link VerticalMetrics#APPROXIMATE}.
+     * (reference/common/typography.md); sin la fuente, {@link VerticalMetrics#APPROXIMATE}.
      */
     VerticalMetrics vertical(FontFace font);
 
     /**
-     * Posición y grosor del subrayado y del tachado de la fuente (referencia/comun/formato-del-texto.md); sin la
+     * Posición y grosor del subrayado y del tachado de la fuente (reference/common/text-formatting.md); sin la
      * fuente, {@link DecorationMetrics#APPROXIMATE}.
      */
     DecorationMetrics decoration(FontFace font);

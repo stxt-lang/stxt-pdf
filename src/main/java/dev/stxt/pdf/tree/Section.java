@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.NumberFormat;
 
 /**
- * Una sección del documento (referencia/componentes/document.md): su caja, que es la raíz de su layout (una
+ * Una sección del documento (reference/components/document.md): su caja, que es la raíz de su layout (una
  * {@code Box} sin padre, como la raíz anónima de un documento de una sola sección), su medio y lo
  * que dice de las páginas que ocupa.
  *
@@ -20,7 +20,7 @@ public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, Num
                       boolean inheritPageOverlays, BeginOn beginOn) {
 
     /**
-     * {@code Begin on} (referencia/componentes/document.md): en qué página física empieza la sección. Si no le toca, la
+     * {@code Begin on} (reference/components/document.md): en qué página física empieza la sección. Si no le toca, la
      * anterior acaba con una página en blanco.
      */
     public enum BeginOn {
@@ -30,7 +30,7 @@ public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, Num
         ODD
     }
 
-    /** {@code Page numbering} (referencia/componentes/document.md): qué hace la sección con el contador de páginas. */
+    /** {@code Page numbering} (reference/components/document.md): qué hace la sección con el contador de páginas. */
     public enum PageNumbering {
         /** Sus páginas siguen el contador del documento. */
         CONTINUE,

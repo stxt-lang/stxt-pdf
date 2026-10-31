@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * El giro de una caja al pintarla (referencia/comun/capas-y-giro.md): {@code Rotate}, en grados en el
+ * El giro de una caja al pintarla (reference/common/layers-and-rotation.md): {@code Rotate}, en grados en el
  * sentido de las agujas del reloj, alrededor de {@code Rotate origin}, un punto de la caja de
  * borde medido desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto
  * ({@code center} es 50 % 50 %).

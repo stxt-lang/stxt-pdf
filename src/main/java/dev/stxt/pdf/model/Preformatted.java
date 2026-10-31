@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Texto preformateado (referencia/comun/formato-del-texto.md): {@code false} colapsa el espacio en blanco; {@code true}
+ * Texto preformateado (reference/common/text-formatting.md): {@code false} colapsa el espacio en blanco; {@code true}
  * conserva los espacios y los saltos de línea y no parte las líneas; {@code wrap} también, pero parte las líneas
  * demasiado anchas entre palabras.
  */

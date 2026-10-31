@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los enlaces en el árbol de cajas (referencia/comun/enlaces.md). */
+/** Los enlaces en el árbol de cajas (reference/common/links.md). */
 class LinksTest {
 
     private static final DocumentReader READER = new DocumentReader();

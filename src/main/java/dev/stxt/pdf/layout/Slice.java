@@ -6,7 +6,7 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Parte de una caja que cae en un fragmento (referencia/comun/cortes.md): su alto, su borde y su
+ * Parte de una caja que cae en un fragmento (reference/common/breaks.md): su alto, su borde y su
  * relleno. Es la parte común de la fragmentación de todos los algoritmos.
  *
  * <ul>

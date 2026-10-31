@@ -3,7 +3,7 @@ package dev.stxt.pdf.model;
 import java.util.List;
 
 /**
- * El relleno de un fondo (referencia/comun/caja.md): un color o un degradado lineal. Los colores
+ * El relleno de un fondo (reference/common/box.md): un color o un degradado lineal. Los colores
  * siguen siendo el texto del documento ({@link Colors}).
  */
 public sealed interface Paint {

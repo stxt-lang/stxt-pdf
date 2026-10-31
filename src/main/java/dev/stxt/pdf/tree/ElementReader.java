@@ -50,7 +50,7 @@ enum ElementReader {
     },
 
     /**
-     * El bloque de código de un {@code Markdown} (referencia/componentes/markdown.md): un texto cuya fuente es su
+     * El bloque de código de un {@code Markdown} (reference/components/markdown.md): un texto cuya fuente es su
      * {@code Code font}, propia o heredada, con la línea de su declaración.
      */
     CODE_BLOCK {
@@ -84,7 +84,7 @@ enum ElementReader {
     },
 
     /**
-     * La {@code Cell} de una tabla (referencia/componentes/table.md): con valor es una caja de texto y, sin él, un
+     * La {@code Cell} de una tabla (reference/components/table.md): con valor es una caja de texto y, sin él, un
      * bloque. Su fila ({@code wrapper}) le da su {@code Typography}, como herencia, y su {@code Break}.
      */
     CELL {
@@ -122,7 +122,7 @@ enum ElementReader {
         }
     },
 
-    /** Una {@code Table} (referencia/componentes/table.md): un grid cuyas celdas coloca {@link TableBuilder}. */
+    /** Una {@code Table} (reference/components/table.md): un grid cuyas celdas coloca {@link TableBuilder}. */
     TABLE {
         @Override
         boolean property(Node p, Style s) {
@@ -174,7 +174,7 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Columns} (referencia/componentes/columns.md): su contenido va en su flujo de columnas, una caja de
+     * Un {@code Columns} (reference/components/columns.md): su contenido va en su flujo de columnas, una caja de
      * bloque generada que es su único hijo y de la que cada columna es un fragmento. Aísla los márgenes, para que
      * no salgan de las columnas, y su alto no es definido: lo decide el reparto en
      * columnas.
@@ -212,7 +212,7 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Markdown} (referencia/componentes/markdown.md): los elementos que genera {@link MarkdownBuilder},
+     * Un {@code Markdown} (reference/components/markdown.md): los elementos que genera {@link MarkdownBuilder},
      * construidos como si los hubiera escrito el autor; sus textos con formato llevan sus tramos.
      */
     MARKDOWN {
@@ -230,7 +230,7 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Table of contents} (referencia/componentes/table-of-contents.md): sus entradas las genera {@link
+     * Un {@code Table of contents} (reference/components/table-of-contents.md): sus entradas las genera {@link
      * TableOfContentsBuilder} al final, con todos los encabezados.
      */
     TABLE_OF_CONTENTS {
@@ -244,7 +244,7 @@ enum ElementReader {
     /** El resto: {@code Block}, los encabezados, {@code List item}, las cajas posicionadas…, con sus hijos. */
     CONTAINER;
 
-    /** Una línea en blanco dentro del texto: separa párrafos (referencia/comun/tipografia.md). */
+    /** Una línea en blanco dentro del texto: separa párrafos (reference/common/typography.md). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
     /** La familia de un elemento. */
@@ -299,7 +299,7 @@ enum ElementReader {
     }
 
     /**
-     * Con {@code Markup: markdown} (referencia/comun/formato-del-texto.md), el texto de la caja es Markdown en línea:
+     * Con {@code Markup: markdown} (reference/common/text-formatting.md), el texto de la caja es Markdown en línea:
      * pasa a ser el texto seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro
      * de un {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un bloque:
      * sus errores señalan la línea donde empieza.
@@ -315,7 +315,7 @@ enum ElementReader {
     }
 
     /**
-     * El código en línea (referencia/comun/formato-del-texto.md) se escribe con la familia de {@code Code font}, propia
+     * El código en línea (reference/common/text-formatting.md) se escribe con la familia de {@code Code font}, propia
      * o heredada, que solo conoce la caja: sus tramos la reciben aquí. Sin ella es un error, con la línea del código.
      */
     private static void codeFont(Box box) {
@@ -342,7 +342,7 @@ enum ElementReader {
     }
 
     /**
-     * La ruta de una {@code Image} (referencia/componentes/image.md), relativa a {@code images/}. Que el fichero exista
+     * La ruta de una {@code Image} (reference/components/image.md), relativa a {@code images/}. Que el fichero exista
      * y sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
      */
     private static void image(InlineNode n, Box box) {
@@ -356,7 +356,7 @@ enum ElementReader {
 
     /**
      * El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos, y sin líneas en
-     * blanco, que lo partirían en párrafos (referencia/componentes/text.md). En un texto preformateado, una línea en blanco
+     * blanco, que lo partirían en párrafos (reference/components/text.md). En un texto preformateado, una línea en blanco
      * es contenido y sí vale, salvo en un {@code Paragraph}, que es siempre un solo párrafo.
      */
     private static void text(InlineNode n, Box box) {

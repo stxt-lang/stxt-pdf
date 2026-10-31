@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Tablas al construir el árbol (referencia/componentes/table.md): traducción a un grid, filas y celdas. */
+/** Tablas al construir el árbol (reference/components/table.md): traducción a un grid, filas y celdas. */
 class TablesTest {
 
     private static Box root(String... lines) {
@@ -52,7 +52,7 @@ class TablesTest {
         assertEquals("Ventas", cell.text().trim());
     }
 
-    /** {@code Row header} es de la celda, no se hereda y por defecto es falso (referencia/componentes/table.md). */
+    /** {@code Row header} es de la celda, no se hereda y por defecto es falso (reference/components/table.md). */
     @Test
     void headerMarksTheRowHeaderCells() {
         Box table = root("\tTable:", "\t\tColumn sizes: 100 100",
@@ -120,7 +120,7 @@ class TablesTest {
 
     /**
      * Una {@code Row} con {@code Id} o {@code Box} tiene su caja, que cuelga de la tabla sin ser su hija y sabe su fila
-     * (referencia/componentes/table.md#filas); sin ninguno de los dos, no.
+     * (reference/components/table.md#filas); sin ninguno de los dos, no.
      */
     @Test
     void aRowWithAnIdOrABoxHasItsOwnBox() {
@@ -153,7 +153,7 @@ class TablesTest {
 
     /**
      * El {@code For id} de una fila da estilo a sus celdas: más que las clases de la celda, menos que su propio
-     * {@code For id} (referencia/componentes/table.md#estilo-de-las-celdas).
+     * {@code For id} (reference/components/table.md#estilo-de-las-celdas).
      */
     @Test
     void theForIdOfARowStylesItsCells() {

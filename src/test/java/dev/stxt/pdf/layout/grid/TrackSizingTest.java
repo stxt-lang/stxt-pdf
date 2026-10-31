@@ -114,7 +114,7 @@ class TrackSizingTest {
 
     /**
      * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su ancho más estrecho va solo a la auto, y su
-     * ancho natural se cuenta con las bases ya subidas (como en CSS, referencia/componentes/grid.md): el área del ítem
+     * ancho natural se cuenta con las bases ya subidas (como en CSS, reference/components/grid.md): el área del ítem
      * mide su ancho natural (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (pruebas de mutación).
      */
     @Test

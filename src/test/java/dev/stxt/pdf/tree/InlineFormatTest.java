@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * {@code Markup: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell}
- * (referencia/comun/formato-del-texto.md).
+ * (reference/common/text-formatting.md).
  */
 class InlineFormatTest {
 
@@ -132,7 +132,7 @@ class InlineFormatTest {
         assertEquals(16, block.line());
     }
 
-    /** Lo que en un Markdown empezaría un bloque es texto, sin escaparlo (referencia/comun/formato-del-texto.md). */
+    /** Lo que en un Markdown empezaría un bloque es texto, sin escaparlo (reference/common/text-formatting.md). */
     @Test
     void blockSyntaxIsLiteralText() {
         Box root = buildInline("\tText: - 5 % de descuento", "\tText: 2024. Un buen año", "\tText: # 1 en ventas",
@@ -145,7 +145,7 @@ class InlineFormatTest {
                 root.children().get(6).formattedRuns());
     }
 
-    /** El código en línea usa la familia de {@code Code font}, que se hereda (referencia/comun/formato-del-texto.md). */
+    /** El código en línea usa la familia de {@code Code font}, que se hereda (reference/common/text-formatting.md). */
     @Test
     void inlineCodeUsesTheInheritedCodeFont() {
         Box root = buildInline("\tBlock:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono",

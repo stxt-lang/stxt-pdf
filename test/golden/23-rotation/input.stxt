@@ -1,4 +1,4 @@
-# Giro y papel con nombre (referencia/componentes/document.md, referencia/comun/capas-y-giro.md, referencia/comun/cortes.md y referencia/comun/desbordamiento.md).
+# Giro y papel con nombre (reference/components/document.md, reference/common/layers-and-rotation.md, reference/common/breaks.md y reference/common/overflow.md).
 #
 # Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
 # El giro de un posicionado solo cambia el pintado: sus Rect son los de las cajas sin girar. Una caja girada en

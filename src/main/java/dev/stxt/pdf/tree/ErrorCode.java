@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
 
 /**
- * Código estable de cada error del modelo (referencia/comun/errores.md). Los tests comparan el código y
+ * Código estable de cada error del modelo (reference/common/errors.md). Los tests comparan el código y
  * la línea, no el texto del mensaje, que puede mejorar sin romperlos. Los errores de sintaxis
  * STXT y del schema llevan los códigos de la librería {@code stxt-core}
  * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}…), en un {@link DocumentSyntaxException}.
@@ -24,7 +24,7 @@ public enum ErrorCode {
     PAGE_NUMBER_UNAVAILABLE,
 
     // --- Valores ------------------------------------------------------------------------------
-    /** Sintaxis de un valor (referencia/comun/valores.md): número, porcentaje, función, lista… */
+    /** Sintaxis de un valor (reference/common/values.md): número, porcentaje, función, lista… */
     VALUE_SYNTAX,
     /** Un valor bien escrito que la propiedad no admite ({@code Width: *}, {@code Padding: -2}…). */
     VALUE_NOT_ALLOWED,

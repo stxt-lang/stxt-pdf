@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * Las mayúsculas del texto al pintarlo: {@code Case} y {@code Small caps}
- * (referencia/comun/formato-del-texto.md). Se aplica a los tramos antes de repartirlos en líneas, porque cambia lo
+ * (reference/common/text-formatting.md). Se aplica a los tramos antes de repartirlos en líneas, porque cambia lo
  * que miden (la «ß» pasa a «SS», las versalitas se pintan más pequeñas); el texto de la caja no
  * cambia.
  *

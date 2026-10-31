@@ -207,7 +207,7 @@ class PositioningTest {
     @Test
     void anAbsoluteMayLeaveItsContainingBlockButNotThePage() {
         // La caja de relleno de R empieza en (42, 42); A sale 42 por la izquierda y por arriba, hasta la esquina de la
-        // página (0, 0), y no más: no es un desbordamiento (referencia/comun/desbordamiento.md).
+        // página (0, 0), y no más: no es un desbordamiento (reference/common/overflow.md).
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: -42 auto auto -42", "\t\t\tBox:", "\t\t\t\tWidth: 20",

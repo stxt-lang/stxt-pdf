@@ -22,7 +22,7 @@ import static dev.stxt.pdf.layout.Messages.pt;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Layout de una {@code Table} (referencia/componentes/table.md): el de su grid, con las filas de
+ * Layout de una {@code Table} (reference/components/table.md): el de su grid, con las filas de
  * {@code Header rows} y {@code Footer rows} repetidas en cada fragmento.
  *
  * <p>{@code BoxTreeBuilder} traduce la tabla a un grid con colocación explícita; las primeras

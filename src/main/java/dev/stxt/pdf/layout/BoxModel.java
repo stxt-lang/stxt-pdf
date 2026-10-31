@@ -11,7 +11,7 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Modelo de caja usado de una caja en un espacio concreto (referencia/comun/caja.md):
+ * Modelo de caja usado de una caja en un espacio concreto (reference/common/box.md):
  * márgenes, borde y relleno en puntos, el ancho de la caja de borde y su alto si es definido.
  * Es la parte común a todos los algoritmos de layout.
  *
@@ -101,7 +101,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Una {@code Image} (referencia/componentes/image.md), como un elemento reemplazado de CSS: su caja de contenido
+     * Una {@code Image} (reference/components/image.md), como un elemento reemplazado de CSS: su caja de contenido
      * tiene la proporción del fichero (o la de {@code Aspect ratio}, que la sustituye). Con {@code Width: auto} mide su
      * ancho natural, también en flujo de bloque, o el que sale de un alto declarado; el alto {@code auto} sale siempre
      * del ancho, así que es definido. Si los dos son {@code auto} y el alto choca con su mínimo o su máximo, el ancho
@@ -154,7 +154,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Limita un ancho de caja de borde por {@code Min width} y {@code Max width} (referencia/comun/caja.md).
+     * Limita un ancho de caja de borde por {@code Min width} y {@code Max width} (reference/common/box.md).
      *
      * @param baseWidth base de los porcentajes
      */
@@ -186,7 +186,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Tamaños intrínsecos de la caja de margen a partir de los de su contenido (referencia/comun/caja.md). Una caja
+     * Tamaños intrínsecos de la caja de margen a partir de los de su contenido (reference/common/box.md). Una caja
      * con {@code Width} fijo tiene ese valor como ancho más estrecho y ancho natural. Los porcentajes no
      * se pueden resolver sin containing block y cuentan como 0 (o como {@code auto}).
      */

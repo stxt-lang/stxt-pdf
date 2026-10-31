@@ -2,7 +2,7 @@ package dev.stxt.pdf.tree;
 
 
 /**
- * Las propiedades de un {@code Columns} (referencia/componentes/columns.md): cuántas columnas y de qué ancho, el
+ * Las propiedades de un {@code Columns} (reference/components/columns.md): cuántas columnas y de qué ancho, el
  * hueco y la línea entre ellas y cómo se llenan. No se heredan.
  */
 public final class ColumnsStyle extends StyleGroup {

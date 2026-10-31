@@ -18,7 +18,7 @@ public interface TextMeasurer {
 
     /**
      * Ascendente y descendente de la fuente, para alinear líneas base al maquetar (el marcador de
-     * una lista, referencia/componentes/list.md). Por defecto, la aproximación sin fuente, que es la que
+     * una lista, reference/components/list.md). Por defecto, la aproximación sin fuente, que es la que
      * usa el pintado SVG.
      */
     default VerticalMetrics vertical(FontFace font) {

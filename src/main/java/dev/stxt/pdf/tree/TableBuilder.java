@@ -25,7 +25,7 @@ import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 
 /**
- * Las filas de una {@code Table} (referencia/componentes/table.md) como ítems de un grid con colocación
+ * Las filas de una {@code Table} (reference/components/table.md) como ítems de un grid con colocación
  * explícita, y el texto de una {@code Cell} con valor.
  */
 final class TableBuilder {
@@ -33,7 +33,7 @@ final class TableBuilder {
     /** Grupos de filas de una {@code Table}, en el orden en que van. */
     private static final List<String> TABLE_GROUPS = List.of("header-rows", "body", "footer-rows");
 
-    /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (referencia/componentes/table.md#filas). */
+    /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (reference/components/table.md#filas). */
     private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
 
     private TableBuilder() {
@@ -53,7 +53,7 @@ final class TableBuilder {
     }
 
     /**
-     * Las filas de una {@code Table} (referencia/componentes/table.md) como ítems de un grid con colocación explícita:
+     * Las filas de una {@code Table} (reference/components/table.md) como ítems de un grid con colocación explícita:
      * cada {@code Cell} va en la primera columna libre de su fila, contando las que ocupan los {@code Span} de las
      * filas de arriba. Los grupos van en el orden {@code Header rows}, {@code Body}, {@code Footer rows}; cada fila
      * llena exactamente las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las
@@ -140,7 +140,7 @@ final class TableBuilder {
     }
 
     /**
-     * La caja de una {@code Row} con {@code Id} o {@code Box} (referencia/componentes/table.md#filas): la franja de la
+     * La caja de una {@code Row} con {@code Id} o {@code Box} (reference/components/table.md#filas): la franja de la
      * fila {@code tableRow} de la tabla (desde 1), de la primera columna a la última, que se pinta debajo de sus
      * celdas. Su {@code Box} solo admite el aspecto ({@code ROW_BOX}); lee también su {@code Typography} (el color de
      * su borde por defecto) y su {@code Break} (su {@code Edges}). Sin {@code Id} ni {@code Box}, la fila no tiene

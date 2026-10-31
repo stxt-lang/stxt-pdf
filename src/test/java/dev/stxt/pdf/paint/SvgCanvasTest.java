@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las imágenes en la salida SVG (referencia/componentes/image.md). */
+/** Las imágenes en la salida SVG (reference/components/image.md). */
 class SvgCanvasTest {
 
     private static final String DOC = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
@@ -58,7 +58,7 @@ class SvgCanvasTest {
 
     /**
      * Una caja girada es un grupo con {@code rotate(ángulo x y)} alrededor de su origen
-     * (referencia/comun/capas-y-giro.md).
+     * (reference/common/layers-and-rotation.md).
      */
     @Test
     void rotationIsAGroupTransform() {

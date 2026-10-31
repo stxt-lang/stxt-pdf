@@ -25,14 +25,14 @@ final class BuildContext {
     /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
     final Map<String, Integer> ids = new HashMap<>();
     /**
-     * Si el alto de la caja de contenido es definido: base de los porcentajes verticales (referencia/comun/valores.md).
+     * Si el alto de la caja de contenido es definido: base de los porcentajes verticales (reference/common/values.md).
      */
     final Map<Box, Boolean> definiteHeight = new HashMap<>();
     /** Número de cada {@code List item} ya construido: el siguiente continúa desde él. */
     final Map<Box, Integer> itemNumbers = new HashMap<>();
     /** Nivel del último encabezado, en orden del documento; 0 antes del primero. */
     int headingLevel;
-    /** Los contadores de la numeración de los encabezados ({@code Numbered}, referencia/componentes/heading.md). */
+    /** Los contadores de la numeración de los encabezados ({@code Numbered}, reference/components/heading.md). */
     final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Si se está construyendo el contenido de un {@code Page overlay}. */
     boolean insidePageOverlay;
@@ -41,12 +41,12 @@ final class BuildContext {
     /**
      * La caja que no se parte entre páginas ({@code un Overlay}, {@code un Page overlay} o {@code un Frame girado})
      * cuyo contenido se está construyendo, o {@code null}: dentro, un {@code Break} no tiene efecto, salvo en las
-     * columnas de un {@code Columns} (referencia/comun/cortes.md).
+     * columnas de un {@code Columns} (reference/common/breaks.md).
      */
     String unbreakable;
     /**
      * Si se está construyendo el contenido de un {@code Markdown}: sus textos ya vienen interpretados
-     * (referencia/componentes/markdown.md).
+     * (reference/components/markdown.md).
      */
     boolean insideMarkdown;
     /**
@@ -56,12 +56,12 @@ final class BuildContext {
     final List<Box> contents = new ArrayList<>();
     /**
      * Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo
-     * (referencia/comun/formato-del-texto.md).
+     * (reference/common/text-formatting.md).
      */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
     /**
      * Los {@code Text} que {@link MarkdownBuilder} genera como bloques de código: su elemento es {@code Code block}
-     * (referencia/componentes/markdown.md).
+     * (reference/components/markdown.md).
      */
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
 

@@ -218,7 +218,7 @@ class PdfCanvasTest {
 
     /**
      * Una caja que declara otro idioma lleva su {@code Lang}, que heredan los elementos de dentro; las demás no
-     * lo repiten (referencia/comun/tipografia.md y referencia/componentes/heading.md).
+     * lo repiten (reference/common/typography.md y reference/components/heading.md).
      */
     @Test
     void aBoxInAnotherLanguageHasLang() throws Exception {
@@ -333,7 +333,7 @@ class PdfCanvasTest {
 
     /**
      * Una celda con {@code Row header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la
-     * cabecera siguen siendo {@code Scope: Column} y las demás, {@code TD} (referencia/componentes/table.md).
+     * cabecera siguen siendo {@code Scope: Column} y las demás, {@code TD} (reference/components/table.md).
      */
     @Test
     void headerCellsAreRowHeaders() throws Exception {
@@ -362,7 +362,7 @@ class PdfCanvasTest {
 
     /**
      * Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador
-     * (referencia/componentes/heading.md y referencia/componentes/table-of-contents.md).
+     * (reference/components/heading.md y reference/components/table-of-contents.md).
      */
     @Test
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
@@ -384,7 +384,7 @@ class PdfCanvasTest {
 
     /**
      * El número de un encabezado numerado es parte de su título: también de su marcador y de su entrada del índice
-     * (referencia/componentes/heading.md).
+     * (reference/components/heading.md).
      */
     @Test
     void theNumberOfAHeadingIsPartOfItsBookmarkAndItsContentsEntry() throws Exception {
@@ -407,7 +407,7 @@ class PdfCanvasTest {
 
     /**
      * Un {@code Columns} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna
-     * (referencia/componentes/columns.md).
+     * (reference/components/columns.md).
      */
     @Test
     void columnsIsADivWithoutOneElementPerColumn() throws Exception {
@@ -442,7 +442,7 @@ class PdfCanvasTest {
      * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
      * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
      * lleva la {@code OBJR} de la anotación; el de un {@code Page overlay}, que no es contenido, es un
-     * {@code Link} sin contenido en su sitio del árbol, con su {@code Alt} (referencia/implementacion/pdf.md).
+     * {@code Link} sin contenido en su sitio del árbol, con su {@code Alt} (reference/implementation/pdf.md).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -512,7 +512,7 @@ class PdfCanvasTest {
 
     /**
      * Un enlace de texto que ocupa varias líneas es un solo {@code Link} con un contenido marcado y una
-     * {@code OBJR} por línea; las zonas son una por línea (referencia/implementacion/pdf.md).
+     * {@code OBJR} por línea; las zonas son una por línea (reference/implementation/pdf.md).
      */
     @Test
     void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
@@ -560,7 +560,7 @@ class PdfCanvasTest {
 
     /**
      * Un enlace a una caja del documento lleva a su página y a su esquina, hacia delante y hacia
-     * atrás (referencia/comun/enlaces.md).
+     * atrás (reference/common/links.md).
      */
     @Test
     void internalLinksGoToThePageOfTheirBox() throws Exception {
@@ -585,7 +585,7 @@ class PdfCanvasTest {
 
     /**
      * Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link}
-     * (referencia/componentes/table-of-contents.md y referencia/comun/enlaces.md).
+     * (reference/components/table-of-contents.md y reference/common/links.md).
      */
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
@@ -617,7 +617,7 @@ class PdfCanvasTest {
     /**
      * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
      * solo es contenido (y envuelve el texto de la celda) en la primera; las anotaciones de las demás van al mismo
-     * {@code Link} (referencia/implementacion/pdf.md).
+     * {@code Link} (reference/implementation/pdf.md).
      */
     @Test
     void aLinkInARepeatedTableHeaderIsTaggedOnce() throws Exception {
@@ -656,7 +656,7 @@ class PdfCanvasTest {
     /**
      * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Page overlay} o de una imagen decorativa
      * es un {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en
-     * su orden de lectura (referencia/implementacion/pdf.md).
+     * su orden de lectura (reference/implementation/pdf.md).
      */
     @Test
     void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
@@ -729,7 +729,7 @@ class PdfCanvasTest {
 
     /**
      * Cada tramo con su fuente, en el mismo contenido marcado del párrafo; el subrayado y el tachado,
-     * <em>artifacts</em> (referencia/comun/formato-del-texto.md). Se revisa a ojo en {@code target/pdf/runs.pdf}.
+     * <em>artifacts</em> (reference/common/text-formatting.md). Se revisa a ojo en {@code target/pdf/runs.pdf}.
      */
     @Test
     void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
@@ -766,7 +766,7 @@ class PdfCanvasTest {
 
     /**
      * Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor
-     * (referencia/componentes/markdown.md).
+     * (reference/components/markdown.md).
      */
     @Test
     void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
@@ -792,7 +792,7 @@ class PdfCanvasTest {
 
     /**
      * Con {@code Case} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura conserva el texto
-     * escrito (referencia/comun/formato-del-texto.md): {@code ActualText}. Un texto con el número de página no lo
+     * escrito (reference/common/text-formatting.md): {@code ActualText}. Un texto con el número de página no lo
      * lleva, porque cambia con la página.
      */
     @Test
@@ -822,7 +822,7 @@ class PdfCanvasTest {
 
     /**
      * Con un interletraje grande, un extractor pondría espacios entre las letras; cada tramo lleva en su contenido
-     * marcado el {@code ActualText} con su texto (referencia/implementacion/pdf.md), que pdfbox respeta.
+     * marcado el {@code ActualText} con su texto (reference/implementation/pdf.md), que pdfbox respeta.
      */
     @Test
     void letterSpacedTextIsExtractedWhole() throws Exception {
@@ -838,7 +838,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un índice (referencia/componentes/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título
+     * Un índice (reference/components/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título
      * y número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada
      * encabezado, también la de un encabezado de un Markdown.
      */
@@ -868,7 +868,7 @@ class PdfCanvasTest {
 
     /**
      * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox}; sin él, y en un
-     * {@code Page overlay}, es un artifact (referencia/componentes/image.md). Cada fichero se incrusta una vez.
+     * {@code Page overlay}, es un artifact (reference/components/image.md). Cada fichero se incrusta una vez.
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
@@ -909,7 +909,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un SVG (referencia/componentes/image.md) es un dibujo vectorial: un formulario del PDF, no una imagen, que se
+     * Un SVG (reference/components/image.md) es un dibujo vectorial: un formulario del PDF, no una imagen, que se
      * incrusta una vez aunque se use en dos páginas y se escala a su caja; con {@code Alt} es un {@code Figure}. El
      * texto del SVG se dibuja con la fuente de {@code fonts/}: los píxeles de las letras están donde toca (blancos
      * sobre el fondo oscuro).
@@ -973,7 +973,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una caja girada (referencia/comun/capas-y-giro.md) gira su contenido con una matriz {@code cm}; su enlace es el
+     * Una caja girada (reference/common/layers-and-rotation.md) gira su contenido con una matriz {@code cm}; su enlace es el
      * rectángulo que envuelve la zona girada con los {@code QuadPoints} de la zona, el {@code BBox} de una figura
      * girada envuelve lo que se pinta, y un destino lleva a la esquina de ese envolvente. El texto girado sigue siendo
      * texto.
@@ -1032,7 +1032,7 @@ class PdfCanvasTest {
             + "\t\t\t\tSize: 10\n\t\tFor style: english\n\t\t\tTypography:\n\t\t\t\tLanguage: en\n";
 
     /**
-     * Las etiquetas de página del PDF son el número impreso (referencia/componentes/document.md): ninguno en la
+     * Las etiquetas de página del PDF son el número impreso (reference/components/document.md): ninguno en la
      * portada, y el anexo reinicia.
      */
     @Test
@@ -1093,7 +1093,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * La primera {@code Sect} de un documento etiquetado (referencia/componentes/document.md): lo que cuelga de ella es
+     * La primera {@code Sect} de un documento etiquetado (reference/components/document.md): lo que cuelga de ella es
      * el contenido.
      */
     private static PDStructureElement firstSection(PDStructureElement document) {

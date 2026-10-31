@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las páginas en que sale un {@code Page overlay} (referencia/componentes/frame-and-overlays.md); la página 1 es la
+ * Las páginas en que sale un {@code Page overlay} (reference/components/frame-and-overlays.md); la página 1 es la
  * primera del documento.
  */
 public enum Pages {

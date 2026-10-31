@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El PDF con PDF/UA-2 (referencia/implementacion/pdf.md): PDF 2.0, los elementos en el espacio de nombres de PDF 2.0,
+ * El PDF con PDF/UA-2 (reference/implementation/pdf.md): PDF 2.0, los elementos en el espacio de nombres de PDF 2.0,
  * las entradas de índice con {@code Reference} y {@code Ref}, los destinos de estructura y {@code Unordered} para las
  * listas con guion. veraPDF lo valida con su perfil de PDF/UA-2.
  */

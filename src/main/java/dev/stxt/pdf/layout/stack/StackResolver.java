@@ -5,7 +5,7 @@ import java.util.List;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Resuelve los tamaños flexibles de una línea stack (referencia/componentes/stack.md; Flexbox §9.7).
+ * Resuelve los tamaños flexibles de una línea stack (reference/components/stack.md; Flexbox §9.7).
  *
  * <p>Si sobra espacio se crece en proporción a {@code Grow}; si falta, se encoge en proporción a
  * {@code Shrink × Base size}. Los ítems que chocan con su mínimo o máximo se congelan y el reparto se

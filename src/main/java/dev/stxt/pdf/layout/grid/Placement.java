@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Colocación de ítems en la rejilla (referencia/componentes/grid.md).
+ * Colocación de ítems en la rejilla (reference/components/grid.md).
  *
  * <ol>
  *   <li>Los ítems con fila y columna explícitas se colocan primero.</li>

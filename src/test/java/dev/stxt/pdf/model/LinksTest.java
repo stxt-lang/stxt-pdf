@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los destinos de un enlace (referencia/comun/enlaces.md). */
+/** Los destinos de un enlace (reference/common/links.md). */
 class LinksTest {
 
     @ParameterizedTest
@@ -20,7 +20,7 @@ class LinksTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "javascript:alert(1)", "file:///etc/passwd", "ftp://example.com", "tel:+34600000000",
-            "docs/manual.pdf", "www.example.com", "https://", "https:///ruta", "http://", "mailto:", "mailto:?subject=x",
+            "docs/es/manual.pdf", "www.example.com", "https://", "https:///ruta", "http://", "mailto:", "mailto:?subject=x",
             "#", "# intro", "#dos palabras", "https://exa mple.com"})
     void invalidDestinations(String destination) {
         assertTrue(Links.problem(destination).isPresent(), destination);

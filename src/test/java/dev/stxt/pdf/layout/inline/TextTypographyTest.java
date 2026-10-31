@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Case}, {@code Letter spacing} y {@code Small caps} (referencia/comun/formato-del-texto.md). Con {@link
+ * {@code Case}, {@code Letter spacing} y {@code Small caps} (reference/common/text-formatting.md). Con {@link
  * FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}.
  */
 class TextTypographyTest {

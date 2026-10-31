@@ -33,7 +33,7 @@ import java.util.OptionalDouble;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
 
 /**
- * Layout {@code grid} (referencia/componentes/grid.md). Pasos:
+ * Layout {@code grid} (reference/components/grid.md). Pasos:
  * <ol>
  *   <li>Colocación: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} y {@link Placement}.</li>
  *   <li>Columnas: {@link TrackSizing} con los anchos más estrecho y natural.</li>
@@ -49,7 +49,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * {@link PendingOverlay} con la esquina de la caja de contenido como posición estática. Los
  * ítems {@code relative} se desplazan con {@link FrameOffset} después de alinearlos.</p>
  *
- * <p>Entre páginas (referencia/comun/cortes.md) se corta entre filas con {@link UnitBreaker}; los ítems de una
+ * <p>Entre páginas (reference/common/breaks.md) se corta entre filas con {@link UnitBreaker}; los ítems de una
  * fila que no cabe en una página se parten en paralelo.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
@@ -86,7 +86,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /**
      * El ítem pide una fila (una columna, con {@code Flow: vertical}) en la que no queda hueco
-     * (referencia/componentes/grid.md).
+     * (reference/components/grid.md).
      */
     private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
         boolean row = flow == Direction.HORIZONTAL;
@@ -109,7 +109,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /**
      * Suma de las columnas dimensionadas para el ancho más estrecho (sin espacio libre) y para el natural (espacio
-     * infinito y los ítems aportando su ancho natural), referencia/comun/caja.md.
+     * infinito y los ítems aportando su ancho natural), reference/common/box.md.
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
@@ -125,7 +125,7 @@ public final class GridLayout implements LayoutAlgorithm {
             maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.natural(), is.natural()));
         }
         double gaps = gap * Math.max(0, g.columns().size() - 1);
-        // Sin containing block, las columnas en porcentaje cuentan como auto (referencia/comun/valores.md).
+        // Sin containing block, las columnas en porcentaje cuentan como auto (reference/common/values.md).
         List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
         double min = Sizing.sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
         double max = Sizing.sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
@@ -214,7 +214,7 @@ public final class GridLayout implements LayoutAlgorithm {
         }
 
         double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        // Las franjas de las filas de una tabla, de la primera columna a la última (referencia/componentes/table.md).
+        // Las franjas de las filas de una tabla, de la primera columna a la última (reference/components/table.md).
         double width = Sizing.sum(columns) + columnGap * Math.max(0, columns.length - 1);
         List<UnitBreaker.Band> bands = box.rows().stream().map(r -> new UnitBreaker.Band(r,
                 r.style().item().area().row() - 1, 0, width, Insets.resolve(r.style().box().border(), contentWidth)))
@@ -223,7 +223,7 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Las filas como unidades de la fragmentación (referencia/comun/cortes.md). No se puede cortar entre dos filas que
+     * Las filas como unidades de la fragmentación (reference/common/breaks.md). No se puede cortar entre dos filas que
      * ocupa un mismo ítem; entre las demás, la calidad del corte sale de los ítems que acaban
      * antes y de los que empiezan después.
      */
@@ -291,7 +291,7 @@ public final class GridLayout implements LayoutAlgorithm {
             }
         }
         // Un ítem estirado se maqueta siempre con su alto fijado, aunque mida lo mismo: es la base
-        // definida de los porcentajes de sus hijos (referencia/comun/valores.md).
+        // definida de los porcentajes de sus hijos (reference/common/values.md).
         if (fixedHeight.isEmpty() && !dependsOnHeightBase(is)) {
             return measureSpace;
         }

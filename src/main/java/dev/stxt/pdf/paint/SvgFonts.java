@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Las fuentes con que JSVG dibuja el texto de un SVG (referencia/componentes/image.md): los ficheros de {@code fonts/}
+ * Las fuentes con que JSVG dibuja el texto de un SVG (reference/components/image.md): los ficheros de {@code fonts/}
  * que {@link ImageFile} comprobó, sin dar nada de alta en AWT ni buscar ninguna fuente por su nombre. Uno por dibujo.
  *
  * <p>JSVG busca la fuente por familia en AWT, que tiene dos problemas: con la JVM en turco no encuentra

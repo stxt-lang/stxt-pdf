@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-/** Colocación automática de los ítems en la rejilla (referencia/componentes/grid.md). */
+/** Colocación automática de los ítems en la rejilla (reference/components/grid.md). */
 class PlacementTest {
 
     private static List<Area> place(List<Cell> cells, int columns) {

@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 /**
  * Los nombres de posición que una regla {@code For element} de {@code Styles} puede dar a una celda de tabla
- * (referencia/comun/estilos.md y referencia/componentes/table.md). No son elementos: el elemento de la caja sigue
+ * (reference/common/styles.md y reference/components/table.md). No son elementos: el elemento de la caja sigue
  * siendo {@code Cell}, y estas reglas se aplican además de la de {@code Cell}.
  */
 enum CellSelector {

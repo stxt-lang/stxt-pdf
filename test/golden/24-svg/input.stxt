@@ -1,4 +1,4 @@
-# Imágenes vectoriales (referencia/componentes/image.md). Área útil de 260 × 260 desde (20, 20). Los SVG de
+# Imágenes vectoriales (reference/components/image.md). Área útil de 260 × 260 desde (20, 20). Los SVG de
 # resources/images/test: shapes.svg de 200 × 100 px (150 × 75 pt, proporción 2) y label.svg, sin
 # width ni height y con viewBox="0 0 160 48" (120 × 36 pt, proporción 10/3). Se dimensionan, se
 # cortan entre páginas y se colocan como un PNG; solo cambia el pintado, que es vectorial.

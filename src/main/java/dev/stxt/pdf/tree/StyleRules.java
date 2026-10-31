@@ -29,12 +29,12 @@ import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 
 /**
- * Las reglas reutilizables de {@code Styles} (referencia/comun/estilos.md): {@code For element} (de un
+ * Las reglas reutilizables de {@code Styles} (reference/common/styles.md): {@code For element} (de un
  * tipo de elemento, de una posición en una tabla o {@code Document}), {@code For style},
  * {@code For id} y {@code For column}, leídas una vez por llamada.
  *
  * <p>Pueden venir de dos sitios: del {@code Styles} del propio documento y de un documento de
- * estilos aparte (raíz {@code Styles}, referencia/comun/estilos.md). En cada nivel de prioridad van antes las reglas
+ * estilos aparte (raíz {@code Styles}, reference/common/styles.md). En cada nivel de prioridad van antes las reglas
  * del documento aparte y después las del documento, así que si las dos declaran la misma propiedad gana el documento.
  * Cada origen se lee por separado: una regla repetida es un error dentro de un origen, no entre los dos.</p>
  */
@@ -79,7 +79,7 @@ final class StyleRules {
      * Lee las reglas de {@code Styles} del documento y, si lo hay, del documento de estilos
      * aparte ({@code styles}, de raíz {@code Styles}; {@code null} si no hay). Sus valores se
      * comprueban aquí, aunque la regla no se aplique a ningún elemento; lo que depende del
-     * elemento (referencia/comun/errores.md), al aplicarla.
+     * elemento (reference/common/errors.md), al aplicarla.
      */
     StyleRules(InlineNode document, InlineNode styles) {
         if (styles != null) {
@@ -176,7 +176,7 @@ final class StyleRules {
 
     /**
      * Aplica la regla {@code For element} de un elemento generado (una entrada del índice,
-     * referencia/componentes/table-of-contents.md), si la hay: no tiene nodo, así que no hay clases ni {@code Id} que
+     * reference/components/table-of-contents.md), si la hay: no tiene nodo, así que no hay clases ni {@code Id} que
      * mirar.
      */
     void apply(Element kind, Style s) {
@@ -213,7 +213,7 @@ final class StyleRules {
     }
 
     /**
-     * Aplica a una {@code Section} (referencia/componentes/document.md) las reglas que le llegan: {@code For element:
+     * Aplica a una {@code Section} (reference/components/document.md) las reglas que le llegan: {@code For element:
      * Section}, las de sus clases y la de su {@code Id}. Solo pueden dar {@code Typography}, que hereda todo su
      * contenido; con {@code Box} o {@code Break} son un error (una sección es el área útil de sus páginas, no una
      * caja).

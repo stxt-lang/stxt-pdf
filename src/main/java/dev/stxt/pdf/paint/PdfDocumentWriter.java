@@ -55,7 +55,7 @@ public final class PdfDocumentWriter {
 
     /**
      * Como {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean)}, cumpliendo la parte {@code ua} de
-     * PDF/UA: 1 (PDF 1.7) o 2 (PDF 2.0), referencia/implementacion/pdf.md.
+     * PDF/UA: 1 (PDF 1.7) o 2 (PDF 2.0), reference/implementation/pdf.md.
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua) throws IOException {
@@ -92,7 +92,7 @@ public final class PdfDocumentWriter {
             }
             for (int i = 0; i < pages.size(); i++) {
                 Page p = pages.get(i);
-                // Cada página tiene el medio de su sección (referencia/componentes/document.md).
+                // Cada página tiene el medio de su sección (reference/components/document.md).
                 PageSetup pageSetup = p.pageSetup();
                 Rect area = pageSetup.pageArea();
                 PDPage page = pdfPages.get(i);
@@ -118,7 +118,7 @@ public final class PdfDocumentWriter {
     }
 
     /**
-     * Las etiquetas de las páginas (referencia/componentes/document.md): el visor muestra el número impreso de cada
+     * Las etiquetas de las páginas (reference/components/document.md): el visor muestra el número impreso de cada
      * una, y ninguno en las que no se numeran. Solo se escriben si alguna página no es su número físico; si no, no
      * añaden nada. Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
      */

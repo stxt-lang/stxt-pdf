@@ -388,7 +388,7 @@ class StackLayoutTest {
     @Test
     void shrinkIsWeightedByTheBasisWithoutMargins() {
         // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Base size (300 y 300), no por los
-        // tamaños con márgenes (referencia/componentes/stack.md): 52.5 cada uno.
+        // tamaños con márgenes (reference/components/stack.md): 52.5 cada uno.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 300", block("A", "Height: 10", "Margin: 0 10"),

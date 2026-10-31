@@ -12,9 +12,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Elementos de caja del documento (referencia/comun/estructura.md), el marcador que el motor genera para cada {@code
- * List item} (referencia/componentes/list.md) y el flujo de columnas de cada {@code Columns}
- * (referencia/componentes/columns.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
+ * Elementos de caja del documento (reference/common/structure.md), el marcador que el motor genera para cada {@code
+ * List item} (reference/components/list.md) y el flujo de columnas de cada {@code Columns}
+ * (reference/components/columns.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
  * significado que usan las reglas {@code For element}, los marcadores y las etiquetas del PDF.
  *
  * <p>La estructura (qué hijos admite cada elemento) está solo en el schema; {@code ElementTest}
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public enum Element {
 
     /**
-     * Una sección del documento (referencia/componentes/document.md): un bloque que es la raíz de su propio layout, con
+     * Una sección del documento (reference/components/document.md): un bloque que es la raíz de su propio layout, con
      * su {@code Page}. Solo es hijo de la raíz del documento.
      */
     SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
@@ -40,27 +40,27 @@ public enum Element {
     HEADING_6("Heading 6", Layout.BLOCK, Position.STATIC, true, false, 6),
     LIST("List", Layout.BLOCK, Position.STATIC, true, false, 0),
     LIST_ITEM("List item", Layout.BLOCK, Position.STATIC, false, false, 0),
-    /** Una tabla se maqueta como un grid con colocación explícita (referencia/componentes/table.md). */
+    /** Una tabla se maqueta como un grid con colocación explícita (reference/components/table.md). */
     TABLE("Table", Layout.GRID, Position.STATIC, true, false, 0),
     /** Sin valor, un bloque; con valor, una caja de texto ({@link BoxTreeBuilder} cambia el {@code Layout}). */
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Bloque en columnas (referencia/componentes/columns.md): su contenido va en el flujo de columnas, {@link
+     * Bloque en columnas (reference/components/columns.md): su contenido va en el flujo de columnas, {@link
      * #COLUMN_FLOW}.
      */
     COLUMNS("Columns", Layout.COLUMNS, Position.STATIC, true, false, 0),
     /**
-     * Contenido en Markdown (referencia/componentes/markdown.md): un bloque cuyos hijos son los elementos que
+     * Contenido en Markdown (reference/components/markdown.md): un bloque cuyos hijos son los elementos que
      * {@link MarkdownBuilder} genera a partir de su {@code Content}.
      */
     MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
     /**
-     * Imagen de la carpeta de recursos (referencia/componentes/image.md): una caja sin hijos con la ruta en {@link
+     * Imagen de la carpeta de recursos (reference/components/image.md): una caja sin hijos con la ruta en {@link
      * Box#image()}.
      */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
-     * Índice automático (referencia/comun/referencias.md): un bloque cuyos hijos, generados al construir el árbol, son
+     * Índice automático (reference/common/references.md): un bloque cuyos hijos, generados al construir el árbol, son
      * una entrada por encabezado ({@link #TOC_1} … {@link #TOC_6}).
      */
     TABLE_OF_CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
@@ -70,25 +70,25 @@ public enum Element {
     /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
-     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (referencia/componentes/table.md): una franja
+     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (reference/components/table.md): una franja
      * que se pinta debajo de sus celdas. No se nombra en las reglas {@code For element}.
      */
     ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
      * El flujo de columnas de un {@code Columns}, generado por el motor: un bloque con los hijos del {@code Columns},
-     * que es su único hijo. Cada columna es un fragmento suyo (referencia/componentes/columns.md).
+     * que es su único hijo. Cada columna es un fragmento suyo (reference/components/columns.md).
      */
     COLUMN_FLOW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Un bloque de código de un {@link #MARKDOWN} (referencia/componentes/markdown.md): un texto preformateado
+     * Un bloque de código de un {@link #MARKDOWN} (reference/components/markdown.md): un texto preformateado
      * generado. No se escribe en el documento, pero las reglas {@code For element} lo nombran ({@code Code block}) para
-     * darle estilo aparte de los {@code Text} (referencia/comun/estilos.md).
+     * darle estilo aparte de los {@code Text} (reference/common/styles.md).
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
      * Las entradas de un {@link #TABLE_OF_CONTENTS}, una por nivel de encabezado: un {@code Stack} generado con el
      * título, la guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las
-     * nombran ({@code TOC 2}) para darles estilo (referencia/componentes/table-of-contents.md).
+     * nombran ({@code TOC 2}) para darles estilo (reference/components/table-of-contents.md).
      */
     TOC_1("TOC 1", Layout.STACK),
     TOC_2("TOC 2", Layout.STACK),
@@ -205,7 +205,7 @@ public enum Element {
 
     /**
      * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
-     * (referencia/comun/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
+     * (reference/common/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
      * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Stack} o {@code Page
      * overlay}, un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link
      * #role()}).
@@ -219,7 +219,7 @@ public enum Element {
         PARAGRAPH,
         /** Un {@code Text}: un párrafo o, dentro de un encabezado, parte de su texto. */
         TEXT,
-        /** Una lista, cuyos ítems llevan su marcador a la izquierda (referencia/componentes/list.md). */
+        /** Una lista, cuyos ítems llevan su marcador a la izquierda (reference/components/list.md). */
         LIST,
         LIST_ITEM,
         TABLE,
@@ -228,7 +228,7 @@ public enum Element {
         CELL,
         /** Una imagen. */
         FIGURE,
-        /** Un índice ({@code Table of contents}, referencia/componentes/table-of-contents.md). */
+        /** Un índice ({@code Table of contents}, reference/components/table-of-contents.md). */
         TABLE_OF_CONTENTS,
         TOC_ENTRY,
         /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
@@ -236,7 +236,7 @@ public enum Element {
         /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
         PAGE_NUMBER,
         /**
-         * La guía de una entrada del índice: no tiene texto, se pinta (referencia/componentes/table-of-contents.md) y
+         * La guía de una entrada del índice: no tiene texto, se pinta (reference/components/table-of-contents.md) y
          * no es contenido.
          */
         LEADER,

@@ -5,7 +5,7 @@ import dev.stxt.pdf.model.Rect;
 
 /**
  * Dónde se dibuja una imagen en su caja de contenido según {@code Fit}
- * (referencia/componentes/image.md). Con proporciones iguales, las tres formas dan la caja de contenido.
+ * (reference/components/image.md). Con proporciones iguales, las tres formas dan la caja de contenido.
  */
 final class ImageFit {
 

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** Modelo de caja usado (referencia/comun/caja.md), con estilos escritos a mano. */
+/** Modelo de caja usado (reference/common/box.md), con estilos escritos a mano. */
 class BoxModelTest {
 
     private static final OptionalDouble NONE = OptionalDouble.empty();

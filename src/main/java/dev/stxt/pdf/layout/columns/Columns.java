@@ -3,7 +3,7 @@ package dev.stxt.pdf.layout.columns;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Número y ancho de las columnas de un {@code Columns} (referencia/componentes/columns.md), con el
+ * Número y ancho de las columnas de un {@code Columns} (reference/components/columns.md), con el
  * pseudoalgoritmo de CSS ({@code column-count} y {@code column-width}):
  *
  * <ul>

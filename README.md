@@ -36,8 +36,8 @@ contradice o no cabe es un error con su línea.
 | | Qué hay |
 |---|---|
 | [Ejemplos](#ejemplos) | Once documentos reales, con su PDF y su fuente |
-| [Manual](docs/manual/README.md) | Cómo se escribe un documento, del primero a cada elemento. Basta con saber STXT ([stxt.dev](https://stxt.dev)) |
-| [Referencia](docs/referencia/README.md) | La regla exacta de cada comportamiento, las decisiones de diseño y la arquitectura del código |
+| [Manual](docs/es/manual/README.md) | Cómo se escribe un documento, del primero a cada elemento. Basta con saber STXT ([stxt.dev](https://stxt.dev)) |
+| [Referencia](docs/es/reference/README.md) | La regla exacta de cada comportamiento, las decisiones de diseño y la arquitectura del código |
 
 ## Ejemplos
 
@@ -82,7 +82,7 @@ try (OutputStream out = Files.newOutputStream(Path.of("informe.pdf"))) {
 
 Las fuentes y las imágenes se buscan en `resources/`. El repositorio incluye IBM Plex Sans, Serif y Mono, con licencia SIL
 Open Font License. Las opciones, los errores, los límites y el uso con varios hilos están en
-[Uso desde Java](docs/manual/comun/uso-desde-java.md).
+[Uso desde Java](docs/es/manual/common/java-usage.md).
 
 ## Desarrollo
 
@@ -90,7 +90,7 @@ Open Font License. Las opciones, los errores, los límites y el uso con varios h
 mvn test
 ```
 
-Cómo está hecho el motor: [arquitectura](docs/referencia/arquitectura.md). Cómo se prueba: [pruebas](docs/referencia/implementacion/pruebas.md).
+Cómo está hecho el motor: [arquitectura](docs/es/reference/architecture.md). Cómo se prueba: [pruebas](docs/es/reference/implementation/testing.md).
 
 ## Licencia
 

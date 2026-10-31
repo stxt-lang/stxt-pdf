@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Copia páginas de otro PDF en el documento, cada una como un formulario (referencia/componentes/image.md).
+ * Copia páginas de otro PDF en el documento, cada una como un formulario (reference/components/image.md).
  *
  * <p>{@link LayerUtility} copia el contenido de la página y sus recursos (un recurso compartido por varias páginas,
  * una vez); las anotaciones no se copian. Luego se le quita el etiquetado del PDF de origen, que en el documento no

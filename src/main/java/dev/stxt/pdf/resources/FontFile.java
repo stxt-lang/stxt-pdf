@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (referencia/comun/recursos.md).
+ * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (reference/common/resources.md).
  *
  * <p>Los anchos son los que escribe PDFBox en el PDF al incrustar la fuente (el avance de cada
  * glifo en milésimas del cuerpo, redondeado): así el texto mide al maquetar lo mismo que al

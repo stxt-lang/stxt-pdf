@@ -52,9 +52,9 @@ import static dev.stxt.pdf.tree.ValueReader.comparable;
 import static dev.stxt.pdf.tree.ValueReader.hasPercentage;
 
 /**
- * Reglas del modelo que el schema no puede expresar (referencia/comun/errores.md) y que miran la caja
+ * Reglas del modelo que el schema no puede expresar (reference/common/errors.md) y que miran la caja
  * ya leída: desplazamientos, márgenes {@code auto}, mínimo y máximo, porcentajes verticales y si
- * el alto es definido (referencia/comun/valores.md), y la fuente de los textos.
+ * el alto es definido (reference/common/values.md), y la fuente de los textos.
  */
 final class ModelValidator {
 
@@ -64,7 +64,7 @@ final class ModelValidator {
     /**
      * {@code Horizontal} y {@code Vertical}, {@code Line distribution} y {@code Gap} de un {@code Stack}: la del eje principal
      * reparte y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code justify}, {@code around} ni
-     * {@code distribute} (referencia/componentes/stack.md).
+     * {@code distribute} (reference/components/stack.md).
      */
     static void validateStack(Style s) {
         String main = s.stack().isHorizontal() ? "Horizontal" : "Vertical";
@@ -97,7 +97,7 @@ final class ModelValidator {
     /**
      * Un {@code Columns} fija sus columnas con {@code Count}, {@code Min column width} o los dos; con una sola columna
      * no hay hueco ni línea entre columnas, {@code Separator color} necesita {@code Separator} y la línea cabe en el
-     * hueco (referencia/componentes/columns.md).
+     * hueco (reference/components/columns.md).
      */
     static void validateColumns(Style s, int line) {
         if (s.columns().count() == null && s.columns().minColumnWidth() == null) {
@@ -126,7 +126,7 @@ final class ModelValidator {
     }
 
     /**
-     * Una {@code Image} no se parte (referencia/componentes/image.md): {@code Keep together} y {@code Edges}, que solo
+     * Una {@code Image} no se parte (reference/components/image.md): {@code Keep together} y {@code Edges}, que solo
      * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
      */
     static void validateImage(Style s) {
@@ -139,7 +139,7 @@ final class ModelValidator {
     }
 
     /**
-     * El giro de una caja (referencia/comun/capas-y-giro.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
+     * El giro de una caja (reference/common/layers-and-rotation.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
      * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Keep together} y
      * {@code Edges} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla los
      * márgenes: {@code Isolate margins} no tiene efecto en ella.
@@ -176,7 +176,7 @@ final class ModelValidator {
         boolean stackItem = !s.isOutOfFlow() && parentLayout == Layout.STACK;
         boolean gridItem = !s.isOutOfFlow() && parentLayout == Layout.GRID;
         if ((stackItem || gridItem) && s.rotatesInFlow()) {
-            // Un ítem ocupa el sitio que le da su contenedor (referencia/comun/capas-y-giro.md).
+            // Un ítem ocupa el sitio que le da su contenedor (reference/common/layers-and-rotation.md).
             throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (stackItem ? "Stack" : "Grid")
                     + " no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem (un "
                     + "Block con la caja girada dentro)");
@@ -211,7 +211,7 @@ final class ModelValidator {
     /**
      * En un ítem de {@code Stack}, {@code Horizontal} o {@code Vertical} solo en el eje cruzado: en el principal reparte
      * el {@code Stack}, con su propia propiedad, y el ítem crece o se encoge con {@code Grow} y {@code Shrink}
-     * (referencia/componentes/stack.md).
+     * (reference/components/stack.md).
      */
     private static void validateStackItem(Style s, Box parent) {
         boolean horizontal = parent.style().stack().isHorizontal();
@@ -241,7 +241,7 @@ final class ModelValidator {
 
     /**
      * {@code Keep with next} con un salto después de la caja, o {@code Keep with previous} con uno antes: la caja no
-     * puede ir con la otra y separarse de ella a la vez (referencia/comun/cortes.md).
+     * puede ir con la otra y separarse de ella a la vez (reference/common/breaks.md).
      */
     private static void validateKeeps(Style s) {
         BreakStyle b = s.breaks();
@@ -359,7 +359,7 @@ final class ModelValidator {
     }
 
     /**
-     * Porcentajes verticales de la caja: su base debe ser un alto definido (referencia/comun/valores.md). La base de
+     * Porcentajes verticales de la caja: su base debe ser un alto definido (reference/common/values.md). La base de
      * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
      * definido para Overlay y Page overlay) o el área (los ítems de grid); la de los desplazamientos
      * de un Frame y de {@code Base size} en un stack {@code column}, la caja de contenido del padre.

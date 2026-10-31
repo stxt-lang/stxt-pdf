@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Los degradados del PDF ({@code Background: linear(…)}, referencia/comun/caja.md): el sombreado axial con
+ * Los degradados del PDF ({@code Background: linear(…)}, reference/common/box.md): el sombreado axial con
  * sus colores y, si alguno no es opaco, la máscara suave de luminosidad con las opacidades, porque PDF no tiene
  * opacidad por color en un sombreado. Solo construye los diccionarios; los pinta {@link PdfCanvas}.
  */

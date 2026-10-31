@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Layout {@code inline}: texto repartido en line boxes (referencia/comun/formato-del-texto.md).
+ * Layout {@code inline}: texto repartido en line boxes (reference/common/text-formatting.md).
  *
  * <p>Pasos: resolver el ancho de contenido, partir con {@link LineBreaker}, alinear cada línea,
  * altura = número de líneas × {@code Line height}. Con {@code justify}, el sobrante de cada línea
  * se reparte entre sus espacios ({@link TextLine#wordSpacing()}), salvo en la última del texto,
  * que es un solo párrafo; una línea cortada por un salto de página no es la última.</p>
  *
- * <p>En cada página (referencia/comun/cortes.md) se colocan las líneas que caben desde la del {@link BreakToken.Line}
+ * <p>En cada página (reference/common/breaks.md) se colocan las líneas que caben desde la del {@link BreakToken.Line}
  * respetando viudas y huérfanas ({@link BreakRules#cutLines}); si no cabe ninguna, se devuelve
  * {@link BreakToken#BEFORE} para que el padre corte antes de la caja.</p>
  *
@@ -56,7 +56,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     /** Reparto en líneas de cada texto por ancho disponible; depende de {@link #measurer}. */
     private final Map<BrokenKey, List<LineBreaker.Line>> broken = new HashMap<>();
     /**
-     * Página que se supone a cada caja referida con {@code {page of: id}} (referencia/comun/referencias.md); ver {@link
+     * Página que se supone a cada caja referida con {@code {page of: id}} (reference/common/references.md); ver {@link
      * #assume}.
      */
     private Map<String, String> pages = Map.of();
@@ -88,7 +88,7 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     /**
      * Lo que valen las referencias a otras cajas del texto ({@code {page of: id}} y {@code {number of: id}},
-     * referencia/comun/referencias.md): se sustituyen antes de repartir el texto en líneas, así que el texto mide lo
+     * reference/common/references.md): se sustituyen antes de repartir el texto en líneas, así que el texto mide lo
      * que va a pintarse. Las páginas son una suposición que el {@link dev.stxt.pdf.layout.Paginator} repite hasta que
      * se cumple. Como con {@link #reservePageNumbers}, quien llama olvida los textos cuyo valor cambia.
      */
@@ -221,7 +221,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             return new LayoutResult(fragment, new BreakToken.Line(end, slice.consumed()),
                     end == texts.size() ? BreakAppeal.PERFECT_BREAK : appeal, List.of(), AdjoiningMargins.NONE);
         }
-        // Una caja sin líneas, borde, relleno ni alto deja fusionar sus márgenes (referencia/componentes/block.md).
+        // Una caja sin líneas, borde, relleno ni alto deja fusionar sus márgenes (reference/components/block.md).
         boolean empty = first && lines.isEmpty() && slice.height() == 0 && model.openAtTop() && model.openAtBottom()
                 && !box.isolatesMargins();
         return LayoutResult.finished(fragment, List.of(), empty ? AdjoiningMargins.EMPTY_BOX : AdjoiningMargins.NONE);

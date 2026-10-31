@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Marker;
 
 /**
- * Las propiedades de las listas (referencia/componentes/list.md): el {@code Marker} y el {@code Start} de una {@code
+ * Las propiedades de las listas (reference/components/list.md): el {@code Marker} y el {@code Start} de una {@code
  * List} y el {@code Number} de un {@code List item}. No se heredan.
  */
 public final class ListStyle extends StyleGroup {

@@ -13,7 +13,7 @@ import static dev.stxt.pdf.tree.PropertyKey.NUMBER;
 import static dev.stxt.pdf.tree.PropertyKey.START;
 
 /**
- * Listas (referencia/componentes/list.md): numeración de los {@code List item}, la caja generada de su
+ * Listas (reference/components/list.md): numeración de los {@code List item}, la caja generada de su
  * marcador y las reglas de {@code Start} y {@code Number}.
  */
 final class ListBuilder {
@@ -22,7 +22,7 @@ final class ListBuilder {
     }
 
     /**
-     * Número de un {@code List item} (referencia/componentes/list.md): el de su {@code Number} o el siguiente al del
+     * Número de un {@code List item} (reference/components/list.md): el de su {@code Number} o el siguiente al del
      * ítem anterior, empezando por el {@code Start} de la lista. En una lista sin numeración, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
@@ -48,7 +48,7 @@ final class ListBuilder {
     }
 
     /**
-     * La caja generada del marcador de un {@code List item} (referencia/componentes/list.md): texto con la tipografía
+     * La caja generada del marcador de un {@code List item} (reference/components/list.md): texto con la tipografía
      * del ítem, que necesita, como cualquier texto, {@code Font} y {@code Size}.
      */
     static Box marker(InlineNode n, Box item, String text) {
@@ -69,7 +69,7 @@ final class ListBuilder {
 
     /**
      * Comprueba que el marcador de un {@code List item} tiene una línea con la que alinearse
-     * (referencia/componentes/list.md): bajando por el primer hijo en flujo de cada bloque se llega a un texto.
+     * (reference/components/list.md): bajando por el primer hijo en flujo de cada bloque se llega a un texto.
      */
     static void markerLine(Box item) {
         Box b = item;

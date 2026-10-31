@@ -132,7 +132,7 @@ class ColumnsFragmentationTest {
 
     /**
      * Height: 160 con clone y relleno de 5: en la página 1 las columnas miden 90 (las limita la página) y caben tres
-     * bloques de 25 por columna, que consumen 75 (referencia/comun/cortes.md); en la 2 les quedan 160 − 10 − 75 = 75,
+     * bloques de 25 por columna, que consumen 75 (reference/common/breaks.md); en la 2 les quedan 160 − 10 − 75 = 75,
      * otros tres por columna.
      */
     @Test

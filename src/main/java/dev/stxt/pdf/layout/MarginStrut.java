@@ -1,7 +1,7 @@
 package dev.stxt.pdf.layout;
 
 /**
- * Márgenes verticales adyacentes pendientes de fusionar (referencia/componentes/block.md). Guarda por
+ * Márgenes verticales adyacentes pendientes de fusionar (reference/components/block.md). Guarda por
  * separado el mayor positivo y el más negativo, porque la fusión de varios márgenes es su suma
  * y no se puede calcular a partir de resultados parciales: {@code 20} y {@code −5} dan 15, pero
  * añadir {@code −10} da 10, no 5.

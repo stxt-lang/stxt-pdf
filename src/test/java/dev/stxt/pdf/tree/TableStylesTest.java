@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Estilo de las celdas de una tabla por su posición y su columna (referencia/comun/estilos.md y
- * referencia/componentes/table.md): {@code Header cell}, {@code Body cell}, {@code Footer cell}, {@code Odd row cell},
+ * Estilo de las celdas de una tabla por su posición y su columna (reference/common/styles.md y
+ * reference/components/table.md): {@code Header cell}, {@code Body cell}, {@code Footer cell}, {@code Odd row cell},
  * {@code Even row cell}, {@code For column} y {@code Column align}.
  */
 class TableStylesTest {
@@ -190,7 +190,7 @@ class TableStylesTest {
     }
 
     /**
-     * referencia/componentes/table.md: el {@code Style} de una {@code Row} aplica sus reglas {@code For style} a cada
+     * reference/components/table.md: el {@code Style} de una {@code Row} aplica sus reglas {@code For style} a cada
      * celda de la fila.
      */
     @Test

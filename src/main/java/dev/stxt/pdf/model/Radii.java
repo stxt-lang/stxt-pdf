@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las esquinas redondeadas de una caja ya resueltas, en puntos (referencia/comun/caja.md): un cuarto
+ * Las esquinas redondeadas de una caja ya resueltas, en puntos (reference/common/box.md): un cuarto
  * de elipse por esquina, con su radio horizontal y su radio vertical. Es solo pintado.
  */
 public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner bottomLeft) {
@@ -69,7 +69,7 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     }
 
     /**
-     * Las esquinas de un fragmento de una caja partida (referencia/comun/cortes.md): con {@code Edges: open},
+     * Las esquinas de un fragmento de una caja partida (reference/common/breaks.md): con {@code Edges: open},
      * solo el primer fragmento tiene las de arriba y solo el último las de abajo.
      */
     public Radii forFragment(boolean topEdge, boolean bottomEdge) {

@@ -30,21 +30,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Los documentos completos de la documentación (cada bloque de código del README, el manual y la referencia que empieza por
- * {@code Document (dev.stxt.pdf):}) y {@code test/spec/report.stxt} se tratan como los de {@code test/examples/}: se
- * maquetan con las métricas reales y la carpeta {@code resources/}, se escriben en PDF y el PDF cumple PDF/UA-1 según
- * veraPDF. Así ningún ejemplo del manual ni de la referencia deja de funcionar sin que se note. No tienen imágenes ni
- * volcado de referencia: lo que se ve de ellos es la documentación. El PDF queda en {@code target/reference/docs/} para
- * mirarlo.
+ * Los documentos completos de la documentación (cada bloque de código de los README, el manual y la referencia, en todos
+ * los idiomas, que empieza por {@code Document (dev.stxt.pdf):}) y {@code test/spec/report.stxt} se tratan como los de
+ * {@code test/examples/}: se maquetan con las métricas reales y la carpeta {@code resources/}, se escriben en PDF y el PDF
+ * cumple PDF/UA-1 según veraPDF. Así ningún ejemplo del manual ni de la referencia deja de funcionar sin que se note. No
+ * tienen imágenes ni volcado de referencia: lo que se ve de ellos es la documentación. El PDF queda en
+ * {@code target/reference/docs/} para mirarlo.
+ *
+ * <p>La documentación está en {@code docs/<idioma>/}. El castellano ({@code docs/es/}) es el original y los demás idiomas
+ * son su espejo, con los mismos ficheros.</p>
  */
 class DocumentationExamplesTest {
 
-    private static final Path README = Path.of("README.md");
     private static final Path DOCS = Path.of("docs");
-    private static final Path MANUAL = DOCS.resolve("manual");
-    private static final Path REFERENCE = DOCS.resolve("referencia");
-    private static final Path COMPONENTS = MANUAL.resolve("componentes");
-    private static final Path COMPLETE_EXAMPLE = REFERENCE.resolve("comun").resolve("ejemplo-completo.md");
+    private static final String ORIGINAL = "es";
     private static final Path REPORT = Path.of("test", "spec", "report.stxt");
     private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("docs");
     private static final Pattern EXAMPLE =
@@ -60,9 +59,11 @@ class DocumentationExamplesTest {
     @TestFactory
     Stream<DynamicTest> documentationDocuments() throws IOException {
         List<DocDocument> documents = new ArrayList<>();
-        List<Path> pages = new ArrayList<>(List.of(README));
-        pages.addAll(pages(MANUAL));
-        pages.addAll(pages(REFERENCE));
+        List<Path> pages = new ArrayList<>(readmes());
+        for (Path language : languages()) {
+            pages.addAll(pages(language.resolve("manual")));
+            pages.addAll(pages(language.resolve("reference")));
+        }
         for (Path page : pages) {
             documents.addAll(examples(page));
         }
@@ -73,24 +74,61 @@ class DocumentationExamplesTest {
     /** Cada página de componente del manual tiene al menos un documento completo, que se puede copiar y probar. */
     @Test
     void everyComponentOfTheManualHasACompleteDocument() throws IOException {
-        List<Path> components = pages(COMPONENTS);
-        assertFalse(components.isEmpty());
-        for (Path page : components) {
-            assertFalse(examples(page).isEmpty(), page + " no tiene ningún documento completo");
+        for (Path language : languages()) {
+            List<Path> components = pages(language.resolve("manual").resolve("components"));
+            assertFalse(components.isEmpty());
+            for (Path page : components) {
+                assertFalse(examples(page).isEmpty(), page + " no tiene ningún documento completo");
+            }
+        }
+    }
+
+    /** Cada idioma tiene los mismos ficheros que el original. */
+    @Test
+    void everyLanguageMirrorsTheOriginal() throws IOException {
+        Path original = DOCS.resolve(ORIGINAL);
+        List<String> expected = relativeFiles(original);
+        assertFalse(expected.isEmpty());
+        for (Path language : languages()) {
+            assertEquals(expected, relativeFiles(language), language + " no tiene los mismos ficheros que " + original);
         }
     }
 
     /**
-     * El ejemplo completo de la referencia es {@code test/spec/report.stxt}, sin los comentarios de su cabecera. El
-     * {@code .stxt} indenta con tabuladores y los bloques STXT de los {@code .md} con cuatro espacios por nivel.
+     * El ejemplo completo de la referencia original es {@code test/spec/report.stxt}, sin los comentarios de su cabecera.
+     * El {@code .stxt} indenta con tabuladores y los bloques STXT de los {@code .md} con cuatro espacios por nivel.
      */
     @Test
     void theReportIsTheCompleteExample() throws IOException {
         String report = Files.readString(REPORT).replace("\r\n", "\n").replaceFirst("\\A(#[^\n]*\n)+", "");
         report = LEADING_TABS.matcher(report).replaceAll(m -> "    ".repeat(m.group().length()));
-        List<DocDocument> examples = examples(COMPLETE_EXAMPLE);
+        Path completeExample = DOCS.resolve(ORIGINAL).resolve("reference").resolve("common").resolve("complete-example.md");
+        List<DocDocument> examples = examples(completeExample);
         assertEquals(1, examples.size());
         assertEquals(examples.get(0).text(), report);
+    }
+
+    /** {@code README.md} y sus traducciones ({@code README.es.md}...), en orden. */
+    private static List<Path> readmes() throws IOException {
+        try (Stream<Path> list = Files.list(Path.of("."))) {
+            return list.map(p -> Path.of(p.getFileName().toString()))
+                    .filter(p -> p.toString().matches("README(\\.[a-z]{2})?\\.md")).sorted().toList();
+        }
+    }
+
+    /** Las carpetas de idioma de {@code docs/}, en orden. */
+    private static List<Path> languages() throws IOException {
+        try (Stream<Path> list = Files.list(DOCS)) {
+            return list.filter(Files::isDirectory).sorted().toList();
+        }
+    }
+
+    /** Los ficheros de una carpeta y sus subcarpetas, relativos a ella, en orden. */
+    private static List<String> relativeFiles(Path folder) throws IOException {
+        try (Stream<Path> walk = Files.walk(folder)) {
+            return walk.filter(Files::isRegularFile).map(p -> folder.relativize(p).toString().replace('\\', '/'))
+                    .sorted().toList();
+        }
     }
 
     /** Las páginas Markdown de una carpeta y sus subcarpetas, en orden. */

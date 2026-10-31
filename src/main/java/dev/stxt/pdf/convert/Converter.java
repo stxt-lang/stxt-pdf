@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 /**
  * Punto de entrada del motor: documento STXT → PDF (o SVG) con las métricas reales de las fuentes y las imágenes de la
  * carpeta de recursos. Reúne en un objeto lo que antes se pasaba suelto a cada llamada: la carpeta de recursos ({@link
- * Resources}), el documento de estilos aparte (referencia/comun/estilos.md) y los contornos de depuración.
+ * Resources}), el documento de estilos aparte (reference/common/styles.md) y los contornos de depuración.
  *
  * <p><strong>Es inmutable y seguro entre hilos</strong>: se crea una vez y se comparte. Cada conversión
  * crea su propio {@link Engine}, que no se puede compartir (guarda la caché del layout), así que dos
@@ -94,7 +94,7 @@ public final class Converter {
 
     /**
      * Maqueta un documento ya validado ({@link DocumentReader}) con las métricas reales de las fuentes de la carpeta de
-     * recursos. Falla con los errores del documento (referencia/comun/errores.md) antes de que se escriba nada,
+     * recursos. Falla con los errores del documento (reference/common/errors.md) antes de que se escriba nada,
      * también con los de las comprobaciones que no se han quitado ({@link Builder#exclude}): el poco contraste de un
      * texto y lo que impide dibujar igual la página de un PDF.
      */
@@ -181,7 +181,7 @@ public final class Converter {
         private Builder() {
         }
 
-        /** Carpeta de recursos (referencia/comun/recursos.md); por defecto {@link Resources#DEFAULT_ROOT}. */
+        /** Carpeta de recursos (reference/common/resources.md); por defecto {@link Resources#DEFAULT_ROOT}. */
         public Builder resources(Resources resources) {
             this.resources = Objects.requireNonNull(resources, "resources");
             return this;
@@ -189,7 +189,7 @@ public final class Converter {
 
         /**
          * Documento de estilos aparte ya leído ({@link DocumentReader#readStyles(String)}), cuyas reglas valen menos
-         * que las del documento (referencia/comun/estilos.md). Sin él, el documento lleva todos sus estilos.
+         * que las del documento (reference/common/styles.md). Sin él, el documento lleva todos sus estilos.
          */
         public Builder styles(InlineNode styles) {
             this.styles = Objects.requireNonNull(styles, "styles");
@@ -216,8 +216,8 @@ public final class Converter {
         }
 
         /**
-         * Quita esas comprobaciones ({@link Check}): el contraste del texto con su fondo (referencia/comun/pdf.md) y lo
-         * que impide dibujar igual la página de un PDF (referencia/componentes/image.md). Por defecto se hacen todas;
+         * Quita esas comprobaciones ({@link Check}): el contraste del texto con su fondo (reference/common/pdf.md) y lo
+         * que impide dibujar igual la página de un PDF (reference/components/image.md). Por defecto se hacen todas;
          * cada llamada añade las suyas a las que ya se quitaron.
          */
         public Builder exclude(Check... checks) {
@@ -228,7 +228,7 @@ public final class Converter {
         }
 
         /**
-         * La parte de PDF/UA que cumple el PDF (referencia/comun/pdf.md): 1, en PDF 1.7, o 2, en PDF 2.0. Por
+         * La parte de PDF/UA que cumple el PDF (reference/common/pdf.md): 1, en PDF 1.7, o 2, en PDF 2.0. Por
          * defecto 1.
          *
          * @throws IllegalArgumentException si no es 1 ni 2

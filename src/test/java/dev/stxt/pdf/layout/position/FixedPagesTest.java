@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Pages} de un {@code Page overlay} (referencia/componentes/frame-and-overlays.md): en qué páginas sale. */
+/** {@code Pages} de un {@code Page overlay} (reference/components/frame-and-overlays.md): en qué páginas sale. */
 class FixedPagesTest {
 
     /**

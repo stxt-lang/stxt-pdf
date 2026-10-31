@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El aspecto de las cajas (referencia/comun/caja.md) en el PDF, mirando los píxeles de la
+ * El aspecto de las cajas (reference/common/box.md) en el PDF, mirando los píxeles de la
  * página que se renderiza a 72 ppp (un píxel por punto), y en el SVG, mirando su texto.
  */
 class BoxLooksPaintTest {

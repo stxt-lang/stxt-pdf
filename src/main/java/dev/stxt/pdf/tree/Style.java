@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Propiedades especificadas de una caja, con los valores por defecto de referencia/comun/estructura.md.
+ * Propiedades especificadas de una caja, con los valores por defecto de reference/common/structure.md.
  *
  * <p>Las propiedades van por grupos, cada uno en su clase: los del documento ({@link TypographyStyle},
- * {@link BoxStyle} y {@link BreakStyle}, referencia/comun/estructura.md) y los de un tipo de elemento ({@link
+ * {@link BoxStyle} y {@link BreakStyle}, reference/common/structure.md) y los de un tipo de elemento ({@link
  * StackStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle}, {@link ImageStyle} y
  * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.stack().direction()}, {@code
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
- * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
+ * (reference/common/structure.md y reference/components/frame-and-overlays.md: el layout y la posición, que
  * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, el giro, {@code Link},
  * {@code Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento
  * ({@link SourceLine}).</p>
@@ -63,24 +63,24 @@ public final class Style extends StyleGroup {
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
     /**
-     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md), solo en {@code Frame}, {@code
+     * {@code Rotate} y {@code Rotate origin} (reference/common/layers-and-rotation.md), solo en {@code Frame}, {@code
      * Overlay}, {@code Page overlay} e {@code Image}; {@code null} = sin giro. No se hereda.
      */
     private Rotation rotation;
     /**
-     * Destino del {@code Link} de la caja ({@link dev.stxt.pdf.model.Links}, referencia/comun/enlaces.md); {@code
+     * Destino del {@code Link} de la caja ({@link dev.stxt.pdf.model.Links}, reference/common/links.md); {@code
      * null} = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva
      * enlace propio.
      */
     private String link;
     /**
-     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (referencia/componentes/table.md). No se
+     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (reference/components/table.md). No se
      * hereda.
      */
     private boolean rowHeader;
     /**
      * {@code In table of contents} de un encabezado: si tiene entrada en los índices
-     * (referencia/componentes/table-of-contents.md). No se hereda.
+     * (reference/components/table-of-contents.md). No se hereda.
      */
     private boolean inTableOfContents = true;
 
@@ -89,55 +89,55 @@ public final class Style extends StyleGroup {
     }
 
     // --- Grupos ------------------------------------------------------------------------------------
-    /** El grupo {@code Typography}: se hereda (referencia/comun/tipografia.md). */
+    /** El grupo {@code Typography}: se hereda (reference/common/typography.md). */
     public TypographyStyle typography() {
         return typography;
     }
 
-    /** El grupo {@code Box}: el modelo de caja (referencia/comun/caja.md). */
+    /** El grupo {@code Box}: el modelo de caja (reference/common/box.md). */
     public BoxStyle box() {
         return box;
     }
 
-    /** El grupo {@code Break}: los cortes (referencia/comun/cortes.md). */
+    /** El grupo {@code Break}: los cortes (reference/common/breaks.md). */
     public BreakStyle breaks() {
         return breaks;
     }
 
-    /** Las propiedades de {@code Stack} (referencia/componentes/stack.md). */
+    /** Las propiedades de {@code Stack} (reference/components/stack.md). */
     public StackStyle stack() {
         return stack;
     }
 
-    /** Las propiedades de {@code Grid} y {@code Table} (referencia/componentes/grid.md). */
+    /** Las propiedades de {@code Grid} y {@code Table} (reference/components/grid.md). */
     public GridStyle grid() {
         return grid;
     }
 
     /**
-     * Las de {@code Item} y {@code Area}, o la celda de una tabla (referencia/componentes/stack.md y
-     * referencia/componentes/grid.md).
+     * Las de {@code Item} y {@code Area}, o la celda de una tabla (reference/components/stack.md y
+     * reference/components/grid.md).
      */
     public ItemStyle item() {
         return item;
     }
 
-    /** Las de {@code List} y {@code List item} (referencia/componentes/list.md). */
+    /** Las de {@code List} y {@code List item} (reference/components/list.md). */
     public ListStyle list() {
         return list;
     }
 
-    /** Las de {@code Columns} (referencia/componentes/columns.md). */
+    /** Las de {@code Columns} (reference/components/columns.md). */
     public ColumnsStyle columns() {
         return columns;
     }
 
-    /** Las de {@code Image} (referencia/componentes/image.md). */
+    /** Las de {@code Image} (reference/components/image.md). */
     public ImageStyle image() {
         return image;
     }
 
-    /** Las de {@code Table of contents} (referencia/componentes/table-of-contents.md). */
+    /** Las de {@code Table of contents} (reference/components/table-of-contents.md). */
     public TableOfContentsStyle tableOfContents() {
         return tableOfContents;
     }
@@ -202,7 +202,7 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * Si la caja gira en flujo (referencia/comun/capas-y-giro.md): un {@code Block}, un {@code Text}, un {@code
+     * Si la caja gira en flujo (reference/common/layers-and-rotation.md): un {@code Block}, un {@code Text}, un {@code
      * Paragraph} o una {@code Image} con {@code Rotate}, que ocupa el rectángulo que la envuelve girada.
      */
     public boolean rotatesInFlow() {
@@ -255,7 +255,7 @@ public final class Style extends StyleGroup {
     /**
      * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
      * (las de {@code Typography} que la eligen, también la del código), {@code Line height}, que fijan el alto de las
-     * líneas (referencia/comun/desbordamiento.md), y {@code Color}, del contraste del texto (referencia/comun/pdf.md).
+     * líneas (reference/common/overflow.md), y {@code Color}, del contraste del texto (reference/common/pdf.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
             PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT,

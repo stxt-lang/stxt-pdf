@@ -34,7 +34,7 @@ import java.util.Locale;
  * activo, dibuja además el contorno de cada caja de borde.
  *
  * <p>No incrusta las fuentes: el visor usa las suyas, y la línea base es la aproximada
- * ({@link dev.stxt.pdf.model.VerticalMetrics#APPROXIMATE}). Las imágenes (referencia/componentes/image.md) van
+ * ({@link dev.stxt.pdf.model.VerticalMetrics#APPROXIMATE}). Las imágenes (reference/components/image.md) van
  * incrustadas ({@code data:}) si se le da la carpeta de recursos; si no, solo se ve su caja.</p>
  */
 public final class SvgCanvas implements Canvas {

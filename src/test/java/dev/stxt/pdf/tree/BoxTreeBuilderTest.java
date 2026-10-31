@@ -150,7 +150,7 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * Un documento necesita al menos una sección (referencia/componentes/document.md): el contenido suelto no se
+     * Un documento necesita al menos una sección (reference/components/document.md): el contenido suelto no se
      * admite.
      */
     @Test
@@ -210,7 +210,7 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * {@code Paper} y {@code Orientation} (referencia/componentes/document.md): el tamaño en vertical, girado con
+     * {@code Paper} y {@code Orientation} (reference/components/document.md): el tamaño en vertical, girado con
      * {@code landscape}.
      */
     @Test
@@ -242,7 +242,7 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * {@code Rotate} y {@code Rotate origin} (referencia/comun/capas-y-giro.md): el giro y su origen, con palabras
+     * {@code Rotate} y {@code Rotate origin} (reference/common/layers-and-rotation.md): el giro y su origen, con palabras
      * clave o con medidas; sin origen, el centro.
      */
     @Test
@@ -265,7 +265,7 @@ class BoxTreeBuilderTest {
 
     /**
      * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
-     * (referencia/comun/errores.md): {@code Isolate margins: false} en un ítem es el valor por defecto, un {@code
+     * (reference/common/errors.md): {@code Isolate margins: false} en un ítem es el valor por defecto, un {@code
      * Break} que llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque
      * esté dentro de un {@code Overlay}.
      */

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * El trozo de una caja que cae en un fragmentainer (referencia/comun/cortes.md). Una caja que se
+ * El trozo de una caja que cae en un fragmentainer (reference/common/breaks.md). Una caja que se
  * parte entre páginas produce varios.
  *
  * @param box      caja de origen (sus propiedades de pintado se leen de su estilo)
@@ -31,11 +31,11 @@ import java.util.List;
  * @param lines    líneas de texto, si la caja contiene texto
  * @param first    es el primer fragmento de la caja
  * @param last     es el último fragmento de la caja
- * @param offsetX  desplazamiento de un {@code Frame} (referencia/componentes/frame-and-overlays.md), ya
+ * @param offsetX  desplazamiento de un {@code Frame} (reference/components/frame-and-overlays.md), ya
  *                 sumado a {@code x}: su sitio en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo,
  *                 con la base de porcentajes de su layout; 0 en las demás cajas
  * @param offsetY  ídem en vertical
- * @param turned   en una caja girada en flujo (referencia/comun/capas-y-giro.md), su caja de borde sin girar, relativa
+ * @param turned   en una caja girada en flujo (reference/common/layers-and-rotation.md), su caja de borde sin girar, relativa
  *                 a ({@code x}, {@code y}) y centrada en el rectángulo que la envuelve; sus hijos y sus líneas se
  *                 refieren a ella. {@code null} en las demás cajas
  */

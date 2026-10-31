@@ -18,7 +18,7 @@ import static dev.stxt.pdf.tree.ValueReader.points;
 
 /**
  * Lo que el documento dice de sí mismo y de sus páginas: el {@code Page} del documento y de cada {@code Section}
- * (referencia/componentes/document.md) y el {@code Title} y el {@code Language} (referencia/componentes/document.md).
+ * (reference/components/document.md) y el {@code Title} y el {@code Language} (reference/components/document.md).
  */
 final class PageSetupReader {
 
@@ -27,7 +27,7 @@ final class PageSetupReader {
 
     /**
      * Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo
-     * (referencia/componentes/document.md).
+     * (reference/components/document.md).
      */
     record Spec(PageSetup pageSetup, PageSetup.Paper paper) {
     }
@@ -46,7 +46,7 @@ final class PageSetupReader {
     }
 
     /**
-     * El medio (referencia/componentes/document.md): su tamaño es un {@code Paper} con su {@code Orientation} o un
+     * El medio (reference/components/document.md): su tamaño es un {@code Paper} con su {@code Orientation} o un
      * {@code Width} y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez. El de una
      * sección hereda por grupos el del documento, {@code base} ({@code null} en el del documento).
      */

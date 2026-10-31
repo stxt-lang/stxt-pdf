@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Table of contents} (referencia/componentes/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área
+ * {@code Table of contents} (reference/components/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área
  * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
  */
 class TableOfContentsTest {
@@ -41,7 +41,7 @@ class TableOfContentsTest {
 
     /**
      * Un encabezado con {@code In table of contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y
-     * las páginas no cambian) pero no tiene entrada (referencia/componentes/table-of-contents.md).
+     * las páginas no cambian) pero no tiene entrada (reference/components/table-of-contents.md).
      */
     @Test
     void aHeadingWithInTableOfContentsFalseHasNoEntry() {

@@ -1,21 +1,21 @@
 package dev.stxt.pdf.model;
 
 /**
- * Formato de un tramo de texto (referencia/comun/formato-del-texto.md): lo que cambia dentro de una línea. La
+ * Formato de un tramo de texto (reference/common/text-formatting.md): lo que cambia dentro de una línea. La
  * negrita y la cursiva se suman a las de la caja (un tramo en negrita de un texto ya en negrita
  * sigue en negrita); el tamaño, el color y {@code Line height} son siempre los de la caja, y la
  * familia también salvo en el código ({@code family}).
  *
- * <p>{@code smallCaps} marca las minúsculas que se pintan como versalitas (referencia/comun/formato-del-texto.md): el
+ * <p>{@code smallCaps} marca las minúsculas que se pintan como versalitas (reference/common/text-formatting.md): el
  * texto del tramo ya está en mayúsculas y se mide y se pinta al {@link #SMALL_CAPS_SCALE} del tamaño. Lo pone el layout
  * al aplicar {@code Small caps}; el documento no lo escribe.</p>
  *
- * <p>{@code code} marca el código en línea (referencia/comun/formato-del-texto.md), que se escribe con la familia de
+ * <p>{@code code} marca el código en línea (reference/common/text-formatting.md), que se escribe con la familia de
  * {@code Code font}: al construir la caja, que conoce su {@code Code font}, recibe esa familia en {@code family}.
  * {@code family} es la familia del tramo cuando no es la de la caja; {@code null} = la de la caja. Conserva el peso y
  * el estilo de la caja y los de las marcas del tramo.</p>
  *
- * <p>{@code link} es el destino del enlace del tramo ({@link Links}, referencia/comun/enlaces.md), o {@code null} si no
+ * <p>{@code link} es el destino del enlace del tramo ({@link Links}, reference/common/links.md), o {@code null} si no
  * lo lleva. No cambia cómo se mide ni cómo se pinta el texto: el subrayado de un enlace de
  * Markdown es el {@code underline} de su tramo.</p>
  */

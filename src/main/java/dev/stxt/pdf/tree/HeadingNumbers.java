@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La numeración de los encabezados (referencia/componentes/heading.md): {@code 1}, {@code 1.1}, {@code II.a}…
+ * La numeración de los encabezados (reference/components/heading.md): {@code 1}, {@code 1.1}, {@code II.a}…
  *
  * <p>Se cuenta en orden del documento, atravesando las secciones y los {@code Markdown}: un
  * contador por nivel que sube con cada encabezado numerado de ese nivel y vuelve a 0 con cualquier

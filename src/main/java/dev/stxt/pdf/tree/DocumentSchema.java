@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * El schema del modelo de cajas ({@code src/main/resources/stxt/dev.stxt.pdf.stxt},
- * referencia/comun/estructura.md), compilado una sola vez. Es la única definición de qué hijos admite
+ * reference/common/structure.md), compilado una sola vez. Es la única definición de qué hijos admite
  * cada nodo: la usan {@code DocumentReader} al leer y {@link BoxTreeBuilder} al construir el
  * árbol, de modo que un documento que no ha pasado por el lector da los mismos errores.
  *

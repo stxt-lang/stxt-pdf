@@ -11,13 +11,13 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reglas de corte (referencia/comun/cortes.md): viudas y huérfanas, calidad de los cortes entre
+ * Reglas de corte (reference/common/breaks.md): viudas y huérfanas, calidad de los cortes entre
  * cajas, cortes forzados y elección del corte. Son piezas puras; los algoritmos de layout las
  * usan para decidir dónde se parte cada caja.
  *
  * <p>La calidad de un corte es una de las constantes de {@link BreakAppeal}: mayor es mejor.
  * Se elige el <strong>último</strong> corte de mayor calidad, que es lo mismo que relajar las
- * reglas en el orden de la referencia (referencia/comun/cortes.md): primero viudas y huérfanas, después
+ * reglas en el orden de la referencia (reference/common/breaks.md): primero viudas y huérfanas, después
  * {@code Keep with next} y {@code Keep with previous}, y por último {@code Keep together} (de {@code Break}).</p>
  */
 public final class BreakRules {

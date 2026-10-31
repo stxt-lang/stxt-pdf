@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Colocación de un ítem de grid, la pedida por su {@code Area} (referencia/componentes/grid.md).
+ * Colocación de un ítem de grid, la pedida por su {@code Area} (reference/components/grid.md).
  *
  * <p>Sintaxis: un nombre de área ({@code Area: side}) o {@code fila columna [filas columnas]},
  * donde {@code fila} y {@code columna} pueden ser {@code auto}. Las extensiones son 1 si no se

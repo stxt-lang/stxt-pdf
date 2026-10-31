@@ -20,7 +20,7 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reparte un texto en líneas (referencia/comun/tipografia.md). Con {@code Line breaking: simple},
+ * Reparte un texto en líneas (reference/common/typography.md). Con {@code Line breaking: simple},
  * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code balanced}, con
  * Knuth-Plass ({@link #optimal}).
  *
@@ -34,7 +34,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * fuente; el espacio entre dos palabras tiene el formato del tramo en que está el primero de sus
  * espacios en blanco. Un texto sin formato es un único tramo y se mide igual que una cadena.</p>
  *
- * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, referencia/comun/formato-del-texto.md);
+ * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, reference/common/text-formatting.md);
  * el último de la línea no lo lleva, así que el ancho de una línea es lo que suman sus caracteres menos un
  * interletraje. Un tramo en versalitas se mide al {@link TextFormat#SMALL_CAPS_SCALE} del tamaño.</p>
  */
@@ -279,7 +279,7 @@ public final class LineBreaker {
     }
 
     /**
-     * Una línea colocada en la caja de contenido (referencia/comun/formato-del-texto.md): cada tramo medido con la
+     * Una línea colocada en la caja de contenido (reference/common/text-formatting.md): cada tramo medido con la
      * fuente de {@code s} y su formato, la línea alineada en {@code available} y, si se justifica, con el espacio extra
      * entre palabras sumado a su ancho y al de cada tramo.
      *

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Ligatures} (referencia/comun/formato-del-texto.md): sin ella, un glifo por carácter; con ella, el texto se
+ * {@code Ligatures} (reference/common/text-formatting.md): sin ella, un glifo por carácter; con ella, el texto se
  * mide y se pinta con los glifos que deja la tabla GSUB de la fuente, y lo medido es lo pintado.
  */
 class LigaturesTest {

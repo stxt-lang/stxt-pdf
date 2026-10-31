@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Lee un PDF de {@code images/} (referencia/componentes/image.md): el tamaño de cada página, en puntos y ya girado,
+ * Lee un PDF de {@code images/} (reference/components/image.md): el tamaño de cada página, en puntos y ya girado,
  * y lo que impide dibujarla igual dentro del documento, en dos grupos que quien convierte puede no comprobar
  * ({@link dev.stxt.pdf.model.Check}). Una página se dibuja con su contenido, no con sus anotaciones, así que una
  * anotación que se ve (un campo de formulario, un comentario, un sello) es un problema; un enlace, no, porque no se ve.

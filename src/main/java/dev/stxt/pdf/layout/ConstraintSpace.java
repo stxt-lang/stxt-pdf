@@ -21,7 +21,7 @@ import java.util.OptionalDouble;
  *                                aunque no quepa (garantía de progreso)
  * @param contentHeight           se mide el alto del contenido: la caja ignora su {@code Height}
  *                                y su {@code Aspect ratio} (el mínimo automático de un ítem stack
- *                                en {@code column}, referencia/componentes/stack.md); no pasa a sus hijos
+ *                                en {@code column}, reference/components/stack.md); no pasa a sus hijos
  */
 public record ConstraintSpace(
         double availableWidth,
@@ -92,7 +92,7 @@ public record ConstraintSpace(
 
     /**
      * El mismo espacio, sin fragmentación: una caja que no se parte (un {@code Frame} girado,
-     * referencia/comun/cortes.md).
+     * reference/common/breaks.md).
      */
     public ConstraintSpace unfragmented() {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,

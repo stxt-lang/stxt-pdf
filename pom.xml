@@ -96,7 +96,7 @@
         </dependency>
 
         <!-- Imágenes SVG (resources.ImageFile, paint.PdfCanvas): JSVG lee y dibuja el SVG en un Graphics2D y
-             pdfbox-graphics2d convierte lo dibujado en rutas, rellenos y texto del PDF (referencia/componentes/image.md). -->
+             pdfbox-graphics2d convierte lo dibujado en rutas, rellenos y texto del PDF (reference/components/image.md). -->
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>

@@ -28,7 +28,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
- * Layout {@code block}: apila los hijos en flujo en vertical (referencia/componentes/block.md).
+ * Layout {@code block}: apila los hijos en flujo en vertical (reference/components/block.md).
  *
  * <pre>
  * cursor = 0; strut = vacío
@@ -47,7 +47,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * <p>Los márgenes que salen de la caja se devuelven en {@link AdjoiningMargins}: el padre los
  * fusiona con los márgenes propios de la caja. Un hijo vacío deja pasar sus márgenes.</p>
  *
- * <p><strong>Fragmentación</strong> (referencia/comun/cortes.md). Cada hijo recibe lo que queda de página desde su
+ * <p><strong>Fragmentación</strong> (reference/common/breaks.md). Cada hijo recibe lo que queda de página desde su
  * borde superior. Delante de cada hijo, si ya se ha colocado algo en este fragmento, hay un corte
  * posible con su calidad ({@link BreakRules#between}); se guarda el estado para poder volver a él.
  * Cuando un hijo no cabe (no coloca nada, se parte por dentro o desborda sin partirse), se elige
@@ -150,7 +150,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 Box child = box.children().get(i);
                 if (child.style().isOutOfFlow()) {
                     // Posición estática: donde empezaría si estuviera en flujo
-                    // (referencia/componentes/frame-and-overlays.md). La caja se resuelve en su containing block
+                    // (reference/components/frame-and-overlays.md). La caja se resuelve en su containing block
                     // (OverlayLayout).
                     pending.add(new PendingOverlay(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
@@ -219,7 +219,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
             // Una caja relative se desplaza después de colocarla; el cursor no se entera
-            // (referencia/componentes/frame-and-overlays.md).
+            // (reference/components/frame-and-overlays.md).
             FrameOffset offset = FrameOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
             double childY = flowY + offset.dy();
@@ -294,7 +294,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /**
          * Los fragmentos hijos y, en el primer fragmento de un {@code List item}, su marcador
-         * delante (referencia/componentes/list.md): va con la primera línea, que está en este fragmento si hay alguno.
+         * delante (reference/components/list.md): va con la primera línea, que está en este fragmento si hay alguno.
          */
         List<Fragment> withMarker(List<Fragment> children, Slice slice) {
             if (box.marker() == null || !first) {

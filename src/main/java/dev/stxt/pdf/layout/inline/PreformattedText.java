@@ -11,7 +11,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * Reparte en líneas un texto con {@code Preformatted: true} o {@code wrap}
- * (referencia/comun/formato-del-texto.md): los espacios y los saltos de línea del texto se conservan.
+ * (reference/common/text-formatting.md): los espacios y los saltos de línea del texto se conservan.
  *
  * <p>Cada línea del texto es una línea de la caja, también las vacías (una línea en blanco no
  * separa párrafos: todo el texto es uno solo para las viudas y huérfanas). Una tabulación lleva

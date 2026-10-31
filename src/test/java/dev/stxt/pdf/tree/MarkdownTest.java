@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** El {@code Markdown} en el árbol de cajas (referencia/componentes/markdown.md). */
+/** El {@code Markdown} en el árbol de cajas (reference/components/markdown.md). */
 class MarkdownTest {
 
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -111,7 +111,7 @@ class MarkdownTest {
 
     /**
      * {@code Code font} es de {@code Typography}: se hereda de un antecesor, y {@code For element: Code block} cambia
-     * la de los bloques sin tocar la del código en línea (referencia/componentes/markdown.md).
+     * la de los bloques sin tocar la del código en línea (reference/components/markdown.md).
      */
     @Test
     void theCodeFontIsInheritedAndACodeBlockRuleChangesOnlyTheBlocks() {
@@ -132,7 +132,7 @@ class MarkdownTest {
     }
 
     /**
-     * referencia/comun/estilos.md: la regla {@code For element: Code block} da estilo al código y no a los demás
+     * reference/common/styles.md: la regla {@code For element: Code block} da estilo al código y no a los demás
      * textos, ni al revés.
      */
     @Test

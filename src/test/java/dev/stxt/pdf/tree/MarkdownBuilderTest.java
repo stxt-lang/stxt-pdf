@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * La traducción de {@code Markdown} a nodos STXT (referencia/componentes/markdown.md). El {@code Markdown}
+ * La traducción de {@code Markdown} a nodos STXT (reference/components/markdown.md). El {@code Markdown}
  * está en la línea 8 del documento, sus propiedades en las siguientes y después {@code Content}:
  * sin propiedades, la primera línea del Markdown es la 10.
  */
@@ -152,7 +152,7 @@ class MarkdownBuilderTest {
     }
 
     /**
-     * Una fila con más celdas que la cabecera es un error, en la línea de la fila (referencia/componentes/markdown.md);
+     * Una fila con más celdas que la cabecera es un error, en la línea de la fila (reference/components/markdown.md);
      * una barra escapada no separa celdas, y las de los extremos son opcionales.
      */
     @Test
@@ -187,7 +187,7 @@ class MarkdownBuilderTest {
     }
 
     /**
-     * Un enlace es un tramo subrayado con su destino; el formato de dentro se conserva (referencia/comun/enlaces.md).
+     * Un enlace es un tramo subrayado con su destino; el formato de dentro se conserva (reference/common/links.md).
      */
     @Test
     void linksAreUnderlinedRunsWithTheirDestination() {

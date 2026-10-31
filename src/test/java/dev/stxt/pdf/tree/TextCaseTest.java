@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Case}, {@code Letter spacing} y {@code Small caps} en el árbol (referencia/comun/formato-del-texto.md).
+ * {@code Case}, {@code Letter spacing} y {@code Small caps} en el árbol (reference/common/text-formatting.md).
  */
 class TextCaseTest {
 
@@ -74,7 +74,7 @@ class TextCaseTest {
 
     /**
      * {@code Language} en {@code Typography} cambia el idioma de la caja y de lo que hay dentro
-     * (referencia/comun/tipografia.md).
+     * (reference/common/typography.md).
      */
     @Test
     void aBoxCanDeclareItsOwnLanguageAndItIsInherited() {

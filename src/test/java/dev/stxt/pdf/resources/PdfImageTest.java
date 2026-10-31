@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los PDF de {@code images/} (referencia/componentes/image.md): el tamaño de cada página, ya recortada y girada, y lo
+ * Los PDF de {@code images/} (reference/components/image.md): el tamaño de cada página, ya recortada y girada, y lo
  * que impide dibujarla. Los ficheros de {@code resources/images/test/} los genera {@code tools/ExamplePdfs.java}.
  */
 class PdfImageTest {

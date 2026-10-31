@@ -1,4 +1,4 @@
-# Paginación (referencia/comun/cortes.md). Área útil de 260 × 160 desde (20, 20).
+# Paginación (reference/common/breaks.md). Área útil de 260 × 160 desde (20, 20).
 #
 # Página 1: intro ocupa 0..100. title iría en 110..130 y text en 140, donde solo cabe una de sus
 #   6 líneas: partirlo deja huérfanas (calidad 2) y cortar antes de text incumple el avoid de

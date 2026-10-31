@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Árbol de contextos de apilamiento (referencia/comun/capas-y-giro.md), construido sobre los
+ * Árbol de contextos de apilamiento (reference/common/layers-and-rotation.md), construido sobre los
  * fragmentos de una página. Es independiente del árbol de cajas.
  *
  * <p>Orden de pintado dentro de un contexto, de abajo arriba:</p>
@@ -42,9 +42,9 @@ import java.util.Objects;
  * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
  * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
  *
- * <p>Una caja con {@code Rotate} (referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene, y una
+ * <p>Una caja con {@code Rotate} (reference/common/layers-and-rotation.md) se pinta girada con todo lo que contiene, y una
  * caja con {@code Corner radius} recorta por su curva los fondos, los bordes y las imágenes de lo que tiene en flujo
- * (referencia/comun/caja.md). Cada pieza lleva la cadena de giros y recortes de sus ancestros, de la página hacia
+ * (reference/common/box.md). Cada pieza lleva la cadena de giros y recortes de sus ancestros, de la página hacia
  * dentro ({@code Piece.frames}), y cada paso del pintado se la aplica: el fondo, el borde y la imagen, entera; el
  * texto, solo los giros.</p>
  *
@@ -191,7 +191,7 @@ public final class StackingContext {
         }
         if (i == 0) {
             // Raíces distintas: un Page overlay del documento y uno de una sección, que es la raíz de su layout
-            // (referencia/componentes/document.md). Los del documento van antes.
+            // (reference/components/document.md). Los del documento van antes.
             return Boolean.compare(pathA.get(0).element() != null, pathB.get(0).element() != null);
         }
         if (i == pathA.size() || i == pathB.size()) {
@@ -213,8 +213,8 @@ public final class StackingContext {
 
     /**
      * Pinta el contexto. Cada paso se pinta con los giros y los recortes de su pieza ({@link #framed}): una caja girada
-     * ({@code Rotate}, referencia/comun/capas-y-giro.md) se pinta girada con todo lo que contiene, y una caja con
-     * esquinas redondeadas recorta los fondos, los bordes y las imágenes de su flujo (referencia/comun/caja.md).
+     * ({@code Rotate}, reference/common/layers-and-rotation.md) se pinta girada con todo lo que contiene, y una caja con
+     * esquinas redondeadas recorta los fondos, los bordes y las imágenes de su flujo (reference/common/box.md).
      */
     public void paint(Canvas canvas) {
         box(canvas, root);
@@ -293,7 +293,7 @@ public final class StackingContext {
     }
 
     /**
-     * Las esquinas de la caja de borde del fragmento (referencia/comun/caja.md): {@code Corner radius} resuelto contra
+     * Las esquinas de la caja de borde del fragmento (reference/common/box.md): {@code Corner radius} resuelto contra
      * su tamaño y, en una caja partida entre páginas con {@code Edges: open}, solo las de
      * arriba en el primer fragmento y las de abajo en el último.
      */
@@ -321,7 +321,7 @@ public final class StackingContext {
 
     /**
      * La línea entre cada dos columnas con contenido de un fragmento de un {@code Columns}
-     * (referencia/componentes/columns.md): centrada en el hueco, desde arriba de la caja de contenido y con el alto de
+     * (reference/components/columns.md): centrada en el hueco, desde arriba de la caja de contenido y con el alto de
      * la columna más alta. Sus hijos son las columnas, en orden.
      */
     private static void paintRules(Canvas canvas, Piece p) {
@@ -340,7 +340,7 @@ public final class StackingContext {
 
     /**
      * El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen
-     * (referencia/componentes/image.md), y después su enlace.
+     * (reference/components/image.md), y después su enlace.
      */
     private static void paintContent(Canvas canvas, Piece p) {
         if (p.f().box().isImage()) {
@@ -358,7 +358,7 @@ public final class StackingContext {
     }
 
     /**
-     * La zona clicable de la caja entera (referencia/comun/enlaces.md): su caja de borde si la caja tiene {@code Link}.
+     * La zona clicable de la caja entera (reference/common/links.md): su caja de borde si la caja tiene {@code Link}.
      * Las de los tramos con enlace de sus líneas de texto las pinta {@link #paintText}, dentro del contenido del
      * enlace. Una caja partida entre páginas tiene una zona por fragmento.
      */
@@ -400,7 +400,7 @@ public final class StackingContext {
     }
 
     /**
-     * La guía de una entrada de índice (referencia/componentes/table-of-contents.md): puntos o una línea sobre la línea
+     * La guía de una entrada de índice (reference/components/table-of-contents.md): puntos o una línea sobre la línea
      * base del texto de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
      */
     private static void paintLeader(Canvas canvas, Piece p) {
@@ -413,14 +413,14 @@ public final class StackingContext {
     }
 
     /**
-     * Las líneas de texto, cada tramo con su fuente (referencia/comun/formato-del-texto.md). Como en CSS, el subrayado
+     * Las líneas de texto, cada tramo con su fuente (reference/common/text-formatting.md). Como en CSS, el subrayado
      * se pinta antes que el texto y el tachado después; los dos fuera del contenido marcado, porque no son texto (en el
      * PDF etiquetado, <em>artifacts</em>).
      *
      * <p>El texto se pinta en secuencias de tramos seguidos con el mismo enlace, también de una línea
      * a la siguiente ({@link Canvas#beginText} si no tienen, {@link Canvas#beginLinkText} si lo tienen): cada secuencia
      * es un contenido marcado aparte, y el de un enlace cuelga del {@code Link} del PDF etiquetado
-     * (referencia/comun/enlaces.md). Dentro de cada una de enlace, una zona clicable por línea ({@link
+     * (reference/common/links.md). Dentro de cada una de enlace, una zona clicable por línea ({@link
      * #paintLinkZone}).</p>
      */
     private static void paintText(Canvas canvas, Piece p) {
@@ -435,7 +435,7 @@ public final class StackingContext {
         paintDecorations(canvas, p, content, metrics, true);
         Tagging tags = canvas.tagging();
         // Con interletraje, quien extrae el texto adivina espacios entre las letras: cada secuencia de tramos de una
-        // línea lleva su texto aparte (referencia/implementacion/pdf.md).
+        // línea lleva su texto aparte (reference/implementation/pdf.md).
         boolean spaced = s.typography().letterSpacing() != 0;
         boolean open = false;
         String current = null;
@@ -499,7 +499,7 @@ public final class StackingContext {
     }
 
     /**
-     * La zona clicable (referencia/comun/enlaces.md) de los tramos de la línea {@code l} que empiezan en {@code first}
+     * La zona clicable (reference/common/links.md) de los tramos de la línea {@code l} que empiezan en {@code first}
      * y van seguidos con el mismo destino (una parte en negrita dentro de un enlace es una sola zona).
      */
     private static void paintLinkZone(Tagging tags, Box box, Rect content, TextLine l, int first,

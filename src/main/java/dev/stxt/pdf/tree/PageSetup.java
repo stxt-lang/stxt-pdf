@@ -4,7 +4,7 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 
 /**
- * El medio de salida (referencia/componentes/document.md): una secuencia de páginas de tamaño fijo. Define
+ * El medio de salida (reference/components/document.md): una secuencia de páginas de tamaño fijo. Define
  * el containing block inicial: el área útil.
  *
  * @param width  ancho de la página, en pt
@@ -19,7 +19,7 @@ public record PageSetup(double width, double height, Insets margin) {
     }
 
     /**
-     * Los tamaños de papel con nombre de {@code Paper} (referencia/componentes/document.md), en vertical y en puntos
+     * Los tamaños de papel con nombre de {@code Paper} (reference/components/document.md), en vertical y en puntos
      * enteros: los de ISO 216 redondeados, como se usan siempre (A4 = 595 × 842), y los de EE. UU.
      */
     public enum Paper {
@@ -37,7 +37,7 @@ public record PageSetup(double width, double height, Insets margin) {
     }
 
     /**
-     * {@code Orientation} (referencia/componentes/document.md): {@code landscape} cambia el ancho por el alto del
+     * {@code Orientation} (reference/components/document.md): {@code landscape} cambia el ancho por el alto del
      * papel.
      */
     public enum Orientation {

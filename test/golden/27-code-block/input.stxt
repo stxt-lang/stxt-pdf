@@ -1,5 +1,5 @@
-# Hito 34: el bloque de código de un Markdown es el elemento generado Code block (referencia/comun/estilos.md,
-# referencia/componentes/markdown.md). Página de 200 × 300 con márgenes de 20: área útil de 160 × 260 desde (20, 20). La línea mide el 120 %
+# Hito 34: el bloque de código de un Markdown es el elemento generado Code block (reference/common/styles.md,
+# reference/components/markdown.md). Página de 200 × 300 con márgenes de 20: área útil de 160 × 260 desde (20, 20). La línea mide el 120 %
 # del Size de su caja.
 #   md:   un Markdown con tres bloques. «Antes.» y «Después.» son Paragraph de una línea (Size 10: 12). El bloque
 #         de código lo estila For element: Code block (Size 5, Margin 4 0, Padding 5): dos líneas de 6 son 12 y con el

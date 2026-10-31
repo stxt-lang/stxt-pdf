@@ -3,7 +3,7 @@ package dev.stxt.pdf.fragment;
 import dev.stxt.pdf.model.Break;
 
 /**
- * Una unidad de la fragmentación de un contenedor (referencia/comun/cortes.md): una línea de un
+ * Una unidad de la fragmentación de un contenedor (reference/common/breaks.md): una línea de un
  * contenedor stack en {@code row}, un ítem de uno en {@code column} o una fila de una rejilla. Se
  * corta entre unidades, nunca dentro de una (salvo partiendo sus ítems en paralelo).
  *

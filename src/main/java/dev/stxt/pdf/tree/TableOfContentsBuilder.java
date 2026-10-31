@@ -13,7 +13,7 @@ import java.util.List;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 /**
- * El índice automático (referencia/componentes/table-of-contents.md): lee {@code Levels} y {@code Leader} de un
+ * El índice automático (reference/components/table-of-contents.md): lee {@code Levels} y {@code Leader} de un
  * {@code Table of contents} y, cuando el árbol está construido y se conocen todos los encabezados, genera
  * sus entradas.
  *
@@ -110,7 +110,7 @@ final class TableOfContentsBuilder {
         ModelValidator.validateBox(ctx, es, contents);
         Box entry = new Box(null, Element.tocEntry(heading.headingLevel()), es, false, heading.line());
         ctx.definiteHeight.put(entry, false);
-        // La entrada lleva a su encabezado (referencia/comun/enlaces.md): toda ella es clicable.
+        // La entrada lleva a su encabezado (reference/common/links.md): toda ella es clicable.
         es.setLink(Links.to(heading.key()));
 
         boolean leader = contents.style().tableOfContents().leader() != Leader.NONE;

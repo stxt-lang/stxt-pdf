@@ -2,7 +2,7 @@ package dev.stxt.pdf.model;
 
 /**
  * Posición y grosor del subrayado y del tachado de una fuente, en fracciones del cuerpo
- * (referencia/comun/formato-del-texto.md). Las posiciones son las de la parte de arriba de la raya, medidas
+ * (reference/common/text-formatting.md). Las posiciones son las de la parte de arriba de la raya, medidas
  * desde la línea base hacia arriba (negativas por debajo), como en las tablas {@code post} y
  * {@code OS/2} del TTF.
  */

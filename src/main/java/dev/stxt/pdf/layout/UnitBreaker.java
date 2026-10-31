@@ -17,7 +17,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * Fragmentación de los contenedores cuyos ítems se agrupan en <em>unidades</em>
- * (referencia/comun/cortes.md): las líneas de un contenedor stack en {@code row}, los ítems de uno en
+ * (reference/common/breaks.md): las líneas de un contenedor stack en {@code row}, los ítems de uno en
  * {@code column} y las filas de una rejilla.
  *
  * <p>El contenedor hace su layout completo sin fragmentar y después {@link #fragment} se queda
@@ -113,7 +113,7 @@ public final class UnitBreaker {
 
     /**
      * La franja de una unidad: la fila de una tabla con {@code Id} o {@code Box}
-     * (referencia/componentes/table.md#filas), que se pinta debajo de sus celdas con el alto de la unidad en cada
+     * (reference/components/table.md#filas), que se pinta debajo de sus celdas con el alto de la unidad en cada
      * fragmento.
      *
      * @param box    la caja de la fila
@@ -144,7 +144,7 @@ public final class UnitBreaker {
 
     /**
      * Ítems que se repiten enteros en cada fragmento, fuera de las unidades: la cabecera de una
-     * tabla arriba y su pie debajo de las unidades colocadas (referencia/componentes/table.md). Nunca se
+     * tabla arriba y su pie debajo de las unidades colocadas (reference/components/table.md). Nunca se
      * parten, y lo que queda de página para las unidades es el resto.
      *
      * @param head       ítems de la cabecera, con su posición desde la caja de contenido
@@ -489,7 +489,7 @@ public final class UnitBreaker {
                     repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
-            // Los márgenes de los ítems nunca se fusionan con los del contenedor (referencia/componentes/block.md).
+            // Los márgenes de los ítems nunca se fusionan con los del contenedor (reference/components/block.md).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
             }

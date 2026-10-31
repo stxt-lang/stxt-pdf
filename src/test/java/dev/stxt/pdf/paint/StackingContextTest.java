@@ -25,7 +25,7 @@ import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Orden de pintado (referencia/comun/caja.md), visto por los colores de fondo que se pintan. */
+/** Orden de pintado (reference/common/box.md), visto por los colores de fondo que se pintan. */
 class StackingContextTest {
 
     private static final DocumentReader READER = new DocumentReader();
@@ -267,7 +267,7 @@ class StackingContextTest {
 
     /**
      * Cada tramo con su fuente; el subrayado antes del texto y el tachado después
-     * (referencia/comun/formato-del-texto.md).
+     * (reference/common/text-formatting.md).
      */
     @Test
     void runsWithTheirFontAndDecorations() {
@@ -282,7 +282,7 @@ class StackingContextTest {
     }
 
     /**
-     * Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (referencia/comun/tipografia.md).
+     * Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (reference/common/typography.md).
      */
     @Test
     void smallCapsAreSmallerAndLetterSpacingIsPassedOn() {
@@ -294,7 +294,7 @@ class StackingContextTest {
 
     /**
      * Una caja con {@code Link} es clicable entera; su zona sigue a su propio texto (que el {@code Link} envuelve) y
-     * precede al de sus hijos, que se pintan después (referencia/comun/enlaces.md).
+     * precede al de sus hijos, que se pintan después (reference/common/links.md).
      */
     @Test
     void aBoxWithLinkIsClickableWholeAndBeforeItsChildren() {
@@ -307,7 +307,7 @@ class StackingContextTest {
 
     /**
      * Un tramo con enlace es una zona del alto de la línea; los seguidos con el mismo destino, una sola
-     * (referencia/comun/enlaces.md).
+     * (reference/common/links.md).
      */
     @Test
     void linkedRunsAreOneZonePerLineAndDestination() {
@@ -344,7 +344,7 @@ class StackingContextTest {
     /**
      * Las líneas que no son la última del fragmento llevan un espacio invisible tras la última palabra (el corte
      * se lo come), para que el texto de las líneas unido no pegue palabras; la última y el texto preformateado,
-     * no (referencia/comun/formato-del-texto.md).
+     * no (reference/common/text-formatting.md).
      */
     @Test
     void aWrappedLineEndsWithASpaceExceptTheLastAndPreformatted() {
@@ -385,7 +385,7 @@ class StackingContextTest {
 
     /**
      * Con interletraje, los tramos seguidos de una línea con el mismo enlace llevan un solo {@code ActualText}, con
-     * el espacio invisible del final de la línea si llegan a él (referencia/implementacion/pdf.md).
+     * el espacio invisible del final de la línea si llegan a él (reference/implementation/pdf.md).
      */
     @Test
     void letterSpacedRunsShareOneActualTextPerLinkSequenceAndLine() {
@@ -458,7 +458,7 @@ class StackingContextTest {
 
     /**
      * La franja de una fila se pinta debajo de sus celdas: su fondo va antes que los de ellas, y su borde con el color
-     * del texto de la fila (referencia/componentes/table.md#filas).
+     * del texto de la fila (reference/components/table.md#filas).
      */
     @Test
     void theBandOfARowIsPaintedUnderItsCells() {
@@ -496,7 +496,7 @@ class StackingContextTest {
 
     /**
      * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Overlay} de dentro, alrededor
-     * de su origen (referencia/comun/capas-y-giro.md); una {@code Image} en flujo, sobre su centro y en sus dos pasos.
+     * de su origen (reference/common/layers-and-rotation.md); una {@code Image} en flujo, sobre su centro y en sus dos pasos.
      */
     @Test
     void rotatedBoxesWrapEverythingTheyPaint() {
@@ -521,7 +521,7 @@ class StackingContextTest {
     /**
      * Un {@code Block} girado en flujo: sus descendientes se pintan en los pasos del contexto que lo contiene, cada uno
      * con el giro del bloque, y el {@code Overlay} de dentro, que lo tiene de contenedor de referencia, también
-     * (referencia/comun/capas-y-giro.md).
+     * (reference/common/layers-and-rotation.md).
      */
     @Test
     void aBlockRotatedInFlowTurnsItsDescendantsInEveryStep() {
@@ -542,7 +542,7 @@ class StackingContextTest {
     /**
      * Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los fondos, los bordes y las
      * imágenes de su flujo, también de un {@code Frame}, pero no su texto ni un {@code Overlay}
-     * (referencia/comun/caja.md).
+     * (reference/common/box.md).
      */
     @Test
     void roundedCornersClipTheBackgroundsOfTheFlowButNotTheText() {

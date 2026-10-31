@@ -20,7 +20,7 @@ public record Insets(double top, double right, double bottom, double left) {
     /**
      * Resuelve cuatro valores contra el <strong>ancho</strong> del containing block. En CSS, los
      * porcentajes de margen y relleno, también los verticales, se calculan sobre el ancho
-     * (referencia/comun/valores.md). Un {@code auto} vale 0 aquí; los márgenes {@code auto} los reparte el layout.
+     * (reference/common/values.md). Un {@code auto} vale 0 aquí; los márgenes {@code auto} los reparte el layout.
      */
     public static Insets resolve(Sides<Value> sides, double containingBlockWidth) {
         return new Insets(

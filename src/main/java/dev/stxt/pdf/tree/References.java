@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Las referencias de los textos del árbol a otras cajas ({@code {page of: id}},
- * referencia/comun/referencias.md): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo
+ * reference/common/references.md): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo
  * que valen lo decide quien maqueta: la página, el {@link dev.stxt.pdf.layout.Paginator}; el número, el builder
  * ({@link Box#number()}).
  */

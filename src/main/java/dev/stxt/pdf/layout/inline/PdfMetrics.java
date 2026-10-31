@@ -23,13 +23,13 @@ import static dev.stxt.pdf.tree.PropertyKey.FONT_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_WEIGHT;
 
 /**
- * Métricas reales de las fuentes TTF de la carpeta de recursos (referencia/comun/recursos.md): es la
+ * Métricas reales de las fuentes TTF de la carpeta de recursos (reference/common/resources.md): es la
  * métrica que corresponde a la salida de {@link dev.stxt.pdf.paint.PdfCanvas}, que incrusta
  * esas mismas fuentes: {@code new Engine(new PdfMetrics(resources))}.
  *
  * <p>{@link #validate(Box)} comprueba antes de maquetar que cada texto tiene su fuente (familia,
  * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución. Un texto con tramos
- * (referencia/comun/formato-del-texto.md) necesita la variante de cada tramo, y cada tramo, sus caracteres en ella.</p>
+ * (reference/common/text-formatting.md) necesita la variante de cada tramo, y cada tramo, sus caracteres en ella.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
@@ -117,7 +117,7 @@ public final class PdfMetrics implements TextMeasurer {
                         continue;
                     }
                 }
-                // Los espacios en blanco del documento se pintan como espacios (referencia/comun/tipografia.md).
+                // Los espacios en blanco del documento se pintan como espacios (reference/common/typography.md).
                 requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
                 i += Character.charCount(cp);
             }

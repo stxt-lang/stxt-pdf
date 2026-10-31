@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Encabezados y párrafos al construir el árbol (referencia/componentes/heading.md). */
+/** Encabezados y párrafos al construir el árbol (reference/components/heading.md). */
 class HeadingsTest {
 
     private static Box root(String... lines) {

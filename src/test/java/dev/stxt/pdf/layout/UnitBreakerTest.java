@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Corte entre unidades (referencia/comun/cortes.md) con unidades sintéticas: un contenedor de 100 pt
+ * Corte entre unidades (reference/common/breaks.md) con unidades sintéticas: un contenedor de 100 pt
  * de ancho sin borde ni relleno y ítems de bloque con un {@code Height}, uno por unidad salvo
  * que se diga otra cosa.
  */

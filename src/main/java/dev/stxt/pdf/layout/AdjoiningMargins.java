@@ -2,7 +2,7 @@ package dev.stxt.pdf.layout;
 
 /**
  * Márgenes de los descendientes que tocan el borde superior o inferior de una caja y por eso
- * se fusionan con los márgenes propios de la caja, fuera de ella (referencia/componentes/block.md: el margen
+ * se fusionan con los márgenes propios de la caja, fuera de ella (reference/components/block.md: el margen
  * del hijo "sale" del padre). No incluyen los márgenes propios de la caja: los resuelve el padre,
  * que es quien la coloca.
  *

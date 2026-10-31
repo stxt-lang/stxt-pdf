@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Las imágenes SVG de {@code images/} (referencia/componentes/image.md): su tamaño natural y el subconjunto que se
+ * Las imágenes SVG de {@code images/} (reference/components/image.md): su tamaño natural y el subconjunto que se
  * admite.
  */
 class SvgImageTest {

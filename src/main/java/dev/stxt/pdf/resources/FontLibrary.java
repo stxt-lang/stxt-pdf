@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Índice de las fuentes de la carpeta {@code fonts/} (referencia/comun/recursos.md), por familia,
+ * Índice de las fuentes de la carpeta {@code fonts/} (reference/common/resources.md), por familia,
  * peso y estilo.
  *
  * <p>Se recorren la carpeta y sus subcarpetas buscando ficheros {@code .ttf}. De cada uno se

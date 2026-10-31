@@ -61,7 +61,7 @@ import static dev.stxt.pdf.tree.ValueReader.value;
 
 /**
  * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
- * y {@code Break} (referencia/comun/estructura.md), que comparten los elementos y las reglas de
+ * y {@code Break} (reference/common/structure.md), que comparten los elementos y las reglas de
  * {@code Styles}, las propiedades de {@code Stack}, {@code Grid} y {@code Columns} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
@@ -72,7 +72,7 @@ import static dev.stxt.pdf.tree.ValueReader.value;
 final class PropertyReader {
 
     /**
-     * Propiedades del elemento {@code Stack} (la estructura completa está en el schema, referencia/comun/estructura.md).
+     * Propiedades del elemento {@code Stack} (la estructura completa está en el schema, reference/common/structure.md).
      */
     static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
@@ -138,7 +138,7 @@ final class PropertyReader {
             s.declared(p.getCanonicalName(), p.getLine());
             switch (p.getCanonicalName()) {
                 case "width" -> s.box().setWidth(value(p, SIZE, false));
-                // Las palabras del contenido solo miden anchos: en un alto serían otra forma de escribir auto (referencia/comun/caja.md).
+                // Las palabras del contenido solo miden anchos: en un alto serían otra forma de escribir auto (reference/common/box.md).
                 case "height" -> s.box().setHeight(value(p, LENGTH_OR_AUTO, false));
                 case "min-width" -> s.box().setMinWidth(value(p, LENGTH_OR_AUTO, false));
                 case "max-width" -> s.box().setMaxWidth(value(p, LENGTH, false));
@@ -169,7 +169,7 @@ final class PropertyReader {
     }
 
     /**
-     * Una propiedad suelta de un elemento, fuera de los grupos (referencia/comun/estructura.md y siguientes): {@code
+     * Una propiedad suelta de un elemento, fuera de los grupos (reference/common/structure.md y siguientes): {@code
      * Offset}, {@code Marker}, {@code Link}, {@code Alt}… Su línea se guarda con su nombre. {@code Id}, {@code Rotate}
      * y {@code Rotate origin} no van en el estilo de la misma forma y los lee {@link BoxTreeBuilder}.
      */
@@ -188,7 +188,7 @@ final class PropertyReader {
     }
 
     /**
-     * El destino de un {@code Link} (referencia/comun/enlaces.md): una URL admitida o {@code #id}; que el {@code Id}
+     * El destino de un {@code Link} (reference/common/links.md): una URL admitida o {@code #id}; que el {@code Id}
      * exista se comprueba al final.
      */
     private static String link(Node p) {
@@ -262,7 +262,7 @@ final class PropertyReader {
     }
 
     /**
-     * Propiedades de {@code Columns}, hijas del elemento (referencia/componentes/columns.md); su línea se guarda sin
+     * Propiedades de {@code Columns}, hijas del elemento (reference/components/columns.md); su línea se guarda sin
      * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Stack} y {@code Grid} lo lleva.
      */
     static void columns(Node p, Style s) {
@@ -324,7 +324,7 @@ final class PropertyReader {
         return Alignment.valueOf(d.name());
     }
 
-    /** {@code Number label}: una plantilla con {@code {number}} una sola vez (referencia/componentes/heading.md). */
+    /** {@code Number label}: una plantilla con {@code {number}} una sola vez (reference/components/heading.md). */
     private static String numberLabel(Node p) {
         String label = p.getText().strip();
         int at = label.indexOf(HeadingNumbers.NUMBER);

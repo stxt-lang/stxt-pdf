@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Una caja del árbol de cajas (referencia/comun/estructura.md): cada elemento de caja del documento
+ * Una caja del árbol de cajas (reference/common/structure.md): cada elemento de caja del documento
  * ({@code Block}, {@code Stack}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
  * {@code Text} guarda su texto directamente.
  *
@@ -93,7 +93,7 @@ public final class Box {
 
     /**
      * Los hijos, en orden del documento; la lista no se puede cambiar. En la raíz del documento, también las
-     * secciones, que cuelgan de ella sin ser sus hijas (referencia/componentes/document.md).
+     * secciones, que cuelgan de ella sin ser sus hijas (reference/components/document.md).
      */
     public List<Box> children() {
         return closed ? children : Collections.unmodifiableList(children);
@@ -110,7 +110,7 @@ public final class Box {
     }
 
     /**
-     * Tramos del texto con su formato (referencia/comun/formato-del-texto.md), cuyo texto seguido es
+     * Tramos del texto con su formato (reference/common/text-formatting.md), cuyo texto seguido es
      * {@link #text()}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
      */
     public List<TextRun> formattedRuns() {
@@ -118,7 +118,7 @@ public final class Box {
     }
 
     /**
-     * Ruta de la imagen de una {@code Image} (referencia/componentes/image.md), relativa a la carpeta
+     * Ruta de la imagen de una {@code Image} (reference/components/image.md), relativa a la carpeta
      * {@code images/} de los recursos; {@code null} en el resto de cajas.
      */
     public String image() {
@@ -126,7 +126,7 @@ public final class Box {
     }
 
     /**
-     * Nombre con que se refiere a la caja un índice (referencia/componentes/table-of-contents.md) cuando no tiene
+     * Nombre con que se refiere a la caja un índice (reference/components/table-of-contents.md) cuando no tiene
      * {@code Id}: el de un encabezado que lista un {@code Table of contents}. {@code null} en el resto.
      */
     public String anchor() {
@@ -135,7 +135,7 @@ public final class Box {
 
     /**
      * Número de la caja en el documento, tal como lo da {@code {number of: id}}
-     * (referencia/comun/referencias.md); {@code null} si no tiene.
+     * (reference/common/references.md); {@code null} si no tiene.
      */
     public String number() {
         return number;
@@ -152,7 +152,7 @@ public final class Box {
     }
 
     /**
-     * Caja del marcador de un {@code List item} (referencia/componentes/list.md), generada por el motor:
+     * Caja del marcador de un {@code List item} (reference/components/list.md), generada por el motor:
      * una caja de texto ({@link Element#MARKER}) con la tipografía del ítem y el texto del
      * marcador más el espacio que lo separa del contenido ({@code "3. "}, {@code "• "}). No está
      * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
@@ -163,7 +163,7 @@ public final class Box {
     }
 
     /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Header rows} (referencia/componentes/table.md): las
+     * Filas de la rejilla de una {@code Table} que son de su {@code Header rows} (reference/components/table.md): las
      * primeras. 0 en el resto de cajas.
      */
     public int headerRows() {
@@ -179,7 +179,7 @@ public final class Box {
 
     /**
      * Las cajas de las filas de una {@code Table} que tienen {@code Id} o {@code Box}
-     * (referencia/componentes/table.md), en orden; la fila de cada una es la de su {@code Area}. No son hijas de la
+     * (reference/components/table.md), en orden; la fila de cada una es la de su {@code Area}. No son hijas de la
      * tabla, que solo tiene celdas, pero la tienen de padre. Vacía en el resto de cajas.
      */
     public List<Box> rows() {
@@ -196,7 +196,7 @@ public final class Box {
 
     /**
      * Cuelga la caja de una sección de la raíz del documento sin ser su hija: no le pone padre
-     * (referencia/componentes/document.md).
+     * (reference/components/document.md).
      */
     void addSection(Box section) {
         writable();
@@ -296,7 +296,7 @@ public final class Box {
     // --- Consultas -------------------------------------------------------------------------------------
 
     /**
-     * Cómo la nombra una referencia (referencia/comun/referencias.md): su {@code Id} o, si no tiene, su {@link
+     * Cómo la nombra una referencia (reference/common/references.md): su {@code Id} o, si no tiene, su {@link
      * #anchor}; puede ser {@code null}.
      */
     public String key() {
@@ -323,7 +323,7 @@ public final class Box {
     }
 
     /**
-     * Si la caja aísla los márgenes, es decir, si corta su fusión (referencia/componentes/block.md): el área útil
+     * Si la caja aísla los márgenes, es decir, si corta su fusión (reference/components/block.md): el área útil
      * (la raíz), los {@code Overlay} y {@code Page overlay}, los ítems de stack y grid, las cajas con
      * {@code Isolate margins: true} y las giradas en flujo.
      */
@@ -336,14 +336,14 @@ public final class Box {
     }
 
     /**
-     * Containing block de una caja fuera de flujo (referencia/comun/caja.md): para {@code absolute},
+     * Containing block de una caja fuera de flujo (reference/common/box.md): para {@code absolute},
      * el ancestro más cercano con {@code Position} distinta de {@code static}; si no hay ninguno,
      * o si la caja es {@code fixed}, la raíz, que representa el área útil.
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
         boolean fixed = style.position() == Position.PAGE_OVERLAY;
-        // Una caja girada en flujo también lo es, como las posicionadas (referencia/comun/capas-y-giro.md).
+        // Una caja girada en flujo también lo es, como las posicionadas (reference/common/layers-and-rotation.md).
         while (b.parent != null && (fixed || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;
         }

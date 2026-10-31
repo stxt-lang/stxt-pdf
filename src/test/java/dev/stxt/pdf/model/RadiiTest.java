@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las esquinas redondeadas ya resueltas (referencia/comun/caja.md). */
+/** Las esquinas redondeadas ya resueltas (reference/common/box.md). */
 class RadiiTest {
 
     private static Corners<Value> radius(Value... v) {

@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Genera los PDF que usan las {@code Image} de la documentación y de los tests (referencia/componentes/image.md), para
+ * Genera los PDF que usan las {@code Image} de la documentación y de los tests (reference/components/image.md), para
  * no subir binarios sin origen:
  *
  * <ul>

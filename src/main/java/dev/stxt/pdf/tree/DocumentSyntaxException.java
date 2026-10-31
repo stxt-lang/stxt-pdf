@@ -5,7 +5,7 @@ import dev.stxt.exceptions.LimitException;
 import dev.stxt.exceptions.ParseException;
 
 /**
- * Error de sintaxis STXT o del schema que detecta la librería {@code stxt-core} (referencia/comun/errores.md, nivel 1),
+ * Error de sintaxis STXT o del schema que detecta la librería {@code stxt-core} (reference/common/errors.md, nivel 1),
  * con el código de la librería ({@code CHILD_NOT_DECLARED}, {@code INVALID_VALUE}…) y su línea. Es el mismo error
  * de la librería sin su tipo: {@link #getCause()} guarda el original. Un {@link LimitException} de la librería
  * (documento demasiado anidado o con líneas demasiado largas) es un {@link Kind#LIMIT}; el resto, un documento

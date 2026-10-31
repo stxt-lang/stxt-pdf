@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Bloques en columnas en una página A4 (área útil de 515 × 762 desde (40, 40)),
- * referencia/componentes/columns.md. Con {@code Count: 2} y {@code Gap: 15}, las columnas miden 250 y la
+ * reference/components/columns.md. Con {@code Count: 2} y {@code Gap: 15}, las columnas miden 250 y la
  * segunda empieza en x = 305.
  */
 class ColumnsLayoutTest {

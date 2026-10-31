@@ -30,7 +30,7 @@ import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 
 /**
- * Layout de un {@code Columns} (referencia/componentes/columns.md): su contenido llena la primera columna,
+ * Layout de un {@code Columns} (reference/components/columns.md): su contenido llena la primera columna,
  * sigue en la siguiente y, al acabar las columnas de la página, continúa en la primera columna
  * de la página siguiente.
  *
@@ -268,7 +268,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
             Slice slice = Slice.of(model, first, consumed, fill.height(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fill.columns(), List.of(), first, slice.finished());
-            // Los márgenes del contenido no salen de las columnas (referencia/componentes/block.md).
+            // Los márgenes del contenido no salen de las columnas (reference/components/block.md).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, List.of(), AdjoiningMargins.NONE);
             }

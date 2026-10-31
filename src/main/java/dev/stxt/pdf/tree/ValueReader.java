@@ -20,15 +20,15 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.parse;
 
 /**
- * Interpreta el valor de una propiedad (referencia/comun/valores.md y referencia/comun/estructura.md) y comprueba lo
+ * Interpreta el valor de una propiedad (reference/common/values.md y reference/common/structure.md) y comprueba lo
  * que admite: longitudes, {@code auto}, palabras clave intrínsecas, pistas de grid, enteros, colores… Los errores
  * llevan la línea del nodo.
  */
 final class ValueReader {
 
     /**
-     * Clases de valor, para comprobar lo que admite cada propiedad (referencia/comun/valores.md y
-     * referencia/comun/estructura.md).
+     * Clases de valor, para comprobar lo que admite cada propiedad (reference/common/values.md y
+     * reference/common/structure.md).
      */
     enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, BETWEEN }
 
@@ -170,7 +170,7 @@ final class ValueReader {
     }
 
     /**
-     * {@code Rotate} (referencia/comun/capas-y-giro.md): grados entre −360 y 360, sin 0 ni las vueltas enteras, que no
+     * {@code Rotate} (reference/common/layers-and-rotation.md): grados entre −360 y 360, sin 0 ni las vueltas enteras, que no
      * girarían nada.
      */
     static double angle(Node n) {
@@ -188,7 +188,7 @@ final class ValueReader {
     }
 
     /**
-     * {@code Rotate origin} (referencia/comun/capas-y-giro.md): el origen horizontal y el vertical, desde la esquina de
+     * {@code Rotate origin} (reference/common/layers-and-rotation.md): el origen horizontal y el vertical, desde la esquina de
      * arriba a la izquierda de la caja de borde.
      */
     static Value[] rotateOrigin(Node n) {

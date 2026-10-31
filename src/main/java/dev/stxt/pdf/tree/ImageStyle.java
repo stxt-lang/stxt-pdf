@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Fit;
 
 /**
- * Las propiedades de una {@code Image} (referencia/componentes/image.md): el texto alternativo, cómo llena su caja y la
+ * Las propiedades de una {@code Image} (reference/components/image.md): el texto alternativo, cómo llena su caja y la
  * página de un PDF. No se heredan.
  */
 public final class ImageStyle extends StyleGroup {

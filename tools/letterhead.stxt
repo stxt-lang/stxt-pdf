@@ -1,5 +1,5 @@
 # Papel de carta de Taller Nogal: el PDF que usan como fondo los documentos de la documentación
-# (referencia/componentes/image.md). La página 1 es la de la primera hoja de una carta, con el membrete
+# (reference/components/image.md). La página 1 es la de la primera hoja de una carta, con el membrete
 # completo; la página 2, la de las siguientes, con el logotipo pequeño. Las dos llevan el pie legal.
 # Se convierte con tools/ExamplePdfs.java en resources/images/examples/letterhead/letterhead.pdf.
 Document (dev.stxt.pdf):

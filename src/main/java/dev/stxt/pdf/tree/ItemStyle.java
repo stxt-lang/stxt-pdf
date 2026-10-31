@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades de {@code Item} y {@code Area} (referencia/componentes/stack.md y referencia/componentes/grid.md), que
+ * Las propiedades de {@code Item} y {@code Area} (reference/components/stack.md y reference/components/grid.md), que
  * pasan al elemento que envuelven: cómo crece y se encoge en un {@code Stack}, dónde va en un {@code Grid} (o la celda
  * que le da la tabla) y su alineación. No se heredan.
  */

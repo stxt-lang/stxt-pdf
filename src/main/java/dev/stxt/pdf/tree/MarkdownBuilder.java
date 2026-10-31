@@ -56,14 +56,14 @@ import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 /**
- * Traduce un {@code Markdown} (referencia/componentes/markdown.md) a los nodos STXT de los elementos que ya existen:
+ * Traduce un {@code Markdown} (reference/components/markdown.md) a los nodos STXT de los elementos que ya existen:
  * encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a {@code Paragraph}, listas a {@code
  * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code Preformatted:
- * true} e imágenes solas en su párrafo a {@code Image} (referencia/componentes/image.md). Un enlace es un tramo
- * subrayado con su destino (referencia/comun/enlaces.md); el código en línea, un tramo de código, que recibe la
+ * true} e imágenes solas en su párrafo a {@code Image} (reference/components/image.md). Un enlace es un tramo
+ * subrayado con su destino (reference/common/links.md); el código en línea, un tramo de código, que recibe la
  * familia de {@code Code font} al construir su caja. {@link BoxTreeBuilder} construye después esos nodos como
  * cualquier otro elemento, así que el schema, las reglas de {@code Styles}, la validación de
- * referencia/comun/errores.md, el PDF etiquetado y los marcadores los tratan igual.
+ * reference/common/errors.md, el PDF etiquetado y los marcadores los tratan igual.
  *
  * <p>El formato dentro de una línea (negrita, cursiva, subrayado, tachado y enlace) no cabe en un nodo
  * STXT: el texto del nodo es el texto seguido y sus tramos van aparte, en
@@ -86,7 +86,7 @@ final class MarkdownBuilder {
     /**
      * El de un texto con {@code Markup: markdown}: sin bloques ni tablas, así que lo que en un {@code Markdown}
      * empezaría un bloque ({@code -}, {@code 2024.}, {@code #}, {@code >}, {@code ---}) es texto
-     * (referencia/comun/formato-del-texto.md).
+     * (reference/common/text-formatting.md).
      */
     private static final Parser INLINE_PARSER = Parser.builder()
             .enabledBlockTypes(Set.of())
@@ -129,7 +129,7 @@ final class MarkdownBuilder {
     }
 
     /**
-     * Un texto con {@code Markup: markdown} (referencia/comun/formato-del-texto.md): sus tramos. Solo párrafos, que se
+     * Un texto con {@code Markup: markdown} (reference/common/text-formatting.md): sus tramos. Solo párrafos, que se
      * separan con una línea en blanco, como en un {@code Text}; la sintaxis de los bloques es texto, y lo que no se
      * admite dentro de la línea, {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
      *
@@ -340,7 +340,7 @@ final class MarkdownBuilder {
         }
 
         /**
-         * Una fila con más celdas que la cabecera es un error (referencia/componentes/markdown.md#tablas): el parser
+         * Una fila con más celdas que la cabecera es un error (reference/components/markdown.md#tablas): el parser
          * descarta las que sobran, así que se cuentan en el texto de la fila, separadas por {@code |} sin escapar.
          */
         private void extraCells(org.commonmark.node.Node row, int columns) {
@@ -397,7 +397,7 @@ final class MarkdownBuilder {
         /** Un {@code Text} o un {@code Paragraph} con el texto de un bloque y sus tramos. */
         /**
          * El {@code Id} de un encabezado, escrito al final de su texto como {@code {#id}}
-         * (referencia/componentes/markdown.md), que se quita del texto; {@code null} si no lo lleva. Un {@code {#…}}
+         * (reference/components/markdown.md), que se quita del texto; {@code null} si no lo lleva. Un {@code {#…}}
          * vacío o con espacios es un error.
          */
         private String headingId(Heading h, int line) {
@@ -451,7 +451,7 @@ final class MarkdownBuilder {
                 if (n instanceof Text t) {
                     out.add(t.getLiteral(), f);
                 } else if (n instanceof SoftLineBreak) {
-                    // Un salto de línea simple vale un espacio, como en un Text (referencia/comun/tipografia.md).
+                    // Un salto de línea simple vale un espacio, como en un Text (reference/common/typography.md).
                     out.add(" ", f);
                 } else if (n instanceof StrongEmphasis) {
                     inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
@@ -472,7 +472,7 @@ final class MarkdownBuilder {
         }
 
         /**
-         * El formato de los tramos de un enlace (referencia/comun/enlaces.md): el de fuera, subrayado y con su destino.
+         * El formato de los tramos de un enlace (reference/common/links.md): el de fuera, subrayado y con su destino.
          * Un enlace de Markdown es el único que se subraya solo. El título ({@code "…"}) no
          * tendría efecto y es un error, como el de una imagen.
          */

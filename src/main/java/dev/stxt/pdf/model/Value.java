@@ -4,11 +4,11 @@ import java.util.OptionalDouble;
 
 /**
  * Valor <em>especificado</em> de una propiedad, tal como lo escribe el autor
- * (referencia/comun/valores.md). El layout lo convierte en un valor <em>usado</em>, en puntos,
+ * (reference/common/values.md). El layout lo convierte en un valor <em>usado</em>, en puntos,
  * con {@link #resolve(OptionalDouble)}.
  *
  * <p>Se conservan separados los valores especificados de los usados porque stack y grid
- * necesitan saber si un valor era {@code auto} en origen (referencia/comun/valores.md).</p>
+ * necesitan saber si un valor era {@code auto} en origen (reference/common/values.md).</p>
  */
 public sealed interface Value {
 
@@ -47,7 +47,7 @@ public sealed interface Value {
      *
      * @param base tamaño de referencia (normalmente del containing block); vacío si es indefinido
      * @return los puntos, o vacío si el valor depende del contenido ({@code auto}, intrínsecos,
-     *         fracciones) o es un porcentaje sobre una base indefinida (referencia/comun/caja.md)
+     *         fracciones) o es un porcentaje sobre una base indefinida (reference/common/box.md)
      */
     default OptionalDouble resolve(OptionalDouble base) {
         if (this instanceof Points p) {

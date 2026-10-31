@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * Las fuentes de un PDF y cómo se escribe el texto con ellas. Cada fuente TTF de la carpeta de recursos
- * (referencia/comun/recursos.md) se incrusta una vez por documento y combinación de {@link FontFace}, como subconjunto
+ * (reference/common/resources.md) se incrusta una vez por documento y combinación de {@link FontFace}, como subconjunto
  * (solo los glifos usados) en una fuente Type 0 con codificación Identity-H: el PDF se ve igual en cualquier
  * máquina. Con Identity-H cada carácter ocupa dos bytes y el operador {@code Tw} no actúa, así que la
  * justificación y el interletraje van en los argumentos de {@code TJ} ({@link #spaced}).

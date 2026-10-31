@@ -38,7 +38,7 @@ class ValueParserTest {
 
     @Test
     void minMaxAndClampAreNotValues() {
-        // Lo hacen Min width y Max width (referencia/comun/valores.md).
+        // Lo hacen Min width y Max width (reference/common/values.md).
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("min(300, 50%)"));
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("max(200, 30%)"));
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("clamp(200, 50%, 400)"));

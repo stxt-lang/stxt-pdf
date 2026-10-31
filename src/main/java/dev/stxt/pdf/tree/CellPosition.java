@@ -4,7 +4,7 @@ import dev.stxt.Node;
 import dev.stxt.pdf.model.TextAlign;
 
 /**
- * Dónde está una {@code Cell} en su tabla (referencia/componentes/table.md), para las reglas de
+ * Dónde está una {@code Cell} en su tabla (reference/components/table.md), para las reglas de
  * {@code Styles} que la nombran por su posición.
  *
  * @param group           grupo de filas: 0 {@code Header rows}, 1 {@code Body}, 2 {@code Footer rows}

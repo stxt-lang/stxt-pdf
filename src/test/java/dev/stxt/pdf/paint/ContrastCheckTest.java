@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El contraste del texto con lo que hay debajo (referencia/comun/pdf.md): 4,5:1, o 3:1 en el texto grande, con los
+ * El contraste del texto con lo que hay debajo (reference/common/pdf.md): 4,5:1, o 3:1 en el texto grande, con los
  * fondos pintados antes que el texto mezclados con su opacidad sobre la página blanca.
  */
 class ContrastCheckTest {

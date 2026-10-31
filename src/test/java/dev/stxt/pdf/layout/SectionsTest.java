@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Las secciones (referencia/componentes/document.md): páginas de 300 × 200 con márgenes de 20 (área útil de
+ * Las secciones (reference/components/document.md): páginas de 300 × 200 con márgenes de 20 (área útil de
  * 260 × 160). Con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt.
  */
 class SectionsTest {
@@ -180,7 +180,7 @@ class SectionsTest {
     /**
      * Un prefacio en romanos y un cuerpo que vuelve a empezar en 5: {@code {page}}, {@code {pages}} y {@code {page of:
      * id}} se escriben con el {@code Page number format} de la página donde salen o a la que se refieren
-     * (referencia/componentes/document.md).
+     * (reference/components/document.md).
      */
     @Test
     void romanPagesAndARestartThatStartsAtFive() {
@@ -237,7 +237,7 @@ class SectionsTest {
     /**
      * {@code Begin on: odd}: si la sección anterior acaba en impar, acaba con una página en blanco de ella, sin
      * contenido ni {@code Page overlay}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages}
-     * de los {@code Page overlay} de su sección (referencia/componentes/document.md).
+     * de los {@code Page overlay} de su sección (reference/components/document.md).
      */
     @Test
     void aSectionThatBeginsOnAnOddPageLeavesABlankPageBefore() {

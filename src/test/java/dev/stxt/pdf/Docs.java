@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Ayudas para escribir documentos de test. La tipografía base del documento va en
- * {@code Styles} (referencia/comun/estilos.md), en la regla {@code For element: Document}; los tests la
+ * {@code Styles} (reference/common/styles.md), en la regla {@code For element: Document}; los tests la
  * escriben aparte del cuerpo, que a veces trae su propio {@code Styles}.
  */
 public final class Docs {
@@ -18,7 +18,7 @@ public final class Docs {
 
     /**
      * Envuelve en una {@code Section} todo lo que {@code Document} no admite suelto
-     * (referencia/componentes/document.md): lo que sigue a {@code Page}, {@code Title}, {@code Language} y {@code
+     * (reference/components/document.md): lo que sigue a {@code Page}, {@code Title}, {@code Language} y {@code
      * Styles}, que quedan donde estaban. No cambia un texto que ya tiene una {@code Section}, que no es un {@code
      * Document} o que no tiene contenido.
      */

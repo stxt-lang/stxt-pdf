@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Lo que comparten los tests de referencia ({@link GoldenTest}) y los de los ejemplos ({@code ExamplesTest}): comparar
- * un volcado (referencia/implementacion/pruebas.md) con el esperado, y las imágenes de cada página del PDF con las
+ * un volcado (reference/implementation/testing.md) con el esperado, y las imágenes de cada página del PDF con las
  * versionadas en la carpeta del caso.
  *
  * <p>El PDF y las imágenes nuevas se escriben siempre en {@code target/reference/} ({@link #writeActual}), nunca en

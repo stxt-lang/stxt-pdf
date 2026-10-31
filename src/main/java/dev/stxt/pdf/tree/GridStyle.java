@@ -8,7 +8,7 @@ import dev.stxt.pdf.model.Value;
 import java.util.List;
 
 /**
- * Las propiedades de los elementos {@code Grid} y {@code Table} (referencia/componentes/grid.md): las pistas, las
+ * Las propiedades de los elementos {@code Grid} y {@code Table} (reference/components/grid.md): las pistas, las
  * áreas, la colocación automática, la alineación de los ítems y el hueco entre pistas. No se heredan.
  */
 public final class GridStyle extends StyleGroup {

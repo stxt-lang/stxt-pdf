@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * estructura (qué hijos admite cada elemento, cardinalidades) y tipos (ENUM, INTEGER, BOOLEAN)
  * los detecta la librería con sus códigos estándar ({@link dev.stxt.exceptions.ParseException}),
  * y el motor solo tiene que comprobar las reglas que el schema no puede expresar
- * (referencia/comun/errores.md).
+ * (reference/common/errors.md).
  *
  * <p>La librería solo valida los nodos que tienen namespace, así que el documento debe tener un
  * único nodo raíz {@code Document} que declare {@code (dev.stxt.pdf)}: sin el namespace pasaría
@@ -53,7 +53,7 @@ public final class DocumentReader {
     }
 
     /**
-     * Lee y valida un documento de estilos aparte (raíz {@code Styles}, referencia/comun/estilos.md), que se
+     * Lee y valida un documento de estilos aparte (raíz {@code Styles}, reference/common/styles.md), que se
      * pasa junto al documento al maquetarlo; devuelve su nodo raíz.
      */
     public InlineNode readStyles(String content) {

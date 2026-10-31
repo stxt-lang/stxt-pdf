@@ -40,11 +40,11 @@ import static dev.stxt.pdf.tree.ValueReader.enumValue;
 import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 
 /**
- * Construye el árbol de cajas a partir del documento (referencia/comun/estructura.md): traduce cada
+ * Construye el árbol de cajas a partir del documento (reference/common/structure.md): traduce cada
  * elemento a una caja con el {@link Layout} y la {@link Position} de su
  * {@link Element}, pasa las propiedades de {@code Item} y {@code Area} al elemento que envuelven,
  * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
- * puede expresar (referencia/comun/errores.md).
+ * puede expresar (reference/common/errors.md).
  *
  * <p>Es el orquestador: lee los valores con {@link ValueReader} y las propiedades con
  * {@link PropertyReader}, aplica las reglas con {@link StyleRules}, construye tablas y listas con
@@ -80,7 +80,7 @@ public final class BoxTreeBuilder {
 
     /**
      * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Page overlay} y sus secciones
-     * (referencia/componentes/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
+     * (reference/components/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
      * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
      */
     public record Result(PageSetup pageSetup, Box root, List<Section> sections, Metadata metadata) {
@@ -89,8 +89,8 @@ public final class BoxTreeBuilder {
     /**
      * Construye el árbol de un documento, validado o no.
      *
-     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (referencia/comun/estructura.md)
-     * @throws InvalidModelException si incumple una regla del modelo (referencia/comun/errores.md)
+     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (reference/common/structure.md)
+     * @throws InvalidModelException si incumple una regla del modelo (reference/common/errors.md)
      */
     public Result build(InlineNode document) {
         return build(document, null);
@@ -98,11 +98,11 @@ public final class BoxTreeBuilder {
 
     /**
      * Como {@link #build(InlineNode)}, con un documento de estilos aparte (raíz {@code Styles},
-     * referencia/comun/estilos.md) cuyas reglas valen menos que las del propio documento. {@code styles} puede ser
+     * reference/common/styles.md) cuyas reglas valen menos que las del propio documento. {@code styles} puede ser
      * {@code null}.
      *
-     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (referencia/comun/estructura.md)
-     * @throws InvalidModelException si incumple una regla del modelo (referencia/comun/errores.md); la línea de un
+     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (reference/common/structure.md)
+     * @throws InvalidModelException si incumple una regla del modelo (reference/common/errors.md); la línea de un
      *         error de las reglas del documento de estilos es la suya, y el mensaje lo dice
      */
     public Result build(InlineNode document, InlineNode styles) {
@@ -160,7 +160,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Una {@code Section} (referencia/componentes/document.md): su caja, que es la raíz de su layout y tiene el alto de
+     * Una {@code Section} (reference/components/document.md): su caja, que es la raíz de su layout y tiene el alto de
      * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Page overlay} que
      * lleva.
      */
@@ -196,7 +196,7 @@ public final class BoxTreeBuilder {
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {
-                        // La primera página del documento ya es impar (referencia/componentes/document.md).
+                        // La primera página del documento ya es impar (reference/components/document.md).
                         throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd no tiene efecto en la primera "
                                 + "sección, que ya empieza en la página 1: sobra");
                     }
@@ -205,7 +205,7 @@ public final class BoxTreeBuilder {
                 }
             }
         }
-        // Lo que no tendría efecto (referencia/componentes/document.md#numeración-de-las-páginas).
+        // Lo que no tendría efecto (reference/components/document.md#numeración-de-las-páginas).
         if (startNode != null && numbering != Section.PageNumbering.RESTART) {
             throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start solo tiene efecto con Page numbering: "
                     + "restart, que es cuando la numeración vuelve a empezar: falta restart o sobra Start");
@@ -264,7 +264,7 @@ public final class BoxTreeBuilder {
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
-            // El motor evita cortar dentro del encabezado y después de él (referencia/componentes/heading.md); no se
+            // El motor evita cortar dentro del encabezado y después de él (reference/components/heading.md); no se
             // declara.
             s.breaks().setKeepWithNext(true);
             s.breaks().setKeepTogether(true);
@@ -301,8 +301,8 @@ public final class BoxTreeBuilder {
 
     /**
      * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate margins} en un ítem de {@code Stack} o
-     * {@code Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row}
-     * de una celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se
+     * {@code Grid}, que ya aísla (reference/components/block.md), y un {@code Break} propio, o el de la {@code Row}
+     * de una celda, dentro de una caja que no se parte (reference/common/breaks.md). Lo que llega de una regla no se
      * mira aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
      */
     private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
@@ -336,7 +336,7 @@ public final class BoxTreeBuilder {
 
     /**
      * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un {@code Columns}
-     * (referencia/componentes/columns.md) y un encabezado respeta la jerarquía (referencia/componentes/heading.md).
+     * (reference/components/columns.md) y un encabezado respeta la jerarquía (reference/components/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideColumns && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
@@ -349,7 +349,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Un {@code List item} (referencia/componentes/list.md): su número, que no puede ser de un ítem vacío, y la caja de
+     * Un {@code List item} (reference/components/list.md): su número, que no puede ser de un ítem vacío, y la caja de
      * su marcador, si la lista lo lleva.
      */
     private static void listItem(BuildContext ctx, InlineNode n, Box box, Box list, int number) {
@@ -410,7 +410,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que un encabezado está en su sitio (referencia/componentes/heading.md): fuera de un {@code Page
+     * Comprueba que un encabezado está en su sitio (reference/components/heading.md): fuera de un {@code Page
      * overlay} y sin saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
      * como mucho un nivel respecto al anterior.
      */

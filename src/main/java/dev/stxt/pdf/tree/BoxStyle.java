@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
 
 /**
- * El grupo {@code Box} (referencia/comun/caja.md): el modelo de caja (tamaños, márgenes, relleno y borde) y su aspecto
+ * El grupo {@code Box} (reference/common/box.md): el modelo de caja (tamaños, márgenes, relleno y borde) y su aspecto
  * (fondo, color del borde y esquinas redondeadas), que solo cambia el pintado. No se hereda.
  */
 public final class BoxStyle extends StyleGroup {

@@ -1,8 +1,8 @@
 package dev.stxt.pdf.layout.inline;
 
 /**
- * Numeración de páginas en el texto: {@code {page}} y {@code {pages}} (referencia/comun/cortes.md y
- * referencia/comun/cortes.md). Se resuelve en dos fases:
+ * Numeración de páginas en el texto: {@code {page}} y {@code {pages}} (reference/common/breaks.md y
+ * reference/common/breaks.md). Se resuelve en dos fases:
  *
  * <ol>
  *   <li>Se pagina midiendo cada marcador como un número de prueba de {@value #DIGITS} cifras

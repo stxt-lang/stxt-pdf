@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Un tramo de texto con su formato (referencia/comun/formato-del-texto.md). El texto de una caja es una lista de
+ * Un tramo de texto con su formato (reference/common/text-formatting.md). El texto de una caja es una lista de
  * tramos seguidos; un texto sin formato es un único tramo {@link TextFormat#PLAIN}.
  */
 public record TextRun(String text, TextFormat format) {

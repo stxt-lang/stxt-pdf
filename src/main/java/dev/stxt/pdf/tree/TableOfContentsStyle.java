@@ -3,7 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Leader;
 
 /**
- * Las propiedades de un {@code Table of contents} (referencia/componentes/table-of-contents.md): los niveles que lista
+ * Las propiedades de un {@code Table of contents} (reference/components/table-of-contents.md): los niveles que lista
  * y la guía de sus entradas, que también lleva la guía generada de cada una. No se heredan.
  */
 public final class TableOfContentsStyle extends StyleGroup {

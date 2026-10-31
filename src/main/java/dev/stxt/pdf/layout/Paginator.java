@@ -26,18 +26,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Bucle de paginación (referencia/comun/cortes.md): maqueta la raíz una vez por página, desde el
+ * Bucle de paginación (reference/common/breaks.md): maqueta la raíz una vez por página, desde el
  * {@link BreakToken} de la anterior, hasta que vuelve como {@code null}.
  *
  * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
  * y se repiten en las páginas que dice su {@code Pages}, todas por defecto
- * (referencia/componentes/frame-and-overlays.md). Su containing block es el área útil.</p>
+ * (reference/components/frame-and-overlays.md). Su containing block es el área útil.</p>
  *
  * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
  * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se
  * vuelve a paginar con las suyas.</p>
  *
- * <p>Las referencias a la página de otra caja ({@code {page of: id}}, referencia/comun/referencias.md) se resuelven
+ * <p>Las referencias a la página de otra caja ({@code {page of: id}}, reference/common/references.md) se resuelven
  * paginando hasta que converjan: cada pasada supone una página para cada caja referida (la
  * primera, un número de prueba), maqueta con ella y mira dónde ha quedado la caja; si no coincide,
  * se vuelve a paginar con la que ha salido. Termina cuando coinciden, o con
@@ -48,7 +48,7 @@ public final class Paginator {
 
     /**
      * Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables
-     * (referencia/comun/referencias.md).
+     * (reference/common/references.md).
      */
     static final int MAX_REFERENCE_PASSES = 10;
 
@@ -60,7 +60,7 @@ public final class Paginator {
 
     /**
      * Pagina el documento: cada sección desde su primera página, con su {@link PageSetup}, y sus {@code Page overlay} y
-     * los del documento (referencia/componentes/document.md). Las referencias convergen para todo el documento a la
+     * los del documento (reference/components/document.md). Las referencias convergen para todo el documento a la
      * vez.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
@@ -148,7 +148,7 @@ public final class Paginator {
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
                 // Pages cuenta dentro del alcance donde se declara: el documento o la sección
-                // (referencia/componentes/document.md).
+                // (reference/components/document.md).
                 List<Queued> queue = new ArrayList<>();
                 if (section.inheritPageOverlays()) {
                     documentPageOverlays.forEach(b -> queue.add(new Queued(new PendingOverlay(b, 0, 0), number,
@@ -170,7 +170,7 @@ public final class Paginator {
             }
             if (flow.blankAfter()[k]) {
                 // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Page
-                // overlay (referencia/componentes/document.md).
+                // overlay (reference/components/document.md).
                 int number = pages.size() + 1;
                 Rect area = section.pageSetup().pageArea();
                 Fragment empty = new Fragment(section.box(), 0, 0, area.width(), area.height(), Insets.ZERO,
@@ -184,7 +184,7 @@ public final class Paginator {
 
     /**
      * Las secciones que acaban con una página en blanco: las que dejan la siguiente, con {@code Begin on: odd}, en una
-     * página física par (referencia/componentes/document.md).
+     * página física par (reference/components/document.md).
      */
     private boolean[] blankAfter(List<Section> sections, List<List<LayoutResult>> results) {
         boolean[] blank = new boolean[sections.size()];
@@ -211,7 +211,7 @@ public final class Paginator {
 
     /**
      * Los {@code Page overlay} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
-     * (referencia/componentes/frame-and-overlays.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
+     * (reference/components/frame-and-overlays.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
      * sale en su resultado y se coloca después.
      */
     private List<Fragment> placePageOverlays(List<Queued> queue, Section section, boolean numbered, int printed, String page,
@@ -239,7 +239,7 @@ public final class Paginator {
 
     /**
      * Un texto con {@code {page}} o {@code {pages}} en una página sin número: no hay qué escribir y no se
-     * deja en blanco (referencia/componentes/document.md).
+     * deja en blanco (reference/components/document.md).
      */
     private static void unavailable(Box box) {
         Box found = withPageNumbers(box);
@@ -278,8 +278,8 @@ public final class Paginator {
     }
 
     /**
-     * La página en que empieza cada caja referida: la de su primer fragmento (referencia/comun/referencias.md), con su
-     * número impreso (referencia/componentes/document.md). Una caja que no sale en ninguna página (no debería pasar:
+     * La página en que empieza cada caja referida: la de su primer fragmento (reference/common/references.md), con su
+     * número impreso (reference/components/document.md). Una caja que no sale en ninguna página (no debería pasar:
      * las cajas con {@code Page overlay} se rechazan al construir el árbol) o que está en una página sin número es un
      * error.
      */
@@ -353,7 +353,7 @@ public final class Paginator {
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
                     throw new InternalException("Sin progreso en la página " + (pages + results.size() + 1)
-                            + ": se ha incumplido la garantía de progreso (referencia/comun/cortes.md)");
+                            + ": se ha incumplido la garantía de progreso (reference/common/breaks.md)");
                 }
                 results.add(r);
                 int section0 = k;

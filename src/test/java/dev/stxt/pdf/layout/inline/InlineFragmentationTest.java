@@ -71,7 +71,7 @@ class InlineFragmentationTest {
     @Test
     void orphansAreRelaxedBeforeKeeps() {
         // Cortar antes de P incumpliría el Keep with next de T; dejar una huérfana es menos grave
-        // (referencia/comun/cortes.md).
+        // (reference/common/breaks.md).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tKeep with next: true",
                 "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
@@ -107,7 +107,7 @@ class InlineFragmentationTest {
 
     /**
      * Un texto con Height: 150 llega al final de la página 1 (100), pero sus 8 líneas solo consumen 96: en la 2 le
-     * quedan 54 para las 2 líneas que siguen (referencia/comun/cortes.md).
+     * quedan 54 para las 2 líneas que siguen (reference/common/breaks.md).
      */
     @Test
     void theHeightOfATextIsTheTotal() {

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * El bloque {@code Areas} de un grid ya interpretado (referencia/componentes/grid.md): una fila de la
+ * El bloque {@code Areas} de un grid ya interpretado (reference/components/grid.md): una fila de la
  * rejilla por línea, nombres separados por espacios y {@code .} para una celda vacía. Cada nombre
  * debe formar un rectángulo.
  *

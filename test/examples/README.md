@@ -10,9 +10,9 @@ Cada carpeta tiene:
 | Fichero | Qué es |
 |---|---|
 | `input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
-| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`For element: Document`), en un [documento de estilos aparte](../../docs/referencia/comun/estilos.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
+| `styles.stxt` | Las reglas de `Styles` y la tipografía base (`For element: Document`), en un [documento de estilos aparte](../../docs/es/reference/common/styles.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura. |
 | `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
-| `expected.stxt` | El [volcado](../../docs/referencia/implementacion/pruebas.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
+| `expected.stxt` | El [volcado](../../docs/es/reference/implementation/testing.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
 | `output.pdf` | El PDF, para abrirlo desde el repositorio. Se reescribe con `-Dexamples.update=true` y no se compara: lleva la fecha y un identificador. |
 
 Los ejemplos los ejecuta `ExamplesTest` con `mvn test`: comprueba que el documento se lee y se
@@ -91,15 +91,15 @@ Lo que se repite en varios ejemplos y cómo se resuelve:
   `In table of contents: false`, para que no salgan en él (ejemplos 04 y 09).
 - **Esquinas, degradados y opacidad.** `Corner radius` redondea el fondo y el borde de su caja, y la caja recorta por
   su curva los fondos, los bordes y las imágenes de lo que contiene
-  ([La caja](../../docs/referencia/comun/caja.md#esquinas)). Un color por lado (`Border color`) y la franja de un aviso (`Border: 0 0 0 3`)
+  ([La caja](../../docs/es/reference/common/box.md#esquinas)). Un color por lado (`Border color`) y la franja de un aviso (`Border: 0 0 0 3`)
   se combinan con un radio solo en el lado contrario (`Corner radius: 0 4 4 0`). Un degradado con un extremo
   transparente (04) funde una imagen con el color de lo que hay debajo sin tocar la imagen. Sin sombras
-  ([La caja](../../docs/referencia/comun/caja.md#lo-que-no-hay)): las fichas del catálogo llevan un filete.
+  ([La caja](../../docs/es/reference/common/box.md#lo-que-no-hay)): las fichas del catálogo llevan un filete.
 - **Lo girado** es una caja con `Rotate`. La etiqueta en diagonal del catálogo (09) es un `Overlay`, y el número
   vertical del certificado (10), un `Page overlay` girado −90 grados alrededor de su esquina de arriba a la izquierda
   (`Rotate origin: top left`), así que su `Offset` es el de esa esquina y la caja sube desde ella. Un posicionado
   girado no cambia el layout. El sello del certificado es una `Image` en flujo, que ocupa el rectángulo que la envuelve
-  girada ([Capas y giro](../../docs/referencia/comun/capas-y-giro.md#giro-rotate)). Lo girado tiene que caber en la
+  girada ([Capas y giro](../../docs/es/reference/common/layers-and-rotation.md#giro-rotate)). Lo girado tiene que caber en la
   página: si no, es un error.
 - **Lo vectorial es SVG**: los logotipos (01, 02, 07, 09), las firmas (02, 07, 10), el sello
   (10), los tres gráficos del informe (04), el emblema y el adorno de la carta (06) y el termostato y el

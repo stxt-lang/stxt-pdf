@@ -30,7 +30,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
- * Layout {@code stack} (referencia/componentes/stack.md). Los ocho pasos:
+ * Layout {@code stack} (reference/components/stack.md). Los ocho pasos:
  * <ol>
  *   <li>Espacio disponible en el eje principal.</li>
  *   <li>Base de cada ítem: {@code Base size}, el tamaño declarado o el ancho natural.</li>
@@ -56,7 +56,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * <p>Simplificación: en vertical, el mínimo automático de un ítem con {@code Height}
  * declarado es ese alto, no el de su contenido.</p>
  *
- * <p>Entre páginas (referencia/comun/cortes.md) se corta entre líneas en horizontal y entre ítems en
+ * <p>Entre páginas (reference/common/breaks.md) se corta entre líneas en horizontal y entre ítems en
  * vertical, con {@link UnitBreaker}; una línea (en vertical, un ítem) que no cabe en
  * una página se parte en paralelo. Un contenedor vertical con {@code Wrap} no se parte.</p>
  */
@@ -68,7 +68,7 @@ public final class StackLayout implements LayoutAlgorithm {
         this.context = context;
     }
 
-    /** Tabla de referencia/comun/caja.md. */
+    /** Tabla de reference/common/box.md. */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
@@ -161,7 +161,7 @@ public final class StackLayout implements LayoutAlgorithm {
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
-            // Base de los porcentajes: la caja de contenido en el eje de cada hueco (referencia/comun/valores.md).
+            // Base de los porcentajes: la caja de contenido en el eje de cada hueco (reference/common/values.md).
             double columnGap = s.stack().columnGap().resolve(contentWidth).orElse(0);
             double rowGap = s.stack().rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
@@ -309,7 +309,7 @@ public final class StackLayout implements LayoutAlgorithm {
                     : is.box().maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.box().minWidth().isAuto()) {
-                // Mínimo automático (referencia/componentes/stack.md): el ancho más estrecho de su contenido, sin pasar de Max
+                // Mínimo automático (reference/components/stack.md): el ancho más estrecho de su contenido, sin pasar de Max
                 // width, y nunca más que el ancho declarado.
                 double content = Math.min(context.contentIntrinsic(b).narrowest() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
@@ -345,7 +345,7 @@ public final class StackLayout implements LayoutAlgorithm {
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
             double min;
             if (is.box().minHeight().isAuto()) {
-                // Mínimo automático (referencia/componentes/stack.md): el alto de su contenido, sin pasar de Max height,
+                // Mínimo automático (reference/components/stack.md): el alto de su contenido, sin pasar de Max height,
                 // y nunca más que el alto declarado.
                 double content = sized.height().isPresent()
                         ? context.layout(b, measure.measuringContentHeight(), null).fragment().height()
@@ -480,7 +480,7 @@ public final class StackLayout implements LayoutAlgorithm {
 
     /**
      * Reparto del sobrante {@code free} entre {@code n} elementos (tabla del eje principal,
-     * referencia/componentes/stack.md). Si falta sitio, {@code justify} se alinea al principio y {@code around} y
+     * reference/components/stack.md). Si falta sitio, {@code justify} se alinea al principio y {@code around} y
      * {@code distribute} se centran, como en CSS.
      *
      * @return {antes del primero, extra entre elementos}

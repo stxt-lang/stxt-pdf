@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Reparto del alto, el borde y el relleno entre fragmentos (referencia/comun/cortes.md). Todas las
+ * Reparto del alto, el borde y el relleno entre fragmentos (reference/common/breaks.md). Todas las
  * cajas tienen borde 1 y relleno 4: 5 pt de decoración arriba y 5 abajo.
  */
 class SliceTest {

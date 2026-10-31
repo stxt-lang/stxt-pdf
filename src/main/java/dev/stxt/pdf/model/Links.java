@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * El destino de un enlace (referencia/comun/enlaces.md): una URL de fuera ({@code https://…},
+ * El destino de un enlace (reference/common/links.md): una URL de fuera ({@code https://…},
  * {@code http://…} o {@code mailto:…}) o el {@code Id} de una caja del documento ({@code #id}).
  * Cualquier otra cosa se rechaza: el motor no abre nada, solo escribe la anotación del PDF, y un
  * visor no debe encontrarse con {@code javascript:}, {@code file:} ni una ruta relativa.

@@ -3,7 +3,7 @@ package dev.stxt.pdf.model;
 import java.util.regex.Pattern;
 
 /**
- * Los colores del documento (referencia/comun/valores.md): {@code #RGB}, {@code #RGBA}, {@code #RRGGBB}
+ * Los colores del documento (reference/common/values.md): {@code #RGB}, {@code #RGBA}, {@code #RRGGBB}
  * o {@code #RRGGBBAA}, con el último par (o dígito) como opacidad. Un color sigue siendo el texto
  * que escribió el autor; aquí se valida y se pasa a componentes.
  */

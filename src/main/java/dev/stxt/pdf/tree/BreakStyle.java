@@ -4,7 +4,7 @@ import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Edges;
 
 /**
- * El grupo {@code Break} (referencia/comun/cortes.md): los saltos de página o de columna antes y después de la caja, lo
+ * El grupo {@code Break} (reference/common/breaks.md): los saltos de página o de columna antes y después de la caja, lo
  * que se mantiene junto ({@code Keep with next}, {@code Keep with previous}, {@code Keep together}) y su decoración en
  * un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
  */

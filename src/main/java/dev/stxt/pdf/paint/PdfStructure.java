@@ -50,34 +50,34 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Significado del documento en el PDF (referencia/implementacion/pdf.md): el árbol de estructura del PDF
+ * Significado del documento en el PDF (reference/implementation/pdf.md): el árbol de estructura del PDF
  * etiquetado y los marcadores (<em>outline</em>) de los encabezados.
  *
  * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
  * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P} para {@code Paragraph}
  * y para {@code Text} ({@code Span} si es parte del texto de un encabezado), {@code L} y {@code LI} para las listas y
- * sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, referencia/componentes/list.md), {@code
+ * sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, reference/components/list.md), {@code
  * Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y {@code TD} para las tablas
- * (referencia/componentes/table.md), {@code Figure} para las imágenes con {@code Alt} (con su texto alternativo y su
- * {@code BBox}, referencia/componentes/image.md) y {@code Div} para el resto, también un {@code Columns}
- * (referencia/componentes/columns.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
+ * (reference/components/table.md), {@code Figure} para las imágenes con {@code Alt} (con su texto alternativo y su
+ * {@code BBox}, reference/components/image.md) y {@code Div} para el resto, también un {@code Columns}
+ * (reference/components/columns.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
  * contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del elemento de su caja; una caja partida
  * entre páginas tiene contenido en varias. Los fondos, los bordes, las imágenes sin {@code Alt} (decorativas) y los
  * {@code Page overlay} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
  *
- * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, referencia/comun/tipografia.md) es
+ * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, reference/common/typography.md) es
  * el {@code Lang} de su elemento, que heredan los de dentro.</p>
  *
  * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
  * información del documento, a los metadatos XMP y al catálogo.</p>
  *
- * <p>Un enlace (referencia/implementacion/pdf.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación
+ * <p>Un enlace (reference/implementation/pdf.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación
  * del PDF como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del elemento
  * de la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de texto ({@code
  * [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto, uno por enlace y fragmento
  * aunque ocupe varias líneas.</p>
  *
- * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, referencia/comun/errores.md), que
+ * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, reference/common/errors.md), que
  * llevan a la esquina superior izquierda de su primer fragmento ({@link PdfDestinations}).</p>
  */
 final class PdfStructure {
@@ -121,14 +121,14 @@ final class PdfStructure {
     /** Los tipos que no están en el espacio de nombres de PDF 2.0: se quedan en el de PDF 1.7, el de omisión. */
     private static final Set<String> PDF_1_7_ONLY = Set.of("TOC", "TOCI", "Reference");
 
-    /** La parte de PDF/UA que cumple el PDF: 1 o 2 (referencia/implementacion/pdf.md). */
+    /** La parte de PDF/UA que cumple el PDF: 1 o 2 (reference/implementation/pdf.md). */
     private final int ua;
     /** Con PDF/UA-2, el espacio de nombres de PDF 2.0 de los elementos; con PDF/UA-1, {@code null}. */
     private final COSDictionary pdf2;
     /** Con PDF/UA-2, el {@code TOCI} de cada entrada de índice, que señala con {@code Ref} a su encabezado. */
     private final Map<Box, PDStructureElement> entries = new HashMap<>();
 
-    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (referencia/componentes/document.md). */
+    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (reference/components/document.md). */
     private final Box root;
 
     private PDPage page;
@@ -270,7 +270,7 @@ final class PdfStructure {
         }
         if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
                 && !PageNumbers.contains(box.text())) {
-            // Las mayúsculas son solo de pintado (referencia/comun/formato-del-texto.md): el texto de la estructura es
+            // Las mayúsculas son solo de pintado (reference/common/text-formatting.md): el texto de la estructura es
             // el escrito. Si lleva números de página o referencias, el texto cambia con la página y no se puede dar.
             e.setActualText(box.text());
         }
@@ -282,7 +282,7 @@ final class PdfStructure {
     }
 
     /**
-     * Si la caja tiene {@code Link} (referencia/implementacion/pdf.md), el {@code Link} que envuelve su contenido (su
+     * Si la caja tiene {@code Link} (reference/implementation/pdf.md), el {@code Link} que envuelve su contenido (su
      * texto y sus hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción:
      * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
      */
@@ -315,7 +315,7 @@ final class PdfStructure {
     }
 
     /**
-     * Una tabla (referencia/componentes/table.md): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
+     * Una tabla (reference/components/table.md): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
      * {@code TFoot}, una {@code TR} por fila. Cada celda es {@code TH} (con {@code Scope:
      * Column}) en la cabecera y {@code TD} en el resto, con {@code RowSpan} y {@code ColSpan} si
      * ocupa más de una fila o columna. Las celdas de la cabecera y el pie, y lo que contienen, se
@@ -531,7 +531,7 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta la zona de una caja con {@code Link} (referencia/implementacion/pdf.md): la
+     * Etiqueta la zona de una caja con {@code Link} (reference/implementation/pdf.md): la
      * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
      * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. Donde la caja no es
      * contenido, el enlace va al {@code Link} que la sustituye en su sitio ({@link #standIns}) o, en las filas

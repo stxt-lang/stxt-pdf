@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** La numeración de los encabezados, {@code Numbered} (referencia/componentes/heading.md), al construir el árbol. */
+/** La numeración de los encabezados, {@code Numbered} (reference/components/heading.md), al construir el árbol. */
 class HeadingNumbersTest {
 
     /** Lo que {@code For element: Document} añade para numerar todos los encabezados. */

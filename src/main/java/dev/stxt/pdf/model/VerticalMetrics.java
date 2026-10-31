@@ -2,7 +2,7 @@ package dev.stxt.pdf.model;
 
 /**
  * Ascendente y descendente de una fuente, en fracciones del cuerpo (los dos positivos). Colocan
- * la línea base dentro de una línea (referencia/comun/tipografia.md).
+ * la línea base dentro de una línea (reference/common/typography.md).
  */
 public record VerticalMetrics(double ascent, double descent) {
 

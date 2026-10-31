@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 /**
- * Vuelca el resultado del layout en STXT (referencia/implementacion/pruebas.md). Es el formato de los tests de
+ * Vuelca el resultado del layout en STXT (reference/implementation/testing.md). Es el formato de los tests de
  * referencia: rectángulos de caja de borde en coordenadas absolutas de página, en pt.
  *
  * <pre>
@@ -31,7 +31,7 @@ public final class StxtDump {
         StringBuilder sb = new StringBuilder("Result:\n");
         for (Page p : pages) {
             // Las coordenadas son las de la página, con el área útil del medio de su sección
-            // (referencia/componentes/document.md).
+            // (reference/components/document.md).
             Rect pageArea = p.pageSetup().pageArea();
             sb.append("\tPage: ").append(p.number()).append('\n');
             dumpChildren(sb, p.content(), pageArea.x(), pageArea.y(), 2, includeWithoutId);

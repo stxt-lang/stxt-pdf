@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  * <p>Cada carpeta tiene {@code input.stxt}, que debe validar y maquetarse sin errores, y puede
  * tener {@code styles.stxt}, el documento de estilos aparte que se pasa junto a él
- * (referencia/comun/estilos.md); el volcado de las cajas con {@code Id} ({@code expected.stxt},
- * referencia/implementacion/pruebas.md), que se compara con tolerancia de 0.01 pt; una imagen por página ({@code
+ * (reference/common/styles.md); el volcado de las cajas con {@code Id} ({@code expected.stxt},
+ * reference/implementation/testing.md), que se compara con tolerancia de 0.01 pt; una imagen por página ({@code
  * page-N.png}, versionadas) y el PDF ({@code output.pdf}, versionado para poder abrirlo desde el repositorio, pero no
  * se compara: lleva la fecha y un identificador que cambian en cada ejecución). El PDF y las imágenes nuevas se
  * escriben en {@code target/reference/examples/}, y si alguna imagen no es la versionada el ejemplo falla.</p>

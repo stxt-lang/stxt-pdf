@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * La página de un PDF como imagen (referencia/componentes/image.md): un formulario con su contenido, su texto y su
+ * La página de un PDF como imagen (reference/components/image.md): un formulario con su contenido, su texto y su
  * giro, sin el etiquetado de su PDF, que se etiqueta como la {@code Image} que lo dibuja.
  */
 class PdfPagesTest {

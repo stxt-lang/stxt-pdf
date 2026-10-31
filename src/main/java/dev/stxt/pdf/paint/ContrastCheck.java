@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * La comprobación del contraste del texto con su fondo (referencia/comun/pdf.md): un lienzo que no dibuja,
+ * La comprobación del contraste del texto con su fondo (reference/common/pdf.md): un lienzo que no dibuja,
  * sino que apunta lo que se pinta en cada página, en el mismo orden que los demás ({@link StackingContext}), y en cada
  * tramo de texto mira qué hay debajo de su primera letra. El contraste es el de las pautas WCAG (nivel AA): al menos
  * {@link #NORMAL}, o {@link #LARGE} en el texto grande.

@@ -84,14 +84,14 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Motor con esas métricas del texto y las imágenes de {@code resources} (referencia/componentes/image.md), con los
+     * Motor con esas métricas del texto y las imágenes de {@code resources} (reference/components/image.md), con los
      * {@link Limits#DEFAULT}.
      */
     public Engine(TextMeasurer measurer, Resources resources) {
         this(measurer, resources, Limits.DEFAULT);
     }
 
-    /** Motor con esas métricas, esas imágenes y esos {@link Limits} (referencia/comun/limites.md). */
+    /** Motor con esas métricas, esas imágenes y esos {@link Limits} (reference/common/limits.md). */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits) {
         this(measurer, resources, limits, Set.of());
     }
@@ -130,7 +130,7 @@ public final class Engine implements LayoutContext {
     /**
      * Como {@link #layOutDocument(InlineNode)}, con un documento de estilos aparte
      * ({@link dev.stxt.pdf.stxt.DocumentReader#readStyles}), cuyas reglas valen menos que las del
-     * propio documento (referencia/comun/estilos.md). {@code styles} puede ser {@code null}.
+     * propio documento (reference/common/styles.md). {@code styles} puede ser {@code null}.
      */
     public LaidOutDocument layOutDocument(InlineNode document, InlineNode styles) {
         return layOutDocument(new BoxTreeBuilder().build(document, styles));
@@ -138,7 +138,7 @@ public final class Engine implements LayoutContext {
 
     /**
      * Como {@link #layOutDocument(InlineNode)}, con el árbol ya construido. Sirve para retocar el árbol antes de
-     * maquetarlo (los tests ponen así tramos con formato en un texto, referencia/comun/formato-del-texto.md); el árbol
+     * maquetarlo (los tests ponen así tramos con formato en un texto, reference/common/text-formatting.md); el árbol
      * no se puede cambiar después.
      */
     public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
@@ -189,7 +189,7 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Lo que valen las referencias a otras cajas en los textos (referencia/comun/referencias.md): la página de cada
+     * Lo que valen las referencias a otras cajas en los textos (reference/common/references.md): la página de cada
      * caja referida con {@code {page of: id}}, que el {@link Paginator} supone y comprueba, y su número con {@code
      * {number of: id}}. Cambian las medidas de {@code changed}, los textos cuyas referencias valen otra cosa que en la
      * pasada anterior: se olvida lo que la caché guarda de ellos y de sus antepasados.
@@ -231,7 +231,7 @@ public final class Engine implements LayoutContext {
      * {@inheritDoc}
      *
      * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría
-     * sin contenedor: su {@code Width} o, si no lo tiene, su ancho natural (referencia/comun/capas-y-giro.md). Los
+     * sin contenedor: su {@code Width} o, si no lo tiene, su ancho natural (reference/common/layers-and-rotation.md). Los
      * porcentajes cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
      */
     @Override
@@ -256,10 +256,10 @@ public final class Engine implements LayoutContext {
 
     /**
      * Layout de una caja con su algoritmo. Si la caja es el containing block de cajas
-     * {@code absolute} de su interior, las resuelve al terminar (referencia/componentes/frame-and-overlays.md).
+     * {@code absolute} de su interior, las resuelve al terminar (reference/components/frame-and-overlays.md).
      *
      * <p>Si la caja termina en esta página y solo se salen de ella su borde y su relleno
-     * inferiores, se repite el layout con ese espacio reservado (referencia/comun/cortes.md): la caja termina dentro
+     * inferiores, se repite el layout con ese espacio reservado (reference/common/breaks.md): la caja termina dentro
      * de la página o se corta antes, y el final pasa a la siguiente con el borde y el relleno.</p>
      *
      * <p>Una caja con {@code Rotate} no se parte, como una imagen: se maqueta sin fragmentación y,
@@ -272,7 +272,7 @@ public final class Engine implements LayoutContext {
             return rotatedInFlow(box, space);
         }
         if (space.fragmenting() && box.style().rotation() != null) {
-            // Una caja girada no se parte (referencia/comun/cortes.md): entera o, si no cabe, en la página siguiente.
+            // Una caja girada no se parte (reference/common/breaks.md): entera o, si no cabe, en la página siguiente.
             LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
             if (!space.atFragmentainerStart()
                     && !fits(whole.fragment().height(), space.fragmentainerRemaining().getAsDouble())) {
@@ -294,7 +294,7 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Una caja girada en flujo (referencia/comun/capas-y-giro.md): se maqueta sin girar con su ancho, que no depende
+     * Una caja girada en flujo (reference/common/layers-and-rotation.md): se maqueta sin girar con su ancho, que no depende
      * del contenedor ({@link #turnedWidth}), y ocupa el rectángulo que envuelve su caja de borde girada sobre su
      * centro. No se parte: entera o, si no cabe en lo que queda de página, en la siguiente. Aísla los márgenes: no
      * salen de ella los de sus hijos.
@@ -360,7 +360,7 @@ public final class Engine implements LayoutContext {
 
     /** El algoritmo de la caja: el de su {@code Layout} o, si es una tabla, el de las tablas. */
     private LayoutAlgorithm algorithm(Box box) {
-        // Una tabla es un grid que repite su cabecera y su pie en cada página (referencia/componentes/table.md).
+        // Una tabla es un grid que repite su cabecera y su pie en cada página (reference/components/table.md).
         return box.element() == Element.TABLE ? table : algorithms.get(box.style().layout());
     }
 

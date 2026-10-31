@@ -20,12 +20,12 @@ import java.util.OptionalDouble;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Layout de una {@code Image} (referencia/componentes/image.md): una caja sin hijos con el tamaño y la
+ * Layout de una {@code Image} (reference/components/image.md): una caja sin hijos con el tamaño y la
  * proporción del fichero, como un elemento reemplazado de CSS. El tamaño lo resuelve
  * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, que también usan los padres stack, grid
  * y absolute para medirla; aquí solo se coloca.
  *
- * <p>No se parte entre páginas (referencia/comun/cortes.md): si no cabe en lo que queda de página, corta antes de
+ * <p>No se parte entre páginas (reference/common/breaks.md): si no cabe en lo que queda de página, corta antes de
  * ella ({@link BreakToken#BEFORE}) y pasa entera a la siguiente; al principio de una página se
  * coloca aunque no quepa, y es {@code PAGE_OVERFLOW}.</p>
  */

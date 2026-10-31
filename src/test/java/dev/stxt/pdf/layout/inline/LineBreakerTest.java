@@ -185,7 +185,7 @@ class LineBreakerTest {
         assertEquals(new TextLine(0, 0, 20, 12, "uno dos tres", 2.5, l.runs()), l);
     }
 
-    // --- Interletraje y versalitas (referencia/comun/tipografia.md)
+    // --- Interletraje y versalitas (reference/common/typography.md)
     // ----------------------------------------------------
 
     @Test

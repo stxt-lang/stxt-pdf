@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades del elemento {@code Stack} (referencia/componentes/stack.md): el eje, el reparto y el hueco entre ítems
+ * Las propiedades del elemento {@code Stack} (reference/components/stack.md): el eje, el reparto y el hueco entre ítems
  * y líneas. No se heredan.
  */
 public final class StackStyle extends StyleGroup {

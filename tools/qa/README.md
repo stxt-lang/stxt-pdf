@@ -2,7 +2,7 @@
 
 Programas sueltos (paquete por defecto) que miden el rendimiento, el comportamiento con varios hilos y las entradas
 hostiles del motor. No son tests: miden y comparan, y sirven para repetir las mediciones antes y después de un cambio.
-Los límites de [`docs/referencia/comun/limites.md`](../../docs/referencia/comun/limites.md) se eligieron con `BombsProbe`.
+Los límites de [`docs/es/reference/common/limits.md`](../../docs/es/reference/common/limits.md) se eligieron con `BombsProbe`.
 
 Desde la raíz del repositorio (`resources/` y `test/` se leen relativos al directorio de trabajo):
 
