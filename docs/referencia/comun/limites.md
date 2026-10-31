@@ -15,7 +15,7 @@ al convertir ([Uso desde Java](../implementacion/api.md#límites)):
 
 Los valores por defecto son los de un servicio con poca memoria. Un PNG con transparencia necesita unos 4 bytes por píxel
 al decodificarse (25 Mpx son 100 MB), una página más tarda lo que su contenido, y un SVG de 300 000 rectángulos tarda
-unos 5 s; subir los límites sube también la memoria que hay que reservar a cada conversión. Un SVG de 1 KB con 5 niveles de
+unos 5 s. Subir los límites sube también la memoria que hay que reservar a cada conversión. Un SVG de 1 KB con 5 niveles de
 `<use>` de 10 copias cada uno son 111 111 elementos. Un SVG con más de 15 niveles de `<use>` anidados no se puede dibujar
 aunque cumpla estos límites (`IMAGE_FORMAT`), y un `<use>` circular tampoco. Un PDF se lee entero al abrirlo, aunque
 solo se dibuje una de sus páginas: para una página de un PDF grande, lo mejor es un PDF con solo esa página.

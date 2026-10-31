@@ -6,7 +6,7 @@ está en [El PDF por dentro](../implementacion/pdf.md).
 ## Páginas
 
 Cada página tiene el tamaño del `Page` de su sección ([Document](../componentes/document.md#page)). El visor muestra el
-número impreso de cada página (el de `{page}`, también en romanos), no su posición en el fichero, y ninguno en las
+número impreso de cada página (el de `{page}`, también en romanos) en lugar de su posición en el fichero, y ninguno en las
 páginas sin número. Una página en blanco de `Begin on: odd` muestra el número que le toca, aunque no lo imprima.
 
 ## Fuentes
@@ -24,7 +24,7 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
   como figuras y un `Table of contents` como un índice.
 - **Decoración:** los fondos, los bordes, las rayas del texto, las guías de un índice, las líneas entre columnas, las
   imágenes sin `Alt`, las filas repetidas de una tabla y todo lo que hay en un `Page overlay` no se leen.
-- **Idioma:** el `Language` de `Document` es el de todo el contenido; una caja que declara otro se lee con ese
+- **Idioma:** el `Language` de `Document` es el de todo el contenido. Una caja que declara otro se lee con ese
   ([Tipografía](tipografia.md#idioma-language)).
 - **Texto que se lee:** el escrito, también con `Case` y `Small caps`
   ([Formato del texto](formato-del-texto.md#mayúsculas-case)), y las palabras de dos líneas seguidas no se pegan al
@@ -34,8 +34,8 @@ pantalla y lo que da el texto al copiarlo o al cambiar el tamaño de la vista.
 
 `Title` y `Language` son obligatorios en `Document` ([Document](../componentes/document.md#title-y-language)), así que todo
 PDF declara cumplir **PDF/UA-1**, la norma de PDF accesible. Quien convierte puede pedir **PDF/UA-2**, su versión nueva, que
-escribe un PDF 2.0 ([Uso desde Java](../implementacion/api.md#convertir); qué cambia por dentro, en
-[El PDF por dentro](../implementacion/pdf.md#pdfua-2)). Los tests comprueban los dos con veraPDF.
+escribe un PDF 2.0 ([Uso desde Java](../implementacion/api.md#convertir)). Qué cambia por dentro está en
+[El PDF por dentro](../implementacion/pdf.md#pdfua-2). Los tests comprueban los dos con veraPDF.
 
 > **Decisión:** `Title` y `Language` son obligatorios: el idioma es lo que un lector de pantalla necesita para leer el
 > contenido, y PDF/UA exige los dos. *Alternativa descartada:* dejarlos opcionales y no declarar PDF/UA sin ellos.
@@ -56,19 +56,20 @@ de siempre, la línea de la caja).
   imagen.
 - Se comprueba todo el texto que se pinta, también el de un `Page overlay` y el de las entradas de un índice.
 
-Quien convierte puede desactivarla ([Uso desde Java](../implementacion/api.md#convertir)); por defecto está activa.
+Quien convierte puede desactivar la comprobación ([Uso desde Java](../implementacion/api.md#convertir)). Por defecto
+está activa.
 
-> **Decisión:** el contraste se mira en lo que se pinta, no en el árbol de cajas: un texto sobre una caja que no es la suya
+> **Decisión:** el contraste se mira en lo que se pinta y no en el árbol de cajas: un texto sobre una caja que no es la suya
 > (un `Overlay` encima de un fondo) tiene debajo ese fondo. *Alternativa descartada:* mirar solo los fondos de la caja y
 > de las de fuera, que daba por blanco lo que hay debajo de un `Overlay` sobre una foto.
 
 > **Decisión:** el texto sobre una imagen no se comprueba. *Alternativa descartada:* tratarlo como un error, que impide la
 > portada con el título sobre una foto aunque se lea bien.
 
-> **Decisión:** se mira el punto donde empieza cada tramo de texto, no toda su superficie. *Alternativa descartada:* el
+> **Decisión:** se mira el punto donde empieza cada tramo de texto y no toda su superficie. *Alternativa descartada:* el
 > peor color de todo lo que el tramo toca, que obliga a medir el texto y cuenta como fondo el subrayado del propio texto.
 
-> **Decisión:** la comprobación está activa por defecto y se desactiva al convertir, no en el documento. *Alternativa
+> **Decisión:** la comprobación está activa por defecto y se desactiva al convertir y no en el documento. *Alternativa
 > descartada:* una propiedad del documento, que lo dejaría a quien escribe y no a quien publica el PDF.
 
 ## Marcadores

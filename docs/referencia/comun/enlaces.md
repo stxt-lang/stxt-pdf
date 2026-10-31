@@ -18,9 +18,9 @@ Markdown:
 
 ## Destino
 
-Una URL `https://…`, `http://…` o `mailto:…` (con servidor o destinatario), o `#id`: el `Id` de una caja del documento.
+Una URL `https://...`, `http://...` o `mailto:...` (con servidor o destinatario), o `#id`: el `Id` de una caja del documento.
 Cualquier otra cosa es `LINK_SCHEME`, con la línea del `Link` o, en Markdown, la del bloque: un destino vacío, mal escrito,
-sin servidor, con otro esquema (`javascript:`, `file:`, `tel:`…) o una ruta relativa.
+sin servidor, con otro esquema (`javascript:`, `file:` o `tel:`) o una ruta relativa.
 
 > **Decisión:** solo `https`, `http`, `mailto` y `#id`: un PDF no debería llevar un enlace que ejecute o lea algo en quien
 > lo abre. *Alternativa descartada:* cualquier URI, con una lista de esquemas prohibidos.
@@ -36,7 +36,7 @@ encabezado de un `Markdown` es un destino si lleva `{#id}` ([Markdown](../compon
 
 En todos los elementos salvo `Markdown` (su contenido lleva sus propios enlaces) y `Table of contents` (sus entradas ya llevan el
 suyo). Es del elemento, como `Id`: no va en `Box`, `Typography` ni `Break`, ni en las reglas de `Styles`, y no se hereda. Lo
-que hay dentro de una caja con enlace es clicable por ella; si además lleva enlace propio, las dos zonas se solapan y el
+que hay dentro de una caja con enlace es clicable por ella. Si además lleva enlace propio, las dos zonas se solapan y el
 visor decide cuál se activa.
 
 > **Decisión:** el enlace es del elemento: por regla de estilo, todas las cajas con ese estilo llevarían al mismo sitio, y
@@ -46,7 +46,7 @@ visor decide cuál se activa.
 
 Un enlace no cambia el aspecto de lo que enlaza: el color y el subrayado los da el autor con su estilo. La excepción es el
 enlace de Markdown, que sale **subrayado** sin cambiar el color, porque no hay otra manera de dar estilo a una parte de una
-línea; se puede combinar con negrita y cursiva (`[la **web**](…)`). El enlace es una marca más del tramo
+línea. Se puede combinar con negrita y cursiva (`[la **web**](...)`). El enlace es una marca más del tramo
 ([Formato del texto](formato-del-texto.md#tramos)): no cambia cómo se miden las palabras ni las líneas.
 
 > **Decisión:** sin aspecto por defecto, salvo el subrayado del de Markdown. *Alternativa descartada:* azul y subrayado
@@ -55,18 +55,17 @@ línea; se puede combinar con negrita y cursiva (`[la **web**](…)`). El enlace
 ## Zonas
 
 La zona clicable de una caja con `Link` es su **caja de borde**, en cada página por la que pasa. La de un enlace de
-Markdown es el rectángulo de cada trozo de cada línea, del alto de la línea; dos tramos seguidos con el mismo destino (una
-parte en negrita dentro de un enlace) son una zona. Un `Page overlay` con `Link` es clicable en todas las páginas; las filas
+Markdown es el rectángulo de cada trozo de cada línea, del alto de la línea. Dos tramos seguidos con el mismo destino (una
+parte en negrita dentro de un enlace) son una zona. Un `Page overlay` con `Link` es clicable en todas las páginas, y las filas
 repetidas de una tabla, también.
 
 ## Accesibilidad
 
-Un lector de pantalla anuncia cada enlace una vez, aunque ocupe varias líneas, con lo que enlaza: el texto de la caja (los
-de un `Block`, unidos por espacios; el número de página de una entrada de índice no cuenta) o el `Alt` de una imagen; sin
-texto, el destino. El de un `Page overlay` o el de las filas repetidas de una tabla también se anuncia una vez, en su sitio del
+Un lector de pantalla anuncia cada enlace una vez, aunque ocupe varias líneas, con lo que enlaza: el texto de la caja (en
+un `Block`, los de dentro unidos por espacios, sin el número de página de una entrada de índice) o el `Alt` de una
+imagen. Sin texto, anuncia el destino. El de un `Page overlay` o el de las filas repetidas de una tabla también se anuncia una vez, en su sitio del
 documento, aunque sea clicable en todas las páginas. Los enlaces se recorren con el tabulador en el orden de lectura. Cómo
-queda en el PDF:
-[El PDF por dentro](../implementacion/pdf.md#enlaces).
+queda en el PDF: [El PDF por dentro](../implementacion/pdf.md#enlaces).
 
 ## Lo que no hay
 

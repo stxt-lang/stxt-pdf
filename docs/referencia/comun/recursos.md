@@ -16,7 +16,7 @@ Los recursos se buscan **siempre hacia abajo**, desde la raíz de su subcarpeta.
 subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es `resources/images/logos/acme.png`,
 [Image](../componentes/image.md#fichero)). Admite `/` y `\` como separadores y no puede:
 
-- ser absoluta (`/…`, `\…`, `C:…`) ni empezar por `~`;
+- ser absoluta (`/...`, `\...`, `C:...`) ni empezar por `~`;
 - contener un segmento `..`, aunque al normalizarla volviera a quedar dentro;
 - llegar, a través de un enlace simbólico, a un fichero fuera de su subcarpeta.
 
@@ -25,21 +25,21 @@ subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es `resources/image
 
 ## Fuentes
 
-Solo se usan las fuentes TTF de `fonts/`; no hay fuentes del sistema, ni las 14 estándar de PDF, ni fuentes de
+Solo se usan las fuentes TTF de `fonts/`. No hay fuentes del sistema, ni las 14 estándar de PDF, ni fuentes de
 sustitución. La salida PDF las incrusta (solo los glifos usados), de modo que el documento se ve igual en cualquier
-máquina; por eso deben tener una licencia que permita incrustarlas, como la SIL Open Font License. El repositorio incluye
+máquina. Por eso deben tener una licencia que permita incrustarlas, como la SIL Open Font License. El repositorio incluye
 IBM Plex Sans, IBM Plex Serif e IBM Plex Mono, cada una en normal, negrita, cursiva y negrita cursiva.
 
-Cada fichero se identifica por lo que declara su interior, no por su nombre
+Cada fichero se identifica por lo que declara su interior y no por su nombre
 ([detalles](../implementacion/api.md#recursos)):
 
-- **familia:** la que muestran los programas de fuentes (`IBM Plex Sans`, no `IBM Plex Sans Bold`). Se compara
-  exactamente, con mayúsculas y espacios; si solo difiere en mayúsculas, el error lo sugiere
+- **familia:** la que muestran los programas de fuentes (`IBM Plex Sans` y no `IBM Plex Sans Bold`). Se compara
+  exactamente, con mayúsculas y espacios. Si solo difiere en mayúsculas, el error lo sugiere
   (`¿Querías decir 'IBM Plex Sans'?`);
-- **peso:** 400 es el normal y 700 la negrita (`Bold: true`); los ficheros de otros pesos (300, 500…) se ignoran;
+- **peso:** 400 es el normal y 700 la negrita (`Bold: true`), y los ficheros de otros pesos (como 300 o 500) se ignoran;
 - **estilo:** normal o cursiva.
 
-Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El kerning no se aplica; las
+Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El kerning no se aplica, y las
 ligaduras, solo con `Ligatures: true` ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). `Font` y `Size` no
 tienen valor por defecto: son obligatorios en todo texto ([Tipografía](tipografia.md)).
 
@@ -49,18 +49,20 @@ tienen valor por defecto: son obligatorios en todo texto ([Tipografía](tipograf
 ## Comprobaciones
 
 Antes de maquetar se comprueba que cada caja con texto tiene su fuente (familia, peso y estilo) en
-`fonts/` y que la fuente tiene todos los caracteres de su texto (los espacios en blanco se comprueban como espacios;
-`{page}`, `{pages}` y las referencias a otras cajas, como cifras). Un texto con tramos necesita además la variante de cada
+`fonts/` y que la fuente tiene todos los caracteres de su texto (los espacios en blanco se comprueban como espacios,
+y `{page}`, `{pages}` y las referencias a otras cajas, como cifras). Un texto con tramos necesita además la variante de cada
 tramo (`Bold: false` con un tramo en negrita necesita la negrita), y cada tramo, sus caracteres en ella. Una fuente
 desconocida (`FONT_UNKNOWN`), una variante que falta (`FONT_VARIANT_MISSING`) o un carácter que la fuente no tiene
-(`GLYPH_MISSING`) son errores con la línea del nodo culpable: la de la `Font` declarada (aunque esté en una antecesora o en
-una regla) si la familia no existe; la del texto, o la del tramo, si falta una variante, y el mensaje nombra dónde se
-declaran `Font`, `Bold` e `Italic`; la del carácter dentro de un bloque `Content >>` si falta un carácter.
+(`GLYPH_MISSING`) son errores con la línea del nodo culpable:
+
+- si la familia no existe, la de la `Font` declarada, aunque esté en una antecesora o en una regla;
+- si falta una variante, la del texto o la del tramo, y el mensaje nombra dónde se declaran `Font`, `Bold` e `Italic`;
+- si falta un carácter, la del carácter dentro de un bloque `Content >>`.
 
 También son errores, sin línea porque no son del documento (`RESOURCE`), que no exista `fonts/`, un fichero que no se puede
 leer, una fuente variable o dos ficheros con la misma familia, peso y estilo.
 
-> **Decisión:** un carácter que la fuente no tiene es un error, con su línea; no se pinta un recuadro vacío ni se busca
+> **Decisión:** un carácter que la fuente no tiene es un error, con su línea. No se pinta un recuadro vacío ni se busca
 > otra fuente. *Alternativa descartada:* el glifo de sustitución, o una lista de fuentes de sustitución.
 
 ## Imágenes

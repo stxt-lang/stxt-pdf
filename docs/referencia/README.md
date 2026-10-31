@@ -11,8 +11,8 @@ al que afecta, en un bloque así:
 
 > **Decisión:** lo que se decidió y lo que implica. *Alternativa descartada:* lo que se podría haber hecho en su lugar.
 
-El schema STXT del modelo es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../src/main/resources/stxt/dev.stxt.pdf.stxt);
-si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el fichero.
+El schema STXT del modelo es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../src/main/resources/stxt/dev.stxt.pdf.stxt).
+Si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el fichero.
 
 ## Comportamiento común
 
@@ -43,7 +43,7 @@ si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [`Document`](componentes/document.md) | `Document`, `Page`, `Title`, `Language` y `Section` |
 | [`Block`](componentes/block.md) | `Block` y el flujo de bloque, que comparten todos los bloques |
 | [`Text`](componentes/text.md) | `Text` y `Paragraph` |
-| [Encabezados](componentes/heading.md) | `Heading 1` … `Heading 6` y su numeración |
+| [Encabezados](componentes/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](componentes/list.md) | `List` y `List item` |
 | [`Table`](componentes/table.md) | `Table`, `Head`, `Body`, `Foot`, `Row` y `Cell` |
 | [`Flex`](componentes/flex.md) | `Flex` e `Item` |

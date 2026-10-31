@@ -1,6 +1,6 @@
 # Estructura de un documento
 
-Un documento describe un **árbol de cajas** con elementos (`Block`, `Flex`, `Grid`, `Text`…) que solo admiten las
+Un documento describe un **árbol de cajas** con elementos (`Block`, `Flex`, `Grid`, `Text`, etc.) que solo admiten las
 propiedades que tienen sentido en ellos. El motor calcula la posición y el tamaño de cada caja en una secuencia de
 **páginas** de tamaño fijo, parte entre páginas lo que no cabe y escribe el resultado en un PDF.
 
@@ -9,7 +9,7 @@ propiedades que tienen sentido en ellos. El motor calcula la posición y el tama
 - **Todas las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada). Un A4 mide 595 × 842 pt.
 - **Los nombres de nodos y valores están en inglés**: `Margin`, `Overlay`, `Edges: open`. El texto de un `Text`
   puede estar en cualquier idioma.
-- **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*; *vertical*, el de `Height` y *arriba/abajo*. La
+- **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*, y *vertical*, el de `Height` y *arriba/abajo*. La
   escritura es siempre horizontal, de izquierda a derecha.
 - **Las cuatro cajas de una caja** ([La caja](caja.md#las-cuatro-cajas)): de contenido, de relleno, de borde y de margen.
   Salvo que se diga otra cosa, las posiciones y los tamaños son los de la **caja de borde**.
@@ -33,7 +33,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Grid` | Coloca sus ítems en una rejilla ([Grid](../componentes/grid.md)) | `Area`, `Overlay` y `Page overlay` |
 | `Text` | Texto suelto: un rótulo, una cifra, una línea de una cabecera ([Text](../componentes/text.md)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
 | `Paragraph` | Un párrafo del contenido ([Text](../componentes/text.md#paragraph)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
-| `Heading 1` … `Heading 6` | Encabezado de nivel 1 a 6 ([Encabezados](../componentes/heading.md)) | Uno o varios `Text` |
+| `Heading 1` a `Heading 6` | Encabezado de nivel 1 a 6 ([Encabezados](../componentes/heading.md)) | Uno o varios `Text` |
 | `List` | Lista con marcadores o numerada ([List](../componentes/list.md)) | Uno o varios `List item` |
 | `List item` | Ítem de una `List`: un bloque con su marcador | Elementos, salvo los encabezados |
 | `Table` | Tabla con cabecera y pie que se repiten en cada página ([Table](../componentes/table.md)) | `Head`, `Body` y `Foot`, en ese orden |
@@ -68,8 +68,8 @@ además una franja que se pinta debajo de sus celdas ([Table](../componentes/tab
 Las propiedades van agrupadas por su significado: `Box` ([la caja](caja.md)), `Typography` ([el texto](tipografia.md),
 que se hereda) y `Break` ([los cortes de página](cortes.md)). Cada grupo va como mucho una vez por elemento, y cada
 propiedad, como mucho una vez por grupo. Fuera de los grupos queda lo que define al elemento: las
-[propiedades del elemento](#propiedades-del-elemento) y las propias de cada uno (`Gap` de `Flex`, `Offset` de `Overlay`,
-`Marker` de `List`…).
+[propiedades del elemento](#propiedades-del-elemento) y las propias de cada uno (`Gap` de `Flex`, `Offset` de `Overlay` o
+`Marker` de `List`).
 
 ```
 Text: Resultados del trimestre
@@ -86,21 +86,21 @@ Text: Resultados del trimestre
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
 > `Line breaking` y no `Wrap`, que es de `Flex` y es otra cosa, porque un nombre es el mismo nodo en todo el schema.
 
-> **Decisión:** un nombre dice qué es la cosa en el documento, no el algoritmo que la maqueta (`Columns`, `Balance`), y
+> **Decisión:** un nombre dice qué es la cosa en el documento y no el algoritmo que la maqueta (`Columns`, `Balance`), y
 > cuando el mundo editorial o un procesador de textos ya tiene uno conocido, se usa ese (`Style` para un estilo con nombre,
-> `Table of contents` y `TOC 1`…`6`, `Row header`, `Corner radius`). Los ejes se nombran por su dirección en la página
+> `Table of contents` y `TOC 1` a `TOC 6`, `Row header`, `Corner radius`). Los ejes se nombran por su dirección en la página
 > (`Horizontal`, `Vertical`) y no por su papel, y no hay dos nombres casi iguales con significados distintos (por eso
 > `Table of contents` y no `Contents`, que se confundía con `Content`). *Alternativa descartada:* nombres del
-> mecanismo (`Multicol`, `Relative`, `Absolute`, `Fixed`, `Main axis`…), que solo entiende quien ya lo conoce.
+> mecanismo (`Multicol`, `Relative`, `Absolute`, `Fixed`, `Main axis`), que solo entiende quien ya lo conoce.
 
 ### Propiedades del elemento
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Id` | texto | — | Elementos y `Section` | Identificador para referencias, enlaces, reglas `For id` y mensajes. Único en el documento (`DUPLICATE_ID`). |
-| `Style` | nombres separados por espacios | — | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
+| `Id` | texto | sin valor | Elementos y `Section` | Identificador para referencias, enlaces, reglas `For id` y mensajes. Único en el documento (`DUPLICATE_ID`). |
+| `Style` | nombres separados por espacios | sin valor | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
 | `In table of contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
-| `Link` | `https://…`, `http://…`, `mailto:…` o `#id` | — | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
+| `Link` | `https://...`, `http://...`, `mailto:...` o `#id` | sin valor | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
 | `Contain margins` | booleano | `false` | `Block`, `Frame` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
 
 ## Orden y texto
@@ -108,7 +108,7 @@ Text: Resultados del trimestre
 **El orden importa.** El motor coloca los elementos en el orden en que aparecen. El de las propiedades, y su posición
 respecto a los elementos, no importa.
 
-**Texto en línea o en bloque.** `Text: una línea` lleva el texto en su valor; el texto largo va en un bloque
+**Texto en línea o en bloque.** `Text: una línea` lleva el texto en su valor. El texto largo va en un bloque
 `Content >>`, sin caracteres de escape. Un `Text` tiene uno de los dos, nunca ambos ([Text](../componentes/text.md)).
 
 ## Ejemplo
@@ -162,19 +162,19 @@ Cada elemento decide **cómo coloca a sus hijos**:
 | `Text`, `Paragraph`, `Cell` con valor | Sin hijos: reparte su texto en líneas ([Tipografía](tipografia.md#el-reparto-en-líneas)) |
 | `Image` | Sin hijos: su contenido es la imagen ([Image](../componentes/image.md)) |
 
-**Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque es un bloque apilado; dentro
-de un `Flex` o un `Grid`, un ítem. `Overlay` y `Page overlay` salen del flujo; un `Frame` participa como cualquier caja y
+**Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque es un bloque apilado, y dentro
+de un `Flex` o un `Grid`, un ítem. `Overlay` y `Page overlay` salen del flujo, y un `Frame` participa como cualquier caja y
 después se desplaza.
 
 ## Schema
 
 El schema es [`src/main/resources/stxt/dev.stxt.pdf.stxt`](../../../src/main/resources/stxt/dev.stxt.pdf.stxt), con el
-namespace `dev.stxt.pdf`. Define cada nodo una sola vez y los hijos que admite; un mismo nombre es el mismo nodo en todo
+namespace `dev.stxt.pdf`. Define cada nodo una sola vez y los hijos que admite. Un mismo nombre es el mismo nodo en todo
 el schema (el `Width` de `Page` y el de `Box`), así que `Gap`, `Horizontal` y `Vertical` tienen los mismos
-valores en todos los sitios donde van; lo que no vale en uno de ellos es un error del motor.
+valores en todos los sitios donde van. Lo que no vale en uno de ellos es un error del motor.
 
-Este resumen da los hijos de cada nodo con hijos; si difiere del fichero, manda el fichero. Cada propiedad va como mucho una
-vez; los elementos, las veces que se quiera.
+Este resumen da los hijos de cada nodo con hijos. Si difiere del fichero, manda el fichero. Cada propiedad va como mucho una
+vez, y los elementos, las veces que se quiera.
 
 | Nodo | Hijos |
 |---|---|
@@ -187,7 +187,7 @@ vez; los elementos, las veces que se quiera.
 | `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Lines`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
-| `Heading 1` … `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
+| `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Head`, `Body` (obligatorio), `Foot` |
@@ -208,12 +208,12 @@ vez; los elementos, las veces que se quiera.
 | `Break` | `Before`, `After`, `Inside`, `Edges` |
 
 *Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
-`Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`; *elementos en flujo*, todos menos `Overlay` y `Page overlay`.
+`Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.
 
-Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`;
+Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`.
 `Block: algo` es un error. `Content` va siempre en bloque `>>`, y `Areas`, en línea o en bloque. Lo que el schema no puede
 expresar (que `Page` declare su tamaño de una sola forma, que un `Item` tenga exactamente un elemento, el orden de las
-partes de una tabla…) lo comprueba el motor, con los códigos de [Errores](errores.md).
+partes de una tabla) lo comprueba el motor, con los códigos de [Errores](errores.md).
 
 ## Lo que no hay
 

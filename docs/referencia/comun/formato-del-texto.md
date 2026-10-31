@@ -20,7 +20,7 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
   de su espacio.
 - Un tramo puede llevar el destino de un enlace ([Enlaces](enlaces.md)), que no cambia cómo se mide ni cómo se ve.
 
-> **Decisión:** un tramo es un conjunto de marcas, no un peso y un estilo propios: así `Styles` puede cambiar la fuente
+> **Decisión:** un tramo es un conjunto de marcas y no un peso y un estilo propios: así `Styles` puede cambiar la fuente
 > de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` e `Italic` explícitos, que podrían deshacer
 > el estilo de la caja.
 
@@ -38,8 +38,8 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `códig
 - Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
   `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
   escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen, HTML o un salto
-  de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo; un enlace con título o con un destino no
-  admitido, como en un `Markdown`.
+  de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo, y un enlace con título o con un destino
+  no admitido, lo mismo que en un `Markdown`.
 - No actúa dentro de un `Markdown`, aunque se herede (lo escapado sigue siendo literal), ni en las entradas de un
   `Table of contents`. `Alt` y los demás valores son siempre literales.
 - Las referencias (`{page}`, `{page of: id}`) funcionan igual.
@@ -49,7 +49,7 @@ sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `códig
 > **Decisión:** el formato en línea se pide con una propiedad heredable: el texto es literal salvo que se pida, y se pide
 > una vez. *Alternativa descartada:* hijos `Run` con su propio `Typography`, mucho más largos de escribir.
 
-> **Decisión:** la sintaxis de los bloques es texto, no un error. Como `Markup` se hereda y se declara una vez para todo
+> **Decisión:** la sintaxis de los bloques es texto y no un error. Como `Markup` se hereda y se declara una vez para todo
 > el documento, un error alcanzaría a cualquier texto, celda o encabezado que empiece por un número con punto, un guion
 > o un `#`, y la lista de lo que hay que escapar es larga (`-`, `+`, `*`, `1.`, `1)`, `>`, `#`, una línea `---` o `===`,
 > una lista que empieza a media frase). Quien escriba una lista en un texto con `Markup: markdown` la obtiene literal,
@@ -65,11 +65,11 @@ cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
 
 `Code font` es de `Typography` ([Tipografía](tipografia.md)) y se hereda: se declara una vez, en `For element: Document`,
 para todo el documento. Sin ella, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en
-un `Markdown`, la del párrafo); si la familia no existe, `FONT_UNKNOWN`, con la línea de `Code font`.
+un `Markdown`, la del párrafo). Si la familia no existe, es `FONT_UNKNOWN`, con la línea de `Code font`.
 
 ## Mayúsculas (`Case`)
 
-`Case` cambia **lo que se pinta, no lo que se escribe**: un rótulo se escribe como una frase normal y una regla lo pone
+`Case` cambia **lo que se pinta y no lo que se escribe**: un rótulo se escribe como una frase normal y una regla lo pone
 en mayúsculas.
 
 - Cambia lo que mide el texto (`ß` pasa a `SS`), así que se aplica antes de repartirlo en líneas.
@@ -77,17 +77,17 @@ en mayúsculas.
   primera letra de cada palabra (lo que sigue a un espacio o un salto de línea, también entre dos tramos) y deja el resto
   como está (`iPhone` da `IPhone`).
 - `{page}` y `{pages}` no se transforman.
-- Un lector de pantalla lee el texto escrito («Emisor», no «EMISOR»), salvo en un texto con `{page}`, `{pages}` o una
+- Un lector de pantalla lee el texto escrito («Emisor» y no «EMISOR»), salvo en un texto con `{page}`, `{pages}` o una
   referencia, donde lee lo pintado.
 
 ## Versalitas (`Small caps`)
 
-`Small caps` pinta cada minúscula, pasada a mayúscula, al 80 % del `Size`; los espacios, las cifras, los signos y las
-mayúsculas, no. Se aplica después de `Case`: con `lowercase` todo son versalitas, con `uppercase` ninguna y con
+`Small caps` pinta cada minúscula, pasada a mayúscula, al 80 % del `Size`. Los espacios, las cifras, los signos y las
+mayúsculas se quedan como están. Se aplica después de `Case`: con `lowercase` todo son versalitas, con `uppercase` ninguna y con
 `capitalize` solo la inicial es grande. El `Size` de la caja no cambia, ni la altura de las líneas ni las rayas. Un lector
 de pantalla lee el texto escrito, como con `Case`.
 
-> **Decisión:** las versalitas son sintetizadas, no la característica `smcp` de la fuente, que no tiene ninguna de las
+> **Decisión:** las versalitas son sintetizadas y no la característica `smcp` de la fuente, que no tiene ninguna de las
 > incluidas. Con `Case: uppercase` no tienen efecto y no es un error: las dos se heredan, y es normal declararlas
 > en sitios distintos.
 
@@ -95,7 +95,7 @@ de pantalla lee el texto escrito, como con `Case`.
 
 Puntos que se suman al avance de cada carácter, también el espacio, **menos el último de cada línea**, para que `right` y
 `center` queden alineados con la última letra. Cuenta en el reparto en líneas, en los tamaños intrínsecos y en la
-alineación; `justify` reparte lo que sobra después. Puede ser negativo, y no se comprueba que el avance siga siendo
+alineación, y `justify` reparte lo que sobra después. Puede ser negativo, y no se comprueba que el avance siga siendo
 positivo. Un porcentaje es `VALUE_NOT_ALLOWED`.
 
 El texto que se copia o se extrae del PDF es el de la línea, sin espacios entre las letras
@@ -104,8 +104,8 @@ El texto que se copia o se extrae del PDF es el de la línea, sin espacios entre
 ## Ligaduras (`Ligatures`)
 
 Por defecto cada carácter es un glifo: `fi` son dos. Con `Ligatures: true` se aplican las ligaduras de la fuente, que
-juntan algunos pares en un glifo de otro ancho (en IBM Plex Sans y Serif, `fi`, `fl`, `ffi`, `ffl`; IBM Plex Mono no tiene
-ninguna). Lo que se mide es lo que se pinta; una ligadura no cruza un espacio ni el límite entre dos tramos. Con
+juntan algunos pares en un glifo de otro ancho (en IBM Plex Sans y Serif, `fi`, `fl`, `ffi` y `ffl`, y ninguna en IBM Plex
+Mono). Lo que se mide es lo que se pinta. Una ligadura no cruza un espacio ni el límite entre dos tramos. Con
 `Letter spacing` distinto de 0 no hay ligaduras. No cambia el texto que se lee ni el que se copia.
 
 > **Decisión:** `false` por defecto: sin ligaduras el texto se pinta mucho más rápido (de 17 a 30 veces). *Alternativa
@@ -116,7 +116,7 @@ ninguna). Lo que se mide es lo que se pinta; una ligadura no cruza un espacio ni
 Por defecto el espacio en blanco se colapsa. Con `White space: preserve` o `preserve-wrap` el texto **conserva sus espacios y sus
 saltos de línea**: cada línea del texto es una línea de la caja, también las vacías. Una línea en blanco **no** separa
 párrafos: el texto entero es un párrafo para las viudas y huérfanas ([Cortes](cortes.md)), así que un bloque largo se
-parte entre líneas. Actúa en un `Text`, un `Paragraph` y una `Cell` con texto; lo normal es una fuente monoespaciada y un
+parte entre líneas. Actúa en un `Text`, un `Paragraph` y una `Cell` con texto. Lo normal es una fuente monoespaciada y un
 `Content >>`, que conserva la sangría relativa (no los espacios al final de una línea ni las líneas en blanco del final).
 Un salto de línea al final del texto no añade una línea vacía.
 
@@ -126,17 +126,17 @@ Un salto de línea al final del texto no añade una línea vacía.
 - **Tabulaciones (`Tab size`).** Cada tabulación lleva a la siguiente columna múltiplo de `Tab size`, contando desde el
   principio de la línea (con `Tab size: 4`, `a⇥b` es `a   b`, y `abcd⇥e`, `abcd    e`). Un valor menor que 1 es
   `VALUE_NOT_ALLOWED`.
-- **Alineación.** `justify` se trata como `left`, porque `Align` se hereda y un bloque de código heredaría el error;
+- **Alineación.** `justify` se trata como `left`, porque `Align` se hereda y un bloque de código heredaría el error.
   `right` y `center` alinean cada línea por separado.
 - `Case`, `Letter spacing`, los tramos, `{page}` y las referencias funcionan como siempre. Con `Markup: markdown` el
   texto se interpreta primero, así que las líneas que se conservan son las de los párrafos.
 
 ### Tamaños intrínsecos
 
-Con `preserve`, el ancho más estrecho y el natural son la línea más ancha; con `preserve-wrap`, el ancho más estrecho es la
+Con `preserve`, el ancho más estrecho y el natural son la línea más ancha. Con `preserve-wrap`, el ancho más estrecho es la
 palabra más ancha y el natural, la línea más ancha.
 
-> **Decisión:** el texto preformateado es una propiedad heredable, no un elemento `Preformatted`, que no cabría en una
+> **Decisión:** el texto preformateado es una propiedad heredable y no un elemento `Preformatted`, que no cabría en una
 > `Cell` con valor.
 
 ## Subrayado y tachado

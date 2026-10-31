@@ -13,8 +13,8 @@
 | `fit` | El ancho natural, sin pasar del disponible ni bajar del más estrecho. | `fit` |
 | `between(a, b)` | Pista de grid entre `a` y `b`. `a` no puede ser fracción. | `between(100, *)` |
 
-Cada propiedad admite solo las formas de la columna *Valores* de su tabla; cualquier otra (`Width: *`,
-`Max width: natural`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED`, nunca un `auto`
+Cada propiedad admite solo las formas de la columna *Valores* de su tabla. Cualquier otra (`Width: *`,
+`Max width: natural`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED` y no un `auto`
 silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
 [definido](#alto-definido) es un error.
 
@@ -35,7 +35,7 @@ silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos
 
 ## Listas y `repeat`
 
-Algunas propiedades admiten varios valores separados por espacios (`Column sizes`, `Row sizes`, `Margin`…). En las listas de
+Algunas propiedades admiten varios valores separados por espacios (`Column sizes`, `Row sizes` o `Margin`). En las listas de
 pistas, `repeat(n, patrón)` repite un patrón:
 
 ```
@@ -62,12 +62,12 @@ pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la
 ## Colores
 
 `#RGB`, `#RGBA`, `#RRGGBB` o `#RRGGBBAA` en hexadecimal: `#000`, `#A32D2D`, `#12315A80`. El último dígito o par es la
-**opacidad** (`FF` o `F`, opaco; `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
+**opacidad** (`FF` o `F`, opaco, y `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
 color (`Color`, `Border color`, `Background`, `Separator color`).
 
-> **Decisión:** la opacidad va en cada color; no hay `Opacity` de la caja, que afectaría a todo lo que contiene.
+> **Decisión:** la opacidad va en cada color. No hay `Opacity` de la caja, que afectaría a todo lo que contiene.
 
-El fondo también admite un **degradado lineal**: `linear(ángulo, color, color…)`, con el ángulo en grados (`0` va hacia
+El fondo también admite un **degradado lineal**: `linear(ángulo, color, color, ...)`, con el ángulo en grados (`0` va hacia
 arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores, repartidos a partes iguales:
 `linear(180, #12315A00, #12315A)`. Cómo se pinta está en [La caja](caja.md#degradado).
 
@@ -80,7 +80,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 
 ## Bases de los porcentajes
 
-| Propiedad | Porcentaje de… |
+| Propiedad | Porcentaje de |
 |---|---|
 | `Width`, `Min width`, `Max width` | el ancho del contenedor de referencia |
 | `Height`, `Min height`, `Max height` | el alto del contenedor de referencia, que **debe ser definido** |
@@ -97,7 +97,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 
 ## Alto definido
 
-Los anchos se conocen siempre; los altos, no. Un porcentaje vertical es un error (`INDEFINITE_PERCENTAGE`) si su base no
+Los anchos se conocen siempre. Los altos, no. Un porcentaje vertical es un error (`INDEFINITE_PERCENTAGE`) si su base no
 es un **alto definido**, que se decide al leer el documento con esta regla fija:
 
 - el área útil;
@@ -108,9 +108,9 @@ es un **alto definido**, que se decide al leer el documento con esta regla fija:
 
 La base de `Height`, `Min height` y `Max height` de un `Overlay` o un `Page overlay` es su contenedor de referencia, y la de un
 ítem de grid, su área: las dos son siempre definidas. Un ítem de `Flex` estirado **no** da un alto definido a sus hijos:
-si lo necesitan, declara su `Height`. El alto de las columnas de un `Columns` tampoco es definido
+si lo necesitan, el ítem debe declarar su `Height`. El alto de las columnas de un `Columns` tampoco es definido
 ([Columns](../componentes/columns.md#contenido)).
 
-> **Decisión:** el alto definido se decide al leer el documento, no al maquetar. Es más estricto (un ítem de `Flex`
+> **Decisión:** el alto definido se decide al leer el documento y no al maquetar. Es más estricto (un ítem de `Flex`
 > estirado no da alto definido aunque su alto se acabe conociendo), pero el error sale siempre, en la línea de la
 > propiedad. *Alternativa descartada:* detectar los porcentajes sin base durante el layout.

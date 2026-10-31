@@ -10,15 +10,15 @@ puede sobrescribir.
 | Regla | Valor | Se aplica a |
 |---|---|---|
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
-| `For element` | nombre de un elemento de caja (`Block`, `Text`, `Heading 1`…) | todos los elementos de ese tipo |
-| `For element` | un elemento generado por el motor: `Code block` o `TOC 1` … `TOC 6` | los bloques de código de un `Markdown` ([Markdown](../componentes/markdown.md#código)) o las entradas de un `Table of contents` ([Table of contents](../componentes/table-of-contents.md#estilo)); no se escriben en el documento |
+| `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
+| `For element` | un elemento generado por el motor: `Code block` o `TOC 1` a `TOC 6` | los bloques de código de un `Markdown` ([Markdown](../componentes/markdown.md#código)) o las entradas de un `Table of contents` ([Table of contents](../componentes/table-of-contents.md#estilo)). No se escriben en el documento |
 | `For element` | una posición en una tabla: `Head cell`, `Body cell`, `Foot cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../componentes/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style` y las celdas de una `Row` con él en su `Style` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas |
 
-Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada; no admite las propiedades propias de un
-elemento (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link`, `Rotate`…).
+Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada. No admite las propiedades propias de un
+elemento (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link` o `Rotate`).
 
 ```
 Styles:
@@ -50,10 +50,10 @@ Cada propiedad toma, de más a menos fuerte:
 
 1. lo que declara el propio elemento;
 2. la regla `For id` de su `Id`;
-3. las reglas `For style` de sus estilos; si varias declaran la misma propiedad, gana la que va **después en `Styles`**, no
-   el orden de `Style`;
-4. las reglas `For style` de los estilos de la `Row` de una celda, con el mismo criterio de orden; entre los puntos 2 y 3,
-   la regla `For id` del `Id` de su `Row`;
+3. las reglas `For style` de sus estilos (si varias declaran la misma propiedad, gana la que va **después en `Styles`** y
+   no el orden de `Style`);
+4. las reglas `For style` de los estilos de la `Row` de una celda, con el mismo criterio de orden (la regla `For id` del
+   `Id` de su `Row` va entre los puntos 2 y 3);
 5. las reglas `For column` de la columna de una celda, con el mismo criterio de orden;
 6. las reglas de posición de una celda (`Head cell`, `Body cell`, `Foot cell`, y después `Odd row cell` o
    `Even row cell`);
@@ -65,11 +65,11 @@ Cada propiedad toma, de más a menos fuerte:
 Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table` ([Table](../componentes/table.md#estilo-de-las-celdas)).
 
 Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare `Size: 20`. Las
-reglas se mezclan **propiedad a propiedad**, no por grupo: si la regla declara `Size` y el elemento `Bold`, se aplican
+reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento `Bold`, se aplican
 las dos. Lo que una regla da a un elemento en `Typography` lo heredan sus descendientes, como si lo hubiera declarado él.
 `Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Style` y el `Id` de una `Row` aplican
-sus reglas a cada una de sus celdas, no a la franja de la fila. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en `For element` (para dar estilo a las celdas de
-cada grupo están las reglas de posición); `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
+sus reglas a cada una de sus celdas y no a la franja de la fila. `Head`, `Body`, `Foot` y `Row` no se pueden nombrar en
+`For element` (para dar estilo a las celdas de cada grupo están las reglas de posición). `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../componentes/document.md#section)).
 
 > **Decisión:** prioridad fija en lugar de especificidad calculada. *Alternativa descartada:* especificidad calculada y
@@ -86,7 +86,7 @@ Son errores:
 - un `For column` que no es un número (`VALUE_SYNTAX`) o un rango que no va de menor a mayor (`VALUE_NOT_ALLOWED`);
 - dos reglas con el mismo selector en el mismo origen, también dos `For column` con el mismo rango (`STYLE_DUPLICATE`);
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
-  una celda, también con una regla de posición, de columna o de el estilo de su `Row` (`STYLE_NOT_ALLOWED`);
+  una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
 - un nombre de `Style` sin su regla `For style` (`STYLE_WITHOUT_RULE`).
 
@@ -114,7 +114,7 @@ Styles:
 Es la base de la herencia: la regla `For element` de un tipo o lo que declara una caja la cambian para esa caja y sus
 descendientes.
 
-> **Decisión:** la base va en una regla, no en `Document`, para que esté con el resto del estilo y se pueda llevar al
+> **Decisión:** la base va en una regla y no en `Document`, para que esté con el resto del estilo y se pueda llevar al
 > documento de estilos aparte.
 
 ## Documento de estilos aparte
@@ -137,7 +137,7 @@ Styles (dev.stxt.pdf):
   ficheros ni carpetas: quien convierte lo lee y lo pasa junto al documento
   ([Uso desde Java](../implementacion/api.md#estilos-aparte)). Es opcional.
 - **Vale menos que el documento.** Se admiten las mismas reglas que en el `Styles` del documento. En cada nivel de la
-  prioridad (el de `For id`, el de `For style`, el de `For element`…), las reglas del documento de estilos aparte van **antes** y
+  prioridad (el de `For id`, el de `For style`, el de `For element`, etc.), las reglas del documento de estilos aparte van **antes** y
   las del documento **después**, así que gana el documento, propiedad a propiedad. La prioridad entre niveles no cambia:
   un `For style` del documento aparte sigue ganando a un `For element` del documento. Con esto, sacar el `Styles` de un
   documento a un fichero aparte no cambia el resultado.
@@ -145,7 +145,7 @@ Styles (dev.stxt.pdf):
   (`STYLE_DUPLICATE`), pero la misma regla puede estar en los dos. Un nombre de `Style` puede tener su `For style` en
   cualquiera de los dos.
 - **Errores.** Una regla del documento de estilos se valida como una del documento, y su error lleva la línea **de ese
-  fichero** y lo dice: `línea 8 de los estilos: …`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Una propiedad que
+  fichero** y lo dice: `línea 8 de los estilos: ...`. La raíz que no es `Styles` es `DOCUMENT_ROOT`. Una propiedad que
   llega de una regla del documento de estilos conserva su línea en él, también la tipografía que se hereda, así que lo
   mismo vale para los errores que se ven al aplicarla o al maquetar (una fuente que no existe, un desbordamiento). Si un
   mensaje nombra otra línea, también dice de qué documento es: `línea 8 de los estilos: Min width es mayor que Max width

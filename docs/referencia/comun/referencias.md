@@ -19,13 +19,13 @@ List:
     Marker: decimal
     List item:
         Id: pago
-        Paragraph: …
+        Paragraph: ...
 ```
 
 ## `{page of: id}`
 
 - **Qué página es.** La de la **primera** caja que sale de la caja referida: si está partida entre varias páginas, la
-  página donde empieza. Es el **número impreso** de esa página, no el físico: el mismo que dice `{page}` en su pie. Si la
+  página donde empieza. Es el **número impreso** de esa página y no el físico: el mismo que dice `{page}` en su pie. Si la
   página no tiene número (`Page numbering: none`), es `REFERENCE_NOT_PLACEABLE`. Una `Section` con `Id` se puede referir:
   es su primera página. Si la caja es una fila repetida de una tabla (cabecera o pie), la primera de sus páginas.
 - **Dónde se puede referir.** Cualquier caja con `Id` que no sea un `Page overlay` ni esté dentro de uno, que se repiten en todas
@@ -35,11 +35,11 @@ List:
   existe, o una referencia sin `Id` (`{page of: }`), es un error (`REFERENCE_UNKNOWN`) con la línea del texto, o la del
   carácter si el texto es un bloque `Content >>`.
 - **El texto mide lo que se escribe.** `página 9` y `página 10` miden distinto, y el texto puede pasar a una línea más.
-  Eso puede mover la caja referida a otra página; el motor vuelve a paginar hasta que la página escrita y la real
+  Eso puede mover la caja referida a otra página. El motor vuelve a paginar hasta que la página escrita y la real
   coinciden ([cómo](../implementacion/layout.md#paginación)). Si no lo consigue, es `REFERENCE_UNSTABLE`, con la línea de
-  la referencia que sigue cambiando; con documentos normales no pasa, porque un número solo cambia de ancho al cambiar de
+  la referencia que sigue cambiando. Con documentos normales no pasa, porque un número solo cambia de ancho al cambiar de
   cifras (9 → 10).
-- **La fuente necesita las cifras**, no las letras del marcador.
+- **La fuente necesita las cifras** y no las letras del marcador.
 
 > **Decisión:** la página de una caja es la de su primer fragmento, también en las filas repetidas de una tabla.
 > *Alternativa descartada:* la del último fragmento.
@@ -47,13 +47,13 @@ List:
 ## `{number of: id}`
 
 Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador sin el sufijo: `3`, `c`, `IV` (`decimal`,
-`lower-alpha`, `upper-roman`…), con el `Start` y el `Number` que haya. Cada ítem da solo su propio número: para escribir
+`lower-alpha`, `upper-roman`), con el `Start` y el `Number` que haya. Cada ítem da solo su propio número: para escribir
 «4.2» de una lista anidada, se escriben los dos, `{number of: clausula}.{number of: apartado}`. También lo tienen los
 encabezados con `Numbered: true`, y su número es el completo (`4.2`: sus niveles unidos por puntos,
 [Encabezados](../componentes/heading.md#numeración-numbered)). Un `List item` de una lista con viñetas o sin marcador, un
 encabezado sin numerar o cualquier otra caja no tiene número (`REFERENCE_NOT_NUMBERED`). Un encabezado escrito en un
-`Markdown` se puede referir si lleva `{#id}` ([Markdown](../componentes/markdown.md#encabezados)); un ítem de una lista
-de Markdown, no, porque no lleva `Id`.
+`Markdown` se puede referir si lleva `{#id}` ([Markdown](../componentes/markdown.md#encabezados)). Un ítem de una lista
+de Markdown no se puede referir, porque no lleva `Id`.
 
 ## Lo que no hay
 

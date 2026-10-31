@@ -16,7 +16,7 @@ su `Offset`:
 | Caja | Contenedor de referencia |
 |---|---|
 | En flujo (también `Frame`) | la caja de **contenido** del padre |
-| `Overlay` | la caja de **relleno** del elemento posicionado (`Frame`, `Overlay` o `Page overlay`) más cercano entre sus ancestros; si no hay ninguno, el área útil |
+| `Overlay` | la caja de **relleno** del elemento posicionado (`Frame`, `Overlay` o `Page overlay`) más cercano entre sus ancestros, o el área útil si no hay ninguno |
 | `Page overlay` | el área útil de cada página |
 | Ítem de `Grid` (y celda de `Table`) | su área: las pistas que ocupa y los huecos de dentro |
 
@@ -28,15 +28,15 @@ El modelo de caja. No se hereda.
 |---|---|---|---|
 | `Width` | número, %, `auto`, `narrowest`, `natural`, `fit` | `auto` | |
 | `Height` | número, %, `auto` | `auto` | `auto` es el alto del contenido. |
-| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Flex` y `Grid`; 0 en el resto. |
+| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Flex` y `Grid`, y 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
-| `Aspect ratio` | `ancho/alto` o número | — | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
+| `Aspect ratio` | `ancho/alto` o número | sin valor | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
 | `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra (ver [márgenes `auto`](#márgenes-auto)). |
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](valores.md#abreviados-de-cuatro-lados)). No afecta al layout. |
 | `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
-| `Background` | color o `linear(…)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
+| `Background` | color o `linear(...)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
 
 > **Decisión:** `narrowest`, `natural` y `fit` solo valen en `Width` (y en las pistas de `Grid` y `Table`): un alto
 > `auto` ya es el de su contenido, y en `Height` serían otra forma de escribir `auto`. *Alternativa descartada:*
@@ -50,14 +50,14 @@ El modelo de caja. No se hereda.
 `Margin: auto` solo tiene efecto donde centra, y en cualquier otro sitio es un error (`MARGIN_AUTO_WITHOUT_EFFECT`):
 
 - **en flujo de bloque**, en horizontal y en una caja con `Width` o `Max width` (o una `Image`, que mide su ancho
-  natural): con los dos márgenes `auto`, el sobrante se reparte entre ambos y la caja queda **centrada**; si solo uno es
-  `auto`, absorbe el sobrante;
+  natural): con los dos márgenes `auto`, el sobrante se reparte entre ambos y la caja queda **centrada**, y si solo uno es
+  `auto`, ese absorbe el sobrante;
 - **en un `Overlay` o un `Page overlay`**, con inicio, tamaño y fin declarados ([posicionados](../componentes/frame-and-overlays.md#overlay)).
 
 Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Flex` y `Grid` (que se alinean
 con `Horizontal` y `Vertical`) son errores.
 
-> **Decisión:** un margen `auto` que no centraría nada es un error, no un 0 silencioso: con ancho `auto` la caja ocupa
+> **Decisión:** un margen `auto` que no centraría nada es un error y no un 0 silencioso: con ancho `auto` la caja ocupa
 > toda la línea y no hay sobrante que repartir.
 
 ## Dimensionado
@@ -85,8 +85,8 @@ En `Flex` se usan los tamaños intrínsecos de cada ítem tal cual, sin tener en
 
 ### Definido e indefinido
 
-Un tamaño es **definido** si se conoce sin hacer el layout del contenido. Los anchos lo son siempre al maquetar; qué
-altos lo son está en [Valores](valores.md#alto-definido), y un porcentaje de un alto que no lo es, un error. El área útil
+Un tamaño es **definido** si se conoce sin hacer el layout del contenido. Los anchos lo son siempre al maquetar. Qué
+altos lo son está en [Valores](valores.md#alto-definido), y un porcentaje de un alto indefinido es un error. El área útil
 es definida: una caja de primer nivel de una sección con `Height: 100%` ocupa la página.
 
 ### Mínimos y máximos
@@ -105,7 +105,7 @@ proporción: la de su fichero, o la de `Aspect ratio`, y en ella se aplica a la 
 ([Image](../componentes/image.md#dimensionado)).
 
 > **Decisión:** en una `Image`, la proporción es la de la caja de contenido, para que el relleno y el borde no deformen
-> el dibujo; en las demás cajas, la de la caja de borde.
+> el dibujo. En las demás cajas, la de la caja de borde.
 
 ## Fondo, borde y esquinas
 
@@ -129,23 +129,23 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
   cajas redondeadas una dentro de otra suman sus recortes. Como nada del flujo se sale de su caja (sería un
   [desbordamiento](desbordamiento.md)), el recorte solo cambia lo que toca las esquinas.
 - **Cajas partidas.** Con `Edges: open`, solo el primer fragmento de una caja tiene las esquinas de arriba y solo
-  el último, las de abajo; con `closed`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
-  fragmento, no sobre el de la caja entera.
+  el último, las de abajo. Con `closed`, todos las tienen todas. Los radios en % se resuelven sobre el tamaño del
+  fragmento y no sobre el de la caja entera.
 
 > **Decisión:** la caja redondeada recorta siempre lo que contiene, sin propiedad que lo pida, porque lo que se sale de
 > la curva nunca es lo que se quiere. *Alternativa descartada:* que no recorte y haya que redondear también cada hijo que
-> toca una esquina; o una propiedad `Clip`.
+> toca una esquina, o una propiedad `Clip`.
 
 > **Decisión:** el recorte no alcanza al texto: un texto cortado a medias se leería mal y no avisaría. Tampoco a un
 > `Overlay`, que sale del flujo para colocarse donde quiera. *Alternativa descartada:* recortarlo todo, como una ventana.
 
-> **Decisión:** un radio por esquina; la elipse se pide con %. Los % de una caja partida son de cada fragmento: uno muy
+> **Decisión:** un radio por esquina, y la elipse se pide con %. Los % de una caja partida son de cada fragmento: uno muy
 > bajo reduce sus radios. *Alternativa descartada:* dos radios por esquina (`10 / 20`).
 
 ### Borde
 
-Es el anillo entre la caja de borde y la de relleno. Con un solo color se pinta de una vez; con colores distintos, cada
-lado con su color, y dos lados seguidos se encuentran en la **diagonal** que une la esquina de la caja de borde con la de
+Es el anillo entre la caja de borde y la de relleno. Con un solo color se pinta de una vez. Con colores distintos, cada
+lado va con su color, y dos lados seguidos se encuentran en la **diagonal** que une la esquina de la caja de borde con la de
 la de relleno (con esquinas redondeadas, la diagonal sigue hacia dentro para cubrir la curva). Un lado sin grosor no
 tiene color: `Border: 0 0 0 3` con `Border color: #B5651D` es una franja a la izquierda. El borde es siempre una línea
 continua.
@@ -156,19 +156,19 @@ Un color, liso o con opacidad, o un degradado lineal. Se pinta en la caja de rel
 
 #### Degradado
 
-`linear(ángulo, …)` pasa por el centro de la caja de relleno y mide lo que hace falta para que las esquinas tengan el
-primer y el último color (`|ancho · sen(ángulo)| + |alto · cos(ángulo)|`); más allá de los extremos se repite el color del
+`linear(ángulo, ...)` pasa por el centro de la caja de relleno y mide lo que hace falta para que las esquinas tengan el
+primer y el último color (`|ancho · sen(ángulo)| + |alto · cos(ángulo)|`). Más allá de los extremos se repite el color del
 extremo. Cada color se pinta con su opacidad: un degradado hacia un color transparente deja ver lo que hay debajo.
 
 ### Opacidad
 
-El color de un fondo, de un borde o de un texto con opacidad deja ver lo que hay debajo; en un borde de un solo color,
+El color de un fondo, de un borde o de un texto con opacidad deja ver lo que hay debajo. En un borde de un solo color,
 las esquinas no se pintan dos veces.
 
 ## Lo que no hay
 
 - Sombras: el PDF no desenfoca y habría que aproximarlas con capas semitransparentes.
-- Estilos de borde (punteado, doble…), varias capas de fondo ni imágenes de fondo.
+- Estilos de borde (punteado o doble), varias capas de fondo ni imágenes de fondo.
 - Recorte del contenido por el contorno de una caja cuadrada: lo que se sale de la caja es un
-  [desbordamiento](desbordamiento.md); las esquinas redondeadas solo recortan los fondos, los bordes y las imágenes
+  [desbordamiento](desbordamiento.md), y las esquinas redondeadas solo recortan los fondos, los bordes y las imágenes
   ([arriba](#esquinas)).

@@ -11,11 +11,11 @@ celdas).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Font` | nombre de familia | — | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declara el fichero TTF de la carpeta de fuentes ([Recursos](recursos.md#fuentes)). |
-| `Code font` | nombre de familia | — | La familia del código, en línea y en bloques ([Formato del texto](formato-del-texto.md#código-en-línea)); suele ser una monoespaciada. **Obligatoria** si hay código, propia o heredada (`CODE_WITHOUT_FONT`). |
-| `Bold` | `true`, `false` | `false` | Negrita: con `false`, el peso 400 de la fuente; con `true`, el 700. |
+| `Font` | nombre de familia | sin valor | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declara el fichero TTF de la carpeta de fuentes ([Recursos](recursos.md#fuentes)). |
+| `Code font` | nombre de familia | sin valor | La familia del código, en línea y en bloques ([Formato del texto](formato-del-texto.md#código-en-línea)). Suele ser una monoespaciada. **Obligatoria** si hay código, propia o heredada (`CODE_WITHOUT_FONT`). |
+| `Bold` | `true`, `false` | `false` | Negrita: con `false`, el peso 400 de la fuente, y con `true`, el 700. |
 | `Italic` | `true`, `false` | `false` | Cursiva: la variante cursiva de la fuente. |
-| `Size` | número > 0 | — | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
+| `Size` | número > 0 | sin valor | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
 | `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](valores.md#colores)). |
@@ -32,7 +32,7 @@ celdas).
 | `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../componentes/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente ([Cortes](cortes.md#elección-del-corte)). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
-| `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`…) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |
+| `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |
 
 Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` para sus hijos, y un `Text` que hereda
 `Numbered: true` no hace nada, porque solo lo lee un encabezado.
@@ -56,8 +56,8 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
 
 - **`Line breaking: simple`**, algoritmo voraz: las palabras se añaden a la línea mientras quepan.
 - **`Line breaking: balanced`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
-  líneas, de modo que las líneas quedan más parejas (sin guiones; los espacios se estiran hasta la mitad de su ancho y no
-  se encogen; la última línea no cuenta).
+  líneas, de modo que las líneas quedan más parejas. Los espacios se estiran hasta la mitad de su ancho y no se encogen,
+  y la última línea no cuenta.
 
 En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](desbordamiento.md)).
 No se parten palabras ni se ponen guiones.
@@ -73,32 +73,32 @@ línea base = arriba + (Line height − (ascendente + descendente) · Size) / 2 
 
 ## Alineación
 
-`left`, `right` y `center` desplazan cada línea; `justify` reparte el sobrante a partes iguales entre los espacios de la
+`left`, `right` y `center` desplazan cada línea. `justify` reparte el sobrante a partes iguales entre los espacios de la
 línea. No se justifican la última línea de cada párrafo, las líneas de una sola palabra ni las que desbordan (los
 espacios no se comprimen). La última línea de una página no es la última de su párrafo si este continúa en la página
 siguiente, así que se justifica.
 
 ## Medida del texto
 
-El ancho de un texto es la suma de los avances de sus glifos, redondeados a milésimas del cuerpo; sin kerning, y con
+El ancho de un texto es la suma de los avances de sus glifos, redondeados a milésimas del cuerpo, sin kerning y con
 ligaduras solo si se piden ([Formato del texto](formato-del-texto.md#ligaduras-ligatures)). Una palabra con partes de
 varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que se pinta
 ([detalles](../implementacion/pintado.md#texto)).
 
 ## Tamaños intrínsecos
 
-ancho más estrecho = la palabra más ancha; ancho natural = el párrafo más largo en una sola línea (con `preserve` y `preserve-wrap`, ver
-[Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
+El ancho más estrecho es la palabra más ancha, y el natural, el párrafo más largo en una sola línea (con `preserve` y
+`preserve-wrap`, ver [Formato del texto](formato-del-texto.md#tamaños-intrínsecos)).
 
 ## Idioma (`Language`)
 
 Una caja cuyo texto no está en el idioma del documento declara el suyo en `Typography` (`Language: en-GB`), también desde
-una regla de `Styles` (`For style: english`). Se hereda; un lector de pantalla cambia de voz al leer esa caja, y
+una regla de `Styles` (`For style: english`). Se hereda. Un lector de pantalla cambia de voz al leer esa caja, y
 `Case` usa las reglas de mayúsculas de ese idioma. Es una etiqueta BCP 47 (`VALUE_NOT_ALLOWED`) y `For element: Document`
 no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de `Document`
 ([Document](../componentes/document.md#title-y-language)).
 
-> **Decisión:** el idioma es de la caja, no de un tramo dentro de una línea ni de una parte de un `Markdown`.
+> **Decisión:** el idioma es de la caja y no de un tramo dentro de una línea ni de una parte de un `Markdown`.
 
 ## Lo que no hay
 

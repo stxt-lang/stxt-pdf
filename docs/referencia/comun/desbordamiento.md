@@ -8,11 +8,13 @@
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija su `Height`, su `Max height`,
   su `Aspect ratio` o, en un `Grid`, sus filas de tamaño fijo (`BOX_OVERFLOW`), en la línea de esa propiedad (`Row sizes` para
-  las filas; si declara varias, la primera de esta lista);
+  las filas, y si declara varias, la primera de esta lista);
 - **algo del flujo que no cabe en el área útil de una página y no se puede partir** (`PAGE_OVERFLOW`), en la línea de lo
-  que impide partirlo: su `Padding` o su `Border` si el relleno y el borde del fragmento ya no caben en la página; si no,
-  su `Line height` (o, sin él, su `Size`), propios o heredados, si es una línea de texto; si no, su `Height` (en una
-  `Image` sin él, su `Width`, del que sale el alto); en una caja girada, que no se parte, su `Rotate`;
+  que impide partirlo:
+  - su `Padding` o su `Border`, si el relleno y el borde del fragmento ya no caben en la página;
+  - si no, y es una línea de texto, su `Line height` (o, sin él, su `Size`), propios o heredados;
+  - si no, su `Height` (en una `Image` sin él, su `Width`, del que sale el alto);
+  - en una caja girada, que no se parte, su `Rotate`;
 - **un `Overlay` o un `Page overlay` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
   ocupar los márgenes de la página, pero no salir de la página;
 - **una caja girada que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Rotate`: lo que se comprueba es
@@ -38,13 +40,13 @@ desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
 
 Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no se baja a un hijo salvo que se salga
 también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido. Una caja cuyo alto impone el
-padre (un ítem estirado a una fila fija) se señala a sí misma, no las `Row sizes` del `Grid`.
+padre (un ítem estirado a una fila fija) se señala a sí misma y no las `Row sizes` del `Grid`.
 
 Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Frame` incluido.
 Una caja girada en flujo se comprueba en su contenedor con ese rectángulo, que es lo que ocupa. Las cajas en flujo de
 dentro de una girada se comprueban contra su padre sin girar, y no se baja a ellas para buscar al culpable de lo que se
 sale a lo ancho de la girada.
 
-> **Decisión:** el error señala la propiedad que hay que cambiar (el `Width`, el `Height`, el `Line height`), no la caja.
+> **Decisión:** el error señala la propiedad que hay que cambiar (el `Width`, el `Height`, el `Line height`) y no la caja.
 > *Alternativa descartada:* la línea de la caja, o comparar siempre con el padre inmediato, que en una caja `auto` señala
 > la caja y no lo que la ensancha.

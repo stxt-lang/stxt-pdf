@@ -28,13 +28,13 @@ mayores. Los `Page overlay` del documento se pintan antes que los de la sección
 
 ## Giro (`Rotate`)
 
-`Rotate` es una propiedad del elemento en `Block`, `Text`, `Paragraph`, `Image`, `Frame`, `Overlay` y `Page overlay`;
-`Rotate origin`, solo en los tres posicionados:
+`Rotate` es una propiedad del elemento en `Block`, `Text`, `Paragraph`, `Image`, `Frame`, `Overlay` y `Page overlay`,
+y `Rotate origin`, solo en los tres posicionados:
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Rotate` | número entre −360 y 360, sin `0` | — | Gira la caja, en grados en el sentido de las agujas del reloj. |
-| `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center`, o dos medidas (número o %) | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom`, `20 50%`…). Solo con `Rotate` (`ROTATE_ORIGIN_WITHOUT_ROTATE`) y solo en `Frame`, `Overlay` y `Page overlay`. |
+| `Rotate` | número entre −360 y 360, sin `0` | sin valor | Gira la caja, en grados en el sentido de las agujas del reloj. |
+| `Rotate origin` | una o dos de `top`, `bottom`, `left`, `right`, `center`, o dos medidas (número o %) | `center` | El punto de la caja de borde alrededor del que gira (`top left`, `bottom` o `20 50%`). Solo con `Rotate` (`ROTATE_ORIGIN_WITHOUT_ROTATE`) y solo en `Frame`, `Overlay` y `Page overlay`. |
 
 Una caja con `Rotate` se pinta girada tantos grados como dice. Gira **todo lo que se pinta de la caja**: fondo, borde,
 texto, imagen, sus descendientes (también los `Overlay` que cuelgan de ella y los contextos con `Layer` de dentro) y las
@@ -43,7 +43,7 @@ zonas de sus enlaces. Un giro dentro de otro se suma al de fuera. Lo que cambia 
 ### Giro en flujo: `Block`, `Text`, `Paragraph` e `Image`
 
 Una caja en flujo girada **ocupa el rectángulo que la envuelve girada**: lo que la rodea se coloca alrededor de ese
-rectángulo, nunca debajo de lo girado. Es la forma de escribir un texto en vertical en su sitio, como la cabecera de una
+rectángulo y nunca debajo de lo girado. Es la forma de escribir un texto en vertical en su sitio, como la cabecera de una
 columna estrecha:
 
 ```
@@ -52,7 +52,7 @@ Text: Lunes
 ```
 
 - **Su tamaño sin girar no depende del contenedor.** Su ancho es el de su `Width` o, si es `auto`, lo que mide su
-  contenido sin partir líneas (ancho natural), limitado por `Min width` y `Max width`; una `Image`, el suyo de siempre. Su
+  contenido sin partir líneas (ancho natural), limitado por `Min width` y `Max width`. Una `Image` tiene el suyo de siempre. Su
   alto sale de ese ancho, como siempre. Un párrafo largo girado necesita un `Width` que reparta sus líneas.
 - **Gira sobre su centro** y ocupa el rectángulo que envuelve su caja de borde girada, con ella centrada dentro. Por eso
   `Rotate origin` no tiene sentido en flujo y no lo admite el schema: cualquier origen daría el mismo resultado.
@@ -61,7 +61,7 @@ Text: Lunes
 - **Es un contexto de formato de bloque** ([Block](../componentes/block.md#contextos-de-formato-de-bloque)): los márgenes
   de sus hijos no salen de ella, y `Contain margins`, que no tendría efecto, es `CONTAIN_MARGINS_IN_ROTATED`. Es también el contenedor de
   referencia de los `Overlay` de dentro, que se colocan en su caja sin girar y giran con ella.
-- **No se parte** entre páginas, como una `Image`: entera o, si no cabe en lo que queda, en la página siguiente; `Inside`
+- **No se parte** entre páginas, como una `Image`: entera o, si no cabe en lo que queda, en la página siguiente. `Inside`
   y `Edges` son `BREAK_IN_ROTATED`, y un `Break` de dentro, `BREAK_IN_UNBREAKABLE` ([Cortes](cortes.md)).
 - **No puede ser un ítem de `Flex` o `Grid`** (`ROTATED_ITEM`), que ocupa el sitio que le da su contenedor: se gira una
   caja dentro del ítem.
@@ -70,8 +70,8 @@ Text: Lunes
 > sitio y no pise a sus vecinos. *Alternativa descartada:* girar solo al pintar, como un `Frame`, que deja la caja
 > encima de lo que la rodea.
 
-> **Decisión:** sin `Width`, una caja girada en flujo mide su contenido sin partir líneas, no el ancho del contenedor: el
-> ancho de una columna dice cuánto puede ocupar girada, no cuánto mide sin girar. *Alternativa descartada:* estirarla
+> **Decisión:** sin `Width`, una caja girada en flujo mide su contenido sin partir líneas y no el ancho del contenedor: el
+> ancho de una columna dice cuánto puede ocupar girada y no cuánto mide sin girar. *Alternativa descartada:* estirarla
 > al ancho del contenedor, que con −90 grados haría una columna de texto tan alta como ancha es la página.
 
 > **Decisión:** un ítem de `Flex` o `Grid` no gira. Su contenedor le da el tamaño, y un tamaño impuesto a la caja girada
@@ -84,12 +84,12 @@ Un posicionado girado gira alrededor de su `Rotate origin` (el centro de su caja
 layout**: como el `Offset` de un `Frame`, es solo pintado. La caja ocupa su sitio sin girar y sus hermanos no se
 mueven. Para un texto vertical en el margen de la página se gira un `Overlay` o un `Page overlay` que lo contiene.
 
-Un `Frame` girado no se parte entre páginas; `Inside` y `Edges` no tienen efecto en él y son un error
+Un `Frame` girado no se parte entre páginas. `Inside` y `Edges` no tienen efecto en él y son un error
 (`BREAK_IN_ROTATED`), también desde una regla.
 
 `Rotate origin` se escribe de una de dos formas:
 
-- **Palabras clave:** una o dos, en cualquier orden (`top left` = `left top`); el eje que no se nombra es `center`.
+- **Palabras clave:** una o dos, en cualquier orden (`top left` = `left top`). El eje que no se nombra es `center`.
 - **Dos medidas:** la horizontal y la vertical, desde la esquina de arriba a la izquierda de la caja de borde, en puntos o
   en porcentaje de su ancho y de su alto (`Rotate origin: 20 50%`). Pueden ser negativas o pasar del tamaño de la caja:
   el centro del giro puede estar fuera de ella.
@@ -113,7 +113,7 @@ es `VALUE_NOT_ALLOWED`.
 - **Texto.** Sigue siendo texto seleccionable y nítido con cualquier ángulo, y el orden de lectura no cambia. Un enlace en
   una caja girada se pulsa en la zona girada.
 
-`Rotate` va entre −360 y 360 grados, sin incluirlos; `0`, `360` y `−360`, que no giran nada, son `VALUE_NOT_ALLOWED`.
+`Rotate` va entre −360 y 360 grados, sin incluirlos. `0`, `360` y `−360`, que no giran nada, son `VALUE_NOT_ALLOWED`.
 
 > **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni se hereda (aunque lo que
 > contiene la caja gira con ella). *Alternativa descartada:* `Rotate` en `Box`, para poder darlo con un estilo.
