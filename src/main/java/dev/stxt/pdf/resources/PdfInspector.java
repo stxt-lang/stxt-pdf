@@ -99,7 +99,7 @@ public final class PdfInspector {
             if (!(annotation instanceof PDAnnotationLink) && !annotation.isHidden() && !annotation.isNoView()
                     && annotation.getNormalAppearanceStream() != null) {
                 return "tiene una anotación que se ve (" + annotation.getSubtype() + ", como un campo de formulario o "
-                        + "un comentario), que no se dibujaría: aplánala en el PDF antes de usarlo";
+                        + "un comentario), que no se dibujaría: hay que aplanar el PDF antes de usarlo";
             }
         }
         return null;
@@ -120,12 +120,12 @@ public final class PdfInspector {
                 continue;
             }
             if (!font.isEmbedded()) {
-                return "usa la fuente " + font.getName() + " sin incrustar, que el visor sustituiría por otra: crea el "
-                        + "PDF con las fuentes incrustadas";
+                return "usa la fuente " + font.getName() + " sin incrustar, que el visor sustituiría por otra: hay que crear "
+                        + "el PDF con las fuentes incrustadas";
             }
             if (!hasUnicode(font)) {
                 return "usa la fuente " + font.getName() + " sin ToUnicode, que dice qué carácter es cada glifo: su "
-                        + "texto no se podría copiar ni leer en voz alta; crea el PDF de nuevo, por ejemplo como PDF/A";
+                        + "texto no se podría copiar ni leer en voz alta. Hay que crear el PDF de nuevo, por ejemplo como PDF/A";
             }
         }
         for (COSName name : resources.getXObjectNames()) {

@@ -204,8 +204,8 @@ final class PropertyReader {
     private static String alt(Node p) {
         String alt = p.getText().trim();
         if (alt.isEmpty()) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto; si la imagen es decorativa, "
-                    + "quita Alt");
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto. Una imagen decorativa no "
+                    + "lleva Alt");
         }
         return alt;
     }
@@ -318,7 +318,7 @@ final class PropertyReader {
         Distribution d = enumValue(Distribution.class, p);
         if (d == Distribution.BETWEEN || d == Distribution.AROUND || d == Distribution.EVENLY) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " alinea en su sitio: admite start, end, center o "
-                    + "stretch; " + p.getText().trim() + " reparte el eje principal de un Flex y solo vale en él");
+                    + "stretch, y " + p.getText().trim() + " reparte el eje principal de un Flex y solo vale en él");
         }
         return Alignment.valueOf(d.name());
     }
@@ -328,8 +328,8 @@ final class PropertyReader {
         String label = p.getText().strip();
         int at = label.indexOf(HeadingNumbers.NUMBER);
         if (at < 0 || label.indexOf(HeadingNumbers.NUMBER, at + 1) >= 0) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Number label lleva {number} una vez, donde va el número: "
-                    + "Number label: Anexo {number}.");
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Number label lleva {number} una vez, donde va el número, "
+                    + "como en Number label: Anexo {number}.");
         }
         return label;
     }

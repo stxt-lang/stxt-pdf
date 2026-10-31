@@ -124,14 +124,14 @@ class OverflowTest {
                 () -> layOut("\tFrame:", "\t\tId: R", "\t\tRotate: -30", "\t\tRotate origin: bottom left",
                         "\t\tBox:", "\t\t\tHeight: 40")));
         assertContains("La caja R (línea", own);
-        assertContains("girada se sale de la página: revisa su Rotate, su Rotate origin, su posición", own);
+        assertContains("girada se sale de la página: hay que revisar su Rotate, su Rotate origin, su posición", own);
         InvalidModelException inside = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tFrame:", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 100",
                         "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                         "\t\t\t\tHeight: 150")));
         assertContains("La caja A (línea", inside);
         // Sin «su su»: lo que hay que revisar empieza por «su» en los dos casos.
-        assertContains(", dentro de una caja girada, se sale de la página: revisa su posición y su tamaño", inside);
+        assertContains(", dentro de una caja girada, se sale de la página: hay que revisar su posición y su tamaño", inside);
     }
 
     @Test

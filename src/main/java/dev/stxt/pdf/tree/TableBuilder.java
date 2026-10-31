@@ -107,7 +107,7 @@ final class TableBuilder {
             if (group != 1) {
                 child(row, "break").ifPresent(b -> {
                     throw error(b, ErrorCode.TABLE_ROW_BREAK, "Las filas de " + g.getName() + " se repiten en "
-                            + "cada página de la tabla y no se cortan: quita el Break");
+                            + "cada página de la tabla y no se cortan: sobra el Break");
                 });
             }
             row(ctx, row, table, firstRow + r + 1, columns.count());
@@ -131,7 +131,7 @@ final class TableBuilder {
             for (int cc = 0; cc < columns.count(); cc++) {
                 if (!taken[r][cc]) {
                     throw error(row, ErrorCode.TABLE_ROW_CELLS, "La fila deja libre la columna " + (cc + 1)
-                            + " de " + columns.count() + " (Columns): añade una Cell, vacía si hace falta, o usa Span");
+                            + " de " + columns.count() + " (Columns): falta una Cell, vacía si hace falta, o un Span");
                 }
             }
         }
@@ -230,7 +230,7 @@ final class TableBuilder {
         }
         if (aligns.size() != columns) {
             throw error(node.get(), ErrorCode.TABLE_COLUMN_ALIGN, "Column align da " + aligns.size()
-                    + " alineaciones y la tabla tiene " + columns + " columnas (Columns): escribe una por columna");
+                    + " alineaciones y la tabla tiene " + columns + " columnas (Columns): va una por columna");
         }
         return aligns;
     }
@@ -254,7 +254,7 @@ final class TableBuilder {
     static void cellText(InlineNode n, Box box) {
         n.getChildren().stream().filter(Nodes::isElement).findFirst().ifPresent(e -> {
             throw error(e, ErrorCode.CELL_CONTENT, "Una Cell tiene texto en el valor (línea " + n.getLine()
-                    + ") o elementos, no las dos cosas: pon el texto en un Paragraph");
+                    + ") o elementos y no las dos cosas: el texto va en un Paragraph");
         });
         font(n, n, box);
         box.setText(n.getText(), n.getLine(), false);

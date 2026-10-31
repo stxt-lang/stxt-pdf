@@ -147,7 +147,7 @@ public final class FontLibrary {
         }
         try {
             if (ttf.getTableMap().containsKey("fvar")) {
-                throw new ResourceException("La fuente " + file + " es variable: usa los ficheros TTF estáticos de cada variante");
+                throw new ResourceException("La fuente " + file + " es variable: hacen falta los ficheros TTF estáticos de cada variante");
             }
             String family = ttf.getNaming().getName(TYPOGRAPHIC_FAMILY, NameRecord.PLATFORM_WINDOWS,
                     NameRecord.ENCODING_WINDOWS_UNICODE_BMP, NameRecord.LANGUAGE_WINDOWS_EN_US);

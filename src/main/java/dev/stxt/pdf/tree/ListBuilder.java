@@ -53,11 +53,11 @@ final class ListBuilder {
      */
     static Box marker(InlineNode n, Box item, String text) {
         if (item.style().typography().font() == null) {
-            throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: declárala en "
+            throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "El marcador del List item necesita Font: se declara en "
                     + "el Typography del List item, de un antecesor o de Styles (For element: Document)");
         }
         if (!item.style().isDeclared(FONT_SIZE)) {
-            throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: decláralo "
+            throw error(n, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El marcador del List item necesita Size: se declara "
                     + "en el Typography del List item, de un antecesor o de Styles (For element: Document)");
         }
         Style s = Style.inheriting(item.style());
@@ -85,7 +85,7 @@ final class ListBuilder {
             if (problem != null) {
                 throw error(b.line(), ErrorCode.LIST_ITEM_WITHOUT_LINE, "El marcador del List item de la línea "
                         + item.line() + " se alinea con su primera línea, y el ítem " + problem
-                        + ": empieza con un texto, o usa Marker: none");
+                        + ": tiene que empezar con un texto, o llevar Marker: none");
             }
             b = b.inFlowChildren().get(0);
         }

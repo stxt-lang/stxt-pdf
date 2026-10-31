@@ -70,7 +70,7 @@ final class PageSetupReader {
         } else {
             if (orientation.isPresent()) {
                 throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "documento no lo declara: usa Paper o cambia el Width por el Height");
+                        + "documento no lo declara: hace falta Paper, o cambiar el Width por el Height");
             }
             if (widthNode.isEmpty() || heightNode.isEmpty()) {
                 throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.PAGE_SIZE, "Page necesita "
@@ -110,7 +110,7 @@ final class PageSetupReader {
             // Una sección que solo gira el papel del documento.
             if (base.paper() == null) {
                 throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "documento no lo declara (da Width y Height): declara Paper en la sección o en el documento");
+                        + "documento no lo declara (da Width y Height): Paper se declara en la sección o en el documento");
             }
             return base.paper();
         }

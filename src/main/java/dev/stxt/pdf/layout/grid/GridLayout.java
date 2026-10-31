@@ -95,7 +95,7 @@ public final class GridLayout implements LayoutAlgorithm {
         String hole = e.span() == 1 ? "1 " + across + " libre" : e.span() + " " + across + "s libres";
         return new InvalidModelException(item.style().line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
                 + e.track() + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks() + " "
-                + across + (e.tracks() == 1 ? "" : "s") + "): elige otra " + track + " o déjala en auto");
+                + across + (e.tracks() == 1 ? "" : "s") + "): hay que elegir otra " + track + " o dejarla en auto");
     }
 
     /** Pistas declaradas y, detrás, las implícitas {@code auto}. */

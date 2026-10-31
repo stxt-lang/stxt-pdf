@@ -56,7 +56,7 @@ final class ValueReader {
         Kind kind = kind(v);
         if (kind == null || !allowed.contains(kind)) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + p.getText().trim()
-                    + ": usa " + describe(allowed));
+                    + ": admite " + describe(allowed));
         }
         if (!negative && isNegative(v)) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite valores negativos: " + p.getText().trim());
@@ -68,14 +68,14 @@ final class ValueReader {
         List<Value> list = parse(p, () -> ValueParser.list(p.getText()));
         for (Value v : list) {
             if (v == Value.Keyword.FIT) {
-                throw error(p, ErrorCode.FIT_TRACK, "fit no es una pista de grid: usa auto, "
-                        + "que ya se ajusta al contenido");
+                throw error(p, ErrorCode.FIT_TRACK, "fit no es una pista de grid: la que se ajusta al contenido "
+                        + "es auto");
             }
             boolean valid = v instanceof Value.Between b
                     ? track(b.min()) && (track(b.max()) || kind(b.max()) == Kind.FRACTION)
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
-                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: usa "
+                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: admite "
                         + "números, porcentajes, fracciones (*), auto, narrowest, natural o between(a, b)");
             }
             if (isNegative(v)) {
@@ -301,7 +301,7 @@ final class ValueReader {
     static String color(Node n) {
         String t = n.getText().trim();
         if (!Colors.isValid(t)) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + t);
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + t);
         }
         return t;
     }
@@ -315,7 +315,7 @@ final class ValueReader {
         for (String part : parts) {
             if (!Colors.isValid(part)) {
                 throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Color no válido (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + part);
+                        "Color no válido (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + part);
             }
         }
         return Sides.shorthand(List.of(parts));
@@ -352,7 +352,7 @@ final class ValueReader {
             String stop = args[i].trim();
             if (!Colors.isValid(stop)) {
                 throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Color no válido en linear (usa #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + stop);
+                        "Color no válido en linear (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + stop);
             }
             stops.add(stop);
         }

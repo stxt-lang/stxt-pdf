@@ -65,7 +65,7 @@ public final class TableLayout implements LayoutAlgorithm {
                 && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
             throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "La cabecera y el pie de la "
                     + "tabla " + box.describe() + " miden " + pt(bodyStart + footHeight) + " y no dejan sitio al cuerpo "
-                    + "en una página vacía: se repiten en cada página; reduce su alto o quita filas de Head y Foot");
+                    + "en una página vacía, y se repiten en cada página: hay que reducir su alto o quitar filas de Head y Foot");
         }
 
         List<UnitBreaker.Placed> headItems = new ArrayList<>();

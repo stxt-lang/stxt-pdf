@@ -60,18 +60,18 @@ public final class Images {
             throw new InvalidModelException(box.line(), ErrorCode.IMAGE_TOO_LARGE, "La imagen " + box.image() + " tiene "
                     + (long) file.pixelWidth() + " × " + (long) file.pixelHeight() + " píxeles ("
                     + megapixels(file.pixels()) + ") y el máximo es " + megapixels(limits.maxImagePixels())
-                    + ": reduce su resolución (Limits.maxImagePixels lo cambia)");
+                    + ": hay que reducir su resolución (Limits.maxImagePixels lo cambia)");
         }
         if (file.svgDepth() > limits.maxSvgDepth()) {
             throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " anida "
                     + file.svgDepth() + " niveles y el máximo es " + limits.maxSvgDepth()
-                    + ": aplánalo (Limits.maxSvgDepth lo cambia)");
+                    + ": hay que aplanarlo (Limits.maxSvgDepth lo cambia)");
         }
         if (file.svgElements() > limits.maxSvgElements()) {
             throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " dibuja "
                     + (file.svgElements() >= (1L << 50) ? "una cantidad desorbitada de" : String.valueOf(file.svgElements()))
                     + " elementos, contando cada vez que un <use> repite un trozo, y el máximo es "
-                    + limits.maxSvgElements() + ": simplifícalo (Limits.maxSvgElements lo cambia)");
+                    + limits.maxSvgElements() + ": hay que simplificarlo (Limits.maxSvgElements lo cambia)");
         }
     }
 
@@ -87,7 +87,7 @@ public final class Images {
         if (bytes > limits.maxPdfBytes()) {
             throw new InvalidModelException(box.line(), ErrorCode.PDF_TOO_LARGE, "El PDF " + box.image() + " ocupa "
                     + megabytes(bytes) + " y el máximo es " + megabytes(limits.maxPdfBytes())
-                    + ": usa un PDF más pequeño, con solo las páginas que necesitas (Limits.maxPdfBytes lo cambia)");
+                    + ": hace falta un PDF más pequeño, con solo las páginas que se usan (Limits.maxPdfBytes lo cambia)");
         }
     }
 
@@ -104,7 +104,7 @@ public final class Images {
         if (box.style().isDeclared(PropertyKey.PDF_PAGE)) {
             if (file.format() != ImageFile.Format.PDF) {
                 throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "Pdf page solo "
-                        + "tiene efecto en un PDF, y la imagen " + box.image() + " es " + file.format() + ": quítalo");
+                        + "tiene efecto en un PDF, y la imagen " + box.image() + " es " + file.format() + ": sobra");
             }
             if (page > file.pages()) {
                 throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "El PDF "
@@ -116,7 +116,7 @@ public final class Images {
             String problem = excluded.contains(check) ? null : file.problem(page, check);
             if (problem != null) {
                 throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "La página " + page + " del PDF "
-                        + box.image() + " " + problem + " (o quita la comprobación " + check + " al convertir)");
+                        + box.image() + " " + problem + " (o se quita la comprobación " + check + " al convertir)");
             }
         }
     }

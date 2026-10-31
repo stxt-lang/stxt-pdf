@@ -246,8 +246,8 @@ public final class Paginator {
         if (found != null) {
             throw new InvalidModelException(found.line(), ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
                     + (found.id() != null ? found.id() : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
-                    + "sin número (Page numbering: none): quita el marcador, o pon la sección con Inherit page overlays: false "
-                    + "o el Page overlay en las secciones que numeran");
+                    + "sin número (Page numbering: none): sobra el marcador, o hace falta Inherit page overlays: false en la "
+                    + "sección o el Page overlay solo en las secciones que numeran");
         }
     }
 

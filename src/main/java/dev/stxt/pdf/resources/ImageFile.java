@@ -88,7 +88,7 @@ public final class ImageFile {
         }
         if (format == null) {
             throw new ImageFormatException("La imagen " + name + " no es PNG, JPEG, SVG ni PDF" + guess(head, n)
-                    + ": conviértela a uno de los cuatro");
+                    + ": hay que convertirla a uno de los cuatro");
         }
         Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName(format.name());
         ImageReader reader = readers.next();
@@ -165,7 +165,7 @@ public final class ImageFile {
         String family = SvgInspector.firstFamily(use.family());
         if (SvgInspector.isGeneric(family)) {
             throw new ImageFormatException(where + " usa la familia genérica " + family + ", que habría que sustituir "
-                    + "por otra: nombra una familia de resources/fonts/");
+                    + "por otra: tiene que ser una familia de resources/fonts/");
         }
         FontFace face = new FontFace(family, use.bold() ? FontWeight.BOLD : FontWeight.NORMAL,
                 use.italic() ? FontStyle.ITALIC : FontStyle.NORMAL);

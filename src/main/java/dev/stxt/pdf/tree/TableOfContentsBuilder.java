@@ -85,11 +85,11 @@ final class TableOfContentsBuilder {
     private static void fill(BuildContext ctx, Box contents, List<Box> headings) {
         Style s = contents.style();
         if (s.typography().font() == null) {
-            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: declárala en el "
+            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT, "El índice necesita Font: se declara en el "
                     + "Typography del Table of contents, de un antecesor o de Styles (For element: Document)");
         }
         if (!s.isDeclared(PropertyKey.FONT_SIZE)) {
-            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: decláralo en el "
+            throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El índice necesita Size: se declara en el "
                     + "Typography del Table of contents, de un antecesor o de Styles (For element: Document)");
         }
         List<Box> listed = headings.stream()

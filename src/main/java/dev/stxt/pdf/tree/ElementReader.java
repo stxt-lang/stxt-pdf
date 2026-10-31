@@ -57,7 +57,7 @@ enum ElementReader {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             if (s.typography().codeFont() == null) {
-                throw error(n, ErrorCode.CODE_WITHOUT_FONT, "El bloque de código necesita Code font: declárala en el "
+                throw error(n, ErrorCode.CODE_WITHOUT_FONT, "El bloque de código necesita Code font: se declara en el "
                         + "Typography del Markdown, de un antecesor o de Styles (For element: Document o For element: Code "
                         + "block), como Code font: IBM Plex Mono");
             }
@@ -330,7 +330,7 @@ enum ElementReader {
             if (r.format().code()) {
                 if (family == null) {
                     throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "El código necesita Code font: "
-                            + "declárala en el Typography del texto, de un antecesor o de Styles (For element: Document), "
+                            + "se declara en el Typography del texto, de un antecesor o de Styles (For element: Document), "
                             + "como Code font: IBM Plex Mono");
                 }
                 r = new TextRun(r.text(), r.format().withFamily(family));
@@ -364,7 +364,7 @@ enum ElementReader {
         boolean value = !n.getText().isBlank();
         if (value && content.isPresent()) {
             throw error(content.get(), ErrorCode.TEXT_CONTENT, n.getName() + " tiene el texto en el valor y en Content "
-                    + "(línea " + n.getLine() + "): deja solo uno");
+                    + "(línea " + n.getLine() + "): va en uno solo");
         }
         if (!value && content.isEmpty()) {
             throw error(n, ErrorCode.TEXT_CONTENT, n.getName() + " necesita su texto: en el valor ("
@@ -382,9 +382,9 @@ enum ElementReader {
                 // El bloque empieza en la línea siguiente a Content; la línea en blanco, tras el salto encontrado.
                 int line = source.getLine() + 2 + (int) text.substring(0, blank.start()).chars().filter(c -> c == '\n').count();
                 throw error(line, ErrorCode.TEXT_BLANK_LINE, paragraph
-                        ? "Un Paragraph es un solo párrafo: quita la línea en blanco o usa un Paragraph para cada uno"
-                        : "Un Text no tiene párrafos: quita la línea en blanco, o escribe un Paragraph para cada párrafo "
-                        + "(en un Block si van juntos); en un texto preformateado (White space: preserve) sí vale");
+                        ? "Un Paragraph es un solo párrafo: sobra la línea en blanco, o va un Paragraph para cada uno"
+                        : "Un Text no tiene párrafos: sobra la línea en blanco, o va un Paragraph para cada párrafo "
+                        + "(en un Block si van juntos). En un texto preformateado (White space: preserve) sí vale");
             }
         }
         box.setText(source.getText(), source.getLine(), source instanceof TextNode);

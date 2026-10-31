@@ -141,7 +141,7 @@ public final class ValueParser {
         String t = s.trim();
         if (!NUMBER.matcher(t).matches()) {
             throw new IllegalArgumentException("Valor no válido: " + original.trim()
-                    + " (usa punto decimal, por ejemplo 12.5)");
+                    + " (el decimal se escribe con punto, por ejemplo 12.5)");
         }
         return Double.parseDouble(t);
     }

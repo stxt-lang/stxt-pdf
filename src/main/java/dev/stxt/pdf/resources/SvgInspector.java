@@ -464,7 +464,7 @@ final class SvgInspector {
             double h = height;
             if (Double.isNaN(w) && Double.isNaN(h)) {
                 if (viewBox == null) {
-                    throw new ImageFormatException("El SVG " + name + " no tiene tamaño: declara width y height, o "
+                    throw new ImageFormatException("El SVG " + name + " no tiene tamaño: le faltan width y height, o "
                             + "un viewBox, en su <svg>");
                 }
                 w = viewBox[2];

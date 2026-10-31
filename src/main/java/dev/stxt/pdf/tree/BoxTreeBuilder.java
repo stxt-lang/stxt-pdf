@@ -198,7 +198,7 @@ public final class BoxTreeBuilder {
                     if (first && beginOn == Section.BeginOn.ODD) {
                         // La primera página del documento ya es impar (referencia/componentes/document.md).
                         throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd no tiene efecto en la primera "
-                                + "sección, que ya empieza en la página 1: quítalo");
+                                + "sección, que ya empieza en la página 1: sobra");
                     }
                 }
                 default -> {
@@ -208,11 +208,11 @@ public final class BoxTreeBuilder {
         // Lo que no tendría efecto (referencia/componentes/document.md#numeración-de-las-páginas).
         if (startNode != null && numbering != Section.PageNumbering.RESTART) {
             throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start solo tiene efecto con Page numbering: "
-                    + "restart, que es cuando la numeración vuelve a empezar: decláralo o quita Start");
+                    + "restart, que es cuando la numeración vuelve a empezar: falta restart o sobra Start");
         }
         if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
             throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format no tiene efecto con Page "
-                    + "numbering: none, porque las páginas de la sección no tienen número: quítalo");
+                    + "numbering: none, porque las páginas de la sección no tienen número: sobra");
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
@@ -309,7 +309,7 @@ public final class BoxTreeBuilder {
         boolean item = wrapper != null && !is(wrapper, "row");
         if (item && s.containMargins()) {
             throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ITEM, "Contain margins no tiene efecto en un ítem de "
-                    + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: quítalo");
+                    + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: sobra");
         }
         if (ctx.unbreakable == null) {
             return;
@@ -319,7 +319,7 @@ public final class BoxTreeBuilder {
             if (group.isPresent() && !inline(group.get()).getChildren().isEmpty()) {
                 Node p = inline(group.get()).getChildren().get(0);
                 throw error(p, ErrorCode.BREAK_IN_UNBREAKABLE, p.getName() + " no tiene efecto dentro de "
-                        + ctx.unbreakable + ", que no se parte entre páginas: quítalo");
+                        + ctx.unbreakable + ", que no se parte entre páginas: sobra");
             }
         }
     }
@@ -341,7 +341,7 @@ public final class BoxTreeBuilder {
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideColumns && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
             throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
-                    + "Columns: su posición no depende de las columnas; sácalo del Columns");
+                    + "Columns: su posición no depende de las columnas, así que va fuera del Columns");
         }
         if (kind.headingLevel() > 0) {
             heading(ctx, n, kind.headingLevel());
@@ -417,7 +417,7 @@ public final class BoxTreeBuilder {
     private static void heading(BuildContext ctx, InlineNode n, int level) {
         if (ctx.insidePageOverlay) {
             throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "Un " + n.getName() + " no puede estar dentro de un Page overlay, "
-                    + "que se repite en cada página y no forma parte del contenido: usa un Text");
+                    + "que se repite en cada página y no forma parte del contenido: ahí va un Text");
         }
         if (level > ctx.headingLevel + 1) {
             throw error(n, ErrorCode.HEADING_LEVEL, ctx.headingLevel == 0

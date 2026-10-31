@@ -167,7 +167,7 @@ class BoxTreeBuilderTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 12")));
         assertEquals(9, e.line());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.errorCode());
-        assertEquals("línea 9: El texto necesita Font: declárala en el Typography del Text, de un antecesor "
+        assertEquals("línea 9: El texto necesita Font: se declara en el Typography del Text, de un antecesor "
                 + "o de Styles (For element: Document)", e.getMessage());
         // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(

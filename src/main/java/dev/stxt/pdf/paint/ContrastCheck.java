@@ -220,7 +220,7 @@ public final class ContrastCheck implements Canvas {
         return new InvalidModelException(line, ErrorCode.CONTRAST_LOW, "El texto de la caja " + box.describe()
                 + " tiene un contraste de " + decimal(ratio) + ":1 con su fondo (" + hex(ink) + " sobre "
                 + hex(backdrop) + ") y necesita " + decimal(needed) + ":1 (3:1 en el texto grande: Size de 18 o más, "
-                + "o de 14 en negrita): cambia su Color o el fondo");
+                + "o de 14 en negrita): hay que cambiar su Color o el fondo");
     }
 
     /** {@code 2,85}: con coma y hacia abajo, para que nunca parezca que llega. */

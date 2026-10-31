@@ -287,9 +287,9 @@ public final class ColumnsLayout implements LayoutAlgorithm {
             String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO).filter(s::isDeclared).findFirst().orElse(null);
             return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(box.line()),
                     ErrorCode.BOX_OVERFLOW,
-                    "El contenido del Multicol " + box.describe() + " no cabe en su alto: " + columns.count()
+                    "El contenido del Columns " + box.describe() + " no cabe en su alto: " + columns.count()
                             + (columns.count() == 1 ? " columna" : " columnas") + " de " + pt(Math.max(0, limit))
-                            + " no bastan; aumenta su alto o reduce el contenido");
+                            + " no bastan: hay que aumentar su alto o reducir el contenido");
         }
 
         /** Sin página ni alto que llenar, los cortes de columna necesitan más columnas de las que hay. */
@@ -297,9 +297,9 @@ public final class ColumnsLayout implements LayoutAlgorithm {
             Style s = box.style();
             return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : SourceLine.of(box.line()),
                     ErrorCode.BOX_OVERFLOW,
-                    "El Multicol " + box.describe() + " tiene " + columns.count() + (columns.count() == 1 ? " columna" : " columnas")
+                    "El Columns " + box.describe() + " tiene " + columns.count() + (columns.count() == 1 ? " columna" : " columnas")
                             + " y sus cortes de columna necesitan más: sin página ni alto que llenar, lo que no "
-                            + "cabe no puede seguir en otra página; quita cortes de columna o añade columnas");
+                            + "cabe no puede seguir en otra página. Sobran cortes de columna o faltan columnas");
         }
     }
 }

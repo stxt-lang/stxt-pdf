@@ -70,13 +70,13 @@ final class ModelValidator {
         String direction = "Direction: " + (s.flex().isHorizontal() ? "horizontal" : "vertical");
         if (s.flex().mainAxis() == Distribution.STRETCH) {
             throw error(s.line(s.flex().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " es el eje principal de "
-                    + "este Flex (" + direction + ") y reparte el espacio sobrante: no admite stretch; usa Grow en los "
-                    + "ítems");
+                    + "este Flex (" + direction + ") y reparte el espacio sobrante: no admite stretch. Lo que estira los "
+                    + "ítems es su Grow");
         }
         String spread = crossSpread(s);
         if (spread != null) {
             throw error(s.line(s.flex().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " es el eje cruzado de "
-                    + "este Flex (" + direction + ") y alinea los ítems: admite start, end, center o stretch, no "
+                    + "este Flex (" + direction + ") y alinea los ítems: admite start, end, center o stretch y no "
                     + spread + ", que reparte el eje principal (" + main + ")");
         }
         if (s.isDeclared(FLEX_LINES) && !s.flex().wrap()) {
@@ -88,7 +88,7 @@ final class ModelValidator {
             String unused = s.flex().direction() == Direction.HORIZONTAL
                     ? "primero, el hueco entre filas," : "segundo, el hueco entre columnas,";
             throw error(s.line(FLEX_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
-                    + " línea y el " + unused + " no tiene efecto: escribe un solo valor, el hueco entre ítems");
+                    + " línea y el " + unused + " no tiene efecto: va un solo valor, el hueco entre ítems");
         }
     }
 
@@ -106,20 +106,20 @@ final class ModelValidator {
             for (String p : List.of(COLUMN_GAP, SEPARATOR)) {
                 if (s.isDeclared(p)) {
                     throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(SEPARATOR) ? "Separator" : "Gap")
-                            + " no tiene efecto con Count: 1, porque no hay dos columnas que separar: quítalo");
+                            + " no tiene efecto con Count: 1, porque no hay dos columnas que separar: sobra");
                 }
             }
         }
         if (s.isDeclared(SEPARATOR_COLOR) && !s.isDeclared(SEPARATOR)) {
             throw error(s.line(SEPARATOR_COLOR), ErrorCode.SEPARATOR_COLOR_WITHOUT_SEPARATOR,
-                    "Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas: declara su "
-                            + "grosor o quítalo");
+                    "Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas: falta el "
+                            + "grosor o sobra el color");
         }
         if (s.columns().separator() > s.columns().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Gap (" + s.line(COLUMN_GAP) + ")"
                     : "Gap, que sin declarar es 0";
             throw error(s.line(SEPARATOR), ErrorCode.SEPARATOR_WIDTH, "Separator es más ancho que " + gap
-                    + ": la línea se pintaría sobre las columnas; ensancha Gap o adelgaza Separator");
+                    + ": la línea se pintaría sobre las columnas. Hay que ensanchar Gap o adelgazar Separator");
         }
     }
 
@@ -131,7 +131,7 @@ final class ModelValidator {
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
-                        + " no tiene efecto en una Image, que no se parte entre páginas: quítalo");
+                        + " no tiene efecto en una Image, que no se parte entre páginas: sobra");
             }
         }
     }
@@ -146,7 +146,7 @@ final class ModelValidator {
         if (s.rotation() == null) {
             if (s.isDeclared(ROTATE_ORIGIN)) {
                 throw error(s.line(ROTATE_ORIGIN), ErrorCode.ROTATE_ORIGIN_WITHOUT_ROTATE, "Rotate origin no tiene "
-                        + "efecto sin Rotate: declara el giro o quítalo");
+                        + "efecto sin Rotate: falta el giro o sobra Rotate origin");
             }
             return;
         }
@@ -157,12 +157,12 @@ final class ModelValidator {
         for (String p : List.of(BREAK_INSIDE, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(BREAK_INSIDE) ? "Inside" : "Edges")
-                        + " no tiene efecto en " + what + ", que no se parte entre páginas: quítalo");
+                        + " no tiene efecto en " + what + ", que no se parte entre páginas: sobra");
             }
         }
         if (s.rotatesInFlow() && s.containMargins()) {
             throw error(s.line("contain-margins"), ErrorCode.CONTAIN_MARGINS_IN_ROTATED, "Contain margins no tiene efecto en una caja girada, "
-                    + "que ya corta el colapso de márgenes con sus hijos: quítalo");
+                    + "que ya corta el colapso de márgenes con sus hijos: sobra");
         }
     }
 
@@ -176,7 +176,7 @@ final class ModelValidator {
         if ((flexItem || gridItem) && s.rotatesInFlow()) {
             // Un ítem ocupa el sitio que le da su contenedor (referencia/comun/capas-y-giro.md).
             throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (flexItem ? "Flex" : "Grid")
-                    + " no puede girar: ocupa el sitio que le da su contenedor; gira una caja dentro del ítem (un "
+                    + " no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem (un "
                     + "Block con la caja girada dentro)");
         }
 
@@ -218,7 +218,7 @@ final class ModelValidator {
             String cross = horizontal ? "Vertical" : "Horizontal";
             throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " no tiene efecto en un ítem de un Flex con "
                     + "Direction: " + main.toLowerCase(Locale.ROOT) + ", porque es su eje principal: el reparto "
-                    + "lo da el " + main + " del Flex y el tamaño, Grow y Shrink; alinea el ítem con " + cross);
+                    + "lo dan el " + main + " del Flex y el tamaño, Grow y Shrink, y el ítem se alinea con " + cross);
         }
     }
 
@@ -231,8 +231,8 @@ final class ModelValidator {
                 : s.breaks().after() == Break.COLUMN ? BREAK_AFTER : null;
         if (property != null) {
             throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_COLUMNS, (property.equals(BREAK_BEFORE)
-                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Columns: usa page para "
-                    + "cortar la página");
+                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Columns: para "
+                    + "cortar la página se usa page");
         }
     }
 
@@ -245,11 +245,11 @@ final class ModelValidator {
         if (s.position() == Position.FRAME) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
                 throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
-                        + "desde arriba y desde abajo: deja uno de los dos en auto");
+                        + "desde arriba y desde abajo: uno de los dos tiene que quedar en auto");
             }
             if (!o.left().isAuto() && !o.right().isAuto()) {
                 throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
-                        + "desde la izquierda y desde la derecha: deja uno de los dos en auto");
+                        + "desde la izquierda y desde la derecha: uno de los dos tiene que quedar en auto");
             }
             return;
         }
@@ -257,12 +257,12 @@ final class ModelValidator {
         if (!o.left().isAuto() && !s.box().width().isAuto() && !o.right().isAuto()
                 && !s.box().margin().left().isAuto() && !s.box().margin().right().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
-                    + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
+                    + "posición dos veces: uno tiene que quedar en auto, o centrar con Margin auto");
         }
         if (!o.top().isAuto() && !s.box().height().isAuto() && !o.bottom().isAuto()
                 && !s.box().margin().top().isAuto() && !s.box().margin().bottom().isAuto()) {
             throw error(line, ErrorCode.OVERCONSTRAINED, "Arriba, Height y abajo declarados fijan la "
-                    + "posición dos veces: deja uno en auto, o usa Margin auto para centrar");
+                    + "posición dos veces: uno tiene que quedar en auto, o centrar con Margin auto");
         }
     }
 
@@ -289,14 +289,14 @@ final class ModelValidator {
         if (parentLayout == Layout.BLOCK) {
             if (verticalAuto) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
-                        "Margin auto en vertical no tiene efecto en flujo de bloque: usa un número");
+                        "Margin auto en vertical no tiene efecto en flujo de bloque: va un número");
             }
             // Una imagen con Width auto mide su ancho natural, y una caja girada en flujo, su contenido: no todo el
             // ancho, así que se pueden centrar.
             if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout() != Layout.IMAGE
                     && !s.rotatesInFlow()) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
-                        + "todo el ancho: declara Width o Max width");
+                        + "todo el ancho: le falta Width o Max width");
             }
         }
     }
@@ -366,7 +366,7 @@ final class ModelValidator {
             }
             if (s.item().grow() > 0) {
                 throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
-                        + "vertical del padre no tiene un alto definido que repartir; declara su Height");
+                        + "vertical del padre no tiene un alto definido que repartir: le falta su Height");
             }
         }
     }
@@ -414,17 +414,17 @@ final class ModelValidator {
 
     private static InvalidModelException indefinite(SourceLine line, String what) {
         return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " usa un porcentaje de un alto que no es "
-                + "definido: declara el Height del containing block, o usa puntos");
+                + "definido: hace falta el Height de su contenedor de referencia, o una medida en puntos");
     }
 
     /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
     static void font(InlineNode n, Node source, Box box) {
         if (box.style().typography().font() == null) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: declárala en el Typography del "
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: se declara en el Typography del "
                     + n.getName() + ", de un antecesor o de Styles (For element: Document)");
         }
         if (!box.style().isDeclared(FONT_SIZE)) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: decláralo en el Typography del "
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: se declara en el Typography del "
                     + n.getName() + ", de un antecesor o de Styles (For element: Document)");
         }
     }

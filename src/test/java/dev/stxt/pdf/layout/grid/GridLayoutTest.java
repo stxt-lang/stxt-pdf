@@ -258,7 +258,7 @@ class GridLayoutTest {
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: 1 auto 1 2", "\t\t\tBlock:")).getMessage();
         assertTrue(two.contains("En la fila 1 no queda un hueco de 2 columnas libres para este ítem (la rejilla tiene "
-                + "2 columnas): elige otra fila"), two);
+                + "2 columnas): hay que elegir otra fila"), two);
         String one = assertThrows(InvalidModelException.class, () -> layOut(
                 "\tGrid:", "\t\tColumn sizes: 100",
                 "\t\tArea: 1 1", "\t\t\tBlock:",
@@ -269,6 +269,6 @@ class GridLayoutTest {
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: auto 1", "\t\t\tBlock:")).getMessage();
         assertTrue(column.contains("En la columna 1 no queda un hueco de 1 fila libre para este ítem (la rejilla tiene "
-                + "1 fila): elige otra columna"), column);
+                + "1 fila): hay que elegir otra columna"), column);
     }
 }

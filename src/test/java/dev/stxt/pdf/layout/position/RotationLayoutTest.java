@@ -161,7 +161,7 @@ class RotationLayoutTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
                 "\tText: " + "palabra ".repeat(20).strip(), "\t\tRotate: 5"));
         assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
-        assertTrue(e.getMessage().contains("dale un Width"), e.getMessage());
+        assertTrue(e.getMessage().contains("Le falta un Width"), e.getMessage());
     }
 
     /** Las líneas del documento con {@code {}} sustituida por {@code line}. */

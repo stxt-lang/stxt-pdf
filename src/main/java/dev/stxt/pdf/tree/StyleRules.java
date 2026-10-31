@@ -352,7 +352,7 @@ final class StyleRules {
                 throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Estilo repetido en Style: " + name);
             }
             if (!classNames.contains(name)) {
-                throw error(n, ErrorCode.STYLE_WITHOUT_RULE, "El estilo " + name + " no tiene regla: añade "
+                throw error(n, ErrorCode.STYLE_WITHOUT_RULE, "El estilo " + name + " no tiene regla: falta "
                         + "'For style: " + name + "' en Styles");
             }
         }

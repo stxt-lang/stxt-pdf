@@ -237,8 +237,8 @@ final class MarkdownBuilder {
             String literal = fenced ? ((FencedCodeBlock) b).getLiteral() : ((IndentedCodeBlock) b).getLiteral();
             if (fenced && !((FencedCodeBlock) b).getInfo().isBlank()) {
                 throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite la etiqueta de lenguaje de un "
-                        + "bloque de código (" + ((FencedCodeBlock) b).getInfo().strip() + "): no hay resaltado; "
-                        + "quítala");
+                        + "bloque de código (" + ((FencedCodeBlock) b).getInfo().strip() + "): no hay resaltado, así que "
+                        + "sobra");
             }
             if (literal.endsWith("\n")) {
                 literal = literal.substring(0, literal.length() - 1);
@@ -265,7 +265,7 @@ final class MarkdownBuilder {
         private InlineNode image(Image i, int line) {
             if (i.getTitle() != null && !i.getTitle().isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de una imagen "
-                        + "(\"" + i.getTitle() + "\"): describe la imagen en su texto alternativo, ![…]");
+                        + "(\"" + i.getTitle() + "\"): la imagen se describe en su texto alternativo, ![...]");
             }
             InlineNode image = node("Image", i.getDestination(), line);
             String alt = TextRun.text(inline(i, line)).strip();
@@ -359,7 +359,7 @@ final class MarkdownBuilder {
             }
             if (cells > columns) {
                 throw error(line(row), ErrorCode.MARKDOWN_UNSUPPORTED, "La fila tiene " + cells + " celdas y la "
-                        + "cabecera " + columns + ": quita las que sobran, que Markdown descartaría sin avisar");
+                        + "cabecera " + columns + ": sobran celdas, que Markdown descartaría sin avisar");
             }
         }
 
@@ -479,7 +479,7 @@ final class MarkdownBuilder {
         private static TextFormat link(Link l, TextFormat f, int line) {
             if (l.getTitle() != null && !l.getTitle().isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de un enlace (\""
-                        + l.getTitle() + "\"): quítalo, [texto](destino)");
+                        + l.getTitle() + "\"): sobra, [texto](destino)");
             }
             String destination = l.getDestination().strip();
             Links.problem(destination).ifPresent(problem -> {
@@ -519,7 +519,7 @@ final class MarkdownBuilder {
         InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
             if (n instanceof Image) {
-                what = inlineOnly ? "imágenes (usa un Image)"
+                what = inlineOnly ? "imágenes (una imagen va en un Image)"
                         : "imágenes dentro de un texto (una imagen va sola en su párrafo)";
             } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
                 what = "código";

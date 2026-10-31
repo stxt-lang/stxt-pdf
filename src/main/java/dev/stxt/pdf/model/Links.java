@@ -42,12 +42,12 @@ public final class Links {
      */
     public static Optional<String> problem(String destination) {
         if (destination.isEmpty()) {
-            return Optional.of("el destino está vacío; usa una URL (https://…, mailto:…) o #id");
+            return Optional.of("el destino está vacío: tiene que ser una URL (https://..., mailto:...) o #id");
         }
         if (internal(destination)) {
             String id = target(destination);
             if (id.isEmpty() || id.chars().anyMatch(Character::isWhitespace)) {
-                return Optional.of("'" + destination + "' no es el Id de una caja: usa #id, sin espacios");
+                return Optional.of("'" + destination + "' no es el Id de una caja: se escribe #id, sin espacios");
             }
             return Optional.empty();
         }

@@ -95,13 +95,13 @@ public final class Overflow {
                 throw new InvalidModelException(own ? s.line(ROTATE) : SourceLine.of(f.box().line()),
                         ErrorCode.BOX_OVERFLOW,
                         "La caja " + f.box().describe() + (own ? " girada" : ", dentro de una caja girada,")
-                                + " se sale de la página: revisa " + (own ? "su Rotate, su Rotate origin, " : "")
+                                + " se sale de la página: hay que revisar " + (own ? "su Rotate, su Rotate origin, " : "")
                                 + "su posición y su tamaño");
             }
         } else if (s.isOutOfFlow() && !inside(borderBox, page)) {
             throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : SourceLine.of(f.box().line()),
-                    ErrorCode.BOX_OVERFLOW, "La caja " + f.box().describe() + " se sale de la página: revisa su "
-                    + "Offset y su tamaño");
+                    ErrorCode.BOX_OVERFLOW, "La caja " + f.box().describe() + " se sale de la página: hay que revisar "
+                    + "su Offset y su tamaño");
         }
         double cx = borderBox.x() + f.border().left() + f.padding().left();
         double cy = borderBox.y() + f.border().top() + f.padding().top();
@@ -169,8 +169,8 @@ public final class Overflow {
             if (m.width() > room + TOLERANCE) {
                 throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "El marcador '"
                         + m.box().text().strip() + "' del List item " + item.box().describe() + " mide " + pt(m.width())
-                        + " con su espacio, y la sangría deja " + pt(room) + ": aumenta el Padding izquierdo de "
-                        + "la lista o el margen izquierdo del ítem");
+                        + " con su espacio, y la sangría deja " + pt(room) + ": hay que aumentar el Padding izquierdo "
+                        + "de la lista o el margen izquierdo del ítem");
             }
         }
     }
@@ -193,9 +193,9 @@ public final class Overflow {
                 String property = s.isDeclared(WIDTH) ? WIDTH : ROTATE;
                 return new InvalidModelException(s.line(property), ErrorCode.BOX_OVERFLOW, "La caja "
                         + c.box().describe() + " girada no cabe a lo ancho: el rectángulo que la envuelve mide "
-                        + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left) + "; "
-                        + (s.isDeclared(WIDTH) ? "reduce su Width" : "dale un Width, que reparte su texto en líneas,")
-                        + " o cambia su Rotate");
+                        + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left) + ". "
+                        + (s.isDeclared(WIDTH) ? "Hay que reducir su Width" : "Le falta un Width, que reparte su texto en líneas,")
+                        + " o hay que cambiar su Rotate");
             }
             double cx = x + c.border().left() + c.padding().left();
             // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
@@ -225,7 +225,7 @@ public final class Overflow {
                 return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(c.box().line()),
                         ErrorCode.BOX_OVERFLOW, "La caja " + c.box().describe() + " no cabe a lo ancho: mide "
                         + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left)
-                        + "; reduce su ancho o el de su contenido");
+                        + ": hay que reducir su ancho o el de su contenido");
             }
             c = inner;
         }
@@ -303,12 +303,12 @@ public final class Overflow {
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
         if (box.style().typography().whiteSpace() == WhiteSpace.PRESERVE) {
-            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: pre "
-                    + "('" + excerpt(word) + "'…) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
-                    + pt(width) + "; ensancha la caja, reduce el Size o usa White space: preserve-wrap, que parte las líneas");
+            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con White space: preserve "
+                    + "('" + excerpt(word) + "'...) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja deja "
+                    + pt(width) + ". Hay que ensanchar la caja, reducir el Size o usar White space: preserve-wrap, que parte las líneas");
         }
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + excerpt(word) + "' no cabe en "
                 + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)
-                + "; ensancha la caja o reduce el Size del texto");
+                + ": hay que ensanchar la caja o reducir el Size del texto");
     }
 }
