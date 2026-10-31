@@ -53,8 +53,8 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * {@link PendingOverlay} with the corner of the content box as static position. The
  * {@code Frame} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
- * <p>Simplification: in vertical, the automatic minimum of an item with a declared {@code Height}
- * is that height, not the height of its content.</p>
+ * <p>In vertical, the automatic minimum of an item with a declared {@code Height} is the height of its content
+ * measured without that {@code Height}, never more than it ({@link ConstraintSpace#measuringContentHeight}).</p>
  *
  * <p>Across pages (reference/common/breaks.md) the break goes between lines in horizontal and between items in
  * vertical, with {@link UnitBreaker}; a line (in vertical, an item) that does not fit on

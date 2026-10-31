@@ -373,13 +373,16 @@ public final class UnitBreaker {
                     next.add(null);
                     continue;
                 }
-                double y = tokens == null ? p.y() - origin : 0;
+                // The item is broken at its place in the flow, without the offset of a Frame, which is applied
+                // afterwards (reference/components/frame-and-overlays.md).
+                double dy = p.frameOffset().dy();
+                double y = tokens == null ? p.y() - dy - origin : 0;
                 LayoutResult r = context.layout(p.box(),
                         p.space().fragmented(remaining - y, space.atFragmentainerStart()), token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return null;
                 }
-                split[k] = piece(p, r, y + repeat.headHeight());
+                split[k] = piece(p, r, y + dy + repeat.headHeight());
                 next.add(r.breakToken());
                 if (!r.isFinished()) {
                     broken = true;

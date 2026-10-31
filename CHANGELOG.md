@@ -11,6 +11,9 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   before it. Before, an empty box with a fixed `Height` in that position was `PAGE_OVERFLOW` «it is 0 high».
 - An empty box (no height, border, padding or content) never overflows vertically: its merged margins can leave it past
   the end of its parent's content, at the end of a block or just before a page break, and that was `BOX_OVERFLOW`.
+- A `Frame` item of a `Stack` line or a `Grid` row that is split in parallel across pages is broken at its place in
+  the flow, as in block flow: its `Offset` moves its fragments afterwards. Before, a vertical `Offset` took that much
+  space away from the item on the first page, and its continuation lost the offset.
 - The `After: page` (or `column`) of an empty box, and the forced break before the child that follows it, apply also
   when the empty box opens its block. Before, they were lost unless something with content had been placed before.
 - The `Keep with next` of the last in-flow child of a block, and the `Keep with previous` of the first one, also apply to

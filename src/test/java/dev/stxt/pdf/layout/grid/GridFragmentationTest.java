@@ -116,6 +116,25 @@ class GridFragmentationTest {
     }
 
     /**
+     * A Frame item of a row that is split in parallel is broken at its place in the flow, as in block flow: its
+     * Offset moves its fragments afterwards and does not take space away from it. F (14 lines of 12) places 8 lines
+     * on page 1 (96), as the same text without Offset would, and its fragments are 10 lower.
+     */
+    @Test
+    void frameOffsetDoesNotChangeTheParallelBreak() {
+        String text = String.join(" ", java.util.Collections.nCopies(40, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 100 100",
+                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tFrame:", "\t\t\t\tId: F",
+                "\t\t\t\tOffset: 10 auto auto auto", "\t\t\t\tText: " + text,
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 150");
+        assertEquals(2, l.pages());
+        assertRect(40, 50, 100, 96, l.rect(1, "F"));
+        assertRect(40, 50, 100, 72, l.rect(2, "F"));
+        assertRect(140, 40, 100, 100, l.rect(1, "B"));
+        assertRect(140, 40, 100, 50, l.rect(2, "B"));
+    }
+
+    /**
      * The second row (20 lines of 12 in a column of 30) does not fit on any page: it starts on page 2, where it is
      * split in parallel from the top even though in the whole grid it starts at 30 (mutation testing). T does not
      * stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and 40.
