@@ -116,6 +116,16 @@ class FontLibraryTest {
                 e.getMessage());
     }
 
+    /** The families of the message are in alphabetical order, so the message is the same on every run. */
+    @Test
+    void unknownFamilyListsTheFamiliesInOrder() {
+        Resources r = new Resources();
+        ResourceException e = assertThrows(ResourceException.class, () -> r.fonts().find(
+                new FontFace("Arial", FontWeight.NORMAL, FontStyle.NORMAL)));
+        assertEquals("Unknown font: Arial. Families in " + r.fontsFolder()
+                + ": IBM Plex Mono, IBM Plex Sans, IBM Plex Serif", e.getMessage());
+    }
+
     @Test
     void twoFilesForTheSameFont() throws IOException {
         Resources r = copy("a", "Regular");
