@@ -9,21 +9,21 @@ resources/
 	images/     imágenes .png, .jpg y .svg
 ```
 
-Dentro de cada una puedes organizar subcarpetas como quieras. La carpeta se puede cambiar al convertir
+Dentro de cada una, las subcarpetas son libres. La carpeta se puede cambiar al convertir
 ([Uso desde Java](uso-desde-java.md)).
 
 ## Fuentes
 
 - Se usan solo las fuentes `.ttf` de `fonts/`: no las del sistema. Van incrustadas en el PDF, así que se ve igual en cualquier
-  ordenador; su licencia tiene que permitirlo (como la SIL Open Font License).
+  ordenador. Su licencia tiene que permitirlo, como la SIL Open Font License.
 - Cada fichero se reconoce por la familia, el peso y el estilo que declara dentro, no por su nombre. `Font: IBM Plex Sans`
   con `Bold: true` busca el fichero de esa familia con peso 700.
 - Solo cuentan los pesos normal (400) y negrita (700). Si un texto pide una variante que no tiene fichero (negrita con
   cursiva, por ejemplo), es un error: no se inventa.
 - El repositorio incluye IBM Plex Sans, Serif y Mono, con las cuatro variantes.
 
-Para añadir una fuente, copia sus `.ttf` estáticos (no las fuentes variables) en `fonts/` y usa su familia en `Font`. Si la
-escribes mal, el error lista las familias que hay.
+Una fuente nueva se añade copiando sus `.ttf` estáticos en `fonts/` (las fuentes variables no sirven) y se usa con su
+familia en `Font`. Si el nombre está mal escrito, el error lista las familias que hay.
 
 ## Imágenes
 

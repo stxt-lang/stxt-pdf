@@ -11,7 +11,7 @@ try (OutputStream out = Files.newOutputStream(Path.of("informe.pdf"))) {
 }
 ```
 
-`DocumentReader` lee y valida el documento; `Converter` lo maqueta y escribe el PDF. Un `Converter` se crea una vez y se
+`DocumentReader` lee y valida el documento. `Converter` lo maqueta y escribe el PDF. Un `Converter` se crea una vez y se
 puede usar desde varios hilos a la vez.
 
 ## Opciones
@@ -44,7 +44,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 |---|---|
 | `Check.CONTRAST` | Un texto que apenas se distingue de su fondo ([Caja](caja.md#contraste)) |
 | `Check.PDF_IMAGE_FONTS` | Una página de un PDF con una fuente sin incrustar o que no dice qué carácter es cada glifo ([Image](../componentes/image.md#una-página-de-un-pdf)) |
-| `Check.PDF_IMAGE_ANNOTATIONS` | Una página de un PDF con un campo de formulario o un comentario que se ven, que no se dibujarían |
+| `Check.PDF_IMAGE_ANNOTATIONS` | Una página de un PDF con un campo de formulario o un comentario visibles, que no se dibujarían |
 
 ## Errores
 
@@ -66,7 +66,7 @@ try {
 ## Más
 
 - Para usar las páginas antes de pintarlas, o escribir también un SVG de cada página: `converter.layOut(doc)` y
-  `converter.toSvg(…)`.
-- En un servidor sin pantalla, arranca la JVM con `-Djava.awt.headless=true`.
+  `converter.toSvg(...)`.
+- En un servidor sin pantalla, la JVM se arranca con `-Djava.awt.headless=true`.
 
 El detalle (hilos, tipos de error, límites) está en la [referencia](../../referencia/implementacion/api.md).

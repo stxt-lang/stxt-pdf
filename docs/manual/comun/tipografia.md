@@ -22,17 +22,17 @@ Styles:
 
 | Propiedad | Valores | Por defecto | Qué hace |
 |---|---|---|---|
-| `Font` | nombre de familia | — | La fuente. **Obligatoria** en todo texto, propia o heredada |
-| `Code font` | nombre de familia | — | La fuente del código ([Formato del texto](formato-del-texto.md#código)). **Obligatoria** si hay código |
-| `Size` | número > 0 | — | El tamaño de la letra, en puntos. **Obligatorio** en todo texto |
+| `Font` | nombre de familia | sin valor | La fuente. **Obligatoria** en todo texto, propia o heredada |
+| `Code font` | nombre de familia | sin valor | La fuente del código ([Formato del texto](formato-del-texto.md#código)). **Obligatoria** si hay código |
+| `Size` | número > 0 | sin valor | El tamaño de la letra, en puntos. **Obligatorio** en todo texto |
 | `Bold` | `true`, `false` | `false` | Negrita |
 | `Italic` | `true`, `false` | `false` | Cursiva |
-| `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos; `140%`, 1,4 veces el tamaño |
+| `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos y `140%`, 1,4 veces el tamaño |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
 | `Color` | color | `#000000` | El color del texto |
 | `Line breaking` | `simple`, `balanced` | `simple` | Cómo se reparte el texto en líneas |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
-| `Language` | `es`, `en-GB`, `ca`… | el del documento | El idioma del texto, si no es el del documento |
+| `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../componentes/heading.md)) |
 | `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../componentes/heading.md)) |
 
@@ -75,9 +75,9 @@ forma de cortar, el motor relaja la regla antes que dejar una página a medias (
 
 ## Idioma
 
-El idioma del documento es su `Language`. Si una parte está en otro idioma (una cita en inglés, un anexo en catalán),
-declárale el suyo en `Typography`: el lector de pantalla cambia de voz ahí, y las mayúsculas automáticas siguen las reglas
-de ese idioma.
+El idioma del documento es su `Language`. Una parte en otro idioma (una cita en inglés, un anexo en catalán) declara el
+suyo en `Typography`. El lector de pantalla cambia de voz ahí, y las mayúsculas automáticas siguen las reglas de ese
+idioma.
 
 ```
 Paragraph: «To be or not to be», dice el personaje.

@@ -8,9 +8,9 @@ caja. Las cajas posicionadas (`Frame`, `Overlay`, `Page overlay`) se pintan desp
 
 **`Layer`** cambia ese orden. Es un entero que admiten los elementos posicionados y los envoltorios `Item` y `Area`:
 
-- con `Layer` negativa, la caja va **detrás** del flujo (una marca de agua, un fondo de página);
-- con `Layer` positiva, **delante** de todo (un sello, una etiqueta);
-- a igual `Layer`, manda el orden del documento.
+- **Negativa**: la caja va **detrás** del flujo (una marca de agua, un fondo de página).
+- **Positiva**: **delante** de todo (un sello, una etiqueta).
+- **A igual `Layer`**, manda el orden del documento.
 
 ```
 Page overlay:
@@ -29,8 +29,8 @@ dentro tenga una `Layer` mayor.
 
 `Rotate` gira una caja: un ángulo en grados, en el sentido de las agujas del reloj (entre −360 y 360, sin 0 ni las
 vueltas enteras, que no giran nada). Gira todo lo que tiene la caja: fondo, borde, texto, imágenes y lo que contiene. El
-texto girado sigue siendo texto en el PDF: se puede seleccionar y se lee igual. Lo girado tiene que caber en la página, y
-una caja girada no se parte entre páginas: si no cabe en lo que queda, pasa entera a la siguiente.
+texto girado sigue siendo texto en el PDF: se puede seleccionar y se lee igual. Lo girado tiene que caber en la página. Una caja
+girada no se parte entre páginas: si no cabe en lo que queda, pasa entera a la siguiente.
 
 Hay dos formas de girar, según la caja.
 
@@ -89,15 +89,15 @@ Document (dev.stxt.pdf):
 					Cell: sí
 ```
 
-- **Sin `Width`, mide su texto en una línea**: no lo parte por el ancho de su columna. Para girar un párrafo largo, dale
+- **Sin `Width`, mide su texto en una línea** y no lo parte por el ancho de su columna. Un párrafo largo girado necesita
   un `Width`, que es el ancho de sus líneas antes de girar.
 - **Gira sobre su centro.** Con `Margin: 0 auto` se centra.
-- **No puede ser directamente un ítem de un `Flex` o un `Grid`**, que le dan su tamaño: gira una caja dentro del ítem.
+- **No puede ser directamente un ítem de un `Flex` o un `Grid`**, que le dan su tamaño. Lo que se gira es una caja dentro
+  del ítem.
 
 ### Solo al pintar: `Frame`, `Overlay` y `Page overlay`
 
-Un posicionado girado **no mueve nada**: la caja ocupa su sitio como si no estuviera girada, y lo de alrededor no se
-entera. Es para lo que va encima de todo, como un sello o una etiqueta en diagonal:
+Un posicionado girado **no mueve nada**: la caja ocupa su sitio como si no estuviera girada. Es para lo que va encima de todo, como un sello o una etiqueta en diagonal:
 
 ```
 Overlay:
@@ -115,7 +115,7 @@ Overlay:
 
 - **`Rotate origin`** es el punto alrededor del que gira: una o dos de `top`, `bottom`, `left`, `right` y `center` (por
   defecto, el centro), o dos medidas desde la esquina de arriba a la izquierda de la caja. `Rotate origin: top left` gira
-  sobre esa esquina; `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
-- Para un texto en vertical en el margen de la página, gira un `Page overlay` que lo contiene.
+  sobre esa esquina, y `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
+- Un texto en vertical en el margen de la página es un `Page overlay` girado que lo contiene.
 
 Más detalle en la [referencia](../../referencia/comun/capas-y-giro.md).

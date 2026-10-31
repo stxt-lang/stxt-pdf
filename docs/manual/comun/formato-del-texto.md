@@ -13,7 +13,7 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Markup: mark
 | `*cursiva*` | *cursiva* |
 | `++subrayado++` | subrayado |
 | `~~tachado~~` | ~~tachado~~ |
-| `[texto](https://…)` | un enlace, subrayado ([Referencias y enlaces](referencias-y-enlaces.md)) |
+| `[texto](https://...)` | un enlace, subrayado ([Referencias y enlaces](referencias-y-enlaces.md)) |
 | `` `código` `` | código, en la fuente de `Code font` ([abajo](#código)) |
 
 ```
@@ -24,8 +24,8 @@ Styles:
 Paragraph: El pago se hace en **30 días**, salvo *acuerdo* en contra.
 ```
 
-Las marcas se pueden combinar (`***negrita y cursiva***`) y no se ven en el PDF. Para escribir un asterisco literal, ponle
-una barra delante (`\*`). Solo vale lo que cabe dentro de una línea: un título, una lista o una tabla van en un
+Las marcas se pueden combinar (`***negrita y cursiva***`) y no se ven en el PDF. Un asterisco literal se escribe con una
+barra delante (`\*`). Solo vale lo que cabe dentro de una línea: un título, una lista o una tabla van en un
 [`Markdown`](../componentes/markdown.md). Lo demás es texto tal cual: `2024. Un buen año` o `- 5 % de descuento` se ven
 como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `Markup: none`.
 
@@ -76,7 +76,7 @@ signos no cambian.
 
 ## Interletraje (`Letter spacing`)
 
-Puntos que se añaden entre cada dos letras; puede ser negativo para apretar el texto. La última letra de cada línea no lo
+Puntos que se añaden entre cada dos letras. Puede ser negativo para apretar el texto. La última letra de cada línea no lo
 lleva, así que un texto alineado a la derecha acaba justo en la última letra.
 
 ## Ligaduras (`Ligatures`)
@@ -103,7 +103,7 @@ Text:
 		consigna      22,0 °C
 ```
 
-- Con `preserve`, una línea más ancha que la caja es un error: hazla más corta o usa `preserve-wrap`.
+- Con `preserve`, una línea más ancha que la caja es un error. Hay que acortarla o usar `preserve-wrap`.
 - `Tab size` (4 por defecto) es el número de columnas de un tabulador: cada tabulador lleva a la siguiente columna múltiplo
   de `Tab size`, como en un editor.
 - Las líneas preformateadas no se justifican.
@@ -113,6 +113,6 @@ Text:
 ## Subrayado y tachado
 
 Son rayas del color del texto, con la posición y el grosor que dice la fuente. Se escriben con `Markup: markdown` o en un
-`Markdown`; no hay estilos de raya.
+`Markdown`. No hay estilos de raya.
 
 Más detalle en la [referencia](../../referencia/comun/formato-del-texto.md).
