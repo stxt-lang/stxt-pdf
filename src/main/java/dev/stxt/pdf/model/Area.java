@@ -1,6 +1,6 @@
 package dev.stxt.pdf.model;
 
-/** Rectangle of cells in the grid. Rows and columns start at 1, like CSS lines. */
+/** Rectangle of cells in the grid. Rows and columns start at 1. */
 public record Area(int row, int column, int rows, int columns) {
 
     public Area {

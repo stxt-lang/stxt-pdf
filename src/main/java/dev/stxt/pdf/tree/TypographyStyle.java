@@ -299,7 +299,7 @@ public final class TypographyStyle extends StyleGroup {
 
     /**
      * Font of the text. Only in boxes with text, which always have {@code Font} (reference/common/errors.md). Ligatures
-     * are turned off with a {@code Letter spacing} other than 0, as in CSS: spacing the letters and joining two into
+     * are turned off with a {@code Letter spacing} other than 0: spacing the letters and joining two into
      * one glyph contradict each other.
      */
     public FontFace fontFace() {

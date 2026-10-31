@@ -29,7 +29,7 @@ class PositioningTest {
     }
 
     @Test
-    void relativeOffsets() {
+    void frameOffsets() {
         // Top and bottom, or left and right, at the same time are an error (error catalog).
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: start", "\t\tOffset: 5 auto auto 11", "\t\tBox:", "\t\t\tHeight: 20",
@@ -39,7 +39,7 @@ class PositioningTest {
     }
 
     @Test
-    void relativePercentages() {
+    void framePercentages() {
         // Left: 10 % of 515. Top: 10 % of the height of the parent (200). A vertical percentage
         // with an indefinite height of the parent is an error (error catalog).
         LayoutFixture l = layOut(
@@ -52,7 +52,7 @@ class PositioningTest {
     }
 
     @Test
-    void absoluteWithoutPositionedAncestorUsesThePageArea() {
+    void overlayWithoutPositionedAncestorUsesThePageArea() {
         // The page area measures 515 × 762 from (40, 40), whatever the height of the flow.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
@@ -65,7 +65,7 @@ class PositioningTest {
     }
 
     @Test
-    void containingBlockIsThePaddingBoxOfThePositionedAncestor() {
+    void referenceContainerIsThePaddingBoxOfThePositionedAncestor() {
         // Padding box of R: (42, 42), 511 × 96.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: R", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 10",
@@ -129,7 +129,7 @@ class PositioningTest {
     }
 
     @Test
-    void percentagesUseTheContainingBlock() {
+    void percentagesUseTheReferenceContainer() {
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 100",
                 "\t\tOverlay:", "\t\t\tId: P", "\t\t\tOffset: 50% auto auto 25%", "\t\t\tBox:", "\t\t\t\tWidth: 50%",
@@ -138,7 +138,7 @@ class PositioningTest {
     }
 
     @Test
-    void absoluteMovesWithItsRelativeContainingBlock() {
+    void overlayMovesWithItsFrame() {
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tOffset: 10 auto auto 20", "\t\tBox:", "\t\t\tHeight: 50",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 10",
@@ -168,7 +168,7 @@ class PositioningTest {
     }
 
     @Test
-    void fixedIgnoresPositionedAncestors() {
+    void pageOverlayIgnoresPositionedAncestors() {
         // G has no offsets: it stays at its static position, in the content box of R.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 30",
@@ -205,7 +205,7 @@ class PositioningTest {
     }
 
     @Test
-    void anAbsoluteMayLeaveItsContainingBlockButNotThePage() {
+    void anOverlayMayLeaveItsReferenceContainerButNotThePage() {
         // The padding box of R starts at (42, 42); A extends 42 to the left and to the top, up to the corner of the
         // page (0, 0), and no further: it is not an overflow (reference/common/overflow.md).
         LayoutFixture l = layOut(
@@ -216,7 +216,7 @@ class PositioningTest {
     }
 
     @Test
-    void staticPositionInsideAContainingBlockWithPadding() {
+    void staticPositionInsideAReferenceContainerWithPadding() {
         // Without Offset, A goes in the content box of R: (40 + 3 + 7, 40 + 3 + 7).
         LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tText: aaa");
@@ -244,7 +244,7 @@ class PositioningTest {
     }
 
     @Test
-    void aFixedInsideABorderedAbsoluteStartsInItsContentBox() {
+    void aPageOverlayInsideABorderedOverlayStartsInItsContentBox() {
         // A, at (50, 50), has a border of 3 and padding of 7: F, without Offset, starts at (60, 60).
         LayoutFixture l = layOut("\tOverlay:", "\t\tOffset: 10 auto auto 10", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 50", "\t\t\tBorder: 3", "\t\t\tPadding: 7",

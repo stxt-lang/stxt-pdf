@@ -1,5 +1,5 @@
-# Multi-page contract for design services between a studio and a cooperative: fixed header
-# with the logo from the second sheet on (the first carries the title) and a fixed footer with initials,
+# Multi-page contract for design services between a studio and a cooperative: header
+# in a Page overlay with the logo from the second sheet on (the first carries the title), footer with initials,
 # the Reunidos section (with the parties in bold, thanks to Markup: markdown in the Paragraph rule) and the
 # Exponen section, twelve numbered clauses with subsections written in Markdown (lists with three numbering
 # levels), an annex with the fee table (with header and footer) and the

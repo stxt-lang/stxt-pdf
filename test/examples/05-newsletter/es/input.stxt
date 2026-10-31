@@ -2,7 +2,7 @@
 # main story with a cropped photo (Fit: fill), three-column articles with a rule and
 # balanced breaks, text with a photo beside it, a calendar in a table and classified ads in
 # a grid. The body is Markdown inside Columns. The front-page masthead is a block of the
-# first page; the following ones carry a fixed running head (Pages: not-first). The labels are written in
+# first page; the following ones carry a running head in a Page overlay (Pages: not-first). The labels are written in
 # lowercase and put in uppercase with Case, sometimes with letter spacing (Letter spacing).
 Document (dev.stxt.pdf):
 	Page:

@@ -251,7 +251,7 @@ class ImageLayoutTest {
     }
 
     @Test
-    void absoluteShrinksToTheImage() {
+    void overlayShrinksToTheImage() {
         LayoutFixture f = layOut(
                 "\tOverlay:",
                 "\t\tId: A",

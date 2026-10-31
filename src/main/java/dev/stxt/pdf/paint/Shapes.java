@@ -130,7 +130,7 @@ final class Shapes {
     /**
      * The part of the border that belongs to a side: the trapezoid that joins the corners of the border
      * box with those of the padding box, so that two sides with different colors meet
-     * at the diagonal of the corner, as in CSS. With the ring of the border as fill and this
+     * at the diagonal of the corner. With the ring of the border as fill and this
      * trapezoid as clip, the piece of the side remains.
      *
      * <p>With rounded inner corners, the ring enters the padding box (between the

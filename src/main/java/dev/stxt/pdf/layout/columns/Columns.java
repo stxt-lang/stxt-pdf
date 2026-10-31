@@ -3,8 +3,7 @@ package dev.stxt.pdf.layout.columns;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Number and width of the columns of a {@code Columns} (reference/components/columns.md), with the
- * CSS pseudo-algorithm ({@code column-count} and {@code column-width}):
+ * Number and width of the columns of a {@code Columns} (reference/components/columns.md):
  *
  * <ul>
  *   <li>only {@code Count}: that number of columns, which share the width;</li>

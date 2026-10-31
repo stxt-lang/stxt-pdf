@@ -63,7 +63,7 @@ public final class Engine implements LayoutContext {
     private final Limits limits;
     private final InlineLayout inline;
     private final TableLayout table;
-    private final OverlayLayout absolute;
+    private final OverlayLayout overlays;
     /** The algorithm of each {@code Layout}; a table, which is a grid, has its own ({@link #algorithm}). */
     private final Map<Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Layout.class);
 
@@ -106,7 +106,7 @@ public final class Engine implements LayoutContext {
         this.inline = new InlineLayout(this, measurer);
         GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
-        this.absolute = new OverlayLayout(this);
+        this.overlays = new OverlayLayout(this);
         algorithms.put(Layout.BLOCK, new BlockLayout(this));
         algorithms.put(Layout.INLINE, inline);
         algorithms.put(Layout.STACK, new StackLayout(this));
@@ -342,7 +342,7 @@ public final class Engine implements LayoutContext {
 
     private LayoutResult layoutOnce(Box box, ConstraintSpace space, BreakToken from) {
         return cache.layout(box, space, from,
-                () -> absolute.resolvePending(box, algorithm(box).layout(box, space, from)));
+                () -> overlays.resolvePending(box, algorithm(box).layout(box, space, from)));
     }
 
     /**
@@ -354,8 +354,8 @@ public final class Engine implements LayoutContext {
     }
 
     /** Layout of the out-of-flow boxes; the {@link Paginator} uses it for the {@code Page overlay} ones. */
-    OverlayLayout absolute() {
-        return absolute;
+    OverlayLayout overlays() {
+        return overlays;
     }
 
     /** The algorithm of the box: that of its {@code Layout} or, if it is a table, that of tables. */

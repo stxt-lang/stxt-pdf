@@ -40,7 +40,7 @@ import java.util.Objects;
  * </ol>
  *
  * <p>Simplification: a positioned box without {@code Layer} is painted complete in step 4, with
- * its descendants; CSS would promote to the parent context the descendants that create a context.</p>
+ * its descendants, also those of them that create a context, which stay inside it.</p>
  *
  * <p>A box with {@code Rotate} (reference/common/layers-and-rotation.md) is painted rotated with everything it
  * contains, and a box with {@code Corner radius} clips by its curve the backgrounds, borders and images of what it has
@@ -414,7 +414,7 @@ public final class StackingContext {
     }
 
     /**
-     * The text lines, each run with its font (reference/common/text-formatting.md). As in CSS, the underline
+     * The text lines, each run with its font (reference/common/text-formatting.md). The underline
      * is painted before the text and the strikethrough after it; both outside the marked content, because they are not
      * text (in the tagged PDF, <em>artifacts</em>).
      *

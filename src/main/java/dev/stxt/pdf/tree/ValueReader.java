@@ -314,7 +314,7 @@ final class ValueReader {
     }
 
     /**
-     * {@code Background}: a color or {@code linear(angle, color, color...)}, with the angle in degrees (as in CSS: 0
+     * {@code Background}: a color or {@code linear(angle, color, color...)}, with the angle in degrees (0
      * upward, 90 to the right, 180 downward) and at least two colors.
      */
     static Paint paint(Node n) {

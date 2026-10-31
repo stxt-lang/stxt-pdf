@@ -24,8 +24,8 @@ public final class Sizing {
      * Border box width of a box in block flow with {@code Width: auto}: it takes up the
      * reference container minus its horizontal margins.
      */
-    public static double autoWidthInFlow(double containingBlockWidth, Insets margin) {
-        return Math.max(0, containingBlockWidth - margin.horizontal());
+    public static double autoWidthInFlow(double containerWidth, Insets margin) {
+        return Math.max(0, containerWidth - margin.horizontal());
     }
 
     /**
@@ -35,11 +35,11 @@ public final class Sizing {
      *
      * @return {left, right}
      */
-    public static double[] horizontalMargins(double containingBlockWidth, double borderBoxWidth,
+    public static double[] horizontalMargins(double containerWidth, double borderBoxWidth,
                                              Value marginLeft, Value marginRight) {
-        double left = marginLeft.resolve(containingBlockWidth).orElse(0);
-        double right = marginRight.resolve(containingBlockWidth).orElse(0);
-        double remaining = containingBlockWidth - borderBoxWidth - left - right;
+        double left = marginLeft.resolve(containerWidth).orElse(0);
+        double right = marginRight.resolve(containerWidth).orElse(0);
+        double remaining = containerWidth - borderBoxWidth - left - right;
         if (marginLeft.isAuto() && marginRight.isAuto()) {
             double each = Math.max(0, remaining) / 2;
             return new double[]{each, each};

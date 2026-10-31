@@ -18,15 +18,15 @@ public record Insets(double top, double right, double bottom, double left) {
     }
 
     /**
-     * Resolves four values against the <strong>width</strong> of the reference container. In CSS, the
+     * Resolves four values against the <strong>width</strong> of the reference container. The
      * percentages of margin and padding, the vertical ones too, are computed on the width
      * (reference/common/values.md). An {@code auto} is 0 here; the layout distributes the {@code auto} margins.
      */
-    public static Insets resolve(Sides<Value> sides, double containingBlockWidth) {
+    public static Insets resolve(Sides<Value> sides, double containerWidth) {
         return new Insets(
-                sides.top().resolve(containingBlockWidth).orElse(0),
-                sides.right().resolve(containingBlockWidth).orElse(0),
-                sides.bottom().resolve(containingBlockWidth).orElse(0),
-                sides.left().resolve(containingBlockWidth).orElse(0));
+                sides.top().resolve(containerWidth).orElse(0),
+                sides.right().resolve(containerWidth).orElse(0),
+                sides.bottom().resolve(containerWidth).orElse(0),
+                sides.left().resolve(containerWidth).orElse(0));
     }
 }

@@ -186,7 +186,7 @@ class StylesFileTest {
     }
 
     @Test
-    void breakFromTheStylesDocumentCannotGoToAnAbsolute() {
+    void breakFromTheStylesDocumentCannotGoToAnOverlay() {
         InvalidModelException e = error(BASE + "\tFor element: Overlay\n\t\tBreak:\n\t\t\tKeep with next: true\n",
                 "\tOverlay:", "\t\tText: a");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());

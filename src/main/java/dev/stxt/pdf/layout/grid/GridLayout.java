@@ -209,9 +209,9 @@ public final class GridLayout implements LayoutAlgorithm {
                     + Sizing.align(horizontal(item, s), areaWidths[i], f.width() + margin.horizontal());
             double py = y[a.row() - 1] + margin.top()
                     + Sizing.align(vertical, areaHeight, f.height() + margin.vertical());
-            FrameOffset relative = FrameOffset.of(item.style(), contentWidth, contentHeight);
-            placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + relative.dx(), py + relative.dy(), a.row() - 1,
-                    relative));
+            FrameOffset frameOffset = FrameOffset.of(item.style(), contentWidth, contentHeight);
+            placed.add(new UnitBreaker.Placed(item, r, finalSpace, px + frameOffset.dx(), py + frameOffset.dy(),
+                    a.row() - 1, frameOffset));
         }
 
         double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);

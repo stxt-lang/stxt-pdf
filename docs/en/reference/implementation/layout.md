@@ -13,7 +13,7 @@ algorithm, so that the `LayoutCache` is used (without it, nested `Stack` and `Gr
 
 `Engine.layOutDocument` is the entry point: it validates the fonts and the images, paginates with the `Paginator`, checks the
 overflows with `Overflow` and returns a `LaidOutDocument`. When it finishes (also if it fails) it releases everything it memoizes.
-The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `number`, `absolute()`) is package-private.
+The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `number`, `overlays()`) is package-private.
 
 > **Decision:** the layout algorithms depend on the interface `LayoutContext` and not on `Engine`. The pagination
 > protocol stays in `Engine`, package-private, because moving it to another class did not remove any dependency.
@@ -81,7 +81,7 @@ algorithms of the parents know nothing about the rotation: they see a box the si
 fit and is not at the start of the page) and whose inner margins do not come out (`AdjoiningMargins.NONE`: it isolates
 margins). `Engine.intrinsic` does the same with the empty percentage base: its narrowest width and its
 natural width are the width of the rectangle plus the margins. It is the reference container of its `Overlay`
-(`Box.outOfFlowContainingBlock`), which are resolved on the unrotated box before wrapping it.
+(`Box.referenceContainer`), which are resolved on the unrotated box before wrapping it.
 
 ## Fragments
 

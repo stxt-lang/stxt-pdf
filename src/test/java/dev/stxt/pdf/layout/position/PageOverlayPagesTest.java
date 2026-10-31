@@ -11,17 +11,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** {@code Pages} of a {@code Page overlay} (reference/components/frame-and-overlays.md): on which pages it appears. */
-class FixedPagesTest {
+class PageOverlayPagesTest {
 
     /**
      * A document of {@code pages} pages (one per block) and a {@code Page overlay} for each value of {@code Pages}.
      */
-    private static LayoutFixture document(int pages, String... fixedValues) {
+    private static LayoutFixture document(int pages, String... pagesValues) {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < pages; i++) {
             lines.addAll(List.of("\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60"));
         }
-        for (String value : fixedValues) {
+        for (String value : pagesValues) {
             lines.addAll(List.of("\tPage overlay:", "\t\tId: " + value, "\t\tPages: " + value, "\t\tOffset: 0 auto auto 0",
                     "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10"));
         }
@@ -65,7 +65,7 @@ class FixedPagesTest {
     }
 
     @Test
-    void aFixedNeverMovesTheFlowWhereItIsShownOrNot() {
+    void aPageOverlayNeverMovesTheFlowWhereItIsShownOrNot() {
         String[] flow = {"\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60"};
         String[] overlay = {"\tPage overlay:", "\t\tId: F", "\t\tPages: first", "\t\tBox:", "\t\t\tHeight: 50"};
@@ -80,7 +80,7 @@ class FixedPagesTest {
     }
 
     @Test
-    void aNestedFixedFollowsItsParentsPagesAndItsOwn() {
+    void aNestedPageOverlayFollowsItsParentsPagesAndItsOwn() {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tBreak:", "\t\t\tAfter: page", "\t\tBox:", "\t\t\tHeight: 60",

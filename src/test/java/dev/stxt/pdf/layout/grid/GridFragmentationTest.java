@@ -105,7 +105,7 @@ class GridFragmentationTest {
     }
 
     @Test
-    void relativePercentOffsetUsesTheWholeHeightOfAFragmentedGrid() {
+    void framePercentOffsetUsesTheWholeHeightOfAFragmentedGrid() {
         // As in block flow: the 10 % is of the whole Height of the grid (30).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 300", "\t\tRow sizes: 80 15",

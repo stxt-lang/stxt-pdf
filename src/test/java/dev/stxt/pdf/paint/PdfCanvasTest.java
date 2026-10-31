@@ -687,7 +687,7 @@ class PdfCanvasTest {
 
     /** A {@code Page overlay} that appears on no page leaves no empty {@code Link}. */
     @Test
-    void aFixedThatIsNeverPaintedLeavesNoEmptyLink() throws Exception {
+    void aPageOverlayThatIsNeverPaintedLeavesNoEmptyLink() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tPage overlay:\n\t\tPages: even\n\t\tText: pie\n\t\t\tLink: https://pie.example\n"
                 + "\tText: Uno\n"));

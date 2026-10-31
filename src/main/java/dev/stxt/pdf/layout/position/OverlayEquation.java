@@ -28,9 +28,9 @@ public final class OverlayEquation {
      */
     public static Solution horizontal(OptionalDouble left, OptionalDouble width, OptionalDouble right,
                                       OptionalDouble marginLeft, OptionalDouble marginRight,
-                                      double containingBlockWidth, double staticLeft,
+                                      double containerWidth, double staticLeft,
                                       IntrinsicSizes content) {
-        return solve(left, width, right, marginLeft, marginRight, containingBlockWidth,
+        return solve(left, width, right, marginLeft, marginRight, containerWidth,
                 staticLeft, content::fit);
     }
 
@@ -40,14 +40,14 @@ public final class OverlayEquation {
      */
     public static Solution vertical(OptionalDouble top, OptionalDouble height, OptionalDouble bottom,
                                     OptionalDouble marginTop, OptionalDouble marginBottom,
-                                    double containingBlockHeight, double staticTop,
+                                    double containerHeight, double staticTop,
                                     double contentHeight) {
-        return solve(top, height, bottom, marginTop, marginBottom, containingBlockHeight,
+        return solve(top, height, bottom, marginTop, marginBottom, containerHeight,
                 staticTop, available -> contentHeight);
     }
 
     private static Solution solve(OptionalDouble start, OptionalDouble size, OptionalDouble end,
-                                  OptionalDouble mStart, OptionalDouble mEnd, double cb,
+                                  OptionalDouble mStart, OptionalDouble mEnd, double container,
                                   double staticStart, DoubleUnaryOperator autoSize) {
         double ms = mStart.orElse(0);
         double me = mEnd.orElse(0);
@@ -55,8 +55,8 @@ public final class OverlayEquation {
         // 1. All auto: static position and automatic size.
         if (start.isEmpty() && size.isEmpty() && end.isEmpty()) {
             double s = staticStart;
-            double t = autoSize.applyAsDouble(cb - s - ms - me);
-            return new Solution(s, ms, t, me, cb - s - ms - t - me);
+            double t = autoSize.applyAsDouble(container - s - ms - me);
+            return new Solution(s, ms, t, me, container - s - ms - t - me);
         }
 
         // 2. Nothing auto: the auto margins absorb the leftover; if there are none, the end is ignored.
@@ -65,50 +65,50 @@ public final class OverlayEquation {
             double t = size.getAsDouble();
             double e = end.getAsDouble();
             if (mStart.isEmpty() && mEnd.isEmpty()) {
-                double remaining = cb - s - t - e;
+                double remaining = container - s - t - e;
                 if (remaining >= 0) {
                     return new Solution(s, remaining / 2, t, remaining / 2, e);
                 }
                 return new Solution(s, 0, t, remaining, e);
             }
             if (mStart.isEmpty()) {
-                return new Solution(s, cb - s - t - e - me, t, me, e);
+                return new Solution(s, container - s - t - e - me, t, me, e);
             }
             if (mEnd.isEmpty()) {
-                return new Solution(s, ms, t, cb - s - ms - t - e, e);
+                return new Solution(s, ms, t, container - s - ms - t - e, e);
             }
-            return new Solution(s, ms, t, me, cb - s - ms - t - me); // over-constrained
+            return new Solution(s, ms, t, me, container - s - ms - t - me); // over-constrained
         }
 
         // 3. Some auto (the auto margins are 0).
         if (start.isEmpty() && size.isEmpty()) {
             double e = end.getAsDouble();
-            double t = autoSize.applyAsDouble(cb - e - ms - me);
-            return new Solution(cb - e - ms - me - t, ms, t, me, e);
+            double t = autoSize.applyAsDouble(container - e - ms - me);
+            return new Solution(container - e - ms - me - t, ms, t, me, e);
         }
         if (start.isEmpty() && end.isEmpty()) {
             double s = staticStart;
             double t = size.getAsDouble();
-            return new Solution(s, ms, t, me, cb - s - ms - t - me);
+            return new Solution(s, ms, t, me, container - s - ms - t - me);
         }
         if (size.isEmpty() && end.isEmpty()) {
             double s = start.getAsDouble();
-            double t = autoSize.applyAsDouble(cb - s - ms - me);
-            return new Solution(s, ms, t, me, cb - s - ms - t - me);
+            double t = autoSize.applyAsDouble(container - s - ms - me);
+            return new Solution(s, ms, t, me, container - s - ms - t - me);
         }
         if (start.isEmpty()) {
             double t = size.getAsDouble();
             double e = end.getAsDouble();
-            return new Solution(cb - t - e - ms - me, ms, t, me, e);
+            return new Solution(container - t - e - ms - me, ms, t, me, e);
         }
         if (size.isEmpty()) {
             double s = start.getAsDouble();
             double e = end.getAsDouble();
-            double t = Math.max(0, cb - s - e - ms - me);
-            return new Solution(s, ms, t, me, cb - s - ms - t - me);
+            double t = Math.max(0, container - s - e - ms - me);
+            return new Solution(s, ms, t, me, container - s - ms - t - me);
         }
         double s = start.getAsDouble();
         double t = size.getAsDouble();
-        return new Solution(s, ms, t, me, cb - s - ms - t - me);
+        return new Solution(s, ms, t, me, container - s - ms - t - me);
     }
 }

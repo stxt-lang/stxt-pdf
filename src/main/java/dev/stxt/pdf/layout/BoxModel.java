@@ -100,7 +100,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * An {@code Image} (reference/components/image.md), like a CSS replaced element: its content box has the ratio
+     * An {@code Image} (reference/components/image.md): its content box has the ratio
      * of the file (or that of {@code Aspect ratio}, which replaces it). With {@code Width: auto} it measures its
      * natural width, also in block flow, or the one that follows from a declared height; the {@code auto} height
      * always follows from the width, so it is definite. If both are {@code auto} and the height hits its minimum or

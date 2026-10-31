@@ -3,7 +3,7 @@ package dev.stxt.pdf.model;
 import java.util.List;
 
 /**
- * Four values per side in CSS order: top, right, bottom, left.
+ * Four values, one per side, clockwise from the top: top, right, bottom, left.
  * Used for {@code Margin}, {@code Padding}, {@code Border} and {@code Offset}
  * (reference/common/values.md).
  */
@@ -13,7 +13,7 @@ public record Sides<T>(T top, T right, T bottom, T left) {
         return new Sides<>(value, value, value, value);
     }
 
-    /** Shorthand of 1 to 4 values, with the same convention as CSS. */
+    /** Shorthand of 1 to 4 values (reference/common/values.md). */
     public static <T> Sides<T> shorthand(List<T> v) {
         return switch (v.size()) {
             case 1 -> new Sides<>(v.get(0), v.get(0), v.get(0), v.get(0));

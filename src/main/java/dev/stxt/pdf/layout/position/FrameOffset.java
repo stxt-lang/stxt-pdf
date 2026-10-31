@@ -18,18 +18,18 @@ public record FrameOffset(double dx, double dy) {
     public static final FrameOffset NONE = new FrameOffset(0, 0);
 
     /**
-     * @param cbWidth  width of the reference container, base of left and right
-     * @param cbHeight height of the reference container, base of top and bottom; empty = indefinite, and
-     *                 then a percentage behaves as {@code auto}
+     * @param containerWidth  width of the reference container, base of left and right
+     * @param containerHeight height of the reference container, base of top and bottom; empty = indefinite,
+     *                        and then a percentage behaves as {@code auto}
      */
-    public static FrameOffset of(Style s, double cbWidth, OptionalDouble cbHeight) {
+    public static FrameOffset of(Style s, double containerWidth, OptionalDouble containerHeight) {
         if (s.position() != Position.FRAME) {
             return NONE;
         }
-        OptionalDouble left = s.offset().left().resolve(cbWidth);
-        OptionalDouble right = s.offset().right().resolve(cbWidth);
-        OptionalDouble top = s.offset().top().resolve(cbHeight);
-        OptionalDouble bottom = s.offset().bottom().resolve(cbHeight);
+        OptionalDouble left = s.offset().left().resolve(containerWidth);
+        OptionalDouble right = s.offset().right().resolve(containerWidth);
+        OptionalDouble top = s.offset().top().resolve(containerHeight);
+        OptionalDouble bottom = s.offset().bottom().resolve(containerHeight);
         double dx = left.isPresent() ? left.getAsDouble() : -right.orElse(0);
         double dy = top.isPresent() ? top.getAsDouble() : -bottom.orElse(0);
         return new FrameOffset(dx, dy);

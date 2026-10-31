@@ -135,7 +135,7 @@ class BlockLayoutTest {
     }
 
     @Test
-    void percentHeightOfADefiniteContainingBlock() {
+    void percentHeightOfADefiniteReferenceContainer() {
         // The page area always has a definite height; a parent with auto height does not (error catalog).
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",

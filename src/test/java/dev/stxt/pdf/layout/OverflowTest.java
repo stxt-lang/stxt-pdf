@@ -155,7 +155,7 @@ class OverflowTest {
      * 40; S, a Frame offset by 60 (which does not count), spans from 44 to 504, inside the page: the culprit is R.
      */
     @Test
-    void tooWideMeasuresFromTheContainerAndIgnoresRelativeOffsets() {
+    void tooWideMeasuresFromTheContainerAndIgnoresFrameOffsets() {
         InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tItem:", "\t\t\tShrink: 0", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 20", "\t\t\t\t\tHeight: 10",
@@ -184,7 +184,7 @@ class OverflowTest {
      * beyond.
      */
     @Test
-    void pageOverflowIgnoresRelativeOffsets() {
+    void pageOverflowIgnoresFrameOffsets() {
         InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
                         "\t\tFrame:", "\t\t\tOffset: 8 auto auto auto",

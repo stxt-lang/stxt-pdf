@@ -202,7 +202,7 @@ class StackingContextTest {
 
     /** The {@code Overlay} hangs from the fragment of its reference container, behind the {@code Frame}. */
     @Test
-    void absoluteBeforeLaterRelative() {
+    void overlayBeforeALaterFrame() {
         List<String> order = paint(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tOverlay:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
@@ -223,7 +223,7 @@ class StackingContextTest {
 
     /** The {@code Page overlay} ones are added to the root context at the end, but are painted in their place. */
     @Test
-    void fixedInDocumentOrder() {
+    void pageOverlaysInDocumentOrder() {
         List<String> order = paint(
                 "\tPage overlay:", "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #222");

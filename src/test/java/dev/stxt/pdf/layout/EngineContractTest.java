@@ -35,7 +35,7 @@ class EngineContractTest {
     void thePaginationProtocolIsNotPublic() {
         Set<String> publicMethods = Arrays.stream(Engine.class.getMethods()).map(Method::getName)
                 .collect(Collectors.toSet());
-        for (String internal : List.of("reservePageNumbers", "assume", "number", "absolute")) {
+        for (String internal : List.of("reservePageNumbers", "assume", "number", "overlays")) {
             assertFalse(publicMethods.contains(internal), internal + " belongs to the Paginator and must not be public");
         }
         // What does belong to the caller.

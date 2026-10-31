@@ -45,17 +45,17 @@ public final class UnitBreaker {
     /**
      * An item already placed in the unfragmented layout.
      *
-     * @param box      the item
-     * @param result   its layout
-     * @param space    space of that layout, to repeat it with fragmentation if the item is broken
-     * @param x        position of its border box, relative to the content box of the container
-     *                 (includes the offset of a {@code Frame})
-     * @param y        likewise
-     * @param unit     unit it belongs to
-     * @param relative offset of a {@code Frame} included in {@code x} and {@code y}
+     * @param box         the item
+     * @param result      its layout
+     * @param space       space of that layout, to repeat it with fragmentation if the item is broken
+     * @param x           position of its border box, relative to the content box of the container
+     *                    (includes the offset of a {@code Frame})
+     * @param y           likewise
+     * @param unit        unit it belongs to
+     * @param frameOffset offset of a {@code Frame} included in {@code x} and {@code y}
      */
     public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
-                         FrameOffset relative) {
+                         FrameOffset frameOffset) {
     }
 
     /**
@@ -423,7 +423,8 @@ public final class UnitBreaker {
             Fragment f = r.fragment();
             double dx = p.x() + f.border().left() + f.padding().left();
             double dy = y + f.border().top() + f.padding().top();
-            return new Piece(f.moved(p.x(), y, p.relative().dx(), p.relative().dy()), r.pending().stream().map(q -> q.translated(dx, dy)).toList());
+            return new Piece(f.moved(p.x(), y, p.frameOffset().dx(), p.frameOffset().dy()),
+                    r.pending().stream().map(q -> q.translated(dx, dy)).toList());
         }
 
         /**

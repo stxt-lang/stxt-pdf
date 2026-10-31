@@ -263,7 +263,7 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void absoluteChildFallsOnThePageOfItsPosition() {
+    void overlayChildFallsOnThePageOfItsPosition() {
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 90",
                 "\tFrame:", "\t\tId: P", "\t\tBreak:", "\t\t\tKeep together: true",
@@ -275,7 +275,7 @@ class BlockFragmentationTest {
     }
 
     @Test
-    void relativePercentOffsetUsesTheWholeHeightOfAFragmentedParent() {
+    void framePercentOffsetUsesTheWholeHeightOfAFragmentedParent() {
         // The 10 % is of the whole Height of P (30), not of the fragment of the first page (10): R
         // is in its place (80-95) inside the page and Overflow cannot move it with another base.
         LayoutFixture l = layOutPaged(PAGE,

@@ -28,7 +28,7 @@ public enum NumberFormat {
         };
     }
 
-    /** Letters as in CSS: 1 → a, 26 → z, 27 → aa. */
+    /** Letters in bijective base 26: 1 → a, 26 → z, 27 → aa. */
     private static String alpha(int number) {
         StringBuilder s = new StringBuilder();
         for (int n = number; n > 0; n = (n - 1) / 26) {

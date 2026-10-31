@@ -128,7 +128,7 @@ public final class BreakRules {
 
     /**
      * The forced break before the box ({@code Before} of {@code Break}) or, if it is a block, before
-     * its first in-flow child: as in CSS, the forced break of the first child propagates to the parent,
+     * its first in-flow child: the forced break of the first child propagates to the parent,
      * because both start at the same point. Only the page break comes out of a {@code Columns}:
      * the column break stays in its first column.
      *

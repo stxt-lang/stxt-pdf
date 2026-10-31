@@ -77,10 +77,10 @@ public final class TableLayout implements LayoutAlgorithm {
                 headItems.add(p);
             } else if (p.unit() < bodyEnd) {
                 body.add(new UnitBreaker.Placed(p.box(), p.result(), p.space(), p.x(), p.y() - bodyStart,
-                        p.unit() - head, p.relative()));
+                        p.unit() - head, p.frameOffset()));
             } else {
                 footItems.add(new UnitBreaker.Placed(p.box(), p.result(), p.space(), p.x(), p.y() - bodyBottom,
-                        p.unit(), p.relative()));
+                        p.unit(), p.frameOffset()));
             }
         }
         // The bands of the rows: those of the header and the footer, already placed; those of the body, in their unit.

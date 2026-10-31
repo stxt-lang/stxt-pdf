@@ -1,6 +1,6 @@
 # Invoice from a furniture workshop to a hotel. One A4 page with a logo, the details of the parties,
-# a strip with the terms, the table of lines with their totals in the footer and the fixed page
-# footer. All the styling is in styles.stxt: the elements carry only their content. The texts carry
+# a strip with the terms, the table of lines with their totals in the footer and the page
+# footer in a Page overlay. All the styling is in styles.stxt: the elements carry only their content. The texts carry
 # Markup: markdown to put a bold word inside the sentence, and the payment details also carry Code
 # font: the IBAN and the BIC, as inline code, in the monospaced font. The labels are written as
 # a normal sentence and the rules put them in uppercase (Case) and space them out (Letter spacing).

@@ -18,7 +18,7 @@ public sealed interface Paint {
     }
 
     /**
-     * {@code linear(angle, color, color...)}: the angle in degrees as in CSS (0 goes up,
+     * {@code linear(angle, color, color...)}: the angle in degrees (0 goes up,
      * 90 to the right, 180 down), with the colors spread evenly.
      */
     record Linear(double angle, List<String> stops) implements Paint {
@@ -29,8 +29,8 @@ public sealed interface Paint {
 
         /**
          * The ends of the gradient line in {@code box} (absolute coordinates): it goes through the
-         * center and is as long as needed for the corners to have the first and the last color,
-         * as in CSS. Returns {@code {x1, y1, x2, y2}}.
+         * center and is as long as needed for the corners to have the first and the last color.
+         * Returns {@code {x1, y1, x2, y2}}.
          */
         public double[] line(Rect box) {
             double rad = Math.toRadians(angle);

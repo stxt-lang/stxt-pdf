@@ -21,7 +21,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * Layout of an {@code Image} (reference/components/image.md): a box without children with the size and the
- * aspect ratio of the file, like a CSS replaced element. The size is resolved by
+ * aspect ratio of the file. The size is resolved by
  * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, which the stack, grid and Overlay parents also
  * use to measure it; here it is only placed.
  *

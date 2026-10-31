@@ -55,10 +55,10 @@ class OverlayEquationTest {
     }
 
     /** The five values of the solution, and that they add up to the reference container. */
-    private static void assertSolution(OverlayEquation.Solution s, double cb, double start, double marginStart,
+    private static void assertSolution(OverlayEquation.Solution s, double c, double start, double marginStart,
                                        double size, double marginEnd, double end) {
         assertEquals(new OverlayEquation.Solution(start, marginStart, size, marginEnd, end), s);
-        assertEquals(cb, s.start() + s.marginStart() + s.size() + s.marginEnd() + s.end(), 1e-9);
+        assertEquals(c, s.start() + s.marginStart() + s.size() + s.marginEnd() + s.end(), 1e-9);
     }
 
     /**
@@ -67,37 +67,37 @@ class OverlayEquationTest {
      */
     @Test
     void everyCaseWithMargins() {
-        double cb = 300;
+        double c = 300; // size of the reference container
         OptionalDouble ms = v(7);
         OptionalDouble me = v(11);
         // All auto: static position; the size, the content (vertical) or what is available if it fits (horizontal).
-        assertSolution(OverlayEquation.vertical(AUTO, AUTO, AUTO, ms, me, cb, 20, 45), cb, 20, 7, 45, 11, 217);
-        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, AUTO, ms, me, cb, 20, new IntrinsicSizes(80, 400)),
-                cb, 20, 7, 262, 11, 0);
+        assertSolution(OverlayEquation.vertical(AUTO, AUTO, AUTO, ms, me, c, 20, 45), c, 20, 7, 45, 11, 217);
+        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, AUTO, ms, me, c, 20, new IntrinsicSizes(80, 400)),
+                c, 20, 7, 262, 11, 0);
         // Nothing auto: the auto margins share the leftover (or the end absorbs it), or the end is ignored.
-        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), AUTO, AUTO, cb, 20, 45), cb, 30, 60, 100, 60, 50);
-        assertSolution(OverlayEquation.vertical(v(30), v(250), v(50), AUTO, AUTO, cb, 20, 45), cb, 30, 0, 250, -30, 50);
-        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), AUTO, me, cb, 20, 45), cb, 30, 109, 100, 11, 50);
-        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), ms, AUTO, cb, 20, 45), cb, 30, 7, 100, 113, 50);
-        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), ms, me, cb, 20, 45), cb, 30, 7, 100, 11, 152);
+        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), AUTO, AUTO, c, 20, 45), c, 30, 60, 100, 60, 50);
+        assertSolution(OverlayEquation.vertical(v(30), v(250), v(50), AUTO, AUTO, c, 20, 45), c, 30, 0, 250, -30, 50);
+        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), AUTO, me, c, 20, 45), c, 30, 109, 100, 11, 50);
+        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), ms, AUTO, c, 20, 45), c, 30, 7, 100, 113, 50);
+        assertSolution(OverlayEquation.vertical(v(30), v(100), v(50), ms, me, c, 20, 45), c, 30, 7, 100, 11, 152);
         // Start and size auto: the size of the content, against the end.
-        assertSolution(OverlayEquation.vertical(AUTO, AUTO, v(50), ms, me, cb, 20, 45), cb, 187, 7, 45, 11, 50);
-        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, v(50), ms, me, cb, 20, CONTENT), cb, 52, 7, 180, 11, 50);
-        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, v(50), ms, me, cb, 20, new IntrinsicSizes(80, 400)),
-                cb, 0, 7, 232, 11, 50);
+        assertSolution(OverlayEquation.vertical(AUTO, AUTO, v(50), ms, me, c, 20, 45), c, 187, 7, 45, 11, 50);
+        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, v(50), ms, me, c, 20, CONTENT), c, 52, 7, 180, 11, 50);
+        assertSolution(OverlayEquation.horizontal(AUTO, AUTO, v(50), ms, me, c, 20, new IntrinsicSizes(80, 400)),
+                c, 0, 7, 232, 11, 50);
         // Start and end auto: static position.
-        assertSolution(OverlayEquation.vertical(AUTO, v(100), AUTO, ms, me, cb, 20, 45), cb, 20, 7, 100, 11, 162);
+        assertSolution(OverlayEquation.vertical(AUTO, v(100), AUTO, ms, me, c, 20, 45), c, 20, 7, 100, 11, 162);
         // Size and end auto: the size of the content from the start.
-        assertSolution(OverlayEquation.vertical(v(30), AUTO, AUTO, ms, me, cb, 20, 45), cb, 30, 7, 45, 11, 207);
-        assertSolution(OverlayEquation.horizontal(v(30), AUTO, AUTO, ms, me, cb, 20, CONTENT), cb, 30, 7, 180, 11, 72);
-        assertSolution(OverlayEquation.horizontal(v(30), AUTO, AUTO, ms, me, cb, 20, new IntrinsicSizes(80, 400)),
-                cb, 30, 7, 252, 11, 0);
+        assertSolution(OverlayEquation.vertical(v(30), AUTO, AUTO, ms, me, c, 20, 45), c, 30, 7, 45, 11, 207);
+        assertSolution(OverlayEquation.horizontal(v(30), AUTO, AUTO, ms, me, c, 20, CONTENT), c, 30, 7, 180, 11, 72);
+        assertSolution(OverlayEquation.horizontal(v(30), AUTO, AUTO, ms, me, c, 20, new IntrinsicSizes(80, 400)),
+                c, 30, 7, 252, 11, 0);
         // Only one auto: it is solved for.
-        assertSolution(OverlayEquation.vertical(AUTO, v(100), v(50), ms, me, cb, 20, 45), cb, 132, 7, 100, 11, 50);
-        assertSolution(OverlayEquation.vertical(v(30), AUTO, v(50), ms, me, cb, 20, 45), cb, 30, 7, 202, 11, 50);
-        assertSolution(OverlayEquation.vertical(v(30), v(100), AUTO, ms, me, cb, 20, 45), cb, 30, 7, 100, 11, 152);
+        assertSolution(OverlayEquation.vertical(AUTO, v(100), v(50), ms, me, c, 20, 45), c, 132, 7, 100, 11, 50);
+        assertSolution(OverlayEquation.vertical(v(30), AUTO, v(50), ms, me, c, 20, 45), c, 30, 7, 202, 11, 50);
+        assertSolution(OverlayEquation.vertical(v(30), v(100), AUTO, ms, me, c, 20, 45), c, 30, 7, 100, 11, 152);
         // A negative solved size is 0, and the end gives way.
-        assertSolution(OverlayEquation.vertical(v(200), AUTO, v(150), ms, me, cb, 20, 45), cb, 200, 7, 0, 11, 82);
+        assertSolution(OverlayEquation.vertical(v(200), AUTO, v(150), ms, me, c, 20, 45), c, 200, 7, 0, 11, 82);
     }
 
     @Test

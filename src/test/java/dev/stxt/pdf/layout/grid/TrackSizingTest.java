@@ -57,7 +57,7 @@ class TrackSizingTest {
 
     @Test
     void percentagesIgnoreGaps() {
-        // As in CSS, 50% 50% with a gap overflows the gap.
+        // The percentages do not discount the gap: 50% 50% with a gap overflows by the gap.
         assertArrayEquals(new double[]{257.5, 257.5}, columns("50% 50%", 515), 1e-9);
     }
 
@@ -114,7 +114,7 @@ class TrackSizingTest {
 
     /**
      * An item over a fixed track and an auto one, with a gap: the excess of its narrowest width goes only to the auto
-     * one, and its natural width is counted with the bases already raised (as in CSS, reference/components/grid.md):
+     * one, and its natural width is counted with the bases already raised (reference/components/grid.md):
      * the area of the item measures its natural width (50 + 10 + 340 = 400), no more. Before, the auto one reached 480
      * (mutation testing).
      */

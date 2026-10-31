@@ -27,8 +27,8 @@ import java.util.function.Supplier;
  * <ul>
  *   <li>The {@code Overlay} ones go up as {@link PendingOverlay} to their reference container, and
  *       {@link LayoutContext#layout} resolves them with {@link #resolvePending} when the layout of
- *       that box finishes. Their fragments are added at the end of the children of the fragment of the containing
- *       block, not of their parent in the box tree.</li>
+ *       that box finishes. Their fragments are added at the end of the children of the fragment of the reference
+ *       container, not of their parent in the box tree.</li>
  *   <li>The {@code Page overlay} ones go up to the root and the
  *       {@link dev.stxt.pdf.layout.Paginator} resolves them on each page, with {@link #layOut}.</li>
  * </ul>
@@ -59,13 +59,13 @@ public final class OverlayLayout {
         }
         Fragment f = r.fragment();
         // The reference container is the padding box.
-        double cbWidth = f.width() - f.border().horizontal();
-        double cbHeight = f.height() - f.border().vertical();
+        double containerWidth = f.width() - f.border().horizontal();
+        double containerHeight = f.height() - f.border().vertical();
         List<Fragment> placed = new ArrayList<>();
         List<PendingOverlay> rest = new ArrayList<>();
         for (PendingOverlay p : r.pending()) {
             if (resolvesHere(p, box)) {
-                LayoutResult a = layOut(p, cbWidth, cbHeight, f.padding());
+                LayoutResult a = layOut(p, containerWidth, containerHeight, f.padding());
                 placed.add(a.fragment());
                 rest.addAll(a.pending());
             } else {
@@ -76,36 +76,37 @@ public final class OverlayLayout {
     }
 
     private static boolean resolvesHere(PendingOverlay p, Box box) {
-        return p.box().style().position() == Position.OVERLAY && p.box().outOfFlowContainingBlock() == box;
+        return p.box().style().position() == Position.OVERLAY && p.box().referenceContainer() == box;
     }
 
     /**
      * Lays out an out-of-flow box in its reference container.
      *
-     * @param p         the box, with the static position relative to the content box of the
-     *                  reference container
-     * @param cbWidth   width of the padding box of the reference container
-     * @param cbHeight  height of the padding box of the reference container
-     * @param cbPadding padding of the reference container
+     * @param p                the box, with the static position relative to the content box of the
+     *                         reference container
+     * @param containerWidth   width of the padding box of the reference container
+     * @param containerHeight  height of the padding box of the reference container
+     * @param containerPadding padding of the reference container
      * @return the fragment placed relative to the content box of the reference container and the
      *         {@code Page overlay} boxes inside it, with the static position relative to that same box
      */
-    public LayoutResult layOut(PendingOverlay p, double cbWidth, double cbHeight, Insets cbPadding) {
+    public LayoutResult layOut(PendingOverlay p, double containerWidth, double containerHeight,
+                               Insets containerPadding) {
         Box box = p.box();
         Style s = box.style();
-        OptionalDouble cbHeightBase = OptionalDouble.of(cbHeight);
+        OptionalDouble containerHeightBase = OptionalDouble.of(containerHeight);
         Supplier<IntrinsicSizes> intrinsic = () -> context.intrinsic(box);
         // The equation works in the padding box of the reference container.
-        double staticX = p.staticX() + cbPadding.left();
-        double staticY = p.staticY() + cbPadding.top();
+        double staticX = p.staticX() + containerPadding.left();
+        double staticY = p.staticY() + containerPadding.top();
 
         // Margins, border, padding and declared width; the percentages are of the reference container.
-        ConstraintSpace probe = ConstraintSpace.free(cbWidth, cbWidth, cbHeightBase, false);
+        ConstraintSpace probe = ConstraintSpace.free(containerWidth, containerWidth, containerHeightBase, false);
         BoxModel model = BoxModel.resolve(box, probe, intrinsic);
         Insets margin = model.margin();
 
-        OptionalDouble left = s.offset().left().resolve(cbWidth);
-        OptionalDouble right = s.offset().right().resolve(cbWidth);
+        OptionalDouble left = s.offset().left().resolve(containerWidth);
+        OptionalDouble right = s.offset().right().resolve(containerWidth);
         OptionalDouble width = s.box().width().isAuto() ? OptionalDouble.empty() : OptionalDouble.of(model.width());
         OptionalDouble marginLeft = term(s.box().margin().left(), margin.left());
         OptionalDouble marginRight = term(s.box().margin().right(), margin.right());
@@ -113,36 +114,37 @@ public final class OverlayLayout {
         IntrinsicSizes content = width.isPresent()
                 ? IntrinsicSizes.ZERO : intrinsic.get().plus(-Insets.resolve(s.box().margin(), 0).horizontal());
         OverlayEquation.Solution h = OverlayEquation.horizontal(left, width, right, marginLeft, marginRight,
-                cbWidth, staticX, content);
+                containerWidth, staticX, content);
         if (width.isEmpty()) {
-            double constrained = BoxModel.constrainWidth(s, h.size(), cbWidth);
+            double constrained = BoxModel.constrainWidth(s, h.size(), containerWidth);
             if (constrained != h.size()) {
                 h = OverlayEquation.horizontal(left, OptionalDouble.of(constrained), right, marginLeft, marginRight,
-                        cbWidth, staticX, content);
+                        containerWidth, staticX, content);
             }
         }
 
-        OptionalDouble top = s.offset().top().resolve(cbHeightBase);
-        OptionalDouble bottom = s.offset().bottom().resolve(cbHeightBase);
+        OptionalDouble top = s.offset().top().resolve(containerHeightBase);
+        OptionalDouble bottom = s.offset().bottom().resolve(containerHeightBase);
         OptionalDouble marginTop = term(s.box().margin().top(), margin.top());
         OptionalDouble marginBottom = term(s.box().margin().bottom(), margin.bottom());
-        ConstraintSpace space = ConstraintSpace.fixed(h.size(), OptionalDouble.empty(), cbWidth, cbHeightBase, false);
+        ConstraintSpace space = ConstraintSpace.fixed(h.size(), OptionalDouble.empty(), containerWidth,
+                containerHeightBase, false);
         BoxModel sized = BoxModel.resolve(box, space, intrinsic);
         OptionalDouble height = sized.height();
         if (height.isEmpty() && top.isPresent() && bottom.isPresent()) {
             // Only the height is auto: the box stretches between top and bottom.
-            double stretched = Math.max(0, cbHeight - top.getAsDouble() - bottom.getAsDouble()
+            double stretched = Math.max(0, containerHeight - top.getAsDouble() - bottom.getAsDouble()
                     - marginTop.orElse(0) - marginBottom.orElse(0));
             height = OptionalDouble.of(Sizing.constrain(stretched, sized.minHeight(), sized.maxHeight()));
-            space = ConstraintSpace.fixed(h.size(), height, cbWidth, cbHeightBase, false);
+            space = ConstraintSpace.fixed(h.size(), height, containerWidth, containerHeightBase, false);
         }
         LayoutResult r = context.layout(box, space, null);
         Fragment f = r.fragment();
         OverlayEquation.Solution v = OverlayEquation.vertical(top, height, bottom, marginTop, marginBottom,
-                cbHeight, staticY, f.height());
+                containerHeight, staticY, f.height());
 
-        double x = h.start() + h.marginStart() - cbPadding.left();
-        double y = v.start() + v.marginStart() - cbPadding.top();
+        double x = h.start() + h.marginStart() - containerPadding.left();
+        double y = v.start() + v.marginStart() - containerPadding.top();
         // The Page overlay boxes inside go from the content box of this one to that of the reference container.
         double dx = x + f.border().left() + sized.padding().left();
         double dy = y + f.border().top() + sized.padding().top();

@@ -29,7 +29,7 @@ import java.util.Map;
  * declared, with its document ({@link SourceLine}).</p>
  *
  * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
- * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link #inheriting}), as in CSS.</p>
+ * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link #inheriting}).</p>
  *
  * <p>The values of the properties with a closed set are enums of {@code model} ({@link TextAlign},
  * {@link Marker}...): the names of their constants match the document values in uppercase and with the hyphen as an

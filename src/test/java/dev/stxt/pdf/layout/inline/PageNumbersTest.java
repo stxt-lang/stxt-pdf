@@ -87,7 +87,7 @@ class PageNumbersTest {
     }
 
     @Test
-    void fixedFooterShowsEachPageNumber() {
+    void pageOverlayFooterShowsEachPageNumber() {
         // A takes up three pages. "Página 2 de 3" measures 13 × 5 = 65: aligned to the right, at 450.
         LayoutFixture l = layOutPaged(PAGE, concat(FOOTER, new String[]{"\tBlock:", "\t\tId: A", "\t\tBox:",
                 "\t\t\tHeight: 250"}));

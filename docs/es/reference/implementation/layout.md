@@ -13,7 +13,7 @@ algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crece
 
 `Engine.layOutDocument` es la entrada: valida las fuentes y las imágenes, pagina con el `Paginator`, comprueba los
 desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
-El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `absolute()`) es de package.
+El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `overlays()`) es de package.
 
 > **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`. El protocolo de la
 > paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia.
@@ -81,7 +81,7 @@ algoritmos de los padres no saben nada del giro: ven una caja del tamaño del re
 cabe y no está al principio de la página) y cuyos márgenes de dentro no salen (`AdjoiningMargins.NONE`: aísla los
 márgenes). `Engine.intrinsic` hace lo mismo con la base de porcentajes vacía: su ancho más estrecho y su
 ancho natural son el ancho del rectángulo más los márgenes. Es contenedor de referencia de sus `Overlay`
-(`Box.outOfFlowContainingBlock`), que se resuelven sobre la caja sin girar antes de envolverla.
+(`Box.referenceContainer`), que se resuelven sobre la caja sin girar antes de envolverla.
 
 ## Fragmentos
 

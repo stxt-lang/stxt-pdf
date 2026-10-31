@@ -11,8 +11,8 @@ public record VerticalMetrics(double ascent, double descent) {
 
     /**
      * Baseline of a line that starts at {@code lineTop} and measures {@code lineHeight}: the box
-     * of the font (ascent plus descent) is centered in the line, like the CSS
-     * <em>half-leading</em>.
+     * of the font (ascent plus descent) is centered in the line: the
+     * leading is shared in halves above and below.
      */
     public double baseline(double lineTop, double lineHeight, double fontSize) {
         return lineTop + (lineHeight - (ascent + descent) * fontSize) / 2 + ascent * fontSize;

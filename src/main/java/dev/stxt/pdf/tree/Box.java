@@ -340,7 +340,7 @@ public final class Box {
      * the closest {@code Frame}, {@code Overlay} or {@code Page overlay} ancestor; if there is none,
      * or if the box is a {@code Page overlay}, the root, which represents the page area.
      */
-    public Box outOfFlowContainingBlock() {
+    public Box referenceContainer() {
         Box b = parent;
         boolean pageOverlay = style.position() == Position.PAGE_OVERLAY;
         // A box rotated in flow is one too, like the positioned ones (reference/common/layers-and-rotation.md).

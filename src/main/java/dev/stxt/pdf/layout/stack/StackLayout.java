@@ -481,7 +481,7 @@ public final class StackLayout implements LayoutAlgorithm {
     /**
      * Distribution of the leftover {@code free} among {@code n} elements (main axis table,
      * reference/components/stack.md). If space is lacking, {@code justify} aligns to the start and {@code around} and
-     * {@code distribute} are centered, as in CSS.
+     * {@code distribute} are centered.
      *
      * @return {before the first, extra between elements}
      */

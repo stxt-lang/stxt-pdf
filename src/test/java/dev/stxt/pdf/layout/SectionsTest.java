@@ -129,7 +129,7 @@ class SectionsTest {
     }
 
     @Test
-    void fixedBoxesOfTheDocumentGoEverywhereAndThoseOfASectionOnlyInIt() {
+    void pageOverlaysOfTheDocumentGoEverywhereAndThoseOfASectionOnlyInIt() {
         LaidOutDocument d = lay(
                 "\tPage overlay:", "\t\tId: foot", "\t\tOffset: auto 0 0 0", "\t\tBox:", "\t\t\tHeight: 10",
                 join(new String[] {"\tSection:", "\t\tPage overlay:", "\t\t\tId: head-a", "\t\t\tPages: first",

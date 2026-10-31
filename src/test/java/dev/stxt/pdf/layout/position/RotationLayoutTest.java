@@ -36,7 +36,7 @@ class RotationLayoutTest {
      * it would be split between its two blocks; rotated, it moves whole to the next page.
      */
     @Test
-    void aRotatedRelativeIsNotSplit() {
+    void aRotatedFrameIsNotSplit() {
         String[] content = {
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tFrame:", "\t\tId: R", "{}", "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30",
@@ -54,7 +54,7 @@ class RotationLayoutTest {
 
     /** At the start of a page there is nowhere to move to: if it fits, it is placed whole. */
     @Test
-    void aRotatedRelativeThatFitsStaysOnItsPage() {
+    void aRotatedFrameThatFitsStaysOnItsPage() {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
                 "\tFrame:", "\t\tId: R", "\t\tRotate: -5", "\t\tBox:", "\t\t\tHeight: 100");
         assertEquals(1, l.pages());
@@ -137,7 +137,7 @@ class RotationLayoutTest {
      * child does not leave it.
      */
     @Test
-    void aRotatedBlockContainsItsAbsolutesAndItsMargins() {
+    void aRotatedBlockContainsItsOverlaysAndItsMargins() {
         LayoutFixture l = LayoutFixture.layOut("\tBlock:", "\t\tId: R", "\t\tRotate: 90", "\t\tBox:",
                 "\t\t\tWidth: 100",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tMargin: 10 0 0 0",

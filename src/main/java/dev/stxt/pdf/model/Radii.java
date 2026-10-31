@@ -25,8 +25,8 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
 
     /**
      * Resolves {@code Corner radius} against the border box: a horizontal percentage is of the width and a
-     * vertical one, of the height, so {@code 50%} on a box that is not square is an ellipse. As in
-     * CSS, if two adjacent radii of a side add up to more than the side, all of them are reduced by the same
+     * vertical one, of the height, so {@code 50%} on a box that is not square is an ellipse. If
+     * two adjacent radii of a side add up to more than the side, all of them are reduced by the same
      * factor until they fit.
      */
     public static Radii resolve(Corners<Value> radius, double width, double height) {

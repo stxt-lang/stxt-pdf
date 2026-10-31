@@ -24,14 +24,14 @@ import java.util.Locale;
  * the content and not by the extension, and its size in pixels. PNG, JPEG, SVG (the
  * subset of {@link SvgInspector}) and PDF ({@link PdfInspector}) are supported.
  *
- * <p>The natural size in points counts each pixel as in CSS, at 96 per inch
+ * <p>The natural size in points counts 96 pixels per inch
  * ({@link #POINTS_PER_PIXEL}), regardless of the resolution the file declares. That of an SVG is
  * that of its {@code width} and {@code height} or, if they are missing, that of its {@code viewBox}, also in
- * CSS pixels. A PDF is already in points and each page has its own.</p>
+ * pixels. A PDF is already in points and each page has its own.</p>
  */
 public final class ImageFile {
 
-    /** Points a pixel measures: 72 / 96, as in CSS. */
+    /** Points a pixel measures: 72 / 96. */
     public static final double POINTS_PER_PIXEL = 0.75;
 
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
@@ -210,12 +210,12 @@ public final class ImageFile {
         return format;
     }
 
-    /** Width in pixels; that of an SVG or a PDF (its first page), in CSS pixels (not necessarily an integer). */
+    /** Width in pixels; that of an SVG or a PDF (its first page) is not necessarily an integer. */
     public double pixelWidth() {
         return pixelWidth;
     }
 
-    /** Height in pixels; that of an SVG or a PDF (its first page), in CSS pixels (not necessarily an integer). */
+    /** Height in pixels; that of an SVG or a PDF (its first page) is not necessarily an integer. */
     public double pixelHeight() {
         return pixelHeight;
     }

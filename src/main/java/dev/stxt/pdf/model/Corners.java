@@ -3,7 +3,7 @@ package dev.stxt.pdf.model;
 import java.util.List;
 
 /**
- * One value per corner, in CSS order: top left, top right, bottom right and bottom left. Used for
+ * One value per corner, clockwise from top left: top left, top right, bottom right and bottom left. Used for
  * {@code Corner radius} (reference/common/values.md).
  */
 public record Corners<T>(T topLeft, T topRight, T bottomRight, T bottomLeft) {
@@ -12,7 +12,7 @@ public record Corners<T>(T topLeft, T topRight, T bottomRight, T bottomLeft) {
         return new Corners<>(value, value, value, value);
     }
 
-    /** Shorthand of 1 to 4 values, with the same convention as CSS. */
+    /** Shorthand of 1 to 4 values (reference/common/values.md). */
     public static <T> Corners<T> shorthand(List<T> v) {
         return switch (v.size()) {
             case 1 -> new Corners<>(v.get(0), v.get(0), v.get(0), v.get(0));

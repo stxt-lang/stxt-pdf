@@ -227,7 +227,7 @@ public final class Paginator {
             if (numbered && printed == 0) {
                 unavailable(item.pending().box());
             }
-            LayoutResult f = engine.absolute().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
+            LayoutResult f = engine.overlays().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
             fragments.add(numbered ? engine.number(f.fragment(), page, tanda) : f.fragment());
             f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
         }
