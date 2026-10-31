@@ -1,8 +1,7 @@
 # stxt-pdf
 
-Motor de layout y generación de PDF a partir de documentos escritos en [STXT](https://stxt.dev). Describes qué hay en
-cada página y cómo se ve; el motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe un PDF con las
-fuentes incrustadas, accesible (PDF/UA-1, o PDF/UA-2 si se pide) y con marcadores.
+Motor de layout y generación de PDF a partir de documentos [STXT](https://stxt.dev). El documento describe qué hay en cada
+página y cómo se ve. El motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF.
 
 ```
 Document (dev.stxt.pdf):
@@ -22,16 +21,23 @@ Document (dev.stxt.pdf):
         Paragraph: Las ventas han crecido un 12 % respecto al trimestre anterior.
 ```
 
-Todo es claro, definido y sencillo: cada elemento solo admite las propiedades que tienen sentido en él, nada tiene un
-estilo oculto y lo que no tendría efecto, se contradice o no cabe es un error con su línea, nunca un resultado a medias.
+El PDF lleva:
 
-## Por dónde empezar
+- **Las fuentes incrustadas**, con los caracteres que se usan.
+- **Etiquetado** para la accesibilidad: PDF/UA-1, o PDF/UA-2 si se pide.
+- **Marcadores**, uno por encabezado.
 
-- **¿No conoces STXT?** Es un lenguaje de texto estructurado por indentación: [stxt.dev](https://stxt.dev).
-- **¿Qué se puede hacer?** Mira los [ejemplos](#ejemplos): once documentos reales, con su PDF y su fuente.
-- **¿Cómo se hace?** El [manual](docs/manual/README.md) lo explica todo, de un primer documento a cada elemento.
-- **¿El detalle exacto de una regla?** La [referencia](docs/referencia/README.md) es la fuente de verdad del comportamiento,
-  con cada decisión de diseño y la arquitectura del código.
+**El motor es estricto.** Cada elemento solo admite las propiedades que tienen sentido en él. Ningún elemento tiene un
+aspecto propio: un `Heading 1` no es más grande que un `Paragraph` si un estilo no lo dice. Lo que no tendría efecto, se
+contradice o no cabe es un error con su línea.
+
+## Documentación
+
+| | Qué hay |
+|---|---|
+| [Ejemplos](#ejemplos) | Once documentos reales, con su PDF y su fuente |
+| [Manual](docs/manual/README.md) | Cómo se escribe un documento, del primero a cada elemento. Basta con saber STXT ([stxt.dev](https://stxt.dev)) |
+| [Referencia](docs/referencia/README.md) | La regla exacta de cada comportamiento, las decisiones de diseño y la arquitectura del código |
 
 ## Ejemplos
 
@@ -49,7 +55,7 @@ estilo oculto y lo que no tendría efecto, se contradice o no cabe es un error c
 | [![](test/examples/10-certificate/page-1.png)](test/examples/10-certificate/output.pdf) | **Certificado**: A4 apaisado, marcos concéntricos, sello girado, texto en vertical | [PDF](test/examples/10-certificate/output.pdf) (1 página) | [STXT](test/examples/10-certificate/input.stxt) |
 | [![](test/examples/11-timetable/page-1.png)](test/examples/11-timetable/output.pdf) | **Horario**: tabla con celdas separadas y redondeadas, colores por estilo | [PDF](test/examples/11-timetable/output.pdf) (1 página) | [STXT](test/examples/11-timetable/input.stxt) |
 
-El estilo de cada ejemplo está en su `styles.stxt`; lo que enseña cada uno, en el [índice de los ejemplos](test/examples/README.md).
+El estilo de cada ejemplo está en su `styles.stxt`. Lo que enseña cada uno está en el [índice de los ejemplos](test/examples/README.md).
 
 ## Uso
 
@@ -62,8 +68,9 @@ try (OutputStream out = Files.newOutputStream(Path.of("informe.pdf"))) {
 }
 ```
 
-Las fuentes y las imágenes se buscan en `resources/` (el repositorio incluye IBM Plex Sans, Serif y Mono, con licencia SIL
-Open Font License). Opciones, errores, límites e hilos: [Uso desde Java](docs/manual/comun/uso-desde-java.md).
+Las fuentes y las imágenes se buscan en `resources/`. El repositorio incluye IBM Plex Sans, Serif y Mono, con licencia SIL
+Open Font License. Las opciones, los errores, los límites y el uso con varios hilos están en
+[Uso desde Java](docs/manual/comun/uso-desde-java.md).
 
 ## Desarrollo
 
@@ -71,7 +78,7 @@ Open Font License). Opciones, errores, límites e hilos: [Uso desde Java](docs/m
 mvn test
 ```
 
-Cómo está hecho el motor: [arquitectura](docs/referencia/arquitectura.md); cómo se prueba: [pruebas](docs/referencia/implementacion/pruebas.md).
+Cómo está hecho el motor: [arquitectura](docs/referencia/arquitectura.md). Cómo se prueba: [pruebas](docs/referencia/implementacion/pruebas.md).
 
 ## Licencia
 
